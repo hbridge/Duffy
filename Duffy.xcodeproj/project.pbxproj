@@ -1,0 +1,480 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
+		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
+		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
+		5ADB24C1189985590016CA02 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24C0189985590016CA02 /* CoreData.framework */; };
+		5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24C5189985590016CA02 /* InfoPlist.strings */; };
+		5ADB24C9189985590016CA02 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24C8189985590016CA02 /* main.m */; };
+		5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24CC189985590016CA02 /* DFAppDelegate.m */; };
+		5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */; };
+		5ADB24D2189985590016CA02 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24D1189985590016CA02 /* Images.xcassets */; };
+		5ADB24D9189985590016CA02 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24D8189985590016CA02 /* XCTest.framework */; };
+		5ADB24DA189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
+		5ADB24DB189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
+		5ADB24DC189985590016CA02 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24C0189985590016CA02 /* CoreData.framework */; };
+		5ADB24E4189985590016CA02 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24E2189985590016CA02 /* InfoPlist.strings */; };
+		5ADB24E6189985590016CA02 /* DuffyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24E5189985590016CA02 /* DuffyTests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5ADB24DD189985590016CA02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5ADB24AF189985590016CA02 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5ADB24B6189985590016CA02;
+			remoteInfo = Duffy;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		5ADB24BE189985590016CA02 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		5ADB24C0189985590016CA02 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		5ADB24C4189985590016CA02 /* Duffy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Duffy-Info.plist"; sourceTree = "<group>"; };
+		5ADB24C6189985590016CA02 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5ADB24C8189985590016CA02 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5ADB24CA189985590016CA02 /* Duffy-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Duffy-Prefix.pch"; sourceTree = "<group>"; };
+		5ADB24CB189985590016CA02 /* DFAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFAppDelegate.h; sourceTree = "<group>"; };
+		5ADB24CC189985590016CA02 /* DFAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DFAppDelegate.m; sourceTree = "<group>"; };
+		5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Duffy.xcdatamodel; sourceTree = "<group>"; };
+		5ADB24D1189985590016CA02 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		5ADB24D7189985590016CA02 /* DuffyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuffyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5ADB24D8189985590016CA02 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		5ADB24E1189985590016CA02 /* DuffyTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DuffyTests-Info.plist"; sourceTree = "<group>"; };
+		5ADB24E3189985590016CA02 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5ADB24E5189985590016CA02 /* DuffyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DuffyTests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5ADB24B4189985590016CA02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */,
+				5ADB24C1189985590016CA02 /* CoreData.framework in Frameworks */,
+				5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */,
+				5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5ADB24D4189985590016CA02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24D9189985590016CA02 /* XCTest.framework in Frameworks */,
+				5ADB24DC189985590016CA02 /* CoreData.framework in Frameworks */,
+				5ADB24DB189985590016CA02 /* UIKit.framework in Frameworks */,
+				5ADB24DA189985590016CA02 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5ADB24AE189985590016CA02 = {
+			isa = PBXGroup;
+			children = (
+				5ADB24C2189985590016CA02 /* Duffy */,
+				5ADB24DF189985590016CA02 /* DuffyTests */,
+				5ADB24B9189985590016CA02 /* Frameworks */,
+				5ADB24B8189985590016CA02 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		5ADB24B8189985590016CA02 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24B7189985590016CA02 /* Duffy.app */,
+				5ADB24D7189985590016CA02 /* DuffyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5ADB24B9189985590016CA02 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24BA189985590016CA02 /* Foundation.framework */,
+				5ADB24BC189985590016CA02 /* CoreGraphics.framework */,
+				5ADB24BE189985590016CA02 /* UIKit.framework */,
+				5ADB24C0189985590016CA02 /* CoreData.framework */,
+				5ADB24D8189985590016CA02 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5ADB24C2189985590016CA02 /* Duffy */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24CB189985590016CA02 /* DFAppDelegate.h */,
+				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
+				5ADB24D1189985590016CA02 /* Images.xcassets */,
+				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
+				5ADB24C3189985590016CA02 /* Supporting Files */,
+			);
+			path = Duffy;
+			sourceTree = "<group>";
+		};
+		5ADB24C3189985590016CA02 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24C4189985590016CA02 /* Duffy-Info.plist */,
+				5ADB24C5189985590016CA02 /* InfoPlist.strings */,
+				5ADB24C8189985590016CA02 /* main.m */,
+				5ADB24CA189985590016CA02 /* Duffy-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		5ADB24DF189985590016CA02 /* DuffyTests */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24E5189985590016CA02 /* DuffyTests.m */,
+				5ADB24E0189985590016CA02 /* Supporting Files */,
+			);
+			path = DuffyTests;
+			sourceTree = "<group>";
+		};
+		5ADB24E0189985590016CA02 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24E1189985590016CA02 /* DuffyTests-Info.plist */,
+				5ADB24E2189985590016CA02 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5ADB24B6189985590016CA02 /* Duffy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5ADB24E9189985590016CA02 /* Build configuration list for PBXNativeTarget "Duffy" */;
+			buildPhases = (
+				5ADB24B3189985590016CA02 /* Sources */,
+				5ADB24B4189985590016CA02 /* Frameworks */,
+				5ADB24B5189985590016CA02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Duffy;
+			productName = Duffy;
+			productReference = 5ADB24B7189985590016CA02 /* Duffy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5ADB24D6189985590016CA02 /* DuffyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5ADB24EC189985590016CA02 /* Build configuration list for PBXNativeTarget "DuffyTests" */;
+			buildPhases = (
+				5ADB24D3189985590016CA02 /* Sources */,
+				5ADB24D4189985590016CA02 /* Frameworks */,
+				5ADB24D5189985590016CA02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5ADB24DE189985590016CA02 /* PBXTargetDependency */,
+			);
+			name = DuffyTests;
+			productName = DuffyTests;
+			productReference = 5ADB24D7189985590016CA02 /* DuffyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5ADB24AF189985590016CA02 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = DF;
+				LastUpgradeCheck = 0500;
+				ORGANIZATIONNAME = "Duffy Productions";
+				TargetAttributes = {
+					5ADB24D6189985590016CA02 = {
+						TestTargetID = 5ADB24B6189985590016CA02;
+					};
+				};
+			};
+			buildConfigurationList = 5ADB24B2189985590016CA02 /* Build configuration list for PBXProject "Duffy" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 5ADB24AE189985590016CA02;
+			productRefGroup = 5ADB24B8189985590016CA02 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5ADB24B6189985590016CA02 /* Duffy */,
+				5ADB24D6189985590016CA02 /* DuffyTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5ADB24B5189985590016CA02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */,
+				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5ADB24D5189985590016CA02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24E4189985590016CA02 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5ADB24B3189985590016CA02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
+				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
+				5ADB24C9189985590016CA02 /* main.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5ADB24D3189985590016CA02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24E6189985590016CA02 /* DuffyTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5ADB24DE189985590016CA02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5ADB24B6189985590016CA02 /* Duffy */;
+			targetProxy = 5ADB24DD189985590016CA02 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		5ADB24C5189985590016CA02 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5ADB24C6189985590016CA02 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		5ADB24E2189985590016CA02 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5ADB24E3189985590016CA02 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		5ADB24E7189985590016CA02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		5ADB24E8189985590016CA02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5ADB24EA189985590016CA02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		5ADB24EB189985590016CA02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		5ADB24ED189985590016CA02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Duffy.app/Duffy";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "DuffyTests/DuffyTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		5ADB24EE189985590016CA02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Duffy.app/Duffy";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				INFOPLIST_FILE = "DuffyTests/DuffyTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5ADB24B2189985590016CA02 /* Build configuration list for PBXProject "Duffy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5ADB24E7189985590016CA02 /* Debug */,
+				5ADB24E8189985590016CA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5ADB24E9189985590016CA02 /* Build configuration list for PBXNativeTarget "Duffy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5ADB24EA189985590016CA02 /* Debug */,
+				5ADB24EB189985590016CA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		5ADB24EC189985590016CA02 /* Build configuration list for PBXNativeTarget "DuffyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5ADB24ED189985590016CA02 /* Debug */,
+				5ADB24EE189985590016CA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */,
+			);
+			currentVersion = 5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */;
+			path = Duffy.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 5ADB24AF189985590016CA02 /* Project object */;
+}
