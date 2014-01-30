@@ -1,0 +1,15 @@
+//
+//  DFTimelineViewController.h
+//  Duffy
+//
+//  Created by Henry Bridge on 1/29/14.
+//  Copyright (c) 2014 Duffy Productions. All rights reserved.
+//
+
+#import <UIKit/UIKit.h>
+
+@interface DFPhotosGridViewController : UICollectionViewController
+
+@property (nonatomic, retain) NSArray *photos;
+
+@end

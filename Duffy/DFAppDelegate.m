@@ -7,6 +7,8 @@
 //
 
 #import "DFAppDelegate.h"
+#import "DFCameraRollViewController.h"
+#import "DFBrowseViewController.h"
 
 @implementation DFAppDelegate
 
@@ -17,7 +19,27 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
+    
+    
+    DFCameraRollViewController *cameraRollTab = [[DFCameraRollViewController alloc] init];
+    
+    UICollectionViewLayout *flowLayout2 = [[UICollectionViewFlowLayout alloc] init];
+    DFBrowseViewController *browseTab = [[DFBrowseViewController alloc] initWithCollectionViewLayout:flowLayout2];
+    UINavigationController *browseNav = [[UINavigationController alloc] initWithRootViewController:browseTab];
+    //browseNav.tabBarItem.title = @"Browse";
+    
+    
+    
+    UITabBarController *tabController = [[UITabBarController alloc] init];
+    [tabController setViewControllers:[NSArray arrayWithObjects:
+                                       cameraRollTab,
+                                       browseNav,
+                                       nil]];
+    
+    
+    
+    [[self window] setRootViewController:tabController];
+    
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
