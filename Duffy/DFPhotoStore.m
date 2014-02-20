@@ -21,6 +21,9 @@
 
 @implementation DFPhotoStore
 
+static BOOL const useLocalData = NO;
+static NSURL *photoURLBase;
+
 static DFPhotoStore *defaultStore;
 
 + (DFPhotoStore *)sharedStore {
@@ -40,8 +43,14 @@ static DFPhotoStore *defaultStore;
 {
     self = [super init];
     if (self) {
-        [self loadCameraRoll];
-        [self loadPhotoAlbums];
+        if (useLocalData) {
+            [self loadCameraRoll];
+            [self loadPhotoAlbums];
+        } else {
+            photoURLBase = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/45798351/photos/"];
+            [self loadCSVDatabase];
+        }
+    
     }
     return self;
 }
@@ -104,6 +113,29 @@ static DFPhotoStore *defaultStore;
                                 failureBlock: ^(NSError *error) {
                                     NSLog(@"Failure");
                                 }];
+}
+
+
+- (void)loadCSVDatabase
+{
+    NSURL *dataURL = [[NSBundle mainBundle] URLForResource:@"database" withExtension:@"csv"];
+    
+    NSStringEncoding encoding;
+    NSError *error;
+    NSString *dataString = [NSString stringWithContentsOfURL:dataURL usedEncoding:&encoding error:&error];
+    
+    _cameraRoll = [[NSMutableArray alloc] init];
+    _allRegularAlbums = [[NSMutableArray alloc] init];
+    for (NSString *line in [dataString componentsSeparatedByString:@"\n"])
+    {
+        NSArray *components = [line componentsSeparatedByString:@","];
+        NSString *filename = components[0];
+        DFPhoto *photo = [[DFPhoto alloc] initWithURL:[photoURLBase URLByAppendingPathComponent:filename]];
+        [_cameraRoll addObject:photo];
+        
+    }
+    
+    
 }
 
 

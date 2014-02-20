@@ -85,7 +85,25 @@
     DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
                                   dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
     
-	[cell.imageView setImage:[photo thumbnail]];
+    if (!photo.isThumbnailFault)
+    {
+        [cell.imageView setImage:[photo thumbnail]];
+    } else {
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            //move to an asynchronous thread to fetch your image data
+            UIImage* thumbnailImage = photo.thumbnail;
+            if (thumbnailImage) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    if ([[collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
+                        DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[collectionView cellForItemAtIndexPath:indexPath];
+                        correctCell.imageView.image = thumbnailImage;
+                        [correctCell setNeedsLayout];
+                    }
+                });
+            }
+        });
+    }
+	
     [cell.textLabel setText:[NSString stringWithFormat:@"Photo %d", indexPath.row+1]];
     
     return cell;
