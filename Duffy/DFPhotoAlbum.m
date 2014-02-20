@@ -24,13 +24,11 @@
 
 - (id)initWithAssetGroup:(ALAssetsGroup *)assetGroup
 {
-    self = [super init];
+    self = [self init];
     if (self) {
         self.thumbnail = [UIImage imageWithCGImage:[assetGroup posterImage]];
         self.name = [assetGroup valueForProperty:ALAssetsGroupPropertyName];
         
-        
-        _photos = [[NSMutableArray alloc] init];
         // add photos in album to album
         void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
             if(result != NULL) {
@@ -48,7 +46,21 @@
     return self;
 }
 
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        _photos = [[NSMutableArray alloc] init];
 
+    }
+    return self;
+}
+
+
+- (void)addPhotosObject:(DFPhoto *)object
+{
+    [_photos addObject:object];
+}
 
 
 

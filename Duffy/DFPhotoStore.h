@@ -15,6 +15,7 @@
 
 
 
-- (NSArray *)allAlbums;
+- (NSArray *)allAlbumsByName;
+- (NSArray *)allAlbumsByCount;
 
 @end

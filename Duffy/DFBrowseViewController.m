@@ -59,12 +59,12 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return [[[DFPhotoStore sharedStore] allAlbums] count];
+    return [[[DFPhotoStore sharedStore] allAlbumsByCount] count];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    DFPhotoAlbum *album = [[[DFPhotoStore sharedStore] allAlbums] objectAtIndex:indexPath.row];
+    DFPhotoAlbum *album = [[[DFPhotoStore sharedStore] allAlbumsByCount] objectAtIndex:indexPath.row];
     
     DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
                                                 dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
@@ -77,7 +77,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    DFPhotoAlbum *album = [[[DFPhotoStore sharedStore] allAlbums] objectAtIndex:indexPath.row];
+    DFPhotoAlbum *album = [[[DFPhotoStore sharedStore] allAlbumsByCount] objectAtIndex:indexPath.row];
     
     DFPhotosGridViewController *photosController = [[DFPhotosGridViewController alloc] init];
     photosController.photos = album.photos;

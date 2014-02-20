@@ -90,9 +90,10 @@
         [cell.imageView setImage:[photo thumbnail]];
     } else {
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            //move to an asynchronous thread to fetch your image data
+            //move to an asynchronous thread to load image data
             UIImage* thumbnailImage = photo.thumbnail;
             if (thumbnailImage) {
+                //update the cell on the UI thread
                 dispatch_async(dispatch_get_main_queue(), ^{
                     if ([[collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
                         DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[collectionView cellForItemAtIndexPath:indexPath];

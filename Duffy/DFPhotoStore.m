@@ -15,7 +15,7 @@
 
 @property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
-@property (nonatomic, retain) NSMutableArray *allRegularAlbums;
+@property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
 
 @end
 
@@ -81,9 +81,6 @@ static DFPhotoStore *defaultStore;
     
     _cameraRoll = [[NSMutableArray alloc] init];
     
-    _allRegularAlbums = [[NSMutableArray alloc] init];
-    
-    
     [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
     					   usingBlock:assetGroupEnumerator
     					 failureBlock: ^(NSError *error) {
@@ -101,12 +98,14 @@ static DFPhotoStore *defaultStore;
     void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
     	if(group != nil) {
             NSLog(@"Enumerating %d assets in: %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-            [_allRegularAlbums addObject:[[DFPhotoAlbum alloc] initWithAssetGroup:group]];
-    	}
+            DFPhotoAlbum *album = [[DFPhotoAlbum alloc] initWithAssetGroup:group];
+            _allDFAlbumsByName[album.name] = album;
+    	} else {
+            NSLog(@"all albums enumerated");
+        }
     };
     
-    _allRegularAlbums = [[NSMutableArray alloc] init];
-    
+    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
     
     [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum
                                   usingBlock:assetGroupEnumerator
@@ -125,23 +124,62 @@ static DFPhotoStore *defaultStore;
     NSString *dataString = [NSString stringWithContentsOfURL:dataURL usedEncoding:&encoding error:&error];
     
     _cameraRoll = [[NSMutableArray alloc] init];
-    _allRegularAlbums = [[NSMutableArray alloc] init];
+    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
     for (NSString *line in [dataString componentsSeparatedByString:@"\n"])
     {
+        // add photo to camera roll
         NSArray *components = [line componentsSeparatedByString:@","];
         NSString *filename = components[0];
         DFPhoto *photo = [[DFPhoto alloc] initWithURL:[photoURLBase URLByAppendingPathComponent:filename]];
         [_cameraRoll addObject:photo];
         
+        // add photo to album and create if necessary
+        NSRange categoryConfidenceRange;
+        categoryConfidenceRange.location = 1;
+        categoryConfidenceRange.length = components.count - 1;
+        for (NSString *categoryConfidenceString in [components subarrayWithRange:categoryConfidenceRange]) {
+            NSString *trimmedString = [categoryConfidenceString stringByTrimmingCharactersInSet:
+                                                                  [NSCharacterSet whitespaceCharacterSet]];
+            NSString *categoryName = [[trimmedString componentsSeparatedByString:@" "] firstObject];
+            if (![categoryName isEqualToString:@""]) {
+                DFPhotoAlbum *categoryAlbum = _allDFAlbumsByName[categoryName];
+                if (!categoryAlbum) {
+                    categoryAlbum = [[DFPhotoAlbum alloc] init];
+                    categoryAlbum.name = categoryName;
+                    _allDFAlbumsByName[categoryName] = categoryAlbum;
+                }
+                [categoryAlbum addPhotosObject:photo];
+            }
+        }
+        
     }
-    
     
 }
 
-
-- (NSArray *)allAlbums
+- (NSArray *)allAlbumsByName
 {
-    return _allRegularAlbums;
+    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
+        ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
+            return [album1.name compare:album2.name];
+    }];
+    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
+}
+
+- (NSArray *)allAlbumsByCount
+{
+    // get the keys in reverse order
+    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
+                     ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
+                         if (album1.photos.count < album2.photos.count) {
+                             return NSOrderedDescending;
+                         } else if (album1.photos.count > album2.photos.count) {
+                             return NSOrderedAscending;
+                         } else {
+                             return NSOrderedSame;
+                         }
+                     }];
+
+    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
 }
 
 
