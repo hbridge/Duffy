@@ -40,8 +40,12 @@
     
     [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(assetsEnumerated)
+                                             selector:@selector(photoStoreChanged)
                                                  name:@"com.duffysoft.DFAssetsEnumerated"
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(photoStoreChanged)
+                                                 name:DFPhotoStoreReadyNotification
                                                object:nil];
     
     
@@ -69,7 +73,11 @@
     DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
                                                 dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
     
-	[cell.imageView setImage:album.thumbnail];
+    if (!album.thumbnail) {
+        [album addObserver:self forKeyPath:@"thumbnail" options:NSKeyValueObservingOptionNew context:(__bridge_retained void *)indexPath];
+    }
+    [cell.imageView setImage:album.thumbnail];
+	
     [cell.textLabel setText:[NSString stringWithFormat:@"%@ (%d)", album.name, (int)album.photos.count]];
     
     return cell;
@@ -85,8 +93,22 @@
     
 }
 
+#pragma mark - Notifications and KVO
 
-- (void)assetsEnumerated
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"thumbnail"]) {
+        NSIndexPath *indexPath = (__bridge NSIndexPath *)context;
+        NSLog(@"browse thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
+        if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
+            DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+            correctCell.imageView.image = [((DFPhotoAlbum *)object) thumbnail];
+            [correctCell setNeedsLayout];
+        }
+    }
+}
+
+- (void)photoStoreChanged
 {
     [self.collectionView reloadData];
 }

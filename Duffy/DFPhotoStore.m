@@ -10,19 +10,22 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhotoAlbum.h"
 #import "DFPhoto.h"
+#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotoStore()
 
 @property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
+@property (nonatomic, retain) DBRestClient *restClient;
 
 @end
 
 @implementation DFPhotoStore
 
+NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
+
 static BOOL const useLocalData = NO;
-static NSURL *photoURLBase;
 
 static DFPhotoStore *defaultStore;
 
@@ -43,11 +46,11 @@ static DFPhotoStore *defaultStore;
 {
     self = [super init];
     if (self) {
+        [self createCacheDirectories];
         if (useLocalData) {
             [self loadCameraRoll];
             [self loadPhotoAlbums];
         } else {
-            photoURLBase = [NSURL URLWithString:@"https://dl.dropboxusercontent.com/u/45798351/photos/"];
             [self loadCSVDatabase];
         }
     
@@ -55,6 +58,28 @@ static DFPhotoStore *defaultStore;
     return self;
 }
 
+- (void)createCacheDirectories
+{
+    // thumbnails
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    NSArray *directoriesToCreate = @[[[DFPhoto localThumbnailsDirectoryURL] path],
+                                     [[DFPhoto localFullImagesDirectoryURL] path]];
+    
+    for (NSString *path in directoriesToCreate) {
+        if (![fm fileExistsAtPath:path]) {
+            NSError *error;
+            [fm createDirectoryAtPath:path withIntermediateDirectories:NO
+                           attributes:nil
+                                error:&error];
+            if (error) {
+                NSLog(@"Error creating cache directory: %@, error: %@", path, error.description);
+                abort();
+            }
+        }
+
+    }
+}
 
 
 - (void)loadCameraRoll
@@ -66,7 +91,7 @@ static DFPhotoStore *defaultStore;
             [_cameraRoll addObject:photo];
         } else {
             NSLog(@"All assets in Camera Roll enumerated");
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"com.duffysoft.DFAssetsEnumerated" object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
         }
     };
     
@@ -93,8 +118,6 @@ static DFPhotoStore *defaultStore;
 
 - (void)loadPhotoAlbums
 {
-    
-    
     void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
     	if(group != nil) {
             NSLog(@"Enumerating %d assets in: %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
@@ -115,13 +138,30 @@ static DFPhotoStore *defaultStore;
 }
 
 
+- (DBRestClient *)restClient {
+    if (!_restClient) {
+        _restClient =
+        [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+        _restClient.delegate = self;
+    }
+    return _restClient;
+}
+
+
+static NSString *databaseRemotePath = @"/database.csv";
+static NSString *databaseLocalFilename = @"database.csv";
+
+
 - (void)loadCSVDatabase
 {
-    NSURL *dataURL = [[NSBundle mainBundle] URLForResource:@"database" withExtension:@"csv"];
     
+    [[self restClient] loadFile:databaseRemotePath intoPath:[[self localdatabaseURL] path]];
+}
+
+- (void)processCSVDatabase {
     NSStringEncoding encoding;
     NSError *error;
-    NSString *dataString = [NSString stringWithContentsOfURL:dataURL usedEncoding:&encoding error:&error];
+    NSString *dataString = [NSString stringWithContentsOfURL:[self localdatabaseURL] usedEncoding:&encoding error:&error];
     
     _cameraRoll = [[NSMutableArray alloc] init];
     _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
@@ -130,7 +170,8 @@ static DFPhotoStore *defaultStore;
         // add photo to camera roll
         NSArray *components = [line componentsSeparatedByString:@","];
         NSString *filename = components[0];
-        DFPhoto *photo = [[DFPhoto alloc] initWithURL:[photoURLBase URLByAppendingPathComponent:filename]];
+        NSString *dropboxPath = [NSString stringWithFormat:@"/%@", filename];
+        DFPhoto *photo = [[DFPhoto alloc] initWithDropboxPath:dropboxPath name:[filename stringByDeletingPathExtension]];
         [_cameraRoll addObject:photo];
         
         // add photo to album and create if necessary
@@ -139,7 +180,7 @@ static DFPhotoStore *defaultStore;
         categoryConfidenceRange.length = components.count - 1;
         for (NSString *categoryConfidenceString in [components subarrayWithRange:categoryConfidenceRange]) {
             NSString *trimmedString = [categoryConfidenceString stringByTrimmingCharactersInSet:
-                                                                  [NSCharacterSet whitespaceCharacterSet]];
+                                       [NSCharacterSet whitespaceCharacterSet]];
             NSString *categoryName = [[trimmedString componentsSeparatedByString:@" "] firstObject];
             if (![categoryName isEqualToString:@""]) {
                 DFPhotoAlbum *categoryAlbum = _allDFAlbumsByName[categoryName];
@@ -154,6 +195,37 @@ static DFPhotoStore *defaultStore;
         
     }
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
+}
+
+- (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath
+       contentType:(NSString*)contentType metadata:(DBMetadata*)metadata {
+    
+    NSLog(@"File loaded into path: %@", localPath);
+    if ([localPath isEqualToString:[[self localdatabaseURL] path]]) {
+        [self processCSVDatabase];
+    }
+}
+
+- (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
+    NSLog(@"There was an error loading the file - %@", error);
+}
+
+
+- (NSURL *)localdatabaseURL
+{
+    return [[DFPhotoStore userLibraryURL] URLByAppendingPathComponent:databaseLocalFilename];
+}
+
++ (NSURL *)userLibraryURL
+{
+    NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
+    
+    if ([paths count] > 0)
+    {
+        return [paths objectAtIndex:0];
+    }
+    return nil;
 }
 
 - (NSArray *)allAlbumsByName

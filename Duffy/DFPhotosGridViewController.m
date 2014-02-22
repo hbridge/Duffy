@@ -9,6 +9,7 @@
 #import "DFPhotosGridViewController.h"
 #import "DFPhoto.h"
 #import "DFPhotoViewCell.h"
+#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotosGridViewController ()
 
@@ -46,16 +47,15 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
-    
     [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(assetsEnumerated)
-                                                 name:@"com.duffysoft.DFAssetsEnumerated"
-                                               object:nil];
-    
-    
     ((UICollectionViewFlowLayout *)self.collectionViewLayout).itemSize =CGSizeMake(150, 200);
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    if (![[DBSession sharedSession] isLinked]) {
+        [[DBSession sharedSession] linkFromController:self];
+    }
 }
 
 - (void)didReceiveMemoryWarning
@@ -89,28 +89,28 @@
     {
         [cell.imageView setImage:[photo thumbnail]];
     } else {
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            //move to an asynchronous thread to load image data
-            UIImage* thumbnailImage = photo.thumbnail;
-            if (thumbnailImage) {
-                //update the cell on the UI thread
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    if ([[collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
-                        DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[collectionView cellForItemAtIndexPath:indexPath];
-                        correctCell.imageView.image = thumbnailImage;
-                        [correctCell setNeedsLayout];
-                    }
-                });
-            }
-        });
+        [photo addObserver:self forKeyPath:@"thumbnail" options:NSKeyValueObservingOptionNew context:(__bridge_retained void *)indexPath];
+        [photo loadThumbnail];
+        [cell.imageView setImage:[photo thumbnail]];
     }
 	
-    [cell.textLabel setText:[NSString stringWithFormat:@"Photo %d", indexPath.row+1]];
+    [cell.textLabel setText:photo.photoName];
     
     return cell;
 }
 
-
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"thumbnail"]) {
+        NSIndexPath *indexPath = (__bridge NSIndexPath *)context;
+        NSLog(@"thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
+        if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
+            DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+            correctCell.imageView.image = [((DFPhoto *)object) thumbnail];
+            [correctCell setNeedsLayout];
+        }
+    }
+}
 
 #pragma mark - Notification responders
 

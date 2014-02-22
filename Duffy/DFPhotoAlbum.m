@@ -56,6 +56,31 @@
     return self;
 }
 
+- (UIImage *)thumbnail
+{
+    if (!thumbnail) {
+        if (self.photos.count > 0) {
+            DFPhoto *firstPhoto = [self.photos firstObject];
+            if (firstPhoto.thumbnail) {
+                thumbnail = firstPhoto.thumbnail;
+                return firstPhoto.thumbnail;
+            } else {
+                [firstPhoto addObserver:self forKeyPath:@"thumbnail" options:NSKeyValueObservingOptionNew
+                                context:nil];
+                [firstPhoto loadThumbnail];
+            }
+        }
+    }
+            
+   return thumbnail;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"thumbnail"]) {
+        self.thumbnail = ((DFPhoto *)object).thumbnail;
+    }
+}
 
 - (void)addPhotosObject:(DFPhoto *)object
 {

@@ -7,13 +7,21 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <DropboxSDK/DBRestClient.h>
 
 @class ALAsset;
 
-@interface DFPhoto : NSObject
+@interface DFPhoto : NSObject <DBRestClientDelegate>
+
++ (NSURL *)localFullImagesDirectoryURL;
++ (NSURL *)localThumbnailsDirectoryURL;
+
+@property (nonatomic, retain) NSString *photoName;
+@property (nonatomic, retain) UIImage *fullImage;
+@property (nonatomic, retain) UIImage *thumbnail;
 
 - (id)initWithAsset:(ALAsset *)asset;
-- (id)initWithURL:(NSURL *)url;
+- (id)initWithDropboxPath:(NSString *)path name:(NSString *)name;
 
 // use these to determine whether asking for the full image will trigger
 // a fault, potentially causing UI slowness
@@ -25,10 +33,7 @@
 - (void)loadFullImage;
 - (void)loadThumbnail;
 
-// actual image data for thumbnail and fullImage, may trigger a fault
-// (even network access) and take awhile to load.
-- (UIImage *)thumbnail;
-- (UIImage *)fullImage;
+
 
 
 @end

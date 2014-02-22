@@ -7,13 +7,17 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <DropboxSDK/DBRestClient.h>
 
-@interface DFPhotoStore : NSObject
+@class DBRestClient;
+
+
+@interface DFPhotoStore : NSObject <DBRestClientDelegate>
+
+extern NSString *const DFPhotoStoreReadyNotification;
 
 + (DFPhotoStore *)sharedStore;
 - (NSArray *)cameraRoll;
-
-
 
 - (NSArray *)allAlbumsByName;
 - (NSArray *)allAlbumsByCount;

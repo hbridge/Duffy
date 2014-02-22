@@ -8,19 +8,19 @@
 
 #import "DFPhoto.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhoto()
 
 @property (nonatomic, retain) ALAsset *asset;
-@property (nonatomic, retain) NSURL *remoteURL;
-@property (nonatomic, retain) UIImage *fullImage;
-@property (nonatomic, retain) UIImage *thumbnail;
+@property (nonatomic, retain) NSString *dropboxPath;
+@property (nonatomic, retain) DBRestClient *restClient;
 
 @end
 
-
 @implementation DFPhoto
 
+@synthesize photoName, thumbnail, fullImage;
 
 - (id)initWithAsset:(ALAsset *)asset;
 {
@@ -32,80 +32,138 @@
     return self;
 }
 
-- (id)initWithURL:(NSURL *)url
+- (id)initWithDropboxPath:(NSString *)path name:(NSString *)name
 {
     self = [super init];
     if (self) {
-        self.remoteURL = url;
+        self.dropboxPath = path;
+        self.photoName = name;
     }
     return self;
+}
+- (void)dealloc
+{
+    NSLog(@"dfphoto %@ dealloc", self.photoName);
 }
 
 - (void)loadThumbnail
 {
-    [self loadThumbnailFromRemoteURL];
-}
-
-- (UIImage *)thumbnail {
-    if (!_thumbnail){
-        if (self.asset) {
-            CGImageRef imageRef = [self.asset thumbnail];
-            self.thumbnail = [UIImage imageWithCGImage:imageRef];
-        } else if (self.remoteURL) {
-            if (!self.fullImage) {
-                [self loadFullImageFromRemoteURL];
-            }
-            
-            self.thumbnail = self.fullImage;
+    if (self.asset) {
+        CGImageRef imageRef = [self.asset thumbnail];
+        self.thumbnail = [UIImage imageWithCGImage:imageRef];
+    } else if (self.dropboxPath) {
+        //try to load from cache
+        UIImage *cachedImage = [UIImage imageWithContentsOfFile:[[self localThumbnailURL] path]];
+        if (cachedImage) {
+            self.thumbnail = cachedImage;
+        } else {
+            [self loadThumbnailFromRemoteURL];
         }
     }
-    
-    return _thumbnail;
 }
+
 
 - (void)loadFullImage
 {
     if (self.asset) {
         CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
         self.fullImage = [UIImage imageWithCGImage:imageRef];
-    } else if (self.remoteURL) {
+    } else if (self.dropboxPath) {
         [self loadFullImageFromRemoteURL];
     }
-}
-
-- (UIImage *)fullImage
-{
-    if (_fullImage) {
-        [self loadFullImage];
-    }
-    
-    return _fullImage;
 }
 
 - (BOOL)isFullImageFault
 {
-    return (_fullImage == nil);
+    return (self.fullImage == nil);
 }
 
 - (BOOL)isThumbnailFault
 {
-    return (_thumbnail == nil);
+    return (self.thumbnail == nil);
 }
 
 #pragma mark - private functions
 
+- (DBRestClient *)restClient {
+    if (!_restClient) {
+        _restClient = [[DBRestClient alloc]
+                       initWithSession:[DBSession sharedSession]];
+        _restClient.delegate = self;
+    }
+    return _restClient;
+}
+
 - (void)loadFullImageFromRemoteURL
 {
-    NSData *imageData = [NSData dataWithContentsOfURL:self.remoteURL];
-    self.fullImage = [UIImage imageWithData:imageData];
+    [[self restClient] loadFile:self.dropboxPath intoPath:[[self localFullImageURL] path]];
 }
+
+static NSString *const thumbnailSize = @"m";
 
 - (void)loadThumbnailFromRemoteURL
 {
-    if (!self.fullImage) {
-        [self loadFullImageFromRemoteURL];
-    }
+    [[self restClient] loadThumbnail:self.dropboxPath
+                              ofSize:thumbnailSize
+                            intoPath:[[self localThumbnailURL] path]];
 }
 
+- (NSURL *)localFullImageURL
+{
+    NSString *fullImageFilename = [NSString stringWithFormat:@"%@.jpg", self.photoName];
+    return [[DFPhoto localFullImagesDirectoryURL] URLByAppendingPathComponent:fullImageFilename];
+}
+
+- (NSURL *)localThumbnailURL
+{
+    NSString *thumbnailFilename = [NSString stringWithFormat:@"%@.jpg", self.photoName];
+    return [[DFPhoto localThumbnailsDirectoryURL] URLByAppendingPathComponent:thumbnailFilename];
+}
+
++ (NSURL *)localFullImagesDirectoryURL
+{
+    return [[DFPhoto userLibraryURL] URLByAppendingPathComponent:@"fullsize"];
+}
+
++ (NSURL *)localThumbnailsDirectoryURL
+{
+    return [[DFPhoto userLibraryURL] URLByAppendingPathComponent:@"thumbnails"];
+}
+
+
+
++ (NSURL *)userLibraryURL
+{
+    NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
+    
+    if ([paths count] > 0)
+    {
+        return [paths objectAtIndex:0];
+    }
+    return nil;
+}
+
+
+
+#pragma mark - Dropbox callbacks
+
+- (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath
+       contentType:(NSString*)contentType metadata:(DBMetadata*)metadata {
+    NSLog(@"File loaded into path: %@", localPath);
+    
+    if ([localPath isEqualToString:[[self localFullImageURL] path]]){
+        self.fullImage = [UIImage imageWithContentsOfFile:localPath];
+    }
+    
+}
+
+- (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
+    NSLog(@"There was an error loading the file - %@", error);
+}
+
+- (void)restClient:(DBRestClient *)client loadedThumbnail:(NSString *)localPath metadata:(DBMetadata *)metadata
+{
+    self.thumbnail = [UIImage imageWithContentsOfFile:localPath];
+}
 
 @end
