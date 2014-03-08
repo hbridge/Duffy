@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
+		5A72E11A18B7EB5E000979D2 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */; };
+		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
+		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -50,6 +54,10 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
+		5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
+		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -97,6 +105,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */,
+				5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */,
+				5A72E11A18B7EB5E000979D2 /* DropboxSDK.framework in Frameworks */,
 				5ADB24F518998CBA0016CA02 /* AssetsLibrary.framework in Frameworks */,
 				5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */,
 				5ADB24C1189985590016CA02 /* CoreData.framework in Frameworks */,
@@ -141,6 +152,9 @@
 		5ADB24B9189985590016CA02 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5A72E11D18B7EB89000979D2 /* Security.framework */,
+				5A72E11B18B7EB83000979D2 /* QuartzCore.framework */,
+				5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */,
 				5ADB24F418998CBA0016CA02 /* AssetsLibrary.framework */,
 				5ADB24BA189985590016CA02 /* Foundation.framework */,
 				5ADB24BC189985590016CA02 /* CoreGraphics.framework */,
@@ -178,6 +192,7 @@
 		5ADB24C3189985590016CA02 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5A72E11718B55CB2000979D2 /* database.csv */,
 				5ADB250A189AE7980016CA02 /* Browse.png */,
 				5ADB250B189AE7980016CA02 /* Browse@2x.png */,
 				5ADB250C189AE7980016CA02 /* Timeline.png */,
@@ -303,6 +318,7 @@
 				5ADB250F189AE7980016CA02 /* Browse@2x.png in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
+				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
 				5ADB2506189AB5640016CA02 /* DFBrowseViewController.xib in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
@@ -452,6 +468,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/hbridge/Documents/Repos/Duffy,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
 				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
@@ -465,6 +485,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/hbridge/Documents/Repos/Duffy,
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
 				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
@@ -534,6 +558,7 @@
 				5ADB24EB189985590016CA02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5ADB24EC189985590016CA02 /* Build configuration list for PBXNativeTarget "DuffyTests" */ = {
 			isa = XCConfigurationList;
@@ -542,6 +567,7 @@
 				5ADB24EE189985590016CA02 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

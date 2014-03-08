@@ -14,21 +14,22 @@
                     <rect key="frame" x="0.0" y="0.0" width="150" height="150"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MLB-EV-fkB">
-                    <rect key="frame" x="54" y="163" width="42" height="21"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="MLB-EV-fkB">
+                    <rect key="frame" x="5" y="163" width="147" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="2gT-dn-UU6" secondAttribute="trailing" id="08O-OK-WTe"/>
                 <constraint firstAttribute="bottom" secondItem="MLB-EV-fkB" secondAttribute="bottom" constant="16" id="QIa-7R-h0Z"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="top" secondItem="1" secondAttribute="top" id="SqT-FX-Ebv"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="centerX" secondItem="MLB-EV-fkB" secondAttribute="centerX" id="VBP-ig-lxa"/>
+                <constraint firstAttribute="trailing" secondItem="MLB-EV-fkB" secondAttribute="trailing" constant="5" id="Wkx-6V-4TK"/>
                 <constraint firstItem="MLB-EV-fkB" firstAttribute="top" secondItem="2gT-dn-UU6" secondAttribute="bottom" constant="13" id="cnJ-iH-p7p"/>
+                <constraint firstItem="MLB-EV-fkB" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="5" id="nru-59-KhW"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="pmS-OT-IQP"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

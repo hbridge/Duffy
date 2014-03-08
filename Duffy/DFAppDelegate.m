@@ -9,6 +9,9 @@
 #import "DFAppDelegate.h"
 #import "DFCameraRollViewController.h"
 #import "DFBrowseViewController.h"
+#import <DropboxSDK/DropboxSDK.h>
+
+
 
 @implementation DFAppDelegate
 
@@ -19,6 +22,14 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    DBSession* dbSession =
+    [[DBSession alloc]
+      initWithAppKey:@"bf5eo7rbgiiorfk"
+      appSecret:@"fdog44gh3824idh"
+     root:kDBRootAppFolder]; // either kDBRootAppFolder or kDBRootDropbox
+    
+    [DBSession setSharedSession:dbSession];
     
     
     DFCameraRollViewController *cameraRollTab = [[DFCameraRollViewController alloc] init];
@@ -35,8 +46,6 @@
                                        cameraRollTab,
                                        browseNav,
                                        nil]];
-    
-    
     
     [[self window] setRootViewController:tabController];
     
@@ -86,6 +95,22 @@
         } 
     }
 }
+
+
+#pragma mark - URL Handlers
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+    if ([[DBSession sharedSession] handleOpenURL:url]) {
+        if ([[DBSession sharedSession] isLinked]) {
+            NSLog(@"App linked successfully!");
+            // At this point you can start making API calls
+        }
+        return YES;
+    }
+    // Add whatever other url handling code your app requires here
+    return NO;
+}
+
 
 #pragma mark - Core Data stack
 

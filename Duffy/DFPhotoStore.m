@@ -10,16 +10,22 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhotoAlbum.h"
 #import "DFPhoto.h"
+#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotoStore()
 
 @property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
-@property (nonatomic, retain) NSMutableArray *allRegularAlbums;
+@property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
+@property (nonatomic, retain) DBRestClient *restClient;
 
 @end
 
 @implementation DFPhotoStore
+
+NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
+
+static BOOL const useLocalData = NO;
 
 static DFPhotoStore *defaultStore;
 
@@ -40,12 +46,40 @@ static DFPhotoStore *defaultStore;
 {
     self = [super init];
     if (self) {
-        [self loadCameraRoll];
-        [self loadPhotoAlbums];
+        [self createCacheDirectories];
+        if (useLocalData) {
+            [self loadCameraRoll];
+            [self loadPhotoAlbums];
+        } else {
+            [self loadCSVDatabase];
+        }
+    
     }
     return self;
 }
 
+- (void)createCacheDirectories
+{
+    // thumbnails
+    NSFileManager *fm = [NSFileManager defaultManager];
+    
+    NSArray *directoriesToCreate = @[[[DFPhoto localThumbnailsDirectoryURL] path],
+                                     [[DFPhoto localFullImagesDirectoryURL] path]];
+    
+    for (NSString *path in directoriesToCreate) {
+        if (![fm fileExistsAtPath:path]) {
+            NSError *error;
+            [fm createDirectoryAtPath:path withIntermediateDirectories:NO
+                           attributes:nil
+                                error:&error];
+            if (error) {
+                NSLog(@"Error creating cache directory: %@, error: %@", path, error.description);
+                abort();
+            }
+        }
+
+    }
+}
 
 
 - (void)loadCameraRoll
@@ -57,7 +91,7 @@ static DFPhotoStore *defaultStore;
             [_cameraRoll addObject:photo];
         } else {
             NSLog(@"All assets in Camera Roll enumerated");
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"com.duffysoft.DFAssetsEnumerated" object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
         }
     };
     
@@ -72,9 +106,6 @@ static DFPhotoStore *defaultStore;
     
     _cameraRoll = [[NSMutableArray alloc] init];
     
-    _allRegularAlbums = [[NSMutableArray alloc] init];
-    
-    
     [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
     					   usingBlock:assetGroupEnumerator
     					 failureBlock: ^(NSError *error) {
@@ -87,17 +118,17 @@ static DFPhotoStore *defaultStore;
 
 - (void)loadPhotoAlbums
 {
-    
-    
     void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
     	if(group != nil) {
             NSLog(@"Enumerating %d assets in: %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-            [_allRegularAlbums addObject:[[DFPhotoAlbum alloc] initWithAssetGroup:group]];
-    	}
+            DFPhotoAlbum *album = [[DFPhotoAlbum alloc] initWithAssetGroup:group];
+            _allDFAlbumsByName[album.name] = album;
+    	} else {
+            NSLog(@"all albums enumerated");
+        }
     };
     
-    _allRegularAlbums = [[NSMutableArray alloc] init];
-    
+    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
     
     [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum
                                   usingBlock:assetGroupEnumerator
@@ -107,9 +138,120 @@ static DFPhotoStore *defaultStore;
 }
 
 
-- (NSArray *)allAlbums
+- (DBRestClient *)restClient {
+    if (!_restClient) {
+        _restClient =
+        [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
+        _restClient.delegate = self;
+    }
+    return _restClient;
+}
+
+
+static NSString *databaseRemotePath = @"/database.csv";
+static NSString *databaseLocalFilename = @"database.csv";
+
+
+- (void)loadCSVDatabase
 {
-    return _allRegularAlbums;
+    
+    [[self restClient] loadFile:databaseRemotePath intoPath:[[self localdatabaseURL] path]];
+}
+
+- (void)processCSVDatabase {
+    NSStringEncoding encoding;
+    NSError *error;
+    NSString *dataString = [NSString stringWithContentsOfURL:[self localdatabaseURL] usedEncoding:&encoding error:&error];
+    
+    _cameraRoll = [[NSMutableArray alloc] init];
+    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
+    for (NSString *line in [dataString componentsSeparatedByString:@"\n"])
+    {
+        // add photo to camera roll
+        NSArray *components = [line componentsSeparatedByString:@","];
+        NSString *filename = components[0];
+        NSString *dropboxPath = [NSString stringWithFormat:@"/%@", filename];
+        DFPhoto *photo = [[DFPhoto alloc] initWithDropboxPath:dropboxPath name:[filename stringByDeletingPathExtension]];
+        [_cameraRoll addObject:photo];
+        
+        // add photo to album and create if necessary
+        NSRange categoryConfidenceRange;
+        categoryConfidenceRange.location = 1;
+        categoryConfidenceRange.length = components.count - 1;
+        for (NSString *categoryConfidenceString in [components subarrayWithRange:categoryConfidenceRange]) {
+            NSString *trimmedString = [categoryConfidenceString stringByTrimmingCharactersInSet:
+                                       [NSCharacterSet whitespaceCharacterSet]];
+            NSString *categoryName = [[trimmedString componentsSeparatedByString:@" "] firstObject];
+            if (![categoryName isEqualToString:@""]) {
+                DFPhotoAlbum *categoryAlbum = _allDFAlbumsByName[categoryName];
+                if (!categoryAlbum) {
+                    categoryAlbum = [[DFPhotoAlbum alloc] init];
+                    categoryAlbum.name = categoryName;
+                    _allDFAlbumsByName[categoryName] = categoryAlbum;
+                }
+                [categoryAlbum addPhotosObject:photo];
+            }
+        }
+        
+    }
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
+}
+
+- (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath
+       contentType:(NSString*)contentType metadata:(DBMetadata*)metadata {
+    
+    NSLog(@"File loaded into path: %@", localPath);
+    if ([localPath isEqualToString:[[self localdatabaseURL] path]]) {
+        [self processCSVDatabase];
+    }
+}
+
+- (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
+    NSLog(@"There was an error loading the file - %@", error);
+}
+
+
+- (NSURL *)localdatabaseURL
+{
+    return [[DFPhotoStore userLibraryURL] URLByAppendingPathComponent:databaseLocalFilename];
+}
+
++ (NSURL *)userLibraryURL
+{
+    NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
+    
+    if ([paths count] > 0)
+    {
+        return [paths objectAtIndex:0];
+    }
+    return nil;
+}
+
+- (NSArray *)allAlbumsByName
+{
+    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
+        ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
+            return [album1.name compare:album2.name];
+    }];
+    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
+}
+
+- (NSArray *)allAlbumsByCount
+{
+    // get the keys in reverse order
+    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
+                     ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
+                         if (album1.photos.count < album2.photos.count) {
+                             return NSOrderedDescending;
+                         } else if (album1.photos.count > album2.photos.count) {
+                             return NSOrderedAscending;
+                         } else {
+                             return NSOrderedSame;
+                         }
+                     }];
+
+    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
 }
 
 

@@ -24,13 +24,11 @@
 
 - (id)initWithAssetGroup:(ALAssetsGroup *)assetGroup
 {
-    self = [super init];
+    self = [self init];
     if (self) {
         self.thumbnail = [UIImage imageWithCGImage:[assetGroup posterImage]];
         self.name = [assetGroup valueForProperty:ALAssetsGroupPropertyName];
         
-        
-        _photos = [[NSMutableArray alloc] init];
         // add photos in album to album
         void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
             if(result != NULL) {
@@ -48,7 +46,46 @@
     return self;
 }
 
+- (id)init
+{
+    self = [super init];
+    if (self) {
+        _photos = [[NSMutableArray alloc] init];
 
+    }
+    return self;
+}
+
+- (UIImage *)thumbnail
+{
+    if (!thumbnail) {
+        if (self.photos.count > 0) {
+            DFPhoto *firstPhoto = [self.photos firstObject];
+            if (firstPhoto.thumbnail) {
+                thumbnail = firstPhoto.thumbnail;
+                return firstPhoto.thumbnail;
+            } else {
+                [firstPhoto addObserver:self forKeyPath:@"thumbnail" options:NSKeyValueObservingOptionNew
+                                context:nil];
+                [firstPhoto loadThumbnail];
+            }
+        }
+    }
+            
+   return thumbnail;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
+{
+    if ([keyPath isEqualToString:@"thumbnail"]) {
+        self.thumbnail = ((DFPhoto *)object).thumbnail;
+    }
+}
+
+- (void)addPhotosObject:(DFPhoto *)object
+{
+    [_photos addObject:object];
+}
 
 
 

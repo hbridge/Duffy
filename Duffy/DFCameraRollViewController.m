@@ -19,6 +19,10 @@
 {
     self = [super init];
     if (self) {
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(photoStoreChanged)
+                                                     name:DFPhotoStoreReadyNotification
+                                                   object:nil];
         self.photos = [[DFPhotoStore sharedStore] cameraRoll];
         
         self.tabBarItem.title = @"Camera Roll";
@@ -29,11 +33,16 @@
     }
     return self;
 }
+         
+         
+- (void)photoStoreChanged
+{
+    self.photos = [[DFPhotoStore sharedStore] cameraRoll];
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	// Do any additional setup after loading the view.
 }
 
 - (void)didReceiveMemoryWarning

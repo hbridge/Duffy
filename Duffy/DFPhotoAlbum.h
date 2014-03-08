@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 @class ALAssetsGroup;
+@class DFPhoto;
 
 @interface DFPhotoAlbum : NSObject
 
@@ -18,5 +19,7 @@
 - (id)initWithAssetGroup:(ALAssetsGroup *)assetGroup;
 
 - (NSArray *)photos;
+- (void)addPhotosObject:(DFPhoto *)object;
+
 
 @end
