@@ -20,8 +20,11 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
-    DFCameraRollViewController *cameraRollTab = [[DFCameraRollViewController alloc] init];
+    // Camera roll tab
+    DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
+    UINavigationController *cameraRollNav = [[UINavigationController alloc] initWithRootViewController:cameraRollController];
     
+    // Album tab
     UICollectionViewLayout *flowLayout2 = [[UICollectionViewFlowLayout alloc] init];
     DFAlbumViewController *browseTab = [[DFAlbumViewController alloc] initWithCollectionViewLayout:flowLayout2];
     UINavigationController *browseNav = [[UINavigationController alloc] initWithRootViewController:browseTab];
@@ -29,7 +32,7 @@
     
     UITabBarController *tabController = [[UITabBarController alloc] init];
     [tabController setViewControllers:[NSArray arrayWithObjects:
-                                       cameraRollTab,
+                                       cameraRollNav,
                                        browseNav,
                                        nil]];
     

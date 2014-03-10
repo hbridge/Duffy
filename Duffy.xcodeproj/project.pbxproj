@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A37478F18CE4F1500E27F00 /* DFSearchController.m */; };
 		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
 		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
 		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
@@ -53,6 +54,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A37478E18CE4F1500E27F00 /* DFSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchController.h; sourceTree = "<group>"; };
+		5A37478F18CE4F1500E27F00 /* DFSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchController.m; sourceTree = "<group>"; };
 		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
 		5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
@@ -180,6 +183,8 @@
 				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
 				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
 				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
+				5A37478E18CE4F1500E27F00 /* DFSearchController.h */,
+				5A37478F18CE4F1500E27F00 /* DFSearchController.m */,
 				5ADB2502189AB5640016CA02 /* DFAlbumViewController.h */,
 				5ADB2503189AB5640016CA02 /* DFAlbumViewController.m */,
 				5ADB2504189AB5640016CA02 /* DFAlbumViewController.xib */,
@@ -352,6 +357,7 @@
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
+				5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
 				5ADB2505189AB5640016CA02 /* DFAlbumViewController.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
