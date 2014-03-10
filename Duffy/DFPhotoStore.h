@@ -17,6 +17,7 @@
 extern NSString *const DFPhotoStoreReadyNotification;
 
 + (DFPhotoStore *)sharedStore;
+
 - (NSArray *)cameraRoll;
 
 - (NSArray *)allAlbumsByName;

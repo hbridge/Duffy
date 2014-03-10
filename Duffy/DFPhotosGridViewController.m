@@ -9,7 +9,6 @@
 #import "DFPhotosGridViewController.h"
 #import "DFPhoto.h"
 #import "DFPhotoViewCell.h"
-#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotosGridViewController ()
 
@@ -49,13 +48,6 @@
     [super viewDidLoad];
     [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
     ((UICollectionViewFlowLayout *)self.collectionViewLayout).itemSize =CGSizeMake(150, 200);
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    if (![[DBSession sharedSession] isLinked]) {
-        [[DBSession sharedSession] linkFromController:self];
-    }
 }
 
 - (void)didReceiveMemoryWarning

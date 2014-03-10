@@ -10,14 +10,12 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhotoAlbum.h"
 #import "DFPhoto.h"
-#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotoStore()
 
 @property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
-@property (nonatomic, retain) DBRestClient *restClient;
 
 @end
 
@@ -25,7 +23,7 @@
 
 NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
 
-static BOOL const useLocalData = NO;
+static BOOL const useLocalData = YES;
 
 static DFPhotoStore *defaultStore;
 
@@ -47,13 +45,8 @@ static DFPhotoStore *defaultStore;
     self = [super init];
     if (self) {
         [self createCacheDirectories];
-        if (useLocalData) {
-            [self loadCameraRoll];
-            [self loadPhotoAlbums];
-        } else {
-            [self loadCSVDatabase];
-        }
-    
+        [self loadCameraRoll];
+        [self loadPhotoAlbums];
     }
     return self;
 }
@@ -111,8 +104,6 @@ static DFPhotoStore *defaultStore;
     					 failureBlock: ^(NSError *error) {
     						 NSLog(@"Failure");
     					 }];
-    
-    
 }
 
 
@@ -137,85 +128,6 @@ static DFPhotoStore *defaultStore;
                                 }];
 }
 
-
-- (DBRestClient *)restClient {
-    if (!_restClient) {
-        _restClient =
-        [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
-        _restClient.delegate = self;
-    }
-    return _restClient;
-}
-
-
-static NSString *databaseRemotePath = @"/database.csv";
-static NSString *databaseLocalFilename = @"database.csv";
-
-
-- (void)loadCSVDatabase
-{
-    
-    [[self restClient] loadFile:databaseRemotePath intoPath:[[self localdatabaseURL] path]];
-}
-
-- (void)processCSVDatabase {
-    NSStringEncoding encoding;
-    NSError *error;
-    NSString *dataString = [NSString stringWithContentsOfURL:[self localdatabaseURL] usedEncoding:&encoding error:&error];
-    
-    _cameraRoll = [[NSMutableArray alloc] init];
-    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
-    for (NSString *line in [dataString componentsSeparatedByString:@"\n"])
-    {
-        // add photo to camera roll
-        NSArray *components = [line componentsSeparatedByString:@","];
-        NSString *filename = components[0];
-        NSString *dropboxPath = [NSString stringWithFormat:@"/%@", filename];
-        DFPhoto *photo = [[DFPhoto alloc] initWithDropboxPath:dropboxPath name:[filename stringByDeletingPathExtension]];
-        [_cameraRoll addObject:photo];
-        
-        // add photo to album and create if necessary
-        NSRange categoryConfidenceRange;
-        categoryConfidenceRange.location = 1;
-        categoryConfidenceRange.length = components.count - 1;
-        for (NSString *categoryConfidenceString in [components subarrayWithRange:categoryConfidenceRange]) {
-            NSString *trimmedString = [categoryConfidenceString stringByTrimmingCharactersInSet:
-                                       [NSCharacterSet whitespaceCharacterSet]];
-            NSString *categoryName = [[trimmedString componentsSeparatedByString:@" "] firstObject];
-            if (![categoryName isEqualToString:@""]) {
-                DFPhotoAlbum *categoryAlbum = _allDFAlbumsByName[categoryName];
-                if (!categoryAlbum) {
-                    categoryAlbum = [[DFPhotoAlbum alloc] init];
-                    categoryAlbum.name = categoryName;
-                    _allDFAlbumsByName[categoryName] = categoryAlbum;
-                }
-                [categoryAlbum addPhotosObject:photo];
-            }
-        }
-        
-    }
-    
-    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
-}
-
-- (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath
-       contentType:(NSString*)contentType metadata:(DBMetadata*)metadata {
-    
-    NSLog(@"File loaded into path: %@", localPath);
-    if ([localPath isEqualToString:[[self localdatabaseURL] path]]) {
-        [self processCSVDatabase];
-    }
-}
-
-- (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
-    NSLog(@"There was an error loading the file - %@", error);
-}
-
-
-- (NSURL *)localdatabaseURL
-{
-    return [[DFPhotoStore userLibraryURL] URLByAppendingPathComponent:databaseLocalFilename];
-}
 
 + (NSURL *)userLibraryURL
 {

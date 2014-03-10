@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFBrowseViewController : UICollectionViewController
+@interface DFAlbumViewController : UICollectionViewController
 
 
 @end

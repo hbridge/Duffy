@@ -6,27 +6,27 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFBrowseViewController.h"
+#import "DFAlbumViewController.h"
 #import "DFPhotoStore.h"
 #import "DFPhotoAlbum.h"
 #import "DFPhotoViewCell.h"
 #import "DFPhotosGridViewController.h"
 
-@interface DFBrowseViewController ()
+@interface DFAlbumViewController ()
 
 @end
 
-@implementation DFBrowseViewController
+@implementation DFAlbumViewController
 
 - (id)initWithCollectionViewLayout:(UICollectionViewLayout *)layout
 {
     self = [super initWithCollectionViewLayout:layout];
     if (self) {
         UINavigationItem *n = [self navigationItem];
-        [n setTitle:@"Browse"];
+        [n setTitle:@"Albums"];
 
-        [self.tabBarItem setTitle:@"Browse"];
-        self.tabBarItem.image = [UIImage imageNamed:@"Browse"];
+        [self.tabBarItem setTitle:@"Albums"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Albums"];
         
         
     }

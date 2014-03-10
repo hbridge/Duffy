@@ -21,7 +21,6 @@
 @property (nonatomic, retain) UIImage *thumbnail;
 
 - (id)initWithAsset:(ALAsset *)asset;
-- (id)initWithDropboxPath:(NSString *)path name:(NSString *)name;
 
 // use these to determine whether asking for the full image will trigger
 // a fault, potentially causing UI slowness
