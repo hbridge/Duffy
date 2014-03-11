@@ -161,6 +161,31 @@ static DFPhotoStore *defaultStore;
     return [result firstObject];
 }
 
+- (NSArray *)photosWithUploadStatus:(BOOL)isUploaded
+{
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
+
+    NSPredicate *predicate;
+    if (isUploaded) {
+        predicate = [NSPredicate predicateWithFormat:@"uploadDate != nil"];
+    } else {
+         predicate = [NSPredicate predicateWithFormat:@"uploadDate = nil"];
+    }
+    
+    request.predicate = predicate;
+    
+    NSError *error;
+    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    if (!result) {
+        [NSException raise:@"Could search for photos."
+                    format:@"Error: %@", [error localizedDescription]];
+    }
+    
+    return result;
+}
+
 
 + (NSURL *)userLibraryURL
 {

@@ -21,6 +21,7 @@ extern NSString *const DFPhotoStoreReadyNotification;
 
 // Main accessors for data
 - (NSArray *)cameraRoll;
+- (NSArray *)photosWithUploadStatus:(BOOL)isUploaded;
 
 // Core data stack
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;

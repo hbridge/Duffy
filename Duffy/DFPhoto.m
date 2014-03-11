@@ -63,6 +63,14 @@
     return (self.thumbnail == nil);
 }
 
+- (NSString *)localID
+{
+    //NSURL *url = [NSURL URLWithString:self.alAssetURLString];
+    ALAssetRepresentation *rep = [self.asset defaultRepresentation];
+    NSString *fileName = [rep filename];
+    return fileName;
+}
+
 
 #pragma mark - File Paths
 

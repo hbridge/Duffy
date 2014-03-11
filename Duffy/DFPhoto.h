@@ -34,6 +34,9 @@
 - (void)loadThumbnail;
 
 
+- (NSString *)localID;
+
+
 
 
 @end

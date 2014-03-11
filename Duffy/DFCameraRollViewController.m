@@ -9,10 +9,12 @@
 #import "DFCameraRollViewController.h"
 #import "DFPhotoStore.h"
 #import "DFSearchController.h"
+#import "DFUploadController.h"
 
 @interface DFCameraRollViewController ()
 
 @property (nonatomic, retain) DFSearchController *sdc;
+@property (nonatomic, retain) DFUploadController *uploadController;
 
 @end
 
@@ -23,7 +25,7 @@
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(photoStoreChanged)
+                                                 selector:@selector(photoStoreReady)
                                                      name:DFPhotoStoreReadyNotification
                                                    object:nil];
         self.photos = [[DFPhotoStore sharedStore] cameraRoll];
@@ -51,11 +53,25 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)photoStoreChanged
+- (void)photoStoreReady
 {
     self.photos = [[DFPhotoStore sharedStore] cameraRoll];
+    
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+    
+    // WARNING PUTTING THIS HERE IS A HACK TO CACHE THUMBNAILS, TODO MAKE THIS BETTER
+    NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
+    if (!self.uploadController) {
+        self.uploadController = [[DFUploadController alloc] init];
+    }
+    
+    [self.uploadController uploadPhotos:photosToUpload];
+}
 
 
 
