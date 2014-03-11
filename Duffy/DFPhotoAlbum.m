@@ -33,8 +33,8 @@
         void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
             if(result != NULL) {
                 NSLog(@"Adding to %@ asset %@", self.name, result);
-                DFPhoto *photo = [[DFPhoto alloc] initWithAsset:result];
-                [_photos addObject:photo];
+                //DFPhoto *photo = [[DFPhoto alloc] initWithAsset:result];
+                //[_photos addObject:photo];
             } else {
                 NSLog(@"All assets in group %@ enumerated", self.name);
                 [[NSNotificationCenter defaultCenter] postNotificationName:@"com.duffysoft.DFAssetsEnumerated" object:self];

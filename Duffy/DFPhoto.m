@@ -12,30 +12,37 @@
 @interface DFPhoto()
 
 @property (nonatomic, retain) ALAsset *asset;
-@property (nonatomic, retain) NSString *remotePath;
-@property (nonatomic, retain) DBRestClient *restClient;
 
 @end
 
 @implementation DFPhoto
 
-@synthesize photoName, thumbnail, fullImage;
-
-- (id)initWithAsset:(ALAsset *)asset;
-{
-    self = [super init];
-    if (self) {
-        self.asset = asset;
-    }
-    return self;
-}
+@synthesize thumbnail, fullImage, asset;
+@dynamic alAssetURLString, universalIDString, uploadDate;
 
 - (void)loadThumbnail
 {
     if (self.asset) {
         CGImageRef imageRef = [self.asset thumbnail];
         self.thumbnail = [UIImage imageWithCGImage:imageRef];
-    } 
+    } else {
+        ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *myasset)
+        {
+            self.asset = myasset;
+            self.thumbnail = [UIImage imageWithCGImage:asset.thumbnail];
+        };
+        
+        ALAssetsLibraryAccessFailureBlock failureblock  = ^(NSError *myerror)
+        {
+            NSLog(@"Can't get image - %@",[myerror localizedDescription]);
+        };
+        
+        NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
+        ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
+        [assetslibrary assetForURL:asseturl
+                       resultBlock:resultblock
+                      failureBlock:failureblock];
+    }
 }
 
 - (void)loadFullImage
@@ -60,17 +67,6 @@
 #pragma mark - File Paths
 
 
-- (NSURL *)localFullImageURL
-{
-    NSString *fullImageFilename = [NSString stringWithFormat:@"%@.jpg", self.photoName];
-    return [[DFPhoto localFullImagesDirectoryURL] URLByAppendingPathComponent:fullImageFilename];
-}
-
-- (NSURL *)localThumbnailURL
-{
-    NSString *thumbnailFilename = [NSString stringWithFormat:@"%@.jpg", self.photoName];
-    return [[DFPhoto localThumbnailsDirectoryURL] URLByAppendingPathComponent:thumbnailFilename];
-}
 
 + (NSURL *)localFullImagesDirectoryURL
 {

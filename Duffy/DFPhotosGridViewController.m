@@ -107,8 +107,6 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
         [photo loadThumbnail];
         [cell.imageView setImage:[photo thumbnail]];
     }
-	
-    [cell.textLabel setText:photo.photoName];
     
     return cell;
 }
