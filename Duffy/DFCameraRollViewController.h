@@ -9,5 +9,4 @@
 #import "DFPhotosGridViewController.h"
 
 @interface DFCameraRollViewController : DFPhotosGridViewController
-
 @end

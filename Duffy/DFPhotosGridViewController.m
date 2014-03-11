@@ -9,7 +9,6 @@
 #import "DFPhotosGridViewController.h"
 #import "DFPhoto.h"
 #import "DFPhotoViewCell.h"
-#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotosGridViewController ()
 
@@ -17,17 +16,27 @@
 
 @implementation DFPhotosGridViewController
 
+@synthesize photoSpacing;
+@synthesize photoSquareSize;
+
+static const CGFloat DEFAULT_PHOTO_SQUARE_SIZE = 77;
+static const CGFloat DEFAULT_PHOTO_SPACING = 4;
+
+
 @synthesize photos;
 
 - (id)init
 {
-    self = [super initWithCollectionViewLayout:[[UICollectionViewFlowLayout alloc] init]];
+    self = [super initWithNibName:@"DFPhotosGridViewController" bundle:[NSBundle mainBundle]];
     if (self) {
         self.tabBarItem.title = @"Photos";
         self.tabBarItem.image = [UIImage imageNamed:@"Timeline"];
         
         UINavigationItem *n = [self navigationItem];
         [n setTitle:@"Photos"];
+        
+        photoSquareSize = DEFAULT_PHOTO_SQUARE_SIZE;
+        photoSpacing = DEFAULT_PHOTO_SPACING;
         
         self.photos = [[NSArray alloc] init];
     }
@@ -47,15 +56,20 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    // configure our flow layout
+    self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
+    self.flowLayout.itemSize =CGSizeMake(self.photoSquareSize, self.photoSquareSize);
+    self.flowLayout.minimumInteritemSpacing = self.photoSpacing;
+    self.flowLayout.minimumLineSpacing = self.photoSpacing;
+    [self.collectionView setCollectionViewLayout:self.flowLayout];
+    self.collectionView.contentInset = UIEdgeInsetsMake(self.photoSpacing, 0, 0, 0);
+    
+    // register cell type
     [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
-    ((UICollectionViewFlowLayout *)self.collectionViewLayout).itemSize =CGSizeMake(150, 200);
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    if (![[DBSession sharedSession] isLinked]) {
-        [[DBSession sharedSession] linkFromController:self];
-    }
+    
+    // set background
+    self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)didReceiveMemoryWarning
@@ -93,8 +107,6 @@
         [photo loadThumbnail];
         [cell.imageView setImage:[photo thumbnail]];
     }
-	
-    [cell.textLabel setText:photo.photoName];
     
     return cell;
 }
@@ -103,7 +115,7 @@
 {
     if ([keyPath isEqualToString:@"thumbnail"]) {
         NSIndexPath *indexPath = (__bridge NSIndexPath *)context;
-        NSLog(@"thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
+        //NSLog(@"thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
         if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
             DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
             correctCell.imageView.image = [((DFPhoto *)object) thumbnail];

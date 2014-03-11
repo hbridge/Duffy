@@ -16,10 +16,24 @@
 
 extern NSString *const DFPhotoStoreReadyNotification;
 
+// Get the singleton store isntance
 + (DFPhotoStore *)sharedStore;
-- (NSArray *)cameraRoll;
 
-- (NSArray *)allAlbumsByName;
-- (NSArray *)allAlbumsByCount;
+// Main accessors for data
+- (NSArray *)cameraRoll;
+- (NSArray *)photosWithUploadStatus:(BOOL)isUploaded;
+
+// Core data stack
+@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
+@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
+@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
+
+// Saves changes to disk
+- (void)saveContext;
+
+- (NSURL *)applicationDocumentsDirectory;
+
+
+
 
 @end

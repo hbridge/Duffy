@@ -8,24 +8,24 @@
 
 #import "DFPhotoStore.h"
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "DFPhotoAlbum.h"
 #import "DFPhoto.h"
-#import <DropboxSDK/DropboxSDK.h>
 
 @interface DFPhotoStore()
 
 @property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
-@property (nonatomic, retain) DBRestClient *restClient;
 
 @end
 
 @implementation DFPhotoStore
 
-NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
+@synthesize managedObjectContext = _managedObjectContext;
+@synthesize managedObjectModel = _managedObjectModel;
+@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 
-static BOOL const useLocalData = NO;
+
+NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
 
 static DFPhotoStore *defaultStore;
 
@@ -47,13 +47,10 @@ static DFPhotoStore *defaultStore;
     self = [super init];
     if (self) {
         [self createCacheDirectories];
-        if (useLocalData) {
-            [self loadCameraRoll];
-            [self loadPhotoAlbums];
-        } else {
-            [self loadCSVDatabase];
-        }
-    
+        
+        _cameraRoll = [[NSMutableArray alloc] init];
+        [self loadCameraRollDB];
+        [self scanCameraRollForNewImages];
     }
     return self;
 }
@@ -82,13 +79,45 @@ static DFPhotoStore *defaultStore;
 }
 
 
-- (void)loadCameraRoll
+- (void)loadCameraRollDB
+{
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    
+    NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
+    
+//    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"cocktailName" ascending:YES];
+//    request.sortDescriptors = [NSArray arrayWithObject:sort];
+    
+    NSError *error;
+    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    if (!result) {
+        [NSException raise:@"Could not fetch photos"
+                    format:@"Error: %@", [error localizedDescription]];
+    }
+    
+    NSLog(@"Loaded %d photos from database.", (u_int)[result count] );
+    [_cameraRoll addObjectsFromArray:result];
+}
+
+- (void)scanCameraRollForNewImages
 {
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
         if(result != NULL) {
-            NSLog(@"Adding to Camera Roll asset: %@", result);
-            DFPhoto *photo = [[DFPhoto alloc] initWithAsset:result];
-            [_cameraRoll addObject:photo];
+            NSLog(@"Scanning Camera Roll asset: %@...", result);
+            NSURL *assetURL = [result valueForProperty: ALAssetPropertyAssetURL];
+            if (nil == [self photoWithALAssetURL:assetURL])
+            {
+                NSLog(@"...asset is new, adding to database.");
+                // we haven't seent this photo before, add it to our database
+                DFPhoto *newPhoto = [NSEntityDescription
+                                     insertNewObjectForEntityForName:@"DFPhoto"
+                                     inManagedObjectContext:_managedObjectContext];
+                newPhoto.alAssetURLString = assetURL.absoluteString;
+                [_cameraRoll addObject:newPhoto];
+            } else {
+                NSLog(@"...asset is not new.");
+            }
         } else {
             NSLog(@"All assets in Camera Roll enumerated");
             [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
@@ -104,118 +133,59 @@ static DFPhotoStore *defaultStore;
     
     _assetsLibrary = [[ALAssetsLibrary alloc] init];
     
-    _cameraRoll = [[NSMutableArray alloc] init];
-    
     [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
     					   usingBlock:assetGroupEnumerator
     					 failureBlock: ^(NSError *error) {
     						 NSLog(@"Failure");
     					 }];
-    
-    
 }
 
 
-- (void)loadPhotoAlbums
+- (DFPhoto *)photoWithALAssetURL:(NSURL *)url
 {
-    void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
-    	if(group != nil) {
-            NSLog(@"Enumerating %d assets in: %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-            DFPhotoAlbum *album = [[DFPhotoAlbum alloc] initWithAssetGroup:group];
-            _allDFAlbumsByName[album.name] = album;
-    	} else {
-            NSLog(@"all albums enumerated");
-        }
-    };
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
     
-    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", url.absoluteString];
+
+    request.predicate = predicate;
     
-    [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum
-                                  usingBlock:assetGroupEnumerator
-                                failureBlock: ^(NSError *error) {
-                                    NSLog(@"Failure");
-                                }];
-}
-
-
-- (DBRestClient *)restClient {
-    if (!_restClient) {
-        _restClient =
-        [[DBRestClient alloc] initWithSession:[DBSession sharedSession]];
-        _restClient.delegate = self;
-    }
-    return _restClient;
-}
-
-
-static NSString *databaseRemotePath = @"/database.csv";
-static NSString *databaseLocalFilename = @"database.csv";
-
-
-- (void)loadCSVDatabase
-{
-    
-    [[self restClient] loadFile:databaseRemotePath intoPath:[[self localdatabaseURL] path]];
-}
-
-- (void)processCSVDatabase {
-    NSStringEncoding encoding;
     NSError *error;
-    NSString *dataString = [NSString stringWithContentsOfURL:[self localdatabaseURL] usedEncoding:&encoding error:&error];
-    
-    _cameraRoll = [[NSMutableArray alloc] init];
-    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
-    for (NSString *line in [dataString componentsSeparatedByString:@"\n"])
-    {
-        // add photo to camera roll
-        NSArray *components = [line componentsSeparatedByString:@","];
-        NSString *filename = components[0];
-        NSString *dropboxPath = [NSString stringWithFormat:@"/%@", filename];
-        DFPhoto *photo = [[DFPhoto alloc] initWithDropboxPath:dropboxPath name:[filename stringByDeletingPathExtension]];
-        [_cameraRoll addObject:photo];
-        
-        // add photo to album and create if necessary
-        NSRange categoryConfidenceRange;
-        categoryConfidenceRange.location = 1;
-        categoryConfidenceRange.length = components.count - 1;
-        for (NSString *categoryConfidenceString in [components subarrayWithRange:categoryConfidenceRange]) {
-            NSString *trimmedString = [categoryConfidenceString stringByTrimmingCharactersInSet:
-                                       [NSCharacterSet whitespaceCharacterSet]];
-            NSString *categoryName = [[trimmedString componentsSeparatedByString:@" "] firstObject];
-            if (![categoryName isEqualToString:@""]) {
-                DFPhotoAlbum *categoryAlbum = _allDFAlbumsByName[categoryName];
-                if (!categoryAlbum) {
-                    categoryAlbum = [[DFPhotoAlbum alloc] init];
-                    categoryAlbum.name = categoryName;
-                    _allDFAlbumsByName[categoryName] = categoryAlbum;
-                }
-                [categoryAlbum addPhotosObject:photo];
-            }
-        }
-        
+    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    if (!result) {
+        [NSException raise:@"Could search for photos."
+                    format:@"Error: %@", [error localizedDescription]];
     }
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
+    return [result firstObject];
 }
 
-- (void)restClient:(DBRestClient*)client loadedFile:(NSString*)localPath
-       contentType:(NSString*)contentType metadata:(DBMetadata*)metadata {
-    
-    NSLog(@"File loaded into path: %@", localPath);
-    if ([localPath isEqualToString:[[self localdatabaseURL] path]]) {
-        [self processCSVDatabase];
-    }
-}
-
-- (void)restClient:(DBRestClient*)client loadFileFailedWithError:(NSError*)error {
-    NSLog(@"There was an error loading the file - %@", error);
-}
-
-
-- (NSURL *)localdatabaseURL
+- (NSArray *)photosWithUploadStatus:(BOOL)isUploaded
 {
-    return [[DFPhotoStore userLibraryURL] URLByAppendingPathComponent:databaseLocalFilename];
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
+
+    NSPredicate *predicate;
+    if (isUploaded) {
+        predicate = [NSPredicate predicateWithFormat:@"uploadDate != nil"];
+    } else {
+         predicate = [NSPredicate predicateWithFormat:@"uploadDate = nil"];
+    }
+    
+    request.predicate = predicate;
+    
+    NSError *error;
+    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    if (!result) {
+        [NSException raise:@"Could search for photos."
+                    format:@"Error: %@", [error localizedDescription]];
+    }
+    
+    return result;
 }
+
 
 + (NSURL *)userLibraryURL
 {
@@ -228,38 +198,112 @@ static NSString *databaseLocalFilename = @"database.csv";
     return nil;
 }
 
-- (NSArray *)allAlbumsByName
-{
-    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
-        ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
-            return [album1.name compare:album2.name];
-    }];
-    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
-}
-
-- (NSArray *)allAlbumsByCount
-{
-    // get the keys in reverse order
-    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
-                     ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
-                         if (album1.photos.count < album2.photos.count) {
-                             return NSOrderedDescending;
-                         } else if (album1.photos.count > album2.photos.count) {
-                             return NSOrderedAscending;
-                         } else {
-                             return NSOrderedSame;
-                         }
-                     }];
-
-    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
-}
-
-
 - (NSArray *)cameraRoll
 {
     return _cameraRoll;
 }
 
+#pragma mark - Core Data stack
+
+// Returns the managed object context for the application.
+// If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
+- (NSManagedObjectContext *)managedObjectContext
+{
+    if (_managedObjectContext != nil) {
+        return _managedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _managedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+    }
+    return _managedObjectContext;
+}
+
+// Returns the managed object model for the application.
+// If the model doesn't already exist, it is created from the application's model.
+- (NSManagedObjectModel *)managedObjectModel
+{
+    if (_managedObjectModel != nil) {
+        return _managedObjectModel;
+    }
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"Duffy" withExtension:@"momd"];
+    _managedObjectModel = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    return _managedObjectModel;
+}
+
+// Returns the persistent store coordinator for the application.
+// If the coordinator doesn't already exist, it is created and the application's store added to it.
+- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
+{
+    if (_persistentStoreCoordinator != nil) {
+        return _persistentStoreCoordinator;
+    }
+    
+    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"Duffy.sqlite"];
+    
+    NSError *error = nil;
+    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
+    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
+                                                   configuration:nil
+                                                             URL:storeURL
+                                                         options:@{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
+                                                           error:&error]) {
+        /*
+         Replace this implementation with code to handle the error appropriately.
+         
+         abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+         
+         Typical reasons for an error here include:
+         * The persistent store is not accessible;
+         * The schema for the persistent store is incompatible with current managed object model.
+         Check the error message to determine what the actual problem was.
+         
+         
+         If the persistent store is not accessible, there is typically something wrong with the file path. Often, a file URL is pointing into the application's resources directory instead of a writeable directory.
+         
+         If you encounter schema incompatibility errors during development, you can reduce their frequency by:
+         * Simply deleting the existing store:
+         [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil]
+         
+         * Performing automatic lightweight migration by passing the following dictionary as the options parameter:
+         @{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
+         
+         Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
+         
+         */
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        abort();
+    }
+    
+    return _persistentStoreCoordinator;
+}
+
+- (void)saveContext
+{
+    NSError *error = nil;
+    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
+    if (managedObjectContext != nil) {
+        if ([managedObjectContext hasChanges]){
+            NSLog(@"DB changes found, saving.");
+            if(![managedObjectContext save:&error]) {
+                // Replace this implementation with code to handle the error appropriately.
+                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                abort();
+            }
+        }
+    }
+}
+
+#pragma mark - Application's Documents directory
+
+// Returns the URL to the application's Documents directory.
+- (NSURL *)applicationDocumentsDirectory
+{
+    return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+}
 
 
 @end

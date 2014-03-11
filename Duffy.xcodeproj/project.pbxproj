@@ -7,10 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A37478F18CE4F1500E27F00 /* DFSearchController.m */; };
 		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
-		5A72E11A18B7EB5E000979D2 /* DropboxSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */; };
 		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
 		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
+		5A81ED2818CFAED5003EF557 /* DFUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A81ED2718CFAED5003EF557 /* DFUploadController.m */; };
+		5A81ED3B18CFB55A003EF557 /* libRestKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3218CFB464003EF557 /* libRestKit.a */; };
+		5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3C18CFB574003EF557 /* CFNetwork.framework */; };
+		5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */; };
+		5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -32,18 +37,50 @@
 		5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24F718998D070016CA02 /* DFPhotoStore.m */; };
 		5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */; };
 		5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */; };
-		5ADB2501189AB38A0016CA02 /* DFPhotoAlbum.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2500189AB38A0016CA02 /* DFPhotoAlbum.m */; };
-		5ADB2505189AB5640016CA02 /* DFBrowseViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2503189AB5640016CA02 /* DFBrowseViewController.m */; };
-		5ADB2506189AB5640016CA02 /* DFBrowseViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB2504189AB5640016CA02 /* DFBrowseViewController.xib */; };
 		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
-		5ADB250E189AE7980016CA02 /* Browse.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250A189AE7980016CA02 /* Browse.png */; };
-		5ADB250F189AE7980016CA02 /* Browse@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250B189AE7980016CA02 /* Browse@2x.png */; };
+		5ADB250E189AE7980016CA02 /* Albums.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250A189AE7980016CA02 /* Albums.png */; };
+		5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250B189AE7980016CA02 /* Albums@2x.png */; };
 		5ADB2510189AE7980016CA02 /* Timeline.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250C189AE7980016CA02 /* Timeline.png */; };
 		5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250D189AE7980016CA02 /* Timeline@2x.png */; };
 		5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5A81ED3118CFB464003EF557 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 25160D1614564E810060A5C5;
+			remoteInfo = RestKit;
+		};
+		5A81ED3318CFB464003EF557 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 25160D2614564E820060A5C5;
+			remoteInfo = RestKitTests;
+		};
+		5A81ED3518CFB464003EF557 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 25160E62145651060060A5C5;
+			remoteInfo = RestKitFramework;
+		};
+		5A81ED3718CFB464003EF557 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 25160E78145651060060A5C5;
+			remoteInfo = RestKitFrameworkTests;
+		};
+		5A81ED3918CFB53B003EF557 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 25160D1514564E810060A5C5;
+			remoteInfo = RestKit;
+		};
 		5ADB24DD189985590016CA02 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5ADB24AF189985590016CA02 /* Project object */;
@@ -54,10 +91,18 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A37478E18CE4F1500E27F00 /* DFSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchController.h; sourceTree = "<group>"; };
+		5A37478F18CE4F1500E27F00 /* DFSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchController.m; sourceTree = "<group>"; };
 		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
 		5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = DropboxSDK.framework; sourceTree = "<group>"; };
 		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		5A81ED2618CFAED5003EF557 /* DFUploadController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadController.h; sourceTree = "<group>"; };
+		5A81ED2718CFAED5003EF557 /* DFUploadController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadController.m; sourceTree = "<group>"; };
+		5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RestKit.xcodeproj; path = RestKit/RestKit.xcodeproj; sourceTree = "<group>"; };
+		5A81ED3C18CFB574003EF557 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -85,15 +130,10 @@
 		5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoViewCell.h; sourceTree = "<group>"; };
 		5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoViewCell.m; sourceTree = "<group>"; };
 		5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewCell.xib; sourceTree = "<group>"; };
-		5ADB24FF189AB38A0016CA02 /* DFPhotoAlbum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoAlbum.h; sourceTree = "<group>"; };
-		5ADB2500189AB38A0016CA02 /* DFPhotoAlbum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoAlbum.m; sourceTree = "<group>"; };
-		5ADB2502189AB5640016CA02 /* DFBrowseViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBrowseViewController.h; sourceTree = "<group>"; };
-		5ADB2503189AB5640016CA02 /* DFBrowseViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBrowseViewController.m; sourceTree = "<group>"; };
-		5ADB2504189AB5640016CA02 /* DFBrowseViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFBrowseViewController.xib; sourceTree = "<group>"; };
 		5ADB2507189ABBB50016CA02 /* DFPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoto.h; sourceTree = "<group>"; };
 		5ADB2508189ABBB50016CA02 /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoto.m; sourceTree = "<group>"; };
-		5ADB250A189AE7980016CA02 /* Browse.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Browse.png; path = Resources/Icons/Browse.png; sourceTree = "<group>"; };
-		5ADB250B189AE7980016CA02 /* Browse@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Browse@2x.png"; path = "Resources/Icons/Browse@2x.png"; sourceTree = "<group>"; };
+		5ADB250A189AE7980016CA02 /* Albums.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Albums.png; path = Resources/Icons/Albums.png; sourceTree = "<group>"; };
+		5ADB250B189AE7980016CA02 /* Albums@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Albums@2x.png"; path = "Resources/Icons/Albums@2x.png"; sourceTree = "<group>"; };
 		5ADB250C189AE7980016CA02 /* Timeline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Timeline.png; path = Resources/Icons/Timeline.png; sourceTree = "<group>"; };
 		5ADB250D189AE7980016CA02 /* Timeline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Timeline@2x.png"; path = "Resources/Icons/Timeline@2x.png"; sourceTree = "<group>"; };
 		5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollViewController.h; sourceTree = "<group>"; };
@@ -105,9 +145,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */,
+				5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */,
+				5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */,
+				5A81ED3B18CFB55A003EF557 /* libRestKit.a in Frameworks */,
 				5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */,
 				5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */,
-				5A72E11A18B7EB5E000979D2 /* DropboxSDK.framework in Frameworks */,
 				5ADB24F518998CBA0016CA02 /* AssetsLibrary.framework in Frameworks */,
 				5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */,
 				5ADB24C1189985590016CA02 /* CoreData.framework in Frameworks */,
@@ -130,6 +173,27 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5A37478D18CE480000E27F00 /* Generic Views */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
+				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
+				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
+			);
+			name = "Generic Views";
+			sourceTree = "<group>";
+		};
+		5A81ED2B18CFB464003EF557 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5A81ED3218CFB464003EF557 /* libRestKit.a */,
+				5A81ED3418CFB464003EF557 /* RestKitTests.octest */,
+				5A81ED3618CFB464003EF557 /* RestKit.framework */,
+				5A81ED3818CFB464003EF557 /* RestKitFrameworkTests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		5ADB24AE189985590016CA02 = {
 			isa = PBXGroup;
 			children = (
@@ -152,6 +216,10 @@
 		5ADB24B9189985590016CA02 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */,
+				5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */,
+				5A81ED3C18CFB574003EF557 /* CFNetwork.framework */,
+				5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */,
 				5A72E11D18B7EB89000979D2 /* Security.framework */,
 				5A72E11B18B7EB83000979D2 /* QuartzCore.framework */,
 				5A72E11918B7EB5E000979D2 /* DropboxSDK.framework */,
@@ -170,17 +238,16 @@
 			children = (
 				5ADB24CB189985590016CA02 /* DFAppDelegate.h */,
 				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
-				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
-				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
-				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
 				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
 				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
-				5ADB2502189AB5640016CA02 /* DFBrowseViewController.h */,
-				5ADB2503189AB5640016CA02 /* DFBrowseViewController.m */,
-				5ADB2504189AB5640016CA02 /* DFBrowseViewController.xib */,
+				5A81ED2618CFAED5003EF557 /* DFUploadController.h */,
+				5A81ED2718CFAED5003EF557 /* DFUploadController.m */,
+				5A37478E18CE4F1500E27F00 /* DFSearchController.h */,
+				5A37478F18CE4F1500E27F00 /* DFSearchController.m */,
 				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
 				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
 				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
+				5A37478D18CE480000E27F00 /* Generic Views */,
 				5ADB24FE189AB3730016CA02 /* Model */,
 				5ADB24D1189985590016CA02 /* Images.xcassets */,
 				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
@@ -193,8 +260,8 @@
 			isa = PBXGroup;
 			children = (
 				5A72E11718B55CB2000979D2 /* database.csv */,
-				5ADB250A189AE7980016CA02 /* Browse.png */,
-				5ADB250B189AE7980016CA02 /* Browse@2x.png */,
+				5ADB250A189AE7980016CA02 /* Albums.png */,
+				5ADB250B189AE7980016CA02 /* Albums@2x.png */,
 				5ADB250C189AE7980016CA02 /* Timeline.png */,
 				5ADB250D189AE7980016CA02 /* Timeline@2x.png */,
 				5ADB24C4189985590016CA02 /* Duffy-Info.plist */,
@@ -228,8 +295,6 @@
 			children = (
 				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
 				5ADB24F718998D070016CA02 /* DFPhotoStore.m */,
-				5ADB24FF189AB38A0016CA02 /* DFPhotoAlbum.h */,
-				5ADB2500189AB38A0016CA02 /* DFPhotoAlbum.m */,
 				5ADB2507189ABBB50016CA02 /* DFPhoto.h */,
 				5ADB2508189ABBB50016CA02 /* DFPhoto.m */,
 			);
@@ -250,6 +315,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				5A81ED3A18CFB53B003EF557 /* PBXTargetDependency */,
 			);
 			name = Duffy;
 			productName = Duffy;
@@ -299,6 +365,12 @@
 			mainGroup = 5ADB24AE189985590016CA02;
 			productRefGroup = 5ADB24B8189985590016CA02 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 5A81ED2B18CFB464003EF557 /* Products */;
+					ProjectRef = 5A81ED2A18CFB464003EF557 /* RestKit.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				5ADB24B6189985590016CA02 /* Duffy */,
@@ -307,19 +379,49 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXReferenceProxy section */
+		5A81ED3218CFB464003EF557 /* libRestKit.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libRestKit.a;
+			remoteRef = 5A81ED3118CFB464003EF557 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5A81ED3418CFB464003EF557 /* RestKitTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = RestKitTests.octest;
+			remoteRef = 5A81ED3318CFB464003EF557 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5A81ED3618CFB464003EF557 /* RestKit.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = RestKit.framework;
+			remoteRef = 5A81ED3518CFB464003EF557 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		5A81ED3818CFB464003EF557 /* RestKitFrameworkTests.octest */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = RestKitFrameworkTests.octest;
+			remoteRef = 5A81ED3718CFB464003EF557 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
 /* Begin PBXResourcesBuildPhase section */
 		5ADB24B5189985590016CA02 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 				5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */,
-				5ADB250E189AE7980016CA02 /* Browse.png in Resources */,
+				5ADB250E189AE7980016CA02 /* Albums.png in Resources */,
 				5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */,
-				5ADB250F189AE7980016CA02 /* Browse@2x.png in Resources */,
+				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
-				5ADB2506189AB5640016CA02 /* DFBrowseViewController.xib in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
 			);
@@ -340,14 +442,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A81ED2818CFAED5003EF557 /* DFUploadController.m in Sources */,
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
-				5ADB2501189AB38A0016CA02 /* DFPhotoAlbum.m in Sources */,
 				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
+				5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
-				5ADB2505189AB5640016CA02 /* DFBrowseViewController.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 			);
@@ -364,6 +466,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5A81ED3A18CFB53B003EF557 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = RestKit;
+			targetProxy = 5A81ED3918CFB53B003EF557 /* PBXContainerItemProxy */;
+		};
 		5ADB24DE189985590016CA02 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5ADB24B6189985590016CA02 /* Duffy */;
@@ -474,7 +581,16 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"$(BUILT_PRODUCTS_DIR)/../../Headers\"",
+				);
 				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -491,7 +607,16 @@
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"$(BUILT_PRODUCTS_DIR)/../../Headers\"",
+				);
 				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

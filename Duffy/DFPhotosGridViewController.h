@@ -8,8 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFPhotosGridViewController : UICollectionViewController
+@interface DFPhotosGridViewController : UIViewController
+
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 
 @property (nonatomic, retain) NSArray *photos;
+@property (nonatomic) CGFloat photoSquareSize;
+@property (nonatomic) CGFloat photoSpacing;
 
 @end
