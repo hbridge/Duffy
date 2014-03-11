@@ -115,7 +115,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
     if ([keyPath isEqualToString:@"thumbnail"]) {
         NSIndexPath *indexPath = (__bridge NSIndexPath *)context;
-        NSLog(@"thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
+        //NSLog(@"thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
         if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
             DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
             correctCell.imageView.image = [((DFPhoto *)object) thumbnail];
