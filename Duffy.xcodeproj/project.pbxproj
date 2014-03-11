@@ -32,9 +32,6 @@
 		5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24F718998D070016CA02 /* DFPhotoStore.m */; };
 		5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */; };
 		5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */; };
-		5ADB2501189AB38A0016CA02 /* DFPhotoAlbum.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2500189AB38A0016CA02 /* DFPhotoAlbum.m */; };
-		5ADB2505189AB5640016CA02 /* DFAlbumViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2503189AB5640016CA02 /* DFAlbumViewController.m */; };
-		5ADB2506189AB5640016CA02 /* DFAlbumViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB2504189AB5640016CA02 /* DFAlbumViewController.xib */; };
 		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
 		5ADB250E189AE7980016CA02 /* Albums.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250A189AE7980016CA02 /* Albums.png */; };
 		5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250B189AE7980016CA02 /* Albums@2x.png */; };
@@ -87,11 +84,6 @@
 		5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoViewCell.h; sourceTree = "<group>"; };
 		5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoViewCell.m; sourceTree = "<group>"; };
 		5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewCell.xib; sourceTree = "<group>"; };
-		5ADB24FF189AB38A0016CA02 /* DFPhotoAlbum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoAlbum.h; sourceTree = "<group>"; };
-		5ADB2500189AB38A0016CA02 /* DFPhotoAlbum.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoAlbum.m; sourceTree = "<group>"; };
-		5ADB2502189AB5640016CA02 /* DFAlbumViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAlbumViewController.h; sourceTree = "<group>"; };
-		5ADB2503189AB5640016CA02 /* DFAlbumViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAlbumViewController.m; sourceTree = "<group>"; };
-		5ADB2504189AB5640016CA02 /* DFAlbumViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFAlbumViewController.xib; sourceTree = "<group>"; };
 		5ADB2507189ABBB50016CA02 /* DFPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoto.h; sourceTree = "<group>"; };
 		5ADB2508189ABBB50016CA02 /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoto.m; sourceTree = "<group>"; };
 		5ADB250A189AE7980016CA02 /* Albums.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Albums.png; path = Resources/Icons/Albums.png; sourceTree = "<group>"; };
@@ -185,9 +177,6 @@
 				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
 				5A37478E18CE4F1500E27F00 /* DFSearchController.h */,
 				5A37478F18CE4F1500E27F00 /* DFSearchController.m */,
-				5ADB2502189AB5640016CA02 /* DFAlbumViewController.h */,
-				5ADB2503189AB5640016CA02 /* DFAlbumViewController.m */,
-				5ADB2504189AB5640016CA02 /* DFAlbumViewController.xib */,
 				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
 				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
 				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
@@ -239,8 +228,6 @@
 			children = (
 				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
 				5ADB24F718998D070016CA02 /* DFPhotoStore.m */,
-				5ADB24FF189AB38A0016CA02 /* DFPhotoAlbum.h */,
-				5ADB2500189AB38A0016CA02 /* DFPhotoAlbum.m */,
 				5ADB2507189ABBB50016CA02 /* DFPhoto.h */,
 				5ADB2508189ABBB50016CA02 /* DFPhoto.m */,
 			);
@@ -330,7 +317,6 @@
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
-				5ADB2506189AB5640016CA02 /* DFAlbumViewController.xib in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
 			);
@@ -352,14 +338,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
-				5ADB2501189AB38A0016CA02 /* DFPhotoAlbum.m in Sources */,
 				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
 				5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
-				5ADB2505189AB5640016CA02 /* DFAlbumViewController.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 			);

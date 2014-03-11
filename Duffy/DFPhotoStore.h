@@ -21,9 +21,6 @@ extern NSString *const DFPhotoStoreReadyNotification;
 
 // Main accessors for data
 - (NSArray *)cameraRoll;
-- (NSArray *)allAlbumsByName;
-- (NSArray *)allAlbumsByCount;
-
 
 // Core data stack
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;

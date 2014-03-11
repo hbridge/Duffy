@@ -8,7 +8,6 @@
 
 #import "DFAppDelegate.h"
 #import "DFCameraRollViewController.h"
-#import "DFAlbumViewController.h"
 #import "DFPhotoStore.h"
 
 @implementation DFAppDelegate
@@ -21,16 +20,9 @@
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[UINavigationController alloc] initWithRootViewController:cameraRollController];
     
-    // Album tab
-    UICollectionViewLayout *flowLayout2 = [[UICollectionViewFlowLayout alloc] init];
-    DFAlbumViewController *browseTab = [[DFAlbumViewController alloc] initWithCollectionViewLayout:flowLayout2];
-    UINavigationController *browseNav = [[UINavigationController alloc] initWithRootViewController:browseTab];
-    
-    
     UITabBarController *tabController = [[UITabBarController alloc] init];
     [tabController setViewControllers:[NSArray arrayWithObjects:
                                        cameraRollNav,
-                                       browseNav,
                                        nil]];
     
     [[self window] setRootViewController:tabController];

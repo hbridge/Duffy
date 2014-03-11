@@ -8,7 +8,6 @@
 
 #import "DFPhotoStore.h"
 #import <AssetsLibrary/AssetsLibrary.h>
-#import "DFPhotoAlbum.h"
 #import "DFPhoto.h"
 
 @interface DFPhotoStore()
@@ -52,7 +51,6 @@ static DFPhotoStore *defaultStore;
         _cameraRoll = [[NSMutableArray alloc] init];
         [self loadCameraRollDB];
         [self scanCameraRollForNewImages];
-        //[self loadPhotoAlbums];
     }
     return self;
 }
@@ -164,28 +162,6 @@ static DFPhotoStore *defaultStore;
 }
 
 
-- (void)loadPhotoAlbums
-{
-    void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
-    	if(group != nil) {
-            NSLog(@"Enumerating %d assets in: %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-            DFPhotoAlbum *album = [[DFPhotoAlbum alloc] initWithAssetGroup:group];
-            _allDFAlbumsByName[album.name] = album;
-    	} else {
-            NSLog(@"all albums enumerated");
-        }
-    };
-    
-    _allDFAlbumsByName = [[NSMutableDictionary alloc] init];
-    
-    [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum
-                                  usingBlock:assetGroupEnumerator
-                                failureBlock: ^(NSError *error) {
-                                    NSLog(@"Failure");
-                                }];
-}
-
-
 + (NSURL *)userLibraryURL
 {
     NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
@@ -197,55 +173,9 @@ static DFPhotoStore *defaultStore;
     return nil;
 }
 
-- (NSArray *)allAlbumsByName
-{
-    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
-        ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
-            return [album1.name compare:album2.name];
-    }];
-    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
-}
-
-- (NSArray *)allAlbumsByCount
-{
-    // get the keys in reverse order
-    NSArray *keys = [_allDFAlbumsByName keysSortedByValueUsingComparator:
-                     ^NSComparisonResult(DFPhotoAlbum *album1, DFPhotoAlbum *album2) {
-                         if (album1.photos.count < album2.photos.count) {
-                             return NSOrderedDescending;
-                         } else if (album1.photos.count > album2.photos.count) {
-                             return NSOrderedAscending;
-                         } else {
-                             return NSOrderedSame;
-                         }
-                     }];
-
-    return [_allDFAlbumsByName objectsForKeys:keys notFoundMarker:@"not found"];
-}
-
-
 - (NSArray *)cameraRoll
 {
     return _cameraRoll;
-}
-
-
-
-- (void)saveContext
-{
-    NSError *error = nil;
-    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
-    if (managedObjectContext != nil) {
-        if ([managedObjectContext hasChanges]){
-            NSLog(@"DB changes found, saving.");
-            if(![managedObjectContext save:&error]) {
-                // Replace this implementation with code to handle the error appropriately.
-                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-                abort();
-            }
-        }
-    }
 }
 
 #pragma mark - Core Data stack
@@ -319,6 +249,23 @@ static DFPhotoStore *defaultStore;
     }
     
     return _persistentStoreCoordinator;
+}
+
+- (void)saveContext
+{
+    NSError *error = nil;
+    NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
+    if (managedObjectContext != nil) {
+        if ([managedObjectContext hasChanges]){
+            NSLog(@"DB changes found, saving.");
+            if(![managedObjectContext save:&error]) {
+                // Replace this implementation with code to handle the error appropriately.
+                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
+                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                abort();
+            }
+        }
+    }
 }
 
 #pragma mark - Application's Documents directory
