@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="4514" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5053" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3747"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -14,27 +14,16 @@
                     <rect key="frame" x="0.0" y="0.0" width="120" height="120"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumScaleFactor="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="MLB-EV-fkB">
-                    <rect key="frame" x="5" y="163" width="147" height="21"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="calibratedRGB"/>
-                    <nil key="highlightedColor"/>
-                </label>
             </subviews>
             <constraints>
-                <constraint firstItem="MLB-EV-fkB" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="5" id="8M9-cn-jpM"/>
                 <constraint firstAttribute="trailing" secondItem="2gT-dn-UU6" secondAttribute="trailing" id="P3Z-Ut-YxP"/>
-                <constraint firstItem="MLB-EV-fkB" firstAttribute="top" secondItem="2gT-dn-UU6" secondAttribute="bottom" constant="43" id="b0a-zI-HCU"/>
                 <constraint firstAttribute="bottom" secondItem="2gT-dn-UU6" secondAttribute="bottom" id="qgQ-L9-sD2"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="wIE-LC-HI3"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="top" secondItem="1" secondAttribute="top" id="xez-Rp-y9J"/>
-                <constraint firstAttribute="trailing" secondItem="MLB-EV-fkB" secondAttribute="trailing" constant="-32" id="zja-mR-EpY"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="imageView" destination="2gT-dn-UU6" id="nAC-fk-qaT"/>
-                <outlet property="textLabel" destination="MLB-EV-fkB" id="INq-wZ-wcl"/>
             </connections>
         </view>
     </objects>
