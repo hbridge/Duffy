@@ -34,6 +34,7 @@ NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
 
 - (void)uploadPhotos:(NSArray *)photos
 {
+    NSLog(@"UploadController uploading %ld photos", photos.count);
     for (DFPhoto *photo in photos) {
         if (photo.uploadDate) {
             NSLog(@"Uh oh, we think this photo was already uploaded!");
@@ -80,9 +81,6 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     [self uploadPhotoWithCachedThumbnail:photo];
 }
 
-
-
-
 - (void)uploadPhotoWithCachedThumbnail:(DFPhoto *)photo
 {
     if (photo.thumbnail == nil) return;
@@ -107,14 +105,21 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     
     RKObjectRequestOperation *operation =
         [[self objectManager] objectRequestOperationWithRequest:request
-                                                        success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+                                                        success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+    {
         DFUploadResponse *response = [mappingResult firstObject];
         NSLog(@"Upload resposne received.  result:%@ debug:%@", response.result, response.debug);
-                                                            
+        if ([response.result isEqualToString:@"true"]) {
+            photo.uploadDate = [NSDate date];
+        } else {
+            // TODO add retry logic here?
+        }
     }
-                                                        failure:^(RKObjectRequestOperation *operation, NSError *error) {
-                                                            NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
+                                                        failure:^(RKObjectRequestOperation *operation, NSError *error)
+    {
+        NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
     }];
+    
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
 }
 
