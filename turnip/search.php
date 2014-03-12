@@ -112,12 +112,9 @@ function cmpWithRanking($a, $b) {
 	return $aScore < $bScore;
 }
 
-$filename = "aseem.csv";
-
 $altWordsFilename = "alt_words.csv";
 
-// Open the file
-$fp = @fopen($filename, 'r');
+
 
 // Open the file
 $altWordsFp = @fopen($altWordsFilename, 'r'); 
@@ -137,9 +134,24 @@ $urlObjects = array();
 // $rankings[$url] = $rating
 $rankings = array();
 
+
+if (!$_GET['userId']) {
+	echo "Please put the userId param into the URL";
+	exit;
+} else {
+	$userId = $_GET['userId'];
+}
+
+
+$dataFilename = "user_data/" . $userId . "/" . $userId . ".csv";
+$thumbsBaseDir = "user_data/" . $userId . "/photos/";
+
+// Open the file
+$fp = @fopen($dataFilename, 'r');
+
 // Add each line to an array
 if ($fp) {
-	$file = explode("\n", fread($fp, filesize($filename)));
+	$file = explode("\n", fread($fp, filesize($dataFilename)));
 
 	$lines = array();
    	foreach ($file as $line) {
@@ -159,10 +171,9 @@ if ($fp) {
 			$classAndRating = explode(" ", trim($line[$x]));
 			$className = strtolower($classAndRating[0]);
 			$rating = trim($classAndRating[1], "()");
-			$url = $url;
 
-			$filename = substr($url, 52, -4) . "_thumb.jpg";
-			$thumb = "aseem/" . $filename;
+			$filename = substr($url,0, -4) . "_thumb.jpg";
+			$thumb = $thumbsBaseDir. "/" . $filename;
 
 			$thumbs[$url] = $thumb;
 
@@ -277,6 +288,7 @@ if ($userQuery != "") {
 						dataType: "json",
 						crossDomain: true,
 						data: {
+							userId: "<? echo $userId ?>",
 							q: $input.val()
 						}
 					})

@@ -1,0 +1,45 @@
+[11-Mar-2014 15:50:35 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 4
+[11-Mar-2014 15:54:04 America/Denver] PHP Warning:  move_uploaded_file(/home2/derektes/public_html/photos/turnip/api/uploads/bigcar.jpg): failed to open stream: No such file or directory in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 8
+[11-Mar-2014 15:54:04 America/Denver] PHP Warning:  move_uploaded_file(): Unable to move '/var/tmp/phpfcAttM' to '/home2/derektes/public_html/photos/turnip/api/uploads/bigcar.jpg' in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 8
+[11-Mar-2014 15:58:20 America/Denver] PHP Warning:  move_uploaded_file(/home2/derektes/public_html/photos/turnip/api/uploads/bigcar.jpg): failed to open stream: No such file or directory in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 8
+[11-Mar-2014 15:58:20 America/Denver] PHP Warning:  move_uploaded_file(): Unable to move '/var/tmp/php6OWZge' to '/home2/derektes/public_html/photos/turnip/api/uploads/bigcar.jpg' in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 8
+[11-Mar-2014 16:00:24 America/Denver] PHP Warning:  move_uploaded_file(/home2/derektes/public_html/photos/turnip/api/uploads/bigcar.jpg): failed to open stream: No such file or directory in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 10
+[11-Mar-2014 16:00:24 America/Denver] PHP Warning:  move_uploaded_file(): Unable to move '/var/tmp/phpyZtTfg' to '/home2/derektes/public_html/photos/turnip/api/uploads/bigcar.jpg' in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 10
+[11-Mar-2014 16:09:17 America/Denver] PHP Parse error:  syntax error, unexpected '[' in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 8
+[11-Mar-2014 16:09:54 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:14:39 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:29:42 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:21 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:52:47 America/Denver] PHP Notice:  Undefined index: uploadFile in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 20
+[11-Mar-2014 16:58:18 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 16:58:52 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
+[11-Mar-2014 17:05:32 America/Denver] PHP Notice:  Undefined index: userId in /home2/derektes/public_html/photos/turnip/api/addphoto.php on line 5
