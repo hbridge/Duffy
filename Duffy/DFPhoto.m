@@ -63,7 +63,7 @@
     return (self.thumbnail == nil);
 }
 
-- (NSString *)localID
+- (NSString *)localFilename
 {
     //NSURL *url = [NSURL URLWithString:self.alAssetURLString];
     ALAssetRepresentation *rep = [self.asset defaultRepresentation];

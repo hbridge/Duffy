@@ -17,6 +17,16 @@
 
 @end
 
+@interface DFUploadResponse : NSObject
+
+@property NSString *result;
+@property NSString *debug;
+
+@end
+
+@implementation DFUploadResponse
+
+@end
 
 @implementation DFUploadController
 
@@ -44,6 +54,17 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
         NSURL *baseURL = [NSURL URLWithString:BaseURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
         
+        // generate response mapping
+        RKObjectMapping *responseMapping = [RKObjectMapping mappingForClass:[DFUploadResponse class]];
+        [responseMapping addAttributeMappingsFromArray:@[@"result", @"debug"]];
+        
+        RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:responseMapping
+                                                                                                method:RKRequestMethodPOST
+                                                                                           pathPattern:@"api/addphoto.php"
+                                                                                               keyPath:nil
+                                                                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+        
+        [_objectManager addResponseDescriptor:responseDescriptor];
     }
     return _objectManager;
 }
@@ -59,6 +80,9 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     [self uploadPhotoWithCachedThumbnail:photo];
 }
 
+
+
+
 - (void)uploadPhotoWithCachedThumbnail:(DFPhoto *)photo
 {
     if (photo.thumbnail == nil) return;
@@ -67,23 +91,29 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     // TOODO add a req parameter "Id" with a user id from the device
     
     
+    
     NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
                                                                                  method:RKRequestMethodPOST
                                                                                    path:AddPhotoResource
                                                                              parameters:nil
                                                               constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:imageData
-                                    name:photo.localID
-                                fileName:[NSString stringWithFormat:@"%@.jpg", photo.localID]
+                                    name:photo.localFilename
+                                fileName:[NSString stringWithFormat:@"%@", photo.localFilename]
                                 mimeType:@"image/jpg"];
     }];
     
     //NSLog(request.description);
     
-    RKObjectRequestOperation *operation = [[self objectManager] objectRequestOperationWithRequest:request success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
-        // success code
-    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
-        // failure block
+    RKObjectRequestOperation *operation =
+        [[self objectManager] objectRequestOperationWithRequest:request
+                                                        success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+        DFUploadResponse *response = [mappingResult firstObject];
+        NSLog(@"Upload resposne received.  result:%@ debug:%@", response.result, response.debug);
+                                                            
+    }
+                                                        failure:^(RKObjectRequestOperation *operation, NSError *error) {
+                                                            NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
     }];
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
 }

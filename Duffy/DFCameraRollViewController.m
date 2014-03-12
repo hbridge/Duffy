@@ -57,20 +57,19 @@
 {
     self.photos = [[DFPhotoStore sharedStore] cameraRoll];
     
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
-    
-    // WARNING PUTTING THIS HERE IS A HACK TO CACHE THUMBNAILS, TODO MAKE THIS BETTER
     NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
     if (!self.uploadController) {
         self.uploadController = [[DFUploadController alloc] init];
     }
     
     [self.uploadController uploadPhotos:photosToUpload];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    
+ 
 }
 
 
