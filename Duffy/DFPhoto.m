@@ -19,24 +19,28 @@
 
 @implementation DFPhoto
 
-@synthesize thumbnail, fullImage, asset;
+@synthesize thumbnail = _thumbnail;
+@synthesize fullImage = _fullImage;
+@synthesize asset;
+
 @dynamic alAssetURLString, universalIDString, uploadDate;
 
-- (void)loadThumbnail
+- (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
     if (self.asset) {
         CGImageRef imageRef = [self.asset thumbnail];
-        self.thumbnail = [UIImage imageWithCGImage:imageRef];
+        _thumbnail = [UIImage imageWithCGImage:imageRef];
     } else {
         ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *myasset)
         {
             self.asset = myasset;
-            self.thumbnail = [UIImage imageWithCGImage:asset.thumbnail];
+            _thumbnail = [UIImage imageWithCGImage:asset.thumbnail];
+            successBlock(_thumbnail);
         };
         
         ALAssetsLibraryAccessFailureBlock failureblock  = ^(NSError *myerror)
         {
-            NSLog(@"Can't get image - %@",[myerror localizedDescription]);
+            failureBlock(myerror);
         };
         
         NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
@@ -51,8 +55,16 @@
 {
     if (self.asset) {
         CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
-        self.fullImage = [UIImage imageWithCGImage:imageRef];
+        _thumbnail = [UIImage imageWithCGImage:imageRef];
     }
+}
+
+
+- (UIImage *)imageResizedToSize:(CGSize *)size
+{
+    
+    
+    return nil;
 }
 
 - (BOOL)isFullImageFault

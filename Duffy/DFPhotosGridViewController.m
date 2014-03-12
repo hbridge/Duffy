@@ -103,25 +103,20 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     {
         [cell.imageView setImage:[photo thumbnail]];
     } else {
-        [photo addObserver:self forKeyPath:@"thumbnail" options:NSKeyValueObservingOptionNew context:(__bridge_retained void *)indexPath];
-        [photo loadThumbnail];
+        [photo loadThumbnailWithSuccessBlock:^(UIImage *image) {
+            if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
+                DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
+                correctCell.imageView.image = image;
+                [correctCell setNeedsLayout];
+            }
+
+        } failureBlock:^(NSError *error) {
+            // failure
+        }];
         [cell.imageView setImage:[photo thumbnail]];
     }
     
     return cell;
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:@"thumbnail"]) {
-        NSIndexPath *indexPath = (__bridge NSIndexPath *)context;
-        //NSLog(@"thumbnail change detected at [%d, %d]", indexPath.section, indexPath.row);
-        if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
-            DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
-            correctCell.imageView.image = [((DFPhoto *)object) thumbnail];
-            [correctCell setNeedsLayout];
-        }
-    }
 }
 
 #pragma mark - Notification responders

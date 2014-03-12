@@ -103,9 +103,15 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
 
 - (void)uploadPhoto:(DFPhoto *)photo
 {
-    if (photo.thumbnail == nil) {
-        [photo addObserver:self forKeyPath:@"thumbnail" options:NSKeyValueObservingOptionNew context:nil];
-        [photo loadThumbnail];
+    if (photo.isThumbnailFault) {
+        [photo loadThumbnailWithSuccessBlock:^(UIImage *image) {
+            [self uploadPhotoWithCachedThumbnail:photo];
+            
+        } failureBlock:^(NSError *error) {
+            // failure
+        }];
+
+        
         return;
     }
     
@@ -152,13 +158,6 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     }];
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
-}
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
-{
-    if ([keyPath isEqualToString:@"thumbnail"]) {
-        [self uploadPhotoWithCachedThumbnail:(DFPhoto *)object];
-    }
 }
 
 
