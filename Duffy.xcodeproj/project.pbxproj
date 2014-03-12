@@ -43,6 +43,10 @@
 		5ADB2510189AE7980016CA02 /* Timeline.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250C189AE7980016CA02 /* Timeline.png */; };
 		5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250D189AE7980016CA02 /* Timeline@2x.png */; };
 		5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */; };
+		5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3418D0C87E00998793 /* DFUser.m */; };
+		5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */; };
+		5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */; };
+		5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -138,6 +142,12 @@
 		5ADB250D189AE7980016CA02 /* Timeline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Timeline@2x.png"; path = "Resources/Icons/Timeline@2x.png"; sourceTree = "<group>"; };
 		5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollViewController.h; sourceTree = "<group>"; };
 		5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollViewController.m; sourceTree = "<group>"; };
+		5AFBCA3318D0C87E00998793 /* DFUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUser.h; sourceTree = "<group>"; };
+		5AFBCA3418D0C87E00998793 /* DFUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUser.m; sourceTree = "<group>"; };
+		5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettingsViewController.h; sourceTree = "<group>"; };
+		5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSettingsViewController.m; sourceTree = "<group>"; };
+		5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSettingsViewController.xib; sourceTree = "<group>"; };
+		5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SettingsTab@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,6 +257,9 @@
 				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
 				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
 				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
+				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
+				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
+				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
 				5ADB24FE189AB3730016CA02 /* Model */,
 				5ADB24D1189985590016CA02 /* Images.xcassets */,
@@ -259,6 +272,7 @@
 		5ADB24C3189985590016CA02 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */,
 				5A72E11718B55CB2000979D2 /* database.csv */,
 				5ADB250A189AE7980016CA02 /* Albums.png */,
 				5ADB250B189AE7980016CA02 /* Albums@2x.png */,
@@ -293,6 +307,8 @@
 		5ADB24FE189AB3730016CA02 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				5AFBCA3318D0C87E00998793 /* DFUser.h */,
+				5AFBCA3418D0C87E00998793 /* DFUser.m */,
 				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
 				5ADB24F718998D070016CA02 /* DFPhotoStore.m */,
 				5ADB2507189ABBB50016CA02 /* DFPhoto.h */,
@@ -418,7 +434,9 @@
 				5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */,
 				5ADB250E189AE7980016CA02 /* Albums.png in Resources */,
 				5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */,
+				5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */,
 				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
+				5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
@@ -445,9 +463,11 @@
 				5A81ED2818CFAED5003EF557 /* DFUploadController.m in Sources */,
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
 				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
+				5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */,
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
+				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
 				5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,

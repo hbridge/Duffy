@@ -12,7 +12,6 @@
 
 @interface DFPhotoStore()
 
-@property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
 
@@ -23,6 +22,7 @@
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize managedObjectModel = _managedObjectModel;
 @synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
+@synthesize assetsLibrary = _assetsLibrary;
 
 
 NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
@@ -131,9 +131,7 @@ static DFPhotoStore *defaultStore;
     	}
     };
     
-    _assetsLibrary = [[ALAssetsLibrary alloc] init];
-    
-    [_assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
+    [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
     					   usingBlock:assetGroupEnumerator
     					 failureBlock: ^(NSError *error) {
     						 NSLog(@"Failure");
@@ -202,6 +200,18 @@ static DFPhotoStore *defaultStore;
 {
     return _cameraRoll;
 }
+
+#pragma mark - Assets Library
+
+- (ALAssetsLibrary *)assetsLibrary
+{
+    if (_assetsLibrary == nil) {
+        _assetsLibrary = [[ALAssetsLibrary alloc] init];
+    }
+    return _assetsLibrary;
+}
+
+
 
 #pragma mark - Core Data stack
 

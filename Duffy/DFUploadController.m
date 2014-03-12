@@ -6,10 +6,11 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
+#import <RestKit/RestKit.h>
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
-#import <RestKit/RestKit.h>
+#import "DFUser.h"
 
 @interface DFUploadController()
 
@@ -17,6 +18,8 @@
 
 @end
 
+
+// Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
 
 @property NSString *result;
@@ -30,7 +33,35 @@
 
 @implementation DFUploadController
 
+
+
 NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
+
+
+
+static DFUploadController *defaultUploadController;
+
++ (DFUploadController *)sharedUploadController {
+    if (!defaultUploadController) {
+        defaultUploadController = [[super allocWithZone:nil] init];
+    }
+    return defaultUploadController;
+}
+
++ (id)allocWithZone:(NSZone *)zone
+{
+    return [self sharedUploadController];
+}
+
+- (DFUploadController *)init
+{
+    self = [super init];
+    if (self) {
+        
+    }
+    return self;
+}
+
 
 - (void)uploadPhotos:(NSArray *)photos
 {
@@ -38,7 +69,6 @@ NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
     for (DFPhoto *photo in photos) {
         if (photo.uploadDate) {
             NSLog(@"Uh oh, we think this photo was already uploaded!");
-            continue;
         }
         
         [self uploadPhoto:photo];
@@ -86,14 +116,12 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     if (photo.thumbnail == nil) return;
     
     NSData *imageData = UIImageJPEGRepresentation(photo.thumbnail, 0.75);
-    // TOODO add a req parameter "Id" with a user id from the device
-    
-    
-    
+    NSDictionary *params = @{@"userId": [DFUser deviceID]};
+
     NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
                                                                                  method:RKRequestMethodPOST
                                                                                    path:AddPhotoResource
-                                                                             parameters:nil
+                                                                             parameters:params
                                                               constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
         [formData appendPartWithFileData:imageData
                                     name:photo.localFilename
@@ -108,7 +136,7 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
                                                         success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
     {
         DFUploadResponse *response = [mappingResult firstObject];
-        NSLog(@"Upload resposne received.  result:%@ debug:%@", response.result, response.debug);
+        NSLog(@"Upload response received.  result:%@ debug:%@", response.result, response.debug);
         if ([response.result isEqualToString:@"true"]) {
             photo.uploadDate = [NSDate date];
         } else {

@@ -7,8 +7,10 @@
 //
 
 #import "DFAppDelegate.h"
-#import "DFCameraRollViewController.h"
 #import "DFPhotoStore.h"
+#import "DFCameraRollViewController.h"
+#import "DFSettingsViewController.h"
+
 
 @implementation DFAppDelegate
 
@@ -20,9 +22,13 @@
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[UINavigationController alloc] initWithRootViewController:cameraRollController];
     
+    DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
+    UINavigationController *settingsNav = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
+    
     UITabBarController *tabController = [[UITabBarController alloc] init];
     [tabController setViewControllers:[NSArray arrayWithObjects:
                                        cameraRollNav,
+                                       settingsNav,
                                        nil]];
     
     [[self window] setRootViewController:tabController];

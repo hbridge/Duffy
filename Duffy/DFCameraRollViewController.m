@@ -14,7 +14,6 @@
 @interface DFCameraRollViewController ()
 
 @property (nonatomic, retain) DFSearchController *sdc;
-@property (nonatomic, retain) DFUploadController *uploadController;
 
 @end
 
@@ -58,11 +57,8 @@
     self.photos = [[DFPhotoStore sharedStore] cameraRoll];
     
     NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
-    if (!self.uploadController) {
-        self.uploadController = [[DFUploadController alloc] init];
-    }
     
-    [self.uploadController uploadPhotos:photosToUpload];
+    [[DFUploadController sharedUploadController] uploadPhotos:photosToUpload];
 }
 
 - (void)viewDidAppear:(BOOL)animated

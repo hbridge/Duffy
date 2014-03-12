@@ -7,7 +7,9 @@
 //
 
 #import "DFPhoto.h"
+
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "DFPhotoStore.h"
 
 @interface DFPhoto()
 
@@ -38,8 +40,8 @@
         };
         
         NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
-        ALAssetsLibrary* assetslibrary = [[ALAssetsLibrary alloc] init];
-        [assetslibrary assetForURL:asseturl
+        ALAssetsLibrary *assetsLibrary = [[DFPhotoStore sharedStore] assetsLibrary];
+        [assetsLibrary assetForURL:asseturl
                        resultBlock:resultblock
                       failureBlock:failureblock];
     }

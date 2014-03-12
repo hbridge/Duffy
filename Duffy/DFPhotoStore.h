@@ -9,15 +9,17 @@
 #import <Foundation/Foundation.h>
 #import <DropboxSDK/DBRestClient.h>
 
-@class DBRestClient;
-
+@class ALAssetsLibrary;
 
 @interface DFPhotoStore : NSObject <DBRestClientDelegate>
 
 extern NSString *const DFPhotoStoreReadyNotification;
 
-// Get the singleton store isntance
+// Get the singleton store instance
 + (DFPhotoStore *)sharedStore;
+
+// Get the shared ALAssets library for other model files
+@property (readonly, strong, nonatomic) ALAssetsLibrary *assetsLibrary;
 
 // Main accessors for data
 - (NSArray *)cameraRoll;
