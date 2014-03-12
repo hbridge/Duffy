@@ -21,34 +21,47 @@
 
 @synthesize thumbnail = _thumbnail;
 @synthesize fullImage = _fullImage;
-@synthesize asset;
+@synthesize asset = _asset;
 
 @dynamic alAssetURLString, universalIDString, uploadDate;
+
+
+- (ALAsset *)asset
+{
+    if (!_asset) {
+        NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
+        ALAssetsLibrary *assetsLibrary = [[DFPhotoStore sharedStore] assetsLibrary];
+        
+        
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        
+        // must dispatch this off the main thread or it will deadlock!
+        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
+                _asset = asset;
+                dispatch_semaphore_signal(sema);
+            } failureBlock:^(NSError *error) {
+                dispatch_semaphore_signal(sema);
+            }];
+        });
+        
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    }
+    
+    return _asset;
+}
+
 
 - (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
     if (self.asset) {
         CGImageRef imageRef = [self.asset thumbnail];
         _thumbnail = [UIImage imageWithCGImage:imageRef];
+        successBlock(_thumbnail);
     } else {
-        ALAssetsLibraryAssetForURLResultBlock resultblock = ^(ALAsset *myasset)
-        {
-            self.asset = myasset;
-            _thumbnail = [UIImage imageWithCGImage:asset.thumbnail];
-            successBlock(_thumbnail);
-        };
-        
-        ALAssetsLibraryAccessFailureBlock failureblock  = ^(NSError *myerror)
-        {
-            failureBlock(myerror);
-        };
-        
-        NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
-        ALAssetsLibrary *assetsLibrary = [[DFPhotoStore sharedStore] assetsLibrary];
-        [assetsLibrary assetForURL:asseturl
-                       resultBlock:resultblock
-                      failureBlock:failureblock];
+        failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
     }
+    
 }
 
 - (void)loadFullImage
