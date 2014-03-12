@@ -50,6 +50,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [self.settingsTableView dequeueReusableCellWithIdentifier:@"UITableViewCell"];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     switch (indexPath.row) {
         case 0:
             cell.textLabel.text = @"Force upload camera roll";
