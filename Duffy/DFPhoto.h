@@ -21,17 +21,16 @@
 
 
 // Access to the images
-// Will block if the image needs to be loaded from somewhere.  Access on the main thread should be preceeded
-// by a check for a fault and a load to prevent unresponsiveness.
+// Will block if the image needs to be loaded from somewhere.  Access on the main thread should
+// Ideally be done with createCGImage calls
 @property (readonly, nonatomic, retain) UIImage *fullImage;
-// returns a 157x157 thumbnail
-@property (readonly, nonatomic, retain) UIImage *thumbnail;
+@property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
 
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;
 
-// use these to force the class to cache the image data so it can
-// be accessed quickly in the future.  blocks can be used to get callbacks
+// Use these to access image data Asynchronously if accessing it will be slow
+// Note that the created CGImage must be released by the caller to prevent memory leaks
 
 typedef void (^DFPhotoLoadSuccessBlock)(CGImageRef imageRef);
 typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
@@ -39,7 +38,7 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 - (void)createCGImageForFullImage:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 - (void)createCGImageForThumbnail:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 
-
+// Image attributes
 
 - (NSString *)localFilename;
 
