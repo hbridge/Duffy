@@ -26,6 +26,78 @@
 @dynamic alAssetURLString, universalIDString, uploadDate;
 
 
+- (UIImage *)thumbnail
+{
+    if (_thumbnail) return _thumbnail;
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    // Synchronously load the thunbnail
+    // must dispatch this off the main thread or it will deadlock!
+    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self loadThumbnailWithSuccessBlock:^(UIImage *image) {
+            dispatch_semaphore_signal(sema);
+        } failureBlock:^(NSError *error) {
+            dispatch_semaphore_signal(sema);
+        }];
+    });
+
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return  _thumbnail;
+}
+
+- (UIImage *)fullImage
+{
+    if (_fullImage) return  _fullImage;
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    // Synchronously load the thunbnail
+    // must dispatch this off the main thread or it will deadlock!
+    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        [self loadFullImageWithSuccessBlock:^(UIImage *image) {
+            dispatch_semaphore_signal(sema);
+        } failureBlock:^(NSError *error) {
+            dispatch_semaphore_signal(sema);
+        }];
+    });
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    return  _fullImage;
+}
+
+- (UIImage *)imageResizedToSize:(CGSize *)size
+{
+    
+    
+    return nil;
+}
+
+
+- (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
+{
+    if (self.asset) {
+        CGImageRef imageRef = [self.asset thumbnail];
+        _thumbnail = [UIImage imageWithCGImage:imageRef];
+        successBlock(_thumbnail);
+    } else {
+        failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
+    }
+    
+}
+
+- (void)loadFullImageWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
+{
+    if (self.asset) {
+        CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
+        _fullImage = [UIImage imageWithCGImage:imageRef];
+        successBlock(_fullImage);
+    } else {
+        failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
+    }
+}
+
+
 - (ALAsset *)asset
 {
     if (!_asset) {
@@ -49,35 +121,6 @@
     }
     
     return _asset;
-}
-
-
-- (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
-{
-    if (self.asset) {
-        CGImageRef imageRef = [self.asset thumbnail];
-        _thumbnail = [UIImage imageWithCGImage:imageRef];
-        successBlock(_thumbnail);
-    } else {
-        failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
-    }
-    
-}
-
-- (void)loadFullImage
-{
-    if (self.asset) {
-        CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
-        _thumbnail = [UIImage imageWithCGImage:imageRef];
-    }
-}
-
-
-- (UIImage *)imageResizedToSize:(CGSize *)size
-{
-    
-    
-    return nil;
 }
 
 - (BOOL)isFullImageFault

@@ -20,9 +20,10 @@
 @property (nonatomic, retain) NSDate *uploadDate;
 
 
-// access the actual image
+// Access to the images
+// Will block if the image needs to be loaded from somewhere.  Access on the main thread should be preceeded
+// by a check for a fault and a load to prevent unresponsiveness.
 @property (readonly, nonatomic, retain) UIImage *fullImage;
-
 // returns a 157x157 thumbnail
 @property (readonly, nonatomic, retain) UIImage *thumbnail;
 
@@ -41,7 +42,7 @@
 typedef void (^DFPhotoLoadSuccessBlock)(UIImage *image);
 typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 
-- (void)loadFullImage;
+- (void)loadFullImageWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 - (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 
 
