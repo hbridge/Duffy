@@ -10,6 +10,7 @@
 
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhotoStore.h"
+#import "ThirdParty/UIImage-Categories/UIImage+Resize.h"
 
 @interface DFPhoto()
 
@@ -66,11 +67,13 @@
     return  _fullImage;
 }
 
-- (UIImage *)imageResizedToSize:(CGSize *)size
+- (UIImage *)imageResizedToFitSize:(CGSize)size
 {
+    UIImage *resizedImage = [self.fullImage resizedImageWithContentMode:UIViewContentModeScaleAspectFit
+                                                                 bounds:size
+                                                   interpolationQuality:kCGInterpolationHigh];
     
-    
-    return nil;
+    return resizedImage;
 }
 
 

@@ -28,7 +28,7 @@
 @property (readonly, nonatomic, retain) UIImage *thumbnail;
 
 // access the image sized to a specific size
-- (UIImage *)imageResizedToSize:(CGSize *)size;
+- (UIImage *)imageResizedToFitSize:(CGSize)size;
 
 
 // use these to determine whether asking for the full image will trigger

@@ -103,9 +103,9 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
 
 - (void)uploadPhoto:(DFPhoto *)photo
 {
-    if (photo.isThumbnailFault) {
-        [photo loadThumbnailWithSuccessBlock:^(UIImage *image) {
-            [self uploadPhotoWithCachedThumbnail:photo];
+    if (photo.isFullImageFault) {
+        [photo loadFullImageWithSuccessBlock:^(UIImage *image) {
+            [self uploadPhotoWithCachedImage:photo];
             
         } failureBlock:^(NSError *error) {
             // failure
@@ -115,14 +115,15 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
         return;
     }
     
-    [self uploadPhotoWithCachedThumbnail:photo];
+    [self uploadPhotoWithCachedImage:photo];
 }
 
-- (void)uploadPhotoWithCachedThumbnail:(DFPhoto *)photo
+- (void)uploadPhotoWithCachedImage:(DFPhoto *)photo
 {
     if (photo.thumbnail == nil) return;
     
-    NSData *imageData = UIImageJPEGRepresentation(photo.thumbnail, 0.75);
+    UIImage *imageToUpload = [photo imageResizedToFitSize:CGSizeMake(256, 256)];
+    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.75);
     NSDictionary *params = @{@"userId": [DFUser deviceID]};
     NSDate *uploadStartDate = [NSDate date];
     NSString *uniqueUploadName = [self uniqueFilenameForPhoto:photo uploadDate:uploadStartDate];
