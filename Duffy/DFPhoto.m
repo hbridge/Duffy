@@ -20,8 +20,8 @@
 
 @implementation DFPhoto
 
-@synthesize thumbnail = _thumbnail;
-@synthesize fullImage = _fullImage;
+@synthesize thumbnail;
+@synthesize fullImage;
 @synthesize asset = _asset;
 
 @dynamic alAssetURLString, universalIDString, uploadDate;
@@ -29,14 +29,15 @@
 
 - (UIImage *)thumbnail
 {
-    if (_thumbnail) return _thumbnail;
-    
+    UIImage __block *loadedThumbnail;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
     // Synchronously load the thunbnail
     // must dispatch this off the main thread or it will deadlock!
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self loadThumbnailWithSuccessBlock:^(UIImage *image) {
+        [self createCGImageForThumbnail:^(CGImageRef imageRef) {
+            loadedThumbnail = [UIImage imageWithCGImage:imageRef];
+            CGImageRelease(imageRef);
             dispatch_semaphore_signal(sema);
         } failureBlock:^(NSError *error) {
             dispatch_semaphore_signal(sema);
@@ -44,19 +45,21 @@
     });
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    return  _thumbnail;
+    return  loadedThumbnail;
 }
 
 - (UIImage *)fullImage
 {
-    if (_fullImage) return  _fullImage;
+    UIImage __block *loadedFullImage;
     
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
     // Synchronously load the thunbnail
     // must dispatch this off the main thread or it will deadlock!
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self loadFullImageWithSuccessBlock:^(UIImage *image) {
+        [self createCGImageForFullImage:^(CGImageRef imageRef) {
+            loadedFullImage = [UIImage imageWithCGImage:imageRef];
+            CGImageRelease(imageRef);
             dispatch_semaphore_signal(sema);
         } failureBlock:^(NSError *error) {
             dispatch_semaphore_signal(sema);
@@ -64,7 +67,7 @@
     });
     
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    return  _fullImage;
+    return loadedFullImage;
 }
 
 - (UIImage *)imageResizedToFitSize:(CGSize)size
@@ -72,29 +75,28 @@
     UIImage *resizedImage = [self.fullImage resizedImageWithContentMode:UIViewContentModeScaleAspectFit
                                                                  bounds:size
                                                    interpolationQuality:kCGInterpolationHigh];
-    
     return resizedImage;
 }
 
 
-- (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
+- (void)createCGImageForThumbnail:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
     if (self.asset) {
         CGImageRef imageRef = [self.asset thumbnail];
-        _thumbnail = [UIImage imageWithCGImage:imageRef];
-        successBlock(_thumbnail);
+        CGImageRetain(imageRef);
+        successBlock(imageRef);
     } else {
         failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
     }
     
 }
 
-- (void)loadFullImageWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
+- (void)createCGImageForFullImage:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
     if (self.asset) {
         CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
-        _fullImage = [UIImage imageWithCGImage:imageRef];
-        successBlock(_fullImage);
+        CGImageRetain(imageRef);
+        successBlock(imageRef);
     } else {
         failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
     }
@@ -124,16 +126,6 @@
     }
     
     return _asset;
-}
-
-- (BOOL)isFullImageFault
-{
-    return (self.fullImage == nil);
-}
-
-- (BOOL)isThumbnailFault
-{
-    return (self.thumbnail == nil);
 }
 
 - (NSString *)localFilename

@@ -99,22 +99,19 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
                                   dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
     
-    if (!photo.isThumbnailFault)
-    {
-        [cell.imageView setImage:[photo thumbnail]];
-    } else {
-        [photo loadThumbnailWithSuccessBlock:^(UIImage *image) {
-            if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
-                DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView cellForItemAtIndexPath:indexPath];
-                correctCell.imageView.image = image;
-                [correctCell setNeedsLayout];
-            }
-
-        } failureBlock:^(NSError *error) {
-            // failure
-        }];
-        [cell.imageView setImage:[photo thumbnail]];
-    }
+    
+    [photo createCGImageForThumbnail:^(CGImageRef imageRef) {
+        if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
+            DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView
+                                                              cellForItemAtIndexPath:indexPath];
+            correctCell.imageView.image = [UIImage imageWithCGImage:imageRef];
+            [correctCell setNeedsLayout];
+            CGImageRelease(imageRef);
+        }
+    } failureBlock:^(NSError *error) {
+        NSLog(@"image load failed");
+    }];
+    [cell.imageView setImage:[photo thumbnail]];
     
     return cell;
 }

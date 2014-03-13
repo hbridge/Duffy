@@ -30,20 +30,14 @@
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;
 
-
-// use these to determine whether asking for the full image will trigger
-// a fault, potentially causing UI slowness
-- (BOOL)isFullImageFault;
-- (BOOL)isThumbnailFault;
-
 // use these to force the class to cache the image data so it can
 // be accessed quickly in the future.  blocks can be used to get callbacks
 
-typedef void (^DFPhotoLoadSuccessBlock)(UIImage *image);
+typedef void (^DFPhotoLoadSuccessBlock)(CGImageRef imageRef);
 typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 
-- (void)loadFullImageWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
-- (void)loadThumbnailWithSuccessBlock:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
+- (void)createCGImageForFullImage:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
+- (void)createCGImageForThumbnail:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 
 
 

@@ -13,35 +13,35 @@
 #import "DFPhoto.h"
 #import "DFUser.h"
 
-@interface DFUploadController()
-
-@property (nonatomic, retain) RKObjectManager* objectManager;
-
-@end
-
 
 // Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
-
 @property NSString *result;
 @property NSString *debug;
-
+@end
+@implementation DFUploadResponse
 @end
 
-@implementation DFUploadResponse
+// Constants
+static NSString *BaseURL = @"http://photos.derektest1.com/";
+static NSString *AddPhotoResource = @"api/addphoto.php";
+NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
+
+@interface DFUploadController()
+
+@property (readonly, atomic, retain) RKObjectManager* objectManager;
+@property (atomic) dispatch_queue_t uploadDispatchQueue;
+@property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
+@property (atomic, retain) NSMutableArray *photosToUpload;
 
 @end
 
 @implementation DFUploadController
 
+@synthesize objectManager = _objectManager;
 
-
-NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
-
-
-
+// We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
-
 + (DFUploadController *)sharedUploadController {
     if (!defaultUploadController) {
         defaultUploadController = [[super allocWithZone:nil] init];
@@ -58,28 +58,95 @@ static DFUploadController *defaultUploadController;
 {
     self = [super init];
     if (self) {
-        
+        self.uploadDispatchQueue = dispatch_queue_create("com.duffysoft.DFUploadController.UploadQueue", DISPATCH_QUEUE_SERIAL);
+        self.photosToUpload = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
+#pragma mark - Public APIs
 
 - (void)uploadPhotos:(NSArray *)photos
 {
     NSLog(@"UploadController uploading %ld photos", photos.count);
-    for (DFPhoto *photo in photos) {
-        if (photo.uploadDate) {
-            NSLog(@"Uploading a file we already think was uploaded.");
-        }
-        
-        [self uploadPhoto:photo];
-        
-    }
+    if (photos.count < 1) return;
     
+    [self.photosToUpload addObjectsFromArray:photos];
+    [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
 }
 
-static NSString *BaseURL = @"http://photos.derektest1.com/";
-static NSString *AddPhotoResource = @"/api/addphoto.php";
+#pragma mark - Private networking code
+
+- (void)enqueuePhotoForUpload:(DFPhoto *)photo
+{
+    dispatch_async(self.uploadDispatchQueue, ^{
+        [self uploadPhoto:photo];
+    });
+}
+
+
+- (void)uploadFinishedForPhoto:(DFPhoto *)photo
+{
+    [self.photosToUpload removeObject:photo];
+    
+    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photosToUpload.count);
+    if (self.photosToUpload.count > 0) {
+        [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
+    }
+}
+
+- (void)uploadPhoto:(DFPhoto *)photo
+{
+    NSURLRequest *postRequest = [self createPostRequestForPhoto:photo];
+    
+    RKObjectRequestOperation *operation =
+        [[self objectManager] objectRequestOperationWithRequest:postRequest
+                                                        success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+    {
+        DFUploadResponse *response = [mappingResult firstObject];
+        NSLog(@"Upload response received.  result:%@ debug:%@", response.result, response.debug);
+        if ([response.result isEqualToString:@"true"]) {
+            photo.uploadDate = [NSDate date];
+            [self uploadFinishedForPhoto:photo];
+        } else {
+            // TODO add retry logic here?
+        }
+    }
+                                                        failure:^(RKObjectRequestOperation *operation, NSError *error)
+    {
+        NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
+        
+    }];
+    
+    
+    [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
+}
+
+- (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
+{
+    UIImage *imageToUpload = [photo imageResizedToFitSize:CGSizeMake(256, 256)];
+    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.75);
+    NSDictionary *params = @{@"userId": [DFUser deviceID]};
+    NSDate *uploadStartDate = [NSDate date];
+    NSString *uniqueUploadName = [self uniqueFilenameForPhoto:photo uploadDate:uploadStartDate];
+    
+    NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
+                                                                                 method:RKRequestMethodPOST
+                                                                                   path:AddPhotoResource
+                                                                             parameters:params
+                                                              constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                                                  [formData appendPartWithFileData:imageData
+                                                                                              name:uniqueUploadName
+                                                                                          fileName:[NSString stringWithFormat:@"%@.jpg", uniqueUploadName]
+                                                                                          mimeType:@"image/jpg"];
+                                                              }];
+
+    return request;
+}
+
+
+#pragma mark - Internal Helper Functions
+
 
 - (RKObjectManager *)objectManager {
     if (!_objectManager) {
@@ -92,7 +159,7 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
         
         RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:responseMapping
                                                                                                 method:RKRequestMethodPOST
-                                                                                           pathPattern:@"api/addphoto.php"
+                                                                                           pathPattern:AddPhotoResource
                                                                                                keyPath:nil
                                                                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
         
@@ -100,68 +167,6 @@ static NSString *AddPhotoResource = @"/api/addphoto.php";
     }
     return _objectManager;
 }
-
-- (void)uploadPhoto:(DFPhoto *)photo
-{
-    if (photo.isFullImageFault) {
-        [photo loadFullImageWithSuccessBlock:^(UIImage *image) {
-            [self uploadPhotoWithCachedImage:photo];
-            
-        } failureBlock:^(NSError *error) {
-            // failure
-        }];
-
-        
-        return;
-    }
-    
-    [self uploadPhotoWithCachedImage:photo];
-}
-
-- (void)uploadPhotoWithCachedImage:(DFPhoto *)photo
-{
-    if (photo.thumbnail == nil) return;
-    
-    UIImage *imageToUpload = [photo imageResizedToFitSize:CGSizeMake(256, 256)];
-    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.75);
-    NSDictionary *params = @{@"userId": [DFUser deviceID]};
-    NSDate *uploadStartDate = [NSDate date];
-    NSString *uniqueUploadName = [self uniqueFilenameForPhoto:photo uploadDate:uploadStartDate];
-
-    NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
-                                                                                 method:RKRequestMethodPOST
-                                                                                   path:AddPhotoResource
-                                                                             parameters:params
-                                                              constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-        [formData appendPartWithFileData:imageData
-                                    name:uniqueUploadName
-                                fileName:[NSString stringWithFormat:@"%@.jpg", uniqueUploadName]
-                                mimeType:@"image/jpg"];
-    }];
-    
-    //NSLog(request.description);
-    
-    RKObjectRequestOperation *operation =
-        [[self objectManager] objectRequestOperationWithRequest:request
-                                                        success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-    {
-        DFUploadResponse *response = [mappingResult firstObject];
-        NSLog(@"Upload response received.  result:%@ debug:%@", response.result, response.debug);
-        if ([response.result isEqualToString:@"true"]) {
-            photo.uploadDate = uploadStartDate;
-        } else {
-            // TODO add retry logic here?
-        }
-    }
-                                                        failure:^(RKObjectRequestOperation *operation, NSError *error)
-    {
-        NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
-    }];
-    
-    [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
-}
-
-
 
 - (NSString *)uniqueFilenameForPhoto:(DFPhoto *)photo uploadDate:(NSDate *)date
 {
