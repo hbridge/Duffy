@@ -67,6 +67,10 @@
     [[DFPhotoStore sharedStore] saveContext];
 }
 
+- (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
+{
+    //[[DFPhotoStore sharedStore] emptyImageCache];
+}
 
 
 @end
