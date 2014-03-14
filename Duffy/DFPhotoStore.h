@@ -7,11 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <DropboxSDK/DBRestClient.h>
 
 @class ALAssetsLibrary;
 
-@interface DFPhotoStore : NSObject <DBRestClientDelegate>
+@interface DFPhotoStore : NSObject
 
 extern NSString *const DFPhotoStoreReadyNotification;
 
