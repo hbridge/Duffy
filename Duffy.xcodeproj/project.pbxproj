@@ -1,1939 +1,725 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-	<key>archiveVersion</key>
-	<string>1</string>
-	<key>classes</key>
-	<dict/>
-	<key>objectVersion</key>
-	<string>46</string>
-	<key>objects</key>
-	<dict>
-		<key>502B025BD24C4FB89333BFED</key>
-		<dict>
-			<key>fileRef</key>
-			<string>68ED45F75CA648D08A506609</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>514DAA1BD6B44149AD7F0216</key>
-		<dict>
-			<key>includeInIndex</key>
-			<string>1</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.xcconfig</string>
-			<key>name</key>
-			<string>Pods.xcconfig</string>
-			<key>path</key>
-			<string>Duffy/Pods/Pods.xcconfig</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A37478D18CE480000E27F00</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24F9189992180016CA02</string>
-				<string>5ADB24FA189992180016CA02</string>
-				<string>5ADB24FC189992A00016CA02</string>
-				<string>5ADB24EF189985A20016CA02</string>
-				<string>5ADB24F0189985A20016CA02</string>
-				<string>5ADB24F1189985A20016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Generic Views</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A37478E18CE4F1500E27F00</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFSearchController.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A37478F18CE4F1500E27F00</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFSearchController.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A37479018CE4F1500E27F00</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A37478F18CE4F1500E27F00</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A72E11718B55CB2000979D2</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text</string>
-			<key>path</key>
-			<string>database.csv</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A72E11818B55CB2000979D2</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A72E11718B55CB2000979D2</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A72E11B18B7EB83000979D2</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>QuartzCore.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/QuartzCore.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5A72E11C18B7EB83000979D2</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A72E11B18B7EB83000979D2</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A72E11D18B7EB89000979D2</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>Security.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/Security.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5A72E11E18B7EB89000979D2</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A72E11D18B7EB89000979D2</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A81ED2618CFAED5003EF557</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFUploadController.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A81ED2718CFAED5003EF557</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFUploadController.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5A81ED2818CFAED5003EF557</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A81ED2718CFAED5003EF557</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A81ED3C18CFB574003EF557</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>CFNetwork.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/CFNetwork.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5A81ED3D18CFB574003EF557</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A81ED3C18CFB574003EF557</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A81ED3E18CFB57F003EF557</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>MobileCoreServices.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/MobileCoreServices.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5A81ED3F18CFB57F003EF557</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A81ED3E18CFB57F003EF557</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5A81ED4018CFB591003EF557</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>SystemConfiguration.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/SystemConfiguration.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5A81ED4118CFB591003EF557</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5A81ED4018CFB591003EF557</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24AE189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24C2189985590016CA02</string>
-				<string>5ADB24DF189985590016CA02</string>
-				<string>5ADB24B9189985590016CA02</string>
-				<string>5ADB24B8189985590016CA02</string>
-				<string>514DAA1BD6B44149AD7F0216</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24AF189985590016CA02</key>
-		<dict>
-			<key>attributes</key>
-			<dict>
-				<key>CLASSPREFIX</key>
-				<string>DF</string>
-				<key>LastUpgradeCheck</key>
-				<string>0510</string>
-				<key>ORGANIZATIONNAME</key>
-				<string>Duffy Productions</string>
-				<key>TargetAttributes</key>
-				<dict>
-					<key>5ADB24D6189985590016CA02</key>
-					<dict>
-						<key>TestTargetID</key>
-						<string>5ADB24B6189985590016CA02</string>
-					</dict>
-				</dict>
-			</dict>
-			<key>buildConfigurationList</key>
-			<string>5ADB24B2189985590016CA02</string>
-			<key>compatibilityVersion</key>
-			<string>Xcode 3.2</string>
-			<key>developmentRegion</key>
-			<string>English</string>
-			<key>hasScannedForEncodings</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXProject</string>
-			<key>knownRegions</key>
-			<array>
-				<string>en</string>
-			</array>
-			<key>mainGroup</key>
-			<string>5ADB24AE189985590016CA02</string>
-			<key>productRefGroup</key>
-			<string>5ADB24B8189985590016CA02</string>
-			<key>projectDirPath</key>
-			<string></string>
-			<key>projectReferences</key>
-			<array/>
-			<key>projectRoot</key>
-			<string></string>
-			<key>targets</key>
-			<array>
-				<string>5ADB24B6189985590016CA02</string>
-				<string>5ADB24D6189985590016CA02</string>
-			</array>
-		</dict>
-		<key>5ADB24B2189985590016CA02</key>
-		<dict>
-			<key>buildConfigurations</key>
-			<array>
-				<string>5ADB24E7189985590016CA02</string>
-				<string>5ADB24E8189985590016CA02</string>
-			</array>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-		</dict>
-		<key>5ADB24B3189985590016CA02</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>5A81ED2818CFAED5003EF557</string>
-				<string>5AFBCA5018D236A900998793</string>
-				<string>5ADB24D0189985590016CA02</string>
-				<string>5ADB24FB189992180016CA02</string>
-				<string>5AFBCA3918D0E0FD00998793</string>
-				<string>5ADB2509189ABBB50016CA02</string>
-				<string>5ADB24F2189985A20016CA02</string>
-				<string>5ADB24F818998D070016CA02</string>
-				<string>5AFBCA3518D0C87E00998793</string>
-				<string>5A37479018CE4F1500E27F00</string>
-				<string>5ADB24CD189985590016CA02</string>
-				<string>5ADB2514189AED860016CA02</string>
-				<string>5ADB24C9189985590016CA02</string>
-				<string>5AFBCA4E18D236A900998793</string>
-				<string>5AFBCA4F18D236A900998793</string>
-			</array>
-			<key>isa</key>
-			<string>PBXSourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>5ADB24B4189985590016CA02</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>5A81ED4118CFB591003EF557</string>
-				<string>5A81ED3F18CFB57F003EF557</string>
-				<string>5A81ED3D18CFB574003EF557</string>
-				<string>5A72E11E18B7EB89000979D2</string>
-				<string>5A72E11C18B7EB83000979D2</string>
-				<string>5ADB24F518998CBA0016CA02</string>
-				<string>5ADB24BD189985590016CA02</string>
-				<string>5ADB24C1189985590016CA02</string>
-				<string>5ADB24BF189985590016CA02</string>
-				<string>5ADB24BB189985590016CA02</string>
-				<string>502B025BD24C4FB89333BFED</string>
-			</array>
-			<key>isa</key>
-			<string>PBXFrameworksBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>5ADB24B5189985590016CA02</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>5ADB24C7189985590016CA02</string>
-				<string>5ADB250E189AE7980016CA02</string>
-				<string>5ADB2511189AE7980016CA02</string>
-				<string>5AFBCA3A18D0E0FD00998793</string>
-				<string>5ADB250F189AE7980016CA02</string>
-				<string>5AFBCA3C18D0E68400998793</string>
-				<string>5ADB24D2189985590016CA02</string>
-				<string>5ADB24F3189985A20016CA02</string>
-				<string>5A72E11818B55CB2000979D2</string>
-				<string>5ADB2510189AE7980016CA02</string>
-				<string>5ADB24FD189992A00016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXResourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>5ADB24B6189985590016CA02</key>
-		<dict>
-			<key>buildConfigurationList</key>
-			<string>5ADB24E9189985590016CA02</string>
-			<key>buildPhases</key>
-			<array>
-				<string>F04301ADF53D493095B8120B</string>
-				<string>5ADB24B3189985590016CA02</string>
-				<string>5ADB24B4189985590016CA02</string>
-				<string>5ADB24B5189985590016CA02</string>
-				<string>F2C81C8A001847B68C26EECC</string>
-			</array>
-			<key>buildRules</key>
-			<array/>
-			<key>dependencies</key>
-			<array/>
-			<key>isa</key>
-			<string>PBXNativeTarget</string>
-			<key>name</key>
-			<string>Duffy</string>
-			<key>productName</key>
-			<string>Duffy</string>
-			<key>productReference</key>
-			<string>5ADB24B7189985590016CA02</string>
-			<key>productType</key>
-			<string>com.apple.product-type.application</string>
-		</dict>
-		<key>5ADB24B7189985590016CA02</key>
-		<dict>
-			<key>explicitFileType</key>
-			<string>wrapper.application</string>
-			<key>includeInIndex</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>path</key>
-			<string>Duffy.app</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>5ADB24B8189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24B7189985590016CA02</string>
-				<string>5ADB24D7189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Products</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24B9189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5A81ED4018CFB591003EF557</string>
-				<string>5A81ED3E18CFB57F003EF557</string>
-				<string>5A81ED3C18CFB574003EF557</string>
-				<string>5A72E11D18B7EB89000979D2</string>
-				<string>5A72E11B18B7EB83000979D2</string>
-				<string>5ADB24F418998CBA0016CA02</string>
-				<string>5ADB24BA189985590016CA02</string>
-				<string>5ADB24BC189985590016CA02</string>
-				<string>5ADB24BE189985590016CA02</string>
-				<string>5ADB24C0189985590016CA02</string>
-				<string>5ADB24D8189985590016CA02</string>
-				<string>68ED45F75CA648D08A506609</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Frameworks</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24BA189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>Foundation.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/Foundation.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5ADB24BB189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24BA189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24BC189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>CoreGraphics.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/CoreGraphics.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5ADB24BD189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24BC189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24BE189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>UIKit.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/UIKit.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5ADB24BF189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24BE189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24C0189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>CoreData.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/CoreData.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5ADB24C1189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24C0189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24C2189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24CB189985590016CA02</string>
-				<string>5ADB24CC189985590016CA02</string>
-				<string>5ADB2512189AED860016CA02</string>
-				<string>5ADB2513189AED860016CA02</string>
-				<string>5A81ED2618CFAED5003EF557</string>
-				<string>5A81ED2718CFAED5003EF557</string>
-				<string>5A37478E18CE4F1500E27F00</string>
-				<string>5A37478F18CE4F1500E27F00</string>
-				<string>5AFBCA3618D0E0FD00998793</string>
-				<string>5AFBCA3718D0E0FD00998793</string>
-				<string>5AFBCA3818D0E0FD00998793</string>
-				<string>5A37478D18CE480000E27F00</string>
-				<string>5ADB24FE189AB3730016CA02</string>
-				<string>5AFBCA5118D236AE00998793</string>
-				<string>5ADB24D1189985590016CA02</string>
-				<string>5ADB24CE189985590016CA02</string>
-				<string>5ADB24C3189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>path</key>
-			<string>Duffy</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24C3189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5AFBCA3B18D0E68400998793</string>
-				<string>5A72E11718B55CB2000979D2</string>
-				<string>5ADB250A189AE7980016CA02</string>
-				<string>5ADB250B189AE7980016CA02</string>
-				<string>5ADB250C189AE7980016CA02</string>
-				<string>5ADB250D189AE7980016CA02</string>
-				<string>5ADB24C4189985590016CA02</string>
-				<string>5ADB24C5189985590016CA02</string>
-				<string>5ADB24C8189985590016CA02</string>
-				<string>5ADB24CA189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Supporting Files</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24C4189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.xml</string>
-			<key>path</key>
-			<string>Duffy-Info.plist</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24C5189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24C6189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXVariantGroup</string>
-			<key>name</key>
-			<string>InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24C6189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.strings</string>
-			<key>name</key>
-			<string>en</string>
-			<key>path</key>
-			<string>en.lproj/InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24C7189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24C5189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24C8189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>main.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24C9189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24C8189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24CA189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>Duffy-Prefix.pch</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24CB189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFAppDelegate.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24CC189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFAppDelegate.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24CD189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24CC189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24CE189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24CF189985590016CA02</string>
-			</array>
-			<key>currentVersion</key>
-			<string>5ADB24CF189985590016CA02</string>
-			<key>isa</key>
-			<string>XCVersionGroup</string>
-			<key>path</key>
-			<string>Duffy.xcdatamodeld</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-			<key>versionGroupType</key>
-			<string>wrapper.xcdatamodel</string>
-		</dict>
-		<key>5ADB24CF189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.xcdatamodel</string>
-			<key>path</key>
-			<string>Duffy.xcdatamodel</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24D0189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24CE189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24D1189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>folder.assetcatalog</string>
-			<key>path</key>
-			<string>Images.xcassets</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24D2189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24D1189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24D3189985590016CA02</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>5ADB24E6189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXSourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>5ADB24D4189985590016CA02</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>5ADB24D9189985590016CA02</string>
-				<string>5ADB24DC189985590016CA02</string>
-				<string>5ADB24DB189985590016CA02</string>
-				<string>5ADB24DA189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXFrameworksBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>5ADB24D5189985590016CA02</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array>
-				<string>5ADB24E4189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXResourcesBuildPhase</string>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-		</dict>
-		<key>5ADB24D6189985590016CA02</key>
-		<dict>
-			<key>buildConfigurationList</key>
-			<string>5ADB24EC189985590016CA02</string>
-			<key>buildPhases</key>
-			<array>
-				<string>5ADB24D3189985590016CA02</string>
-				<string>5ADB24D4189985590016CA02</string>
-				<string>5ADB24D5189985590016CA02</string>
-			</array>
-			<key>buildRules</key>
-			<array/>
-			<key>dependencies</key>
-			<array>
-				<string>5ADB24DE189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXNativeTarget</string>
-			<key>name</key>
-			<string>DuffyTests</string>
-			<key>productName</key>
-			<string>DuffyTests</string>
-			<key>productReference</key>
-			<string>5ADB24D7189985590016CA02</string>
-			<key>productType</key>
-			<string>com.apple.product-type.bundle.unit-test</string>
-		</dict>
-		<key>5ADB24D7189985590016CA02</key>
-		<dict>
-			<key>explicitFileType</key>
-			<string>wrapper.cfbundle</string>
-			<key>includeInIndex</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>path</key>
-			<string>DuffyTests.xctest</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>5ADB24D8189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>XCTest.framework</string>
-			<key>path</key>
-			<string>Library/Frameworks/XCTest.framework</string>
-			<key>sourceTree</key>
-			<string>DEVELOPER_DIR</string>
-		</dict>
-		<key>5ADB24D9189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24D8189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24DA189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24BA189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24DB189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24BE189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24DC189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24C0189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24DD189985590016CA02</key>
-		<dict>
-			<key>containerPortal</key>
-			<string>5ADB24AF189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXContainerItemProxy</string>
-			<key>proxyType</key>
-			<string>1</string>
-			<key>remoteGlobalIDString</key>
-			<string>5ADB24B6189985590016CA02</string>
-			<key>remoteInfo</key>
-			<string>Duffy</string>
-		</dict>
-		<key>5ADB24DE189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXTargetDependency</string>
-			<key>target</key>
-			<string>5ADB24B6189985590016CA02</string>
-			<key>targetProxy</key>
-			<string>5ADB24DD189985590016CA02</string>
-		</dict>
-		<key>5ADB24DF189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24E5189985590016CA02</string>
-				<string>5ADB24E0189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>path</key>
-			<string>DuffyTests</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24E0189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24E1189985590016CA02</string>
-				<string>5ADB24E2189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Supporting Files</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24E1189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.xml</string>
-			<key>path</key>
-			<string>DuffyTests-Info.plist</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24E2189985590016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5ADB24E3189985590016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXVariantGroup</string>
-			<key>name</key>
-			<string>InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24E3189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>text.plist.strings</string>
-			<key>name</key>
-			<string>en</string>
-			<key>path</key>
-			<string>en.lproj/InfoPlist.strings</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24E4189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24E2189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24E5189985590016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DuffyTests.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24E6189985590016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24E5189985590016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24E7189985590016CA02</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>ALWAYS_SEARCH_USER_PATHS</key>
-				<string>NO</string>
-				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
-				<string>gnu++0x</string>
-				<key>CLANG_CXX_LIBRARY</key>
-				<string>libc++</string>
-				<key>CLANG_ENABLE_MODULES</key>
-				<string>YES</string>
-				<key>CLANG_ENABLE_OBJC_ARC</key>
-				<string>YES</string>
-				<key>CLANG_WARN_BOOL_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN_EMPTY_BODY</key>
-				<string>YES</string>
-				<key>CLANG_WARN_ENUM_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_INT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
-				<string>YES</string>
-				<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
-				<string>iPhone Developer</string>
-				<key>COPY_PHASE_STRIP</key>
-				<string>NO</string>
-				<key>GCC_C_LANGUAGE_STANDARD</key>
-				<string>gnu99</string>
-				<key>GCC_DYNAMIC_NO_PIC</key>
-				<string>NO</string>
-				<key>GCC_OPTIMIZATION_LEVEL</key>
-				<string>0</string>
-				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
-				<array>
-					<string>DEBUG=1</string>
-					<string>$(inherited)</string>
-				</array>
-				<key>GCC_SYMBOLS_PRIVATE_EXTERN</key>
-				<string>NO</string>
-				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
-				<string>YES</string>
-				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
-				<string>YES_ERROR</string>
-				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_FUNCTION</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_VARIABLE</key>
-				<string>YES</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
-				<key>ONLY_ACTIVE_ARCH</key>
-				<string>YES</string>
-				<key>SDKROOT</key>
-				<string>iphoneos</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Debug</string>
-		</dict>
-		<key>5ADB24E8189985590016CA02</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>ALWAYS_SEARCH_USER_PATHS</key>
-				<string>NO</string>
-				<key>CLANG_CXX_LANGUAGE_STANDARD</key>
-				<string>gnu++0x</string>
-				<key>CLANG_CXX_LIBRARY</key>
-				<string>libc++</string>
-				<key>CLANG_ENABLE_MODULES</key>
-				<string>YES</string>
-				<key>CLANG_ENABLE_OBJC_ARC</key>
-				<string>YES</string>
-				<key>CLANG_WARN_BOOL_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_CONSTANT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_DIRECT_OBJC_ISA_USAGE</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN_EMPTY_BODY</key>
-				<string>YES</string>
-				<key>CLANG_WARN_ENUM_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_INT_CONVERSION</key>
-				<string>YES</string>
-				<key>CLANG_WARN_OBJC_ROOT_CLASS</key>
-				<string>YES_ERROR</string>
-				<key>CLANG_WARN__DUPLICATE_METHOD_MATCH</key>
-				<string>YES</string>
-				<key>CODE_SIGN_IDENTITY[sdk=iphoneos*]</key>
-				<string>iPhone Developer</string>
-				<key>COPY_PHASE_STRIP</key>
-				<string>YES</string>
-				<key>ENABLE_NS_ASSERTIONS</key>
-				<string>NO</string>
-				<key>GCC_C_LANGUAGE_STANDARD</key>
-				<string>gnu99</string>
-				<key>GCC_WARN_64_TO_32_BIT_CONVERSION</key>
-				<string>YES</string>
-				<key>GCC_WARN_ABOUT_RETURN_TYPE</key>
-				<string>YES_ERROR</string>
-				<key>GCC_WARN_UNDECLARED_SELECTOR</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNINITIALIZED_AUTOS</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_FUNCTION</key>
-				<string>YES</string>
-				<key>GCC_WARN_UNUSED_VARIABLE</key>
-				<string>YES</string>
-				<key>IPHONEOS_DEPLOYMENT_TARGET</key>
-				<string>7.0</string>
-				<key>SDKROOT</key>
-				<string>iphoneos</string>
-				<key>VALIDATE_PRODUCT</key>
-				<string>YES</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>5ADB24E9189985590016CA02</key>
-		<dict>
-			<key>buildConfigurations</key>
-			<array>
-				<string>5ADB24EA189985590016CA02</string>
-				<string>5ADB24EB189985590016CA02</string>
-			</array>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-		</dict>
-		<key>5ADB24EA189985590016CA02</key>
-		<dict>
-			<key>baseConfigurationReference</key>
-			<string>514DAA1BD6B44149AD7F0216</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>
-				<string>AppIcon</string>
-				<key>ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME</key>
-				<string>LaunchImage</string>
-				<key>FRAMEWORK_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>/Users/hbridge/Documents/Repos/Duffy</string>
-				</array>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>Duffy/Duffy-Prefix.pch</string>
-				<key>HEADER_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include</string>
-					<string>"$(BUILT_PRODUCTS_DIR)/../../Headers"</string>
-				</array>
-				<key>INFOPLIST_FILE</key>
-				<string>Duffy/Duffy-Info.plist</string>
-				<key>OTHER_LDFLAGS</key>
-				<array>
-					<string>-ObjC</string>
-					<string>-all_load</string>
-				</array>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>app</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Debug</string>
-		</dict>
-		<key>5ADB24EB189985590016CA02</key>
-		<dict>
-			<key>baseConfigurationReference</key>
-			<string>514DAA1BD6B44149AD7F0216</string>
-			<key>buildSettings</key>
-			<dict>
-				<key>ASSETCATALOG_COMPILER_APPICON_NAME</key>
-				<string>AppIcon</string>
-				<key>ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME</key>
-				<string>LaunchImage</string>
-				<key>FRAMEWORK_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>/Users/hbridge/Documents/Repos/Duffy</string>
-				</array>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>Duffy/Duffy-Prefix.pch</string>
-				<key>HEADER_SEARCH_PATHS</key>
-				<array>
-					<string>$(inherited)</string>
-					<string>/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include</string>
-					<string>"$(BUILT_PRODUCTS_DIR)/../../Headers"</string>
-				</array>
-				<key>INFOPLIST_FILE</key>
-				<string>Duffy/Duffy-Info.plist</string>
-				<key>OTHER_LDFLAGS</key>
-				<array>
-					<string>-ObjC</string>
-					<string>-all_load</string>
-				</array>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>app</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>5ADB24EC189985590016CA02</key>
-		<dict>
-			<key>buildConfigurations</key>
-			<array>
-				<string>5ADB24ED189985590016CA02</string>
-				<string>5ADB24EE189985590016CA02</string>
-			</array>
-			<key>defaultConfigurationIsVisible</key>
-			<string>0</string>
-			<key>defaultConfigurationName</key>
-			<string>Release</string>
-			<key>isa</key>
-			<string>XCConfigurationList</string>
-		</dict>
-		<key>5ADB24ED189985590016CA02</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>BUNDLE_LOADER</key>
-				<string>$(BUILT_PRODUCTS_DIR)/Duffy.app/Duffy</string>
-				<key>FRAMEWORK_SEARCH_PATHS</key>
-				<array>
-					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
-					<string>$(inherited)</string>
-					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
-				</array>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>Duffy/Duffy-Prefix.pch</string>
-				<key>GCC_PREPROCESSOR_DEFINITIONS</key>
-				<array>
-					<string>DEBUG=1</string>
-					<string>$(inherited)</string>
-				</array>
-				<key>INFOPLIST_FILE</key>
-				<string>DuffyTests/DuffyTests-Info.plist</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>TEST_HOST</key>
-				<string>$(BUNDLE_LOADER)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>xctest</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Debug</string>
-		</dict>
-		<key>5ADB24EE189985590016CA02</key>
-		<dict>
-			<key>buildSettings</key>
-			<dict>
-				<key>BUNDLE_LOADER</key>
-				<string>$(BUILT_PRODUCTS_DIR)/Duffy.app/Duffy</string>
-				<key>FRAMEWORK_SEARCH_PATHS</key>
-				<array>
-					<string>$(SDKROOT)/Developer/Library/Frameworks</string>
-					<string>$(inherited)</string>
-					<string>$(DEVELOPER_FRAMEWORKS_DIR)</string>
-				</array>
-				<key>GCC_PRECOMPILE_PREFIX_HEADER</key>
-				<string>YES</string>
-				<key>GCC_PREFIX_HEADER</key>
-				<string>Duffy/Duffy-Prefix.pch</string>
-				<key>INFOPLIST_FILE</key>
-				<string>DuffyTests/DuffyTests-Info.plist</string>
-				<key>PRODUCT_NAME</key>
-				<string>$(TARGET_NAME)</string>
-				<key>TEST_HOST</key>
-				<string>$(BUNDLE_LOADER)</string>
-				<key>WRAPPER_EXTENSION</key>
-				<string>xctest</string>
-			</dict>
-			<key>isa</key>
-			<string>XCBuildConfiguration</string>
-			<key>name</key>
-			<string>Release</string>
-		</dict>
-		<key>5ADB24EF189985A20016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFPhotosGridViewController.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24F0189985A20016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFPhotosGridViewController.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24F1189985A20016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>file.xib</string>
-			<key>path</key>
-			<string>DFPhotosGridViewController.xib</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24F2189985A20016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24F0189985A20016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24F3189985A20016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24F1189985A20016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24F418998CBA0016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>wrapper.framework</string>
-			<key>name</key>
-			<string>AssetsLibrary.framework</string>
-			<key>path</key>
-			<string>System/Library/Frameworks/AssetsLibrary.framework</string>
-			<key>sourceTree</key>
-			<string>SDKROOT</string>
-		</dict>
-		<key>5ADB24F518998CBA0016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24F418998CBA0016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24F618998D070016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFPhotoStore.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24F718998D070016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFPhotoStore.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24F818998D070016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24F718998D070016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24F9189992180016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFPhotoViewCell.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24FA189992180016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFPhotoViewCell.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24FB189992180016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24FA189992180016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24FC189992A00016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>file.xib</string>
-			<key>path</key>
-			<string>DFPhotoViewCell.xib</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB24FD189992A00016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB24FC189992A00016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB24FE189AB3730016CA02</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5AFBCA3318D0C87E00998793</string>
-				<string>5AFBCA3418D0C87E00998793</string>
-				<string>5ADB24F618998D070016CA02</string>
-				<string>5ADB24F718998D070016CA02</string>
-				<string>5ADB2507189ABBB50016CA02</string>
-				<string>5ADB2508189ABBB50016CA02</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Model</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB2507189ABBB50016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFPhoto.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB2508189ABBB50016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFPhoto.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB2509189ABBB50016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB2508189ABBB50016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB250A189AE7980016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>image.png</string>
-			<key>name</key>
-			<string>Albums.png</string>
-			<key>path</key>
-			<string>Resources/Icons/Albums.png</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB250B189AE7980016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>image.png</string>
-			<key>name</key>
-			<string>Albums@2x.png</string>
-			<key>path</key>
-			<string>Resources/Icons/Albums@2x.png</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB250C189AE7980016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>image.png</string>
-			<key>name</key>
-			<string>Timeline.png</string>
-			<key>path</key>
-			<string>Resources/Icons/Timeline.png</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB250D189AE7980016CA02</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>image.png</string>
-			<key>name</key>
-			<string>Timeline@2x.png</string>
-			<key>path</key>
-			<string>Resources/Icons/Timeline@2x.png</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB250E189AE7980016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB250A189AE7980016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB250F189AE7980016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB250B189AE7980016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB2510189AE7980016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB250C189AE7980016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB2511189AE7980016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB250D189AE7980016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5ADB2512189AED860016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFCameraRollViewController.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB2513189AED860016CA02</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFCameraRollViewController.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5ADB2514189AED860016CA02</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5ADB2513189AED860016CA02</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA3318D0C87E00998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFUser.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA3418D0C87E00998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFUser.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA3518D0C87E00998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA3418D0C87E00998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA3618D0E0FD00998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>path</key>
-			<string>DFSettingsViewController.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA3718D0E0FD00998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>path</key>
-			<string>DFSettingsViewController.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA3818D0E0FD00998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>file.xib</string>
-			<key>path</key>
-			<string>DFSettingsViewController.xib</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA3918D0E0FD00998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA3718D0E0FD00998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA3A18D0E0FD00998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA3818D0E0FD00998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA3B18D0E68400998793</key>
-		<dict>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>image.png</string>
-			<key>path</key>
-			<string>SettingsTab@2x.png</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA3C18D0E68400998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA3B18D0E68400998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA4818D236A900998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>name</key>
-			<string>UIImage+Alpha.h</string>
-			<key>path</key>
-			<string>ThirdParty/UIImage-Categories/UIImage+Alpha.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA4918D236A900998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>name</key>
-			<string>UIImage+Alpha.m</string>
-			<key>path</key>
-			<string>ThirdParty/UIImage-Categories/UIImage+Alpha.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA4A18D236A900998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>name</key>
-			<string>UIImage+Resize.h</string>
-			<key>path</key>
-			<string>ThirdParty/UIImage-Categories/UIImage+Resize.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA4B18D236A900998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>name</key>
-			<string>UIImage+Resize.m</string>
-			<key>path</key>
-			<string>ThirdParty/UIImage-Categories/UIImage+Resize.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA4C18D236A900998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.h</string>
-			<key>name</key>
-			<string>UIImage+RoundedCorner.h</string>
-			<key>path</key>
-			<string>ThirdParty/UIImage-Categories/UIImage+RoundedCorner.h</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA4D18D236A900998793</key>
-		<dict>
-			<key>fileEncoding</key>
-			<string>4</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>lastKnownFileType</key>
-			<string>sourcecode.c.objc</string>
-			<key>name</key>
-			<string>UIImage+RoundedCorner.m</string>
-			<key>path</key>
-			<string>ThirdParty/UIImage-Categories/UIImage+RoundedCorner.m</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA4E18D236A900998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA4918D236A900998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA4F18D236A900998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA4B18D236A900998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA5018D236A900998793</key>
-		<dict>
-			<key>fileRef</key>
-			<string>5AFBCA4D18D236A900998793</string>
-			<key>isa</key>
-			<string>PBXBuildFile</string>
-		</dict>
-		<key>5AFBCA5118D236AE00998793</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5AFBCA5218D236B600998793</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>Utils</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>5AFBCA5218D236B600998793</key>
-		<dict>
-			<key>children</key>
-			<array>
-				<string>5AFBCA4818D236A900998793</string>
-				<string>5AFBCA4918D236A900998793</string>
-				<string>5AFBCA4A18D236A900998793</string>
-				<string>5AFBCA4B18D236A900998793</string>
-				<string>5AFBCA4C18D236A900998793</string>
-				<string>5AFBCA4D18D236A900998793</string>
-			</array>
-			<key>isa</key>
-			<string>PBXGroup</string>
-			<key>name</key>
-			<string>UIImageCategories</string>
-			<key>sourceTree</key>
-			<string>&lt;group&gt;</string>
-		</dict>
-		<key>68ED45F75CA648D08A506609</key>
-		<dict>
-			<key>explicitFileType</key>
-			<string>archive.ar</string>
-			<key>includeInIndex</key>
-			<string>0</string>
-			<key>isa</key>
-			<string>PBXFileReference</string>
-			<key>path</key>
-			<string>libPods.a</string>
-			<key>sourceTree</key>
-			<string>BUILT_PRODUCTS_DIR</string>
-		</dict>
-		<key>F04301ADF53D493095B8120B</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array/>
-			<key>inputPaths</key>
-			<array/>
-			<key>isa</key>
-			<string>PBXShellScriptBuildPhase</string>
-			<key>name</key>
-			<string>Check Pods Manifest.lock</string>
-			<key>outputPaths</key>
-			<array/>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-			<key>shellPath</key>
-			<string>/bin/sh</string>
-			<key>shellScript</key>
-			<string>diff "${PODS_ROOT}/../Podfile.lock" "${PODS_ROOT}/Manifest.lock" &gt; /dev/null
-if [[ $? != 0 ]] ; then
-    cat &lt;&lt; EOM
-error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.
-EOM
-    exit 1
-fi
-</string>
-			<key>showEnvVarsInLog</key>
-			<string>0</string>
-		</dict>
-		<key>F2C81C8A001847B68C26EECC</key>
-		<dict>
-			<key>buildActionMask</key>
-			<string>2147483647</string>
-			<key>files</key>
-			<array/>
-			<key>inputPaths</key>
-			<array/>
-			<key>isa</key>
-			<string>PBXShellScriptBuildPhase</string>
-			<key>name</key>
-			<string>Copy Pods Resources</string>
-			<key>outputPaths</key>
-			<array/>
-			<key>runOnlyForDeploymentPostprocessing</key>
-			<string>0</string>
-			<key>shellPath</key>
-			<string>/bin/sh</string>
-			<key>shellScript</key>
-			<string>"${SRCROOT}/Duffy/Pods/Pods-resources.sh"
-</string>
-			<key>showEnvVarsInLog</key>
-			<string>0</string>
-		</dict>
-	</dict>
-	<key>rootObject</key>
-	<string>5ADB24AF189985590016CA02</string>
-</dict>
-</plist>
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		502B025BD24C4FB89333BFED /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68ED45F75CA648D08A506609 /* libPods.a */; };
+		5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */; };
+		5A30E4DB18D3AC5F00E41DBC /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A30E4D918D3AC5F00E41DBC /* DFSearchViewController.xib */; };
+		5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A30E4DC18D3AF0800E41DBC /* Search@2x.png */; };
+		5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A37478F18CE4F1500E27F00 /* DFSearchController.m */; };
+		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
+		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
+		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
+		5A81ED2818CFAED5003EF557 /* DFUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A81ED2718CFAED5003EF557 /* DFUploadController.m */; };
+		5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3C18CFB574003EF557 /* CFNetwork.framework */; };
+		5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */; };
+		5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */; };
+		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
+		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
+		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
+		5ADB24C1189985590016CA02 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24C0189985590016CA02 /* CoreData.framework */; };
+		5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24C5189985590016CA02 /* InfoPlist.strings */; };
+		5ADB24C9189985590016CA02 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24C8189985590016CA02 /* main.m */; };
+		5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24CC189985590016CA02 /* DFAppDelegate.m */; };
+		5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */; };
+		5ADB24D2189985590016CA02 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24D1189985590016CA02 /* Images.xcassets */; };
+		5ADB24D9189985590016CA02 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24D8189985590016CA02 /* XCTest.framework */; };
+		5ADB24DA189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
+		5ADB24DB189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
+		5ADB24DC189985590016CA02 /* CoreData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24C0189985590016CA02 /* CoreData.framework */; };
+		5ADB24E4189985590016CA02 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24E2189985590016CA02 /* InfoPlist.strings */; };
+		5ADB24E6189985590016CA02 /* DuffyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24E5189985590016CA02 /* DuffyTests.m */; };
+		5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */; };
+		5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */; };
+		5ADB24F518998CBA0016CA02 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24F418998CBA0016CA02 /* AssetsLibrary.framework */; };
+		5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24F718998D070016CA02 /* DFPhotoStore.m */; };
+		5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */; };
+		5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */; };
+		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
+		5ADB250E189AE7980016CA02 /* Albums.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250A189AE7980016CA02 /* Albums.png */; };
+		5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250B189AE7980016CA02 /* Albums@2x.png */; };
+		5ADB2510189AE7980016CA02 /* Timeline.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250C189AE7980016CA02 /* Timeline.png */; };
+		5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250D189AE7980016CA02 /* Timeline@2x.png */; };
+		5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */; };
+		5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3418D0C87E00998793 /* DFUser.m */; };
+		5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */; };
+		5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */; };
+		5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */; };
+		5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA4918D236A900998793 /* UIImage+Alpha.m */; };
+		5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA4B18D236A900998793 /* UIImage+Resize.m */; };
+		5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA4D18D236A900998793 /* UIImage+RoundedCorner.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		5ADB24DD189985590016CA02 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5ADB24AF189985590016CA02 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5ADB24B6189985590016CA02;
+			remoteInfo = Duffy;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Duffy/Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController.h; sourceTree = "<group>"; };
+		5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController.m; sourceTree = "<group>"; };
+		5A30E4D918D3AC5F00E41DBC /* DFSearchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchViewController.xib; sourceTree = "<group>"; };
+		5A30E4DC18D3AF0800E41DBC /* Search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Search@2x.png"; sourceTree = "<group>"; };
+		5A37478E18CE4F1500E27F00 /* DFSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchController.h; sourceTree = "<group>"; };
+		5A37478F18CE4F1500E27F00 /* DFSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchController.m; sourceTree = "<group>"; };
+		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
+		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		5A81ED2618CFAED5003EF557 /* DFUploadController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadController.h; sourceTree = "<group>"; };
+		5A81ED2718CFAED5003EF557 /* DFUploadController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadController.m; sourceTree = "<group>"; };
+		5A81ED3C18CFB574003EF557 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		5ADB24BE189985590016CA02 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		5ADB24C0189985590016CA02 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
+		5ADB24C4189985590016CA02 /* Duffy-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Duffy-Info.plist"; sourceTree = "<group>"; };
+		5ADB24C6189985590016CA02 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5ADB24C8189985590016CA02 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		5ADB24CA189985590016CA02 /* Duffy-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Duffy-Prefix.pch"; sourceTree = "<group>"; };
+		5ADB24CB189985590016CA02 /* DFAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFAppDelegate.h; sourceTree = "<group>"; };
+		5ADB24CC189985590016CA02 /* DFAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DFAppDelegate.m; sourceTree = "<group>"; };
+		5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Duffy.xcdatamodel; sourceTree = "<group>"; };
+		5ADB24D1189985590016CA02 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		5ADB24D7189985590016CA02 /* DuffyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DuffyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		5ADB24D8189985590016CA02 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		5ADB24E1189985590016CA02 /* DuffyTests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "DuffyTests-Info.plist"; sourceTree = "<group>"; };
+		5ADB24E3189985590016CA02 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		5ADB24E5189985590016CA02 /* DuffyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DuffyTests.m; sourceTree = "<group>"; };
+		5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotosGridViewController.h; sourceTree = "<group>"; };
+		5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotosGridViewController.m; sourceTree = "<group>"; };
+		5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotosGridViewController.xib; sourceTree = "<group>"; };
+		5ADB24F418998CBA0016CA02 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
+		5ADB24F618998D070016CA02 /* DFPhotoStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoStore.h; sourceTree = "<group>"; };
+		5ADB24F718998D070016CA02 /* DFPhotoStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoStore.m; sourceTree = "<group>"; };
+		5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoViewCell.h; sourceTree = "<group>"; };
+		5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoViewCell.m; sourceTree = "<group>"; };
+		5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewCell.xib; sourceTree = "<group>"; };
+		5ADB2507189ABBB50016CA02 /* DFPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoto.h; sourceTree = "<group>"; };
+		5ADB2508189ABBB50016CA02 /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoto.m; sourceTree = "<group>"; };
+		5ADB250A189AE7980016CA02 /* Albums.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Albums.png; path = Resources/Icons/Albums.png; sourceTree = "<group>"; };
+		5ADB250B189AE7980016CA02 /* Albums@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Albums@2x.png"; path = "Resources/Icons/Albums@2x.png"; sourceTree = "<group>"; };
+		5ADB250C189AE7980016CA02 /* Timeline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Timeline.png; path = Resources/Icons/Timeline.png; sourceTree = "<group>"; };
+		5ADB250D189AE7980016CA02 /* Timeline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Timeline@2x.png"; path = "Resources/Icons/Timeline@2x.png"; sourceTree = "<group>"; };
+		5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollViewController.h; sourceTree = "<group>"; };
+		5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollViewController.m; sourceTree = "<group>"; };
+		5AFBCA3318D0C87E00998793 /* DFUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUser.h; sourceTree = "<group>"; };
+		5AFBCA3418D0C87E00998793 /* DFUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUser.m; sourceTree = "<group>"; };
+		5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettingsViewController.h; sourceTree = "<group>"; };
+		5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSettingsViewController.m; sourceTree = "<group>"; };
+		5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSettingsViewController.xib; sourceTree = "<group>"; };
+		5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SettingsTab@2x.png"; sourceTree = "<group>"; };
+		5AFBCA4818D236A900998793 /* UIImage+Alpha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Alpha.h"; path = "ThirdParty/UIImage-Categories/UIImage+Alpha.h"; sourceTree = "<group>"; };
+		5AFBCA4918D236A900998793 /* UIImage+Alpha.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Alpha.m"; path = "ThirdParty/UIImage-Categories/UIImage+Alpha.m"; sourceTree = "<group>"; };
+		5AFBCA4A18D236A900998793 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Resize.h"; path = "ThirdParty/UIImage-Categories/UIImage+Resize.h"; sourceTree = "<group>"; };
+		5AFBCA4B18D236A900998793 /* UIImage+Resize.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Resize.m"; path = "ThirdParty/UIImage-Categories/UIImage+Resize.m"; sourceTree = "<group>"; };
+		5AFBCA4C18D236A900998793 /* UIImage+RoundedCorner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+RoundedCorner.h"; path = "ThirdParty/UIImage-Categories/UIImage+RoundedCorner.h"; sourceTree = "<group>"; };
+		5AFBCA4D18D236A900998793 /* UIImage+RoundedCorner.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+RoundedCorner.m"; path = "ThirdParty/UIImage-Categories/UIImage+RoundedCorner.m"; sourceTree = "<group>"; };
+		68ED45F75CA648D08A506609 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		5ADB24B4189985590016CA02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */,
+				5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */,
+				5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */,
+				5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */,
+				5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */,
+				5ADB24F518998CBA0016CA02 /* AssetsLibrary.framework in Frameworks */,
+				5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */,
+				5ADB24C1189985590016CA02 /* CoreData.framework in Frameworks */,
+				5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */,
+				5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */,
+				502B025BD24C4FB89333BFED /* libPods.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5ADB24D4189985590016CA02 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24D9189985590016CA02 /* XCTest.framework in Frameworks */,
+				5ADB24DC189985590016CA02 /* CoreData.framework in Frameworks */,
+				5ADB24DB189985590016CA02 /* UIKit.framework in Frameworks */,
+				5ADB24DA189985590016CA02 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		5A37478D18CE480000E27F00 /* Generic Views */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
+				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
+				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
+				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
+				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
+				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
+			);
+			name = "Generic Views";
+			sourceTree = "<group>";
+		};
+		5ADB24AE189985590016CA02 = {
+			isa = PBXGroup;
+			children = (
+				5ADB24C2189985590016CA02 /* Duffy */,
+				5ADB24DF189985590016CA02 /* DuffyTests */,
+				5ADB24B9189985590016CA02 /* Frameworks */,
+				5ADB24B8189985590016CA02 /* Products */,
+				514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */,
+			);
+			sourceTree = "<group>";
+		};
+		5ADB24B8189985590016CA02 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24B7189985590016CA02 /* Duffy.app */,
+				5ADB24D7189985590016CA02 /* DuffyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		5ADB24B9189985590016CA02 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */,
+				5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */,
+				5A81ED3C18CFB574003EF557 /* CFNetwork.framework */,
+				5A72E11D18B7EB89000979D2 /* Security.framework */,
+				5A72E11B18B7EB83000979D2 /* QuartzCore.framework */,
+				5ADB24F418998CBA0016CA02 /* AssetsLibrary.framework */,
+				5ADB24BA189985590016CA02 /* Foundation.framework */,
+				5ADB24BC189985590016CA02 /* CoreGraphics.framework */,
+				5ADB24BE189985590016CA02 /* UIKit.framework */,
+				5ADB24C0189985590016CA02 /* CoreData.framework */,
+				5ADB24D8189985590016CA02 /* XCTest.framework */,
+				68ED45F75CA648D08A506609 /* libPods.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5ADB24C2189985590016CA02 /* Duffy */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24CB189985590016CA02 /* DFAppDelegate.h */,
+				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
+				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
+				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
+				5A81ED2618CFAED5003EF557 /* DFUploadController.h */,
+				5A81ED2718CFAED5003EF557 /* DFUploadController.m */,
+				5A37478E18CE4F1500E27F00 /* DFSearchController.h */,
+				5A37478F18CE4F1500E27F00 /* DFSearchController.m */,
+				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
+				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
+				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
+				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
+				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
+				5A30E4D918D3AC5F00E41DBC /* DFSearchViewController.xib */,
+				5A37478D18CE480000E27F00 /* Generic Views */,
+				5ADB24FE189AB3730016CA02 /* Model */,
+				5AFBCA5118D236AE00998793 /* Utils */,
+				5ADB24D1189985590016CA02 /* Images.xcassets */,
+				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
+				5ADB24C3189985590016CA02 /* Supporting Files */,
+			);
+			path = Duffy;
+			sourceTree = "<group>";
+		};
+		5ADB24C3189985590016CA02 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				5A30E4DC18D3AF0800E41DBC /* Search@2x.png */,
+				5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */,
+				5A72E11718B55CB2000979D2 /* database.csv */,
+				5ADB250A189AE7980016CA02 /* Albums.png */,
+				5ADB250B189AE7980016CA02 /* Albums@2x.png */,
+				5ADB250C189AE7980016CA02 /* Timeline.png */,
+				5ADB250D189AE7980016CA02 /* Timeline@2x.png */,
+				5ADB24C4189985590016CA02 /* Duffy-Info.plist */,
+				5ADB24C5189985590016CA02 /* InfoPlist.strings */,
+				5ADB24C8189985590016CA02 /* main.m */,
+				5ADB24CA189985590016CA02 /* Duffy-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		5ADB24DF189985590016CA02 /* DuffyTests */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24E5189985590016CA02 /* DuffyTests.m */,
+				5ADB24E0189985590016CA02 /* Supporting Files */,
+			);
+			path = DuffyTests;
+			sourceTree = "<group>";
+		};
+		5ADB24E0189985590016CA02 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB24E1189985590016CA02 /* DuffyTests-Info.plist */,
+				5ADB24E2189985590016CA02 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		5ADB24FE189AB3730016CA02 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				5AFBCA3318D0C87E00998793 /* DFUser.h */,
+				5AFBCA3418D0C87E00998793 /* DFUser.m */,
+				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
+				5ADB24F718998D070016CA02 /* DFPhotoStore.m */,
+				5ADB2507189ABBB50016CA02 /* DFPhoto.h */,
+				5ADB2508189ABBB50016CA02 /* DFPhoto.m */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		5AFBCA5118D236AE00998793 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				5AFBCA5218D236B600998793 /* UIImageCategories */,
+			);
+			name = Utils;
+			sourceTree = "<group>";
+		};
+		5AFBCA5218D236B600998793 /* UIImageCategories */ = {
+			isa = PBXGroup;
+			children = (
+				5AFBCA4818D236A900998793 /* UIImage+Alpha.h */,
+				5AFBCA4918D236A900998793 /* UIImage+Alpha.m */,
+				5AFBCA4A18D236A900998793 /* UIImage+Resize.h */,
+				5AFBCA4B18D236A900998793 /* UIImage+Resize.m */,
+				5AFBCA4C18D236A900998793 /* UIImage+RoundedCorner.h */,
+				5AFBCA4D18D236A900998793 /* UIImage+RoundedCorner.m */,
+			);
+			name = UIImageCategories;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5ADB24B6189985590016CA02 /* Duffy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5ADB24E9189985590016CA02 /* Build configuration list for PBXNativeTarget "Duffy" */;
+			buildPhases = (
+				F04301ADF53D493095B8120B /* Check Pods Manifest.lock */,
+				5ADB24B3189985590016CA02 /* Sources */,
+				5ADB24B4189985590016CA02 /* Frameworks */,
+				5ADB24B5189985590016CA02 /* Resources */,
+				F2C81C8A001847B68C26EECC /* Copy Pods Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Duffy;
+			productName = Duffy;
+			productReference = 5ADB24B7189985590016CA02 /* Duffy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5ADB24D6189985590016CA02 /* DuffyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5ADB24EC189985590016CA02 /* Build configuration list for PBXNativeTarget "DuffyTests" */;
+			buildPhases = (
+				5ADB24D3189985590016CA02 /* Sources */,
+				5ADB24D4189985590016CA02 /* Frameworks */,
+				5ADB24D5189985590016CA02 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				5ADB24DE189985590016CA02 /* PBXTargetDependency */,
+			);
+			name = DuffyTests;
+			productName = DuffyTests;
+			productReference = 5ADB24D7189985590016CA02 /* DuffyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		5ADB24AF189985590016CA02 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = DF;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = "Duffy Productions";
+				TargetAttributes = {
+					5ADB24D6189985590016CA02 = {
+						TestTargetID = 5ADB24B6189985590016CA02;
+					};
+				};
+			};
+			buildConfigurationList = 5ADB24B2189985590016CA02 /* Build configuration list for PBXProject "Duffy" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 5ADB24AE189985590016CA02;
+			productRefGroup = 5ADB24B8189985590016CA02 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				5ADB24B6189985590016CA02 /* Duffy */,
+				5ADB24D6189985590016CA02 /* DuffyTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		5ADB24B5189985590016CA02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */,
+				5ADB250E189AE7980016CA02 /* Albums.png in Resources */,
+				5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */,
+				5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */,
+				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
+				5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */,
+				5A30E4DB18D3AC5F00E41DBC /* DFSearchViewController.xib in Resources */,
+				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
+				5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */,
+				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
+				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
+				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
+				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5ADB24D5189985590016CA02 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24E4189985590016CA02 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		F04301ADF53D493095B8120B /* Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+		F2C81C8A001847B68C26EECC /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Duffy/Pods/Pods-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		5ADB24B3189985590016CA02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5A81ED2818CFAED5003EF557 /* DFUploadController.m in Sources */,
+				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
+				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
+				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
+				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
+				5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */,
+				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
+				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
+				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
+				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
+				5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */,
+				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
+				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
+				5ADB24C9189985590016CA02 /* main.m in Sources */,
+				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
+				5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		5ADB24D3189985590016CA02 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5ADB24E6189985590016CA02 /* DuffyTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		5ADB24DE189985590016CA02 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5ADB24B6189985590016CA02 /* Duffy */;
+			targetProxy = 5ADB24DD189985590016CA02 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		5ADB24C5189985590016CA02 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5ADB24C6189985590016CA02 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		5ADB24E2189985590016CA02 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				5ADB24E3189985590016CA02 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		5ADB24E7189985590016CA02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		5ADB24E8189985590016CA02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		5ADB24EA189985590016CA02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/hbridge/Documents/Repos/Duffy,
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"$(BUILT_PRODUCTS_DIR)/../../Headers\"",
+				);
+				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		5ADB24EB189985590016CA02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					/Users/hbridge/Documents/Repos/Duffy,
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"\"$(BUILT_PRODUCTS_DIR)/../../Headers\"",
+				);
+				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				OTHER_LDFLAGS = (
+					"-ObjC",
+					"-all_load",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+		5ADB24ED189985590016CA02 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Duffy.app/Duffy";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "DuffyTests/DuffyTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Debug;
+		};
+		5ADB24EE189985590016CA02 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/Duffy.app/Duffy";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
+				INFOPLIST_FILE = "DuffyTests/DuffyTests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUNDLE_LOADER)";
+				WRAPPER_EXTENSION = xctest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		5ADB24B2189985590016CA02 /* Build configuration list for PBXProject "Duffy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5ADB24E7189985590016CA02 /* Debug */,
+				5ADB24E8189985590016CA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5ADB24E9189985590016CA02 /* Build configuration list for PBXNativeTarget "Duffy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5ADB24EA189985590016CA02 /* Debug */,
+				5ADB24EB189985590016CA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		5ADB24EC189985590016CA02 /* Build configuration list for PBXNativeTarget "DuffyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5ADB24ED189985590016CA02 /* Debug */,
+				5ADB24EE189985590016CA02 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */,
+			);
+			currentVersion = 5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */;
+			path = Duffy.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 5ADB24AF189985590016CA02 /* Project object */;
+}

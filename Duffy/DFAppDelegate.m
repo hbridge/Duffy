@@ -10,6 +10,7 @@
 #import "DFPhotoStore.h"
 #import "DFCameraRollViewController.h"
 #import "DFSettingsViewController.h"
+#import "DFSearchViewController.h"
 
 
 @implementation DFAppDelegate
@@ -22,12 +23,17 @@
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[UINavigationController alloc] initWithRootViewController:cameraRollController];
     
+    DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
+    UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];
+    
+    
     DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
     UINavigationController *settingsNav = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
     
     UITabBarController *tabController = [[UITabBarController alloc] init];
     [tabController setViewControllers:[NSArray arrayWithObjects:
                                        cameraRollNav,
+                                       searchViewNav,
                                        settingsNav,
                                        nil]];
     

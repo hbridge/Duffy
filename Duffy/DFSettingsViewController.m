@@ -94,6 +94,9 @@ NSString *DFPipelineEnabledNo = @"NO";
     if (indexPath.row == 0) {
         NSArray *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
         [[DFUploadController sharedUploadController] uploadPhotos:cameraRollPhotos];
+    } else if (indexPath.row == 1) {
+        UIPasteboard *pb = [UIPasteboard generalPasteboard];
+        [pb setString:[DFUser deviceID]];
     }
     
     [self.settingsTableView deselectRowAtIndexPath:indexPath animated:YES];
