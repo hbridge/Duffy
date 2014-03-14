@@ -104,11 +104,11 @@ static DFPhotoStore *defaultStore;
 {
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
         if(result != NULL) {
-            NSLog(@"Scanning Camera Roll asset: %@...", result);
+            //NSLog(@"Scanning Camera Roll asset: %@...", result);
             NSURL *assetURL = [result valueForProperty: ALAssetPropertyAssetURL];
             if (nil == [self photoWithALAssetURL:assetURL])
             {
-                NSLog(@"...asset is new, adding to database.");
+                //NSLog(@"...asset is new, adding to database.");
                 // we haven't seent this photo before, add it to our database
                 DFPhoto *newPhoto = [NSEntityDescription
                                      insertNewObjectForEntityForName:@"DFPhoto"
@@ -116,7 +116,7 @@ static DFPhotoStore *defaultStore;
                 newPhoto.alAssetURLString = assetURL.absoluteString;
                 [_cameraRoll addObject:newPhoto];
             } else {
-                NSLog(@"...asset is not new.");
+                //NSLog(@"...asset is not new.");
             }
         } else {
             NSLog(@"All assets in Camera Roll enumerated");
