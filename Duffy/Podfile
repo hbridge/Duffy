@@ -1,0 +1,17 @@
+# To use this file install CocoaPods.  From terminal
+#    sudo gem install cocoapods
+#    pod setup
+# then close the Duffy project in XCode and in Duffy directory type 
+#    pod install
+#    open MyProject.xcworkspace
+# From now on use Duffy.xcworkspace
+
+xcodeproj '../Duffy.xcodeproj'
+
+platform :ios, '5.0' 
+# Or platform :osx, '10.7'
+pod 'RestKit', '~> 0.20.0'
+
+# Testing and Search are optional components
+# pod 'RestKit/Testing', '~> 0.20.0'
+# pod 'RestKit/Search',  '~> 0.20.0'
