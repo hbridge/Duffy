@@ -111,7 +111,8 @@ static DFUploadController *defaultUploadController;
             photo.uploadDate = [NSDate date];
             [self uploadFinishedForPhoto:photo];
         } else {
-            // TODO add retry logic here?
+            NSLog(@"File did not upload properly.  Retrying.");
+            [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
         }
     }
                                                         failure:^(RKObjectRequestOperation *operation, NSError *error)
