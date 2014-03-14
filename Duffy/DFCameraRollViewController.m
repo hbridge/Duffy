@@ -56,9 +56,8 @@
 {
     self.photos = [[DFPhotoStore sharedStore] cameraRoll];
     
-    //NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
-    
-    //[[DFUploadController sharedUploadController] uploadPhotos:photosToUpload];
+    NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
+    [[DFUploadController sharedUploadController] uploadPhotos:photosToUpload];
 }
 
 - (void)viewDidAppear:(BOOL)animated
