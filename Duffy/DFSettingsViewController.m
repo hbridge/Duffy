@@ -28,7 +28,7 @@ NSString *DFPipelineEnabledNo = @"NO";
 {
     self = [super init];
     if (self) {
-        self.navigationController.navigationItem.title = @"Settings";
+        self.navigationItem.title = @"Settings";
         self.tabBarItem.title = @"Settings";
         self.tabBarItem.image = [UIImage imageNamed:@"SettingsTab"];
         

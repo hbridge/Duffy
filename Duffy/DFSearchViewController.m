@@ -15,16 +15,19 @@
 
 @implementation DFSearchViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (id)init
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    self = [super init];
     if (self) {
-        self.navigationController.navigationItem.title = @"Search";
+        self.navigationItem.title = @"Search";
         self.tabBarItem.title = @"Search";
         self.tabBarItem.image = [UIImage imageNamed:@"Search"];
     }
     return self;
 }
+
+
+
 
 - (void)viewDidLoad
 {
