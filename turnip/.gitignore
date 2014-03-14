@@ -1,2 +1,6 @@
+.htaccess
 *.jpg
 *.csv
+*.log
+user_data
+error_log

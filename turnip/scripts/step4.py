@@ -1,6 +1,9 @@
 #!/usr/bin/python
-# Runs on Duffy
-# Copies files from "staging" to "processing" in batches of 128 then runs the model
+# Runs on webhost
+#
+# Takes output file which is csv with user, image, classifications...then moves images into user_data dir and adds 
+#   lines to the index
+#
 
 import sys, getopt, os
 import csv

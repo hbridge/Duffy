@@ -143,8 +143,8 @@ if (!$_GET['userId']) {
 }
 
 
-$dataFilename = "user_data/" . $userId . "/" . $userId . ".csv";
-$thumbsBaseDir = "user_data/" . $userId . "/photos/";
+$dataFilename = "user_data/" . $userId . "/index.csv";
+$thumbsBaseDir = "user_data/" . $userId . "/photos";
 
 // Open the file
 $fp = @fopen($dataFilename, 'r');
@@ -158,9 +158,6 @@ if ($fp) {
        	array_push($lines, explode(",", $line));
    	}
 
-   	// Kill first line
-	unset($lines[0]);
-
    	foreach ($lines as $line) {
 		$obj = array();
 		$url = $line[0];
@@ -172,7 +169,8 @@ if ($fp) {
 			$className = strtolower($classAndRating[0]);
 			$rating = trim($classAndRating[1], "()");
 
-			$filename = substr($url,0, -4) . "_thumb.jpg";
+			//$filename = substr($url,0, -4) . "_thumb.jpg";
+			$filename = $url;
 			$thumb = $thumbsBaseDir. "/" . $filename;
 
 			$thumbs[$url] = $thumb;
@@ -192,6 +190,8 @@ if ($fp) {
 	foreach ($indexedUrls as $urls) {
 		array_unique($urls);
 	}
+} else {
+	echo "Index file not found for user";
 }
 
 
@@ -228,7 +228,7 @@ foreach ($indexedUrls as $className => $urlArray) {
 	}
 }
 
-// START PAGE LOGIC
+// ------------------------   START API LOGIC
 
 $userQuery = strtolower(trim(urldecode($_GET["q"])));
 
