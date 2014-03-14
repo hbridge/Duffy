@@ -103,10 +103,10 @@
     CGSize newSize;
     if (originalSize.height < originalSize.width) {
         CGFloat scaleFactor = length/originalSize.height;
-        newSize = CGSizeMake(ceil(originalSize.width * scaleFactor), length);
+        newSize = CGSizeMake(floor(originalSize.width * scaleFactor), length);
     } else {
         CGFloat scaleFactor = length/originalSize.width;
-        newSize = CGSizeMake(length, ceil(originalSize.height * scaleFactor));
+        newSize = CGSizeMake(length, floor(originalSize.height * scaleFactor));
     }
     
     return [self resizedImageWithContentMode:UIViewContentModeScaleAspectFill bounds:newSize interpolationQuality:quality];
