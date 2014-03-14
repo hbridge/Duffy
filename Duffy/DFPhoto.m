@@ -78,6 +78,11 @@
     return resizedImage;
 }
 
+- (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
+{
+    return [self.fullImage resizedImageWithSmallerDimensionScaledToLength:length interpolationQuality:kCGInterpolationHigh];
+}
+
 
 - (void)createCGImageForThumbnail:(DFPhotoLoadSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {

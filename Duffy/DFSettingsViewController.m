@@ -9,12 +9,20 @@
 #import "DFSettingsViewController.h"
 #import "DFPhotoStore.h"
 #import "DFUploadController.h"
+#import "DFUser.h"
 
 @interface DFSettingsViewController ()
+
+@property (nonatomic, retain) NSArray *rowLabels;
 
 @end
 
 @implementation DFSettingsViewController
+
+NSString *DFPipelineEnabledUserDefaultKey = @"DFPipelineEnabledUserDefaultKey";
+NSString *DFPipelineEnabledYes = @"YES";
+NSString *DFPipelineEnabledNo = @"NO";
+
 
 - (id)init
 {
@@ -23,6 +31,19 @@
         self.navigationController.navigationItem.title = @"Settings";
         self.tabBarItem.title = @"Settings";
         self.tabBarItem.image = [UIImage imageNamed:@"SettingsTab"];
+        
+        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+        
+        // version
+        NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+        NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
+
+        
+        self.rowLabels = @[ @"Force upload camera roll",
+                            @"ID",
+                            ];
+        
     }
     return self;
 }
@@ -44,16 +65,21 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    return 1;
+    return self.rowLabels.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     UITableViewCell *cell = [self.settingsTableView dequeueReusableCellWithIdentifier:@"UITableViewCell"];
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    
     switch (indexPath.row) {
         case 0:
-            cell.textLabel.text = @"Force upload camera roll";
+            cell.textLabel.text = self.rowLabels[0];
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            break;
+        case 1:
+            cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", self.rowLabels[1], [DFUser deviceID]];
+            cell.textLabel.adjustsFontSizeToFitWidth = YES;
             break;
         default:
             break;
@@ -72,6 +98,19 @@
     
     [self.settingsTableView deselectRowAtIndexPath:indexPath animated:YES];
 }
+
+
+- (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender {
+    if (sender.isOn) {
+        NSLog(@"Pipeline processing for new uploads now ON");
+        [[ NSUserDefaults standardUserDefaults] setObject:DFPipelineEnabledYes forKey:DFPipelineEnabledUserDefaultKey];
+    } else {
+        NSLog(@"Pipeline processing for new uploads now OFF");
+        [[ NSUserDefaults standardUserDefaults] setObject:DFPipelineEnabledNo forKey:DFPipelineEnabledUserDefaultKey];
+    }
+    
+}
+
 
 
 @end

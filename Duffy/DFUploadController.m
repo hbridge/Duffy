@@ -12,6 +12,7 @@
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
 #import "DFUser.h"
+#import "DFSettingsViewController.h"
 
 
 // Private DFUploadResponse Class
@@ -25,7 +26,8 @@
 // Constants
 static NSString *BaseURL = @"http://photos.derektest1.com/";
 static NSString *AddPhotoResource = @"api/addphoto.php";
-NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
+const NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
+static NSString *UserIDParameterKey = @"userId";
 
 @interface DFUploadController()
 
@@ -122,11 +124,19 @@ static DFUploadController *defaultUploadController;
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
 }
 
+
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {
-    UIImage *imageToUpload = [photo imageResizedToFitSize:CGSizeMake(256, 256)];
-    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.75);
-    NSDictionary *params = @{@"userId": [DFUser deviceID]};
+    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:256.0];
+    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.9);
+    NSMutableDictionary *params = [NSMutableDictionary
+                                   dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];
+    // if processing off, append prefix to userid
+    if ([[[NSUserDefaults standardUserDefaults] valueForKey:DFPipelineEnabledUserDefaultKey]
+         isEqualToString:DFPipelineEnabledNo]){
+        params[UserIDParameterKey] = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
+    }
+    
     NSDate *uploadStartDate = [NSDate date];
     NSString *uniqueUploadName = [self uniqueFilenameForPhoto:photo uploadDate:uploadStartDate];
     

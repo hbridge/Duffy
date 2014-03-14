@@ -28,6 +28,7 @@
 
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;
+- (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length;
 
 // Use these to access image data Asynchronously if accessing it will be slow
 // Note that the created CGImage must be released by the caller to prevent memory leaks

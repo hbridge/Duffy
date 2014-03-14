@@ -11,6 +11,13 @@
 @interface DFSettingsViewController : UIViewController
     <UITableViewDataSource, UITableViewDelegate>
 
+extern NSString *DFPipelineEnabledUserDefaultKey;
+extern NSString *DFPipelineEnabledYes;
+extern NSString *DFPipelineEnabledNo;
+
 @property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
+
+
+- (IBAction)pipelineEnabledSwitchChanged:(id)sender;
 
 @end
