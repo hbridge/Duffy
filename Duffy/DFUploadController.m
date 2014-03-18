@@ -42,6 +42,10 @@ static NSString *UserIDParameterKey = @"userId";
 
 @synthesize objectManager = _objectManager;
 
+
+static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
+static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
+
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
 + (DFUploadController *)sharedUploadController {
@@ -128,8 +132,8 @@ static DFUploadController *defaultUploadController;
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {
-    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:512.0];
-    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.9);
+    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
+    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
     NSMutableDictionary *params = [NSMutableDictionary
                                    dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];
     // if processing off, append prefix to userid
