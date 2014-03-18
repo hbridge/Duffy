@@ -16,6 +16,7 @@
 + (NSURL *)localThumbnailsDirectoryURL;
 
 @property (nonatomic, retain) NSString *alAssetURLString;
+@property (nonatomic, retain) NSDate *creationDate;
 @property (nonatomic, retain) NSString *universalIDString;
 @property (nonatomic, retain) NSDate *uploadDate;
 

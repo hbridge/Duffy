@@ -15,6 +15,11 @@
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
 
+// background
+@property (nonatomic, retain) NSManagedObjectContext *backgroundManagedObjectContext;
+@property (nonatomic) dispatch_queue_t backgroundQueue;
+@property (atomic) BOOL isCameraRollLoadRequested;
+
 
 @end
 
@@ -49,10 +54,12 @@ static DFPhotoStore *defaultStore;
     self = [super init];
     if (self) {
         [self createCacheDirectories];
-        
+        // load photos that have already been imported
         _cameraRoll = [[NSMutableArray alloc] init];
         [self loadCameraRollDB];
-        [self scanCameraRollForNewImages];
+        
+        // scan camera roll
+        self.backgroundQueue = dispatch_queue_create("com.duffysoft.DFPhotoStore.backgroundQueue", DISPATCH_QUEUE_SERIAL);
     }
     return self;
 }
@@ -83,10 +90,14 @@ static DFPhotoStore *defaultStore;
 
 - (void)loadCameraRollDB
 {
+    
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     
     NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
+    
+    NSSortDescriptor *dateSort = [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO];
+    request.sortDescriptors = [NSArray arrayWithObject:dateSort];
     
     NSError *error;
     NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
@@ -95,46 +106,59 @@ static DFPhotoStore *defaultStore;
                     format:@"Error: %@", [error localizedDescription]];
     }
     
-    NSLog(@"Loaded %d photos from database.", (u_int)[result count] );
-    [_cameraRoll addObjectsFromArray:result];
+    _cameraRoll = [result mutableCopy];
+    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
 }
 
-- (void)scanCameraRollForNewImages
+- (void)scanCameraRollForChanges
 {
-    void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
-        if(result != NULL) {
+    int __block newAssets = 0;
+    
+    void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
+        if(photoAsset != NULL) {
             //TODO should also look for items in DB that have been desleted
             
             
             //NSLog(@"Scanning Camera Roll asset: %@...", result);
-            NSURL *assetURL = [result valueForProperty: ALAssetPropertyAssetURL];
-            if (nil == [self photoWithALAssetURL:assetURL])
+            NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
+            if (nil == [self photoWithALAssetURL:assetURL context:self.backgroundManagedObjectContext])
             {
                 //NSLog(@"...asset is new, adding to database.");
                 // we haven't seent this photo before, add it to our database
+                // have to add on main thread, since CoreData is not thread safe
                 DFPhoto *newPhoto = [NSEntityDescription
                                      insertNewObjectForEntityForName:@"DFPhoto"
-                                     inManagedObjectContext:_managedObjectContext];
+                                     inManagedObjectContext:self.backgroundManagedObjectContext];
                 newPhoto.alAssetURLString = assetURL.absoluteString;
-                [_cameraRoll addObject:newPhoto];
-                [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
+                newPhoto.creationDate = [photoAsset valueForProperty:ALAssetPropertyDate];
+                newAssets++;
+                
+                // save to the store so that the main thread context can pick it up
+                NSError *error = nil;
+                if(![self.backgroundManagedObjectContext save:&error]) {
+                    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                    [NSException raise:@"Could not save new photo object." format:@"Error: %@",[error localizedDescription]];
+                }
+                
             } else {
                 //NSLog(@"...asset is not new.");
             }
         } else {
-            NSLog(@"All assets in Camera Roll enumerated");
+            NSLog(@"All assets in Camera Roll enumerated, %d new assets.", newAssets);
             [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
         }
     };
     
     void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
     	if(group != nil) {
-            NSLog(@"Enumerating %d assets in: %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-    		[group enumerateAssetsUsingBlock:assetEnumerator];
+            // only want photos for now
+            [group setAssetsFilter:[ALAssetsFilter allPhotos]];
+            NSLog(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
+    		[group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:assetEnumerator];
     	}
     };
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
                                           usingBlock:assetGroupEnumerator
                                         failureBlock: ^(NSError *error) {
@@ -145,7 +169,7 @@ static DFPhotoStore *defaultStore;
 }
 
 
-- (DFPhoto *)photoWithALAssetURL:(NSURL *)url
+- (DFPhoto *)photoWithALAssetURL:(NSURL *)url context:(NSManagedObjectContext *)context
 {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
@@ -156,7 +180,7 @@ static DFPhotoStore *defaultStore;
     request.predicate = predicate;
     
     NSError *error;
-    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    NSArray *result = [context executeFetchRequest:request error:&error];
     if (!result) {
         [NSException raise:@"Could search for photos."
                     format:@"Error: %@", [error localizedDescription]];
@@ -221,6 +245,24 @@ static DFPhotoStore *defaultStore;
 
 #pragma mark - Core Data stack
 
+
+/* Save notification handler for the background context */
+- (void)backgroundContextDidSave:(NSNotification *)notification {
+    /* Make sure we're on the main thread when updating the main context */
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(backgroundContextDidSave:)
+                               withObject:notification
+                            waitUntilDone:NO];
+        return;
+    }
+    
+    /* merge in the changes to the main context */
+    [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+    [self loadCameraRollDB];
+    
+}
+
+
 // Returns the managed object context for the application.
 // If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
 - (NSManagedObjectContext *)managedObjectContext
@@ -235,6 +277,28 @@ static DFPhotoStore *defaultStore;
         [_managedObjectContext setPersistentStoreCoordinator:coordinator];
     }
     return _managedObjectContext;
+}
+
+// background context, used for
+- (NSManagedObjectContext *)backgroundManagedObjectContext
+{
+    if (_backgroundManagedObjectContext != nil) {
+        return _backgroundManagedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _backgroundManagedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_backgroundManagedObjectContext setPersistentStoreCoordinator:coordinator];
+    }
+    
+    // setup stuff for background
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(backgroundContextDidSave:)
+                                                 name:NSManagedObjectContextDidSaveNotification
+                                               object:_backgroundManagedObjectContext];
+    
+    return _backgroundManagedObjectContext;
 }
 
 // Returns the managed object model for the application.

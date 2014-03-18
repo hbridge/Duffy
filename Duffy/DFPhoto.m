@@ -24,7 +24,7 @@
 @synthesize fullImage;
 @synthesize asset = _asset;
 
-@dynamic alAssetURLString, universalIDString, uploadDate;
+@dynamic alAssetURLString, universalIDString, uploadDate, creationDate;
 
 
 - (UIImage *)thumbnail

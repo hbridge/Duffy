@@ -128,7 +128,7 @@ static DFUploadController *defaultUploadController;
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {
-    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:256.0];
+    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:512.0];
     NSData *imageData = UIImageJPEGRepresentation(imageToUpload, 0.9);
     NSMutableDictionary *params = [NSMutableDictionary
                                    dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];

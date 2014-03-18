@@ -15,7 +15,7 @@
 extern NSString *const DFPhotoStoreCameraRollUpdated;
 extern NSString *const DFPhotoStoreCameraRollScanComplete;
 
-// Get the singleton store instance
+// Get the store instance for the main thread
 + (DFPhotoStore *)sharedStore;
 
 // Get the shared ALAssets library for other model files
@@ -24,6 +24,11 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 // Main accessors for data
 - (NSArray *)cameraRoll;
 - (NSArray *)photosWithUploadStatus:(BOOL)isUploaded;
+
+// Scan for new photos in background
+- (void)scanCameraRollForChanges;
+
+
 
 // Core data stack
 @property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;

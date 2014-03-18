@@ -24,10 +24,6 @@
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(cameraRollUpdated)
-                                                     name:DFPhotoStoreCameraRollUpdated
-                                                   object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(cameraRollScanComplete)
                                                      name:DFPhotoStoreCameraRollScanComplete
                                                    object:nil];
@@ -48,6 +44,11 @@
     // an iOS bug that doesn't retain SDC
     self.sdc = [[DFSearchController alloc] initWithSearchBar:[[UISearchBar alloc] init]
                                                                 contentsController:self];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(cameraRollUpdated)
+                                                 name:DFPhotoStoreCameraRollUpdated
+                                               object:nil];
 }
 
 - (void)didReceiveMemoryWarning

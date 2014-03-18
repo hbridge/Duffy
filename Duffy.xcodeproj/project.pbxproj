@@ -237,7 +237,6 @@
 				5ADB24FE189AB3730016CA02 /* Model */,
 				5AFBCA5118D236AE00998793 /* Utils */,
 				5ADB24D1189985590016CA02 /* Images.xcassets */,
-				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
 				5ADB24C3189985590016CA02 /* Supporting Files */,
 			);
 			path = Duffy;
@@ -282,6 +281,7 @@
 		5ADB24FE189AB3730016CA02 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
 				5AFBCA3318D0C87E00998793 /* DFUser.h */,
 				5AFBCA3418D0C87E00998793 /* DFUser.m */,
 				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
