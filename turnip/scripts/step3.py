@@ -95,7 +95,6 @@ def getNextImagesToProcess(stagingPath, processingPath, maxCount):
                         call (['mv', imagepath, userProcessingPath])
                         movedImagePath = os.path.join(userProcessingPath, filename)
 
-                    
                         imagesToProcess.append(movedImagePath)
                         imageCount += 1
                     else:
@@ -104,13 +103,29 @@ def getNextImagesToProcess(stagingPath, processingPath, maxCount):
 
 def exportOutput(outputFileLoc, webHost, remoteOutputPath):
     # SEND TO WEB SERVER
-    logging.debug("Copying " + outputFileLoc + " " + webHost + ":" + remoteOutputPath)
-    call (['ssh', webHost, "mkdir -p " + remoteOutputPath])
-    call (['scp', outputFileLoc, webHost + ":" + remoteOutputPath])
+    ret = 1
+    while ret != 0:
+        logging.debug("Creating user's output path")
+        ret = call (['ssh', webHost, "mkdir -p " + remoteOutputPath])
+        if ret != 0:
+            logging.debug("return from outputpath: "  + str(ret))
+            time.sleep(1)
 
-    base, filename = os.path.split(outputFileLoc)
-    call (['ssh', webHost, "/home2/derektes/public_html/photos/turnip/scripts/step4.py -i " + filename])
-
+    ret = 1
+    while ret != 0:
+        logging.debug("Copying " + outputFileLoc + " " + webHost + ":" + remoteOutputPath)
+        ret = call (['scp', outputFileLoc, webHost + ":" + remoteOutputPath])
+        if ret != 0:
+            logging.debug("return from scp: "  + str(ret))
+            time.sleep(1)
+    
+    ret = 1
+    while ret != 0:
+        logging.debug("Calling the start to step4")
+        ret = call (['ssh', webHost, "/home2/derektes/public_html/photos/turnip/scripts/step4.py"])
+        if ret != 0:
+            logging.debug("return from start step 4: "  + str(ret))
+            time.sleep(1)
 
 def main(argv):
     basePath = '/home/derek/pipeline'

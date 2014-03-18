@@ -29,7 +29,7 @@ def main(argv):
 		response['images'] = dict()
 		for image in cmd['images']:
 			response['images'][image] = list()
-			response['images'][image].append({'class_id':'n10042', 'class_name':'computer', 'confidence':'0.91'})
+			response['images'][image].append({'class_id':'n10042', 'class_name':'computer', 'confidence':'1.91'})
 			response['images'][image].append({'class_id':'n10041', 'class_name':'desk', 'confidence':'0.81'})
 			response['images'][image].append({'class_id':'n10041', 'class_name':'pizza', 'confidence':'0.81'})
 
