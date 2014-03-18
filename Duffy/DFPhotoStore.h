@@ -12,7 +12,8 @@
 
 @interface DFPhotoStore : NSObject
 
-extern NSString *const DFPhotoStoreReadyNotification;
+extern NSString *const DFPhotoStoreCameraRollUpdated;
+extern NSString *const DFPhotoStoreCameraRollScanComplete;
 
 // Get the singleton store instance
 + (DFPhotoStore *)sharedStore;

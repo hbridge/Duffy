@@ -24,8 +24,12 @@
     self = [super init];
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(photoStoreReady)
-                                                     name:DFPhotoStoreReadyNotification
+                                                 selector:@selector(cameraRollUpdated)
+                                                     name:DFPhotoStoreCameraRollUpdated
+                                                   object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(cameraRollScanComplete)
+                                                     name:DFPhotoStoreCameraRollScanComplete
                                                    object:nil];
         self.photos = [[DFPhotoStore sharedStore] cameraRoll];
         
@@ -52,10 +56,14 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)photoStoreReady
+- (void)cameraRollUpdated
 {
     self.photos = [[DFPhotoStore sharedStore] cameraRoll];
-    
+    [self.collectionView reloadData];
+}
+
+- (void)cameraRollScanComplete
+{    
     NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
     [[DFUploadController sharedUploadController] uploadPhotos:photosToUpload];
 }

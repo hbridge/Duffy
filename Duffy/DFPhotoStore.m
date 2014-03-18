@@ -15,6 +15,7 @@
 @property (nonatomic, retain) NSMutableArray *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
 
+
 @end
 
 @implementation DFPhotoStore
@@ -25,7 +26,8 @@
 @synthesize assetsLibrary = _assetsLibrary;
 
 
-NSString *const DFPhotoStoreReadyNotification = @"DFPhotoStoreReadyNotification";
+NSString *const DFPhotoStoreCameraRollUpdated = @"DFPhotoStoreCameraRollUpdated";
+NSString *const DFPhotoStoreCameraRollScanComplete = @"DFPhotoStoreCameraRollScanComplete";
 
 static DFPhotoStore *defaultStore;
 
@@ -86,9 +88,6 @@ static DFPhotoStore *defaultStore;
     NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
     
-//    NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"cocktailName" ascending:YES];
-//    request.sortDescriptors = [NSArray arrayWithObject:sort];
-    
     NSError *error;
     NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
     if (!result) {
@@ -104,6 +103,9 @@ static DFPhotoStore *defaultStore;
 {
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *result, NSUInteger index, BOOL *stop) {
         if(result != NULL) {
+            //TODO should also look for items in DB that have been desleted
+            
+            
             //NSLog(@"Scanning Camera Roll asset: %@...", result);
             NSURL *assetURL = [result valueForProperty: ALAssetPropertyAssetURL];
             if (nil == [self photoWithALAssetURL:assetURL])
@@ -115,12 +117,13 @@ static DFPhotoStore *defaultStore;
                                      inManagedObjectContext:_managedObjectContext];
                 newPhoto.alAssetURLString = assetURL.absoluteString;
                 [_cameraRoll addObject:newPhoto];
+                [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
             } else {
                 //NSLog(@"...asset is not new.");
             }
         } else {
             NSLog(@"All assets in Camera Roll enumerated");
-            [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreReadyNotification object:self];
+            [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
         }
     };
     
@@ -131,11 +134,14 @@ static DFPhotoStore *defaultStore;
     	}
     };
     
-    [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
-    					   usingBlock:assetGroupEnumerator
-    					 failureBlock: ^(NSError *error) {
-    						 NSLog(@"Failure");
-    					 }];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+        [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
+                                          usingBlock:assetGroupEnumerator
+                                        failureBlock: ^(NSError *error) {
+                                            NSLog(@"Failure");
+                                        }];
+
+    });
 }
 
 
