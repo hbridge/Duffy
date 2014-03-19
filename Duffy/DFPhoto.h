@@ -20,6 +20,8 @@
 @property (nonatomic, retain) NSString *universalIDString;
 @property (nonatomic, retain) NSDate *uploadDate;
 
+// Get a DF Photo instance from its URL
++ (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext;
 
 // Access to the images
 // Will block if the image needs to be loaded from somewhere.  Access on the main thread should

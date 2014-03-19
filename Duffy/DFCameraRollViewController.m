@@ -10,6 +10,7 @@
 #import "DFPhotoStore.h"
 #import "DFUploadController.h"
 #import "DFSettingsViewController.h"
+#import "DFPhoto.h"
 
 @interface DFCameraRollViewController ()
 
@@ -59,8 +60,8 @@
 - (void)cameraRollScanComplete
 {
     if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
-        NSArray *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
-        [[DFUploadController sharedUploadController] uploadPhotos:photosToUpload];
+        DFPhotoCollection *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
+        [[DFUploadController sharedUploadController] uploadPhotosWithURLs:photosToUpload.photoURLSet.allObjects];
     }
 }
 

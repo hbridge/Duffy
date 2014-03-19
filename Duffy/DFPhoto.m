@@ -27,6 +27,28 @@
 @dynamic alAssetURLString, universalIDString, uploadDate, creationDate;
 
 
++ (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext
+{
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [[managedObjectContext.persistentStoreCoordinator.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
+    
+    
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", url];
+    request.predicate = predicate;
+    
+    NSError *error;
+    NSArray *result = [managedObjectContext executeFetchRequest:request error:&error];
+    if (!result) {
+        [NSException raise:@"Could search for photos."
+                    format:@"Error: %@", [error localizedDescription]];
+    }
+    
+    if (result.count < 1) return nil;
+    
+    return [result firstObject];
+}
+
 - (UIImage *)thumbnail
 {
     UIImage __block *loadedThumbnail;

@@ -24,7 +24,7 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 
 // Main accessors for data
 - (DFPhotoCollection *)cameraRoll;
-- (NSArray *)photosWithUploadStatus:(BOOL)isUploaded;
+- (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded;
 
 
 // Core data stack

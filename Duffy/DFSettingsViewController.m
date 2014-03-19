@@ -120,8 +120,8 @@ NSString *DFEnabledNo = @"NO";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.row == 0) {
-        NSArray *cameraRollPhotos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
-        [[DFUploadController sharedUploadController] uploadPhotos:cameraRollPhotos];
+        DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
+        [[DFUploadController sharedUploadController] uploadPhotosWithURLs:[cameraRollPhotos.photoURLSet allObjects]];
     } else if (indexPath.row == 1) {
         UIPasteboard *pb = [UIPasteboard generalPasteboard];
         [pb setString:[DFUser deviceID]];

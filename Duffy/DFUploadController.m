@@ -36,11 +36,14 @@ static NSString *UserIDParameterKey = @"userId";
 @property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
 @property (atomic, retain) NSMutableArray *photosToUpload;
 
+@property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+
 @end
 
 @implementation DFUploadController
 
 @synthesize objectManager = _objectManager;
+@synthesize managedObjectContext = _managedObjectContext;
 
 
 static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
@@ -72,10 +75,15 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Public APIs
 
-- (void)uploadPhotos:(NSArray *)photos
+- (void)uploadPhotosWithURLs:(NSArray *)photoURLs
 {
-    NSLog(@"UploadController uploading %d photos", (int)photos.count);
-    if (photos.count < 1) return;
+    NSLog(@"UploadController uploading %d photos", (int)photoURLs.count);
+    if (photoURLs.count < 1) return;
+    
+    NSMutableArray *photos = [[NSMutableArray alloc] initWithCapacity:photoURLs.count];
+    for (NSString *photoURL in photoURLs) {
+        [photos addObject:[DFPhoto photoWithURL:photoURL inContext:self.managedObjectContext]];
+    }
     
     [self.photosToUpload addObjectsFromArray:photos];
     [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
@@ -90,16 +98,6 @@ static DFUploadController *defaultUploadController;
     });
 }
 
-
-- (void)uploadFinishedForPhoto:(DFPhoto *)photo
-{
-    [self.photosToUpload removeObject:photo];
-    
-    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photosToUpload.count);
-    if (self.photosToUpload.count > 0) {
-        [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
-    }
-}
 
 - (void)uploadPhoto:(DFPhoto *)photo
 {
@@ -127,6 +125,30 @@ static DFUploadController *defaultUploadController;
     
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
+}
+
+- (void)uploadFinishedForPhoto:(DFPhoto *)photo
+{
+    [self.photosToUpload removeObject:photo];
+    
+    [self saveUploadProgress];
+    
+    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photosToUpload.count);
+    if (self.photosToUpload.count > 0) {
+        [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
+    }
+}
+
+- (void)saveUploadProgress
+{
+
+    NSError *error = nil;
+    if(![self.managedObjectContext save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
+    }
+
+    NSLog(@"upload progress saved.");
 }
 
 
@@ -206,6 +228,26 @@ static DFUploadController *defaultUploadController;
     
     return output;
 }
+
+
+
+#pragma mark - Core Data helpers
+
+
+- (NSManagedObjectContext *)managedObjectContext
+{
+    if (_managedObjectContext != nil) {
+        return _managedObjectContext;
+    }
+    
+    NSPersistentStoreCoordinator *coordinator = [[DFPhotoStore sharedStore] persistentStoreCoordinator];
+    if (coordinator != nil) {
+        _managedObjectContext = [[NSManagedObjectContext alloc] init];
+        [_managedObjectContext setPersistentStoreCoordinator:coordinator];
+    }
+    return _managedObjectContext;
+}
+
 
 
 @end

@@ -17,6 +17,6 @@ extern const NSString *DFUploadStatusUpdate;
 
 // pass an Array of DFPhotos to be uploaded to the server aysnchronously
 // subscribe to DFUploadStatusUpdate to be notified of progress
-- (void)uploadPhotos:(NSArray *)photos;
+- (void)uploadPhotosWithURLs:(NSArray *)photoURLs;
 
 @end

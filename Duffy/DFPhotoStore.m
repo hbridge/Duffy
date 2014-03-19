@@ -130,7 +130,7 @@ static DFPhotoStore *defaultStore;
     return [result firstObject];
 }
 
-- (NSArray *)photosWithUploadStatus:(BOOL)isUploaded
+- (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded
 {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
@@ -152,7 +152,7 @@ static DFPhotoStore *defaultStore;
                     format:@"Error: %@", [error localizedDescription]];
     }
     
-    return result;
+    return [[DFPhotoCollection alloc] initWithPhotos:result];
 }
 
 
