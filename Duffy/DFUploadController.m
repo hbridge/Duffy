@@ -138,7 +138,7 @@ static DFUploadController *defaultUploadController;
                                    dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];
     // if processing off, append prefix to userid
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:DFPipelineEnabledUserDefaultKey]
-         isEqualToString:DFPipelineEnabledNo]){
+         isEqualToString:DFEnabledNo]){
         params[UserIDParameterKey] = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
     }
     

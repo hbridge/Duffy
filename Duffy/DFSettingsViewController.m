@@ -20,8 +20,9 @@
 @implementation DFSettingsViewController
 
 NSString *DFPipelineEnabledUserDefaultKey = @"DFPipelineEnabledUserDefaultKey";
-NSString *DFPipelineEnabledYes = @"YES";
-NSString *DFPipelineEnabledNo = @"NO";
+NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
+NSString *DFEnabledYes = @"YES";
+NSString *DFEnabledNo = @"NO";
 
 
 - (id)init
@@ -106,12 +107,22 @@ NSString *DFPipelineEnabledNo = @"NO";
 - (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender {
     if (sender.isOn) {
         NSLog(@"Pipeline processing for new uploads now ON");
-        [[ NSUserDefaults standardUserDefaults] setObject:DFPipelineEnabledYes forKey:DFPipelineEnabledUserDefaultKey];
+        [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFPipelineEnabledUserDefaultKey];
     } else {
         NSLog(@"Pipeline processing for new uploads now OFF");
-        [[ NSUserDefaults standardUserDefaults] setObject:DFPipelineEnabledNo forKey:DFPipelineEnabledUserDefaultKey];
+        [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFPipelineEnabledUserDefaultKey];
     }
     
+}
+
+- (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {
+    if (sender.isOn) {
+        NSLog(@"Auto-upload now ON");
+        [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
+    } else {
+        NSLog(@"Auto-upload now OFF");
+        [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
+    }
 }
 
 

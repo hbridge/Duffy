@@ -12,12 +12,14 @@
     <UITableViewDataSource, UITableViewDelegate>
 
 extern NSString *DFPipelineEnabledUserDefaultKey;
-extern NSString *DFPipelineEnabledYes;
-extern NSString *DFPipelineEnabledNo;
+extern NSString *DFAutoUploadEnabledUserDefaultKey;
+extern NSString *DFEnabledYes;
+extern NSString *DFEnabledNo;
 
 @property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
 
 
-- (IBAction)pipelineEnabledSwitchChanged:(id)sender;
+- (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender;
+- (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender;
 
 @end
