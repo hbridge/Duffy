@@ -7,12 +7,13 @@
 //
 
 #import "DFUser.h"
+#import <AdSupport/ASIdentifierManager.h>
 
 @implementation DFUser
 
 + (NSString *)deviceID
 {
-    NSUUID *oNSUUID = [[UIDevice currentDevice] identifierForVendor];
+    NSUUID *oNSUUID = [[ASIdentifierManager sharedManager] advertisingIdentifier];
     return [oNSUUID UUIDString];
 }
 
