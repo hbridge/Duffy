@@ -17,6 +17,7 @@
 @property (readonly, nonatomic, retain) NSSet *photoURLSet;
 
 
+- (id)initWithPhotos:(NSArray *)photos;
 - (void)addPhotos:(NSArray *)newPhotos;
 - (BOOL)containsPhotoWithAssetURL:(NSString *)assetURLString;
 

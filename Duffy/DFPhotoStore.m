@@ -105,7 +105,7 @@ static DFPhotoStore *defaultStore;
                     format:@"Error: %@", [error localizedDescription]];
     }
     
-    [self.cameraRoll addPhotos:result];
+    self.cameraRoll = [[DFPhotoCollection alloc] initWithPhotos:result];
     [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
 }
 

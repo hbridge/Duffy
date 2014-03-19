@@ -30,6 +30,13 @@
     return self;
 }
 
+- (id)initWithPhotos:(NSArray *)photos {
+    self = [self init];
+    if (self) {
+        [self addPhotos:photos];
+    }
+    return self;
+}
 
 - (void)addPhotos:(NSArray *)newPhotos
 {
