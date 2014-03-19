@@ -45,8 +45,22 @@ NSString *DFEnabledNo = @"NO";
                             @"ID",
                             ];
         
+        
+        [self setSettingsDefaults];
+        
     }
     return self;
+}
+
+- (void)setSettingsDefaults
+{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    if (![defaults valueForKeyPath:DFPipelineEnabledUserDefaultKey]) {
+        [defaults setValue:DFEnabledYes forKey:DFPipelineEnabledUserDefaultKey];
+    }
+    if (![defaults valueForKey:DFAutoUploadEnabledUserDefaultKey]) {
+        [defaults setValue:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
+    }
 }
 
 - (void)viewDidLoad
@@ -55,6 +69,19 @@ NSString *DFEnabledNo = @"NO";
     
     // register a regular cell for reuse
     [self.settingsTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
+    
+    // set switches to correct values
+    if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFPipelineEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
+        self.pipelineEnabledSwitch.on = YES;
+    } else {
+        self.pipelineEnabledSwitch.on = NO;
+    }
+    
+    if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
+        self.autoUploadEnabledSwitch.on = YES;
+    } else {
+        self.autoUploadEnabledSwitch.on = NO;
+    }
 }
 
 - (void)didReceiveMemoryWarning

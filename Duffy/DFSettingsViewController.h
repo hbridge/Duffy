@@ -17,6 +17,8 @@ extern NSString *DFEnabledYes;
 extern NSString *DFEnabledNo;
 
 @property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
+@property (weak, nonatomic) IBOutlet UISwitch *pipelineEnabledSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *autoUploadEnabledSwitch;
 
 
 - (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender;
