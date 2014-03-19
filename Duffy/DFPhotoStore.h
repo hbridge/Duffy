@@ -26,13 +26,8 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 - (DFPhotoCollection *)cameraRoll;
 - (NSArray *)photosWithUploadStatus:(BOOL)isUploaded;
 
-// Scan for new photos in background
-- (void)scanCameraRollForChanges;
-
-
 
 // Core data stack
-@property (readonly, strong, nonatomic) NSManagedObjectContext *managedObjectContext;
 @property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
 @property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
 

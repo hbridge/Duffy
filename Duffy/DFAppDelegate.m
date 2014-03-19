@@ -11,7 +11,14 @@
 #import "DFCameraRollViewController.h"
 #import "DFSettingsViewController.h"
 #import "DFSearchViewController.h"
+#import "DFCameraRollSyncController.h"
 
+
+@interface DFAppDelegate()
+
+@property (nonatomic, retain) DFCameraRollSyncController *cameraRollSyncController;
+
+@end
 
 @implementation DFAppDelegate
 
@@ -66,7 +73,12 @@
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     NSLog(@"applicationDidBecomeActive");
-    [[DFPhotoStore sharedStore] scanCameraRollForChanges];
+    if (self.cameraRollSyncController == nil) {
+        self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
+    }
+    
+    NSSet *dbKnownURLs = [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
+    [self.cameraRollSyncController asyncSyncToCameraRollWithCurrentKnownPhotoURLs:dbKnownURLs];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application

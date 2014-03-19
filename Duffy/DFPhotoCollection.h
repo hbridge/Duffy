@@ -14,6 +14,7 @@
 
 @property (readonly, nonatomic, retain) NSSet *photoSet;
 @property (readonly, nonatomic, retain) NSArray *photosByDate;
+@property (readonly, nonatomic, retain) NSSet *photoURLSet;
 
 
 - (void)addPhotos:(NSArray *)newPhotos;

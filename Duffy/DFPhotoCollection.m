@@ -70,6 +70,11 @@
     return photosByDate;
 }
 
+- (NSSet *)photoURLSet
+{
+    return photoAssetURLSet;
+}
+
 - (BOOL)containsPhotoWithAssetURL:(NSString *)assetURLString
 {
     return [photoAssetURLSet containsObject:assetURLString];
