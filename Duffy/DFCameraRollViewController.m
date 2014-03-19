@@ -8,13 +8,10 @@
 
 #import "DFCameraRollViewController.h"
 #import "DFPhotoStore.h"
-#import "DFSearchController.h"
 #import "DFUploadController.h"
 #import "DFSettingsViewController.h"
 
 @interface DFCameraRollViewController ()
-
-@property (nonatomic, retain) DFSearchController *sdc;
 
 @end
 
@@ -40,11 +37,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    // we have to assign this to something that gets retained because there's
-    // an iOS bug that doesn't retain SDC
-    self.sdc = [[DFSearchController alloc] initWithSearchBar:[[UISearchBar alloc] init]
-                                                                contentsController:self];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(cameraRollUpdated)
