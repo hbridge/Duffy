@@ -27,7 +27,7 @@
                                                  selector:@selector(cameraRollScanComplete)
                                                      name:DFPhotoStoreCameraRollScanComplete
                                                    object:nil];
-        self.photos = [[DFPhotoStore sharedStore] cameraRoll];
+        self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
         
         self.navigationController.navigationItem.title = @"Camera Roll";
         self.tabBarItem.title = @"Camera Roll";
@@ -59,7 +59,7 @@
 
 - (void)cameraRollUpdated
 {
-    self.photos = [[DFPhotoStore sharedStore] cameraRoll];
+    self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
     [self.collectionView reloadData];
 }
 

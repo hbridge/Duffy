@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPhotoCollection.h"
 
 @class ALAssetsLibrary;
 
@@ -22,7 +23,7 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 @property (readonly, strong, nonatomic) ALAssetsLibrary *assetsLibrary;
 
 // Main accessors for data
-- (NSArray *)cameraRoll;
+- (DFPhotoCollection *)cameraRoll;
 - (NSArray *)photosWithUploadStatus:(BOOL)isUploaded;
 
 // Scan for new photos in background

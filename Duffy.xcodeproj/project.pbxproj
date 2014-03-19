@@ -12,6 +12,7 @@
 		5A30E4DB18D3AC5F00E41DBC /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A30E4D918D3AC5F00E41DBC /* DFSearchViewController.xib */; };
 		5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A30E4DC18D3AF0800E41DBC /* Search@2x.png */; };
 		5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A37478F18CE4F1500E27F00 /* DFSearchController.m */; };
+		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
 		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
 		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
@@ -73,6 +74,8 @@
 		5A30E4DC18D3AF0800E41DBC /* Search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Search@2x.png"; sourceTree = "<group>"; };
 		5A37478E18CE4F1500E27F00 /* DFSearchController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchController.h; sourceTree = "<group>"; };
 		5A37478F18CE4F1500E27F00 /* DFSearchController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchController.m; sourceTree = "<group>"; };
+		5A45E9BB18D9F7B8002663EB /* DFPhotoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoCollection.h; sourceTree = "<group>"; };
+		5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoCollection.m; sourceTree = "<group>"; };
 		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
 		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -286,6 +289,8 @@
 				5AFBCA3418D0C87E00998793 /* DFUser.m */,
 				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
 				5ADB24F718998D070016CA02 /* DFPhotoStore.m */,
+				5A45E9BB18D9F7B8002663EB /* DFPhotoCollection.h */,
+				5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */,
 				5ADB2507189ABBB50016CA02 /* DFPhoto.h */,
 				5ADB2508189ABBB50016CA02 /* DFPhoto.m */,
 			);
@@ -468,6 +473,7 @@
 				5A37479018CE4F1500E27F00 /* DFSearchController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
+				5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */,
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
 				5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */,

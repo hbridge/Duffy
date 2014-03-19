@@ -32,12 +32,12 @@ NSString *DFPipelineEnabledNo = @"NO";
         self.tabBarItem.title = @"Settings";
         self.tabBarItem.image = [UIImage imageNamed:@"SettingsTab"];
         
-        NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-        NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+        //NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+        //NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
         
         // version
-        NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
-        NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
+        //NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+        //NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
 
         
         self.rowLabels = @[ @"Force upload camera roll",
@@ -92,7 +92,7 @@ NSString *DFPipelineEnabledNo = @"NO";
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (indexPath.row == 0) {
-        NSArray *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
+        NSArray *cameraRollPhotos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
         [[DFUploadController sharedUploadController] uploadPhotos:cameraRollPhotos];
     } else if (indexPath.row == 1) {
         UIPasteboard *pb = [UIPasteboard generalPasteboard];

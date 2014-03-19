@@ -12,7 +12,7 @@
 
 @interface DFPhotoStore()
 
-@property (nonatomic, retain) NSMutableArray *cameraRoll;
+@property (nonatomic, retain) DFPhotoCollection *cameraRoll;
 @property (nonatomic, retain) NSMutableDictionary *allDFAlbumsByName;
 
 // background
@@ -55,7 +55,7 @@ static DFPhotoStore *defaultStore;
     if (self) {
         [self createCacheDirectories];
         // load photos that have already been imported
-        _cameraRoll = [[NSMutableArray alloc] init];
+        _cameraRoll = [[DFPhotoCollection alloc] init];
         [self loadCameraRollDB];
         
         // scan camera roll
@@ -106,7 +106,7 @@ static DFPhotoStore *defaultStore;
                     format:@"Error: %@", [error localizedDescription]];
     }
     
-    _cameraRoll = [result mutableCopy];
+    [self.cameraRoll addPhotos:result];
     [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
 }
 
@@ -121,7 +121,7 @@ static DFPhotoStore *defaultStore;
             
             //NSLog(@"Scanning Camera Roll asset: %@...", result);
             NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
-            if (nil == [self photoWithALAssetURL:assetURL context:self.backgroundManagedObjectContext])
+            if (![[self cameraRoll] containsPhotoWithAssetURL:assetURL.absoluteString])
             {
                 //NSLog(@"...asset is new, adding to database.");
                 // we haven't seent this photo before, add it to our database
@@ -226,7 +226,7 @@ static DFPhotoStore *defaultStore;
     return nil;
 }
 
-- (NSArray *)cameraRoll
+- (DFPhotoCollection *)cameraRoll
 {
     return _cameraRoll;
 }

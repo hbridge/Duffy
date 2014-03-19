@@ -74,7 +74,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadPhotos:(NSArray *)photos
 {
-    NSLog(@"UploadController uploading %ld photos", photos.count);
+    NSLog(@"UploadController uploading %d photos", (int)photos.count);
     if (photos.count < 1) return;
     
     [self.photosToUpload addObjectsFromArray:photos];
