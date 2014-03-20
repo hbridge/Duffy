@@ -7,10 +7,14 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFUploadSessionStats.h"
 
 @interface DFUploadController : NSObject
 
-extern const NSString *DFUploadStatusUpdate;
+extern NSString *DFUploadStatusUpdate;
+extern NSString *DFUploadStatusUpdateSessionUserInfoKey;
+
+@property (atomic, retain) DFUploadSessionStats *currentSessionStats;
 
 + (DFUploadController *)sharedUploadController;
 

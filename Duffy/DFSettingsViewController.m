@@ -47,6 +47,11 @@ NSString *DFEnabledNo = @"NO";
         
         
         [self setSettingsDefaults];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(uploadStatusChanged:)
+                                                     name:DFUploadStatusUpdate
+                                                   object:nil];
+        
         
     }
     return self;
@@ -126,6 +131,17 @@ NSString *DFEnabledNo = @"NO";
         [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
     }
 }
+
+
+- (void)uploadStatusChanged:(NSNotification *)notification
+{
+    DFUploadSessionStats *uploadStats = [[notification userInfo] valueForKey:DFUploadStatusUpdateSessionUserInfoKey];
+    
+    self.numUploadedLabel.text = [NSString stringWithFormat:@"%d", uploadStats.numUploaded];
+    self.numToUploadLabel.text = [NSString stringWithFormat:@"%d", uploadStats.numAcceptedUploads];
+    self.uploadProgressView.progress = (float)uploadStats.numUploaded / (float)uploadStats.numAcceptedUploads;
+}
+
 
 
 

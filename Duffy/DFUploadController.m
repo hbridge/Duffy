@@ -26,7 +26,8 @@
 // Constants
 static NSString *BaseURL = @"http://photos.derektest1.com/";
 static NSString *AddPhotoResource = @"api/addphoto.php";
-const NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
+NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
+NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 static NSString *UserIDParameterKey = @"userId";
 
 @interface DFUploadController()
@@ -80,6 +81,11 @@ static DFUploadController *defaultUploadController;
     NSUInteger photosInQueuePreAdd = self.photoURLsToUpload.count;
     if (photoURLStrings.count < 1) return;
     
+    if (!self.currentSessionStats) {
+        self.currentSessionStats = [[DFUploadSessionStats alloc] init];
+    }
+    [self.currentSessionStats.acceptedURLs addObjectsFromArray:photoURLStrings];
+    
     [self.photoURLsToUpload addObjectsFromArray:photoURLStrings];
     [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
     
@@ -88,6 +94,7 @@ static DFUploadController *defaultUploadController;
           (int)self.photoURLsToUpload.count,
           (int)(self.photoURLsToUpload.count - photosInQueuePreAdd)
           );
+    [self postStatusUpdate];
 
 }
 
@@ -136,9 +143,15 @@ static DFUploadController *defaultUploadController;
     
     [self saveUploadProgress];
     
+    [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
+    [self postStatusUpdate];
+    
     NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
     if (self.photoURLsToUpload.count > 0) {
         [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    } else {
+        NSLog(@"all photos uploaded.");
+        self.currentSessionStats = nil;
     }
 }
 
@@ -154,6 +167,12 @@ static DFUploadController *defaultUploadController;
     NSLog(@"upload progress saved.");
 }
 
+- (void)postStatusUpdate
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:DFUploadStatusUpdate
+                                                        object:self
+                                                      userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
+}
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {
