@@ -67,6 +67,8 @@
                     [NSException raise:@"Could not save new photo object." format:@"Error: %@",[error localizedDescription]];
                 }
             }
+            
+            
             [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
         }
     };

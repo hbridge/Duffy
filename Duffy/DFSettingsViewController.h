@@ -16,11 +16,12 @@ extern NSString *DFAutoUploadEnabledUserDefaultKey;
 extern NSString *DFEnabledYes;
 extern NSString *DFEnabledNo;
 
-@property (weak, nonatomic) IBOutlet UITableView *settingsTableView;
+@property (weak, nonatomic) IBOutlet UILabel *deviceIDLabel;
 @property (weak, nonatomic) IBOutlet UISwitch *pipelineEnabledSwitch;
 @property (weak, nonatomic) IBOutlet UISwitch *autoUploadEnabledSwitch;
 
-
+- (IBAction)copyDeviceIDClicked:(UIButton *)sender;
+- (IBAction)reUploadAllClicked:(UIButton *)sender;
 - (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender;
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender;
 

@@ -66,9 +66,8 @@ NSString *DFEnabledNo = @"NO";
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-    // register a regular cell for reuse
-    [self.settingsTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
+
+    self.deviceIDLabel.text = [DFUser deviceID];
     
     // set switches to correct values
     if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFPipelineEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
@@ -96,40 +95,16 @@ NSString *DFEnabledNo = @"NO";
     return self.rowLabels.count;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    UITableViewCell *cell = [self.settingsTableView dequeueReusableCellWithIdentifier:@"UITableViewCell"];
-    
-    switch (indexPath.row) {
-        case 0:
-            cell.textLabel.text = self.rowLabels[0];
-            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-            break;
-        case 1:
-            cell.textLabel.text = [NSString stringWithFormat:@"%@: %@", self.rowLabels[1], [DFUser deviceID]];
-            cell.textLabel.adjustsFontSizeToFitWidth = YES;
-            break;
-        default:
-            break;
-    }
-    
-    return cell;
+
+- (IBAction)copyDeviceIDClicked:(UIButton *)sender {
+    UIPasteboard *pb = [UIPasteboard generalPasteboard];
+    [pb setString:[DFUser deviceID]];
 }
 
-
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-    if (indexPath.row == 0) {
-        DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
-        [[DFUploadController sharedUploadController] uploadPhotosWithURLs:[cameraRollPhotos.photoURLSet allObjects]];
-    } else if (indexPath.row == 1) {
-        UIPasteboard *pb = [UIPasteboard generalPasteboard];
-        [pb setString:[DFUser deviceID]];
-    }
-    
-    [self.settingsTableView deselectRowAtIndexPath:indexPath animated:YES];
+- (IBAction)reUploadAllClicked:(UIButton *)sender {
+    DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
+    [[DFUploadController sharedUploadController] uploadPhotosWithURLs:[cameraRollPhotos.photoURLSet allObjects]];
 }
-
 
 - (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender {
     if (sender.isOn) {

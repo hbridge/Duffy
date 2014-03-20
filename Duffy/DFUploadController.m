@@ -34,7 +34,7 @@ static NSString *UserIDParameterKey = @"userId";
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
 @property (atomic) dispatch_queue_t uploadDispatchQueue;
 @property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
-@property (atomic, retain) NSMutableArray *photosToUpload;
+@property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
@@ -68,32 +68,35 @@ static DFUploadController *defaultUploadController;
     self = [super init];
     if (self) {
         self.uploadDispatchQueue = dispatch_queue_create("com.duffysoft.DFUploadController.UploadQueue", DISPATCH_QUEUE_SERIAL);
-        self.photosToUpload = [[NSMutableArray alloc] init];
+        self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
     }
     return self;
 }
 
 #pragma mark - Public APIs
 
-- (void)uploadPhotosWithURLs:(NSArray *)photoURLs
+- (void)uploadPhotosWithURLs:(NSArray *)photoURLStrings
 {
-    NSLog(@"UploadController uploading %d photos", (int)photoURLs.count);
-    if (photoURLs.count < 1) return;
+    NSUInteger photosInQueuePreAdd = self.photoURLsToUpload.count;
+    if (photoURLStrings.count < 1) return;
     
-    NSMutableArray *photos = [[NSMutableArray alloc] initWithCapacity:photoURLs.count];
-    for (NSString *photoURL in photoURLs) {
-        [photos addObject:[DFPhoto photoWithURL:photoURL inContext:self.managedObjectContext]];
-    }
+    [self.photoURLsToUpload addObjectsFromArray:photoURLStrings];
+    [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
     
-    [self.photosToUpload addObjectsFromArray:photos];
-    [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
+    NSLog(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
+          (int)photosInQueuePreAdd,
+          (int)self.photoURLsToUpload.count,
+          (int)(self.photoURLsToUpload.count - photosInQueuePreAdd)
+          );
+
 }
 
 #pragma mark - Private networking code
 
-- (void)enqueuePhotoForUpload:(DFPhoto *)photo
+- (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
     dispatch_async(self.uploadDispatchQueue, ^{
+        DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
         [self uploadPhoto:photo];
     });
 }
@@ -114,7 +117,7 @@ static DFUploadController *defaultUploadController;
             [self uploadFinishedForPhoto:photo];
         } else {
             NSLog(@"File did not upload properly.  Retrying.");
-            [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
+            [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
         }
     }
                                                         failure:^(RKObjectRequestOperation *operation, NSError *error)
@@ -129,13 +132,13 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadFinishedForPhoto:(DFPhoto *)photo
 {
-    [self.photosToUpload removeObject:photo];
+    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
     
     [self saveUploadProgress];
     
-    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photosToUpload.count);
-    if (self.photosToUpload.count > 0) {
-        [self enqueuePhotoForUpload:self.photosToUpload.firstObject];
+    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
+    if (self.photoURLsToUpload.count > 0) {
+        [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
     }
 }
 
