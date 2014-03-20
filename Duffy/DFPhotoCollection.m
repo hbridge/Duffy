@@ -54,12 +54,7 @@
                       inSortedRange:(NSRange){0, photosByDate.count}
                             options:NSBinarySearchingInsertionIndex
                     usingComparator:^NSComparisonResult(DFPhoto *photo1, DFPhoto *photo2) {
-                        if (photo1.creationDate < photo2.creationDate) {
-                            return NSOrderedAscending;
-                        } else if (photo1.creationDate > photo2.creationDate) {
-                            return NSOrderedDescending;
-                        }
-                        return NSOrderedSame;
+                        return [photo1.creationDate compare:photo2.creationDate];
                     }];
         [photosByDate insertObject:newPhoto atIndex:insertIndex];
     }

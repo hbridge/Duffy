@@ -55,6 +55,7 @@
 {
     self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
     [self.collectionView reloadData];
+    NSLog(@"cameraViewController view updated. %d photos in camera roll.", self.photos.count);
 }
 
 - (void)cameraRollScanComplete

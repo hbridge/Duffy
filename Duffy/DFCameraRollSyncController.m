@@ -60,9 +60,12 @@
             NSLog(@"All assets in Camera Roll enumerated, %d new assets.", newAssets);
             // save to the store so that the main thread context can pick it up
             NSError *error = nil;
-            if(![self.managedObjectContext save:&error]) {
-                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-                [NSException raise:@"Could not save new photo object." format:@"Error: %@",[error localizedDescription]];
+            if (self.managedObjectContext.hasChanges) {
+                NSLog(@"Camera roll sync made changes.  Saving... ");
+                if(![self.managedObjectContext save:&error]) {
+                    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                    [NSException raise:@"Could not save new photo object." format:@"Error: %@",[error localizedDescription]];
+                }
             }
             [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
         }

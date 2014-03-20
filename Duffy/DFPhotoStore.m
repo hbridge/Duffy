@@ -95,7 +95,7 @@ static DFPhotoStore *defaultStore;
     NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
     
-    NSSortDescriptor *dateSort = [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO];
+    NSSortDescriptor *dateSort = [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES];
     request.sortDescriptors = [NSArray arrayWithObject:dateSort];
     
     NSError *error;
@@ -207,6 +207,9 @@ static DFPhotoStore *defaultStore;
 // If the context doesn't already exist, it is created and bound to the persistent store coordinator for the application.
 - (NSManagedObjectContext *)managedObjectContext
 {
+    if (![NSThread isMainThread]) {
+        [NSException raise:@"DFPhotoStore managedObjectContext can only be accessed from main thread." format:nil];
+    }
     if (_managedObjectContext != nil) {
         return _managedObjectContext;
     }
