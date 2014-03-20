@@ -53,6 +53,13 @@
 
 - (void)cameraRollUpdated
 {
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(cameraRollUpdated)
+                               withObject:nil
+                            waitUntilDone:NO];
+        return;
+    }
+    
     self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
     [self.collectionView reloadData];
     NSLog(@"cameraViewController view updated. %d photos in camera roll.", self.photos.count);
@@ -60,6 +67,13 @@
 
 - (void)cameraRollScanComplete
 {
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(cameraRollScanComplete)
+                               withObject:nil
+                            waitUntilDone:NO];
+        return;
+    }
+    
     if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
         DFPhotoCollection *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
         [[DFUploadController sharedUploadController] uploadPhotosWithURLs:photosToUpload.photoURLSet.allObjects];
