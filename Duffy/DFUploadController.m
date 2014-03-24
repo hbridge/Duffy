@@ -178,29 +178,35 @@ static DFUploadController *defaultUploadController;
 {
     UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
     NSData *imageData = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
+    NSDictionary *postParameters = [self postParametersForPhoto:photo];
+    NSString *uniqueFilename = [NSString stringWithFormat:@"%@.jpg", [[NSUUID UUID] UUIDString]];
+    
+    
+    NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
+                                                                                 method:RKRequestMethodPOST
+                                                                                   path:AddPhotoResource
+                                                                             parameters:postParameters
+                                                              constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                                                  [formData appendPartWithFileData:imageData
+                                                                                              name:postParameters[UserIDParameterKey]
+                                                                                          fileName:uniqueFilename
+                                                                                          mimeType:@"image/jpg"];
+                                                              }];
+
+    return request;
+}
+
+- (NSDictionary *)postParametersForPhoto:(DFPhoto *)photo
+{
     NSMutableDictionary *params = [NSMutableDictionary
-                                   dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];
+     dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];
     // if processing off, append prefix to userid
     if ([[[NSUserDefaults standardUserDefaults] valueForKey:DFPipelineEnabledUserDefaultKey]
          isEqualToString:DFEnabledNo]){
         params[UserIDParameterKey] = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
     }
-    
-    NSDate *uploadStartDate = [NSDate date];
-    NSString *uniqueUploadName = [self uniqueFilenameForPhoto:photo uploadDate:uploadStartDate];
-    
-    NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
-                                                                                 method:RKRequestMethodPOST
-                                                                                   path:AddPhotoResource
-                                                                             parameters:params
-                                                              constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                                                                  [formData appendPartWithFileData:imageData
-                                                                                              name:uniqueUploadName
-                                                                                          fileName:[NSString stringWithFormat:@"%@.jpg", uniqueUploadName]
-                                                                                          mimeType:@"image/jpg"];
-                                                              }];
-
-    return request;
+        
+    return params;
 }
 
 
