@@ -44,6 +44,7 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 
 // Image attributes
 
+- (NSDictionary *)metadataDictionary;
 - (NSString *)localFilename;
 
 

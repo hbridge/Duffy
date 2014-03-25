@@ -29,6 +29,7 @@ static NSString *AddPhotoResource = @"api/addphoto.php";
 NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 static NSString *UserIDParameterKey = @"userId";
+static NSString *PhotoMetadataKey = @"photoMetadata";
 
 @interface DFUploadController()
 
@@ -198,17 +199,43 @@ static DFUploadController *defaultUploadController;
 
 - (NSDictionary *)postParametersForPhoto:(DFPhoto *)photo
 {
-    NSMutableDictionary *params = [NSMutableDictionary
-     dictionaryWithDictionary:@{UserIDParameterKey: [DFUser deviceID]}];
+    //user id
     // if processing off, append prefix to userid
-    if ([[[NSUserDefaults standardUserDefaults] valueForKey:DFPipelineEnabledUserDefaultKey]
-         isEqualToString:DFEnabledNo]){
-        params[UserIDParameterKey] = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
+    NSString *userID;
+    if ([[[NSUserDefaults standardUserDefaults]
+          valueForKey:DFPipelineEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
+        userID = [DFUser deviceID];
+    } else {
+        userID = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
     }
-        
+
+    // metadata
+    NSString *photoMetadataJSONString = [self metadataJSONStringForPhoto:photo];
+    
+    
+    NSDictionary *params = @{
+                             UserIDParameterKey: userID,
+                             PhotoMetadataKey: photoMetadataJSONString
+                             };
     return params;
 }
 
+
+- (NSString *)metadataJSONStringForPhoto:(DFPhoto *)photo
+{
+    NSDictionary *metadata = [photo metadataDictionary];
+    NSError *error;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:metadata
+                                                       options:NSJSONWritingPrettyPrinted
+                                                         error:&error];
+    
+    if (! jsonData) {
+        NSLog(@"bv_jsonStringWithPrettyPrint: error: %@", error.localizedDescription);
+        return @"{}";
+    } else {
+        return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+    }
+}
 
 #pragma mark - Internal Helper Functions
 

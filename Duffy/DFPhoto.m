@@ -155,6 +155,13 @@
     return _asset;
 }
 
+
+- (NSDictionary *)metadataDictionary
+{
+    return self.asset.defaultRepresentation.metadata;
+}
+
+
 - (NSString *)localFilename
 {
     //NSURL *url = [NSURL URLWithString:self.alAssetURLString];
