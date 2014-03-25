@@ -66,8 +66,8 @@
 
         if (placemarks.count > 0) {
             CLPlacemark *placemark = placemarks.firstObject;
-            locationDict = @{@"address": placemark.addressDictionary,
-                                           @"pois" : placemark.areasOfInterest};
+            locationDict = @{@"address": [NSDictionary dictionaryWithDictionary:placemark.addressDictionary],
+                                           @"pois" : [NSArray arrayWithArray:placemark.areasOfInterest]};
         }
         
         if (error) {
