@@ -12,6 +12,8 @@
 @interface DFSearchViewController ()
 
 @property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
+@property (nonatomic, retain) UIBarButtonItem *loadingIndicatorItem;
+@property (nonatomic, retain) UIBarButtonItem *refreshBarButtonItem;
 
 @end
 
@@ -22,11 +24,19 @@
     self = [super init];
     if (self) {
         self.navigationItem.title = @"Search";
+        
+        // create loading indicator
         self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
         self.loadingIndicator.hidesWhenStopped = YES;
         [self.loadingIndicator startAnimating];
-        self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                                  initWithCustomView:self.loadingIndicator];
+        self.loadingIndicatorItem = [[UIBarButtonItem alloc]
+                                     initWithCustomView:self.loadingIndicator];
+        self.navigationItem.rightBarButtonItem = self.loadingIndicatorItem;
+        
+        // create reload button
+        self.refreshBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                                  target:self
+                                                                                  action:@selector(refreshWebView)];
         
         
         self.tabBarItem.title = @"Search";
@@ -34,9 +44,6 @@
     }
     return self;
 }
-
-
-
 
 - (void)viewDidLoad
 {
@@ -56,13 +63,21 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+    self.navigationItem.rightBarButtonItem = self.loadingIndicatorItem;
     [self.loadingIndicator startAnimating];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
     [self.loadingIndicator stopAnimating];
+    self.navigationItem.rightBarButtonItem = self.refreshBarButtonItem;
 }
+
+- (void)refreshWebView
+{
+    [self.webView loadRequest:[NSURLRequest requestWithURL:[self searchViewURL]]];
+}
+
 
 
 @end
