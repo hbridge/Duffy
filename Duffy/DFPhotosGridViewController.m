@@ -124,5 +124,14 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 }
 
 
+#pragma mark - Action Handlers
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
+    NSLog(@"Photo tapped: %@", photo.metadataDictionary);
+}
+
+
 
 @end

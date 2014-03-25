@@ -13,6 +13,7 @@
 #import "DFPhoto.h"
 #import "DFUser.h"
 #import "DFSettingsViewController.h"
+#import "NSDictionary+DFJSON.h"
 
 
 // Private DFUploadResponse Class
@@ -24,12 +25,13 @@
 @end
 
 // Constants
-static NSString *BaseURL = @"http://photos.derektest1.com/";
-static NSString *AddPhotoResource = @"api/addphoto.php";
+static NSString *BaseURL = @"http://asood123.no-ip.biz/";
+static NSString *AddPhotoResource = @"api/addPhoto";
 NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
-static NSString *UserIDParameterKey = @"userId";
-static NSString *PhotoMetadataKey = @"photoMetadata";
+static NSString *UserIDParameterKey = @"phone_id";
+static NSString *PhotoMetadataKey = @"photo_metadata";
+static NSString *PhotoLocationKey = @"location_data";
 
 @interface DFUploadController()
 
@@ -180,7 +182,7 @@ static DFUploadController *defaultUploadController;
     UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
     NSData *imageData = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
     NSDictionary *postParameters = [self postParametersForPhoto:photo];
-    NSString *uniqueFilename = [NSString stringWithFormat:@"%@.jpg", [[NSUUID UUID] UUIDString]];
+    NSString *uniqueFilename = [NSString stringWithFormat:@"photo_%@.jpg", [[NSUUID UUID] UUIDString]];
     
     
     NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
@@ -189,7 +191,7 @@ static DFUploadController *defaultUploadController;
                                                                              parameters:postParameters
                                                               constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
                                                                   [formData appendPartWithFileData:imageData
-                                                                                              name:postParameters[UserIDParameterKey]
+                                                                                              name:@"file"
                                                                                           fileName:uniqueFilename
                                                                                           mimeType:@"image/jpg"];
                                                               }];
@@ -208,34 +210,52 @@ static DFUploadController *defaultUploadController;
     } else {
         userID = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
     }
-
-    // metadata
-    NSString *photoMetadataJSONString = [self metadataJSONStringForPhoto:photo];
-    
     
     NSDictionary *params = @{
                              UserIDParameterKey: userID,
-                             PhotoMetadataKey: photoMetadataJSONString
+                             PhotoMetadataKey: [self metadataJSONStringForPhoto:photo],
+                             PhotoLocationKey: [self locationJSONStringForPhoto:photo],
                              };
+    
+    NSLog(@"uploadParams: %@", params);
     return params;
 }
 
 
 - (NSString *)metadataJSONStringForPhoto:(DFPhoto *)photo
 {
-    NSDictionary *metadata = [photo metadataDictionary];
-    NSError *error;
-    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:metadata
-                                                       options:NSJSONWritingPrettyPrinted
-                                                         error:&error];
-    
-    if (! jsonData) {
-        NSLog(@"bv_jsonStringWithPrettyPrint: error: %@", error.localizedDescription);
-        return @"{}";
-    } else {
-        return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-    }
+    NSDictionary *jsonSafeMetadataDict = [[photo metadataDictionary] dictionaryWithNonJSONRemoved];
+    return [jsonSafeMetadataDict JSONString];
 }
+
+- (NSString *)locationJSONStringForPhoto:(DFPhoto *)photo
+{
+    if (photo.location == nil) {
+        NSLog(@"photo has no location, skipping.");
+        return [@{} JSONString];
+    }
+    
+    
+    NSDictionary __block *resultDictionary;
+    
+    // safe to call this here as we're on the uploader dispatch queue and
+    // the reverse geocoder call back will happen on main thread, per the docs
+    
+    dispatch_semaphore_t reverseGeocodeSemaphore = dispatch_semaphore_create(0);
+    [photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
+        resultDictionary = locationDict;
+        dispatch_semaphore_signal(reverseGeocodeSemaphore);
+    }];
+     
+     dispatch_semaphore_wait(reverseGeocodeSemaphore, DISPATCH_TIME_FOREVER);
+    
+
+     return [resultDictionary JSONString];
+}
+
+
+
+
 
 #pragma mark - Internal Helper Functions
 

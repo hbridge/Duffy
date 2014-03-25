@@ -14,6 +14,8 @@
 		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
 		5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */; };
+		5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A67605818E2039800E355B6 /* CoreLocation.framework */; };
+		5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */; };
 		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
 		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
 		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
@@ -79,6 +81,9 @@
 		5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncController.m; sourceTree = "<group>"; };
 		5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadSessionStats.h; sourceTree = "<group>"; };
 		5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadSessionStats.m; sourceTree = "<group>"; };
+		5A67605818E2039800E355B6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		5A67605A18E210B000E355B6 /* NSDictionary+DFJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+DFJSON.h"; sourceTree = "<group>"; };
+		5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+DFJSON.m"; sourceTree = "<group>"; };
 		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
 		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -142,6 +147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */,
 				5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */,
 				5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */,
 				5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */,
@@ -206,6 +212,7 @@
 		5ADB24B9189985590016CA02 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5A67605818E2039800E355B6 /* CoreLocation.framework */,
 				5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */,
 				5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */,
 				5A81ED3C18CFB574003EF557 /* CFNetwork.framework */,
@@ -306,6 +313,8 @@
 			isa = PBXGroup;
 			children = (
 				5AFBCA5218D236B600998793 /* UIImageCategories */,
+				5A67605A18E210B000E355B6 /* NSDictionary+DFJSON.h */,
+				5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -482,6 +491,7 @@
 				5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */,
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
+				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
 				5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

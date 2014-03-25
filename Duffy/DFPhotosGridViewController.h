@@ -8,9 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFPhotosGridViewController : UIViewController
+@interface DFPhotosGridViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
 
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 

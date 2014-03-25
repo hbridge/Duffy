@@ -49,6 +49,35 @@
     return [result firstObject];
 }
 
+- (CLLocation *)location
+{
+    return [self.asset valueForProperty:ALAssetPropertyLocation];
+}
+
+- (void)fetchReverseGeocodeDictionary:(DFPhotoReverseGeocodeCompletionBlock)completionBlock
+{
+    if (self.location == nil) {
+        completionBlock(@{});
+    }
+    
+    CLGeocoder *geocoder = [[CLGeocoder alloc]init];
+    [geocoder reverseGeocodeLocation:self.location completionHandler:^(NSArray *placemarks, NSError *error) {
+        NSDictionary *locationDict = @{};
+
+        if (placemarks.count > 0) {
+            CLPlacemark *placemark = placemarks.firstObject;
+            locationDict = @{@"address": placemark.addressDictionary,
+                                           @"pois" : placemark.areasOfInterest};
+        }
+        
+        if (error) {
+            NSLog(@"fetchReverseGeocodeDict error:%@", [error localizedDescription]);
+        }
+        
+        completionBlock(locationDict);
+    }];
+}
+
 - (UIImage *)thumbnail
 {
     UIImage __block *loadedThumbnail;

@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <CoreLocation/CoreLocation.h>
+
 
 @class ALAsset;
 
@@ -19,6 +21,13 @@
 @property (nonatomic, retain) NSDate *creationDate;
 @property (nonatomic, retain) NSString *universalIDString;
 @property (nonatomic, retain) NSDate *uploadDate;
+
+// fetched accessors
+@property (readonly, nonatomic, retain) CLLocation *location;
+
+typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict);
+- (void)fetchReverseGeocodeDictionary:(DFPhotoReverseGeocodeCompletionBlock)completionBlock;
+
 
 // Get a DF Photo instance from its URL
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext;
