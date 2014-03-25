@@ -9,6 +9,7 @@
 #import "DFPhotosGridViewController.h"
 #import "DFPhoto.h"
 #import "DFPhotoViewCell.h"
+#import "DFPhotoViewController.h"
 
 @interface DFPhotosGridViewController ()
 
@@ -130,6 +131,18 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
     NSLog(@"Photo tapped: %@", photo.metadataDictionary);
+    
+    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    [photo createCGImageForFullImage:^(CGImageRef imageRef) {
+        UIImage *image = [UIImage imageWithCGImage:imageRef];
+        pvc.image = image;
+        
+        CGImageRelease(imageRef);
+    } failureBlock:^(NSError *error) {
+        NSLog(@"Could not load photo for picture tapped: %@", error.localizedDescription);
+    }];
+    
+    [self.navigationController pushViewController:pvc animated:YES];
 }
 
 
