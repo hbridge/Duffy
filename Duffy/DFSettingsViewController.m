@@ -137,8 +137,8 @@ NSString *DFEnabledNo = @"NO";
 {
     DFUploadSessionStats *uploadStats = [[notification userInfo] valueForKey:DFUploadStatusUpdateSessionUserInfoKey];
     
-    self.numUploadedLabel.text = [NSString stringWithFormat:@"%d", uploadStats.numUploaded];
-    self.numToUploadLabel.text = [NSString stringWithFormat:@"%d", uploadStats.numAcceptedUploads];
+    self.numUploadedLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)uploadStats.numUploaded];
+    self.numToUploadLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)uploadStats.numAcceptedUploads];
     self.uploadProgressView.progress = (float)uploadStats.numUploaded / (float)uploadStats.numAcceptedUploads;
 }
 
