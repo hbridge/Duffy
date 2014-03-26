@@ -132,9 +132,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
-    UICollectionViewCell __block *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    
-    
+
     [photo createCGImageForFullImage:^(CGImageRef imageRef) {
         UIImage *fullImage = [UIImage imageWithCGImage:imageRef];
         CGImageRelease(imageRef);

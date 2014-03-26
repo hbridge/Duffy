@@ -21,6 +21,7 @@
     if (self) {
         self.delegate = self;
         self.automaticallyAdjustsScrollViewInsets = NO;
+        self.hidesBottomBarWhenPushed = YES;
     }
     return self;
 }
@@ -28,9 +29,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
-//    self.view.frame = [[UIScreen mainScreen] bounds];
-  //  self.view.backgroundColor = [UIColor blackColor];
 }
 
 - (void)didReceiveMemoryWarning
