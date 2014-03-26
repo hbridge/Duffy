@@ -8,6 +8,10 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFMultiPhotoViewController : UIPageViewController
+@class DFPhotoViewController;
+
+@interface DFMultiPhotoViewController : UIPageViewController <UIPageViewControllerDelegate>
+
+@property (readonly, nonatomic, retain) DFPhotoViewController *currentPhotoViewController;
 
 @end

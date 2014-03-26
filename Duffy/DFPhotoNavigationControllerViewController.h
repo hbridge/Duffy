@@ -14,6 +14,7 @@
 
 - (void)pushMultiPhotoViewController:(DFMultiPhotoViewController *)multiPhotoViewController
         withFrontPhotoViewController:(DFPhotoViewController *)photoViewController
-                        fromCellView:(UIView *)cellView;
+                        fromCellView:(UIView *)cellView
+             withFrameInScreenCoords:(CGRect)frame;
 
 @end

@@ -9,6 +9,7 @@
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFPhotoViewController.h"
 #import "DFMultiPhotoViewController.h"
+#import "DFPhotosGridViewController.h"
 
 @interface DFPhotoNavigationControllerViewController ()
 
@@ -65,6 +66,7 @@ static const CGFloat AnimationDuration = 0.3f;
 - (void)pushMultiPhotoViewController:(DFMultiPhotoViewController *)multiPhotoViewController
         withFrontPhotoViewController:(DFPhotoViewController *)photoViewController
                         fromCellView:(UIView *)cellView
+             withFrameInScreenCoords:(CGRect)frame
 {
     if (self.isPushingPhoto) return;
     self.isPushingPhoto = YES;
@@ -74,18 +76,16 @@ static const CGFloat AnimationDuration = 0.3f;
     self.zoomedCellImageView.clipsToBounds = YES;
     
     self.pushedCellView = cellView;
-    self.pushedCellViewOriginalFrame = [self correctedFrameForCell:self.pushedCellView];
-    self.zoomedCellImageView.frame = self.pushedCellViewOriginalFrame;
+    self.zoomedCellImageView.frame = frame;
     [self.view addSubview:self.zoomedCellImageView];
     cellView.alpha = 0.0;
     photoViewController.imageView.alpha = 0.0;
-    
-    
     
     [UIView animateWithDuration:AnimationDuration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.zoomedCellImageView.frame = [DFPhotoNavigationControllerViewController aspectFittedSize:self.zoomedCellImageView.image.size max:[[UIScreen mainScreen] bounds]];
     } completion:^(BOOL finished) {
         photoViewController.imageView.alpha = 1.0;
+        cellView.alpha =  1.0;
         [self.zoomedCellImageView removeFromSuperview];
         self.isPushingPhoto = NO;
     }];
@@ -98,14 +98,22 @@ static const CGFloat AnimationDuration = 0.3f;
     [super pushViewController:multiPhotoViewController animated:NO];
 }
 
-- (void)zoomImageViewBackToCell
+- (void)zoomImage:(UIImage *)image backToCellAtIndexPath:(NSIndexPath *)parentIndexPath
 {
+    self.zoomedCellImageView.image = image;
+    
+    DFPhotosGridViewController *gridController =
+        (DFPhotosGridViewController *)[self.viewControllers objectAtIndex:self.viewControllers.count-2];
+    UICollectionViewCell *cell = [gridController.collectionView cellForItemAtIndexPath:parentIndexPath];
+    cell.alpha = 0.0;
+    CGRect cellFrame = [gridController frameForCellAtIndexPath:parentIndexPath];
+
     [self.view addSubview:self.zoomedCellImageView];
     [UIView animateWithDuration:AnimationDuration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.zoomedCellImageView.frame = self.pushedCellViewOriginalFrame;
+        self.zoomedCellImageView.frame = cellFrame;
     } completion:^(BOOL finished) {
         if (finished) {
-            self.pushedCellView.alpha = 1.0;
+            cell.alpha = 1.0;
             [self.zoomedCellImageView removeFromSuperview];
             self.zoomedCellImageView = nil;
             
@@ -113,17 +121,15 @@ static const CGFloat AnimationDuration = 0.3f;
     }];
 }
 
-- (CGRect)correctedFrameForCell:(UIView *)cell
-{
-    CGPoint correctedOrigin = [self.view convertPoint:cell.frame.origin fromView:cell.superview];
-    return CGRectMake(correctedOrigin.x, correctedOrigin.y, cell.frame.size.width, cell.frame.size.height);
-}
-
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated
 {
     if ([self.visibleViewController isKindOfClass:[DFMultiPhotoViewController class]]) {
-        [self zoomImageViewBackToCell];
+        DFPhotoViewController *currentPhotoViewController = ((DFMultiPhotoViewController *)self.visibleViewController).currentPhotoViewController;
+        NSIndexPath *parentIndexPath = currentPhotoViewController.indexPathInParent;
+        
+        
+        [self zoomImage:currentPhotoViewController.image backToCellAtIndexPath:parentIndexPath];
         return [super popViewControllerAnimated:NO];
     } else {
         return [super popViewControllerAnimated:animated];

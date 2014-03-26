@@ -133,7 +133,6 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
     UICollectionViewCell __block *cell = [collectionView cellForItemAtIndexPath:indexPath];
-    NSLog(@"Photo tapped: %@", photo.metadataDictionary);
     
     
     [photo createCGImageForFullImage:^(CGImageRef imageRef) {
@@ -166,13 +165,15 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     
     DFMultiPhotoViewController *multiPhotoController = [[DFMultiPhotoViewController alloc] init];
     multiPhotoController.dataSource = self;
-    multiPhotoController.delegate = self;
     [multiPhotoController setViewControllers:[NSArray arrayWithObject:pvc] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:^(BOOL finished) {
         //
     }];
     
     DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
-    [photoNavController pushMultiPhotoViewController:multiPhotoController withFrontPhotoViewController:pvc fromCellView:cell];
+    [photoNavController pushMultiPhotoViewController:multiPhotoController
+                        withFrontPhotoViewController:pvc
+                                        fromCellView:cell
+                             withFrameInScreenCoords:[self frameForCellAtIndexPath:indexPath]];
 }
 
 
@@ -202,6 +203,20 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     pvc.image = photo.fullImage;
     pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
     return pvc;
+}
+
+- (CGRect)frameForCellAtIndexPath:(NSIndexPath *)indexPath
+{
+    UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
+    if (layoutAttributes) {
+        CGRect frame = layoutAttributes.frame;
+        return CGRectMake(frame.origin.x,
+                                 frame.origin.y + DEFAULT_PHOTO_SPACING + self.topLayoutGuide.length,
+                                 frame.size.width,
+                                 frame.size.height);
+    }
+    
+    return CGRectZero;
 }
 
 @end

@@ -19,4 +19,7 @@
 @property (nonatomic) CGFloat photoSquareSize;
 @property (nonatomic) CGFloat photoSpacing;
 
+
+- (CGRect)frameForCellAtIndexPath:(NSIndexPath *)indexPath;
+
 @end
