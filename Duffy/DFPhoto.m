@@ -86,9 +86,8 @@
     // Synchronously load the thunbnail
     // must dispatch this off the main thread or it will deadlock!
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self createCGImageForThumbnail:^(CGImageRef imageRef) {
-            loadedThumbnail = [UIImage imageWithCGImage:imageRef];
-            CGImageRelease(imageRef);
+        [self loadUIImageForThumbnail:^(UIImage *thumbnailImage) {
+            loadedThumbnail = thumbnailImage;
             dispatch_semaphore_signal(sema);
         } failureBlock:^(NSError *error) {
             dispatch_semaphore_signal(sema);
@@ -108,11 +107,8 @@
     // Synchronously load the thunbnail
     // must dispatch this off the main thread or it will deadlock!
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self createCGImageForFullImage:^(CGImageRef imageRef) {
-            loadedFullImage = [UIImage imageWithCGImage:imageRef
-                                                  scale:self.asset.defaultRepresentation.scale
-                                            orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
-            CGImageRelease(imageRef);
+        [self loadUIImageForFullImage:^(UIImage *image) {
+            loadedFullImage = image;
             dispatch_semaphore_signal(sema);
         } failureBlock:^(NSError *error) {
             dispatch_semaphore_signal(sema);
@@ -137,31 +133,7 @@
 }
 
 
-- (void)createCGImageForThumbnail:(DFPhotoLoadCGImageSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
-{
-    if (self.asset) {
-        CGImageRef imageRef = [self.asset thumbnail];
-        CGImageRetain(imageRef);
-        successBlock(imageRef);
-    } else {
-        failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
-    }
-    
-}
-
-- (void)createCGImageForFullImage:(DFPhotoLoadCGImageSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock
-{
-    if (self.asset) {
-        CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
-        CGImageRetain(imageRef);
-        successBlock(imageRef);
-    } else {
-        failureBlock([NSError errorWithDomain:@"" code:-1 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
-    }
-}
-
-
-- (void)loadUIImageForThumbnailImage:(DFPhotoLoadUIImageSuccessBlock)successBlock
+- (void)loadUIImageForThumbnail:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
     if (self.asset) {

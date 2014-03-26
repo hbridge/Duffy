@@ -103,17 +103,6 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
                                   dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
     
     
-    [photo createCGImageForThumbnail:^(CGImageRef imageRef) {
-        if ([[self.collectionView indexPathsForVisibleItems] containsObject:indexPath]) {
-            DFPhotoViewCell* correctCell = (DFPhotoViewCell*)[self.collectionView
-                                                              cellForItemAtIndexPath:indexPath];
-            correctCell.imageView.image = [UIImage imageWithCGImage:imageRef];
-            [correctCell setNeedsLayout];
-            CGImageRelease(imageRef);
-        }
-    } failureBlock:^(NSError *error) {
-        NSLog(@"image load failed");
-    }];
     [cell.imageView setImage:[photo thumbnail]];
     
     return cell;

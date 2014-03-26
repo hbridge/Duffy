@@ -45,12 +45,6 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 // Use these to access image data Asynchronously if accessing it will be slow
 // Note that the created CGImage must be released by the caller to prevent memory leaks
 
-typedef void (^DFPhotoLoadCGImageSuccessBlock)(CGImageRef imageRef);
-typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
-
-- (void)createCGImageForFullImage:(DFPhotoLoadCGImageSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
-- (void)createCGImageForThumbnail:(DFPhotoLoadCGImageSuccessBlock)successBlock failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
-
 typedef void (^DFPhotoLoadUIImageSuccessBlock)(UIImage *image);
 typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 
