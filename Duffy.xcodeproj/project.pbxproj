@@ -190,8 +190,39 @@
 				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
 				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
 				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
+				5A67605D18E2444E00E355B6 /* DFPhotoViewController.h */,
+				5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */,
+				5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */,
 			);
 			name = "Generic Views";
+			sourceTree = "<group>";
+		};
+		5A67606218E3381D00E355B6 /* Background processes */ = {
+			isa = PBXGroup;
+			children = (
+				5A45E9C418DA44F6002663EB /* DFCameraRollSyncController.h */,
+				5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */,
+				5A81ED2618CFAED5003EF557 /* DFUploadController.h */,
+				5A81ED2718CFAED5003EF557 /* DFUploadController.m */,
+				5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */,
+				5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */,
+			);
+			name = "Background processes";
+			sourceTree = "<group>";
+		};
+		5A67606318E3384900E355B6 /* Tab view controllers */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
+				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
+				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
+				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
+				5A30E4D918D3AC5F00E41DBC /* DFSearchViewController.xib */,
+				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
+				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
+				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
+			);
+			name = "Tab view controllers";
 			sourceTree = "<group>";
 		};
 		5ADB24AE189985590016CA02 = {
@@ -239,23 +270,8 @@
 			children = (
 				5ADB24CB189985590016CA02 /* DFAppDelegate.h */,
 				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
-				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
-				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
-				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
-				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
-				5A30E4D918D3AC5F00E41DBC /* DFSearchViewController.xib */,
-				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
-				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
-				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
-				5A81ED2618CFAED5003EF557 /* DFUploadController.h */,
-				5A81ED2718CFAED5003EF557 /* DFUploadController.m */,
-				5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */,
-				5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */,
-				5A45E9C418DA44F6002663EB /* DFCameraRollSyncController.h */,
-				5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */,
-				5A67605D18E2444E00E355B6 /* DFPhotoViewController.h */,
-				5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */,
-				5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */,
+				5A67606318E3384900E355B6 /* Tab view controllers */,
+				5A67606218E3381D00E355B6 /* Background processes */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
 				5ADB24FE189AB3730016CA02 /* Model */,
 				5AFBCA5118D236AE00998793 /* Utils */,
