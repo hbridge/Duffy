@@ -172,23 +172,24 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     self.zoomedCellFrame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y + 44 + DEFAULT_PHOTO_SPACING,
                                       cell.frame.size.width, cell.frame.size.height);
     self.zoomedCellImageView.frame = self.zoomedCellFrame;
-    [self.view insertSubview:self.zoomedCellImageView aboveSubview:cell];
+    [self.navigationController.view insertSubview:self.zoomedCellImageView aboveSubview:cell];
     
     [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
         self.zoomedCellImageView.frame = [[UIScreen mainScreen] bounds];
     } completion:^(BOOL finished) {
+        pvc.imageView.alpha = 1.0;
         [self.zoomedCellImageView removeFromSuperview];
-        if (finished) {
-            CATransition* transition = [CATransition animation];
-            
-            transition.duration = 0.3;
-            transition.type = kCATransitionFade;
-            
-            [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
-            [self.navigationController pushViewController:pvc animated:NO];
-            self.isOpeningPhoto = NO;
-        }
     }];
+    
+    CATransition* transition = [CATransition animation];
+    
+    transition.duration = 0.3;
+    transition.type = kCATransitionFade;
+    
+    [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
+    [self.navigationController pushViewController:pvc animated:NO];
+    self.isOpeningPhoto = NO;
+
 }
 
 - (void)zoomImageViewBackToCell
