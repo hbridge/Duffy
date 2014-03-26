@@ -12,6 +12,7 @@
 #import "DFSettingsViewController.h"
 #import "DFSearchViewController.h"
 #import "DFCameraRollSyncController.h"
+#import "DFPhotoNavigationControllerViewController.h"
 
 
 @interface DFAppDelegate()
@@ -28,7 +29,7 @@
     
     // Camera roll tab
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
-    UINavigationController *cameraRollNav = [[UINavigationController alloc] initWithRootViewController:cameraRollController];
+    UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
     
     DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
     UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];

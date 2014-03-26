@@ -10,12 +10,9 @@
 #import "DFPhoto.h"
 #import "DFPhotoViewCell.h"
 #import "DFPhotoViewController.h"
+#import "DFPhotoNavigationControllerViewController.h"
 
 @interface DFPhotosGridViewController ()
-
-@property (nonatomic, retain) UIImageView *zoomedCellImageView;
-@property (nonatomic) CGRect zoomedCellFrame;
-@property (atomic) BOOL isOpeningPhoto;
 
 @end
 
@@ -133,9 +130,6 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (self.isOpeningPhoto) return;
-    self.isOpeningPhoto = YES;
-    
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
     UICollectionViewCell __block *cell = [collectionView cellForItemAtIndexPath:indexPath];
     NSLog(@"Photo tapped: %@", photo.metadataDictionary);
@@ -166,44 +160,10 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
     pvc.image = image;
-
-    self.zoomedCellImageView = [[UIImageView alloc] initWithImage:image];
-    self.zoomedCellImageView.contentMode = UIViewContentModeScaleAspectFit;
-    self.zoomedCellFrame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y + 44 + DEFAULT_PHOTO_SPACING,
-                                      cell.frame.size.width, cell.frame.size.height);
-    self.zoomedCellImageView.frame = self.zoomedCellFrame;
-    [self.navigationController.view insertSubview:self.zoomedCellImageView aboveSubview:cell];
     
-    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.zoomedCellImageView.frame = [[UIScreen mainScreen] bounds];
-    } completion:^(BOOL finished) {
-        pvc.imageView.alpha = 1.0;
-        [self.zoomedCellImageView removeFromSuperview];
-    }];
+    DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
     
-    CATransition* transition = [CATransition animation];
-    
-    transition.duration = 0.3;
-    transition.type = kCATransitionFade;
-    
-    [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
-    [self.navigationController pushViewController:pvc animated:NO];
-    self.isOpeningPhoto = NO;
-
+    [photoNavController pushPhotoViewController:pvc fromCellView:cell];
 }
-
-- (void)zoomImageViewBackToCell
-{
-    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.zoomedCellImageView.frame = self.zoomedCellFrame;
-    } completion:^(BOOL finished) {
-        
-        if (finished) {
-            [self.zoomedCellImageView removeFromSuperview];
-            self.zoomedCellImageView = nil;
-        }
-    }];
-}
-
 
 @end

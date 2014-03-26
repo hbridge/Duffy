@@ -18,6 +18,7 @@
 		5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */; };
 		5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */; };
 		5A67606118E2444E00E355B6 /* DFPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */; };
+		5A67606618E3389900E355B6 /* DFPhotoNavigationControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */; };
 		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
 		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
 		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
@@ -89,6 +90,8 @@
 		5A67605D18E2444E00E355B6 /* DFPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoViewController.h; sourceTree = "<group>"; };
 		5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoViewController.m; sourceTree = "<group>"; };
 		5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewController.xib; sourceTree = "<group>"; };
+		5A67606418E3389900E355B6 /* DFPhotoNavigationControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoNavigationControllerViewController.h; sourceTree = "<group>"; };
+		5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoNavigationControllerViewController.m; sourceTree = "<group>"; };
 		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
 		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -193,6 +196,8 @@
 				5A67605D18E2444E00E355B6 /* DFPhotoViewController.h */,
 				5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */,
 				5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */,
+				5A67606418E3389900E355B6 /* DFPhotoNavigationControllerViewController.h */,
+				5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */,
 			);
 			name = "Generic Views";
 			sourceTree = "<group>";
@@ -500,6 +505,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5A81ED2818CFAED5003EF557 /* DFUploadController.m in Sources */,
+				5A67606618E3389900E355B6 /* DFPhotoNavigationControllerViewController.m in Sources */,
 				5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */,
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
 				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
