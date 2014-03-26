@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) UIImageView *zoomedCellImageView;
 @property (nonatomic) CGRect zoomedCellFrame;
+@property (atomic) BOOL isOpeningPhoto;
 
 @end
 
@@ -132,6 +133,9 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+    if (self.isOpeningPhoto) return;
+    self.isOpeningPhoto = YES;
+    
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
     UICollectionViewCell __block *cell = [collectionView cellForItemAtIndexPath:indexPath];
     NSLog(@"Photo tapped: %@", photo.metadataDictionary);
@@ -182,6 +186,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
             
             [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
             [self.navigationController pushViewController:pvc animated:NO];
+            self.isOpeningPhoto = NO;
         }
     }];
 }
