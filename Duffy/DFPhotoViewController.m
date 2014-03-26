@@ -36,10 +36,6 @@
     [self.imageView sizeToFit];
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-    self.imageView.alpha = 0.0;
-}
 
 - (void)viewDidAppear:(BOOL)animated
 {

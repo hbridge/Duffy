@@ -11,6 +11,7 @@
 #import "DFPhotoViewCell.h"
 #import "DFPhotoViewController.h"
 #import "DFPhotoNavigationControllerViewController.h"
+#import "DFMultiPhotoViewController.h"
 
 @interface DFPhotosGridViewController ()
 
@@ -139,7 +140,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
         UIImage *image = [UIImage imageWithCGImage:imageRef];
         CGImageRelease(imageRef);
         
-        [self pushPhotoViewWithCell:cell image:image];
+        [self pushPhotoViewWithCell:cell atIndexPath:indexPath image:image];
     } failureBlock:^(NSError *error) {
         NSLog(@"Could not load photo for picture tapped: %@", error.localizedDescription);
     }];
@@ -156,14 +157,51 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
    
 }
 
-- (void)pushPhotoViewWithCell:(UICollectionViewCell *)cell image:(UIImage *)image
+- (void)pushPhotoViewWithCell:(UICollectionViewCell *)cell atIndexPath:(NSIndexPath *)indexPath image:(UIImage *)image
 {
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
     pvc.image = image;
+    pvc.indexPathInParent = indexPath;
+    
+    
+    DFMultiPhotoViewController *multiPhotoController = [[DFMultiPhotoViewController alloc] init];
+    multiPhotoController.dataSource = self;
+    multiPhotoController.delegate = self;
+    [multiPhotoController setViewControllers:[NSArray arrayWithObject:pvc] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:^(BOOL finished) {
+        //
+    }];
     
     DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
+    [photoNavController pushMultiPhotoViewController:multiPhotoController withFrontPhotoViewController:pvc fromCellView:cell];
+}
+
+
+- (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
+     viewControllerBeforeViewController:(UIViewController *)viewController
+{
+    NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
     
-    [photoNavController pushPhotoViewController:pvc fromCellView:cell];
+    if (indexPath.row == 0) return nil;
+    
+    DFPhoto *photo = [self.photos objectAtIndex:indexPath.row -1];
+    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    pvc.image = photo.fullImage;
+    pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
+    return pvc;
+}
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+       viewControllerAfterViewController:(UIViewController *)viewController
+{
+    NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
+    
+    if (indexPath.row == self.photos.count -1) return nil;
+    
+    DFPhoto *photo = [self.photos objectAtIndex:indexPath.row + 1];
+    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    pvc.image = photo.fullImage;
+    pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
+    return pvc;
 }
 
 @end

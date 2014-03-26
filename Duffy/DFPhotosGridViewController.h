@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFPhotosGridViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface DFPhotosGridViewController : UIViewController
+    <UICollectionViewDataSource, UICollectionViewDelegate,
+    UIPageViewControllerDataSource, UIPageViewControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;

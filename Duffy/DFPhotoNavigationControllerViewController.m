@@ -8,6 +8,7 @@
 
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFPhotoViewController.h"
+#import "DFMultiPhotoViewController.h"
 
 @interface DFPhotoNavigationControllerViewController ()
 
@@ -61,7 +62,9 @@
 
 static const CGFloat AnimationDuration = 0.3f;
 
-- (void)pushPhotoViewController:(DFPhotoViewController *)photoViewController fromCellView:(UIView *)cellView
+- (void)pushMultiPhotoViewController:(DFMultiPhotoViewController *)multiPhotoViewController
+        withFrontPhotoViewController:(DFPhotoViewController *)photoViewController
+                        fromCellView:(UIView *)cellView
 {
     if (self.isPushingPhoto) return;
     self.isPushingPhoto = YES;
@@ -75,6 +78,7 @@ static const CGFloat AnimationDuration = 0.3f;
     self.zoomedCellImageView.frame = self.pushedCellViewOriginalFrame;
     [self.view addSubview:self.zoomedCellImageView];
     cellView.alpha = 0.0;
+    photoViewController.imageView.alpha = 0.0;
     
     
     
@@ -91,7 +95,7 @@ static const CGFloat AnimationDuration = 0.3f;
     transition.type = kCATransitionFade;
     [self.view.layer addAnimation:transition forKey:kCATransition];
     
-    [super pushViewController:photoViewController animated:NO];
+    [super pushViewController:multiPhotoViewController animated:NO];
 }
 
 - (void)zoomImageViewBackToCell
@@ -118,7 +122,7 @@ static const CGFloat AnimationDuration = 0.3f;
 
 - (UIViewController *)popViewControllerAnimated:(BOOL)animated
 {
-    if ([self.visibleViewController isKindOfClass:[DFPhotoViewController class]]) {
+    if ([self.visibleViewController isKindOfClass:[DFMultiPhotoViewController class]]) {
         [self zoomImageViewBackToCell];
         return [super popViewControllerAnimated:NO];
     } else {

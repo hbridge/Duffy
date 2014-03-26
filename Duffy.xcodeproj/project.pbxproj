@@ -19,6 +19,7 @@
 		5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */; };
 		5A67606118E2444E00E355B6 /* DFPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */; };
 		5A67606618E3389900E355B6 /* DFPhotoNavigationControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */; };
+		5A67606918E3558500E355B6 /* DFMultiPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67606818E3558500E355B6 /* DFMultiPhotoViewController.m */; };
 		5A72E11818B55CB2000979D2 /* database.csv in Resources */ = {isa = PBXBuildFile; fileRef = 5A72E11718B55CB2000979D2 /* database.csv */; };
 		5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11B18B7EB83000979D2 /* QuartzCore.framework */; };
 		5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A72E11D18B7EB89000979D2 /* Security.framework */; };
@@ -92,6 +93,8 @@
 		5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewController.xib; sourceTree = "<group>"; };
 		5A67606418E3389900E355B6 /* DFPhotoNavigationControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoNavigationControllerViewController.h; sourceTree = "<group>"; };
 		5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoNavigationControllerViewController.m; sourceTree = "<group>"; };
+		5A67606718E3558500E355B6 /* DFMultiPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFMultiPhotoViewController.h; sourceTree = "<group>"; };
+		5A67606818E3558500E355B6 /* DFMultiPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFMultiPhotoViewController.m; sourceTree = "<group>"; };
 		5A72E11718B55CB2000979D2 /* database.csv */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = database.csv; sourceTree = "<group>"; };
 		5A72E11B18B7EB83000979D2 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		5A72E11D18B7EB89000979D2 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
@@ -196,6 +199,8 @@
 				5A67605D18E2444E00E355B6 /* DFPhotoViewController.h */,
 				5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */,
 				5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */,
+				5A67606718E3558500E355B6 /* DFMultiPhotoViewController.h */,
+				5A67606818E3558500E355B6 /* DFMultiPhotoViewController.m */,
 				5A67606418E3389900E355B6 /* DFPhotoNavigationControllerViewController.h */,
 				5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */,
 			);
@@ -517,6 +522,7 @@
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
 				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
+				5A67606918E3558500E355B6 /* DFMultiPhotoViewController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */,

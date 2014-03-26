@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@class DFPhotoViewController;
+@class DFPhotoViewController, DFMultiPhotoViewController;
 
 @interface DFPhotoNavigationControllerViewController : UINavigationController
 
-- (void)pushPhotoViewController:(DFPhotoViewController *)photoViewController
-              fromCellView:(UIView *)cellView;
+- (void)pushMultiPhotoViewController:(DFMultiPhotoViewController *)multiPhotoViewController
+        withFrontPhotoViewController:(DFPhotoViewController *)photoViewController
+                        fromCellView:(UIView *)cellView;
 
 @end
