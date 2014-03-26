@@ -133,15 +133,11 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
 
-    [photo createCGImageForFullImage:^(CGImageRef imageRef) {
-        UIImage *fullImage = [UIImage imageWithCGImage:imageRef];
-        CGImageRelease(imageRef);
-        
+    [photo loadUIImageForFullImage:^(UIImage *fullImage) {
         [self pushPhotoViewForPhoto:photo withFullImage:fullImage atIndexPath:indexPath];
     } failureBlock:^(NSError *error) {
         NSLog(@"Could not load photo for picture tapped: %@", error.localizedDescription);
     }];
-       
 }
 
 - (void)pushPhotoViewForPhoto:(DFPhoto *)photo
@@ -204,7 +200,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     if (layoutAttributes) {
         CGRect frame = layoutAttributes.frame;
         return CGRectMake(frame.origin.x,
-                                 frame.origin.y + DEFAULT_PHOTO_SPACING + self.topLayoutGuide.length,
+                                 frame.origin.y + self.topLayoutGuide.length - self.collectionView.contentOffset.y,
                                  frame.size.width,
                                  frame.size.height);
     }
