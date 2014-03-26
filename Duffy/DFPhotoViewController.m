@@ -18,7 +18,12 @@
 {
     self = [super init];
     if (self) {
+        UINavigationItem *n = [self navigationItem];
+        [n setTitle:@"Photo"];
+        
+        
         self.automaticallyAdjustsScrollViewInsets = NO;
+        self.hidesBottomBarWhenPushed = YES;
     }
     return self;
 }

@@ -13,6 +13,9 @@
 
 @interface DFPhotosGridViewController ()
 
+@property (nonatomic, retain) UIImageView *zoomedCellImageView;
+@property (nonatomic) CGRect zoomedCellFrame;
+
 @end
 
 @implementation DFPhotosGridViewController
@@ -130,21 +133,71 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
+    UICollectionViewCell __block *cell = [collectionView cellForItemAtIndexPath:indexPath];
     NSLog(@"Photo tapped: %@", photo.metadataDictionary);
     
-    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    
     [photo createCGImageForFullImage:^(CGImageRef imageRef) {
         UIImage *image = [UIImage imageWithCGImage:imageRef];
-        pvc.image = image;
-        
         CGImageRelease(imageRef);
+        
+        [self pushPhotoViewWithCell:cell image:image];
     } failureBlock:^(NSError *error) {
         NSLog(@"Could not load photo for picture tapped: %@", error.localizedDescription);
     }];
     
-    [self.navigationController pushViewController:pvc animated:YES];
+    
+//    [UIView transitionFromView:self.view
+//                        toView:pvc.view
+//                      duration:0.75
+//                       options:UIViewAnimationOptionTransitionCrossDissolve
+//                    completion:^(BOOL finished) {
+//                        [self.navigationController pushViewController:pvc animated:NO];
+//                    }];
+
+   
 }
 
+- (void)pushPhotoViewWithCell:(UICollectionViewCell *)cell image:(UIImage *)image
+{
+    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    pvc.image = image;
+
+    self.zoomedCellImageView = [[UIImageView alloc] initWithImage:image];
+    self.zoomedCellImageView.contentMode = UIViewContentModeScaleAspectFit;
+    self.zoomedCellFrame = CGRectMake(cell.frame.origin.x, cell.frame.origin.y + 44 + DEFAULT_PHOTO_SPACING,
+                                      cell.frame.size.width, cell.frame.size.height);
+    self.zoomedCellImageView.frame = self.zoomedCellFrame;
+    [self.view insertSubview:self.zoomedCellImageView aboveSubview:cell];
+    
+    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.zoomedCellImageView.frame = [[UIScreen mainScreen] bounds];
+    } completion:^(BOOL finished) {
+        [self.zoomedCellImageView removeFromSuperview];
+        if (finished) {
+            CATransition* transition = [CATransition animation];
+            
+            transition.duration = 0.3;
+            transition.type = kCATransitionFade;
+            
+            [self.navigationController.view.layer addAnimation:transition forKey:kCATransition];
+            [self.navigationController pushViewController:pvc animated:NO];
+        }
+    }];
+}
+
+- (void)zoomImageViewBackToCell
+{
+    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
+        self.zoomedCellImageView.frame = self.zoomedCellFrame;
+    } completion:^(BOOL finished) {
+        
+        if (finished) {
+            [self.zoomedCellImageView removeFromSuperview];
+            self.zoomedCellImageView = nil;
+        }
+    }];
+}
 
 
 @end
