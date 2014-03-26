@@ -13,7 +13,7 @@
 
 @interface DFPhotoNavigationControllerViewController ()
 
-@property (nonatomic, retain) UIImageView *zoomedCellImageView;
+@property (nonatomic, retain) UIImageView *animatingImageView;
 @property (nonatomic, retain) UIView *pushedCellView;
 @property (nonatomic) CGRect pushedCellViewOriginalFrame;
 @property (atomic) BOOL isPushingPhoto;
@@ -65,31 +65,37 @@ static const CGFloat AnimationDuration = 0.3f;
 
 - (void)pushMultiPhotoViewController:(DFMultiPhotoViewController *)multiPhotoViewController
         withFrontPhotoViewController:(DFPhotoViewController *)photoViewController
-                        fromCellView:(UIView *)cellView
-             withFrameInScreenCoords:(CGRect)frame
+            fromPhotosGridController:(DFPhotosGridViewController *)photosGridController
+                     itemAtIndexPath:(NSIndexPath *)indexPath
 {
     if (self.isPushingPhoto) return;
     self.isPushingPhoto = YES;
     
-    self.zoomedCellImageView = [[UIImageView alloc] initWithImage:photoViewController.image];
-    self.zoomedCellImageView.contentMode = UIViewContentModeScaleAspectFill;
-    self.zoomedCellImageView.clipsToBounds = YES;
+    // get the tapped cell and its frame so we can animate from it
+    UIView *tappedCell = [photosGridController.collectionView cellForItemAtIndexPath:indexPath];
     
-    self.pushedCellView = cellView;
-    self.zoomedCellImageView.frame = frame;
-    [self.view addSubview:self.zoomedCellImageView];
-    cellView.alpha = 0.0;
+    // create the image view that will scale upward
+    self.animatingImageView = [[UIImageView alloc] initWithImage:photoViewController.image];
+    self.animatingImageView.contentMode = UIViewContentModeScaleAspectFill;
+    self.animatingImageView.clipsToBounds = YES;
+    self.animatingImageView.frame = [photosGridController frameForCellAtIndexPath:indexPath];
+    [self.view addSubview:self.animatingImageView];
+    
+    // set the original non animating views to be clear while the animation is happening
+    tappedCell.alpha = 0.0;
     photoViewController.imageView.alpha = 0.0;
     
+    // animate the photo zoom
     [UIView animateWithDuration:AnimationDuration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.zoomedCellImageView.frame = [DFPhotoNavigationControllerViewController aspectFittedSize:self.zoomedCellImageView.image.size max:[[UIScreen mainScreen] bounds]];
+        self.animatingImageView.frame = [DFPhotoNavigationControllerViewController aspectFittedSize:self.animatingImageView.image.size max:[[UIScreen mainScreen] bounds]];
     } completion:^(BOOL finished) {
         photoViewController.imageView.alpha = 1.0;
-        cellView.alpha =  1.0;
-        [self.zoomedCellImageView removeFromSuperview];
+        tappedCell.alpha =  1.0;
+        [self.animatingImageView removeFromSuperview];
         self.isPushingPhoto = NO;
     }];
     
+    // animate the navigation controller changes
     CATransition* transition = [CATransition animation];
     transition.duration = AnimationDuration;
     transition.type = kCATransitionFade;
@@ -100,7 +106,7 @@ static const CGFloat AnimationDuration = 0.3f;
 
 - (void)zoomImage:(UIImage *)image backToCellAtIndexPath:(NSIndexPath *)parentIndexPath
 {
-    self.zoomedCellImageView.image = image;
+    self.animatingImageView.image = image;
     
     DFPhotosGridViewController *gridController =
         (DFPhotosGridViewController *)[self.viewControllers objectAtIndex:self.viewControllers.count-2];
@@ -108,14 +114,14 @@ static const CGFloat AnimationDuration = 0.3f;
     cell.alpha = 0.0;
     CGRect cellFrame = [gridController frameForCellAtIndexPath:parentIndexPath];
 
-    [self.view addSubview:self.zoomedCellImageView];
+    [self.view addSubview:self.animatingImageView];
     [UIView animateWithDuration:AnimationDuration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.zoomedCellImageView.frame = cellFrame;
+        self.animatingImageView.frame = cellFrame;
     } completion:^(BOOL finished) {
         if (finished) {
             cell.alpha = 1.0;
-            [self.zoomedCellImageView removeFromSuperview];
-            self.zoomedCellImageView = nil;
+            [self.animatingImageView removeFromSuperview];
+            self.animatingImageView = nil;
             
         }
     }];

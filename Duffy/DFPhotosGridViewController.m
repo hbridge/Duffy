@@ -136,30 +136,23 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     
     
     [photo createCGImageForFullImage:^(CGImageRef imageRef) {
-        UIImage *image = [UIImage imageWithCGImage:imageRef];
+        UIImage *fullImage = [UIImage imageWithCGImage:imageRef];
         CGImageRelease(imageRef);
         
-        [self pushPhotoViewWithCell:cell atIndexPath:indexPath image:image];
+        [self pushPhotoViewForPhoto:photo withFullImage:fullImage atIndexPath:indexPath];
     } failureBlock:^(NSError *error) {
         NSLog(@"Could not load photo for picture tapped: %@", error.localizedDescription);
     }];
-    
-    
-//    [UIView transitionFromView:self.view
-//                        toView:pvc.view
-//                      duration:0.75
-//                       options:UIViewAnimationOptionTransitionCrossDissolve
-//                    completion:^(BOOL finished) {
-//                        [self.navigationController pushViewController:pvc animated:NO];
-//                    }];
-
-   
+       
 }
 
-- (void)pushPhotoViewWithCell:(UICollectionViewCell *)cell atIndexPath:(NSIndexPath *)indexPath image:(UIImage *)image
+- (void)pushPhotoViewForPhoto:(DFPhoto *)photo
+                withFullImage:(UIImage *)fullImage
+                  atIndexPath:(NSIndexPath *)indexPath
 {
+    
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.image = image;
+    pvc.image = fullImage;
     pvc.indexPathInParent = indexPath;
     
     
@@ -172,10 +165,12 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
     [photoNavController pushMultiPhotoViewController:multiPhotoController
                         withFrontPhotoViewController:pvc
-                                        fromCellView:cell
-                             withFrameInScreenCoords:[self frameForCellAtIndexPath:indexPath]];
+                            fromPhotosGridController:self
+                                     itemAtIndexPath:indexPath];
 }
 
+
+#pragma mark - DFMultiPhotoPageView datasource
 
 - (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
      viewControllerBeforeViewController:(UIViewController *)viewController

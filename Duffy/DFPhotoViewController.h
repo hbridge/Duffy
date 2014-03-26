@@ -8,8 +8,11 @@
 
 #import <UIKit/UIKit.h>
 
+@class DFPhoto;
+
 @interface DFPhotoViewController : UIViewController
 
+@property (strong, nonatomic) DFPhoto *photo;
 @property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 
