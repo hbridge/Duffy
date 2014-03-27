@@ -119,7 +119,7 @@ static DFUploadController *defaultUploadController;
     
     RKObjectRequestOperation *operation =
         [[self objectManager] objectRequestOperationWithRequest:postRequest
-                                                        success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+            success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
     {
         DFUploadResponse *response = [mappingResult firstObject];
         NSLog(@"Upload response received.  result:%@ debug:%@", response.result, response.debug);
@@ -131,9 +131,12 @@ static DFUploadController *defaultUploadController;
             [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
         }
     }
-                                                        failure:^(RKObjectRequestOperation *operation, NSError *error)
+            failure:^(RKObjectRequestOperation *operation, NSError *error)
     {
         NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
+        if (error.code == -1001) {//timeout
+            [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+        }
         
     }];
     
