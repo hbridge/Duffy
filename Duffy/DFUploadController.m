@@ -25,8 +25,8 @@
 @end
 
 // Constants
-// static NSString *BaseURL = @"http://asood123.no-ip.biz/"; //prod
-static NSString *BaseURL = @"http://asood123.no-ip.biz:8000/"; //stable
+ static NSString *BaseURL = @"http://asood123.no-ip.biz/"; //prod
+//static NSString *BaseURL = @"http://asood123.no-ip.biz:8000/"; //stable
 static NSString *AddPhotoResource = @"api/addPhoto";
 NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";

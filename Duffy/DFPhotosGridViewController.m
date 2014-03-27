@@ -98,11 +98,8 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
-    
     DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
                                   dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
-    
-    
     [cell.imageView setImage:[photo thumbnail]];
     
     return cell;
