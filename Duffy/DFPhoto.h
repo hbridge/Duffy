@@ -53,7 +53,7 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 - (void)loadUIImageForThumbnail:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 
-
+- (CIImage *)CIImageForFullImage;
 
 // Image attributes
 

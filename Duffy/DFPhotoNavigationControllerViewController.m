@@ -10,6 +10,7 @@
 #import "DFPhotoViewController.h"
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotosGridViewController.h"
+#import "DFCGRectHelpers.h"
 
 @interface DFPhotoNavigationControllerViewController ()
 
@@ -78,7 +79,7 @@ static const CGFloat AnimationDuration = 0.3f;
     
     // animate the photo zoom
     [UIView animateWithDuration:AnimationDuration delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-        self.animatingImageView.frame = [DFPhotoNavigationControllerViewController aspectFittedSize:self.animatingImageView.image.size max:[[UIScreen mainScreen] bounds]];
+        self.animatingImageView.frame = [DFCGRectHelpers aspectFittedSize:self.animatingImageView.image.size max:[[UIScreen mainScreen] bounds]];
     } completion:^(BOOL finished) {
         imageView.alpha = 1.0;
         tappedCell.alpha =  1.0;
@@ -140,21 +141,6 @@ static const CGFloat AnimationDuration = 0.3f;
 
 #pragma mark - Helpers
 
-+ (CGRect) aspectFittedSize:(CGSize)inSize max:(CGRect)maxRect
-{
-	float originalAspectRatio = inSize.width / inSize.height;
-	float maxAspectRatio = maxRect.size.width / maxRect.size.height;
-    
-	CGRect newRect = maxRect;
-	if (originalAspectRatio > maxAspectRatio) { // scale by width
-		newRect.size.height = maxRect.size.width * (inSize.height / inSize.width);
-		newRect.origin.y += (maxRect.size.height - newRect.size.height)/2.0;
-	} else {
-		newRect.size.width = maxRect.size.height  * inSize.width / inSize.height;
-		newRect.origin.x += (maxRect.size.width - newRect.size.width)/2.0;
-	}
-    
-	return CGRectIntegral(newRect);
-}
+
 
 @end

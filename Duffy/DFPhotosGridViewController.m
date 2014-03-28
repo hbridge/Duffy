@@ -132,6 +132,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
     
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    pvc.photo = photo;
     pvc.image = fullImage;
     pvc.indexPathInParent = indexPath;
     

@@ -119,6 +119,15 @@
     return loadedFullImage;
 }
 
+- (UIImage *)fullScreenImage
+{
+    CGImageRef imageRef = self.asset.defaultRepresentation.fullScreenImage;
+    UIImage *image = [UIImage imageWithCGImage:imageRef
+                                         scale:self.asset.defaultRepresentation.scale
+                                   orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
+    return image;
+}
+
 - (UIImage *)imageResizedToFitSize:(CGSize)size
 {
     UIImage *resizedImage = [self.fullImage resizedImageWithContentMode:UIViewContentModeScaleAspectFit
@@ -160,6 +169,18 @@
         failureBlock([NSError errorWithDomain:@"" code:-1
                                      userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
     }
+}
+
+
+- (CIImage *)CIImageForFullImage
+{
+    ALAssetRepresentation *rep = [self.asset defaultRepresentation];
+    Byte *buffer = (Byte*)malloc(rep.size);
+    NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:rep.size error:nil];
+    NSData *data = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
+    
+    
+    return [CIImage imageWithData:data];
 }
 
 - (ALAsset *)asset

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFImageView.h"
 
 @class DFPhoto;
 
@@ -17,6 +18,6 @@
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet DFImageView *imageView;
 
 @end
