@@ -12,6 +12,7 @@
 #import "DFBoundingBoxView.h"
 #import "UIImage+DFHelpers.h"
 #import "DFPhoto.h"
+#import "DFPhoto+FaceDetection.h"
 
 @interface DFPhotoViewController ()
 
@@ -40,13 +41,13 @@
     self.imageView.image = self.image;
     [self.imageView sizeToFit];
     
-    [self addFaceBoundingBoxes];
+    
 }
 
 
 - (void)viewDidAppear:(BOOL)animated
 {
-
+    [self addFaceBoundingBoxes];
 }
 
 - (void)didReceiveMemoryWarning
@@ -73,35 +74,22 @@
 
 - (void)addFaceBoundingBoxes
 {
-    CIImage *ciImage = [self.photo CIImageForFullImage];
-    
-    CIContext *context = [CIContext contextWithOptions:nil];                    // 1
-    NSDictionary *opts = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };      // 2
-    CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
-                                              context:context
-                                              options:opts];                    // 3
-    
-    if ([ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation]) {
-        opts = @{ CIDetectorImageOrientation : [ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation] }; // 4
-    } else {
-        opts = @{};
-    }
-    
-        
-    NSArray *features = [detector featuresInImage:ciImage options:opts];
-    NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
-    
-    for (CIFaceFeature *f in features)
-    {
-        NSLog(@"face found at %@ in photo with properties:%@", NSStringFromCGRect(f.bounds), ciImage.properties);
-        [boundingBoxes addObject:[NSValue valueWithCGRect:f.bounds]];
-    }
-    
-    self.imageView.boundingBoxesInImage = boundingBoxes;
-    [self.imageView setNeedsDisplay];
 
+    [self.photo faceFeaturesInPhoto:^(NSArray *features) {
+        NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
     
+        for (CIFaceFeature *f in features)
+        {
+            NSLog(@"face found at %@", NSStringFromCGRect(f.bounds));
+            [boundingBoxes addObject:[NSValue valueWithCGRect:f.bounds]];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.imageView.boundingBoxesInImageCoordinates = boundingBoxes;
+        });
+    }];
 }
+
 
 
 @end

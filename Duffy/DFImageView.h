@@ -10,6 +10,6 @@
 
 @interface DFImageView : UIImageView
 
-@property (nonatomic, retain) NSArray *boundingBoxesInImage;
+@property (nonatomic, retain) NSArray *boundingBoxesInImageCoordinates;
 
 @end
