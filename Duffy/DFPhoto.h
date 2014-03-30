@@ -35,8 +35,10 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 // Access to the images
 // Will block if the image needs to be loaded from somewhere.  Access on the main thread should
 // Ideally be done with createCGImage calls
-@property (readonly, nonatomic, retain) UIImage *fullImage;
+@property (readonly, nonatomic, retain) UIImage *fullResolutionImage;
 @property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
+@property (readonly, nonatomic, retain) UIImage *fullScreenImage;
+
 
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;

@@ -22,7 +22,7 @@
 
 - (id)init
 {
-    self = [super init];
+    self = [super initWithNibName:@"DFPhotoViewController" bundle:nil];
     if (self) {
         UINavigationItem *n = [self navigationItem];
         [n setTitle:@"Photo"];
@@ -36,14 +36,10 @@
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    
-    self.imageView.image = self.image;
-    [self.imageView sizeToFit];
-    
-    
+    if (self.imageView && self.photo) {
+        self.imageView.image = self.photo.fullScreenImage;
+    }
 }
-
 
 - (void)viewDidAppear:(BOOL)animated
 {
@@ -56,12 +52,16 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void)setImage:(UIImage *)newImage
+- (void)setPhoto:(DFPhoto *)photo
 {
-    _image = newImage;
+    _photo = photo;
     
-    self.imageView.image = newImage;
+    if (self.imageView) {
+        self.imageView.image = photo.fullScreenImage;
+        [self addFaceBoundingBoxes];
+    }
 }
+
 
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)sv
@@ -74,6 +74,9 @@
 
 - (void)addFaceBoundingBoxes
 {
+    // if there are already bounding boxes in the image view, we've already
+    // done recognition, skip it
+    if (self.imageView.boundingBoxesInImageCoordinates) return;
 
     [self.photo faceFeaturesInPhoto:^(NSArray *features) {
         NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];

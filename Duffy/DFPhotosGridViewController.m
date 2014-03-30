@@ -118,30 +118,25 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
-
-    [photo loadUIImageForFullImage:^(UIImage *fullImage) {
-        [self pushPhotoViewForPhoto:photo withFullImage:fullImage atIndexPath:indexPath];
-    } failureBlock:^(NSError *error) {
-        NSLog(@"Could not load photo for picture tapped: %@", error.localizedDescription);
-    }];
+    [self pushPhotoViewForPhoto:photo atIndexPath:indexPath];
 }
 
 - (void)pushPhotoViewForPhoto:(DFPhoto *)photo
-                withFullImage:(UIImage *)fullImage
                   atIndexPath:(NSIndexPath *)indexPath
 {
     
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
     pvc.photo = photo;
-    pvc.image = fullImage;
     pvc.indexPathInParent = indexPath;
     
     
     DFMultiPhotoViewController *multiPhotoController = [[DFMultiPhotoViewController alloc] init];
     multiPhotoController.dataSource = self;
-    [multiPhotoController setViewControllers:[NSArray arrayWithObject:pvc] direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:^(BOOL finished) {
-        //
-    }];
+    [multiPhotoController setViewControllers:[NSArray arrayWithObject:pvc]
+                                   direction:UIPageViewControllerNavigationDirectionForward
+                                    animated:NO
+                                  completion:^(BOOL finished) {
+                                  }];
     
     DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
     [photoNavController pushMultiPhotoViewController:multiPhotoController
@@ -162,7 +157,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row -1];
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.image = photo.fullImage;
+    pvc.photo = photo;
     pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
     return pvc;
 }
@@ -176,7 +171,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row + 1];
     DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.image = photo.fullImage;
+    pvc.photo = photo;
     pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
     return pvc;
 }

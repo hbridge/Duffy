@@ -13,6 +13,7 @@
 #import "DFSearchViewController.h"
 #import "DFCameraRollSyncController.h"
 #import "DFPhotoNavigationControllerViewController.h"
+#import "DFPhotoImageCache.h"
 
 
 @interface DFAppDelegate()
@@ -73,7 +74,6 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    NSLog(@"applicationDidBecomeActive");
     if (self.cameraRollSyncController == nil) {
         self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
     }
@@ -90,7 +90,8 @@
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
-    //[[DFPhotoStore sharedStore] emptyImageCache];
+    NSLog(@"memory warning.  emptying cache.");
+    [[DFPhotoImageCache sharedCache] emptyCache];
 }
 
 

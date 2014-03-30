@@ -11,6 +11,7 @@
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotosGridViewController.h"
 #import "DFCGRectHelpers.h"
+#import "DFPhoto.h"
 
 @interface DFPhotoNavigationControllerViewController ()
 
@@ -54,9 +55,8 @@ static const CGFloat AnimationDuration = 0.3f;
     CGRect tappedCellFrame = [photosGridController frameForCellAtIndexPath:indexPath];
     [self animateTappedCell:tappedCell
                   withFrame:tappedCellFrame
-              upToFullImage:photoViewController.image
+              upToFullImage:photoViewController.photo.fullScreenImage
        displayedInImageView:photoViewController.imageView];
-    
     
     [super pushViewController:multiPhotoViewController animated:NO];
 }
@@ -119,11 +119,14 @@ static const CGFloat AnimationDuration = 0.3f;
     NSIndexPath *parentIndexPath = currentPhotoViewController.indexPathInParent;
     DFPhotosGridViewController *gridController =
         (DFPhotosGridViewController *)[self.viewControllers objectAtIndex:self.viewControllers.count-2];
+    if (![gridController isKindOfClass:[DFPhotosGridViewController class]]) {
+        [NSException raise:@"Wrong type of parent view" format:@"Trying to pop a multiPhotoViewController to something other than a grid view controller.  Current view controllers: %@", self.viewControllers];
+    }
     UICollectionViewCell *cell = [gridController.collectionView cellForItemAtIndexPath:parentIndexPath];
     CGRect destinationFrame = [gridController frameForCellAtIndexPath:parentIndexPath];
     
     
-    [self animateFullImage:currentPhotoViewController.image
+    [self animateFullImage:currentPhotoViewController.photo.fullScreenImage
                 backToCell:cell
                  withFrame:destinationFrame];
     

@@ -61,6 +61,7 @@
 		5AE3BF7B18E4D5C900ACB5DC /* DFCGRectHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF7A18E4D5C900ACB5DC /* DFCGRectHelpers.m */; };
 		5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF7D18E4E91700ACB5DC /* UIImage+DFHelpers.m */; };
 		5AE3BF8118E6301B00ACB5DC /* DFPhoto+FaceDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF8018E6301B00ACB5DC /* DFPhoto+FaceDetection.m */; };
+		5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF8318E724A200ACB5DC /* DFPhotoImageCache.m */; };
 		5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3418D0C87E00998793 /* DFUser.m */; };
 		5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */; };
 		5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */; };
@@ -157,6 +158,8 @@
 		5AE3BF7D18E4E91700ACB5DC /* UIImage+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+DFHelpers.m"; sourceTree = "<group>"; };
 		5AE3BF7F18E6301B00ACB5DC /* DFPhoto+FaceDetection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "DFPhoto+FaceDetection.h"; sourceTree = "<group>"; };
 		5AE3BF8018E6301B00ACB5DC /* DFPhoto+FaceDetection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "DFPhoto+FaceDetection.m"; sourceTree = "<group>"; };
+		5AE3BF8218E724A200ACB5DC /* DFPhotoImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoImageCache.h; sourceTree = "<group>"; };
+		5AE3BF8318E724A200ACB5DC /* DFPhotoImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoImageCache.m; sourceTree = "<group>"; };
 		5AFBCA3318D0C87E00998793 /* DFUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUser.h; sourceTree = "<group>"; };
 		5AFBCA3418D0C87E00998793 /* DFUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUser.m; sourceTree = "<group>"; };
 		5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettingsViewController.h; sourceTree = "<group>"; };
@@ -368,6 +371,8 @@
 				5ADB2508189ABBB50016CA02 /* DFPhoto.m */,
 				5AE3BF7F18E6301B00ACB5DC /* DFPhoto+FaceDetection.h */,
 				5AE3BF8018E6301B00ACB5DC /* DFPhoto+FaceDetection.m */,
+				5AE3BF8218E724A200ACB5DC /* DFPhotoImageCache.h */,
+				5AE3BF8318E724A200ACB5DC /* DFPhotoImageCache.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -547,6 +552,7 @@
 				5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */,
 				5AE3BF7B18E4D5C900ACB5DC /* DFCGRectHelpers.m in Sources */,
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
+				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
 				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,

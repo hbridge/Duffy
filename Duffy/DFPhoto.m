@@ -11,6 +11,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhotoStore.h"
 #import "ThirdParty/UIImage-Categories/UIImage+Resize.h"
+#import "DFPhotoImageCache.h"
 
 @interface DFPhoto()
 
@@ -20,8 +21,6 @@
 
 @implementation DFPhoto
 
-@synthesize thumbnail;
-@synthesize fullImage;
 @synthesize asset = _asset;
 
 @dynamic alAssetURLString, universalIDString, uploadDate, creationDate;
@@ -80,6 +79,10 @@
 
 - (UIImage *)thumbnail
 {
+    UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
+                            thumbnailForPhotoWithURLString:self.alAssetURLString];
+    if (cachedImage) return cachedImage;
+    
     UIImage __block *loadedThumbnail;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
@@ -95,13 +98,17 @@
     });
 
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    
     return  loadedThumbnail;
 }
 
-- (UIImage *)fullImage
+- (UIImage *)fullResolutionImage
 {
-    UIImage __block *loadedFullImage;
+    UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
+                            fullResolutionImageForPhotoWithURLString:self.alAssetURLString];
+    if (cachedImage) return cachedImage;
     
+   UIImage __block *loadedFullImage;
     dispatch_semaphore_t sema = dispatch_semaphore_create(0);
     
     // Synchronously load the thunbnail
@@ -121,16 +128,21 @@
 
 - (UIImage *)fullScreenImage
 {
+    UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
+                            fullScreenImageForPhotoWithURLString:self.alAssetURLString];
+    if (cachedImage) return cachedImage;
+    
     CGImageRef imageRef = self.asset.defaultRepresentation.fullScreenImage;
-    UIImage *image = [UIImage imageWithCGImage:imageRef
-                                         scale:self.asset.defaultRepresentation.scale
-                                   orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
+    UIImage *image = [UIImage imageWithCGImage:imageRef];
+    
+    [[DFPhotoImageCache sharedCache] setFullScreenImage:image forPhotoWithURLString:self.alAssetURLString];
+    
     return image;
 }
 
 - (UIImage *)imageResizedToFitSize:(CGSize)size
 {
-    UIImage *resizedImage = [self.fullImage resizedImageWithContentMode:UIViewContentModeScaleAspectFit
+    UIImage *resizedImage = [self.fullResolutionImage resizedImageWithContentMode:UIViewContentModeScaleAspectFit
                                                                  bounds:size
                                                    interpolationQuality:kCGInterpolationHigh];
     return resizedImage;
@@ -138,16 +150,24 @@
 
 - (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
 {
-    return [self.fullImage resizedImageWithSmallerDimensionScaledToLength:length interpolationQuality:kCGInterpolationHigh];
+    return [self.fullResolutionImage resizedImageWithSmallerDimensionScaledToLength:length interpolationQuality:kCGInterpolationHigh];
 }
 
 
 - (void)loadUIImageForThumbnail:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
+    UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
+                            thumbnailForPhotoWithURLString:self.alAssetURLString];
+    if (cachedImage) {
+        successBlock(cachedImage);
+        return;
+    }
+    
     if (self.asset) {
         CGImageRef imageRef = [self.asset thumbnail];
         UIImage *image = [UIImage imageWithCGImage:imageRef];
+        [[DFPhotoImageCache sharedCache] setThumbnail:image forPhotoWithURLString:self.alAssetURLString];
         successBlock(image);
     } else {
         failureBlock([NSError errorWithDomain:@"" code:-1
@@ -159,11 +179,20 @@
 - (void)loadUIImageForFullImage:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock
 {
+    UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
+                            fullResolutionImageForPhotoWithURLString:self.alAssetURLString];
+    if (cachedImage) {
+        successBlock(cachedImage);
+        return;
+    }
+    
     if (self.asset) {
         CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
         UIImage *image = [UIImage imageWithCGImage:imageRef
                                              scale:self.asset.defaultRepresentation.scale
                                        orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
+        [[DFPhotoImageCache sharedCache] setFullResolutionImage:image
+                                forPhotoWithURLString:self.alAssetURLString];
         successBlock(image);
     } else {
         failureBlock([NSError errorWithDomain:@"" code:-1
@@ -175,8 +204,8 @@
 - (CIImage *)CIImageForFullImage
 {
     ALAssetRepresentation *rep = [self.asset defaultRepresentation];
-    Byte *buffer = (Byte*)malloc(rep.size);
-    NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:rep.size error:nil];
+    Byte *buffer = (Byte*)malloc((unsigned long)rep.size);
+    NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:(unsigned long)rep.size error:nil];
     NSData *data = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
     
     

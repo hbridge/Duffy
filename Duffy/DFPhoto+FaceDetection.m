@@ -8,34 +8,37 @@
 
 #import "DFPhoto+FaceDetection.h"
 #import <ImageIO/ImageIO.h>
+#import "UIImage+Resize.h"
 
 @implementation DFPhoto (FaceDetection)
 
 - (void)faceFeaturesInPhoto:(DFPhotoFaceDetectSuccessBlock)successBlock
 {
-    UIImage *fullImage = self.fullImage;
+    UIImage *fullImage = self.fullScreenImage;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
-        UIGraphicsBeginImageContext(fullImage.size);
-        [fullImage drawInRect:CGRectMake(0.0, 0.0, fullImage.size.width, fullImage.size.height)];
-        UIImage *rotatedImage = UIGraphicsGetImageFromCurrentImageContext();
-        UIGraphicsEndImageContext();
+        NSArray *featuresInImage;
         
-        CIImage *ciImage = [[CIImage alloc] initWithCGImage:[rotatedImage CGImage]];
-        
-        CIContext *context = [CIContext contextWithOptions:nil];
-        NSDictionary *opts = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
-        CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
-                                                  context:context
-                                                  options:opts];
-        
-        if ([ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation]) {
-            opts = @{ CIDetectorImageOrientation : [ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation] }; // 4
-        } else {
-            opts = @{};
+        @autoreleasepool {
+            UIImage *scaledRotatedImage = [fullImage resizedImage:fullImage.size interpolationQuality:kCGInterpolationDefault];
+            
+            CIImage *ciImage = [[CIImage alloc] initWithCGImage:[scaledRotatedImage CGImage]];
+            
+            CIContext *context = [CIContext contextWithOptions:nil];
+            NSDictionary *opts = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
+            CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
+                                                      context:context
+                                                      options:opts];
+            
+            if ([ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation]) {
+                opts = @{ CIDetectorImageOrientation : [ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation] }; // 4
+            } else {
+                opts = @{};
+            }
+            
+            featuresInImage = [detector featuresInImage:ciImage options:opts];
         }
-        
-        successBlock([detector featuresInImage:ciImage options:opts]);
+        successBlock(featuresInImage);
     });
 }
 

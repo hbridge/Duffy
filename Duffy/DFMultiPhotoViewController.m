@@ -17,7 +17,9 @@
 
 - (id)init
 {
-    self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
+    self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+                    navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+                                  options:nil];
     if (self) {
         self.delegate = self;
         self.automaticallyAdjustsScrollViewInsets = NO;
@@ -34,12 +36,22 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+    
+    NSLog(@"Multi-photo view controller received memory warning.");
 }
 
 - (DFPhotoViewController *)currentPhotoViewController
 {
     return self.viewControllers.firstObject;
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+        didFinishAnimating:(BOOL)finished
+   previousViewControllers:(NSArray *)previousViewControllers
+       transitionCompleted:(BOOL)completed
+{
+    // todo: cache next photo controller on first load.
+
 }
 
 @end

@@ -14,7 +14,6 @@
 @interface DFPhotoViewController : UIViewController
 
 @property (strong, nonatomic) DFPhoto *photo;
-@property (strong, nonatomic) UIImage *image;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
