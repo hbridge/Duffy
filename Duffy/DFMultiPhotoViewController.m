@@ -19,7 +19,7 @@
 {
     self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
                     navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
-                                  options:nil];
+                                  options:@{UIPageViewControllerOptionInterPageSpacingKey:[NSNumber numberWithFloat:40.0]}];
     if (self) {
         self.delegate = self;
         self.automaticallyAdjustsScrollViewInsets = NO;

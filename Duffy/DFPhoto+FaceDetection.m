@@ -14,7 +14,7 @@
 
 - (void)faceFeaturesInPhoto:(DFPhotoFaceDetectSuccessBlock)successBlock
 {
-    UIImage *fullImage = self.fullScreenImage;
+    UIImage *fullImage = self.fullResolutionImage;
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
         NSArray *featuresInImage;

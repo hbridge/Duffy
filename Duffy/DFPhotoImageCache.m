@@ -64,12 +64,12 @@ static DFPhotoImageCache *defaultCache;
 
 - (void)setFullScreenImage:(UIImage *)fullScreenImage forPhotoWithURLString:(NSString *)photoURLString
 {
-    self.fullImageCache[photoURLString] = fullScreenImage;
+    self.fullScreenImageCache[photoURLString] = fullScreenImage;
 }
 
 - (void)setFullResolutionImage:(UIImage *)fullImage forPhotoWithURLString:(NSString *)photoURLString
 {
-    self.fullImageCache[photoURLString] = fullImage;
+    self.fullScreenImageCache[photoURLString] = fullImage;
 }
 
 
