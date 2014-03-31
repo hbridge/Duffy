@@ -43,7 +43,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [self addFaceBoundingBoxes];
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -58,7 +58,6 @@
     
     if (self.imageView) {
         self.imageView.image = photo.fullScreenImage;
-        [self addFaceBoundingBoxes];
     }
 }
 

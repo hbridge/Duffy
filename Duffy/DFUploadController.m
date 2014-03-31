@@ -14,6 +14,7 @@
 #import "DFUser.h"
 #import "DFSettingsViewController.h"
 #import "NSDictionary+DFJSON.h"
+#import "DFPhoto+FaceDetection.h"
 
 
 // Private DFUploadResponse Class
@@ -33,6 +34,7 @@ NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 static NSString *UserIDParameterKey = @"phone_id";
 static NSString *PhotoMetadataKey = @"photo_metadata";
 static NSString *PhotoLocationKey = @"location_data";
+static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
 @interface DFUploadController()
 
@@ -219,6 +221,7 @@ static DFUploadController *defaultUploadController;
                              UserIDParameterKey: userID,
                              PhotoMetadataKey: [self metadataJSONStringForPhoto:photo],
                              PhotoLocationKey: [self locationJSONStringForPhoto:photo],
+                             PhotoFacesKey:    [self faceJSONStringForPhoto:photo],
                              };
     
     NSLog(@"uploadParams: %@", params);
@@ -257,7 +260,28 @@ static DFUploadController *defaultUploadController;
      return [resultDictionary JSONString];
 }
 
-
+- (NSString *)faceJSONStringForPhoto:(DFPhoto *)photo
+{
+    NSArray __block *resultArray;
+    
+    dispatch_semaphore_t faceDetectSemaphore = dispatch_semaphore_create(0);
+    [photo faceFeaturesInPhoto:^(NSArray *features) {
+        resultArray = features;
+        dispatch_semaphore_signal(faceDetectSemaphore);
+    }];
+    
+    dispatch_semaphore_wait(faceDetectSemaphore, DISPATCH_TIME_FOREVER);
+    
+    NSMutableDictionary *resultDictionary = [[NSMutableDictionary alloc] init];
+    for (CIFaceFeature *faceFeature in resultArray) {
+        NSString *key = [NSString stringWithFormat:@"%lu", (unsigned long)resultDictionary.count];
+        resultDictionary[key] = @{@"bounds": NSStringFromCGRect(faceFeature.bounds),
+                                  @"has_smile" : [NSNumber numberWithBool:faceFeature.hasSmile],
+                                  };
+    }
+    
+    return [resultDictionary JSONString];
+}
 
 
 
