@@ -27,6 +27,8 @@
 		5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3C18CFB574003EF557 /* CFNetwork.framework */; };
 		5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */; };
 		5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */; };
+		5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */; };
+		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -111,6 +113,10 @@
 		5A81ED3C18CFB574003EF557 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		5A81ED3E18CFB57F003EF557 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+DFThreadingAddons.h"; sourceTree = "<group>"; };
+		5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+DFThreadingAddons.m"; sourceTree = "<group>"; };
+		5A8D0AF118EB6A9600A1D9A7 /* DFNotificationSharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationSharedConstants.h; sourceTree = "<group>"; };
+		5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationSharedConstants.m; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -373,6 +379,8 @@
 				5AE3BF8018E6301B00ACB5DC /* DFPhoto+FaceDetection.m */,
 				5AE3BF8218E724A200ACB5DC /* DFPhotoImageCache.h */,
 				5AE3BF8318E724A200ACB5DC /* DFPhotoImageCache.m */,
+				5A8D0AF118EB6A9600A1D9A7 /* DFNotificationSharedConstants.h */,
+				5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -385,6 +393,8 @@
 				5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */,
 				5AE3BF7918E4D5C900ACB5DC /* DFCGRectHelpers.h */,
 				5AE3BF7A18E4D5C900ACB5DC /* DFCGRectHelpers.m */,
+				5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */,
+				5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -563,6 +573,7 @@
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
 				5AE3BF7118E4CCC600ACB5DC /* DFBoundingBoxView.m in Sources */,
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
+				5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
 				5AE3BF8118E6301B00ACB5DC /* DFPhoto+FaceDetection.m in Sources */,
 				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
@@ -574,6 +585,7 @@
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
+				5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */,
 				5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

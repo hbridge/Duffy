@@ -10,6 +10,8 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhoto.h"
 #import "DFPhotoStore.h"
+#import "NSNotificationCenter+DFThreadingAddons.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFCameraRollSyncController()
 
@@ -34,6 +36,7 @@
 - (void)asyncSyncToCameraRollWithCurrentKnownPhotoURLs:(NSSet *)knownURLs
 {
     int __block newAssets = 0;
+    NSMutableDictionary __block *objectIDsToChanges = [[NSMutableDictionary alloc] init];
     
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
         if(photoAsset != NULL) {
@@ -52,7 +55,10 @@
                                      inManagedObjectContext:self.managedObjectContext];
                 newPhoto.alAssetURLString = assetURL.absoluteString;
                 newPhoto.creationDate = [photoAsset valueForProperty:ALAssetPropertyDate];
+                
+                // store information about the new photo to notify
                 newAssets++;
+                objectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
             } else {
                 //NSLog(@"...asset is not new.");
             }
@@ -65,6 +71,11 @@
                 if(![self.managedObjectContext save:&error]) {
                     NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
                     [NSException raise:@"Could not save new photo object." format:@"Error: %@",[error localizedDescription]];
+                } else {
+                    // successfull save, post notification
+                    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                                        object:self
+                                                                      userInfo:objectIDsToChanges];
                 }
             }
             

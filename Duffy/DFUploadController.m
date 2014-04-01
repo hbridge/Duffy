@@ -15,6 +15,8 @@
 #import "DFSettingsViewController.h"
 #import "NSDictionary+DFJSON.h"
 #import "DFPhoto+FaceDetection.h"
+#import "NSNotificationCenter+DFThreadingAddons.h"
+#import "DFNotificationSharedConstants.h"
 
 
 // Private DFUploadResponse Class
@@ -151,6 +153,9 @@ static DFUploadController *defaultUploadController;
     [self.photoURLsToUpload removeObject:photo.alAssetURLString];
     
     [self saveUploadProgress];
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                        object:self
+                                                      userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
     
     [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
     [self postStatusUpdate];
@@ -178,7 +183,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)postStatusUpdate
 {
-    [[NSNotificationCenter defaultCenter] postNotificationName:DFUploadStatusUpdate
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusUpdate
                                                         object:self
                                                       userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
 }

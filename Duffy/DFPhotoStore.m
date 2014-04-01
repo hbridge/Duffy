@@ -9,6 +9,7 @@
 #import "DFPhotoStore.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhoto.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFPhotoStore(){
     NSManagedObjectContext *_managedObjectContext;
@@ -53,10 +54,16 @@ static DFPhotoStore *defaultStore;
         _cameraRoll = [[DFPhotoCollection alloc] init];
         [self loadCameraRollDB];
         
-        //register to hear about other context saves
+        //register to hear about other context saves so we can merge in changes
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(backgroundContextDidSave:)
                                                      name:NSManagedObjectContextDidSaveNotification
+                                                   object:nil];
+        
+        // register to hear about more fine grained photo notification changes
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(photosChanged:)
+                                                     name:DFPhotoChangedNotificationName
                                                    object:nil];
         
     }
@@ -183,8 +190,8 @@ static DFPhotoStore *defaultStore;
 }
 
 
+#pragma mark - Notification handlers
 
-#pragma mark - Core Data stack
 
 
 /* Save notification handler for the background context */
@@ -199,8 +206,24 @@ static DFPhotoStore *defaultStore;
     
     /* merge in the changes to the main context */
     [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-    [self loadCameraRollDB];
 }
+
+- (void)photosChanged:(NSNotification *)note
+{
+    NSLog(@"DFPhotoStore: notification indicates photo changed");
+    [note.userInfo enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+        NSString *changeType = (NSString *)obj;
+        if ([changeType isEqualToString:DFPhotoChangeTypeAdded] || [changeType isEqualToString:DFPhotoChangeTypeRemoved]) {
+            NSLog(@"DFPhotoStore: notification indicates photo added or removed.  reloading camera roll");
+            [self loadCameraRollDB];
+            *stop = YES;
+        }
+    }];
+}
+
+
+
+#pragma mark - Core Data stack
 
 
 // Returns the managed object context for the application.
@@ -305,6 +328,8 @@ static DFPhotoStore *defaultStore;
 {
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
+
+
 
 
 @end

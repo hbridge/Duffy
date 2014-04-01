@@ -62,7 +62,4 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 - (NSDictionary *)metadataDictionary;
 - (NSString *)localFilename;
 
-
-
-
 @end
