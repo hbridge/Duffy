@@ -181,9 +181,11 @@ def search(request):
 		context = {	'userId': userId,
 					'photoFilename': result.photoFilename,
 					'thumbnailBasepath': thumbnailBasepath,
-					'classificationData': json.loads(result.classificationData),
-					'locationData': json.loads(result.locationData),
 					'result': result}
+		if result.locationData:
+			context['locationData'] = json.loads(result.locationData)
+		if result.classificationData:
+			context['classificationData'] = json.loads(result.classificationData)
 
 		html = render_to_string('photos/search_result.html', context)
 		response['search_result_html'].append(html)

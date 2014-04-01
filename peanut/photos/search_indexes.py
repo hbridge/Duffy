@@ -11,7 +11,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	userId = indexes.CharField()
 	photoFilename = indexes.CharField(model_attr="new_filename")
 	photoId = indexes.CharField(model_attr="id", indexed=False)
-	classificationData = indexes.CharField(model_attr="classification_data")
+	classificationData = indexes.CharField(model_attr="classification_data", null=True)
 	locationData = indexes.CharField(model_attr="location_data")
 	timeTaken = indexes.DateTimeField()
 

@@ -19,7 +19,7 @@ class Photo(models.Model):
 	location_data = models.CharField(max_length=10000, null=True)
 	pipeline_state = models.IntegerField(default=0)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
-	classification_data = models.CharField(max_length=10000, null=True)
+	classification_data = models.CharField(max_length=10000, null=True, default="")
 
 	def __unicode__(self): 
 		return str(self.user) + "/" + str(self.new_filename)
