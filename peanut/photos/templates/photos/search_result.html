@@ -1,0 +1,27 @@
+<a href="{{ thumbnailBasepath }}{{ photoFilename }}" class="link-line"><img src="{{ thumbnailBasepath }}{{ photoFilename }}">
+<table>
+	<tr>
+		<td width="300px">
+			<br/>
+			{% for addy in locationData.address.FormattedAddressLines %}
+				{{ addy }}<br/>
+			{% endfor %}
+		</td>
+		<td width="300px">
+			<table>
+				{% for classification in classificationData %} 
+					<tr>
+						<td>
+							{{ classification.class_name }}: {{ classification.rating }}
+						</td>
+					</tr>
+				{% endfor %}
+			</table>
+		</td>
+		<td>
+			{{ result.timeTaken }}
+		</td>
+	</tr>
+</table>
+
+<span class="ui-li-count">2</span></a>

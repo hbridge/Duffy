@@ -1,0 +1,103 @@
+
+<!DOCTYPE html> 
+<html> 
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Auto-categorized photo viewer</title> 
+	<link rel="stylesheet" href="//code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.css" />
+	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
+
+
+<style type="text/css">
+
+.image-line {
+	font-size: x-small;
+	display:inline-block;
+	height: 80px;
+}
+
+.image-list .ui-li {
+	height: 80px;
+
+}
+
+.link-line {
+	padding: 0px 0px 0px 100px  !important;
+}
+
+.class-table {
+	font-size: xx-small;
+	display:inline-block;
+	height: 65px;
+	border-spacing: 0px;
+}
+
+.sameClass {
+	font-weight: bold !important;
+}
+
+.ui-btn-up-c {
+	font-weight: normal;
+}
+</style>
+</head> 
+
+<body> 
+
+
+<div data-role="page" id="index">
+
+	<div data-role="header" data-theme="b">
+		<h1>{{ user.first_name }}'s photos ({{ numPhotos }})</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Filter groups...">
+			{% for class_name, photos in sorted_buckets.iteritems %}
+				<li>
+					<a href='#{{ class_name }}'>{{ class_name }}</a>
+					<span class="ui-li-count">{{ photos|length }}</span>
+				</li>
+			{% endfor %}
+		</ul>
+	</div><!-- /content -->
+
+	
+</div><!-- /page -->
+
+
+{% for class_name, photos in sorted_buckets.iteritems %}
+<div data-role="page" id="{{ class_name }}">
+	<div data-role="header" data-theme="b">
+		<a href="#demo-intro" data-rel="back" data-icon="arrow-l" data-iconpos="notext" data-shadow="false" data-icon-shadow="false">Back</a>
+		<h1>{{ class_name }}</h1>
+	</div><!-- /header -->
+
+	<div data-role="content">
+		<ul data-role="listview" data-inset="true" class="image-list">
+			{% for photo in photos %}
+				<li>
+					<a href="{{ thumbnailBasepath }}{{ photo.new_filename }}" class="link-line"><img src="" data-lazy-src="{{ thumbnailBasepath }}{{ photo.new_filename }}" class="lazy"></a>
+				</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+
+{% endfor %}
+
+</body>
+
+<script>
+		$('div').live('pagebeforeshow', function (event) {
+ 
+			$(this).find('img.lazy').each(function () {
+				$(this).attr('src', $(this).attr('data-lazy-src'));
+			});
+		 
+		});
+	</script>
+</html>

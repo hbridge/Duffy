@@ -1,0 +1,2 @@
+{{ object.location_data }}
+{{ object.classification_data }}
