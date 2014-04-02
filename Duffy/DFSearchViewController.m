@@ -19,6 +19,11 @@
 
 @end
 
+static NSString *SearchBaseURL = @"http://asood123.no-ip.biz:7000/viz/search/";
+static NSString *PhoneIDURLParameter = @"phone_id";
+static NSString *QueryURLParameter = @"q";
+
+
 @implementation DFSearchViewController
 
 - (id)init
@@ -53,16 +58,7 @@
 {
     [super viewDidLoad];
 
-    [self.webView loadRequest:[NSURLRequest requestWithURL:[self searchViewURL]]];
     [self.webView setDelegate:self];
-
-}
-
-- (NSURL *)searchViewURL
-{
-    NSString *phoneID = [[DFUser currentUser] deviceID];
-    NSString *urlString = [NSString stringWithFormat:@"http://asood123.no-ip.biz:7000/viz/searchwv/?phone_id=%@", phoneID];
-    return [NSURL URLWithString:urlString];
 }
 
 
@@ -86,9 +82,11 @@
 
 - (void)executeSearchForQuery:(NSString *)query
 {
-    NSString *baseSearchURLString = [[self searchViewURL] absoluteString];
-    NSString *queryURLString = [NSString stringWithFormat:@"%@&%@=%@",
-                                baseSearchURLString, @"q", [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+   
+    NSString *queryURLString = [NSString stringWithFormat:@"%@?%@=%@&%@=%@",
+                                SearchBaseURL,
+                                PhoneIDURLParameter, [[DFUser currentUser] deviceID],
+                                QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURL *queryURL = [NSURL URLWithString:queryURLString];
     
     NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
