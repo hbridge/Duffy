@@ -11,8 +11,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	userId = indexes.CharField()
 	photoFilename = indexes.CharField(model_attr="new_filename")
 	photoId = indexes.CharField(model_attr="id", indexed=False)
-	classificationData = indexes.CharField(model_attr="classification_data", null=True)
-	locationData = indexes.CharField(model_attr="location_data")
+	classificationData = indexes.CharField(model_attr="classification_data", default="")
+	locationData = indexes.CharField(model_attr="location_data", default="")
 	timeTaken = indexes.DateTimeField()
 
 	def get_model(self):
@@ -35,3 +35,4 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 						dt = datetime.strptime(metadata[key][a], "%Y:%m:%d %H:%M:%S")
 						timeTaken = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 						return timeTaken
+		return "1900-01-01T01:01:01Z"

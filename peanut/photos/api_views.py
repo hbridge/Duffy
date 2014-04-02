@@ -7,9 +7,12 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from haystack.query import SearchQuerySet
+from haystack.inputs import Raw
 
 from django.template import RequestContext, loader
 import parsedatetime as pdt
+import urllib2
+import urllib
 
 import os
 from time import mktime
@@ -136,6 +139,8 @@ def search(request):
 		response['debug'] = "need query"
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
+	"""
+	Old javascript date parsing code - probably ca
 	if data.has_key('startDate'):
 		if data['startDate']:
 			queryStartDate = int(data['startDate'])
@@ -148,44 +153,70 @@ def search(request):
 			#timeTaken = "2013-01-01T00:00:00Z"
 			startDate = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-	thumbnailBasepath = "/user_data/" + userId + "/"
-
+	# old python date query code. probably can be deleted after natty works
 	#cal = pdt.Calendar()
-
 	#(fromPdt, index) = cal.parse(query)
-
 	#timestamp = mktime(fromPdt)
 	#print(fromPdt)
-	
 	#startDate = "2014-01-01T03:53:31Z"
+	"""
+
+	# get startDate from Natty
+	nattyPort = "7999"
+	nattyParams = { "q" : query }
+
+	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams)) 
+
+	nattyResult = urllib2.urlopen(nattyUrl).read()
+
+	if (nattyResult):
+		nattyJson = json.loads(nattyResult)
+		if (len(nattyJson) > 0):
+			timestamp = nattyJson[0]["timestamps"][0]
+
+			startDate = datetime.fromtimestamp(timestamp)
+
+			usedText = nattyJson[0]["matchingValue"]
+			query = query.replace(usedText, '')
+
+	thumbnailBasepath = "/user_data/" + userId + "/"
 	
 	searchResults = SearchQuerySet().all()
 
 	if (startDate):
-		searchResults = searchResults.exclude(timeTaken__lte=startDate)
+		solrStartDate = startDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate)
 
 	if (endDate):
-		searchResults = searchResults.filter(timeTaken__lte=endDate)
+		searchResults = searchResults.exclude(timeTaken__gte=endDate)
+
+	#searchResults = searchResults.exclude(locationData__exact='{}')
+	#searchResults = searchResults.exclude(timeTaken = Raw("['' TO *]"))
 
 	for word in query.split():
 		try:
 			val = int(word)
 		except ValueError:
-			searchResults = searchResults.filter_or(content__contain=word)
+			searchResults = searchResults.filter(content__contain=word)
 
-	searchResults = searchResults.filter(userId=userId, )[:10]
+	searchResults = searchResults.filter(userId=userId)[:10]
 
 	response['search_result_html'] = list()
 
+	if startDate:
+		response['search_result_html'].append("Using date: " + str(startDate))
+			
 	for result in searchResults:
 		context = {	'userId': userId,
 					'photoFilename': result.photoFilename,
 					'thumbnailBasepath': thumbnailBasepath,
+					'photoId': result.photoId,
 					'result': result}
 		if result.locationData:
 			context['locationData'] = json.loads(result.locationData)
 		if result.classificationData:
 			context['classificationData'] = json.loads(result.classificationData)
+		
 
 		html = render_to_string('photos/search_result.html', context)
 		response['search_result_html'].append(html)
