@@ -153,7 +153,7 @@ static DFUploadController *defaultUploadController;
     [self.photoURLsToUpload removeObject:photo.alAssetURLString];
     
     [self saveUploadProgress];
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+    [[NSNotificationCenter defaultCenter] postMainThreadz NotificationName:DFPhotoChangedNotificationName
                                                         object:self
                                                       userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
     
