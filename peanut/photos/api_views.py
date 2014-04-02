@@ -113,6 +113,56 @@ def addPhoto(request):
 		return HttpResponse("This needs to be a POST")
 
 @csrf_exempt
+def coreSearch(request, userId, query, count):
+	response = dict()
+	response['result'] = True
+	startDate = ""
+	endDate = ""
+	queryStartDate = ""
+
+	# get startDate from Natty
+	nattyPort = "7999"
+	nattyParams = { "q" : query }
+
+	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams)) 
+
+	nattyResult = urllib2.urlopen(nattyUrl).read()
+
+	if (nattyResult):
+		nattyJson = json.loads(nattyResult)
+		if (len(nattyJson) > 0):
+			timestamp = nattyJson[0]["timestamps"][0]
+
+			startDate = datetime.fromtimestamp(timestamp)
+
+			usedText = nattyJson[0]["matchingValue"]
+			query = query.replace(usedText, '')
+	
+	searchResults = SearchQuerySet().all()
+
+	if (startDate):
+		solrStartDate = startDate.strftime("%Y-%m-%dT%H:%M:%SZ")
+		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate)
+
+	if (endDate):
+		searchResults = searchResults.exclude(timeTaken__gte=endDate)
+
+	#searchResults = searchResults.exclude(locationData__exact='{}')
+	#searchResults = searchResults.exclude(timeTaken = Raw("['' TO *]"))
+
+	for word in query.split():
+		try:
+			val = int(word)
+		except ValueError:
+			searchResults = searchResults.filter(content__contain=word)
+
+	
+	searchResults = searchResults.filter(userId=userId)[:count]
+	
+	return searchResults
+
+
+@csrf_exempt
 def search(request):
 	response = dict()
 	response['result'] = True
@@ -139,67 +189,8 @@ def search(request):
 		response['debug'] = "need query"
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
-	"""
-	Old javascript date parsing code - probably ca
-	if data.has_key('startDate'):
-		if data['startDate']:
-			queryStartDate = int(data['startDate'])
-			print queryStartDate
-			dt = datetime.fromtimestamp(queryStartDate)
-
-			response['dateInfo'] = str(dt)
-			response['startDate'] = str(startDate)
-
-			#timeTaken = "2013-01-01T00:00:00Z"
-			startDate = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-	# old python date query code. probably can be deleted after natty works
-	#cal = pdt.Calendar()
-	#(fromPdt, index) = cal.parse(query)
-	#timestamp = mktime(fromPdt)
-	#print(fromPdt)
-	#startDate = "2014-01-01T03:53:31Z"
-	"""
-
-	# get startDate from Natty
-	nattyPort = "7999"
-	nattyParams = { "q" : query }
-
-	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams)) 
-
-	nattyResult = urllib2.urlopen(nattyUrl).read()
-
-	if (nattyResult):
-		nattyJson = json.loads(nattyResult)
-		if (len(nattyJson) > 0):
-			timestamp = nattyJson[0]["timestamps"][0]
-
-			startDate = datetime.fromtimestamp(timestamp)
-
-			usedText = nattyJson[0]["matchingValue"]
-			query = query.replace(usedText, '')
-
+	searchResults = coreSearch(request, userId, query, 10)
 	thumbnailBasepath = "/user_data/" + userId + "/"
-	
-	searchResults = SearchQuerySet().all()
-
-	if (startDate):
-		solrStartDate = startDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate)
-
-	if (endDate):
-		searchResults = searchResults.exclude(timeTaken__gte=endDate)
-
-	#searchResults = searchResults.exclude(locationData__exact='{}')
-	#searchResults = searchResults.exclude(timeTaken = Raw("['' TO *]"))
-
-	for word in query.split():
-		try:
-			val = int(word)
-		except ValueError:
-			searchResults = searchResults.filter(content__contain=word)
-
-	searchResults = searchResults.filter(userId=userId)[:10]
 
 	response['search_result_html'] = list()
 
@@ -223,3 +214,4 @@ def search(request):
 
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
