@@ -8,8 +8,13 @@ http://natty.joestelmach.com
 
 
 Derek Additions:
-To build:
+
+To setup:
 mvn clean install
 
+To build:
+mvn clean compile
+
 To run:
-java -classpath antlr-3.5.2-complete-no-st3.jar:target/natty-0.8.jar com.duffy.DateParse
+mvn exec:java
+
