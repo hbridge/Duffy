@@ -94,11 +94,11 @@ def search(request, user_id=None):
 		else:
 			return HttpResponse("Please specify a query")
 
-		searchResults = api_views.coreSearch(request, user.id, query, count)
+		searchResults = api_views.coreSearch(request, user.id, query)
 
 		context = {	'user' : user,
-					'numPhotos': 5,
-					'searchResults': searchResults,
+					'count': count,
+					'searchResults': searchResults[:count],
 					'thumbnailBasepath': thumbnailBasepath}
 		return render(request, 'photos/search_webview.html', context)
 

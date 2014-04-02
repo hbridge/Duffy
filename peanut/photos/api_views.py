@@ -113,7 +113,7 @@ def addPhoto(request):
 		return HttpResponse("This needs to be a POST")
 
 @csrf_exempt
-def coreSearch(request, userId, query, count):
+def coreSearch(request, userId, query):
 	response = dict()
 	response['result'] = True
 	startDate = ""
@@ -157,7 +157,7 @@ def coreSearch(request, userId, query, count):
 			searchResults = searchResults.filter(content__contain=word)
 
 	
-	searchResults = searchResults.filter(userId=userId)[:count]
+	searchResults = searchResults.filter(userId=userId)
 	
 	return searchResults
 
