@@ -8,12 +8,14 @@
 
 #import "DFSearchViewController.h"
 #import "DFUser.h"
+#import "DFSearchDisplayController.h"
 
 @interface DFSearchViewController ()
 
 @property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
 @property (nonatomic, retain) UIBarButtonItem *loadingIndicatorItem;
 @property (nonatomic, retain) UIBarButtonItem *refreshBarButtonItem;
+@property (nonatomic, retain) DFSearchDisplayController *sdc;
 
 @end
 
@@ -37,6 +39,8 @@
         self.refreshBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                                   target:self
                                                                                   action:@selector(refreshWebView)];
+        self.sdc = [[DFSearchDisplayController alloc] initWithSearchBar:[[UISearchBar alloc] init]
+                                                     contentsController:self];
         
         
         self.tabBarItem.title = @"Search";
@@ -56,7 +60,8 @@
 
 - (NSURL *)searchViewURL
 {
-    NSString *urlString = [NSString stringWithFormat:@"http://photos.derektest1.com/search.php?userId=%@", [DFUser deviceID]];
+    NSString *phoneID = [[DFUser currentUser] deviceID];
+    NSString *urlString = [NSString stringWithFormat:@"http://asood123.no-ip.biz:7000/viz/searchwv/?phone_id=%@", phoneID];
     return [NSURL URLWithString:urlString];
 }
 
@@ -75,9 +80,20 @@
 
 - (void)refreshWebView
 {
-    [self.webView loadRequest:[NSURLRequest requestWithURL:[self searchViewURL]]];
+    [self.webView reload];
 }
 
+
+- (void)executeSearchForQuery:(NSString *)query
+{
+    NSString *baseSearchURLString = [[self searchViewURL] absoluteString];
+    NSString *queryURLString = [NSString stringWithFormat:@"%@&%@=%@",
+                                baseSearchURLString, @"q", [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURL *queryURL = [NSURL URLWithString:queryURLString];
+    
+    NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
+    [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
+}
 
 
 @end

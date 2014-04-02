@@ -72,14 +72,8 @@ NSString *DFEnabledNo = @"NO";
 {
     [super viewDidLoad];
 
-    self.deviceIDLabel.text = [DFUser deviceID];
-    
-    // set switches to correct values
-    if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFPipelineEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
-        self.pipelineEnabledSwitch.on = YES;
-    } else {
-        self.pipelineEnabledSwitch.on = NO;
-    }
+    self.deviceIDLabel.text = [[DFUser currentUser] deviceID];
+    self.userIDTextField.text = [[DFUser currentUser] userID];
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
         self.autoUploadEnabledSwitch.on = YES;
@@ -101,25 +95,34 @@ NSString *DFEnabledNo = @"NO";
 }
 
 
+- (IBAction)userIDTextFieldValueChanged:(UITextField *)sender {
+    
+}
+
+- (IBAction)userIDEditingDidEnd:(UITextField *)sender {
+    [[DFUser currentUser] setUserID:sender.text];
+}
+
+- (BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return YES;
+}
+
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField
+{
+    return YES;
+}
+
+
 - (IBAction)copyDeviceIDClicked:(UIButton *)sender {
     UIPasteboard *pb = [UIPasteboard generalPasteboard];
-    [pb setString:[DFUser deviceID]];
+    [pb setString:[[DFUser currentUser] deviceID]];
 }
 
 - (IBAction)reUploadAllClicked:(UIButton *)sender {
     DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
     [[DFUploadController sharedUploadController] uploadPhotosWithURLs:[cameraRollPhotos.photoURLSet allObjects]];
-}
-
-- (IBAction)pipelineEnabledSwitchChanged:(UISwitch *)sender {
-    if (sender.isOn) {
-        NSLog(@"Pipeline processing for new uploads now ON");
-        [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFPipelineEnabledUserDefaultKey];
-    } else {
-        NSLog(@"Pipeline processing for new uploads now OFF");
-        [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFPipelineEnabledUserDefaultKey];
-    }
-    
 }
 
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {

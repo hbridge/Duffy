@@ -12,6 +12,7 @@
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 
+- (void)executeSearchForQuery:(NSString *)query;
 
 
 @end
