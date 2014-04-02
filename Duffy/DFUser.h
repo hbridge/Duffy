@@ -10,6 +10,9 @@
 
 @interface DFUser : NSObject
 
-+ (NSString *)deviceID;
+@property (readonly, nonatomic, retain) NSString *deviceID;
+@property (nonatomic, retain) NSString *userID;
+
++ (DFUser *)currentUser;
 
 @end

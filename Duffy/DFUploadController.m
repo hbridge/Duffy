@@ -214,16 +214,16 @@ static DFUploadController *defaultUploadController;
 {
     //user id
     // if processing off, append prefix to userid
-    NSString *userID;
+    NSString *deviceID;
     if ([[[NSUserDefaults standardUserDefaults]
           valueForKey:DFPipelineEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
-        userID = [DFUser deviceID];
+        deviceID = [[DFUser currentUser] deviceID];
     } else {
-        userID = [NSString stringWithFormat:@"dnp%@", [DFUser deviceID]];
+        deviceID = [NSString stringWithFormat:@"dnp%@", [[DFUser currentUser] deviceID]];
     }
     
     NSDictionary *params = @{
-                             UserIDParameterKey: userID,
+                             UserIDParameterKey: deviceID,
                              PhotoMetadataKey: [self metadataJSONStringForPhoto:photo],
                              PhotoLocationKey: [self locationJSONStringForPhoto:photo],
                              PhotoFacesKey:    [self faceJSONStringForPhoto:photo],
