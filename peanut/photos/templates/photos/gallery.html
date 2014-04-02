@@ -1,0 +1,122 @@
+<!DOCTYPE html> 
+<html> 
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<title>Auto-categorized photo viewer</title> 
+	<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
+	<script src="http://photos.derektest1.com/js/jquery.lazyload.js"></script>
+
+	<script src="https://rawgithub.com/wanasit/chrono/master/chrono.min.js"></script>
+
+
+	<script>
+		$( document ).on( "pageinit", "#searchPhoto", function() {
+			$( "#autocomplete" ).on( "filterablebeforefilter", function ( e, data ) {
+				var $ul = $( this ),
+					$input = $( data.input ),
+					value = $input.val(),
+					html = "";
+				$ul.html( "" );
+				if ( value && value.length > 1 ) {
+					$ul.html( "<li><div class='ui-loader'><span class='ui-icon ui-icon-loading'></span></div></li>" );
+					$ul.listview( "refresh" );
+					query = $input.val();
+					console.log("sending...");
+					
+					dateInfo = chrono.parse(query);
+
+					startDate = endDate = "";
+					if (dateInfo.length > 0) {
+						startDate = new Date(dateInfo[0].startDate).getTime() / 1000;
+
+						if (dateInfo[0].endDate) {
+							endDate = dateInfo[0].endDate
+						}
+					}
+					console.log(dateInfo)
+
+					console.log("StartDate: " + startDate)
+					console.log("EndDate: " + endDate)
+
+					$.ajax({
+						//url: "http://gd.geobytes.com/AutoCompleteCity",
+						url: "/api/search",
+						dataType: "json",
+						crossDomain: true,
+						data: {
+							user_id: "{{ user.id }}",
+							q: query,
+							startDate: startDate,
+							endDate: endDate
+						}
+					})
+					.then( function ( response ) {
+						//console.log(response);
+						$.each( response['search_result_html'], function ( i, val ) {
+							html += "<li>" + val + "</li>";
+						});
+						$ul.html( html );
+						$ul.listview( "refresh" );
+						$ul.trigger( "updatelayout");
+					});
+				}
+			});
+		});
+
+		$(document).ready($(function() {
+	    	$("img.lazy").lazyload();
+		}));
+	</script>
+<style>
+	html, body { padding: 0; margin: 0; }
+	html, .ui-mobile, .ui-mobile body {
+    	height: 1035px;
+	}
+	.ui-mobile, .ui-mobile .ui-page {
+    	min-height: 1035px;
+	}
+	.ui-content{
+		padding:0px 0px 0px 0px;
+	}
+	.ui-filter-inset {
+		margin-top: 0;
+	}
+	.ui-block{
+		overflow: auto;
+	}
+	.ui-gallery {
+	padding-left: 3px;
+	padding-right: 3px;
+	float:left;
+	}
+	</style>
+</head>
+
+<body>
+	
+<div data-role="page" id="searchPhoto" style="max-height:1040px; min-height:1040px;">
+	<div role="main" class="ui-content">
+    	<div class="ui-block" data-demo-html="true" data-demo-js="true" data-demo-css="true">
+			<div id="autocomplete" class="ui-block" data-role="listview" data-inset="true" data-filter="true"
+			data-filter-placeholder="Find a photo...{{ numPhotos }} images" data-filter-theme="a"></div>
+		</div>
+		<div class="ui-block" id="allImages">
+
+			{% for photo in photos %}
+			<div class = "ui-gallery">
+	 			 <a href="{{ thumbnailBasepath }}{{ photo.new_filename }}"> 
+	 			 	<img data-original="{{ thumbnailBasepath }}{{ photo.new_filename }}" class="lazy" height="96px"></a>
+	 			 </div>
+
+			{% endfor %}
+			
+		</div>
+	</div>
+</div>
+
+</body>
+</html>
