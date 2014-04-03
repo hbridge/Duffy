@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFSearchViewController : UIViewController <UIWebViewDelegate>
+@interface DFSearchViewController : UIViewController <UIWebViewDelegate, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 

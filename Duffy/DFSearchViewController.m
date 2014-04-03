@@ -8,16 +8,26 @@
 
 #import "DFSearchViewController.h"
 #import "DFUser.h"
-#import "DFSearchDisplayController.h"
 
 @interface DFSearchViewController ()
 
 @property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
 @property (nonatomic, retain) UIBarButtonItem *loadingIndicatorItem;
 @property (nonatomic, retain) UIBarButtonItem *refreshBarButtonItem;
-@property (nonatomic, retain) DFSearchDisplayController *sdc;
+
+@property (nonatomic, retain) UISearchBar *searchBar;
+@property (nonatomic, retain) UITableView *searchResultsTableView;
+
+@property (nonatomic, retain) NSMutableDictionary *searchResultsBySectionName;
+@property (nonatomic, retain) NSMutableArray *sectionNames;
 
 @end
+
+
+static NSString *FREE_FORM_SECTION_NAME = @"Search for";
+static NSString *DATE_SECTION_NAME = @"Date";
+static NSString *LOCATION_SECTION_NAME = @"Location";
+static NSString *CATEGORY_SECTION_NAME = @"Category";
 
 static NSString *SearchBaseURL = @"http://asood123.no-ip.biz:7000/viz/search/";
 static NSString *PhoneIDURLParameter = @"phone_id";
@@ -44,8 +54,20 @@ static NSString *QueryURLParameter = @"q";
         self.refreshBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                                   target:self
                                                                                   action:@selector(refreshWebView)];
-        self.sdc = [[DFSearchDisplayController alloc] initWithSearchBar:[[UISearchBar alloc] init]
-                                                     contentsController:self];
+        // create search bar
+        self.searchBar = [[UISearchBar alloc] init];
+        self.searchBar.delegate = self;
+        self.navigationItem.titleView = self.searchBar;
+        
+        // create table view
+        self.searchResultsTableView = [[UITableView alloc] init];
+        self.searchResultsTableView.delegate = self;
+        self.searchResultsTableView.dataSource = self;
+
+        [self.searchResultsTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
+        self.sectionNames = [self defaultSectionNames];
+        self.searchResultsBySectionName = [self defaultSearchResults];
+
         
         
         self.tabBarItem.title = @"Search";
@@ -54,11 +76,34 @@ static NSString *QueryURLParameter = @"q";
     return self;
 }
 
+- (NSMutableArray *)defaultSectionNames
+{
+    return [@[DATE_SECTION_NAME, LOCATION_SECTION_NAME, CATEGORY_SECTION_NAME] mutableCopy];
+}
+
+- (NSMutableDictionary *)defaultSearchResults
+{
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+    dict[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
+    dict[LOCATION_SECTION_NAME] = @[@"New York", @"Hoover Dam", @"Croatia"];
+    dict[CATEGORY_SECTION_NAME] = @[@"red_wine", @"valley", @"cheeseburger"];
+    return dict;
+}
+
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
     [self.webView setDelegate:self];
+    self.searchResultsTableView.frame = self.webView.frame;
+    self.searchResultsTableView.hidden = YES;
+    
+    [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
+    self.automaticallyAdjustsScrollViewInsets = YES;
+    // TODO hack this should be dynamic
+    //self.searchResultsTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+
 }
 
 
@@ -92,6 +137,182 @@ static NSString *QueryURLParameter = @"q";
     NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
     [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
 }
+
+
+
+#pragma mark - Search Bar delegate and helpers
+
+- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+{
+    self.searchResultsTableView.hidden = NO;
+    self.searchBar.showsCancelButton = YES;
+}
+
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+    [self updateSearchResults:searchText];
+}
+
+- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+{
+    [self executeSearchWithSearchbarText];
+}
+
+- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+{
+    self.searchResultsTableView.hidden = YES;
+    self.searchBar.showsCancelButton = NO;
+    [self.searchBar resignFirstResponder];
+}
+
+- (void)updateSearchResults:(NSString *)query
+{
+	/*
+	 Update the filtered array based on the search text and scope.
+	 */
+    
+    NSMutableArray *sections = [self defaultSectionNames];
+    NSMutableDictionary *searchResults = [self defaultSearchResults];
+    
+    if ((query == nil) || [query length] == 0)
+    {
+        return;
+    }
+    
+    [sections insertObject:FREE_FORM_SECTION_NAME atIndex:0];
+    searchResults[FREE_FORM_SECTION_NAME] = [NSArray arrayWithObject:query];
+    
+    if ([self isDateInQuery:query]) {
+        [searchResults removeObjectForKey:DATE_SECTION_NAME];
+        [sections removeObject:DATE_SECTION_NAME];
+    }
+    if ([self isLocationInQuery:query]){
+        [searchResults removeObjectForKey:LOCATION_SECTION_NAME];
+        [sections removeObject:LOCATION_SECTION_NAME];
+    }
+    if ([self isCategoryInQuery:query]) {
+        [searchResults removeObjectForKey:CATEGORY_SECTION_NAME];
+        [sections removeObject:CATEGORY_SECTION_NAME];
+    }
+    
+    self.sectionNames = sections;
+    self.searchResultsBySectionName = searchResults;
+    
+    [self.searchResultsTableView reloadData];
+}
+
+
+- (BOOL)isDateInQuery:(NSString *)query
+{
+    for (NSString *dateString in [[self defaultSearchResults] objectForKey:DATE_SECTION_NAME])
+    {
+        if([query rangeOfString:dateString].location != NSNotFound) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)isLocationInQuery:(NSString *)query
+{
+    for (NSString *locationString in [[self defaultSearchResults] objectForKey:LOCATION_SECTION_NAME])
+    {
+        if([query rangeOfString:locationString].location != NSNotFound) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+- (BOOL)isCategoryInQuery:(NSString *)query
+{
+    for (NSString *categoryString in [[self defaultSearchResults] objectForKey:CATEGORY_SECTION_NAME])
+    {
+        if([query rangeOfString:categoryString].location != NSNotFound) {
+            return YES;
+        }
+    }
+    return NO;
+}
+
+#pragma mark - UITableView datasource and delegate
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+    return self.sectionNames.count;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+
+{
+    NSInteger countForSection = [self resultsForSectionWithIndex:section].count;
+    return countForSection;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell"];
+    cell.textLabel.text = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
+    return cell;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+    return self.sectionNames[section];
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    // TODO configure a view controller and push it
+    
+    // logging
+    //    NSDictionary *openParams = [NSDictionary dictionaryWithObjectsAndKeys:
+    //                                cocktail.cocktailName, COCKTAIL_NAME_KEY,
+    //                                [[self class] description], PARENT_VIEW_CLASS_KEY,
+    //                                eventTrigger, EVENT_TRIGGER_KEY,
+    //                                [NSString stringWithFormat:@"%d", indexPath.row], LIST_INDEX_KEY,
+    //                                self.navigationItem.title, LIST_NAME_KEY,
+    //                                nil];
+    //    [Flurry logEvent:COCKTAIL_OPENED_EVENT withParameters:openParams];
+    
+    NSString *selectionString = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
+    
+    if (![[self sectionNameForIndex:indexPath.section] isEqualToString:FREE_FORM_SECTION_NAME]) {
+        self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
+        [self updateSearchResults:self.searchBar.text];
+    } else {
+        [self executeSearchWithSearchbarText];
+    }
+}
+
+- (void)executeSearchWithSearchbarText
+{
+    [self executeSearchForQuery:self.searchBar.text];
+    
+    self.searchBar.showsCancelButton = NO;
+    self.searchResultsTableView.hidden = YES;
+    [self.searchBar resignFirstResponder];
+}
+
+
+#pragma mark - Data Accessors
+
+
+- (NSArray *)resultsForSectionWithIndex:(NSInteger)sectionIndex
+{
+    return self.searchResultsBySectionName[[self sectionNameForIndex:sectionIndex]];
+}
+
+- (NSArray *)resultsForSectionWithName:(NSString *)sectionName
+{
+    return self.searchResultsBySectionName[sectionName];
+}
+
+- (NSString *)sectionNameForIndex:(NSInteger)index
+{
+    return self.sectionNames[index];
+}
+
 
 
 @end
