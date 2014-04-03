@@ -157,7 +157,7 @@ def coreSearch(request, userId, query):
 			searchResults = searchResults.filter(content__contain=word)
 
 	
-	searchResults = searchResults.filter(userId=userId)
+	searchResults = searchResults.filter(userId=userId).order_by('timeTaken')
 	
 	return searchResults
 

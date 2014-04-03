@@ -98,6 +98,7 @@ def search(request, user_id=None):
 
 		context = {	'user' : user,
 					'count': count,
+					'size': searchResults.count(),
 					'searchResults': searchResults[:count],
 					'thumbnailBasepath': thumbnailBasepath}
 		return render(request, 'photos/search_webview.html', context)
