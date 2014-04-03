@@ -102,7 +102,7 @@ static NSString *QueryURLParameter = @"q";
     [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
     self.automaticallyAdjustsScrollViewInsets = YES;
     // TODO hack this should be dynamic
-    //self.searchResultsTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
 
 }
 
