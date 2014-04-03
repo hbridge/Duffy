@@ -4,7 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
-	<title>Auto-categorized photo viewer</title> 
+	<title>Search your photos</title> 
 	<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 	<script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
@@ -37,8 +37,8 @@
 		overflow: auto;
 	}
 	.ui-gallery {
-	padding-left: 3px;
-	padding-right: 3px;
+	padding-right: 2px;
+	height: {{imageSize|add:+2}}px;
 	float:left;
 	}
 	</style>
@@ -54,13 +54,13 @@
 
 			<div class = "ui-gallery">
 	 			 <a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
-	 			 	<img data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" height="96px"></a>
+	 			 	<img data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" height="{{ imageSize }}px"></a>
 	 			 </div>
 
 			{% endfor %}
 			
 		</div>
-		<p>Showing {{ count }} of {{ size }} results</p>
+		<p>Showing {{ count }} of {{ resultSize }} results</p>
 	</div>
 </div>
 

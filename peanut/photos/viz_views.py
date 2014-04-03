@@ -81,6 +81,11 @@ def search(request, user_id=None):
 		else:
 			count = 10
 
+		if data.has_key('imagesize'):
+			imageSize = data['imagesize']
+		else:
+			imageSize = 90;
+
 		try:
 			user = User.objects.get(phone_id=phoneId)
 		except User.DoesNotExist:
@@ -98,7 +103,8 @@ def search(request, user_id=None):
 
 		context = {	'user' : user,
 					'count': count,
-					'size': searchResults.count(),
+					'imageSize': imageSize,
+					'resultSize': searchResults.count(),
 					'searchResults': searchResults[:count],
 					'thumbnailBasepath': thumbnailBasepath}
 		return render(request, 'photos/search_webview.html', context)
