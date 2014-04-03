@@ -11,6 +11,7 @@
 @interface DFSearchViewController : UIViewController <UIWebViewDelegate, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
+@property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
 
 - (void)executeSearchForQuery:(NSString *)query;
 
