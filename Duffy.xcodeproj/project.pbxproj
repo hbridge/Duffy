@@ -29,6 +29,7 @@
 		5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */; };
 		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
 		5A8D0B4418EDC18C00A1D9A7 /* DFSearchViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4218EDC18C00A1D9A7 /* DFSearchViewController2.m */; };
+		5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -118,6 +119,7 @@
 		5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationSharedConstants.m; sourceTree = "<group>"; };
 		5A8D0B4118EDC18C00A1D9A7 /* DFSearchViewController2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController2.h; sourceTree = "<group>"; };
 		5A8D0B4218EDC18C00A1D9A7 /* DFSearchViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController2.m; sourceTree = "<group>"; };
+		5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchViewController.xib; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -262,6 +264,7 @@
 				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
 				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
 				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
+				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
 				5A8D0B4118EDC18C00A1D9A7 /* DFSearchViewController2.h */,
 				5A8D0B4218EDC18C00A1D9A7 /* DFSearchViewController2.m */,
 				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
@@ -502,6 +505,7 @@
 				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
 				5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
+				5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */,
 				5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
