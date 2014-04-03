@@ -16,7 +16,6 @@
 @property (nonatomic, retain) UIBarButtonItem *refreshBarButtonItem;
 
 @property (nonatomic, retain) UISearchBar *searchBar;
-@property (nonatomic, retain) UITableView *searchResultsTableView;
 
 @property (nonatomic, retain) NSMutableDictionary *searchResultsBySectionName;
 @property (nonatomic, retain) NSMutableArray *sectionNames;
@@ -42,38 +41,49 @@ static NSString *QueryURLParameter = @"q";
     if (self) {
         self.navigationItem.title = @"Search";
         
-        // create loading indicator
-        self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-        self.loadingIndicator.hidesWhenStopped = YES;
-        [self.loadingIndicator startAnimating];
-        self.loadingIndicatorItem = [[UIBarButtonItem alloc]
-                                     initWithCustomView:self.loadingIndicator];
-        self.navigationItem.rightBarButtonItem = self.loadingIndicatorItem;
-        
-        // create reload button
-        self.refreshBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                                  target:self
-                                                                                  action:@selector(refreshWebView)];
-        // create search bar
-        self.searchBar = [[UISearchBar alloc] init];
-        self.searchBar.delegate = self;
-        self.navigationItem.titleView = self.searchBar;
-        
-        // create table view
-        self.searchResultsTableView = [[UITableView alloc] init];
-        self.searchResultsTableView.delegate = self;
-        self.searchResultsTableView.dataSource = self;
-
-        [self.searchResultsTableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"UITableViewCell"];
-        self.sectionNames = [self defaultSectionNames];
-        self.searchResultsBySectionName = [self defaultSearchResults];
-
-        
-        
         self.tabBarItem.title = @"Search";
         self.tabBarItem.image = [UIImage imageNamed:@"Search"];
+        
+        [self setupNavBar];
+        [self registerForKeyboardNotifications];
     }
     return self;
+}
+
+
+- (void)setupNavBar
+{
+    // create loading indicator
+    self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    self.loadingIndicator.hidesWhenStopped = YES;
+    self.loadingIndicatorItem = [[UIBarButtonItem alloc]
+                                 initWithCustomView:self.loadingIndicator];
+    self.navigationItem.rightBarButtonItem = self.loadingIndicatorItem;
+    
+    // create reload button
+    self.refreshBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                              target:self
+                                                                              action:@selector(refreshWebView)];
+    // create search bar
+    self.searchBar = [[UISearchBar alloc] init];
+    self.searchBar.delegate = self;
+    self.searchBar.placeholder = @"Search";
+    
+    self.navigationItem.titleView = self.searchBar;
+}
+
+- (void)setupTableView
+{
+    [self.searchResultsTableView registerClass:[UITableViewCell class]
+                        forCellReuseIdentifier:@"UITableViewCell"];
+    
+    [self updateSearchResults:nil];
+}
+
+- (void)registerForKeyboardNotifications
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
 }
 
 - (NSMutableArray *)defaultSectionNames
@@ -95,6 +105,7 @@ static NSString *QueryURLParameter = @"q";
 {
     [super viewDidLoad];
 
+    [self setupTableView];
     [self.webView setDelegate:self];
     self.searchResultsTableView.frame = self.webView.frame;
     self.searchResultsTableView.hidden = YES;
@@ -174,13 +185,11 @@ static NSString *QueryURLParameter = @"q";
     NSMutableArray *sections = [self defaultSectionNames];
     NSMutableDictionary *searchResults = [self defaultSearchResults];
     
-    if ((query == nil) || [query length] == 0)
+    if ([query length] > 0)
     {
-        return;
+        [sections insertObject:FREE_FORM_SECTION_NAME atIndex:0];
+        searchResults[FREE_FORM_SECTION_NAME] = [NSArray arrayWithObject:query];
     }
-    
-    [sections insertObject:FREE_FORM_SECTION_NAME atIndex:0];
-    searchResults[FREE_FORM_SECTION_NAME] = [NSArray arrayWithObject:query];
     
     if ([self isDateInQuery:query]) {
         [searchResults removeObjectForKey:DATE_SECTION_NAME];
@@ -204,6 +213,7 @@ static NSString *QueryURLParameter = @"q";
 
 - (BOOL)isDateInQuery:(NSString *)query
 {
+    if (query == nil) return NO;
     for (NSString *dateString in [[self defaultSearchResults] objectForKey:DATE_SECTION_NAME])
     {
         if([query rangeOfString:dateString].location != NSNotFound) {
@@ -215,6 +225,7 @@ static NSString *QueryURLParameter = @"q";
 
 - (BOOL)isLocationInQuery:(NSString *)query
 {
+    if (query == nil) return NO;
     for (NSString *locationString in [[self defaultSearchResults] objectForKey:LOCATION_SECTION_NAME])
     {
         if([query rangeOfString:locationString].location != NSNotFound) {
@@ -226,6 +237,7 @@ static NSString *QueryURLParameter = @"q";
 
 - (BOOL)isCategoryInQuery:(NSString *)query
 {
+    if (query == nil) return NO;
     for (NSString *categoryString in [[self defaultSearchResults] objectForKey:CATEGORY_SECTION_NAME])
     {
         if([query rangeOfString:categoryString].location != NSNotFound) {
@@ -313,6 +325,20 @@ static NSString *QueryURLParameter = @"q";
     return self.sectionNames[index];
 }
 
+
+#pragma mark - Keyboard handlers
+
+- (void)keyboardWillShow:(NSNotification *)notification {
+    CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
+                                                   self.searchResultsTableView.frame.origin.x,
+                                                   self.searchResultsTableView.frame.size.width,
+                                                   toRect.origin.y);
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+    
+}
 
 
 @end
