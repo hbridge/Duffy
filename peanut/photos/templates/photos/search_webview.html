@@ -16,6 +16,11 @@
 	<script>
 
 		$(document).ready($(function() {
+			$('img').each(function(){
+				oldName = $(this).attr('fname').split(".");
+				newName = oldName[0]+"-thumb-{{ imageSize|add:imageSize }}.jpg"
+				$(this).attr('data-original', $(this).attr('path') + newName);
+			});
 	    	$("img.lazy").lazyload();
 		}));
 	</script>
@@ -38,7 +43,7 @@
 	}
 	.ui-gallery {
 		padding-right: 2px;
-		height: {{imageSize|add:+2}}px;
+		/*height: {{imageSize|add:+2}}px;*/
 		float:left;
 	}
 	</style>
@@ -54,7 +59,7 @@
 
 			<div class = "ui-gallery">
 	 			 <a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
-	 			 	<img data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" width="{{ imageSize }}px"></a>
+	 			 	<img path="{{ thumbnailBasepath }}" fname="{{ result.photoFilename }}" data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" width="{{ imageSize }}px"></a>
 	 			 </div>
 
 			{% endfor %}

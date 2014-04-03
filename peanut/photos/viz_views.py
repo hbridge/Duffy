@@ -11,7 +11,7 @@ import json
 from collections import OrderedDict
 
 from photos.models import Photo, User, Classification
-from photos import api_views
+from photos import api_views, thumbnails
 
 def groups(request, user_id):
 	try:
@@ -77,12 +77,12 @@ def search(request, user_id=None):
 			return HttpResponse("Please specify a phoneId")
 
 		if data.has_key('count'):
-			count = data['count']
+			count = int(data['count'])
 		else:
 			count = 10
 
 		if data.has_key('imagesize'):
-			imageSize = data['imagesize']
+			imageSize = int(data['imagesize'])
 		else:
 			imageSize = 90;
 
@@ -100,6 +100,11 @@ def search(request, user_id=None):
 			return HttpResponse("Please specify a query")
 
 		searchResults = api_views.coreSearch(request, user.id, query)
+		width = imageSize*2 #doubled  for retina
+
+		for result in searchResults:
+			thumbnails.imageThumbnail(result.photoFilename, width, user.id)
+
 
 		context = {	'user' : user,
 					'count': count,
