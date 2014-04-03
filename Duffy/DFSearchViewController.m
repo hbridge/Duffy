@@ -28,6 +28,7 @@ static NSString *DATE_SECTION_NAME = @"Date";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Category";
 
+static NSString *GroupsBaseURL = @"http://asood123.no-ip.biz:7000/viz/groups/";
 static NSString *SearchBaseURL = @"http://asood123.no-ip.biz:7000/viz/search/";
 static NSString *PhoneIDURLParameter = @"phone_id";
 static NSString *QueryURLParameter = @"q";
@@ -82,8 +83,14 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)registerForKeyboardNotifications
 {
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidShow:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidHide:)
+                                                 name:UIKeyboardDidHideNotification
+                                               object:nil];
 }
 
 - (NSMutableArray *)defaultSectionNames
@@ -117,6 +124,20 @@ static NSString *QueryURLParameter = @"q";
 
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    if ([[DFUser currentUser] userID]) {
+        [self loadImageCategoriesForUser:[[DFUser currentUser] userID]];
+    }
+}
+
+- (void)loadImageCategoriesForUser:(NSString *)userID
+{
+    NSString *urlString = [NSString stringWithFormat:@"%@%@", GroupsBaseURL, userID];
+    NSURL *url = [NSURL URLWithString:urlString];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    [self.webView loadRequest:request];
+}
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
@@ -328,7 +349,7 @@ static NSString *QueryURLParameter = @"q";
 
 #pragma mark - Keyboard handlers
 
-- (void)keyboardWillShow:(NSNotification *)notification {
+- (void)keyboardDidShow:(NSNotification *)notification {
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
                                                    self.searchResultsTableView.frame.origin.x,
@@ -336,9 +357,12 @@ static NSString *QueryURLParameter = @"q";
                                                    toRect.origin.y);
 }
 
-- (void)keyboardWillHide:(NSNotification *)notification {
-    
+- (void)keyboardDidHide:(NSNotification *)notification {
+    CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
+                                                   self.searchResultsTableView.frame.origin.x,
+                                                   self.searchResultsTableView.frame.size.width,
+                                                   toRect.origin.y);
 }
-
 
 @end
