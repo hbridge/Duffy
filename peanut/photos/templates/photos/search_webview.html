@@ -37,9 +37,9 @@
 		overflow: auto;
 	}
 	.ui-gallery {
-	padding-right: 2px;
-	height: {{imageSize|add:+2}}px;
-	float:left;
+		padding-right: 2px;
+		height: {{imageSize|add:+2}}px;
+		float:left;
 	}
 	</style>
 </head>
@@ -54,7 +54,7 @@
 
 			<div class = "ui-gallery">
 	 			 <a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
-	 			 	<img data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" height="{{ imageSize }}px"></a>
+	 			 	<img data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" width="{{ imageSize }}px"></a>
 	 			 </div>
 
 			{% endfor %}

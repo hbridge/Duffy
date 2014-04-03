@@ -14,7 +14,8 @@ import parsedatetime as pdt
 import urllib2
 import urllib
 
-import os
+import os, sys
+import Image
 from time import mktime
 from datetime import datetime
 import json
