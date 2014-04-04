@@ -99,8 +99,6 @@ static NSString *QueryURLParameter = @"q";
 
     [self setupTableView];
     [self.webView setDelegate:self];
-    self.searchResultsTableView.frame = self.webView.frame;
-    self.searchResultsTableView.hidden = YES;
     
     [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
     self.automaticallyAdjustsScrollViewInsets = YES;
@@ -112,7 +110,7 @@ static NSString *QueryURLParameter = @"q";
 - (void)viewDidAppear:(BOOL)animated
 {
     if ([self isMovingToParentViewController] && [[DFUser currentUser] userID]) {
-        [self.searchBar becomeFirstResponder];
+        
     }
 }
 
@@ -320,7 +318,8 @@ static NSString *QueryURLParameter = @"q";
     NSString *selectionString = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
     
     if (![[self sectionNameForIndex:indexPath.section] isEqualToString:FREE_FORM_SECTION_NAME]) {
-        self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
+        if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
+            self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
         [self updateSearchResults:self.searchBar.text];
     } else {
         [self executeSearchForQuery:self.searchBar.text];
