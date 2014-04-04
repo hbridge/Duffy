@@ -349,6 +349,7 @@ static CGFloat SearchResultsCellFontSize = 15;
         [self updateSearchResults:self.searchBar.text];
     } else {
         [self executeSearchForQuery:self.searchBar.text];
+        [self updateUIForSearchBarHasFocus:NO];
     }
 }
 
