@@ -24,7 +24,7 @@
                     <constraints>
                         <constraint firstAttribute="width" constant="256" id="nbc-Ks-KI0"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>

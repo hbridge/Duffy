@@ -20,11 +20,12 @@
 
 @end
 
-
 static NSString *FREE_FORM_SECTION_NAME = @"Search";
 static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Subject";
+
+static NSString *SEARCH_PLACEHOLDER = @"Search for time, location or things";
 
 static NSDictionary *SectionNameToTitles;
 
@@ -45,7 +46,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     SectionNameToTitles = @{FREE_FORM_SECTION_NAME: @"Search for",
                             DATE_SECTION_NAME: @"Time",
                             LOCATION_SECTION_NAME: @"Location",
-                            CATEGORY_SECTION_NAME: @"Subject"
+                            CATEGORY_SECTION_NAME: @"Things"
                             };
 }
 
@@ -70,7 +71,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     // create search bar
     self.searchBar = [[UISearchBar alloc] init];
     self.searchBar.delegate = self;
-    self.searchBar.placeholder = @"Time, location or subject";
+    self.searchBar.placeholder = SEARCH_PLACEHOLDER;
     self.navigationItem.titleView = self.searchBar;
 }
 
