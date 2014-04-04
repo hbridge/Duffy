@@ -15,7 +15,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <webView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="zKo-kM-kyk">
+                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zKo-kM-kyk">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -25,6 +25,12 @@
                 </webView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="zKo-kM-kyk" secondAttribute="trailing" id="1RI-ZQ-jpj"/>
+                <constraint firstItem="zKo-kM-kyk" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="CLb-A2-MmQ"/>
+                <constraint firstItem="zKo-kM-kyk" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="SHd-8K-PAu"/>
+                <constraint firstAttribute="bottom" secondItem="zKo-kM-kyk" secondAttribute="bottom" id="iGv-QF-P6r"/>
+            </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
