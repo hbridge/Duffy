@@ -12,10 +12,6 @@
 
 @interface DFSearchViewController ()
 
-@property (nonatomic, retain) UIActivityIndicatorView *loadingIndicator;
-@property (nonatomic, retain) UIBarButtonItem *loadingIndicatorItem;
-@property (nonatomic, retain) UIBarButtonItem *refreshBarButtonItem;
-
 @property (nonatomic, retain) UISearchBar *searchBar;
 
 @property (nonatomic, retain) NSMutableDictionary *searchResultsBySectionName;
@@ -25,7 +21,7 @@
 
 
 static NSString *FREE_FORM_SECTION_NAME = @"Search for";
-static NSString *DATE_SECTION_NAME = @"Date";
+static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Category";
 
@@ -55,22 +51,10 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)setupNavBar
 {
-    // create loading indicator
-    self.loadingIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    self.loadingIndicator.hidesWhenStopped = YES;
-    self.loadingIndicatorItem = [[UIBarButtonItem alloc]
-                                 initWithCustomView:self.loadingIndicator];
-    self.navigationItem.rightBarButtonItem = self.loadingIndicatorItem;
-    
-    // create reload button
-    self.refreshBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                              target:self
-                                                                              action:@selector(refreshWebView)];
     // create search bar
     self.searchBar = [[UISearchBar alloc] init];
     self.searchBar.delegate = self;
-    self.searchBar.placeholder = @"Search";
-    
+    self.searchBar.placeholder = @"Time, location or subject";
     self.navigationItem.titleView = self.searchBar;
 }
 
@@ -128,7 +112,7 @@ static NSString *QueryURLParameter = @"q";
 - (void)viewDidAppear:(BOOL)animated
 {
     if ([self isMovingToParentViewController] && [[DFUser currentUser] userID]) {
-        [self loadImageCategoriesForUser:[[DFUser currentUser] userID]];
+        [self.searchBar becomeFirstResponder];
     }
 }
 
@@ -143,7 +127,6 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)executeSearchForQuery:(NSString *)query
 {
-    
     NSString *queryURLString = [NSString stringWithFormat:@"%@?%@=%@&%@=%@",
                                 SearchBaseURL,
                                 PhoneIDURLParameter, [[DFUser currentUser] deviceID],
@@ -169,22 +152,13 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
-    self.navigationItem.rightBarButtonItem = self.loadingIndicatorItem;
-    [self.loadingIndicator startAnimating];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
-    [self.loadingIndicator stopAnimating];
-    self.navigationItem.rightBarButtonItem = self.refreshBarButtonItem;
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
 }
-
-- (void)refreshWebView
-{
-    [self.webView reload];
-}
-
-
 
 - (void)pushPhotoWebView:(NSString *)photoURLString
 {
@@ -198,8 +172,7 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
 {
-    self.searchResultsTableView.hidden = NO;
-    self.searchBar.showsCancelButton = YES;
+    [self updateUIForSearchBarHasFocus:YES];
 }
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
@@ -209,14 +182,28 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
-    [self executeSearchWithSearchbarText];
+    [self executeSearchForQuery:self.searchBar.text];
+    [self updateUIForSearchBarHasFocus:NO];
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
 {
-    self.searchResultsTableView.hidden = YES;
-    self.searchBar.showsCancelButton = NO;
-    [self.searchBar resignFirstResponder];
+    [self updateUIForSearchBarHasFocus:NO];
+}
+
+- (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+{
+    if (searchBarHasFocus) {
+        self.searchResultsTableView.hidden = NO;
+        [self.searchBar setShowsCancelButton:YES animated:YES];
+        self.navigationItem.rightBarButtonItem = nil;
+        
+    } else {
+
+        [self.searchBar setShowsCancelButton:NO animated:YES];
+        self.searchResultsTableView.hidden = YES;
+        [self.searchBar resignFirstResponder];
+    }
 }
 
 - (void)updateSearchResults:(NSString *)query
@@ -336,19 +323,9 @@ static NSString *QueryURLParameter = @"q";
         self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
         [self updateSearchResults:self.searchBar.text];
     } else {
-        [self executeSearchWithSearchbarText];
+        [self executeSearchForQuery:self.searchBar.text];
     }
 }
-
-- (void)executeSearchWithSearchbarText
-{
-    [self executeSearchForQuery:self.searchBar.text];
-    
-    self.searchBar.showsCancelButton = NO;
-    self.searchResultsTableView.hidden = YES;
-    [self.searchBar resignFirstResponder];
-}
-
 
 #pragma mark - Data Accessors
 
