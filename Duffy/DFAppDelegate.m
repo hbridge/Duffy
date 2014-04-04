@@ -41,8 +41,8 @@
     
     UITabBarController *tabController = [[UITabBarController alloc] init];
     [tabController setViewControllers:[NSArray arrayWithObjects:
-                                       cameraRollNav,
                                        searchViewNav,
+                                       cameraRollNav,
                                        settingsNav,
                                        nil]];
     
