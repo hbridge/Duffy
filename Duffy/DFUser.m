@@ -13,6 +13,7 @@
 
 
 static NSString *DFUserIDUserDefaultsKey = @"com.duffysoft.DFUserIDUserDefaultsKey";
+static NSString *DFOverrideDeviceIDUserDefaultsKey = @"com.duffysoft.DFOverrideDeviceIDUserDefaultsKey";
 
 static DFUser *currentUser;
 
@@ -29,10 +30,33 @@ static DFUser *currentUser;
     return [self currentUser];
 }
 
+
+
 - (NSString *)deviceID
+{
+    NSString *userSetDeviceID = [self userOverriddenDeviceID];
+    if (userSetDeviceID) return userSetDeviceID;
+    
+    return self.hardwareDeviceID;
+}
+
+- (NSString *)hardwareDeviceID
 {
     NSUUID *oNSUUID = [[ASIdentifierManager sharedManager] advertisingIdentifier];
     return [oNSUUID UUIDString];
+}
+
+- (NSString *)userOverriddenDeviceID
+{
+     NSString *userSetDeviceID = [[NSUserDefaults standardUserDefaults] valueForKey:DFOverrideDeviceIDUserDefaultsKey];
+    if (!userSetDeviceID || [userSetDeviceID isEqualToString:@""]) return nil;
+    
+    return userSetDeviceID;
+}
+
+- (void)setUserOverriddenDeviceID:(NSString *)userOverriddenDeviceID
+{
+    [[NSUserDefaults standardUserDefaults] setObject:userOverriddenDeviceID forKey:DFOverrideDeviceIDUserDefaultsKey];
 }
 
 - (NSString *)userID

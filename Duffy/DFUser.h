@@ -11,6 +11,8 @@
 @interface DFUser : NSObject
 
 @property (readonly, nonatomic, retain) NSString *deviceID;
+@property (readonly, nonatomic, retain) NSString *hardwareDeviceID;
+@property (nonatomic, retain) NSString *userOverriddenDeviceID;
 @property (nonatomic, retain) NSString *userID;
 
 + (DFUser *)currentUser;

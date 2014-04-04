@@ -19,6 +19,8 @@
 
 @implementation DFSettingsViewController
 
+
+// Network default keys
 NSString *DFPipelineEnabledUserDefaultKey = @"DFPipelineEnabledUserDefaultKey";
 NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
 NSString *DFEnabledYes = @"YES";
@@ -72,7 +74,9 @@ NSString *DFEnabledNo = @"NO";
 {
     [super viewDidLoad];
 
-    self.deviceIDLabel.text = [[DFUser currentUser] deviceID];
+    self.deviceIDLabel.text = [[DFUser currentUser] hardwareDeviceID];
+    self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
+    self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
     self.userIDTextField.text = [[DFUser currentUser] userID];
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
@@ -94,10 +98,10 @@ NSString *DFEnabledNo = @"NO";
     return self.rowLabels.count;
 }
 
-
-- (IBAction)userIDTextFieldValueChanged:(UITextField *)sender {
-    
+- (IBAction)deviceIDEditingDidEnd:(UITextField *)sender {
+    [[DFUser currentUser] setUserOverriddenDeviceID:sender.text];
 }
+
 
 - (IBAction)userIDEditingDidEnd:(UITextField *)sender {
     [[DFUser currentUser] setUserID:sender.text];
@@ -119,6 +123,8 @@ NSString *DFEnabledNo = @"NO";
     UIPasteboard *pb = [UIPasteboard generalPasteboard];
     [pb setString:[[DFUser currentUser] deviceID]];
 }
+
+
 
 - (IBAction)reUploadAllClicked:(UIButton *)sender {
     DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
@@ -148,4 +154,6 @@ NSString *DFEnabledNo = @"NO";
 
 
 
+- (IBAction)serverURLEditingDidEnd:(UITextField *)sender {
+}
 @end
