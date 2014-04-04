@@ -9,6 +9,7 @@
 #import "DFSearchViewController.h"
 #import "DFUser.h"
 #import "DFPhotoWebViewController.h"
+#import "DFTableHeaderView.h"
 
 @interface DFSearchViewController ()
 
@@ -20,10 +21,12 @@
 @end
 
 
-static NSString *FREE_FORM_SECTION_NAME = @"Search for";
+static NSString *FREE_FORM_SECTION_NAME = @"Search";
 static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
-static NSString *CATEGORY_SECTION_NAME = @"Category";
+static NSString *CATEGORY_SECTION_NAME = @"Subject";
+
+static NSDictionary *SectionNameToTitles;
 
 static NSString *GroupsBaseURL = @"http://asood123.no-ip.biz:7000/viz/groups/";
 static NSString *SearchBaseURL = @"http://asood123.no-ip.biz:7000/viz/search/";
@@ -31,7 +34,20 @@ static NSString *PhoneIDURLParameter = @"phone_id";
 static NSString *QueryURLParameter = @"q";
 
 
+static CGFloat SearchResultsRowHeight = 38;
+static CGFloat SearchResultsCellFontSize = 15;
+
+
 @implementation DFSearchViewController
+
++ (void)initialize
+{
+    SectionNameToTitles = @{FREE_FORM_SECTION_NAME: @"Search for",
+                            DATE_SECTION_NAME: @"Time",
+                            LOCATION_SECTION_NAME: @"Location",
+                            CATEGORY_SECTION_NAME: @"Subject"
+                            };
+}
 
 - (id)init
 {
@@ -60,6 +76,7 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)setupTableView
 {
+    self.searchResultsTableView.rowHeight = SearchResultsRowHeight;
     [self.searchResultsTableView registerClass:[UITableViewCell class]
                         forCellReuseIdentifier:@"UITableViewCell"];
     
@@ -293,12 +310,21 @@ static NSString *QueryURLParameter = @"q";
 {
     UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell"];
     cell.textLabel.text = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
+    cell.textLabel.font = [cell.textLabel.font fontWithSize:SearchResultsCellFontSize];
     return cell;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-    return self.sectionNames[section];
+    DFTableHeaderView *view = [[[UINib nibWithNibName:@"DFTableHeaderView" bundle:nil] instantiateWithOwner:self options:nil] firstObject];
+    
+    NSString *sectionName = self.sectionNames[section];
+    view.textLabel.text = SectionNameToTitles[sectionName];
+    
+    NSString *imageName = [NSString stringWithFormat:@"%@%@", self.sectionNames[section], @"SectionHeader"];
+    view.imageView.image = [UIImage imageNamed:imageName];
+    
+    return view;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
