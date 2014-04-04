@@ -157,7 +157,6 @@ def coreSearch(request, userId, query):
 		except ValueError:
 			searchResults = searchResults.filter(content__contain=word)
 
-	
 	searchResults = searchResults.filter(userId=userId).order_by('timeTaken')
 	
 	return searchResults

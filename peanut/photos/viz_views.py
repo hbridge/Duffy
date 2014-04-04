@@ -79,7 +79,12 @@ def search(request, user_id=None):
 		if data.has_key('count'):
 			count = int(data['count'])
 		else:
-			count = 50
+			count = 48
+
+		if data.has_key('page'):
+			page = int(data['page'])
+		else:
+			page = 1
 
 		if data.has_key('imagesize'):
 			imageSize = int(data['imagesize'])
@@ -103,15 +108,37 @@ def search(request, user_id=None):
 		searchResults = api_views.coreSearch(request, user.id, query)
 		width = imageSize*2 #doubled  for retina
 
+		allResults = searchResults.count()
+		searchResults = searchResults[((page-1)*count):(count*page)]
+
 		for result in searchResults:
 			thumbnails.imageThumbnail(result.photoFilename, width, user.id)
 
+		start = ((page-1)*count)+1
+		if (allResults > count*page):
+			end = count*page
+			next = True
+		else:
+			end = allResults
+			next = False
+
+		if (start > 1):
+			previous = True
+		else:
+			previous = False
+
 
 		context = {	'user' : user,
-					'count': count,
 					'imageSize': imageSize,
-					'resultSize': searchResults.count(),
-					'searchResults': searchResults[:count],
+					'start': start,
+					'end': end,
+					'resultSize': allResults,
+					'next': next,
+					'previous': previous,
+					'searchResults': searchResults,
+					'query': query,
+					'page': page,
+					'phoneId': phoneId,
 					'thumbnailBasepath': thumbnailBasepath}
 		return render(request, 'photos/search_webview.html', context)
 

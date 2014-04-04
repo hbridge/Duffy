@@ -27,10 +27,8 @@
 <style>
 	html, body { padding: 0; margin: 0; }
 	html, .ui-mobile, .ui-mobile body {
-    	height: 1035px;
 	}
 	.ui-mobile, .ui-mobile .ui-page {
-    	min-height: 1035px;
 	}
 	.ui-content{
 		padding:0px 0px 0px 0px;
@@ -46,12 +44,44 @@
 		height: {{ imageSize|add:+2 }}px;
 		float:left;
 	}
+	.result-bottom, .prev-next {
+		text-align: center;
+	}
+	.text, .prev-next {
+		font-family: arial;
+	}
+	.prev-next {
+		width: 100%;
+		padding-bottom: 10px;
+	}
+	.prev {
+		border-right: 1px solid #000000;
+		padding-right: 6px;
+		width: 49%;
+		float:left;
+		text-align: right;
+	}
+	.next {
+		padding-left: 6px;
+		text-align: left;
+		overflow: hidden;
+	}
+	a:link{
+		text-decoration: none;
+		font-weight: bold;
+		color: #0000FF;
+	}
+	a.visited {
+		text-decoration: none;
+		font-weight: bold;
+		color: #0000FF;	
+	}
 	</style>
 </head>
 
 <body>
 
-<div data-role="page" id="searchPhoto" style="max-height:1040px; min-height:1040px;">
+<div data-role="page" id="searchPhoto">
 	<div role="main" class="ui-content">
 		<div class="ui-block" id="allImages">
 
@@ -66,7 +96,31 @@
 			{% endfor %}
 			
 		</div>
-		<p>Showing {{ count }} of {{ resultSize }} results</p>
+		<div class="result-bottom"> 
+			{% if resultSize > 0 %}
+				<p class="text">Showing {{ start }} - {{ end }} of {{ resultSize }} photos</p>
+				<div class="prev-next">
+					<div class="prev">
+						{% if previous %}
+							<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:-1 }}">Previous</a>
+						{% elif next %}
+							Previous
+						{% else %}
+						{% endif %}
+					</div><div class="next">
+						{% if next %}
+							<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:1 }}">Next</a>
+						{% elif previous %}
+							Next
+						{% else %}
+						{% endif %}
+					</div>
+				</div>
+			{% else %}
+				<p class="text"> No results found! </p>
+			{% endif %}
+		</div>
+
 	</div>
 </div>
 
