@@ -5,12 +5,12 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<title>Search your photos</title> 
-	<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />
+	<!--<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />-->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+	<!--
 	<script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
 	<script src="http://photos.derektest1.com/js/jquery.lazyload.js"></script>
-
-	<script src="https://rawgithub.com/wanasit/chrono/master/chrono.min.js"></script>
+	-->
 
 
 	<script>
@@ -19,9 +19,9 @@
 			$('img').each(function(){
 				oldName = $(this).attr('fname').split(".");
 				newName = oldName[0]+"-thumb-{{ imageSize|add:imageSize }}.jpg"
-				$(this).attr('data-original', $(this).attr('path') + newName);
+				$(this).attr('src', $(this).attr('path') + newName);
 			});
-	    	$("img.lazy").lazyload();
+	    	//$("img.lazy").lazyload();
 		}));
 	</script>
 <style>
@@ -43,7 +43,7 @@
 	}
 	.ui-gallery {
 		padding-right: 2px;
-		/*height: {{imageSize|add:+2}}px;*/
+		height: {{ imageSize|add:+2 }}px;
 		float:left;
 	}
 	</style>
@@ -58,9 +58,10 @@
 			{% for result in searchResults %}
 
 			<div class = "ui-gallery">
-	 			 <a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
+				<a href="{{ thumbnailBasepath }}{{ result.photoFilename }}" rel="external"> 
+				<!--<a href="/viz/serve_image?photo={{ result.photoFilename }}" rel="external"> -->
 	 			 	<img path="{{ thumbnailBasepath }}" fname="{{ result.photoFilename }}" data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" width="{{ imageSize }}px"></a>
-	 			 </div>
+	 		</div>
 
 			{% endfor %}
 			

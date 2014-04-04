@@ -79,12 +79,12 @@ def search(request, user_id=None):
 		if data.has_key('count'):
 			count = int(data['count'])
 		else:
-			count = 10
+			count = 50
 
 		if data.has_key('imagesize'):
 			imageSize = int(data['imagesize'])
 		else:
-			imageSize = 90;
+			imageSize = 78;
 
 		try:
 			user = User.objects.get(phone_id=phoneId)
@@ -99,6 +99,7 @@ def search(request, user_id=None):
 		else:
 			return HttpResponse("Please specify a query")
 
+		setSession(request, user.id)
 		searchResults = api_views.coreSearch(request, user.id, query)
 		width = imageSize*2 #doubled  for retina
 
@@ -134,4 +135,35 @@ def gallery(request, user_id):
 				'photos': photos,
 				'thumbnailBasepath': thumbnailBasepath}
 	return render(request, 'photos/gallery.html', context)
+
+
+
+def serveImage(request):
+
+	if (request.session['userid']):
+		userId = request.session['userid']
+	else:
+		return HttpResponse("Missing user id data")
+
+	if request.method == 'GET':
+		data = request.GET
+	elif request.method == 'POST':
+		data = request.POST
+
+	if data.has_key('photo'):
+		photo = data['photo']
+	else:
+		return HttpResponse("Please specify a photo")
+
+
+	thumbnailBasepath = "/user_data/" + str(userId) + "/"
+
+	context = {	'photo': photo,
+				'thumbnailBasepath': thumbnailBasepath}
+	return render(request, 'photos/serve_image.html', context)
+
+# Helper functions
+
+def setSession(request, userId):
+	request.session['userid'] = userId
 
