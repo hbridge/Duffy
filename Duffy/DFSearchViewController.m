@@ -8,6 +8,7 @@
 
 #import "DFSearchViewController.h"
 #import "DFUser.h"
+#import "DFPhotoWebViewController.h"
 
 @interface DFSearchViewController ()
 
@@ -126,7 +127,7 @@ static NSString *QueryURLParameter = @"q";
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    if ([[DFUser currentUser] userID]) {
+    if ([self isMovingToParentViewController] && [[DFUser currentUser] userID]) {
         [self loadImageCategoriesForUser:[[DFUser currentUser] userID]];
     }
 }
@@ -137,6 +138,33 @@ static NSString *QueryURLParameter = @"q";
     NSURL *url = [NSURL URLWithString:urlString];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [self.webView loadRequest:request];
+}
+
+
+- (void)executeSearchForQuery:(NSString *)query
+{
+    
+    NSString *queryURLString = [NSString stringWithFormat:@"%@?%@=%@&%@=%@",
+                                SearchBaseURL,
+                                PhoneIDURLParameter, [[DFUser currentUser] deviceID],
+                                QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURL *queryURL = [NSURL URLWithString:queryURLString];
+    
+    NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
+    [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
+}
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
+{
+    NSString *requestURLString = request.URL.absoluteString;
+    if ([requestURLString rangeOfString:@"user_data"].location != NSNotFound) {
+        [webView stopLoading];
+        NSLog(@"intercepted load of full photo: %@", requestURLString);
+        [self pushPhotoWebView:requestURLString];
+        return NO;
+    }
+    
+    return YES;
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
@@ -157,19 +185,13 @@ static NSString *QueryURLParameter = @"q";
 }
 
 
-- (void)executeSearchForQuery:(NSString *)query
-{
-   
-    NSString *queryURLString = [NSString stringWithFormat:@"%@?%@=%@&%@=%@",
-                                SearchBaseURL,
-                                PhoneIDURLParameter, [[DFUser currentUser] deviceID],
-                                QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    NSURL *queryURL = [NSURL URLWithString:queryURLString];
-    
-    NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
-    [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
-}
 
+- (void)pushPhotoWebView:(NSString *)photoURLString
+{
+    NSURL *photoURL = [NSURL URLWithString:photoURLString];
+    DFPhotoWebViewController *pvc = [[DFPhotoWebViewController alloc] initWithPhotoURL:photoURL];
+    [self.navigationController pushViewController:pvc animated:YES];
+}
 
 
 #pragma mark - Search Bar delegate and helpers

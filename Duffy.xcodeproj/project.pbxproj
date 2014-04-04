@@ -30,6 +30,8 @@
 		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
 		5A8D0B4418EDC18C00A1D9A7 /* DFSearchViewController2.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4218EDC18C00A1D9A7 /* DFSearchViewController2.m */; };
 		5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */; };
+		5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4918EF174F00A1D9A7 /* DFPhotoWebViewController.m */; };
+		5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -120,6 +122,9 @@
 		5A8D0B4118EDC18C00A1D9A7 /* DFSearchViewController2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController2.h; sourceTree = "<group>"; };
 		5A8D0B4218EDC18C00A1D9A7 /* DFSearchViewController2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController2.m; sourceTree = "<group>"; };
 		5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchViewController.xib; sourceTree = "<group>"; };
+		5A8D0B4818EF174F00A1D9A7 /* DFPhotoWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoWebViewController.h; sourceTree = "<group>"; };
+		5A8D0B4918EF174F00A1D9A7 /* DFPhotoWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoWebViewController.m; sourceTree = "<group>"; };
+		5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoWebViewController.xib; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -270,6 +275,9 @@
 				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
 				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
 				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
+				5A8D0B4818EF174F00A1D9A7 /* DFPhotoWebViewController.h */,
+				5A8D0B4918EF174F00A1D9A7 /* DFPhotoWebViewController.m */,
+				5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */,
 			);
 			name = "Tab view controllers";
 			sourceTree = "<group>";
@@ -510,6 +518,7 @@
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
+				5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */,
 				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -568,6 +577,7 @@
 				5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */,
 				5AE3BF7B18E4D5C900ACB5DC /* DFCGRectHelpers.m in Sources */,
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
+				5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */,
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
 				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
