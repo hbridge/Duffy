@@ -29,8 +29,8 @@ static NSString *SEARCH_PLACEHOLDER = @"Search for time, location or things";
 
 static NSDictionary *SectionNameToTitles;
 
-static NSString *GroupsBaseURL = @"http://asood123.no-ip.biz:7000/viz/groups/";
-static NSString *SearchBaseURL = @"http://asood123.no-ip.biz:7000/viz/search/";
+static NSString *GroupsPath = @"/viz/groups/";
+static NSString *SearchPath = @"/viz/search/";
 static NSString *PhoneIDURLParameter = @"phone_id";
 static NSString *QueryURLParameter = @"q";
 
@@ -134,8 +134,7 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)loadImageCategoriesForUser:(NSString *)userID
 {
-    NSString *urlString = [NSString stringWithFormat:@"%@%@", GroupsBaseURL, userID];
-    NSURL *url = [NSURL URLWithString:urlString];
+    NSURL *url = [[[DFUser currentUser] serverURL] URLByAppendingPathComponent:GroupsPath];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     [self.webView loadRequest:request];
 }
@@ -143,11 +142,13 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)executeSearchForQuery:(NSString *)query
 {
-    NSString *queryURLString = [NSString stringWithFormat:@"%@?%@=%@&%@=%@",
-                                SearchBaseURL,
+    NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
+                                [[[DFUser currentUser] serverURL] absoluteString],
+                                SearchPath,
                                 PhoneIDURLParameter, [[DFUser currentUser] deviceID],
                                 QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURL *queryURL = [NSURL URLWithString:queryURLString];
+
     
     NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
     [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];

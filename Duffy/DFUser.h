@@ -15,6 +15,13 @@
 @property (nonatomic, retain) NSString *userOverriddenDeviceID;
 @property (nonatomic, retain) NSString *userID;
 
+@property (readonly, nonatomic, retain) NSURL *serverURL;
+@property (readonly, nonatomic, retain) NSURL *defaultServerURL;
+@property (readwrite, nonatomic, retain) NSString *userOverriddenServerURLString;
+@property (readwrite, nonatomic, retain) NSString *userOverriddenServerPortString;
+@property (readonly, nonatomic, retain) NSString *defaultServerPort;
+
+
 + (DFUser *)currentUser;
 
 @end

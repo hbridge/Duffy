@@ -7,13 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFKeyboardResizingViewController.h"
 
-@interface DFSettingsViewController : UIViewController <UITextFieldDelegate>
+@interface DFSettingsViewController : DFKeyboardResizingViewController <UITextFieldDelegate>
 
 extern NSString *DFPipelineEnabledUserDefaultKey;
 extern NSString *DFAutoUploadEnabledUserDefaultKey;
 extern NSString *DFEnabledYes;
 extern NSString *DFEnabledNo;
+
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
 // Device/user section outlets
 @property (weak, nonatomic) IBOutlet UILabel *deviceIDLabel;
@@ -34,12 +37,12 @@ extern NSString *DFEnabledNo;
 - (IBAction)copyDeviceIDClicked:(UIButton *)sender;
 // Server section actions
 - (IBAction)serverURLEditingDidEnd:(UITextField *)sender;
-@property (weak, nonatomic) IBOutlet UITextField *serverPortEditingDidEnd;
 
 
 // Upload section actions
 - (IBAction)reUploadAllClicked:(UIButton *)sender;
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender;
+- (IBAction)serverPortEditingDidEnd:(UITextField *)sender;
 
 
 @end

@@ -28,8 +28,6 @@
 @end
 
 // Constants
- static NSString *BaseURL = @"http://asood123.no-ip.biz/"; //prod
-//static NSString *BaseURL = @"http://asood123.no-ip.biz:8000/"; //stable
 static NSString *AddPhotoResource = @"api/addPhoto";
 NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
@@ -295,7 +293,7 @@ static DFUploadController *defaultUploadController;
 
 - (RKObjectManager *)objectManager {
     if (!_objectManager) {
-        NSURL *baseURL = [NSURL URLWithString:BaseURL];
+        NSURL *baseURL = [[DFUser currentUser] serverURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
         
         // generate response mapping

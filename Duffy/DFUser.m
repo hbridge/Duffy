@@ -12,8 +12,14 @@
 @implementation DFUser
 
 
+
 static NSString *DFUserIDUserDefaultsKey = @"com.duffysoft.DFUserIDUserDefaultsKey";
 static NSString *DFOverrideDeviceIDUserDefaultsKey = @"com.duffysoft.DFOverrideDeviceIDUserDefaultsKey";
+NSString *DFOverrideServerURLKey = @"com.duffysoft.DFOverrideServerURLKey";
+NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortKey";
+
+
+static NSString *DefaultServerURL = @"http://asood123.no-ip.biz";
 
 static DFUser *currentUser;
 
@@ -69,5 +75,51 @@ static DFUser *currentUser;
     [[NSUserDefaults standardUserDefaults] setObject:userID forKey:DFUserIDUserDefaultsKey];
 }
 
+- (NSString *)userOverriddenServerURLKey
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:DFOverrideServerURLKey];
+}
+
+- (void)setUserOverriddenServerURLString:(NSString *)userOverriddenServerURLString
+{
+    [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerURLString forKey:DFOverrideServerURLKey];
+}
+
+- (NSString *)userOverriddenServerPortString
+{
+    return [[NSUserDefaults standardUserDefaults] stringForKey:DFOverrideServerPortKey];
+}
+
+- (void)setUserOverriddenServerPortString:(NSString *)userOverriddenServerPortString
+{
+    [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerPortString forKey:DFOverrideServerPortKey];
+}
+
+
+- (NSURL *)serverURL
+{
+    NSString *URLString;
+    if (self.userOverriddenServerURLString && ![self.userOverriddenServerURLString isEqualToString:@""]) {
+        URLString = self.userOverriddenServerURLString;
+    } else {
+        URLString = DefaultServerURL;
+    }
+    
+    if (self.userOverriddenServerPortString) {
+        URLString = [NSString stringWithFormat:@"%@:%@", URLString, self.userOverriddenServerPortString];
+    }
+    
+    return [NSURL URLWithString:URLString];
+}
+
+- (NSURL *)defaultServerURL
+{
+    return [NSURL URLWithString:DefaultServerURL];
+}
+
+- (NSString *)defaultServerPort
+{
+    return @"80";
+}
 
 @end

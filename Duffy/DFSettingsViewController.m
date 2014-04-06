@@ -15,6 +15,8 @@
 
 @property (nonatomic, retain) NSArray *rowLabels;
 
+@property (nonatomic, retain) UIView *lastEditedTextField;
+
 @end
 
 @implementation DFSettingsViewController
@@ -49,11 +51,11 @@ NSString *DFEnabledNo = @"NO";
         
         
         [self setSettingsDefaults];
+        
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(uploadStatusChanged:)
                                                      name:DFUploadStatusUpdate
                                                    object:nil];
-        
         
     }
     return self;
@@ -78,12 +80,33 @@ NSString *DFEnabledNo = @"NO";
     self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
     self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
     self.userIDTextField.text = [[DFUser currentUser] userID];
+    self.serverURLTextField.text = [[DFUser currentUser] userOverriddenServerURLString];
+    self.serverURLTextField.placeholder = [[[DFUser currentUser] defaultServerURL] absoluteString];
+    self.serverPortTextField.text = [[DFUser currentUser] userOverriddenServerPortString];
+    self.serverPortTextField.placeholder = [[DFUser currentUser] defaultServerPort];
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
         self.autoUploadEnabledSwitch.on = YES;
     } else {
         self.autoUploadEnabledSwitch.on = NO;
     }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardDidShow:)
+                                                 name:UIKeyboardDidShowNotification
+                                               object:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UIKeyboardDidShowNotification
+                                                  object:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -102,9 +125,16 @@ NSString *DFEnabledNo = @"NO";
     [[DFUser currentUser] setUserOverriddenDeviceID:sender.text];
 }
 
-
 - (IBAction)userIDEditingDidEnd:(UITextField *)sender {
     [[DFUser currentUser] setUserID:sender.text];
+}
+
+- (IBAction)serverURLEditingDidEnd:(UITextField *)sender {
+    [[DFUser currentUser] setUserOverriddenServerURLString:sender.text];
+}
+
+- (IBAction)serverPortEditingDidEnd:(UITextField *)sender {
+    [[DFUser currentUser] setUserOverriddenServerPortString:sender.text];
 }
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
@@ -118,6 +148,10 @@ NSString *DFEnabledNo = @"NO";
     return YES;
 }
 
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    self.lastEditedTextField = textField;
+}
 
 - (IBAction)copyDeviceIDClicked:(UIButton *)sender {
     UIPasteboard *pb = [UIPasteboard generalPasteboard];
@@ -152,8 +186,18 @@ NSString *DFEnabledNo = @"NO";
 }
 
 
-
-
-- (IBAction)serverURLEditingDidEnd:(UITextField *)sender {
+- (void)keyboardDidShow:(NSNotification *)notification {
+    if (self.lastEditedTextField && self.lastEditedTextField.isFirstResponder) {
+        [self scrollToView:self.lastEditedTextField];
+    }
 }
+
+- (void)scrollToView:(UIView *)view
+{
+    CGRect rectInScrollView = [self.scrollView convertRect:view.frame fromView:view.superview];
+    self.scrollView.contentOffset = rectInScrollView.origin;
+}
+
+
+
 @end

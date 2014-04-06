@@ -37,6 +37,7 @@
 		5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */; };
 		5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */; };
 		5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */; };
+		5AB32EA818F0CD3B004FC27B /* DFKeyboardResizingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -135,6 +136,8 @@
 		5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "LocationSectionHeader@2x.png"; path = "Resources/Icons/LocationSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SubjectSectionHeader@2x.png"; path = "Resources/Icons/SubjectSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SearchSectionHeader@2x.png"; path = "Resources/Icons/SearchSectionHeader@2x.png"; sourceTree = "<group>"; };
+		5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFKeyboardResizingViewController.h; sourceTree = "<group>"; };
+		5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFKeyboardResizingViewController.m; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -241,6 +244,8 @@
 				5A8D0B5318EF51BD00A1D9A7 /* Table view */,
 				5A8D0B5218EF515900A1D9A7 /* Photos grid and nav */,
 				5A8D0B5118EF515100A1D9A7 /* Custom image view */,
+				5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */,
+				5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */,
 			);
 			name = "Generic Views";
 			sourceTree = "<group>";
@@ -641,6 +646,7 @@
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
 				5AE3BF7118E4CCC600ACB5DC /* DFBoundingBoxView.m in Sources */,
 				5ADB24F2189985A20016CA02 /* DFPhotosGridViewController.m in Sources */,
+				5AB32EA818F0CD3B004FC27B /* DFKeyboardResizingViewController.m in Sources */,
 				5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
 				5AE3BF8118E6301B00ACB5DC /* DFPhoto+FaceDetection.m in Sources */,

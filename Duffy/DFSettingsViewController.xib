@@ -11,7 +11,7 @@
                 <outlet property="deviceIDTextField" destination="ebB-jm-RFO" id="VsR-WE-svn"/>
                 <outlet property="numToUploadLabel" destination="9a1-ph-1iN" id="TpT-OT-TEs"/>
                 <outlet property="numUploadedLabel" destination="Pw1-8W-UMk" id="69l-DC-86N"/>
-                <outlet property="serverPortEditingDidEnd" destination="OKa-JV-f9F" id="qkS-cQ-VGp"/>
+                <outlet property="scrollView" destination="j2Z-KM-edp" id="irv-dk-24s"/>
                 <outlet property="serverPortTextField" destination="OKa-JV-f9F" id="G1H-0J-f09"/>
                 <outlet property="serverURLTextField" destination="ggB-cH-qQR" id="a88-Ts-Tgu"/>
                 <outlet property="uploadProgressView" destination="OyD-ng-yaK" id="vDC-FI-dlP"/>
@@ -134,20 +134,25 @@
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ggB-cH-qQR">
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ggB-cH-qQR" userLabel="TF - Server URL">
                                     <rect key="frame" x="20" y="49" width="156" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                    <textInputTraits key="textInputTraits" keyboardType="URL"/>
+                                    <textInputTraits key="textInputTraits" keyboardType="URL" returnKeyType="done"/>
                                     <connections>
                                         <action selector="serverURLEditingDidEnd:" destination="-1" eventType="editingDidEnd" id="0er-aE-mNv"/>
+                                        <outlet property="delegate" destination="-1" id="wsQ-Gp-vva"/>
                                     </connections>
                                 </textField>
-                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OKa-JV-f9F">
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="OKa-JV-f9F" userLabel="TF - Server port">
                                     <rect key="frame" x="194" y="48" width="75" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                    <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
+                                    <textInputTraits key="textInputTraits" keyboardType="numbersAndPunctuation" returnKeyType="done"/>
+                                    <connections>
+                                        <action selector="serverPortEditingDidEnd:" destination="-1" eventType="editingDidEnd" id="SCa-Zr-pfa"/>
+                                        <outlet property="delegate" destination="-1" id="urk-KV-YoU"/>
+                                    </connections>
                                 </textField>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text=":" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="U0v-ca-UiD">
                                     <rect key="frame" x="183" y="53" width="5" height="21"/>
@@ -256,10 +261,14 @@
             </subviews>
             <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
             <constraints>
+                <constraint firstAttribute="bottom" secondItem="j2Z-KM-edp" secondAttribute="bottom" id="0tc-vX-NsM"/>
                 <constraint firstAttribute="bottom" secondItem="j2Z-KM-edp" secondAttribute="bottom" id="Rp6-wb-sCD"/>
                 <constraint firstAttribute="trailing" secondItem="j2Z-KM-edp" secondAttribute="trailing" id="Y3a-Mm-NUW"/>
                 <constraint firstItem="j2Z-KM-edp" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="bkS-2F-0hv"/>
+                <constraint firstAttribute="trailing" secondItem="j2Z-KM-edp" secondAttribute="trailing" id="dRF-js-gY3"/>
                 <constraint firstItem="j2Z-KM-edp" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="gnB-la-PlF"/>
+                <constraint firstItem="j2Z-KM-edp" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="upN-tI-HAh"/>
+                <constraint firstItem="j2Z-KM-edp" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="w23-cC-Fdv"/>
             </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
