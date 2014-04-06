@@ -12,7 +12,14 @@ from collections import OrderedDict
 
 from photos.models import Photo, User, Classification
 from photos import api_views, thumbnails
+from .forms import ManualAddPhoto
 
+def manualAddPhoto(request):
+	form = ManualAddPhoto()
+
+	context = {'form' : form}
+	return render(request, 'photos/manualAddPhoto.html', context)
+	
 def groups(request, user_id):
 	try:
 		user = User.objects.get(id=user_id)

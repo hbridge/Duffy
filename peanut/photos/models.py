@@ -17,9 +17,11 @@ class Photo(models.Model):
 	hashcode = models.CharField(max_length=100, null=True)
 	metadata = models.CharField(max_length=10000, null=True)
 	location_data = models.CharField(max_length=10000, null=True)
+	location_city =  models.CharField(max_length=1000, null=True)
 	pipeline_state = models.IntegerField(default=0)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	classification_data = models.CharField(max_length=10000, null=True, default="")
+
 
 	def __unicode__(self): 
 		return str(self.user) + "/" + str(self.new_filename)
