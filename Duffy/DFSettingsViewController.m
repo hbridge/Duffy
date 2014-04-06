@@ -198,6 +198,12 @@ NSString *DFEnabledNo = @"NO";
     self.scrollView.contentOffset = rectInScrollView.origin;
 }
 
+- (IBAction)scrollViewTapped:(UITapGestureRecognizer *)sender {
+    if (self.lastEditedTextField && self.lastEditedTextField.isFirstResponder) {
+        [self.lastEditedTextField resignFirstResponder];
+    }
+    
+}
 
 
 @end

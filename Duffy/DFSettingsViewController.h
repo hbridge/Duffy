@@ -16,6 +16,8 @@ extern NSString *DFAutoUploadEnabledUserDefaultKey;
 extern NSString *DFEnabledYes;
 extern NSString *DFEnabledNo;
 
+- (IBAction)scrollViewTapped:(UITapGestureRecognizer *)sender;
+
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
 // Device/user section outlets

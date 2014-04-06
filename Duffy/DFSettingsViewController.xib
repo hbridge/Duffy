@@ -247,6 +247,7 @@
                             </constraints>
                         </view>
                     </subviews>
+                    <gestureRecognizers/>
                     <constraints>
                         <constraint firstItem="9sB-5m-hZT" firstAttribute="leading" secondItem="Yuo-Aj-JhJ" secondAttribute="leading" id="155-6Z-KSt"/>
                         <constraint firstItem="AW5-wq-dCB" firstAttribute="top" secondItem="j2Z-KM-edp" secondAttribute="top" constant="20" symbolic="YES" id="6zV-QH-XAE"/>
@@ -260,6 +261,9 @@
                         <constraint firstItem="AW5-wq-dCB" firstAttribute="leading" secondItem="Yuo-Aj-JhJ" secondAttribute="leading" id="iSC-1u-cXL"/>
                         <constraint firstItem="Yuo-Aj-JhJ" firstAttribute="top" secondItem="AW5-wq-dCB" secondAttribute="bottom" constant="8" symbolic="YES" id="tQx-vS-eN9"/>
                     </constraints>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="QhR-EW-yfj" appends="YES" id="C2G-YQ-eDK"/>
+                    </connections>
                 </scrollView>
             </subviews>
             <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -272,5 +276,10 @@
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
+        <tapGestureRecognizer id="QhR-EW-yfj">
+            <connections>
+                <action selector="scrollViewTapped:" destination="-1" id="ln0-G5-WaO"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
 </document>
