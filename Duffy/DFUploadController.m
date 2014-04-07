@@ -104,7 +104,7 @@ static DFUploadController *defaultUploadController;
 
 }
 
-#pragma mark - Private networking code
+#pragma mark - Private Uploading Code
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
@@ -144,46 +144,6 @@ static DFUploadController *defaultUploadController;
     
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
-}
-
-- (void)uploadFinishedForPhoto:(DFPhoto *)photo
-{
-    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
-    
-    [self saveUploadProgress];
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                        object:self
-                                                      userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
-    
-    [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
-    [self postStatusUpdate];
-    
-    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
-    if (self.photoURLsToUpload.count > 0) {
-        [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
-    } else {
-        NSLog(@"all photos uploaded.");
-        self.currentSessionStats = nil;
-    }
-}
-
-- (void)saveUploadProgress
-{
-
-    NSError *error = nil;
-    if(![self.managedObjectContext save:&error]) {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-        [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
-    }
-
-    NSLog(@"upload progress saved.");
-}
-
-- (void)postStatusUpdate
-{
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusUpdate
-                                                        object:self
-                                                      userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
 }
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
@@ -286,7 +246,47 @@ static DFUploadController *defaultUploadController;
     return [resultDictionary JSONString];
 }
 
+# pragma mark - Private Upload Completion Handlers
 
+- (void)uploadFinishedForPhoto:(DFPhoto *)photo
+{
+    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
+    
+    [self saveUploadProgress];
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                                  object:self
+                                                                userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
+    
+    [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
+    [self postStatusUpdate];
+    
+    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
+    if (self.photoURLsToUpload.count > 0) {
+        [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    } else {
+        NSLog(@"all photos uploaded.");
+        self.currentSessionStats = nil;
+    }
+}
+
+- (void)saveUploadProgress
+{
+    
+    NSError *error = nil;
+    if(![self.managedObjectContext save:&error]) {
+        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
+    }
+    
+    NSLog(@"upload progress saved.");
+}
+
+- (void)postStatusUpdate
+{
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusUpdate
+                                                                  object:self
+                                                                userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
+}
 
 #pragma mark - Internal Helper Functions
 

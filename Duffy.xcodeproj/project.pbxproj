@@ -38,6 +38,7 @@
 		5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */; };
 		5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */; };
 		5AB32EA818F0CD3B004FC27B /* DFKeyboardResizingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */; };
+		5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -138,6 +139,8 @@
 		5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SearchSectionHeader@2x.png"; path = "Resources/Icons/SearchSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFKeyboardResizingViewController.h; sourceTree = "<group>"; };
 		5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFKeyboardResizingViewController.m; sourceTree = "<group>"; };
+		5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAutocompleteController.h; sourceTree = "<group>"; };
+		5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAutocompleteController.m; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -266,15 +269,9 @@
 		5A67606318E3384900E355B6 /* Tab view controllers */ = {
 			isa = PBXGroup;
 			children = (
-				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
-				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
-				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
-				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
-				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
-				5A8D0B4D18EF2FBA00A1D9A7 /* Photo Web View */,
-				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
-				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
-				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
+				5AB32EAC18F30121004FC27B /* Camera Roll */,
+				5AB32EAD18F3012D004FC27B /* Search View */,
+				5AB32EAE18F30136004FC27B /* Settings View */,
 			);
 			name = "Tab view controllers";
 			sourceTree = "<group>";
@@ -328,6 +325,38 @@
 				5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */,
 			);
 			name = "Table view";
+			sourceTree = "<group>";
+		};
+		5AB32EAC18F30121004FC27B /* Camera Roll */ = {
+			isa = PBXGroup;
+			children = (
+				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
+				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
+			);
+			name = "Camera Roll";
+			sourceTree = "<group>";
+		};
+		5AB32EAD18F3012D004FC27B /* Search View */ = {
+			isa = PBXGroup;
+			children = (
+				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
+				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
+				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
+				5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */,
+				5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */,
+				5A8D0B4D18EF2FBA00A1D9A7 /* Photo Web View */,
+			);
+			name = "Search View";
+			sourceTree = "<group>";
+		};
+		5AB32EAE18F30136004FC27B /* Settings View */ = {
+			isa = PBXGroup;
+			children = (
+				5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */,
+				5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */,
+				5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */,
+			);
+			name = "Settings View";
 			sourceTree = "<group>";
 		};
 		5ADB24AE189985590016CA02 = {
@@ -653,6 +682,7 @@
 				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
 				5A67606918E3558500E355B6 /* DFMultiPhotoViewController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
+				5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */,
 				5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */,
