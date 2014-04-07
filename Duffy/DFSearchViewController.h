@@ -8,10 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@class DFAutocompleteController;
+
 @interface DFSearchViewController : UIViewController <UIWebViewDelegate, UISearchBarDelegate, UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
+@property (nonatomic, retain) NSMutableDictionary *defaultSearchResults;
+@property (nonatomic, retain) DFAutocompleteController *autcompleteController;
 
 - (void)executeSearchForQuery:(NSString *)query;
 

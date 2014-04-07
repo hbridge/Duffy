@@ -10,6 +10,7 @@
 #import "DFUser.h"
 #import "DFPhotoWebViewController.h"
 #import "DFTableHeaderView.h"
+#import "DFAutocompleteController.h"
 
 @interface DFSearchViewController ()
 
@@ -32,14 +33,15 @@ static NSDictionary *SectionNameToTitles;
 static NSString *GroupsPath = @"/viz/groups/";
 static NSString *SearchPath = @"/viz/search/";
 static NSString *PhoneIDURLParameter = @"phone_id";
+static NSString *UserIDURLParameter = @"user_id";
 static NSString *QueryURLParameter = @"q";
-
 
 static CGFloat SearchResultsRowHeight = 38;
 static CGFloat SearchResultsCellFontSize = 15;
 
-
 @implementation DFSearchViewController
+
+@synthesize defaultSearchResults = _defaultSearchResults;
 
 + (void)initialize
 {
@@ -59,6 +61,7 @@ static CGFloat SearchResultsCellFontSize = 15;
         self.tabBarItem.title = @"Search";
         self.tabBarItem.image = [UIImage imageNamed:@"Search"];
         
+        self.autcompleteController = [[DFAutocompleteController alloc] init];
         [self setupNavBar];
         [self registerForKeyboardNotifications];
     }
@@ -103,11 +106,28 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (NSMutableDictionary *)defaultSearchResults
 {
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    dict[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
-    dict[LOCATION_SECTION_NAME] = @[@"New York", @"Hoover Dam", @"Croatia"];
-    dict[CATEGORY_SECTION_NAME] = @[@"red_wine", @"valley", @"cheeseburger"];
-    return dict;
+    if (!_defaultSearchResults) {
+        _defaultSearchResults = [[NSMutableDictionary alloc] init];
+        _defaultSearchResults[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
+        _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
+        _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@"red_wine", @"valley", @"cheeseburger"];
+        
+        //[self populateDefaultAutocompleteSearchResults];
+    }
+    
+    
+    return _defaultSearchResults;
+}
+
+- (void)populateDefaultAutocompleteSearchResults
+{
+    [self.autcompleteController topLocationsAndCounts:^(NSDictionary *entriesAndCounts) {
+        if (entriesAndCounts != nil) {
+            self.defaultSearchResults[LOCATION_SECTION_NAME] = entriesAndCounts.allKeys;
+            [self.searchResultsTableView reloadData];
+
+        }
+    }];
 }
 
 
@@ -125,13 +145,6 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    if ([self isMovingToParentViewController] && [[DFUser currentUser] userID]) {
-        
-    }
-}
-
 - (void)loadImageCategoriesForUser:(NSString *)userID
 {
     NSURL *url = [[[DFUser currentUser] serverURL] URLByAppendingPathComponent:GroupsPath];
@@ -145,7 +158,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
                                 [[[DFUser currentUser] serverURL] absoluteString],
                                 SearchPath,
-                                PhoneIDURLParameter, [[DFUser currentUser] deviceID],
+                                UserIDURLParameter, [[DFUser currentUser] userID],
                                 QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURL *queryURL = [NSURL URLWithString:queryURLString];
 
@@ -175,6 +188,8 @@ static CGFloat SearchResultsCellFontSize = 15;
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    
+    NSLog(@"webview size:%@ contentSize:%@", NSStringFromCGRect(webView.frame), NSStringFromCGSize(self.webView.scrollView.contentSize));
 }
 
 - (void)pushPhotoWebView:(NSString *)photoURLString
@@ -214,7 +229,6 @@ static CGFloat SearchResultsCellFontSize = 15;
         self.searchResultsTableView.hidden = NO;
         [self.searchBar setShowsCancelButton:YES animated:YES];
         self.navigationItem.rightBarButtonItem = nil;
-        
     } else {
 
         [self.searchBar setShowsCancelButton:NO animated:YES];
@@ -331,18 +345,6 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    // TODO configure a view controller and push it
-    
-    // logging
-    //    NSDictionary *openParams = [NSDictionary dictionaryWithObjectsAndKeys:
-    //                                cocktail.cocktailName, COCKTAIL_NAME_KEY,
-    //                                [[self class] description], PARENT_VIEW_CLASS_KEY,
-    //                                eventTrigger, EVENT_TRIGGER_KEY,
-    //                                [NSString stringWithFormat:@"%d", indexPath.row], LIST_INDEX_KEY,
-    //                                self.navigationItem.title, LIST_NAME_KEY,
-    //                                nil];
-    //    [Flurry logEvent:COCKTAIL_OPENED_EVENT withParameters:openParams];
-    
     NSString *selectionString = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
     
     if (![[self sectionNameForIndex:indexPath.section] isEqualToString:FREE_FORM_SECTION_NAME]) {
