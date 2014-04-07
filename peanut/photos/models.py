@@ -21,7 +21,7 @@ class Photo(models.Model):
 	pipeline_state = models.IntegerField(default=0)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	classification_data = models.CharField(max_length=10000, null=True, default="")
-	time_taken = models.DateTimeField()
+	time_taken = models.DateTimeField(null=True)
 
 
 	def __unicode__(self): 

@@ -10,7 +10,7 @@ import json
 from collections import OrderedDict
 
 from photos.models import Photo, User, Classification
-from photos import api_views, image_util
+from photos import image_util, search_util
 from .forms import ManualAddPhoto
 
 def manualAddPhoto(request):
@@ -104,14 +104,16 @@ def search(request, user_id=None):
 
 		thumbnailBasepath = "/user_data/" + str(user.id) + "/"
 
-
 		if data.has_key('q'):
 			query = data['q']
 		else:
 			return HttpResponse("Please specify a query")
 
 		setSession(request, user.id)
-		searchResults = api_views.coreSearch(request, user.id, query)
+
+		(startDate, newQuery) = search_util.getNattyInfo(query)
+		searchResults = search_util.solrSearch(user.id, startDate, newQuery)
+		
 		width = imageSize*2 #doubled  for retina
 
 		allResults = searchResults.count()

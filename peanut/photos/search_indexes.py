@@ -13,7 +13,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	photoId = indexes.CharField(model_attr="id", indexed=False)
 	classificationData = indexes.CharField(model_attr="classification_data", default="")
 	locationData = indexes.CharField(model_attr="location_data", default="")
-	timeTaken = indexes.DateTimeField(model_attr="time_taken")
+	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
 
 	def get_model(self):
 		return Photo
@@ -25,3 +25,9 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
+
+	def prepare_timeTaken(self, obj):
+		if obj.time_taken:
+			return obj.time_taken
+		else:
+			return "1900-01-01T01:01:01Z"

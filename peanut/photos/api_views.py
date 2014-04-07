@@ -1,12 +1,8 @@
 import parsedatetime as pdt
-import urllib2
-import urllib
 import os, sys
 import json
 import subprocess
 import Image
-
-from datetime import datetime
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -19,11 +15,8 @@ from django.template import RequestContext, loader
 from django.utils import timezone
 from django.forms.models import model_to_dict
 
-from haystack.query import SearchQuerySet
-from haystack.inputs import Raw
-
 from photos.models import Photo, User, Classification
-from photos import image_util
+from photos import image_util, search_util
 from .forms import ManualAddPhoto
 
 """
@@ -34,7 +27,6 @@ from .forms import ManualAddPhoto
 """
 @csrf_exempt
 def add_photo(request):
-	
 	response_data = {}
 
 	if request.method == 'POST':
@@ -62,50 +54,6 @@ def add_photo(request):
 	else:
 		return HttpResponse("This needs to be a POST")
 
-@csrf_exempt
-def coreSearch(request, userId, query):
-	response = dict()
-	response['result'] = True
-	startDate = ""
-	endDate = ""
-
-	# get startDate from Natty
-	nattyPort = "7999"
-	nattyParams = { "q" : query }
-
-	nattyUrl = "http://localhost:%s/?%s" % (nattyPort, urllib.urlencode(nattyParams)) 
-
-	nattyResult = urllib2.urlopen(nattyUrl).read()
-
-	if (nattyResult):
-		nattyJson = json.loads(nattyResult)
-		if (len(nattyJson) > 0):
-			timestamp = nattyJson[0]["timestamps"][0]
-
-			startDate = datetime.fromtimestamp(timestamp)
-
-			usedText = nattyJson[0]["matchingValue"]
-			query = query.replace(usedText, '')
-	
-	searchResults = SearchQuerySet().all()
-
-	if (startDate):
-		solrStartDate = startDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate)
-
-	if (endDate):
-		searchResults = searchResults.exclude(timeTaken__gte=endDate)
-
-	for word in query.split():
-		try:
-			val = int(word)
-		except ValueError:
-			searchResults = searchResults.filter(content__contain=word)
-
-	searchResults = searchResults.filter(userId=userId).order_by('timeTaken')
-	
-	return searchResults
-
 
 @csrf_exempt
 def search(request):
@@ -123,7 +71,9 @@ def search(request):
 	else:
 		return returnFailure(response, "Need q field")
 
-	searchResults = coreSearch(request, userId, query, 10)
+	(startDate, newQuery) = search_util.getNattyInfo(query)
+	searchResults = search_util.solrSearch(userId, startDate, newQuery)
+	
 	thumbnailBasepath = "/user_data/" + userId + "/"
 
 	response['search_result_html'] = list()
@@ -149,14 +99,14 @@ def search(request):
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
-	Fetches all photos for the given user and returns back the top 5 cities the photos were taken in,
-	sorted with their counts.
+	Fetches all photos for the given user and returns back the all cities with their counts.  Results are
+	unsorted.
 	
 	Returns JSON of the format:
 	{"top_locations": [
 		{"San Francisco": 415},
 		{"New York": 246},
-		{"Barcelona": 100},
+		{"Barcelona": 900},
 		{"Montepulciano": 47},
 		{"New Delhi": 39}
 		]
@@ -175,11 +125,11 @@ def get_top_locations(request):
 		
 	queryResult = Photo.objects.filter(user_id=userId).values('location_city').order_by().annotate(Count('location_city')).order_by('-location_city__count')
 	
-	photoLocations = list()
+	photoLocations = dict()
 	for location in queryResult:
-		photoLocations.append(dict({location['location_city'] : location['location_city__count']}))
+		photoLocations[location['location_city']] = location['location_city__count']
 		
-	response['top_locations'] = photoLocations[:5]
+	response['top_locations'] = photoLocations
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 

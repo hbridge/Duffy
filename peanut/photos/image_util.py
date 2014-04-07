@@ -81,13 +81,14 @@ def getTimeTaken(metadataJson, photoPath):
 	If present, grab the city field from the photo's location data
 """
 def getLocationCity(locationJson):
-	locationData = json.loads(locationJson)
+	if (locationJson):
+		locationData = json.loads(locationJson)
 
-	if ('address' in locationData):
-		address = locationData['address']
-		if ('City' in address):
-			city = address['City']
-			return city
+		if ('address' in locationData):
+			address = locationData['address']
+			if ('City' in address):
+				city = address['City']
+				return city
 	return None
 
 
