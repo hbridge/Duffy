@@ -6,16 +6,23 @@ from datetime import datetime
 
 from django.utils import timezone
 
+from peanut import settings
 from photos.models import Photo, User, Classification
 
+"""
+	Generates a thumbnail of the given image to the given size
+	Creates a new file in the same directory as the existing filename of the format:
+	PHOTOID-thumb-SIZE.jpg
+"""
 def imageThumbnail(photoFname, size, userId):
 	# comment this out when production server runs it
 	#path = '/home/aseem/userdata/' + str(userId) + '/images/'
 	path = '/home/derek/user_data/' + str(userId) + '/'
-	outfile = path + str.split(str(photoFname), '.')[0] + "-thumb-" + str(size) + '.jpg'
+	newFilename = str.split(str(photoFname), '.')[0] + "-thumb-" + str(size) + '.jpg'
+	outfilePath = path + newFilename
 
-	if (os.path.isfile(outfile)):
-		return outfile
+	if (os.path.isfile(outfilePath)):
+		return newFilename
 	
 	try:
 		infile = path + photoFname
@@ -41,9 +48,9 @@ def imageThumbnail(photoFname, size, userId):
 			im = im.crop((0, buffer, size, (im.size[1] - buffer)))
 		
 		im.load()
-		im.save(outfile, "JPEG")
-		print "generated thumbnail: '%s" % outfile
-		return outfile
+		im.save(outfilePath, "JPEG")
+		print "generated thumbnail: '%s" % outfilePath
+		return newFilename
 	except IOError:
 		print "cannot create thumbnail for '%s'" % infile
 		return None
@@ -98,7 +105,6 @@ def getLocationCity(locationJson):
 	then tries to populate the time_taken and location_city fields
 """
 def addPhoto(user, origPath, fileObj, metadata, locationData, iPhoneFaceboxesTopleft):
-	uploadsPath = "/home/derek/pipeline/uploads"
 	photo = Photo(	user = user,
 					location_data = locationData,
 					orig_filename = origPath,
@@ -110,8 +116,8 @@ def addPhoto(user, origPath, fileObj, metadata, locationData, iPhoneFaceboxesTop
 	filename, fileExtension = os.path.splitext(origPath)
 	newFilename = str(photo.id) + fileExtension
 
-	userUploadsPath = os.path.join(uploadsPath, str(user.id))
-	newFilePath = os.path.join(userUploadsPath, newFilename)
+	userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(user.id))
+	newFilePath = os.path.join(userDataPath, newFilename)
 
 	photo.new_filename = newFilename
 

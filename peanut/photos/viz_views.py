@@ -12,7 +12,7 @@ from collections import OrderedDict
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util
 from .forms import ManualAddPhoto
-
+	
 def manualAddPhoto(request):
 	form = ManualAddPhoto()
 
@@ -119,8 +119,9 @@ def search(request, user_id=None):
 		allResults = searchResults.count()
 		searchResults = searchResults[((page-1)*count):(count*page)]
 
+		photoIdToThumb = dict()
 		for result in searchResults:
-			image_util.imageThumbnail(result.photoFilename, width, user.id)
+			photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, user.id)
 
 		start = ((page-1)*count)+1
 		if (allResults > count*page):
@@ -147,7 +148,8 @@ def search(request, user_id=None):
 					'query': query,
 					'page': page,
 					'userId': userId,
-					'thumbnailBasepath': thumbnailBasepath}
+					'thumbnailBasepath': thumbnailBasepath,
+					'photoIdToThumb': photoIdToThumb}
 		return render(request, 'photos/search_webview.html', context)
 
 
