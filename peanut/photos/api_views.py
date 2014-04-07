@@ -125,9 +125,12 @@ def get_top_locations(request):
 		
 	queryResult = Photo.objects.filter(user_id=userId).values('location_city').order_by().annotate(Count('location_city')).order_by('-location_city__count')
 	
-	photoLocations = dict()
+	photoLocations = list()
 	for location in queryResult:
-		photoLocations[location['location_city']] = location['location_city__count']
+		entry = dict()
+		entry['name'] = location['location_city']
+		entry['count'] = location['location_city__count']
+		photoLocations.append(entry)
 		
 	response['top_locations'] = photoLocations
 	
