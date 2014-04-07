@@ -103,14 +103,14 @@
 			<div class="prev-next">
 				<div class="prev">
 					{% if previous %}
-						<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:-1 }}">Previous</a>
+						<a href="/viz/search?user_id={{ userId }}&amp;q={{ query }}&amp;page={{ page|add:-1 }}">Previous</a>
 					{% elif next %}
 						Previous
 					{% else %}
 					{% endif %}
 				</div><div class="next">
 					{% if next %}
-						<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:1 }}">Next</a>
+						<a href="/viz/search?user_id={{ userId }}&amp;q={{ query }}&amp;page={{ page|add:1 }}">Next</a>
 					{% elif previous %}
 						Next
 					{% else %}

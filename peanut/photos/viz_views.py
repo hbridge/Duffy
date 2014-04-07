@@ -77,10 +77,10 @@ def search(request, user_id=None):
 		elif request.method == 'POST':
 			data = request.POST
 
-		if data.has_key('phone_id'):
-			phoneId = data['phone_id']
+		if data.has_key('user_id'):
+			userId = data['user_id']
 		else:
-			return HttpResponse("Please specify a phoneId")
+			return HttpResponse("Please specify a userId")
 
 		if data.has_key('count'):
 			count = int(data['count'])
@@ -98,9 +98,9 @@ def search(request, user_id=None):
 			imageSize = 78;
 
 		try:
-			user = User.objects.get(phone_id=phoneId)
+			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
-			return HttpResponse("Phone id " + str(phoneId) + " does not exist")
+			return HttpResponse("Phone id " + str(userId) + " does not exist")
 
 		thumbnailBasepath = "/user_data/" + str(user.id) + "/"
 
@@ -144,7 +144,7 @@ def search(request, user_id=None):
 					'searchResults': searchResults,
 					'query': query,
 					'page': page,
-					'phoneId': phoneId,
+					'userId': userId,
 					'thumbnailBasepath': thumbnailBasepath}
 		return render(request, 'photos/search_webview.html', context)
 
