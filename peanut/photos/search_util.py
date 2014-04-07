@@ -42,8 +42,6 @@ def getNattyInfo(query):
 	after the requested startDate
 """
 def solrSearch(userId, startDate, query):
-	startDate = ""
-
 	searchResults = SearchQuerySet().all()
 
 	if (startDate):
