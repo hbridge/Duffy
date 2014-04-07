@@ -36,16 +36,17 @@
 	.ui-filter-inset {
 		margin-top: 0;
 	}
-	.ui-block{
-		overflow: auto;
+	.ui-gallery{
+		/*overflow: auto;*/
 	}
-	.ui-gallery {
+	.ui-image {
 		padding-right: 2px;
 		height: {{ imageSize|add:+2 }}px;
 		float:left;
 	}
 	.result-bottom, .prev-next {
 		text-align: center;
+		clear:both;
 	}
 	.text, .prev-next {
 		font-family: arial;
@@ -81,47 +82,46 @@
 
 <body>
 
-<div data-role="page" id="searchPhoto">
-	<div role="main" class="ui-content">
-		<div class="ui-block" id="allImages">
+<div role="main" class="ui-content">
+	<div class="ui-gallery" id="allImages">
 
-			{% for result in searchResults %}
+		{% for result in searchResults %}
 
-			<div class = "ui-gallery">
-				<a href="{{ thumbnailBasepath }}{{ result.photoFilename }}" rel="external"> 
-				<!--<a href="/viz/serve_image?photo={{ result.photoFilename }}" rel="external"> -->
-	 			 	<img path="{{ thumbnailBasepath }}" fname="{{ result.photoFilename }}" data-original="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazy" width="{{ imageSize }}px"></a>
-	 		</div>
+		<div class = "ui-image">
+			<a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
+			<!--<a href="/viz/serve_image?photo={{ result.photoFilename }}" rel="external"> -->
+ 			 	<img path="{{ thumbnailBasepath }}" fname="{{ result.photoFilename }}" data-origi="{{ thumbnailBasepath }}{{ result.photoFilename }}" class="lazyo" width="{{ imageSize }}px"></a>
+ 		</div>
 
-			{% endfor %}
-			
-		</div>
-		<div class="result-bottom"> 
-			{% if resultSize > 0 %}
-				<p class="text">Showing {{ start }} - {{ end }} of {{ resultSize }} photos</p>
-				<div class="prev-next">
-					<div class="prev">
-						{% if previous %}
-							<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:-1 }}">Previous</a>
-						{% elif next %}
-							Previous
-						{% else %}
-						{% endif %}
-					</div><div class="next">
-						{% if next %}
-							<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:1 }}">Next</a>
-						{% elif previous %}
-							Next
-						{% else %}
-						{% endif %}
-					</div>
-				</div>
-			{% else %}
-				<p class="text"> No results found! </p>
-			{% endif %}
-		</div>
-
+		{% endfor %}
+		
 	</div>
+
+	<div class="result-bottom"> 
+		{% if resultSize > 0 %}
+			<p class="text">Showing {{ start }} - {{ end }} of {{ resultSize }} photos</p>
+			<div class="prev-next">
+				<div class="prev">
+					{% if previous %}
+						<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:-1 }}">Previous</a>
+					{% elif next %}
+						Previous
+					{% else %}
+					{% endif %}
+				</div><div class="next">
+					{% if next %}
+						<a href="/viz/search?phone_id={{ phoneId }}&amp;q={{ query }}&amp;page={{ page|add:1 }}">Next</a>
+					{% elif previous %}
+						Next
+					{% else %}
+					{% endif %}
+				</div>
+			</div>
+		{% else %}
+			<p class="text"> No results found! </p>
+		{% endif %}
+	</div>
+
 </div>
 
 </body>
