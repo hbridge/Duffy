@@ -17,6 +17,7 @@ from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
 from django.utils import timezone
+from django.forms.models import model_to_dict
 
 from haystack.query import SearchQuerySet
 from haystack.inputs import Raw
@@ -184,9 +185,34 @@ def get_top_locations(request):
 
 
 """
+	Small method to get a user's info based on their id
+	Can be passed in either user_id or phone_id
+	Returns the JSON equlivant of the user
+"""
+@csrf_exempt
+def get_user(request):
+	response = dict({'result': True})
+	user = None
+	data = getRequestData(request)
+	
+	if data.has_key('user_id'):
+		userId = data['user_id']
+		user = User.objects.get(id=userId)
+
+	if data.has_key('phone_id'):
+		phoneId = data['phone_id']
+		user = User.objects.get(phone_id=phoneId)
+
+	if user is None:
+		return returnFailure(response, "User not found.  Need valid user_id or phone_id")
+
+	response['user'] = model_to_dict(user)
+	return HttpResponse(json.dumps(response), content_type="application/json")
+	
+
+"""
 Helper functions
 """
-
 def getRequestData(request):
 	if request.method == 'GET':
 		data = request.GET
