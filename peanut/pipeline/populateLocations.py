@@ -1,12 +1,5 @@
-import sys, getopt, os
-import subprocess
-import logging
-import time
+import sys
 import json
-import socket
-import time
-import zmq
-from pprint import pprint
 
 if "/home/derek/Duffy/peanut" not in sys.path:
      sys.path.insert(0, "/home/derek/Duffy/peanut")

@@ -6,7 +6,6 @@ import json
 import subprocess
 import Image
 
-from time import mktime
 from datetime import datetime
 
 from django.shortcuts import render
@@ -17,11 +16,14 @@ from django.utils import timezone
 from django.db.models import Count
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
+from django.utils import timezone
 
 from haystack.query import SearchQuerySet
 from haystack.inputs import Raw
 
 from photos.models import Photo, User, Classification
+from photos import image_util
+from .forms import ManualAddPhoto
 
 """
 	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage
@@ -31,7 +33,7 @@ from photos.models import Photo, User, Classification
 """
 @csrf_exempt
 def add_photo(request):
-	uploadsPath = "/home/derek/pipeline/uploads"
+	
 	response_data = {}
 
 	if request.method == 'POST':
@@ -47,29 +49,10 @@ def add_photo(request):
 			except User.DoesNotExist:
 				user = createUser(phoneId)
 
-			photo = Photo(	user = user,
-							location_data = locationData,
-							orig_filename = request.FILES['file'].name,
-							upload_date = timezone.now(),
-							metadata = photoMetadata,
-							iphone_faceboxes_topleft = iPhoneFaceboxesTopleft)
-			photo.save()
-
-			filename, fileExtension = os.path.splitext(request.FILES['file'].name)
-			newFilename = str(photo.id) + fileExtension
-
-			userUploadsPath = os.path.join(uploadsPath, str(user.id))
-			newFilePath = os.path.join(userUploadsPath, newFilename)
-
-			photo.new_filename = newFilename
-
-			photo.save()
-
-			handle_uploaded_file(user, request.FILES['file'], newFilePath)
+			image_util.addPhoto(user, request.FILES['file'].name, request.FILES['file'], photoMetadata, locationData, iPhoneFaceboxesTopleft)
 
 			response_data['result'] = True
-			response_data['filename'] = newFilePath
-			response_data['debug'] = photoMetadata
+			response_data['debug'] = ""
 			return HttpResponse(json.dumps(response_data), content_type="application/json")
 		else:
 			response_data['result'] = False
@@ -203,12 +186,6 @@ def get_top_locations(request):
 """
 Helper functions
 """
-def handle_uploaded_file(user, uploadedFile, newFilePath):
-	print("Writing to " + newFilePath)
-
-	with open(newFilePath, 'wb+') as destination:
-		for chunk in uploadedFile.chunks():
-			destination.write(chunk)
 
 def getRequestData(request):
 	if request.method == 'GET':

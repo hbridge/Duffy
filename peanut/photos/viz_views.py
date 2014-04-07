@@ -1,6 +1,5 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.utils import timezone
 
 from haystack.query import SearchQuerySet
 
@@ -11,7 +10,7 @@ import json
 from collections import OrderedDict
 
 from photos.models import Photo, User, Classification
-from photos import api_views, thumbnails
+from photos import api_views, image_util
 from .forms import ManualAddPhoto
 
 def manualAddPhoto(request):
@@ -119,7 +118,7 @@ def search(request, user_id=None):
 		searchResults = searchResults[((page-1)*count):(count*page)]
 
 		for result in searchResults:
-			thumbnails.imageThumbnail(result.photoFilename, width, user.id)
+			image_util.imageThumbnail(result.photoFilename, width, user.id)
 
 		start = ((page-1)*count)+1
 		if (allResults > count*page):

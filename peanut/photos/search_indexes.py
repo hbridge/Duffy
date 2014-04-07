@@ -13,7 +13,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	photoId = indexes.CharField(model_attr="id", indexed=False)
 	classificationData = indexes.CharField(model_attr="classification_data", default="")
 	locationData = indexes.CharField(model_attr="location_data", default="")
-	timeTaken = indexes.DateTimeField()
+	timeTaken = indexes.DateTimeField(model_attr="time_taken")
 
 	def get_model(self):
 		return Photo
@@ -25,14 +25,3 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
-
-	def prepare_timeTaken(self, obj):
-		metadata = json.loads(obj.metadata)
-		for key in metadata.keys():
-			if key == "{Exif}":
-				for a in metadata[key].keys():
-					if a == "DateTimeOriginal":
-						dt = datetime.strptime(metadata[key][a], "%Y:%m:%d %H:%M:%S")
-						timeTaken = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-						return timeTaken
-		return "1900-01-01T01:01:01Z"
