@@ -105,7 +105,7 @@ static DFUser *currentUser;
         URLString = DefaultServerURL;
     }
     
-    if (self.userOverriddenServerPortString) {
+    if (self.userOverriddenServerPortString && ![self.userOverriddenServerPortString isEqualToString:@""]) {
         URLString = [NSString stringWithFormat:@"%@:%@", URLString, self.userOverriddenServerPortString];
     }
     

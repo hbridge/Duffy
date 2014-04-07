@@ -12,15 +12,17 @@
 
 // Private DFAutocompleteResponse Class
 @interface DFAutocompleteResponse : NSObject
-@property NSString *result;
+@property (nonatomic, retain) NSString *result;
+@property (nonatomic, retain) NSArray *top_locations;
 @end
 @implementation DFAutocompleteResponse
 @end
 
-@interface DFTopLocationsRelationship : NSObject
-@property NSDictionary *top_locations;
+@interface DFLocation : NSObject
+@property (nonatomic, retain) NSString *name;
+@property (nonatomic, retain) NSNumber *count;
 @end
-@implementation DFTopLocationsRelationship
+@implementation DFLocation
 @end
 
 
@@ -34,7 +36,7 @@
 
 @synthesize objectManager = _objectManager;
 
-static NSString *TopLocationsPathPattern = @"api/get_top_locations";
+static NSString *TopLocationsPathPattern = @"/api/get_top_locations";
 static NSString *UserIDParameterKey = @"user_id";
 
 
@@ -63,7 +65,11 @@ static NSString *UserIDParameterKey = @"user_id";
 
          NSDictionary *result;
          if ([response.result isEqualToString:@"true"]) {
-             //result = response.top_locations;
+             NSMutableDictionary *entriesAndCounts = [[NSMutableDictionary alloc] init];
+             for (DFLocation *location in response.top_locations) {
+                 entriesAndCounts[location.name] = location.count;
+             }
+             result = entriesAndCounts;
          }  else {
              result = nil;
          }
@@ -101,17 +107,39 @@ static NSString *UserIDParameterKey = @"user_id";
     if (!_objectManager) {
         NSURL *baseURL = [[DFUser currentUser] serverURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
+
+        //Aseem format
+//        RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];
+//        [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
+//
+//        RKObjectMapping *locationMapping = [RKObjectMapping mappingForClass:[DFLocation class]];
+//        [locationMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
+//                                                              @"count" : @"count"
+//                                                              }];
+//        
+//        [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_locations"
+//                                                                                                    toKeyPath:@"top_locations"
+//                                                                                                  withMapping:locationMapping]];
+        // Derek format
         
         RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];
-       [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result", @"top_locations"]];
-        
-        
+        [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
+
+        RKObjectMapping *locationMapping = [RKObjectMapping mappingForClass:[DFLocation class]];
+        locationMapping.forceCollectionMapping = YES;
+        [locationMapping addAttributeMappingFromKeyOfRepresentationToAttribute:@"name"];
+        [locationMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"(name)" toKeyPath:@"count"]];
+
+        [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_locations"
+                                                                                                    toKeyPath:@"top_locations"
+                                                                                                  withMapping:locationMapping]];
+
         RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:autocompleteResponseMapping
-                                                                                                method:RKRequestMethodPOST
+                                                                                                method:RKRequestMethodGET
                                                                                            pathPattern:TopLocationsPathPattern
                                                                                                keyPath:nil
                                                                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-        
+    
         [_objectManager addResponseDescriptor:responseDescriptor];
     }
     return _objectManager;

@@ -112,20 +112,41 @@ static CGFloat SearchResultsCellFontSize = 15;
         _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
         _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@"red_wine", @"valley", @"cheeseburger"];
         
-        //[self populateDefaultAutocompleteSearchResults];
+        [self populateDefaultAutocompleteSearchResults];
     }
     
     
     return _defaultSearchResults;
 }
 
+static NSInteger NUM_LOCATION_RESULTS = 5;
+
 - (void)populateDefaultAutocompleteSearchResults
 {
     [self.autcompleteController topLocationsAndCounts:^(NSDictionary *entriesAndCounts) {
         if (entriesAndCounts != nil) {
-            self.defaultSearchResults[LOCATION_SECTION_NAME] = entriesAndCounts.allKeys;
-            [self.searchResultsTableView reloadData];
+            NSMutableArray *sortedPlaceNames = [entriesAndCounts keysSortedByValueUsingComparator:^NSComparisonResult(NSNumber *count1, NSNumber *count2) {
+                return [count2 compare:count1];
+            }].mutableCopy;
 
+            
+//            [sortedPlaceNames enumerateObjectsUsingBlock:^(NSString *placeName, NSUInteger idx, BOOL *stop) {
+//                NSString *placeWithCount = [NSString stringWithFormat:@"%@ (%lu)",
+//                                            placeName,
+//                                            [(NSNumber *)entriesAndCounts[placeName] integerValue]];
+//                [sortedPlaceNames replaceObjectAtIndex:idx withObject:placeWithCount];
+//                
+//                if (idx >= NUM_LOCATION_RESULTS) {
+//                    *stop = YES;
+//                }
+//            }];
+            NSRange range;
+            range.location = 0;
+            range.length = NUM_LOCATION_RESULTS;
+            self.defaultSearchResults[LOCATION_SECTION_NAME] = [sortedPlaceNames objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
+
+            [self.searchResultsTableView reloadData];
+            
         }
     }];
 }
