@@ -42,8 +42,11 @@ static NSString *UserIDParameterKey = @"user_id";
 
 - (void)topLocationsAndCounts:(DFAutocompleteCompletionBlock)mainThreadCompletionBlock
 {
-    
-    [self fetchAutocompleteResults:mainThreadCompletionBlock];
+    if ([[DFUser currentUser] userID]) {
+        [self fetchAutocompleteResults:mainThreadCompletionBlock];
+    } else {
+        mainThreadCompletionBlock(nil);
+    }
 }
 
 
