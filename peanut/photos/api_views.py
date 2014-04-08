@@ -154,12 +154,16 @@ def get_user(request):
 	
 	if data.has_key('phone_id'):
 		phoneId = data['phone_id']
-		user = User.objects.get(phone_id=phoneId)
+		try:
+			user = User.objects.get(phone_id=phoneId)
+		except User.DoesNotExist:
+			return HttpResponse(json.dumps(response), content_type="application/json")
 
-	if user is None:
-		return returnFailure(response, "User not found.  Need valid user_id or phone_id")
+	#if user is None:
+	#	return returnFailure(response, "User not found.  Need valid user_id or phone_id")
 
-	response['user'] = model_to_dict(user)
+	if (user):
+		response['user'] = model_to_dict(user)
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
