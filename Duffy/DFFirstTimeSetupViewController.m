@@ -10,6 +10,7 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "DFAppDelegate.h"
+#import "DFAnalytics.h"
 
 @interface DFFirstTimeSetupViewController ()
 
@@ -60,6 +61,18 @@
                          DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
                          [appDelegate showLoggedInUserTabs];
                      }];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning

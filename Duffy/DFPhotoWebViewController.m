@@ -7,6 +7,7 @@
 //
 
 #import "DFPhotoWebViewController.h"
+#import "DFAnalytics.h"
 
 @interface DFPhotoWebViewController ()
 
@@ -30,8 +31,6 @@
     return self;
 }
 
-
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -40,6 +39,18 @@
     [self setupNavBar];
     
     [self loadCurrentPhotoURL];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)setupNavBar

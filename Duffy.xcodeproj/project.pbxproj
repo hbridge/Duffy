@@ -37,6 +37,8 @@
 		5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */; };
 		5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */; };
 		5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */; };
+		5AACB90918F49AED00F4EEB6 /* libFlurry_4.4.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */; };
+		5AACB90D18F49D9700F4EEB6 /* DFAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */; };
 		5AB32E9F18EF58EC004FC27B /* TimeSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */; };
 		5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */; };
 		5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */; };
@@ -144,6 +146,10 @@
 		5AACB90018F471E900F4EEB6 /* DFFirstTimeSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFirstTimeSetupViewController.h; sourceTree = "<group>"; };
 		5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFirstTimeSetupViewController.m; sourceTree = "<group>"; };
 		5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFirstTimeSetupViewController.xib; sourceTree = "<group>"; };
+		5AACB90718F49AED00F4EEB6 /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flurry.h; sourceTree = "<group>"; };
+		5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry_4.4.0.a; sourceTree = "<group>"; };
+		5AACB90B18F49D9700F4EEB6 /* DFAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAnalytics.h; sourceTree = "<group>"; };
+		5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAnalytics.m; sourceTree = "<group>"; };
 		5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TimeSectionHeader@2x.png"; path = "Resources/Icons/TimeSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "LocationSectionHeader@2x.png"; path = "Resources/Icons/LocationSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SubjectSectionHeader@2x.png"; path = "Resources/Icons/SubjectSectionHeader@2x.png"; sourceTree = "<group>"; };
@@ -226,6 +232,7 @@
 				5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */,
 				5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */,
 				5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */,
+				5AACB90918F49AED00F4EEB6 /* libFlurry_4.4.0.a in Frameworks */,
 				5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */,
 				5A72E11E18B7EB89000979D2 /* Security.framework in Frameworks */,
 				5A72E11C18B7EB83000979D2 /* QuartzCore.framework in Frameworks */,
@@ -345,6 +352,32 @@
 			name = "Table view";
 			sourceTree = "<group>";
 		};
+		5AACB90518F49AD500F4EEB6 /* ThirdParty */ = {
+			isa = PBXGroup;
+			children = (
+				5AACB90618F49AED00F4EEB6 /* Flurry */,
+			);
+			name = ThirdParty;
+			sourceTree = "<group>";
+		};
+		5AACB90618F49AED00F4EEB6 /* Flurry */ = {
+			isa = PBXGroup;
+			children = (
+				5AACB90718F49AED00F4EEB6 /* Flurry.h */,
+				5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */,
+			);
+			path = Flurry;
+			sourceTree = "<group>";
+		};
+		5AACB90A18F49D6000F4EEB6 /* Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				5AACB90B18F49D9700F4EEB6 /* DFAnalytics.h */,
+				5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */,
+			);
+			name = Analytics;
+			sourceTree = "<group>";
+		};
 		5AB32EAC18F30121004FC27B /* Camera Roll */ = {
 			isa = PBXGroup;
 			children = (
@@ -427,7 +460,9 @@
 				5A67606318E3384900E355B6 /* Tab view controllers */,
 				5A67606218E3381D00E355B6 /* Background processes */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
+				5AACB90A18F49D6000F4EEB6 /* Analytics */,
 				5ADB24FE189AB3730016CA02 /* Model */,
+				5AACB90518F49AD500F4EEB6 /* ThirdParty */,
 				5AFBCA5118D236AE00998793 /* Utils */,
 				5ADB24D1189985590016CA02 /* Images.xcassets */,
 				5ADB24C3189985590016CA02 /* Supporting Files */,
@@ -711,6 +746,7 @@
 				5AACB8F418F4574400F4EEB6 /* DFUserPeanutAdapter.m in Sources */,
 				5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */,
 				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
+				5AACB90D18F49D9700F4EEB6 /* DFAnalytics.m in Sources */,
 				5AE3BF7818E4D46100ACB5DC /* DFImageView.m in Sources */,
 				5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */,
 				5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */,
@@ -863,6 +899,10 @@
 					"\"$(BUILT_PRODUCTS_DIR)/../../Headers\"",
 				);
 				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Duffy/Flurry",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",
@@ -892,6 +932,10 @@
 					"\"$(BUILT_PRODUCTS_DIR)/../../Headers\"",
 				);
 				INFOPLIST_FILE = "Duffy/Duffy-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Duffy/Flurry",
+				);
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-all_load",

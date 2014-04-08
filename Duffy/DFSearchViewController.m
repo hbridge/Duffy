@@ -11,6 +11,7 @@
 #import "DFPhotoWebViewController.h"
 #import "DFTableHeaderView.h"
 #import "DFAutocompleteController.h"
+#import "DFAnalytics.h"
 
 @interface DFSearchViewController ()
 
@@ -84,7 +85,15 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)viewDidAppear:(BOOL)animated
 {
+    [super viewDidAppear:animated];
     self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, 0);
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation

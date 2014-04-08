@@ -24,15 +24,6 @@
 @synthesize managedObjectContext = _managedObjectContext;
 
 
-- (instancetype)init
-{
-    self = [super init];
-    if (self) {
-        
-    }
-    return self;
-}
-
 - (void)asyncSyncToCameraRollWithCurrentKnownPhotoURLs:(NSSet *)knownURLs
 {
     int __block newAssets = 0;

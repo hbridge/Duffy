@@ -11,6 +11,7 @@
 #import "DFUploadController.h"
 #import "DFSettingsViewController.h"
 #import "DFPhoto.h"
+#import "DFAnalytics.h"
 
 @interface DFCameraRollViewController ()
 
@@ -51,6 +52,19 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
 - (void)cameraRollUpdated
 {
     if (![NSThread isMainThread]) {
@@ -80,12 +94,7 @@
     }
 }
 
-- (void)viewDidAppear:(BOOL)animated
-{
-    [super viewDidAppear:animated];
-    
- 
-}
+
 
 
 

@@ -7,6 +7,7 @@
 //
 
 #import "DFAppDelegate.h"
+#import "Flurry/Flurry.h"
 #import "DFPhotoStore.h"
 #import "DFCameraRollViewController.h"
 #import "DFSettingsViewController.h"
@@ -16,6 +17,7 @@
 #import "DFPhotoImageCache.h"
 #import "DFFirstTimeSetupViewController.h"
 #import "DFUser.h"
+
 
 
 @interface DFAppDelegate()
@@ -29,6 +31,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    [Flurry setCrashReportingEnabled:NO];
+    [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
+    [Flurry setLogLevel:FlurryLogLevelAll];
     
     if (![[DFUser currentUser] userID] || [[[DFUser currentUser] userID] isEqualToString:@""]) {
         [self showFirstTimeSetup];

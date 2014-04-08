@@ -10,6 +10,7 @@
 #import "DFPhotoStore.h"
 #import "DFUploadController.h"
 #import "DFUser.h"
+#import "DFAnalytics.h"
 
 @interface DFSettingsViewController ()
 
@@ -99,6 +100,7 @@ NSString *DFEnabledNo = @"NO";
                                              selector:@selector(keyboardDidShow:)
                                                  name:UIKeyboardDidShowNotification
                                                object:nil];
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -107,6 +109,7 @@ NSString *DFEnabledNo = @"NO";
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardDidShowNotification
                                                   object:nil];
+    [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
