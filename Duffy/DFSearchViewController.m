@@ -78,8 +78,18 @@ static CGFloat SearchResultsCellFontSize = 15;
     [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
     self.automaticallyAdjustsScrollViewInsets = YES;
     // TODO hack this should be dynamic
-    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+   
     
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, 0);
+}
+
+- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+{
+    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, 0);
 }
 
 - (void)setupNavBar
@@ -409,16 +419,18 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (void)keyboardDidShow:(NSNotification *)notification {
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    toRect = [self.view convertRect:toRect fromView:nil ];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
-                                                   self.searchResultsTableView.frame.origin.x,
+                                                   self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification {
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
+    toRect = [self.view convertRect:toRect fromView:nil ];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
-                                                   self.searchResultsTableView.frame.origin.x,
+                                                   self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
 }
