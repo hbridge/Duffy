@@ -12,8 +12,17 @@
 
 @interface DFUserPeanutAdapter : NSObject
 
-typedef void (^DFUserFetchCompletionBlock)(DFUser *user);
+typedef void (^DFUserFetchSuccessBlock)(DFUser *user);
+typedef void (^DFUserFetchFailureBlock)(NSError *error);
 
-- (void)fetchUserForDeviceID:(NSString *)deviceId withCompletionBlock:(DFUserFetchCompletionBlock)completionBlock;
+- (void)fetchUserForDeviceID:(NSString *)deviceId
+            withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
+                failureBlock:(DFUserFetchFailureBlock)failureBlock;
+
+- (void)createUserForDeviceID:(NSString *)deviceId
+            withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
+                failureBlock:(DFUserFetchFailureBlock)failureBlock;
+
+
 
 @end

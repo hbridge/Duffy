@@ -33,9 +33,14 @@
 #pragma mark - Internal Network Fetch Functions
 
 
-- (void)fetchUserForDeviceID:(NSString *)deviceId withCompletionBlock:(DFUserFetchCompletionBlock)completionBlock;
+- (void)fetchUserForDeviceID:(NSString *)deviceId
+            withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
+                failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
-    NSURLRequest *getRequest = [self userInfoGetRequestForDeviceID:deviceId];
+    NSURLRequest *getRequest = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
+                                                                    method:RKRequestMethodGET
+                                                                      path:DFGetUserPath
+                                                                parameters:@{DFDeviceIDParameterKey: deviceId}];
     
     RKObjectRequestOperation *operation =
     [[self objectManager]
@@ -52,14 +57,14 @@
              result = nil;
          }
          dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-             completionBlock(result);
+             successBlock(result);
          });
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
          NSLog(@"User Info fetch failed.  Error: %@", error.localizedDescription);
          dispatch_async(dispatch_get_main_queue(), ^{
-             completionBlock(nil);
+             failureBlock(error);
          });
      }];
     
@@ -67,15 +72,48 @@
     [[self objectManager] enqueueObjectRequestOperation:operation];
 }
 
-- (NSMutableURLRequest *)userInfoGetRequestForDeviceID:(NSString *)deviceID
+- (void)createUserForDeviceID:(NSString *)deviceId
+             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
+                 failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
-    NSMutableURLRequest *request = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
-                                                                    method:RKRequestMethodGET
-                                                                      path:DFGetUserPath
-                                                                parameters:@{DFDeviceIDParameterKey: deviceID}];
+    NSURLRequest *createRequest = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
+                                                                method:RKRequestMethodAny
+                                                                  path:DFCreateUserPath
+                                                            parameters:@{DFDeviceIDParameterKey: deviceId}];
     
-    return request;
+    RKObjectRequestOperation *operation =
+    [[self objectManager]
+     objectRequestOperationWithRequest:createRequest
+     success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+     {
+         DFUserInfoFetchResponse *response = [mappingResult firstObject];
+         NSLog(@"User create response received.  result:%@", response.result);
+         
+         DFUser *result;
+         if ([response.result isEqualToString:@"true"]) {
+             result = response.user;
+         }  else {
+             result = nil;
+         }
+         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+             successBlock(result);
+         });
+     }
+     failure:^(RKObjectRequestOperation *operation, NSError *error)
+     {
+         NSLog(@"User create failed.  Error: %@", error.localizedDescription);
+         dispatch_async(dispatch_get_main_queue(), ^{
+             failureBlock(error);
+         });
+     }];
+    
+    
+    [[self objectManager] enqueueObjectRequestOperation:operation];
 }
+
+
+
+
 
 #pragma mark - Internal Helper Functions
 

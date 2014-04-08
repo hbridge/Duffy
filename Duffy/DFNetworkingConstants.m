@@ -21,6 +21,8 @@ NSString const *DFDeviceIDParameterKey = @"phone_id";
 
 // User ID constants
 NSString const *DFGetUserPath = @"/api/get_user";
+NSString const *DFCreateUserPath = @"/api/create_user";
+
 
 
 @end

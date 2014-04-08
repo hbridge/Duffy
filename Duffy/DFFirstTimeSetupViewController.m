@@ -33,16 +33,33 @@
     
     [self.activityIndicatorView startAnimating];
     
-    DFUserPeanutAdapter *uidFetcher = [[DFUserPeanutAdapter alloc] init];
-    [uidFetcher fetchUserForDeviceID:[[DFUser currentUser] deviceID] withCompletionBlock:^(DFUser *user) {
-        sleep(1);
-        [[DFUser currentUser] setUserID:user.userID];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-            [appDelegate showLoggedInUserTabs];
-        });
-    }];
-    
+    DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+    [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
+                     withSuccessBlock:^(DFUser *user) {
+                         if (user) {
+                             [[DFUser currentUser] setUserID:user.userID];
+                             dispatch_async(dispatch_get_main_queue(), ^{
+                                 DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                                 [appDelegate showLoggedInUserTabs];
+                             });
+                         } else {
+                             // the request succeeded, but the user doesn't exist, we have to create it
+                             [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
+                                               withSuccessBlock:^(DFUser *user) {
+                                                   [[DFUser currentUser] setUserID:user.userID];
+                                                   dispatch_async(dispatch_get_main_queue(), ^{
+                                                       DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                                                       [appDelegate showLoggedInUserTabs];
+                                                   });
+                                               }
+                                                   failureBlock:^(NSError *error) {
+                                                       [NSException raise:@"No user" format:@"Failed to get or create user for device ID."];
+                                                   }];
+                         }
+                     } failureBlock:^(NSError *error) {
+                         DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
+                         [appDelegate showLoggedInUserTabs];
+                     }];
 }
 
 - (void)didReceiveMemoryWarning
