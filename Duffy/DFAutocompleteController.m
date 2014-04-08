@@ -70,7 +70,9 @@ static NSString *UserIDParameterKey = @"user_id";
          if ([response.result isEqualToString:@"true"]) {
              NSMutableDictionary *entriesAndCounts = [[NSMutableDictionary alloc] init];
              for (DFLocation *location in response.top_locations) {
-                 entriesAndCounts[location.name] = location.count;
+                 if (location.name) {
+                     entriesAndCounts[location.name] = location.count;
+                 }
              }
              result = entriesAndCounts;
          }  else {
@@ -112,30 +114,18 @@ static NSString *UserIDParameterKey = @"user_id";
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
 
         //Aseem format
-//        RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];
-//        [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
-//
-//        RKObjectMapping *locationMapping = [RKObjectMapping mappingForClass:[DFLocation class]];
-//        [locationMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
-//                                                              @"count" : @"count"
-//                                                              }];
-//        
-//        [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_locations"
-//                                                                                                    toKeyPath:@"top_locations"
-//                                                                                                  withMapping:locationMapping]];
-        // Derek format
-        
         RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];
         [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
 
         RKObjectMapping *locationMapping = [RKObjectMapping mappingForClass:[DFLocation class]];
-        locationMapping.forceCollectionMapping = YES;
-        [locationMapping addAttributeMappingFromKeyOfRepresentationToAttribute:@"name"];
-        [locationMapping addPropertyMapping:[RKAttributeMapping attributeMappingFromKeyPath:@"(name)" toKeyPath:@"count"]];
-
+        [locationMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
+                                                              @"count" : @"count"
+                                                              }];
+        
         [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_locations"
                                                                                                     toKeyPath:@"top_locations"
                                                                                                   withMapping:locationMapping]];
+
 
         RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:autocompleteResponseMapping
                                                                                                 method:RKRequestMethodGET
