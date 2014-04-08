@@ -14,4 +14,7 @@
 @property (strong, nonatomic) UIWindow *window;
 
 
+- (void)showFirstTimeSetup;
+- (void)showLoggedInUserTabs;
+
 @end

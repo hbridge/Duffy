@@ -68,6 +68,19 @@ static CGFloat SearchResultsCellFontSize = 15;
     return self;
 }
 
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    
+    [self setupTableView];
+    [self.webView setDelegate:self];
+    
+    [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
+    self.automaticallyAdjustsScrollViewInsets = YES;
+    // TODO hack this should be dynamic
+    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
+    
+}
 
 - (void)setupNavBar
 {
@@ -159,19 +172,6 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 }
 
 
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-
-    [self setupTableView];
-    [self.webView setDelegate:self];
-    
-    [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
-    self.automaticallyAdjustsScrollViewInsets = YES;
-    // TODO hack this should be dynamic
-    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(64, 0, 0, 0);
-
-}
 
 - (void)loadImageCategoriesForUser:(NSString *)userID
 {

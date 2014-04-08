@@ -14,6 +14,8 @@
 #import "DFCameraRollSyncController.h"
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFPhotoImageCache.h"
+#import "DFFirstTimeSetupViewController.h"
+#import "DFUser.h"
 
 
 @interface DFAppDelegate()
@@ -28,6 +30,26 @@
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
+    if (![[DFUser currentUser] userID] || [[[DFUser currentUser] userID] isEqualToString:@""]) {
+        [self showFirstTimeSetup];
+    } else {
+        [self showLoggedInUserTabs];
+    }
+    
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+    return YES;
+}
+
+- (void)showFirstTimeSetup
+{
+    DFFirstTimeSetupViewController *firstTimeSetup = [[DFFirstTimeSetupViewController alloc] init];
+    [[self window] setRootViewController:firstTimeSetup];
+}
+
+
+- (void)showLoggedInUserTabs
+{
     // Camera roll tab
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
@@ -47,10 +69,6 @@
                                        nil]];
     
     [[self window] setRootViewController:tabController];
-    
-    self.window.backgroundColor = [UIColor whiteColor];
-    [self.window makeKeyAndVisible];
-    return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
