@@ -7,7 +7,7 @@
 //
 
 #import "DFFirstTimeSetupViewController.h"
-#import "DFUserIDFetcher.h"
+#import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "DFAppDelegate.h"
 
@@ -33,8 +33,8 @@
     
     [self.activityIndicatorView startAnimating];
     
-    DFUserIDFetcher *uidFetcher = [[DFUserIDFetcher alloc] init];
-    [uidFetcher fetchUserInfoForDeviceID:[[DFUser currentUser] deviceID] withCompletionBlock:^(DFUser *user) {
+    DFUserPeanutAdapter *uidFetcher = [[DFUserPeanutAdapter alloc] init];
+    [uidFetcher fetchUserForDeviceID:[[DFUser currentUser] deviceID] withCompletionBlock:^(DFUser *user) {
         sleep(1);
         [[DFUser currentUser] setUserID:user.userID];
         dispatch_async(dispatch_get_main_queue(), ^{

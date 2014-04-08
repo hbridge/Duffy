@@ -33,7 +33,7 @@
 		5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */; };
 		5A8D0B5618EF525800A1D9A7 /* DFTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B5518EF525800A1D9A7 /* DFTableHeaderView.m */; };
 		5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */; };
-		5AACB8F418F4574400F4EEB6 /* DFUserIDFetcher.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F318F4574400F4EEB6 /* DFUserIDFetcher.m */; };
+		5AACB8F418F4574400F4EEB6 /* DFUserPeanutAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */; };
 		5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */; };
 		5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */; };
 		5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */; };
@@ -137,8 +137,8 @@
 		5A8D0B5418EF525800A1D9A7 /* DFTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTableHeaderView.h; sourceTree = "<group>"; };
 		5A8D0B5518EF525800A1D9A7 /* DFTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTableHeaderView.m; sourceTree = "<group>"; };
 		5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFTableHeaderView.xib; sourceTree = "<group>"; };
-		5AACB8F218F4574400F4EEB6 /* DFUserIDFetcher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUserIDFetcher.h; sourceTree = "<group>"; };
-		5AACB8F318F4574400F4EEB6 /* DFUserIDFetcher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserIDFetcher.m; sourceTree = "<group>"; };
+		5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUserPeanutAdapter.h; sourceTree = "<group>"; };
+		5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserPeanutAdapter.m; sourceTree = "<group>"; };
 		5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNetworkingConstants.h; sourceTree = "<group>"; };
 		5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNetworkingConstants.m; sourceTree = "<group>"; };
 		5AACB90018F471E900F4EEB6 /* DFFirstTimeSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFirstTimeSetupViewController.h; sourceTree = "<group>"; };
@@ -275,8 +275,8 @@
 				5A81ED2718CFAED5003EF557 /* DFUploadController.m */,
 				5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */,
 				5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */,
-				5AACB8F218F4574400F4EEB6 /* DFUserIDFetcher.h */,
-				5AACB8F318F4574400F4EEB6 /* DFUserIDFetcher.m */,
+				5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */,
+				5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */,
 			);
 			name = "Background processes";
 			sourceTree = "<group>";
@@ -284,6 +284,9 @@
 		5A67606318E3384900E355B6 /* Tab view controllers */ = {
 			isa = PBXGroup;
 			children = (
+				5AACB90018F471E900F4EEB6 /* DFFirstTimeSetupViewController.h */,
+				5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */,
+				5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */,
 				5AB32EAC18F30121004FC27B /* Camera Roll */,
 				5AB32EAD18F3012D004FC27B /* Search View */,
 				5AB32EAE18F30136004FC27B /* Settings View */,
@@ -421,9 +424,6 @@
 			children = (
 				5ADB24CB189985590016CA02 /* DFAppDelegate.h */,
 				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
-				5AACB90018F471E900F4EEB6 /* DFFirstTimeSetupViewController.h */,
-				5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */,
-				5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */,
 				5A67606318E3384900E355B6 /* Tab view controllers */,
 				5A67606218E3381D00E355B6 /* Background processes */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
@@ -708,7 +708,7 @@
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
 				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
-				5AACB8F418F4574400F4EEB6 /* DFUserIDFetcher.m in Sources */,
+				5AACB8F418F4574400F4EEB6 /* DFUserPeanutAdapter.m in Sources */,
 				5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */,
 				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
 				5AE3BF7818E4D46100ACB5DC /* DFImageView.m in Sources */,

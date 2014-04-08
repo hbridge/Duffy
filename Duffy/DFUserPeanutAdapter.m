@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFUserIDFetcher.h"
+#import "DFUserPeanutAdapter.h"
 #import <RestKit/RestKit.h>
 #import "DFNetworkingConstants.h"
 #import "DFUser.h"
@@ -19,13 +19,13 @@
 @end
 
 
-@interface DFUserIDFetcher()
+@interface DFUserPeanutAdapter()
 
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
 
 @end
 
-@implementation DFUserIDFetcher
+@implementation DFUserPeanutAdapter
 
 @synthesize objectManager = _objectManager;
 
@@ -33,7 +33,7 @@
 #pragma mark - Internal Network Fetch Functions
 
 
-- (void)fetchUserInfoForDeviceID:(NSString *)deviceId withCompletionBlock:(DFUserInfoFetchCompletionBlock)completionBlock;
+- (void)fetchUserForDeviceID:(NSString *)deviceId withCompletionBlock:(DFUserFetchCompletionBlock)completionBlock;
 {
     NSURLRequest *getRequest = [self userInfoGetRequestForDeviceID:deviceId];
     
