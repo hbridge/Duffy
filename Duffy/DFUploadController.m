@@ -28,7 +28,7 @@
 @end
 
 // Constants
-static NSString *AddPhotoResource = @"api/addPhoto";
+static NSString *AddPhotoResource = @"/api/addPhoto";
 NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 static NSString *UserIDParameterKey = @"phone_id";
