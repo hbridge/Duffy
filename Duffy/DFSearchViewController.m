@@ -140,13 +140,20 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 //                    *stop = YES;
 //                }
 //            }];
-            NSRange range;
-            range.location = 0;
-            range.length = NUM_LOCATION_RESULTS;
-            self.defaultSearchResults[LOCATION_SECTION_NAME] = [sortedPlaceNames objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
-
-            [self.searchResultsTableView reloadData];
             
+            NSRange range;
+            if (sortedPlaceNames.count > NUM_LOCATION_RESULTS) {
+            
+                range.location = 0;
+                range.length = NUM_LOCATION_RESULTS;
+            } else {
+                range.location = 0;
+                range.length = sortedPlaceNames.count;
+            }
+            
+                
+            self.defaultSearchResults[LOCATION_SECTION_NAME] = [sortedPlaceNames objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
+            [self updateSearchResults:self.searchBar.text];
         }
     }];
 }
@@ -265,7 +272,7 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 	 */
     
     NSMutableArray *sections = [self defaultSectionNames];
-    NSMutableDictionary *searchResults = [self defaultSearchResults];
+    NSMutableDictionary *searchResults = [[self defaultSearchResults] mutableCopy];
     
     if ([query length] > 0)
     {
