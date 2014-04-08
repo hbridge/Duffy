@@ -25,7 +25,7 @@ def imageThumbnail(photoFname, size, userId):
 		return newFilename
 	
 	try:
-		infile = path + photoFname
+		infile = path + str(photoFname)
 		im = Image.open(infile)
 
 		#calc ratios and new min size

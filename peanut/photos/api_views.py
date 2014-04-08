@@ -151,7 +151,7 @@ def get_user(request):
 	if data.has_key('user_id'):
 		userId = data['user_id']
 		user = User.objects.get(id=userId)
-
+	
 	if data.has_key('phone_id'):
 		phoneId = data['phone_id']
 		user = User.objects.get(phone_id=phoneId)
@@ -161,7 +161,30 @@ def get_user(request):
 
 	response['user'] = model_to_dict(user)
 	return HttpResponse(json.dumps(response), content_type="application/json")
-	
+
+"""
+	Creates a new user, if it doesn't exist
+"""
+
+@csrf_exempt
+def create_user(request):
+	response = dict({'result': True})
+	user = None
+	data = getRequestData(request)
+
+	if data.has_key('phone_id'):
+		phoneId = data['phone_id']
+		user = User.objects.get(phone_id=phoneId)
+		if user:
+			return returnFailure(response, "User already exists")
+		else:
+			user = createUser(phoneId)
+	else:
+		return returnFailure(response, "Need a phone_id")
+
+	response['user'] = model_to_dict(user)
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 """
 Helper functions
