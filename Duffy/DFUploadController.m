@@ -42,6 +42,7 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 @property (atomic) dispatch_queue_t uploadDispatchQueue;
 @property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
 @property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
+@property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
@@ -86,7 +87,8 @@ static DFUploadController *defaultUploadController;
 {
     NSUInteger photosInQueuePreAdd = self.photoURLsToUpload.count;
     if (photoURLStrings.count < 1) return;
-    
+ 
+    [self beginBackgroundUpdateTask];
     if (!self.currentSessionStats) {
         self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     }
@@ -105,6 +107,19 @@ static DFUploadController *defaultUploadController;
 }
 
 #pragma mark - Private Uploading Code
+
+- (void) beginBackgroundUpdateTask
+{
+    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundUpdateTask];
+    }];
+}
+
+- (void) endBackgroundUpdateTask
+{
+    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+}
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
@@ -266,6 +281,7 @@ static DFUploadController *defaultUploadController;
     } else {
         NSLog(@"all photos uploaded.");
         self.currentSessionStats = nil;
+        [self endBackgroundUpdateTask];
     }
 }
 
