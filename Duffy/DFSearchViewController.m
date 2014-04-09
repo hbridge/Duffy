@@ -147,7 +147,7 @@ static CGFloat SearchResultsCellFontSize = 15;
         _defaultSearchResults = [[NSMutableDictionary alloc] init];
         _defaultSearchResults[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
         _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
-        _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@"red_wine", @"valley", @"cheeseburger"];
+        _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@""];
         
         [self populateDefaultAutocompleteSearchResults];
     }
@@ -158,40 +158,44 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 static NSInteger NUM_LOCATION_RESULTS = 5;
 
+- (NSArray *)sortedTop:(NSInteger)count suggestionsInDict:(NSDictionary *)dict
+{
+    NSMutableArray *sortedEntries = [dict keysSortedByValueUsingComparator:^NSComparisonResult(NSNumber *count1, NSNumber *count2) {
+        return [count2 compare:count1];
+    }].mutableCopy;
+    
+    NSRange range;
+    if (dict.count > count) {
+        range.location = 0;
+        range.length = count;
+    } else {
+        range.location = 0;
+        range.length = dict.count;
+    }
+    
+    return [sortedEntries objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
+}
+
+
 - (void)populateDefaultAutocompleteSearchResults
 {
-    [self.autcompleteController topLocationsAndCounts:^(NSDictionary *entriesAndCounts) {
-        if (entriesAndCounts != nil) {
-            NSMutableArray *sortedPlaceNames = [entriesAndCounts keysSortedByValueUsingComparator:^NSComparisonResult(NSNumber *count1, NSNumber *count2) {
-                return [count2 compare:count1];
-            }].mutableCopy;
-
-            
-//            [sortedPlaceNames enumerateObjectsUsingBlock:^(NSString *placeName, NSUInteger idx, BOOL *stop) {
-//                NSString *placeWithCount = [NSString stringWithFormat:@"%@ (%lu)",
-//                                            placeName,
-//                                            [(NSNumber *)entriesAndCounts[placeName] integerValue]];
-//                [sortedPlaceNames replaceObjectAtIndex:idx withObject:placeWithCount];
-//                
-//                if (idx >= NUM_LOCATION_RESULTS) {
-//                    *stop = YES;
-//                }
-//            }];
-            
-            NSRange range;
-            if (sortedPlaceNames.count > NUM_LOCATION_RESULTS) {
-            
-                range.location = 0;
-                range.length = NUM_LOCATION_RESULTS;
-            } else {
-                range.location = 0;
-                range.length = sortedPlaceNames.count;
-            }
-            
-                
-            self.defaultSearchResults[LOCATION_SECTION_NAME] = [sortedPlaceNames objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
-            [self updateSearchResults:self.searchBar.text];
+    [self.autcompleteController fetchSuggestions:^(NSDictionary *categorySuggestionsToCounts, NSDictionary *locationSuggestionsToCounts) {
+        if (locationSuggestionsToCounts) {
+            self.defaultSearchResults[LOCATION_SECTION_NAME] = [self sortedTop:NUM_LOCATION_RESULTS
+                                                             suggestionsInDict:locationSuggestionsToCounts];
+        } else {
+            [self.sectionNames removeObject:LOCATION_SECTION_NAME];
         }
+        
+        if (categorySuggestionsToCounts) {
+            self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self sortedTop:NUM_LOCATION_RESULTS
+                                                             suggestionsInDict:categorySuggestionsToCounts];
+        } else {
+            [self.sectionNames removeObject:CATEGORY_SECTION_NAME];
+        }
+        
+        
+        [self updateSearchResults:nil];
     }];
 }
 

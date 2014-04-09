@@ -11,10 +11,9 @@
 @interface DFAutocompleteController : NSObject
 
 
-typedef void (^DFAutocompleteCompletionBlock)(NSDictionary *entriesAndCounts);
+typedef void (^DFAutocompleteCompletionBlock)(NSDictionary *categorySuggestionsToCounts, NSDictionary *locationSuggestionsToCounts);
 
 
-- (void)topLocationsAndCounts:(DFAutocompleteCompletionBlock)mainThreadCompletionBlock;
-
+- (void)fetchSuggestions:(DFAutocompleteCompletionBlock)mainThreadCompletionBlock;
 
 @end
