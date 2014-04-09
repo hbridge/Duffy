@@ -11,6 +11,7 @@
 #import "DFUploadController.h"
 #import "DFUser.h"
 #import "DFAnalytics.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFSettingsViewController ()
 
@@ -55,7 +56,7 @@ NSString *DFEnabledNo = @"NO";
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(uploadStatusChanged:)
-                                                     name:DFUploadStatusUpdate
+                                                     name:DFUploadStatusNotificationName
                                                    object:nil];
         
     }

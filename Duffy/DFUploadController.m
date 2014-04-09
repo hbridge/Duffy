@@ -29,8 +29,6 @@
 
 // Constants
 static NSString *AddPhotoResource = @"/api/addPhoto";
-NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
-NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 static NSString *UserIDParameterKey = @"phone_id";
 static NSString *PhotoMetadataKey = @"photo_metadata";
 static NSString *PhotoLocationKey = @"location_data";
@@ -298,7 +296,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)postStatusUpdate
 {
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusUpdate
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
 }

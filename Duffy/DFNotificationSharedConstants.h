@@ -16,4 +16,9 @@ extern NSString *DFPhotoChangeTypeAdded;
 extern NSString *DFPhotoChangeTypeRemoved;
 extern NSString *DFPhotoChangeTypeMetadata;
 
+extern NSString *DFUploadStatusNotificationName;
+extern NSString *DFUploadStatusUpdateSessionUserInfoKey;
+
+
+
 @end

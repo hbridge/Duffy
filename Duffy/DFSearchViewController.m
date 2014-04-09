@@ -12,6 +12,8 @@
 #import "DFTableHeaderView.h"
 #import "DFAutocompleteController.h"
 #import "DFAnalytics.h"
+#import "DFNotificationSharedConstants.h"
+#import "DFUploadSessionStats.h"
 
 @interface DFSearchViewController ()
 
@@ -65,6 +67,7 @@ static CGFloat SearchResultsCellFontSize = 15;
         self.autcompleteController = [[DFAutocompleteController alloc] init];
         [self setupNavBar];
         [self registerForKeyboardNotifications];
+        [self registerForUploadNotifiations];
     }
     return self;
 }
@@ -86,7 +89,7 @@ static CGFloat SearchResultsCellFontSize = 15;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, 0);
+    [self setViewInsets];
     [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -98,7 +101,15 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
 {
-    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, 0);
+    [self setViewInsets];
+}
+
+
+- (void)setViewInsets
+{
+    CGFloat visibleProgressHeight = self.uploadProgressView.frame.size.height * (self.uploadProgressView.hidden == NO ? 1.0 : 0.0);
+    self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length + visibleProgressHeight, 0, 0, 0);
+    self.webView.scrollView.contentInset = UIEdgeInsetsMake(visibleProgressHeight, 0, 0, 0);
 }
 
 - (void)setupNavBar
@@ -128,6 +139,14 @@ static CGFloat SearchResultsCellFontSize = 15;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardDidHide:)
                                                  name:UIKeyboardDidHideNotification
+                                               object:nil];
+}
+
+- (void)registerForUploadNotifiations
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(uploadStatusChanged:)
+                                                 name:DFUploadStatusNotificationName
                                                object:nil];
 }
 
@@ -442,6 +461,22 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
                                                    self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
+}
+
+#pragma mark - Upload status notification handler
+
+- (void)uploadStatusChanged:(NSNotification *)notification
+{
+    DFUploadSessionStats *uploadStats = [[notification userInfo] valueForKey:DFUploadStatusUpdateSessionUserInfoKey];
+    if (uploadStats.numRemaining > 0) {
+        self.uploadProgressView.hidden = NO;
+        self.uploadProgressView.leftLabel.text = [NSString stringWithFormat:@"%lu left", (unsigned long)uploadStats.numRemaining];
+        self.uploadProgressView.progressView.progress = (float)uploadStats.numUploaded / (float)uploadStats.numAcceptedUploads;
+    } else {
+        self.uploadProgressView.hidden = YES;
+    }
+    
+    [self setViewInsets];
 }
 
 @end

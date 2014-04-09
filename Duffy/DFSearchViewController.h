@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFUploadProgressView.h"
 
 @class DFAutocompleteController;
 
@@ -14,6 +15,7 @@
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
+@property (weak, nonatomic) IBOutlet DFUploadProgressView *uploadProgressView;
 @property (nonatomic, retain) NSMutableDictionary *defaultSearchResults;
 @property (nonatomic, retain) DFAutocompleteController *autcompleteController;
 
