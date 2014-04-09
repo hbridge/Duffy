@@ -46,7 +46,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 
 	def get_altTerms(self, obj, threshold):
-		f = open('photos/alt.txt', 'r')
+		altFilePath = '/home/derek/prod/Duffy/peanut/photos/'
+		f = open(altFilePath + 'alt.txt', 'r')
 		altDict = dict()
 		termList = ""
 
