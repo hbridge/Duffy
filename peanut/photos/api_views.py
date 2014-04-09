@@ -98,9 +98,11 @@ def search(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+
 """
-	Fetches all photos for the given user and returns back the all cities with their counts.  Results are
-	unsorted.
+	Fetches all photos for the given user and returns back two things:
+	1) the all cities with their counts.  Results are unsorted.
+	2) top suggestions for categories with counts.
 	
 	Returns JSON of the format:
 	{"top_locations": [
@@ -109,11 +111,16 @@ def search(request):
 		{"Barcelona": 900},
 		{"Montepulciano": 47},
 		{"New Delhi": 39}
+		],
+		"top_categories": [
+		{"food": 415},
+		{"animal": 300},
+		{"car": 240}
 		]
 	}
 """
 @csrf_exempt
-def get_top_locations(request):
+def get_suggestions(request):
 	response = dict({'result': True})
 
 	data = getRequestData(request)
@@ -122,19 +129,12 @@ def get_top_locations(request):
 		userId = data['user_id']
 	else:
 		return returnFailure(response, "Need user_id")
-		
-	queryResult = Photo.objects.filter(user_id=userId).values('location_city').order_by().annotate(Count('location_city')).order_by('-location_city__count')
-	
-	photoLocations = list()
-	for location in queryResult:
-		entry = dict()
-		entry['name'] = location['location_city']
-		entry['count'] = location['location_city__count']
-		photoLocations.append(entry)
-		
-	response['top_locations'] = photoLocations
+
+	response['top_locations'] = getTopLocations(userId)
+	response['top_categories'] = getTopCategories(userId)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 
 """
@@ -240,3 +240,39 @@ def createUser(phoneId):
 	subprocess.call(['ssh', remoteHost, "mkdir -p " + userRemoteStagingPath])
 
 	return user
+
+"""
+	Fetches all photos for the given user and returns back the all cities with their counts.  Results are
+	unsorted.
+
+	[{"San Francisco": 415},
+		{"New York": 246},
+		{"Barcelona": 900},
+		{"Montepulciano": 47},
+		{"New Delhi": 39}]
+"""
+def getTopLocations(userId):
+
+	queryResult = Photo.objects.filter(user_id=userId).values('location_city').order_by().annotate(Count('location_city')).order_by('-location_city__count')
+	
+	photoLocations = list()
+	for location in queryResult:
+		entry = dict()
+		entry['name'] = location['location_city']
+		entry['count'] = location['location_city__count']
+		photoLocations.append(entry)
+	
+	return photoLocations
+
+"""
+	Fetches all photos for the given user and returns back top categories with count. Currently, faking it.
+
+	[{"food": 415},
+		{"animal": 246},
+		{"car": 90}]
+"""
+def getTopCategories(userId):
+
+	return [{'food': 3}, {'animal': 2}, {'car': 1}]
+
+
