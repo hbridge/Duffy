@@ -273,6 +273,6 @@ def getTopLocations(userId):
 """
 def getTopCategories(userId):
 
-	return [{'food': 3}, {'animal': 2}, {'car': 1}]
+	return [{'name': 'food', 'count': 3}, {'name': 'animal', 'count': 2}, {'name': 'car', 'count': 1}]
 
 
