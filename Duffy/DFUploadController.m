@@ -21,8 +21,8 @@
 
 // Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
-@property NSString *result;
-@property NSString *debug;
+@property (nonatomic, retain )NSString *result;
+@property (nonatomic, retain )NSString *debug;
 @end
 @implementation DFUploadResponse
 @end
@@ -265,13 +265,12 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadFinishedForPhoto:(DFPhoto *)photo
 {
-    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
-    
     [self saveUploadProgress];
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
                                                                   object:self
                                                                 userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
     
+    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
     [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
     [self postStatusUpdate];
     
