@@ -21,8 +21,8 @@
 
 // Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
-@property (nonatomic, retain )NSString *result;
-@property (nonatomic, retain )NSString *debug;
+@property (nonatomic, retain) NSString *result;
+@property (nonatomic, retain) NSString *debug;
 @end
 @implementation DFUploadResponse
 @end
