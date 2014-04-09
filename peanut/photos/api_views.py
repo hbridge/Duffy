@@ -178,10 +178,10 @@ def create_user(request):
 
 	if data.has_key('phone_id'):
 		phoneId = data['phone_id']
-		user = User.objects.get(phone_id=phoneId)
-		if user:
+		try:
+			user = User.objects.get(phone_id=phoneId)
 			return returnFailure(response, "User already exists")
-		else:
+		except User.DoesNotExist:
 			user = createUser(phoneId)
 	else:
 		return returnFailure(response, "Need a phone_id")
