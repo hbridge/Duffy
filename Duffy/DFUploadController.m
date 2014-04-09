@@ -319,7 +319,7 @@ static DFUploadController *defaultUploadController;
 - (void)showStatusBarNotification
 {
     if (self.currentSessionStats.numRemaining > 0) {
-        NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", self.currentSessionStats.numRemaining];
+        NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", (unsigned long)self.currentSessionStats.numRemaining];
 
         [JDStatusBarNotification showWithStatus:statusString];
         [JDStatusBarNotification showProgress:self.currentSessionStats.progress];
