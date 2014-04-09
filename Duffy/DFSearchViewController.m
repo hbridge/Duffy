@@ -195,7 +195,7 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
         }
         
         
-        [self updateSearchResults:nil];
+        [self updateSearchResults:self.searchBar.text];
     }];
 }
 
