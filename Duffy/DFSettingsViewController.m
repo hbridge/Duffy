@@ -161,8 +161,6 @@ NSString *DFEnabledNo = @"NO";
     [pb setString:[[DFUser currentUser] deviceID]];
 }
 
-
-
 - (IBAction)reUploadAllClicked:(UIButton *)sender {
     DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
     [[DFUploadController sharedUploadController] uploadPhotosWithURLs:[cameraRollPhotos.photoURLSet allObjects]];

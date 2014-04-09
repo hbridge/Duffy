@@ -34,7 +34,7 @@
     
     [Flurry setCrashReportingEnabled:NO];
     [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
-    [Flurry setLogLevel:FlurryLogLevelAll];
+    //[Flurry setLogLevel:FlurryLogLevelAll];
     
     if (![[DFUser currentUser] userID] || [[[DFUser currentUser] userID] isEqualToString:@""]) {
         [self showFirstTimeSetup];
