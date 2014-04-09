@@ -21,16 +21,14 @@
 
 // Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
-@property NSString *result;
-@property NSString *debug;
+@property (nonatomic, retain) NSString *result;
+@property (nonatomic, retain) NSString *debug;
 @end
 @implementation DFUploadResponse
 @end
 
 // Constants
 static NSString *AddPhotoResource = @"/api/addPhoto";
-NSString *DFUploadStatusUpdate = @"DFUploadStatusUpdate";
-NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 static NSString *UserIDParameterKey = @"phone_id";
 static NSString *PhotoMetadataKey = @"photo_metadata";
 static NSString *PhotoLocationKey = @"location_data";
@@ -42,6 +40,7 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 @property (atomic) dispatch_queue_t uploadDispatchQueue;
 @property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
 @property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
+@property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
@@ -86,7 +85,8 @@ static DFUploadController *defaultUploadController;
 {
     NSUInteger photosInQueuePreAdd = self.photoURLsToUpload.count;
     if (photoURLStrings.count < 1) return;
-    
+ 
+    [self beginBackgroundUpdateTask];
     if (!self.currentSessionStats) {
         self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     }
@@ -105,6 +105,19 @@ static DFUploadController *defaultUploadController;
 }
 
 #pragma mark - Private Uploading Code
+
+- (void) beginBackgroundUpdateTask
+{
+    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundUpdateTask];
+    }];
+}
+
+- (void) endBackgroundUpdateTask
+{
+    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+}
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
@@ -250,13 +263,12 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadFinishedForPhoto:(DFPhoto *)photo
 {
-    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
-    
     [self saveUploadProgress];
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
                                                                   object:self
                                                                 userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
     
+    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
     [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
     [self postStatusUpdate];
     
@@ -266,6 +278,7 @@ static DFUploadController *defaultUploadController;
     } else {
         NSLog(@"all photos uploaded.");
         self.currentSessionStats = nil;
+        [self endBackgroundUpdateTask];
     }
 }
 
@@ -283,7 +296,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)postStatusUpdate
 {
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusUpdate
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
 }

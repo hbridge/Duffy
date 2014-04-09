@@ -77,10 +77,10 @@
                  failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
     NSURLRequest *createRequest = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
-                                                                method:RKRequestMethodAny
+                                                                method:RKRequestMethodPOST
                                                                   path:DFCreateUserPath
                                                             parameters:@{DFDeviceIDParameterKey: deviceId}];
-    
+        
     RKObjectRequestOperation *operation =
     [[self objectManager]
      objectRequestOperationWithRequest:createRequest
@@ -139,13 +139,19 @@
                                                                                                   withMapping:userDataMapping]];
         
         
-        RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:userInfoResponseMapping
+        RKResponseDescriptor *getUserResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:userInfoResponseMapping
                                                                                                 method:RKRequestMethodGET
                                                                                            pathPattern:DFGetUserPath
                                                                                                keyPath:nil
                                                                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+        RKResponseDescriptor *createUserResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:userInfoResponseMapping
+                                                                                                       method:RKRequestMethodPOST
+                                                                                                  pathPattern:DFCreateUserPath
+                                                                                                      keyPath:nil
+                                                                                                  statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+
         
-        [_objectManager addResponseDescriptor:responseDescriptor];
+        [_objectManager addResponseDescriptorsFromArray:@[getUserResponseDescriptor, createUserResponseDescriptor]];
     }
     return _objectManager;
 }

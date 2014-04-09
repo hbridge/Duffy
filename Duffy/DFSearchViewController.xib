@@ -7,6 +7,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSearchViewController">
             <connections>
                 <outlet property="searchResultsTableView" destination="7kT-Iv-7ae" id="RPY-Tj-9iE"/>
+                <outlet property="uploadProgressView" destination="I97-rA-rDB" id="dVW-1G-0b0"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
                 <outlet property="webView" destination="f4T-rw-vqS" id="y9J-rm-7u7"/>
             </connections>
@@ -29,6 +30,11 @@
                         <outlet property="delegate" destination="-1" id="clb-LY-vdM"/>
                     </connections>
                 </tableView>
+                <view hidden="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="I97-rA-rDB" customClass="DFUploadProgressView">
+                    <rect key="frame" x="0.0" y="66" width="320" height="60"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>

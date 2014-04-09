@@ -39,6 +39,8 @@
 		5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */; };
 		5AACB90918F49AED00F4EEB6 /* libFlurry_4.4.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */; };
 		5AACB90D18F49D9700F4EEB6 /* DFAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */; };
+		5AACB91518F5D61300F4EEB6 /* DFUploadProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */; };
+		5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB91618F5D63500F4EEB6 /* DFUploadProgressView.xib */; };
 		5AB32E9F18EF58EC004FC27B /* TimeSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */; };
 		5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */; };
 		5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */; };
@@ -150,6 +152,9 @@
 		5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry_4.4.0.a; sourceTree = "<group>"; };
 		5AACB90B18F49D9700F4EEB6 /* DFAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAnalytics.h; sourceTree = "<group>"; };
 		5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAnalytics.m; sourceTree = "<group>"; };
+		5AACB91318F5D61300F4EEB6 /* DFUploadProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadProgressView.h; sourceTree = "<group>"; };
+		5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadProgressView.m; sourceTree = "<group>"; };
+		5AACB91618F5D63500F4EEB6 /* DFUploadProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUploadProgressView.xib; sourceTree = "<group>"; };
 		5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TimeSectionHeader@2x.png"; path = "Resources/Icons/TimeSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "LocationSectionHeader@2x.png"; path = "Resources/Icons/LocationSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SubjectSectionHeader@2x.png"; path = "Resources/Icons/SubjectSectionHeader@2x.png"; sourceTree = "<group>"; };
@@ -267,6 +272,9 @@
 				5A8D0B5118EF515100A1D9A7 /* Custom image view */,
 				5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */,
 				5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */,
+				5AACB91318F5D61300F4EEB6 /* DFUploadProgressView.h */,
+				5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */,
+				5AACB91618F5D63500F4EEB6 /* DFUploadProgressView.xib */,
 			);
 			name = "Generic Views";
 			sourceTree = "<group>";
@@ -659,6 +667,7 @@
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */,
 				5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */,
+				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
 				5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */,
@@ -769,6 +778,7 @@
 				5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
 				5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */,
+				5AACB91518F5D61300F4EEB6 /* DFUploadProgressView.m in Sources */,
 				5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -11,9 +11,6 @@
 
 @interface DFUploadController : NSObject
 
-extern NSString *DFUploadStatusUpdate;
-extern NSString *DFUploadStatusUpdateSessionUserInfoKey;
-
 @property (atomic, retain) DFUploadSessionStats *currentSessionStats;
 
 + (DFUploadController *)sharedUploadController;
