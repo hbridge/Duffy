@@ -8,6 +8,7 @@
 
 #import <RestKit/RestKit.h>
 #import <CommonCrypto/CommonHMAC.h>
+#import <JDStatusBarNotification/JDStatusBarNotification.h>
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
@@ -75,9 +76,11 @@ static DFUploadController *defaultUploadController;
     if (self) {
         self.uploadDispatchQueue = dispatch_queue_create("com.duffysoft.DFUploadController.UploadQueue", DISPATCH_QUEUE_SERIAL);
         self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
+        [self setupStatusBarNotifications];
     }
     return self;
 }
+
 
 #pragma mark - Public APIs
 
@@ -102,6 +105,17 @@ static DFUploadController *defaultUploadController;
           );
     [self postStatusUpdate];
 
+}
+
+
+#pragma mark - Private config code
+- (void)setupStatusBarNotifications
+{
+    [JDStatusBarNotification setDefaultStyle:^JDStatusBarStyle *(JDStatusBarStyle *style) {
+        style.progressBarColor = [UIColor blueColor];
+        style.animationType = JDStatusBarAnimationTypeFade;
+        return style;
+    }];
 }
 
 #pragma mark - Private Uploading Code
@@ -299,6 +313,19 @@ static DFUploadController *defaultUploadController;
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
+    [self showStatusBarNotification];
+}
+
+- (void)showStatusBarNotification
+{
+    if (self.currentSessionStats.numRemaining > 0) {
+        NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", self.currentSessionStats.numRemaining];
+
+        [JDStatusBarNotification showWithStatus:statusString];
+        [JDStatusBarNotification showProgress:self.currentSessionStats.progress];
+    } else {
+        [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
+    }
 }
 
 #pragma mark - Internal Helper Functions

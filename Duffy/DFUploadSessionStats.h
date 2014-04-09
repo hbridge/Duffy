@@ -17,5 +17,6 @@
 @property (nonatomic, readonly) NSUInteger numUploaded;
 @property (nonatomic, readonly) NSUInteger numAcceptedUploads;
 @property (nonatomic, readonly) NSUInteger numRemaining;
+@property (nonatomic, readonly) float progress;
 
 @end

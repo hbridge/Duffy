@@ -15,7 +15,6 @@
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
-@property (weak, nonatomic) IBOutlet DFUploadProgressView *uploadProgressView;
 @property (nonatomic, retain) NSMutableDictionary *defaultSearchResults;
 @property (nonatomic, retain) DFAutocompleteController *autcompleteController;
 

@@ -33,4 +33,9 @@
     return self.numAcceptedUploads - self.numUploaded;
 }
 
+- (float)progress
+{
+    return (float)self.numUploaded/(float)self.numAcceptedUploads;
+}
+
 @end
