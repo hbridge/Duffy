@@ -17,6 +17,8 @@
 #import "DFPhotoImageCache.h"
 #import "DFFirstTimeSetupViewController.h"
 #import "DFUser.h"
+#import <HockeySDK/HockeySDK.h>
+
 
 
 
@@ -31,6 +33,10 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"7e0628b85696cfd8bd471f9906fbc79f"];
+    [[BITHockeyManager sharedHockeyManager] startManager];
+    [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     
     [Flurry setCrashReportingEnabled:NO];
     [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];

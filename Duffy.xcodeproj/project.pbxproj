@@ -41,6 +41,9 @@
 		5AACB90D18F49D9700F4EEB6 /* DFAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */; };
 		5AACB91518F5D61300F4EEB6 /* DFUploadProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */; };
 		5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB91618F5D63500F4EEB6 /* DFUploadProgressView.xib */; };
+		5AACB92218F6092F00F4EEB6 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AACB91E18F6092F00F4EEB6 /* HockeySDK.framework */; };
+		5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB92018F6092F00F4EEB6 /* HockeySDK.xcconfig */; };
+		5AACB92418F6092F00F4EEB6 /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */; };
 		5AB32E9F18EF58EC004FC27B /* TimeSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */; };
 		5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */; };
 		5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */; };
@@ -155,6 +158,9 @@
 		5AACB91318F5D61300F4EEB6 /* DFUploadProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadProgressView.h; sourceTree = "<group>"; };
 		5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadProgressView.m; sourceTree = "<group>"; };
 		5AACB91618F5D63500F4EEB6 /* DFUploadProgressView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUploadProgressView.xib; sourceTree = "<group>"; };
+		5AACB91E18F6092F00F4EEB6 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
+		5AACB92018F6092F00F4EEB6 /* HockeySDK.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = HockeySDK.xcconfig; sourceTree = "<group>"; };
+		5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
 		5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TimeSectionHeader@2x.png"; path = "Resources/Icons/TimeSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "LocationSectionHeader@2x.png"; path = "Resources/Icons/LocationSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SubjectSectionHeader@2x.png"; path = "Resources/Icons/SubjectSectionHeader@2x.png"; sourceTree = "<group>"; };
@@ -236,6 +242,7 @@
 				5AE3BF7318E4D08F00ACB5DC /* CoreImage.framework in Frameworks */,
 				5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */,
 				5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */,
+				5AACB92218F6092F00F4EEB6 /* HockeySDK.framework in Frameworks */,
 				5A81ED3F18CFB57F003EF557 /* MobileCoreServices.framework in Frameworks */,
 				5AACB90918F49AED00F4EEB6 /* libFlurry_4.4.0.a in Frameworks */,
 				5A81ED3D18CFB574003EF557 /* CFNetwork.framework in Frameworks */,
@@ -386,6 +393,25 @@
 			name = Analytics;
 			sourceTree = "<group>";
 		};
+		5AACB91D18F6092F00F4EEB6 /* HockeySDK.embeddedframework */ = {
+			isa = PBXGroup;
+			children = (
+				5AACB91E18F6092F00F4EEB6 /* HockeySDK.framework */,
+				5AACB91F18F6092F00F4EEB6 /* Resources */,
+			);
+			name = HockeySDK.embeddedframework;
+			path = "Duffy/HockeySDK-iOS/HockeySDK.embeddedframework";
+			sourceTree = "<group>";
+		};
+		5AACB91F18F6092F00F4EEB6 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				5AACB92018F6092F00F4EEB6 /* HockeySDK.xcconfig */,
+				5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		5AB32EAC18F30121004FC27B /* Camera Roll */ = {
 			isa = PBXGroup;
 			children = (
@@ -441,6 +467,7 @@
 		5ADB24B9189985590016CA02 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5AACB91D18F6092F00F4EEB6 /* HockeySDK.embeddedframework */,
 				5AE3BF7418E4D1BF00ACB5DC /* ImageIO.framework */,
 				5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */,
 				5A67605818E2039800E355B6 /* CoreLocation.framework */,
@@ -582,6 +609,7 @@
 				5ADB24B5189985590016CA02 /* Resources */,
 				F2C81C8A001847B68C26EECC /* Copy Pods Resources */,
 				5A00DD6518F3A5E80095709B /* ShellScript */,
+				5AACB91C18F608B200F4EEB6 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -668,9 +696,11 @@
 				5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */,
 				5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */,
 				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
+				5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
 				5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */,
+				5AACB92418F6092F00F4EEB6 /* HockeySDKResources.bundle in Resources */,
 				5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */,
 				5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
@@ -703,6 +733,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "#!/bin/bash\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$INFOPLIST_FILE\"";
+		};
+		5AACB91C18F608B200F4EEB6 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "FILE=\"${SRCROOT}/HockeySDK-iOS/BuildAgent\"\nif [ -f \"$FILE\" ]; then\n\"$FILE\"\nfi";
 		};
 		F04301ADF53D493095B8120B /* Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -900,6 +943,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/hbridge/Documents/Repos/Duffy,
+					"$(PROJECT_DIR)/Duffy/HockeySDK-iOS/HockeySDK.embeddedframework",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
@@ -933,6 +977,7 @@
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					/Users/hbridge/Documents/Repos/Duffy,
+					"$(PROJECT_DIR)/Duffy/HockeySDK-iOS/HockeySDK.embeddedframework",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
