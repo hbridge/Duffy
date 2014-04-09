@@ -79,7 +79,7 @@
 		<div class = "ui-image">
 			<a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
 			<!--<a href="/viz/serve_image?photo={{ result.photoFilename }}" rel="external"> -->
-				<img src="{{ thumbnailBasepath }}{{ photoIdToThumb|lookup:result.photoId }}" class="lazyo" width="{{ imageSize }}px"></a>
+				<img title="TEXT: {{ result.text }} | ORIG_CLASSIFICATIONS: {{ result.classificationData }}" src="{{ thumbnailBasepath }}{{ photoIdToThumb|lookup:result.photoId }}" class="lazyo" width="{{ imageSize }}px"></a>
 		</div>
 
 		{% endfor %}

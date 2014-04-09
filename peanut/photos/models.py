@@ -23,7 +23,6 @@ class Photo(models.Model):
 	classification_data = models.CharField(max_length=10000, null=True, default="")
 	time_taken = models.DateTimeField(null=True)
 
-
 	def __unicode__(self): 
 		return str(self.user) + "/" + str(self.new_filename)
 
