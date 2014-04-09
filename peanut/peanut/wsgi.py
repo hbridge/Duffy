@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 
 import os, sys
 
-sys.path.append('/home/derek/Duffy/peanut')
+sys.path.append('/home/derek/prod/Duffy/peanut')
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
