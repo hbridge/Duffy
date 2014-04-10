@@ -25,9 +25,12 @@ extern NSString* const DFAnalyticsValueResultFailure;
 + (void)logSearchLoadStartedWithQuery:(NSString *)query
                        suggestions:(NSDictionary *)suggestions;
 + (void)logSearchLoadEndedWithQuery:(NSString *)query;
++ (void)logSearchResultPageLoaded:(NSInteger)searchPage;
 
 + (void)logUploadBeganWithNumBytes:(NSUInteger)bodyDataSizeInBytes;
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
+
+
 
 @end

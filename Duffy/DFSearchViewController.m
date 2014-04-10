@@ -211,7 +211,7 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (void)executeSearchForQuery:(NSString *)query
 {
-    self.lastSearchQuery = query;
+    self.currentlyLoadingSearchQuery = query;
     NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
                                 [[[DFUser currentUser] serverURL] absoluteString],
                                 SearchPath,
@@ -230,12 +230,22 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
     NSString *requestURLString = request.URL.absoluteString;
     if ([requestURLString rangeOfString:@"user_data"].location != NSNotFound) {
         [webView stopLoading];
-        NSLog(@"intercepted load of full photo: %@", requestURLString);
+        NSLog(@"Pushing native view of full photo: %@", requestURLString);
         [self pushPhotoWebView:requestURLString];
         return NO;
     }
     
     return YES;
+}
+
+
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+    if (self.currentlyLoadingSearchQuery) {
+        [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
+        self.currentlyLoadingSearchQuery = nil;
+    }
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
@@ -247,7 +257,23 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     
-    [DFAnalytics logSearchLoadEndedWithQuery:self.lastSearchQuery];
+    if (self.currentlyLoadingSearchQuery) {
+        [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
+        self.currentlyLoadingSearchQuery = nil;
+    }
+    
+    NSString *requestURLString = self.webView.request.URL.absoluteString;
+    
+    NSError *error;
+    NSRegularExpression *pageNumRegex = [NSRegularExpression regularExpressionWithPattern:@"page\\=(\\d+)" options:0 error:&error];
+    NSArray *matches = [pageNumRegex matchesInString:requestURLString options:0 range:[requestURLString rangeOfString:requestURLString]];
+    if (matches && matches.count > 0) {
+        NSRange pageCountRange = [[matches firstObject] rangeAtIndex:1];
+        NSString *pageCountString = [requestURLString substringWithRange:pageCountRange];
+        NSInteger pageCount = [pageCountString integerValue];
+        [DFAnalytics logSearchResultPageLoaded:pageCount];
+    }
+    
 }
 
 - (void)pushPhotoWebView:(NSString *)photoURLString

@@ -42,6 +42,9 @@ NSString* const SuggestionsKey = @"searchSuggestions";
 NSString* const SLatencyKey = @"SecondsLatency";
 NSString* const SearchAbortedEvent = @"SearchExecuted";
 
+NSString* const SearchPageLoaded = @"SearchResultPageLoaded";
+NSString* const NumberKey = @"number";
+
 // Uploads
 NSString* const UploadPhotoEvent = @"UploadPhoto";
 NSString* const SizeInKBKey = @"sizeInKB";
@@ -120,6 +123,7 @@ static DFAnalytics *defaultLogger;
     if (![endQuery isEqualToString:sharedLogger.inProgressQueryString]) {
         NSLog(@"Analytics error: search load end query is different form start query.  Start query: %@ End Query: %@",
               sharedLogger.inProgressQueryString, endQuery);
+        return;
     }
     
     
@@ -144,6 +148,7 @@ static DFAnalytics *defaultLogger;
     if (![query isEqualToString:sharedLogger.inProgressQueryString]) {
         NSLog(@"Analytics error: logging search aported with different query from start query.  Query aborted: %@ End Query: %@",
               query, sharedLogger.inProgressQueryString);
+        return;
     }
     
     NSTimeInterval queryDuration = [[NSDate date] timeIntervalSinceDate:sharedLogger.inProgressQueryStart];
@@ -179,6 +184,11 @@ static DFAnalytics *defaultLogger;
                                                             ResultKey: resultValue,
                                                             DebugStringKey: debug
                                                             }];
+}
+
++ (void)logSearchResultPageLoaded:(NSInteger)searchPage
+{
+    [Flurry logEvent:SearchPageLoaded withParameters:@{NumberKey: [NSNumber numberWithInteger:searchPage]}];
 }
 
 
