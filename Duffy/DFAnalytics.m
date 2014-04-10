@@ -54,6 +54,11 @@ NSString* const DFAnalyticsValueResultFailure = @"failure";
 NSString* const DebugStringKey = @"debug";
 
 
+// Individual photo loads
+NSString* const PhotoWebviewLoadEvent = @"PhotoWebviewLoad";
+NSString* const DFAnalyticsValueResultAborted = @"aborted";
+
+
 static DFAnalytics *defaultLogger;
 
 + (DFAnalytics *)sharedLogger {
@@ -190,6 +195,22 @@ static DFAnalytics *defaultLogger;
 {
     [Flurry logEvent:SearchPageLoaded withParameters:@{NumberKey: [NSNumber numberWithInteger:searchPage]}];
 }
+
++ (void)logPhotoWebviewLoadBegan
+{
+    [Flurry logEvent:PhotoWebviewLoadEvent withParameters:nil timed:YES];
+}
+
++ (void)logPhotoWebviewLoadEnded
+{
+    [Flurry endTimedEvent:PhotoWebviewLoadEvent withParameters:nil];
+}
+
++ (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString
+{
+    [Flurry endTimedEvent:PhotoWebviewLoadEvent withParameters:@{ResultKey: resultString}];
+}
+
 
 
 @end

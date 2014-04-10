@@ -51,6 +51,7 @@
 {
     [super viewDidDisappear:animated];
     [DFAnalytics logViewController:self disappearedWithParameters:nil];
+    [DFAnalytics logPhotoWebviewLoadEndedWithResult:DFAnalyticsValueResultAborted];
 }
 
 - (void)setupNavBar
@@ -79,11 +80,13 @@
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
     [self.loadingIndicator startAnimating];
+    [DFAnalytics logPhotoWebviewLoadBegan];
 }
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
     [self.loadingIndicator stopAnimating];
+    [DFAnalytics logPhotoWebviewLoadEnded];
 }
 
 @end

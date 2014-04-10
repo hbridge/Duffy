@@ -14,7 +14,7 @@
 extern NSString * const DFAnalyticsActionTypeSwipe;
 extern NSString* const DFAnalyticsValueResultSuccess;
 extern NSString* const DFAnalyticsValueResultFailure;
-
+extern NSString* const DFAnalyticsValueResultAborted;
 
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
@@ -31,6 +31,9 @@ extern NSString* const DFAnalyticsValueResultFailure;
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
 
++ (void)logPhotoWebviewLoadBegan;
++ (void)logPhotoWebviewLoadEnded;
++ (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString;
 
 
 @end
