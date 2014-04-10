@@ -1,239 +1,239 @@
-kit fox,Vulpes macrotis,fox,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-English setter,setter,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Siberian husky,sled dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Australian terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-English springer,English springer spaniel,springer spaniel,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-grey whale,gray whale,devilfish,Eschrichtius gibbosus,Eschrichtius robustus,baleen whale,whale,cetacean,aquatic mammal,placental,mammal,vertebrate,chordate,animal
-lesser panda,red panda,panda,bear cat,cat bear,Ailurus fulgens,procyonid,carnivore,placental,mammal,vertebrate,chordate,animal
-Egyptian cat,domestic cat,cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-ibex,Capra ibex,wild goat,goat,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-Persian cat,domestic cat,cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-cougar,puma,catamount,mountain lion,painter,panther,Felis concolor,wildcat,cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-gazelle,antelope,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-porcupine,hedgehog,rodent,placental,mammal,vertebrate,chordate,animal
-sea lion,eared seal,seal,pinniped mammal,aquatic mammal,placental,mammal,vertebrate,chordate,animal
-malamute,malemute,Alaskan malamute,sled dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-badger,American,inhabitant,person
-Great Dane,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Walker hound,Walker foxhound,foxhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Welsh springer spaniel,springer spaniel,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-whippet,greyhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Scottish deerhound,deerhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-killer whale,killer,orca,grampus,sea wolf,Orcinus orca,dolphin,toothed whale,whale,cetacean,aquatic mammal,placental,mammal,vertebrate,chordate,animal
-mink,fur,animal skin,animal product,animal material,material,substance
-African elephant,Loxodonta africana,elephant,proboscidean,placental,mammal,vertebrate,chordate,animal
-Weimaraner,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-soft-coated wheaten terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Dandie Dinmont,Dandie Dinmont terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-red wolf,maned wolf,Canis rufus,Canis niger,wolf,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Old English sheepdog,bobtail,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-jaguar,panther,Panthera onca,Felis onca,big cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-otterhound,otter hound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-bloodhound,sleuthhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Airedale,Airedale terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-hyena,hyaena,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-meerkat,mierkat,viverrine,carnivore,placental,mammal,vertebrate,chordate,animal
-giant schnauzer,schnauzer,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-titi,titi monkey,angiospermous tree,tree,woody plant,vascular plant,plant
-three-toed sloth,ai,Bradypus tridactylus,sloth,edentate,placental,mammal,vertebrate,chordate,animal
-sorrel,herb,vascular plant,plant
-black-footed ferret,ferret,Mustela nigripes,musteline mammal,carnivore,placental,mammal,vertebrate,chordate,animal
-dalmatian,coach dog,carriage dog,European,inhabitant,person
-black-and-tan coonhound,coonhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-papillon,toy spaniel,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-skunk,polecat,wood pussy,unpleasant person,unwelcome person,person
-Staffordshire bullterrier,Staffordshire bull terrier,bullterrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Mexican hairless,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Bouvier des Flandres,Bouviers des Flandres,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-weasel,person
-miniature poodle,poodle,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Cardigan,Cardigan Welsh corgi,sweater,garment,clothing,covering
-malinois,Belgian sheepdog,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-bighorn,bighorn sheep,cimarron,Rocky Mountain bighorn,Rocky Mountain sheep,Ovis canadensis
-fox squirrel,eastern fox squirrel,Sciurus niger,tree squirrel,squirrel,rodent,placental,mammal,vertebrate,chordate,animal
-colobus,colobus monkey,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-tiger cat,wildcat,cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-Lhasa,Lhasa apso
-impala,Aepyceros melampus,antelope,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-coyote,prairie wolf,brush wolf,Canis latrans,wolf,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Yorkshire terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Newfoundland,Newfoundland dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-brown bear,bruin,Ursus arctos,bear,carnivore,placental,mammal,vertebrate,chordate,animal
-red fox,Vulpes vulpes,herb,vascular plant,plant
-Norwegian elkhound,elkhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Rottweiler,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-hartebeest,antelope,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-Saluki,gazelle hound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-grey fox,gray fox,Urocyon cinereoargenteus,fox,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-schipperke,watchdog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Pekinese,Pekingese,Peke,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Brabancon griffon,griffon,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-West Highland white terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Sealyham terrier,Sealyham,Welsh terrier,wirehair,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-guenon,guenon monkey,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-mongoose,viverrine,carnivore,placental,mammal,vertebrate,chordate,animal
-indri,indris,Indri indri,Indri brevicaudatus,lemur,primate,placental,mammal,vertebrate,chordate,animal
-tiger,Panthera tigris,person
-Irish wolfhound,wolfhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-wild boar,boar,Sus scrofa,swine,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-EntleBucher,Sennenhunde,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-zebra,equine,odd-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-ram,tup,volatile storage,memory,memory device,device
-French bulldog,bulldog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-orangutan,orang,orangutang,Pongo pygmaeus,great ape,anthropoid ape,ape,primate,placental,mammal,vertebrate,chordate,animal
-basenji,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-leopard,Panthera pardus,fur,animal skin,animal product,animal material,material,substance
-Bernese mountain dog,Sennenhunde,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Maltese dog,Maltese terrier,Maltese,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Norfolk terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-toy terrier,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-vizsla,Hungarian pointer,pointer,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-cairn,cairn terrier,marker,symbol,signal,communication
-squirrel monkey,Saimiri sciureus,New World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-groenendael,Belgian sheepdog,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-clumber,clumber spaniel,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Siamese cat,Siamese,domestic cat,cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-chimpanzee,chimp,Pan troglodytes,great ape,anthropoid ape,ape,primate,placental,mammal,vertebrate,chordate,animal
-komondor,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Afghan hound,Afghan,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Japanese spaniel,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-proboscis monkey,Nasalis larvatus,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-guinea pig,Cavia cobaya,person
-white wolf,Arctic wolf,Canis lupus tundrarum,wolf,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-ice bear,polar bear,Ursus Maritimus,Thalarctos maritimus,bear,carnivore,placental,mammal,vertebrate,chordate,animal
-gorilla,Gorilla gorilla,great ape,anthropoid ape,ape,primate,placental,mammal,vertebrate,chordate,animal
-borzoi,Russian wolfhound,wolfhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-toy poodle,poodle,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Kerry blue terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-ox,cattle,bovine,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-Scotch terrier,Scottish terrier,Scottie,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Tibetan mastiff,mastiff,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-spider monkey,Ateles geoffroyi,New World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-Doberman,Doberman pinscher,pinscher,watchdog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Boston bull,Boston terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Greater Swiss Mountain dog,Sennenhunde,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Appenzeller,Sennenhunde,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Shih-Tzu,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Irish water spaniel,water spaniel,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Pomeranian,spitz,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Bedlington terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-warthog,swine,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-Arabian camel,dromedary,Camelus dromedarius,camel,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-siamang,Hylobates syndactylus,Symphalangus syndactylus,lesser ape,anthropoid ape,ape,primate,placental,mammal,vertebrate,chordate,animal
-miniature schnauzer,schnauzer,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-collie,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-golden retriever,retriever,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Irish terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-affenpinscher,monkey pinscher,monkey dog,pinscher,watchdog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Border collie,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-hare,leporid,lagomorph,placental,mammal,vertebrate,chordate,animal
-boxer,combatant,person
-silky terrier,Sydney silky,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-beagle,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Leonberg,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-German short-haired pointer,pointer,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-patas,hussar monkey,Erythrocebus patas,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-dhole,Cuon alpinus,wild dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-baboon,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-macaque,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-Chesapeake Bay retriever,retriever,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-bull mastiff,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-kuvasz,watchdog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-capuchin,ringtail,Cebus capucinus,cloak,overgarment,garment,clothing,covering
-pug,pug-dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-curly-coated retriever,retriever,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Norwich terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-flat-coated retriever,retriever,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-hog,pig,grunter,squealer,Sus scrofa,selfish person,unpleasant person,unwelcome person,person
-keeshond,spitz,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Eskimo dog,husky,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Brittany spaniel,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-standard poodle,poodle,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Lakeland terrier,wirehair,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-snow leopard,ounce,Panthera uncia,big cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-Gordon setter,setter,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-dingo,warrigal,warragal,Canis dingo,wild dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-standard schnauzer,schnauzer,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-hamster,rodent,placental,mammal,vertebrate,chordate,animal
-Tibetan terrier,chrysanthemum dog,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Arctic fox,white fox,Alopex lagopus,fox,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-wire-haired fox terrier,fox terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-basset,basset hound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-water buffalo,water ox,Asiatic buffalo,Bubalus bubalis,Old World buffalo,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-American black bear,black bear,Ursus americanus,Euarctos americanus,bear,carnivore,placental,mammal,vertebrate,chordate,animal
-Angora,Angora rabbit
-bison,bovid,ruminant,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-howler monkey,howler,New World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-hippopotamus,hippo,river horse,Hippopotamus amphibius,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-chow,chow chow,dynasty,family,lineage,genealogy,kin,social group,group
-giant panda,panda,panda bear,coon bear,Ailuropoda melanoleuca,procyonid,carnivore,placental,mammal,vertebrate,chordate,animal
-American Staffordshire terrier,Staffordshire terrier,American pit bull terrier,pit bull terrier,bullterrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Shetland sheepdog,Shetland sheep dog,Shetland,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Great Pyrenees,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Chihuahua
-tabby,tabby cat,domestic cat,cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-marmoset,New World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-Labrador retriever,retriever,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Saint Bernard,St Bernard,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-armadillo,edentate,placental,mammal,vertebrate,chordate,animal
-Samoyed,Samoyede,Russian,native,person
-bluetick,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-redbone,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-polecat,fitch,foulmart,foumart,Mustela putorius,musteline mammal,carnivore,placental,mammal,vertebrate,chordate,animal
-marmot,rodent,placental,mammal,vertebrate,chordate,animal
-kelpie,evil spirit,spirit,spiritual being,belief,content,cognition,psychological feature
-gibbon,Hylobates lar
-llama,even-toed ungulate,ungulate,placental,mammal,vertebrate,chordate,animal
-miniature pinscher,pinscher,watchdog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-wood rabbit,cottontail,cottontail rabbit,rabbit,leporid,lagomorph,placental,mammal,vertebrate,chordate,animal
-Italian greyhound,greyhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-lion,king of beasts,Panthera leo,big cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-cocker spaniel,English cocker spaniel,cocker,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Irish setter,red setter,setter,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-dugong,Dugong dugon,sea cow,aquatic mammal,placental,mammal,vertebrate,chordate,animal
-Indian elephant,Elephas maximus,elephant,proboscidean,placental,mammal,vertebrate,chordate,animal
-beaver,fur,animal skin,animal product,animal material,material,substance
-Sussex spaniel,spaniel,sporting dog,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Pembroke,Pembroke Welsh corgi,corgi,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Blenheim spaniel,English toy spaniel,toy spaniel,toy dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-Madagascar cat,ring-tailed lemur,Lemur catta,lemur,primate,placental,mammal,vertebrate,chordate,animal
-Rhodesian ridgeback,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-lynx,catamount
-African hunting dog,hyena dog,Cape hunting dog,Lycaon pictus,wild dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-langur,Old World monkey,monkey,primate,placental,mammal,vertebrate,chordate,animal
-Ibizan hound,Ibizan Podenco,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-timber wolf,grey wolf,gray wolf,Canis lupus,wolf,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-cheetah,chetah,Acinonyx jubatus,big cat,feline,carnivore,placental,mammal,vertebrate,chordate,animal
-English foxhound,foxhound,hound,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-briard,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-sloth bear,Melursus ursinus,Ursus ursinus,bear,carnivore,placental,mammal,vertebrate,chordate,animal
-Border terrier,terrier,hunting dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-German shepherd,German shepherd dog,German police dog,alsatian,shepherd dog,working dog,dog,canine,carnivore,placental,mammal,vertebrate,chordate,animal
-otter,fur,animal skin,animal product,animal material,material,substance
-koala,koala bear,kangaroo bear,native bear,Phascolarctos cinereus,phalanger,marsupial,metatherian,mammal,vertebrate,chordate,animal
-tusker,mammal,vertebrate,chordate,animal
-echidna,spiny anteater,anteater,monotreme,prototherian,mammal,vertebrate,chordate,animal
-wallaby,brush kangaroo,kangaroo,marsupial,metatherian,mammal,vertebrate,chordate,animal
-platypus,duckbill,duckbilled platypus,duck-billed platypus,Ornithorhynchus anatinus,monotreme,prototherian,mammal,vertebrate,chordate,animal
-wombat,marsupial,metatherian,mammal,vertebrate,chordate,animal
+kit fox,Vulpes macrotis,fox,canine,mammal,animal
+English setter,setter,sporting dog,hunting dog,dog,canine,mammal,animal
+Siberian husky,sled dog,working dog,dog,canine,mammal,animal
+Australian terrier,terrier,hunting dog,dog,canine,mammal,animal
+English springer,English springer spaniel,springer spaniel,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+grey whale,gray whale,devilfish,Eschrichtius gibbosus,Eschrichtius robustus,baleen whale,whale,cetacean,aquatic mammal,mammal,animal
+lesser panda,red panda,panda,bear cat,cat bear,Ailurus fulgens,procyonid,mammal,animal
+Egyptian cat,domestic cat,cat,feline,mammal,animal
+ibex,Capra ibex,wild goat,goat,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+Persian cat,domestic cat,cat,feline,mammal,animal
+cougar,puma,catamount,mountain lion,painter,panther,Felis concolor,wildcat,cat,feline,mammal,animal
+gazelle,antelope,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+porcupine,hedgehog,rodent,mammal,animal
+sea lion,eared seal,seal,pinniped mammal,aquatic mammal,mammal,animal
+malamute,malemute,Alaskan malamute,sled dog,working dog,dog,canine,mammal,animal
+badger,musteline mammal,mammal,animal
+Great Dane,working dog,dog,canine,mammal,animal
+Walker hound,Walker foxhound,foxhound,hound,hunting dog,dog,canine,mammal,animal
+Welsh springer spaniel,springer spaniel,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+whippet,greyhound,hound,hunting dog,dog,canine,mammal,animal
+Scottish deerhound,deerhound,hound,hunting dog,dog,canine,mammal,animal
+killer whale,killer,orca,grampus,sea wolf,Orcinus orca,dolphin,toothed whale,whale,cetacean,aquatic mammal,mammal,animal
+mink,musteline mammal,mammal,animal
+African elephant,Loxodonta africana,elephant,proboscidean,mammal,animal
+Weimaraner,hound,hunting dog,dog,canine,mammal,animal
+soft-coated wheaten terrier,terrier,hunting dog,dog,canine,mammal,animal
+Dandie Dinmont,Dandie Dinmont terrier,terrier,hunting dog,dog,canine,mammal,animal
+red wolf,maned wolf,Canis rufus,Canis niger,wolf,canine,mammal,animal
+Old English sheepdog,bobtail,shepherd dog,working dog,dog,canine,mammal,animal
+jaguar,panther,Panthera onca,Felis onca,big cat,feline,mammal,animal
+otterhound,otter hound,hound,hunting dog,dog,canine,mammal,animal
+bloodhound,sleuthhound,hound,hunting dog,dog,canine,mammal,animal
+Airedale,Airedale terrier,terrier,hunting dog,dog,canine,mammal,animal
+hyena,hyaena,canine,mammal,animal
+meerkat,mierkat,viverrine,mammal,animal
+giant schnauzer,schnauzer,terrier,hunting dog,dog,canine,mammal,animal
+titi,titi monkey,New World monkey,monkey,primate,mammal,animal
+three-toed sloth,ai,Bradypus tridactylus,sloth,edentate,mammal,animal
+sorrel,horse,equine,odd-toed ungulate,ungulate,mammal,animal
+black-footed ferret,ferret,Mustela nigripes,musteline mammal,mammal,animal
+dalmatian,coach dog,carriage dog,dog,canine,mammal,animal
+black-and-tan coonhound,coonhound,hound,hunting dog,dog,canine,mammal,animal
+papillon,toy spaniel,toy dog,dog,canine,mammal,animal
+skunk,polecat,wood pussy,musteline mammal,mammal,animal
+Staffordshire bullterrier,Staffordshire bull terrier,bullterrier,terrier,hunting dog,dog,canine,mammal,animal
+Mexican hairless,dog,canine,mammal,animal
+Bouvier des Flandres,Bouviers des Flandres,shepherd dog,working dog,dog,canine,mammal,animal
+weasel,musteline mammal,mammal,animal
+miniature poodle,poodle,dog,canine,mammal,animal
+Cardigan,Cardigan Welsh corgi,corgi,dog,canine,mammal,animal
+malinois,Belgian sheepdog,shepherd dog,working dog,dog,canine,mammal,animal
+bighorn,bighorn sheep,cimarron,Rocky Mountain bighorn,Rocky Mountain sheep,Ovis canadensis,mountain sheep,wild sheep,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+fox squirrel,eastern fox squirrel,Sciurus niger,tree squirrel,squirrel,rodent,mammal,animal
+colobus,colobus monkey,Old World monkey,monkey,primate,mammal,animal
+tiger cat,domestic cat,cat,feline,mammal,animal
+Lhasa,Lhasa apso,terrier,hunting dog,dog,canine,mammal,animal
+impala,Aepyceros melampus,antelope,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+coyote,prairie wolf,brush wolf,Canis latrans,wolf,canine,mammal,animal
+Yorkshire terrier,terrier,hunting dog,dog,canine,mammal,animal
+Newfoundland,Newfoundland dog,dog,canine,mammal,animal
+brown bear,bruin,Ursus arctos,bear,mammal,animal
+red fox,Vulpes vulpes,fox,canine,mammal,animal
+Norwegian elkhound,elkhound,hound,hunting dog,dog,canine,mammal,animal
+Rottweiler,shepherd dog,working dog,dog,canine,mammal,animal
+hartebeest,antelope,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+Saluki,gazelle hound,hound,hunting dog,dog,canine,mammal,animal
+grey fox,gray fox,Urocyon cinereoargenteus,fox,canine,mammal,animal
+schipperke,watchdog,working dog,dog,canine,mammal,animal
+Pekinese,Pekingese,Peke,toy dog,dog,canine,mammal,animal
+Brabancon griffon,griffon,dog,canine,mammal,animal
+West Highland white terrier,terrier,hunting dog,dog,canine,mammal,animal
+Sealyham terrier,Sealyham,Welsh terrier,wirehair,terrier,hunting dog,dog,canine,mammal,animal
+guenon,guenon monkey,Old World monkey,monkey,primate,mammal,animal
+mongoose,viverrine,mammal,animal
+indri,indris,Indri indri,Indri brevicaudatus,lemur,primate,mammal,animal
+tiger,Panthera tigris,big cat,feline,mammal,animal
+Irish wolfhound,wolfhound,hound,hunting dog,dog,canine,mammal,animal
+wild boar,boar,Sus scrofa,swine,even-toed ungulate,ungulate,mammal,animal
+EntleBucher,Sennenhunde,working dog,dog,canine,mammal,animal
+zebra,equine,odd-toed ungulate,ungulate,mammal,animal
+ram,tup,sheep,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+French bulldog,bulldog,working dog,dog,canine,mammal,animal
+orangutan,orang,orangutang,Pongo pygmaeus,great ape,anthropoid ape,ape,primate,mammal,animal
+basenji,dog,canine,mammal,animal
+leopard,Panthera pardus,big cat,feline,mammal,animal
+Bernese mountain dog,Sennenhunde,working dog,dog,canine,mammal,animal
+Maltese dog,Maltese terrier,Maltese,toy dog,dog,canine,mammal,animal
+Norfolk terrier,terrier,hunting dog,dog,canine,mammal,animal
+toy terrier,toy dog,dog,canine,mammal,animal
+vizsla,Hungarian pointer,pointer,sporting dog,hunting dog,dog,canine,mammal,animal
+cairn,cairn terrier,terrier,hunting dog,dog,canine,mammal,animal
+squirrel monkey,Saimiri sciureus,New World monkey,monkey,primate,mammal,animal
+groenendael,Belgian sheepdog,shepherd dog,working dog,dog,canine,mammal,animal
+clumber,clumber spaniel,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+Siamese cat,Siamese,domestic cat,cat,feline,mammal,animal
+chimpanzee,chimp,Pan troglodytes,great ape,anthropoid ape,ape,primate,mammal,animal
+komondor,shepherd dog,working dog,dog,canine,mammal,animal
+Afghan hound,Afghan,hound,hunting dog,dog,canine,mammal,animal
+Japanese spaniel,toy dog,dog,canine,mammal,animal
+proboscis monkey,Nasalis larvatus,Old World monkey,monkey,primate,mammal,animal
+guinea pig,Cavia cobaya,cavy,rodent,mammal,animal
+white wolf,Arctic wolf,Canis lupus tundrarum,wolf,canine,mammal,animal
+ice bear,polar bear,Ursus Maritimus,Thalarctos maritimus,bear,mammal,animal
+gorilla,Gorilla gorilla,great ape,anthropoid ape,ape,primate,mammal,animal
+borzoi,Russian wolfhound,wolfhound,hound,hunting dog,dog,canine,mammal,animal
+toy poodle,poodle,dog,canine,mammal,animal
+Kerry blue terrier,terrier,hunting dog,dog,canine,mammal,animal
+ox,cattle,bovine,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+Scotch terrier,Scottish terrier,Scottie,terrier,hunting dog,dog,canine,mammal,animal
+Tibetan mastiff,mastiff,working dog,dog,canine,mammal,animal
+spider monkey,Ateles geoffroyi,New World monkey,monkey,primate,mammal,animal
+Doberman,Doberman pinscher,pinscher,watchdog,working dog,dog,canine,mammal,animal
+Boston bull,Boston terrier,terrier,hunting dog,dog,canine,mammal,animal
+Greater Swiss Mountain dog,Sennenhunde,working dog,dog,canine,mammal,animal
+Appenzeller,Sennenhunde,working dog,dog,canine,mammal,animal
+Shih-Tzu,toy dog,dog,canine,mammal,animal
+Irish water spaniel,water spaniel,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+Pomeranian,spitz,dog,canine,mammal,animal
+Bedlington terrier,terrier,hunting dog,dog,canine,mammal,animal
+warthog,swine,even-toed ungulate,ungulate,mammal,animal
+Arabian camel,dromedary,Camelus dromedarius,camel,even-toed ungulate,ungulate,mammal,animal
+siamang,Hylobates syndactylus,Symphalangus syndactylus,lesser ape,anthropoid ape,ape,primate,mammal,animal
+miniature schnauzer,schnauzer,terrier,hunting dog,dog,canine,mammal,animal
+collie,shepherd dog,working dog,dog,canine,mammal,animal
+golden retriever,retriever,sporting dog,hunting dog,dog,canine,mammal,animal
+Irish terrier,terrier,hunting dog,dog,canine,mammal,animal
+affenpinscher,monkey pinscher,monkey dog,pinscher,watchdog,working dog,dog,canine,mammal,animal
+Border collie,shepherd dog,working dog,dog,canine,mammal,animal
+hare,leporid,lagomorph,mammal,animal
+boxer,working dog,dog,canine,mammal,animal
+silky terrier,Sydney silky,terrier,hunting dog,dog,canine,mammal,animal
+beagle,hound,hunting dog,dog,canine,mammal,animal
+Leonberg,dog,canine,mammal,animal
+German short-haired pointer,pointer,sporting dog,hunting dog,dog,canine,mammal,animal
+patas,hussar monkey,Erythrocebus patas,Old World monkey,monkey,primate,mammal,animal
+dhole,Cuon alpinus,wild dog,canine,mammal,animal
+baboon,Old World monkey,monkey,primate,mammal,animal
+macaque,Old World monkey,monkey,primate,mammal,animal
+Chesapeake Bay retriever,retriever,sporting dog,hunting dog,dog,canine,mammal,animal
+bull mastiff,working dog,dog,canine,mammal,animal
+kuvasz,watchdog,working dog,dog,canine,mammal,animal
+capuchin,ringtail,Cebus capucinus,New World monkey,monkey,primate,mammal,animal
+pug,pug-dog,dog,canine,mammal,animal
+curly-coated retriever,retriever,sporting dog,hunting dog,dog,canine,mammal,animal
+Norwich terrier,terrier,hunting dog,dog,canine,mammal,animal
+flat-coated retriever,retriever,sporting dog,hunting dog,dog,canine,mammal,animal
+hog,pig,grunter,squealer,Sus scrofa,swine,even-toed ungulate,ungulate,mammal,animal
+keeshond,spitz,dog,canine,mammal,animal
+Eskimo dog,husky,working dog,dog,canine,mammal,animal
+Brittany spaniel,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+standard poodle,poodle,dog,canine,mammal,animal
+Lakeland terrier,wirehair,terrier,hunting dog,dog,canine,mammal,animal
+snow leopard,ounce,Panthera uncia,big cat,feline,mammal,animal
+Gordon setter,setter,sporting dog,hunting dog,dog,canine,mammal,animal
+dingo,warrigal,warragal,Canis dingo,wild dog,canine,mammal,animal
+standard schnauzer,schnauzer,terrier,hunting dog,dog,canine,mammal,animal
+hamster,rodent,mammal,animal
+Tibetan terrier,chrysanthemum dog,terrier,hunting dog,dog,canine,mammal,animal
+Arctic fox,white fox,Alopex lagopus,fox,canine,mammal,animal
+wire-haired fox terrier,fox terrier,terrier,hunting dog,dog,canine,mammal,animal
+basset,basset hound,hound,hunting dog,dog,canine,mammal,animal
+water buffalo,water ox,Asiatic buffalo,Bubalus bubalis,Old World buffalo,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+American black bear,black bear,Ursus americanus,Euarctos americanus,bear,mammal,animal
+Angora,Angora rabbit,rabbit,leporid,lagomorph,mammal,animal
+bison,bovid,ruminant,even-toed ungulate,ungulate,mammal,animal
+howler monkey,howler,New World monkey,monkey,primate,mammal,animal
+hippopotamus,hippo,river horse,Hippopotamus amphibius,even-toed ungulate,ungulate,mammal,animal
+chow,chow chow,spitz,dog,canine,mammal,animal
+giant panda,panda,panda bear,coon bear,Ailuropoda melanoleuca,procyonid,mammal,animal
+American Staffordshire terrier,Staffordshire terrier,American pit bull terrier,pit bull terrier,bullterrier,terrier,hunting dog,dog,canine,mammal,animal
+Shetland sheepdog,Shetland sheep dog,Shetland,shepherd dog,working dog,dog,canine,mammal,animal
+Great Pyrenees,dog,canine,mammal,animal
+Chihuahua,toy dog,dog,canine,mammal,animal
+tabby,tabby cat,domestic cat,cat,feline,mammal,animal
+marmoset,New World monkey,monkey,primate,mammal,animal
+Labrador retriever,retriever,sporting dog,hunting dog,dog,canine,mammal,animal
+Saint Bernard,St Bernard,working dog,dog,canine,mammal,animal
+armadillo,edentate,mammal,animal
+Samoyed,Samoyede,spitz,dog,canine,mammal,animal
+bluetick,hound,hunting dog,dog,canine,mammal,animal
+redbone,hound,hunting dog,dog,canine,mammal,animal
+polecat,fitch,foulmart,foumart,Mustela putorius,musteline mammal,mammal,animal
+marmot,rodent,mammal,animal
+kelpie,shepherd dog,working dog,dog,canine,mammal,animal
+gibbon,Hylobates lar,lesser ape,anthropoid ape,ape,primate,mammal,animal
+llama,even-toed ungulate,ungulate,mammal,animal
+miniature pinscher,pinscher,watchdog,working dog,dog,canine,mammal,animal
+wood rabbit,cottontail,cottontail rabbit,rabbit,leporid,lagomorph,mammal,animal
+Italian greyhound,greyhound,hound,hunting dog,dog,canine,mammal,animal
+lion,king of beasts,Panthera leo,big cat,feline,mammal,animal
+cocker spaniel,English cocker spaniel,cocker,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+Irish setter,red setter,setter,sporting dog,hunting dog,dog,canine,mammal,animal
+dugong,Dugong dugon,sea cow,aquatic mammal,mammal,animal
+Indian elephant,Elephas maximus,elephant,proboscidean,mammal,animal
+beaver,rodent,mammal,animal
+Sussex spaniel,spaniel,sporting dog,hunting dog,dog,canine,mammal,animal
+Pembroke,Pembroke Welsh corgi,corgi,dog,canine,mammal,animal
+Blenheim spaniel,English toy spaniel,toy spaniel,toy dog,dog,canine,mammal,animal
+Madagascar cat,ring-tailed lemur,Lemur catta,lemur,primate,mammal,animal
+Rhodesian ridgeback,hunting dog,dog,canine,mammal,animal
+lynx,catamount,wildcat,cat,feline,mammal,animal
+African hunting dog,hyena dog,Cape hunting dog,Lycaon pictus,wild dog,canine,mammal,animal
+langur,Old World monkey,monkey,primate,mammal,animal
+Ibizan hound,Ibizan Podenco,hound,hunting dog,dog,canine,mammal,animal
+timber wolf,grey wolf,gray wolf,Canis lupus,wolf,canine,mammal,animal
+cheetah,chetah,Acinonyx jubatus,big cat,feline,mammal,animal
+English foxhound,foxhound,hound,hunting dog,dog,canine,mammal,animal
+briard,shepherd dog,working dog,dog,canine,mammal,animal
+sloth bear,Melursus ursinus,Ursus ursinus,bear,mammal,animal
+Border terrier,terrier,hunting dog,dog,canine,mammal,animal
+German shepherd,German shepherd dog,German police dog,alsatian,shepherd dog,working dog,dog,canine,mammal,animal
+otter,musteline mammal,mammal,animal
+koala,koala bear,kangaroo bear,native bear,Phascolarctos cinereus,phalanger,marsupial,metatherian,mammal,animal
+tusker,mammal,animal
+echidna,spiny anteater,anteater,monotreme,prototherian,mammal,animal
+wallaby,brush kangaroo,kangaroo,marsupial,metatherian,mammal,animal
+platypus,duckbill,duckbilled platypus,duck-billed platypus,Ornithorhynchus anatinus,monotreme,prototherian,mammal,animal
+wombat,marsupial,metatherian,mammal,animal
 revolver,six-gun,six-shooter,pistol,firearm,gun,weapon,instrument,device
-umbrella,canopy,shelter,protective covering,covering
-schooner,glass,container
-soccer ball,ball,game equipment,equipment
+umbrella,canopy,shelter,protective covering
+schooner,sailing vessel,vessel,craft,vehicle,conveyance
+soccer ball,ball,game equipment
 accordion,piano accordion,squeeze box,free-reed instrument,wind instrument,musical instrument,device
-ant,emmet,pismire,hymenopterous insect,insect,arthropod,invertebrate,animal
-starfish,sea star,echinoderm,invertebrate,animal
-chambered nautilus,pearly nautilus,nautilus,cephalopod,mollusk,invertebrate,animal
+ant,emmet,pismire,hymenopterous insect,insect,arthropod,animal
+starfish,sea star,echinoderm,animal
+chambered nautilus,pearly nautilus,nautilus,cephalopod,mollusk,animal
 grand piano,grand,piano,keyboard instrument,musical instrument,device
 laptop,laptop computer,portable computer,personal computer,digital computer,computer,machine,device
-strawberry,berry,edible fruit,produce,food,solid
+strawberry,berry,edible fruit,produce,food
 airliner,airplane,heavier-than-air craft,aircraft,craft,vehicle,conveyance
 warplane,military plane,heavier-than-air craft,aircraft,craft,vehicle,conveyance
 airship,dirigible,lighter-than-air craft,aircraft,craft,vehicle,conveyance
 balloon,lighter-than-air craft,aircraft,craft,vehicle,conveyance
 space shuttle,spacecraft,craft,vehicle,conveyance
 fireboat,boat,vessel,craft,vehicle,conveyance
-gondola,freight car,car,wheeled vehicle,vehicle,conveyance
+gondola,boat,vessel,craft,vehicle,conveyance
 speedboat,motorboat,boat,vessel,craft,vehicle,conveyance
 lifeboat,sea boat,boat,vessel,craft,vehicle,conveyance
 canoe,small boat,boat,vessel,craft,vehicle,conveyance
@@ -241,11 +241,11 @@ yawl,small boat,boat,vessel,craft,vehicle,conveyance
 catamaran,sailboat,sailing vessel,vessel,craft,vehicle,conveyance
 trimaran,sailboat,sailing vessel,vessel,craft,vehicle,conveyance
 container ship,containership,container vessel,cargo ship,ship,vessel,craft,vehicle,conveyance
-liner,ocean liner,fly,hit,touch,act,event,psychological feature
-pirate,pirate ship,thief,criminal,principal,wrongdoer,bad person,person
+liner,ocean liner,passenger ship,ship,vessel,craft,vehicle,conveyance
+pirate,pirate ship,ship,vessel,craft,vehicle,conveyance
 aircraft carrier,carrier,flattop,attack aircraft carrier,warship,ship,vessel,craft,vehicle,conveyance
 submarine,pigboat,sub,U-boat,submersible,warship,ship,vessel,craft,vehicle,conveyance
-wreck,decline,condition,state,attribute
+wreck,ship,vessel,craft,vehicle,conveyance
 half track,tracked vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 tank,army tank,armored combat vehicle,armoured combat vehicle,military vehicle,vehicle,conveyance
 missile,rocket,vehicle,conveyance
@@ -255,7 +255,7 @@ bicycle-built-for-two,tandem bicycle,tandem,bicycle,wheeled vehicle,vehicle,conv
 mountain bike,all-terrain bike,off-roader,bicycle,wheeled vehicle,vehicle,conveyance
 freight car,car,wheeled vehicle,vehicle,conveyance
 passenger car,coach,carriage,car,wheeled vehicle,vehicle,conveyance
-barrow,garden cart,lawn cart,wheelbarrow,containerful,indefinite quantity,measure
+barrow,garden cart,lawn cart,wheelbarrow,handcart,wheeled vehicle,vehicle,conveyance
 shopping cart,handcart,wheeled vehicle,vehicle,conveyance
 motor scooter,scooter,wheeled vehicle,vehicle,conveyance
 forklift,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
@@ -264,13 +264,13 @@ steam locomotive,locomotive,self-propelled vehicle,wheeled vehicle,vehicle,conve
 amphibian,amphibious vehicle,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 ambulance,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 beach wagon,station wagon,wagon,estate car,beach waggon,station waggon,waggon,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
-cab,hack,taxi,taxicab,compartment,room,area,structure
+cab,hack,taxi,taxicab,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 convertible,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 jeep,landrover,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 limousine,limo,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 minivan,passenger van,van,truck,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 Model T,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
-racer,race car,racing car,driver,operator,causal agent
+racer,race car,racing car,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 sports car,sport car,car,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 go-kart,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
 golfcart,golf cart,motor vehicle,self-propelled vehicle,wheeled vehicle,vehicle,conveyance
@@ -302,7 +302,7 @@ china cabinet,china closet,cabinet,furniture,furnishing
 medicine chest,medicine cabinet,cabinet,furniture,furnishing
 chiffonier,commode,chest of drawers,furniture,furnishing
 table lamp,lamp,furniture,furnishing
-file,file cabinet,filing cabinet,record,evidence,indication,communication
+file,file cabinet,filing cabinet,office furniture,furniture,furnishing
 park bench,bench,seat,furniture,furnishing
 barber chair,chair,seat,furniture,furnishing
 throne,chair of state,chair,seat,furniture,furnishing
@@ -315,23 +315,23 @@ pool table,billiard table,snooker table,table,furniture,furnishing
 dining table,board,table,furniture,furnishing
 entertainment center,wall unit,furniture,furnishing
 wardrobe,closet,press,furniture,furnishing
-Granny Smith,eating apple,apple,edible fruit,produce,food,solid
-orange,citrus,edible fruit,produce,food,solid
-lemon,citrus,edible fruit,produce,food,solid
-fig,illustration,artwork,visual communication,communication
-pineapple,ananas,herb,vascular plant,plant
-banana,herb,vascular plant,plant
-jackfruit,jak,jack,fruit tree,angiospermous tree,tree,woody plant,vascular plant,plant
-custard apple,fruit tree,angiospermous tree,tree,woody plant,vascular plant,plant
-pomegranate,fruit tree,angiospermous tree,tree,woody plant,vascular plant,plant
-acorn,fruit,reproductive structure,plant organ,plant part,natural object
-hip,rose hip,rosehip,body part,part,thing
-ear,spike,capitulum,sense organ,organ,body part,part,thing
-rapeseed,oilseed,seed,fruit,reproductive structure,plant organ,plant part,natural object
-corn,cereal,grass,gramineous plant,herb,vascular plant,plant
-buckeye,horse chestnut,conker,seed,fruit,reproductive structure,plant organ,plant part,natural object
-organ,pipe organ,body part,part,thing
-upright,upright piano,structural member,support,device
+Granny Smith,eating apple,apple,edible fruit,produce,food
+orange,citrus,edible fruit,produce,food
+lemon,citrus,edible fruit,produce,food
+fig,edible fruit,produce,food
+pineapple,ananas,edible fruit,produce,food
+banana,edible fruit,produce,food
+jackfruit,jak,jack,edible fruit,produce,food
+custard apple,edible fruit,produce,food
+pomegranate,edible fruit,produce,food
+acorn,fruit,reproductive structure,plant organ,plant part
+hip,rose hip,rosehip,fruit,reproductive structure,plant organ,plant part
+ear,spike,capitulum,fruit,reproductive structure,plant organ,plant part
+rapeseed,oilseed,seed,fruit,reproductive structure,plant organ,plant part
+corn,kernel,grain,seed,fruit,reproductive structure,plant organ,plant part
+buckeye,horse chestnut,conker,seed,fruit,reproductive structure,plant organ,plant part
+organ,pipe organ,keyboard instrument,musical instrument,device
+upright,upright piano,piano,keyboard instrument,musical instrument,device
 chime,bell,gong,percussion instrument,musical instrument,device
 drum,membranophone,tympan,percussion instrument,musical instrument,device
 gong,tam-tam,percussion instrument,musical instrument,device
@@ -352,173 +352,173 @@ ocarina,sweet potato,wind instrument,musical instrument,device
 panpipe,pandean pipe,syrinx,pipe,wind instrument,musical instrument,device
 bassoon,double-reed instrument,beating-reed instrument,woodwind,wind instrument,musical instrument,device
 oboe,hautboy,hautbois,double-reed instrument,beating-reed instrument,woodwind,wind instrument,musical instrument,device
-sax,saxophone
+sax,saxophone,single-reed instrument,beating-reed instrument,woodwind,wind instrument,musical instrument,device
 flute,transverse flute,woodwind,wind instrument,musical instrument,device
 daisy,flower,angiosperm,spermatophyte,vascular plant,plant
 yellow lady's slipper,yellow lady-slipper,Cypripedium calceolus,Cypripedium parviflorum,lady's slipper,orchid,flower,angiosperm,spermatophyte,vascular plant,plant
 cliff,drop,drop-off,geological formation
 valley,vale,natural depression,geological formation
 alp,mountain,natural elevation,geological formation
-volcano,crack,opening,space,amorphous shape,shape,attribute
+volcano,mountain,natural elevation,geological formation
 promontory,headland,head,foreland,natural elevation,geological formation
 sandbar,sand bar,bar,ridge,natural elevation,geological formation
 coral reef,reef,ridge,natural elevation,geological formation
 lakeside,lakeshore,shore,geological formation
 seashore,coast,seacoast,sea-coast,shore,geological formation
 geyser,spring,geological formation
-hatchet,weapon,instrument,device
-cleaver,meat cleaver,chopper,knife,edge tool,cutter,cutting implement,tool,implement
-letter opener,paper knife,paperknife,knife,edge tool,cutter,cutting implement,tool,implement
-plane,carpenter's plane,woodworking plane,heavier-than-air craft,aircraft,craft,vehicle,conveyance
+hatchet,ax,edge tool,cutter,cutting implement,tool
+cleaver,meat cleaver,chopper,knife,edge tool,cutter,cutting implement,tool
+letter opener,paper knife,paperknife,knife,edge tool,cutter,cutting implement,tool
+plane,carpenter's plane,woodworking plane,edge tool,cutter,cutting implement,tool
 power drill,power tool,machine,device
-lawn mower,mower,garden tool,tool,implement
-hammer,striker,mechanical device,mechanism,device
-corkscrew,bottle screw,bottle opener,opener,hand tool,tool,implement
-can opener,tin opener,opener,hand tool,tool,implement
-plunger,plumber's helper,adventurer,person
-screwdriver,hand tool,tool,implement
-shovel,hand tool,tool,implement
-plow,plough,tool,implement
+lawn mower,mower,garden tool,tool
+hammer,hand tool,tool
+corkscrew,bottle screw,bottle opener,opener,hand tool,tool
+can opener,tin opener,opener,hand tool,tool
+plunger,plumber's helper,hand tool,tool
+screwdriver,hand tool,tool
+shovel,hand tool,tool
+plow,plough,tool
 chain saw,chainsaw,power saw,power tool,machine,device
-cock,penis,erectile organ,organ,body part,part,thing
-hen,chicken,domestic fowl,gallinaceous bird,bird,vertebrate,chordate,animal
-ostrich,Struthio camelus,person
-brambling,Fringilla montifringilla,finch,oscine,passerine,bird,vertebrate,chordate,animal
-goldfinch,Carduelis carduelis,finch,oscine,passerine,bird,vertebrate,chordate,animal
-house finch,linnet,Carpodacus mexicanus,finch,oscine,passerine,bird,vertebrate,chordate,animal
-junco,snowbird,finch,oscine,passerine,bird,vertebrate,chordate,animal
-indigo bunting,indigo finch,indigo bird,Passerina cyanea,bunting,finch,oscine,passerine,bird,vertebrate,chordate,animal
-robin,American robin,Turdus migratorius,thrush,oscine,passerine,bird,vertebrate,chordate,animal
-bulbul,nightingale,thrush,oscine,passerine,bird,vertebrate,chordate,animal
-jay
-magpie,corvine bird,oscine,passerine,bird,vertebrate,chordate,animal
-chickadee,titmouse,oscine,passerine,bird,vertebrate,chordate,animal
-water ouzel,dipper,oscine,passerine,bird,vertebrate,chordate,animal
-kite,check,draft,negotiable instrument,legal document,document,writing,written communication,communication
-bald eagle,American eagle,Haliaeetus leucocephalus,eagle,bird of prey,bird,vertebrate,chordate,animal
-vulture,bird of prey,bird,vertebrate,chordate,animal
-great grey owl,great gray owl,Strix nebulosa,owl,bird of prey,bird,vertebrate,chordate,animal
+cock,bird,animal
+hen,bird,animal
+ostrich,Struthio camelus,ratite,bird,animal
+brambling,Fringilla montifringilla,finch,oscine,passerine,bird,animal
+goldfinch,Carduelis carduelis,finch,oscine,passerine,bird,animal
+house finch,linnet,Carpodacus mexicanus,finch,oscine,passerine,bird,animal
+junco,snowbird,finch,oscine,passerine,bird,animal
+indigo bunting,indigo finch,indigo bird,Passerina cyanea,bunting,finch,oscine,passerine,bird,animal
+robin,American robin,Turdus migratorius,thrush,oscine,passerine,bird,animal
+bulbul,nightingale,thrush,oscine,passerine,bird,animal
+jay,corvine bird,oscine,passerine,bird,animal
+magpie,corvine bird,oscine,passerine,bird,animal
+chickadee,titmouse,oscine,passerine,bird,animal
+water ouzel,dipper,oscine,passerine,bird,animal
+kite,hawk,bird of prey,bird,animal
+bald eagle,American eagle,Haliaeetus leucocephalus,eagle,bird of prey,bird,animal
+vulture,bird of prey,bird,animal
+great grey owl,great gray owl,Strix nebulosa,owl,bird of prey,bird,animal
 black grouse,grouse,game bird,game,animal
 ptarmigan,grouse,game bird,game,animal
 ruffed grouse,partridge,Bonasa umbellus,grouse,game bird,game,animal
 prairie chicken,prairie grouse,prairie fowl,grouse,game bird,game,animal
-peacock,nymphalid,butterfly,lepidopterous insect,insect,arthropod,invertebrate,animal
-quail,wildfowl,bird,meat,food,solid
-partridge,wildfowl,bird,meat,food,solid
-African grey,African gray,Psittacus erithacus,parrot,bird,vertebrate,chordate,animal
-macaw,parrot,bird,vertebrate,chordate,animal
-sulphur-crested cockatoo,Kakatoe galerita,Cacatua galerita,cockatoo,parrot,bird,vertebrate,chordate,animal
-lorikeet,lory,parrot,bird,vertebrate,chordate,animal
-coucal,cuckoo,cuculiform bird,bird,vertebrate,chordate,animal
-bee eater,coraciiform bird,bird,vertebrate,chordate,animal
-hornbill,coraciiform bird,bird,vertebrate,chordate,animal
-hummingbird,apodiform bird,bird,vertebrate,chordate,animal
-jacamar,piciform bird,bird,vertebrate,chordate,animal
-toucan,piciform bird,bird,vertebrate,chordate,animal
-drake
-red-breasted merganser,Mergus serrator,merganser,sea duck,duck,anseriform bird,waterfowl,aquatic bird,bird,vertebrate,chordate,animal
-goose,anseriform bird,waterfowl,aquatic bird,bird,vertebrate,chordate,animal
-black swan,Cygnus atratus,swan,aquatic bird,bird,vertebrate,chordate,animal
-white stork,Ciconia ciconia,stork,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-black stork,Ciconia nigra,stork,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-spoonbill,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-flamingo,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-American egret,great white heron,Egretta albus,egret,heron,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-little blue heron,Egretta caerulea,heron,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-bittern,heron,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-crane
-limpkin,Aramus pictus,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-American coot,marsh hen,mud hen,water hen,Fulica americana,coot,rail,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-bustard,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-ruddy turnstone,Arenaria interpres,turnstone,plover,shorebird,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-red-backed sandpiper,dunlin,Erolia alpina,sandpiper,shorebird,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-redshank,Tringa totanus,sandpiper,shorebird,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-dowitcher,snipe,shorebird,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-oystercatcher,oyster catcher,shorebird,wading bird,aquatic bird,bird,vertebrate,chordate,animal
-European gallinule,Porphyrio porphyrio,purple gallinule,gallinule,aquatic bird,bird,vertebrate,chordate,animal
-pelican,pelecaniform seabird,seabird,aquatic bird,bird,vertebrate,chordate,animal
-king penguin,Aptenodytes patagonica,penguin,sphenisciform seabird,seabird,aquatic bird,bird,vertebrate,chordate,animal
-albatross,mollymawk,hindrance,difficulty,cognitive factor,cognition,psychological feature
-great white shark,white shark,man-eater,man-eating shark,Carcharodon carcharias,mackerel shark,shark,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-tiger shark,Galeocerdo cuvieri,requiem shark,shark,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-hammerhead,hammerhead shark,stupid,simpleton,person
-electric ray,crampfish,numbfish,torpedo,ray,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-stingray,ray,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-barracouta,snoek,food fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-coho,cohoe,coho salmon,blue jack,silver salmon,Oncorhynchus kisutch,salmon,fish,food,solid
-tench,Tinca tinca,cyprinid,cypriniform fish,soft-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-goldfish,Carassius auratus,cyprinid,cypriniform fish,soft-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-eel,fish,food,solid
-rock beauty,Holocanthus tricolor,butterfly fish,percoid fish,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-anemone fish,damselfish,percoid fish,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-lionfish,scorpaenid,scorpaenoid,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-puffer,pufferfish,blowfish,globefish,saltwater fish,seafood,food,solid
-sturgeon,ganoid,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-gar,garfish,garpike,billfish,Lepisosteus osseus,ganoid,teleost fish,bony fish,fish,aquatic vertebrate,vertebrate,chordate,animal
-loggerhead,loggerhead turtle,Caretta caretta,stupid,simpleton,person
-leatherback turtle,leatherback,leathery turtle,Dermochelys coriacea,sea turtle,turtle,chelonian,anapsid,reptile,vertebrate,chordate,animal
-mud turtle,turtle,chelonian,anapsid,reptile,vertebrate,chordate,animal
-terrapin,turtle,chelonian,anapsid,reptile,vertebrate,chordate,animal
-box turtle,box tortoise,turtle,chelonian,anapsid,reptile,vertebrate,chordate,animal
-banded gecko,gecko,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-common iguana,iguana,Iguana iguana,iguanid,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-American chameleon,anole,Anolis carolinensis,iguanid,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-whiptail,whiptail lizard,teiid lizard,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-agama,agamid,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-frilled lizard,Chlamydosaurus kingi,agamid,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-alligator lizard,anguid lizard,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-Gila monster,Heloderma suspectum,venomous lizard,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-green lizard,Lacerta viridis,lacertid lizard,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-African chameleon,Chamaeleo chamaeleon,chameleon,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-Komodo dragon,Komodo lizard,dragon lizard,giant lizard,Varanus komodoensis,monitor,lizard,saurian,diapsid,reptile,vertebrate,chordate,animal
-triceratops,ceratopsian,ornithischian,dinosaur,archosaur,diapsid,reptile,vertebrate,chordate,animal
-African crocodile,Nile crocodile,Crocodylus niloticus,crocodile,crocodilian reptile,diapsid,reptile,vertebrate,chordate,animal
-American alligator,Alligator mississipiensis,alligator,crocodilian reptile,diapsid,reptile,vertebrate,chordate,animal
-thunder snake,worm snake,Carphophis amoenus,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-ringneck snake,ring-necked snake,ring snake,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-hognose snake,puff adder,sand viper,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-green snake,grass snake,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-king snake,kingsnake,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-garter snake,grass snake,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-water snake,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-vine snake,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-night snake,Hypsiglena torquata,colubrid snake,snake,diapsid,reptile,vertebrate,chordate,animal
-boa constrictor,Constrictor constrictor,boa,constrictor,snake,diapsid,reptile,vertebrate,chordate,animal
-rock python,rock snake,Python sebae,python,boa,constrictor,snake,diapsid,reptile,vertebrate,chordate,animal
-Indian cobra,Naja naja,cobra,elapid,snake,diapsid,reptile,vertebrate,chordate,animal
-green mamba,black mamba,mamba,elapid,snake,diapsid,reptile,vertebrate,chordate,animal
-sea snake,snake,diapsid,reptile,vertebrate,chordate,animal
-horned viper,cerastes,sand viper,horned asp,Cerastes cornutus,viper,snake,diapsid,reptile,vertebrate,chordate,animal
-diamondback,diamondback rattlesnake,Crotalus adamanteus,rattlesnake,pit viper,viper,snake,diapsid,reptile,vertebrate,chordate,animal
-sidewinder,horned rattlesnake,Crotalus cerastes,rattlesnake,pit viper,viper,snake,diapsid,reptile,vertebrate,chordate,animal
-European fire salamander,Salamandra salamandra,salamander,amphibian,vertebrate,chordate,animal
-common newt,Triturus vulgaris,newt,salamander,amphibian,vertebrate,chordate,animal
-eft,newt,salamander,amphibian,vertebrate,chordate,animal
-spotted salamander,Ambystoma maculatum,ambystomid,salamander,amphibian,vertebrate,chordate,animal
-axolotl,mud puppy,Ambystoma mexicanum,ambystomid,salamander,amphibian,vertebrate,chordate,animal
-bullfrog,Rana catesbeiana,true frog,frog,amphibian,vertebrate,chordate,animal
-tree frog,tree-frog,frog,amphibian,vertebrate,chordate,animal
-tailed frog,bell toad,ribbed toad,tailed toad,Ascaphus trui,frog,amphibian,vertebrate,chordate,animal
-whistle,sound,happening,event,psychological feature
-wing,organ,body part,part,thing
-paintbrush,brush,implement
+peacock,peafowl,pheasant,phasianid,game bird,game,animal
+quail,phasianid,game bird,game,animal
+partridge,phasianid,game bird,game,animal
+African grey,African gray,Psittacus erithacus,parrot,bird,animal
+macaw,parrot,bird,animal
+sulphur-crested cockatoo,Kakatoe galerita,Cacatua galerita,cockatoo,parrot,bird,animal
+lorikeet,lory,parrot,bird,animal
+coucal,cuckoo,cuculiform bird,bird,animal
+bee eater,coraciiform bird,bird,animal
+hornbill,coraciiform bird,bird,animal
+hummingbird,apodiform bird,bird,animal
+jacamar,piciform bird,bird,animal
+toucan,piciform bird,bird,animal
+drake,duck,anseriform bird,waterfowl,aquatic bird,bird,animal
+red-breasted merganser,Mergus serrator,merganser,sea duck,duck,anseriform bird,waterfowl,aquatic bird,bird,animal
+goose,anseriform bird,waterfowl,aquatic bird,bird,animal
+black swan,Cygnus atratus,swan,aquatic bird,bird,animal
+white stork,Ciconia ciconia,stork,wading bird,aquatic bird,bird,animal
+black stork,Ciconia nigra,stork,wading bird,aquatic bird,bird,animal
+spoonbill,wading bird,aquatic bird,bird,animal
+flamingo,wading bird,aquatic bird,bird,animal
+American egret,great white heron,Egretta albus,egret,heron,wading bird,aquatic bird,bird,animal
+little blue heron,Egretta caerulea,heron,wading bird,aquatic bird,bird,animal
+bittern,heron,wading bird,aquatic bird,bird,animal
+crane,wading bird,aquatic bird,bird,animal
+limpkin,Aramus pictus,wading bird,aquatic bird,bird,animal
+American coot,marsh hen,mud hen,water hen,Fulica americana,coot,rail,wading bird,aquatic bird,bird,animal
+bustard,wading bird,aquatic bird,bird,animal
+ruddy turnstone,Arenaria interpres,turnstone,plover,shorebird,wading bird,aquatic bird,bird,animal
+red-backed sandpiper,dunlin,Erolia alpina,sandpiper,shorebird,wading bird,aquatic bird,bird,animal
+redshank,Tringa totanus,sandpiper,shorebird,wading bird,aquatic bird,bird,animal
+dowitcher,snipe,shorebird,wading bird,aquatic bird,bird,animal
+oystercatcher,oyster catcher,shorebird,wading bird,aquatic bird,bird,animal
+European gallinule,Porphyrio porphyrio,purple gallinule,gallinule,aquatic bird,bird,animal
+pelican,pelecaniform seabird,seabird,aquatic bird,bird,animal
+king penguin,Aptenodytes patagonica,penguin,sphenisciform seabird,seabird,aquatic bird,bird,animal
+albatross,mollymawk,pelagic bird,seabird,aquatic bird,bird,animal
+great white shark,white shark,man-eater,man-eating shark,Carcharodon carcharias,mackerel shark,shark,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,animal
+tiger shark,Galeocerdo cuvieri,requiem shark,shark,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,animal
+hammerhead,hammerhead shark,shark,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,animal
+electric ray,crampfish,numbfish,torpedo,ray,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,animal
+stingray,ray,elasmobranch,cartilaginous fish,fish,aquatic vertebrate,animal
+barracouta,snoek,food fish,fish,aquatic vertebrate,animal
+coho,cohoe,coho salmon,blue jack,silver salmon,Oncorhynchus kisutch,salmon,salmonid,soft-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+tench,Tinca tinca,cyprinid,cypriniform fish,soft-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+goldfish,Carassius auratus,cyprinid,cypriniform fish,soft-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+eel,soft-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+rock beauty,Holocanthus tricolor,butterfly fish,percoid fish,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+anemone fish,damselfish,percoid fish,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+lionfish,scorpaenid,scorpaenoid,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+puffer,pufferfish,blowfish,globefish,plectognath,spiny-finned fish,teleost fish,bony fish,fish,aquatic vertebrate,animal
+sturgeon,ganoid,teleost fish,bony fish,fish,aquatic vertebrate,animal
+gar,garfish,garpike,billfish,Lepisosteus osseus,ganoid,teleost fish,bony fish,fish,aquatic vertebrate,animal
+loggerhead,loggerhead turtle,Caretta caretta,sea turtle,turtle,chelonian,anapsid,reptile,animal
+leatherback turtle,leatherback,leathery turtle,Dermochelys coriacea,sea turtle,turtle,chelonian,anapsid,reptile,animal
+mud turtle,turtle,chelonian,anapsid,reptile,animal
+terrapin,turtle,chelonian,anapsid,reptile,animal
+box turtle,box tortoise,turtle,chelonian,anapsid,reptile,animal
+banded gecko,gecko,lizard,saurian,diapsid,reptile,animal
+common iguana,iguana,Iguana iguana,iguanid,lizard,saurian,diapsid,reptile,animal
+American chameleon,anole,Anolis carolinensis,iguanid,lizard,saurian,diapsid,reptile,animal
+whiptail,whiptail lizard,teiid lizard,lizard,saurian,diapsid,reptile,animal
+agama,agamid,lizard,saurian,diapsid,reptile,animal
+frilled lizard,Chlamydosaurus kingi,agamid,lizard,saurian,diapsid,reptile,animal
+alligator lizard,anguid lizard,lizard,saurian,diapsid,reptile,animal
+Gila monster,Heloderma suspectum,venomous lizard,lizard,saurian,diapsid,reptile,animal
+green lizard,Lacerta viridis,lacertid lizard,lizard,saurian,diapsid,reptile,animal
+African chameleon,Chamaeleo chamaeleon,chameleon,lizard,saurian,diapsid,reptile,animal
+Komodo dragon,Komodo lizard,dragon lizard,giant lizard,Varanus komodoensis,monitor,lizard,saurian,diapsid,reptile,animal
+triceratops,ceratopsian,ornithischian,dinosaur,archosaur,diapsid,reptile,animal
+African crocodile,Nile crocodile,Crocodylus niloticus,crocodile,crocodilian reptile,diapsid,reptile,animal
+American alligator,Alligator mississipiensis,alligator,crocodilian reptile,diapsid,reptile,animal
+thunder snake,worm snake,Carphophis amoenus,colubrid snake,snake,diapsid,reptile,animal
+ringneck snake,ring-necked snake,ring snake,colubrid snake,snake,diapsid,reptile,animal
+hognose snake,puff adder,sand viper,colubrid snake,snake,diapsid,reptile,animal
+green snake,grass snake,colubrid snake,snake,diapsid,reptile,animal
+king snake,kingsnake,colubrid snake,snake,diapsid,reptile,animal
+garter snake,grass snake,colubrid snake,snake,diapsid,reptile,animal
+water snake,colubrid snake,snake,diapsid,reptile,animal
+vine snake,colubrid snake,snake,diapsid,reptile,animal
+night snake,Hypsiglena torquata,colubrid snake,snake,diapsid,reptile,animal
+boa constrictor,Constrictor constrictor,boa,constrictor,snake,diapsid,reptile,animal
+rock python,rock snake,Python sebae,python,boa,constrictor,snake,diapsid,reptile,animal
+Indian cobra,Naja naja,cobra,elapid,snake,diapsid,reptile,animal
+green mamba,black mamba,mamba,elapid,snake,diapsid,reptile,animal
+sea snake,snake,diapsid,reptile,animal
+horned viper,cerastes,sand viper,horned asp,Cerastes cornutus,viper,snake,diapsid,reptile,animal
+diamondback,diamondback rattlesnake,Crotalus adamanteus,rattlesnake,pit viper,viper,snake,diapsid,reptile,animal
+sidewinder,horned rattlesnake,Crotalus cerastes,rattlesnake,pit viper,viper,snake,diapsid,reptile,animal
+European fire salamander,Salamandra salamandra,salamander,amphibian,animal
+common newt,Triturus vulgaris,newt,salamander,amphibian,animal
+eft,newt,salamander,amphibian,animal
+spotted salamander,Ambystoma maculatum,ambystomid,salamander,amphibian,animal
+axolotl,mud puppy,Ambystoma mexicanum,ambystomid,salamander,amphibian,animal
+bullfrog,Rana catesbeiana,true frog,frog,amphibian,animal
+tree frog,tree-frog,frog,amphibian,animal
+tailed frog,bell toad,ribbed toad,tailed toad,Ascaphus trui,frog,amphibian,animal
+whistle,acoustic device,device
+wing,airfoil,device
+paintbrush,brush
 hand blower,blow dryer,blow drier,hair dryer,hair drier,blower,device
 oxygen mask,breathing device,device
 snorkel,breathing device,device
 loudspeaker,speaker,speaker unit,loudspeaker system,speaker system,electro-acoustic transducer,transducer,electrical device,device
 microphone,mike,electro-acoustic transducer,transducer,electrical device,device
-screen,CRT screen,surface
-mouse,computer mouse,rodent,placental,mammal,vertebrate,chordate,animal
+screen,CRT screen,display,electronic device,device
+mouse,computer mouse,electronic device,device
 electric fan,blower,fan,device
 oil filter,filter,device
 strainer,filter,device
 space heater,heater,device
-stove,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
-guillotine,closure,order,rule,direction,message,communication
+stove,heater,device
+guillotine,instrument of execution,instrument,device
 barometer,measuring instrument,instrument,device
-rule,ruler,concept,idea,content,cognition,psychological feature
+rule,ruler,measuring stick,measuring instrument,instrument,device
 odometer,hodometer,mileometer,milometer,meter,measuring instrument,instrument,device
-scale,weighing machine,standard,system of measurement,measure
+scale,weighing machine,measuring instrument,instrument,device
 analog clock,clock,timepiece,measuring instrument,instrument,device
 digital clock,clock,timepiece,measuring instrument,instrument,device
 wall clock,clock,timepiece,measuring instrument,instrument,device
@@ -531,150 +531,150 @@ stethoscope,medical instrument,instrument,device
 syringe,medical instrument,instrument,device
 magnetic compass,compass,navigational instrument,instrument,device
 binoculars,field glasses,opera glasses,optical instrument,instrument,device
-projector,optical device,device
+projector,optical instrument,instrument,device
 sunglasses,dark glasses,shades,spectacles,optical instrument,instrument,device
 loupe,jeweler's loupe,hand glass,light microscope,microscope,magnifier,scientific instrument,instrument,device
 radio telescope,radio reflector,astronomical telescope,telescope,magnifier,scientific instrument,instrument,device
-bow,knot,fastener,restraint,device
-cannon,artillery,armament,weaponry
+bow,weapon,instrument,device
+cannon,gun,weapon,instrument,device
 assault rifle,assault gun,automatic rifle,automatic firearm,autoloader,firearm,gun,weapon,instrument,device
 rifle,firearm,gun,weapon,instrument,device
 projectile,missile,weapon,instrument,device
 computer keyboard,keypad,keyboard,device
 typewriter keyboard,keyboard,device
-crane
-lighter,light,igniter,ignitor,fuel,substance
-abacus,tablet,slab,block
+crane,lifting device,device
+lighter,light,igniter,ignitor,device
+abacus,calculator,machine,device
 cash machine,cash dispenser,automated teller machine,automatic teller machine,automated teller,automatic teller,ATM,machine,device
 slide rule,slipstick,analog computer,computer,machine,device
 desktop computer,personal computer,digital computer,computer,machine,device
 hand-held computer,hand-held microcomputer,portable computer,personal computer,digital computer,computer,machine,device
-notebook,notebook computer,book,product,creation
+notebook,notebook computer,portable computer,personal computer,digital computer,computer,machine,device
 web site,website,internet site,site,computer,machine,device
-harvester,reaper,farmhand,hired hand,laborer,workman,employee,worker,person
+harvester,reaper,farm machine,machine,device
 thresher,thrasher,threshing machine,farm machine,machine,device
-printer,skilled worker,worker,person
-slot,one-armed bandit,position,relation
+printer,peripheral,electronic equipment
+slot,one-armed bandit,slot machine,machine,device
 vending machine,slot machine,machine,device
 sewing machine,home appliance,appliance,durables,consumer goods,commodity
-joystick,lever,bar,implement
+joystick,control,mechanism,device
 switch,electric switch,electrical switch,control,mechanism,device
-hook,claw,catch,fastener,restraint,device
+hook,claw,mechanical device,mechanism,device
 car wheel,wheel,machine,mechanical device,mechanism,device
 paddlewheel,paddle wheel,wheel,machine,mechanical device,mechanism,device
-pinwheel,subshrub,shrub,woody plant,vascular plant,plant
+pinwheel,wheel,machine,mechanical device,mechanism,device
 potter's wheel,wheel,machine,mechanical device,mechanism,device
 gas pump,gasoline pump,petrol pump,island dispenser,pump,mechanical device,mechanism,device
-carousel,carrousel,merry-go-round,roundabout,whirligig,conveyer belt,belt,loop,simple closed curve,closed curve,curve,line,shape,attribute
-swing,action,state,attribute
-reel,film,photographic paper,photographic equipment,equipment
-radiator,natural object
-puck,hockey puck,fairy,spiritual being,belief,content,cognition,psychological feature
+carousel,carrousel,merry-go-round,roundabout,whirligig,ride,mechanical device,mechanism,device
+swing,mechanical device,mechanism,device
+reel,winder,mechanical device,mechanism,device
+radiator,mechanism,device
+puck,hockey puck,disk,plate,sheet
 hard disc,hard disk,fixed disk,magnetic disk,memory device,device
 sunglass,converging lens,lens,optical device,device
-pick,plectrum,plectron,decision making,higher cognitive process,process,cognition,psychological feature
+pick,plectrum,plectron,device
 car mirror,mirror,reflector,device
 solar dish,solar collector,solar furnace,reflector,device
 remote control,remote,device
 disk brake,disc brake,hydraulic brake,brake system,brake,restraint,device
 buckle,fastener,restraint,device
 hair slide,clip,fastener,restraint,device
-knot,bunch,agglomeration,collection,group
+knot,fastener,restraint,device
 combination lock,lock,fastener,restraint,device
 padlock,lock,fastener,restraint,device
-nail,horny structure,structure,body part,part,thing
+nail,fastener,restraint,device
 safety pin,pin,fastener,restraint,device
-screw,lawman,defender,preserver,person
-muzzle,opening
-seat belt,seatbelt,safety belt,belt,accessory,clothing,covering
+screw,fastener,restraint,device
+muzzle,restraint,device
+seat belt,seatbelt,safety belt,belt,accessory,clothing
 ski,runner,device
 candle,taper,wax light,lamp,source of illumination,device
-jack-o'-lantern,light,actinic radiation,electromagnetic radiation,radiation,energy,physical phenomenon,natural phenomenon,phenomenon,process
-spotlight,spot,prominence,standing,status,state,attribute
+jack-o'-lantern,lantern,lamp,source of illumination,device
+spotlight,spot,lamp,source of illumination,device
 torch,light,source of illumination,device
 neck brace,brace,support,device
-pier,platform,horizontal surface,surface
+pier,support,device
 tripod,rack,support,device
 maypole,post,upright,structural member,support,device
 mousetrap,trap,device
 spider web,spider's web,web,trap,device
-trilobite,arthropod,invertebrate,animal
-harvestman,daddy longlegs,Phalangium opilio,arachnid,arthropod,invertebrate,animal
-scorpion,person
-black and gold garden spider,Argiope aurantia,spider,arachnid,arthropod,invertebrate,animal
-barn spider,Araneus cavaticus,spider,arachnid,arthropod,invertebrate,animal
-garden spider,Aranea diademata,spider,arachnid,arthropod,invertebrate,animal
-black widow,Latrodectus mactans,spider,arachnid,arthropod,invertebrate,animal
-tarantula,wolf spider,spider,arachnid,arthropod,invertebrate,animal
-wolf spider,hunting spider,spider,arachnid,arthropod,invertebrate,animal
-tick,sound,happening,event,psychological feature
-centipede,arthropod,invertebrate,animal
-isopod,malacostracan crustacean,crustacean,arthropod,invertebrate,animal
-Dungeness crab,Cancer magister,crab,shellfish,seafood,food,solid
-rock crab,Cancer irroratus,crab,decapod crustacean,crustacean,arthropod,invertebrate,animal
-fiddler crab,crab,decapod crustacean,crustacean,arthropod,invertebrate,animal
-king crab,Alaska crab,Alaskan king crab,Alaska king crab,Paralithodes camtschatica,crab,shellfish,seafood,food,solid
-American lobster,Northern lobster,Maine lobster,Homarus americanus,lobster,shellfish,seafood,food,solid
-spiny lobster,langouste,rock lobster,crawfish,crayfish,sea crawfish,shellfish,seafood,food,solid
-crayfish,crawfish,crawdad,crawdaddy,shellfish,seafood,food,solid
-hermit crab,decapod crustacean,crustacean,arthropod,invertebrate,animal
-tiger beetle,beetle,insect,arthropod,invertebrate,animal
-ladybug,ladybeetle,lady beetle,ladybird,ladybird beetle,beetle,insect,arthropod,invertebrate,animal
-ground beetle,carabid beetle,beetle,insect,arthropod,invertebrate,animal
-long-horned beetle,longicorn,longicorn beetle,beetle,insect,arthropod,invertebrate,animal
-leaf beetle,chrysomelid,beetle,insect,arthropod,invertebrate,animal
-dung beetle,scarabaeid beetle,lamellicorn beetle,beetle,insect,arthropod,invertebrate,animal
-rhinoceros beetle,scarabaeid beetle,lamellicorn beetle,beetle,insect,arthropod,invertebrate,animal
-weevil,beetle,insect,arthropod,invertebrate,animal
-fly,dipterous insect,insect,arthropod,invertebrate,animal
-bee,hymenopterous insect,insect,arthropod,invertebrate,animal
-grasshopper,hopper,orthopterous insect,insect,arthropod,invertebrate,animal
-cricket,orthopterous insect,insect,arthropod,invertebrate,animal
-walking stick,walkingstick,stick insect,stick,implement
-cockroach,roach,dictyopterous insect,insect,arthropod,invertebrate,animal
-mantis,mantid,dictyopterous insect,insect,arthropod,invertebrate,animal
-cicada,cicala,homopterous insect,insect,arthropod,invertebrate,animal
-leafhopper,homopterous insect,insect,arthropod,invertebrate,animal
-lacewing,lacewing fly,neuropteron,insect,arthropod,invertebrate,animal
-dragonfly,darning needle,devil's darning needle,sewing needle,snake feeder,snake doctor,mosquito hawk,skeeter hawk,odonate,insect,arthropod,invertebrate,animal
-damselfly,odonate,insect,arthropod,invertebrate,animal
-admiral,flag officer,commissioned naval officer,commissioned officer,military officer,serviceman,skilled worker,worker,person
-ringlet,ringlet butterfly,round shape,shape,attribute
-monarch,monarch butterfly,milkweed butterfly,Danaus plexippus,ruler,person
-cabbage butterfly,pierid,butterfly,lepidopterous insect,insect,arthropod,invertebrate,animal
-sulphur butterfly,sulfur butterfly,butterfly,lepidopterous insect,insect,arthropod,invertebrate,animal
-lycaenid,lycaenid butterfly,butterfly,lepidopterous insect,insect,arthropod,invertebrate,animal
-jellyfish,siphonophore,hydrozoan,coelenterate,invertebrate,animal
-sea anemone,anemone,anthozoan,coelenterate,invertebrate,animal
-brain coral,stony coral,coral,anthozoan,coelenterate,invertebrate,animal
-flatworm,platyhelminth,worm,invertebrate,animal
-nematode,nematode worm,roundworm,worm,invertebrate,animal
-conch,gastropod,mollusk,invertebrate,animal
-snail,gastropod,mollusk,invertebrate,animal
-slug,projectile,weapon,instrument,device
-sea slug,nudibranch,gastropod,mollusk,invertebrate,animal
-chiton,coat-of-mail shell,sea cradle,polyplacophore,tunic,cloak,overgarment,garment,clothing,covering
-sea urchin,echinoderm,invertebrate,animal
-sea cucumber,holothurian,echinoderm,invertebrate,animal
-iron,smoothing iron,metallic element,chemical element,substance
+trilobite,arthropod,animal
+harvestman,daddy longlegs,Phalangium opilio,arachnid,arthropod,animal
+scorpion,arachnid,arthropod,animal
+black and gold garden spider,Argiope aurantia,spider,arachnid,arthropod,animal
+barn spider,Araneus cavaticus,spider,arachnid,arthropod,animal
+garden spider,Aranea diademata,spider,arachnid,arthropod,animal
+black widow,Latrodectus mactans,spider,arachnid,arthropod,animal
+tarantula,spider,arachnid,arthropod,animal
+wolf spider,hunting spider,spider,arachnid,arthropod,animal
+tick,acarine,arachnid,arthropod,animal
+centipede,arthropod,animal
+isopod,malacostracan crustacean,crustacean,arthropod,animal
+Dungeness crab,Cancer magister,crab,decapod crustacean,crustacean,arthropod,animal
+rock crab,Cancer irroratus,crab,decapod crustacean,crustacean,arthropod,animal
+fiddler crab,crab,decapod crustacean,crustacean,arthropod,animal
+king crab,Alaska crab,Alaskan king crab,Alaska king crab,Paralithodes camtschatica,crab,decapod crustacean,crustacean,arthropod,animal
+American lobster,Northern lobster,Maine lobster,Homarus americanus,true lobster,lobster,decapod crustacean,crustacean,arthropod,animal
+spiny lobster,langouste,rock lobster,crawfish,crayfish,sea crawfish,lobster,decapod crustacean,crustacean,arthropod,animal
+crayfish,crawfish,crawdad,crawdaddy,decapod crustacean,crustacean,arthropod,animal
+hermit crab,decapod crustacean,crustacean,arthropod,animal
+tiger beetle,beetle,insect,arthropod,animal
+ladybug,ladybeetle,lady beetle,ladybird,ladybird beetle,beetle,insect,arthropod,animal
+ground beetle,carabid beetle,beetle,insect,arthropod,animal
+long-horned beetle,longicorn,longicorn beetle,beetle,insect,arthropod,animal
+leaf beetle,chrysomelid,beetle,insect,arthropod,animal
+dung beetle,scarabaeid beetle,lamellicorn beetle,beetle,insect,arthropod,animal
+rhinoceros beetle,scarabaeid beetle,lamellicorn beetle,beetle,insect,arthropod,animal
+weevil,beetle,insect,arthropod,animal
+fly,dipterous insect,insect,arthropod,animal
+bee,hymenopterous insect,insect,arthropod,animal
+grasshopper,hopper,orthopterous insect,insect,arthropod,animal
+cricket,orthopterous insect,insect,arthropod,animal
+walking stick,walkingstick,stick insect,phasmid,insect,arthropod,animal
+cockroach,roach,dictyopterous insect,insect,arthropod,animal
+mantis,mantid,dictyopterous insect,insect,arthropod,animal
+cicada,cicala,homopterous insect,insect,arthropod,animal
+leafhopper,homopterous insect,insect,arthropod,animal
+lacewing,lacewing fly,neuropteron,insect,arthropod,animal
+dragonfly,darning needle,devil's darning needle,sewing needle,snake feeder,snake doctor,mosquito hawk,skeeter hawk,odonate,insect,arthropod,animal
+damselfly,odonate,insect,arthropod,animal
+admiral,nymphalid,butterfly,lepidopterous insect,insect,arthropod,animal
+ringlet,ringlet butterfly,butterfly,lepidopterous insect,insect,arthropod,animal
+monarch,monarch butterfly,milkweed butterfly,Danaus plexippus,danaid,butterfly,lepidopterous insect,insect,arthropod,animal
+cabbage butterfly,pierid,butterfly,lepidopterous insect,insect,arthropod,animal
+sulphur butterfly,sulfur butterfly,butterfly,lepidopterous insect,insect,arthropod,animal
+lycaenid,lycaenid butterfly,butterfly,lepidopterous insect,insect,arthropod,animal
+jellyfish,coelenterate,animal
+sea anemone,anemone,anthozoan,coelenterate,animal
+brain coral,stony coral,coral,anthozoan,coelenterate,animal
+flatworm,platyhelminth,worm,animal
+nematode,nematode worm,roundworm,worm,animal
+conch,gastropod,mollusk,animal
+snail,gastropod,mollusk,animal
+slug,gastropod,mollusk,animal
+sea slug,nudibranch,gastropod,mollusk,animal
+chiton,coat-of-mail shell,sea cradle,polyplacophore,mollusk,animal
+sea urchin,echinoderm,animal
+sea cucumber,holothurian,echinoderm,animal
+iron,smoothing iron,home appliance,appliance,durables,consumer goods,commodity
 espresso maker,coffee maker,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
-microwave,microwave oven,electromagnetic radiation,radiation,energy,physical phenomenon,natural phenomenon,phenomenon,process
+microwave,microwave oven,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
 Dutch oven,oven,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
 rotisserie,oven,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
-toaster,supporter,advocate,person
+toaster,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
 waffle iron,kitchen appliance,home appliance,appliance,durables,consumer goods,commodity
-vacuum,vacuum cleaner,emptiness,condition,state,attribute
+vacuum,vacuum cleaner,home appliance,appliance,durables,consumer goods,commodity
 dishwasher,dish washer,dishwashing machine,white goods,home appliance,appliance,durables,consumer goods,commodity
 refrigerator,icebox,white goods,home appliance,appliance,durables,consumer goods,commodity
-washer,automatic washer,washing machine,worker,person
-Crock Pot,cooker,cooking utensil,kitchen utensil,utensil,implement
-frying pan,frypan,skillet,pan,cooking utensil,kitchen utensil,utensil,implement
-wok,pan,cooking utensil,kitchen utensil,utensil,implement
-caldron,cauldron,pot,cooking utensil,kitchen utensil,utensil,implement
-coffeepot,pot,cooking utensil,kitchen utensil,utensil,implement
-teapot,pot,cooking utensil,kitchen utensil,utensil,implement
-spatula,turner,cooking utensil,kitchen utensil,utensil,implement
-altar,table,furniture,furnishing
+washer,automatic washer,washing machine,white goods,home appliance,appliance,durables,consumer goods,commodity
+Crock Pot,cooker,cooking utensil,kitchen utensil,utensil
+frying pan,frypan,skillet,pan,cooking utensil,kitchen utensil,utensil
+wok,pan,cooking utensil,kitchen utensil,utensil
+caldron,cauldron,pot,cooking utensil,kitchen utensil,utensil
+coffeepot,pot,cooking utensil,kitchen utensil,utensil
+teapot,pot,cooking utensil,kitchen utensil,utensil
+spatula,turner,cooking utensil,kitchen utensil,utensil
+altar,structure
 triumphal arch,arch,structure
 patio,terrace,area,structure
 steel arch bridge,bridge,structure
@@ -682,319 +682,319 @@ suspension bridge,bridge,structure
 viaduct,bridge,structure
 barn,farm building,building,structure
 greenhouse,nursery,glasshouse,building,structure
-palace,mansion,house,dwelling,housing,structure
+palace,residence,house,dwelling,housing,structure
 monastery,religious residence,residence,house,dwelling,housing,structure
-library,room,area,structure
+library,building,structure
 apiary,bee house,shed,outbuilding,building,structure
 boathouse,shed,outbuilding,building,structure
-church,church building,religion,institution,organization,social group,group
+church,church building,place of worship,building,structure
 mosque,place of worship,building,structure
 stupa,tope,shrine,place of worship,building,structure
 planetarium,building,structure
 restaurant,eating house,eating place,eatery,building,structure
-cinema,movie theater,movie theatre,movie house,picture palace,medium
+cinema,movie theater,movie theatre,movie house,picture palace,theater,building,structure
 home theater,home theatre,theater,building,structure
 lumbermill,sawmill,factory,plant,building complex,structure
 coil,spiral,volute,whorl,helix,structure
 obelisk,column,structure
 totem pole,column,structure
-castle,mansion,house,dwelling,housing,structure
+castle,fortification,defensive structure,structure
 prison,prison house,correctional institution,penal institution,institution,establishment,structure
 grocery store,grocery,food market,market,marketplace,mercantile establishment,place of business,establishment,structure
 bakery,bakeshop,bakehouse,workplace,geographic point,point,location
 barbershop,shop,mercantile establishment,place of business,establishment,structure
 bookshop,bookstore,bookstall,shop,mercantile establishment,place of business,establishment,structure
 butcher shop,meat market,shop,mercantile establishment,place of business,establishment,structure
-confectionery,confectionary,candy store,sweet,dainty,nutriment,food,substance
+confectionery,confectionary,candy store,shop,mercantile establishment,place of business,establishment,structure
 shoe shop,shoe-shop,shoe store,shop,mercantile establishment,place of business,establishment,structure
 tobacco shop,tobacconist shop,tobacconist,shop,mercantile establishment,place of business,establishment,structure
 toyshop,shop,mercantile establishment,place of business,establishment,structure
 fountain,structure
 cliff dwelling,dwelling,housing,structure
 yurt,dwelling,housing,structure
-dock,dockage,docking facility,enclosure,area,structure
-brass,memorial tablet,plaque,copper-base alloy,alloy,mixture,substance
+dock,dockage,docking facility,landing,structure
+brass,memorial tablet,plaque,memorial,structure
 megalith,megalithic structure,memorial,structure
-bannister,banister,balustrade,balusters,handrail
+bannister,banister,balustrade,balusters,handrail,barrier,obstruction,structure
 breakwater,groin,groyne,mole,bulwark,seawall,jetty,barrier,obstruction,structure
 dam,dike,dyke,barrier,obstruction,structure
 chainlink fence,fence,barrier,obstruction,structure
 picket fence,paling,fence,barrier,obstruction,structure
 worm fence,snake fence,snake-rail fence,Virginia fence,rail fence,fence,barrier,obstruction,structure
 stone wall,fence,barrier,obstruction,structure
-grille,radiator grille,opening
+grille,radiator grille,grate,barrier,obstruction,structure
 sliding door,door,movable barrier,barrier,obstruction,structure
 turnstile,gate,movable barrier,barrier,obstruction,structure
 mountain tent,tent,shelter,structure
 scoreboard,board,sheet
-honeycomb,structure
+honeycomb,framework,supporting structure,structure
 plate rack,rack,framework,supporting structure,structure
-pedestal,plinth,footstall,support,device
-beacon,lighthouse,beacon light,pharos,visual signal,signal,communication
-mashed potato,potato,root vegetable,vegetable,produce,food,solid
-bell pepper,capsicum,shrub,woody plant,vascular plant,plant
-head cabbage,cabbage,crucifer,herb,vascular plant,plant
-broccoli,crucifer,herb,vascular plant,plant
-cauliflower,crucifer,herb,vascular plant,plant
-zucchini,courgette,marrow,summer squash,squash,vine,vascular plant,plant
-spaghetti squash,summer squash,squash,vine,vascular plant,plant
-acorn squash,winter squash,squash,vine,vascular plant,plant
-butternut squash,winter squash,squash,vine,vascular plant,plant
-cucumber,cuke,melon,gourd,vine,vascular plant,plant
-artichoke,globe artichoke,vegetable,herb,vascular plant,plant
-cardoon,vegetable,herb,vascular plant,plant
-mushroom,agaric,basidiomycete,fungus
-shower curtain,curtain,blind,protective covering,covering
-jean,blue jean,denim,trouser,garment,clothing,covering
-carton,containerful,indefinite quantity,measure
+pedestal,plinth,footstall,support,supporting structure,structure
+beacon,lighthouse,beacon light,pharos,tower,structure
+mashed potato,potato,root vegetable,vegetable,produce,food
+bell pepper,sweet pepper,pepper,solanaceous vegetable,vegetable,produce,food
+head cabbage,cabbage,cruciferous vegetable,vegetable,produce,food
+broccoli,cruciferous vegetable,vegetable,produce,food
+cauliflower,cruciferous vegetable,vegetable,produce,food
+zucchini,courgette,summer squash,squash,vegetable,produce,food
+spaghetti squash,summer squash,squash,vegetable,produce,food
+acorn squash,winter squash,squash,vegetable,produce,food
+butternut squash,winter squash,squash,vegetable,produce,food
+cucumber,cuke,vegetable,produce,food
+artichoke,globe artichoke,vegetable,produce,food
+cardoon,vegetable,produce,food
+mushroom,vegetable,produce,food
+shower curtain,curtain,blind,protective covering
+jean,blue jean,denim,trouser,garment,clothing
+carton,box,container
 handkerchief,hankie,hanky,hankey,piece of cloth,piece,part
-sandal,shoe,footwear,covering
+sandal,shoe,footwear
 ashcan,trash can,garbage can,wastebin,ash bin,ash-bin,ashbin,dustbin,trash barrel,trash bin,bin,container
 safe,strongbox,box,container
-plate,base,baseball equipment,sports equipment,equipment
+plate,entree,course,nutriment,food
 necklace,jewelry,adornment,decoration
-croquet ball,ball,game equipment,equipment
-fur coat,coat,overgarment,garment,clothing,covering
-thimble,containerful,indefinite quantity,measure
-pajama,pyjama,pj's,jammies,trouser,garment,clothing,covering
-running shoe,shoe,footwear,covering
+croquet ball,ball,game equipment
+fur coat,coat,overgarment,garment,clothing
+thimble,cap,protective covering
+pajama,pyjama,pj's,jammies,nightwear,clothing
+running shoe,shoe,footwear
 cocktail shaker,shaker,container
-chest,body part,part,thing
-manhole cover,top,covering
-modem,electronic equipment,equipment
+chest,box,container
+manhole cover,top
+modem,electronic equipment
 tub,vat,vessel,container
 tray,receptacle,container
-balance beam,beam,gymnastic apparatus,sports equipment,equipment
-bagel,beigel,bun,bread,baked goods,food,solid
-prayer rug,prayer mat,rug,floor cover,covering
-kimono,robe,garment,clothing,covering
-hot pot,hotpot,stew,dish,nutriment,food,substance
+balance beam,beam,gymnastic apparatus,sports equipment
+bagel,beigel,bun,bread,baked goods,food
+prayer rug,prayer mat,rug,floor cover
+kimono,robe,garment,clothing
+hot pot,hotpot,stew,dish,nutriment,food
 whiskey jug,jug,bottle,vessel,container
-knee pad,protective garment,clothing,covering
-book jacket,dust cover,dust jacket,dust wrapper,jacket,wrapping,covering
-spindle,fiber,material,substance
-ski mask,face mask,mask,protective covering,covering
+knee pad,protective garment,clothing
+book jacket,dust cover,dust jacket,dust wrapper,jacket,wrapping
+spindle,stick
+ski mask,face mask,mask,protective covering
 beer bottle,bottle,vessel,container
-crash helmet,helmet,headdress,clothing,covering
-bottlecap,cap,top,covering
-tile roof,roof,protective covering,covering
-mask,covering
-maillot,swimsuit,garment,clothing,covering
+crash helmet,helmet,headdress,clothing
+bottlecap,cap,top
+tile roof,roof,protective covering
+mask
+maillot,tights,hosiery,footwear,clothing
 Petri dish,dish,crockery,tableware,ware,article
-football helmet,helmet,headdress,clothing,covering
-bathing cap,swimming cap,cap,headdress,clothing,covering
+football helmet,helmet,headdress,clothing
+bathing cap,swimming cap,cap,headdress,clothing
 teddy,teddy bear,plaything
-holster,sheath,protective covering,covering
+holster,sheath,protective covering
 pop bottle,soda bottle,bottle,vessel,container
-photocopier,duplicator,apparatus,equipment
-vestment,gown,outerwear,clothing,covering
-crossword puzzle,crossword,puzzle,game,game equipment,equipment
-golf ball,ball,game equipment,equipment
-trifle,pudding,dessert,course,nutriment,food,substance
-suit,suit of clothes,garment,clothing,covering
+photocopier,duplicator,apparatus
+vestment,gown,outerwear,clothing
+crossword puzzle,crossword,puzzle,game,game equipment,documents,document,docs,doc
+golf ball,ball,game equipment
+trifle,pudding,dessert,course,nutriment,food
+suit,suit of clothes,garment,clothing
 water tower,reservoir,tank,vessel,container
-feather boa,boa,scarf,garment,clothing,covering
-cloak,covering
-red wine,wine,alcohol,beverage,food,substance
-drumstick,helping,small indefinite quantity,indefinite quantity,measure
-shield,buckler,protective covering,covering
-Christmas stocking,stocking,hosiery,footwear,clothing,covering
-hoopskirt,crinoline,skirt,garment,clothing,covering
-menu,bill,list,database,information,message,communication
-stage,time period,fundamental quantity,measure
-bonnet,poke bonnet,hat,headdress,clothing,covering
-meat loaf,meatloaf,dish,nutriment,food,substance
-baseball,ball game,field game,outdoor game,athletic game,sport,diversion,activity,act,event,psychological feature
+feather boa,boa,scarf,garment,clothing
+cloak
+red wine,wine,alcohol,beverage,food
+drumstick,stick
+shield,buckler,armor,protective covering
+Christmas stocking,stocking,hosiery,footwear,clothing
+hoopskirt,crinoline,skirt,garment,clothing
+menu,fare,food,documents,document,docs,doc
+stage,platform,horizontal surface,surface
+bonnet,poke bonnet,hat,headdress,clothing
+meat loaf,meatloaf,dish,nutriment,food
+baseball,ball,game equipment
 face powder,powder,toiletry
-scabbard,sheath,protective covering,covering
+scabbard,sheath,protective covering
 sunscreen,sunblock,sun blocker,cream,toiletry
 beer glass,glass,container
 hen-of-the-woods,hen of the woods,Polyporus frondosus,Grifola frondosa,fungus
-guacamole,dip,condiment,flavorer,ingredient,foodstuff,food,substance
-lampshade,lamp shade,shade,protective covering,covering
+guacamole,dip,condiment,food
+lampshade,lamp shade,shade,protective covering
 wool,woolen,woollen,fabric
-hay,fodder,feed,food,substance
-bow tie,bow-tie,bowtie,necktie,neckwear,garment,clothing,covering
-mailbag,postbag,pouch,bag,container
+hay,fodder,feed,food
+bow tie,bow-tie,bowtie,necktie,neckwear,garment,clothing
+mailbag,postbag,bag,container
 water jug,jug,bottle,vessel,container
 bucket,pail,vessel,container
 dishrag,dishcloth,piece of cloth,piece,part
 soup bowl,bowl,dish,crockery,tableware,ware,article
-eggnog,punch,mixed drink,alcohol,beverage,food,substance
-mortar,high-angle gun,cannon,artillery,armament,weaponry
-trench coat,raincoat,coat,overgarment,garment,clothing,covering
-paddle,boat paddle,bat,club,stick,implement
-chain,series,ordering,arrangement,group
-swab,swob,mop,implement
+eggnog,punch,mixed drink,alcohol,beverage,food
+mortar,vessel,container
+trench coat,raincoat,coat,overgarment,garment,clothing
+paddle,boat paddle,oar
+chain,ligament,attachment,connection
+swab,swob,mop,cleaning implement
 mixing bowl,bowl,dish,crockery,tableware,ware,article
-potpie,dish,nutriment,food,substance
+potpie,dish,nutriment,food
 wine bottle,bottle,vessel,container
-shoji,screen,covering
-bulletproof vest,vest,garment,clothing,covering
-drilling platform,offshore rig,drill rig,rig,gear,equipment
-binder,ring-binder,harvester,farm machine,machine,device
-cardigan,sweater,garment,clothing,covering
-sweatshirt,pullover,sweater,garment,clothing,covering
-pot,flowerpot,cooking utensil,kitchen utensil,utensil,implement
-birdhouse,shelter,protective covering,covering
-hamper,restraint,device
-ping-pong ball,ball,game equipment,equipment
+shoji,screen
+bulletproof vest,vest,garment,clothing
+drilling platform,offshore rig,drill rig,rig,gear
+binder,ring-binder,protective covering
+cardigan,sweater,garment,clothing
+sweatshirt,pullover,sweater,garment,clothing
+pot,flowerpot,container
+birdhouse,shelter,protective covering
+hamper,basket,container
+ping-pong ball,ball,game equipment
 pencil box,pencil case,box,container
-pay-phone,pay-station,telephone,electronic equipment,equipment
-consomme,soup,dish,nutriment,food,substance
-apron,protective garment,clothing,covering
-punching bag,punch bag,punching ball,punchball,victim,unfortunate,person
+pay-phone,pay-station,telephone,electronic equipment
+consomme,soup,dish,nutriment,food
+apron,protective garment,clothing
+punching bag,punch bag,punching ball,punchball,ball,game equipment
 backpack,back pack,knapsack,packsack,rucksack,haversack,bag,container
 groom,bridegroom,participant,associate,peer,person
-bearskin,busby,shako,fur,animal skin,animal product,animal material,material,substance
-pencil sharpener,sharpener,implement
-broom,cleaning implement,implement
-mosquito net,screen,protective covering,covering
-abaya,robe,garment,clothing,covering
-mortarboard,board,sheet
-poncho,cloak,overgarment,garment,clothing,covering
-crutch,staff,stick,implement
-Polaroid camera,Polaroid Land camera,camera,photographic equipment,equipment
-space bar,key,lever,bar,implement
-cup,crockery,tableware,ware,article
-racket,racquet,noise,sound,happening,event,psychological feature
+bearskin,busby,shako,hat,headdress,clothing
+pencil sharpener,sharpener
+broom,cleaning implement
+mosquito net,screen,protective covering
+abaya,robe,garment,clothing
+mortarboard,cap,headdress,clothing
+poncho,cloak,overgarment,garment,clothing
+crutch,staff,stick
+Polaroid camera,Polaroid Land camera,camera,photographic equipment
+space bar,key,lever,bar
+cup,punch,mixed drink,alcohol,beverage,food
+racket,racquet,sports implement
 traffic light,traffic signal,stoplight,light,visual signal,signal,communication
-quill,quill pen,pen,writing implement,implement
-radio,wireless,broadcasting,telecommunication,medium
-dough,concoction,foodstuff,food,substance
-cuirass,body armor,armor,protective covering,covering
-military uniform,uniform,clothing,covering
+quill,quill pen,pen,writing implement
+radio,wireless,communication system,system
+dough,concoction,food
+cuirass,body armor,armor,protective covering
+military uniform,uniform,clothing
 lipstick,lip rouge,makeup,cosmetic,toiletry
-shower cap,cap,headdress,clothing,covering
-monitor,supervisor,superior,leader,person
-oscilloscope,scope,cathode-ray oscilloscope,CRO,electronic equipment,equipment
-mitten,glove,handwear,clothing,covering
-brassiere,bra,bandeau,undergarment,garment,clothing,covering
-French loaf,loaf of bread,bread,baked goods,food,solid
+shower cap,cap,headdress,clothing
+monitor,electronic equipment
+oscilloscope,scope,cathode-ray oscilloscope,CRO,electronic equipment
+mitten,glove,handwear,clothing
+brassiere,bra,bandeau,undergarment,garment,clothing
+French loaf,loaf of bread,bread,baked goods,food
 vase,jar,vessel,container
 milk can,can,container
-rugby ball,ball,game equipment,equipment
+rugby ball,ball,game equipment
 paper towel,towel,piece of cloth,piece,part
 earthstar,fungus
-envelope,container
-miniskirt,mini,skirt,garment,clothing,covering
-cowboy hat,ten-gallon hat,hat,headdress,clothing,covering
+envelope,container,documents,document,docs,doc
+miniskirt,mini,skirt,garment,clothing
+cowboy hat,ten-gallon hat,hat,headdress,clothing
 trolleybus,trolley coach,trackless trolley,bus,public transport,conveyance
-perfume,essence,smell,sensation,perception,basic cognitive process,process,cognition,psychological feature
+perfume,essence,toiletry
 bathtub,bathing tub,bath,tub,vessel,container
-hotdog,hot dog,red hot,exhibitionist,egotist,unpleasant person,unwelcome person,person
+hotdog,hot dog,red hot,sandwich,snack food,dish,nutriment,food
 coral fungus,fungus
 bullet train,bullet,passenger train,train,public transport,conveyance
 pillow,cushion,padding
-toilet tissue,toilet paper,bathroom tissue,tissue,paper,material,substance
+toilet tissue,toilet paper,bathroom tissue,tissue,paper,material
 cassette,container
-carpenter's kit,tool kit,kit,gear,equipment
+carpenter's kit,tool kit,kit,gear
 ladle,vessel,container
 stinkhorn,carrion fungus,fungus
 lotion,toiletry
 hair spray,toiletry
-academic gown,academic robe,judge's robe,gown,outerwear,clothing,covering
-dome,concave shape,solid,shape,attribute
+academic gown,academic robe,judge's robe,gown,outerwear,clothing
+dome,roof,protective covering
 crate,box,container
-wig,hairpiece,attire,clothing,covering
-burrito,dish,nutriment,food,substance
+wig,hairpiece,attire,clothing
+burrito,dish,nutriment,food
 pill bottle,bottle,vessel,container
-chain mail,ring mail,mail,chain armor,chain armour,ring armor,ring armour,body armor,armor,protective covering,covering
-theater curtain,theatre curtain,curtain,blind,protective covering,covering
-window shade,window blind,blind,protective covering,covering
-barrel,cask,tube,conduit,passage,way
-washbasin,handbasin,washbowl,lavabo,wash-hand basin,sink,plumbing fixture,fixture
-ballpoint,ballpoint pen,ballpen,Biro,pen,writing implement,implement
-basketball,court game,athletic game,sport,diversion,activity,act,event,psychological feature
+chain mail,ring mail,mail,chain armor,chain armour,ring armor,ring armour,body armor,armor,protective covering
+theater curtain,theatre curtain,curtain,blind,protective covering
+window shade,window blind,blind,protective covering
+barrel,cask,vessel,container
+washbasin,handbasin,washbowl,lavabo,wash-hand basin,basin,vessel,container
+ballpoint,ballpoint pen,ballpen,Biro,pen,writing implement
+basketball,ball,game equipment
 bath towel,towel,piece of cloth,piece,part
-cowboy boot,boot,footwear,covering
-gown,dress,woman's clothing,clothing,covering
-window screen,screen,protective covering,covering
-agaric,fungus
-cellular telephone,cellular phone,cellphone,cell,mobile phone,radiotelephone,telephone,electronic equipment,equipment
-nipple,reproductive organ,organ,body part,part,thing
-barbell,weight,sports equipment,equipment
+cowboy boot,boot,footwear
+gown,dress,woman's clothing,clothing
+window screen,screen,protective covering
+agaric,basidiomycete,fungus
+cellular telephone,cellular phone,cellphone,cell,mobile phone,radiotelephone,telephone,electronic equipment
+nipple,cap,top
+barbell,weight,sports equipment
 mailbox,letter box,box,container
-lab coat,laboratory coat,coat,overgarment,garment,clothing,covering
-fire screen,fireguard,screen,protective covering,covering
+lab coat,laboratory coat,coat,overgarment,garment,clothing
+fire screen,fireguard,screen,protective covering
 minibus,bus,public transport,conveyance
-packet,collection,group
+packet,package,container
 maze,labyrinth,system
-pole,rod,implement
-horizontal bar,high bar,gymnastic apparatus,sports equipment,equipment
-sombrero
-pickelhaube,helmet,armor plate,plate,shield,protective covering,covering
+pole,rod
+horizontal bar,high bar,gymnastic apparatus,sports equipment
+sombrero,hat,headdress,clothing
+pickelhaube,helmet,armor plate,plate,shield,protective covering
 rain barrel,cistern,reservoir,tank,vessel,container
 wallet,billfold,notecase,pocketbook,case,container
-cassette player,electronic equipment,equipment
-comic book,magazine,press,print media,medium
+cassette player,electronic equipment
+comic book,magazine,press,print media
 piggy bank,penny bank,savings bank,container
 street sign,sign,communication
-bell cote,bell cot,shelter,protective covering,covering
-fountain pen,pen,writing implement,implement
-Windsor tie,necktie,neckwear,garment,clothing,covering
-volleyball,court game,athletic game,sport,diversion,activity,act,event,psychological feature
-overskirt,skirt,garment,clothing,covering
-sarong,skirt,garment,clothing,covering
-purse,container
-bolo tie,bolo,bola tie,bola,necktie,neckwear,garment,clothing,covering
+bell cote,bell cot,shelter,protective covering
+fountain pen,pen,writing implement
+Windsor tie,necktie,neckwear,garment,clothing
+volleyball,ball,game equipment
+overskirt,skirt,garment,clothing
+sarong,skirt,garment,clothing
+purse,bag,container
+bolo tie,bolo,bola tie,bola,necktie,neckwear,garment,clothing
 bib,piece of cloth,piece,part
-parachute,chute,rescue equipment,equipment
+parachute,chute,rescue equipment
 sleeping bag,bag,container
-television,television system,broadcasting,telecommunication,medium
-swimming trunks,bathing trunks,swimsuit,garment,clothing,covering
+television,television system,telecommunication system,communication system,system
+swimming trunks,bathing trunks,swimsuit,garment,clothing
 measuring cup,measure,container
-espresso,coffee,beverage,food,substance
-pizza,pizza pie,dish,nutriment,food,substance
-breastplate,aegis,egis,armor plate,plate,shield,protective covering,covering
+espresso,coffee,beverage,food
+pizza,pizza pie,dish,nutriment,food
+breastplate,aegis,egis,armor plate,plate,shield,protective covering
 shopping basket,basket,container
-wooden spoon,booby prize,trophy,award,symbol,signal,communication
+wooden spoon,spoon,cutlery,tableware,ware,article
 saltshaker,salt shaker,shaker,container
-chocolate sauce,chocolate syrup,sauce,condiment,flavorer,ingredient,foodstuff,food,substance
-ballplayer,baseball player,athlete,contestant,person
+chocolate sauce,chocolate syrup,sauce,condiment,food
+ballplayer,baseball player,athlete,person
 goblet,glass,container
 gyromitra,fungus
-stretcher,framework,supporting structure,structure
+stretcher,litter,conveyance
 water bottle,bottle,vessel,container
-dial telephone,dial phone,telephone,electronic equipment,equipment
+dial telephone,dial phone,telephone,electronic equipment
 soap dispenser,dispenser,container
-jersey,T-shirt,tee shirt
+jersey,T-shirt,tee shirt,shirt,garment,clothing
 school bus,bus,public transport,conveyance
-jigsaw puzzle,puzzle,game,game equipment,equipment
+jigsaw puzzle,puzzle,game,game equipment
 plastic bag,bag,container
-reflex camera,camera,photographic equipment,equipment
-diaper,nappy,napkin,garment,clothing,covering
-Band Aid,adhesive bandage,bandage,dressing,cloth covering,covering
-ice lolly,lolly,lollipop,popsicle,frozen dessert,dessert,course,nutriment,food,substance
+reflex camera,camera,photographic equipment
+diaper,nappy,napkin,garment,clothing
+Band Aid,adhesive bandage,bandage,dressing,cloth covering
+ice lolly,lolly,lollipop,popsicle,frozen dessert,dessert,course,nutriment,food
 velvet,fabric
-tennis ball,ball,game equipment,equipment
-gasmask,respirator,gas helmet,mask,protective covering,covering
-doormat,welcome mat,person
-Loafer,nonworker,person
-ice cream,icecream,frozen dessert,dessert,course,nutriment,food,substance
-pretzel,cracker,bread,baked goods,food,solid
-quilt,comforter,comfort,puff,bedclothes,cloth covering,covering
-maillot,tank suit,swimsuit,garment,clothing,covering
-tape player,electronic equipment,equipment
-clog,geta,patten,sabot,footwear,covering
-iPod,stereo,reproducer,audio system,electronic equipment,equipment
+tennis ball,ball,game equipment
+gasmask,respirator,gas helmet,mask,protective covering
+doormat,welcome mat,mat,floor cover
+Loafer,shoe,footwear
+ice cream,icecream,frozen dessert,dessert,course,nutriment,food
+pretzel,cracker,bread,baked goods,food
+quilt,comforter,comfort,puff,bedclothes,cloth covering
+maillot,tank suit,swimsuit,garment,clothing
+tape player,electronic equipment
+clog,geta,patten,sabot,footwear
+iPod,stereo,reproducer,audio system,electronic equipment
 bolete,fungus
 scuba diver,diver,explorer,person
-pitcher,ewer,thrower,person
-matchstick,stick,implement
-bikini,two-piece
-sock,hosiery,footwear,clothing,covering
-CD player,electronic equipment,equipment
-lens cap,lens cover,cap,protective covering,covering
-thatch,thatched roof,hairdo,hair,body covering,covering,natural object
-vault,burial chamber,grave,topographic point,point,location
+pitcher,ewer,vessel,container
+matchstick,stick
+bikini,two-piece,swimsuit,garment,clothing
+sock,hosiery,footwear,clothing
+CD player,electronic equipment
+lens cap,lens cover,cap,protective covering
+thatch,thatched roof,roof,protective covering
+vault,roof,protective covering
 beaker,jar,vessel,container
 bubble,globule,ball,sphere,round shape,shape,attribute
-cheeseburger,hamburger,sandwich,snack food,dish,nutriment,food,substance
-parallel bars,bars,gymnastic apparatus,sports equipment,equipment
-flagpole,flagstaff,surveying instrument,instrument,device
+cheeseburger,hamburger,sandwich,snack food,dish,nutriment,food
+parallel bars,bars,gymnastic apparatus,sports equipment
+flagpole,flagstaff,staff,stick
 coffee mug,mug,drinking vessel,vessel,container
-rubber eraser,rubber,pencil eraser,eraser,implement
-stole,scarf,garment,clothing,covering
-carbonara,spaghetti sauce,sauce,condiment,flavorer,ingredient,foodstuff,food,substance
-dumbbell,weight,sports equipment,equipment
+rubber eraser,rubber,pencil eraser,eraser
+stole,scarf,garment,clothing
+carbonara,spaghetti sauce,sauce,condiment,food
+dumbbell,weight,sports equipment
