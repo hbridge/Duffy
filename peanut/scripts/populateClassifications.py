@@ -32,19 +32,19 @@ def classifyPhotos(photos, socket_send, socket_recv):
 
     pathToPhoto = dict()
 
-    print("About to process files:")
+    logging.debug("About to process files:")
     for photo in photos:
         imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.new_filename)
         pathToPhoto[imagepath] = photo
 
         cmd['images'].append(imagepath)
 
-    print("Sending:  " + str(cmd))
+    logging.debug("Sending:  " + str(cmd))
     socket_send.send_json(cmd)
     
-    print("Waiting for response...")
+    logging.debug("Waiting for response...")
     result = socket_recv.recv_json()
-    print("Got back: " + str(result))
+    logging.debug("Got back: " + str(result))
 
     for imagepath in result['images']:
         photo = pathToPhoto[imagepath]
@@ -70,7 +70,7 @@ def classifyPhotos(photos, socket_send, socket_recv):
 
             successfullyClassified.append(photo)
         else:
-            print("*** File not found: " + imagepath)
+            logging.info("*** File not found: " + imagepath)
     return successfullyClassified
     
 def copyPhotos(photos):
@@ -81,7 +81,7 @@ def copyPhotos(photos):
         userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, userId)
         imagepath = os.path.join(userDataPath, photo.new_filename)
 
-        print("Sending to image server:  " + imagepath + " to " + settings.PIPELINE_REMOTE_PATH)
+        logging.info("Sending to image server:  " + imagepath + " to " + settings.PIPELINE_REMOTE_PATH)
         ret = subprocess.call(['scp', imagepath, settings.PIPELINE_REMOTE_HOST + ":" + settings.PIPELINE_REMOTE_PATH])
         
         if ret == 0:
@@ -100,9 +100,11 @@ def main(argv):
     maxFileAtTime = 16
     count = 0
 
+    logging.basicConfig(filename='/var/log/duffy/classifier.log',level=logging.DEBUG)
+
     socket_send, socket_recv = initClassifier()
 
-    print "Starting pipeline"
+    logging.info("Starting pipeline at " + time.strftime("%c"))
     # Get all photos in pipeline_state 0 which means "not copied to image server"
     nonProcessedPhotos = Photo.objects.filter(classification_data="")
     nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
@@ -116,7 +118,7 @@ def main(argv):
             successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
             count += len (successfullyClassified)
 
-    print "Pipeline complete. " + str(count) + " photos processed"
+    logging.info("Pipeline complete. " + str(count) + " photos processed")
 
 if __name__ == "__main__":
     main(sys.argv[1:])
