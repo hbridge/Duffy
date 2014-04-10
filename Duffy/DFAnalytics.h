@@ -16,7 +16,7 @@ extern NSString * const DFAnalyticsActionTypeSwipe;
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
-+ (void)logCameraRollScanAddedAssets:(NSInteger)numAdded;
++ (void)logCameraRollScanTotalAssets:(NSInteger)totalAssets addedAssets:(NSInteger)numAdded;
 + (void)logSwitchBetweenPhotos:(NSString *)actionType;
 
 + (void)logSearchLoadStartedWithQuery:(NSString *)query

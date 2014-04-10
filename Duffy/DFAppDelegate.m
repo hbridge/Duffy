@@ -41,7 +41,7 @@
     [Flurry setCrashReportingEnabled:NO];
 #ifdef DEBUG
     [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
-    [Flurry setLogLevel:FlurryLogLevelAll];
+    [Flurry setLogLevel:FlurryLogLevelDebug];
 #else
     [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
 #endif

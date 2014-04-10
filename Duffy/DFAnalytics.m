@@ -27,6 +27,7 @@ NSString* const ControllerClassKey = @"controllerClass";
 
 //Camera roll scan
 NSString* const CameraRollScannedEvent = @"CameraRollScanned";
+NSString* const PhotosTotalKey = @"numPhotosTotal";
 NSString* const PhotosAddedKey = @"numPhotosAdded";
 
 //Photo viewing
@@ -75,11 +76,12 @@ static DFAnalytics *defaultLogger;
     return [NSString stringWithFormat:@"%@%@", [viewController.class description], ControllerViewedEventSuffix];
 }
 
-+ (void)logCameraRollScanAddedAssets:(NSInteger)numAdded
++ (void)logCameraRollScanTotalAssets:(NSInteger)totalAssets addedAssets:(NSInteger)numAdded
 {
     [Flurry logEvent:CameraRollScannedEvent
       withParameters:@{
-                       PhotosAddedKey: [NSNumber numberWithInteger:numAdded]
+                       PhotosTotalKey: [NSNumber numberWithInteger:totalAssets],
+                       PhotosAddedKey: [NSNumber numberWithInteger:numAdded],
                        }];
 }
 

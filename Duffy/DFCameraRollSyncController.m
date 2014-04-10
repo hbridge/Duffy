@@ -56,7 +56,8 @@
             }
         } else {
             NSLog(@"All assets in Camera Roll enumerated, %d new assets.", newAssets);
-            [DFAnalytics logCameraRollScanAddedAssets:newAssets];
+            [DFAnalytics logCameraRollScanTotalAssets:(knownURLs.count + newAssets)
+                                          addedAssets:newAssets];
             // save to the store so that the main thread context can pick it up
             NSError *error = nil;
             if (self.managedObjectContext.hasChanges) {
