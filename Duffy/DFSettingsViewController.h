@@ -47,4 +47,5 @@ extern NSString *DFEnabledNo;
 - (IBAction)serverPortEditingDidEnd:(UITextField *)sender;
 
 
+- (IBAction)crashAppClicked:(UIButton *)sender;
 @end

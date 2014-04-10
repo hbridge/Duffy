@@ -141,6 +141,10 @@ NSString *DFEnabledNo = @"NO";
     [[DFUser currentUser] setUserOverriddenServerPortString:sender.text];
 }
 
+- (IBAction)crashAppClicked:(UIButton *)sender {
+    [NSException raise:@"Testing Crash" format:@"Intentionally crashing app to test crash uploads."];
+}
+
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [textField resignFirstResponder];
