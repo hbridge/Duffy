@@ -7,6 +7,7 @@
 //
 
 #import "DFMultiPhotoViewController.h"
+#import "DFAnalytics.h"
 
 @interface DFMultiPhotoViewController ()
 
@@ -33,6 +34,17 @@
     [super viewDidLoad];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
+    [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -50,7 +62,7 @@
    previousViewControllers:(NSArray *)previousViewControllers
        transitionCompleted:(BOOL)completed
 {
-    // todo: cache next photo controller on first load.
+    [DFAnalytics logSwitchBetweenPhotos:DFAnalyticsActionTypeSwipe];
 
 }
 

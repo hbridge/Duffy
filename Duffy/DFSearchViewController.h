@@ -18,6 +18,8 @@
 @property (nonatomic, retain) NSMutableDictionary *defaultSearchResults;
 @property (nonatomic, retain) DFAutocompleteController *autcompleteController;
 
+@property (nonatomic, retain) NSString *lastSearchQuery;
+
 - (void)executeSearchForQuery:(NSString *)query;
 
 

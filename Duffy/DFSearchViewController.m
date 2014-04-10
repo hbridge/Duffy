@@ -211,6 +211,7 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (void)executeSearchForQuery:(NSString *)query
 {
+    self.lastSearchQuery = query;
     NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
                                 [[[DFUser currentUser] serverURL] absoluteString],
                                 SearchPath,
@@ -220,6 +221,7 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
     
     NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
+    [DFAnalytics logSearchLoadStartedWithQuery:query suggestions:self.defaultSearchResults];
     [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
 }
 
@@ -245,7 +247,7 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 {
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     
-    NSLog(@"webview size:%@ contentSize:%@", NSStringFromCGRect(webView.frame), NSStringFromCGSize(self.webView.scrollView.contentSize));
+    [DFAnalytics logSearchLoadEndedWithQuery:self.lastSearchQuery];
 }
 
 - (void)pushPhotoWebView:(NSString *)photoURLString
