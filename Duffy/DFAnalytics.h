@@ -12,5 +12,6 @@
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
++ (void)logCameraRollScanAddedAssets:(NSInteger)numAdded;
 
 @end

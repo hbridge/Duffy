@@ -11,9 +11,12 @@
 
 @implementation DFAnalytics
 
+//Controller logging
 static NSString *ControllerViewedEvent = @"ControllerViewed";
-
 static NSString *ControllerClassKey = @"controllerClass";
+
+static NSString *CameraRollChanged = @"CameraRollChanged";
+static NSString *PhotosAddedKey = @"numPhotosAdded";
 
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params
@@ -28,6 +31,12 @@ static NSString *ControllerClassKey = @"controllerClass";
     [Flurry endTimedEvent:ControllerViewedEvent withParameters:params];
 }
 
-
++ (void)logCameraRollScanAddedAssets:(NSInteger)numAdded
+{
+    [Flurry logEvent:CameraRollChanged
+      withParameters:@{
+                       PhotosAddedKey: [NSNumber numberWithInteger:numAdded]
+                       }];
+}
 
 @end
