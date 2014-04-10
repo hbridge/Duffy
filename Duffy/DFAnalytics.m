@@ -42,6 +42,15 @@ NSString* const SuggestionsKey = @"searchSuggestions";
 NSString* const SLatencyKey = @"SecondsLatency";
 NSString* const SearchAbortedEvent = @"SearchExecuted";
 
+// Uploads
+NSString* const UploadPhotoEvent = @"UploadPhoto";
+NSString* const SizeInKBKey = @"sizeInKB";
+NSString* const ResultKey = @"result";
+NSString* const DFAnalyticsValueResultSuccess = @"success";
+NSString* const DFAnalyticsValueResultFailure = @"failure";
+NSString* const DebugStringKey = @"debug";
+
+
 static DFAnalytics *defaultLogger;
 
 + (DFAnalytics *)sharedLogger {
@@ -147,6 +156,29 @@ static DFAnalytics *defaultLogger;
     
     sharedLogger.inProgressQueryString = nil;
     sharedLogger.inProgressQueryStart = nil;
+}
+
+
++ (void)logUploadBeganWithNumBytes:(NSUInteger)bodyDataSizeInBytes
+{
+    [Flurry logEvent:UploadPhotoEvent
+      withParameters:@{SizeInKBKey: [NSNumber numberWithUnsignedInteger:bodyDataSizeInBytes/1000]}
+               timed:YES];
+}
+
++ (void)logUploadEndedWithResult:(NSString *)resultValue
+{
+    [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
+                                                            ResultKey: resultValue,
+                                                            }];
+}
+
++ (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug
+{
+    [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
+                                                            ResultKey: resultValue,
+                                                            DebugStringKey: debug
+                                                            }];
 }
 
 

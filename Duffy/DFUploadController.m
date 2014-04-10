@@ -18,6 +18,7 @@
 #import "DFPhoto+FaceDetection.h"
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFAnalytics.h"
 
 
 // Private DFUploadResponse Class
@@ -151,6 +152,8 @@ static DFUploadController *defaultUploadController;
 {
     NSURLRequest *postRequest = [self createPostRequestForPhoto:photo];
     
+    NSNumber *numBytes = [NSURLProtocol propertyForKey:@"DFPhotoNumBytes" inRequest:postRequest];
+    [DFAnalytics logUploadBeganWithNumBytes:[numBytes unsignedIntegerValue]];
     RKObjectRequestOperation *operation =
         [[self objectManager] objectRequestOperationWithRequest:postRequest
             success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
@@ -160,14 +163,18 @@ static DFUploadController *defaultUploadController;
         if ([response.result isEqualToString:@"true"]) {
             photo.uploadDate = [NSDate date];
             [self uploadFinishedForPhoto:photo];
+            [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess];
         } else {
             NSLog(@"File did not upload properly.  Retrying.");
             [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+            [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:response.debug];
         }
     }
             failure:^(RKObjectRequestOperation *operation, NSError *error)
     {
         NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
+        NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
+        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
         if (error.code == -1001) {//timeout
             [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
         }
@@ -196,6 +203,7 @@ static DFUploadController *defaultUploadController;
                                                                                           fileName:uniqueFilename
                                                                                           mimeType:@"image/jpg"];
                                                               }];
+    [NSURLProtocol setProperty:[NSNumber numberWithUnsignedInteger:imageData.length] forKey:@"DFPhotoNumBytes" inRequest:request];
 
     return request;
 }
@@ -219,7 +227,6 @@ static DFUploadController *defaultUploadController;
                              PhotoFacesKey:    [self faceJSONStringForPhoto:photo],
                              };
     
-    NSLog(@"uploadParams: %@", params);
     return params;
 }
 
