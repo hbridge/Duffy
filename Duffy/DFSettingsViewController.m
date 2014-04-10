@@ -78,6 +78,11 @@ NSString *DFEnabledNo = @"NO";
     } else {
         self.autoUploadEnabledSwitch.on = NO;
     }
+    
+#ifndef DEBUG
+    self.deviceIDTextField.enabled = NO;
+#endif
+    
 }
 
 - (void)setAppInfo
