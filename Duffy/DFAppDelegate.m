@@ -39,8 +39,12 @@
     [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     
     [Flurry setCrashReportingEnabled:NO];
+#ifdef DEBUG
     [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
-    //[Flurry setLogLevel:FlurryLogLevelAll];
+    [Flurry setLogLevel:FlurryLogLevelAll];
+#else
+    [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
+#endif
     
     if (![[DFUser currentUser] userID] || [[[DFUser currentUser] userID] isEqualToString:@""]) {
         [self showFirstTimeSetup];

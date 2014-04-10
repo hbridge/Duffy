@@ -19,6 +19,7 @@ extern NSString *DFEnabledNo;
 - (IBAction)scrollViewTapped:(UITapGestureRecognizer *)sender;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
+@property (weak, nonatomic) IBOutlet UILabel *appInfoLabel;
 
 // Device/user section outlets
 @property (weak, nonatomic) IBOutlet UILabel *deviceIDLabel;

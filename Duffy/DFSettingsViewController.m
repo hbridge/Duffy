@@ -15,8 +15,6 @@
 
 @interface DFSettingsViewController ()
 
-@property (nonatomic, retain) NSArray *rowLabels;
-
 @property (nonatomic, retain) UIView *lastEditedTextField;
 
 @end
@@ -38,19 +36,6 @@ NSString *DFEnabledNo = @"NO";
         self.navigationItem.title = @"Settings";
         self.tabBarItem.title = @"Settings";
         self.tabBarItem.image = [UIImage imageNamed:@"SettingsTab"];
-        
-        //NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-        //NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
-        
-        // version
-        //NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
-        //NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
-
-        
-        self.rowLabels = @[ @"Force upload camera roll",
-                            @"ID",
-                            ];
-        
         
         [self setSettingsDefaults];
         
@@ -78,6 +63,7 @@ NSString *DFEnabledNo = @"NO";
 {
     [super viewDidLoad];
 
+    [self setAppInfo];
     self.deviceIDLabel.text = [[DFUser currentUser] hardwareDeviceID];
     self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
     self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
@@ -92,6 +78,26 @@ NSString *DFEnabledNo = @"NO";
     } else {
         self.autoUploadEnabledSwitch.on = NO;
     }
+}
+
+- (void)setAppInfo
+{
+    // App name
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
+    
+    // version and build type
+    NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
+    NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
+    NSString *buildType;
+#ifdef DEBUG
+    buildType = @"debug";
+#else
+    buildType = @"release";
+#endif
+    NSString *versionLabelString = [NSString stringWithFormat:@"%@ %@ (%@) %@",
+                                    appName, majorVersion, minorVersion, buildType];
+    self.appInfoLabel.text = versionLabelString;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -117,12 +123,6 @@ NSString *DFEnabledNo = @"NO";
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
-}
-
-
-- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
-{
-    return self.rowLabels.count;
 }
 
 - (IBAction)deviceIDEditingDidEnd:(UITextField *)sender {
