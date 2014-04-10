@@ -62,6 +62,9 @@
 
 - (void)showLoggedInUserTabs
 {
+    // Set the unique userID for logging
+    [Flurry setUserID:[[DFUser currentUser] userID]];
+    
     // Camera roll tab
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
