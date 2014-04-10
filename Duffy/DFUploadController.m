@@ -77,6 +77,7 @@ static DFUploadController *defaultUploadController;
         self.uploadDispatchQueue = dispatch_queue_create("com.duffysoft.DFUploadController.UploadQueue", DISPATCH_QUEUE_SERIAL);
         self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
         [self setupStatusBarNotifications];
+        self.backgroundUpdateTask = UIBackgroundTaskInvalid;
     }
     return self;
 }
@@ -122,6 +123,10 @@ static DFUploadController *defaultUploadController;
 
 - (void) beginBackgroundUpdateTask
 {
+    if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
+        NSLog(@"DFUploadController: have background upload task, no need to register another.");
+        return;
+    }
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         [self endBackgroundUpdateTask];
     }];
