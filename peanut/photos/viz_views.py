@@ -97,6 +97,8 @@ def search(request, user_id=None):
 		else:
 			imageSize = 78;
 
+		width = imageSize*2 #doubled  for retina
+
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
@@ -113,8 +115,6 @@ def search(request, user_id=None):
 
 		(startDate, newQuery) = search_util.getNattyInfo(query)
 		searchResults = search_util.solrSearch(user.id, startDate, newQuery)
-		
-		width = imageSize*2 #doubled  for retina
 
 		allResults = searchResults.count()
 		searchResults = searchResults[((page-1)*count):(count*page)]
@@ -162,13 +162,28 @@ def gallery(request, user_id):
 
 	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
 
+	if request.method == 'GET':
+		data = request.GET
+	elif request.method == 'POST':
+		data = request.POST
 
-	photos = Photo.objects.filter(user_id = user.id)
+	if data.has_key('imagesize'):
+		imageSize = int(data['imagesize'])
+	else:
+		imageSize = 78;
+
+	width = imageSize*2 #doubled  for retina
+
+	photos = Photo.objects.filter(user_id = user.id).order_by('time_taken')
 	numPhotos = photos.count()
+
+	for entry in photos:
+		image_util.imageThumbnail(entry.new_filename, width, user.id)
 
 
 	context = {	'user' : user,
 				'numPhotos': numPhotos,
+				'imageSize': imageSize,
 				'photos': photos,
 				'thumbnailBasepath': thumbnailBasepath}
 	return render(request, 'photos/gallery.html', context)
