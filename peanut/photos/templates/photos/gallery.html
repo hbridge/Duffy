@@ -1,3 +1,4 @@
+{% load dictionary_extras %}
 <!DOCTYPE html> 
 <html> 
 
@@ -5,12 +6,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<title>Search your photos</title> 
-	<!--<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />-->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-	<!--
-	<script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
-	<script src="http://photos.derektest1.com/js/jquery.lazyload.js"></script>
-	-->
 <style>
 	html, body { padding: 0; margin: 0; }
 	html, .ui-mobile, .ui-mobile body {
@@ -23,13 +19,32 @@
 	.ui-filter-inset {
 		margin-top: 0;
 	}
+	.ui-photo-block {
+		float: left;
+	}
 	.ui-gallery{
 		/*overflow: auto;*/
+	}
+	.ui-time-header {
+		font-family: arial;
+		border-bottom: 1px solid #000000;
+		padding: 10px 0px 10px 10px;
 	}
 	.ui-image {
 		padding-right: 2px;
 		height: {{ imageSize|add:+2 }}px;
 		float:left;
+	}
+	.ui-image-more{
+		padding-right: 2px;
+		padding-left: 5px;
+		float:left;
+		font-family: arial;
+		text-align: center;
+		vertical-align: middle;
+		line-height: {{ imageSize }}px;
+		height: {{ imageSize|add:+2 }}px;
+
 	}
 	.result-bottom, .prev-next {
 		text-align: center;
@@ -54,6 +69,9 @@
 		text-align: left;
 		overflow: hidden;
 	}
+	.hidden {
+		display: none;
+	}
 	a:link{
 		text-decoration: none;
 		font-weight: bold;
@@ -69,22 +87,56 @@
 
 <body>
 	
-<div data-role="page" id="searchPhoto" style="max-height:1040px; min-height:1040px;">
+<div data-role="page" id="searchPhoto">
 	<div class="ui-gallery" id="allImages">
-		{% for photo in photos %}
-		<div class = "ui-image">
-			<a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
-			<!--<a href="/viz/serve_image?photo={{ result.photoFilename }}" rel="external"> -->
-				<img title="TEXT: {{ photo.location_data }} | ORIG_CLASSIFICATIONS: {{ photo.classification_data }}" data-lazy-src="{{ thumbnailBasepath }}{{ photo.id }}-thumb-{{ imageSize|add:imageSize }}.jpg" class="lazy" width="{{ imageSize }}px"></a>
-		</div>
+		{% for entry in photos %}
+			<div class="ui-photo-block hidden" id="ui-photo-block-{{ forloop.counter0 }}">
+				<div class="ui-time-header">
+					{{ entry.date }}
+				</div>
+				{% for photo in entry.mainPhotos %}
+					<div class = "ui-image">
+						<a href="{{ thumbnailBasepath }}{{ photo.new_filename }}"> 
+							<img data-lazy-src="{{ thumbnailBasepath }}{{ photo.id }}-thumb-{{ imageSize|add:imageSize }}.jpg" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px"></a>
+					</div>
+				{% endfor %}
+				{% if entry.subPhotos %}
+					{% for photo in entry.subPhotos %}
+						<div class = "ui-image hidden">
+							<a href="{{ thumbnailBasepath }}{{ photo.new_filename }}"> 
+								<img data-lazy-src="{{ thumbnailBasepath }}{{ photo.id }}-thumb-{{ imageSize|add:imageSize }}.jpg" class="lazy-later" height="{{ imageSize }}px" width="{{ imageSize }}px"></a>
+						</div>
+					{% endfor %}
+					<div class = "ui-image-more" id="ui-image-more-{{ forloop.counter0 }}">
+						 <a href="javascript:void(0)" onclick="displayMoreImages({{ forloop.counter0 }})"> {{ entry.count }} more </a>
+					</div>
+				{% endif %}
+			</div>
 		{% endfor %}
+
 	</div>
 </div>
 
 </body>
 	<script>
-		$('img.lazy').each(function () {
-			$(this).attr('src', $(this).attr('data-lazy-src'));
+		jQuery.fn.reverse = [].reverse;
+		$('#allImages').children().reverse().each(function(){
+			$(this).removeClass('hidden');
+			$(this).find('img.lazy').each(function() {
+				$(this).attr('src', $(this).attr('data-lazy-src'));	
+			});
 		});
+
+
+		function displayMoreImages(blockId) {
+			$("#ui-photo-block-"+blockId + " div").each(function() {
+				$(this).removeClass('hidden');
+			});			
+			$("#ui-photo-block-"+blockId + " img").each(function() {
+				$(this).attr('src', $(this).attr('data-lazy-src'));
+				$("#ui-image-more-"+blockId).addClass('hidden');
+			});
+
+		}
 	</script>
 </html>

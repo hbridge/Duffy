@@ -12,6 +12,10 @@ from collections import OrderedDict
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util
 from .forms import ManualAddPhoto
+
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 	
 def manualAddPhoto(request):
 	form = ManualAddPhoto()
@@ -174,15 +178,16 @@ def gallery(request, user_id):
 
 	width = imageSize*2 #doubled  for retina
 
-	photos = Photo.objects.filter(user_id = user.id).order_by('time_taken')
-	numPhotos = photos.count()
+	#photos = Photo.objects.filter(user_id = user.id).order_by('time_taken')
+	#numPhotos = photos.count()
 
-	for entry in photos:
-		image_util.imageThumbnail(entry.new_filename, width, user.id)
+	photos = getPhotosSplitByMonth(request, user.id)
+
+	#for entry in photos:
+	#	image_util.imageThumbnail(entry.new_filename, width, user.id)
 
 
 	context = {	'user' : user,
-				'numPhotos': numPhotos,
 				'imageSize': imageSize,
 				'photos': photos,
 				'thumbnailBasepath': thumbnailBasepath}
@@ -216,6 +221,34 @@ def serveImage(request):
 
 # Helper functions
 
+def getPhotosSplitByMonth(request, userId, threshold=None):
+	#photos = Photo.objects.filter(user_id = userId).order_by('time_taken')
+
+	if (threshold == None):
+		threshold = 11
+
+	dates = Photo.objects.datetimes('time_taken', 'month')
+	photos = list()
+
+	entry = dict()
+	entry['date'] = 'Undated'
+	entry['mainPhotos'] = list(Photo.objects.filter(user_id=userId).filter(time_taken=None)[:threshold])
+	entry['subPhotos'] = list(Photo.objects.filter(user_id=userId).filter(time_taken=None)[threshold:])
+	entry['count'] = len(entry['subPhotos'])
+	photos.append(entry)
+
+	for date in dates:
+		entry = dict()
+		entry['date'] = date.strftime('%b %Y')
+		entry['mainPhotos'] = list(Photo.objects.filter(user_id=userId).exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[:threshold])
+		entry['subPhotos'] = list(Photo.objects.filter(user_id=userId).exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[threshold:])
+		entry['count'] = len(entry['subPhotos'])
+		photos.append(entry)
+
+	return photos
+
 def setSession(request, userId):
 	request.session['userid'] = userId
+
+
 
