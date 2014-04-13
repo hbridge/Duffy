@@ -183,8 +183,11 @@ def gallery(request, user_id):
 
 	photos = getPhotosSplitByMonth(request, user.id)
 
-	#for entry in photos:
-	#	image_util.imageThumbnail(entry.new_filename, width, user.id)
+	for entry in photos:
+		for photo in entry['mainPhotos']:
+			image_util.imageThumbnail(photo.new_filename, width, user.id)
+		for photo in entry['subPhotos']:
+			image_util.imageThumbnail(photo.new_filename, width, user.id)
 
 
 	context = {	'user' : user,
