@@ -227,7 +227,7 @@ def getPhotosSplitByMonth(request, userId, threshold=None):
 	if (threshold == None):
 		threshold = 11
 
-	dates = Photo.objects.datetimes('time_taken', 'month')
+	dates = Photo.objects.filter(user_id=userId).datetimes('time_taken', 'month')
 	photos = list()
 
 	entry = dict()
