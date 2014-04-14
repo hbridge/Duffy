@@ -63,6 +63,15 @@
 {
     [super viewDidAppear:animated];
     [DFAnalytics logViewController:self appearedWithParameters:nil];
+    
+    
+    if (self.isMovingToParentViewController) {
+        NSInteger section = 0;
+        NSInteger item = [self collectionView:self.collectionView numberOfItemsInSection:section] - 1;
+        NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
+        [self.collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+    }
+    
 }
 
 - (void)viewDidDisappear:(BOOL)animated
