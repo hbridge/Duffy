@@ -178,10 +178,12 @@ def gallery(request, user_id):
 
 	width = imageSize*2 #doubled  for retina
 
-	#photos = Photo.objects.filter(user_id = user.id).order_by('time_taken')
-	#numPhotos = photos.count()
+	if data.has_key('groupThreshold'):
+		groupThreshold = int(data['groupThreshold'])
+	else:
+		groupThreshold = 11
 
-	photos = getPhotosSplitByMonth(request, user.id)
+	photos = getPhotosSplitByMonth(request, user.id, groupThreshold)
 
 	for entry in photos:
 		for photo in entry['mainPhotos']:
@@ -224,27 +226,27 @@ def serveImage(request):
 
 # Helper functions
 
-def getPhotosSplitByMonth(request, userId, threshold=None):
+def getPhotosSplitByMonth(request, userId, groupThreshold=None):
 	#photos = Photo.objects.filter(user_id = userId).order_by('time_taken')
 
-	if (threshold == None):
-		threshold = 11
+	if (groupThreshold == None):
+		groupThreshold = 11
 
 	dates = Photo.objects.filter(user_id=userId).datetimes('time_taken', 'month')
 	photos = list()
 
 	entry = dict()
 	entry['date'] = 'Undated'
-	entry['mainPhotos'] = list(Photo.objects.filter(user_id=userId).filter(time_taken=None)[:threshold])
-	entry['subPhotos'] = list(Photo.objects.filter(user_id=userId).filter(time_taken=None)[threshold:])
+	entry['mainPhotos'] = list(Photo.objects.filter(user_id=userId).filter(time_taken=None)[:groupThreshold])
+	entry['subPhotos'] = list(Photo.objects.filter(user_id=userId).filter(time_taken=None)[groupThreshold:])
 	entry['count'] = len(entry['subPhotos'])
 	photos.append(entry)
 
 	for date in dates:
 		entry = dict()
 		entry['date'] = date.strftime('%b %Y')
-		entry['mainPhotos'] = list(Photo.objects.filter(user_id=userId).exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[:threshold])
-		entry['subPhotos'] = list(Photo.objects.filter(user_id=userId).exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[threshold:])
+		entry['mainPhotos'] = list(Photo.objects.filter(user_id=userId).exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[:groupThreshold])
+		entry['subPhotos'] = list(Photo.objects.filter(user_id=userId).exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[groupThreshold:])
 		entry['count'] = len(entry['subPhotos'])
 		photos.append(entry)
 
