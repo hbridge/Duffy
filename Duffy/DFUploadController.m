@@ -114,6 +114,8 @@ static DFUploadController *defaultUploadController;
 - (void)setupStatusBarNotifications
 {
     [JDStatusBarNotification setDefaultStyle:^JDStatusBarStyle *(JDStatusBarStyle *style) {
+        style.barColor = [UIColor colorWithWhite:.9686 alpha:1.0]; //.9686 matches the default nav bar color
+        style.textColor = [UIColor darkGrayColor];
         style.progressBarColor = [UIColor blueColor];
         style.animationType = JDStatusBarAnimationTypeFade;
         return style;
