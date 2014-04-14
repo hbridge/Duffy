@@ -121,6 +121,17 @@ LOGGING = {
     }
 }
 
+TEMPLATE_CONTEXT_PROCESSORS = (                                       
+    'django.core.context_processors.request',
+    "django.contrib.auth.context_processors.auth",                  
+    "django.core.context_processors.debug",                         
+    "django.core.context_processors.i18n",                          
+    "django.core.context_processors.media",                         
+    "django.core.context_processors.static",
+    "django.core.context_processors.tz",          
+    "django.contrib.messages.context_processors.messages",
+)
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 
@@ -144,7 +155,7 @@ STATIC_URL = '/static/'
 PIPELINE_UPLOADED_PATH = "/home/derek/pipeline/uploads/"
 PIPELINE_LOCAL_BASE_PATH = "/home/derek/user_data/"
 PIPELINE_REMOTE_HOST = 'duffy@titanblack.no-ip.biz'
-PIPELINE_REMOTE_PATH = '/home/duffy/pipeline/photos'
+PIPELINE_REMOTE_PATH = '/home/duffy/pipeline/staging'
 
 STATE_NEW = 0
 STATE_COPIED = 1
