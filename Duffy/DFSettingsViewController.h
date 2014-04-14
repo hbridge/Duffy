@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DFKeyboardResizingViewController.h"
 
-@interface DFSettingsViewController : DFKeyboardResizingViewController <UITextFieldDelegate>
+@interface DFSettingsViewController : DFKeyboardResizingViewController <UITextFieldDelegate, UIAlertViewDelegate>
 
 extern NSString *DFPipelineEnabledUserDefaultKey;
 extern NSString *DFAutoUploadEnabledUserDefaultKey;

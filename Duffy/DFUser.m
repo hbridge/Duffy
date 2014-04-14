@@ -63,7 +63,11 @@ static DFUser *currentUser;
 
 - (void)setUserOverriddenDeviceID:(NSString *)userOverriddenDeviceID
 {
-    [[NSUserDefaults standardUserDefaults] setObject:userOverriddenDeviceID forKey:DFOverrideDeviceIDUserDefaultsKey];
+    if (![userOverriddenDeviceID isEqualToString:self.userOverriddenDeviceID]) {
+        [[NSUserDefaults standardUserDefaults] setObject:userOverriddenDeviceID forKey:DFOverrideDeviceIDUserDefaultsKey];
+        // we set the user id to nil if the device is overriden, so that it will be refreshed on next load
+        self.userID = nil;
+    }
 }
 
 - (NSString *)userID

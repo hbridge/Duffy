@@ -81,6 +81,7 @@ NSString *DFEnabledNo = @"NO";
     
 #ifndef DEBUG
     self.deviceIDTextField.enabled = NO;
+    self.deviceIDTextField.placeholder = @"Disabled in release builds.";
 #endif
     
 }
@@ -132,10 +133,29 @@ NSString *DFEnabledNo = @"NO";
 
 - (IBAction)deviceIDEditingDidEnd:(UITextField *)sender {
     [[DFUser currentUser] setUserOverriddenDeviceID:sender.text];
+    [self alertUserAndStopApp];
 }
 
 - (IBAction)userIDEditingDidEnd:(UITextField *)sender {
     [[DFUser currentUser] setUserID:sender.text];
+    [self alertUserAndStopApp];
+}
+
+- (void)alertUserAndStopApp
+{
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Duffy Must Close"
+                                                    message:@"The app must close for this change to take effect."
+                                                   delegate:nil
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles:nil];
+    alert.delegate = self;
+    [alert show];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    exit(0);
 }
 
 - (IBAction)serverURLEditingDidEnd:(UITextField *)sender {
