@@ -10,6 +10,18 @@
 
 @interface DFNotificationSharedConstants : NSObject
 
+
+/*
+ DFPhotoChangedNotifications
+ Come with user info in format:
+ {
+    NSManagedObjectID1 : DFPhotoChangeType1,
+    NSManagedObjectID2 : DFPhotoChangeType2
+    ...
+ }
+ 
+ 
+ */
 extern NSString *DFPhotoChangedNotificationName;
 extern NSString *DFPhotoChangeTypeKey;
 extern NSString *DFPhotoChangeTypeAdded;

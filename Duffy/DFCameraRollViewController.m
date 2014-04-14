@@ -12,6 +12,7 @@
 #import "DFSettingsViewController.h"
 #import "DFPhoto.h"
 #import "DFAnalytics.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFCameraRollViewController ()
 
@@ -32,6 +33,11 @@
         self.navigationController.navigationItem.title = @"Camera Roll";
         self.tabBarItem.title = @"Camera Roll";
         self.tabBarItem.image = [UIImage imageNamed:@"Timeline"];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(cameraRollPhotoChanged:)
+                                                     name:DFPhotoChangedNotificationName
+                                                   object:nil];
     }
     return self;
 }
@@ -95,8 +101,37 @@
 }
 
 
+#pragma mark - Cell view customization
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    UICollectionViewCell *cell = [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
+    
+    DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
+    if (photo.uploadDate == nil) {
+        cell.alpha = 0.2;
+    }
+    
+    return cell;
+}
 
 
+- (void)cameraRollPhotoChanged:(NSNotification *)note
+{
+    NSDictionary *objectIDsToChangeTypes = [note userInfo];
+    NSSet *objectIDsWithMetadataChange = [objectIDsToChangeTypes keysOfEntriesPassingTest:^BOOL(NSManagedObjectID *objID, NSString *changeType, BOOL *stop) {
+        return [changeType isEqualToString:DFPhotoChangeTypeMetadata];
+    }];
+    
+    NSSet *photos = [[DFPhotoStore sharedStore] photosWithObjectIDs:objectIDsWithMetadataChange];
+    NSMutableArray *cellsToReload = [[NSMutableArray alloc] initWithCapacity:photos.count];
+    for (DFPhoto *photo in photos) {
+        NSUInteger photoIndex = [self.photos indexOfObject:photo];
+        [cellsToReload addObject:[NSIndexPath indexPathForRow:photoIndex inSection:0]];
+    }
+    
+    [self.collectionView reloadItemsAtIndexPaths:cellsToReload];
+}
 
 
 @end

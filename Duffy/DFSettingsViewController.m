@@ -23,7 +23,6 @@
 
 
 // Network default keys
-NSString *DFPipelineEnabledUserDefaultKey = @"DFPipelineEnabledUserDefaultKey";
 NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
 NSString *DFEnabledYes = @"YES";
 NSString *DFEnabledNo = @"NO";
@@ -51,11 +50,12 @@ NSString *DFEnabledNo = @"NO";
 - (void)setSettingsDefaults
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-    if (![defaults valueForKeyPath:DFPipelineEnabledUserDefaultKey]) {
-        [defaults setValue:DFEnabledYes forKey:DFPipelineEnabledUserDefaultKey];
-    }
     if (![defaults valueForKey:DFAutoUploadEnabledUserDefaultKey]) {
+#ifdef DEBUG
         [defaults setValue:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
+#else
+        [defaults setValue:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
+#endif
     }
 }
 

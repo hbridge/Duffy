@@ -179,6 +179,22 @@ static DFPhotoStore *defaultStore;
     return _cameraRoll;
 }
 
+- (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs
+{
+    NSMutableSet *photos = [[NSMutableSet alloc] init];
+    for (NSManagedObjectID *objectID in objectIDs) {
+        NSError *error;
+        DFPhoto *photo = (DFPhoto *)[self.managedObjectContext existingObjectWithID:objectID error:&error];
+        if (error) {
+            NSLog(@"Error fetching photos with IDs: %@", error.localizedDescription);
+        }
+        if (photo != nil) {
+            [photos addObject:photo];
+        }
+    }
+    return photos;
+}
+
 #pragma mark - Assets Library
 
 - (ALAssetsLibrary *)assetsLibrary
