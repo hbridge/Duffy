@@ -7,12 +7,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<title>Search your photos</title> 
-	<!--<link rel="stylesheet" href="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.css" />-->
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-	<!--
-	<script src="//code.jquery.com/mobile/1.4.0/jquery.mobile-1.4.0.min.js"></script>
-	<script src="http://photos.derektest1.com/js/jquery.lazyload.js"></script>
-	-->
 <style>
 	html, body { padding: 0; margin: 0; }
 	html, .ui-mobile, .ui-mobile body {
@@ -28,34 +23,25 @@
 	.ui-gallery{
 		/*overflow: auto;*/
 	}
+	.ui-photo-block {
+		float: left;
+	}
+	.ui-time-header {
+		font-family: arial;
+		padding: 10px 0px 10px 10px;
+	}
 	.ui-image {
 		padding-right: 2px;
 		height: {{ imageSize|add:+2 }}px;
 		float:left;
 	}
-	.result-bottom, .prev-next {
-		text-align: center;
-		clear:both;
-	}
-	.text, .prev-next {
+	.text {
 		font-family: arial;
 	}
-	.prev-next {
-		width: 100%;
-		padding-bottom: 10px;
+	.hidden {
+		display: none;
 	}
-	.prev {
-		border-right: 1px solid #000000;
-		padding-right: 6px;
-		width: 49%;
-		float:left;
-		text-align: right;
-	}
-	.next {
-		padding-left: 6px;
-		text-align: left;
-		overflow: hidden;
-	}
+
 	a:link{
 		text-decoration: none;
 		font-weight: bold;
@@ -72,41 +58,25 @@
 <body>
 
 <div role="main" class="ui-content">
-	<div class="ui-gallery" id="allImages">
-
-		{% for result in searchResults %}
-
-		<div class = "ui-image">
-			<a href="{{ thumbnailBasepath }}{{ result.photoFilename }}"> 
-			<!--<a href="/viz/serve_image?photo={{ result.photoFilename }}" rel="external"> -->
-				<img title="TEXT: {{ result.text }} | ORIG_CLASSIFICATIONS: {{ result.classificationData }}" src="{{ thumbnailBasepath }}{{ photoIdToThumb|lookup:result.photoId }}" class="lazyo" width="{{ imageSize }}px"></a>
-		</div>
-
+		<div class="ui-gallery" id="allImages">
+		{% for entry in photoResults %}
+			<div class="ui-photo-block hidden" id="ui-photo-block-{{ forloop.counter0 }}">
+				<div class="ui-time-header">
+					{{ entry.date }} ({{ entry.count }})
+				</div>
+				{% for photo in entry.photos %}
+					<div class = "ui-image">
+						<a href="{{ thumbnailBasepath }}{{ photo.photoFilename }}"> 
+							<img data-lazy-src="{{ thumbnailBasepath }}{{ photoIdToThumb|lookup:photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px"></a>
+					</div>
+				{% endfor %}
+			</div>
 		{% endfor %}
-		
+
 	</div>
 
 	<div class="result-bottom"> 
-		{% if resultSize > 0 %}
-			<p class="text">Showing {{ start }} - {{ end }} of {{ resultSize }} photos</p>
-			<div class="prev-next">
-				<div class="prev">
-					{% if previous %}
-						<a href="/viz/search?user_id={{ userId }}&amp;q={{ query }}&amp;page={{ page|add:-1 }}">Previous</a>
-					{% elif next %}
-						Previous
-					{% else %}
-					{% endif %}
-				</div><div class="next">
-					{% if next %}
-						<a href="/viz/search?user_id={{ userId }}&amp;q={{ query }}&amp;page={{ page|add:1 }}">Next</a>
-					{% elif previous %}
-						Next
-					{% else %}
-					{% endif %}
-				</div>
-			</div>
-		{% else %}
+		{% if resultSize == 0 %}
 			<p class="text"> No results found! </p>
 		{% endif %}
 	</div>
@@ -114,4 +84,12 @@
 </div>
 
 </body>
+	<script>
+		$('#allImages').children().each(function(){
+			$(this).removeClass('hidden');
+			$(this).find('img.lazy').each(function() {
+				$(this).attr('src', $(this).attr('data-lazy-src'));	
+			});
+		});
+		</script>
 </html>
