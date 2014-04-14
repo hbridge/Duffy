@@ -142,7 +142,7 @@ static DFPhotoStore *defaultStore;
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
-
+    
     NSPredicate *predicate;
     if (isUploaded) {
         predicate = [NSPredicate predicateWithFormat:@"uploadDate != nil"];

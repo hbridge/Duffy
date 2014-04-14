@@ -86,16 +86,22 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Public APIs
 
-- (void)uploadPhotosWithURLs:(NSArray *)photoURLStrings
+- (void)uploadPhotos:(NSArray *)photos
 {
     NSUInteger photosInQueuePreAdd = self.photoURLsToUpload.count;
-    if (photoURLStrings.count < 1) return;
+    if (photos.count < 1) return;
  
     [self beginBackgroundUpdateTask];
     if (!self.currentSessionStats) {
         self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     }
+    
+    NSMutableArray *photoURLStrings = [[NSMutableArray alloc] init];
+    for (DFPhoto *photo in photos) {
+        [photoURLStrings addObject:photo.alAssetURLString];
+    }
     [self.currentSessionStats.acceptedURLs addObjectsFromArray:photoURLStrings];
+
     
     [self.photoURLsToUpload addObjectsFromArray:photoURLStrings];
     [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
@@ -108,7 +114,6 @@ static DFUploadController *defaultUploadController;
     [self postStatusUpdate];
 
 }
-
 
 #pragma mark - Private config code
 - (void)setupStatusBarNotifications

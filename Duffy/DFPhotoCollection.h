@@ -13,13 +13,12 @@
 @interface DFPhotoCollection : NSObject
 
 @property (readonly, nonatomic, retain) NSSet *photoSet;
-@property (readonly, nonatomic, retain) NSArray *photosByDate;
 @property (readonly, nonatomic, retain) NSSet *photoURLSet;
 
 
 - (id)initWithPhotos:(NSArray *)photos;
 - (void)addPhotos:(NSArray *)newPhotos;
 - (BOOL)containsPhotoWithAssetURL:(NSString *)assetURLString;
-
+- (NSArray *)photosByDateAscending:(BOOL)ascending;
 
 @end

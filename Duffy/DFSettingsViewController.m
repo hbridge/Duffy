@@ -193,7 +193,7 @@ NSString *DFEnabledNo = @"NO";
 
 - (IBAction)reUploadAllClicked:(UIButton *)sender {
     DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
-    [[DFUploadController sharedUploadController] uploadPhotosWithURLs:[cameraRollPhotos.photoURLSet allObjects]];
+    [[DFUploadController sharedUploadController] uploadPhotos:[cameraRollPhotos photosByDateAscending:NO]];
 }
 
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {

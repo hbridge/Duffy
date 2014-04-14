@@ -28,7 +28,7 @@
                                                  selector:@selector(cameraRollScanComplete)
                                                      name:DFPhotoStoreCameraRollScanComplete
                                                    object:nil];
-        self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
+        self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
         
         self.navigationController.navigationItem.title = @"Camera Roll";
         self.tabBarItem.title = @"Camera Roll";
@@ -80,7 +80,7 @@
         return;
     }
     
-    self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDate];
+    self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
     [self.collectionView reloadData];
     NSLog(@"cameraViewController view updated. %lu photos in camera roll.", (unsigned long)self.photos.count);
 }
@@ -96,7 +96,7 @@
     
     if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
         DFPhotoCollection *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
-        [[DFUploadController sharedUploadController] uploadPhotosWithURLs:photosToUpload.photoURLSet.allObjects];
+        [[DFUploadController sharedUploadController] uploadPhotos:[photosToUpload photosByDateAscending:NO]];
     }
 }
 

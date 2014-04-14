@@ -67,9 +67,12 @@
     return photosSet;
 }
 
-- (NSArray *)photosByDate
+- (NSArray *)photosByDateAscending:(BOOL)ascending
 {
-    return photosByDate;
+    if (ascending)
+        return photosByDate;
+    else
+        return [[photosByDate reverseObjectEnumerator] allObjects];
 }
 
 - (NSSet *)photoURLSet
