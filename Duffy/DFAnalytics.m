@@ -21,6 +21,23 @@
 
 @implementation DFAnalytics
 
+
+/*** Generic Keys and values ***/
+
+NSString* const ActionTypeKey = @"actionType";
+NSString* const DFAnalyticsActionTypeSwipe = @"swipe";
+NSString* const NumberKey = @"number";
+
+NSString* const SizeInKBKey = @"sizeInKB";
+NSString* const ResultKey = @"result";
+NSString* const DFAnalyticsValueResultSuccess = @"success";
+NSString* const DFAnalyticsValueResultFailure = @"failure";
+
+//Generic value
+NSString* const NewValueKey = @"newValue";
+
+/*** Event specific keys ***/
+
 //Controller logging
 NSString* const ControllerViewedEventSuffix = @"Viewed";
 NSString* const ControllerClassKey = @"controllerClass";
@@ -32,8 +49,6 @@ NSString* const PhotosAddedKey = @"numPhotosAdded";
 
 //Photo viewing
 NSString* const SwitchedPhotoToPhotoEvent = @"SwitchedPhotoToPhoto";
-NSString* const ActionTypeKey = @"actionType";
-NSString* const DFAnalyticsActionTypeSwipe = @"swipe";
 
 //Searches
 NSString* const SearchExecutedEvent = @"SearchExecuted";
@@ -43,20 +58,21 @@ NSString* const SLatencyKey = @"SecondsLatency";
 NSString* const SearchAbortedEvent = @"SearchExecuted";
 
 NSString* const SearchPageLoaded = @"SearchResultPageLoaded";
-NSString* const NumberKey = @"number";
+
 
 // Uploads
 NSString* const UploadPhotoEvent = @"UploadPhoto";
-NSString* const SizeInKBKey = @"sizeInKB";
-NSString* const ResultKey = @"result";
-NSString* const DFAnalyticsValueResultSuccess = @"success";
-NSString* const DFAnalyticsValueResultFailure = @"failure";
-NSString* const DebugStringKey = @"debug";
 
+NSString* const DebugStringKey = @"debug";
 
 // Individual photo loads
 NSString* const PhotoWebviewLoadEvent = @"PhotoWebviewLoad";
 NSString* const DFAnalyticsValueResultAborted = @"aborted";
+
+// Settings
+NSString* const SettingAutoUploadChanged = @"SettingAutoUploadChanged";
+
+
 
 
 static DFAnalytics *defaultLogger;
@@ -209,6 +225,11 @@ static DFAnalytics *defaultLogger;
 + (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString
 {
     [Flurry endTimedEvent:PhotoWebviewLoadEvent withParameters:@{ResultKey: resultString}];
+}
+
++ (void)logAutoUploadSettingChanged:(BOOL)isOn
+{
+    [Flurry logEvent:SettingAutoUploadChanged withParameters:@{NewValueKey: [NSNumber numberWithBool:isOn]}];
 }
 
 

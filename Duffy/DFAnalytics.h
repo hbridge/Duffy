@@ -35,5 +35,7 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logPhotoWebviewLoadEnded;
 + (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString;
 
++ (void)logAutoUploadSettingChanged:(BOOL)isOn;
+
 
 @end

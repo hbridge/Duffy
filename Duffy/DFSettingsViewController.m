@@ -184,6 +184,8 @@ NSString *DFEnabledNo = @"NO";
         NSLog(@"Auto-upload now OFF");
         [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
     }
+    
+    [DFAnalytics logAutoUploadSettingChanged:sender.isOn];
 }
 
 
