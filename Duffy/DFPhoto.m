@@ -25,6 +25,10 @@
 
 @dynamic alAssetURLString, universalIDString, uploadDate, creationDate;
 
+NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
+NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
+
+
 
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext
 {
@@ -238,9 +242,23 @@
 }
 
 
+- (NSString *)formatCreationDate:(NSDate *)date
+{
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"];
+    return [dateFormatter stringFromDate:date];
+}
+
 - (NSDictionary *)metadataDictionary
 {
-    return self.asset.defaultRepresentation.metadata;
+    NSMutableDictionary *metadata = [[NSMutableDictionary alloc] initWithDictionary:self.asset.defaultRepresentation.metadata];
+    NSDictionary *cameraRollMetadata = @{
+                                         DFCameraRollCreationDateKey: [self formatCreationDate:self.creationDate],
+                                         };
+
+
+    [metadata setObject:cameraRollMetadata forKey:DFCameraRollExtraMetadataKey];
+    return metadata;
 }
 
 

@@ -43,7 +43,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    
+    [super viewDidAppear:animated];
 }
 
 - (void)didReceiveMemoryWarning
@@ -59,10 +59,7 @@
     if (self.imageView) {
         self.imageView.image = photo.fullScreenImage;
     }
-    NSLog(@"photo date: %@", photo.creationDate.description);
 }
-
-
 
 - (UIView *)viewForZoomingInScrollView:(UIScrollView *)sv
 {
