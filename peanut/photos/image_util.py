@@ -134,7 +134,7 @@ def addPhoto(user, origPath, fileObj, metadata, locationData, iPhoneFaceboxesTop
 	photo.save()
 	
 	# last step: generate a thumbnail
-	image_util.imageThumbnail(photo.new_filename, 156, user.id)
+	imageThumbnail(photo.new_filename, 156, user.id)
 
 
 """
