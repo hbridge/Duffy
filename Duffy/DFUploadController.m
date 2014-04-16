@@ -39,8 +39,7 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 @interface DFUploadController()
 
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
-@property (atomic) dispatch_queue_t uploadDispatchQueue;
-@property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
+@property (atomic, retain) NSOperationQueue *uploadOperationQueue;
 @property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
@@ -56,6 +55,7 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
 static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
+static const NSUInteger MaxSimultaneousUploads = 1;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
@@ -75,7 +75,8 @@ static DFUploadController *defaultUploadController;
 {
     self = [super init];
     if (self) {
-        self.uploadDispatchQueue = dispatch_queue_create("com.duffysoft.DFUploadController.UploadQueue", DISPATCH_QUEUE_SERIAL);
+        self.uploadOperationQueue = [[NSOperationQueue alloc] init];
+        self.uploadOperationQueue.maxConcurrentOperationCount = MaxSimultaneousUploads;
         self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
         [self setupStatusBarNotifications];
         self.backgroundUpdateTask = UIBackgroundTaskInvalid;
@@ -132,10 +133,10 @@ static DFUploadController *defaultUploadController;
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
-    dispatch_async(self.uploadDispatchQueue, ^{
+    [self.uploadOperationQueue addOperationWithBlock:^{
         DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
         [self uploadPhoto:photo];
-    });
+    }];
 }
 
 - (void)retryLastUpload
