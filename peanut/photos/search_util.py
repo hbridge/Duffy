@@ -49,10 +49,8 @@ def solrSearch(userId, startDate, query):
 		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate)
 
 	for word in query.split():
-		try:
-			val = int(word)
-		except ValueError:
-			searchResults = searchResults.filter(content__contain=word)
+		print word
+		searchResults = searchResults.filter(content__contain=word)
 
 	searchResults = searchResults.order_by('timeTaken')
 	
