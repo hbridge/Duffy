@@ -18,6 +18,7 @@
 #import "DFFirstTimeSetupViewController.h"
 #import "DFUser.h"
 #import <HockeySDK/HockeySDK.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 
 
 
@@ -46,7 +47,7 @@
     [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
 #endif
     
-    if (![[DFUser currentUser] userID] || [[[DFUser currentUser] userID] isEqualToString:@""]) {
+    if (![self isAppSetupComplete]) {
         [self showFirstTimeSetup];
     } else {
         [self showLoggedInUserTabs];
@@ -55,6 +56,14 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+
+- (BOOL)isAppSetupComplete
+{
+    return  ([[DFUser currentUser] userID]
+             && ![[[DFUser currentUser] userID] isEqualToString:@""]
+             &&  [ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusAuthorized);
 }
 
 - (void)showFirstTimeSetup
@@ -73,6 +82,8 @@
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
     
+    [self startCameraRollSync];
+    
     DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
     UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];
     
@@ -87,7 +98,19 @@
                                        settingsNav,
                                        nil]];
     
+    
+    
     [[self window] setRootViewController:tabController];
+}
+
+- (void)startCameraRollSync
+{
+    if (self.cameraRollSyncController == nil) {
+        self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
+    }
+    
+    NSSet *dbKnownURLs = [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
+    [self.cameraRollSyncController asyncSyncToCameraRollWithCurrentKnownPhotoURLs:dbKnownURLs];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
@@ -111,17 +134,15 @@
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-    if (self.cameraRollSyncController == nil) {
-        self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
-    }
+    if (![self isAppSetupComplete]) return;
     
-    NSSet *dbKnownURLs = [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
-    [self.cameraRollSyncController asyncSyncToCameraRollWithCurrentKnownPhotoURLs:dbKnownURLs];
+    [self startCameraRollSync];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Saves changes in the application's managed object context before the application terminates.
+    if (![self isAppSetupComplete]) return;
     [[DFPhotoStore sharedStore] saveContext];
 }
 

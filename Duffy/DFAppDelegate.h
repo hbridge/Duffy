@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface DFAppDelegate : UIResponder <UIApplicationDelegate>
+@interface DFAppDelegate : UIResponder <UIApplicationDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

@@ -377,7 +377,7 @@ static DFUploadController *defaultUploadController;
     } else if (updateType == DFStatusUpdateComplete) {
         [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
     } else if (updateType == DFStatusUpdateError) {
-        [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:2];
+        [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:5];
     } else if (updateType == DFStatusUpdateCancelled) {
         [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
     }

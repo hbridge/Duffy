@@ -11,8 +11,12 @@
 #import "DFUser.h"
 #import "DFAppDelegate.h"
 #import "DFAnalytics.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface DFFirstTimeSetupViewController ()
+
+@property (nonatomic, retain) ALAssetsLibrary *assetsLibrary;
+@property (nonatomic, weak) DFAppDelegate *appDelegate;
 
 @end
 
@@ -22,7 +26,7 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+        self.appDelegate = (DFAppDelegate *)[[UIApplication sharedApplication] delegate];
     }
     return self;
 }
@@ -31,17 +35,58 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    [super viewDidAppear:animated];
+    NSLog(@"Running first time setup.");
+    [DFAnalytics logViewController:self appearedWithParameters:nil];
     
     [self.activityIndicatorView startAnimating];
     
+    ALAuthorizationStatus photoAuthStatus = [ALAssetsLibrary authorizationStatus];
+    if (photoAuthStatus == ALAuthorizationStatusDenied || photoAuthStatus == ALAuthorizationStatusRestricted) {
+        NSLog(@"Photo access is denied, showing alert and quitting.");
+        [self showGrantPhotoAccessAlertAndQuit];
+    } else if (photoAuthStatus == ALAuthorizationStatusNotDetermined) {
+         NSLog(@"Photo access not determined, asking.");
+        [self askForPhotosPermission];
+    } else if (photoAuthStatus == ALAuthorizationStatusAuthorized) {
+        [self handleUserGrantedPhotoAccess];
+        NSLog(@"Seem to already have photo access.");
+    } else {
+        NSLog(@"Unknown photo access value: %d", (int)photoAuthStatus);
+    }
+}
+- (void)askForPhotosPermission
+{
+    // request access to user's photos
+    NSLog(@"Asking for photos permission.");
+    ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
+    
+    [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+        if (group == nil) [self handleUserGrantedPhotoAccess];
+    } failureBlock:^(NSError *error) {
+        if (error.code == ALAssetsLibraryAccessUserDeniedError) {
+            NSLog(@"user denied access, code: %li",error.code);
+        }else{
+            NSLog(@"Other error code: %li",error.code);
+        }
+        [self showGrantPhotoAccessAlertAndQuit];
+    }];
+
+}
+
+- (void)handleUserGrantedPhotoAccess
+{
     DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
     [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
                      withSuccessBlock:^(DFUser *user) {
                          if (user) {
                              [[DFUser currentUser] setUserID:user.userID];
                              dispatch_async(dispatch_get_main_queue(), ^{
-                                 DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-                                 [appDelegate showLoggedInUserTabs];
+                                 [self.appDelegate showLoggedInUserTabs];
                              });
                          } else {
                              // the request succeeded, but the user doesn't exist, we have to create it
@@ -49,8 +94,7 @@
                                                withSuccessBlock:^(DFUser *user) {
                                                    [[DFUser currentUser] setUserID:user.userID];
                                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                                       DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-                                                       [appDelegate showLoggedInUserTabs];
+                                                       [self.appDelegate showLoggedInUserTabs];
                                                    });
                                                }
                                                    failureBlock:^(NSError *error) {
@@ -58,16 +102,22 @@
                                                    }];
                          }
                      } failureBlock:^(NSError *error) {
-                         DFAppDelegate *appDelegate = [[UIApplication sharedApplication] delegate];
-                         [appDelegate showLoggedInUserTabs];
+                         [self.appDelegate showLoggedInUserTabs];
                      }];
 }
 
-- (void)viewDidAppear:(BOOL)animated
+- (void)showGrantPhotoAccessAlertAndQuit
 {
-    [super viewDidAppear:animated];
-    [DFAnalytics logViewController:self appearedWithParameters:nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Access Required" message:@"Please give this app permission to access your photo library in your settings app!" delegate:nil cancelButtonTitle:@"Quit" otherButtonTitles:nil, nil];
+    alert.delegate = self;
+    [alert show];
 }
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+    exit(0);
+}
+
 
 - (void)viewDidDisappear:(BOOL)animated
 {

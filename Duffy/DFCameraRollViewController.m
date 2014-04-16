@@ -38,6 +38,10 @@
                                                  selector:@selector(cameraRollPhotoChanged:)
                                                      name:DFPhotoChangedNotificationName
                                                    object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(cameraRollUpdated)
+                                                     name:DFPhotoStoreCameraRollUpdated
+                                                   object:nil];
     }
     return self;
 }
@@ -46,10 +50,7 @@
 {
     [super viewDidLoad];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(cameraRollUpdated)
-                                                 name:DFPhotoStoreCameraRollUpdated
-                                               object:nil];
+    
 }
 
 - (void)didReceiveMemoryWarning
@@ -69,7 +70,9 @@
         NSInteger section = 0;
         NSInteger item = [self collectionView:self.collectionView numberOfItemsInSection:section] - 1;
         NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
-        [self.collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+        if (lastIndexPath.section >= 0 && lastIndexPath.row >= 0) {
+            [self.collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+        }
     }
     
 }
