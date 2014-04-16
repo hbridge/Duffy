@@ -24,6 +24,8 @@
 
 @end
 
+static NSInteger NUM_SUGGESTION_RESULTS = 5;
+
 static NSString *FREE_FORM_SECTION_NAME = @"Search";
 static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
@@ -153,7 +155,7 @@ static CGFloat SearchResultsCellFontSize = 15;
 {
     if (!_defaultSearchResults) {
         _defaultSearchResults = [[NSMutableDictionary alloc] init];
-        _defaultSearchResults[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
+        _defaultSearchResults[DATE_SECTION_NAME] = @[@""];
         _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
         _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@""];
     }
@@ -161,8 +163,6 @@ static CGFloat SearchResultsCellFontSize = 15;
     
     return _defaultSearchResults;
 }
-
-static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (NSArray *)sortedTop:(NSInteger)count suggestionsInDict:(NSDictionary *)dict
 {
@@ -185,19 +185,28 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (void)populateDefaultAutocompleteSearchResults
 {
-    [self.autcompleteController fetchSuggestions:^(NSDictionary *categorySuggestionsToCounts, NSDictionary *locationSuggestionsToCounts) {
+    [self.autcompleteController fetchSuggestions:^(NSDictionary *categorySuggestionsToCounts,
+                                                   NSDictionary *locationSuggestionsToCounts,
+                                                   NSDictionary *timeSuggestionsToCounts) {
         if (locationSuggestionsToCounts) {
-            self.defaultSearchResults[LOCATION_SECTION_NAME] = [self sortedTop:NUM_LOCATION_RESULTS
+            self.defaultSearchResults[LOCATION_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
                                                              suggestionsInDict:locationSuggestionsToCounts];
         } else {
             [self.sectionNames removeObject:LOCATION_SECTION_NAME];
         }
         
         if (categorySuggestionsToCounts) {
-            self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self sortedTop:NUM_LOCATION_RESULTS
+            self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
                                                              suggestionsInDict:categorySuggestionsToCounts];
         } else {
             [self.sectionNames removeObject:CATEGORY_SECTION_NAME];
+        }
+        
+        if (timeSuggestionsToCounts) {
+            self.defaultSearchResults[DATE_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
+                                                             suggestionsInDict:timeSuggestionsToCounts];
+        } else {
+            [self.sectionNames removeObject:DATE_SECTION_NAME];
         }
         
         

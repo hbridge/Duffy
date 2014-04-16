@@ -13,6 +13,7 @@
 // Private DFAutocompleteResponse Class
 @interface DFAutocompleteResponse : NSObject
 @property (nonatomic, retain) NSString *result;
+@property (nonatomic, retain) NSArray *top_times;
 @property (nonatomic, retain) NSArray *top_locations;
 @property (nonatomic, retain) NSArray *top_categories;
 @end
@@ -48,7 +49,7 @@ static NSString *UserIDParameterKey = @"user_id";
     if ([[DFUser currentUser] userID]) {
         [self fetchAutocompleteResults:mainThreadCompletionBlock];
     } else {
-        mainThreadCompletionBlock(nil, nil);
+        mainThreadCompletionBlock(nil, nil, nil);
     }
 }
 
@@ -69,7 +70,7 @@ static NSString *UserIDParameterKey = @"user_id";
          DFAutocompleteResponse *response = [mappingResult firstObject];
          NSLog(@"Autocomplete response received.  result:%@", response.result);
 
-         NSDictionary *locationResult, *categoryResult;
+         NSDictionary *locationResult, *categoryResult, *timeResult;
          if ([response.result isEqualToString:@"true"]) {
              NSMutableDictionary *entriesAndCounts = [[NSMutableDictionary alloc] init];
              for (DFSuggestion *locationSuggestion in response.top_locations) {
@@ -88,11 +89,20 @@ static NSString *UserIDParameterKey = @"user_id";
              categoryResult = entriesAndCounts;
              
              
+             entriesAndCounts = [[NSMutableDictionary alloc] init];
+             for (DFSuggestion *timeSuggestion in response.top_times) {
+                 if (timeSuggestion.name) {
+                     entriesAndCounts[timeSuggestion.name] = timeSuggestion.count;
+                 }
+             }
+             timeResult = entriesAndCounts;
+             
+             
          }  else {
              locationResult = categoryResult = nil;
          }
          dispatch_async(dispatch_get_main_queue(), ^{
-             completionBlock(categoryResult, locationResult);
+             completionBlock(categoryResult, locationResult, timeResult);
          });
 
      }
@@ -100,7 +110,7 @@ static NSString *UserIDParameterKey = @"user_id";
      {
          NSLog(@"Autocomplete fetch failed.  Error: %@", error.localizedDescription);
          dispatch_async(dispatch_get_main_queue(), ^{
-             completionBlock(nil, nil);
+             completionBlock(nil, nil, nil);
          });
      }];
     
@@ -126,7 +136,6 @@ static NSString *UserIDParameterKey = @"user_id";
         NSURL *baseURL = [[DFUser currentUser] serverURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
 
-        //Aseem format
         RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];
         [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
 
@@ -135,16 +144,10 @@ static NSString *UserIDParameterKey = @"user_id";
         [suggestionMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
                                                                         @"count" : @"count"
                                                                         }];
-
-//        RKObjectMapping *locationSuggestionMapping = [RKObjectMapping mappingForClass:[DFSuggestion class]];
-//        [locationSuggestionMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
-//                                                              @"count" : @"count"
-//                                                              }];
-//        RKObjectMapping *categorySuggestionMapping = [RKObjectMapping mappingForClass:[DFSuggestion class]];
-//        [categorySuggestionMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
-//                                                                @"count" : @"count"
-//                                                                }];
         
+        [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_times"
+                                                                                                    toKeyPath:@"top_times"
+                                                                                                  withMapping:suggestionMapping]];
         [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_locations"
                                                                                                     toKeyPath:@"top_locations"
                                                                                                   withMapping:suggestionMapping]];
