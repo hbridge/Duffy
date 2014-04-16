@@ -19,4 +19,9 @@
 @property (nonatomic, readonly) NSUInteger numRemaining;
 @property (nonatomic, readonly) float progress;
 
+//errors and retries
+@property (nonatomic, retain) NSError *fatalError;
+@property (nonatomic) NSUInteger numConsecutiveRetries;
+@property (nonatomic) NSUInteger numTotalRetries;
+
 @end

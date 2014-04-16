@@ -129,22 +129,6 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Private Uploading Code
 
-- (void) beginBackgroundUpdateTask
-{
-    if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
-        NSLog(@"DFUploadController: have background upload task, no need to register another.");
-        return;
-    }
-    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-        [self endBackgroundUpdateTask];
-    }];
-}
-
-- (void) endBackgroundUpdateTask
-{
-    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
-    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
-}
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
@@ -152,6 +136,13 @@ static DFUploadController *defaultUploadController;
         DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
         [self uploadPhoto:photo];
     });
+}
+
+- (void)retryLastUpload
+{
+    [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    self.currentSessionStats.numTotalRetries++;
+    self.currentSessionStats.numConsecutiveRetries++;
 }
 
 
@@ -173,8 +164,8 @@ static DFUploadController *defaultUploadController;
             [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess];
         } else {
             NSLog(@"File did not upload properly.  Retrying.");
-            [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
             [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:response.debug];
+            [self retryLastUpload];
         }
     }
             failure:^(RKObjectRequestOperation *operation, NSError *error)
@@ -183,13 +174,20 @@ static DFUploadController *defaultUploadController;
         NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
         [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
         if (error.code == -1001) {//timeout
-            [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+            [self retryLastUpload];
+        } else {
+            [self cancelUploadsWithIsError:YES];
         }
         
     }];
     
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
+}
+
+- (void)cancelUploadsWithIsError:(BOOL)isError
+{
+    NSLog(@"Cancelling all uploads.  isError:%@", [NSNumber numberWithBool:isError]);
 }
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
@@ -298,6 +296,7 @@ static DFUploadController *defaultUploadController;
     NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
     if (self.photoURLsToUpload.count > 0) {
         [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+        self.currentSessionStats.numConsecutiveRetries = 0;
     } else {
         NSLog(@"all photos uploaded.");
         self.currentSessionStats = nil;
@@ -378,6 +377,25 @@ static DFUploadController *defaultUploadController;
     return _managedObjectContext;
 }
 
+
+# pragma mark - Background task helpes
+
+- (void) beginBackgroundUpdateTask
+{
+    if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
+        NSLog(@"DFUploadController: have background upload task, no need to register another.");
+        return;
+    }
+    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundUpdateTask];
+    }];
+}
+
+- (void) endBackgroundUpdateTask
+{
+    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+}
 
 
 @end

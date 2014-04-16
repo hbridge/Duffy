@@ -10,6 +10,8 @@
 
 @implementation DFUploadSessionStats
 
+@synthesize fatalError, numConsecutiveRetries, numTotalRetries;
+
 - (instancetype)init
 {
     self = [super init];
