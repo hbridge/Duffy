@@ -3,6 +3,7 @@ import os, sys
 import json
 import subprocess
 import Image
+import tempfile
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -42,7 +43,10 @@ def add_photo(request):
 			except User.DoesNotExist:
 				user = createUser(phoneId)
 
-			image_util.addPhoto(user, request.FILES['file'].name, request.FILES['file'], photoMetadata, locationData, iPhoneFaceboxesTopleft)
+			tempFilepath = tempfile.mktemp()
+ 
+			image_util.handleUploadedFile(request.FILES['file'], tempFilepath)
+			image_util.addPhoto(user, request.FILES['file'].name, tempFilepath, photoMetadata, locationData, iPhoneFaceboxesTopleft)
 
 			response_data['result'] = True
 			response_data['debug'] = ""
