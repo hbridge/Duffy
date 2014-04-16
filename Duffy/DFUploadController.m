@@ -130,6 +130,11 @@ static DFUploadController *defaultUploadController;
     [self cancelUploadsWithIsError:NO];
 }
 
+- (BOOL)isUploadInProgress
+{
+    return (self.photoURLsToUpload.count > 0);
+}
+
 #pragma mark - Private config code
 - (void)setupStatusBarNotifications
 {

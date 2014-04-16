@@ -20,5 +20,6 @@
 // subscribe to DFUploadStatusUpdate to be notified of progress
 - (void)uploadPhotos:(NSArray *)photos;
 - (void)cancelUpload;
+- (BOOL)isUploadInProgress;
 
 @end

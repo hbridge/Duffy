@@ -12,6 +12,8 @@
 #import "DFTableHeaderView.h"
 #import "DFAutocompleteController.h"
 #import "DFAnalytics.h"
+#import "DFUploadController.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFSearchViewController ()
 
@@ -65,6 +67,10 @@ static CGFloat SearchResultsCellFontSize = 15;
         self.autcompleteController = [[DFAutocompleteController alloc] init];
         [self setupNavBar];
         [self registerForKeyboardNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(uploadStatusChanged:)
+                                                     name:DFUploadStatusNotificationName
+                                                   object:nil];
     }
     return self;
 }
@@ -88,6 +94,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     [super viewDidAppear:animated];
     [self populateDefaultAutocompleteSearchResults];
     [self setViewInsets];
+    
     [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -313,7 +320,6 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
         [self.searchBar setShowsCancelButton:YES animated:YES];
         self.navigationItem.rightBarButtonItem = nil;
     } else {
-
         [self.searchBar setShowsCancelButton:NO animated:YES];
         self.searchResultsTableView.hidden = YES;
         [self.searchBar resignFirstResponder];
@@ -463,22 +469,50 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 #pragma mark - Keyboard handlers
 
 - (void)keyboardDidShow:(NSNotification *)notification {
+    // cache the header view frame so we can reset it.
+    CGRect headerViewFrame = self.searchResultsTableView.tableHeaderView.frame;
+    
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     toRect = [self.view convertRect:toRect fromView:nil ];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
                                                    self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
+    
+    // reset the header view frame
+    self.searchResultsTableView.tableHeaderView.frame = headerViewFrame;
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification {
+    // cache the header view frame so we can reset it.
+    CGRect headerViewFrame = self.searchResultsTableView.tableHeaderView.frame;
+    
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     toRect = [self.view convertRect:toRect fromView:nil ];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
                                                    self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
+    
+    // reset the header view frame
+    self.searchResultsTableView.tableHeaderView.frame = headerViewFrame;
 }
+
+#pragma mark - Upload notificatoin handler
+
+- (void)uploadStatusChanged:(NSNotification *)note
+{
+    DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
+    
+    if (uploadStats.numRemaining > 0 && self.searchResultsTableView.tableHeaderView == nil) {
+        UINib *warningViewNib = [UINib nibWithNibName:@"DFSearchResultsTableViewResultsIncompleteWarningHeader" bundle:nil];
+        UIView *warningView = [[warningViewNib instantiateWithOwner:self options:nil] objectAtIndex:0];
+        self.searchResultsTableView.tableHeaderView = warningView;
+    } else if (uploadStats.numRemaining == 0){
+        self.searchResultsTableView.tableHeaderView = nil;
+    }
+}
+
 
 
 @end
