@@ -13,6 +13,8 @@
 		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
 		5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */; };
+		5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */; };
+		5A52BD7318FF02ED0038CCCD /* WarningHeaderIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */; };
 		5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A67605818E2039800E355B6 /* CoreLocation.framework */; };
 		5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */; };
 		5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */; };
@@ -115,6 +117,8 @@
 		5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncController.m; sourceTree = "<group>"; };
 		5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadSessionStats.h; sourceTree = "<group>"; };
 		5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadSessionStats.m; sourceTree = "<group>"; };
+		5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchResultsTableViewResultsIncompleteWarningHeader.xib; sourceTree = "<group>"; };
+		5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "WarningHeaderIcon@2x.png"; path = "Resources/Icons/WarningHeaderIcon@2x.png"; sourceTree = "<group>"; };
 		5A67605818E2039800E355B6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		5A67605A18E210B000E355B6 /* NSDictionary+DFJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+DFJSON.h"; sourceTree = "<group>"; };
 		5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+DFJSON.m"; sourceTree = "<group>"; };
@@ -426,6 +430,7 @@
 			children = (
 				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
 				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
+				5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */,
 				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
 				5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */,
 				5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */,
@@ -508,6 +513,7 @@
 		5ADB24C3189985590016CA02 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */,
 				5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */,
 				5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */,
 				5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */,
@@ -692,10 +698,12 @@
 				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
 				5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */,
 				5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */,
+				5A52BD7318FF02ED0038CCCD /* WarningHeaderIcon@2x.png in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */,
 				5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */,
 				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
+				5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */,
 				5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,

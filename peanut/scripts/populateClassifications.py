@@ -104,21 +104,24 @@ def main(argv):
 
     socket_send, socket_recv = initClassifier()
 
-    logging.info("Starting pipeline at " + time.strftime("%c"))
-    # Get all photos in pipeline_state 0 which means "not copied to image server"
-    nonProcessedPhotos = Photo.objects.filter(classification_data="")
-    nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
+    while True:
+        logging.info("Starting pipeline at " + time.strftime("%c"))
+        # Get all photos in pipeline_state 0 which means "not copied to image server"
+        nonProcessedPhotos = Photo.objects.filter(classification_data="")
+        nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
 
-    successfullyClassified = list()
-    
-    for photos in chunks(nonProcessedPhotos, maxFileAtTime):
-        # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
-        successfullyCopied = copyPhotos(photos)
-        if (len(successfullyCopied) > 0):
-            successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
-            count += len (successfullyClassified)
+        successfullyClassified = list()
+        
+        for photos in chunks(nonProcessedPhotos, maxFileAtTime):
+            # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
+            successfullyCopied = copyPhotos(photos)
+            if (len(successfullyCopied) > 0):
+                successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
+                count += len (successfullyClassified)
 
-    logging.info("Pipeline complete. " + str(count) + " photos processed")
+        logging.info("Pipeline complete. " + str(count) + " photos processed")
+
+        time.sleep(5)
 
 if __name__ == "__main__":
     main(sys.argv[1:])

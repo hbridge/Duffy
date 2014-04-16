@@ -13,6 +13,7 @@
 #import "UIImage+DFHelpers.h"
 #import "DFPhoto.h"
 #import "DFPhoto+FaceDetection.h"
+#import "NSDictionary+DFJSON.h"
 
 @interface DFPhotoViewController ()
 
@@ -44,6 +45,8 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    
+    NSLog(@"photo metadata: %@", [self.photo.metadataDictionary JSONString]);
 }
 
 - (void)didReceiveMemoryWarning

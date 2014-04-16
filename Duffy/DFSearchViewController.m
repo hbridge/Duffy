@@ -12,6 +12,8 @@
 #import "DFTableHeaderView.h"
 #import "DFAutocompleteController.h"
 #import "DFAnalytics.h"
+#import "DFUploadController.h"
+#import "DFNotificationSharedConstants.h"
 
 @interface DFSearchViewController ()
 
@@ -21,6 +23,8 @@
 @property (nonatomic, retain) NSMutableArray *sectionNames;
 
 @end
+
+static NSInteger NUM_SUGGESTION_RESULTS = 5;
 
 static NSString *FREE_FORM_SECTION_NAME = @"Search";
 static NSString *DATE_SECTION_NAME = @"Time";
@@ -65,6 +69,10 @@ static CGFloat SearchResultsCellFontSize = 15;
         self.autcompleteController = [[DFAutocompleteController alloc] init];
         [self setupNavBar];
         [self registerForKeyboardNotifications];
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(uploadStatusChanged:)
+                                                     name:DFUploadStatusNotificationName
+                                                   object:nil];
     }
     return self;
 }
@@ -86,7 +94,9 @@ static CGFloat SearchResultsCellFontSize = 15;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [self populateDefaultAutocompleteSearchResults];
     [self setViewInsets];
+    
     [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -145,18 +155,14 @@ static CGFloat SearchResultsCellFontSize = 15;
 {
     if (!_defaultSearchResults) {
         _defaultSearchResults = [[NSMutableDictionary alloc] init];
-        _defaultSearchResults[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
+        _defaultSearchResults[DATE_SECTION_NAME] = @[@""];
         _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
         _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@""];
-        
-        [self populateDefaultAutocompleteSearchResults];
     }
     
     
     return _defaultSearchResults;
 }
-
-static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (NSArray *)sortedTop:(NSInteger)count suggestionsInDict:(NSDictionary *)dict
 {
@@ -179,19 +185,28 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (void)populateDefaultAutocompleteSearchResults
 {
-    [self.autcompleteController fetchSuggestions:^(NSDictionary *categorySuggestionsToCounts, NSDictionary *locationSuggestionsToCounts) {
+    [self.autcompleteController fetchSuggestions:^(NSDictionary *categorySuggestionsToCounts,
+                                                   NSDictionary *locationSuggestionsToCounts,
+                                                   NSDictionary *timeSuggestionsToCounts) {
         if (locationSuggestionsToCounts) {
-            self.defaultSearchResults[LOCATION_SECTION_NAME] = [self sortedTop:NUM_LOCATION_RESULTS
+            self.defaultSearchResults[LOCATION_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
                                                              suggestionsInDict:locationSuggestionsToCounts];
         } else {
             [self.sectionNames removeObject:LOCATION_SECTION_NAME];
         }
         
         if (categorySuggestionsToCounts) {
-            self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self sortedTop:NUM_LOCATION_RESULTS
+            self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
                                                              suggestionsInDict:categorySuggestionsToCounts];
         } else {
             [self.sectionNames removeObject:CATEGORY_SECTION_NAME];
+        }
+        
+        if (timeSuggestionsToCounts) {
+            self.defaultSearchResults[DATE_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
+                                                             suggestionsInDict:timeSuggestionsToCounts];
+        } else {
+            [self.sectionNames removeObject:DATE_SECTION_NAME];
         }
         
         
@@ -314,7 +329,6 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
         [self.searchBar setShowsCancelButton:YES animated:YES];
         self.navigationItem.rightBarButtonItem = nil;
     } else {
-
         [self.searchBar setShowsCancelButton:NO animated:YES];
         self.searchResultsTableView.hidden = YES;
         [self.searchBar resignFirstResponder];
@@ -416,6 +430,14 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+    if (section == 0) {
+        // This is a hack to put this here, but if it's not the header view's frame gets set to something weird
+        // and bleeds into other rows when you start typing in the search bar
+        UINib *warningViewNib = [UINib nibWithNibName:@"DFSearchResultsTableViewResultsIncompleteWarningHeader" bundle:nil];
+        UIView *warningView = [[warningViewNib instantiateWithOwner:self options:nil] objectAtIndex:0];
+        self.searchResultsTableView.tableHeaderView.frame = warningView.frame;
+    }
+    
     DFTableHeaderView *view = [[[UINib nibWithNibName:@"DFTableHeaderView" bundle:nil] instantiateWithOwner:self options:nil] firstObject];
     
     NSString *sectionName = self.sectionNames[section];
@@ -464,22 +486,50 @@ static NSInteger NUM_LOCATION_RESULTS = 5;
 #pragma mark - Keyboard handlers
 
 - (void)keyboardDidShow:(NSNotification *)notification {
+    // cache the header view frame so we can reset it.
+    CGRect headerViewFrame = self.searchResultsTableView.tableHeaderView.frame;
+    
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     toRect = [self.view convertRect:toRect fromView:nil ];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
                                                    self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
+    
+    // reset the header view frame
+    self.searchResultsTableView.tableHeaderView.frame = headerViewFrame;
 }
 
 - (void)keyboardDidHide:(NSNotification *)notification {
+    // cache the header view frame so we can reset it.
+    CGRect headerViewFrame = self.searchResultsTableView.tableHeaderView.frame;
+    
     CGRect toRect = [(NSValue *)notification.userInfo[UIKeyboardFrameEndUserInfoKey] CGRectValue];
     toRect = [self.view convertRect:toRect fromView:nil ];
     self.searchResultsTableView.frame = CGRectMake(self.searchResultsTableView.frame.origin.x,
                                                    self.searchResultsTableView.frame.origin.y,
                                                    self.searchResultsTableView.frame.size.width,
                                                    toRect.origin.y);
+    
+    // reset the header view frame
+    self.searchResultsTableView.tableHeaderView.frame = headerViewFrame;
 }
+
+#pragma mark - Upload notificatoin handler
+
+- (void)uploadStatusChanged:(NSNotification *)note
+{
+    DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
+    
+    if (uploadStats.numRemaining > 0 && self.searchResultsTableView.tableHeaderView == nil) {
+        UINib *warningViewNib = [UINib nibWithNibName:@"DFSearchResultsTableViewResultsIncompleteWarningHeader" bundle:nil];
+        UIView *warningView = [[warningViewNib instantiateWithOwner:self options:nil] objectAtIndex:0];
+        self.searchResultsTableView.tableHeaderView = warningView;
+    } else if (uploadStats.numRemaining == 0){
+        self.searchResultsTableView.tableHeaderView = nil;
+    }
+}
+
 
 
 @end

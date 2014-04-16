@@ -39,8 +39,7 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 @interface DFUploadController()
 
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
-@property (atomic) dispatch_queue_t uploadDispatchQueue;
-@property (atomic) dispatch_semaphore_t uploadEnqueueSemaphore;
+@property (atomic, retain) NSOperationQueue *uploadOperationQueue;
 @property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
@@ -56,6 +55,16 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
 static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
+static const unsigned int MaxSimultaneousUploads = 1;
+static const unsigned int MaxConsecutiveRetries = 5;
+
+
+typedef enum {
+    DFStatusUpdateProgress,
+    DFStatusUpdateComplete,
+    DFStatusUpdateError,
+    DFStatusUpdateCancelled
+} DFStatusUpdateType;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
@@ -75,7 +84,8 @@ static DFUploadController *defaultUploadController;
 {
     self = [super init];
     if (self) {
-        self.uploadDispatchQueue = dispatch_queue_create("com.duffysoft.DFUploadController.UploadQueue", DISPATCH_QUEUE_SERIAL);
+        self.uploadOperationQueue = [[NSOperationQueue alloc] init];
+        self.uploadOperationQueue.maxConcurrentOperationCount = MaxSimultaneousUploads;
         self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
         [self setupStatusBarNotifications];
         self.backgroundUpdateTask = UIBackgroundTaskInvalid;
@@ -115,6 +125,16 @@ static DFUploadController *defaultUploadController;
 
 }
 
+- (void)cancelUpload
+{
+    [self cancelUploadsWithIsError:NO];
+}
+
+- (BOOL)isUploadInProgress
+{
+    return (self.photoURLsToUpload.count > 0);
+}
+
 #pragma mark - Private config code
 - (void)setupStatusBarNotifications
 {
@@ -129,29 +149,25 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Private Uploading Code
 
-- (void) beginBackgroundUpdateTask
-{
-    if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
-        NSLog(@"DFUploadController: have background upload task, no need to register another.");
-        return;
-    }
-    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-        [self endBackgroundUpdateTask];
-    }];
-}
-
-- (void) endBackgroundUpdateTask
-{
-    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
-    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
-}
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
-    dispatch_async(self.uploadDispatchQueue, ^{
+    [self.uploadOperationQueue addOperationWithBlock:^{
         DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
         [self uploadPhoto:photo];
-    });
+    }];
+}
+
+- (void)retryLastUpload
+{
+    [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    self.currentSessionStats.numTotalRetries++;
+    self.currentSessionStats.numConsecutiveRetries++;
+    
+    if (self.currentSessionStats.numConsecutiveRetries > MaxConsecutiveRetries) {
+        [self cancelUploadsWithIsError:YES];
+        [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
+    }
 }
 
 
@@ -173,8 +189,8 @@ static DFUploadController *defaultUploadController;
             [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess];
         } else {
             NSLog(@"File did not upload properly.  Retrying.");
-            [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
             [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:response.debug];
+            [self retryLastUpload];
         }
     }
             failure:^(RKObjectRequestOperation *operation, NSError *error)
@@ -183,7 +199,9 @@ static DFUploadController *defaultUploadController;
         NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
         [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
         if (error.code == -1001) {//timeout
-            [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+            [self retryLastUpload];
+        } else {
+            [self cancelUploadsWithIsError:YES];
         }
         
     }];
@@ -191,6 +209,23 @@ static DFUploadController *defaultUploadController;
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
 }
+
+- (void)cancelUploadsWithIsError:(BOOL)isError
+{
+    NSUInteger numLeft = self.photoURLsToUpload.count;
+    NSLog(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
+    [self.photoURLsToUpload removeAllObjects];
+    [self.uploadOperationQueue cancelAllOperations];
+    self.currentSessionStats = nil;
+    
+    if (isError) {
+        [self showStatusBarNotificationWithType:DFStatusUpdateError];
+    } else {
+        [self showStatusBarNotificationWithType:DFStatusUpdateCancelled];
+    }
+    [DFAnalytics logUploadCancelledWithIsError:isError];
+}
+
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {
@@ -298,6 +333,7 @@ static DFUploadController *defaultUploadController;
     NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
     if (self.photoURLsToUpload.count > 0) {
         [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+        self.currentSessionStats.numConsecutiveRetries = 0;
     } else {
         NSLog(@"all photos uploaded.");
         self.currentSessionStats = nil;
@@ -319,21 +355,31 @@ static DFUploadController *defaultUploadController;
 
 - (void)postStatusUpdate
 {
+    if (self.currentSessionStats == nil) self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
-    [self showStatusBarNotification];
+    
+    if (self.currentSessionStats.numRemaining > 0) {
+        [self showStatusBarNotificationWithType:DFStatusUpdateProgress];
+    } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numAcceptedUploads > 0) {
+        [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
+    }
 }
 
-- (void)showStatusBarNotification
+- (void)showStatusBarNotificationWithType:(DFStatusUpdateType)updateType
 {
-    if (self.currentSessionStats.numRemaining > 0) {
+    if (updateType == DFStatusUpdateProgress) {
         NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", (unsigned long)self.currentSessionStats.numRemaining];
 
         [JDStatusBarNotification showWithStatus:statusString];
         [JDStatusBarNotification showProgress:self.currentSessionStats.progress];
-    } else {
+    } else if (updateType == DFStatusUpdateComplete) {
         [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
+    } else if (updateType == DFStatusUpdateError) {
+        [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:2];
+    } else if (updateType == DFStatusUpdateCancelled) {
+        [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
     }
 }
 
@@ -378,6 +424,25 @@ static DFUploadController *defaultUploadController;
     return _managedObjectContext;
 }
 
+
+# pragma mark - Background task helpes
+
+- (void) beginBackgroundUpdateTask
+{
+    if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
+        NSLog(@"DFUploadController: have background upload task, no need to register another.");
+        return;
+    }
+    self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        [self endBackgroundUpdateTask];
+    }];
+}
+
+- (void) endBackgroundUpdateTask
+{
+    [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
+    self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+}
 
 
 @end

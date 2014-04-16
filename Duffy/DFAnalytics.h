@@ -30,12 +30,15 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logUploadBeganWithNumBytes:(NSUInteger)bodyDataSizeInBytes;
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
++ (void)logUploadCancelledWithIsError:(BOOL)isError;
++ (void)logUploadRetryCountExceededWithCount:(unsigned int)count;
 
 + (void)logPhotoWebviewLoadBegan;
 + (void)logPhotoWebviewLoadEnded;
 + (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString;
 
 + (void)logAutoUploadSettingChanged:(BOOL)isOn;
+
 
 
 @end

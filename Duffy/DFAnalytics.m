@@ -33,6 +33,9 @@ NSString* const ResultKey = @"result";
 NSString* const DFAnalyticsValueResultSuccess = @"success";
 NSString* const DFAnalyticsValueResultFailure = @"failure";
 
+NSString* const DFAnalyticsIsErrorKey = @"isError";
+
+
 //Generic value
 NSString* const NewValueKey = @"newValue";
 
@@ -62,8 +65,10 @@ NSString* const SearchPageLoaded = @"SearchResultPageLoaded";
 
 // Uploads
 NSString* const UploadPhotoEvent = @"UploadPhoto";
-
 NSString* const DebugStringKey = @"debug";
+
+NSString* const UploadPhotoCancelled = @"UploadCancelled";
+NSString* const UploadRetriesExceeded = @"UploadRetriesExceeded";
 
 // Individual photo loads
 NSString* const PhotoWebviewLoadEvent = @"PhotoWebviewLoad";
@@ -206,6 +211,20 @@ static DFAnalytics *defaultLogger;
                                                             DebugStringKey: debug
                                                             }];
 }
+
+
++ (void)logUploadCancelledWithIsError:(BOOL)isError
+{
+    [Flurry logEvent:UploadPhotoCancelled withParameters:@{DFAnalyticsIsErrorKey: [NSNumber numberWithBool:isError]}];
+}
+
+
+
++ (void)logUploadRetryCountExceededWithCount:(unsigned int)count
+{
+    [Flurry logEvent:UploadRetriesExceeded withParameters:@{NumberKey: [NSNumber numberWithUnsignedInt:count]}];
+}
+
 
 + (void)logSearchResultPageLoaded:(NSInteger)searchPage
 {

@@ -166,6 +166,10 @@ NSString *DFEnabledNo = @"NO";
     [[DFUser currentUser] setUserOverriddenServerPortString:sender.text];
 }
 
+- (IBAction)cancelUpload:(UIButton *)sender {
+    [[DFUploadController sharedUploadController] cancelUpload];
+}
+
 - (IBAction)crashAppClicked:(UIButton *)sender {
     [NSException raise:@"Testing Crash" format:@"Intentionally crashing app to test crash uploads."];
 }

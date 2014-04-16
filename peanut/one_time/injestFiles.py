@@ -56,18 +56,20 @@ def main(argv):
         print("Looking in dir: %s" % dirname)
 
         for filename in filenames:
-            
-            newFilename = os.path.splitext(os.path.basename(filename))[0] + "-thumb-" + str(size) + '.jpg'
-            newFilepath = os.path.join(dirname, newFilename)
-            origFilepath = os.path.join(dirname, filename)
-            
-            print("Processing: %s" % origFilepath)
+            name, ext = os.path.splitext(filename)
 
-            image_util.resizeImage(origFilepath, newFilepath, size, False, True)
+            if (ext in [".jpg", ".JPG", ".png", ".PNG"]):
+                newFilename = os.path.splitext(os.path.basename(filename))[0] + "-thumb-" + str(size) + '.jpg'
+                newFilepath = os.path.join(dirname, newFilename)
+                origFilepath = os.path.join(dirname, filename)
+                
+                print("Processing: %s" % origFilepath)
 
-            image_util.addPhoto(user, filename, newFilepath, "", "", "")
+                image_util.resizeImage(origFilepath, newFilepath, size, False, True)
 
-            os.remove(origFilepath)
+                image_util.addPhoto(user, filename, newFilepath, "", "", "")
+
+                os.remove(origFilepath)
 
 
 if __name__ == "__main__":
