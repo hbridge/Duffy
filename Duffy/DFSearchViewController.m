@@ -86,6 +86,7 @@ static CGFloat SearchResultsCellFontSize = 15;
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
+    [self populateDefaultAutocompleteSearchResults];
     [self setViewInsets];
     [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
@@ -148,8 +149,6 @@ static CGFloat SearchResultsCellFontSize = 15;
         _defaultSearchResults[DATE_SECTION_NAME] = @[@"last week", @"February 2014", @"last summer"];
         _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
         _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@""];
-        
-        [self populateDefaultAutocompleteSearchResults];
     }
     
     
