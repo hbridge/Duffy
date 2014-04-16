@@ -1,5 +1,6 @@
 import os, sys, os.path
 import Image
+import pyexiv2
 import exifread
 import json
 from datetime import datetime
@@ -24,9 +25,19 @@ def imageThumbnail(photoFname, size, userId):
 	if (os.path.isfile(outfilePath)):
 		return newFilename
 	
+	infilePath = path + str(photoFname)
+
+	if(resizeImage(infilePath, outfilePath, size, True)):
+		print "generated thumbnail: '%s" % outfilePath
+	else:
+		print "cannot create thumbnail for '%s'" % infilePath
+
+"""
+	Does image resizes and creates a new file (JPG) of the specified size
+"""
+def resizeImage(origFilepath, newFilepath, size, crop):
 	try:
-		infile = path + str(photoFname)
-		im = Image.open(infile)
+		im = Image.open(origFilepath)
 
 		#calc ratios and new min size
 		wratio = (size/float(im.size[0])) #width check
@@ -39,21 +50,32 @@ def imageThumbnail(photoFname, size, userId):
 		im.thumbnail(newSize, Image.ANTIALIAS)
 
 		# setup the crop to size x size image
-		
-		if (hratio > wratio):
-			buffer = int((im.size[0]-size)/2)
-			im = im.crop((buffer, 0, (im.size[0]-buffer), size))			
-		else:
-			buffer = int((im.size[1]-size)/2)
-			im = im.crop((0, buffer, size, (im.size[1] - buffer)))
+		if (crop):
+			if (hratio > wratio):
+				buffer = int((im.size[0]-size)/2)
+				im = im.crop((buffer, 0, (im.size[0]-buffer), size))			
+			else:
+				buffer = int((im.size[1]-size)/2)
+				im = im.crop((0, buffer, size, (im.size[1] - buffer)))
 		
 		im.load()
-		im.save(outfilePath, "JPEG")
-		print "generated thumbnail: '%s" % outfilePath
-		return newFilename
+		im.save(newFilepath, "JPEG")
+
+		# This part copies over the EXIF information to the new image
+		oldmeta = pyexiv2.ImageMetadata(origFilepath)
+		oldmeta.read()
+
+		newmeta = pyexiv2.ImageMetadata(newFilepath)
+		newmeta.read()
+
+		oldmeta.copy(newmeta)
+		newmeta.write()
+
+		return True
 	except IOError:
-		print "cannot create thumbnail for '%s'" % infile
-		return None
+		print("IOError in resizeImage for %s" % origFilepath)
+		return False
+
 
 """
 	This looks at the metadata for the photo and the photo itself to see if it can figure out the time time.
@@ -62,7 +84,7 @@ def imageThumbnail(photoFname, size, userId):
 
 	Returns a datetime object which can be put straight into the database
 """
-def getTimeTaken(metadataJson, photoPath):
+def getTimeTaken(metadataJson, origFilename, photoPath):
 	# first see if the data is in the metadata json
 	if (metadataJson):
 		metadata = json.loads(metadataJson)
@@ -81,6 +103,13 @@ def getTimeTaken(metadataJson, photoPath):
 		origTime = tags["EXIF DateTimeOriginal"]
 		dt = datetime.strptime(str(origTime), "%Y:%m:%d %H:%M:%S")
 		return dt
+
+	try:
+		filenameNoExt = os.path.splitext(os.path.basename(origFilename))[0]
+		dt = datetime.strptime(filenameNoExt, "%Y-%m-%d %H.%M.%S")
+		return dt
+	except ValueError:
+		pass
 
 	return None
 
@@ -104,7 +133,7 @@ def getLocationCity(locationJson):
 	and metadata about the photo.  It then saves assigns the photo a new id, renames it, adds it to the database
 	then tries to populate the time_taken and location_city fields
 """
-def addPhoto(user, origPath, fileObj, metadata, locationData, iPhoneFaceboxesTopleft):
+def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFaceboxesTopleft):
 	photo = Photo(	user = user,
 					location_data = locationData,
 					orig_filename = origPath,
@@ -113,7 +142,8 @@ def addPhoto(user, origPath, fileObj, metadata, locationData, iPhoneFaceboxesTop
 					iphone_faceboxes_topleft = iPhoneFaceboxesTopleft)
 	photo.save()
 
-	filename, fileExtension = os.path.splitext(origPath)
+	base, origFilename = os.path.split(origPath)
+	filenameNoExt, fileExtension = os.path.splitext(origPath)
 	newFilename = str(photo.id) + fileExtension
 
 	userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(user.id))
@@ -121,9 +151,9 @@ def addPhoto(user, origPath, fileObj, metadata, locationData, iPhoneFaceboxesTop
 
 	photo.new_filename = newFilename
 
-	handleUploadedFile(fileObj, newFilePath)
+	os.rename(localFilepath, newFilePath)
 
-	timeTaken = getTimeTaken(metadata, newFilePath)
+	timeTaken = getTimeTaken(metadata, origFilename, newFilePath)
 	if (timeTaken):
 		photo.time_taken = timeTaken
 
