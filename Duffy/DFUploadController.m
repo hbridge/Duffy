@@ -58,6 +58,14 @@ static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
 static const unsigned int MaxSimultaneousUploads = 1;
 static const unsigned int MaxConsecutiveRetries = 5;
 
+
+typedef enum {
+    DFStatusUpdateProgress,
+    DFStatusUpdateComplete,
+    DFStatusUpdateError,
+    DFStatusUpdateCancelled
+} DFStatusUpdateType;
+
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
 + (DFUploadController *)sharedUploadController {
@@ -353,13 +361,6 @@ static DFUploadController *defaultUploadController;
         [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
     }
 }
-
-typedef enum {
-    DFStatusUpdateProgress,
-    DFStatusUpdateComplete,
-    DFStatusUpdateError,
-    DFStatusUpdateCancelled
-} DFStatusUpdateType;
 
 - (void)showStatusBarNotificationWithType:(DFStatusUpdateType)updateType
 {
