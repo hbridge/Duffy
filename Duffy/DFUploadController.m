@@ -116,6 +116,11 @@ static DFUploadController *defaultUploadController;
 
 }
 
+- (void)cancelUpload
+{
+    [self cancelUploadsWithIsError:NO];
+}
+
 #pragma mark - Private config code
 - (void)setupStatusBarNotifications
 {
@@ -188,8 +193,19 @@ static DFUploadController *defaultUploadController;
 
 - (void)cancelUploadsWithIsError:(BOOL)isError
 {
-    NSLog(@"Cancelling all uploads.  isError:%@", [NSNumber numberWithBool:isError]);
+    NSUInteger numLeft = self.photoURLsToUpload.count;
+    NSLog(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
+    [self.photoURLsToUpload removeAllObjects];
+    [self.uploadOperationQueue cancelAllOperations];
+    self.currentSessionStats = nil;
+    
+    if (isError) {
+        [self showStatusBarNotificationWithType:DFStatusUpdateError];
+    } else {
+        [self showStatusBarNotificationWithType:DFStatusUpdateCancelled];
+    }
 }
+
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {
@@ -319,21 +335,38 @@ static DFUploadController *defaultUploadController;
 
 - (void)postStatusUpdate
 {
+    if (self.currentSessionStats == nil) self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
-    [self showStatusBarNotification];
+    
+    if (self.currentSessionStats.numRemaining > 0) {
+        [self showStatusBarNotificationWithType:DFStatusUpdateProgress];
+    } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numAcceptedUploads > 0) {
+        [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
+    }
 }
 
-- (void)showStatusBarNotification
+typedef enum {
+    DFStatusUpdateProgress,
+    DFStatusUpdateComplete,
+    DFStatusUpdateError,
+    DFStatusUpdateCancelled
+} DFStatusUpdateType;
+
+- (void)showStatusBarNotificationWithType:(DFStatusUpdateType)updateType
 {
-    if (self.currentSessionStats.numRemaining > 0) {
+    if (updateType == DFStatusUpdateProgress) {
         NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", (unsigned long)self.currentSessionStats.numRemaining];
 
         [JDStatusBarNotification showWithStatus:statusString];
         [JDStatusBarNotification showProgress:self.currentSessionStats.progress];
-    } else {
+    } else if (updateType == DFStatusUpdateComplete) {
         [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
+    } else if (updateType == DFStatusUpdateError) {
+        [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:2];
+    } else if (updateType == DFStatusUpdateCancelled) {
+        [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
     }
 }
 
