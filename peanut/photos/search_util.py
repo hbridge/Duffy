@@ -42,7 +42,7 @@ def getNattyInfo(query):
 	after the requested startDate
 """
 def solrSearch(userId, startDate, query):
-	searchResults = SearchQuerySet().all()
+	searchResults = SearchQuerySet().all().filter(userId=userId)
 
 	if (startDate):
 		solrStartDate = startDate.strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -54,6 +54,6 @@ def solrSearch(userId, startDate, query):
 		except ValueError:
 			searchResults = searchResults.filter(content__contain=word)
 
-	searchResults = searchResults.filter(userId=userId).order_by('timeTaken')
+	searchResults = searchResults.order_by('timeTaken')
 	
 	return searchResults

@@ -1,0 +1,14 @@
+{% load dictionary_extras %}
+
+<div class="ui-photo-block hidden">
+	<div class="ui-time-header">
+		{{ entry.date }} ({{ entry.count }})
+	</div>
+	{% for photo in entry.photos %}
+		<div class = "ui-image">
+			<a href="{{ thumbnailBasepath }}{{ photo.photoFilename }}"> 
+				<img data-lazy-src="{{ thumbnailBasepath }}{{ resultsDict.photoIdToThumb|lookup:photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px" 
+				title="{% if debug %} TEXT: {{ photo.text }} | TIME: {{ photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ photo.classificationData }} {% endif %} "></a>
+		</div>
+	{% endfor %}
+</div>

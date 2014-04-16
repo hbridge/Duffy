@@ -20,15 +20,28 @@
 	.ui-filter-inset {
 		margin-top: 0;
 	}
+	.input-search {
+		height: 2em;
+		font-size: 12px;
+		text-align: left;
+		background: none;
+		width: 98%;
+		border-width: 1px;
+		background: #ffffff;
+		margin-left: 2px;
+		padding-left: 10px;	
+	}
 	.ui-gallery{
 		/*overflow: auto;*/
 	}
 	.ui-photo-block {
 		float: left;
+		width: 100%;
 	}
 	.ui-time-header {
 		font-family: arial;
-		padding: 10px 0px 10px 10px;
+		padding: 4px 0px 4px 10px;
+		background-color: #F0F0F0;
 	}
 	.ui-image {
 		padding-right: 2px;
@@ -40,6 +53,12 @@
 	}
 	.hidden {
 		display: none;
+	}
+	.fixed-pos {
+		position: fixed;
+		top: 0px;
+		left: 0px;
+		width: 100%;
 	}
 
 	a:link{
@@ -57,26 +76,26 @@
 
 <body>
 
-<div role="main" class="ui-content">
-		<div class="ui-gallery" id="allImages">
-		{% for entry in photoResults %}
-			<div class="ui-photo-block hidden" id="ui-photo-block-{{ forloop.counter0 }}">
-				<div class="ui-time-header">
-					{{ entry.date }} ({{ entry.count }})
-				</div>
-				{% for photo in entry.photos %}
-					<div class = "ui-image">
-						<a href="{{ thumbnailBasepath }}{{ photo.photoFilename }}"> 
-							<img data-lazy-src="{{ thumbnailBasepath }}{{ photoIdToThumb|lookup:photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px"></a>
-					</div>
-				{% endfor %}
+<div role="main" class="ui-content" style="height:2000px">
+	{% if searchBox == True %}
+		<form class="searchform" id="searchform">
+			<div class="ui-input-search" id="searchbox">
+				<input type="text" class="input-search" id="input-search" 
+				value="{% if query %} {{ query }} {% else %} Search for time, location or things {% endif %}" />
 			</div>
-		{% endfor %}
+		</form>
+
+	{% endif %}
+
+	<div class="ui-gallery" id="allImages">
+	{% for entry in resultsDict.photoResults %}
+		{% include "photos/_timeline_block.html" %}
+	{% endfor %}
 
 	</div>
 
 	<div class="result-bottom"> 
-		{% if resultSize == 0 %}
+		{% if resultsDict.resultSize == 0 %}
 			<p class="text"> No results found! </p>
 		{% endif %}
 	</div>
@@ -85,11 +104,93 @@
 
 </body>
 	<script>
-		$('#allImages').children().each(function(){
-			$(this).removeClass('hidden');
-			$(this).find('img.lazy').each(function() {
-				$(this).attr('src', $(this).attr('data-lazy-src'));	
+
+		function loadImages() {
+			$('#allImages').children().each(function(){
+				$(this).removeClass('hidden');
+				$(this).find('img.lazy').each(function() {
+					$(this).attr('src', $(this).attr('data-lazy-src'));	
+				});
 			});
+		}
+		loadImages();
+		var oldVal = "";
+
+		$("#input-search").on("keyup paste", function(){
+			if ($(this).val() == oldVal) {
+				return;
+			}
+			oldVal = $(this).val();
+			html ="";
+			value = $(this).val();
+
+			if (value && value.length > 1) {
+				// TODO: change next line to show a loader in the searchbox
+				//$('#allImages').html( "<div class='ui-loader'> Loading...</div>" );
+				//$('#allImages').listview( "refresh" );
+				query = $(this).val();
+				console.log("sending query..." + query);
+				
+				$.ajax({
+					url: "/api/search",
+					dataType: "json",
+					crossDomain: true,
+					data: {
+						user_id: "{{ user.id }}",
+						q: query,
+						debug: '{{ debug }}',
+					}
+				})
+				.then(function(response) {
+					$.each(response['_timeline_block_html'], function ( i, val ) {
+						html += val;
+					});
+					$('#allImages').html(html);
+					//$('#allImages').listview( "refresh" );
+					//$ul.trigger( "updatelayout");
+					loadImages();
+				});
+			}
 		});
+
+		var fixDivRunning = false;
+		function fixDiv() {
+			if (fixDiv == true) {
+				return;
+			}
+			fixDivRunning = true;
+			console.log("window scrolltop: " + $(window).scrollTop());
+			var currentFloatId = -1;
+			for (var i=0; i< $('div.ui-photo-block').length; i++){
+				var id = '#ui-photo-block-'+i;
+				console.log($(id).offset());
+				console.log($(id).height());
+				if ($(window).scrollTop() - $(id).offset().top - $(id).height() >= 0){
+					console.log("above the fold: " + $(id).attr('id'));
+					$(id).children('div.ui-time-header').each(function(){
+						$(this).removeClass('fixed-pos');
+					});
+				}
+				else {
+					if (currentFloatId < 0) {
+						currentFloatId = i;
+						$(id).children('div.ui-time-header').each(function(){
+							console.log("position fixed for: " + i);
+							$(this).addClass('fixed-pos');
+						});
+					}
+					else {
+						console.log("Not the top div: " + $(id).attr('id'));
+						$(id).children('div.ui-time-header').each(function(){
+								$(this).removeClass('fixed-pos');
+						});
+					}
+				}
+
+			}
+			fixDivRunning = false;
+		}
+		//$(window).scroll(fixDiv);
+		//fixDiv();
 		</script>
 </html>

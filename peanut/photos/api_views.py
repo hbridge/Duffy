@@ -3,7 +3,6 @@ import os, sys
 import json
 import subprocess
 import Image
-import tempfile
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -17,7 +16,7 @@ from django.utils import timezone
 from django.forms.models import model_to_dict
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util
+from photos import image_util, search_util, gallery_util
 from .forms import ManualAddPhoto
 
 """
@@ -43,10 +42,7 @@ def add_photo(request):
 			except User.DoesNotExist:
 				user = createUser(phoneId)
 
-			tempFilepath = tempfile.mktemp()
-
-			image_util.handleUploadedFile(request.FILES['file'], tempFilepath)
-			image_util.addPhoto(user, request.FILES['file'].name, tempFilepath, photoMetadata, locationData, iPhoneFaceboxesTopleft)
+			image_util.addPhoto(user, request.FILES['file'].name, request.FILES['file'], photoMetadata, locationData, iPhoneFaceboxesTopleft)
 
 			response_data['result'] = True
 			response_data['debug'] = ""
@@ -59,6 +55,10 @@ def add_photo(request):
 		return HttpResponse("This needs to be a POST")
 
 
+
+"""
+Search api function that returns the gallery view. Used by the /viz/search?user_id=<userID>
+"""
 @csrf_exempt
 def search(request):
 	response = dict({'result': True})
@@ -70,7 +70,68 @@ def search(request):
 	else:
 		return returnFailure(response, "Need user_id")
 
+	if data.has_key('q'):
+		query = data['q']
+	else:
+		return returnFailure(response, "Need q field")
+
+	if data.has_key('imagesize'):
+		query = data['imagesize']
+	else:
+		imageSize = 78
+
+	width = imageSize*2 #doubled  for retina
+
+	try:
+		user = User.objects.get(id=userId)
+	except User.DoesNotExist:
+		return returnFailure(response, "Invalid user_id")
+
+	(startDate, newQuery) = search_util.getNattyInfo(query)
+	searchResults = search_util.solrSearch(userId, startDate, newQuery)
+	
+	thumbnailBasepath = "/user_data/" + userId + "/"
+
+	response['_timeline_block_html'] = list()
+
+	#allResults = searchResults.count()
+	photoResults = gallery_util.splitPhotosFromIndexbyMonth(userId, searchResults)
+
+	photoIdToThumb = dict()
+	resultsDict = dict()
+	for result in searchResults:
+		photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, userId)
+	
+	resultsDict['photoIdToThumb'] = photoIdToThumb
+
+	for entry in photoResults:
+		context = {	'imageSize': imageSize,
+					'resultsDict': resultsDict,
+					'userId': userId,
+					'entry': entry,
+					'thumbnailBasepath': thumbnailBasepath}
+
+		html = render_to_string('photos/_timeline_block.html', context)
+		response['_timeline_block_html'].append(html)
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+"""
+Old search api function, used by ajax call from /viz/search/<user_id>
+"""
+@csrf_exempt
+def searchJQmobile(request):
+	response = dict({'result': True})
+
+	data = getRequestData(request)
+	
 	if data.has_key('user_id'):
+		userId = data['user_id']
+	else:
+		return returnFailure(response, "Need user_id")
+
+	if data.has_key('q'):
 		query = data['q']
 	else:
 		return returnFailure(response, "Need q field")
@@ -120,6 +181,11 @@ def search(request):
 		{"food": 415},
 		{"animal": 300},
 		{"car": 240}
+		],
+		"top_timestamps": [
+		{"last week": 415},
+		{"last summer": 300},
+		{"mar 2014": 240}
 		]
 	}
 """
@@ -136,6 +202,7 @@ def get_suggestions(request):
 
 	response['top_locations'] = getTopLocations(userId)
 	response['top_categories'] = getTopCategories(userId)
+	response['top_times'] = getTopTimes(userId)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -278,5 +345,17 @@ def getTopLocations(userId):
 def getTopCategories(userId):
 
 	return [{'name': 'food', 'count': 3}, {'name': 'animal', 'count': 2}, {'name': 'car', 'count': 1}]
+
+
+"""
+	Fetches all photos for the given user and returns back top time searches with count. Currently, faking it.
+
+	[{"last week": 415},
+		{"feb 2014": 246},
+		{"last summer": 90}]
+"""
+def getTopTimes(userId):
+
+	return [{'name': 'last week', 'count': 3}, {'name': 'feb 2014', 'count': 2}, {'name': 'last summer', 'count': 1}]
 
 

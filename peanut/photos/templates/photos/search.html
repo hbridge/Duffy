@@ -1,3 +1,5 @@
+{% load dictionary_extras %}
+
 <!DOCTYPE html> 
 <html> 
 
@@ -43,7 +45,7 @@
 
 					$.ajax({
 						//url: "http://gd.geobytes.com/AutoCompleteCity",
-						url: "/api/search",
+						url: "/api/searchJQmobile",
 						dataType: "json",
 						crossDomain: true,
 						data: {

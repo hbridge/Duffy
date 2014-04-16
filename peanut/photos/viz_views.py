@@ -10,7 +10,7 @@ import json
 from collections import OrderedDict
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util
+from photos import image_util, search_util, gallery_util
 from .forms import ManualAddPhoto
 
 from datetime import datetime, date
@@ -62,6 +62,7 @@ def groups(request, user_id):
 
 def search(request, user_id=None):
 	if (user_id):
+		# This is the original jquery mobile code
 		try:
 			user = User.objects.get(id=user_id)
 		except User.DoesNotExist:
@@ -74,8 +75,10 @@ def search(request, user_id=None):
 		context = {	'user' : user,
 					'numPhotos': numPhotos,
 					'thumbnailBasepath': thumbnailBasepath}
-		return render(request, 'photos/search.html', context)
+		return render(request, 'photos/search.html', context)		
 	else:
+		# new webview code that's served in the iOS app
+
 		if request.method == 'GET':
 			data = request.GET
 		elif request.method == 'POST':
@@ -86,28 +89,17 @@ def search(request, user_id=None):
 		else:
 			return HttpResponse("Please specify a userId")
 
-		if data.has_key('count'):
-			count = int(data['count'])
-		else:
-			count = 48
-
-		if data.has_key('page'):
-			page = int(data['page'])
-		else:
-			page = 1
-
 		if data.has_key('imagesize'):
 			imageSize = int(data['imagesize'])
 		else:
 			imageSize = 78;
 
-		if data.has_key('groupThreshold'):
-			groupThreshold = int(data['groupThreshold'])
-		else:
-			groupThreshold = 1000;		
-
-
 		width = imageSize*2 #doubled  for retina
+
+		if data.has_key('debug'):
+			debug = True
+		else:
+			debug = False
 
 		try:
 			user = User.objects.get(id=userId)
@@ -116,47 +108,46 @@ def search(request, user_id=None):
 
 		thumbnailBasepath = "/user_data/" + str(user.id) + "/"
 
-		if data.has_key('q'):
-			query = data['q']
+		# if no searchbox flag, then must have query
+		if data.has_key('searchbox'):
+			searchBox = True
+			if data.has_key('q'):
+				query = data['q']
+			else:
+				query = ''
 		else:
-			return HttpResponse("Please specify a query")
+			searchBox = False
+			if data.has_key('q'):
+				query = data['q']
+			else:
+				return HttpResponse("Please specify a query")
 
 		setSession(request, user.id)
+		resultsDict = dict()
 
-		(startDate, newQuery) = search_util.getNattyInfo(query)
-		searchResults = search_util.solrSearch(user.id, startDate, newQuery)
+		# if there is a query, send results through.
+		if (query):
+			(startDate, newQuery) = search_util.getNattyInfo(query)
+			searchResults = search_util.solrSearch(user.id, startDate, newQuery)
 
-		allResults = searchResults.count()
-		#searchResults = searchResults[((page-1)*count):(count*page)]
-		photoResults = splitPhotosFromIndexbyMonth(request, user.id, searchResults, groupThreshold)
+			allResults = searchResults.count()
+			photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults)
 
-		photoIdToThumb = dict()
-		for result in searchResults:
-			photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, user.id)
-
-		'''
-		start = ((page-1)*count)+1
-		if (allResults > count*page):
-			end = count*page
-			next = True
-		else:
-			end = allResults
-			next = False
-
-		if (start > 1):
-			previous = True
-		else:
-			previous = False
-		'''
+			photoIdToThumb = dict()
+			for result in searchResults:
+				photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, user.id)
+			resultsDict['allResults'] = allResults
+			resultsDict['photoResults'] = photoResults
+			resultsDict['photoIdToThumb'] = photoIdToThumb
 
 		context = {	'user' : user,
 					'imageSize': imageSize,
-					'photoResults': photoResults,
-					'resultSize': allResults,
+					'resultsDict': resultsDict,
+					'searchBox' : searchBox, 
+					'debug' : debug,
 					'query': query,
 					'userId': userId,
-					'thumbnailBasepath': thumbnailBasepath,
-					'photoIdToThumb': photoIdToThumb}
+					'thumbnailBasepath': thumbnailBasepath}
 		return render(request, 'photos/search_webview.html', context)
 
 
@@ -187,7 +178,7 @@ def gallery(request, user_id):
 		groupThreshold = 11
 
 	photoQuery = Photo.objects.filter(user_id=user.id)
-	photos = splitPhotosFromDBbyMonth(request, user.id, photoQuery, groupThreshold)
+	photos = gallery_util.splitPhotosFromDBbyMonth(user.id, photoQuery, groupThreshold)
 
 	for entry in photos:
 		for photo in entry['mainPhotos']:
@@ -228,78 +219,6 @@ def serveImage(request):
 	return render(request, 'photos/serve_image.html', context)
 
 # Helper functions
-
-def splitPhotosFromDBbyMonth(request, userId, photoSet=None, groupThreshold=None):
-	if (photoSet == None):
-		photoSet = Photo.objects.filter(user_id=userId)
-
-	if (groupThreshold == None):
-		groupThreshold = 11
-
-	dates = photoSet.datetimes('time_taken', 'month')
-	
-	photos = list()
-
-	entry = dict()
-	entry['date'] = 'Undated'
-	entry['mainPhotos'] = list(photoSet.filter(time_taken=None)[:groupThreshold])
-	entry['subPhotos'] = list(photoSet.filter(time_taken=None)[groupThreshold:])
-	entry['count'] = len(entry['subPhotos'])
-	photos.append(entry)
-
-	for date in dates:
-		entry = dict()
-		entry['date'] = date.strftime('%b %Y')
-		entry['mainPhotos'] = list(photoSet.exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[:groupThreshold])
-		entry['subPhotos'] = list(photoSet.exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[groupThreshold:])
-		entry['count'] = len(entry['subPhotos'])
-		photos.append(entry)
-
-	return photos
-
-def splitPhotosFromIndexbyMonth(request, userId, photoSet=None, groupThreshold=None):
-	if (photoSet == None):
-		photoSet = 	SearchQuerySet().filter(userId=userId)
-
-	if (groupThreshold == None):
-		groupThreshold = 1000
-
-	dateFacet = photoSet.date_facet('timeTaken', start_date=date(1900,1,1), end_date=date(2014,5,1), gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
-	facetCounts = dateFacet.facet_counts()
-	
-	photos = list()
-
-	'''
-	entry = dict()
-	entry['date'] = 'Undated'
-	entry['mainPhotos'] = list(photoSet.filter(timeTaken=None)[:groupThreshold])
-	entry['subPhotos'] = list(photoSet.filter(timeTaken=None)[groupThreshold:])
-	entry['count'] = len(entry['subPhotos'])
-	photos.append(entry)
-	'''
-	print str(facetCounts['dates']['timeTaken'])
-	del facetCounts['dates']['timeTaken']['start']
-	del facetCounts['dates']['timeTaken']['end']
-	del facetCounts['dates']['timeTaken']['gap']
-	
-
-	print facetCounts
-
-	od = OrderedDict(sorted(facetCounts['dates']['timeTaken'].items()))
-
-	for dateKey, countVal in od.items():
-
-		print dateKey
-		print countVal
-		entry = dict()
-		startDate = datetime.strptime(dateKey[:-1], '%Y-%m-%dT%H:%M:%S')
-		entry['date'] = startDate.strftime('%b %Y')
-		newDate = startDate+relativedelta(months=1)
-		entry['photos'] = list(photoSet.exclude(timeTaken__lt=startDate).exclude(timeTaken__gt=newDate).order_by('timeTaken')[:groupThreshold])
-		entry['count'] = len(entry['photos'])
-		photos.append(entry)
-		
-	return photos
 
 def setSession(request, userId):
 	request.session['userid'] = userId
