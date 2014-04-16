@@ -21,7 +21,7 @@
 
 //errors and retries
 @property (nonatomic, retain) NSError *fatalError;
-@property (nonatomic) NSUInteger numConsecutiveRetries;
-@property (nonatomic) NSUInteger numTotalRetries;
+@property (nonatomic) unsigned int numConsecutiveRetries;
+@property (nonatomic) unsigned int numTotalRetries;
 
 @end

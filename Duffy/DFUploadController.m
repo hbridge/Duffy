@@ -55,7 +55,8 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
 static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
-static const NSUInteger MaxSimultaneousUploads = 1;
+static const unsigned int MaxSimultaneousUploads = 1;
+static const unsigned int MaxConsecutiveRetries = 5;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
@@ -149,6 +150,11 @@ static DFUploadController *defaultUploadController;
     [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
     self.currentSessionStats.numTotalRetries++;
     self.currentSessionStats.numConsecutiveRetries++;
+    
+    if (self.currentSessionStats.numConsecutiveRetries > MaxConsecutiveRetries) {
+        [self cancelUploadsWithIsError:YES];
+        [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
+    }
 }
 
 
@@ -204,6 +210,7 @@ static DFUploadController *defaultUploadController;
     } else {
         [self showStatusBarNotificationWithType:DFStatusUpdateCancelled];
     }
+    [DFAnalytics logUploadCancelledWithIsError:isError];
 }
 
 
