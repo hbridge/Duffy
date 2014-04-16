@@ -25,7 +25,7 @@ from photos.models import Photo, User, Classification
     the image_util code to add it
 """
 def main(argv):
-    size = 513
+    size = 569
 
     try:
         opts, args = getopt.getopt(argv,"hu:d:",["userId="])
@@ -63,7 +63,7 @@ def main(argv):
             
             print("Processing: %s" % origFilepath)
 
-            image_util.resizeImage(origFilepath, newFilepath, size, False)
+            image_util.resizeImage(origFilepath, newFilepath, size, False, True)
 
             image_util.addPhoto(user, filename, newFilepath, "", "", "")
 

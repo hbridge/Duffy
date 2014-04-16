@@ -27,7 +27,7 @@ def imageThumbnail(photoFname, size, userId):
 	
 	infilePath = path + str(photoFname)
 
-	if(resizeImage(infilePath, outfilePath, size, True)):
+	if(resizeImage(infilePath, outfilePath, size, True, False)):
 		print "generated thumbnail: '%s" % outfilePath
 	else:
 		print "cannot create thumbnail for '%s'" % infilePath
@@ -35,7 +35,7 @@ def imageThumbnail(photoFname, size, userId):
 """
 	Does image resizes and creates a new file (JPG) of the specified size
 """
-def resizeImage(origFilepath, newFilepath, size, crop):
+def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 	try:
 		im = Image.open(origFilepath)
 
@@ -61,15 +61,16 @@ def resizeImage(origFilepath, newFilepath, size, crop):
 		im.load()
 		im.save(newFilepath, "JPEG")
 
-		# This part copies over the EXIF information to the new image
-		oldmeta = pyexiv2.ImageMetadata(origFilepath)
-		oldmeta.read()
+		if (copyExif):
+			# This part copies over the EXIF information to the new image
+			oldmeta = pyexiv2.ImageMetadata(origFilepath)
+			oldmeta.read()
 
-		newmeta = pyexiv2.ImageMetadata(newFilepath)
-		newmeta.read()
+			newmeta = pyexiv2.ImageMetadata(newFilepath)
+			newmeta.read()
 
-		oldmeta.copy(newmeta)
-		newmeta.write()
+			oldmeta.copy(newmeta)
+			newmeta.write()
 
 		return True
 	except IOError:
@@ -88,12 +89,17 @@ def getTimeTaken(metadataJson, origFilename, photoPath):
 	# first see if the data is in the metadata json
 	if (metadataJson):
 		metadata = json.loads(metadataJson)
-		for key in metadata.keys():
-			if key == "{Exif}":
-				for a in metadata[key].keys():
-					if a == "DateTimeOriginal":
-						dt = datetime.strptime(metadata[key][a], "%Y:%m:%d %H:%M:%S")
-						return dt
+		if "{Exif}" in metadata:
+			if "DateTimeOriginal" in metadata["{Exif}"]:
+				timeStr = metadata["{Exif}"]["DateTimeOriginal"]
+				dt = datetime.strptime(timeStr, "%Y:%m:%d %H:%M:%S")
+				return dt
+
+		if "{DFCameraRollExtras}" in metadata:
+			if "DateTimeCreated" in metadata["{DFCameraRollExtras}"]:
+				timeStr = metadata["{DFCameraRollExtras}"]["DateTimeCreated"]
+				dt = datetime.strptime(timeStr, "%Y:%m:%d %H:%M:%S")
+				return dt
 							
 	# If not, check the file's EXIF data
 	f = open(photoPath, 'rb')
