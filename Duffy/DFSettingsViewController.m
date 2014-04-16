@@ -51,11 +51,7 @@ NSString *DFEnabledNo = @"NO";
 {
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     if (![defaults valueForKey:DFAutoUploadEnabledUserDefaultKey]) {
-#ifdef DEBUG
-        [defaults setValue:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
-#else
         [defaults setValue:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
-#endif
     }
 }
 
