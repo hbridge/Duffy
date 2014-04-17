@@ -52,6 +52,9 @@
 	.text {
 		font-family: arial;
 	}
+	.center {
+		text-align: center;
+	}
 	.hidden {
 		display: none;
 	}
@@ -59,6 +62,11 @@
 		position: fixed;
 		top: 0px;
 		left: 0px;
+		width: 100%;
+	}
+	.results-footer {
+		float: left;
+		padding: 0px 0px 0px 0px;
 		width: 100%;
 	}
 
@@ -77,7 +85,7 @@
 
 <body>
 
-<div role="main" class="ui-content" style="height:2000px">
+<div role="main" class="ui-content">
 	{% if searchBox == True %}
 		<form class="searchform" id="searchform">
 			<div class="ui-input-search" id="searchbox">
@@ -95,10 +103,12 @@
 
 	</div>
 
-	<div class="result-bottom"> 
-		{% if resultsDict.resultSize == 0 %}
-			<p class="text"> No results found! </p>
+	<div class="results-footer"> 
+		{% if resultsDict.totalResults == 0 %}
+			<div class="text center"> No results found! </div>
+			<br>
 		{% endif %}
+		<div class="ui-time-header center"> Searchable images: {{ resultsDict.indexSize }} </div>
 	</div>
 
 </div>

@@ -125,18 +125,20 @@ def search(request, user_id=None):
 		setSession(request, user.id)
 		resultsDict = dict()
 
+		resultsDict['indexSize'] = SearchQuerySet().all().filter(userId=userId).count()
+
 		# if there is a query, send results through.
 		if (query):
 			(startDate, newQuery) = search_util.getNattyInfo(query)
 			searchResults = search_util.solrSearch(user.id, startDate, newQuery)
 
-			allResults = searchResults.count()
+			totalResults = searchResults.count()
 			photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults)
 
 			photoIdToThumb = dict()
 			for result in searchResults:
 				photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, user.id)
-			resultsDict['allResults'] = allResults
+			resultsDict['totalResults'] = totalResults
 			resultsDict['photoResults'] = photoResults
 			resultsDict['photoIdToThumb'] = photoIdToThumb
 
