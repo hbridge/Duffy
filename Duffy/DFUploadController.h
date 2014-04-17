@@ -11,7 +11,7 @@
 
 @interface DFUploadController : NSObject
 
-@property (atomic, retain) DFUploadSessionStats *currentSessionStats;
+@property (atomic, readonly, retain) DFUploadSessionStats *currentSessionStats;
 
 + (DFUploadController *)sharedUploadController;
 

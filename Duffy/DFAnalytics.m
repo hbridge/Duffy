@@ -190,10 +190,9 @@ static DFAnalytics *defaultLogger;
 }
 
 
-+ (void)logUploadBeganWithNumBytes:(NSUInteger)bodyDataSizeInBytes
++ (void)logUploadBegan
 {
     [Flurry logEvent:UploadPhotoEvent
-      withParameters:@{SizeInKBKey: [NSNumber numberWithUnsignedInteger:bodyDataSizeInBytes/1000]}
                timed:YES];
 }
 
@@ -201,6 +200,15 @@ static DFAnalytics *defaultLogger;
 {
     [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
                                                             ResultKey: resultValue,
+                                                            }];
+}
+
+
++ (void)logUploadEndedWithResult:(NSString *)resultValue numImageBytes:(NSUInteger)imageDataSizeInBytes
+{
+    [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
+                                                            ResultKey: resultValue,
+                                                            SizeInKBKey: [NSNumber numberWithUnsignedInteger:imageDataSizeInBytes/1000]
                                                             }];
 }
 

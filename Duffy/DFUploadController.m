@@ -19,31 +19,22 @@
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFAnalytics.h"
+#import "DFPhotoUploadAdapter.h"
+#import "DFUploadQueue.h"
 
 
-// Private DFUploadResponse Class
-@interface DFUploadResponse : NSObject
-@property (nonatomic, retain) NSString *result;
-@property (nonatomic, retain) NSString *debug;
-@end
-@implementation DFUploadResponse
-@end
 
-// Constants
-static NSString *AddPhotoResource = @"/api/addPhoto";
-static NSString *UserIDParameterKey = @"phone_id";
-static NSString *PhotoMetadataKey = @"photo_metadata";
-static NSString *PhotoLocationKey = @"location_data";
-static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
 @interface DFUploadController()
 
-@property (readonly, atomic, retain) RKObjectManager* objectManager;
-@property (atomic, retain) NSOperationQueue *uploadOperationQueue;
-@property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
-@property (atomic, retain) NSMutableOrderedSet *photoURLsCurrentlyBeingUploaded;
-@property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
+@property (atomic, retain) DFPhotoUploadAdapter *uploadAdapter;
+@property (atomic) dispatch_queue_t dispatchQueue;
 @property (atomic) dispatch_semaphore_t enqueueSemaphore;
+@property (atomic, retain) DFUploadQueue *uploadURLQueue;
+@property (atomic) unsigned int numUploadOperations;
+
+@property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
+
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
@@ -51,12 +42,10 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
 @implementation DFUploadController
 
-@synthesize objectManager = _objectManager;
 @synthesize managedObjectContext = _managedObjectContext;
 
 
-static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
-static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
+
 static const unsigned int MaxSimultaneousUploads = 1;
 static const unsigned int MaxConsecutiveRetries = 5;
 
@@ -86,48 +75,49 @@ static DFUploadController *defaultUploadController;
 {
     self = [super init];
     if (self) {
-        self.uploadOperationQueue = [[NSOperationQueue alloc] init];
-        self.uploadOperationQueue.maxConcurrentOperationCount = MaxSimultaneousUploads;
+        self.dispatchQueue = dispatch_queue_create("com.duffyapp.DFUploadController.dispatchQueue", DISPATCH_QUEUE_CONCURRENT);
         self.enqueueSemaphore = dispatch_semaphore_create(1);
-        self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
-        self.photoURLsCurrentlyBeingUploaded = [[NSMutableOrderedSet alloc] init];
+        self.uploadURLQueue = [[DFUploadQueue alloc] init];
         [self setupStatusBarNotifications];
         self.backgroundUpdateTask = UIBackgroundTaskInvalid;
+        self.uploadAdapter = [[DFPhotoUploadAdapter alloc] init];
     }
     return self;
 }
 
+- (DFUploadSessionStats *)currentSessionStats
+{
+    DFUploadSessionStats *stats = [[DFUploadSessionStats alloc] init];
+    stats.numAcceptedUploads = self.uploadURLQueue.numTotalObjects;
+    stats.numUploaded = self.uploadURLQueue.numObjectsComplete;
+    return stats;
+}
 
 #pragma mark - Public APIs
 
 - (void)uploadPhotos:(NSArray *)photos
 {
-    NSUInteger photosInQueuePreAdd = self.photoURLsToUpload.count;
+    NSUInteger photosInQueuePreAdd = self.uploadURLQueue.numObjectsIncomplete;
     if (photos.count < 1) return;
  
     [self beginBackgroundUpdateTask];
-    if (!self.currentSessionStats) {
-        self.currentSessionStats = [[DFUploadSessionStats alloc] init];
-    }
     
     NSMutableOrderedSet *photoURLStrings = [[NSMutableOrderedSet alloc] init];
     for (DFPhoto *photo in photos) {
         [photoURLStrings addObject:photo.alAssetURLString];
     }
-    [self.currentSessionStats.acceptedURLs addObjectsFromArray:photoURLStrings.array];
-
-    [photoURLStrings removeObjectsInArray:self.photoURLsCurrentlyBeingUploaded.array]; //need to remove currently uploading ones to prevent dupes
-    [self.photoURLsToUpload addObjectsFromArray:photoURLStrings.array];
     
-    [self enqueueFirstPhotoURLForUpload];
-    
-    NSLog(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
-          (int)photos.count,
-          (int)self.photoURLsToUpload.count,
-          (int)(self.photoURLsToUpload.count - photosInQueuePreAdd)
-          );
-    [self postStatusUpdate];
-
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSUInteger numAdded = [self.uploadURLQueue addObjectsFromArray:photoURLStrings.array];
+        
+        NSLog(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
+              (int)photos.count,
+              (int)photosInQueuePreAdd,
+              (int)numAdded
+              );
+        
+        if (numAdded > 0) [self uploadQueueChanged];
+    });
 }
 
 - (void)cancelUpload
@@ -137,7 +127,7 @@ static DFUploadController *defaultUploadController;
 
 - (BOOL)isUploadInProgress
 {
-    return (self.photoURLsToUpload.count > 0);
+    return (self.uploadURLQueue.numObjectsIncomplete > 0);
 }
 
 #pragma mark - Private config code
@@ -154,85 +144,74 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Private Uploading Code
 
-- (void)enqueueFirstPhotoURLForUpload
+- (void)uploadQueueChanged
 {
-    // TODO add a third set for current uploads
+    [self postStatusUpdate];
     
-    [self.uploadOperationQueue addOperationWithBlock:^{
-        dispatch_semaphore_wait(self.enqueueSemaphore, DISPATCH_TIME_FOREVER);
-        NSString *photoURLString = [self.photoURLsToUpload firstObject];
-        [self.photoURLsToUpload removeObject:photoURLString];
-        [self.photoURLsCurrentlyBeingUploaded addObject:photoURLString];
-        dispatch_semaphore_signal(self.enqueueSemaphore);
-        
-        DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
-        [self uploadPhoto:photo];
-    }];
-    
+    if (self.uploadURLQueue.objectsWaiting.count > 0) {
+        dispatch_async(self.dispatchQueue, ^{
+            dispatch_semaphore_wait(self.enqueueSemaphore, DISPATCH_TIME_FOREVER);
+            if (self.numUploadOperations >= MaxSimultaneousUploads) {
+                dispatch_semaphore_signal(self.enqueueSemaphore);
+                return;
+            } else {
+                self.numUploadOperations++;
+                dispatch_semaphore_signal(self.enqueueSemaphore);
+            }
+            NSString *photoURLString = [self.uploadURLQueue takeNextObject];
+            if (!photoURLString) {
+                self.numUploadOperations--;
+                return;
+            }
+            DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
+            
+            [DFAnalytics logUploadBegan];
+            [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
+                self.numUploadOperations--;
+                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:numBytes];
+                [self uploadFinishedForPhoto:photo];
+            } failureBlock:^(NSError *error) {
+                self.numUploadOperations--;
+                NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
+                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
+                
+                if (error.code == -1001) //timeout
+                {
+                    [self retryUploadPhoto:photo];
+                } else {
+                    [self cancelUploadsWithIsError:YES];
+                }
+            }];
+        });
+    } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
+        NSLog(@"No photos remaining.");
+        [self.uploadURLQueue clearCompleted];
+        [self endBackgroundUpdateTask];
+    }
 }
-
-
 
 - (void)retryUploadPhoto:(DFPhoto *)photo
 {
-    [self uploadPhoto:photo];
-    
     self.currentSessionStats.numTotalRetries++;
     self.currentSessionStats.numConsecutiveRetries++;
     
     if (self.currentSessionStats.numConsecutiveRetries > MaxConsecutiveRetries) {
         [self cancelUploadsWithIsError:YES];
         [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
+    } else {
+        [self.uploadURLQueue moveInProgressObjectBackToQueue:photo.alAssetURLString];
+        [self uploadQueueChanged];
     }
 }
 
 
-- (void)uploadPhoto:(DFPhoto *)photo
-{
-    NSURLRequest *postRequest = [self createPostRequestForPhoto:photo];
-    
-    NSNumber *numBytes = [NSURLProtocol propertyForKey:@"DFPhotoNumBytes" inRequest:postRequest];
-    [DFAnalytics logUploadBeganWithNumBytes:[numBytes unsignedIntegerValue]];
-    RKObjectRequestOperation *operation =
-        [[self objectManager] objectRequestOperationWithRequest:postRequest
-            success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-    {
-        DFUploadResponse *response = [mappingResult firstObject];
-        if ([response.result isEqualToString:@"true"]) {
-            photo.uploadDate = [NSDate date];
-            [self uploadFinishedForPhoto:photo];
-            [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess];
-        } else {
-            NSLog(@"File did not upload properly.  Retrying.");
-            [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:response.debug];
-            [self retryUploadPhoto:photo];
-        }
-    }
-            failure:^(RKObjectRequestOperation *operation, NSError *error)
-    {
-        NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
-        NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
-        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
-        if (error.code == -1001) {//timeout
-            [self retryUploadPhoto:photo];
-        } else {
-            [self cancelUploadsWithIsError:YES];
-        }
-        
-    }];
-    
-    
-    [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
-}
+
 
 - (void)cancelUploadsWithIsError:(BOOL)isError
 {
-    NSUInteger numLeft = self.photoURLsToUpload.count;
+    NSUInteger numLeft = self.uploadURLQueue.numObjectsIncomplete;
     NSLog(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
-    [self.photoURLsToUpload removeAllObjects];
-    [self.photoURLsCurrentlyBeingUploaded removeAllObjects];
-    [self.uploadOperationQueue cancelAllOperations];
-    self.currentSessionStats = nil;
+    [self.uploadURLQueue removeAllObjects];
     
     if (isError) {
         [self showStatusBarNotificationWithType:DFStatusUpdateError];
@@ -243,117 +222,23 @@ static DFUploadController *defaultUploadController;
 }
 
 
-- (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
-{
-    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
-    NSData *imageData = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
-    NSDictionary *postParameters = [self postParametersForPhoto:photo];
-    NSString *uniqueFilename = [NSString stringWithFormat:@"photo_%@.jpg", [[NSUUID UUID] UUIDString]];
-    
-    
-    NSMutableURLRequest *request = [[self objectManager] multipartFormRequestWithObject:nil
-                                                                                 method:RKRequestMethodPOST
-                                                                                   path:AddPhotoResource
-                                                                             parameters:postParameters
-                                                              constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                                                                  [formData appendPartWithFileData:imageData
-                                                                                              name:@"file"
-                                                                                          fileName:uniqueFilename
-                                                                                          mimeType:@"image/jpg"];
-                                                              }];
-    [NSURLProtocol setProperty:[NSNumber numberWithUnsignedInteger:imageData.length] forKey:@"DFPhotoNumBytes" inRequest:request];
 
-    return request;
-}
-
-- (NSDictionary *)postParametersForPhoto:(DFPhoto *)photo
-{
-    NSDictionary *params = @{
-                             UserIDParameterKey: [[DFUser currentUser] deviceID],
-                             PhotoMetadataKey: [self metadataJSONStringForPhoto:photo],
-                             PhotoLocationKey: [self locationJSONStringForPhoto:photo],
-                             PhotoFacesKey:    [self faceJSONStringForPhoto:photo],
-                             };
-    
-    return params;
-}
-
-
-- (NSString *)metadataJSONStringForPhoto:(DFPhoto *)photo
-{
-    NSDictionary *jsonSafeMetadataDict = [[photo metadataDictionary] dictionaryWithNonJSONRemoved];
-    return [jsonSafeMetadataDict JSONString];
-}
-
-- (NSString *)locationJSONStringForPhoto:(DFPhoto *)photo
-{
-    if (photo.location == nil) {
-        return [@{} JSONString];
-    }
-    
-    
-    NSDictionary __block *resultDictionary;
-    
-    // safe to call this here as we're on the uploader dispatch queue and
-    // the reverse geocoder call back will happen on main thread, per the docs
-    
-    dispatch_semaphore_t reverseGeocodeSemaphore = dispatch_semaphore_create(0);
-    [photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
-        resultDictionary = locationDict;
-        dispatch_semaphore_signal(reverseGeocodeSemaphore);
-    }];
-     
-    dispatch_semaphore_wait(reverseGeocodeSemaphore, DISPATCH_TIME_FOREVER);
-    
-    
-    return [resultDictionary JSONString];
-}
-
-- (NSString *)faceJSONStringForPhoto:(DFPhoto *)photo
-{
-    NSArray __block *resultArray;
-    
-    dispatch_semaphore_t faceDetectSemaphore = dispatch_semaphore_create(0);
-    [photo faceFeaturesInPhoto:^(NSArray *features) {
-        resultArray = features;
-        dispatch_semaphore_signal(faceDetectSemaphore);
-    }];
-    
-    dispatch_semaphore_wait(faceDetectSemaphore, DISPATCH_TIME_FOREVER);
-    
-    NSMutableDictionary *resultDictionary = [[NSMutableDictionary alloc] init];
-    for (CIFaceFeature *faceFeature in resultArray) {
-        NSString *key = [NSString stringWithFormat:@"%lu", (unsigned long)resultDictionary.count];
-        resultDictionary[key] = @{@"bounds": NSStringFromCGRect(faceFeature.bounds),
-                                  @"has_smile" : [NSNumber numberWithBool:faceFeature.hasSmile],
-                                  };
-    }
-    
-    return [resultDictionary JSONString];
-}
 
 # pragma mark - Private Upload Completion Handlers
 
 - (void)uploadFinishedForPhoto:(DFPhoto *)photo
 {
-    [self saveUploadProgress];
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                                  object:self
-                                                                userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
-    
-    [self.photoURLsCurrentlyBeingUploaded removeObject:photo.alAssetURLString];
-    [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
-    [self postStatusUpdate];
-    
-    NSLog(@"Finished uploading %@.  %d left.", photo.alAssetURLString, (int)self.photoURLsToUpload.count);
-    if (self.photoURLsToUpload.count > 0) {
-        [self enqueueFirstPhotoURLForUpload];
+    dispatch_async(self.dispatchQueue, ^{
+        [self saveUploadProgress];
+        [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                                      object:self
+                                                                    userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
+        
+        
         self.currentSessionStats.numConsecutiveRetries = 0;
-    } else {
-        NSLog(@"all photos uploaded.");
-        self.currentSessionStats = nil;
-        [self endBackgroundUpdateTask];
-    }
+        [self.uploadURLQueue markObjectCompleted:photo.alAssetURLString];
+        [self uploadQueueChanged];
+    });
 }
 
 - (void)saveUploadProgress
@@ -368,7 +253,6 @@ static DFUploadController *defaultUploadController;
 
 - (void)postStatusUpdate
 {
-    if (self.currentSessionStats == nil) self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
@@ -378,46 +262,31 @@ static DFUploadController *defaultUploadController;
     } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numAcceptedUploads > 0) {
         [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
     }
+    
+    NSLog(@"%@", self.currentSessionStats.description);
 }
 
 - (void)showStatusBarNotificationWithType:(DFStatusUpdateType)updateType
 {
-    if (updateType == DFStatusUpdateProgress) {
-        NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", (unsigned long)self.currentSessionStats.numRemaining];
-
-        [JDStatusBarNotification showWithStatus:statusString];
-        [JDStatusBarNotification showProgress:self.currentSessionStats.progress];
-    } else if (updateType == DFStatusUpdateComplete) {
-        [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
-    } else if (updateType == DFStatusUpdateError) {
-        [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:5];
-    } else if (updateType == DFStatusUpdateCancelled) {
-        [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
-    }
+    DFUploadSessionStats *sessionStats = self.currentSessionStats;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (updateType == DFStatusUpdateProgress) {
+            NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", (unsigned long)self.currentSessionStats.numRemaining];
+            
+            [JDStatusBarNotification showWithStatus:statusString];
+            [JDStatusBarNotification showProgress:sessionStats.progress];
+        } else if (updateType == DFStatusUpdateComplete) {
+            [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
+        } else if (updateType == DFStatusUpdateError) {
+            [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:5];
+        } else if (updateType == DFStatusUpdateCancelled) {
+            [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
+        }
+    });
 }
 
-#pragma mark - Internal Helper Functions
 
-
-- (RKObjectManager *)objectManager {
-    if (!_objectManager) {
-        NSURL *baseURL = [[DFUser currentUser] serverURL];
-        _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
-        
-        // generate response mapping
-        RKObjectMapping *responseMapping = [RKObjectMapping mappingForClass:[DFUploadResponse class]];
-        [responseMapping addAttributeMappingsFromArray:@[@"result", @"debug"]];
-        
-        RKResponseDescriptor *responseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:responseMapping
-                                                                                                method:RKRequestMethodPOST
-                                                                                           pathPattern:AddPhotoResource
-                                                                                               keyPath:nil
-                                                                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-        
-        [_objectManager addResponseDescriptor:responseDescriptor];
-    }
-    return _objectManager;
-}
 
 
 #pragma mark - Core Data helpers

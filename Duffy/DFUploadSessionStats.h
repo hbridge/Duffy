@@ -10,12 +10,8 @@
 
 @interface DFUploadSessionStats : NSObject
 
-@property (atomic) NSMutableSet *uploadedURLs;
-@property (atomic) NSMutableSet *acceptedURLs;
-
-
-@property (nonatomic, readonly) NSUInteger numUploaded;
-@property (nonatomic, readonly) NSUInteger numAcceptedUploads;
+@property (nonatomic) NSUInteger numUploaded;
+@property (nonatomic) NSUInteger numAcceptedUploads;
 @property (nonatomic, readonly) NSUInteger numRemaining;
 @property (nonatomic, readonly) float progress;
 

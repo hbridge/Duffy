@@ -10,25 +10,14 @@
 
 @implementation DFUploadSessionStats
 
-@synthesize fatalError, numConsecutiveRetries, numTotalRetries;
+@synthesize numAcceptedUploads, numUploaded, fatalError, numConsecutiveRetries, numTotalRetries;
 
 - (instancetype)init
 {
     self = [super init];
     if (self) {
-        self.uploadedURLs = [[NSMutableSet alloc] init];
-        self.acceptedURLs = [[NSMutableSet alloc] init];
-    }
+            }
     return self;
-}
-
-
-- (NSUInteger)numUploaded {
-    return self.uploadedURLs.count;
-}
-
-- (NSUInteger)numAcceptedUploads {
-    return self.acceptedURLs.count;
 }
 
 - (NSUInteger)numRemaining {
@@ -38,6 +27,16 @@
 - (float)progress
 {
     return (float)self.numUploaded/(float)self.numAcceptedUploads;
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"SessionStats: accepted:%lu uploaded:%lu remaining:%lu consecutive_retries:%d total_retries:%d",
+            self.numAcceptedUploads,
+            self.numUploaded,
+            self.numRemaining,
+            self.numConsecutiveRetries,
+            self.numTotalRetries];
 }
 
 @end
