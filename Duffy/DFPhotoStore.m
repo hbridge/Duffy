@@ -226,7 +226,6 @@ static DFPhotoStore *defaultStore;
 
 - (void)photosChanged:(NSNotification *)note
 {
-    NSLog(@"DFPhotoStore: notification indicates photo changed");
     [note.userInfo enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         NSString *changeType = (NSString *)obj;
         if ([changeType isEqualToString:DFPhotoChangeTypeAdded] || [changeType isEqualToString:DFPhotoChangeTypeRemoved]) {

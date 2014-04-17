@@ -19,6 +19,7 @@
 #import "DFUser.h"
 #import <HockeySDK/HockeySDK.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <RestKit/RestKit.h>
 
 
 
@@ -38,6 +39,8 @@
     [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"7e0628b85696cfd8bd471f9906fbc79f"];
     [[BITHockeyManager sharedHockeyManager] startManager];
     [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+    
+    RKLogConfigureByName("RestKit/Network", RKLogLevelError);
     
     [Flurry setCrashReportingEnabled:NO];
 #ifdef DEBUG

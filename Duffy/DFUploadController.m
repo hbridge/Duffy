@@ -114,7 +114,9 @@ static DFUploadController *defaultUploadController;
 
     
     [self.photoURLsToUpload addObjectsFromArray:photoURLStrings];
-    [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    if (self.uploadOperationQueue.operationCount == 0) {
+        [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    }
     
     NSLog(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
           (int)photosInQueuePreAdd,
@@ -152,6 +154,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
 {
+    // TODO add a third set for current uploads
     [self.uploadOperationQueue addOperationWithBlock:^{
         DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
         [self uploadPhoto:photo];
@@ -182,7 +185,6 @@ static DFUploadController *defaultUploadController;
             success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
     {
         DFUploadResponse *response = [mappingResult firstObject];
-        NSLog(@"Upload response received.  result:%@ debug:%@", response.result, response.debug);
         if ([response.result isEqualToString:@"true"]) {
             photo.uploadDate = [NSDate date];
             [self uploadFinishedForPhoto:photo];
@@ -272,7 +274,6 @@ static DFUploadController *defaultUploadController;
 - (NSString *)locationJSONStringForPhoto:(DFPhoto *)photo
 {
     if (photo.location == nil) {
-        NSLog(@"photo has no location, skipping.");
         return [@{} JSONString];
     }
     
@@ -288,10 +289,10 @@ static DFUploadController *defaultUploadController;
         dispatch_semaphore_signal(reverseGeocodeSemaphore);
     }];
      
-     dispatch_semaphore_wait(reverseGeocodeSemaphore, DISPATCH_TIME_FOREVER);
+    dispatch_semaphore_wait(reverseGeocodeSemaphore, DISPATCH_TIME_FOREVER);
     
-
-     return [resultDictionary JSONString];
+    
+    return [resultDictionary JSONString];
 }
 
 - (NSString *)faceJSONStringForPhoto:(DFPhoto *)photo
@@ -349,8 +350,6 @@ static DFUploadController *defaultUploadController;
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
     }
-    
-    NSLog(@"upload progress saved.");
 }
 
 - (void)postStatusUpdate
