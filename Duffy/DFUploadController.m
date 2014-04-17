@@ -41,7 +41,9 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
 @property (atomic, retain) NSOperationQueue *uploadOperationQueue;
 @property (atomic, retain) NSMutableOrderedSet *photoURLsToUpload;
+@property (atomic, retain) NSMutableOrderedSet *photoURLsCurrentlyBeingUploaded;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
+@property (atomic) dispatch_semaphore_t enqueueSemaphore;
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
@@ -86,7 +88,9 @@ static DFUploadController *defaultUploadController;
     if (self) {
         self.uploadOperationQueue = [[NSOperationQueue alloc] init];
         self.uploadOperationQueue.maxConcurrentOperationCount = MaxSimultaneousUploads;
+        self.enqueueSemaphore = dispatch_semaphore_create(1);
         self.photoURLsToUpload = [[NSMutableOrderedSet alloc] init];
+        self.photoURLsCurrentlyBeingUploaded = [[NSMutableOrderedSet alloc] init];
         [self setupStatusBarNotifications];
         self.backgroundUpdateTask = UIBackgroundTaskInvalid;
     }
@@ -106,20 +110,19 @@ static DFUploadController *defaultUploadController;
         self.currentSessionStats = [[DFUploadSessionStats alloc] init];
     }
     
-    NSMutableArray *photoURLStrings = [[NSMutableArray alloc] init];
+    NSMutableOrderedSet *photoURLStrings = [[NSMutableOrderedSet alloc] init];
     for (DFPhoto *photo in photos) {
         [photoURLStrings addObject:photo.alAssetURLString];
     }
-    [self.currentSessionStats.acceptedURLs addObjectsFromArray:photoURLStrings];
+    [self.currentSessionStats.acceptedURLs addObjectsFromArray:photoURLStrings.array];
 
+    [photoURLStrings removeObjectsInArray:self.photoURLsCurrentlyBeingUploaded.array]; //need to remove currently uploading ones to prevent dupes
+    [self.photoURLsToUpload addObjectsFromArray:photoURLStrings.array];
     
-    [self.photoURLsToUpload addObjectsFromArray:photoURLStrings];
-    if (self.uploadOperationQueue.operationCount == 0) {
-        [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
-    }
+    [self enqueueFirstPhotoURLForUpload];
     
     NSLog(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
-          (int)photosInQueuePreAdd,
+          (int)photos.count,
           (int)self.photoURLsToUpload.count,
           (int)(self.photoURLsToUpload.count - photosInQueuePreAdd)
           );
@@ -151,19 +154,29 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Private Uploading Code
 
-
-- (void)enqueuePhotoURLForUpload:(NSString *)photoURLString
+- (void)enqueueFirstPhotoURLForUpload
 {
     // TODO add a third set for current uploads
+    
     [self.uploadOperationQueue addOperationWithBlock:^{
+        dispatch_semaphore_wait(self.enqueueSemaphore, DISPATCH_TIME_FOREVER);
+        NSString *photoURLString = [self.photoURLsToUpload firstObject];
+        [self.photoURLsToUpload removeObject:photoURLString];
+        [self.photoURLsCurrentlyBeingUploaded addObject:photoURLString];
+        dispatch_semaphore_signal(self.enqueueSemaphore);
+        
         DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
         [self uploadPhoto:photo];
     }];
+    
 }
 
-- (void)retryLastUpload
+
+
+- (void)retryUploadPhoto:(DFPhoto *)photo
 {
-    [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+    [self uploadPhoto:photo];
+    
     self.currentSessionStats.numTotalRetries++;
     self.currentSessionStats.numConsecutiveRetries++;
     
@@ -192,7 +205,7 @@ static DFUploadController *defaultUploadController;
         } else {
             NSLog(@"File did not upload properly.  Retrying.");
             [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:response.debug];
-            [self retryLastUpload];
+            [self retryUploadPhoto:photo];
         }
     }
             failure:^(RKObjectRequestOperation *operation, NSError *error)
@@ -201,7 +214,7 @@ static DFUploadController *defaultUploadController;
         NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
         [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
         if (error.code == -1001) {//timeout
-            [self retryLastUpload];
+            [self retryUploadPhoto:photo];
         } else {
             [self cancelUploadsWithIsError:YES];
         }
@@ -217,6 +230,7 @@ static DFUploadController *defaultUploadController;
     NSUInteger numLeft = self.photoURLsToUpload.count;
     NSLog(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
     [self.photoURLsToUpload removeAllObjects];
+    [self.photoURLsCurrentlyBeingUploaded removeAllObjects];
     [self.uploadOperationQueue cancelAllOperations];
     self.currentSessionStats = nil;
     
@@ -327,13 +341,13 @@ static DFUploadController *defaultUploadController;
                                                                   object:self
                                                                 userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
     
-    [self.photoURLsToUpload removeObject:photo.alAssetURLString];
+    [self.photoURLsCurrentlyBeingUploaded removeObject:photo.alAssetURLString];
     [self.currentSessionStats.uploadedURLs addObject:photo.alAssetURLString];
     [self postStatusUpdate];
     
-    NSLog(@"Photo upload complete.  %d photos remaining.", (int)self.photoURLsToUpload.count);
+    NSLog(@"Finished uploading %@.  %d left.", photo.alAssetURLString, (int)self.photoURLsToUpload.count);
     if (self.photoURLsToUpload.count > 0) {
-        [self enqueuePhotoURLForUpload:self.photoURLsToUpload.firstObject];
+        [self enqueueFirstPhotoURLForUpload];
         self.currentSessionStats.numConsecutiveRetries = 0;
     } else {
         NSLog(@"all photos uploaded.");
