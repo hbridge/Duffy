@@ -58,7 +58,7 @@ def main(argv):
         for filename in filenames:
             name, ext = os.path.splitext(filename)
 
-            if (ext in [".jpg", ".JPG", ".png", ".PNG"]):
+            if (ext in [".jpg", ".JPG"]):
                 newFilename = os.path.splitext(os.path.basename(filename))[0] + "-thumb-" + str(size) + '.jpg'
                 newFilepath = os.path.join(dirname, newFilename)
                 origFilepath = os.path.join(dirname, filename)
