@@ -178,7 +178,7 @@ static DFUploadController *defaultUploadController;
                     NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
                     [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
                     
-                    if (error.code == -1001) //timeout
+                    if ([self isErrorRetryable:error])
                     {
                         [self retryUploadPhoto:photo];
                     } else {
@@ -194,8 +194,19 @@ static DFUploadController *defaultUploadController;
     }
 }
 
+- (BOOL)isErrorRetryable:(NSError *)error
+{
+    //-1001 = timeout, -1021 = request body stream exhausted
+    if (error.code == -1001 || error.code == -1021) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 - (void)retryUploadPhoto:(DFPhoto *)photo
 {
+    // TODO self.currentSessionStats is not a persistent object any more, move this
     self.currentSessionStats.numTotalRetries++;
     self.currentSessionStats.numConsecutiveRetries++;
     
