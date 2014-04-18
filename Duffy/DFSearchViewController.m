@@ -83,6 +83,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     
     [self setupTableView];
     [self.webView setDelegate:self];
+    [self.webView loadHTMLString:@"<br><center style=\"font-family: sans-serif\">Tap above to get started</center>" baseURL:nil];
     
     [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
     self.automaticallyAdjustsScrollViewInsets = YES;
