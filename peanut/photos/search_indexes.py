@@ -14,7 +14,6 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	classificationData = indexes.CharField(model_attr="classification_data", default="")
 	locationData = indexes.CharField(model_attr="location_data", default="")
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
-	#altTerms = indexes.CharField(default="")
 
 	def get_model(self):
 		return Photo
@@ -29,7 +28,11 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	'''
 	def prepare_text(self, obj):
-		return self.prepared_data['locationData'] + '\n' + self.clean_classData(obj, 20) + '\n' + self.get_altTerms(obj, 20)		
+		#self.add_faceKeywords(obj)
+		return self.add_locData(obj) + '\n' + \
+				self.add_classData(obj, 20) + '\n' + \
+				self.add_altTerms(obj, 20) + '\n' + \
+				self.add_faceKeywords(obj)
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
@@ -41,11 +44,51 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 			return "1900-01-01T01:01:01Z"
 
 	'''
+	Cleans the location data to be inserted in the index
+	'''
+	def add_locData(self, obj):
+		locText = list()
+		if (self.prepared_data['locationData']):
+			locData = json.loads(self.prepared_data['locationData'])
+			if ('address' in locData):
+				address = locData['address']
+				for k, v in address.items():
+					if type(v) is list: 
+						locText.append(' '.join(v))
+					else:
+						if (v not in locText):
+							locText.append(v)
+
+			if ('pois' in locData):
+				pois = locData['pois']
+				for item in pois:
+					#locText += item + '\n'
+					if (item not in locText):
+						locText.append(item)
+
+		return ', '.join(locText)
+
+
+
+	'''
+	Cleans the classification list to only include entries higher than threshold and 
+	removes underscores
+	'''
+	def add_classData(self, obj, threshold):
+		newList = list()
+		if (self.prepared_data['classificationData']):
+			catList = json.loads(obj.classification_data)
+			for entry in catList:
+				if (entry['rating'] > threshold):
+					newList.append(entry['class_name'].replace('_', ' ').encode('ascii'))
+		return ', '.join(newList)
+
+
+	'''
 	loads the list of alternate terms, adds them to the index for any classification that
 	is greater than threshold
 	'''
-
-	def get_altTerms(self, obj, threshold):
+	def add_altTerms(self, obj, threshold):
 		altFilePath = '/home/derek/prod/Duffy/peanut/photos/'
 		f = open(altFilePath + 'alt.txt', 'r')
 		altDict = dict()
@@ -67,18 +110,28 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		return termList
 
 	'''
-	Cleans the classification list to only include entries higher than threshold and 
-	removes underscores
+	adds the keyword 'face, faces, people, person' if there is a photo detected
 	'''
-
-	def clean_classData(self, obj, threshold):
-		newList = list()
-		if (self.prepared_data['classificationData']):
-			catList = json.loads(obj.classification_data)
-			for entry in catList:
-				if (entry['rating'] > threshold):
-					newClass = dict()
-					newClass['class_name'] = entry['class_name'].replace('_', ' ').encode('ascii')
-					newClass['rating'] = entry['rating']
-					newList.append(newClass)
-		return str(newList)
+	def add_faceKeywords(self, obj):
+		faceKeywords = {'face', 'faces', 'people', 'person'}
+		smileKeywords = {'smile', 'smiles', 'smiling'}
+		termList = ""
+		foundSmile = False;
+		foundFace = False;
+		if (obj.iphone_faceboxes_topleft):
+			facedict = json.loads(obj.iphone_faceboxes_topleft)
+			if (len(facedict) > 0):
+				foundFace = True;
+				for k1,v1 in facedict.items():
+					for k2,v2 in v1.items():
+						if ('has_smile' in k2):
+								if (v2 == 'false'):
+									foundSmile = True
+									break
+				if (foundFace == True):
+					termList += ', '.join(faceKeywords)
+				if (foundSmile == True):
+					termList += ',' 
+					termList += ', '.join(smileKeywords)
+				return termList
+		return ''
