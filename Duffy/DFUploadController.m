@@ -158,7 +158,6 @@ static DFUploadController *defaultUploadController;
             
             while (self.numUploadOperations < MaxSimultaneousUploads){
                 self.numUploadOperations++;
-                NSLog(@"numUploadOperations %d", self.numUploadOperations);
                 
                 NSString *photoURLString = [self.uploadURLQueue takeNextObject];
                 if (!photoURLString) {
