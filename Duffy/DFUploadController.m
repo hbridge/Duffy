@@ -46,7 +46,7 @@
 
 
 
-static const unsigned int MaxSimultaneousUploads = 1;
+static const unsigned int MaxSimultaneousUploads = 2;
 static const unsigned int MaxConsecutiveRetries = 5;
 
 
@@ -154,38 +154,42 @@ static DFUploadController *defaultUploadController;
             if (self.numUploadOperations >= MaxSimultaneousUploads) {
                 dispatch_semaphore_signal(self.enqueueSemaphore);
                 return;
-            } else {
-                self.numUploadOperations++;
-                dispatch_semaphore_signal(self.enqueueSemaphore);
             }
-            NSString *photoURLString = [self.uploadURLQueue takeNextObject];
-            if (!photoURLString) {
-                self.numUploadOperations--;
-                return;
-            }
-            DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
             
-            [DFAnalytics logUploadBegan];
-            [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
-                dispatch_async(self.dispatchQueue, ^{
+            while (self.numUploadOperations < MaxSimultaneousUploads){
+                self.numUploadOperations++;
+                NSLog(@"numUploadOperations %d", self.numUploadOperations);
+                
+                NSString *photoURLString = [self.uploadURLQueue takeNextObject];
+                if (!photoURLString) {
                     self.numUploadOperations--;
-                    [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:numBytes];
-                    [self uploadFinishedForPhoto:photo];
-                });
-            } failureBlock:^(NSError *error) {
-                dispatch_async(self.dispatchQueue, ^{
-                    self.numUploadOperations--;
-                    NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
-                    [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
-                    
-                    if ([self isErrorRetryable:error])
-                    {
-                        [self retryUploadPhoto:photo];
-                    } else {
-                        [self cancelUploadsWithIsError:YES];
-                    }
-                });
-            }];
+                    break;
+                }
+                DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
+                
+                [DFAnalytics logUploadBegan];
+                [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
+                    dispatch_async(self.dispatchQueue, ^{
+                        self.numUploadOperations--;
+                        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:numBytes];
+                        [self uploadFinishedForPhoto:photo];
+                    });
+                } failureBlock:^(NSError *error) {
+                    dispatch_async(self.dispatchQueue, ^{
+                        self.numUploadOperations--;
+                        NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
+                        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
+                        
+                        if ([self isErrorRetryable:error])
+                        {
+                            [self retryUploadPhoto:photo];
+                        } else {
+                            [self cancelUploadsWithIsError:YES];
+                        }
+                    });
+                }];
+            }
+            dispatch_semaphore_signal(self.enqueueSemaphore);
         });
     } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
         NSLog(@"No photos remaining.");
