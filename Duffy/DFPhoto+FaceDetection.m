@@ -25,7 +25,6 @@
             CIImage *ciImage = [[CIImage alloc] initWithCGImage:[scaledRotatedImage CGImage]];
             
             CIContext *context = [CIContext contextWithOptions:nil];
-            
             NSDictionary *opts = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
             CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
                                                       context:context

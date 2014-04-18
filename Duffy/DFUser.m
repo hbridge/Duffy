@@ -124,4 +124,11 @@ static DFUser *currentUser;
     return [NSURL URLWithString:URLString];
 }
 
+
+- (unsigned int) devicePhysicalMemoryMB
+{
+    unsigned long long memoryInBytes = [[NSProcessInfo processInfo] physicalMemory];
+    return (unsigned int)(memoryInBytes/1000/1000);
+}
+
 @end

@@ -32,6 +32,8 @@
 @property (atomic) dispatch_semaphore_t enqueueSemaphore;
 @property (atomic, retain) DFUploadQueue *uploadURLQueue;
 @property (atomic) unsigned int numUploadOperations;
+@property (atomic) unsigned int consecutiveRetryCount;
+@property (atomic) unsigned int sessionRetryCount;
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
@@ -90,6 +92,9 @@ static DFUploadController *defaultUploadController;
     DFUploadSessionStats *stats = [[DFUploadSessionStats alloc] init];
     stats.numAcceptedUploads = self.uploadURLQueue.numTotalObjects;
     stats.numUploaded = self.uploadURLQueue.numObjectsComplete;
+    stats.numConsecutiveRetries = self.consecutiveRetryCount;
+    stats.numTotalRetries = self.sessionRetryCount;
+    
     return stats;
 }
 
@@ -210,12 +215,12 @@ static DFUploadController *defaultUploadController;
 - (void)retryUploadPhoto:(DFPhoto *)photo
 {
     // TODO self.currentSessionStats is not a persistent object any more, move this
-    self.currentSessionStats.numTotalRetries++;
-    self.currentSessionStats.numConsecutiveRetries++;
+    self.consecutiveRetryCount++;
+    self.sessionRetryCount++;
     
-    if (self.currentSessionStats.numConsecutiveRetries > MaxConsecutiveRetries) {
+    if (self.consecutiveRetryCount > MaxConsecutiveRetries) {
         [self cancelUploadsWithIsError:YES];
-        [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
+        [DFAnalytics logUploadRetryCountExceededWithCount:self.consecutiveRetryCount];
     } else {
         [self.uploadURLQueue moveInProgressObjectBackToQueue:photo.alAssetURLString];
         [self uploadQueueChanged];
@@ -252,7 +257,7 @@ static DFUploadController *defaultUploadController;
                                                                 userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
     
     
-    self.currentSessionStats.numConsecutiveRetries = 0;
+    self.consecutiveRetryCount = 0;
     [self.uploadURLQueue markObjectCompleted:photo.alAssetURLString];
     [self uploadQueueChanged];
 }

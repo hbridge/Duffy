@@ -12,6 +12,7 @@
 
 @property (readonly, nonatomic, retain) NSString *deviceID;
 @property (nonatomic, retain) NSString *hardwareDeviceID;
+@property (nonatomic, readonly) unsigned int devicePhysicalMemoryMB;
 @property (nonatomic, retain) NSString *userOverriddenDeviceID;
 @property (nonatomic, retain) NSString *userID;
 @property (nonatomic, retain) NSString *firstName;

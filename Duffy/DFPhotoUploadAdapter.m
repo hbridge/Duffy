@@ -98,11 +98,21 @@ static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
 
 - (NSDictionary *)postParametersForPhoto:(DFPhoto *)photo
 {
+    NSLog(@"device memory MB: %d", [[DFUser currentUser] devicePhysicalMemoryMB]);
+    
+    NSString *faceInfoJSONString;
+    if ([[DFUser currentUser] devicePhysicalMemoryMB] > 1000) {
+        faceInfoJSONString = [self faceJSONStringForPhoto:photo];
+    } else {
+        faceInfoJSONString = @"{}";
+    }
+    
+    
     NSDictionary *params = @{
                              UserIDParameterKey: [[DFUser currentUser] deviceID],
                              PhotoMetadataKey: [self metadataJSONStringForPhoto:photo],
                              PhotoLocationKey: [self locationJSONStringForPhoto:photo],
-                             PhotoFacesKey:    [self faceJSONStringForPhoto:photo],
+                             PhotoFacesKey:    faceInfoJSONString,
                              };
     
     return params;
