@@ -167,20 +167,24 @@ static DFUploadController *defaultUploadController;
             
             [DFAnalytics logUploadBegan];
             [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
-                self.numUploadOperations--;
-                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:numBytes];
-                [self uploadFinishedForPhoto:photo];
+                dispatch_async(self.dispatchQueue, ^{
+                    self.numUploadOperations--;
+                    [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:numBytes];
+                    [self uploadFinishedForPhoto:photo];
+                });
             } failureBlock:^(NSError *error) {
-                self.numUploadOperations--;
-                NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
-                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
-                
-                if (error.code == -1001) //timeout
-                {
-                    [self retryUploadPhoto:photo];
-                } else {
-                    [self cancelUploadsWithIsError:YES];
-                }
+                dispatch_async(self.dispatchQueue, ^{
+                    self.numUploadOperations--;
+                    NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
+                    [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
+                    
+                    if (error.code == -1001) //timeout
+                    {
+                        [self retryUploadPhoto:photo];
+                    } else {
+                        [self cancelUploadsWithIsError:YES];
+                    }
+                });
             }];
         });
     } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
@@ -228,17 +232,15 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadFinishedForPhoto:(DFPhoto *)photo
 {
-    dispatch_async(self.dispatchQueue, ^{
-        [self saveUploadProgress];
-        [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                                      object:self
-                                                                    userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
-        
-        
-        self.currentSessionStats.numConsecutiveRetries = 0;
-        [self.uploadURLQueue markObjectCompleted:photo.alAssetURLString];
-        [self uploadQueueChanged];
-    });
+    [self saveUploadProgress];
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                                  object:self
+                                                                userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
+    
+    
+    self.currentSessionStats.numConsecutiveRetries = 0;
+    [self.uploadURLQueue markObjectCompleted:photo.alAssetURLString];
+    [self uploadQueueChanged];
 }
 
 - (void)saveUploadProgress
