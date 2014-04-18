@@ -31,6 +31,8 @@ static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
 
+static const unsigned int FaceDetectionMinMemory = 1000;
+
 
 @interface DFPhotoUploadAdapter()
 
@@ -98,10 +100,8 @@ static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
 
 - (NSDictionary *)postParametersForPhoto:(DFPhoto *)photo
 {
-    NSLog(@"device memory MB: %d", [[DFUser currentUser] devicePhysicalMemoryMB]);
-    
     NSString *faceInfoJSONString;
-    if ([[DFUser currentUser] devicePhysicalMemoryMB] > 1000) {
+    if ([[DFUser currentUser] devicePhysicalMemoryMB] >= FaceDetectionMinMemory) {
         faceInfoJSONString = [self faceJSONStringForPhoto:photo];
     } else {
         faceInfoJSONString = @"{}";
