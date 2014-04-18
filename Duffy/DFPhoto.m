@@ -191,13 +191,15 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     }
     
     if (self.asset) {
-        CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
-        UIImage *image = [UIImage imageWithCGImage:imageRef
-                                             scale:self.asset.defaultRepresentation.scale
-                                       orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
-        [[DFPhotoImageCache sharedCache] setFullResolutionImage:image
-                                forPhotoWithURLString:self.alAssetURLString];
-        successBlock(image);
+        @autoreleasepool {
+            CGImageRef imageRef = [[self.asset defaultRepresentation] fullResolutionImage];
+            UIImage *image = [UIImage imageWithCGImage:imageRef
+                                                 scale:self.asset.defaultRepresentation.scale
+                                           orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
+            [[DFPhotoImageCache sharedCache] setFullResolutionImage:image
+                                              forPhotoWithURLString:self.alAssetURLString];
+            successBlock(image);
+        }
     } else {
         failureBlock([NSError errorWithDomain:@"" code:-1
                                      userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
