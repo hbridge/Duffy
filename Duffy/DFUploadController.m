@@ -34,6 +34,7 @@
 @property (atomic) unsigned int numUploadOperations;
 @property (atomic) unsigned int consecutiveRetryCount;
 @property (atomic) unsigned int sessionRetryCount;
+@property (atomic) dispatch_semaphore_t saveSemaphore;
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
@@ -79,6 +80,7 @@ static DFUploadController *defaultUploadController;
     if (self) {
         self.dispatchQueue = dispatch_queue_create("com.duffyapp.DFUploadController.dispatchQueue", DISPATCH_QUEUE_CONCURRENT);
         self.enqueueSemaphore = dispatch_semaphore_create(1);
+        self.saveSemaphore = dispatch_semaphore_create(1);
         self.uploadURLQueue = [[DFUploadQueue alloc] init];
         [self setupStatusBarNotifications];
         self.backgroundUpdateTask = UIBackgroundTaskInvalid;
@@ -264,12 +266,13 @@ static DFUploadController *defaultUploadController;
 
 - (void)saveUploadProgress
 {
-    
+    dispatch_semaphore_wait(self.saveSemaphore, DISPATCH_TIME_FOREVER);
     NSError *error = nil;
     if(![self.managedObjectContext save:&error]) {
         NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
         [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
     }
+    dispatch_semaphore_signal(self.saveSemaphore);
 }
 
 - (void)postStatusUpdate
