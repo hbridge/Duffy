@@ -112,8 +112,7 @@
         self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
     }
     
-    NSSet *dbKnownURLs = [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
-    [self.cameraRollSyncController asyncSyncToCameraRollWithCurrentKnownPhotoURLs:dbKnownURLs];
+    [self.cameraRollSyncController asyncSyncToCameraRoll];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

@@ -10,6 +10,6 @@
 
 @interface DFCameraRollSyncController : NSObject
 
-- (void)asyncSyncToCameraRollWithCurrentKnownPhotoURLs:(NSSet *)knownURLs;
+- (void)asyncSyncToCameraRoll;
 
 @end
