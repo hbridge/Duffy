@@ -14,9 +14,9 @@
 {
     
     if (![NSJSONSerialization isValidJSONObject:self]) {
-        NSLog(@"json invalid for dict, enumerating types");
+        NSLog(@"Warning: json invalid for dict, enumerating types and removing unsafe types.");
         [self enumerateObjectTypes:@""];
-        
+        return [[self dictionaryWithNonJSONRemoved] JSONString];
     }
     
     NSError *error;

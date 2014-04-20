@@ -45,8 +45,9 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+#ifdef DEBUG
     NSLog(@"photo metadata: %@", [self.photo.metadataDictionary JSONString]);
+#endif
 }
 
 - (void)didReceiveMemoryWarning
