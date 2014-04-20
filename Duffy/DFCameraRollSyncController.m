@@ -111,12 +111,12 @@
     };
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        [[[DFPhotoStore sharedStore] assetsLibrary] enumerateGroupsWithTypes:ALAssetsGroupAll | ALAssetsGroupLibrary
-                                          usingBlock:assetGroupEnumerator
-                                        failureBlock: ^(NSError *error) {
-                                            NSLog(@"Failure");
-                                        }];
-        
+        [[[DFPhotoStore sharedStore] assetsLibrary]
+         enumerateGroupsWithTypes:ALAssetsGroupLibrary | ALAssetsGroupAlbum | ALAssetsGroupSavedPhotos
+         usingBlock:assetGroupEnumerator
+         failureBlock: ^(NSError *error) {
+             NSLog(@"Failure");
+         }];
     });
 }
 
