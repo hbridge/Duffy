@@ -153,7 +153,8 @@ static int const FetchStride = 500;
         }
         
         [allObjects addObjectsFromArray:result];
-        numFetched += predicates.count;
+        numFetched += predicates.count; // we use the predicates count to avoid getting into an infinite loop
+                                        // in case one of the search terms wasn't found in the DB
     }
     
     return allObjects;
