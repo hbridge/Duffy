@@ -120,24 +120,33 @@ static DFPhotoStore *defaultStore;
 }
 
 
-- (DFPhoto *)photoWithALAssetURL:(NSURL *)url context:(NSManagedObjectContext *)context
++ (DFPhoto *)photoWithALAssetURLStrings:(NSString *)assetURLString context:(NSManagedObjectContext *)context
+{
+    return [[self photosWithALAssetURLStrings:[NSSet setWithObject:assetURLString] context:context] firstObject];
+}
+
++ (NSArray *)photosWithALAssetURLStrings:(NSSet *)assetURLStrings context:(NSManagedObjectContext *)context;
 {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
     
-    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", url.absoluteString];
-
-    request.predicate = predicate;
+    NSMutableArray *predicates = [[NSMutableArray alloc] init];
+    for (NSString *urlString in assetURLStrings) {
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", urlString];
+        [predicates addObject:predicate];
+    }
+    
+    request.predicate = [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
     
     NSError *error;
     NSArray *result = [context executeFetchRequest:request error:&error];
     if (!result) {
-        [NSException raise:@"Could search for photos."
+        [NSException raise:@"Could search for photos with ALAssetURLs."
                     format:@"Error: %@", [error localizedDescription]];
     }
     
-    return [result firstObject];
+    return result;
 }
 
 - (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded

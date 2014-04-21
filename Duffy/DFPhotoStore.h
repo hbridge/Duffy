@@ -27,6 +27,7 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 - (DFPhotoCollection *)cameraRoll;
 - (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;
++ (NSArray *)photosWithALAssetURLStrings:(NSSet *)assetURLStrings context:(NSManagedObjectContext *)context;
 
 
 // Core data stack

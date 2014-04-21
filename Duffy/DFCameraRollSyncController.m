@@ -14,6 +14,18 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFAnalytics.h"
 
+
+@interface DFPhotoFingerprint : NSObject
+
+@property (nonatomic, retain) NSString *alAssetURLString;
+@property (nonatomic, retain) NSData *hash;
+
+@end
+@implementation DFPhotoFingerprint
+@end
+
+
+
 @interface DFCameraRollSyncController()
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
@@ -37,42 +49,73 @@
 
 - (void)asyncSyncToCameraRoll
 {
-    [self findNewAssets];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        dispatch_semaphore_wait(self.syncSemaphore, DISPATCH_TIME_FOREVER);
+
+        DFPhotoCollection *knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
+        NSDictionary *changes = [self findChangesWithKnownPhotos:knownPhotos];
+        
+        
+        // save changes
+        [self saveChanges:changes];
+        
+        dispatch_semaphore_signal(self.syncSemaphore);
+        
+        // gather info about total changes then send notification that a scan completed
+        NSDictionary *changeTypesToCounts = [self changeTypesToCountsForChanges:changes];
+        NSUInteger numAdded = [(NSNumber *)changeTypesToCounts[DFPhotoChangeTypeAdded] unsignedIntegerValue];
+        NSUInteger numDeleted = [(NSNumber *)changeTypesToCounts[DFPhotoChangeTypeRemoved] unsignedIntegerValue];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [DFAnalytics logCameraRollScanTotalAssets:knownPhotos.photoSet.count + numAdded - numDeleted
+                                          addedAssets:numAdded];
+            [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
+        });
+    });
 }
 
-- (void)findNewAssets
-{    
+- (NSDictionary *)changeTypesToCountsForChanges:(NSDictionary *)changes
+{
+    NSMutableDictionary *changeTypesToCounts = [[NSMutableDictionary alloc] init];
+    for (NSString *changeType in @[DFPhotoChangeTypeAdded, DFPhotoChangeTypeMetadata, DFPhotoChangeTypeRemoved]) {
+        NSSet *keysForType = [changes keysOfEntriesPassingTest:^BOOL(id key, NSString *changeTypeForKey, BOOL *stop) {
+            if ([changeTypeForKey isEqualToString:changeType]) return YES;
+            return NO;
+        }];
+        changeTypesToCounts[changeType] = [NSNumber numberWithUnsignedInteger:keysForType.count];
+    }
+    
+    return changeTypesToCounts;
+}
+
+
+typedef void (^DFScanCompletionBlock)(NSDictionary *objectIDsToChanges);
+
+
+- (NSDictionary *)findChangesWithKnownPhotos:(DFPhotoCollection *)knownPhotos
+{
+    dispatch_semaphore_t findNewAssetSemaphore = dispatch_semaphore_create(0);
     NSMutableSet __block *knownAndFoundURLs;
+    NSMutableSet __block *knownNotFoundURLs;
     unsigned int __block groupNewAssets = 0;
     unsigned int __block totalNewAssets = 0;
     NSMutableDictionary __block *objectIDsToChanges = [[NSMutableDictionary alloc] init];
     
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
         if(photoAsset != NULL) {
-            //TODO should also look for items in DB that have been desleted
-            
-            NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
-#ifdef DEBUG
-            NSLog(@"Scanning asset: %@", assetURL.absoluteString);
-#endif
-            if (![knownAndFoundURLs containsObject:assetURL.absoluteString])
+            NSString *assetURLString = [[photoAsset valueForProperty: ALAssetPropertyAssetURL] absoluteString];
+            #ifdef DEBUG
+            NSLog(@"Scanning asset: %@", assetURLString);
+            #endif
+            [knownNotFoundURLs removeObject:assetURLString];
+            if (![knownAndFoundURLs containsObject:assetURLString])
             {
-                //NSLog(@"...asset is new, adding to database.");
-                // we haven't seent this photo before, add it to our database
-                // have to add on main thread, since CoreData is not thread safe
-                DFPhoto *newPhoto = [NSEntityDescription
-                                     insertNewObjectForEntityForName:@"DFPhoto"
-                                     inManagedObjectContext:self.managedObjectContext];
-                newPhoto.alAssetURLString = assetURL.absoluteString;
-                newPhoto.creationDate = [photoAsset valueForProperty:ALAssetPropertyDate];
+                DFPhoto *newPhoto = [self addPhotoForAsset:photoAsset];
                 
                 // store information about the new photo to notify
                 groupNewAssets++;
                 objectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
                 // add to list of knownURLs so we don't duplicate add it
-                [knownAndFoundURLs addObject:assetURL.absoluteString];
-            } else {
-                //NSLog(@"...asset is not new.");
+                [knownAndFoundURLs addObject:assetURLString];
             }
         } else {
             NSLog(@"...all assets in group enumerated, %d new assets.", groupNewAssets);
@@ -82,57 +125,72 @@
     
     void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
     	if(group != nil) {
-            // only want photos for now
             groupNewAssets = 0;
-            [group setAssetsFilter:[ALAssetsFilter allPhotos]];
+            [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
             NSLog(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
     		[group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:assetEnumerator];
     	} else {
-            // save to the store so that the main thread context can pick it up
-            NSError *error = nil;
-            if (self.managedObjectContext.hasChanges) {
-                NSLog(@"Camera roll sync made changes (%d new assets).  Saving... ", totalNewAssets);
-                if(![self.managedObjectContext save:&error]) {
-                    NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
-                    [NSException raise:@"Could not save new photo object." format:@"Error: %@",[error localizedDescription]];
-                } else {
-                    // successfull save, post notification
-                    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                                                  object:self
-                                                                                userInfo:objectIDsToChanges];
-                }
-            }
-            
-            [DFAnalytics logCameraRollScanTotalAssets:knownAndFoundURLs.count
-                                          addedAssets:totalNewAssets];
-            dispatch_semaphore_signal(self.syncSemaphore);
-            
-            [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
+            dispatch_semaphore_signal(findNewAssetSemaphore);
         }
     };
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-        dispatch_semaphore_wait(self.syncSemaphore, DISPATCH_TIME_FOREVER);
-        NSSet *dbKnownURLs = [self knownPhotoURLs];
-        knownAndFoundURLs = [dbKnownURLs mutableCopy];
-        
-        [[[DFPhotoStore sharedStore] assetsLibrary]
-         enumerateGroupsWithTypes:ALAssetsGroupLibrary | ALAssetsGroupAlbum | ALAssetsGroupSavedPhotos
-         usingBlock:assetGroupEnumerator
-         failureBlock: ^(NSError *error) {
-             NSLog(@"Failure");
-         }];
-    });
-}
-
-- (void)findDeletedAssets
-{
+    knownAndFoundURLs = [[knownPhotos photoURLSet] mutableCopy];
+    knownNotFoundURLs = [[knownPhotos photoURLSet] mutableCopy];
     
+    [[[DFPhotoStore sharedStore] assetsLibrary]
+     enumerateGroupsWithTypes:ALAssetsGroupLibrary | ALAssetsGroupAlbum | ALAssetsGroupSavedPhotos
+     usingBlock:assetGroupEnumerator
+     failureBlock: ^(NSError *error) {
+         NSLog(@"Failed to enumerate photo groups: %@", error.localizedDescription);
+         dispatch_semaphore_signal(findNewAssetSemaphore);
+     }];
+    dispatch_semaphore_wait(findNewAssetSemaphore, DISPATCH_TIME_FOREVER);
+    
+    [objectIDsToChanges addEntriesFromDictionary:[self removePhotosNotFound:knownNotFoundURLs]];
+    
+    return objectIDsToChanges;
 }
 
-- (NSSet *)knownPhotoURLs
+- (DFPhoto *)addPhotoForAsset:(ALAsset *)asset
 {
-    return [[DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext] photoURLSet];
+    DFPhoto *newPhoto = [NSEntityDescription
+                         insertNewObjectForEntityForName:@"DFPhoto"
+                         inManagedObjectContext:self.managedObjectContext];
+    newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
+    newPhoto.creationDate = [asset valueForProperty:ALAssetPropertyDate];
+    return newPhoto;
+}
+
+- (NSDictionary *)removePhotosNotFound:(NSSet *)photoURLsNotFound
+{
+    NSLog(@"%lu photos in DB not present on device.", photoURLsNotFound.count);
+    NSMutableDictionary *objectIDsToChanges = [[NSMutableDictionary alloc] init];
+    NSArray *photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:photoURLsNotFound context:self.managedObjectContext];
+    
+    for (DFPhoto *photo in photosToRemove) {
+        NSLog(@"Photo with ALAsset: %@ no longer in camera roll.  Removing from DB", photo.alAssetURLString);
+        objectIDsToChanges[photo.objectID] = DFPhotoChangeTypeRemoved;
+        [self.managedObjectContext deleteObject:photo];
+    }
+    
+    return objectIDsToChanges;
+}
+
+- (void)saveChanges:(NSDictionary *)accumulatedChanges
+{
+    // save to the store so that the main thread context can pick it up
+    NSError *error = nil;
+    if (self.managedObjectContext.hasChanges) {
+        NSLog(@"Camera roll sync made changes.  Saving... ");
+        if(![self.managedObjectContext save:&error]) {
+            NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+            [NSException raise:@"Could not save camera roll sync changes." format:@"Error: %@",[error localizedDescription]];
+        } else {
+            [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                                          object:self
+                                                                        userInfo:accumulatedChanges];
+        }
+    }
 }
 
 - (NSManagedObjectContext *)managedObjectContext

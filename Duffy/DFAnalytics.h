@@ -19,7 +19,7 @@ extern NSString* const DFAnalyticsValueResultAborted;
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
-+ (void)logCameraRollScanTotalAssets:(NSInteger)totalAssets addedAssets:(NSInteger)numAdded;
++ (void)logCameraRollScanTotalAssets:(NSUInteger)totalAssets addedAssets:(NSUInteger)numAdded;
 + (void)logSwitchBetweenPhotos:(NSString *)actionType;
 
 + (void)logSearchLoadStartedWithQuery:(NSString *)query

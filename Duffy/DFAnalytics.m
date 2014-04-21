@@ -114,12 +114,12 @@ static DFAnalytics *defaultLogger;
     return [NSString stringWithFormat:@"%@%@", [viewController.class description], ControllerViewedEventSuffix];
 }
 
-+ (void)logCameraRollScanTotalAssets:(NSInteger)totalAssets addedAssets:(NSInteger)numAdded
++ (void)logCameraRollScanTotalAssets:(NSUInteger)totalAssets addedAssets:(NSUInteger)numAdded
 {
     [Flurry logEvent:CameraRollScannedEvent
       withParameters:@{
-                       PhotosTotalKey: [NSNumber numberWithInteger:totalAssets],
-                       PhotosAddedKey: [NSNumber numberWithInteger:numAdded],
+                       PhotosTotalKey: [NSNumber numberWithUnsignedInteger:totalAssets],
+                       PhotosAddedKey: [NSNumber numberWithUnsignedInteger:numAdded],
                        }];
 }
 
