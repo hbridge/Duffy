@@ -163,9 +163,9 @@ typedef void (^DFScanCompletionBlock)(NSDictionary *objectIDsToChanges);
 
 - (NSDictionary *)removePhotosNotFound:(NSSet *)photoURLsNotFound
 {
-    NSLog(@"%lu photos in DB not present on device.", photoURLsNotFound.count);
+    NSLog(@"%lu photos in DB not present on device.", (unsigned long)photoURLsNotFound.count);
     NSMutableDictionary *objectIDsToChanges = [[NSMutableDictionary alloc] init];
-    NSArray *photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:photoURLsNotFound context:self.managedObjectContext];
+    NSArray *photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:photoURLsNotFound.allObjects context:self.managedObjectContext];
     
     for (DFPhoto *photo in photosToRemove) {
         NSLog(@"Photo with ALAsset: %@ no longer in camera roll.  Removing from DB", photo.alAssetURLString);

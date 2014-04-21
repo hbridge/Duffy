@@ -122,31 +122,41 @@ static DFPhotoStore *defaultStore;
 
 + (DFPhoto *)photoWithALAssetURLStrings:(NSString *)assetURLString context:(NSManagedObjectContext *)context
 {
-    return [[self photosWithALAssetURLStrings:[NSSet setWithObject:assetURLString] context:context] firstObject];
+    return [[self photosWithALAssetURLStrings:[NSArray arrayWithObject:assetURLString] context:context] firstObject];
 }
 
-+ (NSArray *)photosWithALAssetURLStrings:(NSSet *)assetURLStrings context:(NSManagedObjectContext *)context;
+static int const FetchStride = 500;
+
++ (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 {
-    NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
-    request.entity = entity;
-    
-    NSMutableArray *predicates = [[NSMutableArray alloc] init];
-    for (NSString *urlString in assetURLStrings) {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", urlString];
-        [predicates addObject:predicate];
+    NSMutableArray *allObjects = [[NSMutableArray alloc] init];
+    NSUInteger numFetched = 0;
+    while (numFetched < assetURLStrings.count) {
+        NSFetchRequest *request = [[NSFetchRequest alloc] init];
+        NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+        request.entity = entity;
+        
+        NSMutableArray *predicates = [[NSMutableArray alloc] init];
+        for (int i = numFetched; i < MIN(numFetched + FetchStride, assetURLStrings.count); i++) {
+            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", assetURLStrings[i]];
+            [predicates addObject:predicate];
+        }
+        
+        NSPredicate *orPredicate = [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
+        request.predicate = orPredicate;
+        
+        NSError *error;
+        NSArray *result = [context executeFetchRequest:request error:&error];
+        if (!result) {
+            [NSException raise:@"Could search for photos with ALAssetURLs."
+                        format:@"Error: %@", [error localizedDescription]];
+        }
+        
+        [allObjects addObjectsFromArray:result];
+        numFetched += predicates.count;
     }
     
-    request.predicate = [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
-    
-    NSError *error;
-    NSArray *result = [context executeFetchRequest:request error:&error];
-    if (!result) {
-        [NSException raise:@"Could search for photos with ALAssetURLs."
-                    format:@"Error: %@", [error localizedDescription]];
-    }
-    
-    return result;
+    return allObjects;
 }
 
 - (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded
