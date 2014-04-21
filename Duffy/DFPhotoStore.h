@@ -23,6 +23,7 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 @property (readonly, strong, nonatomic) ALAssetsLibrary *assetsLibrary;
 
 // Main accessors for data
++ (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context; // used for accessing on another thread using a different context
 - (DFPhotoCollection *)cameraRoll;
 - (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;

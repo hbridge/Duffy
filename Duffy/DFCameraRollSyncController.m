@@ -41,14 +41,8 @@
 }
 
 - (void)findNewAssets
-{
-    // TODO this could block the main thread, we should really get the list of known URLs from our sync context
-    // this requires also observing save changes and merging them in, although currently this class is the only one
-    // modifying whether there is stuff in the camera roll
-    
-    dispatch_semaphore_wait(self.syncSemaphore, DISPATCH_TIME_FOREVER);
-    NSSet *dbKnownURLs = [self knownPhotoURLs];
-    NSMutableSet __block *knownAndFoundURLs = [dbKnownURLs mutableCopy];
+{    
+    NSMutableSet __block *knownAndFoundURLs;
     unsigned int __block groupNewAssets = 0;
     unsigned int __block totalNewAssets = 0;
     NSMutableDictionary __block *objectIDsToChanges = [[NSMutableDictionary alloc] init];
@@ -58,7 +52,9 @@
             //TODO should also look for items in DB that have been desleted
             
             NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
+#ifdef DEBUG
             NSLog(@"Scanning asset: %@", assetURL.absoluteString);
+#endif
             if (![knownAndFoundURLs containsObject:assetURL.absoluteString])
             {
                 //NSLog(@"...asset is new, adding to database.");
@@ -116,6 +112,10 @@
     };
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
+        dispatch_semaphore_wait(self.syncSemaphore, DISPATCH_TIME_FOREVER);
+        NSSet *dbKnownURLs = [self knownPhotoURLs];
+        knownAndFoundURLs = [dbKnownURLs mutableCopy];
+        
         [[[DFPhotoStore sharedStore] assetsLibrary]
          enumerateGroupsWithTypes:ALAssetsGroupLibrary | ALAssetsGroupAlbum | ALAssetsGroupSavedPhotos
          usingBlock:assetGroupEnumerator
@@ -132,9 +132,7 @@
 
 - (NSSet *)knownPhotoURLs
 {
-//    NSManagedObjectModel *managedObjectModel = [[DFPhotoStore sharedStore] managedObjectModel];
-//    
-    return [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
+    return [[DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext] photoURLSet];
 }
 
 - (NSManagedObjectContext *)managedObjectContext
