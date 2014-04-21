@@ -37,12 +37,17 @@
 
 - (void)asyncSyncToCameraRoll
 {
+    [self findNewAssets];
+}
+
+- (void)findNewAssets
+{
     // TODO this could block the main thread, we should really get the list of known URLs from our sync context
     // this requires also observing save changes and merging them in, although currently this class is the only one
     // modifying whether there is stuff in the camera roll
     
     dispatch_semaphore_wait(self.syncSemaphore, DISPATCH_TIME_FOREVER);
-    NSSet *dbKnownURLs = [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
+    NSSet *dbKnownURLs = [self knownPhotoURLs];
     NSMutableSet __block *knownAndFoundURLs = [dbKnownURLs mutableCopy];
     unsigned int __block groupNewAssets = 0;
     unsigned int __block totalNewAssets = 0;
@@ -53,7 +58,7 @@
             //TODO should also look for items in DB that have been desleted
             
             NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
-            //NSLog(@"Scanning asset: %@", assetURL.absoluteString);
+            NSLog(@"Scanning asset: %@", assetURL.absoluteString);
             if (![knownAndFoundURLs containsObject:assetURL.absoluteString])
             {
                 //NSLog(@"...asset is new, adding to database.");
@@ -120,13 +125,25 @@
     });
 }
 
+- (void)findDeletedAssets
+{
+    
+}
+
+- (NSSet *)knownPhotoURLs
+{
+//    NSManagedObjectModel *managedObjectModel = [[DFPhotoStore sharedStore] managedObjectModel];
+//    
+    return [[[DFPhotoStore sharedStore] cameraRoll] photoURLSet];
+}
+
 - (NSManagedObjectContext *)managedObjectContext
 {
     if (_managedObjectContext != nil) {
         return _managedObjectContext;
     }
     
-    NSPersistentStoreCoordinator *coordinator = [[DFPhotoStore sharedStore] persistentStoreCoordinator];
+    NSPersistentStoreCoordinator *coordinator = [DFPhotoStore persistentStoreCoordinator];
     if (coordinator != nil) {
         _managedObjectContext = [[NSManagedObjectContext alloc] init];
         [_managedObjectContext setPersistentStoreCoordinator:coordinator];

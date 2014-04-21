@@ -322,7 +322,7 @@ static DFUploadController *defaultUploadController;
         return _managedObjectContext;
     }
     
-    NSPersistentStoreCoordinator *coordinator = [[DFPhotoStore sharedStore] persistentStoreCoordinator];
+    NSPersistentStoreCoordinator *coordinator = [DFPhotoStore persistentStoreCoordinator];
     if (coordinator != nil) {
         _managedObjectContext = [[NSManagedObjectContext alloc] init];
         [_managedObjectContext setPersistentStoreCoordinator:coordinator];

@@ -22,8 +22,6 @@
 
 @implementation DFPhotoStore
 
-@synthesize managedObjectModel = _managedObjectModel;
-@synthesize persistentStoreCoordinator = _persistentStoreCoordinator;
 @synthesize assetsLibrary = _assetsLibrary;
 
 
@@ -96,7 +94,13 @@ static DFPhotoStore *defaultStore;
 
 - (void)loadCameraRollDB
 {
+    self.cameraRoll = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
     
+    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
+}
+
++ (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context
+{
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     
     NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
@@ -106,21 +110,20 @@ static DFPhotoStore *defaultStore;
     request.sortDescriptors = [NSArray arrayWithObject:dateSort];
     
     NSError *error;
-    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    NSArray *result = [context executeFetchRequest:request error:&error];
     if (!result) {
         [NSException raise:@"Could not fetch photos"
                     format:@"Error: %@", [error localizedDescription]];
     }
     
-    self.cameraRoll = [[DFPhotoCollection alloc] initWithPhotos:result];
-    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
+    return [[DFPhotoCollection alloc] initWithPhotos:result];
 }
 
 
 - (DFPhoto *)photoWithALAssetURL:(NSURL *)url context:(NSManagedObjectContext *)context
 {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
     
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", url.absoluteString];
@@ -140,7 +143,7 @@ static DFPhotoStore *defaultStore;
 - (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded
 {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [[[self managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
     request.entity = entity;
     
     NSPredicate *predicate;
@@ -252,7 +255,7 @@ static DFPhotoStore *defaultStore;
         return _managedObjectContext;
     }
     
-    NSPersistentStoreCoordinator *coordinator = [self persistentStoreCoordinator];
+    NSPersistentStoreCoordinator *coordinator = [DFPhotoStore persistentStoreCoordinator];
     if (coordinator != nil) {
         _managedObjectContext = [[NSManagedObjectContext alloc] init];
         [_managedObjectContext setPersistentStoreCoordinator:coordinator];
@@ -260,9 +263,12 @@ static DFPhotoStore *defaultStore;
     return _managedObjectContext;
 }
 
+static NSManagedObjectModel *_managedObjectModel = nil;
+static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
+
 // Returns the managed object model for the application.
 // If the model doesn't already exist, it is created from the application's model.
-- (NSManagedObjectModel *)managedObjectModel
++ (NSManagedObjectModel *)managedObjectModel
 {
     if (_managedObjectModel != nil) {
         return _managedObjectModel;
@@ -274,13 +280,13 @@ static DFPhotoStore *defaultStore;
 
 // Returns the persistent store coordinator for the application.
 // If the coordinator doesn't already exist, it is created and the application's store added to it.
-- (NSPersistentStoreCoordinator *)persistentStoreCoordinator
++ (NSPersistentStoreCoordinator *)persistentStoreCoordinator
 {
     if (_persistentStoreCoordinator != nil) {
         return _persistentStoreCoordinator;
     }
     
-    NSURL *storeURL = [[self applicationDocumentsDirectory] URLByAppendingPathComponent:@"Duffy.sqlite"];
+    NSURL *storeURL = [[DFPhotoStore applicationDocumentsDirectory] URLByAppendingPathComponent:@"Duffy.sqlite"];
     
     NSError *error = nil;
     _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
@@ -339,7 +345,7 @@ static DFPhotoStore *defaultStore;
 #pragma mark - Application's Documents directory
 
 // Returns the URL to the application's Documents directory.
-- (NSURL *)applicationDocumentsDirectory
++ (NSURL *)applicationDocumentsDirectory
 {
     return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }

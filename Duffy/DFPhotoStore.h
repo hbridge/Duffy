@@ -29,15 +29,15 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 
 
 // Core data stack
-@property (readonly, strong, nonatomic) NSManagedObjectModel *managedObjectModel;
-@property (readonly, strong, nonatomic) NSPersistentStoreCoordinator *persistentStoreCoordinator;
++ (NSManagedObjectModel *)managedObjectModel;
++ (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
 
 // Saves changes to disk
 - (void)saveContext;
 
 // 
 
-- (NSURL *)applicationDocumentsDirectory;
++ (NSURL *)applicationDocumentsDirectory;
 
 
 
