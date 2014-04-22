@@ -5,6 +5,8 @@ class User(models.Model):
 	first_name = models.CharField(max_length=100, null=True)
 	last_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
 		return self.first_name + " " + self.last_name + " - " + self.phone_id
@@ -22,6 +24,8 @@ class Photo(models.Model):
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	classification_data = models.CharField(max_length=10000, null=True, default="")
 	time_taken = models.DateTimeField(null=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self): 
 		return str(self.user) + "/" + str(self.new_filename)
