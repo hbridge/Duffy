@@ -18,10 +18,9 @@ extern NSString *DFServerBaseURL;
 extern NSString *DFUserIDParameterKey;
 extern NSString *DFDeviceIDParameterKey;
 
-
-
 // User ID constants
 extern NSString *DFGetUserPath;
 extern NSString *DFCreateUserPath;
+extern NSString *DFDeviceNameParameterKey;
 
 @end

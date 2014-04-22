@@ -73,13 +73,15 @@
 }
 
 - (void)createUserForDeviceID:(NSString *)deviceId
+                   deviceName:(NSString *)deviceName
              withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                  failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
     NSURLRequest *createRequest = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
                                                                 method:RKRequestMethodPOST
                                                                   path:DFCreateUserPath
-                                                            parameters:@{DFDeviceIDParameterKey: deviceId}];
+                                                            parameters:@{DFDeviceIDParameterKey: deviceId,
+                                                                         DFDeviceNameParameterKey: deviceName}];
         
     RKObjectRequestOperation *operation =
     [[self objectManager]

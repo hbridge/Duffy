@@ -53,6 +53,11 @@ static DFUser *currentUser;
     _hardwareDeviceID = hardwareDeviceID;
 }
 
+- (NSString *) deviceName
+{
+    return [[UIDevice currentDevice] name];
+}
+
 - (NSString *)userOverriddenDeviceID
 {
     NSString *userSetDeviceID = [[NSUserDefaults standardUserDefaults] valueForKey:DFOverrideDeviceIDUserDefaultsKey];

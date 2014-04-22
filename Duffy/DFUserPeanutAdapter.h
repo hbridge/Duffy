@@ -20,6 +20,7 @@ typedef void (^DFUserFetchFailureBlock)(NSError *error);
                 failureBlock:(DFUserFetchFailureBlock)failureBlock;
 
 - (void)createUserForDeviceID:(NSString *)deviceId
+                   deviceName:(NSString *)deviceName
             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                 failureBlock:(DFUserFetchFailureBlock)failureBlock;
 

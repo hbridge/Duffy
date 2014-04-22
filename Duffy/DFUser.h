@@ -17,6 +17,7 @@
 @property (nonatomic, retain) NSString *userID;
 @property (nonatomic, retain) NSString *firstName;
 @property (nonatomic, retain) NSString *lastName;
+@property (nonatomic, retain, readonly) NSString *deviceName;
 
 @property (readonly, nonatomic, retain) NSURL *serverURL;
 @property (readonly, nonatomic, retain) NSURL *defaultServerURL;
