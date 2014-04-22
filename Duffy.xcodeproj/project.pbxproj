@@ -54,6 +54,7 @@
 		5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */; };
 		5AB32EA818F0CD3B004FC27B /* DFKeyboardResizingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */; };
 		5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */; };
+		5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC677E71906F027002F9D42 /* DFDataHasher.m */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -179,6 +180,9 @@
 		5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFKeyboardResizingViewController.m; sourceTree = "<group>"; };
 		5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAutocompleteController.h; sourceTree = "<group>"; };
 		5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAutocompleteController.m; sourceTree = "<group>"; };
+		5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 2.xcdatamodel"; sourceTree = "<group>"; };
+		5AC677E61906F027002F9D42 /* DFDataHasher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDataHasher.h; sourceTree = "<group>"; };
+		5AC677E71906F027002F9D42 /* DFDataHasher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDataHasher.m; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -593,6 +597,8 @@
 				5AE3BF7A18E4D5C900ACB5DC /* DFCGRectHelpers.m */,
 				5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */,
 				5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */,
+				5AC677E61906F027002F9D42 /* DFDataHasher.h */,
+				5AC677E71906F027002F9D42 /* DFDataHasher.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -810,6 +816,7 @@
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
 				5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */,
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
+				5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
 				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,
@@ -1098,9 +1105,10 @@
 		5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */,
 				5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */,
 			);
-			currentVersion = 5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */;
+			currentVersion = 5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */;
 			path = Duffy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

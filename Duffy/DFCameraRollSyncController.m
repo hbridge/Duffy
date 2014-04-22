@@ -15,17 +15,6 @@
 #import "DFAnalytics.h"
 
 
-@interface DFPhotoFingerprint : NSObject
-
-@property (nonatomic, retain) NSString *alAssetURLString;
-@property (nonatomic, retain) NSData *hash;
-
-@end
-@implementation DFPhotoFingerprint
-@end
-
-
-
 @interface DFCameraRollSyncController()
 
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;

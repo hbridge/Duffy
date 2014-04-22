@@ -21,6 +21,7 @@
 @property (nonatomic, retain) NSDate *creationDate;
 @property (nonatomic, retain) NSString *universalIDString;
 @property (nonatomic, retain) NSDate *uploadDate;
+@property (nonatomic, retain) NSData *creationHashData;
 
 // fetched accessors
 @property (readonly, nonatomic, retain) CLLocation *location;
@@ -61,5 +62,7 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 
 - (NSDictionary *)metadataDictionary;
 - (NSString *)localFilename;
+
+- (NSData *)currentHashData;
 
 @end

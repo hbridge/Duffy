@@ -12,6 +12,7 @@
 #import "DFPhotoStore.h"
 #import "ThirdParty/UIImage-Categories/UIImage+Resize.h"
 #import "DFPhotoImageCache.h"
+#import "DFDataHasher.h"
 
 @interface DFPhoto()
 
@@ -23,7 +24,7 @@
 
 @synthesize asset = _asset;
 
-@dynamic alAssetURLString, universalIDString, uploadDate, creationDate;
+@dynamic alAssetURLString, universalIDString, uploadDate, creationDate, creationHashData;
 
 NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
 NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
@@ -270,6 +271,15 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     ALAssetRepresentation *rep = [self.asset defaultRepresentation];
     NSString *fileName = [rep filename];
     return fileName;
+}
+
+
+
+#pragma mark - Hashing
+
+- (NSData *)currentHashData
+{
+    return [DFDataHasher hashDataForALAsset:self.asset];
 }
 
 
