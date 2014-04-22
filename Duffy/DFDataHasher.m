@@ -35,7 +35,7 @@ static const unsigned int ALAssetHashBytesLength = 1024 * 8;
                     format:@"Hashing ALAsset %@ failed: %@", [asset valueForProperty:ALAssetPropertyAssetURL], [error localizedDescription]];
     }
     
-    return [NSData dataWithBytes:assetBytesToHash length:ALAssetHashBytesLength];
+    return [DFDataHasher hashDataForData:[NSData dataWithBytes:assetBytesToHash length:ALAssetHashBytesLength]];
 }
 
 

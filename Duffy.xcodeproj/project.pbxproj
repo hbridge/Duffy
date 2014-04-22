@@ -183,6 +183,7 @@
 		5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 2.xcdatamodel"; sourceTree = "<group>"; };
 		5AC677E61906F027002F9D42 /* DFDataHasher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDataHasher.h; sourceTree = "<group>"; };
 		5AC677E71906F027002F9D42 /* DFDataHasher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDataHasher.m; sourceTree = "<group>"; };
+		5AC677E9190700F6002F9D42 /* Duffy 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 3.xcdatamodel"; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -1106,6 +1107,7 @@
 			isa = XCVersionGroup;
 			children = (
 				5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */,
+				5AC677E9190700F6002F9D42 /* Duffy 3.xcdatamodel */,
 				5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */,
 			);
 			currentVersion = 5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */;
