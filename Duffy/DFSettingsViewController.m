@@ -60,10 +60,7 @@ NSString *DFEnabledNo = @"NO";
     [super viewDidLoad];
 
     [self setAppInfo];
-    self.deviceIDLabel.text = [[DFUser currentUser] hardwareDeviceID];
-    self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
-    self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
-    self.userIDTextField.text = [[DFUser currentUser] userID];
+    [self refreshDeviceInfoUI];
     self.serverURLTextField.text = [[DFUser currentUser] userOverriddenServerURLString];
     self.serverURLTextField.placeholder = [[[DFUser currentUser] defaultServerURL] absoluteString];
     self.serverPortTextField.text = [[DFUser currentUser] userOverriddenServerPortString];
@@ -75,10 +72,6 @@ NSString *DFEnabledNo = @"NO";
         self.autoUploadEnabledSwitch.on = NO;
     }
     
-#ifndef DEBUG
-    self.deviceIDTextField.enabled = NO;
-    self.deviceIDTextField.placeholder = @"Disabled in release builds.";
-#endif
     
 }
 
@@ -100,6 +93,19 @@ NSString *DFEnabledNo = @"NO";
     NSString *versionLabelString = [NSString stringWithFormat:@"%@ %@ (%@) %@",
                                     appName, majorVersion, minorVersion, buildType];
     self.appInfoLabel.text = versionLabelString;
+}
+
+- (void)refreshDeviceInfoUI
+{
+    self.deviceIDLabel.text = [[DFUser currentUser] hardwareDeviceID];
+    self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
+    self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
+    self.userIDTextField.text = [[DFUser currentUser] userID];
+    
+#ifndef DEBUG
+    self.deviceIDTextField.enabled = NO;
+    self.deviceIDTextField.placeholder = @"Disabled in release builds.";
+#endif
 }
 
 - (void)viewDidAppear:(BOOL)animated

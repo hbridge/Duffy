@@ -130,7 +130,7 @@ static int const FetchStride = 500;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 {
     NSMutableArray *allObjects = [[NSMutableArray alloc] init];
-    NSUInteger numFetched = 0;
+    unsigned int numFetched = 0;
     while (numFetched < assetURLStrings.count) {
         NSFetchRequest *request = [[NSFetchRequest alloc] init];
         NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];

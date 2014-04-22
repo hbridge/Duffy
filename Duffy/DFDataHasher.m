@@ -18,7 +18,7 @@ static const unsigned int ALAssetHashBytesLength = 1024 * 8;
 {
     uint8_t digest[CC_SHA1_DIGEST_LENGTH];
     
-    CC_SHA1(inputData.bytes, inputData.length, digest);
+    CC_SHA1(inputData.bytes, (CC_LONG)inputData.length, digest);
     
     return [NSData dataWithBytes:&digest length:CC_SHA1_DIGEST_LENGTH];
 }

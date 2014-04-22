@@ -69,9 +69,9 @@
         if (group == nil) [self handleUserGrantedPhotoAccess];
     } failureBlock:^(NSError *error) {
         if (error.code == ALAssetsLibraryAccessUserDeniedError) {
-            NSLog(@"user denied access, code: %li",error.code);
+            NSLog(@"user denied access, code: %li",(long)error.code);
         }else{
-            NSLog(@"Other error code: %li",error.code);
+            NSLog(@"Other error code: %li",(long)error.code);
         }
         [self showGrantPhotoAccessAlertAndQuit];
     }];
@@ -91,6 +91,7 @@
                          } else {
                              // the request succeeded, but the user doesn't exist, we have to create it
                              [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
+                                                     deviceName:[[DFUser currentUser] deviceName]
                                                withSuccessBlock:^(DFUser *user) {
                                                    [[DFUser currentUser] setUserID:user.userID];
                                                    dispatch_async(dispatch_get_main_queue(), ^{

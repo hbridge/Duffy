@@ -32,9 +32,9 @@
 - (NSString *)description
 {
     return [NSString stringWithFormat:@"SessionStats: accepted:%lu uploaded:%lu remaining:%lu consecutive_retries:%d total_retries:%d",
-            self.numAcceptedUploads,
-            self.numUploaded,
-            self.numRemaining,
+            (unsigned long)self.numAcceptedUploads,
+            (unsigned long)self.numUploaded,
+            (unsigned long)self.numRemaining,
             self.numConsecutiveRetries,
             self.numTotalRetries];
 }
