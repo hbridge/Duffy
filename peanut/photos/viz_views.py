@@ -220,6 +220,22 @@ def serveImage(request):
 				'thumbnailBasepath': thumbnailBasepath}
 	return render(request, 'photos/serve_image.html', context)
 
+def userbaseSummary(request):
+	resultList = list()
+	for i in range(200):
+		userId = i
+		try:
+			user = User.objects.get(id=userId)
+			entry = dict()
+			entry['user'] = user
+			entry['resultsCount'] = SearchQuerySet().all().filter(userId=userId).count()
+			resultList.append(entry)
+		except User.DoesNotExist:
+			continue
+
+	context = {	'resultList': resultList}
+	return render(request, 'admin/userbaseSummary.html', context)
+
 # Helper functions
 
 def setSession(request, userId):

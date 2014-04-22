@@ -1,0 +1,25 @@
+<html>
+<style>
+	html, body { padding: 0; margin: 0; }
+
+</style>
+<body>
+<div class="ui-content">
+	<table border='1px'>
+		<tr>
+			<td class='userid'> UserId </td>
+			<td class='name'> Name </td>
+			<td class='phoneid'> PhoneId </td>
+			<td class='count'> Photos </td>
+		</tr>
+	{% for entry in resultList %}
+		<tr>
+			<td class='userid'> {{ entry.user.id }} </td>
+			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
+			<td class='phoneid'> {{ entry.user.phone_id}} </td>
+			<td class='count'> {{ entry.resultsCount }} </td>
+		</tr>
+	{% endfor %}
+</div>
+</body>
+</html>
