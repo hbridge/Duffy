@@ -221,6 +221,11 @@ def serveImage(request):
 	return render(request, 'photos/serve_image.html', context)
 
 def userbaseSummary(request):
+	knownPhoneIds = {	'AA94D207-D1E8-4098-9A39-76A3A1CC81FB',
+						'BA8E652E-6BD4-4DC7-B8A0-7157FFA51DEC',
+						'0012F94E-E6AF-429A-8530-E1011E1BFCAE',
+						'CEE91F90-263A-4BF1-AED7-6AB27B7BC076',
+						'DEADBEEF'}
 	resultList = list()
 	for i in range(200):
 		userId = i
@@ -228,7 +233,20 @@ def userbaseSummary(request):
 			user = User.objects.get(id=userId)
 			entry = dict()
 			entry['user'] = user
-			entry['resultsCount'] = SearchQuerySet().all().filter(userId=userId).count()
+			dbQuery = Photo.objects.filter(user_id=user.id)
+			if (dbQuery.count() > 0):
+				photoSet = dbQuery.order_by('-upload_date')[:1]
+				for photo in photoSet:
+					entry['lastUploadTime'] = photo.upload_date
+					break
+			entry['dbCount'] = dbQuery.count()
+			searchResults = SearchQuerySet().all().filter(userId=userId)
+			entry['resultsCount'] = searchResults.count()
+			#entry['results']
+			for phoneid in knownPhoneIds:
+				if (phoneid.lower() in user.phone_id.lower()):
+					entry['internal'] = True
+					break
 			resultList.append(entry)
 		except User.DoesNotExist:
 			continue
