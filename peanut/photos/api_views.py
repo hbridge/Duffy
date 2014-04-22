@@ -41,7 +41,7 @@ def add_photo(request):
 			try:
 				user = User.objects.get(phone_id=phoneId)
 			except User.DoesNotExist:
-				user = createUser(phoneId)
+				user = createUser(phoneId, "")
 
 			tempFilepath = tempfile.mktemp()
  
@@ -251,13 +251,18 @@ def create_user(request):
 	user = None
 	data = getRequestData(request)
 
+	if data.has_key('device_name'):
+		firstName =  data['device_name']
+	else:
+		firstName = ""
+
 	if data.has_key('phone_id'):
 		phoneId = data['phone_id']
 		try:
 			user = User.objects.get(phone_id=phoneId)
 			return returnFailure(response, "User already exists")
 		except User.DoesNotExist:
-			user = createUser(phoneId)
+			user = createUser(phoneId, firstName)
 	else:
 		return returnFailure(response, "Need a phone_id")
 
@@ -288,13 +293,13 @@ def returnFailure(response, msg):
 
 	This could be located else where
 """
-def createUser(phoneId):
+def createUser(phoneId, firstName):
 	uploadsPath = "/home/derek/pipeline/uploads"
 	basePath = "/home/derek/user_data"
 	remoteHost = 'duffy@titanblack.no-ip.biz'
 	remoteStagingPath = '/home/duffy/pipeline/staging'
 
-	user = User(first_name="", last_name="", phone_id = phoneId)
+	user = User(first_name = firstName, last_name = "", phone_id = phoneId)
 	user.save()
 
 	userId = str(user.id)
@@ -348,10 +353,8 @@ def getTopLocations(userId):
 """
 def getTopCategories(userId):
 
-	return [{'name': 'people', 'count': 8}, 
-			{'name': 'food', 'count': 6}, 
-			{'name': 'animal', 'count': 4}, 
-			{'name': 'car', 'count': 2}]
+	return [{'name': 'food', 'count': 3}, {'name': 'animal', 'count': 2}, {'name': 'car', 'count': 1}]
+
 
 """
 	Fetches all photos for the given user and returns back top time searches with count. Currently, faking it.
