@@ -120,7 +120,7 @@ static DFPhotoStore *defaultStore;
 }
 
 
-+ (DFPhoto *)photoWithALAssetURLStrings:(NSString *)assetURLString context:(NSManagedObjectContext *)context
++ (DFPhoto *)photoWithALAssetURLString:(NSString *)assetURLString context:(NSManagedObjectContext *)context;
 {
     return [[self photosWithALAssetURLStrings:[NSArray arrayWithObject:assetURLString] context:context] firstObject];
 }

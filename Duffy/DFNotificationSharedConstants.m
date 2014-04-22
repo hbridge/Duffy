@@ -17,7 +17,6 @@ NSString const *DFPhotoChangeTypeAdded = @"DFPhotoChangeTypeAdded";
 NSString const *DFPhotoChangeTypeRemoved = @"DFPhotoChangeTypeRemoved";
 NSString const *DFPhotoChangeTypeMetadata = @"DFPhotoChangeTypeMetadata";
 
-
 NSString *DFUploadStatusNotificationName = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 

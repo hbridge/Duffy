@@ -47,6 +47,9 @@
     [super viewDidAppear:animated];
 #ifdef DEBUG
     NSLog(@"photo metadata: %@", [self.photo.metadataDictionary JSONString]);
+    NSLog(@"\n*** photo creation hash:%@, \n***current hash:%@",
+          self.photo.creationHashData.description,
+          self.photo.currentHashData.description);
 #endif
 }
 

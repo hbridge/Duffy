@@ -9,7 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "DFPhotoCollection.h"
 
-@class ALAssetsLibrary;
+@class ALAssetsLibrary, DFPhoto;
 
 @interface DFPhotoStore : NSObject
 
@@ -28,6 +28,8 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 - (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
++ (DFPhoto *)photoWithALAssetURLString:(NSString *)assetURLString context:(NSManagedObjectContext *)context;
+
 
 
 // Core data stack
