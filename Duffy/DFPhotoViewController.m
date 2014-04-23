@@ -46,10 +46,13 @@
 {
     [super viewDidAppear:animated];
 #ifdef DEBUG
-    NSLog(@"photo metadata: %@", [self.photo.metadataDictionary JSONString]);
+    NSLog(@"photo metadata: %@", [self.photo.metadataDictionary JSONStringPrettyPrinted:YES]);
     NSLog(@"\n*** photo creation hash:%@, \n***current hash:%@",
           self.photo.creationHashData.description,
           self.photo.currentHashData.description);
+    [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
+        NSLog(@"photo reverse Geocode: %@", locationDict.description);
+    }];
 #endif
 }
 

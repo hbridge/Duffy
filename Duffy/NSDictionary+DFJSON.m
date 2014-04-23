@@ -12,6 +12,11 @@
 
 - (NSString *)JSONString
 {
+    return [self JSONStringPrettyPrinted:NO];
+}
+
+- (NSString *)JSONStringPrettyPrinted:(BOOL)prettyPrinted
+{
     
     if (![NSJSONSerialization isValidJSONObject:self]) {
         NSLog(@"Warning: json invalid for dict, enumerating types and removing unsafe types.");
@@ -21,7 +26,7 @@
     
     NSError *error;
     NSData *jsonData = [NSJSONSerialization dataWithJSONObject:self
-                                                       options:0
+                                                       options:prettyPrinted ? NSJSONWritingPrettyPrinted : 0
                                                          error:&error];
     
     if (! jsonData) {

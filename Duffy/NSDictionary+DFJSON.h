@@ -11,6 +11,7 @@
 @interface NSDictionary (DFJSON)
 
 - (NSString *)JSONString;
+- (NSString *)JSONStringPrettyPrinted:(BOOL)prettyPrinted;
 - (NSDictionary *)dictionaryWithNonJSONRemoved;
 
 
