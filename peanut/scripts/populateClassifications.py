@@ -32,7 +32,7 @@ def classifyPhotos(photos, socket_send, socket_recv):
 
     pathToPhoto = dict()
 
-    logging.debug("About to process files:")
+    logging.debug("About to process files (at " + time.strftime("%c") + "):")
     for photo in photos:
         imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.new_filename)
         pathToPhoto[imagepath] = photo
