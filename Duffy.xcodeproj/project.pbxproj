@@ -180,6 +180,7 @@
 		5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFKeyboardResizingViewController.m; sourceTree = "<group>"; };
 		5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAutocompleteController.h; sourceTree = "<group>"; };
 		5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAutocompleteController.m; sourceTree = "<group>"; };
+		5AC40EDB1908704300ED3532 /* LoggingConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoggingConfig.h; sourceTree = "<group>"; };
 		5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 2.xcdatamodel"; sourceTree = "<group>"; };
 		5AC677E61906F027002F9D42 /* DFDataHasher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDataHasher.h; sourceTree = "<group>"; };
 		5AC677E71906F027002F9D42 /* DFDataHasher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDataHasher.m; sourceTree = "<group>"; };
@@ -512,6 +513,7 @@
 			children = (
 				5ADB24CB189985590016CA02 /* DFAppDelegate.h */,
 				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
+				5AC40EDB1908704300ED3532 /* LoggingConfig.h */,
 				5A67606318E3384900E355B6 /* Tab view controllers */,
 				5A67606218E3381D00E355B6 /* Background processes */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
