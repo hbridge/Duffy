@@ -172,6 +172,13 @@ static DFUploadController *defaultUploadController;
                     break;
                 }
                 DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
+                if (photo == nil) {
+                    [self.uploadURLQueue markObjectCancelled:photoURLString];
+                    self.numUploadOperations--;
+                    [self uploadQueueChanged];
+                    break;
+                }
+                
                 
                 [DFAnalytics logUploadBegan];
                 [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){

@@ -14,6 +14,7 @@
 @property (nonatomic, retain) NSMutableOrderedSet *notStartedUploads;
 @property (nonatomic, retain) NSMutableOrderedSet *inProgressUploads;
 @property (nonatomic, retain) NSMutableOrderedSet *completedUploads;
+@property (nonatomic, retain) NSMutableOrderedSet *cancelledUploads;
 
 @end
 
@@ -34,6 +35,7 @@
     self.notStartedUploads = [[NSMutableOrderedSet alloc] init];
     self.inProgressUploads = [[NSMutableOrderedSet alloc] init];
     self.completedUploads = [[NSMutableOrderedSet alloc] init];
+    self.cancelledUploads = [[NSMutableOrderedSet alloc] init];
 
 }
 - (void)getLock
@@ -78,6 +80,7 @@
     [self releaseLock];
     return object;
 }
+
 - (void)markObjectCompleted:(id)object
 {
     [self getLock];
@@ -87,6 +90,18 @@
     
     [self releaseLock];
 }
+
+
+- (void)markObjectCancelled:(id)object
+{
+    [self getLock];
+    
+    [self.inProgressUploads removeObject:object];
+    [self.cancelledUploads addObject:object];
+    
+    [self releaseLock];
+}
+
 - (void)moveInProgressObjectBackToQueue:(id)object
 {
     [self getLock];

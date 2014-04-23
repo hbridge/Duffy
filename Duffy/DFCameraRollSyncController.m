@@ -93,7 +93,7 @@
     
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
 #ifdef DEBUG
-        usleep(1000000/10 * 3);
+        //usleep(1000000/10 * 3);
 
 #endif
         if(photoAsset != NULL) {
