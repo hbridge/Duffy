@@ -39,8 +39,10 @@
 
 - (void)asyncSyncToCameraRoll
 {
+    NSLog(@"Camera roll sync requested.");
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
         dispatch_semaphore_wait(self.syncSemaphore, DISPATCH_TIME_FOREVER);
+        NSLog(@"Camera roll sync beginning.");
 
         DFPhotoCollection *knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
         NSDictionary *knownPhotoURLsToHashes = [self mapKnownPhotoURLsToHashes:knownPhotos];
