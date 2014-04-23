@@ -26,11 +26,12 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>db-bf5eo7rbgiiorfk</string>
+				<string>ha7e0628b85696cfd8bd471f9906fbc79f</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1164</string>
+	<string>1170</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIBackgroundModes</key>
