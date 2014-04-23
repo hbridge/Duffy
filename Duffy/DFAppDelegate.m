@@ -74,7 +74,7 @@
     
     DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
     fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
-    fileLogger.logFileManager.maximumNumberOfLogFiles = 7;
+    fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // 7 days of files
     
     [DDLog addLogger:fileLogger];
 }

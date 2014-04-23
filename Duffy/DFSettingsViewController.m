@@ -7,6 +7,7 @@
 //
 
 #import "DFSettingsViewController.h"
+#import <CocoaLumberjack/DDFileLogger.h>
 #import "DFPhotoStore.h"
 #import "DFUploadController.h"
 #import "DFUser.h"
@@ -77,6 +78,11 @@ NSString *DFEnabledNo = @"NO";
 
 - (void)setAppInfo
 {
+    self.appInfoLabel.text = [self appInfoString];
+}
+
+- (NSString *)appInfoString
+{
     // App name
     NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
     NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
@@ -90,9 +96,8 @@ NSString *DFEnabledNo = @"NO";
 #else
     buildType = @"release";
 #endif
-    NSString *versionLabelString = [NSString stringWithFormat:@"%@ %@ (%@) %@",
+    return [NSString stringWithFormat:@"%@ %@ (%@) %@",
                                     appName, majorVersion, minorVersion, buildType];
-    self.appInfoLabel.text = versionLabelString;
 }
 
 - (void)refreshDeviceInfoUI
@@ -172,6 +177,59 @@ NSString *DFEnabledNo = @"NO";
     [[DFUploadController sharedUploadController] cancelUpload];
 }
 
+- (IBAction)sendInfoClicked:(UIButton *)sender {
+    if ([MFMailComposeViewController canSendMail]) {
+        MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
+        mailViewController.mailComposeDelegate = self;
+        NSMutableData *errorLogData = [NSMutableData data];
+        for (NSData *errorLogFileData in [self errorLogData]) {
+            [errorLogData appendData:errorLogFileData];
+        }
+        [mailViewController addAttachmentData:errorLogData mimeType:@"text/plain" fileName:@"DuffyLog.txt"];
+        [mailViewController setSubject:[NSString stringWithFormat:@"Diagnostic info for %@", [self appInfoString]]];
+        [mailViewController setToRecipients:[NSArray arrayWithObject:@"hbridge@gmail.com"]];
+
+        [self presentViewController:mailViewController animated:YES completion:nil];
+    }
+
+    else {
+        NSString *message = NSLocalizedString(@"Sorry, your issue can't be reported right now. This is most likely because no mail accounts are set up on your mobile device.", @"");
+        [[[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil] show];
+    }
+
+}
+
+static const int MaxLogFiles = 10;
+
+- (NSMutableArray *)errorLogData
+{
+    DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
+    NSArray *sortedLogFileInfos = [fileLogger.logFileManager sortedLogFileInfos];
+    int numFilesToUpload = MIN((unsigned int)sortedLogFileInfos.count, MaxLogFiles);
+    
+    NSMutableArray *errorLogFiles = [NSMutableArray arrayWithCapacity:numFilesToUpload];
+    for (int i = 0; i < numFilesToUpload; i++) {
+        DDLogFileInfo *logFileInfo = [sortedLogFileInfos objectAtIndex:i];
+        NSData *fileData = [NSData dataWithContentsOfFile:logFileInfo.filePath];
+        [errorLogFiles addObject:fileData];
+    }
+    
+    return errorLogFiles;
+}
+
+- (void)mailComposeController:(MFMailComposeViewController*)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError*)error;
+{
+    if (result == MFMailComposeResultSent) {
+        DDLogInfo(@"Feedback email sent.");
+    }
+    
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+
 - (IBAction)crashAppClicked:(UIButton *)sender {
     [NSException raise:@"Testing Crash" format:@"Intentionally crashing app to test crash uploads."];
 }
@@ -243,6 +301,9 @@ NSString *DFEnabledNo = @"NO";
     }
     
 }
+
+
+
 
 
 @end

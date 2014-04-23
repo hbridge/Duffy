@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MFMailComposeViewController.h>
 #import "DFKeyboardResizingViewController.h"
 
-@interface DFSettingsViewController : DFKeyboardResizingViewController <UITextFieldDelegate, UIAlertViewDelegate>
+@interface DFSettingsViewController : DFKeyboardResizingViewController <UITextFieldDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 
 extern NSString *DFPipelineEnabledUserDefaultKey;
 extern NSString *DFAutoUploadEnabledUserDefaultKey;
@@ -48,6 +49,7 @@ extern NSString *DFEnabledNo;
 - (IBAction)serverPortEditingDidEnd:(UITextField *)sender;
 - (IBAction)cancelUpload:(UIButton *)sender;
 
+- (IBAction)sendInfoClicked:(UIButton *)sender;
 
 - (IBAction)crashAppClicked:(UIButton *)sender;
 @end
