@@ -37,8 +37,8 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"7e0628b85696cfd8bd471f9906fbc79f"];
+    [[BITHockeyManager sharedHockeyManager].authenticator setIdentificationType:BITAuthenticatorIdentificationTypeDevice];
     [[BITHockeyManager sharedHockeyManager] startManager];
-    [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     
     RKLogConfigureByName("RestKit/Network", RKLogLevelError);
     
@@ -80,6 +80,7 @@
 {
     // Set the unique userID for logging
     [Flurry setUserID:[[DFUser currentUser] userID]];
+    [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     
     // Camera roll tab
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
@@ -151,6 +152,19 @@
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
     [[DFPhotoImageCache sharedCache] emptyCache];
+}
+
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+    if( [[BITHockeyManager sharedHockeyManager].authenticator handleOpenURL:url
+                                                          sourceApplication:sourceApplication
+                                                                 annotation:annotation]) {
+        return YES;
+    }
+    
+    /* Your own custom URL handlers */
+    
+    return NO;
 }
 
 
