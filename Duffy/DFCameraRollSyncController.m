@@ -95,9 +95,6 @@
         if(photoAsset != NULL) {
             NSString *assetURLString = [[photoAsset valueForProperty: ALAssetPropertyAssetURL] absoluteString];
             NSData *assetHash = [DFDataHasher hashDataForALAsset:photoAsset];
-            #ifdef DEBUG
-            NSLog(@"Scanning asset: %@", assetURLString);
-            #endif
             [knownNotFoundURLs removeObject:assetURLString];
             
            
@@ -141,7 +138,7 @@
     };
 
     [[[DFPhotoStore sharedStore] assetsLibrary]
-     enumerateGroupsWithTypes:ALAssetsGroupLibrary | ALAssetsGroupAlbum | ALAssetsGroupSavedPhotos
+     enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos
      usingBlock:assetGroupEnumerator
      failureBlock: ^(NSError *error) {
          NSLog(@"Failed to enumerate photo groups: %@", error.localizedDescription);
