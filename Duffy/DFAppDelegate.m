@@ -150,7 +150,6 @@
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
-    NSLog(@"memory warning.  emptying cache.");
     [[DFPhotoImageCache sharedCache] emptyCache];
 }
 

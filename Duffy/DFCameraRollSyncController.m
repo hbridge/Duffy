@@ -92,6 +92,10 @@
     NSMutableDictionary __block *objectIDsToChanges = [[NSMutableDictionary alloc] init];
     
     void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
+#ifdef DEBUG
+        usleep(1000000/10 * 3);
+
+#endif
         if(photoAsset != NULL) {
             NSString *assetURLString = [[photoAsset valueForProperty: ALAssetPropertyAssetURL] absoluteString];
             NSData *assetHash = [DFDataHasher hashDataForALAsset:photoAsset];
@@ -102,7 +106,7 @@
             if ([knownAndFoundURLs containsObject:assetURLString]) {
                 // Check the actual asset hash against our stored hash, if it doesn't match, delete and recreate the DFPhoto with new info.
                 if (![assetHash isEqual:knownAndFoundURLsToHashes[assetURLString]]){
-                    NSDictionary *changes = [self assetDataChangedForAsset:photoAsset];
+                    NSDictionary *changes = [self assetDataChangedForAsset:photoAsset withNewHashData:assetHash];
                     [groupObjectIDsToChanges addEntriesFromDictionary:changes];
                     // set to the new known hash
                     knownAndFoundURLsToHashes[assetURLString] = assetHash;
@@ -110,7 +114,7 @@
             } else {//(![knownAndFoundURLs containsObject:assetURLString])
                 // Check to see whether this is a dupe of an already known photo, if it's not, create a new one
                 if (![[knownAndFoundURLsToHashes allValues] containsObject:assetHash]) {
-                    DFPhoto *newPhoto = [self addPhotoForAsset:photoAsset];
+                    DFPhoto *newPhoto = [self addPhotoForAsset:photoAsset withHashData:assetHash];
                     
                     // store information about the new photo to notify
                     groupObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
@@ -133,6 +137,7 @@
             NSLog(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
     		[group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:assetEnumerator];
     	} else {
+            NSLog(@"Scan complete.  Change summary for all groups: \n%@", [self changeTypesToCountsForChanges:objectIDsToChanges]);
             dispatch_semaphore_signal(findNewAssetSemaphore);
         }
     };
@@ -151,7 +156,7 @@
     return objectIDsToChanges;
 }
 
-- (NSDictionary *)assetDataChangedForAsset:(ALAsset *)asset
+- (NSDictionary *)assetDataChangedForAsset:(ALAsset *)asset withNewHashData:(NSData *)newHashData
 {
     NSMutableDictionary *objectIDsToChanges = [[NSMutableDictionary alloc] init];
     
@@ -160,19 +165,20 @@
     objectIDsToChanges[photoToRemove.objectID] = DFPhotoChangeTypeRemoved;
     [self.managedObjectContext deleteObject:photoToRemove];
     
-    DFPhoto *newPhoto = [self addPhotoForAsset:asset];
+    DFPhoto *newPhoto = [self addPhotoForAsset:asset withHashData:newHashData];
     objectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
     
     return objectIDsToChanges;
 }
 
-- (DFPhoto *)addPhotoForAsset:(ALAsset *)asset
+- (DFPhoto *)addPhotoForAsset:(ALAsset *)asset withHashData:(NSData *)hashData
 {
     DFPhoto *newPhoto = [NSEntityDescription
                          insertNewObjectForEntityForName:@"DFPhoto"
                          inManagedObjectContext:self.managedObjectContext];
     newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
     newPhoto.creationDate = [asset valueForProperty:ALAssetPropertyDate];
+    newPhoto.creationHashData = hashData;
     return newPhoto;
 }
 
