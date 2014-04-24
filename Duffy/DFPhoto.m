@@ -183,10 +183,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
         CGFloat scaleFactor = length/originalSize.width;
         newSize = CGSizeMake(length, ceil(originalSize.height * scaleFactor));
     }
-    DDLogVerbose(@"originalImageSize:%@, newSize:%@",
-                 NSStringFromCGSize(self.asset.defaultRepresentation.dimensions),
-                 NSStringFromCGSize(newSize));
-
+    
     return [self imageResizedToFitSize:newSize];
 }
 
@@ -296,9 +293,6 @@ static void releaseAssetCallback(void *info) {
     }
     
     UIImage *toReturn = [UIImage imageWithCGImage:imageRef];
-    DDLogVerbose(@"thumbnailForAsset returnSize:%@ for maxPixel:%lu",
-                 NSStringFromCGSize(toReturn.size),
-                 (unsigned long)size);
     CFRelease(imageRef);
     
     return toReturn;

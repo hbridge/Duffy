@@ -108,6 +108,7 @@ static DFUploadController *defaultUploadController;
     NSUInteger photosInQueuePreAdd = self.uploadURLQueue.numObjectsIncomplete;
     if (photos.count < 1) return;
  
+    //TODO may get more background time if we call this on app background
     [self beginBackgroundUpdateTask];
     
     NSMutableOrderedSet *photoURLStrings = [[NSMutableOrderedSet alloc] init];
@@ -130,7 +131,9 @@ static DFUploadController *defaultUploadController;
 
 - (void)cancelUpload
 {
-    [self cancelUploadsWithIsError:NO];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+        [self cancelUploadsWithIsError:NO silent:NO];
+    });
 }
 
 - (BOOL)isUploadInProgress
@@ -198,7 +201,7 @@ static DFUploadController *defaultUploadController;
                         {
                             [self retryUploadPhoto:photo];
                         } else {
-                            [self cancelUploadsWithIsError:YES];
+                            [self cancelUploadsWithIsError:YES silent:NO];
                         }
                     });
                 }];
@@ -229,7 +232,7 @@ static DFUploadController *defaultUploadController;
     self.sessionRetryCount++;
     
     if (self.consecutiveRetryCount > MaxConsecutiveRetries) {
-        [self cancelUploadsWithIsError:YES];
+        [self cancelUploadsWithIsError:YES silent:NO];
         [DFAnalytics logUploadRetryCountExceededWithCount:self.consecutiveRetryCount];
     } else {
         [self.uploadURLQueue moveInProgressObjectBackToQueue:photo.alAssetURLString];
@@ -237,25 +240,23 @@ static DFUploadController *defaultUploadController;
     }
 }
 
-
-
-
-- (void)cancelUploadsWithIsError:(BOOL)isError
+- (void)cancelUploadsWithIsError:(BOOL)isError silent:(BOOL)isSilent
 {
     NSUInteger numLeft = self.uploadURLQueue.numObjectsIncomplete;
-    if (isError) {
-        DDLogError(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
-    } else {
-        DDLogInfo(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
-    }
-    [self.uploadURLQueue removeAllObjects];
+
+    DDLogInfo(@"Non-error: canceling all uploads with %lu left.", (unsigned long)numLeft);
     
-    if (isError) {
-        [self showStatusBarNotificationWithType:DFStatusUpdateError];
-    } else {
-        [self showStatusBarNotificationWithType:DFStatusUpdateCancelled];
+    if (!isSilent){
+        if (isError) {
+            [self showStatusBarNotificationWithType:DFStatusUpdateError];
+        } else {
+            [self showStatusBarNotificationWithType:DFStatusUpdateCancelled];
+        }
+        [DFAnalytics logUploadCancelledWithIsError:isError];
     }
-    [DFAnalytics logUploadCancelledWithIsError:isError];
+    
+    [self.uploadAdapter cancelAllUploads];
+    [self.uploadURLQueue removeAllObjects];
 }
 
 
@@ -295,7 +296,7 @@ static DFUploadController *defaultUploadController;
     
     if (self.currentSessionStats.numRemaining > 0) {
         [self showStatusBarNotificationWithType:DFStatusUpdateProgress];
-    } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numAcceptedUploads > 0) {
+    } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numUploaded > 0) {
         [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
     }
     
@@ -354,8 +355,18 @@ static DFUploadController *defaultUploadController;
         return;
     }
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-        DDLogInfo(@"Background upload task about to expire.  Cancelling uploads and ending background task.");
-        [self.uploadAdapter cancelAllUploads];
+        DDLogInfo(@"Background upload task about to expire.  Cancelling uploads...");
+        
+        // By cancel will throw an exception on the main thread because it could block.  That's the behavior
+        // we want here so we create a semaphore an wait on it.
+        dispatch_semaphore_t cancelSemaphore = dispatch_semaphore_create(0);
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+            [self cancelUploadsWithIsError:NO silent:YES];
+            dispatch_semaphore_signal(cancelSemaphore);
+        });
+        dispatch_semaphore_wait(cancelSemaphore, DISPATCH_TIME_FOREVER);
+        DDLogInfo(@"Uploads cancelled.  Ending background task.");
+        
         [self endBackgroundUpdateTask];
     }];
 }

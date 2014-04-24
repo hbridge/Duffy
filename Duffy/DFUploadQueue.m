@@ -36,8 +36,8 @@
     self.inProgressUploads = [[NSMutableOrderedSet alloc] init];
     self.completedUploads = [[NSMutableOrderedSet alloc] init];
     self.cancelledUploads = [[NSMutableOrderedSet alloc] init];
-
 }
+
 - (void)getLock
 {
     if ([NSThread isMainThread]) {

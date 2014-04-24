@@ -66,17 +66,20 @@ static const unsigned int FaceDetectionMinMemory = 1000;
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
-         DDLogError(@"Upload failed.  Error: %@", error.localizedDescription);
+         if (operation.isCancelled) {
+             DDLogInfo(@"Cancelled upload operation returned.");
+         } else {
+             DDLogError(@"Upload failed.  Error: %@", error.localizedDescription);
+         }
          failureHandler(error);
      }];
-    
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
 }
 
 - (void)cancelAllUploads
 {
-    DDLogInfo(@"%@ cancelling all uploads.", [self.class description]);
+    DDLogInfo(@"%@ canceling all uploads.", [self.class description]);
     [self.objectManager.operationQueue cancelAllOperations];
 }
 
