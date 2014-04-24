@@ -75,7 +75,11 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
         }
         
         if (error) {
-            DDLogError(@"fetchReverseGeocodeDict error:%@", [error localizedDescription]);
+            BOOL possibleThrottle = NO;
+            if (error.code == kCLErrorNetwork) possibleThrottle = YES;
+            DDLogError(@"fetchReverseGeocodeDict error:%@, Possible rate limit:%@",
+                       [error localizedDescription],
+                       possibleThrottle ? @"YES" : @"NO");
         }
         
         completionBlock(locationDict);
