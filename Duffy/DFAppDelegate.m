@@ -40,7 +40,7 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
     [self configureLogs];
-    DDLogInfo(@"CocoaLumberjack active.");
+    DDLogVerbose(@"CocoaLumberjack active.");
     
     [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"7e0628b85696cfd8bd471f9906fbc79f"];
     [[BITHockeyManager sharedHockeyManager].authenticator setIdentificationType:BITAuthenticatorIdentificationTypeDevice];
@@ -76,7 +76,9 @@
     fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
     fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // 7 days of files
     
-    [DDLog addLogger:fileLogger];
+#ifdef DEBUG
+    [DDLog addLogger:fileLogger withLogLevel:LOG_LEVEL_WARN];
+#endif
 }
 
 
