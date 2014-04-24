@@ -197,8 +197,7 @@ static DFUploadController *defaultUploadController;
                         NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
                         [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
                         
-                        if ([self isErrorRetryable:error])
-                        {
+                        if ([self isErrorRetryable:error]) {
                             [self retryUploadPhoto:photo];
                         } else {
                             [self cancelUploadsWithIsError:YES silent:NO];
@@ -227,7 +226,6 @@ static DFUploadController *defaultUploadController;
 
 - (void)retryUploadPhoto:(DFPhoto *)photo
 {
-    // TODO self.currentSessionStats is not a persistent object any more, move this
     self.consecutiveRetryCount++;
     self.sessionRetryCount++;
     
