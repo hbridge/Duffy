@@ -7,6 +7,7 @@
 //
 
 #import "DFPhotoStore.h"
+#import "DFPhotoStore+IntegrityCheck.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhoto.h"
 #import "DFNotificationSharedConstants.h"
@@ -48,6 +49,15 @@ static DFPhotoStore *defaultStore;
     self = [super init];
     if (self) {
         [self createCacheDirectories];
+        // do an integrity check
+        DFPhotoStoreIntegrityCheckResult integrityResult =
+            [self checkForErrorsAndRepairWithContext:[self managedObjectContext]];
+        if (integrityResult == DFIntegrityResultErrorsFixed) {
+            [self saveContext];
+        } else if (integrityResult == DFIntegrityResultErrorsUnfixable) {
+            DDLogError(@"Integrity check found errors it could not fix!");
+        }
+        
         // load photos that have already been imported
         _cameraRoll = [[DFPhotoCollection alloc] init];
         [self loadCameraRollDB];
@@ -90,7 +100,6 @@ static DFPhotoStore *defaultStore;
 
     }
 }
-
 
 - (void)loadCameraRollDB
 {
