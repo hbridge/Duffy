@@ -38,6 +38,7 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 // Ideally be done with createCGImage calls
 @property (readonly, nonatomic, retain) UIImage *fullResolutionImage;
 @property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
+@property (readonly, nonatomic, retain) UIImage *highResolutionImage; //max 2048x2048, aspect fit
 @property (readonly, nonatomic, retain) UIImage *fullScreenImage;
 
 
@@ -56,7 +57,6 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
 - (void)loadUIImageForThumbnail:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 
-- (CIImage *)CIImageForFullImage;
 
 // Image attributes
 
