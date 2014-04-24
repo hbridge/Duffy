@@ -77,7 +77,9 @@ NSString* const DFAnalyticsValueResultAborted = @"aborted";
 // Settings
 NSString* const SettingAutoUploadChanged = @"SettingAutoUploadChanged";
 
-
+// Maps
+NSString *const MapsServiceRequestFailed = @"MapsServiceRequestFailed";
+NSString *const PossibleThrottleKey = @"isPossibleThrottle";
 
 
 static DFAnalytics *defaultLogger;
@@ -259,6 +261,14 @@ static DFAnalytics *defaultLogger;
     [Flurry logEvent:SettingAutoUploadChanged withParameters:@{NewValueKey: [NSNumber numberWithBool:isOn]}];
 }
 
++ (void)logMapsServiceErrorWithCode:(long)errorCode isPossibleRateLimit:(BOOL)isPossibleRateLimit
+{
+    [Flurry logEvent:MapsServiceRequestFailed
+      withParameters:@{
+                       ResultKey : [NSNumber numberWithLong:errorCode],
+                       PossibleThrottleKey: (isPossibleRateLimit ? @"true" : @"false")
+                       }];
+}
 
 
 @end

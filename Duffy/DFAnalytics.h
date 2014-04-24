@@ -40,6 +40,7 @@ extern NSString* const DFAnalyticsValueResultAborted;
 
 + (void)logAutoUploadSettingChanged:(BOOL)isOn;
 
++ (void)logMapsServiceErrorWithCode:(long)errorCode isPossibleRateLimit:(BOOL)isPossibleRateLimit;
 
 
 @end

@@ -14,6 +14,7 @@
 #import "ThirdParty/UIImage-Categories/UIImage+Resize.h"
 #import "DFPhotoImageCache.h"
 #import "DFDataHasher.h"
+#import "DFAnalytics.h"
 
 
 @interface DFPhoto()
@@ -82,6 +83,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
             DDLogError(@"fetchReverseGeocodeDict error:%@, Possible rate limit:%@",
                        [error localizedDescription],
                        possibleThrottle ? @"YES" : @"NO");
+            [DFAnalytics logMapsServiceErrorWithCode:error.code isPossibleRateLimit:possibleThrottle];
         }
         
         completionBlock(locationDict);

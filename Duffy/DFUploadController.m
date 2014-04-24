@@ -29,7 +29,6 @@
 
 @property (atomic, retain) DFPhotoUploadAdapter *uploadAdapter;
 @property (atomic) dispatch_queue_t dispatchQueue;
-@property (atomic) dispatch_semaphore_t enqueueSemaphore;
 @property (atomic, retain) DFUploadQueue *uploadURLQueue;
 @property (atomic) unsigned int numUploadOperations;
 @property (atomic) unsigned int consecutiveRetryCount;
@@ -80,7 +79,6 @@ static DFUploadController *defaultUploadController;
     self = [super init];
     if (self) {
         self.dispatchQueue = dispatch_queue_create("com.duffyapp.DFUploadController.dispatchQueue", DISPATCH_QUEUE_CONCURRENT);
-        self.enqueueSemaphore = dispatch_semaphore_create(1);
         self.saveSemaphore = dispatch_semaphore_create(1);
         self.uploadURLQueue = [[DFUploadQueue alloc] init];
         [self setupStatusBarNotifications];
@@ -161,9 +159,7 @@ static DFUploadController *defaultUploadController;
     
     if (self.uploadURLQueue.objectsWaiting.count > 0) {
         dispatch_async(self.dispatchQueue, ^{
-            dispatch_semaphore_wait(self.enqueueSemaphore, DISPATCH_TIME_FOREVER);
             if (self.numUploadOperations >= MaxSimultaneousUploads) {
-                dispatch_semaphore_signal(self.enqueueSemaphore);
                 return;
             }
             
@@ -205,7 +201,6 @@ static DFUploadController *defaultUploadController;
                     });
                 }];
             }
-            dispatch_semaphore_signal(self.enqueueSemaphore);
         });
     } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
         DDLogInfo(@"No photos remaining.");
