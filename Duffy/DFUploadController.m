@@ -117,7 +117,7 @@ static DFUploadController *defaultUploadController;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSUInteger numAdded = [self.uploadURLQueue addObjectsFromArray:photoURLStrings.array];
         
-        NSLog(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
+        DDLogInfo(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
               (int)photos.count,
               (int)photosInQueuePreAdd,
               (int)numAdded
@@ -205,7 +205,7 @@ static DFUploadController *defaultUploadController;
             dispatch_semaphore_signal(self.enqueueSemaphore);
         });
     } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
-        NSLog(@"No photos remaining.");
+        DDLogInfo(@"No photos remaining.");
         [self.uploadURLQueue clearCompleted];
         [self endBackgroundUpdateTask];
     }
@@ -242,7 +242,11 @@ static DFUploadController *defaultUploadController;
 - (void)cancelUploadsWithIsError:(BOOL)isError
 {
     NSUInteger numLeft = self.uploadURLQueue.numObjectsIncomplete;
-    NSLog(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
+    if (isError) {
+        DDLogError(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
+    } else {
+        DDLogInfo(@"Cancelling all uploads with %lu left.  isError:%@", (unsigned long)numLeft, [NSNumber numberWithBool:isError]);
+    }
     [self.uploadURLQueue removeAllObjects];
     
     if (isError) {
@@ -276,7 +280,7 @@ static DFUploadController *defaultUploadController;
     dispatch_semaphore_wait(self.saveSemaphore, DISPATCH_TIME_FOREVER);
     NSError *error = nil;
     if(![self.managedObjectContext save:&error]) {
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
         [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
     }
     dispatch_semaphore_signal(self.saveSemaphore);
@@ -294,7 +298,7 @@ static DFUploadController *defaultUploadController;
         [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
     }
     
-    NSLog(@"%@", self.currentSessionStats.description);
+    DDLogInfo(@"%@", self.currentSessionStats.description);
 }
 
 - (void)showStatusBarNotificationWithType:(DFStatusUpdateType)updateType
@@ -343,7 +347,7 @@ static DFUploadController *defaultUploadController;
 - (void) beginBackgroundUpdateTask
 {
     if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
-        NSLog(@"DFUploadController: have background upload task, no need to register another.");
+        DDLogVerbose(@"DFUploadController: have background upload task, no need to register another.");
         return;
     }
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{

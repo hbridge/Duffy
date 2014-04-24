@@ -68,7 +68,7 @@ static NSString *UserIDParameterKey = @"user_id";
      success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
      {
          DFAutocompleteResponse *response = [mappingResult firstObject];
-         NSLog(@"Autocomplete response received.  result:%@", response.result);
+         DDLogVerbose(@"Autocomplete response received.  result:%@", response.result);
 
          NSDictionary *locationResult, *categoryResult, *timeResult;
          if ([response.result isEqualToString:@"true"]) {
@@ -108,7 +108,7 @@ static NSString *UserIDParameterKey = @"user_id";
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
-         NSLog(@"Autocomplete fetch failed.  Error: %@", error.localizedDescription);
+         DDLogWarn(@"Autocomplete fetch failed.  Error: %@", error.localizedDescription);
          dispatch_async(dispatch_get_main_queue(), ^{
              completionBlock(nil, nil, nil);
          });

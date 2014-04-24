@@ -262,10 +262,10 @@ static const int MaxLogFiles = 10;
 
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {
     if (sender.isOn) {
-        NSLog(@"Auto-upload now ON");
+        DDLogInfo(@"Auto-upload now ON");
         [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
     } else {
-        NSLog(@"Auto-upload now OFF");
+        DDLogInfo(@"Auto-upload now OFF");
         [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
     }
     

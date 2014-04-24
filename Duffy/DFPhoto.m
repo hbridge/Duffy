@@ -75,7 +75,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
         }
         
         if (error) {
-            NSLog(@"fetchReverseGeocodeDict error:%@", [error localizedDescription]);
+            DDLogError(@"fetchReverseGeocodeDict error:%@", [error localizedDescription]);
         }
         
         completionBlock(locationDict);

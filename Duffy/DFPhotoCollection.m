@@ -47,7 +47,7 @@
         if (![photoAssetURLSet containsObject:newPhoto.alAssetURLString]) {
             [photoAssetURLSet addObject:newPhoto.alAssetURLString];
         } else {
-            NSLog(@"Error, adding another DFPhoto with the same universal ID as another in the set");
+            DDLogError(@"Error, adding another DFPhoto with the same universal ID as another in the set");
         }
 
         NSUInteger insertIndex = [photosByDate indexOfObject:newPhoto

@@ -19,7 +19,7 @@
 {
     
     if (![NSJSONSerialization isValidJSONObject:self]) {
-        NSLog(@"Warning: json invalid for dict, enumerating types and removing unsafe types.");
+        DDLogWarn(@"Warning: json invalid for dict, enumerating types and removing unsafe types.");
         [self enumerateObjectTypes:@""];
         return [[self dictionaryWithNonJSONRemoved] JSONString];
     }
@@ -29,8 +29,8 @@
                                                        options:prettyPrinted ? NSJSONWritingPrettyPrinted : 0
                                                          error:&error];
     
-    if (! jsonData) {
-        NSLog(@"NSDictionary+DFJSON error: %@", error.localizedDescription);
+    if (!jsonData) {
+        DDLogError(@"NSDictionary+DFJSON error: %@", error.localizedDescription);
         return @"{}";
     } else {
         return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
@@ -41,8 +41,8 @@
 - (void)enumerateObjectTypes:(NSString *)path
 {
     [self enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-        NSLog(@"key: %@.%@, class %@", path, key, [key class]);
-        NSLog(@"value: %@, class %@", obj, [obj class]);
+        DDLogVerbose(@"key: %@.%@, class %@", path, key, [key class]);
+        DDLogVerbose(@"value: %@, class %@", obj, [obj class]);
         
         if ([[obj class] isSubclassOfClass:[NSDictionary class]]) {
             NSString *newPath = [NSString stringWithFormat:@"%@.%@", path, (NSString *)key];

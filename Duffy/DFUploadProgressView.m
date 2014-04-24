@@ -22,7 +22,7 @@
 
 - (void)awakeFromNib
 {
-    NSLog(@"uploadview awake");
+    DDLogVerbose(@"uploadview awake");
 }
 
 - (id) awakeAfterUsingCoder:(NSCoder*)aDecoder {

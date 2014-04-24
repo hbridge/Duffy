@@ -83,7 +83,7 @@ static DFPhotoStore *defaultStore;
                            attributes:nil
                                 error:&error];
             if (error) {
-                NSLog(@"Error creating cache directory: %@, error: %@", path, error.description);
+                DDLogError(@"Error creating cache directory: %@, error: %@", path, error.description);
                 abort();
             }
         }
@@ -209,7 +209,7 @@ static int const FetchStride = 500;
         NSError *error;
         DFPhoto *photo = (DFPhoto *)[self.managedObjectContext existingObjectWithID:objectID error:&error];
         if (error) {
-            NSLog(@"Error fetching photos with IDs: %@", error.localizedDescription);
+            DDLogError(@"Error fetching photos with IDs: %@", error.localizedDescription);
         }
         if (photo != nil) {
             [photos addObject:photo];
@@ -252,7 +252,7 @@ static int const FetchStride = 500;
     [note.userInfo enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
         NSString *changeType = (NSString *)obj;
         if ([changeType isEqualToString:DFPhotoChangeTypeAdded] || [changeType isEqualToString:DFPhotoChangeTypeRemoved]) {
-            NSLog(@"DFPhotoStore: notification indicates photo added or removed.  reloading camera roll");
+            DDLogInfo(@"DFPhotoStore: notification indicates photo added or removed.  Reloading camera roll.");
             [self loadCameraRollDB];
             *stop = YES;
         }
@@ -338,7 +338,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
          Lightweight migration will only work for a limited set of schema changes; consult "Core Data Model Versioning and Data Migration Programming Guide" for details.
          
          */
-        NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+        DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
         abort();
     }
     
@@ -351,11 +351,11 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
     NSManagedObjectContext *managedObjectContext = self.managedObjectContext;
     if (managedObjectContext != nil) {
         if ([managedObjectContext hasChanges]){
-            NSLog(@"DB changes found, saving.");
+            DDLogInfo(@"DB changes found, saving.");
             if(![managedObjectContext save:&error]) {
                 // Replace this implementation with code to handle the error appropriately.
                 // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                NSLog(@"Unresolved error %@, %@", error, [error userInfo]);
+                DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
                 abort();
             }
         }

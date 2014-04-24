@@ -45,15 +45,13 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-#ifdef DEBUG
-    NSLog(@"photo metadata: %@", [self.photo.metadataDictionary JSONStringPrettyPrinted:YES]);
-    NSLog(@"\n*** photo creation hash:%@, \n***current hash:%@",
+    DDLogVerbose(@"photo metadata: %@", [self.photo.metadataDictionary JSONStringPrettyPrinted:YES]);
+    DDLogVerbose(@"\n*** photo creation hash:%@, \n***current hash:%@",
           self.photo.creationHashData.description,
           self.photo.currentHashData.description);
     [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
-        NSLog(@"photo reverse Geocode: %@", locationDict.description);
+        DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
     }];
-#endif
 }
 
 - (void)didReceiveMemoryWarning
@@ -90,7 +88,7 @@
     
         for (CIFaceFeature *f in features)
         {
-            NSLog(@"face found at %@", NSStringFromCGRect(f.bounds));
+            DDLogVerbose(@"face found at %@", NSStringFromCGRect(f.bounds));
             [boundingBoxes addObject:[NSValue valueWithCGRect:f.bounds]];
         }
         

@@ -8,4 +8,8 @@
 
 #import "DDLog.h"
 
+#ifndef DFRELEASE_LOG_LEVEL
+    #define DFRELEASE_LOG_LEVEL LOG_LEVEL_INFO
+#endif
+
 extern int const ddLogLevel;

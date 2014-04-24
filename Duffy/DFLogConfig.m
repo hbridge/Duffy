@@ -9,7 +9,7 @@
 #import "DFLogConfig.h"
 
 #ifdef DEBUG
-int const ddLogLevel = LOG_LEVEL_VERBOSE;
+    int const ddLogLevel = LOG_LEVEL_VERBOSE;
 #else
-int const ddLogLevel = LOG_LEVEL_WARN;
+    int const ddLogLevel = DFRELEASE_LOG_LEVEL;
 #endif

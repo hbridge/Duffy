@@ -236,7 +236,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     NSURL *queryURL = [NSURL URLWithString:queryURLString];
 
     
-    NSLog(@"Executing search for URL: %@", queryURL.absoluteString);
+    DDLogVerbose(@"Executing search for URL: %@", queryURL.absoluteString);
     [DFAnalytics logSearchLoadStartedWithQuery:query suggestions:self.defaultSearchResults];
     [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
 }
@@ -246,7 +246,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     NSString *requestURLString = request.URL.absoluteString;
     if ([requestURLString rangeOfString:@"user_data"].location != NSNotFound) {
         [webView stopLoading];
-        NSLog(@"Pushing native view of full photo: %@", requestURLString);
+        DDLogVerbose(@"Pushing native view of full photo: %@", requestURLString);
         [self pushPhotoWebView:requestURLString];
         return NO;
     }

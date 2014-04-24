@@ -147,7 +147,7 @@ static DFAnalytics *defaultLogger;
 {
     DFAnalytics *sharedLogger = [DFAnalytics sharedLogger];
     if (![endQuery isEqualToString:sharedLogger.inProgressQueryString]) {
-        NSLog(@"Analytics error: search load end query is different form start query.  Start query: %@ End Query: %@",
+        DDLogError(@"Analytics error: search load end query is different form start query.  Start query: %@ End Query: %@",
               sharedLogger.inProgressQueryString, endQuery);
         return;
     }
@@ -172,7 +172,7 @@ static DFAnalytics *defaultLogger;
 {
     DFAnalytics *sharedLogger = [DFAnalytics sharedLogger];
     if (![query isEqualToString:sharedLogger.inProgressQueryString]) {
-        NSLog(@"Analytics error: logging search aported with different query from start query.  Query aborted: %@ End Query: %@",
+        DDLogError(@"Analytics error: logging search aported with different query from start query.  Query aborted: %@ End Query: %@",
               query, sharedLogger.inProgressQueryString);
         return;
     }

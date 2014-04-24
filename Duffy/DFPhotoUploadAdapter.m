@@ -60,13 +60,13 @@ static const unsigned int FaceDetectionMinMemory = 1000;
              photo.uploadDate = [NSDate date];
              successHandler(numBytes.unsignedIntegerValue);
          } else {
-             NSLog(@"File did not upload properly.  Retrying.");
+             DDLogWarn(@"File did not upload properly.  Retrying.");
              failureHandler([NSError errorWithDomain:@"com.duffyapp.UploadError" code:-10 userInfo:nil]);
          }
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
-         NSLog(@"Upload failed.  Error: %@", error.localizedDescription);
+         DDLogError(@"Upload failed.  Error: %@", error.localizedDescription);
          failureHandler(error);
      }];
     

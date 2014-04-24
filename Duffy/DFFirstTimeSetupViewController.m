@@ -40,38 +40,38 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    NSLog(@"Running first time setup.");
+    DDLogInfo(@"Running first time setup.");
     [DFAnalytics logViewController:self appearedWithParameters:nil];
     
     [self.activityIndicatorView startAnimating];
     
     ALAuthorizationStatus photoAuthStatus = [ALAssetsLibrary authorizationStatus];
     if (photoAuthStatus == ALAuthorizationStatusDenied || photoAuthStatus == ALAuthorizationStatusRestricted) {
-        NSLog(@"Photo access is denied, showing alert and quitting.");
+        DDLogInfo(@"Photo access is denied, showing alert and quitting.");
         [self showGrantPhotoAccessAlertAndQuit];
     } else if (photoAuthStatus == ALAuthorizationStatusNotDetermined) {
-         NSLog(@"Photo access not determined, asking.");
+         DDLogInfo(@"Photo access not determined, asking.");
         [self askForPhotosPermission];
     } else if (photoAuthStatus == ALAuthorizationStatusAuthorized) {
         [self handleUserGrantedPhotoAccess];
-        NSLog(@"Seem to already have photo access.");
+        DDLogInfo(@"Seem to already have photo access.");
     } else {
-        NSLog(@"Unknown photo access value: %d", (int)photoAuthStatus);
+        DDLogError(@"Unknown photo access value: %d", (int)photoAuthStatus);
     }
 }
 - (void)askForPhotosPermission
 {
     // request access to user's photos
-    NSLog(@"Asking for photos permission.");
+    DDLogInfo(@"Asking for photos permission.");
     ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
     
     [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
         if (group == nil) [self handleUserGrantedPhotoAccess];
     } failureBlock:^(NSError *error) {
         if (error.code == ALAssetsLibraryAccessUserDeniedError) {
-            NSLog(@"user denied access, code: %li",(long)error.code);
+            DDLogError(@"User denied access, code: %li",(long)error.code);
         }else{
-            NSLog(@"Other error code: %li",(long)error.code);
+            DDLogError(@"Other error code: %li",(long)error.code);
         }
         [self showGrantPhotoAccessAlertAndQuit];
     }];
@@ -109,7 +109,10 @@
 
 - (void)showGrantPhotoAccessAlertAndQuit
 {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Access Required" message:@"Please give this app permission to access your photo library in your settings app!" delegate:nil cancelButtonTitle:@"Quit" otherButtonTitles:nil, nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Access Required"
+                                                    message:@"Please give this app permission to access your photo library in your settings app!" delegate:nil
+                                          cancelButtonTitle:@"Quit"
+                                          otherButtonTitles:nil, nil];
     alert.delegate = self;
     [alert show];
 }

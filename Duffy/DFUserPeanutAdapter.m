@@ -48,7 +48,7 @@
      success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
      {
          DFUserInfoFetchResponse *response = [mappingResult firstObject];
-         NSLog(@"User Info response received.  result:%@", response.result);
+         DDLogInfo(@"User Info response received.  result:%@", response.result);
          
          DFUser *result;
          if ([response.result isEqualToString:@"true"]) {
@@ -62,7 +62,7 @@
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
-         NSLog(@"User Info fetch failed.  Error: %@", error.localizedDescription);
+         DDLogError(@"User Info fetch failed.  Error: %@", error.localizedDescription);
          dispatch_async(dispatch_get_main_queue(), ^{
              failureBlock(error);
          });
@@ -89,7 +89,7 @@
      success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
      {
          DFUserInfoFetchResponse *response = [mappingResult firstObject];
-         NSLog(@"User create response received.  result:%@", response.result);
+         DDLogInfo(@"User create response received.  result:%@", response.result);
          
          DFUser *result;
          if ([response.result isEqualToString:@"true"]) {
@@ -103,7 +103,7 @@
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
-         NSLog(@"User create failed.  Error: %@", error.localizedDescription);
+         DDLogError(@"User create failed.  Error: %@", error.localizedDescription);
          dispatch_async(dispatch_get_main_queue(), ^{
              failureBlock(error);
          });
