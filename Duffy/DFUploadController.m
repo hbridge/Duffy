@@ -49,7 +49,7 @@
 
 
 
-static const unsigned int MaxSimultaneousUploads = 1;
+static const unsigned int MaxSimultaneousUploads = 2;
 static const unsigned int MaxConsecutiveRetries = 5;
 
 
