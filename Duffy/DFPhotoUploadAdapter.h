@@ -18,6 +18,6 @@ typedef void (^DFPhotoUploadFailureBlock)(NSError *error);
 - (void)uploadPhoto:(DFPhoto *)photo
    withSuccessBlock:(DFPhotoUploadSuccessBlock)successHandler
        failureBlock:(DFPhotoUploadFailureBlock)failureHandler;
-
+- (void)cancelAllUploads;
 
 @end
