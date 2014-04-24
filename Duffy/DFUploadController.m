@@ -49,7 +49,7 @@
 
 
 
-static const unsigned int MaxSimultaneousUploads = 1;
+static const unsigned int MaxSimultaneousUploads = 2;
 static const unsigned int MaxConsecutiveRetries = 5;
 
 
@@ -57,7 +57,8 @@ typedef enum {
     DFStatusUpdateProgress,
     DFStatusUpdateComplete,
     DFStatusUpdateError,
-    DFStatusUpdateCancelled
+    DFStatusUpdateCancelled,
+    DFStatusUpdateResumed,
 } DFStatusUpdateType;
 
 // We want the upload controller to be a singleton
@@ -317,6 +318,8 @@ static DFUploadController *defaultUploadController;
             [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:5];
         } else if (updateType == DFStatusUpdateCancelled) {
             [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
+        } else if (updateType == DFStatusUpdateResumed) {
+            [JDStatusBarNotification showWithStatus:@"Upload resuming..." dismissAfter:2];
         }
     });
 }
@@ -351,6 +354,8 @@ static DFUploadController *defaultUploadController;
         return;
     }
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
+        DDLogInfo(@"Background upload task about to expire.  Cancelling uploads and ending background task.");
+        [self.uploadAdapter cancelAllUploads];
         [self endBackgroundUpdateTask];
     }];
 }

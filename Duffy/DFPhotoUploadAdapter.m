@@ -74,6 +74,14 @@ static const unsigned int FaceDetectionMinMemory = 1000;
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
 }
 
+- (void)cancelAllUploads
+{
+    DDLogInfo(@"%@ cancelling all uploads.", [self.class description]);
+    [self.objectManager.operationQueue cancelAllOperations];
+}
+
+
+#pragma mark - Private methods
 
 - (NSMutableURLRequest *)createPostRequestForPhoto:(DFPhoto *)photo
 {

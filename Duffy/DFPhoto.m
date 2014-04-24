@@ -9,10 +9,12 @@
 #import "DFPhoto.h"
 
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <ImageIO/ImageIO.h>
 #import "DFPhotoStore.h"
 #import "ThirdParty/UIImage-Categories/UIImage+Resize.h"
 #import "DFPhotoImageCache.h"
 #import "DFDataHasher.h"
+
 
 @interface DFPhoto()
 
@@ -75,7 +77,11 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
         }
         
         if (error) {
-            DDLogError(@"fetchReverseGeocodeDict error:%@", [error localizedDescription]);
+            BOOL possibleThrottle = NO;
+            if (error.code == kCLErrorNetwork) possibleThrottle = YES;
+            DDLogError(@"fetchReverseGeocodeDict error:%@, Possible rate limit:%@",
+                       [error localizedDescription],
+                       possibleThrottle ? @"YES" : @"NO");
         }
         
         completionBlock(locationDict);
@@ -131,6 +137,20 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     return loadedFullImage;
 }
 
+- (UIImage *)highResolutionImage
+{
+    if (self.asset) {
+        @autoreleasepool {
+            UIImage *image = [self thumbnailForAsset:self.asset maxPixelSize:2048];
+            return image;
+        }
+    } else {
+        DDLogError(@"Could not get asset for photo: %@", self.description);
+    }
+    
+    return nil;
+}
+
 - (UIImage *)fullScreenImage
 {
     UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
@@ -147,15 +167,27 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 - (UIImage *)imageResizedToFitSize:(CGSize)size
 {
-    UIImage *resizedImage = [self.fullResolutionImage resizedImageWithContentMode:UIViewContentModeScaleAspectFit
-                                                                 bounds:size
-                                                   interpolationQuality:kCGInterpolationHigh];
+
+    UIImage *resizedImage = [self thumbnailForAsset:self.asset maxPixelSize:MAX(size.height, size.width)];
     return resizedImage;
 }
 
 - (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
 {
-    return [self.fullResolutionImage resizedImageWithSmallerDimensionScaledToLength:length interpolationQuality:kCGInterpolationHigh];
+    CGSize originalSize = self.asset.defaultRepresentation.dimensions;
+    CGSize newSize;
+    if (originalSize.height < originalSize.width) {
+        CGFloat scaleFactor = length/originalSize.height;
+        newSize = CGSizeMake(ceil(originalSize.width * scaleFactor), length);
+    } else {
+        CGFloat scaleFactor = length/originalSize.width;
+        newSize = CGSizeMake(length, ceil(originalSize.height * scaleFactor));
+    }
+    DDLogVerbose(@"originalImageSize:%@, newSize:%@",
+                 NSStringFromCGSize(self.asset.defaultRepresentation.dimensions),
+                 NSStringFromCGSize(newSize));
+
+    return [self imageResizedToFitSize:newSize];
 }
 
 
@@ -207,16 +239,69 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     }
 }
 
+// Helper methods for thumbnailForAsset:maxPixelSize:
+static size_t getAssetBytesCallback(void *info, void *buffer, off_t position, size_t count) {
+    ALAssetRepresentation *rep = (__bridge id)info;
+    
+    NSError *error = nil;
+    size_t countRead = [rep getBytes:(uint8_t *)buffer fromOffset:position length:count error:&error];
+    
+    if (countRead == 0 && error) {
+        // We have no way of passing this info back to the caller, so we log it, at least.
+        NSLog(@"thumbnailForAsset:maxPixelSize: got an error reading an asset: %@", error);
+    }
+    
+    return countRead;
+}
 
-- (CIImage *)CIImageForFullImage
-{
-    ALAssetRepresentation *rep = [self.asset defaultRepresentation];
-    Byte *buffer = (Byte*)malloc((unsigned long)rep.size);
-    NSUInteger buffered = [rep getBytes:buffer fromOffset:0.0 length:(unsigned long)rep.size error:nil];
-    NSData *data = [NSData dataWithBytesNoCopy:buffer length:buffered freeWhenDone:YES];
+static void releaseAssetCallback(void *info) {
+    // The info here is an ALAssetRepresentation which we CFRetain in thumbnailForAsset:maxPixelSize:.
+    // This release balances that retain.
+    CFRelease(info);
+}
+
+// Returns a UIImage for the given asset, with size length at most the passed size.
+// The resulting UIImage will be already rotated to UIImageOrientationUp, so its CGImageRef
+// can be used directly without additional rotation handling.
+// This is done synchronously, so you should call this method on a background queue/thread.
+- (UIImage *)thumbnailForAsset:(ALAsset *)asset maxPixelSize:(NSUInteger)size {
+    NSParameterAssert(asset != nil);
+    NSParameterAssert(size > 0);
     
+    ALAssetRepresentation *rep = [asset defaultRepresentation];
     
-    return [CIImage imageWithData:data];
+    CGDataProviderDirectCallbacks callbacks = {
+        .version = 0,
+        .getBytePointer = NULL,
+        .releaseBytePointer = NULL,
+        .getBytesAtPosition = getAssetBytesCallback,
+        .releaseInfo = releaseAssetCallback,
+    };
+    
+    CGDataProviderRef provider = CGDataProviderCreateDirect((void *)CFBridgingRetain(rep), [rep size], &callbacks);
+    CGImageSourceRef source = CGImageSourceCreateWithDataProvider(provider, NULL);
+    
+    CGImageRef imageRef = CGImageSourceCreateThumbnailAtIndex(source,
+                                                              0,
+                                                              (__bridge CFDictionaryRef) @{
+                                                                                           (NSString *)kCGImageSourceCreateThumbnailFromImageAlways : @YES,
+                                                                                           (NSString *)kCGImageSourceThumbnailMaxPixelSize : [NSNumber numberWithUnsignedInteger:size],
+                                                                                           (NSString *)kCGImageSourceCreateThumbnailWithTransform : @YES,
+                                                                                           });
+    CFRelease(source);
+    CFRelease(provider);
+    
+    if (!imageRef) {
+        return nil;
+    }
+    
+    UIImage *toReturn = [UIImage imageWithCGImage:imageRef];
+    DDLogVerbose(@"thumbnailForAsset returnSize:%@ for maxPixel:%lu",
+                 NSStringFromCGSize(toReturn.size),
+                 (unsigned long)size);
+    CFRelease(imageRef);
+    
+    return toReturn;
 }
 
 - (ALAsset *)asset
