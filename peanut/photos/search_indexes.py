@@ -28,11 +28,11 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	'''
 	def prepare_text(self, obj):
-		#self.add_faceKeywords(obj)
 		return self.add_locData(obj) + '\n' + \
 				self.add_classData(obj, 20) + '\n' + \
 				self.add_altTerms(obj, 20) + '\n' + \
-				self.add_faceKeywords(obj)
+				self.add_faceKeywords(obj) + '\n' + \
+				self.add_screenshotKeywords(obj)
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
@@ -42,6 +42,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 			return obj.time_taken
 		else:
 			return "1900-01-01T01:01:01Z"
+
+### Helper functions to clean up data before adding to index
 
 	'''
 	Cleans the location data to be inserted in the index
@@ -134,4 +136,20 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 					termList += ',' 
 					termList += ', '.join(smileKeywords)
 				return termList
+		return ''
+
+	'''
+	adds the keyword 'screenshot, screenshots' if there is a screenshot detected
+	'''
+	def add_screenshotKeywords(self, obj):
+		screenshotKeywords = {'screenshot', 'screenshots'}
+		png = 'png'
+		#print ''
+		#print obj.metadata
+		if (len(obj.metadata) > 0):
+			metadata = json.loads(obj.metadata)
+			if (len(metadata) > 0):
+				for k, v in metadata.items():
+					if (png.lower() in k.lower()):
+						return ', '.join(screenshotKeywords)
 		return ''
