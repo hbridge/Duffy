@@ -15,6 +15,7 @@
 #import "DFStatusBarNotificationManager.h"
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
+#import <RestKit/RestKit.h>
 
 @interface DFUploadController2()
 
@@ -122,6 +123,12 @@ static DFUploadController2 *defaultUploadController;
             return;
         }
         
+        if ([[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus] != AFNetworkReachabilityStatusReachableViaWiFi
+            && [[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
+            DDLogInfo(@"In background and not on wifi.  Cancelling uploads.");
+            [self cancelAllUploadsOperationWithIsError:NO silent:YES];
+        }
+        
         [self beginBackgroundUpdateTask];
         NSManagedObjectID *nextPhotoID = [self.objectIDQueue takeNextObject];
         if (nextPhotoID) {
@@ -211,6 +218,7 @@ static DFUploadController2 *defaultUploadController;
                   isSilent ? @"true" : @"false");
         [self.objectIDQueue removeAllObjects];
         [self.uploadOperationQueue cancelAllOperations];
+        _currentSessionStats = nil;
         
         if (!isSilent){
             if (isError) {
@@ -224,7 +232,6 @@ static DFUploadController2 *defaultUploadController;
             }
             [DFAnalytics logUploadCancelledWithIsError:isError];
         }
-        _currentSessionStats = nil;
         [self endBackgroundUpdateTask];
     }];
 }
