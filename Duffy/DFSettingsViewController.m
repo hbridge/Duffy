@@ -9,7 +9,7 @@
 #import "DFSettingsViewController.h"
 #import <CocoaLumberjack/DDFileLogger.h>
 #import "DFPhotoStore.h"
-#import "DFUploadController.h"
+#import "DFUploadController2.h"
 #import "DFUser.h"
 #import "DFAnalytics.h"
 #import "DFNotificationSharedConstants.h"
@@ -174,7 +174,7 @@ NSString *DFEnabledNo = @"NO";
 }
 
 - (IBAction)cancelUpload:(UIButton *)sender {
-    [[DFUploadController sharedUploadController] cancelUpload];
+    [[DFUploadController2 sharedUploadController] cancelUploads];
 }
 
 - (IBAction)sendInfoClicked:(UIButton *)sender {
@@ -257,7 +257,7 @@ static const int MaxLogFiles = 10;
 
 - (IBAction)reUploadAllClicked:(UIButton *)sender {
     DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
-    [[DFUploadController sharedUploadController] uploadPhotos:[cameraRollPhotos photosByDateAscending:NO]];
+    [[DFUploadController2 sharedUploadController] uploadPhotos:[cameraRollPhotos photosByDateAscending:NO]];
 }
 
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {

@@ -12,7 +12,7 @@
 #import "DFTableHeaderView.h"
 #import "DFAutocompleteController.h"
 #import "DFAnalytics.h"
-#import "DFUploadController.h"
+#import "DFUploadController2.h"
 #import "DFNotificationSharedConstants.h"
 
 @interface DFSearchViewController ()

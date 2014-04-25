@@ -13,6 +13,11 @@
 #import "DFUser.h"
 #import "NSDictionary+DFJSON.h"
 
+// Result dict strings
+NSString const *DFUploadResultErrorKey = @"DFUploadResult";
+NSString const *DFUploadResultNumBytes = @"DFUploadNumBytes";
+
+
 // Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
 @property (nonatomic, retain) NSString *result;
@@ -75,6 +80,38 @@ static const unsigned int FaceDetectionMinMemory = 1000;
      }];
     
     [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
+}
+
+- (NSDictionary *)uploadPhoto:(DFPhoto *)photo
+{
+    NSURLRequest *postRequest = [self createPostRequestForPhoto:photo];
+    
+    NSNumber *numBytes = [NSURLProtocol propertyForKey:@"DFPhotoNumBytes" inRequest:postRequest];
+    
+    RKObjectRequestOperation *operation =
+    [[self objectManager] objectRequestOperationWithRequest:postRequest
+                                                    success:nil
+                                                    failure:nil];
+    
+    [[self objectManager] enqueueObjectRequestOperation:operation]; // NOTE: Must be enqueued rather than started
+    [operation waitUntilFinished];
+    
+    DFUploadResponse *response = [operation.mappingResult firstObject];
+    NSDictionary *resultDict;
+    if ([response.result isEqualToString:@"true"]) {
+        resultDict = @{DFUploadResultNumBytes: numBytes};
+    } else if (![response.result isEqualToString:@"true"]){
+        DDLogError(@"File did not upload properly.  Server error: %@", response.debug);
+    } else if (operation.isCancelled) {
+        DDLogInfo(@"Cancelled upload returned");
+    } else if (operation.error && !operation.isCancelled) {
+        DDLogError(@"File did not upload properly.  Error:%@", operation.error);
+        resultDict = @{DFUploadResultErrorKey: operation.error};
+    } else {
+        DDLogError(@"File did not upload properly.  Unexpected condition.");
+    }
+    
+    return resultDict;
 }
 
 - (void)cancelAllUploads

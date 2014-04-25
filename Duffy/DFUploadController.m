@@ -28,12 +28,12 @@
 @interface DFUploadController()
 
 @property (atomic, retain) DFPhotoUploadAdapter *uploadAdapter;
-@property (atomic) dispatch_queue_t dispatchQueue;
 @property (atomic, retain) DFUploadQueue *uploadURLQueue;
-@property (atomic) unsigned int numUploadOperations;
 @property (atomic) unsigned int consecutiveRetryCount;
 @property (atomic) unsigned int sessionRetryCount;
 @property (atomic) dispatch_semaphore_t saveSemaphore;
+@property (atomic, retain) NSMutableArray *uploadOperationQueues;
+@property (atomic, retain) NSOperationQueue *synchronizedOperationQueue;
 
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
@@ -45,8 +45,6 @@
 @implementation DFUploadController
 
 @synthesize managedObjectContext = _managedObjectContext;
-
-
 
 static const unsigned int MaxSimultaneousUploads = 2;
 static const unsigned int MaxConsecutiveRetries = 5;
@@ -78,7 +76,14 @@ static DFUploadController *defaultUploadController;
 {
     self = [super init];
     if (self) {
-        self.dispatchQueue = dispatch_queue_create("com.duffyapp.DFUploadController.dispatchQueue", DISPATCH_QUEUE_CONCURRENT);
+        self.synchronizedOperationQueue = [[NSOperationQueue alloc] init];
+        self.synchronizedOperationQueue.maxConcurrentOperationCount = 1;
+        self.uploadOperationQueues = [[NSMutableArray alloc] initWithCapacity:MaxSimultaneousUploads];
+        for (int i = 0; i < MaxSimultaneousUploads; i++) {
+            NSOperationQueue *newQueue = [[NSOperationQueue alloc] init];
+            newQueue.maxConcurrentOperationCount = 1;
+            [self.uploadOperationQueues addObject:newQueue];
+        }
         self.saveSemaphore = dispatch_semaphore_create(1);
         self.uploadURLQueue = [[DFUploadQueue alloc] init];
         [self setupStatusBarNotifications];
@@ -155,59 +160,87 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadQueueChanged
 {
-    [self postStatusUpdate];
-    
-    if (self.uploadURLQueue.objectsWaiting.count > 0) {
-        dispatch_async(self.dispatchQueue, ^{
-            if (self.numUploadOperations >= MaxSimultaneousUploads) {
-                return;
+    [self.synchronizedOperationQueue addOperationWithBlock:^{
+        [self postStatusUpdate];
+        
+        if (self.uploadURLQueue.objectsWaiting.count > 0) {
+            for (NSOperationQueue *uploadQueue in self.uploadOperationQueues) {
+                if (uploadQueue.operationCount < 1) {
+                    DDLogVerbose(@"Found a free queue at index: %d.", (int)[self.uploadOperationQueues indexOfObject:uploadQueue]);
+                    
+                    // TODO get a request using the sync'd queue and context
+                    // Create an upload operation and send to the queue
+                    [uploadQueue addOperation:[self uploadOperationForNextUpload]];
+                }
             }
             
-            while (self.numUploadOperations < MaxSimultaneousUploads){
-                self.numUploadOperations++;
-                
-                NSString *photoURLString = [self.uploadURLQueue takeNextObject];
-                if (!photoURLString) {
-                    self.numUploadOperations--;
-                    break;
-                }
-                DFPhoto *photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
-                if (photo == nil) {
-                    [self.uploadURLQueue markObjectCancelled:photoURLString];
-                    self.numUploadOperations--;
-                    [self uploadQueueChanged];
-                    break;
-                }
-                
-                
-                [DFAnalytics logUploadBegan];
-                [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
-                    dispatch_async(self.dispatchQueue, ^{
-                        self.numUploadOperations--;
-                        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:numBytes];
-                        [self uploadFinishedForPhoto:photo];
-                    });
-                } failureBlock:^(NSError *error) {
-                    dispatch_async(self.dispatchQueue, ^{
-                        self.numUploadOperations--;
-                        NSString *debugString = [NSString stringWithFormat:@"%@ %ld", error.domain, (long)error.code];
-                        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
-                        
-                        if ([self isErrorRetryable:error]) {
-                            [self retryUploadPhoto:photo];
-                        } else {
-                            [self cancelUploadsWithIsError:YES silent:NO];
-                        }
-                    });
-                }];
-            }
-        });
-    } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
-        DDLogInfo(@"No photos remaining.");
-        [self.uploadURLQueue clearCompleted];
-        [self endBackgroundUpdateTask];
-    }
+        } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
+            DDLogInfo(@"No photos remaining.");
+            [self.uploadURLQueue clearCompleted];
+            [self endBackgroundUpdateTask];
+        }
+    }];
 }
+
+- (NSOperation *)uploadOperationForNextUpload
+{
+    NSError __block *returnedError = nil;
+    NSUInteger __block returnedBytes = 0;
+    DFPhoto __block *photo;
+    
+    NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+        NSString *photoURLString = [self.uploadURLQueue takeNextObject];
+        if (!photoURLString) {
+            return;
+        }
+        
+        //NOT SAFE TO GET THE PHOTO ON THIS THREAD, data should be passed in from the sync'ed queue
+        
+        photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
+        if (photo == nil) {
+            [self.uploadURLQueue markObjectCancelled:photoURLString];
+            [self uploadQueueChanged];
+            return;
+        }
+        
+        [DFAnalytics logUploadBegan];
+        
+        dispatch_semaphore_t uploadSemaphore = dispatch_semaphore_create(0);
+       
+        [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
+            returnedBytes = numBytes;
+            dispatch_semaphore_signal(uploadSemaphore);
+        } failureBlock:^(NSError *error) {
+            returnedError = error;
+            dispatch_semaphore_signal(uploadSemaphore);
+        }];
+        
+        
+        dispatch_semaphore_wait(uploadSemaphore, DISPATCH_TIME_FOREVER);
+        
+    }];
+    
+    [operation setCompletionBlock:^{
+        [self.synchronizedOperationQueue addOperationWithBlock:^{
+            if (!returnedError) {
+                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:returnedBytes];
+                [self uploadFinishedForPhoto:photo];
+            } else {
+                NSString *debugString = [NSString stringWithFormat:@"%@ %ld", returnedError.domain, (long)returnedError.code];
+                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
+                
+                if ([self isErrorRetryable:returnedError]) {
+                    [self retryUploadPhoto:photo];
+                } else {
+                    [self cancelUploadsWithIsError:YES silent:NO];
+                }
+            }
+        }];
+    }];
+    
+    return operation;
+}
+
 
 - (BOOL)isErrorRetryable:(NSError *)error
 {
