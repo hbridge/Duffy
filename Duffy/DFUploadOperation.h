@@ -11,7 +11,7 @@
 @interface DFUploadOperation : NSOperation
 
 typedef void (^DFPhotoUploadOperationSuccessBlock)(NSUInteger numImageBytes);
-typedef void (^DFPhotoUploadOperationFailureBlock)(NSError *error);
+typedef void (^DFPhotoUploadOperationFailureBlock)(NSError *error, BOOL isCancelled);
 
 @property (nonatomic, retain) NSManagedObjectID *photoID;
 @property (nonatomic, retain) NSOperationQueue *completionOperationQueue;

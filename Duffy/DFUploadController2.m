@@ -135,7 +135,7 @@ static DFUploadController2 *defaultUploadController;
             }
         } else {
             //there's nothing else to upload, check to see if everything's complete
-            if (self.objectIDQueue.numObjectsIncomplete == 0) {
+            if (self.objectIDQueue.numObjectsIncomplete == 0 && self.objectIDQueue.numObjectsComplete > 0) {
                 [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
             }
         }
@@ -172,7 +172,8 @@ static DFUploadController2 *defaultUploadController;
 
 - (DFPhotoUploadOperationFailureBlock)uploadFailureBlockForObjectID:(NSManagedObjectID *)objectID
 {
-    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error){
+    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error, BOOL isCancelled){
+        if (isCancelled) return;
         DDLogVerbose(@"Upload failed for %@", objectID.description);
         if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
             DDLogVerbose(@"Error retryable.  Moving to back of queue.");

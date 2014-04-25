@@ -40,10 +40,12 @@
         if (!photo || !([[photo class] isSubclassOfClass:[DFPhoto class]])) {
             [self failure:[NSError errorWithDomain:@"com.duffyapp.Duffy.DFUploadOperation" code:-100 userInfo:@{NSLocalizedDescriptionKey: @"objectWithID was invalid"}]];
         }
+        if (self.isCancelled) return;
         
         DFPhotoUploadAdapter *uploadAdapter = [[DFPhotoUploadAdapter alloc] init];
         NSDictionary *result = [uploadAdapter uploadPhoto:photo];
         
+        if (self.isCancelled) [uploadAdapter cancelAllUploads];
         if (result[DFUploadResultNumBytes]) {
             [self success:[result[DFUploadResultNumBytes] unsignedIntegerValue]];
         } else {
@@ -56,10 +58,11 @@
 {
     NSOperationQueue __block *completionQueue = self.completionOperationQueue;
     DFPhotoUploadOperationFailureBlock __block cachedFailureBlock = self.failureBlock;
+    BOOL __block cachedCancelled = self.isCancelled;
     
     [self setCompletionBlock:^{
         [completionQueue addOperation:[NSBlockOperation blockOperationWithBlock:^{
-            cachedFailureBlock(error);
+            cachedFailureBlock(error, cachedCancelled);
         }]];
     }];
 }
