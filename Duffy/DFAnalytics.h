@@ -27,9 +27,8 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logSearchLoadEndedWithQuery:(NSString *)query;
 + (void)logSearchResultPageLoaded:(NSInteger)searchPage;
 
-+ (void)logUploadBegan;
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
-+ (void)logUploadEndedWithResult:(NSString *)resultValue numImageBytes:(NSUInteger)imageDataSizeInBytes;
++ (void)logUploadEndedWithResult:(NSString *)resultValue numImageBytes:(NSUInteger)imageDataSizeInBytes sessionAvgThroughputKBPS:(double)KBPS;
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
 + (void)logUploadCancelledWithIsError:(BOOL)isError;
 + (void)logUploadRetryCountExceededWithCount:(unsigned int)count;

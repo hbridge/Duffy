@@ -203,7 +203,7 @@ static DFUploadController *defaultUploadController;
             return;
         }
         
-        [DFAnalytics logUploadBegan];
+        //[DFAnalytics logUploadBegan];
         
         dispatch_semaphore_t uploadSemaphore = dispatch_semaphore_create(0);
        
@@ -223,7 +223,7 @@ static DFUploadController *defaultUploadController;
     [operation setCompletionBlock:^{
         [self.synchronizedOperationQueue addOperationWithBlock:^{
             if (!returnedError) {
-                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:returnedBytes];
+                //[DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:returnedBytes];
                 [self uploadFinishedForPhoto:photo];
             } else {
                 NSString *debugString = [NSString stringWithFormat:@"%@ %ld", returnedError.domain, (long)returnedError.code];

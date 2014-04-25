@@ -69,6 +69,7 @@ NSString* const DebugStringKey = @"debug";
 
 NSString* const UploadPhotoCancelled = @"UploadCancelled";
 NSString* const UploadRetriesExceeded = @"UploadRetriesExceeded";
+NSString* const SessionAvgKBPSKey = @"sessionAvgKBPS";
 
 // Individual photo loads
 NSString* const PhotoWebviewLoadEvent = @"PhotoWebviewLoad";
@@ -191,32 +192,26 @@ static DFAnalytics *defaultLogger;
     sharedLogger.inProgressQueryStart = nil;
 }
 
-
-+ (void)logUploadBegan
-{
-    [Flurry logEvent:UploadPhotoEvent
-               timed:YES];
-}
-
 + (void)logUploadEndedWithResult:(NSString *)resultValue
 {
-    [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
+    [Flurry logEvent:UploadPhotoEvent withParameters:@{
                                                             ResultKey: resultValue,
                                                             }];
 }
 
 
-+ (void)logUploadEndedWithResult:(NSString *)resultValue numImageBytes:(NSUInteger)imageDataSizeInBytes
++ (void)logUploadEndedWithResult:(NSString *)resultValue numImageBytes:(NSUInteger)imageDataSizeInBytes sessionAvgThroughputKBPS:(double)KBPS;
 {
-    [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
+    [Flurry logEvent:UploadPhotoEvent withParameters:@{
                                                             ResultKey: resultValue,
-                                                            SizeInKBKey: [NSNumber numberWithUnsignedInteger:imageDataSizeInBytes/1000]
+                                                            SizeInKBKey: [NSNumber numberWithUnsignedInteger:imageDataSizeInBytes/1000],
+                                                            SessionAvgKBPSKey: [NSNumber numberWithDouble:KBPS]
                                                             }];
 }
 
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug
 {
-    [Flurry endTimedEvent:UploadPhotoEvent withParameters:@{
+    [Flurry logEvent:UploadPhotoEvent withParameters:@{
                                                             ResultKey: resultValue,
                                                             DebugStringKey: debug
                                                             }];

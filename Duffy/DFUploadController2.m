@@ -25,8 +25,7 @@
 @property (atomic, retain) NSOperationQueue *uploadOperationQueue;
 @property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
 
-@property (nonatomic) unsigned int consecutiveRetryCount;
-@property (nonatomic) unsigned int sessionRetryCount;
+@property (nonatomic, retain) DFUploadSessionStats *currentSessionStats;
 
 @end
 
@@ -34,8 +33,9 @@
 @implementation DFUploadController2
 
 @synthesize managedObjectContext = _managedObjectContext;
+@synthesize currentSessionStats = _currentSessionStats;
 
-static unsigned int MaxConcurrentUploads = 3;
+static unsigned int MaxConcurrentUploads = 2;
 static unsigned int MaxRetryCount = 5;
 
 // We want the upload controller to be a singleton
@@ -125,7 +125,6 @@ static DFUploadController2 *defaultUploadController;
         [self beginBackgroundUpdateTask];
         NSManagedObjectID *nextPhotoID = [self.objectIDQueue takeNextObject];
         if (nextPhotoID) {
-            DDLogVerbose(@"Dispatching %@ on uploadQueue.", nextPhotoID);
             DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] initWithPhotoID:nextPhotoID];
             uploadOperation.completionOperationQueue = self.syncOperationQueue;
             uploadOperation.successBlock = [self uploadSuccessfullBlockForObjectID:nextPhotoID];
@@ -148,10 +147,13 @@ static DFUploadController2 *defaultUploadController;
 - (DFPhotoUploadOperationSuccessBlock)uploadSuccessfullBlockForObjectID:(NSManagedObjectID *)objectID
 {
     DFPhotoUploadOperationSuccessBlock successBlock = ^(NSUInteger numBytes){
-        DDLogVerbose(@"Upload successful for %@", objectID.description);
         [self.objectIDQueue markObjectCompleted:objectID];
         [self saveUploadedPhotoWithObjectID:objectID];
-        self.consecutiveRetryCount = 0;
+        self.currentSessionStats.numConsecutiveRetries = 0;
+        self.currentSessionStats.numBytesUploaded += numBytes;
+        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
+                                numImageBytes:numBytes
+                     sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
         [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
     };
     return successBlock;
@@ -172,12 +174,13 @@ static DFUploadController2 *defaultUploadController;
 {
     DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error){
         DDLogVerbose(@"Upload failed for %@", objectID.description);
-        if ([self isErrorRetryable:error] && self.consecutiveRetryCount < MaxRetryCount) {
+        if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
             DDLogVerbose(@"Error retryable.  Moving to back of queue.");
             [self.objectIDQueue moveInProgressObjectBackToQueue:objectID];
-            self.consecutiveRetryCount++;
-            self.sessionRetryCount++;
+            self.currentSessionStats.numConsecutiveRetries++;
+            self.currentSessionStats.numTotalRetries++;
         } else {
+            [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
             NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
             [cancelOperation start];
         }
@@ -220,6 +223,7 @@ static DFUploadController2 *defaultUploadController;
             }
             [DFAnalytics logUploadCancelledWithIsError:isError];
         }
+        _currentSessionStats = nil;
         [self endBackgroundUpdateTask];
     }];
 }
@@ -228,8 +232,7 @@ static DFUploadController2 *defaultUploadController;
 {
     NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         DDLogInfo(@"All uploads complete.");
-        self.consecutiveRetryCount = 0;
-        self.sessionRetryCount = 0;
+        _currentSessionStats = nil;
         [self endBackgroundUpdateTask];
     }];
     
@@ -261,13 +264,15 @@ static DFUploadController2 *defaultUploadController;
 
 - (DFUploadSessionStats *)currentSessionStats
 {
-    DFUploadSessionStats *stats = [[DFUploadSessionStats alloc] init];
-    stats.numAcceptedUploads = self.objectIDQueue.numTotalObjects;
-    stats.numUploaded = self.objectIDQueue.numObjectsComplete;
-    stats.numConsecutiveRetries = self.consecutiveRetryCount;
-    stats.numTotalRetries = self.sessionRetryCount;
+    if (!_currentSessionStats) {
+        _currentSessionStats = [[DFUploadSessionStats alloc] init];
+        _currentSessionStats.startDate = [NSDate date];
+    }
+    _currentSessionStats.numAcceptedUploads = self.objectIDQueue.numTotalObjects;
+    _currentSessionStats.numUploaded = self.objectIDQueue.numObjectsComplete;
     
-    return stats;
+    
+    return _currentSessionStats;
 }
 
 #pragma mark - Core Data helpers
