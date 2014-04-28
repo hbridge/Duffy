@@ -27,8 +27,8 @@ class Photo(models.Model):
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
-	def __unicode__(self): 
-		return str(self.user) + "/" + str(self.new_filename)
+	def __unicode__(self):
+		return u'%s/%s' % (self.user, self.new_filename)
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
