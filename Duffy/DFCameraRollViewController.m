@@ -8,7 +8,7 @@
 
 #import "DFCameraRollViewController.h"
 #import "DFPhotoStore.h"
-#import "DFUploadController2.h"
+#import "DFUploadController.h"
 #import "DFSettingsViewController.h"
 #import "DFPhoto.h"
 #import "DFAnalytics.h"
@@ -108,7 +108,7 @@
     
     if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
         DFPhotoCollection *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
-        [[DFUploadController2 sharedUploadController] uploadPhotos:[photosToUpload photosByDateAscending:NO]];
+        [[DFUploadController sharedUploadController] uploadPhotos:[photosToUpload photosByDateAscending:NO]];
     }
 }
 

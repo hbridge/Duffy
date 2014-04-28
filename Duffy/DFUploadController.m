@@ -1,62 +1,43 @@
 //
-//  DFUploadController.m
+//  DFUploadController2.m
 //  Duffy
 //
-//  Created by Henry Bridge on 3/11/14.
+//  Created by Henry Bridge on 4/25/14.
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import <RestKit/RestKit.h>
-#import <CommonCrypto/CommonHMAC.h>
-#import <JDStatusBarNotification/JDStatusBarNotification.h>
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
-#import "DFUser.h"
-#import "DFSettingsViewController.h"
-#import "NSDictionary+DFJSON.h"
-#import "DFPhoto+FaceDetection.h"
+#import "DFUploadQueue.h"
+#import "DFUploadOperation.h"
+#import "DFAnalytics.h"
+#import "DFStatusBarNotificationManager.h"
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
-#import "DFAnalytics.h"
-#import "DFPhotoUploadAdapter.h"
-#import "DFUploadQueue.h"
-
-
-
+#import <RestKit/RestKit.h>
 
 @interface DFUploadController()
 
-@property (atomic, retain) DFPhotoUploadAdapter *uploadAdapter;
-@property (atomic, retain) DFUploadQueue *uploadURLQueue;
-@property (atomic) unsigned int consecutiveRetryCount;
-@property (atomic) unsigned int sessionRetryCount;
-@property (atomic) dispatch_semaphore_t saveSemaphore;
-@property (atomic, retain) NSMutableArray *uploadOperationQueues;
-@property (atomic, retain) NSOperationQueue *synchronizedOperationQueue;
-
-@property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
-
-
+@property (atomic, retain) DFUploadQueue *objectIDQueue;
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
+@property (atomic, retain) NSOperationQueue *syncOperationQueue;
+@property (atomic, retain) NSOperationQueue *uploadOperationQueue;
+@property (nonatomic) UIBackgroundTaskIdentifier backgroundUpdateTask;
+
+@property (nonatomic, retain) DFUploadSessionStats *currentSessionStats;
+
 @end
+
 
 @implementation DFUploadController
 
 @synthesize managedObjectContext = _managedObjectContext;
+@synthesize currentSessionStats = _currentSessionStats;
 
-static const unsigned int MaxSimultaneousUploads = 2;
-static const unsigned int MaxConsecutiveRetries = 5;
-
-
-typedef enum {
-    DFStatusUpdateProgress,
-    DFStatusUpdateComplete,
-    DFStatusUpdateError,
-    DFStatusUpdateCancelled,
-    DFStatusUpdateResumed,
-} DFStatusUpdateType;
+static unsigned int MaxConcurrentUploads = 2;
+static unsigned int MaxRetryCount = 5;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
@@ -72,175 +53,150 @@ static DFUploadController *defaultUploadController;
     return [self sharedUploadController];
 }
 
-- (DFUploadController *)init
+
+- (id)init
 {
     self = [super init];
     if (self) {
-        self.synchronizedOperationQueue = [[NSOperationQueue alloc] init];
-        self.synchronizedOperationQueue.maxConcurrentOperationCount = 1;
-        self.uploadOperationQueues = [[NSMutableArray alloc] initWithCapacity:MaxSimultaneousUploads];
-        for (int i = 0; i < MaxSimultaneousUploads; i++) {
-            NSOperationQueue *newQueue = [[NSOperationQueue alloc] init];
-            newQueue.maxConcurrentOperationCount = 1;
-            [self.uploadOperationQueues addObject:newQueue];
-        }
-        self.saveSemaphore = dispatch_semaphore_create(1);
-        self.uploadURLQueue = [[DFUploadQueue alloc] init];
-        [self setupStatusBarNotifications];
-        self.backgroundUpdateTask = UIBackgroundTaskInvalid;
-        self.uploadAdapter = [[DFPhotoUploadAdapter alloc] init];
+        self.objectIDQueue = [[DFUploadQueue alloc] init];
+        // Setup operation queues
+        self.syncOperationQueue = [[NSOperationQueue alloc] init];
+        self.syncOperationQueue.maxConcurrentOperationCount = 1;
+        self.uploadOperationQueue = [[NSOperationQueue alloc] init];
+        self.uploadOperationQueue.maxConcurrentOperationCount = MaxConcurrentUploads;
     }
     return self;
 }
 
-- (DFUploadSessionStats *)currentSessionStats
-{
-    DFUploadSessionStats *stats = [[DFUploadSessionStats alloc] init];
-    stats.numAcceptedUploads = self.uploadURLQueue.numTotalObjects;
-    stats.numUploaded = self.uploadURLQueue.numObjectsComplete;
-    stats.numConsecutiveRetries = self.consecutiveRetryCount;
-    stats.numTotalRetries = self.sessionRetryCount;
-    
-    return stats;
-}
 
-#pragma mark - Public APIs
+#pragma mark - Public methods
 
 - (void)uploadPhotos:(NSArray *)photos
 {
-    NSUInteger photosInQueuePreAdd = self.uploadURLQueue.numObjectsIncomplete;
-    if (photos.count < 1) return;
- 
-    //TODO may get more background time if we call this on app background
-    [self beginBackgroundUpdateTask];
-    
-    NSMutableOrderedSet *photoURLStrings = [[NSMutableOrderedSet alloc] init];
+    // convert all DFPhotos to ObjectIDs, which are thread safe, so we can pass them across threads
+    NSMutableArray *photoIDs = [[NSMutableArray alloc]  initWithCapacity:photos.count];
     for (DFPhoto *photo in photos) {
-        [photoURLStrings addObject:photo.alAssetURLString];
+        [photoIDs addObject:photo.objectID];
     }
     
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSUInteger numAdded = [self.uploadURLQueue addObjectsFromArray:photoURLStrings.array];
-        
-        DDLogInfo(@"UploadController: upload requested for %d photos, %d already in queue, %d added.",
-              (int)photos.count,
-              (int)photosInQueuePreAdd,
-              (int)numAdded
-              );
-        
-        if (numAdded > 0) [self uploadQueueChanged];
-    });
+    [self addPhotosIDsToQueue:photoIDs];
 }
 
-- (void)cancelUpload
+- (void)cancelUploads
 {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        [self cancelUploadsWithIsError:NO silent:NO];
-    });
+    NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:NO];
+    cancelOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+    [self scheduleWithDispatchUploads:NO operation:cancelOperation];
 }
 
 - (BOOL)isUploadInProgress
 {
-    return (self.uploadURLQueue.numObjectsIncomplete > 0);
+    return self.objectIDQueue.numObjectsIncomplete > 0;
 }
 
-#pragma mark - Private config code
-- (void)setupStatusBarNotifications
+#pragma mark - Upload scheduling
+
+- (void)addPhotosIDsToQueue:(NSArray *)photoIDs
 {
-    [JDStatusBarNotification setDefaultStyle:^JDStatusBarStyle *(JDStatusBarStyle *style) {
-        style.barColor = [UIColor colorWithWhite:.9686 alpha:1.0]; //.9686 matches the default nav bar color
-        style.textColor = [UIColor darkGrayColor];
-        style.progressBarColor = [UIColor blueColor];
-        style.animationType = JDStatusBarAnimationTypeFade;
-        return style;
-    }];
+    [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
+        [self.objectIDQueue addObjectsFromArray:photoIDs];
+    }]];
 }
 
-#pragma mark - Private Uploading Code
-
-- (void)uploadQueueChanged
+- (void)scheduleWithDispatchUploads:(BOOL)dispatchUploadsOnComplete operation:(NSOperation *)operation
 {
-    [self.synchronizedOperationQueue addOperationWithBlock:^{
+    if (dispatchUploadsOnComplete) {
+        operation.completionBlock = ^{
+            [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
+        };
+    }
+    [self.syncOperationQueue addOperation:operation];
+}
+
+- (NSOperation *)dispatchUploadsOperation
+{
+    return [NSBlockOperation blockOperationWithBlock:^{
         [self postStatusUpdate];
+        DDLogVerbose(@"Dispatching uploads...");
+        if (self.uploadOperationQueue.operationCount >= self.uploadOperationQueue.maxConcurrentOperationCount) {
+            DDLogVerbose(@"Already maxed out on operations.");
+            return;
+        }
         
-        if (self.uploadURLQueue.objectsWaiting.count > 0) {
-            for (NSOperationQueue *uploadQueue in self.uploadOperationQueues) {
-                if (uploadQueue.operationCount < 1) {
-                    DDLogVerbose(@"Found a free queue at index: %d.", (int)[self.uploadOperationQueues indexOfObject:uploadQueue]);
-                    
-                    // TODO get a request using the sync'd queue and context
-                    // Create an upload operation and send to the queue
-                    [uploadQueue addOperation:[self uploadOperationForNextUpload]];
-                }
+        if ([[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus] != AFNetworkReachabilityStatusReachableViaWiFi
+            && [[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
+            DDLogInfo(@"In background and not on wifi.  Cancelling uploads.");
+            [self cancelAllUploadsOperationWithIsError:NO silent:YES];
+        }
+        
+        [self beginBackgroundUpdateTask];
+        NSManagedObjectID *nextPhotoID = [self.objectIDQueue takeNextObject];
+        if (nextPhotoID) {
+            DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] initWithPhotoID:nextPhotoID];
+            uploadOperation.completionOperationQueue = self.syncOperationQueue;
+            uploadOperation.successBlock = [self uploadSuccessfullBlockForObjectID:nextPhotoID];
+            uploadOperation.failureBlock = [self uploadFailureBlockForObjectID:nextPhotoID];
+            [self.uploadOperationQueue addOperation:uploadOperation];
+            if (self.uploadOperationQueue.operationCount < self.uploadOperationQueue.maxConcurrentOperationCount) {
+                [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
             }
-            
-        } else if (self.uploadURLQueue.numObjectsIncomplete == 0) {
-            DDLogInfo(@"No photos remaining.");
-            [self.uploadURLQueue clearCompleted];
-            [self endBackgroundUpdateTask];
+        } else {
+            //there's nothing else to upload, check to see if everything's complete
+            if (self.objectIDQueue.numObjectsIncomplete == 0 && self.objectIDQueue.numObjectsComplete > 0) {
+                [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
+            }
         }
     }];
 }
 
-- (NSOperation *)uploadOperationForNextUpload
+#pragma mark - Upload operation response handlers
+
+- (DFPhotoUploadOperationSuccessBlock)uploadSuccessfullBlockForObjectID:(NSManagedObjectID *)objectID
 {
-    NSError __block *returnedError = nil;
-    NSUInteger __block returnedBytes = 0;
-    DFPhoto __block *photo;
-    
-    NSOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-        NSString *photoURLString = [self.uploadURLQueue takeNextObject];
-        if (!photoURLString) {
-            return;
-        }
-        
-        //NOT SAFE TO GET THE PHOTO ON THIS THREAD, data should be passed in from the sync'ed queue
-        
-        photo = [DFPhoto photoWithURL:photoURLString inContext:self.managedObjectContext];
-        if (photo == nil) {
-            [self.uploadURLQueue markObjectCancelled:photoURLString];
-            [self uploadQueueChanged];
-            return;
-        }
-        
-        //[DFAnalytics logUploadBegan];
-        
-        dispatch_semaphore_t uploadSemaphore = dispatch_semaphore_create(0);
-       
-        [self.uploadAdapter uploadPhoto:photo withSuccessBlock:^(NSUInteger numBytes){
-            returnedBytes = numBytes;
-            dispatch_semaphore_signal(uploadSemaphore);
-        } failureBlock:^(NSError *error) {
-            returnedError = error;
-            dispatch_semaphore_signal(uploadSemaphore);
-        }];
-        
-        
-        dispatch_semaphore_wait(uploadSemaphore, DISPATCH_TIME_FOREVER);
-        
-    }];
-    
-    [operation setCompletionBlock:^{
-        [self.synchronizedOperationQueue addOperationWithBlock:^{
-            if (!returnedError) {
-                //[DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess numImageBytes:returnedBytes];
-                [self uploadFinishedForPhoto:photo];
-            } else {
-                NSString *debugString = [NSString stringWithFormat:@"%@ %ld", returnedError.domain, (long)returnedError.code];
-                [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultFailure debug:debugString];
-                
-                if ([self isErrorRetryable:returnedError]) {
-                    [self retryUploadPhoto:photo];
-                } else {
-                    [self cancelUploadsWithIsError:YES silent:NO];
-                }
-            }
-        }];
-    }];
-    
-    return operation;
+    DFPhotoUploadOperationSuccessBlock successBlock = ^(NSUInteger numBytes){
+        [self.objectIDQueue markObjectCompleted:objectID];
+        [self saveUploadedPhotoWithObjectID:objectID];
+        self.currentSessionStats.numConsecutiveRetries = 0;
+        self.currentSessionStats.numBytesUploaded += numBytes;
+        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
+                                numImageBytes:numBytes
+                     sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
+        [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
+    };
+    return successBlock;
 }
 
+- (void)saveUploadedPhotoWithObjectID:(NSManagedObjectID *)objectID
+{
+    DFPhoto *photo = (DFPhoto*)[self.managedObjectContext objectWithID:objectID];
+    photo.uploadDate = [NSDate date];
+    [self saveContext];
+    
+    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
+                                                                  object:self
+                                                                userInfo:@{objectID : DFPhotoChangeTypeMetadata}];
+}
+
+- (DFPhotoUploadOperationFailureBlock)uploadFailureBlockForObjectID:(NSManagedObjectID *)objectID
+{
+    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error, BOOL isCancelled){
+        if (isCancelled) return;
+        DDLogVerbose(@"Upload failed for %@", objectID.description);
+        if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
+            DDLogVerbose(@"Error retryable.  Moving to back of queue.");
+            [self.objectIDQueue moveInProgressObjectBackToQueue:objectID];
+            self.currentSessionStats.numConsecutiveRetries++;
+            self.currentSessionStats.numTotalRetries++;
+        } else {
+            [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
+            NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
+            [cancelOperation start];
+        }
+        
+        [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
+    };
+    return failureBlock;
+}
 
 - (BOOL)isErrorRetryable:(NSError *)error
 {
@@ -252,107 +208,80 @@ static DFUploadController *defaultUploadController;
     return NO;
 }
 
-- (void)retryUploadPhoto:(DFPhoto *)photo
-{
-    self.consecutiveRetryCount++;
-    self.sessionRetryCount++;
-    
-    if (self.consecutiveRetryCount > MaxConsecutiveRetries) {
-        [self cancelUploadsWithIsError:YES silent:NO];
-        [DFAnalytics logUploadRetryCountExceededWithCount:self.consecutiveRetryCount];
-    } else {
-        [self.uploadURLQueue moveInProgressObjectBackToQueue:photo.alAssetURLString];
-        [self uploadQueueChanged];
-    }
-}
+#pragma mark - End of uploads
 
-- (void)cancelUploadsWithIsError:(BOOL)isError silent:(BOOL)isSilent
+- (NSOperation *)cancelAllUploadsOperationWithIsError:(BOOL)isError silent:(BOOL)isSilent
 {
-    NSUInteger numLeft = self.uploadURLQueue.numObjectsIncomplete;
-
-    DDLogInfo(@"Non-error: canceling all uploads with %lu left.", (unsigned long)numLeft);
-    
-    if (!isSilent){
-        if (isError) {
-            [self showStatusBarNotificationWithType:DFStatusUpdateError];
-        } else {
-            [self showStatusBarNotificationWithType:DFStatusUpdateCancelled];
+    return [NSBlockOperation blockOperationWithBlock:^{
+        DDLogInfo(@"Cancelling all operations with isError:%@ isSilent%@",
+                  isError ? @"true" : @"false",
+                  isSilent ? @"true" : @"false");
+        [self.objectIDQueue removeAllObjects];
+        [self.uploadOperationQueue cancelAllOperations];
+        _currentSessionStats = nil;
+        
+        if (!isSilent){
+            if (isError) {
+                [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateError
+                                                                                            numRemaining:0
+                                                                                                progress:0.0];
+            } else {
+                [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateCancelled
+                                                                                            numRemaining:0
+                                                                                                progress:0.0];
+            }
+            [DFAnalytics logUploadCancelledWithIsError:isError];
         }
-        [DFAnalytics logUploadCancelledWithIsError:isError];
-    }
-    
-    [self.uploadAdapter cancelAllUploads];
-    [self.uploadURLQueue removeAllObjects];
+        [self endBackgroundUpdateTask];
+    }];
 }
 
-
-
-
-# pragma mark - Private Upload Completion Handlers
-
-- (void)uploadFinishedForPhoto:(DFPhoto *)photo
+- (NSOperation *)allUploadsCompleteOperation
 {
-    [self saveUploadProgress];
-    [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                                  object:self
-                                                                userInfo:@{photo.objectID : DFPhotoChangeTypeMetadata}];
+    NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
+        DDLogInfo(@"All uploads complete.");
+        _currentSessionStats = nil;
+        [self endBackgroundUpdateTask];
+    }];
     
-    
-    self.consecutiveRetryCount = 0;
-    [self.uploadURLQueue markObjectCompleted:photo.alAssetURLString];
-    [self uploadQueueChanged];
+    operation.queuePriority = NSOperationQueuePriorityHigh;
+    return operation;
 }
 
-- (void)saveUploadProgress
-{
-    dispatch_semaphore_wait(self.saveSemaphore, DISPATCH_TIME_FOREVER);
-    NSError *error = nil;
-    if(![self.managedObjectContext save:&error]) {
-        DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
-        [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
-    }
-    dispatch_semaphore_signal(self.saveSemaphore);
-}
+#pragma mark - Misc helpers
 
 - (void)postStatusUpdate
 {
+    DFUploadSessionStats *currentStats = [self currentSessionStats];
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
-                                                                userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: self.currentSessionStats}];
+                                                                userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: currentStats}];
     
     if (self.currentSessionStats.numRemaining > 0) {
-        [self showStatusBarNotificationWithType:DFStatusUpdateProgress];
+        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateProgress
+                                                                                    numRemaining:currentStats.numRemaining
+                                                                                        progress:currentStats.progress];
     } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numUploaded > 0) {
-        [self showStatusBarNotificationWithType:DFStatusUpdateComplete];
+        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateComplete
+                                                                                    numRemaining:currentStats.numRemaining
+                                                                                        progress:currentStats.progress];
     }
     
-    DDLogInfo(@"%@", self.currentSessionStats.description);
+    DDLogInfo(@"%@", currentStats.description);
 }
 
-- (void)showStatusBarNotificationWithType:(DFStatusUpdateType)updateType
+- (DFUploadSessionStats *)currentSessionStats
 {
-    DFUploadSessionStats *sessionStats = self.currentSessionStats;
+    if (!_currentSessionStats) {
+        _currentSessionStats = [[DFUploadSessionStats alloc] init];
+        _currentSessionStats.startDate = [NSDate date];
+    }
+    _currentSessionStats.numAcceptedUploads = self.objectIDQueue.numTotalObjects;
+    _currentSessionStats.numUploaded = self.objectIDQueue.numObjectsComplete;
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (updateType == DFStatusUpdateProgress) {
-            NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", (unsigned long)self.currentSessionStats.numRemaining];
-            
-            [JDStatusBarNotification showWithStatus:statusString];
-            [JDStatusBarNotification showProgress:sessionStats.progress];
-        } else if (updateType == DFStatusUpdateComplete) {
-            [JDStatusBarNotification showWithStatus:@"Upload complete." dismissAfter:2];
-        } else if (updateType == DFStatusUpdateError) {
-            [JDStatusBarNotification showWithStatus:@"Upload error.  Try again later." dismissAfter:5];
-        } else if (updateType == DFStatusUpdateCancelled) {
-            [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
-        } else if (updateType == DFStatusUpdateResumed) {
-            [JDStatusBarNotification showWithStatus:@"Upload resuming..." dismissAfter:2];
-        }
-    });
+    
+    return _currentSessionStats;
 }
-
-
-
 
 #pragma mark - Core Data helpers
 
@@ -371,13 +300,21 @@ static DFUploadController *defaultUploadController;
     return _managedObjectContext;
 }
 
+- (void)saveContext
+{
+    NSError *error = nil;
+    if(![self.managedObjectContext save:&error]) {
+        DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
+        [NSException raise:@"Could not save upload photo progress." format:@"Error: %@",[error localizedDescription]];
+    }
+}
+
 
 # pragma mark - Background task helpes
 
 - (void) beginBackgroundUpdateTask
 {
     if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
-        DDLogVerbose(@"DFUploadController: have background upload task, no need to register another.");
         return;
     }
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
@@ -385,23 +322,20 @@ static DFUploadController *defaultUploadController;
         
         // By cancel will throw an exception on the main thread because it could block.  That's the behavior
         // we want here so we create a semaphore an wait on it.
-        dispatch_semaphore_t cancelSemaphore = dispatch_semaphore_create(0);
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-            [self cancelUploadsWithIsError:NO silent:YES];
-            dispatch_semaphore_signal(cancelSemaphore);
-        });
-        dispatch_semaphore_wait(cancelSemaphore, DISPATCH_TIME_FOREVER);
-        DDLogInfo(@"Uploads cancelled.  Ending background task.");
-        
-        [self endBackgroundUpdateTask];
+        NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:YES];
+        cancelOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
+        [self scheduleWithDispatchUploads:NO operation:cancelOperation];
+        // the cancel operation ends the background task
     }];
 }
 
 - (void) endBackgroundUpdateTask
 {
+    DDLogInfo(@"Ending background update task.");
     [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
     self.backgroundUpdateTask = UIBackgroundTaskInvalid;
 }
+
 
 
 @end
