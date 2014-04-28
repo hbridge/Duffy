@@ -31,12 +31,13 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>1560</string>
+	<string>1575</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>voip</string>
 	</array>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>

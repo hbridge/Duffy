@@ -64,6 +64,8 @@ static DFUploadController *defaultUploadController;
         self.syncOperationQueue.maxConcurrentOperationCount = 1;
         self.uploadOperationQueue = [[NSOperationQueue alloc] init];
         self.uploadOperationQueue.maxConcurrentOperationCount = MaxConcurrentUploads;
+        // setup battery monitoring
+        [[UIDevice currentDevice] setBatteryMonitoringEnabled:YES];
     }
     return self;
 }
@@ -123,10 +125,11 @@ static DFUploadController *defaultUploadController;
             return;
         }
         
-        if ([[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus] != AFNetworkReachabilityStatusReachableViaWiFi
-            && [[UIApplication sharedApplication] applicationState] == UIApplicationStateBackground) {
-            DDLogInfo(@"In background and not on wifi.  Cancelling uploads.");
-            [self cancelAllUploadsOperationWithIsError:NO silent:YES];
+        if (![self isDeviceStateGoodForUploads]) {
+            DDLogInfo(@"Device is not in good state for uploads.  Canceling.");
+            NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:YES];
+            [self scheduleWithDispatchUploads:NO operation:cancelOperation];
+            return;
         }
         
         [self beginBackgroundUpdateTask];
@@ -147,6 +150,30 @@ static DFUploadController *defaultUploadController;
             }
         }
     }];
+}
+
+- (BOOL)isDeviceStateGoodForUploads
+{
+    UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
+    AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
+    
+    // if we're in the background we may not want upload
+    if (appState == UIApplicationStateBackground) {
+        // if we're not on wifi don't upload
+        if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi) {
+            return NO;
+        }
+        
+        // if the battery is < 50% and it's not plugged in (or don't know) don't upload
+        UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
+        float batteryChargeLevel = [[UIDevice currentDevice] batteryLevel];
+        if ((batteryState == UIDeviceBatteryStateUnplugged || batteryState == UIDeviceBatteryStateUnknown)
+            && batteryChargeLevel < 0.5) {
+            return NO;
+        }
+    }
+    
+    return YES;
 }
 
 #pragma mark - Upload operation response handlers
@@ -267,7 +294,7 @@ static DFUploadController *defaultUploadController;
                                                                                         progress:currentStats.progress];
     }
     
-    DDLogInfo(@"%@", currentStats.description);
+    DDLogInfo(@"\n%@", currentStats.description);
 }
 
 - (DFUploadSessionStats *)currentSessionStats
