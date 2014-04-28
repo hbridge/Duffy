@@ -126,9 +126,7 @@ static DFUploadController *defaultUploadController;
         }
         
         if (![self isDeviceStateGoodForUploads]) {
-            DDLogInfo(@"Device is not in good state for uploads.  Canceling.");
-            NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:YES];
-            [self scheduleWithDispatchUploads:NO operation:cancelOperation];
+            DDLogInfo(@"Device is not in good state for uploads.  Not scheduling upload.");
             return;
         }
         
