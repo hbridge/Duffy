@@ -18,6 +18,7 @@ import cv2.cv as cv
 	PHOTOID-thumb-SIZE.jpg
 """
 def imageThumbnail(photoFname, size, userId):
+	path = '/home/derek/user_data/' + str(userId) + '/'
 	newFilename = str.split(str(photoFname), '.')[0] + "-thumb-" + str(size) + '.jpg'
 	outfilePath = path + newFilename
 
