@@ -268,11 +268,27 @@ static DFUploadController *defaultUploadController;
     NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         DDLogInfo(@"All uploads complete.");
         _currentSessionStats = nil;
+        [self showBackgroundUploadCompleteNotif];
         [self endBackgroundUpdateTask];
     }];
     
     operation.queuePriority = NSOperationQueuePriorityHigh;
     return operation;
+}
+
+- (void)showBackgroundUploadCompleteNotif
+{
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) return;
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        UILocalNotification *localNotif = [[UILocalNotification alloc] init];
+        if (localNotif) {
+            localNotif.alertBody = @"Ready to search your photos!";
+            localNotif.alertAction = NSLocalizedString(@"Open", nil);
+            localNotif.applicationIconBadgeNumber = 1;
+            [[UIApplication sharedApplication] presentLocalNotificationNow:localNotif];
+        }
+    });
 }
 
 #pragma mark - Misc helpers

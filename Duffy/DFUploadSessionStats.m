@@ -31,8 +31,8 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"SessionStats: startDate:%@ accepted:%lu uploaded:%lu remaining:%lu consecutive_retries:%d total_retries:%d MBUploaded:%.02f throughputKBPS:%.02f",
-            self.startDate.description,
+    return [NSString stringWithFormat:@"SessionStats: timeSinceStarted:%.02fs accepted:%lu uploaded:%lu remaining:%lu consecutive_retries:%d total_retries:%d MBUploaded:%.02f throughputKBPS:%.02f",
+            [[NSDate date] timeIntervalSinceDate:startDate],
             (unsigned long)self.numAcceptedUploads,
             (unsigned long)self.numUploaded,
             (unsigned long)self.numRemaining,
