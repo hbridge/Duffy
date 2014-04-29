@@ -27,15 +27,18 @@
 <body>
 <div class="ui-content">
 	<div class="ui-key">
-		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are "duplicates". Currently any distance less than 100 is shaded. You can set ?threshold=xx to try different levels.
+		<!--Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are "duplicates". Currently any distance less than 100 is shaded. You can set ?threshold=xx to try different levels.-->
+		<span> Total photos: {{ totalPhotos }} | </span>
+			<span> Total Sets: {{ totalSets }} | </span>
+			<span> Distance threshold: {{ threshold }} </span>
 	</div>
 	{% for entry in histList %}
 	<div class='ui-row {% if entry.dup %} ui-dup {% endif %}'>
-		<div class='ui-image'> 
-			<img class='lazy' data-lazy-src='{{ thumbnailBasepath }}{{ entry.firstPhoto }}' height='78px' width='78px'> </div>
-		<div class='ui-image'>
-			<img class='lazy' data-lazy-src='{{ thumbnailBasepath }}{{ entry.secondPhoto }}' height='78px' width='78px'> </div>
-		<div class='ui-dist'>Dist: {{ entry.dist }}</div>
+		{% for photo in entry.photos %}
+			<div class='ui-image'> 
+				<img class='lazy' data-lazy-src='{{ thumbnailBasepath }}{{ photo }}' height='78px' width='78px'> </div>
+		{% endfor %}
+		<!--div class='ui-dist'>Dist: {{ entry.dist }}</div-->
 	</div>
 		
 	{% endfor %}

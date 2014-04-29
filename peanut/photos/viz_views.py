@@ -292,6 +292,7 @@ def hist(request):
 	photoQuery = Photo.objects.filter(user_id=user.id).order_by('time_taken')
 	prevHist = None
 	prevPhotoFName = None
+	prevThreshold = None
 
 	histList = list()
 
@@ -302,18 +303,28 @@ def hist(request):
 		if (prevHist != None):
 			# compare histograms
 			dist = image_util.compHist(curHist, prevHist)
-			entry = dict()
-			entry['firstPhoto'] = prevPhotoFName
-			entry['secondPhoto'] = photoFName
-			entry['dist'] = "%.2f"%dist
 			if (dist < threshold):
-				entry['dup'] = True
-			histList.append(entry)
+				entry['photos'].append(photoFName)
+			else:
+				histList.append(entry)
+				entry = dict()
+				entry['photos'] = list()
+				entry['photos'].append(photoFName)
+				#entry['dist'] = "%.2f"%dist
+				#if (dist < threshold):
+					#entry['dup'] = True
+		else:
+			entry = dict()
+			entry['photos'] = list()
+			entry['photos'].append(photoFName)
 		prevHist = curHist
-		prevPhotoFName = photoFName
+		#prevPhotoFName = photoFName
 
 		#print "{0}: {1}".format(photoFName, str(dist))
 	context = {	'histList': histList,
+				'totalPhotos': photoQuery.count(),
+				'totalSets': len(histList),
+				'threshold': threshold,
 				'thumbnailBasepath': thumbnailBasepath}
 	return render(request, 'photos/hist.html', context)
 
