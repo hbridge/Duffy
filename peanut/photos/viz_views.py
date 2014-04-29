@@ -277,7 +277,7 @@ def hist(request):
 		debug = False
 
 	if data.has_key('threshold'):
-		threshold = data['threshold']
+		threshold = int(data['threshold'])
 	else:
 		threshold = 100
 
