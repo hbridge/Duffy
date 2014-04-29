@@ -9,10 +9,10 @@
 	width:100%;
 }
 .ui-image {
-	float: left;
 	padding-right: 2px;
 	height: 80px;
 	float:left;
+	position:relative;
 }
 .ui-dup {
 	background-color: #E0E0E0;
@@ -20,6 +20,14 @@
 
 .ui-key {
 	padding: 0px 0px 10px 0px;
+}
+.ui-dist {
+	position: absolute;
+	/*background-color: transparent;*/
+	background-color: #ffffff;
+	color: #ff0000;
+	top: 2px;
+	left: 2px;
 }
 
 </style>
@@ -32,13 +40,16 @@
 			<span> Total Sets: {{ totalSets }} | </span>
 			<span> Distance threshold: {{ threshold }} </span>
 	</div>
-	{% for entry in histList %}
+	{% for cluster in histList %}
 	<div class='ui-row {% if entry.dup %} ui-dup {% endif %}'>
-		{% for photo in entry.photos %}
+		{% for entry in cluster %}
 			<div class='ui-image'> 
-				<img class='lazy' data-lazy-src='{{ thumbnailBasepath }}{{ photo }}' height='78px' width='78px'> </div>
+				<img class='lazy' title='{{ entry.dist }}' data-lazy-src='{{ thumbnailBasepath }}{{ entry.photo }}-thumb-156.jpg' height='78px' width='78px'>
+				<div class='ui-dist'>
+					{{entry.dist}}
+				</div>
+			</div>
 		{% endfor %}
-		<!--div class='ui-dist'>Dist: {{ entry.dist }}</div-->
 	</div>
 		
 	{% endfor %}

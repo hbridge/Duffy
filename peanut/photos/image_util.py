@@ -18,9 +18,6 @@ import cv2.cv as cv
 	PHOTOID-thumb-SIZE.jpg
 """
 def imageThumbnail(photoFname, size, userId):
-	# comment this out when production server runs it
-	#path = '/home/aseem/userdata/' + str(userId) + '/images/'
-	path = '/home/derek/user_data/' + str(userId) + '/'
 	newFilename = str.split(str(photoFname), '.')[0] + "-thumb-" + str(size) + '.jpg'
 	outfilePath = path + newFilename
 
@@ -185,16 +182,28 @@ def handleUploadedFile(uploadedFile, newFilePath):
 		for chunk in uploadedFile.chunks():
 			destination.write(chunk)
 
-"""
-	Get a photo's histogram
-"""
-def getHist(origPath, photoFName):
-    photo_color = cv2.imread(origPath+photoFName)
-    photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
-    photo_gray = cv2.equalizeHist(photo_gray)
 
-    lbp = cv2.elbp(photo_gray, 1, 8)
-    return cv2.spatial_histogram(lbp, 256, 8, 8, True)
+### Functions related to finding duplicates and similar photos
+
+"""
+	Returns the distance between two photos
+"""
+
+def getSimilarity(photoId1, photoId2, userId):
+	return compHist(getSpatialHist(photoId1, userId), getSpatialHist(photoId2, userId))
+
+
+"""
+	Get a photo's spatial histogram using opencv's ELBP method
+"""
+def getSpatialHist(photoId, userId):
+	origPath = '/home/derek/user_data/' + str(userId) + '/'
+	photo_color = cv2.imread(origPath + str(photoId) + '-thumb-156.jpg')
+	photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
+	photo_gray = cv2.equalizeHist(photo_gray)
+
+	lbp = cv2.elbp(photo_gray, 1, 8)
+	return cv2.spatial_histogram(lbp, 256, 8, 8, True)
 
 """
 	Returns distance between two histograms

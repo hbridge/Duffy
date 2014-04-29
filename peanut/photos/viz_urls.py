@@ -9,5 +9,5 @@ urlpatterns = patterns('',
 	url(r'^search/$', viz_views.search, name='search'),
 	url(r'^serve_image/$', viz_views.serveImage, name='serve_image'),
 	url(r'^summary/$', viz_views.userbaseSummary, name='userbaseSummary'),
-	url(r'^hist/$', viz_views.hist, name='hist')
+	url(r'^dedup/$', viz_views.dedup, name='hist')
 )

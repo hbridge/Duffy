@@ -11,7 +11,7 @@
 	td {
 		padding: 0px 5px 0px 5px;
 	}
-	.ui-row-internal {
+	.ui-row-external {
 		background-color: #C0C0C0;
 	}
 	.ui-content {
@@ -27,13 +27,16 @@
 		font-weight: bold;
 		font-size: 12px;
 	}
-	.ui-footer {
-		padding: 10px 0px 0px 0px;
+	.ui-key {
+		padding: 0px 0px 10px 0px;
 	}
 
 </style>
 <body>
 <div class="ui-content">
+	<div class="ui-key">
+		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are external users.
+	</div>
 	<table class='ui-table' cellpadding='3'>
 		<tr class='ui-row-header' >
 			<td class='userid'> UserId </td>
@@ -45,7 +48,7 @@
 			<td class='last-uploaded-timestamp'> Last Upload </td>
 		</tr>
 	{% for entry in resultList %}
-		<tr class='ui-row {% if entry.internal %} ui-row-internal {% endif %}'>
+		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
 			<td class='userid'> {{ entry.user.id }} </td>
 			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
 			<td class='phoneid'> {{ entry.user.phone_id}} </td>
@@ -56,9 +59,6 @@
 		</tr>
 	{% endfor %}
 </table>
-	<div class="ui-footer">
-		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are internal users.
-	</div>
 </div>
 </body>
 </html>

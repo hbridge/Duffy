@@ -227,9 +227,12 @@ def userbaseSummary(request):
 						'BA8E652E-6BD4-4DC7-B8A0-7157FFA51DEC',
 						'0012F94E-E6AF-429A-8530-E1011E1BFCAE',
 						'CEE91F90-263A-4BF1-AED7-6AB27B7BC076',
+						'F7092B08-EF4D-40EF-896D-0539CB102D3D',
+						'3E8018C0-1BE5-483D-89C4-85CD66F81298',
+						'26A1609E-BBBA-4684-8DF0-A394500FA96B',
 						'DEADBEEF'}
 	resultList = list()
-	for i in range(200):
+	for i in range(1000):
 		userId = i
 		try:
 			user = User.objects.get(id=userId)
@@ -244,11 +247,17 @@ def userbaseSummary(request):
 			entry['dbCount'] = dbQuery.count()
 			searchResults = SearchQuerySet().all().filter(userId=userId)
 			entry['resultsCount'] = searchResults.count()
-			#entry['results']
-			for phoneid in knownPhoneIds:
-				if (phoneid.lower() in user.phone_id.lower()):
-					entry['internal'] = True
-					break
+			entry['internal'] = False
+
+			if (user.added == None):
+				entry['internal'] = True
+			else:
+				for phoneid in knownPhoneIds:
+					if ((phoneid.lower() in user.phone_id.lower()) or 
+						('iphone simulator'.lower() in user.first_name.lower()) or
+						('ipad simulator'.lower() in user.first_name.lower())):
+						entry['internal'] = True
+						break
 			resultList.append(entry)
 		except User.DoesNotExist:
 			continue
@@ -257,10 +266,10 @@ def userbaseSummary(request):
 	return render(request, 'admin/userbaseSummary.html', context)
 
 '''
-Experimenting with histograms
+Experimenting with deduping
 '''
 
-def hist(request):
+def dedup(request):
 	if request.method == 'GET':
 		data = request.GET
 	elif request.method == 'POST':
@@ -279,7 +288,7 @@ def hist(request):
 	if data.has_key('threshold'):
 		threshold = int(data['threshold'])
 	else:
-		threshold = 100
+		threshold = 75
 
 	try:
 		user = User.objects.get(id=userId)
@@ -290,7 +299,7 @@ def hist(request):
 
 	path = '/home/derek/user_data/' + str(userId) + '/'
 	photoQuery = Photo.objects.filter(user_id=user.id).order_by('time_taken')
-	prevHist = None
+	prevHist = list()
 	prevPhotoFName = None
 	prevThreshold = None
 
@@ -298,35 +307,48 @@ def hist(request):
 
 	# iterate through images
 	for photo in photoQuery:
-		photoFName = str(photo.id)+'-thumb-156.jpg'
-		curHist = image_util.getHist(path, photoFName)
-		if (prevHist != None):
-			# compare histograms
-			dist = image_util.compHist(curHist, prevHist)
-			if (dist < threshold):
-				entry['photos'].append(photoFName)
-			else:
-				histList.append(entry)
-				entry = dict()
-				entry['photos'] = list()
-				entry['photos'].append(photoFName)
-				#entry['dist'] = "%.2f"%dist
-				#if (dist < threshold):
-					#entry['dup'] = True
-		else:
-			entry = dict()
-			entry['photos'] = list()
-			entry['photos'].append(photoFName)
-		prevHist = curHist
-		#prevPhotoFName = photoFName
+		#photoFName = str(photo.id)+'-thumb-156.jpg'
+		#photoFName = str(photo.id)+'.jpg'
+		curHist = image_util.getSpatialHist(photo.id, user.id)
 
-		#print "{0}: {1}".format(photoFName, str(dist))
+		addToCluster = False
+		if (len(prevHist) == 0):
+			# first image
+			cluster = list()
+			entry = dict()
+			entry['photo'] = photo.id
+			cluster.append(entry)
+			prevHist.append(curHist)
+		else:
+			for hist in prevHist:
+				dist = image_util.compHist(curHist, hist)
+				if (dist < threshold):
+					addToCluster = True
+					break
+
+			if (addToCluster):
+				entry = dict()
+				entry['photo'] = photo.id
+				entry['dist'] = "%.2f"%dist
+				cluster.append(entry)
+				prevHist.append(curHist)
+			else:
+				histList.append(cluster)
+				cluster = list()
+				entry = dict()
+				entry['photo'] = photo.id
+				entry['dist'] = "%.2f"%dist
+				cluster.append(entry)
+				prevHist = list()
+				prevHist.append(curHist)
+
+
 	context = {	'histList': histList,
 				'totalPhotos': photoQuery.count(),
 				'totalSets': len(histList),
 				'threshold': threshold,
 				'thumbnailBasepath': thumbnailBasepath}
-	return render(request, 'photos/hist.html', context)
+	return render(request, 'photos/dedup.html', context)
 
 
 # Helper functions
