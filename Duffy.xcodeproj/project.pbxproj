@@ -31,6 +31,7 @@
 		5A81ED4118CFB591003EF557 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A81ED4018CFB591003EF557 /* SystemConfiguration.framework */; };
 		5A8C98E5190AEAD700AE9F88 /* DFUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98E4190AEAD700AE9F88 /* DFUploadOperation.m */; };
 		5A8C98E8190AFBF200AE9F88 /* DFStatusBarNotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */; };
+		5A8C98EB190EE78B00AE9F88 /* DFLocationPinger.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */; };
 		5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */; };
 		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
 		5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */; };
@@ -150,6 +151,8 @@
 		5A8C98E4190AEAD700AE9F88 /* DFUploadOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadOperation.m; sourceTree = "<group>"; };
 		5A8C98E6190AFBF200AE9F88 /* DFStatusBarNotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStatusBarNotificationManager.h; sourceTree = "<group>"; };
 		5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStatusBarNotificationManager.m; sourceTree = "<group>"; };
+		5A8C98E9190EE78A00AE9F88 /* DFLocationPinger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationPinger.h; sourceTree = "<group>"; };
+		5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPinger.m; sourceTree = "<group>"; };
 		5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+DFThreadingAddons.h"; sourceTree = "<group>"; };
 		5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+DFThreadingAddons.m"; sourceTree = "<group>"; };
 		5A8D0AF118EB6A9600A1D9A7 /* DFNotificationSharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationSharedConstants.h; sourceTree = "<group>"; };
@@ -476,6 +479,8 @@
 			children = (
 				5AC40EE2190AD0E700ED3532 /* DFUploadController.h */,
 				5AC40EE3190AD0E700ED3532 /* DFUploadController.m */,
+				5A8C98E9190EE78A00AE9F88 /* DFLocationPinger.h */,
+				5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */,
 				5A8C98E6190AFBF200AE9F88 /* DFStatusBarNotificationManager.h */,
 				5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */,
 				5A8C98E3190AEAD700AE9F88 /* DFUploadOperation.h */,
@@ -847,6 +852,7 @@
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
+				5A8C98EB190EE78B00AE9F88 /* DFLocationPinger.m in Sources */,
 				5AC40EE4190AD0E700ED3532 /* DFUploadController.m in Sources */,
 				5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */,
 				5ADB24D0189985590016CA02 /* Duffy.xcdatamodeld in Sources */,

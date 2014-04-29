@@ -16,6 +16,7 @@
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
 #import <RestKit/RestKit.h>
+#import "DFLocationPinger.h"
 
 @interface DFUploadController()
 
@@ -119,20 +120,21 @@ static DFUploadController *defaultUploadController;
 {
     return [NSBlockOperation blockOperationWithBlock:^{
         [self postStatusUpdate];
-        DDLogVerbose(@"Dispatching uploads...");
+        DDLogVerbose(@"Dispatching uploads if required...");
         if (self.uploadOperationQueue.operationCount >= self.uploadOperationQueue.maxConcurrentOperationCount) {
             DDLogVerbose(@"Already maxed out on operations.");
             return;
         }
         
-        if (![self isDeviceStateGoodForUploads]) {
+        if (![self isDeviceStateGoodForBackgroundUploads]) {
             DDLogInfo(@"Device is not in good state for uploads.  Not scheduling upload.");
+            if (self.uploadOperationQueue.operationCount == 0) [self endBackgroundUpdateTask];
             return;
         }
         
-        [self beginBackgroundUpdateTask];
         NSManagedObjectID *nextPhotoID = [self.objectIDQueue takeNextObject];
         if (nextPhotoID) {
+            [self beginBackgroundUpdateTask];
             DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] initWithPhotoID:nextPhotoID];
             uploadOperation.completionOperationQueue = self.syncOperationQueue;
             uploadOperation.successBlock = [self uploadSuccessfullBlockForObjectID:nextPhotoID];
@@ -150,7 +152,7 @@ static DFUploadController *defaultUploadController;
     }];
 }
 
-- (BOOL)isDeviceStateGoodForUploads
+- (BOOL)isDeviceStateGoodForBackgroundUploads
 {
     UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
     AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
@@ -304,7 +306,6 @@ static DFUploadController *defaultUploadController;
     _currentSessionStats.numAcceptedUploads = self.objectIDQueue.numTotalObjects;
     _currentSessionStats.numUploaded = self.objectIDQueue.numObjectsComplete;
     
-    
     return _currentSessionStats;
 }
 
@@ -335,15 +336,20 @@ static DFUploadController *defaultUploadController;
 }
 
 
-# pragma mark - Background task helpes
+# pragma mark - Background task helper
 
 - (void) beginBackgroundUpdateTask
 {
     if (self.backgroundUpdateTask != UIBackgroundTaskInvalid) {
         return;
     }
+    
+    [[DFLocationPinger sharedInstance] addObjectRequestingKeepAlive:self];
+    if ([[DFLocationPinger sharedInstance] canMonitorLocation]) {
+        [[DFLocationPinger sharedInstance] startPings];
+    }
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
-        DDLogInfo(@"Background upload task about to expire.  Cancelling uploads...");
+        DDLogInfo(@"Background upload task about to expire.  Canceling uploads...");
         
         // By cancel will throw an exception on the main thread because it could block.  That's the behavior
         // we want here so we create a semaphore an wait on it.
@@ -357,6 +363,7 @@ static DFUploadController *defaultUploadController;
 - (void) endBackgroundUpdateTask
 {
     DDLogInfo(@"Ending background update task.");
+    [[DFLocationPinger sharedInstance] removeObjectRequestingKeepAlive:self];
     [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
     self.backgroundUpdateTask = UIBackgroundTaskInvalid;
 }

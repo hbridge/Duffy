@@ -18,4 +18,5 @@
 - (void)cancelUploads;
 - (BOOL)isUploadInProgress;
 
+
 @end
