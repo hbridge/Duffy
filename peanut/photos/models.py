@@ -38,3 +38,8 @@ class Classification(models.Model):
 
 	def __unicode__(self): 
 		return str(self.photo.id) + " " + self.class_name
+
+class Similarity(models.Model):
+	photo_1 = models.ForeignKey(Photo, related_name="photo_1")
+	photo_2 = models.ForeignKey(Photo, related_name="photo_2")
+	similarity = models.IntegerField()
