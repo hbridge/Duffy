@@ -9,6 +9,8 @@ from django.utils import timezone
 
 from peanut import settings
 from photos.models import Photo, User, Classification
+import cv2
+import cv2.cv as cv
 
 """
 	Generates a thumbnail of the given image to the given size
@@ -182,3 +184,21 @@ def handleUploadedFile(uploadedFile, newFilePath):
 	with open(newFilePath, 'wb+') as destination:
 		for chunk in uploadedFile.chunks():
 			destination.write(chunk)
+
+"""
+	Get a photo's histogram
+"""
+def getHist(origPath, photoFName):
+    photo_color = cv2.imread(origPath+photoFName)
+    photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
+    photo_gray = cv2.equalizeHist(photo_gray)
+
+    lbp = cv2.elbp(photo_gray, 1, 8)
+    return cv2.spatial_histogram(lbp, 256, 8, 8, True)
+
+"""
+	Returns distance between two histograms
+"""
+def compHist(h1, h2):
+	return cv2.compareHist(h1, h2, cv.CV_COMP_CHISQR)
+

@@ -1,0 +1,50 @@
+<html>
+<style>
+	html, body { padding: 0; margin: 0; font-family: arial; font-size: 12px;}
+.ui-content {
+	padding: 10px 0px 0px 10px;
+}
+.ui-row {
+	float: left;
+	width:100%;
+}
+.ui-image {
+	float: left;
+	padding-right: 2px;
+	height: 80px;
+	float:left;
+}
+.ui-dup {
+	background-color: #E0E0E0;
+}
+
+.ui-key {
+	padding: 0px 0px 10px 0px;
+}
+
+</style>
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+<body>
+<div class="ui-content">
+	<div class="ui-key">
+		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are "duplicates". Currently any distance less than 100 is shaded. You can set ?threshold=xx to try different levels.
+	</div>
+	{% for entry in histList %}
+	<div class='ui-row {% if entry.dup %} ui-dup {% endif %}'>
+		<div class='ui-image'> 
+			<img class='lazy' data-lazy-src='{{ thumbnailBasepath }}{{ entry.firstPhoto }}' height='78px' width='78px'> </div>
+		<div class='ui-image'>
+			<img class='lazy' data-lazy-src='{{ thumbnailBasepath }}{{ entry.secondPhoto }}' height='78px' width='78px'> </div>
+		<div class='ui-dist'>Dist: {{ entry.dist }}</div>
+	</div>
+		
+	{% endfor %}
+</div>
+</body>
+<script>
+	$('img.lazy').each(function(){
+		$(this).attr('src', $(this).attr('data-lazy-src'));	
+	});
+
+</script>
+</html>

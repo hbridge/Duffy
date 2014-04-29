@@ -16,6 +16,8 @@ from .forms import ManualAddPhoto
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 
+
+
 	
 def manualAddPhoto(request):
 	form = ManualAddPhoto()
@@ -104,7 +106,7 @@ def search(request, user_id=None):
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
-			return HttpResponse("Phone id " + str(userId) + " does not exist")
+			return HttpResponse("User id " + str(userId) + " does not exist")
 
 		thumbnailBasepath = "/user_data/" + str(user.id) + "/"
 
@@ -253,6 +255,68 @@ def userbaseSummary(request):
 
 	context = {	'resultList': resultList}
 	return render(request, 'admin/userbaseSummary.html', context)
+
+'''
+Experimenting with histograms
+'''
+
+def hist(request):
+	if request.method == 'GET':
+		data = request.GET
+	elif request.method == 'POST':
+		data = request.POST
+
+	if data.has_key('user_id'):
+		userId = data['user_id']
+	else:
+		return HttpResponse("Please specify a userId")
+
+	if data.has_key('debug'):
+		debug = True
+	else:
+		debug = False
+
+	if data.has_key('threshold'):
+		threshold = data['threshold']
+	else:
+		threshold = 100
+
+	try:
+		user = User.objects.get(id=userId)
+	except User.DoesNotExist:
+		return HttpResponse("User id " + str(userId) + " does not exist")
+
+	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
+
+	path = '/home/derek/user_data/' + str(userId) + '/'
+	photoQuery = Photo.objects.filter(user_id=user.id).order_by('time_taken')
+	prevHist = None
+	prevPhotoFName = None
+
+	histList = list()
+
+	# iterate through images
+	for photo in photoQuery:
+		photoFName = str(photo.id)+'-thumb-156.jpg'
+		curHist = image_util.getHist(path, photoFName)
+		if (prevHist != None):
+			# compare histograms
+			dist = image_util.compHist(curHist, prevHist)
+			entry = dict()
+			entry['firstPhoto'] = prevPhotoFName
+			entry['secondPhoto'] = photoFName
+			entry['dist'] = "%.2f"%dist
+			if (dist < threshold):
+				entry['dup'] = True
+			histList.append(entry)
+		prevHist = curHist
+		prevPhotoFName = photoFName
+
+		#print "{0}: {1}".format(photoFName, str(dist))
+	context = {	'histList': histList,
+				'thumbnailBasepath': thumbnailBasepath}
+	return render(request, 'photos/hist.html', context)
+
 
 # Helper functions
 
