@@ -84,6 +84,7 @@ static DFLocationPinger *defaultPinger;
 
 - (void)startPings
 {
+    if (self.isKeepingAlive) return;
     if (self.objectsRequestingKeepAlive.count > 0) {
         DDLogInfo(@"DFLocationPinger: starting pings.");
         [self.locationManager startUpdatingLocation];
@@ -130,6 +131,10 @@ static DFLocationPinger *defaultPinger;
     AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
     UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
     float batteryLevel = [[UIDevice currentDevice] batteryLevel];
+
+    // always keep pings going in FG if we have wifi so if someone plugs in their phone after starting duffy, we keep alive
+    if (appState == UIApplicationStateActive && reachabilityStatus == AFNetworkReachabilityStatusReachableViaWiFi)
+        return YES;
     
     if (reachabilityStatus == AFNetworkReachabilityStatusReachableViaWiFi
         && (batteryState == UIDeviceBatteryStateCharging || batteryState == UIDeviceBatteryStateFull)
