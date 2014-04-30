@@ -143,7 +143,6 @@ def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFacebo
 	photo = Photo(	user = user,
 					location_data = locationData,
 					orig_filename = origPath,
-					upload_date = timezone.now(),
 					metadata = metadata,
 					iphone_faceboxes_topleft = iPhoneFaceboxesTopleft)
 	photo.save()

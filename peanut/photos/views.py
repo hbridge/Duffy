@@ -52,7 +52,7 @@ def addPhoto(request):
 
 			handle_uploaded_file(user, request.FILES['file'])
 
-			photo = Photo(user = user, location_data = locationData, filename = request.FILES['file'].name, upload_date = timezone.now(), metadata = photoMetadata)
+			photo = Photo(user = user, location_data = locationData, filename = request.FILES['file'].name, metadata = photoMetadata)
 			photo.save()
 
 			response_data['result'] = True

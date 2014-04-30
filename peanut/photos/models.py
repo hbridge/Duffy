@@ -15,7 +15,6 @@ class Photo(models.Model):
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100)
 	new_filename = models.CharField(max_length=100, blank=True, default="")
-	upload_date = models.DateTimeField()
 	hashcode = models.CharField(max_length=100, null=True)
 	metadata = models.CharField(max_length=10000, null=True)
 	location_data = models.TextField(null=True)

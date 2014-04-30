@@ -240,9 +240,9 @@ def userbaseSummary(request):
 			entry['user'] = user
 			dbQuery = Photo.objects.filter(user_id=user.id)
 			if (dbQuery.count() > 0):
-				photoSet = dbQuery.order_by('-upload_date')[:1]
+				photoSet = dbQuery.order_by('-added')[:1]
 				for photo in photoSet:
-					entry['lastUploadTime'] = photo.upload_date
+					entry['lastUploadTime'] = photo.added
 					break
 			entry['dbCount'] = dbQuery.count()
 			searchResults = SearchQuerySet().all().filter(userId=userId)
