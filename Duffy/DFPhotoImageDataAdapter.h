@@ -10,7 +10,7 @@
 
 @class DFPhoto;
 
-@interface DFPhotoUploadAdapter : NSObject
+@interface DFPhotoImageDataAdapter : NSObject
 
 typedef void (^DFPhotoUploadSuccessBlock)(NSUInteger numImageBytes);
 typedef void (^DFPhotoUploadFailureBlock)(NSError *error);

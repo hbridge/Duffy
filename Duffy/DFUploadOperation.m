@@ -7,7 +7,7 @@
 //
 
 #import "DFUploadOperation.h"
-#import "DFPhotoUploadAdapter.h"
+#import "DFPhotoImageDataAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
 
@@ -42,7 +42,7 @@
         }
         if (self.isCancelled) return;
         
-        DFPhotoUploadAdapter *uploadAdapter = [[DFPhotoUploadAdapter alloc] init];
+        DFPhotoImageDataAdapter *uploadAdapter = [[DFPhotoImageDataAdapter alloc] init];
         NSDictionary *result = [uploadAdapter uploadPhoto:photo];
         
         if (self.isCancelled) [uploadAdapter cancelAllUploads];

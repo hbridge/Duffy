@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFPhotoUploadAdapter.h"
+#import "DFPhotoImageDataAdapter.h"
 #import <RestKit/RestKit.h>
 #import "DFPhoto.h"
 #import "DFPhoto+FaceDetection.h"
@@ -39,13 +39,13 @@ static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
 static const unsigned int FaceDetectionMinMemory = 1000;
 
 
-@interface DFPhotoUploadAdapter()
+@interface DFPhotoImageDataAdapter()
 
 @property (nonatomic, retain) RKObjectManager *objectManager;
 
 @end
 
-@implementation DFPhotoUploadAdapter
+@implementation DFPhotoImageDataAdapter
 
 - (void)uploadPhoto:(DFPhoto *)photo
    withSuccessBlock:(DFPhotoUploadSuccessBlock)successHandler

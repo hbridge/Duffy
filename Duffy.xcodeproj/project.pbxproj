@@ -13,7 +13,7 @@
 		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
 		5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */; };
-		5A512725190072A50057A31F /* DFPhotoUploadAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A512724190072A50057A31F /* DFPhotoUploadAdapter.m */; };
+		5A512725190072A50057A31F /* DFPhotoImageDataAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A512724190072A50057A31F /* DFPhotoImageDataAdapter.m */; };
 		5A51272B19007CE00057A31F /* DFUploadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A51272A19007CE00057A31F /* DFUploadQueue.m */; };
 		5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */; };
 		5A52BD7318FF02ED0038CCCD /* WarningHeaderIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */; };
@@ -32,6 +32,7 @@
 		5A8C98E5190AEAD700AE9F88 /* DFUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98E4190AEAD700AE9F88 /* DFUploadOperation.m */; };
 		5A8C98E8190AFBF200AE9F88 /* DFStatusBarNotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */; };
 		5A8C98EB190EE78B00AE9F88 /* DFLocationPinger.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */; };
+		5A8C98EE19115BB800AE9F88 /* DFPhotoMetadataAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98ED19115BB800AE9F88 /* DFPhotoMetadataAdapter.m */; };
 		5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */; };
 		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
 		5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */; };
@@ -125,8 +126,8 @@
 		5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncController.m; sourceTree = "<group>"; };
 		5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadSessionStats.h; sourceTree = "<group>"; };
 		5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadSessionStats.m; sourceTree = "<group>"; };
-		5A512723190072A50057A31F /* DFPhotoUploadAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoUploadAdapter.h; sourceTree = "<group>"; };
-		5A512724190072A50057A31F /* DFPhotoUploadAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoUploadAdapter.m; sourceTree = "<group>"; };
+		5A512723190072A50057A31F /* DFPhotoImageDataAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoImageDataAdapter.h; sourceTree = "<group>"; };
+		5A512724190072A50057A31F /* DFPhotoImageDataAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoImageDataAdapter.m; sourceTree = "<group>"; };
 		5A51272919007CE00057A31F /* DFUploadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadQueue.h; sourceTree = "<group>"; };
 		5A51272A19007CE00057A31F /* DFUploadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadQueue.m; sourceTree = "<group>"; };
 		5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchResultsTableViewResultsIncompleteWarningHeader.xib; sourceTree = "<group>"; };
@@ -153,6 +154,8 @@
 		5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStatusBarNotificationManager.m; sourceTree = "<group>"; };
 		5A8C98E9190EE78A00AE9F88 /* DFLocationPinger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationPinger.h; sourceTree = "<group>"; };
 		5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPinger.m; sourceTree = "<group>"; };
+		5A8C98EC19115BB800AE9F88 /* DFPhotoMetadataAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoMetadataAdapter.h; sourceTree = "<group>"; };
+		5A8C98ED19115BB800AE9F88 /* DFPhotoMetadataAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoMetadataAdapter.m; sourceTree = "<group>"; };
 		5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+DFThreadingAddons.h"; sourceTree = "<group>"; };
 		5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+DFThreadingAddons.m"; sourceTree = "<group>"; };
 		5A8D0AF118EB6A9600A1D9A7 /* DFNotificationSharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationSharedConstants.h; sourceTree = "<group>"; };
@@ -304,6 +307,8 @@
 		5A37478D18CE480000E27F00 /* Generic Views */ = {
 			isa = PBXGroup;
 			children = (
+				5A8C98E6190AFBF200AE9F88 /* DFStatusBarNotificationManager.h */,
+				5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */,
 				5A8D0B5318EF51BD00A1D9A7 /* Table view */,
 				5A8D0B5218EF515900A1D9A7 /* Photos grid and nav */,
 				5A8D0B5118EF515100A1D9A7 /* Custom image view */,
@@ -321,13 +326,6 @@
 			children = (
 				5A45E9C418DA44F6002663EB /* DFCameraRollSyncController.h */,
 				5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */,
-				5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */,
-				5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */,
-				5A512723190072A50057A31F /* DFPhotoUploadAdapter.h */,
-				5A512724190072A50057A31F /* DFPhotoUploadAdapter.m */,
-				5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */,
-				5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */,
-				5AC40EE5190AD0F100ED3532 /* Uploader */,
 			);
 			name = "Background processes";
 			sourceTree = "<group>";
@@ -474,23 +472,29 @@
 			name = "Settings View";
 			sourceTree = "<group>";
 		};
-		5AC40EE5190AD0F100ED3532 /* Uploader */ = {
+		5AC40EE5190AD0F100ED3532 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
-				5AC40EE2190AD0E700ED3532 /* DFUploadController.h */,
-				5AC40EE3190AD0E700ED3532 /* DFUploadController.m */,
 				5A8C98E9190EE78A00AE9F88 /* DFLocationPinger.h */,
 				5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */,
-				5A8C98E6190AFBF200AE9F88 /* DFStatusBarNotificationManager.h */,
-				5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */,
+				5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */,
+				5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */,
+				5A512723190072A50057A31F /* DFPhotoImageDataAdapter.h */,
+				5A512724190072A50057A31F /* DFPhotoImageDataAdapter.m */,
+				5A8C98EC19115BB800AE9F88 /* DFPhotoMetadataAdapter.h */,
+				5A8C98ED19115BB800AE9F88 /* DFPhotoMetadataAdapter.m */,
+				5AC40EE2190AD0E700ED3532 /* DFUploadController.h */,
+				5AC40EE3190AD0E700ED3532 /* DFUploadController.m */,
 				5A8C98E3190AEAD700AE9F88 /* DFUploadOperation.h */,
 				5A8C98E4190AEAD700AE9F88 /* DFUploadOperation.m */,
 				5A51272919007CE00057A31F /* DFUploadQueue.h */,
 				5A51272A19007CE00057A31F /* DFUploadQueue.m */,
 				5A45E9CA18DB990D002663EB /* DFUploadSessionStats.h */,
 				5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */,
+				5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */,
+				5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */,
 			);
-			name = Uploader;
+			name = Networking;
 			sourceTree = "<group>";
 		};
 		5ADB24AE189985590016CA02 = {
@@ -546,8 +550,9 @@
 				5A67606318E3384900E355B6 /* Tab view controllers */,
 				5A67606218E3381D00E355B6 /* Background processes */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
-				5AACB90A18F49D6000F4EEB6 /* Analytics */,
 				5ADB24FE189AB3730016CA02 /* Model */,
+				5AC40EE5190AD0F100ED3532 /* Networking */,
+				5AACB90A18F49D6000F4EEB6 /* Analytics */,
 				5AACB90518F49AD500F4EEB6 /* ThirdParty */,
 				5AFBCA5118D236AE00998793 /* Utils */,
 				5ADB24D1189985590016CA02 /* Images.xcassets */,
@@ -851,6 +856,7 @@
 				5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */,
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */,
+				5A8C98EE19115BB800AE9F88 /* DFPhotoMetadataAdapter.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
 				5A8C98EB190EE78B00AE9F88 /* DFLocationPinger.m in Sources */,
 				5AC40EE4190AD0E700ED3532 /* DFUploadController.m in Sources */,
@@ -883,7 +889,7 @@
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
 				5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */,
-				5A512725190072A50057A31F /* DFPhotoUploadAdapter.m in Sources */,
+				5A512725190072A50057A31F /* DFPhotoImageDataAdapter.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
 				5AC40EDE1908738C00ED3532 /* DFLogConfig.m in Sources */,
 				5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */,
