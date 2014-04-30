@@ -348,7 +348,6 @@ static void releaseAssetCallback(void *info) {
 
 - (NSString *)localFilename
 {
-    //NSURL *url = [NSURL URLWithString:self.alAssetURLString];
     ALAssetRepresentation *rep = [self.asset defaultRepresentation];
     NSString *fileName = [rep filename];
     return fileName;

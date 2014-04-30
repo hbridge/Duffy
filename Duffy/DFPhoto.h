@@ -21,7 +21,10 @@
 @property (nonatomic, retain) NSDate *creationDate;
 @property (nonatomic, retain) NSString *universalIDString;
 @property (nonatomic, retain) NSDate *uploadDate;
-@property (nonatomic, retain) NSData *creationHashData;
+@property (readonly, nonatomic, retain) NSData *currentHashData; // generated on the fly from the underlying ALAsset
+@property (nonatomic, retain) NSData *creationHashData; // stored when the DFPhoto is first created so it can be compared later
+@property (readonly, nonatomic, retain) NSDictionary *metadataDictionary;
+@property (readonly, nonatomic, retain) NSString *localFilename;
 
 // fetched accessors
 @property (readonly, nonatomic, retain) CLLocation *location;
@@ -58,11 +61,6 @@ typedef void (^DFPhotoLoadFailureBlock)(NSError *error);
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock;
 
 
-// Image attributes
 
-- (NSDictionary *)metadataDictionary;
-- (NSString *)localFilename;
-
-- (NSData *)currentHashData;
 
 @end
