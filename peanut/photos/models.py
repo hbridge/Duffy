@@ -20,7 +20,6 @@ class Photo(models.Model):
 	location_data = models.TextField(null=True)
 	location_city =  models.CharField(max_length=1000, null=True)
 	twofishes_data = models.TextField(null=True)
-	pipeline_state = models.IntegerField(default=0)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	classification_data = models.CharField(max_length=10000, null=True, default="")
 	time_taken = models.DateTimeField(null=True)
