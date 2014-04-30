@@ -14,13 +14,13 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	classificationData = indexes.CharField(model_attr="classification_data", default="")
 	locationData = indexes.CharField(model_attr="location_data", default="")
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
-
+	twoFishesData = indexes.CharField(model_attr="twofishes_data", default="")
+	
 	def get_model(self):
 		return Photo
 
 	def index_queryset(self, using=None):
 		"""Used when the entire index for model is updated."""
-		#return self.get_model().objects.filter(pub_date__lte=datetime.datetime.now())
 		return self.get_model().objects.all()
 
 	'''
@@ -32,7 +32,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 				self.add_classData(obj, 20) + '\n' + \
 				self.add_altTerms(obj, 20) + '\n' + \
 				self.add_faceKeywords(obj) + '\n' + \
-				self.add_screenshotKeywords(obj)
+				self.add_twofishesData(obj)
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
@@ -50,8 +50,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 	def add_locData(self, obj):
 		locText = list()
-		if (self.prepared_data['locationData']):
-			locData = json.loads(self.prepared_data['locationData'])
+		if (obj.location_data):
+			locData = json.loads(obj.location_data)
 			if ('address' in locData):
 				address = locData['address']
 				for k, v in address.items():
@@ -68,7 +68,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 					if (item not in locText):
 						locText.append(item)
 
-		return ', '.join(locText)
+		return u', '.join(locText)
 
 
 
@@ -78,7 +78,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 	def add_classData(self, obj, threshold):
 		newList = list()
-		if (self.prepared_data['classificationData']):
+		if (obj.classification_data):
 			catList = json.loads(obj.classification_data)
 			for entry in catList:
 				if (entry['rating'] > threshold):
@@ -102,7 +102,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 			if (len(altSplit) > 1):
 				altDict[altSplit[0]] = line.split(',', 1)[1]
 
-		if (self.prepared_data['classificationData']):
+		if (obj.classification_data):
 			catList = json.loads(obj.classification_data)
 			for entry in catList:
 				if (entry['rating'] > threshold):
@@ -144,12 +144,23 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def add_screenshotKeywords(self, obj):
 		screenshotKeywords = {'screenshot', 'screenshots'}
 		png = 'png'
-		#print ''
-		#print obj.metadata
+
 		if (len(obj.metadata) > 0):
 			metadata = json.loads(obj.metadata)
 			if (len(metadata) > 0):
 				for k, v in metadata.items():
 					if (png.lower() in k.lower()):
 						return ', '.join(screenshotKeywords)
+
 		return ''
+
+	def add_twofishesData(self, obj):
+		locText = list()
+
+		if (obj.twofishes_data):
+			twoFishesData = json.loads(obj.twofishes_data)
+			
+			for data in twoFishesData["interpretations"]:
+				locText.append(data["feature"]["displayName"])
+
+		return u', '.join(locText)
