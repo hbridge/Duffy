@@ -27,7 +27,7 @@ NSString const *DFUploadResultNumBytes = @"DFUploadNumBytes";
 @end
 
 // Constants
-static NSString *AddPhotoResource = @"/api/addPhoto";
+static NSString *AddPhotoResource = @"addPhoto";
 static NSString *UserIDParameterKey = @"phone_id";
 static NSString *PhotoMetadataKey = @"photo_metadata";
 static NSString *PhotoLocationKey = @"location_data";

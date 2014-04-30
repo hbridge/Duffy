@@ -11,7 +11,7 @@
 @interface DFNetworkingConstants : NSObject
 
 extern NSString *DFServerBaseURL;
-
+extern NSString *DFServerAPIPath;
 
 
 // common parameters

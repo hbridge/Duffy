@@ -1,5 +1,5 @@
 //
-//  DFPhotoMetadataAdapter.h
+//  DFObjectManager.h
 //  Duffy
 //
 //  Created by Henry Bridge on 4/30/14.
@@ -10,12 +10,10 @@
 #import "DFNetworkAdapter.h"
 
 @class RKObjectManager;
-@class DFPhoto;
 
-@interface DFPhotoMetadataAdapter : NSObject <DFNetworkAdapter>
+@interface DFObjectManager : NSObject
 
-- (id)initWithObjectManager:(RKObjectManager *)manager;
-
-- (void)postPhoto:(DFPhoto *)photo;
++ (void)registerAdapterClass:(Class <DFNetworkAdapter>)adapter;
++ (RKObjectManager *)sharedManager;
 
 @end

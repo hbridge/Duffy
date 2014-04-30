@@ -39,8 +39,7 @@
 
 @synthesize objectManager = _objectManager;
 
-static NSString *SuggestionsPathPattern = @"/api/get_suggestions";
-//static NSString *TopLocationsPathPattern = @"/api/get_top_locations";
+static NSString *SuggestionsPathPattern = @"get_suggestions";
 static NSString *UserIDParameterKey = @"user_id";
 
 
@@ -123,7 +122,7 @@ static NSString *UserIDParameterKey = @"user_id";
     NSMutableURLRequest *request = [[self objectManager] requestWithObject:[[DFAutocompleteResponse alloc] init]
                                                                     method:RKRequestMethodGET
                                                                       path:SuggestionsPathPattern
-                                                                parameters:@{UserIDParameterKey: [[DFUser currentUser] userID]}];
+                                                                parameters:@{UserIDParameterKey: [NSNumber numberWithUnsignedLongLong:[[DFUser currentUser] userID]]}];
     
     return request;
 }

@@ -11,6 +11,7 @@
 @implementation DFNetworkingConstants
 
 NSString const *DFServerBaseURL = @"http://asood123.no-ip.biz";
+NSString const *DFServerAPIPath = @"/api/";
 NSString const *DFServerPortDefault = @"";
 
 // common parameters
@@ -18,8 +19,8 @@ NSString const *DFUserIDParameterKey = @"user_id";
 NSString const *DFDeviceIDParameterKey = @"phone_id";
 
 // User ID constants
-NSString const *DFGetUserPath = @"/api/get_user";
-NSString const *DFCreateUserPath = @"/api/create_user";
+NSString const *DFGetUserPath = @"get_user";
+NSString const *DFCreateUserPath = @"create_user";
 NSString const *DFDeviceNameParameterKey = @"device_name";
 
 @end

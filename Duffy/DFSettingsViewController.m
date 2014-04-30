@@ -105,7 +105,7 @@ NSString *DFEnabledNo = @"NO";
     self.deviceIDLabel.text = [[DFUser currentUser] hardwareDeviceID];
     self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
     self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
-    self.userIDTextField.text = [[DFUser currentUser] userID];
+    self.userIDTextField.text = [NSString stringWithFormat:@"%lu", (long)[[DFUser currentUser] userID]];
     
 #ifndef DEBUG
     self.deviceIDTextField.enabled = NO;

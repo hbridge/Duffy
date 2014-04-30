@@ -10,6 +10,9 @@
 #import "DFPhotoImageDataAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
+#import "DFPhotoMetadataAdapter.h"
+#import <RestKit/RestKit.h>
+#import "DFObjectManager.h"
 
 @interface DFUploadOperation()
 

@@ -14,6 +14,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFAnalytics.h"
 #import "DFDataHasher.h"
+#import "DFUser.h"
 
 
 @interface DFCameraRollSyncController()
@@ -178,6 +179,7 @@
     DFPhoto *newPhoto = [NSEntityDescription
                          insertNewObjectForEntityForName:@"DFPhoto"
                          inManagedObjectContext:self.managedObjectContext];
+    newPhoto.userID = [[DFUser currentUser] userID];
     newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
     newPhoto.creationDate = [asset valueForProperty:ALAssetPropertyDate];
     newPhoto.creationHashData = hashData;

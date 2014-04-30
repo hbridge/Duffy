@@ -33,6 +33,9 @@
 		5A8C98E8190AFBF200AE9F88 /* DFStatusBarNotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */; };
 		5A8C98EB190EE78B00AE9F88 /* DFLocationPinger.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */; };
 		5A8C98EE19115BB800AE9F88 /* DFPhotoMetadataAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98ED19115BB800AE9F88 /* DFPhotoMetadataAdapter.m */; };
+		5A8C98F3191175F600AE9F88 /* DFPhotoMap-2-3.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98F2191175F600AE9F88 /* DFPhotoMap-2-3.xcmappingmodel */; };
+		5A8C98F61911793B00AE9F88 /* DFObjectManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98F51911793B00AE9F88 /* DFObjectManager.m */; };
+		5A8C98F91911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98F81911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m */; };
 		5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */; };
 		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
 		5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */; };
@@ -156,6 +159,12 @@
 		5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPinger.m; sourceTree = "<group>"; };
 		5A8C98EC19115BB800AE9F88 /* DFPhotoMetadataAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoMetadataAdapter.h; sourceTree = "<group>"; };
 		5A8C98ED19115BB800AE9F88 /* DFPhotoMetadataAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoMetadataAdapter.m; sourceTree = "<group>"; };
+		5A8C98F2191175F600AE9F88 /* DFPhotoMap-2-3.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = "DFPhotoMap-2-3.xcmappingmodel"; sourceTree = "<group>"; };
+		5A8C98F41911793B00AE9F88 /* DFObjectManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFObjectManager.h; sourceTree = "<group>"; };
+		5A8C98F51911793B00AE9F88 /* DFObjectManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFObjectManager.m; sourceTree = "<group>"; };
+		5A8C98F71911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDateFormatter+DFPhotoDateFormatters.h"; sourceTree = "<group>"; };
+		5A8C98F81911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDateFormatter+DFPhotoDateFormatters.m"; sourceTree = "<group>"; };
+		5A8C98FA19118E9700AE9F88 /* DFNetworkAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFNetworkAdapter.h; sourceTree = "<group>"; };
 		5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSNotificationCenter+DFThreadingAddons.h"; sourceTree = "<group>"; };
 		5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+DFThreadingAddons.m"; sourceTree = "<group>"; };
 		5A8D0AF118EB6A9600A1D9A7 /* DFNotificationSharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationSharedConstants.h; sourceTree = "<group>"; };
@@ -343,6 +352,15 @@
 			name = "Tab view controllers";
 			sourceTree = "<group>";
 		};
+		5A8C98EF191161CE00AE9F88 /* Core Data */ = {
+			isa = PBXGroup;
+			children = (
+				5A8C98F2191175F600AE9F88 /* DFPhotoMap-2-3.xcmappingmodel */,
+				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
+			);
+			name = "Core Data";
+			sourceTree = "<group>";
+		};
 		5A8D0B4D18EF2FBA00A1D9A7 /* Photo Web View */ = {
 			isa = PBXGroup;
 			children = (
@@ -479,6 +497,8 @@
 				5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */,
 				5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */,
 				5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */,
+				5A8C98F41911793B00AE9F88 /* DFObjectManager.h */,
+				5A8C98F51911793B00AE9F88 /* DFObjectManager.m */,
 				5A512723190072A50057A31F /* DFPhotoImageDataAdapter.h */,
 				5A512724190072A50057A31F /* DFPhotoImageDataAdapter.m */,
 				5A8C98EC19115BB800AE9F88 /* DFPhotoMetadataAdapter.h */,
@@ -493,6 +513,7 @@
 				5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */,
 				5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */,
 				5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */,
+				5A8C98FA19118E9700AE9F88 /* DFNetworkAdapter.h */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -605,7 +626,7 @@
 		5ADB24FE189AB3730016CA02 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				5ADB24CE189985590016CA02 /* Duffy.xcdatamodeld */,
+				5A8C98EF191161CE00AE9F88 /* Core Data */,
 				5AFBCA3318D0C87E00998793 /* DFUser.h */,
 				5AFBCA3418D0C87E00998793 /* DFUser.m */,
 				5ADB24F618998D070016CA02 /* DFPhotoStore.h */,
@@ -638,6 +659,8 @@
 				5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */,
 				5AC677E61906F027002F9D42 /* DFDataHasher.h */,
 				5AC677E71906F027002F9D42 /* DFDataHasher.m */,
+				5A8C98F71911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.h */,
+				5A8C98F81911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -852,8 +875,10 @@
 				5AE3BF7B18E4D5C900ACB5DC /* DFCGRectHelpers.m in Sources */,
 				5A8D0B5618EF525800A1D9A7 /* DFTableHeaderView.m in Sources */,
 				5AC40EE11909B2C000ED3532 /* DFPhotoStore+IntegrityCheck.m in Sources */,
+				5A8C98F3191175F600AE9F88 /* DFPhotoMap-2-3.xcmappingmodel in Sources */,
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
 				5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */,
+				5A8C98F91911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */,
 				5A8C98EE19115BB800AE9F88 /* DFPhotoMetadataAdapter.m in Sources */,
@@ -888,6 +913,7 @@
 				5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */,
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
+				5A8C98F61911793B00AE9F88 /* DFObjectManager.m in Sources */,
 				5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */,
 				5A512725190072A50057A31F /* DFPhotoImageDataAdapter.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
@@ -1154,7 +1180,7 @@
 				5AC677E9190700F6002F9D42 /* Duffy 3.xcdatamodel */,
 				5ADB24CF189985590016CA02 /* Duffy.xcdatamodel */,
 			);
-			currentVersion = 5AC677E21906E47E002F9D42 /* Duffy 2.xcdatamodel */;
+			currentVersion = 5AC677E9190700F6002F9D42 /* Duffy 3.xcdatamodel */;
 			path = Duffy.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;

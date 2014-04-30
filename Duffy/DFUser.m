@@ -14,7 +14,7 @@
 
 @synthesize hardwareDeviceID = _hardwareDeviceID, userID = _userID;
 
-static NSString *DFUserIDUserDefaultsKey = @"com.duffysoft.DFUserIDUserDefaultsKey";
+static NSString *DFUserIDUserDefaultsKey = @"com.duffysoft.DFUserIDNumberUserDefaultsKey";
 static NSString *DFOverrideDeviceIDUserDefaultsKey = @"com.duffysoft.DFOverrideDeviceIDUserDefaultsKey";
 static NSString *DFOverrideServerURLKey = @"com.duffysoft.DFOverrideServerURLKey";
 static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortKey";
@@ -71,24 +71,24 @@ static DFUser *currentUser;
     if (![userOverriddenDeviceID isEqualToString:self.userOverriddenDeviceID]) {
         [[NSUserDefaults standardUserDefaults] setObject:userOverriddenDeviceID forKey:DFOverrideDeviceIDUserDefaultsKey];
         // we set the user id to nil if the device is overriden, so that it will be refreshed on next load
-        self.userID = nil;
+        self.userID = 0;
     }
 }
 
-- (NSString *)userID
+- (UInt64)userID
 {
     if (!_userID && self == [DFUser currentUser]) {
-        _userID = [[NSUserDefaults standardUserDefaults] valueForKey:DFUserIDUserDefaultsKey];
+        _userID = [(NSNumber *)[[NSUserDefaults standardUserDefaults] valueForKey:DFUserIDUserDefaultsKey] unsignedLongLongValue];
     }
     
     return _userID;
 }
 
-- (void)setUserID:(NSString *)userID
+- (void)setUserID:(UInt64)userID
 {
     _userID = userID;
     if (self == [DFUser currentUser]) {
-        [[NSUserDefaults standardUserDefaults] setObject:userID forKey:DFUserIDUserDefaultsKey];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedLongLong:userID] forKey:DFUserIDUserDefaultsKey];
     }
 }
 
@@ -115,16 +115,18 @@ static DFUser *currentUser;
 
 - (NSURL *)serverURL
 {
-    NSString *URLString;
+    NSMutableString *URLString;
     if (self.userOverriddenServerURLString && ![self.userOverriddenServerURLString isEqualToString:@""]) {
-        URLString = self.userOverriddenServerURLString;
+        URLString = [self.userOverriddenServerURLString mutableCopy];
     } else {
-        URLString = DFServerBaseURL;
+        URLString = [DFServerBaseURL mutableCopy];
     }
     
     if (self.userOverriddenServerPortString && ![self.userOverriddenServerPortString isEqualToString:@""]) {
-        URLString = [NSString stringWithFormat:@"%@:%@", URLString, self.userOverriddenServerPortString];
+        [URLString appendString:[NSString stringWithFormat:@":%@", self.userOverriddenServerPortString]];
     }
+    
+    [URLString appendString:DFServerAPIPath];
     
     return [NSURL URLWithString:URLString];
 }

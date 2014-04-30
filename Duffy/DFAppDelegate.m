@@ -85,7 +85,7 @@
 - (BOOL)isAppSetupComplete
 {
     return  ([[DFUser currentUser] userID]
-             && ![[[DFUser currentUser] userID] isEqualToString:@""]
+             && ![[DFUser currentUser] userID] == 0
              &&  [ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusAuthorized
              && ![[DFLocationPinger sharedInstance] canAskForLocationPermission]);
 }
@@ -100,7 +100,7 @@
 - (void)showLoggedInUserTabs
 {
     // Set the unique userID for logging
-    [Flurry setUserID:[[DFUser currentUser] userID]];
+    [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
     [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
     
     // Camera roll tab

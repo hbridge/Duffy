@@ -14,7 +14,7 @@
 @property (nonatomic, retain) NSString *hardwareDeviceID;
 @property (nonatomic, readonly) unsigned int devicePhysicalMemoryMB;
 @property (nonatomic, retain) NSString *userOverriddenDeviceID;
-@property (nonatomic, retain) NSString *userID;
+@property (nonatomic) UInt64 userID;
 @property (nonatomic, retain) NSString *firstName;
 @property (nonatomic, retain) NSString *lastName;
 @property (nonatomic, retain, readonly) NSString *deviceName;

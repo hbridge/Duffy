@@ -15,6 +15,8 @@
 #import "DFPhotoImageCache.h"
 #import "DFDataHasher.h"
 #import "DFAnalytics.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFUser.h"
 
 
 @interface DFPhoto()
@@ -26,13 +28,18 @@
 @implementation DFPhoto
 
 @synthesize asset = _asset;
+@synthesize metadataDictionary = _metadataDictionary;
 
-@dynamic alAssetURLString, universalIDString, uploadDate, creationDate, creationHashData;
+@dynamic userID, alAssetURLString, photoID, uploadDate, creationDate, creationHashData;
 
 NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
 NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 
+-(void)awakeFromFetch
+{
+    if (!self.userID) self.userID = [[DFUser currentUser] userID];
+}
 
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext
 {
@@ -169,7 +176,6 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 - (UIImage *)imageResizedToFitSize:(CGSize)size
 {
-
     UIImage *resizedImage = [self thumbnailForAsset:self.asset maxPixelSize:MAX(size.height, size.width)];
     return resizedImage;
 }
@@ -328,21 +334,23 @@ static void releaseAssetCallback(void *info) {
 
 - (NSString *)formatCreationDate:(NSDate *)date
 {
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"];
+    NSDateFormatter *dateFormatter = [NSDateFormatter EXIFDateFormatter];
     return [dateFormatter stringFromDate:date];
 }
 
 - (NSDictionary *)metadataDictionary
 {
-    NSMutableDictionary *metadata = [[NSMutableDictionary alloc] initWithDictionary:self.asset.defaultRepresentation.metadata];
-    NSDictionary *cameraRollMetadata = @{
-                                         DFCameraRollCreationDateKey: [self formatCreationDate:self.creationDate],
-                                         };
-
-
-    [metadata setObject:cameraRollMetadata forKey:DFCameraRollExtraMetadataKey];
-    return metadata;
+    if (!_metadataDictionary) {
+        NSMutableDictionary *metadata = [[NSMutableDictionary alloc] initWithDictionary:self.asset.defaultRepresentation.metadata];
+        NSDictionary *cameraRollMetadata = @{
+                                             DFCameraRollCreationDateKey: [self formatCreationDate:self.creationDate],
+                                             };
+        
+        
+        [metadata setObject:cameraRollMetadata forKey:DFCameraRollExtraMetadataKey];
+        _metadataDictionary = metadata;
+    }
+    return _metadataDictionary;
 }
 
 
