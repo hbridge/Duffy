@@ -10,7 +10,7 @@ import json
 from collections import OrderedDict
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util, gallery_util
+from photos import image_util, search_util, gallery_util, cluster_util
 from .forms import ManualAddPhoto
 
 from datetime import datetime, date
@@ -307,9 +307,7 @@ def dedup(request):
 
 	# iterate through images
 	for photo in photoQuery:
-		#photoFName = str(photo.id)+'-thumb-156.jpg'
-		#photoFName = str(photo.id)+'.jpg'
-		curHist = image_util.getSpatialHist(photo.id, user.id)
+		curHist = cluster_util.getSpatialHist(photo.id)
 
 		addToCluster = False
 		if (len(prevHist) == 0):
@@ -321,7 +319,7 @@ def dedup(request):
 			prevHist.append(curHist)
 		else:
 			for hist in prevHist:
-				dist = image_util.compHist(curHist, hist)
+				dist = cluster_util.compHist(curHist, hist)
 				if (dist < threshold):
 					addToCluster = True
 					break

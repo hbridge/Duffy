@@ -8,7 +8,7 @@ from datetime import datetime
 from django.utils import timezone
 
 from peanut import settings
-from photos.models import Photo, User, Classification
+from photos.models import Photo, User, Classification, Similarity
 import cv2
 import cv2.cv as cv
 
@@ -58,6 +58,7 @@ def imageThumbnail(photoFname, size, userId):
 
 	if(resizeImage(infilePath, outfilePath, size, True, False)):
 		print "generated thumbnail: '%s" % outfilePath
+		return newFilename
 	else:
 		print "cannot create thumbnail for '%s'" % infilePath
 
@@ -210,33 +211,4 @@ def writeOutUploadedFile(uploadedFile, newFilePath):
 	with open(newFilePath, 'wb+') as destination:
 		for chunk in uploadedFile.chunks():
 			destination.write(chunk)
-
-
-### Functions related to finding duplicates and similar photos
-
-"""
-	Returns the distance between two photos
-"""
-
-def getSimilarity(photoId1, photoId2, userId):
-	return compHist(getSpatialHist(photoId1, userId), getSpatialHist(photoId2, userId))
-
-
-"""
-	Get a photo's spatial histogram using opencv's ELBP method
-"""
-def getSpatialHist(photoId, userId):
-	origPath = '/home/derek/user_data/' + str(userId) + '/'
-	photo_color = cv2.imread(origPath + str(photoId) + '-thumb-156.jpg')
-	photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
-	photo_gray = cv2.equalizeHist(photo_gray)
-
-	lbp = cv2.elbp(photo_gray, 1, 8)
-	return cv2.spatial_histogram(lbp, 256, 8, 8, True)
-
-"""
-	Returns distance between two histograms
-"""
-def compHist(h1, h2):
-	return cv2.compareHist(h1, h2, cv.CV_COMP_CHISQR)
 
