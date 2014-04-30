@@ -16,9 +16,27 @@ from django.template import RequestContext, loader
 from django.utils import timezone
 from django.forms.models import model_to_dict
 
+from rest_framework import generics
+from rest_framework import mixins
+
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util
+from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
+
+class PhotoCreate(mixins.CreateModelMixin,
+				  generics.GenericAPIView):
+	queryset = Photo.objects.all()
+	serializer_class = PhotoSerializer
+
+	def post(self, request, *args, **kwargs):
+		print str(request.FILES)
+		return self.create(request, *args, **kwargs)
+
+class PhotoDetail(generics.RetrieveUpdateAPIView):
+	queryset = Photo.objects.all()
+	serializer_class = PhotoSerializer
+	
 
 """
 	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage

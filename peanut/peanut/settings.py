@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'photos',
     # Added.
     'haystack',
+    'rest_framework'
 )
 
 MIDDLEWARE_CLASSES = (
