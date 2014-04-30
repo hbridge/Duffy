@@ -119,20 +119,6 @@ def getTimeTaken(metadataJson, origFilename, photoPath):
 
 	return None
 
-"""
-	If present, grab the city field from the photo's location data
-"""
-def getLocationCity(locationJson):
-	if (locationJson):
-		locationData = json.loads(locationJson)
-
-		if ('address' in locationData):
-			address = locationData['address']
-			if ('City' in address):
-				city = address['City']
-				return city
-	return None
-
 
 """
 	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
@@ -161,10 +147,6 @@ def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFacebo
 	timeTaken = getTimeTaken(metadata, origFilename, newFilePath)
 	if (timeTaken):
 		photo.time_taken = timeTaken
-
-	city = getLocationCity(locationData)
-	if (city):
-		photo.location_city = city
 
 	photo.save()
 	

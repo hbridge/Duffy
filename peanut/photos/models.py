@@ -1,4 +1,5 @@
 from django.db import models
+import json
 
 # Create your models here.
 class User(models.Model):
@@ -25,6 +26,28 @@ class Photo(models.Model):
 	time_taken = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	"""
+		Look to see from the iphone's location data if there's a city present
+		TODO(derek):  Should this be pulled out to its own table?
+	"""
+	def getLocationCity(self, locationJson):
+		if (locationJson):
+			locationData = json.loads(locationJson)
+
+			if ('address' in locationData):
+				address = locationData['address']
+				if ('City' in address):
+					city = address['City']
+					return city
+		return None
+
+	def save(self, *args, **kwargs):
+		city = self.getLocationCity(self.location_data)
+		if (city):
+			self.location_city = city
+		
+		models.Model.save(self, *args, **kwargs)
 
 	def __unicode__(self):
 		return u'%s/%s' % (self.user, self.new_filename)
