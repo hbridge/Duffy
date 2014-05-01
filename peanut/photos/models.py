@@ -106,7 +106,6 @@ class Photo(models.Model):
 				gpsData = metadata["{GPS}"]
 				lat = lon = None
 
-
 				if "Latitude" in gpsData:
 					lat = gpsData["Latitude"]
 					if gpsData["LatitudeRef"] == "S":
@@ -117,6 +116,24 @@ class Photo(models.Model):
 						lon = lon * -1
 				return (lat, lon)
 		return None
+
+	"""
+		Static method for populating extra info like twoFishes.
+
+		Static so it can be called in its own thread.
+	"""
+	@staticmethod
+	def populateExtraData(photoId):
+		photo = Photo.objects.get(id=photoId)
+		latLon = photo.getLatLon()
+
+		if latLon:
+			(lat, lon) = latLon
+			twoFishesResult = location_util.getDataFromTwoFishes(lat, lon)
+
+			if twoFishesResult:
+				photo.twofishes_data = twoFishesResult
+				photo.save()
 
 	def __unicode__(self):
 		return u'%s/%s' % (self.user, self.full_filename)

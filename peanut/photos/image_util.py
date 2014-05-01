@@ -3,6 +3,7 @@ import Image
 import pyexiv2
 import exifread
 import json
+import tempfile
 from datetime import datetime
 
 from django.utils import timezone
@@ -166,6 +167,13 @@ def processUploadedPhoto(photo, origFileName, tempFilepath):
 		photo.save()
 
 		createThumbnail(photo)
+
+def handleUploadedImage(request, fileKey, photo):
+	if fileKey in request.FILES:
+		tempFilepath = tempfile.mktemp()
+ 
+		writeOutUploadedFile(request.FILES[fileKey], tempFilepath)
+		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFilepath)
 
 """
 	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
