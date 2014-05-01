@@ -17,27 +17,27 @@ from photos import cluster_util
 
 def main(argv):
 	if (len(sys.argv) > 1):
-		threshold = int(sys.argv[1])
+		userId = int(sys.argv[1])
 	else:
-		threshold = 75
+		userId = None
 
 	print "Starting to populate similarity table"
 
-	allUsers = User.objects.all()
+	allUsers = User.objects.all().filter(id__gt=38) #ignores first set of accounts
 	totalRows = 0
 
 	for user in allUsers:
-		if (user.id <= 38 or user.id > 40): # ignores first set of accounts
-			continue
+		if (userId):
+			if (user.id != userId):
+				continue;
 		photoQuery = Photo.objects.all().filter(user_id=user.id).order_by('time_taken')
 		print "userId {0}: | Photos: {1}".format(user.id, photoQuery.count())
 
 		# iterate through images
 		userRows = 0
 		for photo in photoQuery:
-			print "L: {0}, {1}".format(photo.id, photo.time_taken)
 			userRows += cluster_util.addToClusters(photo.id)
-		print "DB operations (added/modified): {0}".format(userRows)
+		print "DB adds: {0}".format(userRows)
 		totalRows += userRows
 	print "Total entries generated: {0}".format(totalRows)
 
