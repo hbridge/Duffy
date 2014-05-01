@@ -36,7 +36,9 @@ def main(argv):
 		# iterate through images
 		userRows = 0
 		for photo in photoQuery:
-			userRows += cluster_util.addToClusters(photo.id)
+			if (photo.full_filename and not photo.thumb_filename):
+				print photo.id
+			#userRows += cluster_util.addToClusters(photo.id)
 		print "DB adds: {0}".format(userRows)
 		totalRows += userRows
 	print "Total entries generated: {0}".format(totalRows)
