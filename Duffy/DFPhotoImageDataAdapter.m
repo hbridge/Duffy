@@ -12,6 +12,7 @@
 #import "DFPhoto+FaceDetection.h"
 #import "DFUser.h"
 #import "NSDictionary+DFJSON.h"
+#import "DFNetworkingConstants.h"
 
 // Result dict strings
 NSString const *DFUploadResultErrorKey = @"DFUploadResult";
@@ -33,11 +34,7 @@ static NSString *PhotoMetadataKey = @"photo_metadata";
 static NSString *PhotoLocationKey = @"location_data";
 static NSString *PhotoFacesKey = @"iphone_faceboxes_topleft";
 
-static const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
-static const float IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
-
 static const unsigned int FaceDetectionMinMemory = 1000;
-
 
 @interface DFPhotoImageDataAdapter()
 

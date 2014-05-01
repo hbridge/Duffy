@@ -23,4 +23,8 @@ extern NSString *DFGetUserPath;
 extern NSString *DFCreateUserPath;
 extern NSString *DFDeviceNameParameterKey;
 
+// Upload quality constants
+extern const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION;
+extern const float IMAGE_UPLOAD_JPEG_QUALITY;
+
 @end

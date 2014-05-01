@@ -16,6 +16,6 @@
 
 - (id)initWithObjectManager:(RKObjectManager *)manager;
 
-- (void)postPhoto:(DFPhoto *)photo;
+- (void)postPhotoMetadataWithThumbnail:(DFPhoto *)photo;
 
 @end

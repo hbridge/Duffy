@@ -11,6 +11,7 @@
 #import "DFPhoto.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFObjectManager.h"
+#import "DFNetworkingConstants.h"
 
 
 
@@ -105,12 +106,21 @@
     return [NSArray arrayWithObjects:responseDescriptor, nil];
 }
 
-- (void)postPhoto:(DFPhoto *)photo
+- (void)postPhotoMetadataWithThumbnail:(DFPhoto *)photo
 {
     DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
     
-    NSMutableURLRequest *request = [self.objectManager requestWithObject:peanutPhoto method:RKRequestMethodPOST path:@"photos/" parameters:nil];
+    //NSMutableURLRequest *request = [self.objectManager requestWithObject:peanutPhoto method:RKRequestMethodPOST path:@"photos/" parameters:nil];
+    NSMutableURLRequest *request = [self.objectManager
+                                    multipartFormRequestWithObject:peanutPhoto
+                                    method:RKRequestMethodPOST
+                                    path:@"photos/"
+                                    parameters:nil
+                                    constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                        [formData appendPartWithFileData:UIImageJPEGRepresentation(photo.thumbnail, IMAGE_UPLOAD_JPEG_QUALITY) name:@"thumbnail" fileName:@"thumbnail.jpg" mimeType:@"image/jpg"];
+                                    }];
     RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
+
     [self.objectManager enqueueObjectRequestOperation:requestOperation];
     
     [requestOperation waitUntilFinished];
