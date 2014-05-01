@@ -42,7 +42,7 @@ def main(argv):
 
         if (foundDate == False):
             userUploadsPath = os.path.join(uploadsPath, str(photo.user.id))
-            photoPath = os.path.join(userUploadsPath, photo.new_filename)
+            photoPath = os.path.join(userUploadsPath, photo.full_filename)
             
             f = open(photoPath, 'rb')
             tags = exifread.process_file(f)

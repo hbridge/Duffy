@@ -15,8 +15,8 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
 from django.utils import timezone
 from django.forms.models import model_to_dict
+from django.http import Http404
 
-from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -27,33 +27,46 @@ from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
 
-class PhotoCreate(APIView):
+class PhotoAPI(APIView):
+	def handleUploadedFile(self, request, photo):
+		if "file" in request.FILES:
+			print "Found file: " + request.FILES['file'].name
+			tempFilepath = tempfile.mktemp()
+	 
+			image_util.writeOutUploadedFile(request.FILES['file'], tempFilepath)
+			image_util.processUploadedPhoto(photo, request.FILES['file'].name, tempFilepath)
+
+	def getObject(self, photoId):
+		try:
+			return Photo.objects.get(id=photoId)
+		except Photo.DoesNotExist:
+			raise Http404
+
+	def get(self, request, photoId, format=None):
+		photo = self.getObject(photoId)
+		serializer = PhotoSerializer(photo)
+		return Response(serializer.data)
+
+	def put(self, request, photoId, format=None):
+		photo = self.getObject(photoId)
+		serializer = PhotoSerializer(photo, data=request.DATA)
+		if serializer.is_valid():
+			serializer.save()
+
+			self.handleUploadedFile(request, serializer.object)
+
+			return Response(serializer.data)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 	def post(self, request, format=None):
 		serializer = PhotoSerializer(data=request.DATA)
 		if serializer.is_valid():
-			tempFilepath = tempfile.mktemp()
- 
-			image_util.handleUploadedFile(request.FILES['file'], tempFilepath)
-
 			serializer.save()
 
-			photoId = serializer.data["id"]
-
-			photo = Photo.objects.get(id=photoId)
-
-			# Not great to do here, would be nice ot do it in the serializer.save()
-			photo.orig_filename = request.FILES['file'].name
-			photo.save()
-
-			image_util.processUploadedPhoto(photo, tempFilepath)
+			self.handleUploadedFile(request, serializer.object)
 
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class PhotoDetail(generics.RetrieveUpdateAPIView):
-	queryset = Photo.objects.all()
-	serializer_class = PhotoSerializer
-	
 
 """
 	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage
@@ -80,7 +93,7 @@ def add_photo(request):
 
 			tempFilepath = tempfile.mktemp()
  
-			image_util.handleUploadedFile(request.FILES['file'], tempFilepath)
+			image_util.writeOutUploadedFile(request.FILES['file'], tempFilepath)
 			image_util.addPhoto(user, request.FILES['file'].name, tempFilepath, photoMetadata, locationData, iPhoneFaceboxesTopleft)
 
 			response_data['result'] = True
@@ -345,11 +358,13 @@ def createUser(phoneId, firstName):
 		os.stat(userUploadsPath)
 	except:
 		os.mkdir(userUploadsPath)
+		os.chmod(userBasePath, 775)
 
 	try:
 		os.stat(userBasePath)
 	except:
 		os.mkdir(userBasePath)
+		os.chmod(userBasePath, 775)
 
 	userRemoteStagingPath = os.path.join(remoteStagingPath, userId)
 	subprocess.call(['ssh', remoteHost, "mkdir -p " + userRemoteStagingPath])

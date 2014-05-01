@@ -19,7 +19,7 @@ import cv2.cv as cv
 	PHOTOID-thumb-SIZE.jpg
 """
 def createThumbnail(photo):
-	if photo.new_filename:
+	if photo.full_filename:
 		thumbFilePath = photo.getThumbPath()
 		fullFilePath = photo.getFullPath()
 
@@ -144,17 +144,19 @@ def getTimeTaken(metadataJson, origFilename, photoPath):
 
 	return None
 
-def processUploadedPhoto(photo, tempFilepath):
+def processUploadedPhoto(photo, origFileName, tempFilepath):
 	im = Image.open(tempFilepath)
 	(width, height) = im.size
 
-	if (width == 156 and height == 156):
+	if (width == 157 and height == 157):
 		os.rename(tempFilepath, photo.getThumbPath())
 	else:
-		os.rename(tempFilepath, photo.getFullPath())
+		# Must put this in first since getFullfilename needs it
+		photo.orig_filename = origFileName
+		photo.full_filename = photo.getFullFilename()
 
-		newFilename = photo.getFullFilename()
-		photo.new_filename = newFilename
+		os.rename(tempFilepath, photo.getFullPath())
+		
 		photo.save()
 
 		createThumbnail(photo)
@@ -181,7 +183,7 @@ def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFacebo
 	userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(user.id))
 	newFilePath = os.path.join(userDataPath, newFilename)
 
-	photo.new_filename = newFilename
+	photo.full_filename = newFilename
 
 	os.rename(localFilepath, newFilePath)
 
@@ -192,12 +194,12 @@ def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFacebo
 	photo.save()
 
 	# last step: generate a thumbnail
-	imageThumbnail(photo.new_filename, 156, user.id)
+	imageThumbnail(photo.full_filename, 156, user.id)
 
 """
 	Moves an uploaded file to a new destination
 """
-def handleUploadedFile(uploadedFile, newFilePath):
+def writeOutUploadedFile(uploadedFile, newFilePath):
 	print("Writing to " + newFilePath)
 
 	with open(newFilePath, 'wb+') as destination:

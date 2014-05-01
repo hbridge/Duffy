@@ -186,9 +186,9 @@ def gallery(request, user_id):
 
 	for entry in photos:
 		for photo in entry['mainPhotos']:
-			image_util.imageThumbnail(photo.new_filename, width, user.id)
+			image_util.imageThumbnail(photo.full_filename, width, user.id)
 		for photo in entry['subPhotos']:
-			image_util.imageThumbnail(photo.new_filename, width, user.id)
+			image_util.imageThumbnail(photo.full_filename, width, user.id)
 
 
 	context = {	'user' : user,

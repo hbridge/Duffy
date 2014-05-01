@@ -12,8 +12,8 @@ urlpatterns = patterns('photos.api_views',
 
 	# REST API
 	#url(r'^photos/$', 'photo_list'),
-	url(r'^photos/$', api_views.PhotoCreate.as_view()),
-	url(r'^photos/(?P<pk>[0-9]+)/$', api_views.PhotoDetail.as_view())
+	url(r'^photos/$', api_views.PhotoAPI.as_view()),
+	url(r'^photos/(?P<photoId>[0-9]+)/$', api_views.PhotoAPI.as_view())
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

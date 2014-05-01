@@ -34,7 +34,7 @@ def classifyPhotos(photos, socket_send, socket_recv):
 
     logging.info("About to process files (at " + time.strftime("%c") + "):")
     for photo in photos:
-        imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.new_filename)
+        imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.full_filename)
         pathToPhoto[imagepath] = photo
 
         cmd['images'].append(imagepath)
@@ -90,7 +90,7 @@ def copyPhotos(photos):
         userId = str(photo.user.id)
         # Setup user's staging dir on duffy
         userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, userId)
-        imagepath = os.path.join(userDataPath, photo.new_filename)
+        imagepath = os.path.join(userDataPath, photo.full_filename)
 
         logging.info("Sending to image server:  " + imagepath + " to " + settings.PIPELINE_REMOTE_PATH)
         ret = subprocess.call(['scp', imagepath, settings.PIPELINE_REMOTE_HOST + ":" + settings.PIPELINE_REMOTE_PATH])
@@ -117,8 +117,9 @@ def main(argv):
 
     while True:
         logging.info("Starting pipeline at " + time.strftime("%c"))
-        # Get all photos in pipeline_state 0 which means "not copied to image server"
-        nonProcessedPhotos = Photo.objects.filter(classification_data="").exclude(user=1)
+        # Get all photos which don't have classification data yet
+        #  But also filter out test users and any photo which only has a thumb
+        nonProcessedPhotos = Photo.objects.filter(classification_data="").exclude(user=1).exclude(full_filename="").exclude(full_filename__isnull=True)
         nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
 
         successfullyClassified = list()

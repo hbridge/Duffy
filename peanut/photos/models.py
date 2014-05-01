@@ -27,14 +27,15 @@ class User(models.Model):
 class Photo(models.Model):
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100)
-	new_filename = models.CharField(max_length=100, blank=True, default="")
+	full_filename = models.CharField(max_length=100, null=True)
+	thumb_filename = models.CharField(max_length=100, null=True)
 	hashcode = models.CharField(max_length=100, null=True)
 	metadata = models.CharField(max_length=10000, null=True)
 	location_data = models.TextField(null=True)
 	location_city =  models.CharField(max_length=1000, null=True)
 	twofishes_data = models.TextField(null=True)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
-	classification_data = models.CharField(max_length=10000, null=True, default="")
+	classification_data = models.CharField(max_length=10000, null=True)
 	time_taken = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
@@ -95,7 +96,7 @@ class Photo(models.Model):
 		return os.path.join(self.user.getUserDataPath(), self.getFullFilename())
 
 	def __unicode__(self):
-		return u'%s/%s' % (self.user, self.new_filename)
+		return u'%s/%s' % (self.user, self.full_filename)
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
