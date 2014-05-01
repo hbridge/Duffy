@@ -154,7 +154,8 @@ def processUploadedPhoto(photo, origFileName, tempFilepath):
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
 		os.rename(tempFilepath, photo.getThumbPath())
-		photo.thumb_filename = photo.getFullFilename()
+		photo.thumb_filename = photo.getThumbFilename()
+		photo.save()
 	else:
 		# Must put this in first since getFullfilename needs it
 		photo.orig_filename = origFileName

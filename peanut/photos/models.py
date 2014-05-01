@@ -26,7 +26,7 @@ class User(models.Model):
 
 class Photo(models.Model):
 	user = models.ForeignKey(User)
-	orig_filename = models.CharField(max_length=100)
+	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
 	thumb_filename = models.CharField(max_length=100, null=True)
 	hashcode = models.CharField(max_length=100, null=True)
