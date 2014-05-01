@@ -24,10 +24,14 @@ def createThumbnail(photo):
 		fullFilePath = photo.getFullPath()
 
 		if (os.path.isfile(thumbFilePath)):
+			if not photo.thumb_filename:
+				photo.thumb_filename = photo.getThumbFilename()
+				photo.save()
 			return photo.getThumbFilename()
-	
 
 		if(resizeImage(fullFilePath, thumbFilePath, settings.THUMBNAIL_SIZE, True, False)):
+			photo.thumb_filename = photo.getThumbFilename()
+			photo.save()
 			print "generated thumbnail: '%s" % thumbFilePath
 		else:
 			print "cannot create thumbnail for '%s'" % fullFilePath
@@ -148,8 +152,9 @@ def processUploadedPhoto(photo, origFileName, tempFilepath):
 	im = Image.open(tempFilepath)
 	(width, height) = im.size
 
-	if (width == 157 and height == 157):
+	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
 		os.rename(tempFilepath, photo.getThumbPath())
+		photo.thumb_filename = photo.getFullFilename()
 	else:
 		# Must put this in first since getFullfilename needs it
 		photo.orig_filename = origFileName

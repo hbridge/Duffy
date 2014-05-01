@@ -66,6 +66,8 @@ class Photo(models.Model):
 		Returns back just the filename for the thumbnail.
 		So if:  /home/blah/1/1234-thumb-156.jpg
 		Will return:  1234-thumb-156.jpg
+
+		This is used as a stopgap, the db also has this name
 	"""
 	def getThumbFilename(self):
 		return str(self.id) + "-thumb-" + str(settings.THUMBNAIL_SIZE) + '.jpg'
@@ -81,6 +83,8 @@ class Photo(models.Model):
 		Returns back just the filename for the fullsize image.
 		So if:  /home/blah/1/1234.jpg
 		Will return:  1234.jpg
+
+		This is used as a stopgap, the db also has this name
 	"""
 	def getFullFilename(self):
 		baseWithoutExtension, fileExtension = os.path.splitext(self.orig_filename)

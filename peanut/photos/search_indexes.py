@@ -9,7 +9,7 @@ from datetime import datetime
 class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	text = indexes.CharField(document=True, use_template=False)
 	userId = indexes.CharField()
-	photoFilename = indexes.CharField(model_attr="full_filename")
+	photoFilename = indexes.CharField(model_attr="full_filename", default="")
 	photoId = indexes.CharField(model_attr="id", indexed=False)
 	classificationData = indexes.CharField(model_attr="classification_data", default="")
 	locationData = indexes.CharField(model_attr="location_data", default="")
