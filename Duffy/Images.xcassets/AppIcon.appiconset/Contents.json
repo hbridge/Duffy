@@ -3,19 +3,19 @@
     {
       "size" : "29x29",
       "idiom" : "iphone",
-      "filename" : "Duffy Icon-2.png",
+      "filename" : "Duffy29pt.png",
       "scale" : "2x"
     },
     {
       "size" : "40x40",
       "idiom" : "iphone",
-      "filename" : "Duffy Icon-1.png",
+      "filename" : "Duffy40pt.png",
       "scale" : "2x"
     },
     {
       "size" : "60x60",
       "idiom" : "iphone",
-      "filename" : "Duffy Icon.png",
+      "filename" : "Duffy60pt.png",
       "scale" : "2x"
     }
   ],
