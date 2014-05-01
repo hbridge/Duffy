@@ -32,22 +32,33 @@ def classifyPhotos(photos, socket_send, socket_recv):
 
     pathToPhoto = dict()
 
-    logging.debug("About to process files (at " + time.strftime("%c") + "):")
+    logging.info("About to process files (at " + time.strftime("%c") + "):")
     for photo in photos:
         imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.new_filename)
         pathToPhoto[imagepath] = photo
 
         cmd['images'].append(imagepath)
 
-    logging.debug("Sending:  " + str(cmd))
+    logging.info("Sending:  " + str(cmd))
     socket_send.send_json(cmd)
     
-    logging.debug("Waiting for response...")
+    logging.info("Waiting for response...")
     result = socket_recv.recv_json()
-    logging.debug("Got back: " + str(result))
+    logging.info("Got back: " + str(result))
 
+
+    # We might get back responses for different images
     for imagepath in result['images']:
-        photo = pathToPhoto[imagepath]
+        if imagepath in pathToPhoto:
+            photo = pathToPhoto[imagepath]
+        else:
+            logging.info("*** Unkonwn file - looking up in db: " + imagepath)
+            # need to do a lookup
+            base, origFilename = os.path.split(imagepath)
+            filenameNoExt, extension = os.path.splittext(origFilename)
+            photoId = filenameNoExt.split('-')[0]
+
+            photo = Photo.objects.filter(id=photoId)
 
         if result['images'][imagepath] is not "not_found":
             Classification.objects.filter(user_id = photo.user.id, photo_id = photo.id).delete()
