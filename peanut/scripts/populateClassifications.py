@@ -118,7 +118,7 @@ def main(argv):
     while True:
         logging.info("Starting pipeline at " + time.strftime("%c"))
         # Get all photos in pipeline_state 0 which means "not copied to image server"
-        nonProcessedPhotos = Photo.objects.filter(classification_data="")
+        nonProcessedPhotos = Photo.objects.filter(classification_data="").exclude(user=1)
         nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
 
         successfullyClassified = list()
