@@ -17,21 +17,38 @@ from django.utils import timezone
 from django.forms.models import model_to_dict
 
 from rest_framework import generics
-from rest_framework import mixins
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
-class PhotoCreate(mixins.CreateModelMixin,
-				  generics.GenericAPIView):
-	queryset = Photo.objects.all()
-	serializer_class = PhotoSerializer
 
-	def post(self, request, *args, **kwargs):
-		print str(request.FILES)
-		return self.create(request, *args, **kwargs)
+class PhotoCreate(APIView):
+	def post(self, request, format=None):
+		serializer = PhotoSerializer(data=request.DATA)
+		if serializer.is_valid():
+			tempFilepath = tempfile.mktemp()
+ 
+			image_util.handleUploadedFile(request.FILES['file'], tempFilepath)
+
+			serializer.save()
+
+			photoId = serializer.data["id"]
+
+			photo = Photo.objects.get(id=photoId)
+
+			# Not great to do here, would be nice ot do it in the serializer.save()
+			photo.orig_filename = request.FILES['file'].name
+			photo.save()
+
+			image_util.processUploadedPhoto(photo, tempFilepath)
+
+			return Response(serializer.data, status=status.HTTP_201_CREATED)
+		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PhotoDetail(generics.RetrieveUpdateAPIView):
 	queryset = Photo.objects.all()

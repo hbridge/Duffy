@@ -158,6 +158,8 @@ PIPELINE_LOCAL_BASE_PATH = "/home/derek/user_data/"
 PIPELINE_REMOTE_HOST = 'duffy@titanblack.no-ip.biz'
 PIPELINE_REMOTE_PATH = '/home/duffy/pipeline/staging'
 
+THUMBNAIL_SIZE = 156
+
 STATE_NEW = 0
 STATE_COPIED = 1
 STATE_CLASSIFIED = 2

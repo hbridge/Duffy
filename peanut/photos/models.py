@@ -1,5 +1,9 @@
-from django.db import models
+import os
 import json
+
+from django.db import models
+
+from peanut import settings
 
 # Create your models here.
 class User(models.Model):
@@ -9,8 +13,16 @@ class User(models.Model):
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	"""
+		Returns back the full localfile path where the user's photos are located
+		So:  /home/blah/1/
+	"""
+	def getUserDataPath(self):
+		return os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(self.id))
+
 	def __unicode__(self):
 		return self.first_name + " " + self.last_name + " - " + self.phone_id
+
 
 class Photo(models.Model):
 	user = models.ForeignKey(User)
@@ -48,6 +60,39 @@ class Photo(models.Model):
 			self.location_city = city
 		
 		models.Model.save(self, *args, **kwargs)
+
+	"""
+		Returns back just the filename for the thumbnail.
+		So if:  /home/blah/1/1234-thumb-156.jpg
+		Will return:  1234-thumb-156.jpg
+	"""
+	def getThumbFilename(self):
+		return str(self.id) + "-thumb-" + str(settings.THUMBNAIL_SIZE) + '.jpg'
+
+	"""
+		Returns back the full localfile path of the thumb
+		So:  /home/blah/1/1234-thumb-156.jpg
+	"""
+	def getThumbPath(self):
+		return os.path.join(self.user.getUserDataPath(), self.getThumbFilename())
+
+	"""
+		Returns back just the filename for the fullsize image.
+		So if:  /home/blah/1/1234.jpg
+		Will return:  1234.jpg
+	"""
+	def getFullFilename(self):
+		baseWithoutExtension, fileExtension = os.path.splitext(self.orig_filename)
+		fullFilename = str(self.id) + fileExtension
+
+		return fullFilename
+
+	"""
+		Returns back the full localfile path of the thumb
+		So:  /home/blah/1/1234.jpg
+	"""
+	def getFullPath(self):
+		return os.path.join(self.user.getUserDataPath(), self.getFullFilename())
 
 	def __unicode__(self):
 		return u'%s/%s' % (self.user, self.new_filename)

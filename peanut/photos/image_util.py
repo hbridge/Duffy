@@ -12,10 +12,35 @@ from photos.models import Photo, User, Classification
 import cv2
 import cv2.cv as cv
 
+
 """
 	Generates a thumbnail of the given image to the given size
 	Creates a new file in the same directory as the existing filename of the format:
 	PHOTOID-thumb-SIZE.jpg
+"""
+def createThumbnail(photo):
+	if photo.new_filename:
+		thumbFilePath = photo.getThumbPath()
+		fullFilePath = photo.getFullPath()
+
+		if (os.path.isfile(thumbFilePath)):
+			return photo.getThumbFilename()
+	
+
+		if(resizeImage(fullFilePath, thumbFilePath, settings.THUMBNAIL_SIZE, True, False)):
+			print "generated thumbnail: '%s" % thumbFilePath
+		else:
+			print "cannot create thumbnail for '%s'" % fullFilePath
+	else:
+		return None
+
+
+"""
+	Generates a thumbnail of the given image to the given size
+	Creates a new file in the same directory as the existing filename of the format:
+	PHOTOID-thumb-SIZE.jpg
+
+	TODO(derek):  remove this and move to createThumbnail
 """
 def imageThumbnail(photoFname, size, userId):
 	path = '/home/derek/user_data/' + str(userId) + '/'
@@ -24,7 +49,7 @@ def imageThumbnail(photoFname, size, userId):
 
 	if (os.path.isfile(outfilePath)):
 		return newFilename
-	
+
 	infilePath = path + str(photoFname)
 
 	if(resizeImage(infilePath, outfilePath, size, True, False)):
@@ -119,11 +144,27 @@ def getTimeTaken(metadataJson, origFilename, photoPath):
 
 	return None
 
+def processUploadedPhoto(photo, tempFilepath):
+	im = Image.open(tempFilepath)
+	(width, height) = im.size
+
+	if (width == 156 and height == 156):
+		os.rename(tempFilepath, photo.getThumbPath())
+	else:
+		os.rename(tempFilepath, photo.getFullPath())
+
+		newFilename = photo.getFullFilename()
+		photo.new_filename = newFilename
+		photo.save()
+
+		createThumbnail(photo)
 
 """
 	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
 	and metadata about the photo.  It then saves assigns the photo a new id, renames it, adds it to the database
 	then tries to populate the time_taken and location_city fields
+
+	TODO(derek):  Remove this and rely upon proccessUploadedPhoto and REST API
 """
 def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFaceboxesTopleft):
 	photo = Photo(	user = user,
@@ -149,10 +190,9 @@ def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFacebo
 		photo.time_taken = timeTaken
 
 	photo.save()
-	
+
 	# last step: generate a thumbnail
 	imageThumbnail(photo.new_filename, 156, user.id)
-
 
 """
 	Moves an uploaded file to a new destination
