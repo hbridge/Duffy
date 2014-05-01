@@ -4,6 +4,7 @@ import json
 import subprocess
 import Image
 import tempfile
+import thread
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -22,12 +23,24 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util, gallery_util
+from photos import image_util, search_util, gallery_util, location_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
 
 class PhotoAPI(APIView):
+	def populateExtraData(self, photoId):
+		photo = self.getObject(photoId)
+		latLon = photo.getLatLon()
+
+		if latLon:
+			(lat, lon) = latLon
+			twoFishesResult = location_util.getDataFromTwoFishes(lat, lon)
+
+			if twoFishesResult:
+				photo.twofishes_data = twoFishesResult
+				photo.save()
+
 	def handleUploadedFile(self, request, photo):
 		if "file" in request.FILES:
 			print "Found file: " + request.FILES['file'].name
@@ -55,6 +68,8 @@ class PhotoAPI(APIView):
 
 			self.handleUploadedFile(request, serializer.object)
 
+			thread.start_new_thread(self.populateExtraData, (serializer.data["id"],))
+
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,6 +79,8 @@ class PhotoAPI(APIView):
 			serializer.save()
 
 			self.handleUploadedFile(request, serializer.object)
+			
+			thread.start_new_thread(self.populateExtraData, (serializer.data["id"],))
 
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

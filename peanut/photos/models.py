@@ -99,6 +99,25 @@ class Photo(models.Model):
 	def getFullPath(self):
 		return os.path.join(self.user.getUserDataPath(), self.getFullFilename())
 
+	def getLatLon(self):
+		if self.metadata:
+			metadata = json.loads(self.metadata)
+			if "{GPS}" in metadata:
+				gpsData = metadata["{GPS}"]
+				lat = lon = None
+
+
+				if "Latitude" in gpsData:
+					lat = gpsData["Latitude"]
+					if gpsData["LatitudeRef"] == "S":
+						lat = lat * -1
+				if "Longitude" in gpsData:
+					lon = gpsData["Longitude"]
+					if gpsData["LongitudeRef"] == "W":
+						lon = lon * -1
+				return (lat, lon)
+		return None
+
 	def __unicode__(self):
 		return u'%s/%s' % (self.user, self.full_filename)
 
