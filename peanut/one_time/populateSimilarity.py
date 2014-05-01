@@ -27,16 +27,15 @@ def main(argv):
 	totalRows = 0
 
 	for user in allUsers:
-		if (user.id <= 1 or user.id > 7): # ignores user 1 
+		if (user.id <= 38 or user.id > 40): # ignores first set of accounts
 			continue
 		photoQuery = Photo.objects.all().filter(user_id=user.id).order_by('time_taken')
 		print "userId {0}: | Photos: {1}".format(user.id, photoQuery.count())
 
 		# iterate through images
-		clusterHist = dict() #stores histograms for current cluster
-		allClusters = list() #stores list of premade clusters (num of photos >= 2)
 		userRows = 0
 		for photo in photoQuery:
+			print "L: {0}, {1}".format(photo.id, photo.time_taken)
 			userRows += cluster_util.addToClusters(photo.id)
 		print "DB operations (added/modified): {0}".format(userRows)
 		totalRows += userRows

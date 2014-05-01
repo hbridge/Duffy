@@ -46,8 +46,23 @@
 	}
 	.ui-image {
 		padding-right: 2px;
-		height: {{ imageSize|add:+2 }}px;
 		float:left;
+		position: relative;
+		height: {{ imageSize|add:+2 }}px;
+	}
+	.ui-image-count {
+		position:absolute;
+		background-color: transparent;
+		color: #ffffff;
+		top: 39px;
+		left: 37px;
+		font-size: 1em;
+		text-align: right;
+		width: 39px;
+		height:39px;
+		line-height: 60px;
+		vertical-align: text-bottom;
+		padding-right: 2px;
 	}
 	.text {
 		font-family: arial;

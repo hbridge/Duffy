@@ -9,6 +9,7 @@ from django.utils import timezone
 
 from peanut import settings
 from photos.models import Photo, User, Classification, Similarity
+from photos import image_util
 import cv2
 import cv2.cv as cv
 
@@ -32,11 +33,16 @@ def addToClusters(photoId, threshold=None):
 	if (threshold == None):
 		threshold = 100
 
+	if (curPhoto.time_taken == None and curPhoto.added == None):
+		# handling case before 'added' field was in the database
+		# if no timestamp exists, then skip the photo for clustering
+		return 0
+
 	# get a list of photos that are "near" this photo: meaning pre and post in the timeline
 	if (curPhoto.time_taken == None):
-		# for undated photos, use upload time
-		photoQueryPre = Photo.objects.all().filter(user_id=userId).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=curPhoto.upload_date).order_by('-added')[:20]
-		photoQueryPost = Photo.objects.all().filter(user_id=userId).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=curPhoto.upload_date).order_by('added')[:20]
+		# for undated photos, use 'added' which is the upload time
+		photoQueryPre = Photo.objects.all().filter(user_id=userId).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=curPhoto.added).order_by('-added')[:20]
+		photoQueryPost = Photo.objects.all().filter(user_id=userId).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=curPhoto.added).order_by('added')[:20]
 	else:
 		photoQueryPre = Photo.objects.all().filter(user_id=userId).exclude(time_taken__gt=curPhoto.time_taken).exclude(time_taken=None).exclude(id=photoId).order_by('-time_taken')[:20]
 		photoQueryPost = Photo.objects.all().filter(user_id=userId).exclude(time_taken__lt=curPhoto.time_taken).exclude(time_taken=None).exclude(id=photoId).order_by('time_taken')[:20]
@@ -54,7 +60,6 @@ def addToClusters(photoId, threshold=None):
 
 """
 	Continues to follow a resulting query of photos until one of them isn't similar enough
-
 	Returns count of DB operations: adds or modified
 """
 
@@ -80,7 +85,6 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 
 """
 	Compares curPhoto to each photo in photoList and adds a row if under threshold
-
 	Returns count of DB operations: adds or modified
 
 """
@@ -88,8 +92,9 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 def genSimilarityRowsFromList(curPhoto, curHist, photoList, threshold):
 	count = 0
 	for photo in photoList:
-		#print "photo.id: {0} | time_taken: {1}".format(str(photo.id), photo.time_taken)
+		print "P: {0}, {1}".format(photo.id, photo.time_taken)
 		if (doesSimilarityRowAlreadyExists(curPhoto, photo)):
+			count += 1
 			continue
 		dist = getSimilarityFromHistAndPhoto(curHist, photo.id)
 		if (dist < threshold):
@@ -99,20 +104,18 @@ def genSimilarityRowsFromList(curPhoto, curHist, photoList, threshold):
 
 """
 	Adds/updates a specific row to similarity table, if it doesn't exist.
-	Note: photoId1 < photoId2 or it'll error
+	Note: photoId1 should be less than photoId2 
 """
 def addSimilarityRow(photo1, photo2, sim):
 	if (photo1.id == photo2.id):
 		print "Error: Can't add same photo for both photo_1 and photo_2 in Similarity table"
 		return False
 
-	if (photo1.id >= photo2.id):
+	if (photo1.id > photo2.id):
 		tempPhoto = photo1
 		photo1 = photo2
 		photo2 = tempPhoto
 	
-	#print "ROW: Photo1: {0} | Photo2: {1} | sim: {2}".format(photo1.id, photo2.id, sim)
-	'''	
 	sim = int(sim)
 	
 	simQuery= Similarity.objects.all().filter(photo_1=photo1).filter(photo_2=photo2)
@@ -121,18 +124,20 @@ def addSimilarityRow(photo1, photo2, sim):
 		simRow = Similarity(	photo_1 = photo1,
 								photo_2 = photo2,
 								similarity = sim)
+		print simRow
 	elif (simQuery.count() == 1):
 		if (simQuery[0].similarity == sim):
 			return False
 		else:
 			simRow = simQuery[0]
 			simRow.similarity = sim
+		return False
 	else:
 		print "Error: Found multiple rows with photoId1: {0} and photoId2: {1}".format(photo1.id, photo2.id)
 		return False
 
 	simRow.save()
-	'''
+	
 	return True
 
 """ 
@@ -143,7 +148,9 @@ def doesSimilarityRowAlreadyExists(photo1, photo2):
 		tempPhoto = photo1
 		photo1 = photo2
 		photo2 = tempPhoto
-	if (Similarity.objects.all().filter(photo_1=photo1).filter(photo_2=photo2).count() > 0):
+	sim = Similarity.objects.all().filter(photo_1=photo1).filter(photo_2=photo2) 
+	if (sim.count() > 0):
+		print sim[0] 
 		return True
 	return False
 
@@ -183,7 +190,7 @@ def getSpatialHist(photoId):
 	origPath = '/home/derek/user_data/' + str(userId) + '/'
 
 	# Check to make sure that a thumbnail exists
-	photo_thumbnail = imageThumbnail(str(photo.id)+'.jpg', 156, userId)
+	photo_thumbnail = image_util.imageThumbnail(str(photo.id)+'.jpg', 156, userId)
 	if (photo_thumbnail == None):
 		print "No thumbnail found for userId/photoId: {0}/{1}".format(userId, photoId)
 		return None

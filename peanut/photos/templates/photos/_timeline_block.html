@@ -4,11 +4,20 @@
 	<div class="ui-time-header">
 		{{ entry.date }} ({{ entry.count }})
 	</div>
-	{% for photo in entry.photos %}
-		<div class = "ui-image">
-			<a href="{{ thumbnailBasepath }}{{ photo.photoFilename }}"> 
-				<img data-lazy-src="{{ thumbnailBasepath }}{{ resultsDict.photoIdToThumb|lookup:photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px" 
-				title="{% if debug %} TEXT: {{ photo.text }} | TIME: {{ photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ photo.classificationData }} {% endif %} "></a>
-		</div>
+	{% for cluster in entry.clusterList %}
+		{% for imageEntry in cluster.photoblocks %}
+			{% if imageEntry.dist == None %}
+				<div class = "ui-image">
+					<a href="{{ thumbnailBasepath }}{{ imageEntry.photo.photoFilename }}"> 
+						<img data-lazy-src="{{ thumbnailBasepath }}{{ resultsDict.photoIdToThumb|lookup:imageEntry.photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px" 
+						title="{% if debug %} TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} {% endif %} "></a>
+					{% if cluster.count > 0 %}
+						<div class="ui-image-count text">
+							{{ cluster.count }}
+						</div>
+					{% endif %}
+				</div>
+			{% endif %}
+		{% endfor %}
 	{% endfor %}
 </div>
