@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFNetworkingConstants.h"
 
 @class DFPhoto;
 
@@ -22,8 +23,6 @@ typedef void (^DFPhotoUploadFailureBlock)(NSError *error);
 /* 
  Upload a photo syncrhonously and get a result dict with either an error or numImage bytes
  */
-extern NSString *DFUploadResultErrorKey;
-extern NSString *DFUploadResultNumBytes;
 
 - (NSDictionary *)uploadPhoto:(DFPhoto *)photo;
 

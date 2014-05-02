@@ -22,15 +22,16 @@
 
 @implementation DFUploadOperation
 
-@synthesize photoID, completionOperationQueue, successBlock, failureBlock;
+@synthesize photoIDs, completionOperationQueue, successBlock, failureBlock;
 @synthesize managedObjectContext = _managedObjectContext;
 
 
-- (id)initWithPhotoID:(NSManagedObjectID *)newPhotoID
+- (id)initWithPhotoIDs:(NSArray *)IDs uploadOperationType:(DFPhotoUploadOperationImageDataType)imageUploadType;
 {
     self = [super init];
     if (self) {
-        self.photoID = newPhotoID;
+        self.photoIDs = IDs;
+        self.uploadOperationType = imageUploadType;
     }
     return self;
 }
@@ -39,44 +40,67 @@
 {
     @autoreleasepool {
         // get the photo
-        DFPhoto *photo = (DFPhoto *)[self.managedObjectContext objectWithID:self.photoID];
-        if (!photo || !([[photo class] isSubclassOfClass:[DFPhoto class]])) {
-            [self failure:[NSError errorWithDomain:@"com.duffyapp.Duffy.DFUploadOperation" code:-100 userInfo:@{NSLocalizedDescriptionKey: @"objectWithID was invalid"}]];
+        NSDate *startDate = [NSDate date];
+        DDLogInfo(@"DFUploadOperation starting at %@", [startDate description]);
+        NSMutableArray *photos = [[NSMutableArray alloc] initWithCapacity:self.photoIDs.count];
+        
+        for (NSManagedObjectID *photoID in self.photoIDs) {
+            DFPhoto *photo = (DFPhoto *)[self.managedObjectContext objectWithID:photoID];
+            if (!photo || !([[photo class] isSubclassOfClass:[DFPhoto class]])) {
+                [self failureWithError:[NSError errorWithDomain:@"com.duffyapp.Duffy.DFUploadOperation"
+                                                           code:-100
+                                                       userInfo:@{NSLocalizedDescriptionKey: @"objectWithID was invalid"}]];
+            }
+            [photos addObject:photo];
         }
         if (self.isCancelled) return;
-        
-        DFPhotoImageDataAdapter *uploadAdapter = [[DFPhotoImageDataAdapter alloc] init];
-        NSDictionary *result = [uploadAdapter uploadPhoto:photo];
-        
-        if (self.isCancelled) [uploadAdapter cancelAllUploads];
-        if (result[DFUploadResultNumBytes]) {
-            [self success:[result[DFUploadResultNumBytes] unsignedIntegerValue]];
-        } else {
-            [self failure:result[DFUploadResultErrorKey]];
+
+        DFPhotoMetadataAdapter *photoAdapter = [[DFPhotoMetadataAdapter alloc] initWithObjectManager:[DFObjectManager sharedManager]];
+        NSDictionary *result;
+        NSDate *postStartDate = [NSDate date];
+        DDLogInfo(@"Post operation starting at %@ ", postStartDate.description);
+        if (self.uploadOperationType == DFPhotoUploadOperation157Data) {
+            result = [photoAdapter postPhotosWithThumbnails:photos];
+        } else if (self.uploadOperationType == DFPhotoUploadOperation569Data) {
+            result = [photoAdapter postPhotosWithFullImages:photos];
         }
+        DDLogInfo(@"Post operation finished for %lu photos with elapsed time:%.02f", (unsigned long)photos.count, [[NSDate date] timeIntervalSinceDate:postStartDate]);
+        
+        
+        if (self.isCancelled) [[[DFObjectManager sharedManager] operationQueue] cancelAllOperations];
+        
+        if (!result[DFUploadResultErrorKey]) {
+            [self successForDFPeanutPhotos:(NSArray *)result[DFUploadResultPeanutPhotos]];
+        } else {
+            [self failureWithError:result[DFUploadResultErrorKey]];
+        }
+        
+        DDLogInfo(@"DFUploadOperation finished for %lu photos with elapsed time:%.02f", (unsigned long)photos.count, [[NSDate date] timeIntervalSinceDate:startDate]);
     }
 }
 
-- (void)failure:(NSError *)error
+- (void)failureWithError:(NSError *)error
 {
     NSOperationQueue __block *completionQueue = self.completionOperationQueue;
     DFPhotoUploadOperationFailureBlock __block cachedFailureBlock = self.failureBlock;
     BOOL __block cachedCancelled = self.isCancelled;
+    NSArray __block *cachedPhotoIDs = self.photoIDs;
+    DFPhotoUploadOperationImageDataType __block cachedUploadType = self.uploadOperationType;
     
     [self setCompletionBlock:^{
         [completionQueue addOperation:[NSBlockOperation blockOperationWithBlock:^{
-            cachedFailureBlock(error, cachedCancelled);
+            cachedFailureBlock(error, cachedPhotoIDs, cachedUploadType,cachedCancelled);
         }]];
     }];
 }
 
-- (void)success:(NSUInteger)numBytes
+- (void)successForDFPeanutPhotos:(NSArray *)peanutPhotos
 {
     NSOperationQueue __block *completionQueue = self.completionOperationQueue;
     DFPhotoUploadOperationSuccessBlock __block cachedSuccessBlock = self.successBlock;
     [self setCompletionBlock:^{
         [completionQueue addOperation:[NSBlockOperation blockOperationWithBlock:^{
-            cachedSuccessBlock(numBytes);
+            cachedSuccessBlock(peanutPhotos);
         }]];
     }];
 }

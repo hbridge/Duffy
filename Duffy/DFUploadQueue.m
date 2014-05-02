@@ -81,6 +81,26 @@
     return object;
 }
 
+- (id)takeNextObjects:(NSUInteger)count
+{
+    [self getLock];
+    
+    NSArray *objects = @[];
+    if (self.notStartedUploads.count > 0) {
+        NSRange range;
+        range.location = 0;
+        range.length = MIN(count, self.notStartedUploads.count);
+        NSIndexSet *indexSet = [NSIndexSet indexSetWithIndexesInRange:range];
+        objects = [self.notStartedUploads objectsAtIndexes:indexSet];
+        [self.notStartedUploads removeObjectsAtIndexes:indexSet];
+        [self.inProgressUploads addObjectsFromArray:objects];
+    }
+    
+    
+    [self releaseLock];
+    return objects;
+}
+
 - (void)markObjectCompleted:(id)object
 {
     [self getLock];
@@ -111,6 +131,17 @@
     
     [self releaseLock];
 }
+
+- (void)moveInProgressObjectsBackToQueue:(NSArray *)objects
+{
+    [self getLock];
+    
+    [self.inProgressUploads removeObjectsInArray:objects];
+    [self.notStartedUploads addObjectsFromArray:objects];
+    
+    [self releaseLock];
+}
+
 
 - (NSArray *)objectsWaiting
 {

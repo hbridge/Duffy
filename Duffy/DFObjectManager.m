@@ -19,7 +19,7 @@ static NSMutableSet *registeredAdapters;
 
 + (void)initialize
 {
-    RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:[[DFUser currentUser] serverURL]];
+    RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:[[DFUser currentUser] apiURL]];
     [RKObjectManager setSharedManager:objectManager];
     
     registeredAdapters = [[NSMutableSet alloc] init];

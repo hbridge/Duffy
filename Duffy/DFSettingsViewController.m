@@ -144,7 +144,7 @@ NSString *DFEnabledNo = @"NO";
 }
 
 - (IBAction)userIDEditingDidEnd:(UITextField *)sender {
-    [[DFUser currentUser] setUserID:sender.text];
+    [[DFUser currentUser] setUserID:[sender.text longLongValue]];
     [self alertUserAndStopApp];
 }
 
@@ -255,9 +255,9 @@ static const int MaxLogFiles = 10;
     [pb setString:[[DFUser currentUser] deviceID]];
 }
 
-- (IBAction)reUploadAllClicked:(UIButton *)sender {
-    DFPhotoCollection *cameraRollPhotos = [[DFPhotoStore sharedStore] cameraRoll];
-    [[DFUploadController sharedUploadController] uploadPhotos:[cameraRollPhotos photosByDateAscending:NO]];
+- (IBAction)clearUploadDatabaseClicked:(UIButton *)sender {
+    [[DFPhotoStore sharedStore] clearUploadInfo];
+    [[DFUploadController sharedUploadController] uploadPhotos];
 }
 
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {
@@ -277,9 +277,12 @@ static const int MaxLogFiles = 10;
 {
     DFUploadSessionStats *uploadStats = [[notification userInfo] valueForKey:DFUploadStatusUpdateSessionUserInfoKey];
     
-    self.numUploadedLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)uploadStats.numUploaded];
-    self.numToUploadLabel.text = [NSString stringWithFormat:@"%lu", (unsigned long)uploadStats.numAcceptedUploads];
-    self.uploadProgressView.progress = (float)uploadStats.numUploaded / (float)uploadStats.numAcceptedUploads;
+    
+    unsigned long numTotalUploaded = (unsigned long)uploadStats.numThumbnailsUploaded + uploadStats.numFullPhotosUploaded;
+    unsigned long numTotalAccepted = (unsigned long)uploadStats.numThumbnailsAccepted + uploadStats.numFullPhotosAccepted;
+    self.numUploadedLabel.text = [NSString stringWithFormat:@"%lu", numTotalUploaded];
+    self.numToUploadLabel.text = [NSString stringWithFormat:@"%lu", numTotalAccepted];
+    self.uploadProgressView.progress = (float)numTotalUploaded / (float)numTotalAccepted;
 }
 
 

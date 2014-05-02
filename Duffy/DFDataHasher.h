@@ -14,6 +14,7 @@
 
 
 + (NSData *)hashDataForALAsset:(ALAsset *)asset;
++ (NSString *)hashStringForHashData:(NSData *)hashData;
 
 
 @end

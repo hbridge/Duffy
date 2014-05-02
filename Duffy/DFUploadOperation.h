@@ -10,15 +10,27 @@
 
 @interface DFUploadOperation : NSOperation
 
-typedef void (^DFPhotoUploadOperationSuccessBlock)(NSUInteger numImageBytes);
-typedef void (^DFPhotoUploadOperationFailureBlock)(NSError *error, BOOL isCancelled);
 
-@property (nonatomic, retain) NSManagedObjectID *photoID;
+typedef enum {
+    DFPhotoUploadOperation157Data,
+    DFPhotoUploadOperation569Data,
+} DFPhotoUploadOperationImageDataType;
+
+
+typedef void (^DFPhotoUploadOperationSuccessBlock)(NSArray *peanutPhotos);
+typedef void (^DFPhotoUploadOperationFailureBlock)(NSError *error,
+                                                   NSArray *photoIDs,
+                                                   DFPhotoUploadOperationImageDataType uploadType,
+                                                   BOOL isCancelled);
+
+@property (nonatomic, retain) NSArray *photoIDs;
+@property (nonatomic) DFPhotoUploadOperationImageDataType uploadOperationType;
 @property (nonatomic, retain) NSOperationQueue *completionOperationQueue;
 @property (nonatomic, copy) DFPhotoUploadOperationSuccessBlock successBlock;
 @property (nonatomic, copy) DFPhotoUploadOperationFailureBlock failureBlock;
 
 
-- (id)initWithPhotoID:(NSManagedObjectID *)photoID;
+- (id)initWithPhotoIDs:(NSArray *)photoIDs
+   uploadOperationType:(DFPhotoUploadOperationImageDataType)imageUploadType;
 
 @end

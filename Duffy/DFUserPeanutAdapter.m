@@ -122,7 +122,7 @@
 
 - (RKObjectManager *)objectManager {
     if (!_objectManager) {
-        NSURL *baseURL = [[DFUser currentUser] serverURL];
+        NSURL *baseURL = [[DFUser currentUser] apiURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
         
         //Aseem format

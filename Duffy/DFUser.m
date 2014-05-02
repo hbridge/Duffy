@@ -126,9 +126,12 @@ static DFUser *currentUser;
         [URLString appendString:[NSString stringWithFormat:@":%@", self.userOverriddenServerPortString]];
     }
     
-    [URLString appendString:DFServerAPIPath];
-    
     return [NSURL URLWithString:URLString];
+}
+
+- (NSURL *)apiURL
+{
+    return [[self serverURL] URLByAppendingPathComponent:DFServerAPIPath isDirectory:YES];
 }
 
 

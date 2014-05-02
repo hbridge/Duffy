@@ -11,7 +11,8 @@
 @interface DFStatusBarNotificationManager : NSObject
 
 typedef enum {
-    DFStatusUpdateProgress,
+    DFStatusUpdateThumbnailProgress,
+    DFStatusUpdateFullImageProgress,
     DFStatusUpdateComplete,
     DFStatusUpdateError,
     DFStatusUpdateCancelled,

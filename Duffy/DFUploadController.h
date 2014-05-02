@@ -14,7 +14,7 @@
 @interface DFUploadController : NSObject
 
 + (DFUploadController *)sharedUploadController;
-- (void)uploadPhotos:(NSArray *)photos;
+- (void)uploadPhotos;
 - (void)cancelUploads;
 - (BOOL)isUploadInProgress;
 

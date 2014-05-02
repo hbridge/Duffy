@@ -12,12 +12,6 @@
 #import "DFPhoto+FaceDetection.h"
 #import "DFUser.h"
 #import "NSDictionary+DFJSON.h"
-#import "DFNetworkingConstants.h"
-
-// Result dict strings
-NSString const *DFUploadResultErrorKey = @"DFUploadResult";
-NSString const *DFUploadResultNumBytes = @"DFUploadNumBytes";
-
 
 // Private DFUploadResponse Class
 @interface DFUploadResponse : NSObject
@@ -59,7 +53,7 @@ static const unsigned int FaceDetectionMinMemory = 1000;
      {
          DFUploadResponse *response = [mappingResult firstObject];
          if ([response.result isEqualToString:@"true"]) {
-             photo.uploadDate = [NSDate date];
+             photo.upload569Date = [NSDate date];
              successHandler(numBytes.unsignedIntegerValue);
          } else {
              DDLogWarn(@"File did not upload properly.  Retrying.");
@@ -222,7 +216,7 @@ static const unsigned int FaceDetectionMinMemory = 1000;
 
 - (RKObjectManager *)objectManager {
     if (!_objectManager) {
-        NSURL *baseURL = [[DFUser currentUser] serverURL];
+        NSURL *baseURL = [[DFUser currentUser] apiURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
         
         // generate response mapping

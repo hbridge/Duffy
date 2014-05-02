@@ -16,6 +16,8 @@
 
 - (id)initWithObjectManager:(RKObjectManager *)manager;
 
-- (void)postPhotoMetadataWithThumbnail:(DFPhoto *)photo;
+- (NSDictionary *)postPhotosWithThumbnails:(NSArray *)photos;
+- (NSDictionary *)postPhotosWithFullImages:(NSArray *)photos;
+
 
 @end

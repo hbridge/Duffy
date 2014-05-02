@@ -25,12 +25,15 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 // Main accessors for data
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context; // used for accessing on another thread using a different context
 - (DFPhotoCollection *)cameraRoll;
-- (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded;
++ (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
+                                      fullUploadStatus:(BOOL)isFullPhotoUploaded
+                                             inContext:(NSManagedObjectContext *)context;
++ (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 + (DFPhoto *)photoWithALAssetURLString:(NSString *)assetURLString context:(NSManagedObjectContext *)context;
 
-
+- (void)clearUploadInfo;
 
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;

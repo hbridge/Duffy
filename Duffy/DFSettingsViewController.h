@@ -44,7 +44,7 @@ extern NSString *DFEnabledNo;
 
 
 // Upload section actions
-- (IBAction)reUploadAllClicked:(UIButton *)sender;
+- (IBAction)clearUploadDatabaseClicked:(UIButton *)sender;
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender;
 - (IBAction)serverPortEditingDidEnd:(UITextField *)sender;
 - (IBAction)cancelUpload:(UIButton *)sender;

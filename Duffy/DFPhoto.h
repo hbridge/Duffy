@@ -18,22 +18,30 @@
 + (NSURL *)localThumbnailsDirectoryURL;
 
 // stored properties
-@property (nonatomic) UInt64 userID;
 @property (nonatomic, retain) NSString *alAssetURLString;
+@property (nonatomic) UInt64 userID;
 @property (nonatomic, retain) NSDate *creationDate;
-@property (nonatomic) UInt64 photoID;
-@property (nonatomic, retain) NSDate *uploadDate;
 @property (nonatomic, retain) NSData *creationHashData; // stored when the DFPhoto is first created so it can be compared later
-@property (nonatomic, retain) NSDictionary *metadataDictionary;
+@property (nonatomic) BOOL hasLocation;
+@property (nonatomic, retain) CLPlacemark *placemark;
+@property (nonatomic) UInt64 photoID;
+@property (nonatomic, retain) NSDate *upload157Date;
+@property (nonatomic, retain) NSDate *upload569Date;
+
 
 // fetched (not stored in Core Data DB) properties
 @property (readonly, nonatomic, retain) NSData *currentHashData; // generated on the fly from the underlying ALAsset
+@property (readonly, nonatomic, retain) NSString *creationHashString;
 @property (readonly, nonatomic, retain) NSString *localFilename;
 @property (readonly, nonatomic, retain) CLLocation *location;
+@property (readonly, nonatomic, retain) NSDictionary *metadataDictionary;
 
 
 typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict);
 - (void)fetchReverseGeocodeDictionary:(DFPhotoReverseGeocodeCompletionBlock)completionBlock;
+
+// Create a new DFPhoto in a context
++ (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset withHashData:(NSData *)hashData inContext:(NSManagedObjectContext *)context;
 
 // Get a DF Photo instance from its URL
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext;
@@ -43,8 +51,11 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 // Ideally be done with createCGImage calls
 @property (readonly, nonatomic, retain) UIImage *fullResolutionImage;
 @property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
+@property (readonly, nonatomic, retain) NSData *thumbnailData;
 @property (readonly, nonatomic, retain) UIImage *highResolutionImage; //max 2048x2048, aspect fit
 @property (readonly, nonatomic, retain) UIImage *fullScreenImage;
+
+
 
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;

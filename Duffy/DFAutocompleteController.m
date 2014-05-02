@@ -132,7 +132,7 @@ static NSString *UserIDParameterKey = @"user_id";
 
 - (RKObjectManager *)objectManager {
     if (!_objectManager) {
-        NSURL *baseURL = [[DFUser currentUser] serverURL];
+        NSURL *baseURL = [[DFUser currentUser] apiURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
 
         RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];

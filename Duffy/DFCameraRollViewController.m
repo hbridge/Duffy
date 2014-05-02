@@ -107,8 +107,7 @@
     }
     
     if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
-        DFPhotoCollection *photosToUpload = [[DFPhotoStore sharedStore] photosWithUploadStatus:NO];
-        [[DFUploadController sharedUploadController] uploadPhotos:[photosToUpload photosByDateAscending:NO]];
+        [[DFUploadController sharedUploadController] uploadPhotos];
     }
 }
 
@@ -120,7 +119,7 @@
     UICollectionViewCell *cell = [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
-    if (photo.uploadDate == nil) {
+    if (photo.upload569Date == nil) {
         cell.alpha = 0.2;
     }
     

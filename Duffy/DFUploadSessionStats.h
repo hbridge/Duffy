@@ -10,10 +10,15 @@
 
 @interface DFUploadSessionStats : NSObject
 
-@property (nonatomic) NSUInteger numUploaded;
-@property (nonatomic) NSUInteger numAcceptedUploads;
-@property (nonatomic, readonly) NSUInteger numRemaining;
-@property (nonatomic, readonly) float progress;
+@property (nonatomic) NSUInteger numThumbnailsUploaded;
+@property (nonatomic) NSUInteger numThumbnailsAccepted;
+@property (nonatomic, readonly) NSUInteger numThumbnailsRemaining;
+@property (nonatomic, readonly) float thumbnailProgress;
+
+@property (nonatomic) NSUInteger numFullPhotosUploaded;
+@property (nonatomic) NSUInteger numFullPhotosAccepted;
+@property (nonatomic, readonly) NSUInteger numFullPhotosRemaining;
+@property (nonatomic, readonly) float fullPhotosProgress;
 
 //errors and retries
 @property (nonatomic, retain) NSError *fatalError;

@@ -231,7 +231,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
                                 [[[DFUser currentUser] serverURL] absoluteString],
                                 SearchPath,
-                                UserIDURLParameter, [[DFUser currentUser] userID],
+                                UserIDURLParameter, [NSNumber numberWithUnsignedLongLong:[[DFUser currentUser] userID]],
                                 QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURL *queryURL = [NSURL URLWithString:queryURLString];
 
@@ -520,15 +520,9 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)uploadStatusChanged:(NSNotification *)note
 {
-    DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
+    // do nothing , don't show warning any more
     
-    if (uploadStats.numRemaining > 0 && self.searchResultsTableView.tableHeaderView == nil) {
-        UINib *warningViewNib = [UINib nibWithNibName:@"DFSearchResultsTableViewResultsIncompleteWarningHeader" bundle:nil];
-        UIView *warningView = [[warningViewNib instantiateWithOwner:self options:nil] objectAtIndex:0];
-        self.searchResultsTableView.tableHeaderView = warningView;
-    } else if (uploadStats.numRemaining == 0){
-        self.searchResultsTableView.tableHeaderView = nil;
-    }
+    
 }
 
 

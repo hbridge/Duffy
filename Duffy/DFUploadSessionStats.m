@@ -10,7 +10,7 @@
 
 @implementation DFUploadSessionStats
 
-@synthesize numAcceptedUploads, numUploaded, fatalError, numConsecutiveRetries, numTotalRetries, startDate, endDate, numBytesUploaded;
+@synthesize numThumbnailsAccepted, numThumbnailsUploaded, numFullPhotosAccepted, numFullPhotosUploaded, fatalError, numConsecutiveRetries, numTotalRetries, startDate, endDate, numBytesUploaded;
 
 - (instancetype)init
 {
@@ -20,22 +20,34 @@
     return self;
 }
 
-- (NSUInteger)numRemaining {
-    return self.numAcceptedUploads - self.numUploaded;
+- (NSUInteger)numThumbnailsRemaining {
+    return self.numThumbnailsAccepted - self.numThumbnailsUploaded;
 }
 
-- (float)progress
+- (NSUInteger)numFullPhotosRemaining {
+    return self.numFullPhotosAccepted - self.numFullPhotosUploaded;
+}
+
+- (float)thumbnailProgress
 {
-    return (float)self.numUploaded/(float)self.numAcceptedUploads;
+    return (float)self.numThumbnailsUploaded/(float)self.numThumbnailsAccepted;
+}
+
+- (float)fullPhotosProgress
+{
+    return (float)self.numFullPhotosUploaded/(float)self.numFullPhotosAccepted;
 }
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"SessionStats: timeSinceStarted:%.02fs accepted:%lu uploaded:%lu remaining:%lu consecutive_retries:%d total_retries:%d MBUploaded:%.02f throughputKBPS:%.02f",
+    return [NSString stringWithFormat:@"SessionStats: timeSinceStarted:%.02fs thumbs_accepted:%lu thumbs_uploaded:%lu thumbs_remaining:%lu full_accepted:%lu full_uploaded:%lu full_remaining:%lu consecutive_retries:%d total_retries:%d MBUploaded:%.02f throughputKBPS:%.02f",
             [[NSDate date] timeIntervalSinceDate:startDate],
-            (unsigned long)self.numAcceptedUploads,
-            (unsigned long)self.numUploaded,
-            (unsigned long)self.numRemaining,
+            (unsigned long)self.numThumbnailsAccepted,
+            (unsigned long)self.numThumbnailsUploaded,
+            (unsigned long)self.numThumbnailsRemaining,
+            (unsigned long)self.numFullPhotosAccepted,
+            (unsigned long)self.numFullPhotosUploaded,
+            (unsigned long)self.numFullPhotosRemaining,
             self.numConsecutiveRetries,
             self.numTotalRetries,
             (double)self.numBytesUploaded/1024.0/1024.0,

@@ -217,13 +217,13 @@
                                     </connections>
                                 </switch>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YXu-gs-gLv">
-                                    <rect key="frame" x="53" y="117" width="183" height="30"/>
+                                    <rect key="frame" x="66" y="117" width="156" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                    <state key="normal" title="Force re-upload all images">
+                                    <state key="normal" title="Clear upload database">
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
-                                        <action selector="reUploadAllClicked:" destination="-1" eventType="touchUpInside" id="yo8-DT-rVh"/>
+                                        <action selector="clearUploadDatabaseClicked:" destination="-1" eventType="touchUpInside" id="1JQ-Ij-4r1"/>
                                     </connections>
                                 </button>
                                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pw1-8W-UMk">

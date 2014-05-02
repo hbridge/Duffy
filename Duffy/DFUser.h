@@ -20,6 +20,7 @@
 @property (nonatomic, retain, readonly) NSString *deviceName;
 
 @property (readonly, nonatomic, retain) NSURL *serverURL;
+@property (readonly, nonatomic, retain) NSURL *apiURL;
 @property (readonly, nonatomic, retain) NSURL *defaultServerURL;
 @property (readwrite, nonatomic, retain) NSString *userOverriddenServerURLString;
 @property (readwrite, nonatomic, retain) NSString *userOverriddenServerPortString;

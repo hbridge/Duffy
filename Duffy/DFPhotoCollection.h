@@ -20,5 +20,6 @@
 - (void)addPhotos:(NSArray *)newPhotos;
 - (BOOL)containsPhotoWithAssetURL:(NSString *)assetURLString;
 - (NSArray *)photosByDateAscending:(BOOL)ascending;
+- (NSArray *)objectIDsByDateAscending:(BOOL)ascending;
 
 @end

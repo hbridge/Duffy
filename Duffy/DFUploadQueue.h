@@ -17,8 +17,10 @@
  */
 - (NSUInteger)addObjectsFromArray:(NSArray *)objects;
 - (id)takeNextObject;
+- (id)takeNextObjects:(NSUInteger)objectCount;
 - (void)markObjectCompleted:(id)object;
 - (void)markObjectCancelled:(id)object;
+- (void)moveInProgressObjectsBackToQueue:(NSArray *)objects;
 - (void)moveInProgressObjectBackToQueue:(id)object;
 
 - (NSArray *)objectsWaiting;

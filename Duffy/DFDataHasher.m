@@ -39,5 +39,17 @@ static const unsigned int ALAssetHashBytesLength = 1024 * 8;
 }
 
 
++ (NSString *)hashStringForHashData:(NSData *)hashData
+{
+    uint8_t bytes[hashData.length];
+    [hashData getBytes:bytes];
+    
+    NSMutableString *output = [[NSMutableString alloc] init];
+    for(int i = 0; i < hashData.length; i++) {
+        [output appendFormat:@"%02x", bytes[i]];
+    }
+    return output;
+}
+
 
 @end

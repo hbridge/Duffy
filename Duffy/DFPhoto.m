@@ -28,9 +28,16 @@
 @implementation DFPhoto
 
 @synthesize asset = _asset;
-@synthesize metadataDictionary = _metadataDictionary;
 
-@dynamic userID, alAssetURLString, photoID, uploadDate, creationDate, creationHashData;
+@dynamic alAssetURLString;
+@dynamic creationDate;
+@dynamic creationHashData;
+@dynamic hasLocation;
+@dynamic placemark;
+@dynamic photoID;
+@dynamic upload157Date;
+@dynamic upload569Date;
+@dynamic userID;
 
 NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
 NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
@@ -38,8 +45,26 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 -(void)awakeFromFetch
 {
-    if (!self.userID) self.userID = [[DFUser currentUser] userID];
+    // in model v3 we added a bunch of fields, including user id.  if the item doesn't have a user ID, populate these fields
+    if (!self.userID) {
+        self.userID = [[DFUser currentUser] userID];
+        self.hasLocation = ([self.asset valueForProperty:ALAssetPropertyLocation] != nil);
+    }
 }
+
++ (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset withHashData:(NSData *)hashData inContext:(NSManagedObjectContext *)context
+{
+    DFPhoto *newPhoto = [NSEntityDescription
+                         insertNewObjectForEntityForName:@"DFPhoto"
+                         inManagedObjectContext:context];
+    newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
+    newPhoto.creationDate = [asset valueForProperty:ALAssetPropertyDate];
+    newPhoto.creationHashData = hashData;
+    newPhoto.hasLocation = ([asset valueForProperty:ALAssetPropertyLocation] != nil);
+    newPhoto.userID = [[DFUser currentUser] userID];
+    return newPhoto;
+}
+
 
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext
 {
@@ -62,6 +87,79 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     
     return [result firstObject];
 }
+
+#pragma mark - Core Data stored accessors
+
+
+#pragma mark - Fetched propery accessors
+
+- (ALAsset *)asset
+{
+    if (!_asset) {
+        NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
+        ALAssetsLibrary *assetsLibrary = [[DFPhotoStore sharedStore] assetsLibrary];
+        
+        
+        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+        
+        // must dispatch this off the main thread or it will deadlock!
+        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
+                _asset = asset;
+                dispatch_semaphore_signal(sema);
+            } failureBlock:^(NSError *error) {
+                dispatch_semaphore_signal(sema);
+            }];
+        });
+        
+        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+    }
+    
+    return _asset;
+}
+
+- (NSString *)creationHashString
+{
+    return [DFDataHasher hashStringForHashData:self.creationHashData];
+}
+
+- (NSDictionary *)metadataDictionary
+{
+    NSMutableDictionary *metadata = [[NSMutableDictionary alloc] initWithDictionary:self.asset.defaultRepresentation.metadata];
+    NSDictionary *cameraRollMetadata = @{
+                                         DFCameraRollCreationDateKey: [self formatCreationDate:self.creationDate],
+                                         };
+    
+    [metadata setObject:cameraRollMetadata forKey:DFCameraRollExtraMetadataKey];
+    return metadata;
+}
+
+- (NSString *)formatCreationDate:(NSDate *)date
+{
+    NSDateFormatter *dateFormatter = [NSDateFormatter EXIFDateFormatter];
+    return [dateFormatter stringFromDate:date];
+}
+
+
+- (NSString *)localFilename
+{
+    ALAssetRepresentation *rep = [self.asset defaultRepresentation];
+    NSString *fileName = [rep filename];
+    return fileName;
+}
+
+
+
+#pragma mark - Hashing
+
+- (NSData *)currentHashData
+{
+    return [DFDataHasher hashDataForALAsset:self.asset];
+}
+
+
+
+#pragma mark - Location
 
 - (CLLocation *)location
 {
@@ -97,6 +195,8 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     }];
 }
 
+#pragma mark - Image Accessors
+
 - (UIImage *)thumbnail
 {
     UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
@@ -121,6 +221,32 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     
     return  loadedThumbnail;
 }
+
+- (NSData *)thumbnailData
+{
+    NSMutableData *data = [[NSMutableData alloc] init];
+    CGImageDestinationRef destinationRef =
+    
+    CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,
+                                    /* file type */ kUTTypeJPEG,
+                                    /* number of images */ 1,
+                                    /* reserved */ NULL);
+    
+    NSDictionary *properties = @{
+                                 (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(0.7)
+                                 };
+    
+    CGImageDestinationSetProperties(destinationRef,
+                                    (__bridge CFDictionaryRef)properties);
+    CGImageDestinationAddImage(destinationRef,
+                               /* image */ self.thumbnail.CGImage,
+                               /* properties */ NULL);
+    CGImageDestinationFinalize(destinationRef);
+    CFRelease(destinationRef);
+    
+    return data;
+}
+
 
 - (UIImage *)fullResolutionImage
 {
@@ -305,71 +431,6 @@ static void releaseAssetCallback(void *info) {
     
     return toReturn;
 }
-
-- (ALAsset *)asset
-{
-    if (!_asset) {
-        NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
-        ALAssetsLibrary *assetsLibrary = [[DFPhotoStore sharedStore] assetsLibrary];
-        
-        
-        dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-        
-        // must dispatch this off the main thread or it will deadlock!
-        dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
-                _asset = asset;
-                dispatch_semaphore_signal(sema);
-            } failureBlock:^(NSError *error) {
-                dispatch_semaphore_signal(sema);
-            }];
-        });
-        
-        dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-    }
-    
-    return _asset;
-}
-
-
-- (NSString *)formatCreationDate:(NSDate *)date
-{
-    NSDateFormatter *dateFormatter = [NSDateFormatter EXIFDateFormatter];
-    return [dateFormatter stringFromDate:date];
-}
-
-- (NSDictionary *)metadataDictionary
-{
-    if (!_metadataDictionary) {
-        NSMutableDictionary *metadata = [[NSMutableDictionary alloc] initWithDictionary:self.asset.defaultRepresentation.metadata];
-        NSDictionary *cameraRollMetadata = @{
-                                             DFCameraRollCreationDateKey: [self formatCreationDate:self.creationDate],
-                                             };
-        
-        
-        [metadata setObject:cameraRollMetadata forKey:DFCameraRollExtraMetadataKey];
-        _metadataDictionary = metadata;
-    }
-    return _metadataDictionary;
-}
-
-
-- (NSString *)localFilename
-{
-    ALAssetRepresentation *rep = [self.asset defaultRepresentation];
-    NSString *fileName = [rep filename];
-    return fileName;
-}
-
-
-
-#pragma mark - Hashing
-
-- (NSData *)currentHashData
-{
-    return [DFDataHasher hashDataForALAsset:self.asset];
-}
-
 
 #pragma mark - File Paths
 

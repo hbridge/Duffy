@@ -13,6 +13,7 @@
     NSMutableSet *photosSet;
     NSMutableArray *photosByDate;
     NSMutableSet *photoAssetURLSet;
+    NSMutableArray *objectIDsByDate;
 }
 @end
 
@@ -26,6 +27,7 @@
         photosSet = [[NSMutableSet alloc] init];
         photosByDate = [[NSMutableArray alloc] init];
         photoAssetURLSet = [[NSMutableSet alloc] init];
+        objectIDsByDate = [[NSMutableArray alloc] init];
     }
     return self;
 }
@@ -57,6 +59,7 @@
                         return [photo1.creationDate compare:photo2.creationDate];
                     }];
         [photosByDate insertObject:newPhoto atIndex:insertIndex];
+        [objectIDsByDate insertObject:newPhoto.objectID atIndex:insertIndex];
     }
 }
 
@@ -73,6 +76,14 @@
         return photosByDate;
     else
         return [[photosByDate reverseObjectEnumerator] allObjects];
+}
+
+- (NSArray *)objectIDsByDateAscending:(BOOL)ascending
+{
+    if (ascending)
+        return objectIDsByDate;
+    else
+        return [[objectIDsByDate reverseObjectEnumerator] allObjects];
 }
 
 - (NSSet *)photoURLSet

@@ -50,8 +50,13 @@ static DFStatusBarNotificationManager *defaultManager;
                                        progress:(float)progress
 {
         dispatch_async(dispatch_get_main_queue(), ^{
-        if (updateType == DFStatusUpdateProgress) {
-            NSString *statusString = [NSString stringWithFormat:@"Uploading. %lu left.", numRemaining];
+        if (updateType == DFStatusUpdateThumbnailProgress) {
+            NSString *statusString = [NSString stringWithFormat:@"Uploading thumbnails. %lu left.", numRemaining];
+            
+            [JDStatusBarNotification showWithStatus:statusString];
+            [JDStatusBarNotification showProgress:progress];
+        } else if (updateType == DFStatusUpdateFullImageProgress) {
+            NSString *statusString = [NSString stringWithFormat:@"Uploading full images. %lu left.", numRemaining];
             
             [JDStatusBarNotification showWithStatus:statusString];
             [JDStatusBarNotification showProgress:progress];

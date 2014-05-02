@@ -17,10 +17,12 @@
 #import "DFNotificationSharedConstants.h"
 #import <RestKit/RestKit.h>
 #import "DFLocationPinger.h"
+#import "DFPeanutPhoto.h"
 
 @interface DFUploadController()
 
-@property (atomic, retain) DFUploadQueue *objectIDQueue;
+@property (atomic, retain) DFUploadQueue *thumbnailsObjectIDQueue;
+@property (atomic, retain) DFUploadQueue *fullImageObjectIDQueue;
 @property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 @property (atomic, retain) NSOperationQueue *syncOperationQueue;
@@ -37,8 +39,9 @@
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize currentSessionStats = _currentSessionStats;
 
-static unsigned int MaxConcurrentUploads = 2;
+static unsigned int MaxConcurrentUploads = 1;
 static unsigned int MaxRetryCount = 5;
+static unsigned int MaxThumbnailsPerRequest = 100;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
@@ -59,7 +62,8 @@ static DFUploadController *defaultUploadController;
 {
     self = [super init];
     if (self) {
-        self.objectIDQueue = [[DFUploadQueue alloc] init];
+        self.thumbnailsObjectIDQueue = [[DFUploadQueue alloc] init];
+        self.fullImageObjectIDQueue = [[DFUploadQueue alloc] init];
         // Setup operation queues
         self.syncOperationQueue = [[NSOperationQueue alloc] init];
         self.syncOperationQueue.maxConcurrentOperationCount = 1;
@@ -67,6 +71,11 @@ static DFUploadController *defaultUploadController;
         self.uploadOperationQueue.maxConcurrentOperationCount = MaxConcurrentUploads;
         // setup battery monitoring
         [[UIDevice currentDevice] setBatteryMonitoringEnabled:YES];
+        
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(backgroundContextDidSave:)
+                                                     name:NSManagedObjectContextDidSaveNotification
+                                                   object:nil];
     }
     return self;
 }
@@ -74,15 +83,9 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Public methods
 
-- (void)uploadPhotos:(NSArray *)photos
+- (void)uploadPhotos
 {
-    // convert all DFPhotos to ObjectIDs, which are thread safe, so we can pass them across threads
-    NSMutableArray *photoIDs = [[NSMutableArray alloc]  initWithCapacity:photos.count];
-    for (DFPhoto *photo in photos) {
-        [photoIDs addObject:photo.objectID];
-    }
-    
-    [self addPhotosIDsToQueue:photoIDs];
+    [self addPhotosIDsToQueue];
 }
 
 - (void)cancelUploads
@@ -94,15 +97,21 @@ static DFUploadController *defaultUploadController;
 
 - (BOOL)isUploadInProgress
 {
-    return self.objectIDQueue.numObjectsIncomplete > 0;
+    return self.thumbnailsObjectIDQueue.numObjectsIncomplete + self.fullImageObjectIDQueue.numObjectsIncomplete > 0;
 }
 
 #pragma mark - Upload scheduling
 
-- (void)addPhotosIDsToQueue:(NSArray *)photoIDs
+- (void)addPhotosIDsToQueue
 {
     [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
-        [self.objectIDQueue addObjectsFromArray:photoIDs];
+        DFPhotoCollection *photosWithThumbsToUpload =
+            [DFPhotoStore photosWithThumbnailUploadStatus:NO fullUploadStatus:NO inContext:self.managedObjectContext];
+        DFPhotoCollection *eligibleFullImagesToUpload =
+            [DFPhotoStore photosWithThumbnailUploadStatus:YES fullUploadStatus:NO inContext:self.managedObjectContext];
+        
+        [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
+        [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
     }]];
 }
 
@@ -132,20 +141,31 @@ static DFUploadController *defaultUploadController;
             return;
         }
         
-        NSManagedObjectID *nextPhotoID = [self.objectIDQueue takeNextObject];
-        if (nextPhotoID) {
+
+        DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] init];
+        NSArray *nextThumbnailIDs = [self.thumbnailsObjectIDQueue takeNextObjects:MaxThumbnailsPerRequest];
+        if (nextThumbnailIDs.count > 0) {
+            uploadOperation.photoIDs = nextThumbnailIDs;
+            uploadOperation.uploadOperationType = DFPhotoUploadOperation157Data;
+        } else {
+            NSArray *nextFullImageIDs = [self.fullImageObjectIDQueue takeNextObjects:1];
+            uploadOperation.photoIDs = nextFullImageIDs;
+            uploadOperation.uploadOperationType = DFPhotoUploadOperation569Data;
+        }
+        
+        if (uploadOperation.photoIDs.count > 0) {
             [self beginBackgroundUpdateTask];
-            DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] initWithPhotoID:nextPhotoID];
             uploadOperation.completionOperationQueue = self.syncOperationQueue;
-            uploadOperation.successBlock = [self uploadSuccessfullBlockForObjectID:nextPhotoID];
-            uploadOperation.failureBlock = [self uploadFailureBlockForObjectID:nextPhotoID];
+            uploadOperation.successBlock = [self uploadSuccessfullBlock];
+            uploadOperation.failureBlock = [self uploadFailureBlock];
             [self.uploadOperationQueue addOperation:uploadOperation];
             if (self.uploadOperationQueue.operationCount < self.uploadOperationQueue.maxConcurrentOperationCount) {
                 [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
             }
         } else {
             //there's nothing else to upload, check to see if everything's complete
-            if (self.objectIDQueue.numObjectsIncomplete == 0 && self.objectIDQueue.numObjectsComplete > 0) {
+            if (self.thumbnailsObjectIDQueue.numObjectsIncomplete + self.fullImageObjectIDQueue.numObjectsIncomplete == 0
+                && self.thumbnailsObjectIDQueue.numObjectsComplete + self.fullImageObjectIDQueue.numObjectsIncomplete > 0) {
                 [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
             }
         }
@@ -178,40 +198,63 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Upload operation response handlers
 
-- (DFPhotoUploadOperationSuccessBlock)uploadSuccessfullBlockForObjectID:(NSManagedObjectID *)objectID
+- (DFPhotoUploadOperationSuccessBlock)uploadSuccessfullBlock
 {
-    DFPhotoUploadOperationSuccessBlock successBlock = ^(NSUInteger numBytes){
-        [self.objectIDQueue markObjectCompleted:objectID];
-        [self saveUploadedPhotoWithObjectID:objectID];
-        self.currentSessionStats.numConsecutiveRetries = 0;
-        self.currentSessionStats.numBytesUploaded += numBytes;
-        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
-                                numImageBytes:numBytes
-                     sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
+    DFPhotoUploadOperationSuccessBlock successBlock = ^(NSArray *peanutPhotos){
+        [self saveUploadedPhotosWithPeanutPhotos:peanutPhotos];
+        for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
+            self.currentSessionStats.numConsecutiveRetries = 0;
+            self.currentSessionStats.numBytesUploaded += peanutPhoto.uploaded_image_bytes;
+            [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
+                                    numImageBytes:peanutPhoto.uploaded_image_bytes
+                         sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
+        }
         [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
     };
     return successBlock;
 }
 
-- (void)saveUploadedPhotoWithObjectID:(NSManagedObjectID *)objectID
+- (void)saveUploadedPhotosWithPeanutPhotos:(NSArray *)peanutPhotos
 {
-    DFPhoto *photo = (DFPhoto*)[self.managedObjectContext objectWithID:objectID];
-    photo.uploadDate = [NSDate date];
+    NSMutableDictionary *metadataChanges = [[NSMutableDictionary alloc] initWithCapacity:peanutPhotos.count];
+    for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
+        NSManagedObjectID *objectID = [self.managedObjectContext.persistentStoreCoordinator
+                                       managedObjectIDForURIRepresentation:peanutPhoto.key];
+        DFPhoto *photo = (DFPhoto *)[self.managedObjectContext objectWithID:objectID];
+
+        for (NSValue *sizeValue in peanutPhoto.uploaded_dimensions) {
+            CGSize uploadedSize = [sizeValue CGSizeValue];
+            if (photo.upload157Date == nil && uploadedSize.width == 157 && uploadedSize.height == 157) {
+                [self.thumbnailsObjectIDQueue markObjectCompleted:objectID];
+                photo.upload157Date = [NSDate date];
+                metadataChanges[objectID] = DFPhotoChangeTypeMetadata;
+                [self.fullImageObjectIDQueue addObjectsFromArray:@[objectID]];
+            } else if (photo.upload569Date == nil && (uploadedSize.height == 569 || uploadedSize.width == 569)) {
+                [self.fullImageObjectIDQueue markObjectCompleted:objectID];
+                photo.upload569Date = [NSDate date];
+                metadataChanges[objectID] = DFPhotoChangeTypeMetadata;
+            }
+        }
+    }
     [self saveContext];
     
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
                                                                   object:self
-                                                                userInfo:@{objectID : DFPhotoChangeTypeMetadata}];
+                                                                userInfo:metadataChanges];
 }
 
-- (DFPhotoUploadOperationFailureBlock)uploadFailureBlockForObjectID:(NSManagedObjectID *)objectID
+- (DFPhotoUploadOperationFailureBlock)uploadFailureBlock
 {
-    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error, BOOL isCancelled){
+    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error, NSArray *objectIDs, DFPhotoUploadOperationImageDataType uploadType, BOOL isCancelled){
         if (isCancelled) return;
-        DDLogVerbose(@"Upload failed for %@", objectID.description);
+        DDLogVerbose(@"Upload failed for %lu objects", objectIDs.count);
         if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
-            DDLogVerbose(@"Error retryable.  Moving to back of queue.");
-            [self.objectIDQueue moveInProgressObjectBackToQueue:objectID];
+            DDLogVerbose(@"Error retryable.  Moving objects to back of queue.");
+            if (uploadType == DFPhotoUploadOperation157Data) {
+                [self.thumbnailsObjectIDQueue moveInProgressObjectsBackToQueue:objectIDs];
+            } else if (uploadType == DFPhotoUploadOperation569Data) {
+                [self.fullImageObjectIDQueue moveInProgressObjectsBackToQueue:objectIDs];
+            }
             self.currentSessionStats.numConsecutiveRetries++;
             self.currentSessionStats.numTotalRetries++;
         } else {
@@ -243,7 +286,8 @@ static DFUploadController *defaultUploadController;
         DDLogInfo(@"Cancelling all operations with isError:%@ isSilent%@",
                   isError ? @"true" : @"false",
                   isSilent ? @"true" : @"false");
-        [self.objectIDQueue removeAllObjects];
+        [self.thumbnailsObjectIDQueue removeAllObjects];
+        [self.fullImageObjectIDQueue removeAllObjects];
         [self.uploadOperationQueue cancelAllOperations];
         _currentSessionStats = nil;
         
@@ -270,6 +314,8 @@ static DFUploadController *defaultUploadController;
         _currentSessionStats = nil;
         [self showBackgroundUploadCompleteNotif];
         [self endBackgroundUpdateTask];
+        [self.thumbnailsObjectIDQueue clearCompleted];
+        [self.fullImageObjectIDQueue clearCompleted];
     }];
     
     operation.queuePriority = NSOperationQueuePriorityHigh;
@@ -300,14 +346,18 @@ static DFUploadController *defaultUploadController;
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: currentStats}];
     
-    if (self.currentSessionStats.numRemaining > 0) {
-        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateProgress
-                                                                                    numRemaining:currentStats.numRemaining
-                                                                                        progress:currentStats.progress];
-    } else if (self.currentSessionStats.numRemaining == 0 && self.currentSessionStats.numUploaded > 0) {
+    if (currentStats.numThumbnailsRemaining > 0) {
+        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateThumbnailProgress
+                                                                                    numRemaining:currentStats.numThumbnailsRemaining
+                                                                                        progress:currentStats.thumbnailProgress];
+    } else if (currentStats.numFullPhotosRemaining > 0) {
+        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateFullImageProgress
+                                                                                    numRemaining:currentStats.numFullPhotosRemaining
+                                                                                        progress:currentStats.fullPhotosProgress];
+    } else if (currentStats.numThumbnailsUploaded > 0 || currentStats.numFullPhotosUploaded > 0){
         [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateComplete
-                                                                                    numRemaining:currentStats.numRemaining
-                                                                                        progress:currentStats.progress];
+                                                                                    numRemaining:0
+                                                                                        progress:1.0];
     }
     
     DDLogInfo(@"\n%@", currentStats.description);
@@ -319,9 +369,11 @@ static DFUploadController *defaultUploadController;
         _currentSessionStats = [[DFUploadSessionStats alloc] init];
         _currentSessionStats.startDate = [NSDate date];
     }
-    _currentSessionStats.numAcceptedUploads = self.objectIDQueue.numTotalObjects;
-    _currentSessionStats.numUploaded = self.objectIDQueue.numObjectsComplete;
-    
+    _currentSessionStats.numThumbnailsAccepted = self.thumbnailsObjectIDQueue.numTotalObjects;
+    _currentSessionStats.numThumbnailsUploaded = self.thumbnailsObjectIDQueue.numObjectsComplete;
+    _currentSessionStats.numFullPhotosAccepted = self.fullImageObjectIDQueue.numTotalObjects;
+    _currentSessionStats.numFullPhotosUploaded = self.fullImageObjectIDQueue.numObjectsComplete;
+
     return _currentSessionStats;
 }
 
@@ -351,6 +403,16 @@ static DFUploadController *defaultUploadController;
     }
 }
 
+
+/* Save notification handler for the background context */
+- (void)backgroundContextDidSave:(NSNotification *)notification {
+    /* merge in the changes to the main context */
+    [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
+        
+//        [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+//        [self uploadPhotos];
+    }]];
+}
 
 # pragma mark - Background task helper
 

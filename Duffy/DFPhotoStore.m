@@ -169,7 +169,44 @@ static int const FetchStride = 500;
     return allObjects;
 }
 
-- (DFPhotoCollection *)photosWithUploadStatus:(BOOL)isUploaded
++ (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
+                                      fullUploadStatus:(BOOL)isFullPhotoUploaded
+                                             inContext:(NSManagedObjectContext *)context;
+{
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
+    
+    NSPredicate *thumbnailPredicate;
+    if (isThumbnailUploaded) {
+        thumbnailPredicate = [NSPredicate predicateWithFormat:@"upload157Date != nil"];
+    } else {
+        thumbnailPredicate = [NSPredicate predicateWithFormat:@"upload157Date = nil"];
+    }
+    
+    NSPredicate *fullPredicate;
+    if (isFullPhotoUploaded) {
+        fullPredicate = [NSPredicate predicateWithFormat:@"upload569Date != nil"];
+    } else {
+        fullPredicate = [NSPredicate predicateWithFormat:@"upload569Date = nil"];
+    }
+    
+    NSCompoundPredicate *compoundPredicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType
+                                                                         subpredicates:@[thumbnailPredicate, fullPredicate]];
+    request.predicate = compoundPredicate;
+    
+    NSError *error;
+    NSArray *result = [context executeFetchRequest:request error:&error];
+    if (!result) {
+        [NSException raise:@"Could search for photos."
+                    format:@"Error: %@", [error localizedDescription]];
+    }
+    
+    return [[DFPhotoCollection alloc] initWithPhotos:result];
+}
+
+
++ (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context
 {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
     NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
@@ -177,21 +214,22 @@ static int const FetchStride = 500;
     
     NSPredicate *predicate;
     if (isUploaded) {
-        predicate = [NSPredicate predicateWithFormat:@"uploadDate != nil"];
+        predicate = [NSPredicate predicateWithFormat:@"upload569Date != nil"];
     } else {
-         predicate = [NSPredicate predicateWithFormat:@"uploadDate = nil"];
+        predicate = [NSPredicate predicateWithFormat:@"upload569Date = nil"];
     }
     
     request.predicate = predicate;
     
     NSError *error;
-    NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+    NSArray *result = [context executeFetchRequest:request error:&error];
     if (!result) {
         [NSException raise:@"Could search for photos."
                     format:@"Error: %@", [error localizedDescription]];
     }
     
     return [[DFPhotoCollection alloc] initWithPhotos:result];
+
 }
 
 
@@ -268,6 +306,20 @@ static int const FetchStride = 500;
     }];
 }
 
+
+
+
+- (void)clearUploadInfo
+{
+    DFPhotoCollection *allPhotosCollection = [DFPhotoStore allPhotosCollectionUsingContext:[self managedObjectContext]];
+    for (DFPhoto *photo in allPhotosCollection.photoSet) {
+        photo.upload157Date = nil;
+        photo.upload569Date = nil;
+        photo.photoID = 0;
+    }
+    
+    [self saveContext];
+}
 
 
 #pragma mark - Core Data stack

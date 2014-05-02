@@ -27,4 +27,10 @@ extern NSString *DFDeviceNameParameterKey;
 extern const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION;
 extern const float IMAGE_UPLOAD_JPEG_QUALITY;
 
+
+extern NSString *DFUploadResultErrorKey;
+extern NSString const *DFUploadResultPeanutPhotos;
+extern NSString *DFUploadResultNumBytes;
+extern NSString *DFUploadResultPhotoID;
+
 @end

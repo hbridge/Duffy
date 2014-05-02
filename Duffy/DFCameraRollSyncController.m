@@ -117,7 +117,9 @@
             } else {//(![knownAndFoundURLs containsObject:assetURLString])
                 // Check to see whether this is a dupe of an already known photo, if it's not, create a new one
                 if (![[knownAndFoundURLsToHashes allValues] containsObject:assetHash]) {
-                    DFPhoto *newPhoto = [self addPhotoForAsset:photoAsset withHashData:assetHash];
+                    DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:photoAsset
+                                                               withHashData:assetHash
+                                                                  inContext:self.managedObjectContext];
                     
                     // store information about the new photo to notify
                     groupObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
@@ -168,25 +170,14 @@
     objectIDsToChanges[photoToRemove.objectID] = DFPhotoChangeTypeRemoved;
     [self.managedObjectContext deleteObject:photoToRemove];
     
-    DFPhoto *newPhoto = [self addPhotoForAsset:asset withHashData:newHashData];
+    DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:asset
+                                               withHashData:newHashData
+                                                  inContext:self.managedObjectContext];
     objectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
     
     return objectIDsToChanges;
 }
 
-- (DFPhoto *)addPhotoForAsset:(ALAsset *)asset withHashData:(NSData *)hashData
-{
-    DFPhoto *newPhoto = [NSEntityDescription
-                         insertNewObjectForEntityForName:@"DFPhoto"
-                         inManagedObjectContext:self.managedObjectContext];
-    newPhoto.userID = [[DFUser currentUser] userID];
-    newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
-    newPhoto.creationDate = [asset valueForProperty:ALAssetPropertyDate];
-    newPhoto.creationHashData = hashData;
-    return newPhoto;
-}
-
-                     
 - (NSDictionary *)removePhotosNotFound:(NSSet *)photoURLsNotFound
 {
     DDLogInfo(@"%lu photos in DB not present on device.", (unsigned long)photoURLsNotFound.count);
