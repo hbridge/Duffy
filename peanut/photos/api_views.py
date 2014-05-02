@@ -3,7 +3,7 @@ import os, sys
 import json
 import subprocess
 import Image
-import tempfile
+import thread
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -22,20 +22,11 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util, gallery_util
+from photos import image_util, search_util, gallery_util, location_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
-
 class PhotoAPI(APIView):
-	def handleUploadedFile(self, request, photo):
-		if "file" in request.FILES:
-			print "Found file: " + request.FILES['file'].name
-			tempFilepath = tempfile.mktemp()
-	 
-			image_util.writeOutUploadedFile(request.FILES['file'], tempFilepath)
-			image_util.processUploadedPhoto(photo, request.FILES['file'].name, tempFilepath)
-
 	def getObject(self, photoId):
 		try:
 			return Photo.objects.get(id=photoId)
@@ -53,7 +44,9 @@ class PhotoAPI(APIView):
 		if serializer.is_valid():
 			serializer.save()
 
-			self.handleUploadedFile(request, serializer.object)
+			image_util.handleUploadedImage(request, "file", serializer.object)
+
+			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -63,11 +56,35 @@ class PhotoAPI(APIView):
 		if serializer.is_valid():
 			serializer.save()
 
-			self.handleUploadedFile(request, serializer.object)
+			image_util.handleUploadedImage(request, "file", serializer.object)
+			
+			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class PhotoBulkAPI(APIView):
+	def post(self, request, format=None):
+		response = list()
+		if "bulkphotos" in request.DATA:
+			print(request.DATA["bulkphotos"])
+			photosData = json.loads(request.DATA["bulkphotos"])
+			for photoData in photosData:
+				serializer = PhotoSerializer(data=photoData)
+				if serializer.is_valid():
+					fileKey = photoData["key"]
+					serializer.save()
+
+					image_util.handleUploadedImage(request, fileKey, serializer.object)
+					
+					thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+
+					# Put this in so the calling code can key off of it with the responses
+					serializer.data["key"] = fileKey
+					
+					response.append(serializer.data)
+			return Response(response, status=status.HTTP_201_CREATED)
+		return Response(response, status=status.HTTP_400_BAD_REQUEST)
 """
 	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage
 	and the iPhone app call this endpoint.
