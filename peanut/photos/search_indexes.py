@@ -15,9 +15,13 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	locationData = indexes.CharField(model_attr="location_data", default="")
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
 	twoFishesData = indexes.CharField(model_attr="twofishes_data", default="")
+	updated = indexes.DateField()
 	
 	def get_model(self):
 		return Photo
+
+	def get_updated_field(self):
+		return "updated"
 
 	def index_queryset(self, using=None):
 		"""Used when the entire index for model is updated."""

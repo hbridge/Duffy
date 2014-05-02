@@ -4,6 +4,7 @@ import pyexiv2
 import exifread
 import json
 import tempfile
+import logging
 from datetime import datetime
 
 from django.utils import timezone
@@ -13,6 +14,8 @@ from photos.models import Photo, User, Classification, Similarity
 import cv2
 import cv2.cv as cv
 
+
+logger = logging.getLogger(__name__)
 
 """
 	Generates a thumbnail of the given image to the given size
@@ -155,6 +158,8 @@ def processUploadedPhoto(photo, origFileName, tempFilepath):
 	(width, height) = im.size
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
+		print("tempFilepath=" + tempFilepath)
+		print("getThumbPath=" + photo.getThumbPath())
 		os.rename(tempFilepath, photo.getThumbPath())
 		photo.thumb_filename = photo.getThumbFilename()
 		photo.save()
@@ -175,7 +180,8 @@ def handleUploadedImage(request, fileKey, photo):
  
 		writeOutUploadedFile(request.FILES[fileKey], tempFilepath)
 		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFilepath)
-
+	else:
+		logger.error("File not found in request: " + fileKey)
 """
 	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
 	and metadata about the photo.  It then saves assigns the photo a new id, renames it, adds it to the database

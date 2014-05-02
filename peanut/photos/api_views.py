@@ -3,7 +3,9 @@ import os, sys
 import json
 import subprocess
 import Image
+import logging
 import thread
+import pprint
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -25,6 +27,8 @@ from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util, location_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
+
+logger = logging.getLogger(__name__)
 
 class PhotoAPI(APIView):
 	def getObject(self, photoId):
@@ -64,19 +68,30 @@ class PhotoAPI(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PhotoBulkAPI(APIView):
+	def jsonDictToSimple(self, jsonDict):
+		ret = dict()
+		for key in jsonDict:
+			var = jsonDict[key]
+			if type(var) is dict or type(var) is list:
+				ret[key] = json.dumps(jsonDict[key])
+			else:
+				ret[key] = str(var)
+
+		return ret
+
 	def post(self, request, format=None):
 		response = list()
-		if "bulkphotos" in request.DATA:
-			print(request.DATA["bulkphotos"])
-			photosData = json.loads(request.DATA["bulkphotos"])
+
+		if "bulk_photos" in request.DATA:
+			photosData = json.loads(request.DATA["bulk_photos"])
 			for photoData in photosData:
+				photoData = self.jsonDictToSimple(photoData)
 				serializer = PhotoSerializer(data=photoData)
 				if serializer.is_valid():
-					fileKey = photoData["key"]
 					serializer.save()
 
+					fileKey = photoData["key"]
 					image_util.handleUploadedImage(request, fileKey, serializer.object)
-					
 					thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 
 					# Put this in so the calling code can key off of it with the responses
@@ -85,6 +100,7 @@ class PhotoBulkAPI(APIView):
 					response.append(serializer.data)
 			return Response(response, status=status.HTTP_201_CREATED)
 		return Response(response, status=status.HTTP_400_BAD_REQUEST)
+
 """
 	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage
 	and the iPhone app call this endpoint.
@@ -372,16 +388,10 @@ def createUser(phoneId, firstName):
 	userBasePath = os.path.join(basePath, userId)
 
 	try:
-		os.stat(userUploadsPath)
-	except:
-		os.mkdir(userUploadsPath)
-		os.chmod(userBasePath, 775)
-
-	try:
 		os.stat(userBasePath)
 	except:
 		os.mkdir(userBasePath)
-		os.chmod(userBasePath, 775)
+		os.chmod(userBasePath, 0775)
 
 	userRemoteStagingPath = os.path.join(remoteStagingPath, userId)
 	subprocess.call(['ssh', remoteHost, "mkdir -p " + userRemoteStagingPath])
