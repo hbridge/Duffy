@@ -43,18 +43,12 @@ INSTALLED_APPS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    # Added this to record page load time
-    'peanut.middlewares.StatsMiddleware',
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-
-    # uncomment for real profiling
-    # 'snippetscream.ProfileMiddleware',
 )
 
 ROOT_URLCONF = 'peanut.urls'
@@ -121,7 +115,7 @@ LOGGING = {
             'propagate': True,
             'level':'DEBUG',
         },
-        'MYAPP': {
+        'photos': {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
@@ -155,28 +149,8 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-
-
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
-#STATIC_ROOT = '' # uncomment for static files for dev servers
 STATIC_URL = '/static/'
-
-
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
- # '/home/aseem/repos/Duffy/peanut/static',
-)
-
-# List of finder classes that know how to find static files in
-# various locations.
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
 
 
 PIPELINE_UPLOADED_PATH = "/home/derek/pipeline/uploads/"
