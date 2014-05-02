@@ -36,7 +36,7 @@ def main(argv):
 		for photo in photoQuery:
 			if (photo.full_filename and not photo.thumb_filename):
 				image_util.createThumbnail(photo) # check in case thumbnails haven't been created
-			cluster_util.addToClusters(photo.id)
+			cluster_util.addToClusters(photo)
 		print "Done"
 
 

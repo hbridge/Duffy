@@ -18,41 +18,35 @@ import cv2.cv as cv
 """
 	Populates similarity table for a new photo
 """
-def addToClusters(photoId, threshold=None):
-	try:
-		curPhoto = Photo.objects.get(id=photoId)
-		userId = curPhoto.user.id
-	except Photo.DoesNotExist:
-		print "addToClusters: PhotoId {0} not found".format(photoId)
-		return 0
+def addToClusters(photo, threshold=None):
 
-	if (curPhoto.thumb_filename == None):
+	if (photo.thumb_filename == None):
 		return 0
 
 	if (threshold == None):
 		threshold = 100
 
-	if (curPhoto.time_taken == None and curPhoto.added == None):
+	if (photo.time_taken == None and photo.added == None):
 		# handling case before 'added' field was in the database
 		# if no timestamp exists, then skip the photo for clustering
 		return 0
 
 	# get a list of photos that are "near" this photo: meaning pre and post in the timeline
-	if (curPhoto.time_taken == None):
+	if (photo.time_taken == None):
 		# for undated photos, use 'added' which is the upload time
-		photoQueryPre = Photo.objects.all().filter(user_id=userId).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=curPhoto.added).order_by('-added')[:20]
-		photoQueryPost = Photo.objects.all().filter(user_id=userId).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=curPhoto.added).order_by('added')[:20]
+		photoQueryPre = Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=photo.added).order_by('-added')[:20]
+		photoQueryPost = Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=photo.added).order_by('added')[:20]
 	else:
-		photoQueryPre = Photo.objects.all().filter(user_id=userId).exclude(time_taken__gt=curPhoto.time_taken).exclude(time_taken=None).exclude(id=photoId).order_by('-time_taken')[:20]
-		photoQueryPost = Photo.objects.all().filter(user_id=userId).exclude(time_taken__lt=curPhoto.time_taken).exclude(time_taken=None).exclude(id=photoId).order_by('time_taken')[:20]
+		photoQueryPre = Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__gt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).order_by('-time_taken')[:20]
+		photoQueryPost = Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__lt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).order_by('time_taken')[:20]
 
 	# get current photo's histogram
-	curHist = getSpatialHist(photoId)
+	curHist = getSpatialHist(photo)
 	if (curHist == None):
 		return 0
 
-	genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQueryPre, threshold)
-	genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQueryPost, threshold)
+	genSimilarityRowsFromDBQuery(photo, curHist, photoQueryPre, threshold)
+	genSimilarityRowsFromDBQuery(photo, curHist, photoQueryPost, threshold)
 
 
 """
@@ -88,7 +82,7 @@ def genSimilarityRowsFromList(curPhoto, curHist, photoList, threshold):
 		if (doesSimilarityRowAlreadyExists(curPhoto, photo)):
 			returnVal = True
 			continue
-		dist = getSimilarityFromHistAndPhoto(curHist, photo.id)
+		dist = getSimilarityFromHistAndPhoto(curHist, photo)
 		if (dist < threshold):
 			if (addSimilarityRow(curPhoto, photo, dist)):
 				returnVal = True
@@ -149,8 +143,8 @@ def doesSimilarityRowAlreadyExists(photo1, photo2):
 """
 	Returns distance between two photos when given one hist and one photo Id 
 """		
-def getSimilarityFromHistAndPhoto(hist1, photoId2):
-	return compHist(hist1, getSpatialHist(photoId2))
+def getSimilarityFromHistAndPhoto(hist1, photo2):
+	return compHist(hist1, getSpatialHist(photo2))
 
 
 """
@@ -164,20 +158,15 @@ def getSimilarityFromHists(hist1, hist2):
 	Calculates histograms and returns distance between two photos, when 
 	given only their photo Ids
 """		
-def getSimilarityFromPhotoIds(photoId1, photoId2):
-	return compHist(getSpatialHist(photoId1), getSpatialHist(photoId2))
+def getSimilarityFromPhotos(photo1, photo2):
+	return compHist(getSpatialHist(photo1), getSpatialHist(photo2))
 
 """
 	Get a photo's spatial histogram using opencv's ELBP method
 """
-def getSpatialHist(photoId):
-	try:
-		photo = Photo.objects.get(id=photoId)
-		userId = photo.user.id
-	except Photo.DoesNotExist:
-		return None
+def getSpatialHist(photo):
 
-	origPath = '/home/derek/user_data/' + str(userId) + '/'
+	origPath = '/home/derek/user_data/' + str(photo.user.id) + '/'
 
 	if (photo.full_filename and not photo.thumb_filename):
 		image_util.createThumbnail(photo) # check in case thumbnails haven't been created

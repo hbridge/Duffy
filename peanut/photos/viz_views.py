@@ -307,7 +307,7 @@ def dedup(request):
 
 	# iterate through images
 	for photo in photoQuery:
-		curHist = cluster_util.getSpatialHist(photo.id)
+		curHist = cluster_util.getSpatialHist(photo)
 
 		addToCluster = False
 		if (len(prevHist) == 0):
