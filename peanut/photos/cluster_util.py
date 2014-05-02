@@ -72,7 +72,7 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 		loop += 1
 		# pick them in batches to process
 		photoBatch = list(photoQuery[((loop-1)*batch):(batch*loop)])
-		if (genSimilarityRowsFromList(curPhoto, curHist, photoBatch, threshold))
+		if (genSimilarityRowsFromList(curPhoto, curHist, photoBatch, threshold)):
 			keepGoing = True
 
 
