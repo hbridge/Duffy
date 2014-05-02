@@ -80,6 +80,7 @@ def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
 
 def getClusters(photoSet, threshold):
 
+	tStart = datetime.now()
 	# get a list of Similarity objects matching the current set of photos
 	photoSetList = list()
 	photoIdToPhotoDict = dict()
@@ -150,6 +151,9 @@ def getClusters(photoSet, threshold):
 				curCluster['count'] = 0
 				curClusterPhotoList = list()
 				curClusterPhotoList.append(photoIdToPhotoDict[result.photoId])
+
+	tEnd = datetime.now()
+	print tEnd-tStart
 	return clusterList
 
 

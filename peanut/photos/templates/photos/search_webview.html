@@ -92,7 +92,9 @@
 		padding: 0px 0px 0px 0px;
 		width: 100%;
 	}
-
+	#stats{
+		text-align: right;
+	}
 	a:link{
 		text-decoration: none;
 		font-weight: bold;
@@ -131,7 +133,11 @@
 			<div class="text center"> No results found! </div>
 			<br>
 		{% endif %}
-		<div class="ui-time-header center"> Searchable images: {{ resultsDict.indexSize }} </div>
+		<div class="ui-time-header center"> Searchable images: {{ resultsDict.indexSize }}  </div>
+
+		<div id="stats">
+			<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
+		</div>
 	</div>
 
 </div>

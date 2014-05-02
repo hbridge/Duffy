@@ -15,6 +15,7 @@ from .forms import ManualAddPhoto
 
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+import time
 
 
 
@@ -80,7 +81,7 @@ def search(request, user_id=None):
 		return render(request, 'photos/search.html', context)		
 	else:
 		# new webview code that's served in the iOS app
-
+		tStart = time.time()
 		if request.method == 'GET':
 			data = request.GET
 		elif request.method == 'POST':
@@ -143,7 +144,8 @@ def search(request, user_id=None):
 			resultsDict['totalResults'] = totalResults
 			resultsDict['photoResults'] = photoResults
 			resultsDict['photoIdToThumb'] = photoIdToThumb
-
+		tTaken = time.time() - tStart
+		print tTaken
 		context = {	'user' : user,
 					'imageSize': imageSize,
 					'resultsDict': resultsDict,
