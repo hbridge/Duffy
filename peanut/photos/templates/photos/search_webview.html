@@ -48,12 +48,13 @@
 		padding-right: 2px;
 		float:left;
 		position: relative;
+		cursor: pointer;
 		height: {{ imageSize|add:+2 }}px;
 	}
 	.ui-image-count {
 		position:absolute;
 		background-color: transparent;
-		color: #ffffff;
+		color: #000000;
 		top: 39px;
 		left: 37px;
 		font-size: 1em;
@@ -61,8 +62,15 @@
 		width: 39px;
 		height:39px;
 		line-height: 60px;
-		vertical-align: text-bottom;
 		padding-right: 2px;
+	}
+	.ui-image-page-turn {
+		background-color: transparent;
+		position:absolute;
+		top: 48px;
+		left:48px;
+		height: 30px;
+		width: 30px;
 	}
 	.text {
 		font-family: arial;
@@ -140,6 +148,25 @@
 			});
 		}
 		loadImages();
+
+		/*
+			used to display clusters
+		*/
+		$('div.ui-image').click(function() {
+			if ($(this).hasClass('cluster')) {
+				$(this).removeClass('cluster');
+				$(this).children('div').addClass('hidden');
+				current = $(this).next()
+				while (current.hasClass('hidden')){
+					current.show("fast");
+					current = current.next();
+				}
+			}
+			else {
+				window.location.href = $(this).attr('redirect');
+			}
+		});
+
 		var oldVal = "";
 
 		$("#input-search").on("keyup paste", function(){
@@ -178,45 +205,5 @@
 				});
 			}
 		});
-
-		var fixDivRunning = false;
-		function fixDiv() {
-			if (fixDiv == true) {
-				return;
-			}
-			fixDivRunning = true;
-			console.log("window scrolltop: " + $(window).scrollTop());
-			var currentFloatId = -1;
-			for (var i=0; i< $('div.ui-photo-block').length; i++){
-				var id = '#ui-photo-block-'+i;
-				console.log($(id).offset());
-				console.log($(id).height());
-				if ($(window).scrollTop() - $(id).offset().top - $(id).height() >= 0){
-					console.log("above the fold: " + $(id).attr('id'));
-					$(id).children('div.ui-time-header').each(function(){
-						$(this).removeClass('fixed-pos');
-					});
-				}
-				else {
-					if (currentFloatId < 0) {
-						currentFloatId = i;
-						$(id).children('div.ui-time-header').each(function(){
-							console.log("position fixed for: " + i);
-							$(this).addClass('fixed-pos');
-						});
-					}
-					else {
-						console.log("Not the top div: " + $(id).attr('id'));
-						$(id).children('div.ui-time-header').each(function(){
-								$(this).removeClass('fixed-pos');
-						});
-					}
-				}
-
-			}
-			fixDivRunning = false;
-		}
-		//$(window).scroll(fixDiv);
-		//fixDiv();
 		</script>
 </html>

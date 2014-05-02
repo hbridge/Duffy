@@ -12,7 +12,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
 from photos.models import Photo, User, Classification, Similarity
 from peanut import settings
-from photos import cluster_util
+from photos import cluster_util, image_util
 
 
 def main(argv):
@@ -24,12 +24,10 @@ def main(argv):
 	print "Starting to populate similarity table"
 
 	allUsers = User.objects.all().filter(id__gt=38) #ignores first set of accounts
-	totalRows = 0
 
 	for user in allUsers:
-		if (userId):
-			if (user.id != userId):
-				continue;
+		if (userId and user.id != userId):
+			continue;
 		photoQuery = Photo.objects.all().filter(user_id=user.id).order_by('time_taken')
 		print "userId {0}: | Photos: {1}".format(user.id, photoQuery.count())
 
@@ -37,11 +35,9 @@ def main(argv):
 		userRows = 0
 		for photo in photoQuery:
 			if (photo.full_filename and not photo.thumb_filename):
-				print photo.id
-			#userRows += cluster_util.addToClusters(photo.id)
-		print "DB adds: {0}".format(userRows)
-		totalRows += userRows
-	print "Total entries generated: {0}".format(totalRows)
+				image_util.createThumbnail(photo) # check in case thumbnails haven't been created
+			cluster_util.addToClusters(photo.id)
+		print "Done"
 
 
 if __name__ == "__main__":

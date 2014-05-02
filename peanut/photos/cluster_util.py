@@ -13,7 +13,7 @@ from photos import image_util
 import cv2
 import cv2.cv as cv
 
-### Clustering functions
+### Clustering/deduping functions
 
 """
 	Populates similarity table for a new photo
@@ -26,8 +26,7 @@ def addToClusters(photoId, threshold=None):
 		print "addToClusters: PhotoId {0} not found".format(photoId)
 		return 0
 
-	# check to see if photo has time_taken field. If not, ignore it.
-	if (curPhoto.new_filename == None):
+	if (curPhoto.thumb_filename == None):
 		return 0
 
 	if (threshold == None):
@@ -52,10 +51,8 @@ def addToClusters(photoId, threshold=None):
 	if (curHist == None):
 		return 0
 
-	rowCount = genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQueryPre, threshold)
-	rowCount += genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQueryPost, threshold)
-
-	return rowCount
+	genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQueryPre, threshold)
+	genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQueryPost, threshold)
 
 
 """
@@ -68,7 +65,6 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 	if (batch == None):
 		batch = 5
 
-	rowCount = 0
 	keepGoing = True
 	loop = 0
 	while keepGoing == True:
@@ -76,31 +72,27 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 		loop += 1
 		# pick them in batches to process
 		photoBatch = list(photoQuery[((loop-1)*batch):(batch*loop)])
-		dbOps = genSimilarityRowsFromList(curPhoto, curHist, photoBatch, threshold)
-		if (dbOps > 0):
-			rowCount += dbOps
+		if (genSimilarityRowsFromList(curPhoto, curHist, photoBatch, threshold))
 			keepGoing = True
-	return rowCount
 
 
 """
 	Compares curPhoto to each photo in photoList and adds a row if under threshold
-	Returns count of DB operations: adds or modified
+	Returns True if any rows were added (useful to figure out if you need to keep going)
 
 """
 
 def genSimilarityRowsFromList(curPhoto, curHist, photoList, threshold):
-	count = 0
+	returnVal = False
 	for photo in photoList:
-		print "P: {0}, {1}".format(photo.id, photo.time_taken)
 		if (doesSimilarityRowAlreadyExists(curPhoto, photo)):
-			count += 1
+			returnVal = True
 			continue
 		dist = getSimilarityFromHistAndPhoto(curHist, photo.id)
 		if (dist < threshold):
 			if (addSimilarityRow(curPhoto, photo, dist)):
-				count += 1
-	return count
+				returnVal = True
+	return returnVal
 
 """
 	Adds/updates a specific row to similarity table, if it doesn't exist.
@@ -124,7 +116,6 @@ def addSimilarityRow(photo1, photo2, sim):
 		simRow = Similarity(	photo_1 = photo1,
 								photo_2 = photo2,
 								similarity = sim)
-		print simRow
 	elif (simQuery.count() == 1):
 		if (simQuery[0].similarity == sim):
 			return False
@@ -150,7 +141,6 @@ def doesSimilarityRowAlreadyExists(photo1, photo2):
 		photo2 = tempPhoto
 	sim = Similarity.objects.all().filter(photo_1=photo1).filter(photo_2=photo2) 
 	if (sim.count() > 0):
-		print sim[0] 
 		return True
 	return False
 
@@ -189,18 +179,15 @@ def getSpatialHist(photoId):
 
 	origPath = '/home/derek/user_data/' + str(userId) + '/'
 
-	# Check to make sure that a thumbnail exists
-	photo_thumbnail = image_util.imageThumbnail(str(photo.id)+'.jpg', 156, userId)
-	if (photo_thumbnail == None):
-		print "No thumbnail found for userId/photoId: {0}/{1}".format(userId, photoId)
-		return None
-	else:
-		photo_color = cv2.imread(origPath+photo_thumbnail)
-		photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
-		photo_gray = cv2.equalizeHist(photo_gray)
+	if (photo.full_filename and not photo.thumb_filename):
+		image_util.createThumbnail(photo) # check in case thumbnails haven't been created
 
-		lbp = cv2.elbp(photo_gray, 1, 8)
-		return cv2.spatial_histogram(lbp, 256, 8, 8, True)
+	photo_color = cv2.imread(origPath+photo.thumb_filename)
+	photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
+	photo_gray = cv2.equalizeHist(photo_gray)
+
+	lbp = cv2.elbp(photo_gray, 1, 8)
+	return cv2.spatial_histogram(lbp, 256, 8, 8, True)
 
 """
 	Returns distance between two histograms 
@@ -212,14 +199,14 @@ def compHist(h1, h2):
 
 """
 	Returns distance between two histograms using ChiSqr
-	Scale: 0 - infinity (lower the better match)
+	Scale: 0 - infinity (lower is better)
 """
 def compHistChiSqr(h1, h2):
 	return cv2.compareHist(h1, h2, cv.CV_COMP_CHISQR)
 
 """
 	Returns distance between two histograms using Intersection
-	Scale: 0 - 100 (lower the better match)
+	Scale: 0 - 100 (lower is better)
 """
 def compHistIntersect(h1, h2):
 	return 100*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_INTERSECT))

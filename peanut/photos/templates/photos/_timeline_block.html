@@ -1,4 +1,5 @@
 {% load dictionary_extras %}
+{% load staticfiles %}
 
 <div class="ui-photo-block hidden">
 	<div class="ui-time-header">
@@ -6,18 +7,19 @@
 	</div>
 	{% for cluster in entry.clusterList %}
 		{% for imageEntry in cluster.photoblocks %}
-			{% if imageEntry.dist == None %}
-				<div class = "ui-image">
-					<a href="{{ thumbnailBasepath }}{{ imageEntry.photo.photoFilename }}"> 
-						<img data-lazy-src="{{ thumbnailBasepath }}{{ resultsDict.photoIdToThumb|lookup:imageEntry.photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px" 
-						title="{% if debug %} TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} {% endif %} "></a>
-					{% if cluster.count > 0 %}
-						<div class="ui-image-count text">
-							{{ cluster.count }}
-						</div>
-					{% endif %}
-				</div>
-			{% endif %}
+			<div class = "ui-image {% if imageEntry.dist == None and cluster.count > 0 %} cluster{% elif imageEntry.dist != None %}hidden {% else %} {% endif %}" redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoFilename }}">
+					<img data-lazy-src="{{ thumbnailBasepath }}{{ resultsDict.photoIdToThumb|lookup:imageEntry.photo.photoId }}" class="lazy" height="{{ imageSize }}px" width="{{ imageSize }}px" 
+					title="{% if debug %} TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} {% endif %} ">
+				
+				{% if imageEntry.dist == None and cluster.count > 0 %}
+					<div class="ui-image-page-turn">
+						<img src="{% static "page-fold-th.png" %}" height="100%" width="100%" />
+					</div>
+					<div class="ui-image-count text">
+						{{ cluster.count }}
+					</div>
+				{% endif %}
+			</div>
 		{% endfor %}
 	{% endfor %}
 </div>

@@ -8,6 +8,9 @@ from dateutil.relativedelta import relativedelta
 from haystack.query import SearchQuerySet
 from django.db.models import Q
 
+"""
+	Splits a DB query of Photo objects into timeline view with headers and set of photo clusters
+"""
 
 def splitPhotosFromDBbyMonth(userId, photoSet=None, groupThreshold=None):
 	if (photoSet == None):
@@ -38,6 +41,10 @@ def splitPhotosFromDBbyMonth(userId, photoSet=None, groupThreshold=None):
 
 	return photos
 
+"""
+	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
+"""
+
 def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
 	if (photoSet == None):
 		photoSet = 	SearchQuerySet().filter(userId=userId)
@@ -65,6 +72,10 @@ def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
 		photos.append(entry)
 		
 	return photos
+
+"""
+	Returns clusters for a set of photos based on the threshold
+"""
 
 
 def getClusters(photoSet, threshold):
@@ -97,8 +108,10 @@ def getClusters(photoSet, threshold):
 		   --> count
 		cluster
 		   --> photoblocks
-		   	   ---> photo
-		   	   ---> dist (shortest distance to any photo)
+		   	   --> entry
+		   	       --> photo
+		   	       --> dist (shortest distance to any photo in set)
+		   	   --> ...
 		   --> count
 	'''
 	clusterList = list()
