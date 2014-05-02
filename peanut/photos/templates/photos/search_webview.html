@@ -94,6 +94,7 @@
 	}
 	#stats{
 		text-align: right;
+		font-size: 10px;
 	}
 	a:link{
 		text-decoration: none;
@@ -135,7 +136,7 @@
 		{% endif %}
 		<div class="ui-time-header center"> Searchable images: {{ resultsDict.indexSize }}  </div>
 
-		<div id="stats">
+		<div id="stats" class="text">
 			<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
 		</div>
 	</div>
