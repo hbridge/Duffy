@@ -147,6 +147,7 @@
 				});
 			});
 		}
+
 		loadImages();
 
 		/*
@@ -158,6 +159,9 @@
 				$(this).children('div').addClass('hidden');
 				current = $(this).next()
 				while (current.hasClass('hidden')){
+					current.find('img.lazy-cluster').each(function() {
+						$(this).attr('src', $(this).attr('data-lazy-src'));
+					});
 					current.show("fast");
 					current = current.next();
 				}
