@@ -102,21 +102,29 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
-            'level': 'INFO',
+        'djangofile': {
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'duffy.log',
+            'filename': '/home/derek/logs/duffy-django.log',
+            'formatter': 'verbose'
+        },
+        'duffyfile': {
+            'level': 'DEBUG',
+            'class':'logging.handlers.RotatingFileHandler',
+            'class': 'logging.FileHandler',
+            'filename': '/home/derek/logs/duffy-photos.log',
             'formatter': 'verbose'
         },
     },
     'loggers': {
         'django': {
-            'handlers':['file'],
+            'handlers':['djangofile',],
             'propagate': True,
             'level':'DEBUG',
         },
         'photos': {
-            'handlers': ['file'],
+            'handlers': ['duffyfile'],
+            'propagate': True,
             'level': 'DEBUG',
         },
     }
