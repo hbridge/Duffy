@@ -24,7 +24,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util, gallery_util, location_util
+from photos import image_util, search_util, gallery_util, location_util, cluster_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
@@ -51,6 +51,7 @@ class PhotoAPI(APIView):
 			image_util.handleUploadedImage(request, "file", serializer.object)
 
 			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
 			return Response(serializer.data)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -63,6 +64,7 @@ class PhotoAPI(APIView):
 			image_util.handleUploadedImage(request, "file", serializer.object)
 			
 			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -93,10 +95,11 @@ class PhotoBulkAPI(APIView):
 					fileKey = photoData["key"]
 					image_util.handleUploadedImage(request, fileKey, serializer.object)
 					thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+					thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
 					# Put this in so the calling code can key off of it with the responses
 					serializer.data["key"] = fileKey
-					
+
 					response.append(serializer.data)
 			return Response(response, status=status.HTTP_201_CREATED)
 		return Response(response, status=status.HTTP_400_BAD_REQUEST)

@@ -16,12 +16,29 @@ import cv2.cv as cv
 ### Clustering/deduping functions
 
 """
+	Wrapper to start clustering from a new thread
+"""
+
+
+def startThreadCluster(photoId, threshold=None):
+
+	if (threshold == None):
+		threshold = 100
+
+	try:
+		photo = Photo.objects.get(id=photoId)
+		addToClusters(photo, threshold)
+	except Photo.DoesNotExist:
+		return
+
+
+"""
 	Populates similarity table for a new photo
 """
 def addToClusters(photo, threshold=None):
 
 	if (photo.thumb_filename == None):
-		return 0
+		return
 
 	if (threshold == None):
 		threshold = 100
@@ -29,7 +46,7 @@ def addToClusters(photo, threshold=None):
 	if (photo.time_taken == None and photo.added == None):
 		# handling case before 'added' field was in the database
 		# if no timestamp exists, then skip the photo for clustering
-		return 0
+		return
 
 	# get a list of photos that are "near" this photo: meaning pre and post in the timeline
 	if (photo.time_taken == None):
@@ -43,7 +60,7 @@ def addToClusters(photo, threshold=None):
 	# get current photo's histogram
 	curHist = getSpatialHist(photo)
 	if (curHist == None):
-		return 0
+		return
 
 	genSimilarityRowsFromDBQuery(photo, curHist, photoQueryPre, threshold)
 	genSimilarityRowsFromDBQuery(photo, curHist, photoQueryPost, threshold)
