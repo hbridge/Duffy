@@ -3,9 +3,11 @@ import os, sys
 import json
 import subprocess
 import Image
+import time
 import logging
 import thread
 import pprint
+from random import randint
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -31,6 +33,10 @@ from .forms import ManualAddPhoto
 logger = logging.getLogger(__name__)
 
 class PhotoAPI(APIView):
+<<<<<<< HEAD
+=======
+	# TODO(derek)  pull this out to shared class
+>>>>>>> peanut: start of bulk upload
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
 		for key in jsonDict:
@@ -72,6 +78,9 @@ class PhotoAPI(APIView):
 			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
 			return Response(serializer.data)
+		else:
+			print "Serializer errors"
+			logger.error(serializer.errors)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	def post(self, request, format=None):
@@ -88,6 +97,7 @@ class PhotoAPI(APIView):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PhotoBulkAPI(APIView):
+	# TODO(derek)  pull this out to shared class
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
 		for key in jsonDict:
@@ -102,20 +112,53 @@ class PhotoBulkAPI(APIView):
 	def post(self, request, format=None):
 		response = list()
 
+		timeStart = time.time()
+		points = list()
+		points.append(time.time())
+
 		if "bulk_photos" in request.DATA:
+			points.append(time.time())
 			photosData = json.loads(request.DATA["bulk_photos"])
+			points.append(time.time())
+
+			objsToCreate = list()
+			batchKey = randint(1,10000)
+
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
+				photoData["bulk_batch_key"] = batchKey
 				serializer = PhotoSerializer(data=photoData)
 				if serializer.is_valid():
-					serializer.save()
+					objsToCreate.append(serializer.object)
 
-					image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
-					thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
-					thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
+					#thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+					#thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
+					# Put this in so the calling code can key off of it with the responses
+					
+			Photo.objects.bulk_create(objsToCreate)
+			points.append(time.time())
 
-					response.append(serializer.data)
+			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey)
+			points.append(time.time())
+			for photo in createdPhotos:
+				serializer = PhotoSerializer(photo)
+				image_util.handleUploadedImage(request, photo.file_key, photo)
+				response.append(serializer.data)
+
+				points.append(time.time())
+
+			points.append(time.time())
+			timeEnd = time.time()
+
+			sum = 0
+			for i, item in enumerate(points):
+				if i != (len(points) - 1):
+					print "diff: %2.5f" % (points[i+1] - points[i])
+					sum += points[i+1] - points[i]
+
+			print "Full run: %2.5f" % (timeEnd - timeStart)
+			print "Sum: %2.5f" % (sum)
 			return Response(response, status=status.HTTP_201_CREATED)
 		return Response(response, status=status.HTTP_400_BAD_REQUEST)
 

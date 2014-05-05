@@ -182,6 +182,11 @@ def handleUploadedImage(request, fileKey, photo):
 		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFilepath)
 	else:
 		logger.error("File not found in request: " + fileKey)
+
+
+def handleUploadedImagesInThread(request, fileKey, photo):
+	pass
+	
 """
 	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
 	and metadata about the photo.  It then saves assigns the photo a new id, renames it, adds it to the database
