@@ -136,6 +136,7 @@ def getClusters(photoSet, threshold):
 				entry = dict()
 				entry['photo'] = result
 				entry['dist'] = filterClusterRows[0].similarity
+				entry['simrow'] = filterClusterRows[0]
 				curCluster['photoblocks'].append(entry)
 				curCluster['count'] += 1				
 				curClusterPhotoList.append(photoIdToPhotoDict[result.photoId])
