@@ -45,13 +45,16 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    DDLogVerbose(@"photo metadata: %@", [self.photo.metadataDictionary JSONStringPrettyPrinted:YES]);
-    DDLogVerbose(@"\n*** photo creation hash:%@, \n***current hash:%@",
-          self.photo.creationHashData.description,
-          self.photo.currentHashData.description);
-    [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
-        DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
-    }];
+    DDLogVerbose(@"\n*** photo_id:%lld user:%lld, photo creation hash:%@, \n***current hash:%@",
+                 self.photo.photoID,
+                 self.photo.userID,
+                 self.photo.creationHashData.description,
+                 self.photo.currentHashData.description);
+
+    //DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved] JSONStringPrettyPrinted:YES]);
+//    [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
+//        DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
+//    }];
 }
 
 - (void)didReceiveMemoryWarning
