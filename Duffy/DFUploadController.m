@@ -39,7 +39,7 @@
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize currentSessionStats = _currentSessionStats;
 
-static unsigned int MaxConcurrentUploads = 1;
+static unsigned int MaxConcurrentUploads = 2;
 static unsigned int MaxRetryCount = 5;
 static unsigned int MaxThumbnailsPerRequest = 100;
 
@@ -110,13 +110,13 @@ static DFUploadController *defaultUploadController;
         DFPhotoCollection *eligibleFullImagesToUpload =
             [DFPhotoStore photosWithThumbnailUploadStatus:YES fullUploadStatus:NO inContext:self.managedObjectContext];
         
-        DDLogVerbose(@"thumbnailsObjectIDQueue:%@ adding photos to \nthumbnails queue: %@ \nfullImageQueue: %@",
-                     self.thumbnailsObjectIDQueue.description, photosWithThumbsToUpload.description, eligibleFullImagesToUpload.description);
+//        DDLogVerbose(@"thumbnailsObjectIDQueue:%@ adding photos to \nthumbnails queue: %@ \nfullImageQueue: %@",
+//                     self.thumbnailsObjectIDQueue.description, photosWithThumbsToUpload.description, eligibleFullImagesToUpload.description);
         
         [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
         [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
         
-        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
+//        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
     }]];
 }
 
