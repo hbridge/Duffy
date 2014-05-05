@@ -14,7 +14,7 @@ class StatsMiddleware(object):
         </div>
         '''
 
-        if ((request.path.startswith('/admin/') or (request.path.startswith('/api/'))
+        if (not (request.path.startswith('/viz/')):
             return None
 
         # Uncomment the following if you want to get stats on DEBUG=True only
