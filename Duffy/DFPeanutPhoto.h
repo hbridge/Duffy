@@ -19,15 +19,18 @@
 @property (nonatomic, retain) NSDictionary *metadata;
 @property (nonatomic, retain) NSString *hash;
 @property (nonatomic, retain) NSURL *key;
+@property (nonatomic, retain) NSString *thumb_filename;
+@property (nonatomic, retain) NSString *full_filename;
 
 /* Not Sync'ed with server */
-@property (nonatomic, retain) NSArray *uploaded_dimensions;
-@property (nonatomic) NSUInteger uploaded_image_bytes;
+@property (readonly, nonatomic, retain) NSString *filename;
 
 + (RKObjectMapping *)objectMapping;
 - (id)initWithDFPhoto:(DFPhoto *)photo;
+- (DFPhoto *)photoInContext:(NSManagedObjectContext *)context;
 
 - (NSDictionary *)dictionary;
-
+- (NSString *)JSONString;
+- (NSString *)photoUploadJSONString;
 
 @end

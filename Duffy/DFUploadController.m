@@ -110,8 +110,13 @@ static DFUploadController *defaultUploadController;
         DFPhotoCollection *eligibleFullImagesToUpload =
             [DFPhotoStore photosWithThumbnailUploadStatus:YES fullUploadStatus:NO inContext:self.managedObjectContext];
         
+        DDLogVerbose(@"thumbnailsObjectIDQueue:%@ adding photos to \nthumbnails queue: %@ \nfullImageQueue: %@",
+                     self.thumbnailsObjectIDQueue.description, photosWithThumbsToUpload.description, eligibleFullImagesToUpload.description);
+        
         [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
         [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
+        
+        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
     }]];
 }
 
@@ -146,11 +151,11 @@ static DFUploadController *defaultUploadController;
         NSArray *nextThumbnailIDs = [self.thumbnailsObjectIDQueue takeNextObjects:MaxThumbnailsPerRequest];
         if (nextThumbnailIDs.count > 0) {
             uploadOperation.photoIDs = nextThumbnailIDs;
-            uploadOperation.uploadOperationType = DFPhotoUploadOperation157Data;
+            uploadOperation.uploadOperationType = DFPhotoUploadOperationThumbnailData;
         } else {
             NSArray *nextFullImageIDs = [self.fullImageObjectIDQueue takeNextObjects:1];
             uploadOperation.photoIDs = nextFullImageIDs;
-            uploadOperation.uploadOperationType = DFPhotoUploadOperation569Data;
+            uploadOperation.uploadOperationType = DFPhotoUploadOperationFullImageData;
         }
         
         if (uploadOperation.photoIDs.count > 0) {
@@ -200,40 +205,40 @@ static DFUploadController *defaultUploadController;
 
 - (DFPhotoUploadOperationSuccessBlock)uploadSuccessfullBlock
 {
-    DFPhotoUploadOperationSuccessBlock successBlock = ^(NSArray *peanutPhotos){
-        [self saveUploadedPhotosWithPeanutPhotos:peanutPhotos];
-        for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
-            self.currentSessionStats.numConsecutiveRetries = 0;
-            self.currentSessionStats.numBytesUploaded += peanutPhoto.uploaded_image_bytes;
-            [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
-                                    numImageBytes:peanutPhoto.uploaded_image_bytes
-                         sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
-        }
+    DFPhotoUploadOperationSuccessBlock successBlock = ^(NSDictionary *resultDictionary){
+        NSArray *peanutPhotos = resultDictionary[DFUploadResultPeanutPhotos];
+        [self saveUploadedPhotosWithPeanutPhotos:peanutPhotos uploadOperationType:resultDictionary[DFUploadResultOperationType]];
+        self.currentSessionStats.numConsecutiveRetries = 0;
+        self.currentSessionStats.numBytesUploaded += [resultDictionary[DFUploadResultNumBytes] unsignedLongValue];
+        [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
+                                numPhotos:peanutPhotos.count
+                     sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
         [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
     };
     return successBlock;
 }
 
-- (void)saveUploadedPhotosWithPeanutPhotos:(NSArray *)peanutPhotos
+- (void)saveUploadedPhotosWithPeanutPhotos:(NSArray *)peanutPhotos uploadOperationType:(DFPhotoUploadOperationImageDataType)uploadType
 {
     NSMutableDictionary *metadataChanges = [[NSMutableDictionary alloc] initWithCapacity:peanutPhotos.count];
     for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
-        NSManagedObjectID *objectID = [self.managedObjectContext.persistentStoreCoordinator
-                                       managedObjectIDForURIRepresentation:peanutPhoto.key];
-        DFPhoto *photo = (DFPhoto *)[self.managedObjectContext objectWithID:objectID];
-
-        for (NSValue *sizeValue in peanutPhoto.uploaded_dimensions) {
-            CGSize uploadedSize = [sizeValue CGSizeValue];
-            if (photo.upload157Date == nil && uploadedSize.width == 157 && uploadedSize.height == 157) {
-                [self.thumbnailsObjectIDQueue markObjectCompleted:objectID];
-                photo.upload157Date = [NSDate date];
-                metadataChanges[objectID] = DFPhotoChangeTypeMetadata;
-                [self.fullImageObjectIDQueue addObjectsFromArray:@[objectID]];
-            } else if (photo.upload569Date == nil && (uploadedSize.height == 569 || uploadedSize.width == 569)) {
-                [self.fullImageObjectIDQueue markObjectCompleted:objectID];
-                photo.upload569Date = [NSDate date];
-                metadataChanges[objectID] = DFPhotoChangeTypeMetadata;
-            }
+        // Update the DFPhoto with info returned from server
+        DFPhoto *photo = [peanutPhoto photoInContext:self.managedObjectContext];
+        [self updatePhoto:photo withPeanutPhotos:peanutPhoto];
+        
+        // Mark the photo as complete in the queue and record changes
+        metadataChanges[photo.objectID] = DFPhotoChangeTypeMetadata;
+        
+        if (uploadType == DFPhotoUploadOperationThumbnailData) {
+            photo.upload157Date = [NSDate date];
+            if (peanutPhoto.full_filename && ![peanutPhoto.full_filename isEqualToString:@""])
+                DDLogWarn(@"Interesting: got non null full filename (%@) for photo we're just uploading thumbnail for.", peanutPhoto.full_filename);
+            // Manage out upload queues
+            [self.thumbnailsObjectIDQueue markObjectCompleted:photo.objectID];
+            [self.fullImageObjectIDQueue addObjectsFromArray:@[photo.objectID]];
+        } else if (uploadType == DFPhotoUploadOperationFullImageData) {
+            photo.upload569Date = [NSDate date];
+            [self.fullImageObjectIDQueue markObjectCompleted:photo.objectID];
         }
     }
     [self saveContext];
@@ -243,16 +248,30 @@ static DFUploadController *defaultUploadController;
                                                                 userInfo:metadataChanges];
 }
 
+- (void)updatePhoto:(DFPhoto *)photo withPeanutPhotos:(DFPeanutPhoto *)peanutPhoto
+{
+    photo.photoID = [peanutPhoto.id unsignedLongLongValue];
+}
+
 - (DFPhotoUploadOperationFailureBlock)uploadFailureBlock
 {
-    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSError *error, NSArray *objectIDs, DFPhotoUploadOperationImageDataType uploadType, BOOL isCancelled){
+    DFPhotoUploadOperationFailureBlock failureBlock = ^(NSDictionary *resultDict, BOOL isCancelled){
         if (isCancelled) return;
-        DDLogVerbose(@"Upload failed for %lu objects", objectIDs.count);
+        
+        NSError *error = resultDict[DFUploadResultErrorKey];
+        DFPhotoUploadOperationImageDataType uploadType = resultDict[DFUploadResultOperationType];
+        NSArray *peanutPhotos = resultDict[DFUploadResultPeanutPhotos];
+        NSMutableArray *objectIDs = [[NSMutableArray alloc] initWithCapacity:peanutPhotos.count];
+        for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
+            [objectIDs addObject:[[peanutPhoto photoInContext:self.managedObjectContext] objectID]];
+        }
+        
+        DDLogVerbose(@"Upload failed for %lu objects", peanutPhotos.count);
         if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
             DDLogVerbose(@"Error retryable.  Moving objects to back of queue.");
-            if (uploadType == DFPhotoUploadOperation157Data) {
+            if (uploadType == DFPhotoUploadOperationThumbnailData) {
                 [self.thumbnailsObjectIDQueue moveInProgressObjectsBackToQueue:objectIDs];
-            } else if (uploadType == DFPhotoUploadOperation569Data) {
+            } else if (uploadType == DFPhotoUploadOperationFullImageData) {
                 [self.fullImageObjectIDQueue moveInProgressObjectsBackToQueue:objectIDs];
             }
             self.currentSessionStats.numConsecutiveRetries++;

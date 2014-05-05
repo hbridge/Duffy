@@ -29,11 +29,18 @@ CGFloat const IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 float const IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
 
 
+DFPhotoUploadOperationImageDataType DFPhotoUploadOperationThumbnailData = @"DFPhotoUploadOperationThumbnailData";
+DFPhotoUploadOperationImageDataType DFPhotoUploadOperationFullImageData = @"DFPhotoUploadOperationFullImageData";
+
+
 // Result dict strings
 NSString const *DFUploadResultErrorKey = @"DFUploadResult";
+NSString const *DFUploadResultOperationType = @"DFUploadResultOperationType";
 NSString const *DFUploadResultPeanutPhotos = @"DFUploadResultPeanutPhotos";
 NSString const *DFUploadResultNumBytes = @"DFUploadNumBytes";
 NSString const *DFUploadResultPhotoID = @"DFUploadResultPhotoID";
+
+
 
 
 

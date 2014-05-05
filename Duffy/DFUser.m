@@ -131,7 +131,7 @@ static DFUser *currentUser;
 
 - (NSURL *)apiURL
 {
-    return [[self serverURL] URLByAppendingPathComponent:DFServerAPIPath isDirectory:YES];
+    return [[self serverURL] URLByAppendingPathComponent:DFServerAPIPath isDirectory:NO];
 }
 
 

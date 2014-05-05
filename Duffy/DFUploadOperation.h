@@ -7,21 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFNetworkingConstants.h"
 
 @interface DFUploadOperation : NSOperation
 
 
-typedef enum {
-    DFPhotoUploadOperation157Data,
-    DFPhotoUploadOperation569Data,
-} DFPhotoUploadOperationImageDataType;
 
 
-typedef void (^DFPhotoUploadOperationSuccessBlock)(NSArray *peanutPhotos);
-typedef void (^DFPhotoUploadOperationFailureBlock)(NSError *error,
-                                                   NSArray *photoIDs,
-                                                   DFPhotoUploadOperationImageDataType uploadType,
-                                                   BOOL isCancelled);
+
+typedef void (^DFPhotoUploadOperationSuccessBlock)(NSDictionary *resultDict);
+typedef void (^DFPhotoUploadOperationFailureBlock)(NSDictionary *resultDict, BOOL isCancelled);
 
 @property (nonatomic, retain) NSArray *photoIDs;
 @property (nonatomic) DFPhotoUploadOperationImageDataType uploadOperationType;

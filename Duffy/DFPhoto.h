@@ -17,6 +17,9 @@
 + (NSURL *)localFullImagesDirectoryURL;
 + (NSURL *)localThumbnailsDirectoryURL;
 
+
+typedef UInt64 DFPhotoIDType;
+
 // stored properties
 @property (nonatomic, retain) NSString *alAssetURLString;
 @property (nonatomic) UInt64 userID;
@@ -24,7 +27,7 @@
 @property (nonatomic, retain) NSData *creationHashData; // stored when the DFPhoto is first created so it can be compared later
 @property (nonatomic) BOOL hasLocation;
 @property (nonatomic, retain) CLPlacemark *placemark;
-@property (nonatomic) UInt64 photoID;
+@property (nonatomic) DFPhotoIDType photoID;
 @property (nonatomic, retain) NSDate *upload157Date;
 @property (nonatomic, retain) NSDate *upload569Date;
 

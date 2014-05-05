@@ -43,8 +43,7 @@
     
     [result appendString:@"["];
     for (DFPeanutPhoto *peanutPhoto in self.bulk_photos) {
-        NSDictionary *JSONSafeDict = [peanutPhoto.dictionary dictionaryWithNonJSONRemoved];
-        [result appendString:[JSONSafeDict JSONString]];
+        [result appendString:[peanutPhoto JSONString]];
         [result appendString:@","];
     }
     if (result.length > 0) { // remove trailing comma
@@ -89,73 +88,50 @@
 
 + (NSArray *)requestDescriptors
 {
-    RKRequestDescriptor *photoDescriptor =
-    [RKRequestDescriptor requestDescriptorWithMapping:[[DFPeanutPhoto objectMapping] inverseMapping]
+    RKRequestDescriptor *photoDescriptor = [RKRequestDescriptor requestDescriptorWithMapping:[[DFPeanutPhoto objectMapping] inverseMapping]
                                           objectClass:[DFPeanutPhoto class]
                                           rootKeyPath:nil
-                                               method:RKRequestMethodPOST];
+                                               method:RKRequestMethodPUT];
     
     RKRequestDescriptor *bulkPhotosDescriptor = [RKRequestDescriptor requestDescriptorWithMapping:[[DFPeanutBulkPhotos objectMapping] inverseMapping]
                                           objectClass:[DFPeanutBulkPhotos class]
                                           rootKeyPath:@"bulk_photos"
                                                method:RKRequestMethodPOST];
     
-
-    
-//    return [NSArray arrayWithObjects:photoDescriptor, nil];
     return [NSArray arrayWithObjects:photoDescriptor, bulkPhotosDescriptor, nil];
 }
 
 + (NSArray *)responseDescriptors
 {
-    RKResponseDescriptor *photoResponseDescriptor =
+    RKResponseDescriptor *bulkPhotoResponseDescriptor =
     [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto objectMapping]
                                                  method:RKRequestMethodAny
                                             pathPattern:@"photos/bulk/"
                                                 keyPath:nil
                                             statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
     
-//    RKResponseDescriptor *bulkResponseDescriptor =
-//    [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutBulkPhotos objectMapping]
-//                                                 method:RKRequestMethodAny
-//                                            pathPattern:@"photos/bulk/"
-//                                                keyPath:nil
-//                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-  
-        return [NSArray arrayWithObjects:photoResponseDescriptor, nil];
-//    return [NSArray arrayWithObjects:photoResponseDescriptor, bulkResponseDescriptor, nil];
-}
-
-- (NSDictionary *)postPhotosWithFullImages:(NSArray *)photos
-{
-    DDLogInfo(@"%@ postPhotosWithFullData", [[self class] description]);
-    return [self postPhotos:photos appendThumbnailData:NO appendFullImageData:YES];
-}
-
-- (NSDictionary *)postPhotosWithThumbnails:(NSArray *)photos
-{
-    DDLogInfo(@"%@ postPhotosWithThumbnails count %lu", [[self class] description], photos.count);
+    RKResponseDescriptor *photoResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto objectMapping]
+                                                                                                 method:RKRequestMethodAny
+                                                                                            pathPattern:nil
+                                                                                                keyPath:nil
+                                                                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
     
-    return [self postPhotos:photos appendThumbnailData:YES appendFullImageData:NO];
+    return [NSArray arrayWithObjects:photoResponseDescriptor, bulkPhotoResponseDescriptor, nil];
 }
 
 - (NSDictionary *)postPhotos:(NSArray *)photos
          appendThumbnailData:(BOOL)appendThumbnailData
-         appendFullImageData:(BOOL)appendFullImageData
 {
     NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
     NSMutableDictionary *objectIDURLToImageData = [[NSMutableDictionary alloc] initWithCapacity:photos.count];
-    NSMutableDictionary *objectIDURLToDimensionsData = [[NSMutableDictionary alloc] initWithCapacity:photos.count];
+    unsigned long numImageBytes = 0;
     for (DFPhoto *photo in photos) {
-        [peanutPhotos addObject:[[DFPeanutPhoto alloc] initWithDFPhoto:photo]];
+        DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+        [peanutPhotos addObject:peanutPhoto];
         if (appendThumbnailData) {
-            objectIDURLToImageData[photo.objectID.URIRepresentation] = photo.thumbnailData;
-            objectIDURLToDimensionsData[photo.objectID.URIRepresentation] = [NSValue valueWithCGSize:CGSizeMake(157, 157)];
-        } else if (appendFullImageData) {
-            UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
-            NSData *data = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
-            objectIDURLToImageData[photo.objectID.URIRepresentation] = data;
-            objectIDURLToDimensionsData[photo.objectID.URIRepresentation] = [NSValue valueWithCGSize:imageToUpload.size];
+            NSData *thumbnailData = photo.thumbnailData;
+            objectIDURLToImageData[photo.objectID.URIRepresentation] = thumbnailData;
+            numImageBytes += thumbnailData.length;
         }
     }
     DFPeanutBulkPhotos *bulkPhotos = [[DFPeanutBulkPhotos alloc] init];
@@ -168,10 +144,9 @@
                                     parameters:@{@"bulk_photos": [bulkPhotos arrayString]}
                                     constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
                                         for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
-                                            NSString *fileName = [NSString stringWithFormat:@"%@.jpg", peanutPhoto.hash];
                                             [formData appendPartWithFileData:objectIDURLToImageData[peanutPhoto.key]
                                                                         name:peanutPhoto.key.absoluteString
-                                                                    fileName:fileName
+                                                                    fileName:peanutPhoto.filename
                                                                     mimeType:@"image/jpg"];
                                         }
                                     }];
@@ -185,15 +160,65 @@
     NSDictionary *result;
     if (requestOperation.error) {
         DDLogWarn(@"DFPhotoMetadataAdapter post failed: %@", requestOperation.error.localizedDescription);
-        result = @{DFUploadResultErrorKey : requestOperation.error};
+        result = @{DFUploadResultErrorKey : requestOperation.error,
+                   DFUploadResultPeanutPhotos : peanutPhotos
+                   };
     } else {
         NSArray *resultPhotos = [requestOperation.mappingResult array];
-        for (DFPeanutPhoto *peanutPhoto in resultPhotos) {
-            peanutPhoto.uploaded_dimensions = @[objectIDURLToDimensionsData[peanutPhoto.key]];
-            peanutPhoto.uploaded_image_bytes = [(NSData *)objectIDURLToImageData[peanutPhoto.key] length];
-        }
-        result = @{DFUploadResultPeanutPhotos : resultPhotos};
+        result = @{DFUploadResultPeanutPhotos : resultPhotos,
+                   DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
+                   DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:numImageBytes + request.HTTPBody.length],
+                   };
     }
+    
+    
+    DDLogInfo(@"thumbnail upload numImageKB:%lu requestBodyKB:%lu", numImageBytes/1024, request.HTTPBody.length/1024);
+    
+    return result;
+}
+
+- (NSDictionary *)putPhoto:(DFPhoto *)photo
+            updateMetadata:(BOOL)updateMetadata
+      appendLargeImageData:(BOOL)uploadImage
+{
+    DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
+    NSData *data = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
+    NSString *photoParamater = updateMetadata ? [peanutPhoto JSONString] : [peanutPhoto photoUploadJSONString];
+    
+    NSString *pathString = [NSString stringWithFormat:@"photos/%llu/", photo.photoID];
+    NSMutableURLRequest *request = [self.objectManager
+                                    multipartFormRequestWithObject:nil
+                                    method:RKRequestMethodPUT
+                                    path:pathString
+                                    parameters:@{@"photo": photoParamater}
+                                    constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                        if (uploadImage) {
+                                            [formData appendPartWithFileData:data
+                                                                        name:peanutPhoto.key.absoluteString
+                                                                    fileName:peanutPhoto.filename
+                                                                    mimeType:@"image/jpg"];
+                                        }
+                                    }];
+    RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
+    [self.objectManager enqueueObjectRequestOperation:requestOperation];
+    [requestOperation waitUntilFinished];
+    
+    NSDictionary *result;
+    if (requestOperation.error) {
+        DDLogWarn(@"DFPhotoMetadataAdapter put failed: %@", requestOperation.error.localizedDescription);
+        result = @{DFUploadResultErrorKey : requestOperation.error,
+                   DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
+                   DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
+                   };
+    } else {
+        result = @{DFUploadResultPeanutPhotos : @[peanutPhoto],
+                   DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
+                   DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
+                   };
+    }
+    
+    DDLogInfo(@"full image upload numImageKB:%lu requestBodyKB:%lu", data.length/1024, request.HTTPBody.length/1024);
     
     return result;
 }

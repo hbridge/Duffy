@@ -28,9 +28,14 @@ extern const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION;
 extern const float IMAGE_UPLOAD_JPEG_QUALITY;
 
 
+typedef NSString* const DFPhotoUploadOperationImageDataType;
+extern DFPhotoUploadOperationImageDataType DFPhotoUploadOperationThumbnailData;
+extern DFPhotoUploadOperationImageDataType DFPhotoUploadOperationFullImageData;
+
 extern NSString *DFUploadResultErrorKey;
 extern NSString const *DFUploadResultPeanutPhotos;
 extern NSString *DFUploadResultNumBytes;
 extern NSString *DFUploadResultPhotoID;
+extern NSString const *DFUploadResultOperationType;
 
 @end

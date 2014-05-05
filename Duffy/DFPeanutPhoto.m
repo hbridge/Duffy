@@ -35,13 +35,13 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 + (NSArray *)attributes
 {
-    return @[@"user", @"id", @"time_taken", @"metadata", @"hash", @"key"];
+    return @[@"user", @"id", @"time_taken", @"metadata", @"hash", @"key", @"thumb_filename", @"full_filename"];
 }
 
-- (NSDictionary *)dictionary
+- (NSDictionary *)dictionaryForAttributes:(NSArray *)attributes
 {
     NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
-    for (NSString *key in [DFPeanutPhoto attributes]) {
+    for (NSString *key in attributes) {
         id value = [self valueForKey:key];
         if (value) {
             if ([[value class] isSubclassOfClass:[NSURL class]]) {
@@ -54,6 +54,24 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
     return result;
 }
 
+- (NSDictionary *)dictionary
+{
+    return [self dictionaryForAttributes:[DFPeanutPhoto attributes]];
+}
+
+- (NSString *)JSONString
+{
+    NSDictionary *JSONSafeDict = [[self dictionary] dictionaryWithNonJSONRemoved];
+    return [JSONSafeDict JSONString];
+}
+
+
+- (NSString *)photoUploadJSONString
+{
+    NSDictionary *JSONSafeDict = [[self dictionaryForAttributes:@[@"id", @"user", @"hash", @"key"]] dictionaryWithNonJSONRemoved];
+    return [JSONSafeDict JSONString];
+}
+
 + (RKObjectMapping *)objectMapping
 {
     RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[DFPeanutPhoto class]];
@@ -61,11 +79,23 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
     return objectMapping;
 }
 
+- (NSString *)filename
+{
+    return [NSString stringWithFormat:@"%@.jpg", self.hash];
+}
+
+- (DFPhoto *)photoInContext:(NSManagedObjectContext *)context
+{
+    NSManagedObjectID *objectID = [context.persistentStoreCoordinator
+                                   managedObjectIDForURIRepresentation:self.key];
+    return (DFPhoto *)[context objectWithID:objectID];
+}
+
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, hash:%@, key:%@, metadata:%@, }",
-            (int)self.user, (int)self.id, self.time_taken, self.hash, self.key.absoluteString, self.metadata.description];
+    return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, hash:%@, key:%@, metadata:%@, thumb_filename:%@ full_filename:%@}",
+            (int)self.user, (int)self.id, self.time_taken, self.hash, self.key.absoluteString, self.metadata.description, self.thumb_filename, self.full_filename];
 }
 
 @end

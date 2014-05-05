@@ -186,4 +186,10 @@
     [self releaseLock];
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"DFPhotoUploadQueue notStarted:%@ inProgress:%@ completed:%@ cancelled:%@",
+            self.notStartedUploads.description, self.inProgressUploads.description, self.completedObjects.description, self.cancelledUploads.description];
+}
+
 @end

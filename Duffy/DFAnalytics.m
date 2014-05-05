@@ -200,11 +200,11 @@ static DFAnalytics *defaultLogger;
 }
 
 
-+ (void)logUploadEndedWithResult:(NSString *)resultValue numImageBytes:(NSUInteger)imageDataSizeInBytes sessionAvgThroughputKBPS:(double)KBPS;
++ (void)logUploadEndedWithResult:(NSString *)resultValue numPhotos:(unsigned long)numPhotos sessionAvgThroughputKBPS:(double)KBPS;
 {
     [Flurry logEvent:UploadPhotoEvent withParameters:@{
                                                             ResultKey: resultValue,
-                                                            SizeInKBKey: [NSNumber numberWithUnsignedInteger:imageDataSizeInBytes/1000],
+                                                            NumberKey: [NSNumber numberWithUnsignedInteger:numPhotos],
                                                             SessionAvgKBPSKey: [NSNumber numberWithDouble:KBPS]
                                                             }];
 }

@@ -46,7 +46,8 @@ static NSString *UserIDParameterKey = @"user_id";
 - (void)fetchSuggestions:(DFAutocompleteCompletionBlock)mainThreadCompletionBlock
 {
     if ([[DFUser currentUser] userID]) {
-        [self fetchAutocompleteResults:mainThreadCompletionBlock];
+        //[self fetchAutocompleteResults:mainThreadCompletionBlock];
+        mainThreadCompletionBlock(nil,nil, nil);
     } else {
         mainThreadCompletionBlock(nil, nil, nil);
     }

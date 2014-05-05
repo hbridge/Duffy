@@ -14,6 +14,7 @@
 #import "DFAnalytics.h"
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFPhoto.h"
 
 @interface DFSearchViewController ()
 
@@ -241,6 +242,9 @@ static CGFloat SearchResultsCellFontSize = 15;
     [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
 }
 
+#pragma mark - Webview Delegate Methods
+
+
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType
 {
     NSString *requestURLString = request.URL.absoluteString;
@@ -295,6 +299,10 @@ static CGFloat SearchResultsCellFontSize = 15;
 - (void)pushPhotoWebView:(NSString *)photoURLString
 {
     NSURL *photoURL = [NSURL URLWithString:photoURLString];
+    NSString *photoIDString = [[photoURL lastPathComponent] stringByDeletingPathExtension];
+    DDLogVerbose(@"photo id string: %@", photoIDString);
+    
+    
     DFPhotoWebViewController *pvc = [[DFPhotoWebViewController alloc] initWithPhotoURL:photoURL];
     [self.navigationController pushViewController:pvc animated:YES];
 }
