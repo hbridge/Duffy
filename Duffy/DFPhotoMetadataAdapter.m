@@ -146,8 +146,8 @@
                                         parameters:@{@"bulk_photos": [bulkPhotos arrayString]}
                                         constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
                                             for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
-                                                [formData appendPartWithFileData:objectIDURLToImageData[peanutPhoto.key]
-                                                                            name:peanutPhoto.key.absoluteString
+                                                [formData appendPartWithFileData:objectIDURLToImageData[peanutPhoto.file_key]
+                                                                            name:peanutPhoto.file_key.absoluteString
                                                                         fileName:peanutPhoto.filename
                                                                         mimeType:@"image/jpg"];
                                             }
@@ -198,7 +198,7 @@
                                     constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
                                         if (uploadImage) {
                                             [formData appendPartWithFileData:data
-                                                                        name:peanutPhoto.key.absoluteString
+                                                                        name:peanutPhoto.file_key.absoluteString
                                                                     fileName:peanutPhoto.filename
                                                                     mimeType:@"image/jpg"];
                                         }
