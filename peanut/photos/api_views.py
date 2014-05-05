@@ -31,6 +31,17 @@ from .forms import ManualAddPhoto
 logger = logging.getLogger(__name__)
 
 class PhotoAPI(APIView):
+	def jsonDictToSimple(self, jsonDict):
+		ret = dict()
+		for key in jsonDict:
+			var = jsonDict[key]
+			if type(var) is dict or type(var) is list:
+				ret[key] = json.dumps(jsonDict[key])
+			else:
+				ret[key] = str(var)
+
+		return ret
+		
 	def getObject(self, photoId):
 		try:
 			return Photo.objects.get(id=photoId)
@@ -44,11 +55,18 @@ class PhotoAPI(APIView):
 
 	def put(self, request, photoId, format=None):
 		photo = self.getObject(photoId)
-		serializer = PhotoSerializer(photo, data=request.DATA)
+
+		if "photo" in request.DATA:
+			jsonDict = json.loads(request.DATA["photo"])
+			photoData = self.jsonDictToSimple(jsonDict)
+		else:
+			photoData = request.DATA
+
+		serializer = PhotoSerializer(photo, data=photoData)
 		if serializer.is_valid():
 			serializer.save()
 
-			image_util.handleUploadedImage(request, "file", serializer.object)
+			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 
 			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
@@ -61,7 +79,7 @@ class PhotoAPI(APIView):
 		if serializer.is_valid():
 			serializer.save()
 
-			image_util.handleUploadedImage(request, "file", serializer.object)
+			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 			
 			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
@@ -92,13 +110,10 @@ class PhotoBulkAPI(APIView):
 				if serializer.is_valid():
 					serializer.save()
 
-					fileKey = photoData["key"]
-					image_util.handleUploadedImage(request, fileKey, serializer.object)
+					image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 					thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 					thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
-					# Put this in so the calling code can key off of it with the responses
-					serializer.data["key"] = fileKey
 
 					response.append(serializer.data)
 			return Response(response, status=status.HTTP_201_CREATED)
