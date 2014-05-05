@@ -21,13 +21,15 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 {
     self = [super init];
     if (self) {
-        self.user = [NSNumber numberWithUnsignedLongLong:photo.userID];
-        self.id = [NSNumber numberWithUnsignedLongLong:photo.photoID];
-        NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
-        self.time_taken = [djangoFormatter stringFromDate:photo.creationDate];
-        self.metadata = photo.metadataDictionary;
-        self.hash = photo.creationHashString;
-        self.file_key = photo.objectID.URIRepresentation;
+        @autoreleasepool {
+            self.user = [NSNumber numberWithUnsignedLongLong:photo.userID];
+            self.id = [NSNumber numberWithUnsignedLongLong:photo.photoID];
+            NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
+            self.time_taken = [djangoFormatter stringFromDate:photo.creationDate];
+            self.metadata = photo.metadataDictionary;
+            self.hash = photo.creationHashString;
+            self.file_key = photo.objectID.URIRepresentation;
+        }
     }
     return self;
 }

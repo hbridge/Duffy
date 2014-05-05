@@ -123,60 +123,55 @@
          appendThumbnailData:(BOOL)appendThumbnailData
 {
     NSDictionary *result;
-    @autoreleasepool {
-        NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
-        NSMutableDictionary *objectIDURLToImageData = [[NSMutableDictionary alloc] initWithCapacity:photos.count];
-        unsigned long numImageBytes = 0;
-        for (DFPhoto *photo in photos) {
-            DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
-            [peanutPhotos addObject:peanutPhoto];
-            if (appendThumbnailData) {
-                NSData *thumbnailData = photo.thumbnailData;
-                objectIDURLToImageData[photo.objectID.URIRepresentation] = thumbnailData;
-                numImageBytes += thumbnailData.length;
-            }
-        }
-        DFPeanutBulkPhotos *bulkPhotos = [[DFPeanutBulkPhotos alloc] init];
-        bulkPhotos.bulk_photos = peanutPhotos;
-        
-        NSMutableURLRequest *request = [self.objectManager
-                                        multipartFormRequestWithObject:nil
-                                        method:RKRequestMethodPOST
-                                        path:@"photos/bulk/"
-                                        parameters:@{@"bulk_photos": [bulkPhotos arrayString]}
-                                        constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                                            for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
-                                                [formData appendPartWithFileData:objectIDURLToImageData[peanutPhoto.file_key]
-                                                                            name:peanutPhoto.file_key.absoluteString
-                                                                        fileName:peanutPhoto.filename
-                                                                        mimeType:@"image/jpg"];
-                                            }
-                                        }];
-        RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
-        
-        
-        [self.objectManager enqueueObjectRequestOperation:requestOperation];
-        
-        [requestOperation waitUntilFinished];
-        
-        
-        if (requestOperation.error) {
-            DDLogWarn(@"DFPhotoMetadataAdapter post failed: %@", requestOperation.error.localizedDescription);
-            result = @{DFUploadResultErrorKey : requestOperation.error,
-                       DFUploadResultPeanutPhotos : peanutPhotos
-                       };
-        } else {
-            NSArray *resultPhotos = [requestOperation.mappingResult array];
-            result = @{DFUploadResultPeanutPhotos : resultPhotos,
-                       DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
-                       DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:numImageBytes + request.HTTPBody.length],
-                       };
-        }
-        
-        
-        DDLogInfo(@"thumbnail upload numImageKB:%lu requestBodyKB:%lu", numImageBytes/1024, request.HTTPBody.length/1024);
+    NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
+    unsigned long numImageBytes = 0;
+    for (DFPhoto *photo in photos) {
+        DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+        [peanutPhotos addObject:peanutPhoto];
     }
     
+    DFPeanutBulkPhotos *bulkPhotos = [[DFPeanutBulkPhotos alloc] init];
+    bulkPhotos.bulk_photos = peanutPhotos;
+    
+    NSMutableURLRequest *request = [self.objectManager
+                                    multipartFormRequestWithObject:nil
+                                    method:RKRequestMethodPOST
+                                    path:@"photos/bulk/"
+                                    parameters:@{@"bulk_photos": [bulkPhotos arrayString]}
+                                    constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                        if (appendThumbnailData) {
+                                            for (DFPhoto *photo in photos) {
+                                                [formData appendPartWithFileData:photo.thumbnailData
+                                                                            name:photo.objectID.URIRepresentation.absoluteString
+                                                                        fileName:[NSString stringWithFormat:@"%@.jpg", photo.creationHashString]
+                                                                        mimeType:@"image/jpg"];
+                                            }
+                                        }
+                                    }];
+    
+    RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
+    
+    
+    [self.objectManager enqueueObjectRequestOperation:requestOperation];
+    
+    [requestOperation waitUntilFinished];
+    
+    
+    if (requestOperation.error) {
+        DDLogWarn(@"postPhotos:appendThumbnails failed: %@", requestOperation.error.localizedDescription);
+        result = @{DFUploadResultErrorKey : requestOperation.error,
+                   DFUploadResultPeanutPhotos : peanutPhotos
+                   };
+    } else {
+        NSArray *resultPhotos = [requestOperation.mappingResult array];
+        result = @{DFUploadResultPeanutPhotos : resultPhotos,
+                   DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
+                   DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:numImageBytes + request.HTTPBody.length],
+                   };
+    }
+    
+    
+    DDLogInfo(@"thumbnail upload numImageKB:%lu requestBodyKB:%lu", numImageBytes/1024, request.HTTPBody.length/1024);
     return result;
 }
 
@@ -184,51 +179,50 @@
             updateMetadata:(BOOL)updateMetadata
       appendLargeImageData:(BOOL)uploadImage
 {
+    
     NSDictionary *result;
-    @autoreleasepool {
-        DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
-        UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
-        NSData *data = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
-        NSString *photoParamater = updateMetadata ? [peanutPhoto JSONString] : [peanutPhoto photoUploadJSONString];
-        
-        NSString *pathString = [NSString stringWithFormat:@"photos/%llu/", photo.photoID];
-        NSMutableURLRequest *request = [self.objectManager
-                                        multipartFormRequestWithObject:nil
-                                        method:RKRequestMethodPUT
-                                        path:pathString
-                                        parameters:@{@"photo": photoParamater}
-                                        constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
-                                            if (uploadImage) {
-                                                [formData appendPartWithFileData:data
-                                                                            name:peanutPhoto.file_key.absoluteString
-                                                                        fileName:peanutPhoto.filename
-                                                                        mimeType:@"image/jpg"];
-                                            }
-                                        }];
-        RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
-        [self.objectManager enqueueObjectRequestOperation:requestOperation];
-        [requestOperation waitUntilFinished];
-        
-        NSDictionary *result;
-        if (requestOperation.error) {
-            DDLogWarn(@"DFPhotoMetadataAdapter put failed: %@", requestOperation.error.localizedDescription);
-            result = @{DFUploadResultErrorKey : requestOperation.error,
-                       DFUploadResultPeanutPhotos : @[peanutPhoto],
-                       DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
-                       DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
-                       };
-        } else {
-            result = @{DFUploadResultPeanutPhotos : @[peanutPhoto],
-                       DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
-                       DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
-                       };
-        }
-        
-        DDLogInfo(@"full image upload numImageKB:%lu requestBodyKB:%lu", data.length/1024, request.HTTPBody.length/1024);
+    DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+    UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
+    NSData *data = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
+    NSString *photoParamater = updateMetadata ? [peanutPhoto JSONString] : [peanutPhoto photoUploadJSONString];
+    
+    NSString *pathString = [NSString stringWithFormat:@"photos/%llu/", photo.photoID];
+    NSMutableURLRequest *request = [self.objectManager
+                                    multipartFormRequestWithObject:nil
+                                    method:RKRequestMethodPUT
+                                    path:pathString
+                                    parameters:@{@"photo": photoParamater}
+                                    constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
+                                        if (uploadImage) {
+                                            [formData appendPartWithFileData:data
+                                                                        name:peanutPhoto.file_key.absoluteString
+                                                                    fileName:peanutPhoto.filename
+                                                                    mimeType:@"image/jpg"];
+                                        }
+                                    }];
+    RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
+    [self.objectManager enqueueObjectRequestOperation:requestOperation];
+    [requestOperation waitUntilFinished];
+    
+    if (requestOperation.error) {
+        DDLogWarn(@"DFPhotoMetadataAdapter put failed: %@", requestOperation.error.localizedDescription);
+        result = [@{DFUploadResultErrorKey : requestOperation.error,
+                    DFUploadResultPeanutPhotos : @[peanutPhoto],
+                    DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
+                    DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
+                    } copy];
+    } else {
+        result = [@{DFUploadResultPeanutPhotos : @[peanutPhoto],
+                    DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
+                    DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
+                    } copy];
     }
     
-    return result;
+    DDLogInfo(@"full image upload numImageKB:%lu requestBodyKB:%lu", data.length/1024, request.HTTPBody.length/1024);
+    return  result;
 }
+
+
 
 
 

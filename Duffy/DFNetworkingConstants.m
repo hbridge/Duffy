@@ -34,7 +34,7 @@ DFPhotoUploadOperationImageDataType DFPhotoUploadOperationFullImageData = @"DFPh
 
 
 // Result dict strings
-NSString const *DFUploadResultErrorKey = @"DFUploadResult";
+NSString const *DFUploadResultErrorKey = @"DFUploadResultError";
 NSString const *DFUploadResultOperationType = @"DFUploadResultOperationType";
 NSString const *DFUploadResultPeanutPhotos = @"DFUploadResultPeanutPhotos";
 NSString const *DFUploadResultNumBytes = @"DFUploadNumBytes";

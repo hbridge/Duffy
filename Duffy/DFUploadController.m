@@ -207,6 +207,8 @@ static DFUploadController *defaultUploadController;
 {
     DFPhotoUploadOperationSuccessBlock successBlock = ^(NSDictionary *resultDictionary){
         NSArray *peanutPhotos = resultDictionary[DFUploadResultPeanutPhotos];
+        if (peanutPhotos.count < 1) [NSException raise:@"DFUploadController upload result with no photos"
+                                                format:@"Uploaded photos result contained no photos in the result array."];
         [self saveUploadedPhotosWithPeanutPhotos:peanutPhotos uploadOperationType:resultDictionary[DFUploadResultOperationType]];
         self.currentSessionStats.numConsecutiveRetries = 0;
         self.currentSessionStats.numBytesUploaded += [resultDictionary[DFUploadResultNumBytes] unsignedLongValue];
