@@ -14,6 +14,9 @@ class StatsMiddleware(object):
         </div>
         '''
 
+        if request.path.startswith('/admin/'):
+           return None
+
         # Uncomment the following if you want to get stats on DEBUG=True only
         #if not settings.DEBUG:
         #    return None
