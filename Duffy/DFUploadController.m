@@ -292,8 +292,11 @@ static DFUploadController *defaultUploadController;
 
 - (BOOL)isErrorRetryable:(NSError *)error
 {
-    //-1001 = timeout, -1021 = request body stream exhausted
-    if (error.code == -1001 || error.code == -1021) {
+    //-1001 = timeout, -1021 = request body stream exhausted,
+    if (error.code == -1001 || // timeout
+        error.code == -1021 || // request body stream exhausted
+        error.code == -1005    // network connection was lost
+        ){
         return YES;
     }
     
