@@ -124,7 +124,7 @@
 {
     NSDictionary *result;
     NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
-    unsigned long numImageBytes = 0;
+    unsigned long __block numImageBytes = 0;
     for (DFPhoto *photo in photos) {
         DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
         [peanutPhotos addObject:peanutPhoto];
@@ -141,16 +141,19 @@
                                     constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
                                         if (appendThumbnailData) {
                                             for (DFPhoto *photo in photos) {
-                                                [formData appendPartWithFileData:photo.thumbnailData
-                                                                            name:photo.objectID.URIRepresentation.absoluteString
-                                                                        fileName:[NSString stringWithFormat:@"%@.jpg", photo.creationHashString]
-                                                                        mimeType:@"image/jpg"];
+                                                @autoreleasepool {
+                                                    NSData *thumbnailData = photo.thumbnailData;
+                                                    numImageBytes += thumbnailData.length;
+                                                    [formData appendPartWithFileData:thumbnailData
+                                                                                name:photo.objectID.URIRepresentation.absoluteString
+                                                                            fileName:[NSString stringWithFormat:@"%@.jpg", photo.creationHashString]
+                                                                            mimeType:@"image/jpg"];
+                                                }
                                             }
                                         }
                                     }];
     
     RKObjectRequestOperation *requestOperation = [self.objectManager objectRequestOperationWithRequest:request success:nil failure:nil];
-    
     
     [self.objectManager enqueueObjectRequestOperation:requestOperation];
     
