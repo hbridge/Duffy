@@ -164,10 +164,11 @@
                                                 success:nil
                                                 failure:nil];
   
+
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
   
   [requestOperation waitUntilFinished];
-  
+
   
   if (requestOperation.error) {
     DDLogWarn(@"postPhotos:appendThumbnails failed: %@", requestOperation.error.localizedDescription);
@@ -223,6 +224,8 @@
                                                   objectRequestOperationWithRequest:request
                                                   success:nil
                                                   failure:nil];
+    
+    DDLogInfo(@"%lu operations in queue before enqueue", [self.objectManager.operationQueue operationCount]);
     [self.objectManager enqueueObjectRequestOperation:requestOperation];
     [requestOperation waitUntilFinished];
     

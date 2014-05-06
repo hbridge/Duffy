@@ -228,9 +228,9 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   CGImageDestinationRef destinationRef =
   
   CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,
-                                   /* file type */ kUTTypeJPEG,
-                                   /* number of images */ 1,
-                                   /* reserved */ NULL);
+                                   kUTTypeJPEG,
+                                   1,
+                                   NULL);
   
   NSDictionary *properties = @{
                                (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(0.7)
@@ -239,8 +239,8 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   CGImageDestinationSetProperties(destinationRef,
                                   (__bridge CFDictionaryRef)properties);
   CGImageDestinationAddImage(destinationRef,
-                             /* image */ self.thumbnail.CGImage,
-                             /* properties */ NULL);
+                             self.thumbnail.CGImage,
+                             NULL);
   CGImageDestinationFinalize(destinationRef);
   CFRelease(destinationRef);
   
