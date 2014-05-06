@@ -7,6 +7,7 @@ import time
 import logging
 import thread
 import pprint
+import datetime
 from random import randint
 
 from django.shortcuts import render
@@ -33,10 +34,7 @@ from .forms import ManualAddPhoto
 logger = logging.getLogger(__name__)
 
 class PhotoAPI(APIView):
-<<<<<<< HEAD
-=======
 	# TODO(derek)  pull this out to shared class
->>>>>>> peanut: start of bulk upload
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
 		for key in jsonDict:
@@ -111,15 +109,9 @@ class PhotoBulkAPI(APIView):
 
 	def post(self, request, format=None):
 		response = list()
-
-		timeStart = time.time()
-		points = list()
-		points.append(time.time())
-
+		
 		if "bulk_photos" in request.DATA:
-			points.append(time.time())
 			photosData = json.loads(request.DATA["bulk_photos"])
-			points.append(time.time())
 
 			objsToCreate = list()
 			batchKey = randint(1,10000)
@@ -131,34 +123,24 @@ class PhotoBulkAPI(APIView):
 				if serializer.is_valid():
 					objsToCreate.append(serializer.object)
 
+					# TODO(derek): get these working again, leaving as place holder
 					#thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
 					#thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
-
-					# Put this in so the calling code can key off of it with the responses
+				else:
+					return Response(response, status=status.HTTP_400_BAD_REQUEST)
 					
 			Photo.objects.bulk_create(objsToCreate)
-			points.append(time.time())
 
-			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey)
-			points.append(time.time())
-			for photo in createdPhotos:
+			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
+			dt = datetime.datetime.utcnow() - datetime.timedelta(seconds=60)
+			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
+
+			updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
+			
+			for photo in updatedPhotos:
 				serializer = PhotoSerializer(photo)
-				image_util.handleUploadedImage(request, photo.file_key, photo)
 				response.append(serializer.data)
 
-				points.append(time.time())
-
-			points.append(time.time())
-			timeEnd = time.time()
-
-			sum = 0
-			for i, item in enumerate(points):
-				if i != (len(points) - 1):
-					print "diff: %2.5f" % (points[i+1] - points[i])
-					sum += points[i+1] - points[i]
-
-			print "Full run: %2.5f" % (timeEnd - timeStart)
-			print "Sum: %2.5f" % (sum)
 			return Response(response, status=status.HTTP_201_CREATED)
 		return Response(response, status=status.HTTP_400_BAD_REQUEST)
 

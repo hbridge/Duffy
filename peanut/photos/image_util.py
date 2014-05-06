@@ -14,6 +14,7 @@ from photos.models import Photo, User, Classification, Similarity
 import cv2
 import cv2.cv as cv
 
+from bulk_update.helper import bulk_update
 
 logger = logging.getLogger(__name__)
 
@@ -36,9 +37,9 @@ def createThumbnail(photo):
 		if(resizeImage(fullFilePath, thumbFilePath, settings.THUMBNAIL_SIZE, True, False)):
 			photo.thumb_filename = photo.getThumbFilename()
 			photo.save()
-			print "generated thumbnail: '%s" % thumbFilePath
+			logger.info("generated thumbnail: '%s" % thumbFilePath)
 		else:
-			print "cannot create thumbnail for '%s'" % fullFilePath
+			logger.info("cannot create thumbnail for '%s'" % fullFilePath)
 	else:
 		return None
 
@@ -61,10 +62,10 @@ def imageThumbnail(photoFname, size, userId):
 	infilePath = path + str(photoFname)
 
 	if(resizeImage(infilePath, outfilePath, size, True, False)):
-		print "generated thumbnail: '%s" % outfilePath
+		logger.info("generated thumbnail: '%s" % outfilePath)
 		return newFilename
 	else:
-		print "cannot create thumbnail for '%s'" % infilePath
+		logger.info("cannot create thumbnail for '%s'" % infilePath)
 
 """
 	Does image resizes and creates a new file (JPG) of the specified size
@@ -153,16 +154,18 @@ def getTimeTaken(metadataJson, origFilename, photoPath):
 
 	return None
 
-def processUploadedPhoto(photo, origFileName, tempFilepath):
+def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 	im = Image.open(tempFilepath)
 	(width, height) = im.size
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
-		print("tempFilepath=" + tempFilepath)
-		print("getThumbPath=" + photo.getThumbPath())
 		os.rename(tempFilepath, photo.getThumbPath())
 		photo.thumb_filename = photo.getThumbFilename()
-		photo.save()
+
+		if bulk:
+			return photo
+		else:
+			photo.save()
 	else:
 		# Must put this in first since getFullfilename needs it
 		photo.orig_filename = origFileName
@@ -170,6 +173,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath):
 
 		os.rename(tempFilepath, photo.getFullPath())
 		
+		# Don't worry about bulk here since that's only used for thumbnails
 		photo.save()
 
 		createThumbnail(photo)
@@ -184,8 +188,17 @@ def handleUploadedImage(request, fileKey, photo):
 		logger.error("File not found in request: " + fileKey)
 
 
-def handleUploadedImagesInThread(request, fileKey, photo):
-	pass
+def handleUploadedImagesBulk(request, photos):
+	photosToUpdate = list()
+	for photo in photos:
+		tempFilepath = tempfile.mktemp()
+ 
+		writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
+		updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
+		photosToUpdate.append(updatedPhoto)
+
+	bulk_update(photosToUpdate)
+	return photosToUpdate
 	
 """
 	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
@@ -226,8 +239,6 @@ def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFacebo
 	Moves an uploaded file to a new destination
 """
 def writeOutUploadedFile(uploadedFile, newFilePath):
-	print("Writing to " + newFilePath)
-
 	with open(newFilePath, 'wb+') as destination:
 		for chunk in uploadedFile.chunks():
 			destination.write(chunk)
