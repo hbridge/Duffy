@@ -58,7 +58,9 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 @property (readonly, nonatomic, retain) UIImage *highResolutionImage; //max 2048x2048, aspect fit
 @property (readonly, nonatomic, retain) UIImage *fullScreenImage;
 
-
+// Access to data
+- (NSData *)scaledImageDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality;
+- (NSData *)imageDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality;
 
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;

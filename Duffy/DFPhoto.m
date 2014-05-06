@@ -306,7 +306,12 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     return resizedImage;
 }
 
-- (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
+- (NSData *)imageDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality
+{
+    return [self thumbnailDataForAsset:self.asset maxPixelSize:MAX(size.height, size.width) compressionQuality:quality];
+}
+
+- (CGSize)scaledSizeWithSmallerDimension:(CGFloat)length
 {
     CGSize originalSize = self.asset.defaultRepresentation.dimensions;
     CGSize newSize;
@@ -318,9 +323,20 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
         newSize = CGSizeMake(length, ceil(originalSize.height * scaleFactor));
     }
     
+    return newSize;
+}
+
+- (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
+{
+    CGSize newSize = [self scaledSizeWithSmallerDimension:length];
     return [self imageResizedToFitSize:newSize];
 }
 
+- (NSData *)scaledImageDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality
+{
+    CGSize newSize = [self scaledSizeWithSmallerDimension:length];
+    return [self imageDataResizedToFitSize:newSize compressionQuality:quality];
+}
 
 - (void)loadUIImageForThumbnail:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock
@@ -430,6 +446,51 @@ static void releaseAssetCallback(void *info) {
     CFRelease(imageRef);
     
     return toReturn;
+}
+
+- (NSData *)thumbnailDataForAsset:(ALAsset *)asset maxPixelSize:(NSUInteger)size compressionQuality:(float)quality {
+    @autoreleasepool {
+        NSParameterAssert(asset != nil);
+        NSParameterAssert(size > 0);
+        
+        ALAssetRepresentation *rep = [asset defaultRepresentation];
+        
+        CGDataProviderDirectCallbacks callbacks = {
+            .version = 0,
+            .getBytePointer = NULL,
+            .releaseBytePointer = NULL,
+            .getBytesAtPosition = getAssetBytesCallback,
+            .releaseInfo = releaseAssetCallback,
+        };
+        
+        CGDataProviderRef provider = CGDataProviderCreateDirect((void *)CFBridgingRetain(rep), [rep size], &callbacks);
+        CGImageSourceRef source = CGImageSourceCreateWithDataProvider(provider, NULL);
+        
+        CGImageRef imageRef = CGImageSourceCreateThumbnailAtIndex(source,
+                                                                  0,
+                                                                  (__bridge CFDictionaryRef) @{
+                                                                                               (NSString *)kCGImageSourceCreateThumbnailFromImageAlways : @YES,
+                                                                                               (NSString *)kCGImageSourceThumbnailMaxPixelSize : [NSNumber numberWithUnsignedInteger:size],
+                                                                                               (NSString *)kCGImageSourceCreateThumbnailWithTransform : @YES,
+                                                                                               });
+        CFRelease(source);
+        CFRelease(provider);
+        
+        if (!imageRef) {
+            return nil;
+        }
+        
+        NSMutableData *outputData = [[NSMutableData alloc] init];
+        CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef) outputData, kUTTypeJPEG, 1, NULL);
+        CGImageDestinationAddImage(destRef, imageRef, (__bridge CFDictionaryRef) @{
+                                                                                   (NSString *)kCGImageDestinationLossyCompressionQuality : [NSNumber numberWithFloat:quality],
+                                                                                   });
+        CGImageDestinationFinalize(destRef);
+        CFRelease(imageRef);
+        CFRelease(destRef);
+        
+        return outputData;
+    }
 }
 
 #pragma mark - File Paths

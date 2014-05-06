@@ -44,12 +44,14 @@
         
         for (NSManagedObjectID *photoID in self.photoIDs) {
             DFPhoto *photo = (DFPhoto *)[self.managedObjectContext objectWithID:photoID];
-            if (!photo || !([[photo class] isSubclassOfClass:[DFPhoto class]])) {
+            if (photo && [[photo class] isSubclassOfClass:[DFPhoto class]]) {
+                [photos addObject:photo];
+            } else {
                 [self failureWithResultDict:@{DFUploadResultErrorKey : [NSError errorWithDomain:@"com.duffyapp.Duffy.DFUploadOperation"
                                                                                            code:-100
                                                                                        userInfo:@{NSLocalizedDescriptionKey: @"objectWithID was invalid"}]}];
             }
-            [photos addObject:photo];
+            
         }
         if (self.isCancelled) return;
 

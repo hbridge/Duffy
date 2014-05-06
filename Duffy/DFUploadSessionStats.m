@@ -7,10 +7,14 @@
 //
 
 #import "DFUploadSessionStats.h"
+#import "NSDictionary+DFJSON.h"
 
 @implementation DFUploadSessionStats
 
-@synthesize numThumbnailsAccepted, numThumbnailsUploaded, numFullPhotosAccepted, numFullPhotosUploaded, fatalError, numConsecutiveRetries, numTotalRetries, startDate, endDate, numBytesUploaded;
+@synthesize numThumbnailsAccepted, numThumbnailsUploaded, numThumbnailsRemaining,
+    numFullPhotosAccepted, numFullPhotosRemaining, numFullPhotosUploaded,
+    fatalError, numConsecutiveRetries, numTotalRetries,
+    startDate, endDate, numBytesUploaded;
 
 - (instancetype)init
 {
@@ -40,18 +44,23 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"SessionStats: timeSinceStarted:%.02fs thumbs_accepted:%lu thumbs_uploaded:%lu thumbs_remaining:%lu full_accepted:%lu full_uploaded:%lu full_remaining:%lu consecutive_retries:%d total_retries:%d MBUploaded:%.02f throughputKBPS:%.02f",
+    return [NSString stringWithFormat:@"SessionStats: timeSinceStarted:%.02fs consecutive_retries:%d total_retries:%d MBUploaded:%.02f throughputKBPS:%.02f \nthumbs_queue:\n%@ full_queue:\n%@",
             [[NSDate date] timeIntervalSinceDate:startDate],
-            (unsigned long)self.numThumbnailsAccepted,
-            (unsigned long)self.numThumbnailsUploaded,
-            (unsigned long)self.numThumbnailsRemaining,
-            (unsigned long)self.numFullPhotosAccepted,
-            (unsigned long)self.numFullPhotosUploaded,
-            (unsigned long)self.numFullPhotosRemaining,
             self.numConsecutiveRetries,
             self.numTotalRetries,
             (double)self.numBytesUploaded/1024.0/1024.0,
-            self.throughPutKBPS];
+            self.throughPutKBPS,
+            [@{
+               @"accepted" : [NSNumber numberWithUnsignedInteger:self.numThumbnailsAccepted],
+               @"remaining": [NSNumber numberWithUnsignedInteger:self.numThumbnailsRemaining],
+               @"uploaded" : [NSNumber numberWithUnsignedInteger:self.numThumbnailsUploaded]
+               } JSONStringPrettyPrinted:YES],
+            [@{
+               @"accepted" : [NSNumber numberWithUnsignedInteger:self.numFullPhotosAccepted],
+               @"remaining": [NSNumber numberWithUnsignedInteger:self.numFullPhotosRemaining],
+               @"uploaded" : [NSNumber numberWithUnsignedInteger:self.numFullPhotosUploaded]
+               } JSONStringPrettyPrinted:YES]
+            ];
 }
 
 
