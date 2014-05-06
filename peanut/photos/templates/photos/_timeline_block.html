@@ -7,11 +7,11 @@
 	</div>
 	{% for cluster in entry.clusterList %}
 		{% for imageEntry in cluster.photoblocks %}
-			<div class = "ui-image {% if imageEntry.dist == None and cluster.count > 0 %} cluster{% elif imageEntry.dist != None %}hidden {% else %} {% endif %}" redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoFilename }}">
+			<div class = "ui-image {% if imageEntry.dist == None and cluster.count > 1 %} cluster{% elif imageEntry.dist != None %}hidden {% else %} {% endif %}" redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoFilename }}">
 					<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg" class="lazy{% if imageEntry.dist != None %}-cluster{% endif %}" height="{{ imageSize }}px" width="{{ imageSize }}px" 
 					{% if debug %}title="TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }}" {% if imageEntry.simrow %} sim="{{ imageEntry.simrow }}" {% endif %} {% endif %}>
 				
-				{% if imageEntry.dist == None and cluster.count > 0 %}
+				{% if imageEntry.dist == None and cluster.count > 1 %}
 					<div class="ui-image-page-turn">
 						<img src="{% static "page-fold-th.png" %}" height="100%" width="100%" />
 					</div>

@@ -125,7 +125,7 @@ def getClusters(photoSet, threshold):
 			entry = dict()
 			entry['photo'] = result
 			curCluster['photoblocks'].append(entry)
-			curCluster['count'] = 0 # don't include the first picture
+			curCluster['count'] = 1 # don't include the first picture
 			curClusterPhotoList = list()
 			curClusterPhotoList.append(photoIdToPhotoDict[result.photoId])
 		else:
@@ -148,7 +148,7 @@ def getClusters(photoSet, threshold):
 				entry = dict()
 				entry['photo'] = result
 				curCluster['photoblocks'].append(entry)
-				curCluster['count'] = 0
+				curCluster['count'] = 1
 				curClusterPhotoList = list()
 				curClusterPhotoList.append(photoIdToPhotoDict[result.photoId])
 	return clusterList
