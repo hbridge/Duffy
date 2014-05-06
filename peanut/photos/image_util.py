@@ -192,10 +192,14 @@ def handleUploadedImagesBulk(request, photos):
 	photosToUpdate = list()
 	for photo in photos:
 		tempFilepath = tempfile.mktemp()
- 
-		writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
-		updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
-		photosToUpdate.append(updatedPhoto)
+
+		if photo.file_key in request.FILES:
+			writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
+			updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
+			photosToUpdate.append(updatedPhoto)
+		else:
+			logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
+
 
 	bulk_update(photosToUpdate)
 	return photosToUpdate
