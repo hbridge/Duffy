@@ -201,7 +201,11 @@ def handleUploadedImagesBulk(request, photos):
 			logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
 
 
-	bulk_update(photosToUpdate)
+	if (len(photosToUpdate) == 1):
+		photosToUpdate[0].save()
+	else:
+		bulk_update(photosToUpdate)
+		
 	return photosToUpdate
 	
 """
