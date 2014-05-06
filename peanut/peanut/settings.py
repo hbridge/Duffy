@@ -108,14 +108,14 @@ LOGGING = {
         'djangofile': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'duffy-django.log',
+            'filename': '/home/derek/logs/duffy-django.log',
             'formatter': 'verbose'
         },
         'duffyfile': {
             'level': 'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
             'class': 'logging.FileHandler',
-            'filename': 'duffy-photos.log',
+            'filename': '/home/derek/logs/duffy-photos.log',
             'formatter': 'verbose'
         },
     },
