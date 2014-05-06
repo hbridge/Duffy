@@ -124,10 +124,11 @@
 {
     NSDictionary *result;
     NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
-    unsigned long __block numImageBytes = 0;
+    unsigned long __block numBytes = 0;
     for (DFPhoto *photo in photos) {
         DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
         [peanutPhotos addObject:peanutPhoto];
+        numBytes += peanutPhoto.metadataSizeBytes;
     }
     
     DFPeanutBulkPhotos *bulkPhotos = [[DFPeanutBulkPhotos alloc] init];
@@ -143,7 +144,7 @@
                                             for (DFPhoto *photo in photos) {
                                                 @autoreleasepool {
                                                     NSData *thumbnailData = photo.thumbnailData;
-                                                    numImageBytes += thumbnailData.length;
+                                                    numBytes += thumbnailData.length;
                                                     [formData appendPartWithFileData:thumbnailData
                                                                                 name:photo.objectID.URIRepresentation.absoluteString
                                                                             fileName:[NSString stringWithFormat:@"%@.jpg", photo.creationHashString]
@@ -169,12 +170,10 @@
         NSArray *resultPhotos = [requestOperation.mappingResult array];
         result = @{DFUploadResultPeanutPhotos : resultPhotos,
                    DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
-                   DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:numImageBytes + request.HTTPBody.length],
+                   DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:numBytes],
                    };
     }
     
-    
-    DDLogInfo(@"thumbnail upload numImageKB:%lu requestBodyKB:%lu", numImageBytes/1024, request.HTTPBody.length/1024);
     return result;
 }
 
@@ -184,6 +183,7 @@
 {
     
     NSDictionary *result;
+    
     DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
     UIImage *imageToUpload = [photo scaledImageWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION];
     NSData *data = UIImageJPEGRepresentation(imageToUpload, IMAGE_UPLOAD_JPEG_QUALITY);
@@ -209,19 +209,18 @@
     
     if (requestOperation.error) {
         DDLogWarn(@"DFPhotoMetadataAdapter put failed: %@", requestOperation.error.localizedDescription);
-        result = [@{DFUploadResultErrorKey : requestOperation.error,
+        result = @{DFUploadResultErrorKey : requestOperation.error,
                     DFUploadResultPeanutPhotos : @[peanutPhoto],
                     DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
-                    DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
-                    } copy];
+                    DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length]
+                    };
     } else {
-        result = [@{DFUploadResultPeanutPhotos : @[peanutPhoto],
+        result = @{DFUploadResultPeanutPhotos : @[peanutPhoto],
                     DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
-                    DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length + request.HTTPBody.length]
-                    } copy];
+                    DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:data.length]
+                    };
     }
     
-    DDLogInfo(@"full image upload numImageKB:%lu requestBodyKB:%lu", data.length/1024, request.HTTPBody.length/1024);
     return  result;
 }
 

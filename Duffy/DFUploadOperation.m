@@ -40,8 +40,6 @@
 {
     @autoreleasepool {
         // get the photo
-        NSDate *startDate = [NSDate date];
-        DDLogVerbose(@"DFUploadOperation starting at %@", [startDate description]);
         NSMutableArray *photos = [[NSMutableArray alloc] initWithCapacity:self.photoIDs.count];
         
         for (NSManagedObjectID *photoID in self.photoIDs) {
@@ -57,8 +55,6 @@
 
         DFPhotoMetadataAdapter *photoAdapter = [[DFPhotoMetadataAdapter alloc] initWithObjectManager:[DFObjectManager sharedManager]];
         NSDictionary *result;
-        NSDate *postStartDate = [NSDate date];
-        DDLogVerbose(@"Post operation starting at %@ ", postStartDate.description);
         if (self.uploadOperationType == DFPhotoUploadOperationThumbnailData) {
             result = [photoAdapter postPhotos:photos appendThumbnailData:YES];
         } else if (self.uploadOperationType == DFPhotoUploadOperationFullImageData) {
@@ -66,9 +62,7 @@
                                               format:@"Attempting to upload %lu photos in a full image data upload operation", photos.count];
             result = [photoAdapter putPhoto:[photos firstObject] updateMetadata:NO appendLargeImageData:YES];
         }
-        DDLogVerbose(@"Post operation finished for %lu photos with elapsed time:%.02f", (unsigned long)photos.count, [[NSDate date] timeIntervalSinceDate:postStartDate]);
-        
-        
+
         if (self.isCancelled) [[[DFObjectManager sharedManager] operationQueue] cancelAllOperations];
         
         if (!result[DFUploadResultErrorKey]) {
@@ -76,8 +70,6 @@
         } else {
             [self failureWithResultDict:result];
         }
-        
-        DDLogVerbose(@"DFUploadOperation finished for %lu photos with elapsed time:%.02f", (unsigned long)photos.count, [[NSDate date] timeIntervalSinceDate:startDate]);
     }
 }
 

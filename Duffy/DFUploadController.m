@@ -146,7 +146,6 @@ static DFUploadController *defaultUploadController;
             return;
         }
         
-
         DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] init];
         NSArray *nextThumbnailIDs = [self.thumbnailsObjectIDQueue takeNextObjects:MaxThumbnailsPerRequest];
         if (nextThumbnailIDs.count > 0) {
@@ -265,7 +264,9 @@ static DFUploadController *defaultUploadController;
         NSArray *peanutPhotos = resultDict[DFUploadResultPeanutPhotos];
         NSMutableArray *objectIDs = [[NSMutableArray alloc] initWithCapacity:peanutPhotos.count];
         for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
-            [objectIDs addObject:[[peanutPhoto photoInContext:self.managedObjectContext] objectID]];
+            NSManagedObjectID *objectID = [[peanutPhoto photoInContext:self.managedObjectContext] objectID];
+            if (objectID == nil) [NSException raise:@"nil NSManagedObjectID" format:@"objectID in upload failureblock nil."];
+            [objectIDs addObject:objectID];
         }
         
         DDLogVerbose(@"Upload failed for %lu objects", peanutPhotos.count);
