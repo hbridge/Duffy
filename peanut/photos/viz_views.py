@@ -232,7 +232,7 @@ def userbaseSummary(request):
 						'F7092B08-EF4D-40EF-896D-0539CB102D3D',
 						'3E8018C0-1BE5-483D-89C4-85CD66F81298',
 						'26A1609E-BBBA-4684-8DF0-A394500FA96B',
-						'DEADBEEF'}
+						'BEEF'}
 	resultList = list()
 	for i in range(1000):
 		userId = i
@@ -247,11 +247,13 @@ def userbaseSummary(request):
 					entry['lastUploadTime'] = photo.added
 					break
 			entry['dbCount'] = dbQuery.count()
+			entry['thumbs'] = dbQuery.exclude(thumb_filename=None).count()
+			entry['fullimages'] = dbQuery.exclude(full_filename=None).count()
 			searchResults = SearchQuerySet().all().filter(userId=userId)
 			entry['resultsCount'] = searchResults.count()
 			entry['internal'] = False
 
-			if (user.added == None):
+			if (user.added == None or len(user.first_name) == 0):
 				entry['internal'] = True
 			else:
 				for phoneid in knownPhoneIds:

@@ -42,10 +42,12 @@
 			<td class='userid'> UserId </td>
 			<td class='name'> Name </td>
 			<td class='phoneid'> PhoneId </td>
-			<td class='created'> Created </td>
+			<td class='created'> Created (GMT) </td>
 			<td class='db-count'> DBPhotos </td>
+			<td class='db-thumbnails'> Thumbnails </td>
+			<td class='db-fullimage'> Full images </td>
 			<td class='index-count'> IndexedPhotos </td>
-			<td class='last-uploaded-timestamp'> Last Upload </td>
+			<td class='last-uploaded-timestamp'> Last Upload (GMT) </td>
 		</tr>
 	{% for entry in resultList %}
 		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
@@ -54,6 +56,8 @@
 			<td class='phoneid'> {{ entry.user.phone_id}} </td>
 			<td class='created'> {{ entry.user.added }} </td>
 			<td class='db-count'> {{ entry.dbCount }} </td>
+			<td class='db-thumbnails'> {{ entry.thumbs }} </td>
+			<td class='db-fullimage'> {{ entry.fullimages }} </td>
 			<td class='index-count'> {{ entry.resultsCount }} </td>
 			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime }} </td>
 		</tr>
