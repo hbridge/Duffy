@@ -31,6 +31,7 @@
 
 - (NSDictionary *)dictionary;
 - (NSString *)JSONString;
+- (NSUInteger)metadataSizeBytes;
 - (NSString *)photoUploadJSONString;
 
 @end

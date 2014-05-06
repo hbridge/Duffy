@@ -67,6 +67,15 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
     return [JSONSafeDict JSONString];
 }
 
+- (NSUInteger)metadataSizeBytes
+{
+    NSUInteger result = 0;
+    @autoreleasepool {
+        NSString *metadataJSONString = [self JSONString];
+        result += [[metadataJSONString dataUsingEncoding:NSUTF8StringEncoding] length];
+    }
+    return result;
+}
 
 - (NSString *)photoUploadJSONString
 {

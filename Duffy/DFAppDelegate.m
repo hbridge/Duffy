@@ -126,8 +126,6 @@
                                        settingsNav,
                                        nil]];
     
-    
-    
     [[self window] setRootViewController:tabController];
 }
 
@@ -147,7 +145,7 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    
+    DDLogInfo(@"Duffy app entered background.");
     [[DFPhotoStore sharedStore] saveContext];
 }
 
