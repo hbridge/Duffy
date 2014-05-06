@@ -72,8 +72,9 @@ class PhotoAPI(APIView):
 
 			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 
-			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
-			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
+			# TODO(derek): get these working again, leaving as place holder
+			#thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+			#thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 
 			return Response(serializer.data)
 		else:
