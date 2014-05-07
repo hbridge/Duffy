@@ -3,6 +3,7 @@ import urllib2
 import urllib
 import sys
 import os
+import logging
 
 if "/home/derek/Duffy/peanut" not in sys.path:
 	 sys.path.insert(0, "/home/derek/Duffy/peanut")
@@ -10,6 +11,8 @@ if "/home/derek/Duffy/peanut" not in sys.path:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
 from bulk_update.helper import bulk_update
+
+logger = logging.getLogger(__name__)
 
 """
 	Makes call to twofishes and gets back raw json
@@ -34,7 +37,7 @@ def chunks(l, n):
 		
 def getLatLon(photo):
 	if photo.metadata:
-		metadata = json.loads(self.metadata)
+		metadata = json.loads(photo.metadata)
 		if "{GPS}" in metadata:
 			gpsData = metadata["{GPS}"]
 			lat = lon = None
@@ -48,6 +51,16 @@ def getLatLon(photo):
 				if gpsData["LongitudeRef"] == "W":
 					lon = lon * -1
 			return (lat, lon)
+	return None
+
+def getCity(twoFishesResult):
+	for entry in twoFishesResult:
+		if "feature" in entry:
+			feature = entry["feature"]
+			if "woeType" in feature:
+				if int(feature["woeType"]) == 7:
+					return feature["displayName"]
+
 	return None
 
 """
@@ -64,25 +77,22 @@ def populateLocationInfo(photos):
 			latLonList.append(ll)
 			photosWithLL.append(photo)
 
-	if latLon:
-		(lat, lon) = latLon
-		twoFishesResult = location_util.getDataFromTwoFishes(lat, lon)
-
-		if twoFishesResult:
-			photo.twofishes_data = twoFishesResult
-			photo.save()
-
 	twoFishesResults = getDataFromTwoFishesBulk(latLonList)
 
 	photosToUpdate = list()
 	for i, photo in enumerate(photosWithLL):
-		photo.twofishes_data = twoFishesResults[i]
-		photosToUpdate.append(photo)	
+		city = getCity(twoFishesResults[i])
+		if city:
+			photo.location_city = city
+		photo.twofishes_data = json.dumps(twoFishesResults[i])
+		photosToUpdate.append(photo)
 
-	bulk_update(photosToUpdate)
+	if len(photosToUpdate) == 1:
+		photosToUpdate[0].save()
+	else:
+		bulk_update(photosToUpdate)
 
-def __unicode__(self):
-	return u'%s/%s' % (self.user, self.full_filename)
+	logger.info("Wrote out " + str(len(photosToUpdate)) + " twofish entries")
 
 """
 	Makes call to twofishes and gets back raw json
@@ -101,7 +111,6 @@ def getDataFromTwoFishesBulk(latLonList):
 		twoFishesUrl = "http://demo.twofishes.net/?%s" % (twoFishesParams)
 
 		twoFishesResultJson = urllib2.urlopen(twoFishesUrl).read()
-		print twoFishesUrl
 		
 		if (twoFishesResultJson):
 			twoFishesResult = json.loads(twoFishesResultJson)
