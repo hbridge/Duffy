@@ -3,6 +3,7 @@ from haystack import indexes
 from photos.models import Photo
 import json
 import time
+import logging
 from datetime import datetime
 
 
@@ -17,6 +18,11 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	twoFishesData = indexes.CharField(model_attr="twofishes_data", default="")
 	updated = indexes.DateField()
 	
+	logger = None
+
+	def __init__(self):
+		self.logger = logging.basicConfig(filename='indexer.log',level=logging.DEBUG)
+
 	def get_model(self):
 		return Photo
 
@@ -36,7 +42,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 				self.add_classData(obj, 20) + '\n' + \
 				self.add_altTerms(obj, 20) + '\n' + \
 				self.add_faceKeywords(obj) + '\n' + \
-				self.add_twofishesData(obj)
+				self.add_twofishesData(obj) + '\n' + \
+				self.add_screenshotKeywords(obj)
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
@@ -149,13 +156,10 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		screenshotKeywords = {'screenshot', 'screenshots'}
 		png = 'png'
 
-		if (len(obj.metadata) > 0):
+		if (obj.metadata):
 			metadata = json.loads(obj.metadata)
-			if (len(metadata) > 0):
-				for k, v in metadata.items():
-					if (png.lower() in k.lower()):
-						return ', '.join(screenshotKeywords)
-
+			if "{PNG}" in metadata:
+				return ', '.join(screenshotKeywords)
 		return ''
 
 	def add_twofishesData(self, obj):
