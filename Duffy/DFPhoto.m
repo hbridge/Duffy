@@ -436,7 +436,7 @@ static void releaseAssetCallback(void *info) {
 - (NSData *)aspectJPEGDataWithMaxPixelSize:(NSUInteger)size
                compressionQuality:(float)quality {
   UIImage *image = [self aspectImageWithMaxPixelSize:size];
-  NSData *outputData = [self JPEGDataForImage:image withQuality:quality];
+  NSData *outputData = UIImageJPEGRepresentation(image, quality);
   
   return outputData;
 }
@@ -444,31 +444,9 @@ static void releaseAssetCallback(void *info) {
 
 - (NSData *)thumbnailJPEGData
 {
-  return [self JPEGDataForImage:self.thumbnail withQuality:0.7];
+  return UIImageJPEGRepresentation(self.thumbnail, 0.7);
 }
 
-
-- (NSData *)JPEGDataForImage:(UIImage *)image withQuality:(float)quality
-{
-  NSMutableData *outputData = [[NSMutableData alloc] init];
-  CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)outputData,
-                                                                   kUTTypeJPEG,
-                                                                   1,
-                                                                   NULL);
-  NSDictionary *properties = @{
-                               (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(quality)
-                               };
-  
-  CGImageDestinationSetProperties(destRef,
-                                  (__bridge CFDictionaryRef)properties);
-  
-  CGImageDestinationAddImage(destRef,
-                             image.CGImage,
-                             NULL);
-  CGImageDestinationFinalize(destRef);
-  CFRelease(destRef);
-  return outputData;
-}
 
 #pragma mark - File Paths
 
