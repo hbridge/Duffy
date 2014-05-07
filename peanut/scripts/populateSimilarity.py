@@ -2,6 +2,7 @@ import sys, os
 import time
 
 parentPath = os.path.abspath("..")
+print parentPath
 if parentPath not in sys.path:
     sys.path.insert(0, parentPath)
 
