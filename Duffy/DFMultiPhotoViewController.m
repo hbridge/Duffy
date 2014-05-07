@@ -48,8 +48,6 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    
-    DDLogWarn(@"Multi-photo view controller received memory warning.");
 }
 
 - (DFPhotoViewController *)currentPhotoViewController

@@ -172,7 +172,8 @@
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
 {
-    [[DFPhotoImageCache sharedCache] emptyCache];
+  DDLogWarn(@"DFAppDelegate memory warning.");
+  [[DFPhotoImageCache sharedCache] emptyCache];
 }
 
 

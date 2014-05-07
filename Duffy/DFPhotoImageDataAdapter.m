@@ -193,7 +193,7 @@ static const unsigned int FaceDetectionMinMemory = 1000;
     NSArray __block *resultArray;
     
     dispatch_semaphore_t faceDetectSemaphore = dispatch_semaphore_create(0);
-    [photo faceFeaturesInPhoto:^(NSArray *features) {
+    [photo faceFeaturesWithHighQuality:YES successBlock:^(NSArray *features) {
         resultArray = features;
         dispatch_semaphore_signal(faceDetectSemaphore);
     }];

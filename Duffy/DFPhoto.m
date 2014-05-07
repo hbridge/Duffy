@@ -18,7 +18,6 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFUser.h"
 
-
 @interface DFPhoto()
 
 @property (nonatomic, retain) ALAsset *asset;
@@ -95,7 +94,8 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 - (ALAsset *)asset
 {
-  if (!_asset) {
+  //if (!_asset) {
+  ALAsset __block *returnAsset;
     NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
     ALAssetsLibrary *assetsLibrary = [[DFPhotoStore sharedStore] assetsLibrary];
     
@@ -105,7 +105,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     // must dispatch this off the main thread or it will deadlock!
     dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
-        _asset = asset;
+        returnAsset = asset;
         dispatch_semaphore_signal(sema);
       } failureBlock:^(NSError *error) {
         dispatch_semaphore_signal(sema);
@@ -113,9 +113,9 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     });
     
     dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  }
-  
-  return _asset;
+  //}
+return returnAsset;
+//return _asset;
 }
 
 - (NSString *)creationHashString
@@ -222,32 +222,6 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   return  loadedThumbnail;
 }
 
-- (NSData *)thumbnailData
-{
-  NSMutableData *data = [[NSMutableData alloc] init];
-  CGImageDestinationRef destinationRef =
-  
-  CGImageDestinationCreateWithData((__bridge CFMutableDataRef)data,
-                                   kUTTypeJPEG,
-                                   1,
-                                   NULL);
-  
-  NSDictionary *properties = @{
-                               (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(0.7)
-                               };
-  
-  CGImageDestinationSetProperties(destinationRef,
-                                  (__bridge CFDictionaryRef)properties);
-  CGImageDestinationAddImage(destinationRef,
-                             self.thumbnail.CGImage,
-                             NULL);
-  CGImageDestinationFinalize(destinationRef);
-  CFRelease(destinationRef);
-  
-  return data;
-}
-
-
 - (UIImage *)fullResolutionImage
 {
   UIImage *cachedImage = [[DFPhotoImageCache sharedCache]
@@ -276,7 +250,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 {
   if (self.asset) {
     @autoreleasepool {
-      UIImage *image = [self thumbnailForAsset:self.asset maxPixelSize:2048];
+      UIImage *image = [self aspectImageWithMaxPixelSize:2048];
       return image;
     }
   } else {
@@ -302,13 +276,8 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 - (UIImage *)imageResizedToFitSize:(CGSize)size
 {
-  UIImage *resizedImage = [self thumbnailForAsset:self.asset maxPixelSize:MAX(size.height, size.width)];
+  UIImage *resizedImage = [self aspectImageWithMaxPixelSize:MAX(size.height, size.width)];
   return resizedImage;
-}
-
-- (NSData *)imageDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality
-{
-  return [self thumbnailDataForAsset:self.asset maxPixelSize:MAX(size.height, size.width) compressionQuality:quality];
 }
 
 - (CGSize)scaledSizeWithSmallerDimension:(CGFloat)length
@@ -332,11 +301,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   return [self imageResizedToFitSize:newSize];
 }
 
-- (NSData *)scaledImageDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality
-{
-  CGSize newSize = [self scaledSizeWithSmallerDimension:length];
-  return [self imageDataResizedToFitSize:newSize compressionQuality:quality];
-}
+
 
 - (void)loadUIImageForThumbnail:(DFPhotoLoadUIImageSuccessBlock)successBlock
                    failureBlock:(DFPhotoLoadFailureBlock)failureBlock
@@ -411,11 +376,11 @@ static void releaseAssetCallback(void *info) {
 // The resulting UIImage will be already rotated to UIImageOrientationUp, so its CGImageRef
 // can be used directly without additional rotation handling.
 // This is done synchronously, so you should call this method on a background queue/thread.
-- (UIImage *)thumbnailForAsset:(ALAsset *)asset maxPixelSize:(NSUInteger)size {
-  NSParameterAssert(asset != nil);
+- (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size {
+  NSParameterAssert(self.asset != nil);
   NSParameterAssert(size > 0);
   
-  ALAssetRepresentation *rep = [asset defaultRepresentation];
+  ALAssetRepresentation *rep = [self.asset defaultRepresentation];
   
   CGDataProviderDirectCallbacks callbacks = {
     .version = 0,
@@ -453,68 +418,59 @@ static void releaseAssetCallback(void *info) {
   return toReturn;
 }
 
-- (NSData *)thumbnailDataForAsset:(ALAsset *)asset
-                     maxPixelSize:(NSUInteger)size
+#pragma mark - JPEGData Access
+
+
+
+- (NSData *)scaledJPEGDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality
+{
+  CGSize newSize = [self scaledSizeWithSmallerDimension:length];
+  return [self scaledJPEGDataResizedToFitSize:newSize compressionQuality:quality];
+}
+
+- (NSData *)scaledJPEGDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality
+{
+  return [self aspectJPEGDataWithMaxPixelSize:MAX(size.height, size.width) compressionQuality:quality];
+}
+
+- (NSData *)aspectJPEGDataWithMaxPixelSize:(NSUInteger)size
                compressionQuality:(float)quality {
-  @autoreleasepool {
-    NSParameterAssert(asset != nil);
-    NSParameterAssert(size > 0);
-    
-    ALAssetRepresentation *rep = [asset defaultRepresentation];
-    
-    CGDataProviderDirectCallbacks callbacks = {
-      .version = 0,
-      .getBytePointer = NULL,
-      .releaseBytePointer = NULL,
-      .getBytesAtPosition = getAssetBytesCallback,
-      .releaseInfo = releaseAssetCallback,
-    };
-    
-    CGDataProviderRef provider = CGDataProviderCreateDirect((void *)CFBridgingRetain(rep),
-                                                            [rep size],
-                                                            &callbacks);
-    CGImageSourceRef source = CGImageSourceCreateWithDataProvider(provider, NULL);
-    
-    NSDictionary *imageOptions =
-    @{
-      (NSString *)kCGImageSourceCreateThumbnailFromImageAlways : @YES,
-      (NSString *)kCGImageSourceThumbnailMaxPixelSize : [NSNumber numberWithUnsignedInteger:size],
-      (NSString *)kCGImageSourceCreateThumbnailWithTransform : @YES,
-      };
-    CGImageRef imageRef = CGImageSourceCreateThumbnailAtIndex(source,
-                                                              0,
-                                                              (__bridge CFDictionaryRef) imageOptions);
-    CFRelease(source);
-    CFRelease(provider);
-    
-    if (!imageRef) {
-      return nil;
-    }
-    
-    
-    NSMutableData *outputData = [[NSMutableData alloc] init];
-    CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef) outputData,
-                                                                     kUTTypeJPEG,
-                                                                     1,
-                                                                     NULL);
-    NSDictionary *imageAddOptions =
-    @{
-      (NSString *)kCGImageDestinationLossyCompressionQuality : [NSNumber numberWithFloat:quality],
-      };
-    CGImageDestinationAddImage(destRef,
-                               imageRef,
-                               (__bridge CFDictionaryRef) imageAddOptions);
-    CGImageDestinationFinalize(destRef);
-    CFRelease(imageRef);
-    CFRelease(destRef);
-    
-    return outputData;
-  }
+  UIImage *image = [self aspectImageWithMaxPixelSize:size];
+  NSData *outputData = [self JPEGDataForImage:image withQuality:quality];
+  
+  return outputData;
+}
+
+
+- (NSData *)thumbnailJPEGData
+{
+  return [self JPEGDataForImage:self.thumbnail withQuality:0.7];
+}
+
+
+- (NSData *)JPEGDataForImage:(UIImage *)image withQuality:(float)quality
+{
+  NSMutableData *outputData = [[NSMutableData alloc] init];
+  CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)outputData,
+                                                                   kUTTypeJPEG,
+                                                                   1,
+                                                                   NULL);
+  NSDictionary *properties = @{
+                               (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(quality)
+                               };
+  
+  CGImageDestinationSetProperties(destRef,
+                                  (__bridge CFDictionaryRef)properties);
+  
+  CGImageDestinationAddImage(destRef,
+                             image.CGImage,
+                             NULL);
+  CGImageDestinationFinalize(destRef);
+  CFRelease(destRef);
+  return outputData;
 }
 
 #pragma mark - File Paths
-
-
 
 + (NSURL *)localFullImagesDirectoryURL
 {

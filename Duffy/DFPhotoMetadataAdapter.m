@@ -148,7 +148,7 @@
      if (appendThumbnailData) {
        for (DFPhoto *photo in photos) {
          @autoreleasepool {
-           NSData *thumbnailData = photo.thumbnailData;
+           NSData *thumbnailData = [photo thumbnailJPEGData];
            numBytes += thumbnailData.length;
            [formData appendPartWithFileData:thumbnailData
                                        name:photo.objectID.URIRepresentation.absoluteString
@@ -192,12 +192,11 @@
 {
   NSDictionary *result;
   @autoreleasepool {
-    DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+    DFPeanutPhoto __block *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
     NSString *photoParamater =
      updateMetadata ? [peanutPhoto JSONString] : [peanutPhoto photoUploadJSONString];
     unsigned long __block imageDataBytes = 0;
-    
-    
+    DFPhoto __block *photoToUpload = photo;
     
     NSString *pathString = [NSString stringWithFormat:@"photos/%llu/", photo.photoID];
     NSMutableURLRequest *request =
@@ -209,9 +208,9 @@
      constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
        @autoreleasepool {
          if (uploadImage) {
-           NSData *imageData =
-           [photo scaledImageDataWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION
-                                   compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY];
+           NSData *imageData = //photo.thumbnailData;
+           [photoToUpload scaledJPEGDataWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION
+                                 compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY];
            imageDataBytes += imageData.length;
            [formData appendPartWithFileData:imageData
                                        name:peanutPhoto.file_key.absoluteString
@@ -238,7 +237,7 @@
                  DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:imageDataBytes]
                  };
     } else {
-      result = @{DFUploadResultPeanutPhotos : @[peanutPhoto],
+      result = @{DFUploadResultPeanutPhotos : [requestOperation.mappingResult array],
                  DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
                  DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:imageDataBytes]
                  };
