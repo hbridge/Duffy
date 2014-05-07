@@ -25,7 +25,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	def index_queryset(self, using=None):
 		"""Used when the entire index for model is updated."""
-		return self.get_model().objects.all()
+		return self.get_model().objects.filter(user__gt=1)
 
 	'''
 	This function prepares the text field (if use_template=False)

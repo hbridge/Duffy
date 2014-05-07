@@ -137,6 +137,7 @@ class PhotoBulkAPI(APIView):
 			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
 
 			updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
+			thread.start_new_thread(location_util.populateLocationInfo, (updatedPhotos,))
 			
 			for photo in updatedPhotos:
 				serializer = PhotoSerializer(photo)
