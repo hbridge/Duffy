@@ -5,7 +5,7 @@ PODS:
   - CocoaLumberjack/Core (1.8.1)
   - CocoaLumberjack/Extensions (1.8.1):
     - CocoaLumberjack/Core
-  - JDStatusBarNotification (1.4.7)
+  - JDStatusBarNotification (1.4.8)
   - RestKit (0.20.3):
     - RestKit/Core
   - RestKit/Core (0.20.3):
@@ -32,7 +32,7 @@ DEPENDENCIES:
 SPEC CHECKSUMS:
   AFNetworking: e403d4333a4e1956cb3fe42364c3c879f820c9a0
   CocoaLumberjack: 020378ec400d658923bf5887178394f65f052c90
-  JDStatusBarNotification: 8801f6fcd7e2c2a8b01aaea5a9b049b1cc395491
+  JDStatusBarNotification: a77275c66f1dfb1d1e4c2a49ab5a6498cb5a9b62
   RestKit: 1f181c180105a92f11ec4f6cd7de37625e516d83
   SOCKit: 8871d058926a6c6cc144f0c5eee82c5d0ec274a3
   TransitionKit: d0e3344aac92991395d4c2e72d9c5a8ceeb12910

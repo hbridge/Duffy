@@ -86,7 +86,7 @@
     // done recognition, skip it
     if (self.imageView.boundingBoxesInImageCoordinates) return;
 
-    [self.photo faceFeaturesInPhoto:^(NSArray *features) {
+    [self.photo faceFeaturesWithHighQuality:YES successBlock:^(NSArray *features) {
         NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
     
         for (CIFaceFeature *f in features)

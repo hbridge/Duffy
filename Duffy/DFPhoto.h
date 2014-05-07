@@ -54,15 +54,19 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 // Ideally be done with createCGImage calls
 @property (readonly, nonatomic, retain) UIImage *fullResolutionImage;
 @property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
-@property (readonly, nonatomic, retain) NSData *thumbnailData;
 @property (readonly, nonatomic, retain) UIImage *highResolutionImage; //max 2048x2048, aspect fit
 @property (readonly, nonatomic, retain) UIImage *fullScreenImage;
-
-
 
 // access the image sized to a specific size
 - (UIImage *)imageResizedToFitSize:(CGSize)size;
 - (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length;
+
+// Access to data
+- (NSData *)thumbnailJPEGData;
+- (NSData *)scaledJPEGDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality;
+- (NSData *)scaledJPEGDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality;
+
+
 
 // Use these to access image data Asynchronously if accessing it will be slow
 // Note that the created CGImage must be released by the caller to prevent memory leaks
