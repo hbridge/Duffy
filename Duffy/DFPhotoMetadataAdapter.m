@@ -224,7 +224,6 @@
                                                   success:nil
                                                   failure:nil];
     
-    DDLogInfo(@"%lu operations in queue before enqueue", [self.objectManager.operationQueue operationCount]);
     [self.objectManager enqueueObjectRequestOperation:requestOperation];
     [requestOperation waitUntilFinished];
     

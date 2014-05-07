@@ -16,6 +16,4 @@ typedef void (^DFPhotoFaceDetectSuccessBlock)(NSArray *features);
 
 - (void)faceFeaturesWithHighQuality:(BOOL)highQuality successBlock:(DFPhotoFaceDetectSuccessBlock)successBlock;
 
-
-
 @end
