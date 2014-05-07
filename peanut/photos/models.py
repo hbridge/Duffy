@@ -38,6 +38,7 @@ class Photo(models.Model):
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	classification_data = models.CharField(max_length=10000, null=True)
 	time_taken = models.DateTimeField(null=True)
+	clustered_time = models.DateTimeField(null=True)
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)

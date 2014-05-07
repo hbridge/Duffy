@@ -1,7 +1,5 @@
 import os, sys, os.path
 import Image
-import pyexiv2
-import exifread
 import json
 from datetime import datetime
 
@@ -13,68 +11,64 @@ from photos import image_util
 import cv2
 import cv2.cv as cv
 
+from bulk_update.helper import bulk_update
+
 ### Clustering/deduping functions
 
 """
-	Wrapper to start clustering from a new thread
+	Cluster for multiple photos
 """
-
-
-def startThreadCluster(photoId, threshold=None):
-
-	if (threshold == None):
-		threshold = 100
-
-	try:
-		photo = Photo.objects.get(id=photoId)
-		addToClusters(photo, threshold)
-	except Photo.DoesNotExist:
-		return
-
+def addToClustersBulk(photos, threshold=None):
+	histCache = dict()
+	count = 0
+	for photo in photos:
+		count += addToClusters(photo, histCache)
 
 """
 	Populates similarity table for a new photo
 """
-def addToClusters(photo, threshold=None):
+def addToClusters(photo, histCache, threshold=100):
 
 	if (photo.thumb_filename == None):
-		return
-
-	if (threshold == None):
-		threshold = 100
+		return 0
 
 	if (photo.time_taken == None and photo.added == None):
-		# handling case before 'added' field was in the database
 		# if no timestamp exists, then skip the photo for clustering
-		return
+		return 0
+
+	photos = list()
 
 	# get a list of photos that are "near" this photo: meaning pre and post in the timeline
 	if (photo.time_taken == None):
 		# for undated photos, use 'added' which is the upload time
-		photoQueryPre = Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=photo.added).order_by('-added')[:20]
-		photoQueryPost = Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=photo.added).order_by('added')[:20]
+		photos = list(Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=photo.added).exclude(thumb_filename=None).order_by('-added')[:5])
+		photos.extend(list(Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=photo.added).exclude(thumb_filename=None).order_by('added')[:5]))
 	else:
-		photoQueryPre = Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__gt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).order_by('-time_taken')[:20]
-		photoQueryPost = Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__lt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).order_by('time_taken')[:20]
+		photos = list(Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__gt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).exclude(thumb_filename=None).order_by('-time_taken')[:5])
+		photos.extend(list(Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__lt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).exclude(thumb_filename=None).order_by('time_taken')[:5]))
 
 	# get current photo's histogram
-	curHist = getSpatialHist(photo)
+	curHist = getSpatialHistFromCache(photo, histCache)
 	if (curHist == None):
-		return
+		return 0
 
-	genSimilarityRowsFromDBQuery(photo, curHist, photoQueryPre, threshold)
-	genSimilarityRowsFromDBQuery(photo, curHist, photoQueryPost, threshold)
-
+	count = genSimilarityRowsFromList(photo, histCache, photos, threshold)
+	photo.clustered_time = datetime.now()
+	photo.save()
+	return count
 
 """
 	Continues to follow a resulting query of photos until one of them isn't similar enough
 	Returns count of DB operations: adds or modified
 """
 
-def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch=None):
+def genSimilarityRowsFromDBQuery(curPhoto, histCache, photoQuery, threshold, batch=None):
 
 	if (batch == None):
 		batch = 5
+
+	simRows = list()
+	tempRows = list()
 
 	keepGoing = True
 	loop = 0
@@ -83,7 +77,9 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 		loop += 1
 		# pick them in batches to process
 		photoBatch = list(photoQuery[((loop-1)*batch):(batch*loop)])
-		if (genSimilarityRowsFromList(curPhoto, curHist, photoBatch, threshold)):
+		tempRows = genSimilarityRowsFromList(curPhoto, histCache, photoBatch)
+		if (len(tempRows) > 0):
+			simRows.extend(tempRows)
 			keepGoing = True
 
 
@@ -93,26 +89,28 @@ def genSimilarityRowsFromDBQuery(curPhoto, curHist, photoQuery, threshold, batch
 
 """
 
-def genSimilarityRowsFromList(curPhoto, curHist, photoList, threshold):
-	returnVal = False
+def genSimilarityRowsFromList(curPhoto, histCache, photoList, threshold):
+
+	count = 0
 	for photo in photoList:
-		if (doesSimilarityRowAlreadyExists(curPhoto, photo)):
-			returnVal = True
-			continue
-		dist = getSimilarityFromHistAndPhoto(curHist, photo)
+		#TODO(Aseem): In theory you can do a check here to see if the row already exists
+		# But, that stops the search because it doesn't extend beyond these 5
+		#if (doesSimilarityRowAlreadyExists(curPhoto, photo)):
+		#	returnVal = True
+		#	continue
+		dist = compHist(getSpatialHistFromCache(curPhoto, histCache),getSpatialHistFromCache(photo, histCache))
 		if (dist < threshold):
-			if (addSimilarityRow(curPhoto, photo, dist)):
-				returnVal = True
-	return returnVal
+			count += genSimilarityRow(curPhoto, photo, dist)
+	return count
 
 """
 	Adds/updates a specific row to similarity table, if it doesn't exist.
 	Note: photoId1 should be less than photoId2 
 """
-def addSimilarityRow(photo1, photo2, sim):
+def genSimilarityRow(photo1, photo2, sim):
 	if (photo1.id == photo2.id):
 		print "Error: Can't add same photo for both photo_1 and photo_2 in Similarity table"
-		return False
+		return 0
 
 	if (photo1.id > photo2.id):
 		tempPhoto = photo1
@@ -128,19 +126,17 @@ def addSimilarityRow(photo1, photo2, sim):
 								photo_2 = photo2,
 								similarity = sim)
 	elif (simQuery.count() == 1):
-		if (simQuery[0].similarity == sim):
-			return False
+		if (simQuery[0].similarity <= sim):
+			return 0
 		else:
 			simRow = simQuery[0]
 			simRow.similarity = sim
-		return False
 	else:
 		print "Error: Found multiple rows with photoId1: {0} and photoId2: {1}".format(photo1.id, photo2.id)
-		return False
+		return 0
 
 	simRow.save()
-	
-	return True
+	return 1
 
 """ 
 	Returns true if a row of two photos already exists in the table
@@ -158,25 +154,12 @@ def doesSimilarityRowAlreadyExists(photo1, photo2):
 ### Clustering: Histogram functions
 
 """
-	Returns distance between two photos when given one hist and one photo Id 
-"""		
-def getSimilarityFromHistAndPhoto(hist1, photo2):
-	return compHist(hist1, getSpatialHist(photo2))
-
-
+	Get histogram from cache. If it doesn't exist, generate and add to cache and return it
 """
-	Returns distance between two histograms. Repetitive to function below.
-"""		
-def getSimilarityFromHists(hist1, hist2):
-	return compHist(hist1, hist2)
-
-
-"""
-	Calculates histograms and returns distance between two photos, when 
-	given only their photo Ids
-"""		
-def getSimilarityFromPhotos(photo1, photo2):
-	return compHist(getSpatialHist(photo1), getSpatialHist(photo2))
+def getSpatialHistFromCache(photo, histCache):
+	if (photo.id not in histCache):
+		histCache[photo.id] = getSpatialHist(photo)
+	return histCache[photo.id]
 
 """
 	Get a photo's spatial histogram using opencv's ELBP method
@@ -189,6 +172,7 @@ def getSpatialHist(photo):
 		image_util.createThumbnail(photo) # check in case thumbnails haven't been created
 
 	photo_color = cv2.imread(origPath+photo.thumb_filename)
+	photo_color = cv2.resize(photo_color,(156,156))
 	photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
 	photo_gray = cv2.equalizeHist(photo_gray)
 
