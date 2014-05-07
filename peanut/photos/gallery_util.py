@@ -45,12 +45,9 @@ def splitPhotosFromDBbyMonth(userId, photoSet=None, groupThreshold=None):
 	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
 """
 
-def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
+def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=75, dupThreshold=40):
 	if (photoSet == None):
 		photoSet = 	SearchQuerySet().filter(userId=userId)
-
-	if (threshold == None):
-		threshold = 75
 
 	dateFacet = photoSet.date_facet('timeTaken', start_date=date(1900,1,1), end_date=date(2016,1,1), gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
 	facetCounts = dateFacet.facet_counts()
@@ -67,7 +64,7 @@ def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
 		startDate = datetime.strptime(dateKey[:-1], '%Y-%m-%dT%H:%M:%S')
 		entry['date'] = startDate.strftime('%b %Y')
 		newDate = startDate+relativedelta(months=1)
-		entry['clusterList'] = getClusters(photoSet.exclude(timeTaken__lt=startDate).exclude(timeTaken__gt=newDate).order_by('timeTaken'), threshold)
+		entry['clusterList'] = getClusters(photoSet.exclude(timeTaken__lt=startDate).exclude(timeTaken__gt=newDate).order_by('timeTaken'), threshold, dupThreshold)
 		entry['count'] = len(entry['clusterList'])
 		photos.append(entry)
 		
@@ -78,7 +75,7 @@ def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
 """
 
 
-def getClusters(photoSet, threshold):
+def getClusters(photoSet, threshold, dupThreshold):
 
 	# get a list of Similarity objects matching the current set of photos
 	photoSetList = list()
@@ -138,8 +135,10 @@ def getClusters(photoSet, threshold):
 				entry['dist'] = filterClusterRows[0].similarity
 				entry['simrow'] = filterClusterRows[0]
 				curCluster['photoblocks'].append(entry)
-				curCluster['count'] += 1				
+				if (filterClusterRows[0].similarity > dupThreshold):
+					curCluster['count'] += 1	
 				curClusterPhotoList.append(photoIdToPhotoDict[result.photoId])
+
 			else:
 				# no match, start new cluster
 				curCluster = dict()

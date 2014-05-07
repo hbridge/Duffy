@@ -104,6 +104,20 @@ def search(request, user_id=None):
 		else:
 			debug = False
 
+		if data.has_key('threshold'):
+			threshold = int(data['threshold'])
+		else:
+			threshold = 75;
+
+		if data.has_key('dupthreshold'):
+			dupThreshold = int(data['dupthreshold'])
+		else:
+			dupThreshold = 40
+
+		if debug:
+			dupThreshold = -1
+
+
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
@@ -136,7 +150,7 @@ def search(request, user_id=None):
 			searchResults = search_util.solrSearch(user.id, startDate, newQuery)
 
 			totalResults = searchResults.count()
-			photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults)
+			photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold)
 
 			photoIdToThumb = dict()
 			for result in searchResults:
