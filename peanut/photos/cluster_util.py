@@ -23,6 +23,7 @@ def addToClustersBulk(photos, threshold=None):
 	count = 0
 	for photo in photos:
 		count += addToClusters(photo, histCache)
+	return count
 
 """
 	Populates similarity table for a new photo
