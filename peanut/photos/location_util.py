@@ -84,7 +84,9 @@ def populateLocationInfo(photos):
 		city = getCity(twoFishesResults[i])
 		if city:
 			photo.location_city = city
-		photo.twofishes_data = json.dumps(twoFishesResults[i])
+
+		formattedResult = {"interpretations": twoFishesResults[i]}
+		photo.twofishes_data = json.dumps(formattedResult)
 		photosToUpdate.append(photo)
 
 	if len(photosToUpdate) == 1:
