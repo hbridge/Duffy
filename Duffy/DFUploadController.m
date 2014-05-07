@@ -39,9 +39,9 @@
 @synthesize managedObjectContext = _managedObjectContext;
 @synthesize currentSessionStats = _currentSessionStats;
 
-static unsigned int MaxConcurrentUploads = 1;
+static unsigned int MaxConcurrentUploads = 2;
 static unsigned int MaxRetryCount = 5;
-static unsigned int MaxThumbnailsPerRequest = 2;
+static unsigned int MaxThumbnailsPerRequest = 100;
 
 // We want the upload controller to be a singleton
 static DFUploadController *defaultUploadController;
