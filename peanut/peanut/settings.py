@@ -192,3 +192,10 @@ THUMBNAIL_SIZE = 156
 STATE_NEW = 0
 STATE_COPIED = 1
 STATE_CLASSIFIED = 2
+
+
+# Added to suppress timezone warnings
+import warnings
+warnings.filterwarnings('ignore',
+                        r"DateTimeField .* received a naive datetime",
+                        RuntimeWarning, r'django\.db\.models\.fields')
