@@ -52,7 +52,7 @@ def splitPhotosFromIndexbyMonth(userId, photoSet=None, threshold=None):
 	if (threshold == None):
 		threshold = 75
 
-	dateFacet = photoSet.date_facet('timeTaken', start_date=date(1900,1,1), end_date=date(2014,5,1), gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
+	dateFacet = photoSet.date_facet('timeTaken', start_date=date(1900,1,1), end_date=date(2016,1,1), gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
 	facetCounts = dateFacet.facet_counts()
 	
 	photos = list()

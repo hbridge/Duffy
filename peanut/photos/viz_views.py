@@ -144,8 +144,7 @@ def search(request, user_id=None):
 			resultsDict['totalResults'] = totalResults
 			resultsDict['photoResults'] = photoResults
 			resultsDict['photoIdToThumb'] = photoIdToThumb
-		tTaken = time.time() - tStart
-		print tTaken
+
 		context = {	'user' : user,
 					'imageSize': imageSize,
 					'resultsDict': resultsDict,
