@@ -147,7 +147,7 @@
     };
 
     [[[DFPhotoStore sharedStore] assetsLibrary]
-     enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos
+     enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos | ALAssetsGroupAlbum
      usingBlock:assetGroupEnumerator
      failureBlock: ^(NSError *error) {
          DDLogError(@"Failed to enumerate photo groups: %@", error.localizedDescription);
