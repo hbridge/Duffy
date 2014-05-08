@@ -168,13 +168,12 @@
                                                 failure:nil];
   
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
-  
   [requestOperation waitUntilFinished];
 
-  
   if (requestOperation.error) {
     DDLogWarn(@"postPhotos:appendThumbnails failed: %@", requestOperation.error.localizedDescription);
-    result = @{DFUploadResultErrorKey : requestOperation.error,
+    result = @{DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
+               DFUploadResultErrorKey : requestOperation.error,
                DFUploadResultPeanutPhotos : peanutPhotos
                };
   } else {
