@@ -18,11 +18,13 @@ from bulk_update.helper import bulk_update
 """
 	Cluster for multiple photos
 """
-def addToClustersBulk(photos, threshold=None):
+def addToClustersBulk(photos, threshold=100):
 	histCache = dict()
 	count = 0
 	for photo in photos:
 		count += addToClusters(photo, histCache)
+		photo.clustered_time = datetime.now()
+	bulk_update(photos)
 	return count
 
 """
@@ -54,8 +56,6 @@ def addToClusters(photo, histCache, threshold=100):
 		return 0
 
 	count = genSimilarityRowsFromList(photo, histCache, photos, threshold)
-	photo.clustered_time = datetime.now()
-	photo.save()
 	return count
 
 """
