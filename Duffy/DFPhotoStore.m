@@ -169,6 +169,38 @@ static int const FetchStride = 500;
     return allObjects;
 }
 
+
++ (DFPhotoCollection *)photosWithPredicate:(NSPredicate *)predicate inContext:(NSManagedObjectContext *)context
+{
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+  request.entity = entity;
+  
+  request.predicate = predicate;
+  
+  NSError *error;
+  NSArray *result = [context executeFetchRequest:request error:&error];
+  if (!result) {
+    [NSException raise:@"Could fetch photos"
+                format:@"Error: %@", [error localizedDescription]];
+  }
+  
+  return [[DFPhotoCollection alloc] initWithPhotos:result];
+}
+
+- (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"photoID == %llu", photoID];
+  DFPhotoCollection *results = [DFPhotoStore photosWithPredicate:predicate inContext:[self managedObjectContext]];
+  if (results.photoSet.count > 1) {
+    [NSException raise:@"Multiple photos matching ID" format:@"%lu photos matching id:%llu", results.photoSet.count, photoID];
+  } else if (results.photoSet.count == 0) {
+    return nil;
+  }
+  
+  return [[results photosByDateAscending:YES] firstObject];
+}
+
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
                                       fullUploadStatus:(BOOL)isFullPhotoUploaded
                                              inContext:(NSManagedObjectContext *)context;

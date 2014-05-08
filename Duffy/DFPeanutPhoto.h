@@ -17,7 +17,7 @@
 @property (nonatomic, retain) NSNumber *id; //unsigned long long
 @property (nonatomic, retain) NSString *time_taken;
 @property (nonatomic, retain) NSDictionary *metadata;
-@property (nonatomic, retain) NSString *hash;
+@property (nonatomic, retain) NSString *iphone_hash;
 @property (nonatomic, retain) NSURL *file_key;
 @property (nonatomic, retain) NSString *thumb_filename;
 @property (nonatomic, retain) NSString *full_filename;

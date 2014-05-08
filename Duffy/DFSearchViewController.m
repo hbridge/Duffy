@@ -15,6 +15,8 @@
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFPhoto.h"
+#import "DFPhotoStore.h"
+#import "DFPhotoViewController.h"
 
 @interface DFSearchViewController ()
 
@@ -250,7 +252,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     NSString *requestURLString = request.URL.absoluteString;
     if ([requestURLString rangeOfString:@"user_data"].location != NSNotFound) {
         [webView stopLoading];
-        DDLogVerbose(@"Pushing native view of full photo: %@", requestURLString);
+        DDLogVerbose(@"Search result clicked for photo with URL: %@", requestURLString);
         [self pushPhotoWebView:requestURLString];
         return NO;
     }
@@ -298,13 +300,21 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)pushPhotoWebView:(NSString *)photoURLString
 {
-    NSURL *photoURL = [NSURL URLWithString:photoURLString];
-    NSString *photoIDString = [[photoURL lastPathComponent] stringByDeletingPathExtension];
-    DDLogVerbose(@"photo id string: %@", photoIDString);
-    
-    
+  NSURL *photoURL = [NSURL URLWithString:photoURLString];
+  NSString *photoIDString = [[photoURL lastPathComponent] stringByDeletingPathExtension];
+  DDLogVerbose(@"photoURL:%@, photo id string: %@", photoURL, photoIDString);
+  
+  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:[photoIDString longLongValue]];
+  
+  if (photo) {
+    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+    pvc.photo = photo;
+    [self.navigationController pushViewController:pvc animated:YES];
+  } else {
+    DDLogError(@"Error: no local photo found for photoID:%llu, showing web view", [photoIDString longLongValue]);
     DFPhotoWebViewController *pvc = [[DFPhotoWebViewController alloc] initWithPhotoURL:photoURL];
     [self.navigationController pushViewController:pvc animated:YES];
+  }
 }
 
 
