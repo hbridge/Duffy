@@ -114,7 +114,7 @@ class Photo(models.Model):
 	"""
 	def getFullPath(self):
 		if self.full_filename:
-			return os.path.join(self.user.getUserDataPath(), self.full_filename))
+			return os.path.join(self.user.getUserDataPath(), self.full_filename)
 		else:
 			return None
 

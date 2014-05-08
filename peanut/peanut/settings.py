@@ -111,6 +111,12 @@ LOGGING = {
             'filename': '/home/derek/logs/duffy-django.log',
             'formatter': 'verbose'
         },
+        'djangoerror': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/home/derek/logs/duffy-django-error.log',
+            'formatter': 'verbose'
+        },
         'duffyfile': {
             'level': 'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
@@ -121,7 +127,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers':['djangofile',],
+            'handlers':['djangofile', 'djangoerror'],
             'propagate': True,
             'level':'DEBUG',
         },
