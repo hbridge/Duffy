@@ -24,7 +24,11 @@ def addToClustersBulk(photos, threshold=100):
 	for photo in photos:
 		count += addToClusters(photo, histCache)
 		photo.clustered_time = datetime.now()
-	bulk_update(photos)
+	if (len(photos) > 0):
+		if (len(photos) == 1):
+			photos[0].save()
+		else:
+			bulk_update(photos)
 	return count
 
 """

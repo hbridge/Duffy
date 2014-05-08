@@ -197,5 +197,5 @@ STATE_CLASSIFIED = 2
 # Added to suppress timezone warnings
 import warnings
 warnings.filterwarnings('ignore',
-                        r"DateTimeField .* received a naive datetime",
-                        RuntimeWarning, r'django\.db\.models\.fields')
+                        r".*received a naive datetime",
+                        RuntimeWarning, r'.*')
