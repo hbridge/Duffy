@@ -73,15 +73,26 @@ class Photo(models.Model):
 
 		This is used as a stopgap, the db also has this name
 	"""
-	def getThumbFilename(self):
+	def getDefaultThumbFilename(self):
 		return str(self.id) + "-thumb-" + str(settings.THUMBNAIL_SIZE) + '.jpg'
+
+	"""
+		Returns back the full localfile path of the thumb
+		If the file was moved though this could be different from the default
+		So:  /home/blah/1/1234-thumb-156.jpg
+	"""
+	def getThumbPath(self):
+		if self.thumb_filename:
+			return os.path.join(self.user.getUserDataPath(), self.thumb_filename)
+		else:
+			return None
 
 	"""
 		Returns back the full localfile path of the thumb
 		So:  /home/blah/1/1234-thumb-156.jpg
 	"""
-	def getThumbPath(self):
-		return os.path.join(self.user.getUserDataPath(), self.getThumbFilename())
+	def getDefaultThumbPath(self):
+		return os.path.join(self.user.getUserDataPath(), self.getDefaultThumbFilename())
 
 	"""
 		Returns back just the filename for the fullsize image.
@@ -90,18 +101,29 @@ class Photo(models.Model):
 
 		This is used as a stopgap, the db also has this name
 	"""
-	def getFullFilename(self):
+	def getDefaultFullFilename(self):
 		baseWithoutExtension, fileExtension = os.path.splitext(self.orig_filename)
 		fullFilename = str(self.id) + fileExtension
 
 		return fullFilename
 
 	"""
-		Returns back the full localfile path of the thumb
+		Returns back the full localfile path of the full res image
+		If the file was moved though this could be different from the default
 		So:  /home/blah/1/1234.jpg
 	"""
 	def getFullPath(self):
-		return os.path.join(self.user.getUserDataPath(), self.getFullFilename())
+		if self.full_filename:
+			return os.path.join(self.user.getUserDataPath(), self.full_filename))
+		else:
+			return None
+
+	"""
+		Returns back the default path for a new full res image
+		So:  /home/blah/1/1234.jpg
+	"""
+	def getDefaultFullPath(self):
+		return os.path.join(self.user.getUserDataPath(), self.getDefaultFullFilename())
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)

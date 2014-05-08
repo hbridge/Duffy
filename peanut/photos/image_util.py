@@ -25,17 +25,17 @@ logger = logging.getLogger(__name__)
 """
 def createThumbnail(photo):
 	if photo.full_filename:
-		thumbFilePath = photo.getThumbPath()
-		fullFilePath = photo.getFullPath()
+		thumbFilePath = photo.getDefaultThumbPath()
+		fullFilePath = photo.getDefaultFullPath()
 
 		if (os.path.isfile(thumbFilePath)):
 			if not photo.thumb_filename:
-				photo.thumb_filename = photo.getThumbFilename()
+				photo.thumb_filename = photo.getDefaultThumbFilename()
 				photo.save()
-			return photo.getThumbFilename()
+			return photo.getDefaultThumbFilename()
 
 		if(resizeImage(fullFilePath, thumbFilePath, settings.THUMBNAIL_SIZE, True, False)):
-			photo.thumb_filename = photo.getThumbFilename()
+			photo.thumb_filename = photo.getDefaultThumbFilename()
 			photo.save()
 			logger.info("generated thumbnail: '%s" % thumbFilePath)
 		else:
@@ -159,8 +159,8 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 	(width, height) = im.size
 
 	if ((width == 156 and height == 156) or (width == 157 and height == 157)):
-		os.rename(tempFilepath, photo.getThumbPath())
-		photo.thumb_filename = photo.getThumbFilename()
+		os.rename(tempFilepath, photo.getDefaultThumbPath())
+		photo.thumb_filename = photo.getDefaultThumbFilename()
 
 		if bulk:
 			return photo
@@ -169,9 +169,9 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 	else:
 		# Must put this in first since getFullfilename needs it
 		photo.orig_filename = origFileName
-		photo.full_filename = photo.getFullFilename()
+		photo.full_filename = photo.getDefaultFullFilename()
 
-		os.rename(tempFilepath, photo.getFullPath())
+		os.rename(tempFilepath, photo.getDefaultFullPath())
 		
 		# Don't worry about bulk here since that's only used for thumbnails
 		photo.save()
