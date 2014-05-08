@@ -21,7 +21,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	logger = None
 
 	def __init__(self):
-		self.logger = logging.basicConfig(filename='indexer.log',level=logging.DEBUG)
+		#self.logger = logging.basicConfig(filename='indexer.log',level=logging.DEBUG)
 
 	def get_model(self):
 		return Photo
