@@ -175,12 +175,12 @@
 				}
 			}
 			else {
-				window.location.href = $(this).attr('redirect');
+				window.location.href = $(this).attr('redirect')+'?photoIdArray='+photoIdArray().toString();
 			}
 		});
 
 		/*
-			returns an array of JS
+			returns an array of photoIds that are currently open/expanded
 		*/
 		function photoIdArray(){
 			var pArray = [];
