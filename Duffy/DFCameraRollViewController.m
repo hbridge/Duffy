@@ -119,7 +119,7 @@
     UICollectionViewCell *cell = [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
     DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
-    if (photo.upload569Date == nil) {
+    if (photo.upload157Date == nil) {
         cell.alpha = 0.2;
     }
     
