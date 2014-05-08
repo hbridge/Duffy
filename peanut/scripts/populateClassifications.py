@@ -109,20 +109,22 @@ def chunks(l, n):
 def main(argv):
     maxFileCount = 10000
     maxFileAtTime = 16
-    count = 0
 
     logging.basicConfig(filename='/var/log/duffy/classifier.log',level=logging.DEBUG)
 
     socket_send, socket_recv = initClassifier()
 
     while True:
+        count = 0
         logging.info("Starting pipeline at " + time.strftime("%c"))
         # Get all photos which don't have classification data yet
         #  But also filter out test users and any photo which only has a thumb
-        nonProcessedPhotos = Photo.objects.filter(classification_data="").exclude(user=1).exclude(full_filename="").exclude(full_filename__isnull=True)
+        nonProcessedPhotos = Photo.objects.filter(classification_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True)
         nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
 
         successfullyClassified = list()
+
+        logging.info("Found " + str(len(nonProcessedPhotos)) + " photos that are not processed")
         
         for photos in chunks(nonProcessedPhotos, maxFileAtTime):
             # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
