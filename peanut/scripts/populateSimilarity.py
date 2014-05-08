@@ -1,5 +1,5 @@
 import sys, os
-import time
+import time, datetime
 
 parentPath = os.path.abspath("..")
 if parentPath not in sys.path:
@@ -19,7 +19,7 @@ def main(argv):
 		for user in allUsers:
 			print user.id
 			photos = list(Photo.objects.all().filter(user_id=user.id).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
-			print "Unclustered photos: {0}".format(len(photos))
+			print "{0}: Unclustered photos: {1}".format(datetime.datetime.utcnow(), len(photos))
 			print "{0} rows added".format(cluster_util.addToClustersBulk(photos))
 		time.sleep(5)
 
