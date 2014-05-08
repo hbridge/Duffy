@@ -244,6 +244,7 @@ static CGFloat SearchResultsCellFontSize = 15;
     
     DDLogVerbose(@"Executing search for URL: %@", queryURL.absoluteString);
     [DFAnalytics logSearchLoadStartedWithQuery:query suggestions:self.defaultSearchResults];
+  self.navigationItem.title = [query capitalizedString];
     [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
 }
 
