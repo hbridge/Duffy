@@ -21,7 +21,8 @@ def main(argv):
 			photos = list(Photo.objects.all().filter(user_id=user.id).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
 			tStart = datetime.datetime.utcnow()
 			print "{0}: Unclustered photos: {1}".format(tStart, len(photos))
-			print "{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, cluster_util.addToClustersBulk(photos))
+			count = cluster_util.addToClustersBulk(photos)
+			print "{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, count)
 		time.sleep(5)
 
 if __name__ == "__main__":
