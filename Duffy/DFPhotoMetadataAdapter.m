@@ -16,6 +16,7 @@
 #import "DFPeanutPhoto.h"
 #import <AFNetworking.h>
 #import "DFUser.h"
+#import "DFPhoto+FaceDetection.h"
 
 /* DFPeanutBulkPhotos Mapping Class */
 
@@ -47,7 +48,7 @@
     [result appendString:[peanutPhoto JSONString]];
     [result appendString:@","];
   }
-  if (result.length > 0) { // remove trailing comma
+  if (result.length > 1) { // remove trailing comma
     NSRange lastChar;
     lastChar.location = result.length-1;
     lastChar.length = 1;
@@ -129,11 +130,13 @@
   NSDictionary *result;
   NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
   unsigned long __block numBytes = 0;
+  NSDate *startDate = [NSDate date];
   for (DFPhoto *photo in photos) {
     DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
     [peanutPhotos addObject:peanutPhoto];
     numBytes += peanutPhoto.metadataSizeBytes;
   }
+  DDLogInfo(@"Generating peanut photos for %lu photos took %.02f seconds", photos.count, [[NSDate date] timeIntervalSinceDate:startDate]);
   
   DFPeanutBulkPhotos *bulkPhotos = [[DFPeanutBulkPhotos alloc] init];
   bulkPhotos.bulk_photos = peanutPhotos;
@@ -164,15 +167,13 @@
                                                 success:nil
                                                 failure:nil];
   
-
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
-  
   [requestOperation waitUntilFinished];
 
-  
   if (requestOperation.error) {
     DDLogWarn(@"postPhotos:appendThumbnails failed: %@", requestOperation.error.localizedDescription);
-    result = @{DFUploadResultErrorKey : requestOperation.error,
+    result = @{DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
+               DFUploadResultErrorKey : requestOperation.error,
                DFUploadResultPeanutPhotos : peanutPhotos
                };
   } else {

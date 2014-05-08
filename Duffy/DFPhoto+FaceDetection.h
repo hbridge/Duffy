@@ -7,6 +7,7 @@
 //
 
 #import "DFPhoto.h"
+#import "DFFaceFeature.h"
 
 @interface DFPhoto (FaceDetection)
 
@@ -14,6 +15,8 @@
 
 typedef void (^DFPhotoFaceDetectSuccessBlock)(NSArray *features);
 
-- (void)faceFeaturesWithHighQuality:(BOOL)highQuality successBlock:(DFPhotoFaceDetectSuccessBlock)successBlock;
++ (CIDetector *)faceDetectorWithHighQuality:(BOOL)highQuality;
+- (void)generateFaceFeaturesWithDetector:(CIDetector *)detector isHighQuality:(BOOL)isHighQuality;
+
 
 @end

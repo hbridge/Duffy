@@ -21,6 +21,7 @@
 @property (nonatomic, retain) NSURL *file_key;
 @property (nonatomic, retain) NSString *thumb_filename;
 @property (nonatomic, retain) NSString *full_filename;
+@property (nonatomic, retain) NSSet *iphone_faceboxes_topleft; //array of DFPeanutFaceFeatures
 
 /* Not Sync'ed with server */
 @property (readonly, nonatomic, retain) NSString *filename;

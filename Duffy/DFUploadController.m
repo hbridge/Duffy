@@ -240,6 +240,9 @@ static DFUploadController *defaultUploadController;
         } else if (uploadType == DFPhotoUploadOperationFullImageData) {
             photo.upload569Date = [NSDate date];
             [self.fullImageObjectIDQueue markObjectCompleted:photo.objectID];
+        } else {
+          [NSException raise:@"No DFPhotoUploadOperationImageDataType"
+                      format:@"Upload completed without DFPhotoUploadOperationImageDataType"];
         }
     }
     [self saveContext];
@@ -276,10 +279,14 @@ static DFUploadController *defaultUploadController;
                 [self.thumbnailsObjectIDQueue moveInProgressObjectsBackToQueue:objectIDs];
             } else if (uploadType == DFPhotoUploadOperationFullImageData) {
                 [self.fullImageObjectIDQueue moveInProgressObjectsBackToQueue:objectIDs];
+            } else {
+              [NSException raise:@"No DFPhotoUploadOperationImageDataType" format:@"Error retryable but no DFPhotoUploadOperationImageDataType"];
             }
             self.currentSessionStats.numConsecutiveRetries++;
             self.currentSessionStats.numTotalRetries++;
         } else {
+          DDLogInfo(@"Retry count exceeded (%du/%du) or error not retryable. Cancelling uploads.",
+                    self.currentSessionStats.numConsecutiveRetries, MaxRetryCount);
             [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
             NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
             [cancelOperation start];
@@ -292,7 +299,6 @@ static DFUploadController *defaultUploadController;
 
 - (BOOL)isErrorRetryable:(NSError *)error
 {
-    //-1001 = timeout, -1021 = request body stream exhausted,
     if (error.code == -1001 || // timeout
         error.code == -1021 || // request body stream exhausted
         error.code == -1005    // network connection was lost

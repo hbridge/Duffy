@@ -51,10 +51,12 @@
                  self.photo.creationHashData.description,
                  self.photo.currentHashData.description);
 
-    //DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved] JSONStringPrettyPrinted:YES]);
-//    [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
-//        DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
-//    }];
+    DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved] JSONStringPrettyPrinted:YES]);
+   [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
+        DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
+    }];
+  NSSet *faceFeatures = self.photo.faceFeatures;
+  DDLogVerbose(@"DFFaceFeatures sources:%du count:%lu", self.photo.faceFeatureSources, faceFeatures.count);
 }
 
 - (void)didReceiveMemoryWarning
@@ -82,23 +84,23 @@
 
 - (void)addFaceBoundingBoxes
 {
-    // if there are already bounding boxes in the image view, we've already
-    // done recognition, skip it
-    if (self.imageView.boundingBoxesInImageCoordinates) return;
-
-    [self.photo faceFeaturesWithHighQuality:YES successBlock:^(NSArray *features) {
-        NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
-    
-        for (CIFaceFeature *f in features)
-        {
-            DDLogVerbose(@"face found at %@", NSStringFromCGRect(f.bounds));
-            [boundingBoxes addObject:[NSValue valueWithCGRect:f.bounds]];
-        }
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            self.imageView.boundingBoxesInImageCoordinates = boundingBoxes;
-        });
-    }];
+//    // if there are already bounding boxes in the image view, we've already
+//    // done recognition, skip it
+//    if (self.imageView.boundingBoxesInImageCoordinates) return;
+//
+//    [self.photo faceFeaturesWithQuality:YES successBlock:^(NSArray *features) {
+//        NSMutableArray *boundingBoxes = [[NSMutableArray alloc] init];
+//    
+//        for (CIFaceFeature *f in features)
+//        {
+//            DDLogVerbose(@"face found at %@", NSStringFromCGRect(f.bounds));
+//            [boundingBoxes addObject:[NSValue valueWithCGRect:f.bounds]];
+//        }
+//        
+//        dispatch_async(dispatch_get_main_queue(), ^{
+//            self.imageView.boundingBoxesInImageCoordinates = boundingBoxes;
+//        });
+//    }];
 }
 
 

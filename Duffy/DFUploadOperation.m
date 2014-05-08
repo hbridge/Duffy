@@ -7,7 +7,6 @@
 //
 
 #import "DFUploadOperation.h"
-#import "DFPhotoImageDataAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFPhoto.h"
 #import "DFPhotoMetadataAdapter.h"
