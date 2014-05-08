@@ -13,11 +13,13 @@ from photos import cluster_util
 
 
 def main(argv):
+	print "Starting..."
 	while True:
 		allUsers = User.objects.all().filter(id__gt=75) #ignores first set of accounts
 		for user in allUsers:
+			print user.id
 			photos = list(Photo.objects.all().filter(user_id=user.id).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
-			print "userId: {0} |  Unclustered photos: {1}".format(user.id, len(photos))
+			print "Unclustered photos: {0}".format(len(photos))
 			print "{0} rows added".format(cluster_util.addToClustersBulk(photos))
 		time.sleep(5)
 
