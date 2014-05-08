@@ -371,7 +371,8 @@ static void releaseAssetCallback(void *info) {
 // The resulting UIImage will be already rotated to UIImageOrientationUp, so its CGImageRef
 // can be used directly without additional rotation handling.
 // This is done synchronously, so you should call this method on a background queue/thread.
-- (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size {
+
+- (CGImageRef)createAspectCGImageWithMaxPixelSize:(NSUInteger)size {
   NSParameterAssert(self.asset != nil);
   NSParameterAssert(size > 0);
   
@@ -403,6 +404,12 @@ static void releaseAssetCallback(void *info) {
   CFRelease(source);
   CFRelease(provider);
   
+  return imageRef;
+}
+
+- (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size {
+  
+  CGImageRef imageRef = [self createAspectCGImageWithMaxPixelSize:size];
   if (!imageRef) {
     return nil;
   }
@@ -430,18 +437,44 @@ static void releaseAssetCallback(void *info) {
 
 - (NSData *)aspectJPEGDataWithMaxPixelSize:(NSUInteger)size
                compressionQuality:(float)quality {
-  UIImage *image = [self aspectImageWithMaxPixelSize:size];
-  NSData *outputData = UIImageJPEGRepresentation(image, quality);
+  CGImageRef imageRef = [self createAspectCGImageWithMaxPixelSize:size];
+  NSData *outputData = [self JPEGDataForCGImage:imageRef withQuality:quality];
+  CGImageRelease(imageRef);
   
   return outputData;
 }
 
 
+
 - (NSData *)thumbnailJPEGData
 {
-  return UIImageJPEGRepresentation(self.thumbnail, 0.7);
+  CGImageRef thumbnail = [self.asset thumbnail];
+  return [self JPEGDataForCGImage:thumbnail withQuality:0.7];
 }
 
+
+
+- (NSData *)JPEGDataForCGImage:(CGImageRef)imageRef withQuality:(float)quality
+{
+  NSMutableData *outputData = [[NSMutableData alloc] init];
+  CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)outputData,
+                                                                   kUTTypeJPEG,
+                                                                   1,
+                                                                   NULL);
+  NSDictionary *properties = @{
+                               (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(quality)
+                               };
+  
+  CGImageDestinationSetProperties(destRef,
+                                  (__bridge CFDictionaryRef)properties);
+  
+  CGImageDestinationAddImage(destRef,
+                             imageRef,
+                             NULL);
+  CGImageDestinationFinalize(destRef);
+  CFRelease(destRef);
+  return outputData;
+}
 
 #pragma mark - File Paths
 
