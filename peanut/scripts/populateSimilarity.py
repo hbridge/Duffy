@@ -17,6 +17,7 @@ def main(argv):
 		allUsers = User.objects.all().filter(id__gt=75) #ignores first set of accounts
 		for user in allUsers:
 			photos = list(Photo.objects.all().filter(user_id=user.id).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
+			print "userId: {0} |  photos: {1}".format(user.id, len(photos))
 			print "{0}: {1} rows".format(user.id, cluster_util.addToClustersBulk(photos))
 		time.sleep(5)
 
