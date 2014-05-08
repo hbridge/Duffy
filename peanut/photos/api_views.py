@@ -16,6 +16,7 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.utils import timezone
 from django.db.models import Count
+from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
 from django.utils import timezone
@@ -85,13 +86,16 @@ class PhotoAPI(APIView):
 	def post(self, request, format=None):
 		serializer = PhotoSerializer(data=request.DATA)
 		if serializer.is_valid():
-			serializer.save()
+			try:
+				serializer.save()
 
-			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
+				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 			
-			thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
-			thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
-
+				thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
+				thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
+			except IntegrityError:
+				pass
+				
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -108,6 +112,21 @@ class PhotoBulkAPI(APIView):
 
 		return ret
 
+	def handleDups(self, photos):
+		photoDups = list()
+		for photo in photos:
+			try:
+				photo.save()
+			except IntegrityError:
+				dup = Photo.objects.filter(iphone_hash=photo.iphone_hash).filter(user=photo.user)
+				if len(dup) > 0:
+					logger.info("Found dup photo in upload: " + str(dup[0].id))
+					photoDups.append(dup[0])
+
+				if len(dup) > 1:
+					logger.error("Validation error for user id: " + str(photo.user) + " and " + photo.iphone_hash)
+		return photoDups
+
 	def post(self, request, format=None):
 		response = list()
 		
@@ -119,6 +138,7 @@ class PhotoBulkAPI(APIView):
 
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
+				print(photoData)
 				photoData["bulk_batch_key"] = batchKey
 				serializer = PhotoSerializer(data=photoData)
 				if serializer.is_valid():
@@ -129,17 +149,28 @@ class PhotoBulkAPI(APIView):
 					#thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 				else:
 					return Response(response, status=status.HTTP_400_BAD_REQUEST)
-					
-			Photo.objects.bulk_create(objsToCreate)
+			
+			dups = list()
+			try:
+				Photo.objects.bulk_create(objsToCreate)
+			except IntegrityError:
+				logger.info("Found dups in bulk upload")
+				dups = self.handleDups(objsToCreate)
 
 			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
 			dt = datetime.datetime.utcnow() - datetime.timedelta(seconds=60)
 			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
 
-			updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
-			thread.start_new_thread(location_util.populateLocationInfo, (updatedPhotos,))
+			updatedPhotos = list()
+			if len(createdPhotos) > 0:
+				updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
+				thread.start_new_thread(location_util.populateLocationInfo, (updatedPhotos,))
 			
 			for photo in updatedPhotos:
+				serializer = PhotoSerializer(photo)
+				response.append(serializer.data)
+
+			for photo in dups:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
 
