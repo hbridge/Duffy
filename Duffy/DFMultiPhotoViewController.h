@@ -9,9 +9,14 @@
 #import <UIKit/UIKit.h>
 
 @class DFPhotoViewController;
+@class DFPhoto;
 
-@interface DFMultiPhotoViewController : UIPageViewController <UIPageViewControllerDelegate>
+@interface DFMultiPhotoViewController : UIPageViewController <UIPageViewControllerDelegate,
+UIPageViewControllerDataSource>
 
 @property (readonly, nonatomic, retain) DFPhotoViewController *currentPhotoViewController;
+
+
+- (id)initWithActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos;
 
 @end
