@@ -170,6 +170,7 @@
 						$(this).attr('src', $(this).attr('data-lazy-src'));
 					});
 					current.show("fast");
+					current.removeClass('hidden');
 					current = current.next();
 				}
 			}
@@ -177,6 +178,19 @@
 				window.location.href = $(this).attr('redirect');
 			}
 		});
+
+		/*
+			returns an array of JS
+		*/
+		function photoIdArray(){
+			var pArray = [];
+			$('#allImages').find('div.ui-image').each(function(){
+				if (!($(this).hasClass('hidden'))) {
+					pArray.push($(this).attr('photoId'));
+				}
+			});
+			return pArray;
+		}
 
 		var oldVal = "";
 
