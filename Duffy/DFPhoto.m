@@ -45,15 +45,6 @@ NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
 NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 
--(void)awakeFromFetch
-{
-  // in model v3 we added a bunch of fields, including user id.  if the item doesn't have a user ID, populate these fields
-  if (!self.userID) {
-    self.userID = [[DFUser currentUser] userID];
-    self.hasLocation = ([self.asset valueForProperty:ALAssetPropertyLocation] != nil);
-  }
-}
-
 + (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset withHashData:(NSData *)hashData inContext:(NSManagedObjectContext *)context
 {
   DFPhoto *newPhoto = [NSEntityDescription

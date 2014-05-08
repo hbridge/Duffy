@@ -439,9 +439,8 @@ static DFUploadController *defaultUploadController;
 - (void)backgroundContextDidSave:(NSNotification *)notification {
     /* merge in the changes to the main context */
     [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
-        
-//        [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
-//        [self uploadPhotos];
+        [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+        [self uploadPhotos];
     }]];
 }
 

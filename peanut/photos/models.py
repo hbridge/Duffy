@@ -44,6 +44,8 @@ class Photo(models.Model):
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
+	class Meta:
+		unique_together = ("user", "iphone_hash")
 	"""
 		Look to see from the iphone's location data if there's a city present
 		TODO(derek):  Should this be pulled out to its own table?

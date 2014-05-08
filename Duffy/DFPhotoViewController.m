@@ -44,17 +44,17 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
-    DDLogVerbose(@"\n*** photo_id:%lld user:%lld, photo creation hash:%@, \n***current hash:%@",
-                 self.photo.photoID,
-                 self.photo.userID,
-                 self.photo.creationHashData.description,
-                 self.photo.currentHashData.description);
-
-    DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved] JSONStringPrettyPrinted:YES]);
-   [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
-        DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
-    }];
+  [super viewDidAppear:animated];
+  DDLogVerbose(@"\n*** photo_id:%lld user:%lld, photo creation hash:%@, \n***current hash:%@",
+               self.photo.photoID,
+               self.photo.userID,
+               self.photo.creationHashData.description,
+               self.photo.currentHashData.description);
+  
+  DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved] JSONStringPrettyPrinted:YES]);
+//  [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
+//    DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
+//  }];
   NSSet *faceFeatures = self.photo.faceFeatures;
   DDLogVerbose(@"DFFaceFeatures sources:%du count:%lu", self.photo.faceFeatureSources, faceFeatures.count);
 }

@@ -13,6 +13,7 @@
 #import <RestKit/RestKit.h>
 #import "DFFaceFeature.h"
 #import "DFPeanutFaceFeature.h"
+#import "DFUser.h"
 
 @implementation DFPeanutPhoto
 
@@ -25,11 +26,18 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
   if (self) {
     @autoreleasepool {
       self.user = [NSNumber numberWithUnsignedLongLong:photo.userID];
+      if ([self.user isEqualToNumber:@(0)]) {
+        DDLogWarn(@"DFPeanutPhoto initWithDFPhoto UserID=0");
+        self.user = @([[DFUser currentUser] userID]);
+      }
       self.id = [NSNumber numberWithUnsignedLongLong:photo.photoID];
       NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
       self.time_taken = [djangoFormatter stringFromDate:photo.creationDate];
       self.metadata = photo.metadataDictionary;
-      self.hash = photo.creationHashString;
+      if (!photo.creationHashString || [photo.creationHashString isEqualToString:@""]) {
+        [NSException raise:@"No hash" format:@"Cannot create a DFPeanutPhoto from DFPhoto with no creation hash."];
+      }
+      self.iphone_hash = photo.creationHashString;
       self.file_key = photo.objectID.URIRepresentation;
       if (photo.faceFeatureSources != DFFaceFeatureDetectionNone) {
         self.iphone_faceboxes_topleft = [DFPeanutFaceFeature
@@ -43,7 +51,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 + (NSArray *)attributes
 {
-  return @[@"user", @"id", @"time_taken", @"metadata", @"hash", @"file_key", @"thumb_filename",
+  return @[@"user", @"id", @"time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
            @"full_filename"];
 }
 
@@ -93,7 +101,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 - (NSString *)photoUploadJSONString
 {
-  NSDictionary *JSONSafeDict = [[self dictionaryForAttributes:@[@"id", @"user", @"hash", @"file_key"]] dictionaryWithNonJSONRemoved];
+  NSDictionary *JSONSafeDict = [[self dictionaryForAttributes:@[@"id", @"user", @"iphone_hash", @"file_key"]] dictionaryWithNonJSONRemoved];
   return [JSONSafeDict JSONString];
 }
 
@@ -112,7 +120,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 - (NSString *)filename
 {
-  return [NSString stringWithFormat:@"%@.jpg", self.hash];
+  return [NSString stringWithFormat:@"%@.jpg", self.iphone_hash];
 }
 
 - (DFPhoto *)photoInContext:(NSManagedObjectContext *)context
@@ -125,8 +133,8 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, hash:%@, file_key:%@, metadata:%@, thumb_filename:%@ full_filename:%@ iphone_faceboxes_topleft:%@}",
-          (int)self.user, (int)self.id, self.time_taken, self.hash, self.file_key.absoluteString, self.metadata.description, self.thumb_filename, self.full_filename, self.iphone_faceboxes_topleft];
+  return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, iphone_hash:%@, file_key:%@, metadata:%@, thumb_filename:%@ full_filename:%@ iphone_faceboxes_topleft:%@}",
+          (int)self.user, (int)self.id, self.time_taken, self.iphone_hash, self.file_key.absoluteString, self.metadata.description, self.thumb_filename, self.full_filename, self.iphone_faceboxes_topleft];
 }
 
 @end
