@@ -17,6 +17,7 @@
 #import "DFAnalytics.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFUser.h"
+#import "DFPhoto+FaceDetection.h"
 
 @interface DFPhoto()
 
@@ -31,6 +32,8 @@
 @dynamic alAssetURLString;
 @dynamic creationDate;
 @dynamic creationHashData;
+@dynamic faceFeatures;
+@dynamic faceFeatureSources;
 @dynamic hasLocation;
 @dynamic placemark;
 @dynamic photoID;
@@ -61,6 +64,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   newPhoto.creationHashData = hashData;
   newPhoto.hasLocation = ([asset valueForProperty:ALAssetPropertyLocation] != nil);
   newPhoto.userID = [[DFUser currentUser] userID];
+  
   return newPhoto;
 }
 

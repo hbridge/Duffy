@@ -20,11 +20,19 @@
 
 typedef UInt64 DFPhotoIDType;
 
+typedef enum {
+  DFFaceFeatureDetectionNone = 0,
+  DFFaceFeatureDetectioniOSLowQuality  = 1 << 0,
+  DFFaceFeatureDetectioniOSHighQuality = 1 << 1,
+} DFFaceFeatureDetectionSources;
+
 // stored properties
 @property (nonatomic, retain) NSString *alAssetURLString;
 @property (nonatomic) UInt64 userID;
 @property (nonatomic, retain) NSDate *creationDate;
 @property (nonatomic, retain) NSData *creationHashData; // stored when the DFPhoto is first created so it can be compared later
+@property (nonatomic, retain) NSSet *faceFeatures;
+@property (nonatomic) UInt16 faceFeatureSources;
 @property (nonatomic) BOOL hasLocation;
 @property (nonatomic, retain) CLPlacemark *placemark;
 @property (nonatomic) DFPhotoIDType photoID;

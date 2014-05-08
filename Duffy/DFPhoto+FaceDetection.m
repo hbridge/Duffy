@@ -8,45 +8,68 @@
 
 #import "DFPhoto+FaceDetection.h"
 #import <ImageIO/ImageIO.h>
-#import "UIImage+Resize.h"
 
 @implementation DFPhoto (FaceDetection)
 
-- (void)faceFeaturesWithHighQuality:(BOOL)highQuality successBlock:(DFPhotoFaceDetectSuccessBlock)successBlock;
+
++ (CIDetector *)faceDetectorWithHighQuality:(BOOL)highQuality
 {
-  UIImage *fullImage = self.highResolutionImage;
+  CIContext *context = [CIContext contextWithOptions:nil];
   
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_BACKGROUND, 0), ^{
-    NSArray *featuresInImage;
-    
-    @autoreleasepool {
-      UIImage *scaledRotatedImage = [fullImage resizedImage:fullImage.size interpolationQuality:kCGInterpolationDefault];
-      
-      CIImage *ciImage = [[CIImage alloc] initWithCGImage:[scaledRotatedImage CGImage]];
-      
-      CIContext *context = [CIContext contextWithOptions:nil];
-      
-      NSDictionary *opts;
-      if (highQuality) {
-        opts = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
-      } else {
-        opts = @{ CIDetectorAccuracy : CIDetectorAccuracyLow };
-      }
-      CIDetector *detector = [CIDetector detectorOfType:CIDetectorTypeFace
-                                                context:context
-                                                options:opts];
-      
-      if ([ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation]) {
-        opts = @{ CIDetectorImageOrientation : [ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation] }; // 4
-      } else {
-        opts = @{};
-      }
-      
-      featuresInImage = [detector featuresInImage:ciImage options:opts];
-    }
-    successBlock(featuresInImage);
-  });
+  NSDictionary *detectorOpts;
+  if (highQuality) {
+    detectorOpts = @{ CIDetectorAccuracy : CIDetectorAccuracyHigh };
+  } else {
+    detectorOpts = @{ CIDetectorAccuracy : CIDetectorAccuracyLow };
+  }
+  return [CIDetector detectorOfType:CIDetectorTypeFace
+                                            context:context
+                                            options:detectorOpts];
 }
 
+- (void)generateFaceFeaturesWithDetector:(CIDetector *)detector isHighQuality:(BOOL)isHighQuality
+{
+  @autoreleasepool {
+    UIImage *scaledRotatedImage = [self highResolutionImage];
+    
+    CIImage *ciImage = [[CIImage alloc] initWithCGImage:[scaledRotatedImage CGImage]];
+    
+    
+    
+    NSMutableDictionary *operationOptions = [[NSMutableDictionary alloc] init];
+    if ([ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation]) {
+      [operationOptions addEntriesFromDictionary:
+       @{ CIDetectorImageOrientation :
+            [ciImage.properties valueForKey:(NSString *)kCGImagePropertyOrientation] }]; // 4
+    }
+    [operationOptions addEntriesFromDictionary:@{
+                                                 CIDetectorSmile: @(YES),
+                                                 CIDetectorEyeBlink: @(YES),
+                                                 }];
+    
+    NSArray *CIFaceFeatures = [detector featuresInImage:ciImage options:operationOptions];
+    DDLogVerbose(@"Found %lu faceFeatures for photo.", CIFaceFeatures.count);
+    [self createFaceFeaturesFromCIFeatures:CIFaceFeatures];
+    
+    if (isHighQuality) {
+      self.faceFeatureSources |= DFFaceFeatureDetectioniOSHighQuality;
+    } else {
+      self.faceFeatureSources |= DFFaceFeatureDetectioniOSLowQuality;
+    }
+  }
+}
+
+- (void)createFaceFeaturesFromCIFeatures:(NSArray *)CIFaceFeatures
+{
+  for (CIFaceFeature *CIFaceFeature in CIFaceFeatures) {
+    DFFaceFeature *faceFeature =
+    [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([DFFaceFeature class])
+                                  inManagedObjectContext:self.managedObjectContext];
+    faceFeature.boundsString = NSStringFromCGRect(CIFaceFeature.bounds);
+    faceFeature.hasSmile = faceFeature.hasSmile;
+    faceFeature.hasBlink = faceFeature.hasBlink;
+    faceFeature.photo = self;
+  }
+}
 
 @end
