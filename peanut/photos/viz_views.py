@@ -261,6 +261,7 @@ def userbaseSummary(request):
 					break
 			entry['dbCount'] = dbQuery.count()
 			entry['thumbs'] = dbQuery.exclude(thumb_filename=None).count()
+			entry['twofish'] = dbQuery.exclude(twofishes_data=None).count()
 			entry['fullimages'] = dbQuery.exclude(full_filename=None).count()
 			searchResults = SearchQuerySet().all().filter(userId=userId)
 			entry['resultsCount'] = searchResults.count()

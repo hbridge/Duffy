@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="5">
+<meta http-equiv="refresh" content="10">
 </head>
 <style>
 	html, body { padding: 0; margin: 0; font-family: arial; font-size: 12px;}
@@ -52,10 +52,11 @@
 			<td class='created'> Created (GMT) </td>
 			<td class='db-count'> DBPhotos </td>
 			<td class='db-thumbnails'> Thumbnails </td>
-			<td class='db-fullimage'> Full <br>images </td>
 			<td class='index-count'> Indexed <br> Photos </td>
+			<td class='twofish'> TwoFish </td>
 			<td class='clustered'> Clustered </td>
 			<td class='classifications'> Image <br> Classifications </td>
+			<td class='db-fullimage'> Full <br>images </td>
 			<td class='last-uploaded-timestamp'> Last Upload (GMT) </td>
 		</tr>
 	{% for entry in resultList %}
@@ -66,10 +67,11 @@
 			<td class='created'> {{ entry.user.added|date:'m/d h:i.s A' }} </td>
 			<td class='db-count'> {{ entry.dbCount }} </td>
 			<td class='db-thumbnails'> {{ entry.thumbs }} </td>
-			<td class='db-fullimage'> {{ entry.fullimages }} </td>
 			<td class='index-count'> {{ entry.resultsCount }} </td>
+			<td class='twofish'>{{ entry.twofish }} </td>
 			<td class='clustered'> {{ entry.clustered }} </td>
 			<td class='classifications'> {{ entry.classifications }} </td>
+			<td class='db-fullimage'> {{ entry.fullimages }} </td>			
 			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime|date:'m/d h:i.s A' }} </td>
 		</tr>
 	{% endfor %}
