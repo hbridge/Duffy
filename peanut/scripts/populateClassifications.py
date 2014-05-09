@@ -55,7 +55,7 @@ def classifyPhotos(photos, socket_send, socket_recv):
             logging.info("*** Unkonwn file - looking up in db: " + imagepath)
             # need to do a lookup
             base, origFilename = os.path.split(imagepath)
-            filenameNoExt, extension = os.path.splittext(origFilename)
+            filenameNoExt, extension = os.path.splitext(origFilename)
             photoId = filenameNoExt.split('-')[0]
 
             photo = Photo.objects.filter(id=photoId)
