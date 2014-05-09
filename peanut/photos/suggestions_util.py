@@ -37,10 +37,19 @@ def getTopLocations(userId):
 """
 def getTopCategories(userId):
 
-	return [{'name': 'food', 'count': 0, 'order': 1},
-			{'name': 'screenshots', 'count': 0, 'order': 2}, 
-			{'name': 'animal', 'count': 0, 'order': 3}, 
-			{'name': 'car', 'count': 0, 'order': 4}]
+	catQueries = ['screenshots', 'people', 'food', 'animals', 'car']
+	order = 1
+	sugList = list()
+	for catQuery in catQueries:
+		count = search_util.solrSearch(userId, None, catQuery).count()
+		if (count > 0):
+			entry = dict()
+			entry['name'] = catQuery
+			entry['count'] = count
+			entry['order'] = order
+			order += 1
+			sugList.append(entry)
+	return sugList
 
 
 
