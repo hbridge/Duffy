@@ -29,10 +29,9 @@
 @property (nonatomic, retain) NSMutableArray *sectionNames;
 @property (nonatomic, retain) NSMutableArray *searchResultPhotoIDs;
 @property (nonatomic) NSUInteger currentPhotoIDIndex;
+@property (nonatomic) NSUInteger lastSeenNumUploaded;
 
 @end
-
-static NSInteger NUM_SUGGESTION_RESULTS = 5;
 
 static NSString *FREE_FORM_SECTION_NAME = @"Search";
 static NSString *DATE_SECTION_NAME = @"Time";
@@ -51,6 +50,8 @@ static NSString *QueryURLParameter = @"q";
 
 static CGFloat SearchResultsRowHeight = 38;
 static CGFloat SearchResultsCellFontSize = 15;
+static NSUInteger RefreshSuggestionsThreshold = 50;
+
 
 @implementation DFSearchViewController
 
@@ -579,9 +580,12 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)uploadStatusChanged:(NSNotification *)note
 {
-  // do nothing , don't show warning any more
+  DFUploadSessionStats *sessionStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
+  if (sessionStats.numThumbnailsUploaded - self.lastSeenNumUploaded > RefreshSuggestionsThreshold) {
+    [self populateDefaultAutocompleteSearchResults];
+  }
   
-  
+  self.lastSeenNumUploaded = sessionStats.numThumbnailsUploaded;
 }
 
 
