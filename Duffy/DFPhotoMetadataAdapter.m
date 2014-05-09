@@ -17,6 +17,7 @@
 #import <AFNetworking.h>
 #import "DFUser.h"
 #import "DFPhoto+FaceDetection.h"
+#import "DFPhotoStore.h"
 
 /* DFPeanutBulkPhotos Mapping Class */
 
@@ -127,7 +128,6 @@
 - (NSDictionary *)postPhotos:(NSArray *)photos
          appendThumbnailData:(BOOL)appendThumbnailData
 {
-  NSDictionary *result;
   NSMutableArray *peanutPhotos = [[NSMutableArray alloc] initWithCapacity:photos.count];
   unsigned long __block numBytes = 0;
   NSDate *startDate = [NSDate date];
@@ -170,19 +170,24 @@
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
   [requestOperation waitUntilFinished];
 
+  NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   if (requestOperation.error) {
     DDLogWarn(@"postPhotos:appendThumbnails failed: %@", requestOperation.error.localizedDescription);
-    result = @{DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
-               DFUploadResultErrorKey : requestOperation.error,
-               DFUploadResultPeanutPhotos : peanutPhotos
-               };
+    result[DFUploadResultErrorKey] = requestOperation.error;
+    result[DFUploadResultPeanutPhotos] = peanutPhotos;
   } else {
-    NSArray *resultPhotos = [requestOperation.mappingResult array];
-    result = @{DFUploadResultPeanutPhotos : resultPhotos,
-               DFUploadResultOperationType : DFPhotoUploadOperationThumbnailData,
-               DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:numBytes],
-               };
+    NSArray *resultPeanutPhotos = requestOperation.mappingResult.array;
+    NSError *validationError = [self verifyResultPhotos:resultPeanutPhotos];
+    if (validationError){
+      result[DFUploadResultErrorKey] = validationError;
+      result[DFUploadResultPeanutPhotos] = peanutPhotos;
+    } else {
+      result[DFUploadResultPeanutPhotos] = resultPeanutPhotos;
+    }
   }
+  
+  result[DFUploadResultNumBytes] = @(numBytes);
+  result[DFUploadResultOperationType] = DFPhotoUploadOperationThumbnailData;
   
   return result;
 }
@@ -247,6 +252,39 @@
   return  result;
 }
 
+
+- (NSError *)verifyResultPhotos:(NSArray *)resultPeanutPhotos
+{
+  NSError *error;
+  
+  for (DFPeanutPhoto *peanutPhoto in resultPeanutPhotos) {
+    if (peanutPhoto.file_key == nil) {
+      error = [NSError errorWithDomain:@"com.duffyappp.DFPhotoMetadataAdapter"
+                                 code:-1
+                             userInfo:@{
+                                        NSLocalizedDescriptionKey: @"The server returned a peanutPhoto with file_key == nil"}];
+      break;
+    }
+    
+    if (![[DFPhotoStore persistentStoreCoordinator]
+          managedObjectIDForURIRepresentation:peanutPhoto.file_key]){
+      error = [NSError errorWithDomain:@"com.duffyappp.DFPhotoMetadataAdapter"
+                                  code:-2
+                              userInfo:@{
+                                         NSLocalizedDescriptionKey: @"The server returned a peanutPhoto with file_key that does not exist locally"}];
+      break;
+    }
+  }
+  
+  #ifdef DEBUG
+  if (error) {
+    [NSException raise:@"Server response failed verification"
+                format:@"Reason: %@", error.localizedDescription];
+  }
+  #endif
+  
+  return error;
+}
 
 
 
