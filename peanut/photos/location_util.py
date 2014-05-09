@@ -72,13 +72,18 @@ def populateLocationInfoByIds(photoIds):
 def populateLocationInfo(photos):
 	latLonList = list()
 	photosWithLL = list()
+	logger.info("Starting populateLocationInfo with %s photos" % len(photos))
 	for photo in photos:
 		ll = getLatLon(photo)
 		if (ll):
 			latLonList.append(ll)
 			photosWithLL.append(photo)
 
+	logger.info("Found %s lat/lon" % len(latLonList))
+
 	twoFishesResults = getDataFromTwoFishesBulk(latLonList)
+
+	logger.info("Got back %s results from twofishes" % len(twoFishesResults))
 
 	photosToUpdate = list()
 	for i, photo in enumerate(photosWithLL):
@@ -90,12 +95,12 @@ def populateLocationInfo(photos):
 		photo.twofishes_data = json.dumps(formattedResult)
 		photosToUpdate.append(photo)
 
+	logger.info("Updating %s photos" % len(photosToUpdate))
+
 	if len(photosToUpdate) == 1:
 		photosToUpdate[0].save()
 	else:
 		bulk_update(photosToUpdate)
-
-	logger.info("Wrote out " + str(len(photosToUpdate)) + " twofish entries")
 
 """
 	Makes call to twofishes and gets back raw json
