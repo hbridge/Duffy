@@ -27,7 +27,9 @@
   return objectMapping;
 }
 
-
-
+- (NSDictionary *)dictionary
+{
+  return [self dictionaryWithValuesForKeys:[DFPeanutSuggestion attributes]];
+}
 
 @end

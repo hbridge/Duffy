@@ -66,6 +66,8 @@
 		5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */; };
 		5AD8AD40191BDFCB00782144 /* DFPeanutFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */; };
 		5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */; };
+		5AD8AD49191D462500782144 /* DFSearchResultTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD47191D462500782144 /* DFSearchResultTableViewCell.m */; };
+		5AD8AD4A191D462500782144 /* DFSearchResultTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AD8AD48191D462500782144 /* DFSearchResultTableViewCell.xib */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -218,6 +220,9 @@
 		5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFaceFeature.m; sourceTree = "<group>"; };
 		5AD8AD43191D398200782144 /* DFPeanutSuggestion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSuggestion.h; sourceTree = "<group>"; };
 		5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSuggestion.m; sourceTree = "<group>"; };
+		5AD8AD46191D462500782144 /* DFSearchResultTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchResultTableViewCell.h; sourceTree = "<group>"; };
+		5AD8AD47191D462500782144 /* DFSearchResultTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchResultTableViewCell.m; sourceTree = "<group>"; };
+		5AD8AD48191D462500782144 /* DFSearchResultTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchResultTableViewCell.xib; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -432,6 +437,9 @@
 				5A8D0B5418EF525800A1D9A7 /* DFTableHeaderView.h */,
 				5A8D0B5518EF525800A1D9A7 /* DFTableHeaderView.m */,
 				5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */,
+				5AD8AD46191D462500782144 /* DFSearchResultTableViewCell.h */,
+				5AD8AD47191D462500782144 /* DFSearchResultTableViewCell.m */,
+				5AD8AD48191D462500782144 /* DFSearchResultTableViewCell.xib */,
 			);
 			name = "Table view";
 			sourceTree = "<group>";
@@ -828,6 +836,7 @@
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */,
 				5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */,
+				5AD8AD4A191D462500782144 /* DFSearchResultTableViewCell.xib in Resources */,
 				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -954,6 +963,7 @@
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
 				5A8C98F61911793B00AE9F88 /* DFObjectManager.m in Sources */,
 				5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */,
+				5AD8AD49191D462500782144 /* DFSearchResultTableViewCell.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
 				5AC40EDE1908738C00ED3532 /* DFLogConfig.m in Sources */,
 				5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */,

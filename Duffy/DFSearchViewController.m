@@ -19,6 +19,7 @@
 #import "DFPhotoViewController.h"
 #import "DFMultiPhotoViewController.h"
 #import "DFPeanutSuggestion.h"
+#import "DFSearchResultTableViewCell.h"
 
 @interface DFSearchViewController ()
 
@@ -136,8 +137,8 @@ static CGFloat SearchResultsCellFontSize = 15;
 - (void)setupTableView
 {
   self.searchResultsTableView.rowHeight = SearchResultsRowHeight;
-  [self.searchResultsTableView registerClass:[UITableViewCell class]
-                      forCellReuseIdentifier:@"UITableViewCell"];
+  [self.searchResultsTableView registerClass:[DFSearchResultTableViewCell class]
+                      forCellReuseIdentifier:@"DFSearchResultTableViewCell"];
   
   [self updateSearchResults:nil];
 }
@@ -163,73 +164,14 @@ static CGFloat SearchResultsCellFontSize = 15;
 {
   if (!_defaultSearchResults) {
     _defaultSearchResults = [[NSMutableDictionary alloc] init];
-    _defaultSearchResults[DATE_SECTION_NAME] = @[@""];
-    _defaultSearchResults[LOCATION_SECTION_NAME] = @[@""];
-    _defaultSearchResults[CATEGORY_SECTION_NAME] = @[@""];
+    _defaultSearchResults[DATE_SECTION_NAME] = @[];
+    _defaultSearchResults[LOCATION_SECTION_NAME] = @[];
+    _defaultSearchResults[CATEGORY_SECTION_NAME] = @[];
   }
   
   
   return _defaultSearchResults;
 }
-
-- (NSArray *)formattedTop:(NSUInteger)count suggestionsInArray:(NSArray *)array
-{
-  NSArray *sortedArray = [array sortedArrayUsingComparator:
-                                 ^NSComparisonResult(DFPeanutSuggestion *suggestion1,
-                                                     DFPeanutSuggestion *suggestion2)
-  {
-    return [@(suggestion1.order) compare:@(suggestion2.order)];
-  }];
-  
-  //trim the sorted array to desired size
-  NSMutableArray *resultArray;
-  if (array.count > count) {
-    NSRange range;
-    range.location = 0;
-    range.length = count;
-   resultArray = [[sortedArray objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]]
-                  mutableCopy];
-  } else {
-     resultArray = sortedArray.mutableCopy;
-  }
-  
-  // reformat as strings
-  for (unsigned long i = 0; i < resultArray.count; i++) {
-    DFPeanutSuggestion *suggestion = [sortedArray objectAtIndex:i];
-    NSString *suggestionName;
-    if (suggestion.name && ![suggestion.name isEqualToString:@""]) {
-      suggestionName = suggestion.name;
-    } else {
-      suggestionName = @"None";
-    }
-    NSString *suggestionString = [NSString stringWithFormat:@"%@ (%d)",
-                        suggestionName, suggestion.count];
-
-    [resultArray replaceObjectAtIndex:i withObject:suggestionString];
-  }
-  
-  return resultArray;
-}
-
-
-- (NSArray *)sortedTop:(NSInteger)count suggestionsInDict:(NSDictionary *)dict
-{
-  NSMutableArray *sortedEntries = [dict keysSortedByValueUsingComparator:^NSComparisonResult(NSNumber *count1, NSNumber *count2) {
-    return [count2 compare:count1];
-  }].mutableCopy;
-  
-  NSRange range;
-  if (dict.count > count) {
-    range.location = 0;
-    range.length = count;
-  } else {
-    range.location = 0;
-    range.length = dict.count;
-  }
-  
-  return [sortedEntries objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]];
-}
-
 
 - (void)populateDefaultAutocompleteSearchResults
 {
@@ -237,22 +179,19 @@ static CGFloat SearchResultsCellFontSize = 15;
                                                  NSArray *locationPeanutSuggestions,
                                                  NSArray *timePeanutSuggestions) {
     if (categoryPeanutSuggestions) {
-      self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self formattedTop:NUM_SUGGESTION_RESULTS
-                                                         suggestionsInArray:categoryPeanutSuggestions];
+      self.defaultSearchResults[CATEGORY_SECTION_NAME] = categoryPeanutSuggestions;
     } else {
       [self.sectionNames removeObject:CATEGORY_SECTION_NAME];
     }
     
     if (locationPeanutSuggestions) {
-      self.defaultSearchResults[LOCATION_SECTION_NAME] = [self formattedTop:NUM_SUGGESTION_RESULTS
-                                                         suggestionsInArray:locationPeanutSuggestions];
+      self.defaultSearchResults[LOCATION_SECTION_NAME] = locationPeanutSuggestions;
     } else {
       [self.sectionNames removeObject:LOCATION_SECTION_NAME];
     }
     
     if (timePeanutSuggestions) {
-      self.defaultSearchResults[DATE_SECTION_NAME] = [self formattedTop:NUM_SUGGESTION_RESULTS
-                                                         suggestionsInArray:timePeanutSuggestions];
+      self.defaultSearchResults[DATE_SECTION_NAME] = timePeanutSuggestions;
     } else {
       [self.sectionNames removeObject:DATE_SECTION_NAME];
     }
@@ -283,9 +222,24 @@ static CGFloat SearchResultsCellFontSize = 15;
   
   
   DDLogVerbose(@"Executing search for URL: %@", queryURL.absoluteString);
-  [DFAnalytics logSearchLoadStartedWithQuery:query suggestions:self.defaultSearchResults];
+  NSDictionary *suggestionsStrings = [self suggestionsStrings];
+  [DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
   [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
+}
+
+- (NSDictionary *)suggestionsStrings
+{
+  NSMutableDictionary *result = self.defaultSearchResults.mutableCopy;
+  for (NSString *key in result.allKeys) {
+    NSMutableArray *suggestions = [(NSArray *)result[key] mutableCopy];
+    for (int i = 0; i < suggestions.count; i++) {
+      DFPeanutSuggestion *suggestion = suggestions[i];
+      suggestions[i] = suggestion.name;
+    }
+    result[key] = suggestions;
+  }
+  return result;
 }
 
 #pragma mark - Webview Delegate Methods
@@ -435,8 +389,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   
   if ([query length] > 0)
   {
+    DFPeanutSuggestion *freeFormSuggestion = [[DFPeanutSuggestion alloc] init];
+    freeFormSuggestion.name = query;
     [sections insertObject:FREE_FORM_SECTION_NAME atIndex:0];
-    searchResults[FREE_FORM_SECTION_NAME] = [NSArray arrayWithObject:query];
+    searchResults[FREE_FORM_SECTION_NAME] = [NSArray arrayWithObject:freeFormSuggestion];
   }
   
   if ([self isDateInQuery:query]) {
@@ -456,15 +412,16 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   self.searchResultsBySectionName = searchResults;
   
   [self.searchResultsTableView reloadData];
+  
 }
 
 
 - (BOOL)isDateInQuery:(NSString *)query
 {
   if (query == nil) return NO;
-  for (NSString *dateString in [[self defaultSearchResults] objectForKey:DATE_SECTION_NAME])
+  for (DFPeanutSuggestion *dateSuggestion in [[self defaultSearchResults] objectForKey:DATE_SECTION_NAME])
   {
-    if([query rangeOfString:dateString].location != NSNotFound) {
+    if([query rangeOfString:dateSuggestion.name].location != NSNotFound) {
       return YES;
     }
   }
@@ -474,9 +431,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (BOOL)isLocationInQuery:(NSString *)query
 {
   if (query == nil) return NO;
-  for (NSString *locationString in [[self defaultSearchResults] objectForKey:LOCATION_SECTION_NAME])
+  for (DFPeanutSuggestion *locationSuggestion in [[self defaultSearchResults] objectForKey:LOCATION_SECTION_NAME])
   {
-    if([query rangeOfString:locationString].location != NSNotFound) {
+    if([query rangeOfString:locationSuggestion.name].location != NSNotFound) {
       return YES;
     }
   }
@@ -486,9 +443,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (BOOL)isCategoryInQuery:(NSString *)query
 {
   if (query == nil) return NO;
-  for (NSString *categoryString in [[self defaultSearchResults] objectForKey:CATEGORY_SECTION_NAME])
+  for (DFPeanutSuggestion *categorySuggestion in [[self defaultSearchResults] objectForKey:CATEGORY_SECTION_NAME])
   {
-    if([query rangeOfString:categoryString].location != NSNotFound) {
+    if([query rangeOfString:categorySuggestion.name].location != NSNotFound) {
       return YES;
     }
   }
@@ -511,8 +468,12 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"UITableViewCell"];
-  cell.textLabel.text = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
+  DFPeanutSuggestion *peanutSuggestion = [[self resultsForSectionWithIndex:indexPath.section]
+                                          objectAtIndex:indexPath.row];
+  
+  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"DFSearchResultTableViewCell"];
+  cell.textLabel.text = peanutSuggestion.name ? peanutSuggestion.name : @"None";
+  cell.detailTextLabel.text = [NSString stringWithFormat:@"%d", peanutSuggestion.count];
   cell.textLabel.font = [cell.textLabel.font fontWithSize:SearchResultsCellFontSize];
   return cell;
 }
@@ -543,7 +504,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   NSString *selectionString;
   NSArray *resultsForSectionWithIndex = [self resultsForSectionWithIndex:indexPath.section];
   if (resultsForSectionWithIndex && resultsForSectionWithIndex.count > 0) {
-    [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
+    DFPeanutSuggestion *suggestion = [[self resultsForSectionWithIndex:indexPath.section]
+                                      objectAtIndex:indexPath.row];
+    selectionString = suggestion.name;
   } else {
     selectionString = @"";
     DDLogWarn(@"DFSearchViewController user selected blank indexPath: %@ searchResultsBySecitonName:%@",
