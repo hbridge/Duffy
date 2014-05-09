@@ -28,7 +28,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from photos.models import Photo, User, Classification
-from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
+from photos import image_util, search_util, gallery_util, location_util, cluster_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
@@ -164,7 +164,11 @@ class PhotoBulkAPI(APIView):
 			updatedPhotos = list()
 			if len(createdPhotos) > 0:
 				updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
-				thread.start_new_thread(location_util.populateLocationInfo, (updatedPhotos,))
+
+				photoIds = list()
+				for photo in updatedPhotos:
+					photoIds.append(photo.id)
+				thread.start_new_thread(location_util.populateLocationInfoByIds, (photoIds,))
 			
 			for photo in updatedPhotos:
 				serializer = PhotoSerializer(photo)
@@ -361,9 +365,9 @@ def get_suggestions(request):
 	else:
 		return returnFailure(response, "Need user_id")
 
-	response['top_locations'] = suggestions_util.getTopLocations(userId)
-	response['top_categories'] = suggestions_util.getTopCategories(userId)
-	response['top_times'] = suggestions_util.getTopTimes(userId)
+	response['top_locations'] = getTopLocations(userId)
+	response['top_categories'] = getTopCategories(userId)
+	response['top_times'] = getTopTimes(userId)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -473,4 +477,56 @@ def createUser(phoneId, firstName):
 	subprocess.call(['ssh', remoteHost, "mkdir -p " + userRemoteStagingPath])
 
 	return user
+
+"""
+	Fetches all photos for the given user and returns back the all cities with their counts.  Results are
+	unsorted.
+
+	[{"San Francisco": 415},
+		{"New York": 246},
+		{"Barcelona": 900},
+		{"Montepulciano": 47},
+		{"New Delhi": 39}]
+"""
+def getTopLocations(userId):
+
+	queryResult = Photo.objects.filter(user_id=userId).values('location_city').order_by().annotate(Count('location_city')).order_by('-location_city__count')
+	
+	photoLocations = list()
+	for location in queryResult:
+		entry = dict()
+		entry['name'] = location['location_city']
+		entry['count'] = location['location_city__count']
+		photoLocations.append(entry)
+	
+	return photoLocations
+
+"""
+	Fetches all photos for the given user and returns back top categories with count. Currently, faking it.
+
+	[{"food": 415},
+		{"animal": 246},
+		{"car": 90}]
+"""
+def getTopCategories(userId):
+
+	return [{'name': 'people', 'count': 8},
+			{'name': 'food', 'count': 8}, 
+			{'name': 'screenshots', 'count': 6}, 
+			{'name': 'animal', 'count': 4}, 
+			{'name': 'car', 'count': 2}]
+
+
+
+"""
+	Fetches all photos for the given user and returns back top time searches with count. Currently, faking it.
+
+	[{"last week": 415},
+		{"feb 2014": 246},
+		{"last summer": 90}]
+"""
+def getTopTimes(userId):
+
+	return [{'name': 'last week', 'count': 3}, {'name': 'feb 2014', 'count': 2}, {'name': 'last summer', 'count': 1}]
+
 

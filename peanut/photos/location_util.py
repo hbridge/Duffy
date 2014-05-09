@@ -5,12 +5,9 @@ import sys
 import os
 import logging
 
-if "/home/derek/Duffy/peanut" not in sys.path:
-	 sys.path.insert(0, "/home/derek/Duffy/peanut")
-
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
-
 from bulk_update.helper import bulk_update
+
+from photos.models import Photo
 
 logger = logging.getLogger(__name__)
 
@@ -62,6 +59,10 @@ def getCity(twoFishesResult):
 					return feature["displayName"]
 
 	return None
+
+def populateLocationInfoByIds(photoIds):
+	photos = Photo.objects.filter(id__in = photoIds)
+	return populateLocationInfo(photos)
 
 """
 	Static method for populating extra info like twoFishes.

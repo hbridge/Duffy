@@ -4,7 +4,6 @@ import json
 from django.db import models
 
 from peanut import settings
-from photos import location_util
 
 # Create your models here.
 class User(models.Model):
