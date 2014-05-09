@@ -500,8 +500,16 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *selectionString = [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
-    
+  NSString *selectionString;
+  NSArray *resultsForSectionWithIndex = [self resultsForSectionWithIndex:indexPath.section];
+  if (resultsForSectionWithIndex && resultsForSectionWithIndex.count > 0) {
+    [[self resultsForSectionWithIndex:indexPath.section] objectAtIndex:indexPath.row];
+  } else {
+    selectionString = @"";
+    DDLogWarn(@"DFSearchViewController user selected blank indexPath: %@ searchResultsBySecitonName:%@",
+              indexPath.description, self.searchResultsBySectionName.description);
+  }
+  
     if (![[self sectionNameForIndex:indexPath.section] isEqualToString:FREE_FORM_SECTION_NAME]) {
         if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
             self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
