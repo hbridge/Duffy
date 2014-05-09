@@ -285,8 +285,8 @@ static DFUploadController *defaultUploadController;
             self.currentSessionStats.numConsecutiveRetries++;
             self.currentSessionStats.numTotalRetries++;
         } else {
-          DDLogInfo(@"Retry count exceeded (%du/%du) or error not retryable. Cancelling uploads.",
-                    self.currentSessionStats.numConsecutiveRetries, MaxRetryCount);
+          DDLogInfo(@"Retry count exceeded (%du/%du) or error:%@ not retryable. Cancelling uploads.",
+                    self.currentSessionStats.numConsecutiveRetries, MaxRetryCount, error.description);
             [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
             NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
             [cancelOperation start];
