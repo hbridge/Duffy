@@ -17,10 +17,11 @@ def getTopLocations(userId):
 	
 	photoLocations = list()
 	for location in queryResult:
-		entry = dict()
-		entry['name'] = location['location_city']
-		entry['count'] = location['location_city__count']
-		photoLocations.append(entry)
+		if (location['location_city__count'] > 0):
+			entry = dict()
+			entry['name'] = location['location_city']
+			entry['count'] = location['location_city__count']
+			photoLocations.append(entry)
 	
 	sortedList = sorted(photoLocations, key=lambda k: k['count'], reverse=True)
 	index = 1
@@ -36,11 +37,10 @@ def getTopLocations(userId):
 """
 def getTopCategories(userId):
 
-	return [{'name': 'people', 'count': 1, 'order': 1},
-			{'name': 'food', 'count': 8, 'order': 2}, 
-			{'name': 'screenshots', 'count': 6, 'order': 3}, 
-			{'name': 'animal', 'count': 4, 'order': 4}, 
-			{'name': 'car', 'count': 2, 'order':5}]
+	return [{'name': 'food', 'count': 1, 'order': 1},
+			{'name': 'screenshots', 'count': 8, 'order': 2}, 
+			{'name': 'animal', 'count': 6, 'order': 3}, 
+			{'name': 'car', 'count': 4, 'order': 4}]
 
 
 
