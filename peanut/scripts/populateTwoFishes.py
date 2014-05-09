@@ -20,9 +20,7 @@ def main(argv):
 	while True:
 		photos = Photo.objects.all().filter(twofishes_data=None).filter(metadata__contains='{GPS}')
 
-		if len(photos) == 0:
-			logger.info("Found no photos that need two fishes data")
-		else:
+		if len(photos) > 0:
 			logger.info("Found {0} images that need two fishes data".format(len(photos)))
 			location_util.populateLocationInfo(photos)
 
