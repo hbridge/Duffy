@@ -1,7 +1,9 @@
 import os, sys, os.path
 import Image
 import json
+import logging
 from datetime import datetime
+from time import time
 
 from django.utils import timezone
 
@@ -14,28 +16,112 @@ import cv2.cv as cv
 from bulk_update.helper import bulk_update
 
 ### Clustering/deduping functions
-
 """
 	Cluster for multiple photos
 """
 def addToClustersBulk(photos, threshold=100):
+	if len(photos) == 0:
+		return 0
+
+	simRows = list()
 	histCache = dict()
-	count = 0
+	simsToCreate = list()
+	simsToUpdate = list()
+	
+	userPhotoCache = list(Photo.objects.select_related().filter(user=photos[0].user.id).exclude(time_taken=None).exclude(thumb_filename=None).order_by('time_taken'))
+	
 	for photo in photos:
-		count += addToClusters(photo, histCache)
+		simRows.extend(addToClusters(photo, histCache, userPhotoCache))
 		photo.clustered_time = datetime.now()
+
+	if (len(simRows) > 0):
+		if (len(simRows) == 1):
+			simRows[0].save()
+		else:
+			uniqueSimRows = getUniqueSimRows(simRows)
+			allIds = getAllPhotoIds(uniqueSimRows)
+
+			existingSims = Similarity.objects.select_related().filter(photo_1__in=allIds).filter(photo_2__in=allIds)
+			(simsToCreate, simsToUpdate) = processWithExisting(existingSims, uniqueSimRows)
+			Similarity.objects.bulk_create(simsToCreate)
+			if (len(simsToUpdate) == 1):
+				simsToUpdate[0].save()
+			elif (len(simsToUpdate) > 1):
+				bulk_update(simsToUpdate)
+
+	# If we wrote put the Similarities correctly, then update photos to update the clustered_time
 	if (len(photos) > 0):
 		if (len(photos) == 1):
 			photos[0].save()
 		else:
 			bulk_update(photos)
-	return count
+
+	return len(simsToCreate) + len(simsToUpdate)
+
+
+def getUniqueSimRows(simRows):
+	uniqueSimRows = dict()
+
+	for simRow in simRows:
+		id = (simRow.photo_1.id, simRow.photo_2.id)
+		if id in uniqueSimRows:
+			if simRow.similarity < uniqueSimRows[id]:
+				uniqueSimRows[id] = simRow
+		else:
+			uniqueSimRows[id] = simRow
+	return uniqueSimRows.values()
+	
+def getAllPhotoIds(simRows):
+	photoIds = list()
+	for simRow in simRows:
+		photoIds.append(simRow.photo_1)
+		photoIds.append(simRow.photo_2)
+
+	return set(photoIds)
+
+def processWithExisting(existingSims, newSims):
+	simsToCreate = list()
+	simsToUpdate = list()
+
+	for newSim in newSims:
+		found = False
+		for existingSim in existingSims:
+			if newSim.photo_1 == existingSim.photo_1 and newSim.photo_2 == existingSim.photo_2:
+				if newSim.similarity < existingSim.similarity:
+					existingSim.similarity = newSim.similarity
+					simsToUpdate.append(existingSim)
+				found = True
+
+		if not found:
+			simsToCreate.append(newSim)
+
+	return (simsToCreate, simsToUpdate)
+
+"""
+	Get a list of photos that are "near" this photo: meaning pre and post in the timeline
+"""
+def getNearbyPhotos(photo, range, userPhotoCache):
+	for i, p in enumerate(userPhotoCache):
+		if photo == p:
+			# We want the RANGE before and RANGE after our current photo
+			# If index - RANGE is below 0, if so lets use 0
+			lowIndex = max(0, i - range)
+			# If index + RANGE is above len, then use len
+			highIndex = min(len(userPhotoCache) - 1, i + range)
+
+			nearbyPhotos = list()
+			if i > 0:
+				nearbyPhotos.extend(userPhotoCache[lowIndex:i-1])
+
+			if i < len(userPhotoCache):
+				nearbyPhotos.extend(userPhotoCache[i+1:highIndex])
+				
+			return nearbyPhotos
 
 """
 	Populates similarity table for a new photo
 """
-def addToClusters(photo, histCache, threshold=100):
-
+def addToClusters(photo, histCache, userPhotoCache, threshold=100):
 	if (photo.thumb_filename == None):
 		return 0
 
@@ -43,50 +129,15 @@ def addToClusters(photo, histCache, threshold=100):
 		# if no timestamp exists, then skip the photo for clustering
 		return 0
 
-	photos = list()
-
-	# get a list of photos that are "near" this photo: meaning pre and post in the timeline
-	if (photo.time_taken == None):
-		# for undated photos, use 'added' which is the upload time
-		photos = list(Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__gt=photo.added).exclude(thumb_filename=None).order_by('-added')[:5])
-		photos.extend(list(Photo.objects.all().filter(user_id=photo.user.id).filter(time_taken=None).exclude(id=photoId).exclude(added__lt=photo.added).exclude(thumb_filename=None).order_by('added')[:5]))
-	else:
-		photos = list(Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__gt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).exclude(thumb_filename=None).order_by('-time_taken')[:5])
-		photos.extend(list(Photo.objects.all().filter(user_id=photo.user.id).exclude(time_taken__lt=photo.time_taken).exclude(time_taken=None).exclude(id=photo.id).exclude(thumb_filename=None).order_by('time_taken')[:5]))
-
 	# get current photo's histogram
 	curHist = getSpatialHistFromCache(photo, histCache)
 	if (curHist == None):
 		return 0
 
-	count = genSimilarityRowsFromList(photo, histCache, photos, threshold)
-	return count
+	nearbyPhotos = getNearbyPhotos(photo, 5, userPhotoCache)
 
-"""
-	Continues to follow a resulting query of photos until one of them isn't similar enough
-	Returns count of DB operations: adds or modified
-"""
-
-def genSimilarityRowsFromDBQuery(curPhoto, histCache, photoQuery, threshold, batch=None):
-
-	if (batch == None):
-		batch = 5
-
-	simRows = list()
-	tempRows = list()
-
-	keepGoing = True
-	loop = 0
-	while keepGoing == True:
-		keepGoing = False
-		loop += 1
-		# pick them in batches to process
-		photoBatch = list(photoQuery[((loop-1)*batch):(batch*loop)])
-		tempRows = genSimilarityRowsFromList(curPhoto, histCache, photoBatch)
-		if (len(tempRows) > 0):
-			simRows.extend(tempRows)
-			keepGoing = True
-
+	simRows = genSimilarityRowsFromList(photo, histCache, nearbyPhotos, threshold)
+	return simRows
 
 """
 	Compares curPhoto to each photo in photoList and adds a row if under threshold
@@ -95,18 +146,14 @@ def genSimilarityRowsFromDBQuery(curPhoto, histCache, photoQuery, threshold, bat
 """
 
 def genSimilarityRowsFromList(curPhoto, histCache, photoList, threshold):
-
-	count = 0
+	simRows = list()
 	for photo in photoList:
-		#TODO(Aseem): In theory you can do a check here to see if the row already exists
-		# But, that stops the search because it doesn't extend beyond these 5
-		#if (doesSimilarityRowAlreadyExists(curPhoto, photo)):
-		#	returnVal = True
-		#	continue
 		dist = compHist(getSpatialHistFromCache(curPhoto, histCache),getSpatialHistFromCache(photo, histCache))
 		if (dist < threshold):
-			count += genSimilarityRow(curPhoto, photo, dist)
-	return count
+			simRow = genSimilarityRow(curPhoto, photo, dist)
+			if simRow:
+				simRows.append(simRow)
+	return simRows
 
 """
 	Adds/updates a specific row to similarity table, if it doesn't exist.
@@ -115,33 +162,18 @@ def genSimilarityRowsFromList(curPhoto, histCache, photoList, threshold):
 def genSimilarityRow(photo1, photo2, sim):
 	if (photo1.id == photo2.id):
 		print "Error: Can't add same photo for both photo_1 and photo_2 in Similarity table"
-		return 0
+		return None
 
 	if (photo1.id > photo2.id):
 		tempPhoto = photo1
 		photo1 = photo2
 		photo2 = tempPhoto
 	
-	sim = int(sim)
-	
-	simQuery= Similarity.objects.all().filter(photo_1=photo1).filter(photo_2=photo2)
+	simRow = Similarity(photo_1 = photo1,
+						photo_2 = photo2,
+						similarity = int(sim))
 
-	if (simQuery.count() == 0):
-		simRow = Similarity(	photo_1 = photo1,
-								photo_2 = photo2,
-								similarity = sim)
-	elif (simQuery.count() == 1):
-		if (simQuery[0].similarity <= sim):
-			return 0
-		else:
-			simRow = simQuery[0]
-			simRow.similarity = sim
-	else:
-		print "Error: Found multiple rows with photoId1: {0} and photoId2: {1}".format(photo1.id, photo2.id)
-		return 0
-
-	simRow.save()
-	return 1
+	return simRow
 
 """ 
 	Returns true if a row of two photos already exists in the table
@@ -170,13 +202,10 @@ def getSpatialHistFromCache(photo, histCache):
 	Get a photo's spatial histogram using opencv's ELBP method
 """
 def getSpatialHist(photo):
-
-	origPath = '/home/derek/user_data/' + str(photo.user.id) + '/'
-
 	if (photo.full_filename and not photo.thumb_filename):
 		image_util.createThumbnail(photo) # check in case thumbnails haven't been created
 
-	photo_color = cv2.imread(origPath+photo.thumb_filename)
+	photo_color = cv2.imread(photo.getThumbPath())
 	photo_color = cv2.resize(photo_color,(156,156))
 	photo_gray = cv2.cvtColor(photo_color, cv.CV_RGB2GRAY)
 	photo_gray = cv2.equalizeHist(photo_gray)
