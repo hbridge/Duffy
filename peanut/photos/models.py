@@ -141,5 +141,8 @@ class Similarity(models.Model):
 	photo_2 = models.ForeignKey(Photo, related_name="photo_2")
 	similarity = models.IntegerField()
 
+	class Meta:
+		unique_together = ("photo_1", "photo_2")
+
 	def __unicode__(self):
 		return '{0}, {1}, {2}'.format(self.photo_1.id, self.photo_2.id, self.similarity)
