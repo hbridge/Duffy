@@ -20,15 +20,6 @@
 @implementation DFAutocompleteResponse
 @end
 
-@interface DFSuggestion : NSObject
-@property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) NSNumber *count;
-@end
-@implementation DFSuggestion
-@end
-
-
-
 @interface DFAutocompleteController()
 
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
@@ -47,7 +38,6 @@ static NSString *UserIDParameterKey = @"user_id";
 {
     if ([[DFUser currentUser] userID]) {
         [self fetchAutocompleteResults:mainThreadCompletionBlock];
-        //mainThreadCompletionBlock(nil,nil, nil);
     } else {
         mainThreadCompletionBlock(nil, nil, nil);
     }
@@ -70,40 +60,13 @@ static NSString *UserIDParameterKey = @"user_id";
          DFAutocompleteResponse *response = [mappingResult firstObject];
          DDLogVerbose(@"Autocomplete response received.  result:%@", response.result);
 
-         NSDictionary *locationResult, *categoryResult, *timeResult;
          if ([response.result isEqualToString:@"true"]) {
-             NSMutableDictionary *entriesAndCounts = [[NSMutableDictionary alloc] init];
-             for (DFSuggestion *locationSuggestion in response.top_locations) {
-                 if (locationSuggestion.name) {
-                     entriesAndCounts[locationSuggestion.name] = locationSuggestion.count;
-                 }
-             }
-             locationResult = entriesAndCounts;
-             
-             entriesAndCounts = [[NSMutableDictionary alloc] init];
-             for (DFSuggestion *categorySuggestion in response.top_categories) {
-                 if (categorySuggestion.name) {
-                     entriesAndCounts[categorySuggestion.name] = categorySuggestion.count;
-                 }
-             }
-             categoryResult = entriesAndCounts;
-             
-             
-             entriesAndCounts = [[NSMutableDictionary alloc] init];
-             for (DFSuggestion *timeSuggestion in response.top_times) {
-                 if (timeSuggestion.name) {
-                     entriesAndCounts[timeSuggestion.name] = timeSuggestion.count;
-                 }
-             }
-             timeResult = entriesAndCounts;
-             
-             
+           dispatch_async(dispatch_get_main_queue(), ^{
+             completionBlock(response.top_categories, response.top_locations, response.top_times);
+           });
          }  else {
-             locationResult = categoryResult = nil;
+           completionBlock(nil, nil, nil);
          }
-         dispatch_async(dispatch_get_main_queue(), ^{
-             completionBlock(categoryResult, locationResult, timeResult);
-         });
 
      }
      failure:^(RKObjectRequestOperation *operation, NSError *error)
@@ -140,11 +103,8 @@ static NSString *UserIDParameterKey = @"user_id";
         [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
 
         
-        RKObjectMapping *suggestionMapping = [RKObjectMapping mappingForClass:[DFSuggestion class]];
-        [suggestionMapping addAttributeMappingsFromDictionary:@{@"name": @"name",
-                                                                        @"count" : @"count"
-                                                                        }];
-        
+        RKObjectMapping *suggestionMapping = [DFPeanutSuggestion objectMapping];
+      
         [autocompleteResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"top_times"
                                                                                                     toKeyPath:@"top_times"
                                                                                                   withMapping:suggestionMapping]];

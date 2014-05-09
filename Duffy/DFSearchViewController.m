@@ -18,6 +18,7 @@
 #import "DFPhotoStore.h"
 #import "DFPhotoViewController.h"
 #import "DFMultiPhotoViewController.h"
+#import "DFPeanutSuggestion.h"
 
 @interface DFSearchViewController ()
 
@@ -171,6 +172,46 @@ static CGFloat SearchResultsCellFontSize = 15;
   return _defaultSearchResults;
 }
 
+- (NSArray *)formattedTop:(NSUInteger)count suggestionsInArray:(NSArray *)array
+{
+  NSArray *sortedArray = [array sortedArrayUsingComparator:
+                                 ^NSComparisonResult(DFPeanutSuggestion *suggestion1,
+                                                     DFPeanutSuggestion *suggestion2)
+  {
+    return [@(suggestion1.order) compare:@(suggestion2.order)];
+  }];
+  
+  //trim the sorted array to desired size
+  NSMutableArray *resultArray;
+  if (array.count > count) {
+    NSRange range;
+    range.location = 0;
+    range.length = count;
+   resultArray = [[sortedArray objectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range]]
+                  mutableCopy];
+  } else {
+     resultArray = sortedArray.mutableCopy;
+  }
+  
+  // reformat as strings
+  for (unsigned long i = 0; i < resultArray.count; i++) {
+    DFPeanutSuggestion *suggestion = [sortedArray objectAtIndex:i];
+    NSString *suggestionName;
+    if (suggestion.name && ![suggestion.name isEqualToString:@""]) {
+      suggestionName = suggestion.name;
+    } else {
+      suggestionName = @"None";
+    }
+    NSString *suggestionString = [NSString stringWithFormat:@"%@ (%d)",
+                        suggestionName, suggestion.count];
+
+    [resultArray replaceObjectAtIndex:i withObject:suggestionString];
+  }
+  
+  return resultArray;
+}
+
+
 - (NSArray *)sortedTop:(NSInteger)count suggestionsInDict:(NSDictionary *)dict
 {
   NSMutableArray *sortedEntries = [dict keysSortedByValueUsingComparator:^NSComparisonResult(NSNumber *count1, NSNumber *count2) {
@@ -192,30 +233,29 @@ static CGFloat SearchResultsCellFontSize = 15;
 
 - (void)populateDefaultAutocompleteSearchResults
 {
-  [self.autcompleteController fetchSuggestions:^(NSDictionary *categorySuggestionsToCounts,
-                                                 NSDictionary *locationSuggestionsToCounts,
-                                                 NSDictionary *timeSuggestionsToCounts) {
-    if (locationSuggestionsToCounts) {
-      self.defaultSearchResults[LOCATION_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
-                                                       suggestionsInDict:locationSuggestionsToCounts];
-    } else {
-      [self.sectionNames removeObject:LOCATION_SECTION_NAME];
-    }
-    
-    if (categorySuggestionsToCounts) {
-      self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
-                                                       suggestionsInDict:categorySuggestionsToCounts];
+  [self.autcompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
+                                                 NSArray *locationPeanutSuggestions,
+                                                 NSArray *timePeanutSuggestions) {
+    if (categoryPeanutSuggestions) {
+      self.defaultSearchResults[CATEGORY_SECTION_NAME] = [self formattedTop:NUM_SUGGESTION_RESULTS
+                                                         suggestionsInArray:categoryPeanutSuggestions];
     } else {
       [self.sectionNames removeObject:CATEGORY_SECTION_NAME];
     }
     
-    if (timeSuggestionsToCounts) {
-      self.defaultSearchResults[DATE_SECTION_NAME] = [self sortedTop:NUM_SUGGESTION_RESULTS
-                                                   suggestionsInDict:timeSuggestionsToCounts];
+    if (locationPeanutSuggestions) {
+      self.defaultSearchResults[LOCATION_SECTION_NAME] = [self formattedTop:NUM_SUGGESTION_RESULTS
+                                                         suggestionsInArray:locationPeanutSuggestions];
+    } else {
+      [self.sectionNames removeObject:LOCATION_SECTION_NAME];
+    }
+    
+    if (timePeanutSuggestions) {
+      self.defaultSearchResults[DATE_SECTION_NAME] = [self formattedTop:NUM_SUGGESTION_RESULTS
+                                                         suggestionsInArray:timePeanutSuggestions];
     } else {
       [self.sectionNames removeObject:DATE_SECTION_NAME];
     }
-    
     
     [self updateSearchResults:self.searchBar.text];
   }];

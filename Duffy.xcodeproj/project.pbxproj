@@ -65,6 +65,7 @@
 		5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC677E71906F027002F9D42 /* DFDataHasher.m */; };
 		5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */; };
 		5AD8AD40191BDFCB00782144 /* DFPeanutFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */; };
+		5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */; };
 		5ADB24BB189985590016CA02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BA189985590016CA02 /* Foundation.framework */; };
 		5ADB24BD189985590016CA02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BC189985590016CA02 /* CoreGraphics.framework */; };
 		5ADB24BF189985590016CA02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ADB24BE189985590016CA02 /* UIKit.framework */; };
@@ -215,6 +216,8 @@
 		5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFaceFeature.m; sourceTree = "<group>"; };
 		5AD8AD3E191BDFCB00782144 /* DFPeanutFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFaceFeature.h; sourceTree = "<group>"; };
 		5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFaceFeature.m; sourceTree = "<group>"; };
+		5AD8AD43191D398200782144 /* DFPeanutSuggestion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSuggestion.h; sourceTree = "<group>"; };
+		5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSuggestion.m; sourceTree = "<group>"; };
 		5ADB24B7189985590016CA02 /* Duffy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Duffy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADB24BA189985590016CA02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ADB24BC189985590016CA02 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -494,8 +497,6 @@
 				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
 				5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */,
 				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
-				5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */,
-				5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */,
 				5A8D0B4D18EF2FBA00A1D9A7 /* Photo Web View */,
 			);
 			name = "Search View";
@@ -514,6 +515,7 @@
 		5AC40EE5190AD0F100ED3532 /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				5AD8AD42191D396700782144 /* Autocomplete */,
 				5A8C98E9190EE78A00AE9F88 /* DFLocationPinger.h */,
 				5A8C98EA190EE78B00AE9F88 /* DFLocationPinger.m */,
 				5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */,
@@ -537,6 +539,17 @@
 				5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */,
 			);
 			name = Mappings;
+			sourceTree = "<group>";
+		};
+		5AD8AD42191D396700782144 /* Autocomplete */ = {
+			isa = PBXGroup;
+			children = (
+				5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */,
+				5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */,
+				5AD8AD43191D398200782144 /* DFPeanutSuggestion.h */,
+				5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */,
+			);
+			name = Autocomplete;
 			sourceTree = "<group>";
 		};
 		5ADB24AE189985590016CA02 = {
@@ -929,6 +942,7 @@
 				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
 				5A67606918E3558500E355B6 /* DFMultiPhotoViewController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
+				5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */,
 				5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */,
 				5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
