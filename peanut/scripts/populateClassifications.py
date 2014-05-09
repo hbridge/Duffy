@@ -110,7 +110,10 @@ def main(argv):
     maxFileCount = 10000
     maxFileAtTime = 16
 
-    logging.basicConfig(filename='/var/log/duffy/classifier.log',level=logging.DEBUG)
+    logging.basicConfig(filename='/var/log/duffy/classifier.log',
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s')
+    logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
 
     socket_send, socket_recv = initClassifier()
 
