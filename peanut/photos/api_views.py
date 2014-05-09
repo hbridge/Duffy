@@ -168,7 +168,8 @@ class PhotoBulkAPI(APIView):
 				photoIds = list()
 				for photo in updatedPhotos:
 					photoIds.append(photo.id)
-				thread.start_new_thread(location_util.populateLocationInfoByIds, (photoIds,))
+				# Derek - commented out since not working
+				#thread.start_new_thread(location_util.populateLocationInfoByIds, (photoIds,))
 						
 			for photo in updatedPhotos:
 				serializer = PhotoSerializer(photo)

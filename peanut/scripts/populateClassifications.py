@@ -7,8 +7,9 @@ import socket
 import time
 import zmq
 
-if "/home/derek/Duffy/peanut" not in sys.path:
-     sys.path.insert(0, "/home/derek/Duffy/peanut")
+parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
+if parentPath not in sys.path:
+    sys.path.insert(0, parentPath)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 

@@ -2,7 +2,7 @@ import sys, os
 import time, datetime
 import logging
 
-parentPath = os.path.abspath("..")
+parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 

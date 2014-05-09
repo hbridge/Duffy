@@ -2,7 +2,7 @@ import sys, os
 import time, datetime
 import logging
 
-parentPath = os.path.abspath("..")
+parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 
@@ -26,7 +26,7 @@ def main(argv):
 			logger.info("Found {0} images that need two fishes data".format(len(photos)))
 			location_util.populateLocationInfo(photos)
 
-		time.sleep(5)
+		time.sleep(1)
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/twofishes.log',
