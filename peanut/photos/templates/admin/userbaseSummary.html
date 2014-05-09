@@ -30,6 +30,10 @@
 	.ui-key {
 		padding: 0px 0px 10px 0px;
 	}
+	#stats{
+		text-align: right;
+		font-size: 10px;
+	}
 
 </style>
 <body>
@@ -45,24 +49,33 @@
 			<td class='created'> Created (GMT) </td>
 			<td class='db-count'> DBPhotos </td>
 			<td class='db-thumbnails'> Thumbnails </td>
-			<td class='db-fullimage'> Full images </td>
-			<td class='index-count'> IndexedPhotos </td>
+			<td class='db-fullimage'> Full <br>images </td>
+			<td class='index-count'> Indexed <br> Photos </td>
+			<td class='clustered'> Clustered </td>
+			<td class='classifications'> Image <br> Classifications </td>
 			<td class='last-uploaded-timestamp'> Last Upload (GMT) </td>
 		</tr>
 	{% for entry in resultList %}
 		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
 			<td class='userid'> {{ entry.user.id }} </td>
 			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
-			<td class='phoneid'> {{ entry.user.phone_id}} </td>
-			<td class='created'> {{ entry.user.added }} </td>
+			<td class='phoneid'> {{ entry.user.phone_id|truncatechars:12}} </td>
+			<td class='created'> {{ entry.user.added|date:'m/d h:i.s A' }} </td>
 			<td class='db-count'> {{ entry.dbCount }} </td>
 			<td class='db-thumbnails'> {{ entry.thumbs }} </td>
 			<td class='db-fullimage'> {{ entry.fullimages }} </td>
 			<td class='index-count'> {{ entry.resultsCount }} </td>
-			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime }} </td>
+			<td class='clustered'> {{ entry.clustered }} </td>
+			<td class='classifications'> {{ entry.classifications }} </td>
+			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime|date:'m/d h:i.s A' }} </td>
 		</tr>
 	{% endfor %}
-</table>
+	</table>
+<div id="stats" class="text">
+	<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
 </div>
+</div>
+
+
 </body>
 </html>

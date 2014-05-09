@@ -264,6 +264,8 @@ def userbaseSummary(request):
 			entry['fullimages'] = dbQuery.exclude(full_filename=None).count()
 			searchResults = SearchQuerySet().all().filter(userId=userId)
 			entry['resultsCount'] = searchResults.count()
+			entry['clustered'] = dbQuery.exclude(clustered_time=None).count()
+			entry['classifications'] = dbQuery.exclude(classification_data=None).count()
 			entry['internal'] = False
 
 			if (user.added == None or len(user.first_name) == 0):
