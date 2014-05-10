@@ -123,7 +123,7 @@ def getDataFromTwoFishesBulk(latLonList):
 
 		twoFishesUrl = "http://demo.twofishes.net/?%s" % (twoFishesParams)
 
-		logger.info("Requesting:  %s" % twoFishesUrl)
+		logger.debug("Requesting URL:  %s" % twoFishesUrl)
 		twoFishesResultJson = urllib2.urlopen(twoFishesUrl).read()
 		
 		if (twoFishesResultJson):
