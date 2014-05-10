@@ -56,12 +56,13 @@ def classifyPhotos(photos, socket_send, socket_recv):
             logging.info("*** Unkonwn file - looking up in db: " + imagepath)
             # need to do a lookup
             base, origFilename = os.path.split(imagepath)
-            filenameNoExt, extension = os.path.splitext(origFilename)
-            photoId = filenameNoExt.split('-')[0]
 
-            photo = Photo.objects.filter(id=photoId)
+            logging.info("looking for %s" % (origFilename))
 
-        if result['images'][imagepath] is not "not_found":
+            photo = Photo.objects.filter(full_filename=origFilename)
+            logging.info("found photo id: %s" % (photo.id))
+
+        if result['images'][imagepath] is not "not_found" and photo:
             Classification.objects.filter(user_id = photo.user.id, photo_id = photo.id).delete()
 
             classificationDataInPhoto = list()
