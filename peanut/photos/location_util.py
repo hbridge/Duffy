@@ -47,7 +47,12 @@ def getLatLon(photo):
 				lon = gpsData["Longitude"]
 				if gpsData["LongitudeRef"] == "W":
 					lon = lon * -1
-			return (lat, lon)
+
+			if lat and lon:
+				return (lat, lon)
+			else:
+				logger.error("Thought I should have found GPS data but didn't in photo %s and metadata: %s" % (photo.id, metadata))
+				return None
 	return None
 
 def getCity(twoFishesResult):
@@ -118,6 +123,7 @@ def getDataFromTwoFishesBulk(latLonList):
 
 		twoFishesUrl = "http://demo.twofishes.net/?%s" % (twoFishesParams)
 
+		logger.info("Requesting:  %s" % twoFishesUrl)
 		twoFishesResultJson = urllib2.urlopen(twoFishesUrl).read()
 		
 		if (twoFishesResultJson):
