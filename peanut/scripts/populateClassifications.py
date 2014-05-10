@@ -123,21 +123,26 @@ def main(argv):
     logging.info("Starting pipeline at " + time.strftime("%c"))
     
     while True:
+        successfullyClassified = list()
         # Get all photos which don't have classification data yet
         #  But also filter out test users and any photo which only has a thumb
         nonProcessedPhotos = Photo.objects.filter(classification_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True)[:maxFileAtTime]
 
-        logging.info("Got the next " + str(len(nonProcessedPhotos)) + " photos that are not processed")
-        
-        # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
-        successfullyCopied = copyPhotos(nonProcessedPhotos)
-        if (len(successfullyCopied) > 0):
-            successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
+        if len(nonProcessedPhotos) > 0:
+            logging.info("Got the next " + str(len(nonProcessedPhotos)) + " photos that are not processed")
+            # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
+            successfullyCopied = copyPhotos(nonProcessedPhotos)
+            if (len(successfullyCopied) > 0):
+                successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
 
-        if len(successfullyClassified) > 0:
-            logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
+            if len(successfullyClassified) > 0:
+                logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
+            else:
+                logging.error("Did not complete classification")
+                time.sleep(5)
         else:
             time.sleep(5)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
