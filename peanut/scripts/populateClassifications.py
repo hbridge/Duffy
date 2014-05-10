@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import sys, getopt, os
 import subprocess
 import logging
@@ -53,14 +54,14 @@ def classifyPhotos(photos, socket_send, socket_recv):
         if imagepath in pathToPhoto:
             photo = pathToPhoto[imagepath]
         else:
-            logging.info("*** Unkonwn file - looking up in db: " + imagepath)
             # need to do a lookup
             base, origFilename = os.path.split(imagepath)
 
-            logging.info("looking for %s" % (origFilename))
+            photoId, ext = os.path.splitext(origFilename)
+            logging.info("*** Unkonwn file - looking up in db by photoid: " + photoId)
 
-            photo = Photo.objects.filter(full_filename=origFilename)
-            logging.info("found photo id: %s" % (photo.id))
+            photo = Photo.objects.get(id=int(photoId))
+            logging.info("Found photo id: %s" % (photo.id))
 
         if result['images'][imagepath] is not "not_found" and photo:
             Classification.objects.filter(user_id = photo.user.id, photo_id = photo.id).delete()
@@ -119,28 +120,24 @@ def main(argv):
 
     socket_send, socket_recv = initClassifier()
 
+    logging.info("Starting pipeline at " + time.strftime("%c"))
+    
     while True:
-        count = 0
-        logging.info("Starting pipeline at " + time.strftime("%c"))
         # Get all photos which don't have classification data yet
         #  But also filter out test users and any photo which only has a thumb
-        nonProcessedPhotos = Photo.objects.filter(classification_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True)
-        nonProcessedPhotos = nonProcessedPhotos[:maxFileCount]
+        nonProcessedPhotos = Photo.objects.filter(classification_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True)[:maxFileAtTime]
 
-        successfullyClassified = list()
-
-        logging.info("Found " + str(len(nonProcessedPhotos)) + " photos that are not processed")
+        logging.info("Got the next " + str(len(nonProcessedPhotos)) + " photos that are not processed")
         
-        for photos in chunks(nonProcessedPhotos, maxFileAtTime):
-            # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
-            successfullyCopied = copyPhotos(photos)
-            if (len(successfullyCopied) > 0):
-                successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
-                count += len (successfullyClassified)
+        # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
+        successfullyCopied = copyPhotos(nonProcessedPhotos)
+        if (len(successfullyCopied) > 0):
+            successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
 
-        logging.info("Pipeline complete. " + str(count) + " photos processed")
-
-        time.sleep(5)
+        if len(successfullyClassified) > 0:
+            logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
+        else:
+            time.sleep(5)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
