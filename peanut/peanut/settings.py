@@ -106,7 +106,7 @@ LOGGING = {
     },
     'handlers': {
         'djangofile': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'class': 'logging.FileHandler',
             'filename': '/home/derek/logs/duffy-django.log',
             'formatter': 'verbose'
@@ -129,7 +129,7 @@ LOGGING = {
         'django': {
             'handlers':['djangofile', 'djangoerror'],
             'propagate': True,
-            'level':'DEBUG',
+            'level':'INFO',
         },
         'photos': {
             'handlers': ['duffyfile'],
