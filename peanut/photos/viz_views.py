@@ -261,7 +261,11 @@ def userbaseSummary(request):
 					break
 			entry['dbCount'] = dbQuery.count()
 			entry['thumbs'] = dbQuery.exclude(thumb_filename=None).count()
-			entry['twofish'] = dbQuery.exclude(twofishes_data=None).count()
+			photosWithGPS = dbQuery.filter(metadata__contains='{GPS}').count()
+			if photosWithGPS > 0:				
+				entry['twofish'] = int(dbQuery.exclude(twofishes_data=None).count()/photosWithGPS*100)
+			else:
+				entry['twofish'] = '-'
 			entry['fullimages'] = dbQuery.exclude(full_filename=None).count()
 			searchResults = SearchQuerySet().all().filter(userId=userId)
 			entry['resultsCount'] = searchResults.count()
