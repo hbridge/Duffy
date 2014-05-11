@@ -31,7 +31,7 @@ def main(argv):
 				count = cluster_util.addToClustersBulk(nonClusteredPhotos)
 				logger.info("{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, count))
 		else:
-			time.sleep(5)	
+			time.sleep(1)	
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/similarity.log',
