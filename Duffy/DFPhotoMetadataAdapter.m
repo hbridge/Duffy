@@ -172,7 +172,7 @@
 
   NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   if (requestOperation.error) {
-    DDLogWarn(@"postPhotos:appendThumbnails failed: %@", requestOperation.error.localizedDescription);
+    DDLogWarn(@"postPhotos:appendThumbnailData failed: %@", requestOperation.error.localizedDescription);
     result[DFUploadResultErrorKey] = requestOperation.error;
     result[DFUploadResultPeanutPhotos] = peanutPhotos;
   } else {

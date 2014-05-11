@@ -186,6 +186,7 @@ static DFUploadController *defaultUploadController;
         // if we're not on wifi don't upload
         if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi) {
             return NO;
+          DDLogInfo(@"Not on wifi. isDeviceStateGoodForBackgroundUploads:NO");
         }
         
         // if the battery is < 50% and it's not plugged in (or don't know) don't upload
@@ -193,6 +194,7 @@ static DFUploadController *defaultUploadController;
         float batteryChargeLevel = [[UIDevice currentDevice] batteryLevel];
         if ((batteryState == UIDeviceBatteryStateUnplugged || batteryState == UIDeviceBatteryStateUnknown)
             && batteryChargeLevel < 0.5) {
+          DDLogInfo(@"Battery not charging and charge level %.02f. isDeviceStateGoodForBackgroundUploads:NO", batteryChargeLevel);
             return NO;
         }
     }
