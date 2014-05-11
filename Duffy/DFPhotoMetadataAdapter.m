@@ -172,7 +172,7 @@
 
   NSMutableDictionary *result = [[NSMutableDictionary alloc] init];
   if (requestOperation.error) {
-    DDLogWarn(@"postPhotos:appendThumbnailData failed: %@", requestOperation.error.localizedDescription);
+    DDLogVerbose(@"postPhotos:appendThumbnailData failed: %@", requestOperation.error.localizedDescription);
     result[DFUploadResultErrorKey] = requestOperation.error;
     result[DFUploadResultPeanutPhotos] = peanutPhotos;
   } else {
@@ -234,7 +234,7 @@
     [requestOperation waitUntilFinished];
     
     if (requestOperation.error) {
-      DDLogWarn(@"DFPhotoMetadataAdapter put failed: %@",
+      DDLogVerbose(@"DFPhotoMetadataAdapter put failed: %@",
                 requestOperation.error.localizedDescription);
       result = @{DFUploadResultErrorKey : requestOperation.error,
                  DFUploadResultPeanutPhotos : @[peanutPhoto],
