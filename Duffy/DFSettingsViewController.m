@@ -13,6 +13,7 @@
 #import "DFUser.h"
 #import "DFAnalytics.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFAppInfo.h"
 
 @interface DFSettingsViewController ()
 
@@ -78,26 +79,7 @@ NSString *DFEnabledNo = @"NO";
 
 - (void)setAppInfo
 {
-    self.appInfoLabel.text = [self appInfoString];
-}
-
-- (NSString *)appInfoString
-{
-    // App name
-    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
-    NSString *appName = [infoDictionary objectForKey:@"CFBundleDisplayName"];
-    
-    // version and build type
-    NSString *majorVersion = [infoDictionary objectForKey:@"CFBundleShortVersionString"];
-    NSString *minorVersion = [infoDictionary objectForKey:@"CFBundleVersion"];
-    NSString *buildType;
-#ifdef DEBUG
-    buildType = @"debug";
-#else
-    buildType = @"release";
-#endif
-    return [NSString stringWithFormat:@"%@ %@ (%@) %@",
-                                    appName, majorVersion, minorVersion, buildType];
+    self.appInfoLabel.text = [DFAppInfo appInfoString];
 }
 
 - (void)refreshDeviceInfoUI
@@ -186,7 +168,7 @@ NSString *DFEnabledNo = @"NO";
             [errorLogData appendData:errorLogFileData];
         }
         [mailViewController addAttachmentData:errorLogData mimeType:@"text/plain" fileName:@"DuffyLog.txt"];
-        [mailViewController setSubject:[NSString stringWithFormat:@"Diagnostic info for %@", [self appInfoString]]];
+        [mailViewController setSubject:[NSString stringWithFormat:@"Diagnostic info for %@", [DFAppInfo appInfoString]]];
         [mailViewController setToRecipients:[NSArray arrayWithObject:@"hbridge@gmail.com"]];
 
         [self presentViewController:mailViewController animated:YES completion:nil];
@@ -204,7 +186,7 @@ static const int MaxLogFiles = 10;
 - (NSMutableArray *)errorLogData
 {
     DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
-    NSArray *sortedLogFileInfos = [fileLogger.logFileManager sortedLogFileInfos];
+    NSArray *sortedLogFileInfos = [[[fileLogger.logFileManager sortedLogFileInfos] reverseObjectEnumerator] allObjects];
     int numFilesToUpload = MIN((unsigned int)sortedLogFileInfos.count, MaxLogFiles);
     
     NSMutableArray *errorLogFiles = [NSMutableArray arrayWithCapacity:numFilesToUpload];

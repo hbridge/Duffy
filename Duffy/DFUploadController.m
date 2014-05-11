@@ -193,8 +193,8 @@ static DFUploadController *defaultUploadController;
         UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
         float batteryChargeLevel = [[UIDevice currentDevice] batteryLevel];
         if ((batteryState == UIDeviceBatteryStateUnplugged || batteryState == UIDeviceBatteryStateUnknown)
-            && batteryChargeLevel < 0.5) {
-          DDLogInfo(@"Battery not charging and charge level %.02f. isDeviceStateGoodForBackgroundUploads:NO", batteryChargeLevel);
+            && batteryChargeLevel < 0.2) {
+          DDLogInfo(@"Battery state unplugged/unknown and charge level %.02f. isDeviceStateGoodForBackgroundUploads:NO", batteryChargeLevel);
             return NO;
         }
     }

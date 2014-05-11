@@ -24,6 +24,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <RestKit/RestKit.h>
 #import "DFLocationPinger.h"
+#import "DFAppInfo.h"
 
 
 
@@ -156,7 +157,7 @@
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    DDLogInfo(@"Duffy app became active.");
+    DDLogInfo(@"%@ became active.", [DFAppInfo appInfoString]);
     if (![self isAppSetupComplete]) return;
     
     [self startCameraRollSync];
