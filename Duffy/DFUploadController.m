@@ -192,9 +192,9 @@ static DFUploadController *defaultUploadController;
         // if the battery is < 50% and it's not plugged in (or don't know) don't upload
         UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
         float batteryChargeLevel = [[UIDevice currentDevice] batteryLevel];
-        if ((batteryState == UIDeviceBatteryStateUnplugged || batteryState == UIDeviceBatteryStateUnknown)
+        if ((batteryState == UIDeviceBatteryStateUnplugged)
             && batteryChargeLevel < 0.05) {
-          DDLogInfo(@"Battery state unplugged/unknown and charge level %.02f. isDeviceStateGoodForBackgroundUploads:NO", batteryChargeLevel);
+          DDLogInfo(@"Battery state unplugged and charge level %.02f. isDeviceStateGoodForBackgroundUploads:NO", batteryChargeLevel);
             return NO;
         }
     }
