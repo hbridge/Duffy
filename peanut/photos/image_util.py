@@ -204,7 +204,11 @@ def handleUploadedImagesBulk(request, photos):
 	if (len(photosToUpdate) == 1):
 		photosToUpdate[0].save()
 	else:
+		logger.info("Updating %s photos in db" % (len(photosToUpdate)))
 		bulk_update(photosToUpdate)
+
+	if (len(request.FILES) != len(photosToUpdate)):
+		logger.error("Have request with %s files and only %s photos updated" % (len(request.FILES), len(photosToUpdate)))
 		
 	return photosToUpdate
 	

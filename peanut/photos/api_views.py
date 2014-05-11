@@ -51,6 +51,7 @@ class PhotoAPI(APIView):
 		try:
 			return Photo.objects.get(id=photoId)
 		except Photo.DoesNotExist:
+			logger.info("Photo id does not exist: %s   returning 404" % (photoId))
 			raise Http404
 
 	def get(self, request, photoId, format=None):
@@ -131,6 +132,7 @@ class PhotoBulkAPI(APIView):
 		response = list()
 		
 		if "bulk_photos" in request.DATA:
+			logger.info("Got request for bulk photo update with %s files" % len(request.FILES))
 			photosData = json.loads(request.DATA["bulk_photos"])
 
 			objsToCreate = list()
@@ -138,16 +140,13 @@ class PhotoBulkAPI(APIView):
 
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
-				print(photoData)
 				photoData["bulk_batch_key"] = batchKey
 				serializer = PhotoSerializer(data=photoData)
 				if serializer.is_valid():
+					logger.debug("file_key: %s" % serializer.object.file_key)
 					objsToCreate.append(serializer.object)
-
-					# TODO(derek): get these working again, leaving as place holder
-					#thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
-					#thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 				else:
+					logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
 					return Response(response, status=status.HTTP_400_BAD_REQUEST)
 			
 			dups = list()
@@ -180,7 +179,9 @@ class PhotoBulkAPI(APIView):
 				response.append(serializer.data)
 
 			return Response(response, status=status.HTTP_201_CREATED)
-		return Response(response, status=status.HTTP_400_BAD_REQUEST)
+		else:
+			logger.info("Got request with no bulk_photos, returning 400")
+			return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 """
 	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage
