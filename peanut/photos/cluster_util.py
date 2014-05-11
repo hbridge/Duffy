@@ -15,6 +15,19 @@ import cv2.cv as cv
 
 from bulk_update.helper import bulk_update
 
+def smartBulkUpdate(objectDict):
+	objsToUpdate = list()
+	results = Photo.objects.in_bulk(objectDict.keys())
+
+	for id, photo in results.iteritems():
+		photo.clustered_time = objectDict[id].clustered_time
+		objsToUpdate.append(photo)
+
+	if (len(objsToUpdate) == 1):
+		objsToUpdate[0].save()
+	else:
+		bulk_update(objsToUpdate)
+
 ### Clustering/deduping functions
 """
 	Cluster for multiple photos
@@ -27,12 +40,14 @@ def addToClustersBulk(photos, threshold=100):
 	histCache = dict()
 	simsToCreate = list()
 	simsToUpdate = list()
+	photosToUpdate = dict()
 	
 	userPhotoCache = list(Photo.objects.select_related().filter(user=photos[0].user.id).exclude(time_taken=None).exclude(thumb_filename=None).order_by('time_taken'))
 	
 	for photo in photos:
 		simRows.extend(addToClusters(photo, histCache, userPhotoCache))
 		photo.clustered_time = datetime.now()
+		photosToUpdate[photo.id] = photo
 
 	if (len(simRows) > 0):
 		if (len(simRows) == 1):
@@ -50,11 +65,8 @@ def addToClustersBulk(photos, threshold=100):
 				bulk_update(simsToUpdate)
 
 	# If we wrote put the Similarities correctly, then update photos to update the clustered_time
-	if (len(photos) > 0):
-		if (len(photos) == 1):
-			photos[0].save()
-		else:
-			bulk_update(photos)
+	if (len(photosToUpdate) > 0):
+		smartBulkUpdate(photosToUpdate)
 
 	return len(simsToCreate) + len(simsToUpdate)
 

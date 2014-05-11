@@ -69,6 +69,18 @@ def populateLocationInfoByIds(photoIds):
 	photos = Photo.objects.filter(id__in = photoIds)
 	return populateLocationInfo(photos)
 
+
+def smartBulkUpdate(objectDict):
+	objsToUpdate = list()
+	results = Photo.objects.in_bulk(objectDict.keys())
+
+	for id, photo in results.iteritems():
+		photo.twofishes_data = objectDict[id].twofishes_data
+		photo.location_city = objectDict[id].location_city
+		objsToUpdate.append(photo)
+
+	bulk_update(objsToUpdate)
+
 """
 	Static method for populating extra info like twoFishes.
 
@@ -90,7 +102,7 @@ def populateLocationInfo(photos):
 
 	logger.info("Got back %s results from twofishes" % len(twoFishesResults))
 
-	photosToUpdate = list()
+	photosToUpdate = dict()
 	for i, photo in enumerate(photosWithLL):
 		city = getCity(twoFishesResults[i])
 		if city:
@@ -98,14 +110,16 @@ def populateLocationInfo(photos):
 
 		formattedResult = {"interpretations": twoFishesResults[i]}
 		photo.twofishes_data = json.dumps(formattedResult)
-		photosToUpdate.append(photo)
+		photosToUpdate[photo.id] = photo
 
 	logger.info("Updating %s photos" % len(photosToUpdate))
 
 	if len(photosToUpdate) == 1:
-		photosToUpdate[0].save()
+		photosToUpdate.values()[0].save()
 	else:
-		bulk_update(photosToUpdate)
+		smartBulkUpdate(photosToUpdate)
+
+	return len(photosToUpdate)
 
 """
 	Makes call to twofishes and gets back raw json

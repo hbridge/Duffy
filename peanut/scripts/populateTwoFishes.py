@@ -23,9 +23,9 @@ def main(argv):
 
 		if len(photos) > 0:
 			logger.info("Found {0} images that need two fishes data".format(len(photos)))
-			location_util.populateLocationInfo(photos)
-
-		time.sleep(1)
+			numUpdated = location_util.populateLocationInfo(photos)
+		else:
+			time.sleep(1)
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/twofishes.log',
