@@ -20,19 +20,18 @@ def main(argv):
 	while True:
 		results = Photo.objects.all().filter(user__gt=75).exclude(thumb_filename=None).filter(clustered_time=None).values('user').annotate(Count('user'))
 
-		if len(results) == 0:
-			logger.info("Found no users with photos needing similarity processing at " + time.strftime("%c"))
-		for result in results:
-			userId = result['user']
-			logger.info("Processing user id:  " + str(userId))
-			nonClusteredPhotos = list(Photo.objects.select_related().filter(user_id=userId).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
-			
-			tStart = datetime.datetime.utcnow()
-			logger.info("{0}: Unclustered photos: {1}".format(tStart, len(nonClusteredPhotos)))
-			count = cluster_util.addToClustersBulk(nonClusteredPhotos)
-			logger.info("{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, count))
-			
-		time.sleep(5)
+		if len(results) > 0:	
+			for result in results:
+				userId = result['user']
+				logger.info("Processing user id:  " + str(userId))
+				nonClusteredPhotos = list(Photo.objects.select_related().filter(user_id=userId).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
+				
+				tStart = datetime.datetime.utcnow()
+				logger.info("{0}: Unclustered photos: {1}".format(tStart, len(nonClusteredPhotos)))
+				count = cluster_util.addToClustersBulk(nonClusteredPhotos)
+				logger.info("{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, count))
+		else:
+			time.sleep(5)	
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/similarity.log',
