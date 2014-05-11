@@ -80,8 +80,8 @@ class PhotoAPI(APIView):
 
 			return Response(serializer.data)
 		else:
-			print "Serializer errors"
-			logger.error(serializer.errors)
+			logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	def post(self, request, format=None):
@@ -147,7 +147,7 @@ class PhotoBulkAPI(APIView):
 					objsToCreate.append(serializer.object)
 				else:
 					logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
-					return Response(response, status=status.HTTP_400_BAD_REQUEST)
+					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 			
 			dups = list()
 			try:
