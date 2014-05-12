@@ -91,6 +91,7 @@ def getClusters(photoSet, threshold, dupThreshold):
 	sims = Similarity.objects.filter(photo_1__in=photoSetList).filter(photo_2__in=photoSetList).order_by('similarity')
 
 	# start building clusters
+	clusterList = list()
 	'''
 	clusterList
 		cluster
@@ -111,7 +112,6 @@ def getClusters(photoSet, threshold, dupThreshold):
 		   	   --> ...
 		   --> count
 	'''
-	clusterList = list()
 
 	for result in photoSet:
 		if (len(clusterList) == 0):

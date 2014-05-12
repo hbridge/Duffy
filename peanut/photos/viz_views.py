@@ -63,111 +63,92 @@ def groups(request, user_id):
 	return render(request, 'photos/groups.html', context)
 
 
-def search(request, user_id=None):
-	if (user_id):
-		# This is the original jquery mobile code
-		try:
-			user = User.objects.get(id=user_id)
-		except User.DoesNotExist:
-			return HttpResponse("User id " + str(user_id) + " does not exist")
+def search(request):
+	# new webview code that's served in the iOS app
+	tStart = time.time()
+	if request.method == 'GET':
+		data = request.GET
+	elif request.method == 'POST':
+		data = request.POST
 
-		thumbnailBasepath = "/user_data/" + str(user.id) + "/"
-
-		numPhotos = Photo.objects.filter(user_id = user.id).count()
-
-		context = {	'user' : user,
-					'numPhotos': numPhotos,
-					'thumbnailBasepath': thumbnailBasepath}
-		return render(request, 'photos/search.html', context)		
+	if data.has_key('user_id'):
+		userId = data['user_id']
 	else:
-		# new webview code that's served in the iOS app
-		tStart = time.time()
-		if request.method == 'GET':
-			data = request.GET
-		elif request.method == 'POST':
-			data = request.POST
+		return HttpResponse("Please specify a userId")
 
-		if data.has_key('user_id'):
-			userId = data['user_id']
+	if data.has_key('imagesize'):
+		imageSize = int(data['imagesize'])
+	else:
+		imageSize = 78;
+
+	width = imageSize*2 #doubled  for retina
+
+	if data.has_key('debug'):
+		debug = True
+	else:
+		debug = False
+
+	if data.has_key('threshold'):
+		threshold = int(data['threshold'])
+	else:
+		threshold = 75;
+
+	if data.has_key('dupthreshold'):
+		dupThreshold = int(data['dupthreshold'])
+	else:
+		dupThreshold = 40
+
+	if debug:
+		dupThreshold = -1
+
+
+	try:
+		user = User.objects.get(id=userId)
+	except User.DoesNotExist:
+		return HttpResponse("User id " + str(userId) + " does not exist")
+
+	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
+
+	# if no searchbox flag, then must have query
+	if data.has_key('searchbox'):
+		searchBox = True
+		if data.has_key('q'):
+			query = data['q']
 		else:
-			return HttpResponse("Please specify a userId")
-
-		if data.has_key('imagesize'):
-			imageSize = int(data['imagesize'])
+			query = ''
+	else:
+		searchBox = False
+		if data.has_key('q'):
+			query = data['q']
 		else:
-			imageSize = 78;
+			return HttpResponse("Please specify a query")
 
-		width = imageSize*2 #doubled  for retina
+	setSession(request, user.id)
+	resultsDict = dict()
 
-		if data.has_key('debug'):
-			debug = True
-		else:
-			debug = False
+	resultsDict['indexSize'] = SearchQuerySet().all().filter(userId=userId).count()
 
-		if data.has_key('threshold'):
-			threshold = int(data['threshold'])
-		else:
-			threshold = 75;
+	# if there is a query, send results through.
+	if (query):
+		(startDate, newQuery) = search_util.getNattyInfo(query)
+		searchResults = search_util.solrSearch(user.id, startDate, newQuery)
 
-		if data.has_key('dupthreshold'):
-			dupThreshold = int(data['dupthreshold'])
-		else:
-			dupThreshold = 40
+		totalResults = searchResults.count()
+		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold)
 
-		if debug:
-			dupThreshold = -1
+		photoIdToThumb = dict()
+		resultsDict['totalResults'] = totalResults
+		resultsDict['photoResults'] = photoResults
 
-
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return HttpResponse("User id " + str(userId) + " does not exist")
-
-		thumbnailBasepath = "/user_data/" + str(user.id) + "/"
-
-		# if no searchbox flag, then must have query
-		if data.has_key('searchbox'):
-			searchBox = True
-			if data.has_key('q'):
-				query = data['q']
-			else:
-				query = ''
-		else:
-			searchBox = False
-			if data.has_key('q'):
-				query = data['q']
-			else:
-				return HttpResponse("Please specify a query")
-
-		setSession(request, user.id)
-		resultsDict = dict()
-
-		resultsDict['indexSize'] = SearchQuerySet().all().filter(userId=userId).count()
-
-		# if there is a query, send results through.
-		if (query):
-			(startDate, newQuery) = search_util.getNattyInfo(query)
-			searchResults = search_util.solrSearch(user.id, startDate, newQuery)
-
-			totalResults = searchResults.count()
-			photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold)
-
-			photoIdToThumb = dict()
-			for result in searchResults:
-				photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, user.id)
-			resultsDict['totalResults'] = totalResults
-			resultsDict['photoResults'] = photoResults
-			resultsDict['photoIdToThumb'] = photoIdToThumb
-
-		context = {	'user' : user,
-					'imageSize': imageSize,
-					'resultsDict': resultsDict,
-					'searchBox' : searchBox, 
-					'debug' : debug,
-					'query': query,
-					'userId': userId,
-					'thumbnailBasepath': thumbnailBasepath}
-		return render(request, 'photos/search_webview.html', context)
+	context = {	'user' : user,
+				'imageSize': imageSize,
+				'resultsDict': resultsDict,
+				'searchBox' : searchBox, 
+				'debug' : debug,
+				'query': query,
+				'userId': userId,
+				'thumbnailBasepath': thumbnailBasepath}
+	return render(request, 'photos/search_webview.html', context)
 
 
 
@@ -198,12 +179,6 @@ def gallery(request, user_id):
 
 	photoQuery = Photo.objects.filter(user_id=user.id)
 	photos = gallery_util.splitPhotosFromDBbyMonth(user.id, photoQuery, groupThreshold)
-
-	for entry in photos:
-		for photo in entry['mainPhotos']:
-			image_util.imageThumbnail(photo.full_filename, width, user.id)
-		for photo in entry['subPhotos']:
-			image_util.imageThumbnail(photo.full_filename, width, user.id)
 
 
 	context = {	'user' : user,
