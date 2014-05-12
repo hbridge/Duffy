@@ -63,6 +63,7 @@
 		5AC40EE11909B2C000ED3532 /* DFPhotoStore+IntegrityCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC40EE01909B2C000ED3532 /* DFPhotoStore+IntegrityCheck.m */; };
 		5AC40EE4190AD0E700ED3532 /* DFUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC40EE3190AD0E700ED3532 /* DFUploadController.m */; };
 		5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC677E71906F027002F9D42 /* DFDataHasher.m */; };
+		5AD62A5119215C6300EE22D7 /* ALAsset+DFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */; };
 		5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */; };
 		5AD8AD40191BDFCB00782144 /* DFPeanutFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */; };
 		5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */; };
@@ -215,6 +216,8 @@
 		5AC677E61906F027002F9D42 /* DFDataHasher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDataHasher.h; sourceTree = "<group>"; };
 		5AC677E71906F027002F9D42 /* DFDataHasher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDataHasher.m; sourceTree = "<group>"; };
 		5AC677E9190700F6002F9D42 /* Duffy 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 3.xcdatamodel"; sourceTree = "<group>"; };
+		5AD62A4F19215C6300EE22D7 /* ALAsset+DFExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "ALAsset+DFExtensions.h"; sourceTree = "<group>"; };
+		5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ALAsset+DFExtensions.m"; sourceTree = "<group>"; };
 		5AD8AD3B191AD76F00782144 /* DFFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFaceFeature.h; sourceTree = "<group>"; };
 		5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFaceFeature.m; sourceTree = "<group>"; };
 		5AD8AD3E191BDFCB00782144 /* DFPeanutFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFaceFeature.h; sourceTree = "<group>"; };
@@ -710,6 +713,8 @@
 				5A8C98F81911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m */,
 				5AD8AD4B191FCDE800782144 /* DFAppInfo.h */,
 				5AD8AD4C191FCDE800782144 /* DFAppInfo.m */,
+				5AD62A4F19215C6300EE22D7 /* ALAsset+DFExtensions.h */,
+				5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -931,6 +936,7 @@
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */,
 				5A8C98EE19115BB800AE9F88 /* DFPhotoMetadataAdapter.m in Sources */,
+				5AD62A5119215C6300EE22D7 /* ALAsset+DFExtensions.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
 				5A8C98EB190EE78B00AE9F88 /* DFLocationPinger.m in Sources */,
 				5AC40EE4190AD0E700ED3532 /* DFUploadController.m in Sources */,

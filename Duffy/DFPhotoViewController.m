@@ -14,6 +14,7 @@
 #import "DFPhoto.h"
 #import "DFPhoto+FaceDetection.h"
 #import "NSDictionary+DFJSON.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 @interface DFPhotoViewController ()
 
@@ -51,12 +52,14 @@
                self.photo.creationHashData.description,
                self.photo.currentHashData.description);
   
-  DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved] JSONStringPrettyPrinted:YES]);
+  DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved]
+                                       JSONStringPrettyPrinted:YES]);
 //  [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
 //    DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
 //  }];
   NSSet *faceFeatures = self.photo.faceFeatures;
-  DDLogVerbose(@"DFFaceFeatures sources:%du count:%lu", self.photo.faceFeatureSources, faceFeatures.count);
+  DDLogVerbose(@"DFFaceFeatures sources:%du count:%lu", self.photo.faceFeatureSources,
+               (unsigned long)faceFeatures.count);
 }
 
 - (void)didReceiveMemoryWarning

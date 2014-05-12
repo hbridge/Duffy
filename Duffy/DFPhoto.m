@@ -18,6 +18,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFUser.h"
 #import "DFPhoto+FaceDetection.h"
+#import "ALAsset+DFExtensions.h"
 
 @interface DFPhoto()
 
@@ -44,20 +45,20 @@
 NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
 NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
-
 + (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset withHashData:(NSData *)hashData inContext:(NSManagedObjectContext *)context
 {
   DFPhoto *newPhoto = [NSEntityDescription
                        insertNewObjectForEntityForName:@"DFPhoto"
                        inManagedObjectContext:context];
   newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
-  newPhoto.creationDate = [asset valueForProperty:ALAssetPropertyDate];
+  newPhoto.creationDate = [asset creationDate];
   newPhoto.creationHashData = hashData;
   newPhoto.hasLocation = ([asset valueForProperty:ALAssetPropertyLocation] != nil);
   newPhoto.userID = [[DFUser currentUser] userID];
   
   return newPhoto;
 }
+
 
 
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext
@@ -376,20 +377,7 @@ static void releaseAssetCallback(void *info) {
   NSParameterAssert(self.asset != nil);
   NSParameterAssert(size > 0);
   
-  ALAssetRepresentation *rep = [self.asset defaultRepresentation];
-  
-  CGDataProviderDirectCallbacks callbacks = {
-    .version = 0,
-    .getBytePointer = NULL,
-    .releaseBytePointer = NULL,
-    .getBytesAtPosition = getAssetBytesCallback,
-    .releaseInfo = releaseAssetCallback,
-  };
-  
-  CGDataProviderRef provider = CGDataProviderCreateDirect((void *)CFBridgingRetain(rep),
-                                                          [rep size],
-                                                          &callbacks);
-  CGImageSourceRef source = CGImageSourceCreateWithDataProvider(provider, NULL);
+  CGImageSourceRef source = [self createImageSourceRefForAsset];
   
   NSDictionary *imageOptions =
   @{
@@ -402,7 +390,7 @@ static void releaseAssetCallback(void *info) {
                                                             0,
                                                             (__bridge CFDictionaryRef) imageOptions);
   CFRelease(source);
-  CFRelease(provider);
+  
   
   return imageRef;
 }
@@ -418,6 +406,27 @@ static void releaseAssetCallback(void *info) {
   CFRelease(imageRef);
   
   return toReturn;
+}
+
+
+- (CGImageSourceRef)createImageSourceRefForAsset
+{
+  ALAssetRepresentation *rep = [self.asset defaultRepresentation];
+  
+  CGDataProviderDirectCallbacks callbacks = {
+    .version = 0,
+    .getBytePointer = NULL,
+    .releaseBytePointer = NULL,
+    .getBytesAtPosition = getAssetBytesCallback,
+    .releaseInfo = releaseAssetCallback,
+  };
+  
+  CGDataProviderRef provider = CGDataProviderCreateDirect((void *)CFBridgingRetain(rep),
+                                                          [rep size],
+                                                          &callbacks);
+  CGImageSourceRef source = CGImageSourceCreateWithDataProvider(provider, NULL);
+  CFRelease(provider);
+  return source;
 }
 
 #pragma mark - JPEGData Access

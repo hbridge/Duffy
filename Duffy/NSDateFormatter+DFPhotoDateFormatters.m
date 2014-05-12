@@ -12,18 +12,25 @@
 
 + (NSDateFormatter *)EXIFDateFormatter
 {
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"];
-    return dateFormatter;
+  static NSDateFormatter *exifFormatter = nil;
+  if (!exifFormatter) {
+    exifFormatter = [[NSDateFormatter alloc] init];
+    exifFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    [exifFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"];
+  }
+    return exifFormatter;
 }
 
 + (NSDateFormatter *)DjangoDateFormatter
 {
-    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-    [dateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
-    return dateFormatter;
+  static NSDateFormatter *djangoDateFormatter = nil;
+  if (!djangoDateFormatter) {
+    djangoDateFormatter = [[NSDateFormatter alloc] init];
+    djangoDateFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+    [djangoDateFormatter setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+  }
+  
+  return djangoDateFormatter;
 }
-
-
 
 @end
