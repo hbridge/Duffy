@@ -105,7 +105,7 @@
         return _managedObjectContext;
     }
   
-  _managedObjectContext = [[DFPhotoStore sharedStore] createBackgroundManagedObjectContext];
+  _managedObjectContext = [DFPhotoStore createBackgroundManagedObjectContext];
     return _managedObjectContext;
 }
 

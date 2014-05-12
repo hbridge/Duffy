@@ -21,7 +21,7 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 + (DFPhotoStore *)sharedStore;
 
 // Get a background context for use on background thread
-- (NSManagedObjectContext *)createBackgroundManagedObjectContext;
++ (NSManagedObjectContext *)createBackgroundManagedObjectContext;
 
 // Get the shared ALAssets library for other model files
 @property (readonly, strong, nonatomic) ALAssetsLibrary *assetsLibrary;

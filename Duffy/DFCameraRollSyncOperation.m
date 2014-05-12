@@ -16,6 +16,7 @@
 #import "DFDataHasher.h"
 #import "NSNotificationCenter+DFThreadingAddons.h"
 
+static int NumChangesFlushThreshold = 100;
 
 @interface DFCameraRollSyncOperation()
 
@@ -37,13 +38,6 @@
     DFPhotoCollection *knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
     NSDictionary *knownPhotoURLsToHashes = [self mapKnownPhotoURLsToHashes:knownPhotos];
     NSDictionary *changes = [self findChangesWithKnownPhotos:knownPhotos urlsToHashes:knownPhotoURLsToHashes];
-    
-    // save changes
-    if (self.isCancelled) {
-      [self cancelled];
-      return;
-    }
-    [self saveChanges:changes];
     
     // gather info about total changes then send notification that a scan completed
     NSDictionary *changeTypesToCounts = [self changeTypesToCountsForChanges:changes];
@@ -81,31 +75,32 @@
 - (NSDictionary *)findChangesWithKnownPhotos:(DFPhotoCollection *)knownPhotos
                                 urlsToHashes:(NSDictionary *)knownPhotosURLsToHashes
 {
-  dispatch_semaphore_t findNewAssetSemaphore = dispatch_semaphore_create(0);
-  NSMutableSet __block *knownAndFoundURLs = [[knownPhotos photoURLSet] mutableCopy];
+  dispatch_semaphore_t enumerationCompleteSemaphore = dispatch_semaphore_create(0);
+  NSMutableSet __block *foundURLs = [[knownPhotos photoURLSet] mutableCopy];
   NSMutableSet __block *knownNotFoundURLs = [[knownPhotos photoURLSet] mutableCopy];
   NSMutableDictionary __block *knownAndFoundURLsToHashes = [knownPhotosURLsToHashes mutableCopy];
   
   NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   NSMutableDictionary __block *objectIDsToChanges = [[NSMutableDictionary alloc] init];
+  NSMutableDictionary __block *toSaveObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   
   void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
-#ifdef DEBUG
-    //usleep(1000000/10 * 3);
-    
-#endif
     if(photoAsset != NULL) {
+      if (toSaveObjectIDsToChanges.count > NumChangesFlushThreshold) {
+        [groupObjectIDsToChanges addEntriesFromDictionary:toSaveObjectIDsToChanges];
+        [self flushChanges:toSaveObjectIDsToChanges];
+      }
       NSString *assetURLString = [[photoAsset valueForProperty: ALAssetPropertyAssetURL] absoluteString];
       NSData *assetHash = [DFDataHasher hashDataForALAsset:photoAsset];
       [knownNotFoundURLs removeObject:assetURLString];
       
       
       // We have this asset in our DB, see if it matches what we expect
-      if ([knownAndFoundURLs containsObject:assetURLString]) {
+      if ([knownPhotos.photoURLSet containsObject:assetURLString]) {
         // Check the actual asset hash against our stored hash, if it doesn't match, delete and recreate the DFPhoto with new info.
         if (![assetHash isEqual:knownAndFoundURLsToHashes[assetURLString]]){
           NSDictionary *changes = [self assetDataChangedForAsset:photoAsset withNewHashData:assetHash];
-          [groupObjectIDsToChanges addEntriesFromDictionary:changes];
+          [toSaveObjectIDsToChanges addEntriesFromDictionary:changes];
           // set to the new known hash
           knownAndFoundURLsToHashes[assetURLString] = assetHash;
         }
@@ -117,14 +112,15 @@
                                                         inContext:self.managedObjectContext];
           
           // store information about the new photo to notify
-          groupObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
+          toSaveObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
           // add to list of knownURLs so we don't duplicate add it
         }
         // in either case, add mappings
-        [knownAndFoundURLs addObject:assetURLString];
+        [foundURLs addObject:assetURLString];
         knownAndFoundURLsToHashes[assetURLString] = assetHash;
       }
     } else {
+      [groupObjectIDsToChanges addEntriesFromDictionary:toSaveObjectIDsToChanges];
       DDLogInfo(@"...all assets in group enumerated, changes: \n%@", [self changeTypesToCountsForChanges:groupObjectIDsToChanges].description);
       [objectIDsToChanges addEntriesFromDictionary:groupObjectIDsToChanges];
       [groupObjectIDsToChanges removeAllObjects];
@@ -136,21 +132,29 @@
       [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
       DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
       [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:assetEnumerator];
+      if ([[group valueForProperty:ALAssetsGroupPropertyName] isEqualToString:@"Camera Roll"]){
+        [self flushChanges:toSaveObjectIDsToChanges]; // don't need to transfer toSaveChanges because they've already been rolled into the objectIdToChanges dict
+      }
     } else {
-      dispatch_semaphore_signal(findNewAssetSemaphore);
+      dispatch_semaphore_signal(enumerationCompleteSemaphore);
     }
   };
   
-  [[[DFPhotoStore sharedStore] assetsLibrary]
+  
+  ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+  [library
    enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos | ALAssetsGroupAlbum
    usingBlock:assetGroupEnumerator
    failureBlock: ^(NSError *error) {
      DDLogError(@"Failed to enumerate photo groups: %@", error.localizedDescription);
-     dispatch_semaphore_signal(findNewAssetSemaphore);
+     dispatch_semaphore_signal(enumerationCompleteSemaphore);
    }];
-  dispatch_semaphore_wait(findNewAssetSemaphore, DISPATCH_TIME_FOREVER);
+  dispatch_semaphore_wait(enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
   
-  [objectIDsToChanges addEntriesFromDictionary:[self removePhotosNotFound:knownNotFoundURLs]];
+  NSDictionary *removeChanges = [self removePhotosNotFound:knownNotFoundURLs];
+  [objectIDsToChanges addEntriesFromDictionary:removeChanges];
+  [toSaveObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  [self flushChanges:toSaveObjectIDsToChanges];
   DDLogInfo(@"Scan complete.  Change summary for all groups: \n%@", [self changeTypesToCountsForChanges:objectIDsToChanges]);
   
   return objectIDsToChanges;
@@ -187,7 +191,14 @@
   return objectIDsToChanges;
 }
 
-- (void)saveChanges:(NSDictionary *)accumulatedChanges
+
+- (void)flushChanges:(NSMutableDictionary *)changes
+{
+  [self saveChanges:[changes copy]];
+  [changes removeAllObjects];
+}
+
+- (void)saveChanges:(NSDictionary *)changes
 {
   // save to the store so that the main thread context can pick it up
   NSError *error = nil;
@@ -199,7 +210,7 @@
     } else {
       [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
                                                                     object:self
-                                                                  userInfo:accumulatedChanges];
+                                                                  userInfo:changes];
     }
   }
 }
@@ -227,7 +238,7 @@
     return _managedObjectContext;
   }
   
-  _managedObjectContext = [[DFPhotoStore sharedStore] createBackgroundManagedObjectContext];
+  _managedObjectContext = [DFPhotoStore createBackgroundManagedObjectContext];
   return _managedObjectContext;
 }
 

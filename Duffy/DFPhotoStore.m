@@ -79,7 +79,7 @@ static DFPhotoStore *defaultStore;
 }
 
 
-- (NSManagedObjectContext *)createBackgroundManagedObjectContext
++ (NSManagedObjectContext *)createBackgroundManagedObjectContext
 {
   NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
   managedObjectContext.persistentStoreCoordinator = [DFPhotoStore persistentStoreCoordinator];

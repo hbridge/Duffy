@@ -107,7 +107,9 @@
     // Set the unique userID for logging
     [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
     [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
-    
+  
+  [DFPhotoStore sharedStore];
+  
     // Camera roll tab
     DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
     UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];

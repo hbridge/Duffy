@@ -29,7 +29,7 @@
                                                      name:DFPhotoStoreCameraRollScanComplete
                                                    object:nil];
         self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
-        
+      
         self.navigationController.navigationItem.title = @"Camera Roll";
         self.tabBarItem.title = @"Camera Roll";
         self.tabBarItem.image = [UIImage imageNamed:@"Timeline"];
@@ -94,6 +94,10 @@
     
     self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
     [self.collectionView reloadData];
+  if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
+    [[DFUploadController sharedUploadController] uploadPhotos];
+  }
+
     DDLogInfo(@"cameraViewController view updated. %lu photos in camera roll.", (unsigned long)self.photos.count);
 }
 
