@@ -78,6 +78,14 @@ static DFPhotoStore *defaultStore;
     return self;
 }
 
+
+- (NSManagedObjectContext *)createBackgroundManagedObjectContext
+{
+  NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
+  managedObjectContext.persistentStoreCoordinator = [DFPhotoStore persistentStoreCoordinator];
+  return managedObjectContext;
+}
+
 - (void)createCacheDirectories
 {
     // thumbnails
@@ -410,8 +418,22 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                                                            error:&error]) {
 
       DDLogError(@"Error loading persistent store %@, %@", error, [error userInfo]);
-      DDLogWarn(@"Deleting persistent store %@", storeURL);
+      error = nil;
       [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil];
+      DDLogWarn(@"Deleted persistent store %@, error: %@", storeURL, error);
+      error = nil;
+      NSURL *storeShm = [[storeURL URLByDeletingPathExtension]
+                         URLByAppendingPathComponent:@"sqlite-shm"];
+      [[NSFileManager defaultManager] removeItemAtURL:storeShm
+                                                error:&error];
+      DDLogWarn(@"Deleted store shm %@, error: %@", storeShm, error);
+      error = nil;
+      NSURL *storeWal = [[storeURL URLByDeletingPathExtension]
+                         URLByAppendingPathComponent:@"sqlite-wal"];
+      [[NSFileManager defaultManager] removeItemAtURL:storeWal
+                                                error:&error];
+      DDLogWarn(@"Deleted store wal %@, error: %@", storeWal, error);
+      
       if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
                                                      configuration:nil
                                                                URL:storeURL
@@ -440,6 +462,11 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
             }
         }
     }
+}
+
+- (void)resetStore
+{
+  
 }
 
 #pragma mark - Application's Documents directory

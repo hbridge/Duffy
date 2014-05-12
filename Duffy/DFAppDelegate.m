@@ -191,4 +191,11 @@
 }
 
 
+- (void)resetApplication
+{
+  
+}
+
+
+
 @end
