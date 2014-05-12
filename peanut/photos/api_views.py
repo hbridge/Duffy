@@ -54,10 +54,13 @@ class PhotoAPI(APIView):
 			logger.info("Photo id does not exist: %s   returning 404" % (photoId))
 			raise Http404
 
-	def get(self, request, photoId, format=None):
-		photo = self.getObject(photoId)
-		serializer = PhotoSerializer(photo)
-		return Response(serializer.data)
+	def get(self, request, photoId=None, format=None):
+		if (photoId):
+			photo = self.getObject(photoId)
+			serializer = PhotoSerializer(photo)
+			return Response(serializer.data)
+		else:
+			pass
 
 	def put(self, request, photoId, format=None):
 		photo = self.getObject(photoId)
@@ -73,11 +76,6 @@ class PhotoAPI(APIView):
 			serializer.save()
 
 			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
-
-			# TODO(derek): get these working again, leaving as place holder
-			#thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
-			#thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
-
 			return Response(serializer.data)
 		else:
 			logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
@@ -89,13 +87,10 @@ class PhotoAPI(APIView):
 		if serializer.is_valid():
 			try:
 				serializer.save()
-
 				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
-			
-				thread.start_new_thread(Photo.populateExtraData, (serializer.data["id"],))
-				thread.start_new_thread(cluster_util.startThreadCluster, (serializer.data["id"],))
 			except IntegrityError:
-				pass
+				logger.error("IntegrityError")
+				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 				
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -182,46 +177,6 @@ class PhotoBulkAPI(APIView):
 		else:
 			logger.info("Got request with no bulk_photos, returning 400")
 			return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
-"""
-	Add a photo that is submitted through a POST.  Both the manualAddPhoto webpage
-	and the iPhone app call this endpoint.
-
-	This creates a database entry for the photo and copies it into the user directory
-"""
-@csrf_exempt
-def add_photo(request):
-	response_data = {}
-
-	if request.method == 'POST':
-		form = ManualAddPhoto(request.POST, request.FILES)
-		if form.is_valid():
-			phoneId = form.cleaned_data['phone_id']
-			photoMetadata = form.cleaned_data['photo_metadata']
-			locationData = form.cleaned_data['location_data']
-			iPhoneFaceboxesTopleft = form.cleaned_data['iphone_faceboxes_topleft']
-
-			try:
-				user = User.objects.get(phone_id=phoneId)
-			except User.DoesNotExist:
-				user = createUser(phoneId, "")
-
-			tempFilepath = tempfile.mktemp()
- 
-			image_util.writeOutUploadedFile(request.FILES['file'], tempFilepath)
-			image_util.addPhoto(user, request.FILES['file'].name, tempFilepath, photoMetadata, locationData, iPhoneFaceboxesTopleft)
-
-			response_data['result'] = True
-			response_data['debug'] = ""
-			return HttpResponse(json.dumps(response_data), content_type="application/json")
-		else:
-			response_data['result'] = False
-			response_data['debug'] = 'Form data is incorrect'
-			return HttpResponse(json.dumps(response_data), content_type="application/json")
-	else:
-		return HttpResponse("This needs to be a POST")
-
-
 
 """
 Search api function that returns the gallery view. Used by the /viz/search?user_id=<userID>

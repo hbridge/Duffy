@@ -3,7 +3,6 @@ from rest_framework.urlpatterns import format_suffix_patterns
 from photos import api_views
 
 urlpatterns = patterns('photos.api_views',
-	url(r'^addPhoto$', 'add_photo'),
 	url(r'^search$', 'search'),
 	url(r'^searchJQmobile$', 'searchJQmobile'),
 	url(r'^get_suggestions$', 'get_suggestions'),

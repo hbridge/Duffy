@@ -4,7 +4,7 @@
 </head>
 <body>
 This form allows you to upload a photo for a user.<br>
-<form action="/api/addPhoto" method="post" enctype= "multipart/form-data">{% csrf_token %}
+<form action="/api/photos/" method="post" enctype= "multipart/form-data">{% csrf_token %}
 <br>
 {{ form.as_p }}
 <input type="submit" value="Upload File">

@@ -55,11 +55,14 @@ def imageThumbnail(photoFname, size, userId):
 	path = '/home/derek/user_data/' + str(userId) + '/'
 	newFilename = str.split(str(photoFname), '.')[0] + "-thumb-" + str(size) + '.jpg'
 	outfilePath = path + newFilename
+	infilePath = path + str(photoFname)
+	
+	if (not os.path.isfile(infilePath)):
+		logger.info("File not found: '%s'" % infilePath)
+		return None
 
 	if (os.path.isfile(outfilePath)):
 		return newFilename
-
-	infilePath = path + str(photoFname)
 
 	if(resizeImage(infilePath, outfilePath, size, True, False)):
 		logger.info("generated thumbnail: '%s" % outfilePath)
@@ -119,6 +122,8 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 	Then, it looks in the file EXIF data
 
 	Returns a datetime object which can be put straight into the database
+
+	TODO(Derek):  Not used now, move or remove
 """
 def getTimeTaken(metadataJson, origFilename, photoPath):
 	# first see if the data is in the metadata json
@@ -211,41 +216,6 @@ def handleUploadedImagesBulk(request, photos):
 		logger.error("Have request with %s files and only %s photos updated" % (len(request.FILES), len(photosToUpdate)))
 		
 	return photosToUpdate
-	
-"""
-	Utility method to add a photo for a user.  Takes in original path (probably uploaded), file info,
-	and metadata about the photo.  It then saves assigns the photo a new id, renames it, adds it to the database
-	then tries to populate the time_taken and location_city fields
-
-	TODO(derek):  Remove this and rely upon proccessUploadedPhoto and REST API
-"""
-def addPhoto(user, origPath, localFilepath, metadata, locationData, iPhoneFaceboxesTopleft):
-	photo = Photo(	user = user,
-					location_data = locationData,
-					orig_filename = origPath,
-					metadata = metadata,
-					iphone_faceboxes_topleft = iPhoneFaceboxesTopleft)
-	photo.save()
-
-	base, origFilename = os.path.split(origPath)
-	filenameNoExt, fileExtension = os.path.splitext(origPath)
-	newFilename = str(photo.id) + fileExtension
-
-	userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(user.id))
-	newFilePath = os.path.join(userDataPath, newFilename)
-
-	photo.full_filename = newFilename
-
-	os.rename(localFilepath, newFilePath)
-
-	timeTaken = getTimeTaken(metadata, origFilename, newFilePath)
-	if (timeTaken):
-		photo.time_taken = timeTaken
-
-	photo.save()
-
-	# last step: generate a thumbnail
-	imageThumbnail(photo.full_filename, 156, user.id)
 
 """
 	Moves an uploaded file to a new destination

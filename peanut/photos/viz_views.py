@@ -17,8 +17,6 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 import time
 
-
-
 	
 def manualAddPhoto(request):
 	form = ManualAddPhoto()
