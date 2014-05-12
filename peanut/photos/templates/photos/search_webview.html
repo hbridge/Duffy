@@ -148,10 +148,10 @@
 
 		function loadImages() {
 			$('#allImages').children().each(function(){
-				$(this).removeClass('hidden');
 				$(this).find('img.lazy').each(function() {
 					$(this).attr('src', $(this).attr('data-lazy-src'));	
 				});
+				$(this).removeClass('hidden');
 			});
 		}
 
