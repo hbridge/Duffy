@@ -47,6 +47,10 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 // Saves changes to disk
 - (void)saveContext;
 
+// wipe the store
+- (void)resetStore;
+
+
 + (NSURL *)applicationDocumentsDirectory;
 
 

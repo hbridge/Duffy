@@ -16,5 +16,6 @@
 
 - (void)showFirstTimeSetup;
 - (void)showLoggedInUserTabs;
+- (void)resetApplication;
 
 @end

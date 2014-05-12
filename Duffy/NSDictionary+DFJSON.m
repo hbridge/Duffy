@@ -87,4 +87,19 @@
     return mutableCopy;
 }
 
+
++ (NSDictionary *)dictionaryWithJSONString:(NSString *)jsonString
+{
+  NSError *error;
+  NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
+                                                       options:0
+                                                         error:&error];
+  if (error) {
+    DDLogWarn(@"Error converting:%@ to JSON object.", jsonString);
+    return nil;
+  }
+  
+  return dict;
+}
+
 @end

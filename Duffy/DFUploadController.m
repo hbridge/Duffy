@@ -18,6 +18,8 @@
 #import <RestKit/RestKit.h>
 #import "DFLocationPinger.h"
 #import "DFPeanutPhoto.h"
+#import "DFAppDelegate.h"
+#import "NSDictionary+DFJSON.h"
 
 @interface DFUploadController()
 
@@ -286,11 +288,17 @@ static DFUploadController *defaultUploadController;
             }
             self.currentSessionStats.numConsecutiveRetries++;
             self.currentSessionStats.numTotalRetries++;
+        } else if ([self isErrorBadLocalData:error]) {
+          DDLogWarn(@"Warning: local app state appears to be bad.  Askinng for reset.");
+          DFAppDelegate *appDelegate = (DFAppDelegate *)[[UIApplication sharedApplication] delegate];
+          NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
+          [cancelOperation start];
+          [appDelegate resetApplication];
         } else {
           DDLogInfo(@"Retry count exceeded (%d/%d) or error not retryable. Cancelling uploads.  Error:%@",
                     self.currentSessionStats.numConsecutiveRetries, MaxRetryCount, error.description);
             [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
-            NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
+            NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:YES];
             [cancelOperation start];
         }
         
@@ -311,33 +319,47 @@ static DFUploadController *defaultUploadController;
     return NO;
 }
 
+- (BOOL)isErrorBadLocalData:(NSError *)error
+{
+  NSDictionary *recoverySuggestionDict =
+  [NSDictionary dictionaryWithJSONString:error.localizedRecoverySuggestion];
+  if (!recoverySuggestionDict) return NO;
+  
+  if ([[recoverySuggestionDict allKeys] containsObject:@"user"]) {
+    return YES;
+  }
+  
+  return NO;
+}
+
 #pragma mark - End of uploads
 
 - (NSOperation *)cancelAllUploadsOperationWithIsError:(BOOL)isError silent:(BOOL)isSilent
 {
-    return [NSBlockOperation blockOperationWithBlock:^{
-        DDLogInfo(@"Cancelling all operations with isError:%@ isSilent%@",
-                  isError ? @"true" : @"false",
-                  isSilent ? @"true" : @"false");
-        [self.thumbnailsObjectIDQueue removeAllObjects];
-        [self.fullImageObjectIDQueue removeAllObjects];
-        [self.uploadOperationQueue cancelAllOperations];
-        _currentSessionStats = nil;
-        
-        if (!isSilent){
-            if (isError) {
-                [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateError
-                                                                                            numRemaining:0
-                                                                                                progress:0.0];
-            } else {
-                [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateCancelled
-                                                                                            numRemaining:0
-                                                                                                progress:0.0];
-            }
-            [DFAnalytics logUploadCancelledWithIsError:isError];
-        }
-        [self endBackgroundUpdateTask];
-    }];
+  return [NSBlockOperation blockOperationWithBlock:^{
+    DDLogInfo(@"Cancelling all operations with isError:%@ isSilent%@",
+              isError ? @"true" : @"false",
+              isSilent ? @"true" : @"false");
+    [self.thumbnailsObjectIDQueue removeAllObjects];
+    [self.fullImageObjectIDQueue removeAllObjects];
+    [self.uploadOperationQueue cancelAllOperations];
+    _managedObjectContext = nil;
+    _currentSessionStats = nil;
+    
+    if (!isSilent){
+      if (isError) {
+        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateError
+                                                                                    numRemaining:0
+                                                                                        progress:0.0];
+      } else {
+        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateCancelled
+                                                                                    numRemaining:0
+                                                                                        progress:0.0];
+      }
+      [DFAnalytics logUploadCancelledWithIsError:isError];
+    }
+    [self endBackgroundUpdateTask];
+  }];
 }
 
 - (NSOperation *)allUploadsCompleteOperation

@@ -14,5 +14,6 @@
 - (NSString *)JSONStringPrettyPrinted:(BOOL)prettyPrinted;
 - (NSDictionary *)dictionaryWithNonJSONRemoved;
 
++ (NSDictionary *)dictionaryWithJSONString:(NSString *)jsonString;
 
 @end

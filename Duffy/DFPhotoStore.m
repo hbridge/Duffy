@@ -455,9 +455,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
         if ([managedObjectContext hasChanges]){
             DDLogInfo(@"DB changes found, saving.");
             if(![managedObjectContext save:&error]) {
-                // Replace this implementation with code to handle the error appropriately.
-                // abort() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                DDLogError(@"Unresolved error %@, %@", error, [error userInfo]);
+                DDLogError(@"Unresolved error while saving %@, %@", error, [error userInfo]);
                 abort();
             }
         }
@@ -466,7 +464,14 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 
 - (void)resetStore
 {
+  DFPhotoCollection *allPhotos = [DFPhotoStore allPhotosCollectionUsingContext:[self managedObjectContext]];
   
+  DDLogInfo(@"Reset store requested.  Deleting %lu items.", (unsigned long)allPhotos.photoSet.count);
+  for (NSManagedObject *managedObject in allPhotos.photoSet) {
+    [_managedObjectContext deleteObject:managedObject];
+    DDLogVerbose(@"Deleted – %@", managedObject.description);
+  }
+  [self saveContext];
 }
 
 #pragma mark - Application's Documents directory

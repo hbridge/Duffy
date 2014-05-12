@@ -25,6 +25,7 @@
 #import <RestKit/RestKit.h>
 #import "DFLocationPinger.h"
 #import "DFAppInfo.h"
+#import "DFUploadController.h"
 
 
 
@@ -193,7 +194,19 @@
 
 - (void)resetApplication
 {
-  
+  dispatch_async(dispatch_get_main_queue(), ^{
+    DDLogInfo(@"Resetting application.");
+    [[DFCameraRollSyncController sharedSyncController] cancelSyncOperations];
+    [[DFUploadController sharedUploadController] cancelUploads];
+    [[DFPhotoStore sharedStore] resetStore];
+    
+    // clear user defaults
+    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+    
+    DDLogInfo(@"App reset complete.  Showing first time setup.");
+    [self showFirstTimeSetup];
+  });
 }
 
 

@@ -10,6 +10,8 @@
 
 @interface DFCameraRollSyncController : NSObject
 
++ (DFCameraRollSyncController *)sharedSyncController;
 - (void)asyncSyncToCameraRoll;
+- (void)cancelSyncOperations;
 
 @end
