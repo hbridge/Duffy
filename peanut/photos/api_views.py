@@ -108,16 +108,24 @@ class PhotoBulkAPI(APIView):
 
 		return ret
 
-	def handleDups(self, photos):
+	"""
+		This goes through and tries to save each photo and deals with IntegrityError's (dups)
+		If we find one, grab the current one in the db (which could be wrong), and update it
+		with the latest info
+	"""
+	def handleDups(self, photos, dupPhotoData):
 		photoDups = list()
-		for photo in photos:
+		for i, photo in enumerate(photos):
 			try:
 				photo.save()
 			except IntegrityError:
 				dup = Photo.objects.filter(iphone_hash=photo.iphone_hash).filter(user=photo.user)
 				if len(dup) > 0:
-					logger.info("Found dup photo in upload: " + str(dup[0].id))
-					photoDups.append(dup[0])
+					logger.warning("Found dup photo in upload: " + str(dup[0].id))
+					serializer = PhotoSerializer(dup[0], data=dupPhotoData[i])
+					if serializer.is_valid():
+						serializer.save()
+						photoDups.append(serializer.object)
 
 				if len(dup) > 1:
 					logger.error("Validation error for user id: " + str(photo.user) + " and " + photo.iphone_hash)
@@ -131,6 +139,9 @@ class PhotoBulkAPI(APIView):
 			photosData = json.loads(request.DATA["bulk_photos"])
 
 			objsToCreate = list()
+
+			# Keep this around incase we find dups, then we can update the photo with new data
+			dupPhotoData = list()
 			batchKey = randint(1,10000)
 
 			for photoData in photosData:
@@ -138,33 +149,30 @@ class PhotoBulkAPI(APIView):
 				photoData["bulk_batch_key"] = batchKey
 				serializer = PhotoSerializer(data=photoData)
 				if serializer.is_valid():
-					logger.debug("file_key: %s" % serializer.object.file_key)
 					objsToCreate.append(serializer.object)
+					dupPhotoData.append(photoData)
 				else:
-					logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
+					logger.error("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
 					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 			
 			dups = list()
 			try:
 				Photo.objects.bulk_create(objsToCreate)
 			except IntegrityError:
-				logger.info("Found dups in bulk upload")
-				dups = self.handleDups(objsToCreate)
+				logger.warning("Found dups in bulk upload")
+				dups = self.handleDups(objsToCreate, dupPhotoData)
 
 			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
 			dt = datetime.datetime.utcnow() - datetime.timedelta(seconds=60)
+
+			# This grabs all photos created in bulk_create and dups, since we're updating the batch_key
+			# with dups
 			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
 
 			updatedPhotos = list()
 			if len(createdPhotos) > 0:
 				updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
 
-				photoIds = list()
-				for photo in updatedPhotos:
-					photoIds.append(photo.id)
-				# Derek - commented out since not working
-				#thread.start_new_thread(location_util.populateLocationInfoByIds, (photoIds,))
-						
 			for photo in updatedPhotos:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
@@ -175,7 +183,7 @@ class PhotoBulkAPI(APIView):
 
 			return Response(response, status=status.HTTP_201_CREATED)
 		else:
-			logger.info("Got request with no bulk_photos, returning 400")
+			logger.error("Got request with no bulk_photos, returning 400")
 			return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 """
