@@ -9,10 +9,9 @@
 #import "DFDataHasher.h"
 #import <CommonCrypto/CommonDigest.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <ImageIO/ImageIO.h>
 
 @implementation DFDataHasher
-
-static const unsigned int ALAssetHashBytesLength = 1024 * 8;
 
 + (NSData *)hashDataForData:(NSData *)inputData
 {
@@ -26,16 +25,7 @@ static const unsigned int ALAssetHashBytesLength = 1024 * 8;
 
 + (NSData *)hashDataForALAsset:(ALAsset *)asset
 {
-    uint8_t assetBytesToHash[ALAssetHashBytesLength];
-    
-    NSError *error;
-    [asset.defaultRepresentation getBytes:assetBytesToHash fromOffset:0 length:ALAssetHashBytesLength error:&error];
-    if (error) {
-        [NSException raise:@"Could not hash ALAsset"
-                    format:@"Hashing ALAsset %@ failed: %@", [asset valueForProperty:ALAssetPropertyAssetURL], [error localizedDescription]];
-    }
-    
-    return [DFDataHasher hashDataForData:[NSData dataWithBytes:assetBytesToHash length:ALAssetHashBytesLength]];
+  return [DFDataHasher hashDataForData:[DFDataHasher JPEGDataForCGImage:asset.thumbnail withQuality:0.8]];
 }
 
 
@@ -49,6 +39,29 @@ static const unsigned int ALAssetHashBytesLength = 1024 * 8;
         [output appendFormat:@"%02x", bytes[i]];
     }
     return output;
+}
+
+
++ (NSData *)JPEGDataForCGImage:(CGImageRef)imageRef withQuality:(float)quality
+{
+  NSMutableData *outputData = [[NSMutableData alloc] init];
+  CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)outputData,
+                                                                   kUTTypeJPEG,
+                                                                   1,
+                                                                   NULL);
+  NSDictionary *properties = @{
+                               (__bridge NSString *)kCGImageDestinationLossyCompressionQuality: @(quality)
+                               };
+  
+  CGImageDestinationSetProperties(destRef,
+                                  (__bridge CFDictionaryRef)properties);
+  
+  CGImageDestinationAddImage(destRef,
+                             imageRef,
+                             NULL);
+  CGImageDestinationFinalize(destRef);
+  CFRelease(destRef);
+  return outputData;
 }
 
 
