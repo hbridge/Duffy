@@ -123,7 +123,7 @@ def getNearbyPhotos(photo, range, userPhotoCache):
 
 			nearbyPhotos = list()
 			if i > 0:
-				nearbyPhotos.extend(userPhotoCache[lowIndex:i-1])
+				nearbyPhotos.extend(userPhotoCache[lowIndex:i])
 
 			if i < len(userPhotoCache):
 				nearbyPhotos.extend(userPhotoCache[i+1:highIndex])

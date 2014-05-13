@@ -39,6 +39,11 @@ static int NumChangesFlushThreshold = 100;
     NSDictionary *knownPhotoURLsToHashes = [self mapKnownPhotoURLsToHashes:knownPhotos];
     NSDictionary *changes = [self findChangesWithKnownPhotos:knownPhotos urlsToHashes:knownPhotoURLsToHashes];
     
+    if (self.isCancelled) {
+      [self cancelled];
+      return;
+    }
+    
     // gather info about total changes then send notification that a scan completed
     NSDictionary *changeTypesToCounts = [self changeTypesToCountsForChanges:changes];
     NSUInteger numAdded = [(NSNumber *)changeTypesToCounts[DFPhotoChangeTypeAdded] unsignedIntegerValue];
@@ -86,6 +91,10 @@ static int NumChangesFlushThreshold = 100;
   
   void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
     if(photoAsset != NULL) {
+      if (self.isCancelled) {
+        *stop = YES;
+        return;
+      }
       if (toSaveObjectIDsToChanges.count > NumChangesFlushThreshold) {
         [groupObjectIDsToChanges addEntriesFromDictionary:toSaveObjectIDsToChanges];
         [self flushChanges:toSaveObjectIDsToChanges];
@@ -128,6 +137,11 @@ static int NumChangesFlushThreshold = 100;
   };
   
   void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
+    if (self.isCancelled) {
+      *stop = YES;
+      dispatch_semaphore_signal(enumerationCompleteSemaphore);
+      return;
+    }
     if(group != nil) {
       [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
       DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
@@ -150,6 +164,10 @@ static int NumChangesFlushThreshold = 100;
      dispatch_semaphore_signal(enumerationCompleteSemaphore);
    }];
   dispatch_semaphore_wait(enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
+  
+  if (self.isCancelled) {
+    return objectIDsToChanges;
+  }
   
   NSDictionary *removeChanges = [self removePhotosNotFound:knownNotFoundURLs];
   [objectIDsToChanges addEntriesFromDictionary:removeChanges];
