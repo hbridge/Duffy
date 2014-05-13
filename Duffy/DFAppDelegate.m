@@ -40,138 +40,138 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-
-    [self configureLogs];
-    DDLogVerbose(@"CocoaLumberjack active.");
-    
-    [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"7e0628b85696cfd8bd471f9906fbc79f"];
-    [[BITHockeyManager sharedHockeyManager].authenticator setIdentificationType:BITAuthenticatorIdentificationTypeDevice];
-    [[BITHockeyManager sharedHockeyManager] startManager];
-    
-    //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-    //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
-    RKLogConfigureByName("RestKit/Network", RKLogLevelError);
-    
-    
-    [Flurry setCrashReportingEnabled:NO];
-    #ifdef DEBUG
-    [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
-    //[Flurry setLogLevel:FlurryLogLevelDebug];
-    #else
-    [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
-    #endif
-    
-    if (![self isAppSetupComplete]) {
-        [self showFirstTimeSetup];
-    } else {
-        [self showLoggedInUserTabs];
-    }
-    
-    self.window.backgroundColor = [UIColor whiteColor];
-    [self.window makeKeyAndVisible];
-    return YES;
+  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  
+  [self configureLogs];
+  DDLogVerbose(@"CocoaLumberjack active.");
+  
+  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"7e0628b85696cfd8bd471f9906fbc79f"];
+  [[BITHockeyManager sharedHockeyManager].authenticator setIdentificationType:BITAuthenticatorIdentificationTypeDevice];
+  [[BITHockeyManager sharedHockeyManager] startManager];
+  
+  //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
+  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  RKLogConfigureByName("RestKit/Network", RKLogLevelError);
+  
+  
+  [Flurry setCrashReportingEnabled:NO];
+#ifdef DEBUG
+  [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
+  //[Flurry setLogLevel:FlurryLogLevelDebug];
+#else
+  [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
+#endif
+  
+  if (![self isAppSetupComplete]) {
+    [self showFirstTimeSetup];
+  } else {
+    [self showLoggedInUserTabs];
+  }
+  
+  self.window.backgroundColor = [UIColor whiteColor];
+  [self.window makeKeyAndVisible];
+  return YES;
 }
 
 - (void)configureLogs
 {
-    [DDLog addLogger:[DDASLLogger sharedInstance]];
-    [DDLog addLogger:[DDTTYLogger sharedInstance]];
-    
-    DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
-    fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
-    fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // 7 days of files
-    
-    // To simulate the amount of log data saved, use the release log level for the fileLogger
-    [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
+  [DDLog addLogger:[DDASLLogger sharedInstance]];
+  [DDLog addLogger:[DDTTYLogger sharedInstance]];
+  
+  DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
+  fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
+  fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // 7 days of files
+  
+  // To simulate the amount of log data saved, use the release log level for the fileLogger
+  [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
 }
 
 
 - (BOOL)isAppSetupComplete
 {
-    return  ([[DFUser currentUser] userID]
-             && ![[DFUser currentUser] userID] == 0
-             &&  [ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusAuthorized
-             && ![[DFLocationPinger sharedInstance] canAskForLocationPermission]);
+  return  ([[DFUser currentUser] userID]
+           && ![[DFUser currentUser] userID] == 0
+           &&  [ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusAuthorized
+           && ![[DFLocationPinger sharedInstance] canAskForLocationPermission]);
 }
 
 - (void)showFirstTimeSetup
 {
-    DFFirstTimeSetupViewController *firstTimeSetup = [[DFFirstTimeSetupViewController alloc] init];
-    [[self window] setRootViewController:firstTimeSetup];
+  DFFirstTimeSetupViewController *firstTimeSetup = [[DFFirstTimeSetupViewController alloc] init];
+  [[self window] setRootViewController:firstTimeSetup];
 }
 
 
 - (void)showLoggedInUserTabs
 {
-    // Set the unique userID for logging
-    [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
-    [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
+  // Set the unique userID for logging
+  [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
+  [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
   
   [DFPhotoStore sharedStore];
   
-    // Camera roll tab
-    DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
-    UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
-    
-    [self startCameraRollSync];
-    
-    DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
-    UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];
-    
-    
-    DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
-    UINavigationController *settingsNav = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
-    
-    UITabBarController *tabController = [[UITabBarController alloc] init];
-    [tabController setViewControllers:[NSArray arrayWithObjects:
-                                       searchViewNav,
-                                       cameraRollNav,
-                                       settingsNav,
-                                       nil]];
-    
-    [[self window] setRootViewController:tabController];
+  // Camera roll tab
+  DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
+  UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
+  
+  [self startCameraRollSync];
+  
+  DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
+  UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];
+  
+  
+  DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
+  UINavigationController *settingsNav = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
+  
+  UITabBarController *tabController = [[UITabBarController alloc] init];
+  [tabController setViewControllers:[NSArray arrayWithObjects:
+                                     searchViewNav,
+                                     cameraRollNav,
+                                     settingsNav,
+                                     nil]];
+  
+  [[self window] setRootViewController:tabController];
 }
 
 - (void)startCameraRollSync
 {
-    if (self.cameraRollSyncController == nil) {
-        self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
-    }
-    
-    [self.cameraRollSyncController asyncSyncToCameraRoll];
+  if (self.cameraRollSyncController == nil) {
+    self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
+  }
+  
+  [self.cameraRollSyncController asyncSyncToCameraRoll];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-    
+  
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    DDLogInfo(@"Duffy app entered background.");
-    [[DFPhotoStore sharedStore] saveContext];
+  DDLogInfo(@"Duffy app entered background.");
+  [[DFPhotoStore sharedStore] saveContext];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-    // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+  // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    DDLogInfo(@"%@ became active.", [DFAppInfo appInfoString]);
-    if (![self isAppSetupComplete]) return;
-    
-    [self startCameraRollSync];
+  DDLogInfo(@"%@ became active.", [DFAppInfo appInfoString]);
+  if (![self isAppSetupComplete]) return;
+  
+  [self startCameraRollSync];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
-    DDLogInfo(@"Duffy applicationWillTerminate");
-
-    if (![self isAppSetupComplete]) return;
-    [[DFPhotoStore sharedStore] saveContext];
+  DDLogInfo(@"Duffy applicationWillTerminate");
+  
+  if (![self isAppSetupComplete]) return;
+  [[DFPhotoStore sharedStore] saveContext];
 }
 
 - (void)applicationDidReceiveMemoryWarning:(UIApplication *)application
@@ -182,15 +182,15 @@
 
 
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-    if( [[BITHockeyManager sharedHockeyManager].authenticator handleOpenURL:url
-                                                          sourceApplication:sourceApplication
-                                                                 annotation:annotation]) {
-        return YES;
-    }
-    
-    /* Your own custom URL handlers */
-    
-    return NO;
+  if( [[BITHockeyManager sharedHockeyManager].authenticator handleOpenURL:url
+                                                        sourceApplication:sourceApplication
+                                                               annotation:annotation]) {
+    return YES;
+  }
+  
+  /* Your own custom URL handlers */
+  
+  return NO;
 }
 
 
