@@ -63,7 +63,6 @@ def groups(request, user_id):
 
 def search(request):
 	# new webview code that's served in the iOS app
-	tStart = time.time()
 	if request.method == 'GET':
 		data = request.GET
 	elif request.method == 'POST':
@@ -99,7 +98,6 @@ def search(request):
 	if debug:
 		dupThreshold = -1
 
-
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -130,10 +128,10 @@ def search(request):
 	if (query):
 		(startDate, newQuery) = search_util.getNattyInfo(query)
 		searchResults = search_util.solrSearch(user.id, startDate, newQuery)
-
-		totalResults = searchResults.count()
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold)
 
+		totalResults = searchResults.count()
+		
 		photoIdToThumb = dict()
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
@@ -146,9 +144,8 @@ def search(request):
 				'query': query,
 				'userId': userId,
 				'thumbnailBasepath': thumbnailBasepath}
+				
 	return render(request, 'photos/search_webview.html', context)
-
-
 
 def gallery(request, user_id):
 	try:
