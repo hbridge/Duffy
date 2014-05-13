@@ -126,7 +126,7 @@ def main(argv):
         successfullyClassified = list()
         # Get all photos which don't have classification data yet
         #  But also filter out test users and any photo which only has a thumb
-        nonProcessedPhotos = Photo.objects.filter(classification_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True)[:maxFileAtTime]
+        nonProcessedPhotos = Photo.objects.filter(classification_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True).order_by('-added')[:maxFileAtTime]
 
         if len(nonProcessedPhotos) > 0:
             logging.info("Got the next " + str(len(nonProcessedPhotos)) + " photos that are not processed")
