@@ -20,6 +20,7 @@
 #import "DFMultiPhotoViewController.h"
 #import "DFPeanutSuggestion.h"
 #import "DFSearchResultTableViewCell.h"
+#import "NSDictionary+DFJSON.h"
 
 @interface DFSearchViewController ()
 
@@ -165,9 +166,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 {
   if (!_defaultSearchResults) {
     _defaultSearchResults = [[NSMutableDictionary alloc] init];
-    _defaultSearchResults[DATE_SECTION_NAME] = @[];
-    _defaultSearchResults[LOCATION_SECTION_NAME] = @[];
-    _defaultSearchResults[CATEGORY_SECTION_NAME] = @[];
+    [_defaultSearchResults addEntriesFromDictionary:[self loadDefaultSearchResults]];
   }
   
   
@@ -198,7 +197,23 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
     }
     
     [self updateSearchResults:self.searchBar.text];
+    
+    [self saveDefaultSearchResults:self.defaultSearchResults];
   }];
+}
+
+- (void)saveDefaultSearchResults:(NSDictionary *)searchResults
+{
+  NSString *jsonString = [[searchResults dictionaryWithNonJSONRemoved] JSONString];
+  [[NSUserDefaults standardUserDefaults] setObject:searchResults
+                                            forKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
+}
+
+- (NSDictionary *)loadDefaultSearchResults
+{
+  NSDictionary *loadedDict = [[NSUserDefaults standardUserDefaults]
+                              objectForKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
+  return loadedDict;
 }
 
 

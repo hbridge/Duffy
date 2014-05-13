@@ -221,6 +221,7 @@
 		5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ALAsset+DFExtensions.m"; sourceTree = "<group>"; };
 		5AD62A521921648D00EE22D7 /* DFCameraRollSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollSyncOperation.h; sourceTree = "<group>"; };
 		5AD62A531921648D00EE22D7 /* DFCameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncOperation.m; sourceTree = "<group>"; };
+		5AD62AA7192290BF00EE22D7 /* DFJSONConvertible.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFJSONConvertible.h; sourceTree = "<group>"; };
 		5AD8AD3B191AD76F00782144 /* DFFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFaceFeature.h; sourceTree = "<group>"; };
 		5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFaceFeature.m; sourceTree = "<group>"; };
 		5AD8AD3E191BDFCB00782144 /* DFPeanutFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFaceFeature.h; sourceTree = "<group>"; };
@@ -720,6 +721,7 @@
 				5AD8AD4C191FCDE800782144 /* DFAppInfo.m */,
 				5AD62A4F19215C6300EE22D7 /* ALAsset+DFExtensions.h */,
 				5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */,
+				5AD62AA7192290BF00EE22D7 /* DFJSONConvertible.h */,
 			);
 			name = Utils;
 			sourceTree = "<group>";

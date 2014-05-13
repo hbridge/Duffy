@@ -7,6 +7,7 @@
 //
 
 #import "DFPeanutSuggestion.h"
+#import "NSDictionary+DFJSON.h"
 
 @implementation DFPeanutSuggestion
 
@@ -30,6 +31,16 @@
 - (NSDictionary *)dictionary
 {
   return [self dictionaryWithValuesForKeys:[DFPeanutSuggestion attributes]];
+}
+
+
+- (NSDictionary *)JSONDictionary
+{
+  return [[self dictionary] dictionaryWithNonJSONRemoved];
+}
+
+- (NSString *)JSONString {
+  return [[[self dictionary] dictionaryWithNonJSONRemoved] JSONString];
 }
 
 @end

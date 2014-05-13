@@ -7,6 +7,7 @@
 //
 
 #import "NSDictionary+DFJSON.h"
+#import "DFJSONConvertible.h"
 
 @implementation NSDictionary (DFJSON)
 
@@ -64,7 +65,8 @@
             [[value class] isSubclassOfClass:[NSNumber class]] ||
             [[value class] isSubclassOfClass:[NSArray class]] ||
             [[value class] isSubclassOfClass:[NSDictionary class]] ||
-            [[value class] isSubclassOfClass:[NSNull class]]
+            [[value class] isSubclassOfClass:[NSNull class]] ||
+            [[value class] conformsToProtocol:@protocol(DFJSONConvertible)]
     );
 }
 
@@ -79,6 +81,9 @@
         
         if ([[obj class] isSubclassOfClass:[NSDictionary class]]) {
             mutableCopy[key] = [(NSDictionary*)obj dictionaryWithNonJSONRemoved];
+        } else if ([[obj class] conformsToProtocol:@protocol(DFJSONConvertible)]) {
+          NSDictionary *JSONDict = [obj JSONDictionary];
+          mutableCopy[key] = JSONDict;
         }
     }];
     
