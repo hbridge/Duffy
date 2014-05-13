@@ -14,7 +14,7 @@ from haystack.query import SearchQuerySet
 	returns back list of dicts with:
 	name, count, order
 """
-def getTopLocations(userId, limit=10:
+def getTopLocations(userId, limit=10):
 	sqs = SearchQuerySet().filter(userId=userId)
 	queryResult = sqs.facet('locations').facet_counts()
 	order = 0
