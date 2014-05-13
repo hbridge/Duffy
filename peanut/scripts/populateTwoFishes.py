@@ -19,7 +19,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().filter(twofishes_data=None).filter(metadata__contains='{GPS}').exclude(thumb_filename=None)
+		photos = Photo.objects.all().filter(twofishes_data=None).filter(metadata__contains='{GPS}').filter(metadata__contains='Latitude').exclude(thumb_filename=None)
 
 		if len(photos) > 0:
 			logger.info("Found {0} images that need two fishes data".format(len(photos)))
