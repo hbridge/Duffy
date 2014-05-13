@@ -21,12 +21,13 @@ def getTopLocations(userId, limit=None):
 	photoLocations = list()
 
 	for location in queryResult["fields"]["locations"]:
-		entry = dict()
-		entry['name'] = location[0]
-		entry['count'] = location[1]
-		entry['order'] = order
-		order += 1
-		photoLocations.append(entry)
+		if (location[1] > 0):
+			entry = dict()
+			entry['name'] = location[0]
+			entry['count'] = location[1]
+			entry['order'] = order
+			order += 1
+			photoLocations.append(entry)
 	
 	sortedList = sorted(photoLocations, key=lambda k: k['count'], reverse=True)
 
@@ -47,12 +48,13 @@ def getTopCategories(userId, limit=None):
 	classesList = list()
 	
 	for classResult in queryResult["fields"]["classes"]:
-		entry = dict()
-		entry['name'] = classResult[0]
-		entry['count'] = classResult[1]
-		entry['order'] = order
-		order += 1
-		classesList.append(entry)
+		if (classResult[1] > 0):
+			entry = dict()
+			entry['name'] = classResult[0]
+			entry['count'] = classResult[1]
+			entry['order'] = order
+			order += 1
+			classesList.append(entry)
 
 	if (limit):
 		classesList = classesList[:limit]
