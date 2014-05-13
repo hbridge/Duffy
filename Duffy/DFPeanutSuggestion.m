@@ -7,12 +7,23 @@
 //
 
 #import "DFPeanutSuggestion.h"
+#import "NSDictionary+DFJSON.h"
 
 @implementation DFPeanutSuggestion
 
 @synthesize name;
 @synthesize count;
 @synthesize order;
+
+
+- (id)initWithJSONDict:(NSDictionary *)jsonDict
+{
+  self = [super init];
+  if (self) {
+    [self setValuesForKeysWithDictionary:jsonDict];
+  }
+  return self;
+}
 
 + (NSArray *)attributes
 {
@@ -31,5 +42,17 @@
 {
   return [self dictionaryWithValuesForKeys:[DFPeanutSuggestion attributes]];
 }
+
+
+- (NSDictionary *)JSONDictionary
+{
+  return [[self dictionary] dictionaryWithNonJSONRemoved];
+}
+
+- (NSString *)JSONString {
+  return [[[self dictionary] dictionaryWithNonJSONRemoved] JSONString];
+}
+
+
 
 @end

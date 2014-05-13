@@ -65,6 +65,7 @@
 		5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC677E71906F027002F9D42 /* DFDataHasher.m */; };
 		5AD62A5119215C6300EE22D7 /* ALAsset+DFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */; };
 		5AD62A541921648D00EE22D7 /* DFCameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD62A531921648D00EE22D7 /* DFCameraRollSyncOperation.m */; };
+		5AD62AF41922D36200EE22D7 /* NSArray+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD62AF31922D36200EE22D7 /* NSArray+DFJSON.m */; };
 		5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */; };
 		5AD8AD40191BDFCB00782144 /* DFPeanutFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD3F191BDFCB00782144 /* DFPeanutFaceFeature.m */; };
 		5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */; };
@@ -221,6 +222,9 @@
 		5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "ALAsset+DFExtensions.m"; sourceTree = "<group>"; };
 		5AD62A521921648D00EE22D7 /* DFCameraRollSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollSyncOperation.h; sourceTree = "<group>"; };
 		5AD62A531921648D00EE22D7 /* DFCameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncOperation.m; sourceTree = "<group>"; };
+		5AD62AA7192290BF00EE22D7 /* DFJSONConvertible.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFJSONConvertible.h; sourceTree = "<group>"; };
+		5AD62AF21922D36200EE22D7 /* NSArray+DFJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+DFJSON.h"; sourceTree = "<group>"; };
+		5AD62AF31922D36200EE22D7 /* NSArray+DFJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DFJSON.m"; sourceTree = "<group>"; };
 		5AD8AD3B191AD76F00782144 /* DFFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFaceFeature.h; sourceTree = "<group>"; };
 		5AD8AD3C191AD76F00782144 /* DFFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFaceFeature.m; sourceTree = "<group>"; };
 		5AD8AD3E191BDFCB00782144 /* DFPeanutFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFaceFeature.h; sourceTree = "<group>"; };
@@ -708,6 +712,8 @@
 				5AFBCA5218D236B600998793 /* UIImageCategories */,
 				5A67605A18E210B000E355B6 /* NSDictionary+DFJSON.h */,
 				5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */,
+				5AD62AF21922D36200EE22D7 /* NSArray+DFJSON.h */,
+				5AD62AF31922D36200EE22D7 /* NSArray+DFJSON.m */,
 				5AE3BF7918E4D5C900ACB5DC /* DFCGRectHelpers.h */,
 				5AE3BF7A18E4D5C900ACB5DC /* DFCGRectHelpers.m */,
 				5A8D0AEB18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.h */,
@@ -720,6 +726,7 @@
 				5AD8AD4C191FCDE800782144 /* DFAppInfo.m */,
 				5AD62A4F19215C6300EE22D7 /* ALAsset+DFExtensions.h */,
 				5AD62A5019215C6300EE22D7 /* ALAsset+DFExtensions.m */,
+				5AD62AA7192290BF00EE22D7 /* DFJSONConvertible.h */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -954,6 +961,7 @@
 				5A8C99001913D6F400AE9F88 /* DFPeanutPhoto.m in Sources */,
 				5A8C98E8190AFBF200AE9F88 /* DFStatusBarNotificationManager.m in Sources */,
 				5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */,
+				5AD62AF41922D36200EE22D7 /* NSArray+DFJSON.m in Sources */,
 				5AACB90D18F49D9700F4EEB6 /* DFAnalytics.m in Sources */,
 				5AD8AD40191BDFCB00782144 /* DFPeanutFaceFeature.m in Sources */,
 				5A51272B19007CE00057A31F /* DFUploadQueue.m in Sources */,

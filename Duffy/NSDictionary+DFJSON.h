@@ -16,4 +16,9 @@
 
 + (NSDictionary *)dictionaryWithJSONString:(NSString *)jsonString;
 
+
++ (BOOL)isJSONSafeKey:(id)key;
++ (BOOL)isJSONSafeValue:(id)value;
+
+
 @end

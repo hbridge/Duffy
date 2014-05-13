@@ -8,13 +8,19 @@
 
 #import <Foundation/Foundation.h>
 #import <RestKit.h>
+#import "DFJSONConvertible.h"
 
-@interface DFPeanutSuggestion : NSObject
+
+@interface DFPeanutSuggestion : NSObject <DFJSONConvertible>
 
 @property (nonatomic, retain) NSString *name;
 @property (nonatomic) unsigned int count;
 @property (nonatomic) unsigned int order;
 
 + (RKObjectMapping *)objectMapping;
+
+- (id)initWithJSONDict:(NSDictionary *)jsonDict;
+- (NSDictionary *)JSONDictionary;
+- (NSString *)JSONString;
 
 @end
