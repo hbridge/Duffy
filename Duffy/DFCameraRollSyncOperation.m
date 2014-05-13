@@ -139,6 +139,7 @@ static int NumChangesFlushThreshold = 100;
   void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
     if (self.isCancelled) {
       *stop = YES;
+      dispatch_semaphore_signal(enumerationCompleteSemaphore);
       return;
     }
     if(group != nil) {
