@@ -10,15 +10,29 @@ from datetime import datetime
 class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	text = indexes.CharField(document=True, use_template=False)
 	userId = indexes.CharField()
-	photoFilename = indexes.CharField(model_attr="full_filename", default="")
 	photoId = indexes.CharField(model_attr="id", indexed=False)
-	classificationData = indexes.CharField(model_attr="classification_data", default="")
-	locationData = indexes.CharField(model_attr="location_data", default="")
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
-	twoFishesData = indexes.CharField(model_attr="twofishes_data", default="")
 	updated = indexes.DateField()
+
+	locations = indexes.MultiValueField(faceted=True, indexed=False)
+	classes = indexes.MultiValueField(faceted=True, indexed=False)
 	
 	logger = None
+
+	altDict = None
+
+	def prepare_locations(self, obj):
+		locItems = self.getTwoFishesData(obj)
+		return locItems
+
+	def prepare_classes(self, obj):
+		items = list()
+		items.extend(self.getClassData(obj, 20))
+		items.extend(self.getScreenshotKeywords(obj))
+		items.extend(self.getAltTerms(obj, 20))
+		items.extend(self.getFaceKeywords(obj))
+
+		return items
 
 	#def __init__(self):
 		#self.logger = logging.basicConfig(filename='indexer.log',level=logging.DEBUG)
@@ -30,6 +44,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		return "updated"
 
 	def index_queryset(self, using=None):
+		self.prepAltList()
 		"""Used when the entire index for model is updated."""
 		return self.get_model().objects.filter(user__gt=1)
 
@@ -38,12 +53,18 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	'''
 	def prepare_text(self, obj):
+		if (not self.altDict):
+			self.prepAltList()
+
+		items = list()
+		items.extend(self.getTwoFishesData(obj))
+		items.extend(self.getClassData(obj, 20))
+		items.extend(self.getScreenshotKeywords(obj))
+		items.extend(self.getAltTerms(obj, 20))
+		items.extend(self.getFaceKeywords(obj))
 		return self.add_locData(obj) + '\n' + \
-				self.add_classData(obj, 20) + '\n' + \
-				self.add_altTerms(obj, 20) + '\n' + \
-				self.add_faceKeywords(obj) + '\n' + \
-				self.add_twofishesData(obj) + '\n' + \
-				self.add_screenshotKeywords(obj)
+				u', '.join(items)
+				
 
 	def prepare_userId(self, obj):
 		return str(obj.user.id)
@@ -87,48 +108,50 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	Cleans the classification list to only include entries higher than threshold and 
 	removes underscores
 	'''
-	def add_classData(self, obj, threshold):
-		newList = list()
+	def getClassData(self, obj, threshold):
+		classes = list()
 		if (obj.classification_data):
 			catList = json.loads(obj.classification_data)
 			for entry in catList:
 				if (entry['rating'] > threshold):
-					newList.append(entry['class_name'].replace('_', ' ').encode('ascii'))
-		return ', '.join(newList)
+					classes.append(entry['class_name'].replace('_', ' ').encode('ascii'))
+		return classes
 
+	def prepAltList(self):
+		print "PREPARING ALT DICT"
+		altFilePath = '/home/derek/prod/Duffy/peanut/photos/'
+		f = open(altFilePath + 'alt.txt', 'r')
+		self.altDict = dict()
+
+		# build a dict
+		for line in f:
+			altSplit = line.strip().split(',')
+			if (len(altSplit) > 1):
+				self.altDict[altSplit[0]] = altSplit[1:]
 
 	'''
 	loads the list of alternate terms, adds them to the index for any classification that
 	is greater than threshold
 	'''
-	def add_altTerms(self, obj, threshold):
-		altFilePath = '/home/derek/prod/Duffy/peanut/photos/'
-		f = open(altFilePath + 'alt.txt', 'r')
-		altDict = dict()
-		termList = ""
-
-		# build a dict
-		for line in f:
-			altSplit = line.split(',')
-			if (len(altSplit) > 1):
-				altDict[altSplit[0]] = line.split(',', 1)[1]
+	def getAltTerms(self, obj, threshold):
+		altTermItems = list()
 
 		if (obj.classification_data):
 			catList = json.loads(obj.classification_data)
 			for entry in catList:
 				if (entry['rating'] > threshold):
 					className = entry['class_name'].replace('_', ' ')
-					if (className in altDict):
-						termList = termList + str(altDict[className])
-		return termList
+					if (className in self.altDict):
+						altTermItems.extend(self.altDict[className])
+		return altTermItems
 
 	'''
 	adds the keyword 'face, faces, people, person' if there is a photo detected
 	'''
-	def add_faceKeywords(self, obj):
-		faceKeywords = {'face', 'faces', 'people', 'person'}
-		smileKeywords = {'smile', 'smiles', 'smiling'}
-		termList = ""
+	def getFaceKeywords(self, obj):
+		faceKeywords = ['face', 'faces', 'people', 'person']
+		smileKeywords = ['smile', 'smiles', 'smiling']
+		termList = list()
 		foundSmile = False;
 		foundFace = False;
 		if (obj.iphone_faceboxes_topleft):
@@ -142,33 +165,32 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 									foundSmile = True
 									break
 				if (foundFace == True):
-					termList += ', '.join(faceKeywords)
+					termList.extend(faceKeywords)
 				if (foundSmile == True):
-					termList += ',' 
-					termList += ', '.join(smileKeywords)
+					termList.extend(smileKeywords)
 				return termList
-		return ''
+		return termList
 
 	'''
 	adds the keyword 'screenshot, screenshots' if there is a screenshot detected
 	'''
-	def add_screenshotKeywords(self, obj):
-		screenshotKeywords = {'screenshot', 'screenshots'}
+	def getScreenshotKeywords(self, obj):
+		screenshotKeywords = ['screenshot', 'screenshots']
 		png = 'png'
 
 		if (obj.metadata):
 			metadata = json.loads(obj.metadata)
 			if "{PNG}" in metadata:
-				return ', '.join(screenshotKeywords)
-		return ''
+				screenshotKeywords
+		return list()
 
-	def add_twofishesData(self, obj):
-		locText = list()
+	def getTwoFishesData(self, obj):
+		locItems = list()
 
 		if (obj.twofishes_data):
 			twoFishesData = json.loads(obj.twofishes_data)
 			
 			for data in twoFishesData["interpretations"]:
-				locText.append(data["feature"]["displayName"])
+				locItems.append(data["feature"]["displayName"])
 
-		return u', '.join(locText)
+		return locItems
