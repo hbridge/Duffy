@@ -13,8 +13,7 @@ urlpatterns = patterns('photos.api_views',
 	#url(r'^photos/$', 'photo_list'),
 	url(r'^photos/$', api_views.PhotoAPI.as_view()),
 	url(r'^photos/(?P<photoId>[0-9]+)/$', api_views.PhotoAPI.as_view()),
-	url(r'^photos/bulk/$', api_views.PhotoBulkAPI.as_view()),
-	url(r'^test$', 'test')
+	url(r'^photos/bulk/$', api_views.PhotoBulkAPI.as_view())
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
