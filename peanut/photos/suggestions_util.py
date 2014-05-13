@@ -5,57 +5,64 @@ from django.db.models import Count
 from photos.models import Photo, User
 from photos import search_util
 
+from haystack.query import SearchQuerySet
 
 """
-	Fetches all photos for the given user and returns back the all cities with their counts.  Results are
-	unsorted.
+	Fetches all photos for the given user and returns back the all non-state and non-country
+	location names
 
+	returns back list of dicts with:
+	name, count, order
 """
-def getTopLocations(userId):
-
-	queryResult = Photo.objects.filter(user_id=userId).values('location_city').order_by().annotate(Count('location_city')).order_by('-location_city__count')
-	
+def getTopLocations(userId, limit=None):
+	sqs = SearchQuerySet().filter(userId=userId)
+	queryResult = sqs.facet('locations').facet_counts()
+	order = 0
 	photoLocations = list()
-	for location in queryResult:
-		if (location['location_city__count'] > 0):
-			entry = dict()
-			entry['name'] = location['location_city']
-			entry['count'] = location['location_city__count']
-			photoLocations.append(entry)
+
+	for location in queryResult["fields"]["locations"]:
+		entry = dict()
+		entry['name'] = location[0]
+		entry['count'] = location[1]
+		entry['order'] = order
+		order += 1
+		photoLocations.append(entry)
 	
 	sortedList = sorted(photoLocations, key=lambda k: k['count'], reverse=True)
-	index = 1
-	for entry in sortedList:
-		entry['order'] = index
-		index += 1
+
+	if (limit):
+		sortedList = sortedList[:limit]
 
 	return sortedList
 
 """
-	Fetches all photos for the given user and returns back top categories with count. Currently, faking it.
-
+	Fetches all photos for the given user and returns back top categories with count.
+	returns back list of dicts with:
+	name, count, order
 """
-def getTopCategories(userId):
+def getTopCategories(userId, limit=None):
+	sqs = SearchQuerySet().filter(userId=userId)
+	queryResult = sqs.facet('classes').facet_counts()
+	order = 0
+	classesList = list()
+	
+	for classResult in queryResult["fields"]["classes"]:
+		entry = dict()
+		entry['name'] = classResult[0]
+		entry['count'] = classResult[1]
+		entry['order'] = order
+		order += 1
+		classesList.append(entry)
 
-	catQueries = ['screenshots', 'people', 'food', 'animals', 'car']
-	order = 1
-	sugList = list()
-	for catQuery in catQueries:
-		count = search_util.solrSearch(userId, None, catQuery).count()
-		if (count > 0):
-			entry = dict()
-			entry['name'] = catQuery
-			entry['count'] = count
-			entry['order'] = order
-			order += 1
-			sugList.append(entry)
-	return sugList
-
-
+	if (limit):
+		classesList = classesList[:limit]
+		
+	return classesList
 
 """
 	Fetches all photos for the given user and returns back top time searches with count. Currently, faking it.
-
+	returns back list of dicts with:
+	name, count, order
 """
 def getTopTimes(userId):
 

@@ -27,8 +27,6 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from haystack.query import SearchQuerySet
-
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
 from photos.serializers import PhotoSerializer
@@ -324,8 +322,13 @@ def get_suggestions(request):
 	else:
 		return returnFailure(response, "Need user_id")
 
-	response['top_locations'] = suggestions_util.getTopLocations(userId)
-	response['top_categories'] = suggestions_util.getTopCategories(userId)
+	if data.has_key('limit'):
+		limit = int(data['limit'])
+	else:
+		limit = None
+
+	response['top_locations'] = suggestions_util.getTopLocations(userId, limit)
+	response['top_categories'] = suggestions_util.getTopCategories(userId, limit)
 	response['top_times'] = suggestions_util.getTopTimes(userId)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
@@ -389,14 +392,6 @@ def create_user(request):
 	response['user'] = model_to_dict(user)
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
-
-def test(request):
-	data = getRequestData(request)
-	sqs = SearchQuerySet().filter(userId=data['user_id'])
-	counts = sqs.facet('classes').facet_counts()
-
-	return HttpResponse(json.dumps(counts), content_type="application/json")
-	
 """
 Helper functions
 """
