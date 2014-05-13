@@ -90,6 +90,8 @@
 
 + (NSDictionary *)dictionaryWithJSONString:(NSString *)jsonString
 {
+  if (jsonString == nil) return nil;
+  
   NSError *error;
   NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:[jsonString dataUsingEncoding:NSUTF8StringEncoding]
                                                        options:0
