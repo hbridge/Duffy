@@ -183,6 +183,7 @@ def genSimilarityRow(photo1, photo2, sim):
 	
 	simRow = Similarity(photo_1 = photo1,
 						photo_2 = photo2,
+						user = photo1.user,
 						similarity = int(sim))
 
 	return simRow

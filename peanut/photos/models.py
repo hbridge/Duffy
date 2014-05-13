@@ -142,6 +142,7 @@ class Classification(models.Model):
 class Similarity(models.Model):
 	photo_1 = models.ForeignKey(Photo, related_name="photo_1")
 	photo_2 = models.ForeignKey(Photo, related_name="photo_2")
+	user = models.ForeignKey(User)
 	similarity = models.IntegerField()
 
 	class Meta:
