@@ -325,7 +325,7 @@ def get_suggestions(request):
 	if data.has_key('limit'):
 		limit = int(data['limit'])
 	else:
-		limit = None
+		limit = 10
 
 	response['top_locations'] = suggestions_util.getTopLocations(userId, limit)
 	response['top_categories'] = suggestions_util.getTopCategories(userId, limit)
