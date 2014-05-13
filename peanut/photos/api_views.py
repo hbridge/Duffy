@@ -27,6 +27,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
+from haystack.query import SearchQuerySet
+
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
 from photos.serializers import PhotoSerializer
@@ -388,6 +390,13 @@ def create_user(request):
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 
+def test(request):
+	data = getRequestData(request)
+	sqs = SearchQuerySet().filter(userId=data['user_id'])
+	counts = sqs.facet('classes').facet_counts()
+
+	return HttpResponse(json.dumps(counts), content_type="application/json")
+	
 """
 Helper functions
 """
