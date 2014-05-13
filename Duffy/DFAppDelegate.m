@@ -92,7 +92,8 @@
 {
   DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
   [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID] withSuccessBlock:^(DFUser *user) {
-    if (!user) {
+    if (!user || user.userID != [[DFUser currentUser] userID]) {
+      DDLogWarn(@"Server uid:%llu, phone uid:%llu.  Requesting reset.", user.userID, [[DFUser currentUser ]userID]);
       [self resetApplication];
     }
   } failureBlock:nil];
