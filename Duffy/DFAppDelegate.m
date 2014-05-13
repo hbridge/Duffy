@@ -26,6 +26,7 @@
 #import "DFLocationPinger.h"
 #import "DFAppInfo.h"
 #import "DFUploadController.h"
+#import "DFUserPeanutAdapter.h"
 
 
 
@@ -65,6 +66,7 @@
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
   } else {
+    [self startUserIDCheck];
     [self showLoggedInUserTabs];
   }
   
@@ -84,6 +86,16 @@
   
   // To simulate the amount of log data saved, use the release log level for the fileLogger
   [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
+}
+
+- (void)startUserIDCheck
+{
+  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID] withSuccessBlock:^(DFUser *user) {
+    if (!user) {
+      [self resetApplication];
+    }
+  } failureBlock:nil];
 }
 
 

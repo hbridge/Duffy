@@ -63,9 +63,11 @@
      failure:^(RKObjectRequestOperation *operation, NSError *error)
      {
          DDLogError(@"User Info fetch failed.  Error: %@", error.localizedDescription);
+       if (failureBlock) {
          dispatch_async(dispatch_get_main_queue(), ^{
              failureBlock(error);
          });
+       }
      }];
     
     
