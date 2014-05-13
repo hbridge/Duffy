@@ -15,6 +15,16 @@
 @synthesize count;
 @synthesize order;
 
+
+- (id)initWithJSONDict:(NSDictionary *)jsonDict
+{
+  self = [super init];
+  if (self) {
+    [self setValuesForKeysWithDictionary:jsonDict];
+  }
+  return self;
+}
+
 + (NSArray *)attributes
 {
   return @[@"name", @"count", @"order"];
@@ -42,5 +52,7 @@
 - (NSString *)JSONString {
   return [[[self dictionary] dictionaryWithNonJSONRemoved] JSONString];
 }
+
+
 
 @end

@@ -8,6 +8,7 @@
 
 #import "NSDictionary+DFJSON.h"
 #import "DFJSONConvertible.h"
+#import "NSArray+DFJSON.h"
 
 @implementation NSDictionary (DFJSON)
 
@@ -78,8 +79,10 @@
         if (![NSDictionary isJSONSafeKey:key] || ![NSDictionary isJSONSafeValue:obj]) {
             [keysToRemove addObject:key];
         }
-        
-        if ([[obj class] isSubclassOfClass:[NSDictionary class]]) {
+      
+      if ([[obj class] isSubclassOfClass:[NSArray class]]) {
+        mutableCopy[key] = [(NSArray *)obj JSONSafeArray];
+      } else if ([[obj class] isSubclassOfClass:[NSDictionary class]]) {
             mutableCopy[key] = [(NSDictionary*)obj dictionaryWithNonJSONRemoved];
         } else if ([[obj class] conformsToProtocol:@protocol(DFJSONConvertible)]) {
           NSDictionary *JSONDict = [obj JSONDictionary];

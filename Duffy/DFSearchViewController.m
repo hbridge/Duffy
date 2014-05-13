@@ -205,15 +205,29 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 - (void)saveDefaultSearchResults:(NSDictionary *)searchResults
 {
   NSString *jsonString = [[searchResults dictionaryWithNonJSONRemoved] JSONString];
-  [[NSUserDefaults standardUserDefaults] setObject:searchResults
+  [[NSUserDefaults standardUserDefaults] setObject:jsonString
                                             forKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
 }
 
 - (NSDictionary *)loadDefaultSearchResults
 {
-  NSDictionary *loadedDict = [[NSUserDefaults standardUserDefaults]
+  NSString *loadedDictString = [[NSUserDefaults standardUserDefaults]
                               objectForKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
-  return loadedDict;
+  NSMutableDictionary *resultsDict = [[NSDictionary dictionaryWithJSONString:loadedDictString] mutableCopy];
+  [resultsDict enumerateKeysAndObjectsUsingBlock:^(NSString *sectionName, NSArray *suggestions, BOOL *stop) {
+    if (suggestions) {
+      NSMutableArray *mutableSuggestions = suggestions.mutableCopy;
+      for (unsigned long i = 0; i < mutableSuggestions.count; i++) {
+        NSDictionary *suggestionDict = mutableSuggestions[i];
+        mutableSuggestions[i] = [[DFPeanutSuggestion alloc] initWithJSONDict:suggestionDict];
+      }
+      
+      resultsDict[sectionName] = mutableSuggestions;
+    }
+  }];
+  
+  
+  return resultsDict;
 }
 
 

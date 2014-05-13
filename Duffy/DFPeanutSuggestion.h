@@ -19,6 +19,7 @@
 
 + (RKObjectMapping *)objectMapping;
 
+- (id)initWithJSONDict:(NSDictionary *)jsonDict;
 - (NSDictionary *)JSONDictionary;
 - (NSString *)JSONString;
 
