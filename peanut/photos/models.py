@@ -45,6 +45,10 @@ class Photo(models.Model):
 
 	class Meta:
 		unique_together = ("user", "iphone_hash")
+
+	def __unicode__(self):
+		return str(self.id)
+
 	"""
 		Look to see from the iphone's location data if there's a city present
 		TODO(derek):  Should this be pulled out to its own table?
