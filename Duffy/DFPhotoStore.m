@@ -469,7 +469,6 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   DDLogInfo(@"Reset store requested.  Deleting %lu items.", (unsigned long)allPhotos.photoSet.count);
   for (NSManagedObject *managedObject in allPhotos.photoSet) {
     [_managedObjectContext deleteObject:managedObject];
-    DDLogVerbose(@"Deleted – %@", managedObject.description);
   }
   [self saveContext];
 }
