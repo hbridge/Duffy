@@ -28,7 +28,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def prepare_classes(self, obj):
 		items = list()
 		items.extend(self.getClassData(obj, 20))
-		items.extend(self.getScreenshotKeywords(obj))
+		items.extend(self.getMetadataKeywords(obj))
 		items.extend(self.getAltTerms(obj, 20))
 		items.extend(self.getFaceKeywords(obj))
 
@@ -59,7 +59,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		items = list()
 		items.extend(self.getTwoFishesData(obj))
 		items.extend(self.getClassData(obj, 20))
-		items.extend(self.getScreenshotKeywords(obj))
+		items.extend(self.getMetadataKeywords(obj))
 		items.extend(self.getAltTerms(obj, 20))
 		items.extend(self.getFaceKeywords(obj))
 		return self.add_locData(obj) + '\n' + \
@@ -171,17 +171,20 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		return termList
 
 	'''
-	adds the keyword 'screenshot, screenshots' if there is a screenshot detected
+	adds the keyword 'face, faces, people, person' if there is a photo detected
 	'''
-	def getScreenshotKeywords(self, obj):
-		screenshotKeywords = ['screenshot', 'screenshots']
-		png = 'png'
+	def getMetadataKeywords(self, obj):
+		foundTerms = list()
+		keywords = {"front camera" : ['selfie', 'selfy'],
+					"{PNG}" : ['screenshot', 'screenshots']}
 
 		if (obj.metadata):
-			metadata = json.loads(obj.metadata)
-			if "{PNG}" in metadata:
-				screenshotKeywords
-		return list()
+			for key in keywords:
+				if (str(obj.metadata).find(key) >= 0):
+					foundTerms.extend(keywords[key])
+
+		return foundTerms
+
 
 	def getTwoFishesData(self, obj):
 		locItems = list()
