@@ -80,18 +80,28 @@ static DFUploadController *defaultUploadController;
                                                      name:NSManagedObjectContextDidSaveNotification
                                                    object:nil];
       
-      [[RKObjectManager sharedManager].HTTPClient setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
-        if (status == AFNetworkReachabilityStatusNotReachable) {
-          
-        } if (status == AFNetworkReachabilityStatusReachableViaWiFi) {
-          [self uploadPhotos];
-        }
-      }];
-      
+      [self observeNetworkChanges];
     }
     return self;
 }
 
+- (void)observeNetworkChanges
+{
+  [[RKObjectManager sharedManager].HTTPClient setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+    if (status == AFNetworkReachabilityStatusNotReachable) {
+      DDLogInfo(@"DFUploadController reachability none.");
+    } else if (status == AFNetworkReachabilityStatusReachableViaWiFi) {
+      DDLogInfo(@"DFUploadController reachability Wifi.  Nudging uploads.");
+      [self uploadPhotos];
+    } else if (status == AFNetworkReachabilityStatusReachableViaWWAN) {
+      DDLogInfo(@"DFUploadController reachability Cellular.  Nudging uploads.");
+      [self uploadPhotos];
+    } else if (status == AFNetworkReachabilityStatusUnknown) {
+      DDLogInfo(@"DFUploadController reachability unknown.");
+    }
+  }];
+
+}
 
 #pragma mark - Public methods
 
