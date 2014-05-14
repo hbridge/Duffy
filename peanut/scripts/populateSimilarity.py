@@ -25,7 +25,7 @@ def main(argv):
 			for result in results:
 				userId = result['user']
 				logger.info("Processing user id:  " + str(userId))
-				nonClusteredPhotos = list(Photo.objects.select_related().filter(user_id=userId).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken'))
+				nonClusteredPhotos = list(Photo.objects.select_related().filter(user_id=userId).exclude(thumb_filename=None).filter(clustered_time=None).order_by('time_taken')[:250])
 				
 				tStart = datetime.datetime.utcnow()
 				logger.info("{0}: Unclustered photos: {1}".format(tStart, len(nonClusteredPhotos)))

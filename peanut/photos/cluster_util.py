@@ -77,7 +77,7 @@ def getUniqueSimRows(simRows):
 	for simRow in simRows:
 		id = (simRow.photo_1.id, simRow.photo_2.id)
 		if id in uniqueSimRows:
-			if simRow.similarity < uniqueSimRows[id]:
+			if simRow.similarity > uniqueSimRows[id]:
 				uniqueSimRows[id] = simRow
 		else:
 			uniqueSimRows[id] = simRow
@@ -99,7 +99,7 @@ def processWithExisting(existingSims, newSims):
 		found = False
 		for existingSim in existingSims:
 			if newSim.photo_1 == existingSim.photo_1 and newSim.photo_2 == existingSim.photo_2:
-				if newSim.similarity < existingSim.similarity:
+				if newSim.similarity > existingSim.similarity:
 					existingSim.similarity = newSim.similarity
 					simsToUpdate.append(existingSim)
 				found = True
