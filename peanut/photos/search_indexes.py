@@ -173,6 +173,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 		Adds keywords based on metadata
 		Right now, we're just doing basic text searches.  Probably want to upgrade this at some point.
+		adds the keyword 'face, faces, people, person' if there is a photo detected
 	'''
 	def getMetadataKeywords(self, obj):
 		foundTerms = list()
