@@ -45,8 +45,9 @@ def splitPhotosFromDBbyMonth(userId, photoSet=None, groupThreshold=None):
 	Fetch all Similarities for the given photo ideas then put into a hash table keyed on the id
 	Note:  Make sure to refer to photo_1_id instead of photo_1.id to avoid an extra lookup
 """
-def getSimCache(photoIds):
-	simCache = dict()
+def getSimCaches(photoIds):
+	simCacheLowHigh = dict()
+	simCacheHighLow = dict()
 
 	simResults = Similarity.objects.filter(photo_1__in=photoIds).filter(photo_2__in=photoIds).order_by('similarity')
 
@@ -54,10 +55,16 @@ def getSimCache(photoIds):
 		id1 = sim.photo_1_id
 		id2 = sim.photo_2_id
 
-		if (id1 not in simCache):
-			simCache[id1] = dict()
-		simCache[id1][id2] = sim
-	return simCache
+		if (id1 not in simCacheLowHigh):
+			simCacheLowHigh[id1] = dict()
+		simCacheLowHigh[id1][id2] = sim
+
+		if (id2 not in simCacheHighLow):
+			simCacheHighLow[id2] = dict()
+		simCacheHighLow[id2][id1] = sim
+
+
+	return (simCacheLowHigh, simCacheHighLow)
 
 """
 	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
@@ -76,7 +83,7 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet=None, threshold=75, dupThre
 		photoIds.append(solrPhoto.photoId)
 
 	# Fetch all the similarities at once so we can process in memory
-	simCache = getSimCache(photoIds)
+	simCaches = getSimCaches(photoIds)
 	
 	del facetCounts['dates']['timeTaken']['start']
 	del facetCounts['dates']['timeTaken']['end']
@@ -93,7 +100,7 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet=None, threshold=75, dupThre
 
 		filteredPhotos = solrPhotoSet.exclude(timeTaken__lt=startDate).exclude(timeTaken__gt=newDate).order_by('timeTaken')
 		
-		entry['clusterList'] = getClusters(filteredPhotos, threshold, dupThreshold, simCache)
+		entry['clusterList'] = getClusters(filteredPhotos, threshold, dupThreshold, simCaches)
 		photos.append(entry)
 
 	return photos
@@ -101,7 +108,8 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet=None, threshold=75, dupThre
 """
 	Look up in the hash table cache for the Similarity
 """
-def getSim(solrPhoto1, solrPhoto2, simsCache):
+def getSim(solrPhoto1, solrPhoto2, simCaches):
+	simsCacheLowHigh, simsCacheHighLow = simCaches
 	if (solrPhoto1.photoId < solrPhoto2.photoId):
 		lowerPhotoId = int(solrPhoto1.photoId)
 		higherPhotoId = int(solrPhoto2.photoId)
@@ -109,25 +117,42 @@ def getSim(solrPhoto1, solrPhoto2, simsCache):
 		lowerPhotoId = int(solrPhoto2.photoId)
 		higherPhotoId = int(solrPhoto1.photoId)
 
-	if (lowerPhotoId in simsCache):
-		if (higherPhotoId in simsCache[lowerPhotoId]):
-			return simsCache[lowerPhotoId][higherPhotoId]
+	if (lowerPhotoId in simsCacheLowHigh):
+		if (higherPhotoId in simsCacheLowHigh[lowerPhotoId]):
+			return simsCacheLowHigh[lowerPhotoId][higherPhotoId]
 
 	return None
+
+
+def getAllSims(solrPhoto, simCaches):
+	sims = list()
+	photoId = int(solrPhoto.photoId)
+	simsCacheLowHigh, simsCacheHighLow = simCaches
+
+	if (photoId in simsCacheLowHigh):
+		for key in simsCacheLowHigh[photoId]:
+			sims.append(simsCacheLowHigh[photoId][key])
+
+	if (photoId in simsCacheHighLow):
+		for key in simsCacheHighLow[photoId]:
+			sims.append(simsCacheHighLow[photoId][key])
+
+	return sims
+
 
 """
 	Searches the given cluster to see what the lowest distance is for the given solrPhoto
 	Returns (index of the photo with the lowest distance, the lowest distance)
 """
-def getLowestDistance(cluster, solrPhoto, simCache):
+def getLowestDistance(cluster, solrPhoto, simCaches):
 	if (len(cluster) == 0):
 		return (None, None)
-
+		
 	lowestDist = None
 	lowestIndex = None
 
 	for i, entry in enumerate(cluster):
-		sim = getSim(entry['photo'], solrPhoto, simCache)
+		sim = getSim(entry['photo'], solrPhoto, simCaches)
 		if (sim):
 			dist = sim.similarity
 			if (not lowestDist):
@@ -143,9 +168,9 @@ def getLowestDistance(cluster, solrPhoto, simCache):
 	Adds the given solrPhoto to the cluster, also grabs the sim from the simCache
 	and adds that for debugging
 """		
-def addToCluster(cluster, solrPhoto, lowestIndex, lowestDist, simCache):
-	sim = getSim(solrPhoto, cluster[lowestIndex]['photo'], simCache)
-	cluster.append({'photo': solrPhoto, 'dist': lowestDist, 'simrow': sim})
+def addToCluster(cluster, solrPhoto, lowestIndex, lowestDist, simCaches):
+	sim = getSim(solrPhoto, cluster[lowestIndex]['photo'], simCaches)
+	cluster.append({'photo': solrPhoto, 'dist': lowestDist, 'simrow': sim, 'simrows': getAllSims(solrPhoto, simCaches)})
 
 	return cluster
 
@@ -169,30 +194,30 @@ def addToCluster(cluster, solrPhoto, lowestIndex, lowestDist, simCache):
 				--> dist (shortest distance to any photo in set)
 			--> ...
 """	
-def getClusters(solrPhotoSet, threshold, dupThreshold, simCache):
+def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 	# get a list of Similarity objects matching the current set of photos
 	
 	# start building clusters
 	clusterList = list()
 	solrPhotoSetIter = iter(solrPhotoSet)
 	firstPhoto = next(solrPhotoSetIter)
-	clusterList.append([{'photo': firstPhoto, 'dist': None}])
+	clusterList.append([{'photo': firstPhoto, 'dist': None, 'simrows': getAllSims(firstPhoto, simCaches)}])
 
 	for solrPhoto in solrPhotoSetIter:
 		currentCluster = clusterList[-1]
 		# For each photo, look at last cluster and see if it belongs
 		# If so, add it
 		# Else, start a new cluster
-		lowestIndex, lowestDist = getLowestDistance(currentCluster, solrPhoto, simCache)
-		if (lowestDist):
+		lowestIndex, lowestDist = getLowestDistance(currentCluster, solrPhoto, simCaches)
+		if (lowestDist != None):
 			if (lowestDist < dupThreshold):
 				pass
 			elif (lowestDist < threshold):
-				addToCluster(currentCluster, solrPhoto, lowestIndex, lowestDist, simCache)
+				addToCluster(currentCluster, solrPhoto, lowestIndex, lowestDist, simCaches)
 			else:
-				clusterList.append([{'photo': solrPhoto, 'dist': None}])
+				clusterList.append([{'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])
 		else:
-			clusterList.append([{'photo': solrPhoto, 'dist': None}])
+			clusterList.append([{'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])
 	return clusterList
 
 

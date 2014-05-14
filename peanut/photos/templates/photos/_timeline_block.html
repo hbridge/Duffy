@@ -1,5 +1,4 @@
 {% load dictionary_extras %}
-{% load staticfiles %}
 
 <div class="ui-photo-block hidden">
 	<div class="ui-time-header">
@@ -8,13 +7,40 @@
 	{% for cluster in entry.clusterList %}
 		{% for imageEntry in cluster %}
 			{% if imageEntry.dist == None or imageEntry.dist >= 40 %} 
-				<div class = "ui-image {% if imageEntry.dist == None and cluster|length > 1 %} cluster{% elif imageEntry.dist != None %}hidden {% else %} {% endif %}" redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" photoId="{{ imageEntry.photo.photoId }}">
-						<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg" class="lazy{% if imageEntry.dist != None %}-cluster{% endif %}" height="{{ imageSize }}px" width="{{ imageSize }}px" 
-						title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} | SIMROW: {{ imageEntry.simrow }}" >
+				<div class = "ui-image 
+					{% if imageEntry.dist == None and cluster|length > 1 %} 
+						cluster
+					{% elif imageEntry.dist != None %}
+						hidden
+					{% endif %}"
+					redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg"
+					photoId="{{ imageEntry.photo.photoId }}">
+
+				<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
+					class="
+						{% if imageEntry.dist != None %}
+							lazy-cluster
+						{% else %}
+							lazy
+						{% endif %}"
+					height="{{ imageSize }}px"
+					width="{{ imageSize }}px" 
+
+					{% if debug %}
+					title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
+					SIMROW: {{ imageEntry.simrow }} |
+					SIMROWS:
+					{% for sim in imageEntry.simrows %}
+						{{ sim }}
+					{% endfor %}
+					" 
+					{% endif %}
+					>
+					
 					
 					{% if imageEntry.dist == None and cluster|length > 1 %}
 						<div class="ui-image-page-turn">
-							<img src="{% static "page-fold-th.png" %}" height="100%" width="100%" />
+							<img src="http://asood123.no-ip.biz/static/page-fold-th.png" height="100%" width="100%" />
 						</div>
 						<div class="ui-image-count text">
 							{{ cluster|length }}
