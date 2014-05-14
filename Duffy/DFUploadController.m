@@ -80,6 +80,13 @@ static DFUploadController *defaultUploadController;
                                                      name:NSManagedObjectContextDidSaveNotification
                                                    object:nil];
       
+      [[RKObjectManager sharedManager].HTTPClient setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
+        if (status == AFNetworkReachabilityStatusNotReachable) {
+          
+        } if (status == AFNetworkReachabilityStatusReachableViaWiFi) {
+          [self uploadPhotos];
+        }
+      }];
       
     }
     return self;
@@ -178,7 +185,7 @@ static DFUploadController *defaultUploadController;
             if (self.fullImageObjectIDQueue.numObjectsIncomplete == 0
                 && self.fullImageObjectIDQueue.numObjectsComplete > 0) {
                 [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
-            } else if (![self shouldUploadFullPhotos]) {
+            } else if (![self shouldUploadFullPhotos] && self.fullImageObjectIDQueue.numObjectsIncomplete > 0) {
               [self scheduleWithDispatchUploads:NO operation:[self cannotContinueFullUploadsOperation]];
             }
         }
