@@ -8,6 +8,7 @@
             <connections>
                 <outlet property="appInfoLabel" destination="bKn-Iy-QAv" id="WIl-4b-bbk"/>
                 <outlet property="autoUploadEnabledSwitch" destination="haQ-ms-BgT" id="aRl-Jo-nYD"/>
+                <outlet property="conserveDataEnabledSwitch" destination="19c-aY-Rfp" id="ZUX-ty-tgs"/>
                 <outlet property="scrollView" destination="j2Z-KM-edp" id="irv-dk-24s"/>
                 <outlet property="userIDTextField" destination="IV8-RS-QgB" id="2F3-3I-nbG"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -15,18 +16,18 @@
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
-            <rect key="frame" x="0.0" y="0.0" width="331" height="433"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="561"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2Z-KM-edp">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="787"/>
+                <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" translatesAutoresizingMaskIntoConstraints="NO" id="j2Z-KM-edp">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="561"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <subviews>
-                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="i6q-NP-6GB" userLabel="Build info">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="i6q-NP-6GB" userLabel="Build info">
                             <rect key="frame" x="10" y="20" width="300" height="63"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Duffy version" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bKn-Iy-QAv">
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Duffy version" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bKn-Iy-QAv">
                                     <rect key="frame" x="20" y="20" width="260" height="23"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="19"/>
@@ -35,19 +36,25 @@
                                 </label>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="bKn-Iy-QAv" secondAttribute="bottom" constant="20" symbolic="YES" id="2a4-wj-Jd1"/>
+                                <constraint firstItem="bKn-Iy-QAv" firstAttribute="leading" secondItem="i6q-NP-6GB" secondAttribute="leading" constant="20" symbolic="YES" id="EFs-Um-35Z"/>
+                                <constraint firstItem="bKn-Iy-QAv" firstAttribute="top" secondItem="i6q-NP-6GB" secondAttribute="top" constant="20" symbolic="YES" id="N3M-cR-fp0"/>
+                                <constraint firstAttribute="trailing" secondItem="bKn-Iy-QAv" secondAttribute="trailing" constant="20" symbolic="YES" id="fXT-aY-r1Q"/>
+                            </constraints>
                         </view>
-                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="AW5-wq-dCB" userLabel="Device group">
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AW5-wq-dCB" userLabel="Device group">
                             <rect key="frame" x="10" y="91" width="300" height="64"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="User ID" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bdM-Vw-4kd" userLabel="LB - User ID">
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="User ID" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bdM-Vw-4kd" userLabel="LB - User ID">
                                     <rect key="frame" x="20" y="20" width="58" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="IV8-RS-QgB" userLabel="TF - UserID">
+                                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="IV8-RS-QgB" userLabel="TF - UserID">
                                     <rect key="frame" x="86" y="16" width="194" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -59,26 +66,34 @@
                                 </textField>
                             </subviews>
                             <color key="backgroundColor" cocoaTouchSystemColor="tableCellGroupedBackgroundColor"/>
+                            <constraints>
+                                <constraint firstAttribute="trailing" secondItem="IV8-RS-QgB" secondAttribute="trailing" constant="20" symbolic="YES" id="KDY-kN-aIc"/>
+                                <constraint firstAttribute="bottom" secondItem="IV8-RS-QgB" secondAttribute="bottom" constant="18" id="PMS-Nj-1pw"/>
+                                <constraint firstItem="IV8-RS-QgB" firstAttribute="leading" secondItem="bdM-Vw-4kd" secondAttribute="trailing" constant="8" symbolic="YES" id="lK5-iD-MNI"/>
+                                <constraint firstItem="IV8-RS-QgB" firstAttribute="top" secondItem="AW5-wq-dCB" secondAttribute="top" constant="16" id="lVb-uR-Cwq"/>
+                                <constraint firstItem="bdM-Vw-4kd" firstAttribute="top" secondItem="AW5-wq-dCB" secondAttribute="top" constant="20" symbolic="YES" id="nar-h4-533"/>
+                                <constraint firstItem="bdM-Vw-4kd" firstAttribute="leading" secondItem="AW5-wq-dCB" secondAttribute="leading" constant="20" symbolic="YES" id="rRP-Vc-HuO"/>
+                            </constraints>
                         </view>
-                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="9sB-5m-hZT" userLabel="Uploads group">
-                            <rect key="frame" x="10" y="163" width="300" height="138"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="9sB-5m-hZT" userLabel="Uploads group">
+                            <rect key="frame" x="10" y="163" width="300" height="176"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Enable auto-upload" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iwx-KT-bh3">
-                                    <rect key="frame" x="20" y="25" width="151" height="21"/>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Auto-Upload" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iwx-KT-bh3">
+                                    <rect key="frame" x="20" y="25" width="99" height="21"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                     <nil key="highlightedColor"/>
                                 </label>
-                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="haQ-ms-BgT" userLabel="Switch - Auto-Upload">
+                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="haQ-ms-BgT" userLabel="Switch - Auto-Upload">
                                     <rect key="frame" x="231" y="20" width="51" height="31"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <connections>
                                         <action selector="autoUploadEnabledSwitchChanged:" destination="-1" eventType="valueChanged" id="TVL-EW-VLH"/>
                                     </connections>
                                 </switch>
-                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XCG-3A-R3p">
-                                    <rect key="frame" x="101" y="88" width="99" height="30"/>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XCG-3A-R3p">
+                                    <rect key="frame" x="101" y="126" width="99" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Cancel upload">
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -87,14 +102,42 @@
                                         <action selector="cancelUpload:" destination="-1" eventType="touchUpInside" id="T8p-tP-u53"/>
                                     </connections>
                                 </button>
+                                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Conserve Cellular Data" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HzA-Ji-mst">
+                                    <rect key="frame" x="20" y="77" width="176" height="21"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" on="YES" translatesAutoresizingMaskIntoConstraints="NO" id="19c-aY-Rfp" userLabel="Switch - Conserve bandwidth">
+                                    <rect key="frame" x="231" y="72" width="51" height="31"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                    <connections>
+                                        <action selector="conserveDataEnabledSwitchChanged:" destination="-1" eventType="valueChanged" id="BLw-ck-jJt"/>
+                                    </connections>
+                                </switch>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="XCG-3A-R3p" firstAttribute="centerX" secondItem="9sB-5m-hZT" secondAttribute="centerX" id="2Vr-E1-7m6"/>
+                                <constraint firstAttribute="bottom" secondItem="XCG-3A-R3p" secondAttribute="bottom" constant="20" symbolic="YES" id="Jbt-Hy-ogf"/>
+                                <constraint firstItem="HzA-Ji-mst" firstAttribute="leading" secondItem="Iwx-KT-bh3" secondAttribute="leading" id="K5c-ye-Lw1"/>
+                                <constraint firstItem="Iwx-KT-bh3" firstAttribute="leading" secondItem="9sB-5m-hZT" secondAttribute="leading" constant="20" symbolic="YES" id="KkC-3A-1t7"/>
+                                <constraint firstItem="haQ-ms-BgT" firstAttribute="top" secondItem="9sB-5m-hZT" secondAttribute="top" constant="20" symbolic="YES" id="N1j-VK-ssL"/>
+                                <constraint firstItem="19c-aY-Rfp" firstAttribute="leading" secondItem="HzA-Ji-mst" secondAttribute="trailing" constant="35" id="UHy-fW-fSn"/>
+                                <constraint firstItem="haQ-ms-BgT" firstAttribute="leading" secondItem="19c-aY-Rfp" secondAttribute="leading" id="Xpc-WK-bbb"/>
+                                <constraint firstAttribute="trailing" secondItem="haQ-ms-BgT" secondAttribute="trailing" constant="20" symbolic="YES" id="cPz-Yq-g6Q"/>
+                                <constraint firstItem="19c-aY-Rfp" firstAttribute="centerY" secondItem="HzA-Ji-mst" secondAttribute="centerY" id="rnm-Kh-lgv"/>
+                                <constraint firstItem="Iwx-KT-bh3" firstAttribute="centerY" secondItem="haQ-ms-BgT" secondAttribute="centerY" id="sPT-Cn-UCY"/>
+                                <constraint firstItem="19c-aY-Rfp" firstAttribute="top" secondItem="haQ-ms-BgT" secondAttribute="bottom" constant="21" id="w9N-Gn-a2V"/>
+                                <constraint firstItem="XCG-3A-R3p" firstAttribute="top" secondItem="HzA-Ji-mst" secondAttribute="bottom" constant="28" id="y2c-07-z2W"/>
+                            </constraints>
                         </view>
-                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="G1L-qS-gBd" userLabel="Other actions">
-                            <rect key="frame" x="10" y="309" width="300" height="51"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="G1L-qS-gBd" userLabel="Other actions">
+                            <rect key="frame" x="10" y="431" width="300" height="51"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d8P-oF-yBR">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d8P-oF-yBR">
                                     <rect key="frame" x="79" y="11" width="143" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Send Diagnostic Info">
@@ -106,12 +149,17 @@
                                 </button>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="bottom" secondItem="d8P-oF-yBR" secondAttribute="bottom" constant="10" id="YJw-ih-1sP"/>
+                                <constraint firstItem="d8P-oF-yBR" firstAttribute="top" secondItem="G1L-qS-gBd" secondAttribute="top" constant="11" id="Zi9-YB-SBm"/>
+                                <constraint firstItem="d8P-oF-yBR" firstAttribute="centerX" secondItem="G1L-qS-gBd" secondAttribute="centerX" id="hPs-FQ-sIK"/>
+                            </constraints>
                         </view>
-                        <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ipy-ms-DDt" userLabel="Developer action">
-                            <rect key="frame" x="10" y="368" width="300" height="51"/>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Ipy-ms-DDt" userLabel="Developer action">
+                            <rect key="frame" x="10" y="490" width="300" height="51"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <subviews>
-                                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xFW-Ht-VXU">
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xFW-Ht-VXU">
                                     <rect key="frame" x="85" y="11" width="130" height="30"/>
                                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                     <state key="normal" title="Developer Settings">
@@ -124,15 +172,55 @@
                                 </button>
                             </subviews>
                             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="xFW-Ht-VXU" firstAttribute="top" secondItem="Ipy-ms-DDt" secondAttribute="top" constant="11" id="PIe-4A-OfK"/>
+                                <constraint firstItem="xFW-Ht-VXU" firstAttribute="centerX" secondItem="Ipy-ms-DDt" secondAttribute="centerX" id="PgK-8E-4eP"/>
+                                <constraint firstAttribute="bottom" secondItem="xFW-Ht-VXU" secondAttribute="bottom" constant="10" id="uiv-KR-quw"/>
+                            </constraints>
                         </view>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="F7h-rx-oVP">
+                            <rect key="frame" x="20" y="347" width="280" height="58"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <string key="text">Turn off Auto-Upload to prevent Duffy from uploading and indexing new photos.  Turn off Conserve Cellular Data to upload large images over the cellular network.</string>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                     </subviews>
                     <gestureRecognizers/>
+                    <constraints>
+                        <constraint firstItem="G1L-qS-gBd" firstAttribute="top" secondItem="F7h-rx-oVP" secondAttribute="bottom" constant="26" id="5Id-96-4GC"/>
+                        <constraint firstAttribute="trailing" secondItem="F7h-rx-oVP" secondAttribute="trailing" constant="20" symbolic="YES" id="5Ku-3w-yXq"/>
+                        <constraint firstItem="G1L-qS-gBd" firstAttribute="leading" secondItem="Ipy-ms-DDt" secondAttribute="leading" id="698-RX-euC"/>
+                        <constraint firstItem="i6q-NP-6GB" firstAttribute="top" secondItem="j2Z-KM-edp" secondAttribute="top" constant="20" symbolic="YES" id="FmX-AE-5AT"/>
+                        <constraint firstItem="Ipy-ms-DDt" firstAttribute="trailing" secondItem="G1L-qS-gBd" secondAttribute="trailing" id="JBh-g2-KCg"/>
+                        <constraint firstItem="i6q-NP-6GB" firstAttribute="leading" secondItem="AW5-wq-dCB" secondAttribute="leading" id="Jgx-nm-cri"/>
+                        <constraint firstAttribute="bottom" secondItem="Ipy-ms-DDt" secondAttribute="bottom" constant="20" symbolic="YES" id="Jlj-xT-7dc"/>
+                        <constraint firstItem="F7h-rx-oVP" firstAttribute="leading" secondItem="j2Z-KM-edp" secondAttribute="leading" constant="20" symbolic="YES" id="Kac-sj-A7y"/>
+                        <constraint firstItem="9sB-5m-hZT" firstAttribute="top" secondItem="AW5-wq-dCB" secondAttribute="bottom" constant="8" symbolic="YES" id="Lie-HY-0fu"/>
+                        <constraint firstItem="Ipy-ms-DDt" firstAttribute="top" secondItem="G1L-qS-gBd" secondAttribute="bottom" constant="8" symbolic="YES" id="Lro-Lj-kyY"/>
+                        <constraint firstItem="G1L-qS-gBd" firstAttribute="centerX" secondItem="F7h-rx-oVP" secondAttribute="centerX" id="PHI-SB-UHm"/>
+                        <constraint firstItem="AW5-wq-dCB" firstAttribute="leading" secondItem="9sB-5m-hZT" secondAttribute="leading" id="VKN-r5-d88"/>
+                        <constraint firstItem="i6q-NP-6GB" firstAttribute="centerX" secondItem="j2Z-KM-edp" secondAttribute="centerX" id="h77-gl-nSY"/>
+                        <constraint firstItem="AW5-wq-dCB" firstAttribute="trailing" secondItem="9sB-5m-hZT" secondAttribute="trailing" id="hyh-jS-uTU"/>
+                        <constraint firstItem="AW5-wq-dCB" firstAttribute="trailing" secondItem="i6q-NP-6GB" secondAttribute="trailing" id="hza-vW-E7w"/>
+                        <constraint firstItem="G1L-qS-gBd" firstAttribute="trailing" secondItem="9sB-5m-hZT" secondAttribute="trailing" id="i4y-Gc-IDM"/>
+                        <constraint firstItem="G1L-qS-gBd" firstAttribute="leading" secondItem="9sB-5m-hZT" secondAttribute="leading" id="syz-JB-9k7"/>
+                        <constraint firstItem="F7h-rx-oVP" firstAttribute="top" secondItem="9sB-5m-hZT" secondAttribute="bottom" constant="8" symbolic="YES" id="t2S-be-oCK"/>
+                        <constraint firstItem="AW5-wq-dCB" firstAttribute="top" secondItem="i6q-NP-6GB" secondAttribute="bottom" constant="8" symbolic="YES" id="vfU-yd-msj"/>
+                    </constraints>
                     <connections>
                         <outletCollection property="gestureRecognizers" destination="QhR-EW-yfj" appends="YES" id="C2G-YQ-eDK"/>
                     </connections>
                 </scrollView>
             </subviews>
             <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="j2Z-KM-edp" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="5Rw-5D-PP2"/>
+                <constraint firstItem="j2Z-KM-edp" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="7P9-cg-pLG"/>
+                <constraint firstAttribute="bottom" secondItem="j2Z-KM-edp" secondAttribute="bottom" id="KHQ-Wa-fQ3"/>
+                <constraint firstAttribute="trailing" secondItem="j2Z-KM-edp" secondAttribute="trailing" id="sDb-d2-rQ4"/>
+            </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
         </view>
         <tapGestureRecognizer id="QhR-EW-yfj">

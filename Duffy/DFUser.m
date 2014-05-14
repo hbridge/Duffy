@@ -21,6 +21,7 @@ static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortK
 
 
 NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
+NSString *DFConserveDataEnabledUserDefaultKey = @"DFConserveDataEnabledUserDefaultKey";
 NSString *DFEnabledYes = @"YES";
 NSString *DFEnabledNo = @"NO";
 
@@ -30,8 +31,21 @@ static DFUser *currentUser;
 {
     if (!currentUser) {
         currentUser = [[super allocWithZone:nil] init];
+      [self checkUserDefaults];
     }
     return currentUser;
+}
+
++ (void)checkUserDefaults
+{
+  if (![[NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey]){
+    [[NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
+  }
+  
+  if (![[NSUserDefaults standardUserDefaults] valueForKey:DFConserveDataEnabledUserDefaultKey]){
+    [[NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFConserveDataEnabledUserDefaultKey];
+  }
+  [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (NSString *)deviceID
@@ -145,5 +159,55 @@ static DFUser *currentUser;
     unsigned long long memoryInBytes = [[NSProcessInfo processInfo] physicalMemory];
     return (unsigned int)(memoryInBytes/1000/1000);
 }
+
+- (BOOL)autoUploadEnabled
+{
+  if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey]
+       isEqualToString:DFEnabledYes]){
+    return YES;
+  }
+  
+  return NO;
+}
+
+- (void)setAutoUploadEnabled:(BOOL)autoUploadEnabled
+{
+  if (autoUploadEnabled) {
+    DDLogInfo(@"Auto-upload now ON");
+    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
+  } else {
+    DDLogInfo(@"Auto-upload now OFF");
+    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
+  }
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+
+- (BOOL)conserveDataEnabled
+{
+  if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFConserveDataEnabledUserDefaultKey]
+       isEqualToString:DFEnabledYes]){
+    return YES;
+  }
+  
+  return NO;
+}
+
+- (void)setConserveDataEnabled:(BOOL)conserveDataEnabled
+{
+  if (conserveDataEnabled) {
+    DDLogInfo(@"Conserve cellular data now ON");
+    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFConserveDataEnabledUserDefaultKey];
+  } else {
+    DDLogInfo(@"Conserve cell data now OFF");
+    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFConserveDataEnabledUserDefaultKey];
+  }
+  
+  [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+
+
+
 
 @end

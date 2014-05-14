@@ -94,7 +94,7 @@
     
     self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
     [self.collectionView reloadData];
-  if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
+  if ([[DFUser currentUser] autoUploadEnabled]){
     [[DFUploadController sharedUploadController] uploadPhotos];
   }
 
@@ -110,7 +110,7 @@
         return;
     }
     
-    if ([[[ NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
+    if ([[DFUser currentUser] autoUploadEnabled]){
         [[DFUploadController sharedUploadController] uploadPhotos];
     }
 }

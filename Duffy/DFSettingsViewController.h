@@ -22,9 +22,11 @@
 
 //Upload section outlets
 @property (weak, nonatomic) IBOutlet UISwitch *autoUploadEnabledSwitch;
+@property (weak, nonatomic) IBOutlet UISwitch *conserveDataEnabledSwitch;
 
 // Upload section actions
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender;
+- (IBAction)conserveDataEnabledSwitchChanged:(UISwitch *)sender;
 - (IBAction)cancelUpload:(UIButton *)sender;
 
 - (IBAction)sendInfoClicked:(UIButton *)sender;
