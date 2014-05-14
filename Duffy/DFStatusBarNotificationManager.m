@@ -68,6 +68,11 @@ static DFStatusBarNotificationManager *defaultManager;
             [JDStatusBarNotification showWithStatus:@"Upload cancelled." dismissAfter:2];
         } else if (updateType == DFStatusUpdateResumed) {
             [JDStatusBarNotification showWithStatus:@"Upload resuming..." dismissAfter:2];
+        } else if (updateType == DFStatusUpdateFullPhotosStopped) {
+          NSString *statusString = [NSString stringWithFormat:
+                                    @"Connect to Wifi to finish. %lu left.", numRemaining];
+          [JDStatusBarNotification showWithStatus:statusString dismissAfter:7];
+          [JDStatusBarNotification showProgress:progress];
         }
     });
 }
