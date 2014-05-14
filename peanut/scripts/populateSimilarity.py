@@ -19,7 +19,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	#while True:
-	results = Photo.objects.all().filter(user=133).exclude(thumb_filename=None).filter(clustered_time=None).values('user').annotate(Count('user'))
+	results = Photo.objects.all().filter(user__gt=75).exclude(thumb_filename=None).filter(clustered_time=None).values('user').annotate(Count('user'))
 
 	if len(results) > 0:	
 		for result in results:
