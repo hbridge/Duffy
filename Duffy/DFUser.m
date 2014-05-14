@@ -19,6 +19,11 @@ static NSString *DFOverrideDeviceIDUserDefaultsKey = @"com.duffysoft.DFOverrideD
 static NSString *DFOverrideServerURLKey = @"com.duffysoft.DFOverrideServerURLKey";
 static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortKey";
 
+
+NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
+NSString *DFEnabledYes = @"YES";
+NSString *DFEnabledNo = @"NO";
+
 static DFUser *currentUser;
 
 + (DFUser *)currentUser

@@ -14,6 +14,7 @@
 #import "DFAnalytics.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFAppInfo.h"
+#import "DFDevelopmentSettingsViewController.h"
 
 @interface DFSettingsViewController ()
 
@@ -22,13 +23,6 @@
 @end
 
 @implementation DFSettingsViewController
-
-
-// Network default keys
-NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
-NSString *DFEnabledYes = @"YES";
-NSString *DFEnabledNo = @"NO";
-
 
 - (id)init
 {
@@ -39,12 +33,6 @@ NSString *DFEnabledNo = @"NO";
         self.tabBarItem.image = [UIImage imageNamed:@"SettingsTab"];
         
         [self setSettingsDefaults];
-        
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(uploadStatusChanged:)
-                                                     name:DFUploadStatusNotificationName
-                                                   object:nil];
-        
     }
     return self;
 }
@@ -61,12 +49,9 @@ NSString *DFEnabledNo = @"NO";
 {
     [super viewDidLoad];
 
-    [self setAppInfo];
-    [self refreshDeviceInfoUI];
-    self.serverURLTextField.text = [[DFUser currentUser] userOverriddenServerURLString];
-    self.serverURLTextField.placeholder = [[[DFUser currentUser] defaultServerURL] absoluteString];
-    self.serverPortTextField.text = [[DFUser currentUser] userOverriddenServerPortString];
-    self.serverPortTextField.placeholder = [[DFUser currentUser] defaultServerPort];
+    [self configureAppInfoView];
+    [self configureUserSectionView];
+  
     
     if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey] isEqualToString:DFEnabledYes]){
         self.autoUploadEnabledSwitch.on = YES;
@@ -77,22 +62,14 @@ NSString *DFEnabledNo = @"NO";
     
 }
 
-- (void)setAppInfo
+- (void)configureAppInfoView
 {
     self.appInfoLabel.text = [DFAppInfo appInfoString];
 }
 
-- (void)refreshDeviceInfoUI
+- (void)configureUserSectionView
 {
-    self.deviceIDLabel.text = [[DFUser currentUser] hardwareDeviceID];
-    self.deviceIDTextField.text = [[DFUser currentUser] userOverriddenDeviceID];
-    self.deviceIDTextField.placeholder = @"Enter another device ID to override.";
-    self.userIDTextField.text = [NSString stringWithFormat:@"%lu", (long)[[DFUser currentUser] userID]];
-    
-#ifndef DEBUG
-    self.deviceIDTextField.enabled = NO;
-    self.deviceIDTextField.placeholder = @"Disabled in release builds.";
-#endif
+  self.userIDTextField.text = [NSString stringWithFormat:@"%lu", (long)[[DFUser currentUser] userID]];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -120,40 +97,6 @@ NSString *DFEnabledNo = @"NO";
     // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)deviceIDEditingDidEnd:(UITextField *)sender {
-    [[DFUser currentUser] setUserOverriddenDeviceID:sender.text];
-    [self alertUserAndStopApp];
-}
-
-- (IBAction)userIDEditingDidEnd:(UITextField *)sender {
-    [[DFUser currentUser] setUserID:[sender.text longLongValue]];
-    [self alertUserAndStopApp];
-}
-
-- (void)alertUserAndStopApp
-{
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Duffy Must Close"
-                                                    message:@"The app must close for this change to take effect."
-                                                   delegate:nil
-                                          cancelButtonTitle:@"OK"
-                                          otherButtonTitles:nil];
-    alert.delegate = self;
-    [alert show];
-}
-
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
-{
-    exit(0);
-}
-
-- (IBAction)serverURLEditingDidEnd:(UITextField *)sender {
-    [[DFUser currentUser] setUserOverriddenServerURLString:sender.text];
-}
-
-- (IBAction)serverPortEditingDidEnd:(UITextField *)sender {
-    [[DFUser currentUser] setUserOverriddenServerPortString:sender.text];
-}
 
 - (IBAction)cancelUpload:(UIButton *)sender {
     [[DFUploadController sharedUploadController] cancelUploads];
@@ -179,6 +122,11 @@ NSString *DFEnabledNo = @"NO";
         [[[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil] show];
     }
 
+}
+
+- (IBAction)developerSettingsClicked:(UIButton *)sender {
+  DFDevelopmentSettingsViewController *dsvc = [[DFDevelopmentSettingsViewController alloc] init];
+  [self.navigationController pushViewController:dsvc animated:YES];
 }
 
 static const int MaxLogFiles = 10;
@@ -212,10 +160,6 @@ static const int MaxLogFiles = 10;
 
 
 
-- (IBAction)crashAppClicked:(UIButton *)sender {
-    [NSException raise:@"Testing Crash" format:@"Intentionally crashing app to test crash uploads."];
-}
-
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
     [textField resignFirstResponder];
@@ -232,15 +176,6 @@ static const int MaxLogFiles = 10;
     self.lastEditedTextField = textField;
 }
 
-- (IBAction)copyDeviceIDClicked:(UIButton *)sender {
-    UIPasteboard *pb = [UIPasteboard generalPasteboard];
-    [pb setString:[[DFUser currentUser] deviceID]];
-}
-
-- (IBAction)clearUploadDatabaseClicked:(UIButton *)sender {
-    [[DFPhotoStore sharedStore] clearUploadInfo];
-    [[DFUploadController sharedUploadController] uploadPhotos];
-}
 
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender {
     if (sender.isOn) {
@@ -252,19 +187,6 @@ static const int MaxLogFiles = 10;
     }
     
     [DFAnalytics logAutoUploadSettingChanged:sender.isOn];
-}
-
-
-- (void)uploadStatusChanged:(NSNotification *)notification
-{
-    DFUploadSessionStats *uploadStats = [[notification userInfo] valueForKey:DFUploadStatusUpdateSessionUserInfoKey];
-    
-    
-    unsigned long numTotalUploaded = (unsigned long)uploadStats.numThumbnailsUploaded + uploadStats.numFullPhotosUploaded;
-    unsigned long numTotalAccepted = (unsigned long)uploadStats.numThumbnailsAccepted + uploadStats.numFullPhotosAccepted;
-    self.numUploadedLabel.text = [NSString stringWithFormat:@"%lu", numTotalUploaded];
-    self.numToUploadLabel.text = [NSString stringWithFormat:@"%lu", numTotalAccepted];
-    self.uploadProgressView.progress = (float)numTotalUploaded / (float)numTotalAccepted;
 }
 
 

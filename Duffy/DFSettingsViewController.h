@@ -12,44 +12,23 @@
 
 @interface DFSettingsViewController : DFKeyboardResizingViewController <UITextFieldDelegate, UIAlertViewDelegate, MFMailComposeViewControllerDelegate>
 
-extern NSString *DFPipelineEnabledUserDefaultKey;
-extern NSString *DFAutoUploadEnabledUserDefaultKey;
-extern NSString *DFEnabledYes;
-extern NSString *DFEnabledNo;
-
 - (IBAction)scrollViewTapped:(UITapGestureRecognizer *)sender;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UILabel *appInfoLabel;
 
-// Device/user section outlets
-@property (weak, nonatomic) IBOutlet UILabel *deviceIDLabel;
+// User section outlets
 @property (weak, nonatomic) IBOutlet UITextField *userIDTextField;
-@property (weak, nonatomic) IBOutlet UITextField *deviceIDTextField;
-// Server section outlets
-@property (weak, nonatomic) IBOutlet UITextField *serverURLTextField;
-@property (weak, nonatomic) IBOutlet UITextField *serverPortTextField;
+
 //Upload section outlets
 @property (weak, nonatomic) IBOutlet UISwitch *autoUploadEnabledSwitch;
-@property (weak, nonatomic) IBOutlet UILabel *numUploadedLabel;
-@property (weak, nonatomic) IBOutlet UILabel *numToUploadLabel;
-@property (weak, nonatomic) IBOutlet UIProgressView *uploadProgressView;
-
-// Device/user section actions
-- (IBAction)deviceIDEditingDidEnd:(UITextField *)sender;
-- (IBAction)userIDEditingDidEnd:(UITextField *)sender;
-- (IBAction)copyDeviceIDClicked:(UIButton *)sender;
-// Server section actions
-- (IBAction)serverURLEditingDidEnd:(UITextField *)sender;
-
 
 // Upload section actions
-- (IBAction)clearUploadDatabaseClicked:(UIButton *)sender;
 - (IBAction)autoUploadEnabledSwitchChanged:(UISwitch *)sender;
-- (IBAction)serverPortEditingDidEnd:(UITextField *)sender;
 - (IBAction)cancelUpload:(UIButton *)sender;
 
 - (IBAction)sendInfoClicked:(UIButton *)sender;
+- (IBAction)developerSettingsClicked:(UIButton *)sender;
 
-- (IBAction)crashAppClicked:(UIButton *)sender;
+
 @end

@@ -9,7 +9,7 @@
 #import "DFCameraRollViewController.h"
 #import "DFPhotoStore.h"
 #import "DFUploadController.h"
-#import "DFSettingsViewController.h"
+#import "DFUser.h"
 #import "DFPhoto.h"
 #import "DFAnalytics.h"
 #import "DFNotificationSharedConstants.h"

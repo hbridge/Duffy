@@ -27,6 +27,10 @@
 @property (readonly, nonatomic, retain) NSString *defaultServerPort;
 
 
+extern NSString *DFAutoUploadEnabledUserDefaultKey;
+extern NSString *DFEnabledYes;
+extern NSString *DFEnabledNo;
+
 + (DFUser *)currentUser;
 
 @end
