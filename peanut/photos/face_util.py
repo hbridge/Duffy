@@ -21,20 +21,20 @@ import cv2.cv as cv
 	Returns set of rectangles with faces found. 
 	Format: [[x, y, width, height]]
 	Ex: [[244 694  50  50] # rect 1 starts at coordinates (244, 694) with width and height of 50px
- 		 [229 647  57  57]] # rect 2
+		 [229 647  57  57]] # rect 2
 """
 
-def findFaces(photo, userId):
-
+def findFaces(photo):
 	# Make sure a photo full or thumb exists
 	if (photo.full_filename):
-		photoFile = photo.full_filename
+		photoPath = photo.getFullPath()
 		minSize = (30,30)
 	elif (photo.thumb_filename):
-		photoFile = photo.thumb_filename
+		photoPath = photo.getThumbPath()
 		minSize = (20,20)
 	else:
 		return 0
+
 
 	# path on disk
 	origPath = '/home/derek/user_data/' + str(userId) + '/'
@@ -46,7 +46,7 @@ def findFaces(photo, userId):
 
 
 	# cascade list for face detection
-	cascadePath = 'cascades/'
+	cascadePath = os.path.split(os.path.abspath(__file__))[0] + '/cascades/'
 
 	cascadeFFDefault =  cascadePath + 'haarcascades/haarcascade_frontalface_alt.xml'
 	#cascadeEye = cascadePath + 'haarcascades/haarcascade_eye.xml'
@@ -60,26 +60,27 @@ def findFaces(photo, userId):
 	
 
 def detect(img, cascade_fn,
-           scaleFactor=1.1, minNeighbors=4, minSize=(30, 30),
-           flags=cv.CV_HAAR_SCALE_IMAGE):
+		   scaleFactor=1.1, minNeighbors=4, minSize=(30, 30),
+		   flags=cv.CV_HAAR_SCALE_IMAGE):
 
-    cascade = cv2.CascadeClassifier(cascade_fn)
-    rects = cascade.detectMultiScale(img, scaleFactor=scaleFactor,
-                                     minNeighbors=minNeighbors,
-                                     minSize=minSize, flags=flags)
-    if len(rects) == 0:
-        return []
-    return rects
+	cascade = cv2.CascadeClassifier(cascade_fn)
+	rects = cascade.detectMultiScale(img, scaleFactor=scaleFactor,
+									 minNeighbors=minNeighbors,
+									 minSize=minSize, flags=flags)
+	if len(rects) == 0:
+		return []
+	return rects
 
 def main(argv):
 
-	userId = 139
+	userId = 138
 		
 	photos = list(Photo.objects.select_related().filter(user_id=userId).exclude(thumb_filename=None).order_by('time_taken')[:100])
 
 	faceRects = dict()
 	for photo in photos:
 		faceRects[photo] = findFaces(photo, userId)
+		print faceRects[photo] 
 		if len(faceRects[photo]) > 0:
 			print "PhotoId: {0}".format(photo.id)
 			print str(faceRects[photo])
