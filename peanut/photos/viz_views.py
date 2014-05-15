@@ -15,7 +15,7 @@ from .forms import ManualAddPhoto
 
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
-import time
+import time, math
 
 	
 def manualAddPhoto(request):
@@ -224,35 +224,38 @@ def userbaseSummary(request):
 			entry = dict()
 			entry['user'] = user
 			dbQuery = Photo.objects.filter(user_id=user.id)
-			if (dbQuery.count() > 0):
+			totalCount = dbQuery.count()
+			if (totalCount > 0):
 				photoSet = dbQuery.order_by('-added')[:1]
 				for photo in photoSet:
 					entry['lastUploadTime'] = photo.added
 					break
-			entry['dbCount'] = dbQuery.count()
-			entry['thumbs'] = dbQuery.exclude(thumb_filename=None).count()
-			photosWithGPS = dbQuery.filter(metadata__contains='{GPS}').count()
-			if photosWithGPS > 0:				
-				entry['twofish'] = int(dbQuery.exclude(twofishes_data=None).count()/photosWithGPS*100)
-			else:
-				entry['twofish'] = '-'
-			entry['fullimages'] = dbQuery.exclude(full_filename=None).count()
-			searchResults = SearchQuerySet().all().filter(userId=userId)
-			entry['resultsCount'] = searchResults.count()
-			entry['clustered'] = dbQuery.exclude(clustered_time=None).count()
-			entry['classifications'] = dbQuery.exclude(classification_data=None).count()
-			entry['internal'] = False
+				entry['dbCount'] = totalCount
+				entry['thumbs'] = int(math.floor(dbQuery.exclude(thumb_filename=None).count()/totalCount*100))
+				photosWithGPS = dbQuery.filter(metadata__contains='{GPS}').count()
+				if photosWithGPS > 0:				
+					entry['twofish'] = int(math.floor(dbQuery.exclude(twofishes_data=None).count()/photosWithGPS*100))
+				else:
+					entry['twofish'] = '-'
+				entry['fullimagesCount'] = dbQuery.exclude(full_filename=None).count()
+				entry['fullimages'] = int(math.floor(entry['fullimagesCount']/totalCount*100))
+				searchResults = SearchQuerySet().all().filter(userId=userId)
+				entry['resultsCount'] = int(math.floor(searchResults.count()/totalCount*100))
+				entry['clustered'] = int(math.floor(dbQuery.exclude(clustered_time=None).count()/totalCount*100))
+				entry['classifications'] = int(math.floor(dbQuery.exclude(classification_data=None).count()/totalCount*100))
 
-			if (user.added == None or len(user.first_name) == 0):
-				entry['internal'] = True
-			else:
-				for phoneid in knownPhoneIds:
-					if ((phoneid.lower() in user.phone_id.lower()) or 
-						('iphone simulator'.lower() in user.first_name.lower()) or
-						('ipad simulator'.lower() in user.first_name.lower())):
-						entry['internal'] = True
-						break
-			resultList.append(entry)
+				entry['internal'] = False
+
+				if (user.added == None or len(user.first_name) == 0):
+					entry['internal'] = True
+				else:
+					for phoneid in knownPhoneIds:
+						if ((phoneid.lower() in user.phone_id.lower()) or 
+							('iphone simulator'.lower() in user.first_name.lower()) or
+							('ipad simulator'.lower() in user.first_name.lower())):
+							entry['internal'] = True
+							break
+				resultList.append(entry)
 		except User.DoesNotExist:
 			continue
 

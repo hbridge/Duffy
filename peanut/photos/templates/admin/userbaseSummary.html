@@ -37,6 +37,12 @@
 		text-align: right;
 		font-size: 10px;
 	}
+	.right{
+		text-align: right;
+	}
+	.center{
+		text-align: center;
+	}
 
 </style>
 <body>
@@ -51,12 +57,12 @@
 			<td class='phoneid'> PhoneId </td>
 			<td class='created'> Created (GMT) </td>
 			<td class='db-count'> DBPhotos </td>
-			<td class='db-thumbnails'> Thumbnails </td>
-			<td class='index-count'> Indexed <br> Photos </td>
+			<td class='db-thumbnails'> Thumbnails <br> (%)</td>
+			<td class='index-count'> Indexed <br> Photos (%) </td>
 			<td class='twofish'> TwoFish <br> (%) </td>
-			<td class='clustered'> Clustered </td>
-			<td class='classifications'> Image <br> Classifications </td>
-			<td class='db-fullimage'> Full <br>images </td>
+			<td class='clustered'> Clustered <br> (%)  </td>
+			<td class='classifications'> Image <br> Rec (%)  </td>
+			<td class='db-fullimage'> Full <br>images (%) </td>
 			<td class='last-uploaded-timestamp'> Last Upload (GMT) </td>
 		</tr>
 	{% for entry in resultList %}
@@ -65,13 +71,13 @@
 			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
 			<td class='phoneid' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
 			<td class='created'> {{ entry.user.added|date:'m/d h:i.s A' }} </td>
-			<td class='db-count'> {{ entry.dbCount }} </td>
-			<td class='db-thumbnails'> {{ entry.thumbs }} </td>
-			<td class='index-count'> {{ entry.resultsCount }} </td>
-			<td class='twofish'>{{ entry.twofish }} </td>
-			<td class='clustered'> {{ entry.clustered }} </td>
-			<td class='classifications'> {{ entry.classifications }} </td>
-			<td class='db-fullimage'> {{ entry.fullimages }} </td>			
+			<td class='db-count right'> {{ entry.dbCount }} </td>
+			<td class='db-thumbnails right'> {{ entry.thumbs }} </td>
+			<td class='index-count right'> {{ entry.resultsCount }} </td>
+			<td class='twofish right'>{{ entry.twofish }} </td>
+			<td class='clustered right'> {{ entry.clustered }} </td>
+			<td class='classifications right'> {{ entry.classifications }} </td>
+			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>			
 			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime|date:'m/d h:i.s A' }} </td>
 		</tr>
 	{% endfor %}
