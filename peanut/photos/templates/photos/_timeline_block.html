@@ -6,7 +6,6 @@
 	</div>
 	{% for cluster in entry.clusterList %}
 		{% for imageEntry in cluster %}
-			{% if imageEntry.dist == None or imageEntry.dist >= 40 %} 
 				<div class = "ui-image 
 					{% if imageEntry.dist == None and cluster|length > 1 %} 
 						cluster
@@ -47,7 +46,6 @@
 						</div>
 					{% endif %}
 				</div>
-			{% endif %}
 		{% endfor %}
 	{% endfor %}
 </div>
