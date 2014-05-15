@@ -163,11 +163,18 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 								if (v2 == 'false'):
 									foundSmile = True
 									break
-				if (foundFace == True):
-					termList.extend(faceKeywords)
-				if (foundSmile == True):
-					termList.extend(smileKeywords)
-				return termList
+				
+
+		if (obj.faces_data):
+			facesData = json.loads(obj.faces_data)
+			if "rects" in facesData["opencv"]:
+				foundFace = True
+
+		if (foundFace == True):
+			termList.extend(faceKeywords)
+		if (foundSmile == True):
+			termList.extend(smileKeywords)
+		
 		return termList
 
 	'''
