@@ -233,8 +233,9 @@ def userbaseSummary(request):
 				entry['dbCount'] = totalCount
 				entry['thumbs'] = int(math.floor(dbQuery.exclude(thumb_filename=None).count()/totalCount*100))
 				photosWithGPS = dbQuery.filter(metadata__contains='{GPS}').count()
-				if photosWithGPS > 0:				
-					entry['twofish'] = int(math.floor(dbQuery.exclude(twofishes_data=None).count()/photosWithGPS*100))
+
+				if photosWithGPS > 0:
+					entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
 				else:
 					entry['twofish'] = '-'
 				entry['fullimagesCount'] = dbQuery.exclude(full_filename=None).count()
