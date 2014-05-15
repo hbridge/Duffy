@@ -239,12 +239,12 @@ def userbaseSummary(request):
 				else:
 					entry['twofish'] = '-'
 				entry['fullimagesCount'] = dbQuery.exclude(full_filename=None).count()
-				entry['fullimages'] = int(math.floor(entry['fullimagesCount']/totalCount*100))
+				entry['fullimages'] = entry['fullimagesCount']*100/totalCount
 				searchResults = SearchQuerySet().all().filter(userId=userId)
-				entry['resultsCount'] = int(math.floor(searchResults.count()/totalCount*100))
-				entry['clustered'] = int(math.floor(dbQuery.exclude(clustered_time=None).count()/totalCount*100))
-				entry['classifications'] = int(math.floor(dbQuery.exclude(classification_data=None).count()/totalCount*100))
-
+				entry['resultsCount'] = searchResults.count()*100/totalCount
+				entry['clustered'] = dbQuery.exclude(clustered_time=None).count()*100/totalCount
+				entry['classifications'] = dbQuery.exclude(classification_data=None).count()*100/totalCount
+				entry['faces'] = dbQuery.exclude(faces_data=None).count()*100/totalCount
 				entry['internal'] = False
 
 				if (user.added == None or len(user.first_name) == 0):
