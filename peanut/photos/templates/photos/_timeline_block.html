@@ -15,15 +15,27 @@
 					redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg"
 					photoId="{{ imageEntry.photo.photoId }}">
 
+				{% if imageEntry.dist == None and cluster|length > 1 %}
+						<div class='ui-image-gray-2'>
+						</div>
+						<div class='ui-image-gray-1'>
+						</div>
+					{% endif %}
+
 				<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
 					class="
 						{% if imageEntry.dist != None %}
 							lazy-cluster
 						{% else %}
-							lazy
+							lazy ui-image-photo
 						{% endif %}"
-					height="{{ imageSize }}px"
-					width="{{ imageSize }}px" 
+						{% if imageEntry.dist == None and cluster|length > 1 %}
+							height="{{ imageSize|add:-6 }}px"
+							width="{{ imageSize|add:-6 }}px" 
+						{% else %}
+							height="{{ imageSize }}px"
+							width="{{ imageSize }}px" 
+						{% endif %}
 
 					{% if debug %}
 					title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
@@ -38,9 +50,6 @@
 					
 					
 					{% if imageEntry.dist == None and cluster|length > 1 %}
-						<div class="ui-image-page-turn">
-							<img src="http://asood123.no-ip.biz/static/page-fold-th.png" height="100%" width="100%" />
-						</div>
 						<div class="ui-image-count text">
 							{{ cluster|length }}
 						</div>

@@ -50,6 +50,12 @@
 		position: relative;
 		cursor: pointer;
 		height: {{ imageSize|add:+2 }}px;
+		width: {{ imageSize }}px;
+	}
+	.ui-image-photo {
+		position: absolute;
+		top: 0px;
+		left: 0px;
 	}
 	.ui-image-count {
 		position:absolute;
@@ -59,21 +65,31 @@
 		left: 37px;
 		font-size: 1em;
 		text-align: right;
-		width: 39px;
-		height:39px;
-		line-height: 60px;
+		width: 33px;
+		height:33px;
+		line-height: 50px;
 		padding-right: 2px;
+		color: #ffffff;
+		text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
 	}
-	.ui-image-page-turn {
-		background-color: transparent;
-		position:absolute;
-		top: 48px;
-		left:48px;
-		height: 30px;
-		width: 30px;
+	.ui-image-gray-1 {
+		background-color: #a0a0a0;
+		height: {{ imageSize|add:-6 }}px;
+		width: {{ imageSize|add:-6 }}px;
+		position: absolute;
+		top: 3px;
+		left: 3px;
+	}
+	.ui-image-gray-2 {
+		background-color: #c0c0c0;
+		height: {{ imageSize|add:-6 }}px;
+		width: {{ imageSize|add:-6 }}px;
+		position: absolute;
+		top: 6px;
+		left: 6px;
 	}
 	.text {
-		font-family: arial;
+		font-family: sans-serif;
 	}
 	.center {
 		text-align: center;
@@ -164,6 +180,10 @@
 			if ($(this).hasClass('cluster')) {
 				$(this).removeClass('cluster');
 				$(this).children('div').addClass('hidden');
+				$(this).find('img').animate({
+					height: '+=6',
+					width: '+=6'
+				}, 200, function() {});
 				current = $(this).next()
 				while (current.hasClass('hidden')){
 					current.find('img.lazy-cluster').each(function() {
