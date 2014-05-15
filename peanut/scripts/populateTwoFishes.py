@@ -12,7 +12,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 from django.db.models import Count
 from photos.models import Photo
 from peanut import settings
-from photos import cluster_util, location_util
+from photos import location_util
 
 def main(argv):
 	logger = logging.getLogger(__name__)
