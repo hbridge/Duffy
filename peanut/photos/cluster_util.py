@@ -10,8 +10,8 @@ from django.utils import timezone
 from peanut import settings
 from photos.models import Photo, User, Classification, Similarity
 from photos import image_util
-#import cv2
-#import cv2.cv as cv
+import cv2
+import cv2.cv as cv
 
 from bulk_update.helper import bulk_update
 
@@ -239,30 +239,26 @@ def compHist(h1, h2):
 	Scale: 0 - infinity (lower is better)
 """
 def compHistChiSqr(h1, h2):
-	#return cv2.compareHist(h1, h2, cv.CV_COMP_CHISQR)
-	return 0
+	return cv2.compareHist(h1, h2, cv.CV_COMP_CHISQR)
 
 """
 	Returns distance between two histograms using Intersection
 	Scale: 0 - 100 (lower is better)
 """
 def compHistIntersect(h1, h2):
-	#return 100*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_INTERSECT))
-	return 0
+	return 100*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_INTERSECT))
 
 """
 	Returns distance between two histograms using Correlation
 	Scale: 0 - 100 (lower is a better match)
 """
 def compHistCorrel(h1, h2):
-	#return 50*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_CORREL))
-	return 0
+	return 50*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_CORREL))
 
 """
 	Returns distance between two histograms using Bhattacharya
 	Scale: 0 - 100 (lower is a better match)
 """
 def compHistBhat(h1, h2):
-	#return 50*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_BHATTACHARYYA))
-	return 0
+	return 50*(1 - cv2.compareHist(h1, h2, cv.CV_COMP_BHATTACHARYYA))
 
