@@ -1,9 +1,12 @@
 import os
 import json
+import datetime
 
 from django.db import models
 
 from peanut import settings
+
+from bulk_update.helper import bulk_update
 
 # Create your models here.
 class User(models.Model):
@@ -36,6 +39,7 @@ class Photo(models.Model):
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	iphone_hash = models.CharField(max_length=100, null=True)
 	classification_data = models.CharField(max_length=10000, null=True)
+	faces_data = models.TextField(null=True)
 	time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
 	file_key = models.CharField(max_length=100, null=True)
@@ -129,6 +133,32 @@ class Photo(models.Model):
 	"""
 	def getDefaultFullPath(self):
 		return os.path.join(self.user.getUserDataPath(), self.getDefaultFullFilename())
+
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		idsToUpdate = list()
+		oldObjsById = dict()
+		objsToUpdate = list()
+
+		for obj in objs:
+			idsToUpdate.append(obj.id)
+			oldObjsById[obj.id] = obj
+
+		results = cls.objects.in_bulk(idsToUpdate)
+
+		for id, obj in results.iteritems():
+			for attributeName in attributesList:
+				newAttribute = getattr(oldObjsById[id], attributeName)
+				setattr(obj, attributeName, newAttribute)
+				obj.updated = datetime.datetime.now()
+			objsToUpdate.append(obj)
+
+		if (len(objsToUpdate) == 1):
+			objsToUpdate[0].save()
+		else:
+			bulk_update(objsToUpdate)
+		
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
