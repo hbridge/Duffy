@@ -27,6 +27,7 @@
 #import "DFAppInfo.h"
 #import "DFUploadController.h"
 #import "DFUserPeanutAdapter.h"
+#import "DFIntroPageViewController.h"
 
 
 
@@ -62,13 +63,17 @@
 #else
   [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
 #endif
+
+  UIStoryboard *introStoryboard = [UIStoryboard storyboardWithName:@"DFIntro" bundle:nil];
+  UIViewController *vc = [introStoryboard instantiateInitialViewController];
+  self.window.rootViewController = vc;
   
-  if (![self isAppSetupComplete]) {
-    [self showFirstTimeSetup];
-  } else {
-    [self startUserIDCheck];
-    [self showLoggedInUserTabs];
-  }
+//  if (![self isAppSetupComplete]) {
+//    [self showFirstTimeSetup];
+//  } else {
+//    [self startUserIDCheck];
+//    [self showLoggedInUserTabs];
+//  }
   
   self.window.backgroundColor = [UIColor whiteColor];
   [self.window makeKeyAndVisible];
