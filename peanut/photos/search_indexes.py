@@ -28,9 +28,9 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def prepare_classes(self, obj):
 		items = list()
 		items.extend(self.getClassData(obj, 20))
-		items.extend(self.getMetadataKeywords(obj))
+		items.extend(self.getMetadataKeywords(obj, forSearch=False))
 		items.extend(self.getAltTerms(obj, 20))
-		items.extend(self.getFaceKeywords(obj))
+		items.extend(self.getFaceKeywords(obj, forSearch=False))
 
 		return items
 
@@ -147,8 +147,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 	adds the keyword 'face, faces, people, person' if there is a photo detected
 	'''
-	def getFaceKeywords(self, obj):
-		faceKeywords = ['face', 'faces', 'people', 'person']
+	def getFaceKeywords(self, obj, forSearch=True):
+		faceKeywords = ['people', 'face', 'faces', 'person']
 		smileKeywords = ['smile', 'smiles', 'smiling']
 		termList = list()
 		foundSmile = False;
@@ -170,8 +170,13 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 			if "rects" in facesData["opencv"]:
 				foundFace = True
 
+
 		if (foundFace == True):
-			termList.extend(faceKeywords)
+			if forSearch:
+				termList.extend(faceKeywords)
+			else:
+				termList.append(faceKeywords[0])
+				
 		if (foundSmile == True):
 			termList.extend(smileKeywords)
 		
@@ -182,15 +187,18 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		Right now, we're just doing basic text searches.  Probably want to upgrade this at some point.
 		adds the keyword 'face, faces, people, person' if there is a photo detected
 	'''
-	def getMetadataKeywords(self, obj):
+	def getMetadataKeywords(self, obj, forSearch=True):
 		foundTerms = list()
-		keywords = {"front camera" : ['selfie', 'selfy'],
-					"{PNG}" : ['screenshot', 'screenshots']}
+		keywords = {"front camera" : ['selfies', 'selfie', 'selfy'],
+					"{PNG}" : ['screenshots', 'screenshot']}
 
 		if (obj.metadata):
 			for key in keywords:
 				if (str(obj.metadata).find(key) >= 0):
-					foundTerms.extend(keywords[key])
+					if forSearch:
+						foundTerms.extend(keywords[key])
+					else:
+						foundTerms.append(keywords[key][0])
 
 		return foundTerms
 
