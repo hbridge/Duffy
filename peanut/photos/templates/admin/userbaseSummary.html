@@ -73,10 +73,10 @@
 			<td class='phoneid' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
 			<td class='created'> {{ entry.user.added|date:'m/d h:i.s A' }} </td>
 			<td class='db-count right'> {{ entry.dbCount }} </td>
-			<td class='db-thumbnails right'> {{ entry.thumbs }} </td>
+			<td class='db-thumbnails right' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
 			<td class='index-count right'> {{ entry.resultsCount }} </td>
 			<td class='twofish right'>{{ entry.twofish }} </td>
-			<td class='clustered right'> {{ entry.clustered }} </td>
+			<td class='clustered right' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
 			<td class='classifications right'> {{ entry.classifications }} </td>
 			<td class='faces right'> {{ entry.faces }} </td>
 			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>			

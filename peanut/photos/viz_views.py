@@ -231,7 +231,8 @@ def userbaseSummary(request):
 					entry['lastUploadTime'] = photo.added
 					break
 				entry['dbCount'] = totalCount
-				entry['thumbs'] = int(math.floor(dbQuery.exclude(thumb_filename=None).count()/totalCount*100))
+				entry['thumbsCount'] = dbQuery.exclude(thumb_filename=None).count()
+				entry['thumbs'] = int(math.floor(entry['thumbsCount']/totalCount*100))
 				photosWithGPS = dbQuery.filter(metadata__contains='{GPS}').count()
 
 				if photosWithGPS > 0:
@@ -242,7 +243,8 @@ def userbaseSummary(request):
 				entry['fullimages'] = entry['fullimagesCount']*100/totalCount
 				searchResults = SearchQuerySet().all().filter(userId=userId)
 				entry['resultsCount'] = searchResults.count()*100/totalCount
-				entry['clustered'] = dbQuery.exclude(clustered_time=None).count()*100/totalCount
+				entry['clusteredCount'] = dbQuery.exclude(clustered_time=None).count()
+				entry['clustered'] = entry['clusteredCount']*100/totalCount
 				entry['classifications'] = dbQuery.exclude(classification_data=None).count()*100/totalCount
 				entry['faces'] = dbQuery.exclude(faces_data=None).count()*100/totalCount
 				entry['internal'] = False
