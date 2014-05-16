@@ -10,4 +10,7 @@
 
 @interface DFIntroPageViewController : UIViewController <UIPageViewControllerDataSource>
 
+
+- (void)showNextStep:(UIViewController *)currentViewController;
+
 @end

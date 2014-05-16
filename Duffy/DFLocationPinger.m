@@ -73,6 +73,12 @@ static DFLocationPinger *defaultPinger;
             && [CLLocationManager authorizationStatus] == ALAuthorizationStatusNotDetermined);
 }
 
+- (BOOL)haveLocationPermisison
+{
+  return [CLLocationManager locationServicesEnabled] &&
+   [CLLocationManager authorizationStatus] == ALAuthorizationStatusAuthorized;
+}
+
 
 - (void)addObjectRequestingKeepAlive:(id)object{
     [self.objectsRequestingKeepAlive addObject:object];

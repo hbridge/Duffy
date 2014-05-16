@@ -18,6 +18,7 @@
 
 - (BOOL)canMonitorLocation;
 - (BOOL)canAskForLocationPermission;
+- (BOOL)haveLocationPermisison;
 - (void)askForLocationPermission;
 
 - (void)addObjectRequestingKeepAlive:(id)object;
@@ -25,6 +26,7 @@
 
 - (void)startPings;
 - (void)stopPings;
+
 
 
 

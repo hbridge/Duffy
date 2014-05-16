@@ -122,6 +122,9 @@
 
 - (void)showLoggedInUserTabs
 {
+  
+  
+  
   // Set the unique userID for logging
   [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
   [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
@@ -148,7 +151,7 @@
                                      settingsNav,
                                      nil]];
   
-  [[self window] setRootViewController:tabController];
+    [[self window] setRootViewController:tabController];
 }
 
 - (void)startCameraRollSync

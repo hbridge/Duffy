@@ -8,6 +8,7 @@
 
 #import "DFIntroPageViewController.h"
 #import "DFIntroContentViewController.h"
+#import "DFAppDelegate.h"
 
 @interface DFIntroPageViewController ()
 
@@ -34,13 +35,14 @@
     DFIntroContentViewController *cvc =
     [self.storyboard instantiateViewControllerWithIdentifier:@"DFIntroContentViewController"];
     cvc.pageIndex = i;
+    cvc.pageViewController = self;
     [self.viewControllersArr addObject:cvc];
   }
   
   [self.pageViewController setViewControllers:@[self.viewControllersArr[0]]
-                 direction:UIPageViewControllerNavigationDirectionForward
-                  animated:NO
-                completion:nil];
+                                    direction:UIPageViewControllerNavigationDirectionForward
+                                     animated:NO
+                                   completion:nil];
   
   // add the page view controller to view
   [self addChildViewController:self.pageViewController];
@@ -58,8 +60,8 @@
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 - (BOOL)prefersStatusBarHidden
@@ -104,15 +106,32 @@
 {
   return [self.viewControllersArr count];
 }
-/*
-#pragma mark - Navigation
 
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+
+- (void)showNextStep:(UIViewController *)currentViewController
 {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+  UIViewController *nextController = [self pageViewController:self.pageViewController
+                            viewControllerAfterViewController:currentViewController];
+  if (nextController) {
+    [self.pageViewController setViewControllers:@[nextController]
+                                      direction:UIPageViewControllerNavigationDirectionForward
+                                       animated:YES
+                                     completion:nil];
+  } else { // this is the last step, show logged in tabs instead
+    DFAppDelegate *appDelegate = (DFAppDelegate *)[[UIApplication sharedApplication] delegate];
+    [appDelegate showLoggedInUserTabs];
+  }
 }
-*/
+
+/*
+ #pragma mark - Navigation
+ 
+ // In a storyboard-based application, you will often want to do a little preparation before navigation
+ - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+ {
+ // Get the new view controller using [segue destinationViewController].
+ // Pass the selected object to the new view controller.
+ }
+ */
 
 @end

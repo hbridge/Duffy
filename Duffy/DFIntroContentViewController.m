@@ -7,12 +7,22 @@
 //
 
 #import "DFIntroContentViewController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPeanutSuggestion.h"
 #import "DFAutocompleteController.h"
+#import "DFUserPeanutAdapter.h"
+#import "DFUser.h"
+#import "DFLocationPinger.h"
+#import "DFIntroPageViewController.h"
+#import "DFUploadController.h"
+#import "DFNotificationSharedConstants.h"
+
+unsigned long MinNumThumbnailsToTransition = 100;
 
 @interface DFIntroContentViewController ()
 
 @property (nonatomic, retain) DFAutocompleteController *autoCompleteController;
+@property (nonatomic) dispatch_semaphore_t nextStepSemaphore;
 
 @end
 
@@ -31,6 +41,7 @@
 {
     [super viewDidLoad];
   
+  self.nextStepSemaphore = dispatch_semaphore_create(0);
   
   if (self.pageIndex == 0) {
     [self configureWelcomeScreen];
@@ -51,6 +62,9 @@
   [self.actionButton addTarget:self
                         action:@selector(askForPermissions:)
               forControlEvents:UIControlEventTouchUpInside];
+  
+  // run actions for welcome
+  [self getUserID];
 }
 
 - (void)configureUploadScreen
@@ -59,11 +73,18 @@
   self.contentLabel.attributedText = [self attributedStringForPage:1];
   [self.activityIndicator startAnimating];
   self.actionButton.hidden = YES;
+  
+  // run actions for upload
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(uploadStatusChanged:)
+                                               name:DFUploadStatusNotificationName
+                                             object:nil];
+  [[DFUploadController sharedUploadController] uploadPhotos];
 }
 
 - (void)configureDoneScreen
 {
-  self.titleLabel.text = @"Ready to Get Started";
+  self.titleLabel.text = @"Ready to Search";
   
   DFIntroContentViewController __weak *weakSelf = self;
   self.autoCompleteController = [[DFAutocompleteController alloc] init];
@@ -161,16 +182,24 @@
   return result;
 }
 
-
+#pragma mark - User/Network Action Responses
 
 - (void)askForPermissions:(id)sender
 {
-  DDLogInfo(@"Asking for user permissinos.");
+    DDLogInfo(@"Asking for user permissions.");
+  
+  [self checkForAndRequestPhotoAccess];
+  dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+  [self checkForAndRequestLocationAccess];
+  dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+  
+  [self.pageViewController showNextStep:self];
 }
 
 - (void)dimsissIntro:(id)sender
 {
   DDLogInfo(@"User dismissed intro");
+  [self.pageViewController showNextStep:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -179,18 +208,115 @@
     // Dispose of any resources that can be recreated.
 }
 
-
-
-
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
+- (void)checkForAndRequestPhotoAccess
 {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+  ALAuthorizationStatus photoAuthStatus = [ALAssetsLibrary authorizationStatus];
+  if (photoAuthStatus == ALAuthorizationStatusDenied || photoAuthStatus == ALAuthorizationStatusRestricted) {
+    DDLogInfo(@"Photo access is denied, showing alert and quitting.");
+    [self showDeniedAccessAlertAndQuit];
+  } else if (photoAuthStatus == ALAuthorizationStatusNotDetermined) {
+    DDLogInfo(@"Photo access not determined, asking.");
+    [self askForPhotosPermission];
+  } else if (photoAuthStatus == ALAuthorizationStatusAuthorized) {
+    DDLogInfo(@"Already have photo access.");
+    dispatch_semaphore_signal(self.nextStepSemaphore);
+  } else {
+    DDLogError(@"Unknown photo access value: %d", (int)photoAuthStatus);
+    dispatch_semaphore_signal(self.nextStepSemaphore);
+  }
 }
-*/
+
+
+- (void)askForPhotosPermission
+{
+  // request access to user's photos
+  DDLogInfo(@"Asking for photos permission.");
+  ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
+  
+  [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+    if (group == nil) dispatch_semaphore_signal(self.nextStepSemaphore);
+  } failureBlock:^(NSError *error) {
+    if (error.code == ALAssetsLibraryAccessUserDeniedError) {
+      DDLogError(@"User denied access, code: %li",(long)error.code);
+    }else{
+      DDLogError(@"Other error code: %li",(long)error.code);
+    }
+    [self showDeniedAccessAlertAndQuit];
+  }];
+  
+}
+
+
+- (void)showDeniedAccessAlertAndQuit
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Access Required"
+                                                    message:@"Please give this app permission to access your photo library in Settings > Privacy > Photos." delegate:nil
+                                          cancelButtonTitle:@"Quit"
+                                          otherButtonTitles:nil, nil];
+    alert.delegate = self;
+    [alert show];
+    
+  });
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  exit(0);
+}
+
+
+- (void)getUserID
+{
+  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
+                   withSuccessBlock:^(DFUser *user) {
+                     if (user) {
+                       [[DFUser currentUser] setUserID:user.userID];
+                       dispatch_semaphore_signal(self.nextStepSemaphore);
+                     } else {
+                       // the request succeeded, but the user doesn't exist, we have to create it
+                       [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
+                                               deviceName:[[DFUser currentUser] deviceName]
+                                         withSuccessBlock:^(DFUser *user) {
+                                           [[DFUser currentUser] setUserID:user.userID];
+                                           dispatch_semaphore_signal(self.nextStepSemaphore);
+                                         }
+                                             failureBlock:^(NSError *error) {
+                                               [NSException raise:@"No user" format:@"Failed to get or create user for device ID."];
+                                               dispatch_semaphore_signal(self.nextStepSemaphore);
+                                             }];
+                     }
+                   } failureBlock:^(NSError *error) {
+                     dispatch_semaphore_signal(self.nextStepSemaphore);
+                   }];
+}
+
+- (void)checkForAndRequestLocationAccess
+{
+  if ([[DFLocationPinger sharedInstance] haveLocationPermisison]) {
+    DDLogInfo(@"Already have location access.");
+  } else if ([[DFLocationPinger sharedInstance] canAskForLocationPermission])
+  {
+    [[DFLocationPinger sharedInstance] askForLocationPermission];
+  }
+  while ([[DFLocationPinger sharedInstance] canAskForLocationPermission]) {
+    usleep(500);
+  }
+  
+  dispatch_semaphore_signal(self.nextStepSemaphore);
+}
+
+- (void)uploadStatusChanged:(NSNotification *)note
+{
+  DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
+  DDLogInfo(@"Intro thumbnails uploaded %lu", uploadStats.numThumbnailsUploaded);
+  if (uploadStats.numThumbnailsUploaded > MinNumThumbnailsToTransition || uploadStats.numThumbnailsRemaining == 0) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self.pageViewController showNextStep:self];
+    });
+  }
+}
+
 
 @end
