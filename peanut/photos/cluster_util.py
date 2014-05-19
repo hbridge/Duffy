@@ -129,6 +129,7 @@ def getNearbyPhotos(photo, range, userPhotoCache):
 				nearbyPhotos.extend(userPhotoCache[i+1:highIndex])
 				
 			return nearbyPhotos
+	return []
 
 """
 	Populates similarity table for a new photo
