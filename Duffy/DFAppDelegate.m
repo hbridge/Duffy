@@ -34,8 +34,6 @@
 
 @interface DFAppDelegate()
 
-@property (nonatomic, retain) DFCameraRollSyncController *cameraRollSyncController;
-
 @end
 
 @implementation DFAppDelegate
@@ -154,21 +152,17 @@
 
 - (void)startCameraRollSync
 {
-  if (self.cameraRollSyncController == nil) {
-    self.cameraRollSyncController = [[DFCameraRollSyncController alloc] init];
-  }
-  
-  [self.cameraRollSyncController asyncSyncToCameraRoll];
+  [[DFCameraRollSyncController sharedSyncController] asyncSyncToCameraRoll];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
 {
-  
+  DDLogInfo(@"Duffy resigned active.");
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-  DDLogInfo(@"Duffy app entered background.");
+  DDLogInfo(@"Duffy entered background.");
   [[DFPhotoStore sharedStore] saveContext];
 }
 
