@@ -15,6 +15,8 @@
 #import "DFPeanutFaceFeature.h"
 #import "DFUser.h"
 
+const int MaxUserCommentLength = 200;
+
 @implementation DFPeanutPhoto
 
 NSString const *DFPeanutPhotoImageDimensionsKey = @"DFPeanutPhotoImageDimensionsKey";
@@ -33,7 +35,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
       self.id = [NSNumber numberWithUnsignedLongLong:photo.photoID];
       NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
       self.time_taken = [djangoFormatter stringFromDate:photo.creationDate];
-      self.metadata = photo.metadataDictionary;
+      self.metadata = [self trimmedMetadataDict:photo.metadataDictionary];
       if (!photo.creationHashString || [photo.creationHashString isEqualToString:@""]) {
         [NSException raise:@"No hash" format:@"Cannot create a DFPeanutPhoto from DFPhoto with no creation hash."];
       }
@@ -46,6 +48,21 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
     }
   }
   return self;
+}
+
+- (NSDictionary *)trimmedMetadataDict:(NSDictionary *)dictionary
+{
+  NSMutableDictionary *metadata = dictionary.mutableCopy;
+  NSMutableDictionary *exif = [metadata[@"{Exif}"] mutableCopy];
+  if (exif) {
+    NSString *userCommentString = exif[@"UserComment"];
+    if (userCommentString.length > MaxUserCommentLength) {
+      exif[@"UserComment"] = [userCommentString substringToIndex:MaxUserCommentLength];
+      metadata[@"{Exif}"] = exif;
+    }
+  }
+  
+  return metadata;
 }
 
 
