@@ -86,7 +86,11 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 - (NSString *)JSONString
 {
   NSDictionary *JSONSafeDict = [[self dictionary] dictionaryWithNonJSONRemoved];
-  return [JSONSafeDict JSONString];
+  NSString *result = [JSONSafeDict JSONString];
+  
+  if (result.length > 10000) DDLogWarn(@"DFPeanutPhoto JSONString > 10000 chars in length, string:%@", result);
+  
+  return result;
 }
 
 - (NSUInteger)metadataSizeBytes
