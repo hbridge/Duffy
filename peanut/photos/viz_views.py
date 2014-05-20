@@ -258,7 +258,7 @@ def userbaseSummary(request):
 							('ipad simulator'.lower() in user.first_name.lower())):
 							entry['internal'] = True
 							break
-				resultList.append(entry)
+			resultList.append(entry)
 		except User.DoesNotExist:
 			continue
 
