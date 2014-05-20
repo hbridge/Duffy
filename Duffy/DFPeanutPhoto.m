@@ -55,6 +55,8 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
   NSMutableDictionary *metadata = dictionary.mutableCopy;
   NSMutableDictionary *exif = [metadata[@"{Exif}"] mutableCopy];
   if (exif) {
+    // the UserComment section of Exif data seems to be a dumping ground for app vendors
+    // make sure it's within 200 chars
     NSString *userCommentString = exif[@"UserComment"];
     if (userCommentString.length > MaxUserCommentLength) {
       exif[@"UserComment"] = [userCommentString substringToIndex:MaxUserCommentLength];
