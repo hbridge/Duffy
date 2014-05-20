@@ -138,7 +138,7 @@ static DFUploadController *defaultUploadController;
         [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
         [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
         
-//        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
+        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
     }]];
 }
 
@@ -155,7 +155,6 @@ static DFUploadController *defaultUploadController;
 - (NSOperation *)dispatchUploadsOperation
 {
     return [NSBlockOperation blockOperationWithBlock:^{
-        [self postStatusUpdate];
         DDLogVerbose(@"Dispatching uploads if required...");
         if (self.uploadOperationQueue.operationCount >= self.uploadOperationQueue.maxConcurrentOperationCount) {
             DDLogVerbose(@"Already maxed out on operations.");
@@ -182,6 +181,7 @@ static DFUploadController *defaultUploadController;
         }
         
         if (uploadOperation.photoIDs.count > 0) {
+          [self postStatusUpdateWithError:nil];
             [self beginBackgroundUpdateTask];
             uploadOperation.completionOperationQueue = self.syncOperationQueue;
             uploadOperation.successBlock = [self uploadSuccessfullBlock];
@@ -400,6 +400,8 @@ static DFUploadController *defaultUploadController;
     [self.thumbnailsObjectIDQueue removeAllObjects];
     [self.fullImageObjectIDQueue removeAllObjects];
     [self.uploadOperationQueue cancelAllOperations];
+    [self postStatusUpdateWithError:[NSError errorWithDomain:@"com.duffyapp.DFUploadController.uploadError"
+                                                        code:-1 userInfo:nil]];
     _managedObjectContext = nil;
     _currentSessionStats = nil;
     
@@ -423,6 +425,7 @@ static DFUploadController *defaultUploadController;
 {
     NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
         DDLogInfo(@"All uploads complete.");
+      [self postStatusUpdateWithError:nil];
         _currentSessionStats = nil;
       [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateComplete
                                                                                   numRemaining:0
@@ -459,9 +462,10 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Misc helpers
 
-- (void)postStatusUpdate
+- (void)postStatusUpdateWithError:(NSError *)error
 {
     DFUploadSessionStats *currentStats = [self currentSessionStats];
+  self.currentSessionStats.fatalError = error;
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: currentStats}];

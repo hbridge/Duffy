@@ -16,8 +16,16 @@
 #import "DFIntroPageViewController.h"
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFCameraRollSyncController.h"
 
 unsigned long MinNumThumbnailsToTransition = 100;
+unsigned int MaxAutocompleteFetchRetryCount = 3;
+
+DFIntroContentType DFIntroContentWelcome = @"DFIntroContentWelcome";
+DFIntroContentType DFIntroContentUploading = @"DFIntroContentUploading";
+DFIntroContentType DFIntroContentDone = @"DFIntroContentDone";
+DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading";
+
 
 @interface DFIntroContentViewController ()
 
@@ -27,6 +35,8 @@ unsigned long MinNumThumbnailsToTransition = 100;
 @end
 
 @implementation DFIntroContentViewController
+
+@synthesize introContent;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -43,12 +53,15 @@ unsigned long MinNumThumbnailsToTransition = 100;
   
   self.nextStepSemaphore = dispatch_semaphore_create(0);
   
-  if (self.pageIndex == 0) {
+  if (self.introContent == DFIntroContentWelcome) {
     [self configureWelcomeScreen];
-  } else if (self.pageIndex == 1) {
+  } else if (self.introContent == DFIntroContentUploading) {
     [self configureUploadScreen];
-  } else if (self.pageIndex == 2) {
+    [self runUploadProcess];
+  } else if (self.introContent == DFIntroContentDone) {
     [self configureDoneScreen];
+  } else if (self.introContent == DFIntroContentErrorUploading) {
+    [self configureErrorUploading];
   }
 }
 
@@ -73,13 +86,31 @@ unsigned long MinNumThumbnailsToTransition = 100;
   self.contentLabel.attributedText = [self attributedStringForPage:1];
   [self.activityIndicator startAnimating];
   self.actionButton.hidden = YES;
-  
-  // run actions for upload
+}
+
+- (void)runUploadProcess
+{
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(uploadStatusChanged:)
                                                name:DFUploadStatusNotificationName
                                              object:nil];
   [[DFUploadController sharedUploadController] uploadPhotos];
+}
+
+- (void)configureErrorUploading
+{
+  self.titleLabel.text = @"Error";
+  self.contentLabel.text = @"Looks like we couldn't upload your photos.  Please ensure that you can connect to the internet and try again later.";
+  self.activityIndicator.hidden = YES;
+  [self.actionButton setTitle:@"Try Again" forState:UIControlStateNormal];
+  [self.actionButton addTarget:self
+                        action:@selector(tryUploadAgain:)
+              forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)tryUploadAgain:(UIButton *)sender
+{
+  [self.pageViewController showNextContentViewController:DFIntroContentUploading];
 }
 
 - (void)configureDoneScreen
@@ -89,30 +120,20 @@ unsigned long MinNumThumbnailsToTransition = 100;
   DFIntroContentViewController __weak *weakSelf = self;
   self.autoCompleteController = [[DFAutocompleteController alloc] init];
   [self.autoCompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
-                                             NSArray *locationPeanutSuggestions,
-                                             NSArray *timePeanutSuggestions) {
-//    [weakSelf showDoneTextWithTimeSuggestions:timePeanutSuggestions
-//                      locationSuggestions:locationPeanutSuggestions
-//                         thingSuggestions:categoryPeanutSuggestions];
+                                                  NSArray *locationPeanutSuggestions,
+                                                  NSArray *timePeanutSuggestions) {
     
-    DFPeanutSuggestion *timePeanutSuggestion = [[DFPeanutSuggestion alloc] init];
-    timePeanutSuggestion.name = @"last week";
-    timePeanutSuggestion.count = 5;
-    
-    DFPeanutSuggestion *locationPeanutSuggestion = [[DFPeanutSuggestion alloc] init];
-    locationPeanutSuggestion.name = @"New York";
-    locationPeanutSuggestion.count = 100;
-    
-    DFPeanutSuggestion *thingPeanutSuggestion = [[DFPeanutSuggestion alloc] init];
-    thingPeanutSuggestion.name = @"Nutriment";
-    thingPeanutSuggestion.count = 15;
-    
-    [weakSelf showDoneTextWithTimeSuggestions:@[timePeanutSuggestion]
-                          locationSuggestions:@[locationPeanutSuggestion]
-                             thingSuggestions:@[thingPeanutSuggestion]];
+    if (categoryPeanutSuggestions.count == 0 &&
+        locationPeanutSuggestions.count == 0 &&
+        timePeanutSuggestions.count == 0) {
+      weakSelf.contentLabel.text = @"Start searching!  We'll keep uploading your photos in the background.";
+    } else {
+      [weakSelf showDoneTextWithTimeSuggestions:timePeanutSuggestions
+                        locationSuggestions:locationPeanutSuggestions
+                           thingSuggestions:categoryPeanutSuggestions];
+    }
     
   }];
-  
   
   [self.actionButton setTitle:@"Get Started" forState:UIControlStateNormal];
   self.activityIndicator.hidden = YES;
@@ -186,20 +207,22 @@ unsigned long MinNumThumbnailsToTransition = 100;
 
 - (void)askForPermissions:(id)sender
 {
-    DDLogInfo(@"Asking for user permissions.");
+  DDLogInfo(@"Asking for user permissions.");
   
   [self checkForAndRequestPhotoAccess];
   dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+  [[DFCameraRollSyncController sharedSyncController] asyncSyncToCameraRoll];
+  
   [self checkForAndRequestLocationAccess];
   dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
   
-  [self.pageViewController showNextStep:self];
+  [self.pageViewController showNextContentViewController:DFIntroContentUploading];
 }
 
 - (void)dimsissIntro:(id)sender
 {
   DDLogInfo(@"User dismissed intro");
-  [self.pageViewController showNextStep:self];
+  [self.pageViewController dismissIntro];
 }
 
 - (void)didReceiveMemoryWarning
@@ -311,11 +334,45 @@ unsigned long MinNumThumbnailsToTransition = 100;
 {
   DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
   DDLogInfo(@"Intro thumbnails uploaded %lu", uploadStats.numThumbnailsUploaded);
-  if (uploadStats.numThumbnailsUploaded > MinNumThumbnailsToTransition || uploadStats.numThumbnailsRemaining == 0) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self.pageViewController showNextStep:self];
+  if (uploadStats.fatalError) {
+    [self.pageViewController showNextContentViewController:DFIntroContentErrorUploading];
+  } else if (uploadStats.numThumbnailsUploaded > MinNumThumbnailsToTransition ||
+      uploadStats.numThumbnailsRemaining == 0) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      [self checkForAutocompleteUntilDone:uploadStats];
     });
   }
+}
+
+static int retryCount = 0;
+
+- (void)checkForAutocompleteUntilDone:(DFUploadSessionStats *)sessionStats
+{
+  DFIntroContentViewController __weak *weakSelf = self;
+  self.autoCompleteController = [[DFAutocompleteController alloc] init];
+  [self.autoCompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
+                                                  NSArray *locationPeanutSuggestions,
+                                                  NSArray *timePeanutSuggestions) {
+    if (categoryPeanutSuggestions.count == 0 &&
+        locationPeanutSuggestions.count == 0 &&
+        timePeanutSuggestions.count == 0) {
+      if (sessionStats.numThumbnailsUploaded > 0 || retryCount <= MaxAutocompleteFetchRetryCount) {
+        sleep(1);
+        retryCount++;
+        [weakSelf checkForAutocompleteUntilDone:sessionStats];
+      } else {
+        [weakSelf.pageViewController showNextContentViewController:DFIntroContentDone];
+      }
+    } else {
+      [weakSelf.pageViewController showNextContentViewController:DFIntroContentDone];
+    }
+    
+  }];
+  
+  
+  
+
 }
 
 

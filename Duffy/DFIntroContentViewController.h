@@ -18,7 +18,14 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 @property (weak, nonatomic) DFIntroPageViewController *pageViewController;
 
-@property (nonatomic) unsigned int pageIndex;
+
+typedef NSString *const DFIntroContentType;
+extern DFIntroContentType DFIntroContentWelcome;
+extern DFIntroContentType DFIntroContentUploading;
+extern DFIntroContentType DFIntroContentDone;
+extern DFIntroContentType  DFIntroContentErrorUploading;
+
+@property (nonatomic, retain) DFIntroContentType introContent;
 
 
 @end

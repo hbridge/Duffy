@@ -7,10 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFIntroContentViewController.h"
 
-@interface DFIntroPageViewController : UIViewController <UIPageViewControllerDataSource>
+@interface DFIntroPageViewController : UIViewController
 
 
-- (void)showNextStep:(UIViewController *)currentViewController;
+
+- (void)showNextContentViewController:(DFIntroContentType)contentType;
+- (void)dismissIntro;
+
 
 @end

@@ -64,16 +64,16 @@
   [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
 #endif
 
-  UIStoryboard *introStoryboard = [UIStoryboard storyboardWithName:@"DFIntro" bundle:nil];
-  UIViewController *vc = [introStoryboard instantiateInitialViewController];
-  self.window.rootViewController = vc;
+  // create the shared store, this will automatically run integrity checks
+  [DFPhotoStore sharedStore];
   
-//  if (![self isAppSetupComplete]) {
-//    [self showFirstTimeSetup];
-//  } else {
-//    [self startUserIDCheck];
-//    [self showLoggedInUserTabs];
-//  }
+
+  if (![self isAppSetupComplete]) {
+    [self showFirstTimeSetup];
+  } else {
+    [self startUserIDCheck];
+    [self showLoggedInUserTabs];
+  }
   
   self.window.backgroundColor = [UIColor whiteColor];
   [self.window makeKeyAndVisible];
@@ -115,16 +115,14 @@
 
 - (void)showFirstTimeSetup
 {
-  DFFirstTimeSetupViewController *firstTimeSetup = [[DFFirstTimeSetupViewController alloc] init];
-  [[self window] setRootViewController:firstTimeSetup];
+  UIStoryboard *introStoryboard = [UIStoryboard storyboardWithName:@"DFIntro" bundle:nil];
+  UIViewController *vc = [introStoryboard instantiateInitialViewController];
+  self.window.rootViewController = vc;
 }
 
 
 - (void)showLoggedInUserTabs
 {
-  
-  
-  
   // Set the unique userID for logging
   [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
   [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
