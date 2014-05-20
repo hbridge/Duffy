@@ -192,8 +192,8 @@ static DFUploadController *defaultUploadController;
             }
         } else {
             //there's nothing else to upload, check to see if everything's complete
-            if (self.fullImageObjectIDQueue.numObjectsIncomplete == 0
-                && self.fullImageObjectIDQueue.numObjectsComplete > 0) {
+            if (self.thumbnailsObjectIDQueue.numObjectsIncomplete == 0 && self.fullImageObjectIDQueue.numObjectsIncomplete == 0
+                && (self.thumbnailsObjectIDQueue.numObjectsComplete > 0 || self.fullImageObjectIDQueue.numObjectsComplete > 0)) {
                 [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
             } else if (![self shouldUploadFullPhotos] && self.fullImageObjectIDQueue.numObjectsIncomplete > 0) {
               [self scheduleWithDispatchUploads:NO operation:[self cannotContinueFullUploadsOperation]];
