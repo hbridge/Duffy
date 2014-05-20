@@ -23,6 +23,7 @@ typedef NSString *const DFIntroContentType;
 extern DFIntroContentType DFIntroContentWelcome;
 extern DFIntroContentType DFIntroContentUploading;
 extern DFIntroContentType DFIntroContentDone;
+extern DFIntroContentType  DFIntroContentErrorNoUser;
 extern DFIntroContentType  DFIntroContentErrorUploading;
 
 @property (nonatomic, retain) DFIntroContentType introContent;

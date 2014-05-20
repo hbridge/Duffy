@@ -25,7 +25,7 @@ DFIntroContentType DFIntroContentWelcome = @"DFIntroContentWelcome";
 DFIntroContentType DFIntroContentUploading = @"DFIntroContentUploading";
 DFIntroContentType DFIntroContentDone = @"DFIntroContentDone";
 DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading";
-
+DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
 
 @interface DFIntroContentViewController ()
 
@@ -55,6 +55,7 @@ DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading
   
   if (self.introContent == DFIntroContentWelcome) {
     [self configureWelcomeScreen];
+    [self getUserID];
   } else if (self.introContent == DFIntroContentUploading) {
     [self configureUploadScreen];
     [self runUploadProcess];
@@ -62,6 +63,8 @@ DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading
     [self configureDoneScreen];
   } else if (self.introContent == DFIntroContentErrorUploading) {
     [self configureErrorUploading];
+  } else if (self.introContent == DFIntroContentErrorNoUser) {
+    [self configureUserError];
   }
 }
 
@@ -75,9 +78,6 @@ DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading
   [self.actionButton addTarget:self
                         action:@selector(askForPermissions:)
               forControlEvents:UIControlEventTouchUpInside];
-  
-  // run actions for welcome
-  [self getUserID];
 }
 
 - (void)configureUploadScreen
@@ -97,16 +97,35 @@ DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading
   [[DFUploadController sharedUploadController] uploadPhotos];
 }
 
+- (void)configureUserError
+{
+  self.titleLabel.text = @"Error";
+  self.contentLabel.text = @"Looks like we couldn't connect to our server. Please ensure that you can connect to the internet and try again later.";
+  self.activityIndicator.hidden = YES;
+  [self.actionButton  setTitle:@"Try Again" forState:UIControlStateNormal];
+  [self. actionButton addTarget:self
+                         action:@selector(tryWelcomeAgain:)
+               forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)tryWelcomeAgain:(UIButton *)sender
+{
+  [self.pageViewController showNextContentViewController:DFIntroContentWelcome];
+}
+
+
 - (void)configureErrorUploading
 {
   self.titleLabel.text = @"Error";
-  self.contentLabel.text = @"Looks like we couldn't upload your photos.  Please ensure that you can connect to the internet and try again later.";
+  self.contentLabel.text = @"Looks like we couldn't upload your photos. Please ensure that you can connect to the internet and try again later.";
   self.activityIndicator.hidden = YES;
   [self.actionButton setTitle:@"Try Again" forState:UIControlStateNormal];
   [self.actionButton addTarget:self
                         action:@selector(tryUploadAgain:)
               forControlEvents:UIControlEventTouchUpInside];
 }
+
+
 
 - (void)tryUploadAgain:(UIButton *)sender
 {
@@ -292,6 +311,7 @@ DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading
 - (void)getUserID
 {
   DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+  DFIntroContentViewController __weak *weakSelf = self;
   [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
                    withSuccessBlock:^(DFUser *user) {
                      if (user) {
@@ -306,11 +326,16 @@ DFIntroContentType DFIntroContentErrorUploading = @"DFIntroContentErrorUploading
                                            dispatch_semaphore_signal(self.nextStepSemaphore);
                                          }
                                              failureBlock:^(NSError *error) {
-                                               [NSException raise:@"No user" format:@"Failed to get or create user for device ID."];
+                                               DDLogWarn(@"Create user failed: %@", error.localizedDescription);
+                                               [weakSelf.pageViewController
+                                                showNextContentViewController:DFIntroContentErrorNoUser];
                                                dispatch_semaphore_signal(self.nextStepSemaphore);
                                              }];
                      }
                    } failureBlock:^(NSError *error) {
+                     DDLogWarn(@"Get user failed: %@", error.localizedDescription);
+                     [weakSelf.pageViewController
+                      showNextContentViewController:DFIntroContentErrorNoUser];
                      dispatch_semaphore_signal(self.nextStepSemaphore);
                    }];
 }

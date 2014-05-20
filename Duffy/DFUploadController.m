@@ -138,7 +138,7 @@ static DFUploadController *defaultUploadController;
         [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
         [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
         
-        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
+      //        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
     }]];
 }
 
@@ -276,6 +276,7 @@ static DFUploadController *defaultUploadController;
                                 numPhotos:peanutPhotos.count
                      sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
         [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
+      [self postStatusUpdateWithError:nil];
     };
     return successBlock;
 }
