@@ -136,7 +136,8 @@
     [peanutPhotos addObject:peanutPhoto];
     numBytes += peanutPhoto.metadataSizeBytes;
   }
-  DDLogInfo(@"Generating peanut photos for %lu photos took %.02f seconds", photos.count, [[NSDate date] timeIntervalSinceDate:startDate]);
+  DDLogInfo(@"Generating peanut photos for %lu photos took %.02f seconds", (unsigned long)photos.count,
+            [[NSDate date] timeIntervalSinceDate:startDate]);
   
   DFPeanutBulkPhotos *bulkPhotos = [[DFPeanutBulkPhotos alloc] init];
   bulkPhotos.bulk_photos = peanutPhotos;

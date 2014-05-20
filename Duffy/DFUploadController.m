@@ -334,7 +334,7 @@ static DFUploadController *defaultUploadController;
             [objectIDs addObject:objectID];
         }
         
-        DDLogVerbose(@"Upload failed for %lu objects", peanutPhotos.count);
+        DDLogVerbose(@"Upload failed for %lu objects", (unsigned long)peanutPhotos.count);
         if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
             DDLogVerbose(@"Error retryable.  Moving objects to back of queue.");
             if (uploadType == DFPhotoUploadOperationThumbnailData) {

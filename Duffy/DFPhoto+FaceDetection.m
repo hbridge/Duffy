@@ -48,7 +48,7 @@
                                                  }];
     
     NSArray *CIFaceFeatures = [detector featuresInImage:ciImage options:operationOptions];
-    DDLogVerbose(@"Found %lu faceFeatures for photo.", CIFaceFeatures.count);
+    DDLogVerbose(@"Found %lu faceFeatures for photo.", (unsigned long)CIFaceFeatures.count);
     [self createFaceFeaturesFromCIFeatures:CIFaceFeatures];
     
     if (isHighQuality) {

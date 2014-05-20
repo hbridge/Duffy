@@ -60,7 +60,8 @@
             result = [photoAdapter postPhotos:photos appendThumbnailData:YES];
         } else if (self.uploadOperationType == DFPhotoUploadOperationFullImageData) {
             if (photos.count > 1) [NSException raise:@"DFPhotoUploadOperation: not supported"
-                                              format:@"Attempting to upload %lu photos in a full image data upload operation", photos.count];
+                                              format:@"Attempting to upload %lu photos in a full image data upload operation",
+                                   (unsigned long)photos.count];
             result = [photoAdapter putPhoto:[photos firstObject] updateMetadata:NO appendLargeImageData:YES];
         }
 

@@ -201,7 +201,8 @@ static int const FetchStride = 500;
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"photoID == %llu", photoID];
   DFPhotoCollection *results = [DFPhotoStore photosWithPredicate:predicate inContext:[self managedObjectContext]];
   if (results.photoSet.count > 1) {
-    [NSException raise:@"Multiple photos matching ID" format:@"%lu photos matching id:%llu", results.photoSet.count, photoID];
+    [NSException raise:@"Multiple photos matching ID" format:@"%lu photos matching id:%llu",
+     (unsigned long)results.photoSet.count, photoID];
   } else if (results.photoSet.count == 0) {
     return nil;
   }

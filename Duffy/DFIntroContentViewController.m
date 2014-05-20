@@ -358,7 +358,7 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
 - (void)uploadStatusChanged:(NSNotification *)note
 {
   DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
-  DDLogInfo(@"Intro thumbnails uploaded %lu", uploadStats.numThumbnailsUploaded);
+  DDLogInfo(@"Intro thumbnails uploaded %lu", (unsigned long)uploadStats.numThumbnailsUploaded);
   if (uploadStats.fatalError) {
     [self.pageViewController showNextContentViewController:DFIntroContentErrorUploading];
   } else if (uploadStats.numThumbnailsUploaded > MinNumThumbnailsToTransition ||
