@@ -10,7 +10,7 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="64"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SearchBarIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="xPT-ud-47f">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Icons/SearchBarIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="xPT-ud-47f">
                     <rect key="frame" x="0.0" y="19" width="26" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </imageView>
@@ -35,7 +35,7 @@
                         <constraint firstAttribute="width" constant="26" id="7P2-Xh-l7u"/>
                         <constraint firstAttribute="height" constant="26" id="7bv-rK-Vbo"/>
                     </constraints>
-                    <state key="normal" image="SearchClearButton.png">
+                    <state key="normal" image="Icons/SearchClearButton.png">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                     <connections>
@@ -70,7 +70,7 @@
         </view>
     </objects>
     <resources>
-        <image name="SearchBarIcon.png" width="26" height="26"/>
-        <image name="SearchClearButton.png" width="26" height="26"/>
+        <image name="Icons/SearchBarIcon.png" width="26" height="26"/>
+        <image name="Icons/SearchClearButton.png" width="26" height="26"/>
     </resources>
 </document>
