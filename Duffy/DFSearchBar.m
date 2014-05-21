@@ -46,6 +46,16 @@
   }
 }
 
+- (void)setPlaceholder:(NSString *)placeholderText
+{
+  self.textField.placeholder = placeholderText;
+}
+
+- (NSString *)placeholder
+{
+  return self.textField.placeholder;
+}
+
 - (void)setShowsCancelButton:(BOOL)showsCancelButton animated:(BOOL)animated
 {
   _showsCancelButton = showsCancelButton;
