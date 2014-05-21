@@ -11,11 +11,11 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="SearchBarIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="xPT-ud-47f">
-                    <rect key="frame" x="10" y="19" width="26" height="26"/>
+                    <rect key="frame" x="0.0" y="19" width="26" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </imageView>
                 <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NNO-gn-7DZ">
-                    <rect key="frame" x="262" y="17" width="48" height="30"/>
+                    <rect key="frame" x="272" y="17" width="48" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="48" id="5Dm-cL-xWC"/>
@@ -29,7 +29,7 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Cf-oq-Jsq">
-                    <rect key="frame" x="284" y="19" width="26" height="26"/>
+                    <rect key="frame" x="294" y="19" width="26" height="26"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="26" id="7P2-Xh-l7u"/>
@@ -43,7 +43,7 @@
                     </connections>
                 </button>
                 <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Search" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="0FW-ga-xjZ">
-                    <rect key="frame" x="44" y="21" width="232" height="22"/>
+                    <rect key="frame" x="34" y="21" width="252" height="22"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <fontDescription key="fontDescription" type="system" pointSize="18"/>
                     <textInputTraits key="textInputTraits" returnKeyType="search"/>
@@ -52,14 +52,14 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="centerY" secondItem="NNO-gn-7DZ" secondAttribute="centerY" id="8Kx-85-ic5"/>
-                <constraint firstItem="xPT-ud-47f" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="GlK-N8-eMa"/>
+                <constraint firstItem="xPT-ud-47f" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="GlK-N8-eMa"/>
                 <constraint firstAttribute="centerY" secondItem="4Cf-oq-Jsq" secondAttribute="centerY" id="HVp-5N-KqD"/>
                 <constraint firstItem="4Cf-oq-Jsq" firstAttribute="leading" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="900" constant="8" id="Uxv-AV-GXx"/>
-                <constraint firstAttribute="trailing" secondItem="4Cf-oq-Jsq" secondAttribute="trailing" constant="10" id="aJ6-eo-Y6b"/>
+                <constraint firstAttribute="trailing" secondItem="4Cf-oq-Jsq" secondAttribute="trailing" id="aJ6-eo-Y6b"/>
                 <constraint firstAttribute="centerY" secondItem="0FW-ga-xjZ" secondAttribute="centerY" id="s0J-UA-Prm"/>
-                <constraint firstAttribute="trailing" secondItem="NNO-gn-7DZ" secondAttribute="trailing" constant="10" id="tAx-UH-zIc"/>
+                <constraint firstAttribute="trailing" secondItem="NNO-gn-7DZ" secondAttribute="trailing" id="tAx-UH-zIc"/>
                 <constraint firstItem="0FW-ga-xjZ" firstAttribute="leading" secondItem="xPT-ud-47f" secondAttribute="trailing" constant="8" id="tMX-Ge-Vyo"/>
-                <constraint firstAttribute="trailing" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="700" constant="10" id="vDg-90-3SN"/>
+                <constraint firstAttribute="trailing" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="700" id="vDg-90-3SN"/>
                 <constraint firstAttribute="centerY" secondItem="xPT-ud-47f" secondAttribute="centerY" id="yat-VX-CBX"/>
             </constraints>
             <connections>
