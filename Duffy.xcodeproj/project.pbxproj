@@ -48,8 +48,6 @@
 		5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */; };
 		5AACB8F418F4574400F4EEB6 /* DFUserPeanutAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */; };
 		5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */; };
-		5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */; };
-		5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */; };
 		5AACB90918F49AED00F4EEB6 /* libFlurry_4.4.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */; };
 		5AACB90D18F49D9700F4EEB6 /* DFAnalytics.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB90C18F49D9700F4EEB6 /* DFAnalytics.m */; };
 		5AACB91518F5D61300F4EEB6 /* DFUploadProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */; };
@@ -204,9 +202,6 @@
 		5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserPeanutAdapter.m; sourceTree = "<group>"; };
 		5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNetworkingConstants.h; sourceTree = "<group>"; };
 		5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNetworkingConstants.m; sourceTree = "<group>"; };
-		5AACB90018F471E900F4EEB6 /* DFFirstTimeSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFirstTimeSetupViewController.h; sourceTree = "<group>"; };
-		5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFirstTimeSetupViewController.m; sourceTree = "<group>"; };
-		5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFirstTimeSetupViewController.xib; sourceTree = "<group>"; };
 		5AACB90718F49AED00F4EEB6 /* Flurry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Flurry.h; sourceTree = "<group>"; };
 		5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libFlurry_4.4.0.a; sourceTree = "<group>"; };
 		5AACB90B18F49D9700F4EEB6 /* DFAnalytics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAnalytics.h; sourceTree = "<group>"; };
@@ -383,6 +378,16 @@
 			name = "Generic Views";
 			sourceTree = "<group>";
 		};
+		5A5FCB3D192D50FE00A060A7 /* Intro Text */ = {
+			isa = PBXGroup;
+			children = (
+				5AB39841192563E700E6E69E /* IntroPage1.rtf */,
+				5AB398431925690C00E6E69E /* IntroPage2.rtf */,
+				5AB398441925690C00E6E69E /* IntroPage3.rtf */,
+			);
+			name = "Intro Text";
+			sourceTree = "<group>";
+		};
 		5A67606218E3381D00E355B6 /* Background processes */ = {
 			isa = PBXGroup;
 			children = (
@@ -394,7 +399,7 @@
 			name = "Background processes";
 			sourceTree = "<group>";
 		};
-		5A67606318E3384900E355B6 /* Tab view controllers */ = {
+		5A67606318E3384900E355B6 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				5AB3983519252D8100E6E69E /* First run */,
@@ -402,7 +407,7 @@
 				5AB32EAD18F3012D004FC27B /* Search View */,
 				5AB32EAE18F30136004FC27B /* Settings View */,
 			);
-			name = "Tab view controllers";
+			name = "View Controllers";
 			sourceTree = "<group>";
 		};
 		5A8C98EF191161CE00AE9F88 /* Core Data */ = {
@@ -570,12 +575,7 @@
 		5AB3983519252D8100E6E69E /* First run */ = {
 			isa = PBXGroup;
 			children = (
-				5AB39841192563E700E6E69E /* IntroPage1.rtf */,
-				5AB398431925690C00E6E69E /* IntroPage2.rtf */,
-				5AB398441925690C00E6E69E /* IntroPage3.rtf */,
-				5AACB90018F471E900F4EEB6 /* DFFirstTimeSetupViewController.h */,
-				5AACB90118F471E900F4EEB6 /* DFFirstTimeSetupViewController.m */,
-				5AACB90218F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib */,
+				5A5FCB3D192D50FE00A060A7 /* Intro Text */,
 				5AB3983619252D9700E6E69E /* DFIntro.storyboard */,
 				5AB3983E192533D800E6E69E /* DFIntroPageViewController.h */,
 				5AB3983F192533D800E6E69E /* DFIntroPageViewController.m */,
@@ -675,7 +675,7 @@
 				5ADB24CC189985590016CA02 /* DFAppDelegate.m */,
 				5AC40EDC1908738C00ED3532 /* DFLogConfig.h */,
 				5AC40EDD1908738C00ED3532 /* DFLogConfig.m */,
-				5A67606318E3384900E355B6 /* Tab view controllers */,
+				5A67606318E3384900E355B6 /* View Controllers */,
 				5A67606218E3381D00E355B6 /* Background processes */,
 				5A37478D18CE480000E27F00 /* Generic Views */,
 				5ADB24FE189AB3730016CA02 /* Model */,
@@ -914,7 +914,6 @@
 				5AACB92418F6092F00F4EEB6 /* HockeySDKResources.bundle in Resources */,
 				5AB398451925690C00E6E69E /* IntroPage2.rtf in Resources */,
 				5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */,
-				5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */,
 				5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */,
@@ -1051,7 +1050,6 @@
 				5ADB24C9189985590016CA02 /* main.m in Sources */,
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
 				5A8C98F61911793B00AE9F88 /* DFObjectManager.m in Sources */,
-				5AACB90318F471E900F4EEB6 /* DFFirstTimeSetupViewController.m in Sources */,
 				5AD8AD49191D462500782144 /* DFSearchResultTableViewCell.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
 				5AC40EDE1908738C00ED3532 /* DFLogConfig.m in Sources */,

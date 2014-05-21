@@ -18,7 +18,6 @@
 #import "DFCameraRollSyncController.h"
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFPhotoImageCache.h"
-#import "DFFirstTimeSetupViewController.h"
 #import "DFUser.h"
 #import <HockeySDK/HockeySDK.h>
 #import <AssetsLibrary/AssetsLibrary.h>
