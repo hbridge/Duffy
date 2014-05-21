@@ -15,7 +15,7 @@ from .forms import ManualAddPhoto
 
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
-import time, math
+import time, math, urllib
 
 	
 def manualAddPhoto(request):
@@ -23,43 +23,6 @@ def manualAddPhoto(request):
 
 	context = {'form' : form}
 	return render(request, 'photos/manualAddPhoto.html', context)
-	
-def groups(request, user_id):
-	try:
-		user = User.objects.get(id=user_id)
-	except User.DoesNotExist:
-		return HttpResponse("User id " + str(user_id) + " does not exist")
-
-	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
-
-	classifications = Classification.objects.select_related().filter(user_id = user.id)
-
-	bucketedClasses = dict()
-	photos = list()
-	
-	for classification in classifications:
-		if classification.class_name not in bucketedClasses:
-			bucketedClasses[classification.class_name] = list()
-		bucketedClasses[classification.class_name].append(classification.photo)
-		photos.append(classification.photo)
-		
-
-	numPhotos = len(set(photos))
-
-	filteredBuckets = dict()
-
-	for key, bucket in bucketedClasses.iteritems():
-		if (len(bucket) > 2):
-			filteredBuckets[key] = bucket
-
-	sortedBuckets = OrderedDict(reversed(sorted(filteredBuckets.viewitems(), key=lambda x: len(x[1]))))
-	
-	context = {	'user' : user,
-				'numPhotos': numPhotos,
-				'sorted_buckets': sortedBuckets,
-				'thumbnailBasepath': thumbnailBasepath}
-	return render(request, 'photos/groups.html', context)
-
 
 def search(request):
 	# new webview code that's served in the iOS app
@@ -80,11 +43,6 @@ def search(request):
 
 	width = imageSize*2 #doubled  for retina
 
-	if data.has_key('debug'):
-		debug = True
-	else:
-		debug = False
-
 	if data.has_key('threshold'):
 		threshold = int(data['threshold'])
 	else:
@@ -95,8 +53,16 @@ def search(request):
 	else:
 		dupThreshold = 40
 
-	if debug:
+	if data.has_key('debug'):
+		debug = True
 		dupThreshold = -1
+	else:
+		debug = False
+
+	if data.has_key('page'):
+		page = int(data['page'])
+	else:
+		page = 1
 
 	try:
 		user = User.objects.get(id=userId)
@@ -105,36 +71,34 @@ def search(request):
 
 	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
 
-	# if no searchbox flag, then must have query
 	if data.has_key('searchbox'):
 		searchBox = True
-		if data.has_key('q'):
-			query = data['q']
-		else:
-			query = ''
 	else:
 		searchBox = False
-		if data.has_key('q'):
-			query = data['q']
-		else:
-			return HttpResponse("Please specify a query")
+
+	if data.has_key('q'):
+		query = data['q']
+	else:
+		query = ''
 
 	setSession(request, user.id)
 	resultsDict = dict()
 
-	resultsDict['indexSize'] = SearchQuerySet().all().filter(userId=userId).count()
+	allResults = SearchQuerySet().all().filter(userId=userId).order_by('timeTaken')
+	resultsDict['indexSize'] = allResults.count()
 
-	# if there is a query, send results through.
-	if (query):
-		(startDate, newQuery) = search_util.getNattyInfo(query)
-		searchResults = search_util.solrSearch(user.id, startDate, newQuery)
-		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold)
+	(startDate, newQuery) = search_util.getNattyInfo(query)
 
+	if (resultsDict['indexSize'] > 0):
+		if (startDate == None):
+			startDate = allResults[0].timeTaken
+		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
+		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold, startDate=pageStartDate, endDate=pageEndDate)
 		totalResults = searchResults.count()
-		
-		photoIdToThumb = dict()
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
+		resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)
 
 	context = {	'user' : user,
 				'imageSize': imageSize,
@@ -146,43 +110,6 @@ def search(request):
 				'thumbnailBasepath': thumbnailBasepath}
 				
 	return render(request, 'photos/search_webview.html', context)
-
-def gallery(request, user_id):
-	try:
-		user = User.objects.get(id=user_id)
-	except User.DoesNotExist:
-		return HttpResponse("User id " + str(user_id) + " does not exist")
-
-	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
-
-	if request.method == 'GET':
-		data = request.GET
-	elif request.method == 'POST':
-		data = request.POST
-
-	if data.has_key('imagesize'):
-		imageSize = int(data['imagesize'])
-	else:
-		imageSize = 78;
-
-	width = imageSize*2 #doubled  for retina
-
-	if data.has_key('groupThreshold'):
-		groupThreshold = int(data['groupThreshold'])
-	else:
-		groupThreshold = 11
-
-	photoQuery = Photo.objects.filter(user_id=user.id)
-	photos = gallery_util.splitPhotosFromDBbyMonth(user.id, photoQuery, groupThreshold)
-
-
-	context = {	'user' : user,
-				'imageSize': imageSize,
-				'photos': photos,
-				'thumbnailBasepath': thumbnailBasepath}
-	return render(request, 'photos/gallery.html', context)
-
-
 
 def serveImage(request):
 	if (request.session['userid']):
@@ -264,90 +191,6 @@ def userbaseSummary(request):
 
 	context = {	'resultList': resultList}
 	return render(request, 'admin/userbaseSummary.html', context)
-
-'''
-Experimenting with deduping
-'''
-
-def dedup(request):
-	if request.method == 'GET':
-		data = request.GET
-	elif request.method == 'POST':
-		data = request.POST
-
-	if data.has_key('user_id'):
-		userId = data['user_id']
-	else:
-		return HttpResponse("Please specify a userId")
-
-	if data.has_key('debug'):
-		debug = True
-	else:
-		debug = False
-
-	if data.has_key('threshold'):
-		threshold = int(data['threshold'])
-	else:
-		threshold = 75
-
-	try:
-		user = User.objects.get(id=userId)
-	except User.DoesNotExist:
-		return HttpResponse("User id " + str(userId) + " does not exist")
-
-	thumbnailBasepath = "/user_data/" + str(user.id) + "/"
-
-	path = '/home/derek/user_data/' + str(userId) + '/'
-	photoQuery = Photo.objects.filter(user_id=user.id).order_by('time_taken')
-	prevHist = list()
-	prevPhotoFName = None
-	prevThreshold = None
-
-	histList = list()
-
-	# iterate through images
-	for photo in photoQuery:
-		curHist = cluster_util.getSpatialHist(photo)
-
-		addToCluster = False
-		if (len(prevHist) == 0):
-			# first image
-			cluster = list()
-			entry = dict()
-			entry['photo'] = photo.id
-			cluster.append(entry)
-			prevHist.append(curHist)
-		else:
-			for hist in prevHist:
-				dist = cluster_util.compHist(curHist, hist)
-				if (dist < threshold):
-					addToCluster = True
-					break
-
-			if (addToCluster):
-				entry = dict()
-				entry['photo'] = photo.id
-				entry['dist'] = "%.2f"%dist
-				cluster.append(entry)
-				prevHist.append(curHist)
-			else:
-				histList.append(cluster)
-				cluster = list()
-				entry = dict()
-				entry['photo'] = photo.id
-				entry['dist'] = "%.2f"%dist
-				cluster.append(entry)
-				prevHist = list()
-				prevHist.append(curHist)
-
-
-	context = {	'histList': histList,
-				'totalPhotos': photoQuery.count(),
-				'totalSets': len(histList),
-				'threshold': threshold,
-				'thumbnailBasepath': thumbnailBasepath}
-	return render(request, 'photos/dedup.html', context)
-
 
 # Helper functions
 

@@ -23,6 +23,8 @@ from django.utils import timezone
 from django.forms.models import model_to_dict
 from django.http import Http404
 
+from haystack.query import SearchQuerySet
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -31,6 +33,8 @@ from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
 from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
+
+import urllib
 
 logger = logging.getLogger(__name__)
 
@@ -187,23 +191,16 @@ class PhotoBulkAPI(APIView):
 			return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 """
-Search api function that returns the gallery view. Used by the /viz/search?user_id=<userID>
+Search api function that returns the search view. Used by the /viz/search?user_id=<userID>
 """
 @csrf_exempt
 def search(request):
-	response = dict({'result': True})
-
 	data = getRequestData(request)
 	
 	if data.has_key('user_id'):
 		userId = data['user_id']
 	else:
 		return returnFailure(response, "Need user_id")
-
-	if data.has_key('q'):
-		query = data['q']
-	else:
-		return returnFailure(response, "Need q field")
 
 	if data.has_key('imagesize'):
 		query = data['imagesize']
@@ -212,86 +209,50 @@ def search(request):
 
 	width = imageSize*2 #doubled  for retina
 
+	if data.has_key('page'):
+		page = int(data['page'])
+	else:
+		page = 1
+
+	if data.has_key('q'):
+		query = data['q']
+	else:
+		query = ''
+
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
 		return returnFailure(response, "Invalid user_id")
 
-	(startDate, newQuery) = search_util.getNattyInfo(query)
-	searchResults = search_util.solrSearch(userId, startDate, newQuery)
 	
 	thumbnailBasepath = "/user_data/" + userId + "/"
 
-	response['_timeline_block_html'] = list()
+	response = ''
 
-	#allResults = searchResults.count()
-	photoResults = gallery_util.splitPhotosFromIndexbyMonth(userId, searchResults)
-
-	photoIdToThumb = dict()
-	resultsDict = dict()
-	for result in searchResults:
-		photoIdToThumb[result.photoId] = image_util.imageThumbnail(result.photoFilename, width, userId)
-	
-	resultsDict['photoIdToThumb'] = photoIdToThumb
-
-	for entry in photoResults:
-		context = {	'imageSize': imageSize,
-					'resultsDict': resultsDict,
-					'userId': userId,
-					'entry': entry,
-					'thumbnailBasepath': thumbnailBasepath}
-
-		html = render_to_string('photos/_timeline_block.html', context)
-		response['_timeline_block_html'].append(html)
-
-	return HttpResponse(json.dumps(response), content_type="application/json")
-
-
-"""
-Old search api function, used by ajax call from /viz/search/<user_id>
-"""
-@csrf_exempt
-def searchJQmobile(request):
-	response = dict({'result': True})
-
-	data = getRequestData(request)
-	
-	if data.has_key('user_id'):
-		userId = data['user_id']
-	else:
-		return returnFailure(response, "Need user_id")
-
-	if data.has_key('q'):
-		query = data['q']
-	else:
-		return returnFailure(response, "Need q field")
+	allResults = SearchQuerySet().all().filter(userId=userId).order_by('timeTaken')
 
 	(startDate, newQuery) = search_util.getNattyInfo(query)
-	searchResults = search_util.solrSearch(userId, startDate, newQuery)
+
+	if (allResults.count() > 0):
+		if (startDate == None):
+			startDate = allResults[0].timeTaken
+		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
+		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
+
+		for entry in photoResults:
+			context = {	'imageSize': imageSize,
+						'userId': userId,
+						'entry': entry,
+						'thumbnailBasepath': thumbnailBasepath}
+
+			html = render_to_string('photos/_timeline_block.html', context)
+			response += html
 	
-	thumbnailBasepath = "/user_data/" + userId + "/"
-
-	response['search_result_html'] = list()
-
-	if startDate:
-		response['search_result_html'].append("Using date: " + str(startDate))
-			
-	for result in searchResults:
-		context = {	'userId': userId,
-					'photoFilename': result.photoFilename,
-					'thumbnailBasepath': thumbnailBasepath,
-					'photoId': result.photoId,
-					'result': result}
-		if result.locationData:
-			context['locationData'] = json.loads(result.locationData)
-		if result.classificationData:
-			context['classificationData'] = json.loads(result.classificationData)
-		
-
-		html = render_to_string('photos/search_result.html', context)
-		response['search_result_html'].append(html)
-
-	return HttpResponse(json.dumps(response), content_type="application/json")
+		if (pageEndDate < datetime.datetime.utcnow()):
+			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) +'">Next</a>'
+			response += nextLink
+	return HttpResponse(response, content_type="application/html")
 
 
 """

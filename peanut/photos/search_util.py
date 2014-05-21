@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+import datetime
 
 import urllib2
 import urllib
@@ -29,7 +29,7 @@ def getNattyInfo(query):
 		if (len(nattyJson) > 0):
 			timestamp = nattyJson[0]["timestamps"][0]
 
-			startDate = datetime.fromtimestamp(timestamp)
+			startDate = datetime.datetime.fromtimestamp(timestamp)
 
 			usedText = nattyJson[0]["matchingValue"]
 			newQuery = query.replace(usedText, '')
@@ -41,12 +41,14 @@ def getNattyInfo(query):
 	Send a request to the Solr search index.  This filters by the userId and grabs everything
 	after the requested startDate
 """
-def solrSearch(userId, startDate, query):
+def solrSearch(userId, startDate, query, endDate=datetime.datetime.utcnow()):
 	searchResults = SearchQuerySet().all().filter(userId=userId)
 
 	if (startDate):
 		solrStartDate = startDate.strftime("%Y-%m-%dT%H:%M:%SZ")
-		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate)
+		searchResults = searchResults.exclude(timeTaken__lte=solrStartDate).exclude(timeTaken__gte=endDate.strftime("%Y-%m-%dT%H:%M:%SZ"))
+	else:
+		searchResults = searchResults.exclude(timeTaken__gte=endDate.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
 	for word in query.split():
 		searchResults = searchResults.filter(content__contain=word)
@@ -54,3 +56,32 @@ def solrSearch(userId, startDate, query):
 	searchResults = searchResults.order_by('timeTaken')
 	
 	return searchResults
+
+"""
+	Returns first n months
+"""
+def getNMonthsOut(startDate, nMonths):
+	month = startDate.month + nMonths - 1
+	year = startDate.year + month/12
+	month = month % 12 + 1
+	day = 1
+	return datetime.datetime(year,month,day, 0, 0, 0)
+
+"""
+	Given a "page", returns starts and end dates of this page
+"""
+def pageToDates(page, origStartDate):
+	if (page > 1):
+		pageStartDate = getNMonthsOut(origStartDate, 2*(page-1))
+	else:
+		pageStartDate = origStartDate
+	pageEndDate = getNMonthsOut(origStartDate, 2*page)
+	return (pageStartDate, pageEndDate)
+
+"""
+	Returns false if searchResults are incomplete
+"""
+def areSearchResultsComplete(userId):
+	if (Photos.objects.filter(user_id=userId).filter(full_filename=None).count() > 0):
+		return False
+	return True

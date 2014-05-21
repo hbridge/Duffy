@@ -9,6 +9,7 @@
 	<meta name="mobile-web-app-capable" content="yes">
 	<title>Search your photos</title> 
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="http://asood123.no-ip.biz/static/jquery.jscroll.js"></script>
 <style>
 	html, body { padding: 0; margin: 0; }
 	html, .ui-mobile, .ui-mobile body {
@@ -88,6 +89,9 @@
 		top: 6px;
 		left: 6px;
 	}
+	.ui-loader {
+
+	}
 	.text {
 		font-family: sans-serif;
 	}
@@ -128,20 +132,14 @@
 <body>
 
 <div role="main" class="ui-content">
-	{% if searchBox == True %}
-		<form class="searchform" id="searchform">
-			<div class="ui-input-search" id="searchbox">
-				<input type="text" class="input-search" id="input-search" 
-				value="{% if query %} {{ query }} {% else %} Search for time, location or things {% endif %}" />
-			</div>
-		</form>
-
-	{% endif %}
 
 	<div class="ui-gallery" id="allImages">
 	{% for entry in resultsDict.photoResults %}
 		{% include "photos/_timeline_block.html" %}
 	{% endfor %}
+	{% if resultsDict.nextLink %}
+		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}">Next</a>
+	{% endif %}
 
 	</div>
 
@@ -161,14 +159,14 @@
 
 </body>
 	<script>
-
 		function loadImages() {
-			$('#allImages').children().each(function(){
+			$('#allImages').find('div.ui-photo-block.hidden').each(function(){
 				$(this).find('img.lazy').each(function() {
 					$(this).attr('src', $(this).attr('data-lazy-src'));	
 				});
+				clusterClickHandler($(this).find('div.ui-image'));
 				$(this).removeClass('hidden');
-			});
+				});
 		}
 
 		loadImages();
@@ -176,29 +174,31 @@
 		/*
 			used to display clusters
 		*/
-		$('div.ui-image').click(function() {
-			if ($(this).hasClass('cluster')) {
-				$(this).removeClass('cluster');
-				$(this).children('div').addClass('hidden');
-				$(this).find('img').animate({
-					height: '+=6',
-					width: '+=6'
-				}, 200, function() {});
-				current = $(this).next()
-				while (current.hasClass('hidden')){
-					current.find('img.lazy-cluster').each(function() {
-						$(this).attr('src', $(this).attr('data-lazy-src'));
-					});
-					current.show("fast");
-					current.removeClass('hidden');
-					current = current.next();
+		
+		function clusterClickHandler(clusters){
+			clusters.click(function() {
+				if ($(this).hasClass('cluster')) {
+					$(this).removeClass('cluster');
+					$(this).children('div').addClass('hidden');
+					$(this).find('img').animate({
+						height: '+=6',
+						width: '+=6'
+					}, 200, function() {});
+					current = $(this).next()
+					while (current.hasClass('hidden')){
+						current.find('img.lazy-cluster').each(function() {
+							$(this).attr('src', $(this).attr('data-lazy-src'));
+						});
+						current.show("fast");
+						current.removeClass('hidden');
+						current = current.next();
+					}
 				}
-			}
-			else {
-				window.location.href = $(this).attr('redirect')+'?photoIdArray='+photoIdArray().toString();
-			}
-		});
-
+				else {
+					window.location.href = $(this).attr('redirect')+'?photoIdArray='+photoIdArray().toString();
+				}
+			});
+		}
 		/*
 			returns an array of photoIds that are currently open/expanded
 		*/
@@ -210,45 +210,15 @@
 				}
 			});
 			return pArray;
-		}
-
-		var oldVal = "";
-
-		$("#input-search").on("keyup paste", function(){
-			if ($(this).val() == oldVal) {
-				return;
-			}
-			oldVal = $(this).val();
-			html ="";
-			value = $(this).val();
-
-			if (value && value.length > 1) {
-				// TODO: change next line to show a loader in the searchbox
-				//$('#allImages').html( "<div class='ui-loader'> Loading...</div>" );
-				//$('#allImages').listview( "refresh" );
-				query = $(this).val();
-				console.log("sending query..." + query);
-				
-				$.ajax({
-					url: "/api/search",
-					dataType: "json",
-					crossDomain: true,
-					data: {
-						user_id: "{{ user.id }}",
-						q: query,
-						debug: '{{ debug }}',
-					}
-				})
-				.then(function(response) {
-					$.each(response['_timeline_block_html'], function ( i, val ) {
-						html += val;
-					});
-					$('#allImages').html(html);
-					//$('#allImages').listview( "refresh" );
-					//$ul.trigger( "updatelayout");
-					loadImages();
-				});
-			}
+		}	
+		$('div.ui-gallery').jscroll({
+			nextSelector: 'a.jscroll-next:last',
+			debug: true,
+			autoTrigger: true,
+			callback: function(){
+				loadImages();
+			},
+			loadingHtml: '<div class="ui-loader center text"> Loading... </p>'
 		});
 		</script>
 </html>

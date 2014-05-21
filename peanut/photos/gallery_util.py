@@ -70,12 +70,12 @@ def getSimCaches(photoIds):
 	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
 """
 
-def splitPhotosFromIndexbyMonth(userId, solrPhotoSet=None, threshold=75, dupThreshold=40):
+def splitPhotosFromIndexbyMonth(userId, solrPhotoSet=None, threshold=75, dupThreshold=40, startDate = date(1900,1,1), endDate=date(2016,1,1)):
 	if (solrPhotoSet == None):
 		solrPhotoSet = 	SearchQuerySet().filter(userId=userId)
 
 	# Buckets all the search queries by month
-	dateFacet = solrPhotoSet.date_facet('timeTaken', start_date=date(1900,1,1), end_date=date(2016,1,1), gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
+	dateFacet = solrPhotoSet.date_facet('timeTaken', start_date=startDate, end_date=endDate, gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
 	facetCounts = dateFacet.facet_counts()
 
 	photoIds = list()
