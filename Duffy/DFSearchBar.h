@@ -23,6 +23,7 @@
 @property (strong, nonatomic) NSString *defaultQuery;
 @property (strong, nonatomic) NSString *text;
 @property (strong, nonatomic) NSString *textBeforeLastEdit;
+@property (strong, nonatomic) NSString *placeholder;
 
 @property (weak, nonatomic) id<DFSearchBarDelegate> delegate;
 

@@ -40,7 +40,9 @@ static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Subject";
 
-static NSString *SEARCH_PLACEHOLDER = @"Everything";
+static NSString *SEARCH_PLACEHOLDER = @"Search Photos";
+static NSString *SEARCH_DEFAULT_QUERY = @"Everything";
+
 
 static NSDictionary *SectionNameToTitles;
 
@@ -135,7 +137,8 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
                      instantiateWithOwner:self options:nil]
                     firstObject];
   self.searchBar.delegate = self;
-  self.searchBar.defaultQuery = SEARCH_PLACEHOLDER;
+  self.searchBar.placeholder = SEARCH_PLACEHOLDER;
+  self.searchBar.defaultQuery = SEARCH_DEFAULT_QUERY;
   
   
   self.navigationItem.titleView = self.searchBar;
@@ -249,6 +252,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:@"''"];
+  self.navigationItem.title = @"Everything";
 }
 
 - (void)executeSearchForQuery:(NSString *)query
