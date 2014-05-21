@@ -540,14 +540,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-  if (section == 0) {
-    // This is a hack to put this here, but if it's not the header view's frame gets set to something weird
-    // and bleeds into other rows when you start typing in the search bar
-    UINib *warningViewNib = [UINib nibWithNibName:@"DFSearchResultsTableViewResultsIncompleteWarningHeader" bundle:nil];
-    UIView *warningView = [[warningViewNib instantiateWithOwner:self options:nil] objectAtIndex:0];
-    self.searchResultsTableView.tableHeaderView.frame = warningView.frame;
-  }
-  
   DFTableHeaderView *view = [[[UINib nibWithNibName:@"DFTableHeaderView" bundle:nil] instantiateWithOwner:self options:nil] firstObject];
   
   NSString *sectionName = self.sectionNames[section];
