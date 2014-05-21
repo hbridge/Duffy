@@ -124,8 +124,9 @@
   [Flurry setUserID:[NSString stringWithFormat:@"%llu",[[DFUser currentUser] userID]]];
   [[BITHockeyManager sharedHockeyManager].authenticator authenticateInstallation];
   
+  //make sure our singletons are set up.
   [DFPhotoStore sharedStore];
-  
+  [DFUploadController sharedUploadController];
   [self startCameraRollSync];
   
   DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
