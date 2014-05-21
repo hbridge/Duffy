@@ -16,6 +16,11 @@
 		5A51272B19007CE00057A31F /* DFUploadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A51272A19007CE00057A31F /* DFUploadQueue.m */; };
 		5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */; };
 		5A52BD7318FF02ED0038CCCD /* WarningHeaderIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */; };
+		5A5FCB2A192D11CB00A060A7 /* SettingsToolbar@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB29192D11CB00A060A7 /* SettingsToolbar@2x.png */; };
+		5A5FCB2D192D17B500A060A7 /* DFSearchBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5FCB2C192D17B500A060A7 /* DFSearchBar.m */; };
+		5A5FCB2F192D17C500A060A7 /* DFSearchBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB2E192D17C500A060A7 /* DFSearchBar.xib */; };
+		5A5FCB31192D1A1B00A060A7 /* SearchBarIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB30192D1A1B00A060A7 /* SearchBarIcon@2x.png */; };
+		5A5FCB33192D1BB500A060A7 /* SearchClearButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB32192D1BB500A060A7 /* SearchClearButton@2x.png */; };
 		5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A67605818E2039800E355B6 /* CoreLocation.framework */; };
 		5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */; };
 		5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */; };
@@ -149,6 +154,12 @@
 		5A51272A19007CE00057A31F /* DFUploadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadQueue.m; sourceTree = "<group>"; };
 		5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchResultsTableViewResultsIncompleteWarningHeader.xib; sourceTree = "<group>"; };
 		5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "WarningHeaderIcon@2x.png"; path = "Resources/Icons/WarningHeaderIcon@2x.png"; sourceTree = "<group>"; };
+		5A5FCB29192D11CB00A060A7 /* SettingsToolbar@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SettingsToolbar@2x.png"; sourceTree = "<group>"; };
+		5A5FCB2B192D17B500A060A7 /* DFSearchBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchBar.h; sourceTree = "<group>"; };
+		5A5FCB2C192D17B500A060A7 /* DFSearchBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchBar.m; sourceTree = "<group>"; };
+		5A5FCB2E192D17C500A060A7 /* DFSearchBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchBar.xib; sourceTree = "<group>"; };
+		5A5FCB30192D1A1B00A060A7 /* SearchBarIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SearchBarIcon@2x.png"; sourceTree = "<group>"; };
+		5A5FCB32192D1BB500A060A7 /* SearchClearButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SearchClearButton@2x.png"; sourceTree = "<group>"; };
 		5A67605818E2039800E355B6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		5A67605A18E210B000E355B6 /* NSDictionary+DFJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+DFJSON.h"; sourceTree = "<group>"; };
 		5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+DFJSON.m"; sourceTree = "<group>"; };
@@ -538,6 +549,9 @@
 				5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */,
 				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
 				5A8D0B4D18EF2FBA00A1D9A7 /* Photo Web View */,
+				5A5FCB2B192D17B500A060A7 /* DFSearchBar.h */,
+				5A5FCB2C192D17B500A060A7 /* DFSearchBar.m */,
+				5A5FCB2E192D17C500A060A7 /* DFSearchBar.xib */,
 			);
 			name = "Search View";
 			sourceTree = "<group>";
@@ -680,6 +694,9 @@
 		5ADB24C3189985590016CA02 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5A5FCB32192D1BB500A060A7 /* SearchClearButton@2x.png */,
+				5A5FCB30192D1A1B00A060A7 /* SearchBarIcon@2x.png */,
+				5A5FCB29192D11CB00A060A7 /* SettingsToolbar@2x.png */,
 				5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */,
 				5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */,
 				5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */,
@@ -877,8 +894,10 @@
 				5A67606118E2444E00E355B6 /* DFPhotoViewController.xib in Resources */,
 				5AB398461925690C00E6E69E /* IntroPage3.rtf in Resources */,
 				5ADB250E189AE7980016CA02 /* Albums.png in Resources */,
+				5A5FCB31192D1A1B00A060A7 /* SearchBarIcon@2x.png in Resources */,
 				5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */,
 				5AD62B101923E33700EE22D7 /* DFDevelopmentSettingsViewController.xib in Resources */,
+				5A5FCB2F192D17C500A060A7 /* DFSearchBar.xib in Resources */,
 				5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */,
 				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
 				5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */,
@@ -891,6 +910,7 @@
 				5AB39842192563E700E6E69E /* IntroPage1.rtf in Resources */,
 				5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */,
 				5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */,
+				5A5FCB2A192D11CB00A060A7 /* SettingsToolbar@2x.png in Resources */,
 				5ADB24F3189985A20016CA02 /* DFPhotosGridViewController.xib in Resources */,
 				5A72E11818B55CB2000979D2 /* database.csv in Resources */,
 				5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */,
@@ -898,6 +918,7 @@
 				5AB398451925690C00E6E69E /* IntroPage2.rtf in Resources */,
 				5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */,
 				5AACB90418F471E900F4EEB6 /* DFFirstTimeSetupViewController.xib in Resources */,
+				5A5FCB33192D1BB500A060A7 /* SearchClearButton@2x.png in Resources */,
 				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */,
 				5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */,
@@ -1019,6 +1040,7 @@
 				5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
 				5ADB24F818998D070016CA02 /* DFPhotoStore.m in Sources */,
 				5AE3BF8118E6301B00ACB5DC /* DFPhoto+FaceDetection.m in Sources */,
+				5A5FCB2D192D17B500A060A7 /* DFSearchBar.m in Sources */,
 				5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */,
 				5A67606918E3558500E355B6 /* DFMultiPhotoViewController.m in Sources */,
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,

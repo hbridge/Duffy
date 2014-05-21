@@ -21,10 +21,11 @@
 #import "DFPeanutSuggestion.h"
 #import "DFSearchResultTableViewCell.h"
 #import "NSDictionary+DFJSON.h"
+#import "DFSettingsViewController.h"
 
 @interface DFSearchViewController ()
 
-@property (nonatomic, retain) UISearchBar *searchBar;
+@property (nonatomic, retain) DFSearchBar *searchBar;
 
 @property (nonatomic, retain) NSMutableDictionary *searchResultsBySectionName;
 @property (nonatomic, retain) NSMutableArray *sectionNames;
@@ -39,7 +40,7 @@ static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Subject";
 
-static NSString *SEARCH_PLACEHOLDER = @"Search for time, location or things";
+static NSString *SEARCH_PLACEHOLDER = @"Everything";
 
 static NSDictionary *SectionNameToTitles;
 
@@ -99,7 +100,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   self.automaticallyAdjustsScrollViewInsets = YES;
   
   
-  [self executeSearchForQuery:@"''"];
+  [self loadDefaultSearch];
   [self updateUIForSearchBarHasFocus:NO];
 }
 
@@ -130,10 +131,16 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 - (void)setupNavBar
 {
   // create search bar
-  self.searchBar = [[UISearchBar alloc] init];
+  self.searchBar = [[[UINib nibWithNibName:@"DFSearchBar" bundle:nil]
+                     instantiateWithOwner:self options:nil]
+                    firstObject];
   self.searchBar.delegate = self;
-  self.searchBar.placeholder = SEARCH_PLACEHOLDER;
+  self.searchBar.defaultQuery = SEARCH_PLACEHOLDER;
+  
+  
   self.navigationItem.titleView = self.searchBar;
+  self.navigationController.toolbar.tintColor = [UIColor colorWithRed:241 green:155 blue:43
+                                                                      alpha:1.0];
 }
 
 - (void)setupTableView
@@ -239,6 +246,10 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   [self.webView loadRequest:request];
 }
 
+- (void)loadDefaultSearch
+{
+  [self executeSearchForQuery:@"''"];
+}
 
 - (void)executeSearchForQuery:(NSString *)query
 {
@@ -377,25 +388,31 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 #pragma mark - Search Bar delegate and helpers
 
-- (void)searchBarTextDidBeginEditing:(UISearchBar *)searchBar
+- (void)searchBarTextDidBeginEditing:(DFSearchBar *)searchBar
 {
   [self updateUIForSearchBarHasFocus:YES];
 }
 
-- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
+- (void)searchBar:(DFSearchBar *)searchBar textDidChange:(NSString *)searchText
 {
   [self updateSearchResults:searchText];
 }
 
-- (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
+- (void)searchBarSearchButtonClicked:(DFSearchBar *)searchBar
 {
   [self executeSearchForQuery:self.searchBar.text];
   [self updateUIForSearchBarHasFocus:NO];
 }
 
-- (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
+- (void)searchBarCancelButtonClicked:(DFSearchBar *)searchBar
 {
   [self updateUIForSearchBarHasFocus:NO];
+}
+
+- (void)searchBarClearButtonClicked:(DFSearchBar *)searchBar
+{
+  searchBar.text = searchBar.defaultQuery;
+  [self loadDefaultSearch];
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
@@ -403,9 +420,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   if (searchBarHasFocus) {
     self.searchResultsTableView.hidden = NO;
     [self.searchBar setShowsCancelButton:YES animated:YES];
-    self.navigationItem.rightBarButtonItem = nil;
+    [self.searchBar setShowsClearButton:NO animated:YES];
   } else {
     [self.searchBar setShowsCancelButton:NO animated:YES];
+    [self.searchBar setShowsClearButton:YES animated:YES];
     self.searchResultsTableView.hidden = YES;
     [self.searchBar resignFirstResponder];
   }
@@ -555,6 +573,13 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     [self updateUIForSearchBarHasFocus:NO];
   }
+}
+
+
+- (void)showSettings:(id)sender
+{
+  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
+  [self.navigationController pushViewController:svc animated:YES];
 }
 
 #pragma mark - Data Accessors
