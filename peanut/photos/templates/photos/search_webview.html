@@ -19,20 +19,7 @@
 	.ui-content{
 		padding:0px 0px 0px 0px;
 	}
-	.ui-filter-inset {
-		margin-top: 0;
-	}
-	.input-search {
-		height: 2em;
-		font-size: 12px;
-		text-align: left;
-		background: none;
-		width: 98%;
-		border-width: 1px;
-		background: #ffffff;
-		margin-left: 2px;
-		padding-left: 10px;	
-	}
+
 	.ui-gallery{
 		/*overflow: auto;*/
 	}
@@ -42,6 +29,7 @@
 	}
 	.ui-time-header {
 		font-family: arial;
+		font-size: 1em;
 		padding: 4px 0px 4px 10px;
 		background-color: #F0F0F0;
 	}
@@ -53,44 +41,36 @@
 		height: {{ imageSize|add:+2 }}px;
 		width: {{ imageSize }}px;
 	}
-	.ui-image-photo {
-		position: absolute;
-		top: 0px;
-		left: 0px;
-	}
 	.ui-image-count {
 		position:absolute;
 		background-color: transparent;
-		color: #000000;
-		top: 39px;
-		left: 37px;
-		font-size: 1em;
+		top: 44px;
+		left: 45px;
+		font-size: 0.9em;
 		text-align: right;
 		width: 33px;
 		height:33px;
 		line-height: 50px;
 		padding-right: 2px;
-		color: #ffffff;
-		text-shadow: 1px 1px 1px rgba(0,0,0,0.6);
+		color: rgb(245, 166, 35);
 	}
-	.ui-image-gray-1 {
-		background-color: #a0a0a0;
-		height: {{ imageSize|add:-6 }}px;
-		width: {{ imageSize|add:-6 }}px;
-		position: absolute;
-		top: 3px;
-		left: 3px;
-	}
-	.ui-image-gray-2 {
-		background-color: #c0c0c0;
-		height: {{ imageSize|add:-6 }}px;
-		width: {{ imageSize|add:-6 }}px;
-		position: absolute;
-		top: 6px;
-		left: 6px;
+	.ui-arrow-down {
+		width: 0; 
+		height: 0; 
+		border-top: 25px solid transparent;
+		border-left: 25px solid transparent;
+		border-bottom: 25px solid #fff;
+		position:absolute;
+		top: 28px;
+		left: 53px;
 	}
 	.ui-loader {
 
+	}
+	.ui-warning {
+		background-color: rgba(241,155,43,0.7);
+		padding: 5px 5px 5px 5px;
+		font-size: 14px;
 	}
 	.text {
 		font-family: sans-serif;
@@ -109,8 +89,11 @@
 	}
 	.results-footer {
 		float: left;
-		padding: 0px 0px 0px 0px;
+		margin: 0px 0px 0px 0px;
 		width: 100%;
+		border-top: 1px solid rgb(241,155,43);
+		font-size: 10px;
+		text-align: right;
 	}
 	#stats{
 		text-align: right;
@@ -132,7 +115,11 @@
 <body>
 
 <div role="main" class="ui-content">
-
+	{% if resultsDict.incompleteResults %}
+		<div class='ui-warning text'>
+		Incomplete searches for things like animals, food, etc. Get on WiFi to upload rest of your photos.
+		</div>
+	{% endif %}
 	<div class="ui-gallery" id="allImages">
 	{% for entry in resultsDict.photoResults %}
 		{% include "photos/_timeline_block.html" %}
@@ -148,10 +135,10 @@
 			<div class="text center"> No results found! </div>
 			<br>
 		{% endif %}
-		<div class="ui-time-header center"> Searchable images: {{ resultsDict.indexSize }}  </div>
+		<div class="text" > Your searchable images: {{ resultsDict.indexSize }}  </div>
 
 		<div id="stats" class="text">
-			<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
+			<!-- STATS: Time: %(total_time).2fs | P: %(python_time).2fs | DB: %(db_time).2fs | Q: %(db_queries)d ENDSTATS -->
 		</div>
 	</div>
 
@@ -180,10 +167,6 @@
 				if ($(this).hasClass('cluster')) {
 					$(this).removeClass('cluster');
 					$(this).children('div').addClass('hidden');
-					$(this).find('img').animate({
-						height: '+=6',
-						width: '+=6'
-					}, 200, function() {});
 					current = $(this).next()
 					while (current.hasClass('hidden')){
 						current.find('img.lazy-cluster').each(function() {

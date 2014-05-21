@@ -1,60 +1,31 @@
 {% load dictionary_extras %}
 
 <div class="ui-photo-block hidden">
-	<div class="ui-time-header">
-		{{ entry.date }} ({{ entry.clusterList|length }})
-	</div>
-	{% for cluster in entry.clusterList %}
-		{% for imageEntry in cluster %}
-				<div class = "ui-image 
-					{% if imageEntry.dist == None and cluster|length > 1 %} 
-						cluster
-					{% elif imageEntry.dist != None %}
-						hidden
-					{% endif %}"
-					redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg"
-					photoId="{{ imageEntry.photo.photoId }}">
-
-				{% if imageEntry.dist == None and cluster|length > 1 %}
-						<div class='ui-image-gray-2'>
-						</div>
-						<div class='ui-image-gray-1'>
-						</div>
-					{% endif %}
-
-				<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
-					class="
-						{% if imageEntry.dist != None %}
-							lazy-cluster
-						{% else %}
-							lazy ui-image-photo
-						{% endif %}"
-						{% if imageEntry.dist == None and cluster|length > 1 %}
-							height="{{ imageSize|add:-6 }}px"
-							width="{{ imageSize|add:-6 }}px" 
-						{% else %}
-							height="{{ imageSize }}px"
-							width="{{ imageSize }}px" 
-						{% endif %}
-
-					{% if debug %}
-					title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
-					SIMROW: {{ imageEntry.simrow }} |
-					SIMROWS:
-					{% for sim in imageEntry.simrows %}
-						{{ sim }}
-					{% endfor %}
-					" 
-					{% endif %}
-					>
-					
-					
-					{% if imageEntry.dist == None and cluster|length > 1 %}
-						<div class="ui-image-count text">
-							{{ cluster|length }}
-						</div>
-					{% endif %}
-				</div>
+<div class="ui-time-header">
+{{ entry.date }} ({{ entry.clusterList|length }})
+</div>
+{% for cluster in entry.clusterList %}
+	{% for imageEntry in cluster %}
+	<div class = "ui-image 
+		{% if imageEntry.dist == None and cluster|length > 1 %} cluster {% elif imageEntry.dist != None %} hidden {% endif %}" redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" photoId="{{ imageEntry.photo.photoId }}">
+	<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
+		class="{% if imageEntry.dist != None %} lazy-cluster {% else %} lazy {% endif %}"
+		height="{{ imageSize }}px" width="{{ imageSize }}px" 
+		{% if debug %}
+		title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
+		SIMROW: {{ imageEntry.simrow }} |
+		SIMROWS:
+		{% for sim in imageEntry.simrows %}
+			{{ sim }}
 		{% endfor %}
+		" 
+		{% endif %}
+		>
+		{% if imageEntry.dist == None and cluster|length > 1 %}
+			<div class='ui-arrow-down'></div>
+			<div class="ui-image-count text">{{ cluster|length }}</div>
+		{% endif %}
+	</div>
 	{% endfor %}
+{% endfor %}
 </div>

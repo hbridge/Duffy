@@ -6,6 +6,8 @@ import urllib
 
 from haystack.query import SearchQuerySet
 
+from photos.models import Photo
+
 """
 	Helper method to get a startDate and a new filtered query from Natty.
 	This makes a url call to the Natty server that gets back the timestamp around a 
@@ -82,6 +84,6 @@ def pageToDates(page, origStartDate):
 	Returns false if searchResults are incomplete
 """
 def areSearchResultsComplete(userId):
-	if (Photos.objects.filter(user_id=userId).filter(full_filename=None).count() > 0):
+	if (Photo.objects.filter(user_id=userId).filter(full_filename=None).count() > 0):
 		return False
 	return True

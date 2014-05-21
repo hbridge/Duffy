@@ -100,6 +100,9 @@ def search(request):
 		resultsDict['photoResults'] = photoResults
 		resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)
 
+	if (not search_util.areSearchResultsComplete(user.id)):
+		resultsDict['incompleteResults'] = True
+
 	context = {	'user' : user,
 				'imageSize': imageSize,
 				'resultsDict': resultsDict,
