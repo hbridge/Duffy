@@ -92,20 +92,20 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   [super viewDidLoad];
   
   [self setupTableView];
+  [self populateDefaultAutocompleteSearchResults];
   [self.webView setDelegate:self];
-  [self.webView loadHTMLString:@"<br><center style=\"font-family: sans-serif\">Tap above to get started</center>" baseURL:nil];
   
   [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
   self.automaticallyAdjustsScrollViewInsets = YES;
-  // TODO hack this should be dynamic
   
   
+  [self executeSearchForQuery:@"''"];
+  [self updateUIForSearchBarHasFocus:NO];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self populateDefaultAutocompleteSearchResults];
   [self setViewInsets];
   
   [DFAnalytics logViewController:self appearedWithParameters:nil];
@@ -291,10 +291,13 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   return YES;
 }
 
-
-
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+  NSString *htmlString = [NSString stringWithFormat:
+                          @"<br><center style=\"font-family: sans-serif\">Could not load results: %@</center>",
+                          error.localizedDescription];
+  [self.webView loadHTMLString:htmlString baseURL:nil];
   if (self.currentlyLoadingSearchQuery) {
     [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
     self.currentlyLoadingSearchQuery = nil;

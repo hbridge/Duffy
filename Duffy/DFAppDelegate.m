@@ -127,27 +127,12 @@
   
   [DFPhotoStore sharedStore];
   
-  // Camera roll tab
-  DFCameraRollViewController *cameraRollController = [[DFCameraRollViewController alloc] init];
-  UINavigationController *cameraRollNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:cameraRollController];
-  
   [self startCameraRollSync];
   
   DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
   UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];
   
-  
-  DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
-  UINavigationController *settingsNav = [[UINavigationController alloc] initWithRootViewController:settingsViewController];
-  
-  UITabBarController *tabController = [[UITabBarController alloc] init];
-  [tabController setViewControllers:[NSArray arrayWithObjects:
-                                     searchViewNav,
-                                     cameraRollNav,
-                                     settingsNav,
-                                     nil]];
-  
-    [[self window] setRootViewController:tabController];
+    [[self window] setRootViewController:searchViewNav];
 }
 
 - (void)startCameraRollSync
