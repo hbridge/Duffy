@@ -32,7 +32,7 @@
       
         self.navigationController.navigationItem.title = @"Camera Roll";
         self.tabBarItem.title = @"Camera Roll";
-        self.tabBarItem.image = [UIImage imageNamed:@"Timeline"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Icons/Timeline"];
         
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(cameraRollPhotoChanged:)

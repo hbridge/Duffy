@@ -33,7 +33,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     self = [super initWithNibName:@"DFPhotosGridViewController" bundle:[NSBundle mainBundle]];
     if (self) {
         self.tabBarItem.title = @"Photos";
-        self.tabBarItem.image = [UIImage imageNamed:@"Timeline"];
+        self.tabBarItem.image = [UIImage imageNamed:@"Icons/Timeline"];
         
         UINavigationItem *n = [self navigationItem];
         [n setTitle:@"Photos"];

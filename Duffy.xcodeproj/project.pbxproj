@@ -9,17 +9,14 @@
 /* Begin PBXBuildFile section */
 		502B025BD24C4FB89333BFED /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68ED45F75CA648D08A506609 /* libPods.a */; };
 		5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */; };
-		5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A30E4DC18D3AF0800E41DBC /* Search@2x.png */; };
 		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
 		5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */; };
 		5A51272B19007CE00057A31F /* DFUploadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A51272A19007CE00057A31F /* DFUploadQueue.m */; };
 		5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */; };
-		5A52BD7318FF02ED0038CCCD /* WarningHeaderIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */; };
 		5A5FCB37192D478F00A060A7 /* DFSearchBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A5FCB35192D478F00A060A7 /* DFSearchBar.m */; };
 		5A5FCB38192D478F00A060A7 /* DFSearchBar.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB36192D478F00A060A7 /* DFSearchBar.xib */; };
-		5A5FCB3B192D47BE00A060A7 /* SearchBarIcon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB39192D47BE00A060A7 /* SearchBarIcon@2x.png */; };
-		5A5FCB3C192D47BE00A060A7 /* SearchClearButton@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB3A192D47BE00A060A7 /* SearchClearButton@2x.png */; };
+		5A5FCB54192D52B600A060A7 /* Icons in Resources */ = {isa = PBXBuildFile; fileRef = 5A5FCB53192D52B600A060A7 /* Icons */; };
 		5A67605918E2039800E355B6 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A67605818E2039800E355B6 /* CoreLocation.framework */; };
 		5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */; };
 		5A67606018E2444E00E355B6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */; };
@@ -55,10 +52,6 @@
 		5AACB92218F6092F00F4EEB6 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AACB91E18F6092F00F4EEB6 /* HockeySDK.framework */; };
 		5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB92018F6092F00F4EEB6 /* HockeySDK.xcconfig */; };
 		5AACB92418F6092F00F4EEB6 /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */; };
-		5AB32E9F18EF58EC004FC27B /* TimeSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */; };
-		5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */; };
-		5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */; };
-		5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */; };
 		5AB32EA818F0CD3B004FC27B /* DFKeyboardResizingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */; };
 		5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */; };
 		5AB3983719252D9700E6E69E /* DFIntro.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5AB3983619252D9700E6E69E /* DFIntro.storyboard */; };
@@ -104,10 +97,6 @@
 		5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */; };
 		5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */; };
 		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
-		5ADB250E189AE7980016CA02 /* Albums.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250A189AE7980016CA02 /* Albums.png */; };
-		5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250B189AE7980016CA02 /* Albums@2x.png */; };
-		5ADB2510189AE7980016CA02 /* Timeline.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250C189AE7980016CA02 /* Timeline.png */; };
-		5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB250D189AE7980016CA02 /* Timeline@2x.png */; };
 		5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */; };
 		5AE3BF7118E4CCC600ACB5DC /* DFBoundingBoxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF7018E4CCC600ACB5DC /* DFBoundingBoxView.m */; };
 		5AE3BF7318E4D08F00ACB5DC /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */; };
@@ -120,7 +109,6 @@
 		5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3418D0C87E00998793 /* DFUser.m */; };
 		5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */; };
 		5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */; };
-		5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */; };
 		5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA4918D236A900998793 /* UIImage+Alpha.m */; };
 		5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA4B18D236A900998793 /* UIImage+Resize.m */; };
 		5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA4D18D236A900998793 /* UIImage+RoundedCorner.m */; };
@@ -140,7 +128,6 @@
 		514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Duffy/Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController.h; sourceTree = "<group>"; };
 		5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController.m; sourceTree = "<group>"; };
-		5A30E4DC18D3AF0800E41DBC /* Search@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Search@2x.png"; sourceTree = "<group>"; };
 		5A45E9BB18D9F7B8002663EB /* DFPhotoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoCollection.h; sourceTree = "<group>"; };
 		5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoCollection.m; sourceTree = "<group>"; };
 		5A45E9C418DA44F6002663EB /* DFCameraRollSyncController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollSyncController.h; sourceTree = "<group>"; };
@@ -150,12 +137,10 @@
 		5A51272919007CE00057A31F /* DFUploadQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadQueue.h; sourceTree = "<group>"; };
 		5A51272A19007CE00057A31F /* DFUploadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadQueue.m; sourceTree = "<group>"; };
 		5A52BD7018FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchResultsTableViewResultsIncompleteWarningHeader.xib; sourceTree = "<group>"; };
-		5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "WarningHeaderIcon@2x.png"; path = "Resources/Icons/WarningHeaderIcon@2x.png"; sourceTree = "<group>"; };
 		5A5FCB34192D478F00A060A7 /* DFSearchBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchBar.h; sourceTree = "<group>"; };
 		5A5FCB35192D478F00A060A7 /* DFSearchBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchBar.m; sourceTree = "<group>"; };
 		5A5FCB36192D478F00A060A7 /* DFSearchBar.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchBar.xib; sourceTree = "<group>"; };
-		5A5FCB39192D47BE00A060A7 /* SearchBarIcon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SearchBarIcon@2x.png"; sourceTree = "<group>"; };
-		5A5FCB3A192D47BE00A060A7 /* SearchClearButton@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SearchClearButton@2x.png"; sourceTree = "<group>"; };
+		5A5FCB53192D52B600A060A7 /* Icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Icons; path = Resources/Icons; sourceTree = "<group>"; };
 		5A67605818E2039800E355B6 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		5A67605A18E210B000E355B6 /* NSDictionary+DFJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+DFJSON.h"; sourceTree = "<group>"; };
 		5A67605B18E210B000E355B6 /* NSDictionary+DFJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSDictionary+DFJSON.m"; sourceTree = "<group>"; };
@@ -212,10 +197,6 @@
 		5AACB91E18F6092F00F4EEB6 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HockeySDK.framework; sourceTree = "<group>"; };
 		5AACB92018F6092F00F4EEB6 /* HockeySDK.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = HockeySDK.xcconfig; sourceTree = "<group>"; };
 		5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
-		5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "TimeSectionHeader@2x.png"; path = "Resources/Icons/TimeSectionHeader@2x.png"; sourceTree = "<group>"; };
-		5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "LocationSectionHeader@2x.png"; path = "Resources/Icons/LocationSectionHeader@2x.png"; sourceTree = "<group>"; };
-		5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SubjectSectionHeader@2x.png"; path = "Resources/Icons/SubjectSectionHeader@2x.png"; sourceTree = "<group>"; };
-		5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "SearchSectionHeader@2x.png"; path = "Resources/Icons/SearchSectionHeader@2x.png"; sourceTree = "<group>"; };
 		5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFKeyboardResizingViewController.h; sourceTree = "<group>"; };
 		5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFKeyboardResizingViewController.m; sourceTree = "<group>"; };
 		5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAutocompleteController.h; sourceTree = "<group>"; };
@@ -288,10 +269,6 @@
 		5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewCell.xib; sourceTree = "<group>"; };
 		5ADB2507189ABBB50016CA02 /* DFPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoto.h; sourceTree = "<group>"; };
 		5ADB2508189ABBB50016CA02 /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoto.m; sourceTree = "<group>"; };
-		5ADB250A189AE7980016CA02 /* Albums.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Albums.png; path = Resources/Icons/Albums.png; sourceTree = "<group>"; };
-		5ADB250B189AE7980016CA02 /* Albums@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Albums@2x.png"; path = "Resources/Icons/Albums@2x.png"; sourceTree = "<group>"; };
-		5ADB250C189AE7980016CA02 /* Timeline.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Timeline.png; path = Resources/Icons/Timeline.png; sourceTree = "<group>"; };
-		5ADB250D189AE7980016CA02 /* Timeline@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Timeline@2x.png"; path = "Resources/Icons/Timeline@2x.png"; sourceTree = "<group>"; };
 		5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollViewController.h; sourceTree = "<group>"; };
 		5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollViewController.m; sourceTree = "<group>"; };
 		5AE3BF6F18E4CCC600ACB5DC /* DFBoundingBoxView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBoundingBoxView.h; sourceTree = "<group>"; };
@@ -313,7 +290,6 @@
 		5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettingsViewController.h; sourceTree = "<group>"; };
 		5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSettingsViewController.m; sourceTree = "<group>"; };
 		5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSettingsViewController.xib; sourceTree = "<group>"; };
-		5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "SettingsTab@2x.png"; sourceTree = "<group>"; };
 		5AFBCA4818D236A900998793 /* UIImage+Alpha.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Alpha.h"; path = "ThirdParty/UIImage-Categories/UIImage+Alpha.h"; sourceTree = "<group>"; };
 		5AFBCA4918D236A900998793 /* UIImage+Alpha.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UIImage+Alpha.m"; path = "ThirdParty/UIImage-Categories/UIImage+Alpha.m"; sourceTree = "<group>"; };
 		5AFBCA4A18D236A900998793 /* UIImage+Resize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+Resize.h"; path = "ThirdParty/UIImage-Categories/UIImage+Resize.h"; sourceTree = "<group>"; };
@@ -692,20 +668,8 @@
 		5ADB24C3189985590016CA02 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
-				5A5FCB39192D47BE00A060A7 /* SearchBarIcon@2x.png */,
-				5A5FCB3A192D47BE00A060A7 /* SearchClearButton@2x.png */,
-				5A52BD7218FF02ED0038CCCD /* WarningHeaderIcon@2x.png */,
-				5AB32EA418EF5DA6004FC27B /* SearchSectionHeader@2x.png */,
-				5AB32EA218EF5BC3004FC27B /* SubjectSectionHeader@2x.png */,
-				5AB32EA018EF5A37004FC27B /* LocationSectionHeader@2x.png */,
-				5AB32E9E18EF58EC004FC27B /* TimeSectionHeader@2x.png */,
-				5A30E4DC18D3AF0800E41DBC /* Search@2x.png */,
-				5AFBCA3B18D0E68400998793 /* SettingsTab@2x.png */,
+				5A5FCB53192D52B600A060A7 /* Icons */,
 				5A72E11718B55CB2000979D2 /* database.csv */,
-				5ADB250A189AE7980016CA02 /* Albums.png */,
-				5ADB250B189AE7980016CA02 /* Albums@2x.png */,
-				5ADB250C189AE7980016CA02 /* Timeline.png */,
-				5ADB250D189AE7980016CA02 /* Timeline@2x.png */,
 				5ADB24C4189985590016CA02 /* Duffy-Info.plist */,
 				5ADB24C5189985590016CA02 /* InfoPlist.strings */,
 				5ADB24C8189985590016CA02 /* main.m */,
@@ -888,22 +852,13 @@
 				5A5FCB38192D478F00A060A7 /* DFSearchBar.xib in Resources */,
 				5AB3983719252D9700E6E69E /* DFIntro.storyboard in Resources */,
 				5ADB24C7189985590016CA02 /* InfoPlist.strings in Resources */,
-				5A5FCB3C192D47BE00A060A7 /* SearchClearButton@2x.png in Resources */,
-				5A5FCB3B192D47BE00A060A7 /* SearchBarIcon@2x.png in Resources */,
-				5AB32E9F18EF58EC004FC27B /* TimeSectionHeader@2x.png in Resources */,
 				5A67606118E2444E00E355B6 /* DFPhotoViewController.xib in Resources */,
+				5A5FCB54192D52B600A060A7 /* Icons in Resources */,
 				5AB398461925690C00E6E69E /* IntroPage3.rtf in Resources */,
-				5ADB250E189AE7980016CA02 /* Albums.png in Resources */,
-				5ADB2511189AE7980016CA02 /* Timeline@2x.png in Resources */,
 				5AD62B101923E33700EE22D7 /* DFDevelopmentSettingsViewController.xib in Resources */,
 				5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */,
-				5ADB250F189AE7980016CA02 /* Albums@2x.png in Resources */,
-				5AFBCA3C18D0E68400998793 /* SettingsTab@2x.png in Resources */,
-				5AB32EA118EF5A37004FC27B /* LocationSectionHeader@2x.png in Resources */,
-				5A52BD7318FF02ED0038CCCD /* WarningHeaderIcon@2x.png in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */,
-				5A30E4DD18D3AF0800E41DBC /* Search@2x.png in Resources */,
 				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
 				5AB39842192563E700E6E69E /* IntroPage1.rtf in Resources */,
 				5A52BD7118FEFE400038CCCD /* DFSearchResultsTableViewResultsIncompleteWarningHeader.xib in Resources */,
@@ -913,10 +868,7 @@
 				5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */,
 				5AACB92418F6092F00F4EEB6 /* HockeySDKResources.bundle in Resources */,
 				5AB398451925690C00E6E69E /* IntroPage2.rtf in Resources */,
-				5AB32EA518EF5DA6004FC27B /* SearchSectionHeader@2x.png in Resources */,
-				5ADB2510189AE7980016CA02 /* Timeline.png in Resources */,
 				5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */,
-				5AB32EA318EF5BC3004FC27B /* SubjectSectionHeader@2x.png in Resources */,
 				5AD8AD4A191D462500782144 /* DFSearchResultTableViewCell.xib in Resources */,
 				5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */,
 			);

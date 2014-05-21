@@ -75,7 +75,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
     self.navigationItem.title = @"Search";
     
     self.tabBarItem.title = @"Search";
-    self.tabBarItem.image = [UIImage imageNamed:@"Search"];
+    self.tabBarItem.image = [UIImage imageNamed:@"Icons/Search"];
     
     self.autcompleteController = [[DFAutocompleteController alloc] init];
     [self setupNavBar];
@@ -553,7 +553,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   NSString *sectionName = self.sectionNames[section];
   view.textLabel.text = SectionNameToTitles[sectionName];
   
-  NSString *imageName = [NSString stringWithFormat:@"%@%@", self.sectionNames[section], @"SectionHeader"];
+  NSString *imageName = [NSString stringWithFormat:@"Icons/%@%@", self.sectionNames[section], @"SectionHeader"];
   view.imageView.image = [UIImage imageNamed:imageName];
   
   return view;

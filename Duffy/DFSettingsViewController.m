@@ -30,7 +30,7 @@
   if (self) {
     self.navigationItem.title = @"Settings";
     self.tabBarItem.title = @"Settings";
-    self.tabBarItem.image = [UIImage imageNamed:@"SettingsTab"];
+    self.tabBarItem.image = [UIImage imageNamed:@"Icons/SettingsTab"];
   }
   return self;
 }
