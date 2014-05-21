@@ -297,6 +297,15 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     
     [self pushPhotoView:requestURLString];
     return NO;
+  } else if ([requestURLString rangeOfString:@"settings"].location != NSNotFound) {
+    [webView stopLoading];
+    DDLogInfo(@"Settings request detect in search string with URL: %@", requestURLString);
+    
+    DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
+    self.navigationItem.title = @"Search";
+    [self.navigationController pushViewController:svc animated:YES];
+    
+    return NO;
   }
   
   return YES;
