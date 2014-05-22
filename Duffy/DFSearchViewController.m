@@ -33,9 +33,10 @@
 @property (nonatomic) NSUInteger currentPhotoIDIndex;
 @property (nonatomic) NSUInteger lastSeenNumUploaded;
 
+@property (nonatomic, retain) NSURL *lastAttemptedURL;
+
 @end
 
-static NSString *FREE_FORM_SECTION_NAME = @"Search";
 static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Subject";
@@ -63,8 +64,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 
 + (void)initialize
 {
-  SectionNameToTitles = @{FREE_FORM_SECTION_NAME: @"Search for",
-                          DATE_SECTION_NAME: @"Time",
+  SectionNameToTitles = @{DATE_SECTION_NAME: @"Time",
                           LOCATION_SECTION_NAME: @"Location",
                           CATEGORY_SECTION_NAME: @"Things"
                           };
@@ -252,18 +252,26 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:@"''"];
+  self.searchBar.text = @"Everything";
   self.navigationItem.title = @"Everything";
+  [self updateUIForSearchBarHasFocus:NO];
 }
 
 - (void)executeSearchForQuery:(NSString *)query
 {
+  if (self.webView.isLoading) {
+    [self.webView stopLoading];
+  }
+  
   self.currentlyLoadingSearchQuery = query;
+  
   NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
                               [[[DFUser currentUser] serverURL] absoluteString],
                               SearchPath,
                               UserIDURLParameter, [NSNumber numberWithUnsignedLongLong:[[DFUser currentUser] userID]],
                               QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
   NSURL *queryURL = [NSURL URLWithString:queryURLString];
+  self.lastAttemptedURL = queryURL;
   
   
   DDLogVerbose(@"Executing search for URL: %@", queryURL.absoluteString);
@@ -317,15 +325,30 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
 {
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-  NSString *htmlString = [NSString stringWithFormat:
-                          @"<br><center style=\"font-family: sans-serif\">Could not load results: %@</center>",
-                          error.localizedDescription];
-  [self.webView loadHTMLString:htmlString baseURL:nil];
-  if (self.currentlyLoadingSearchQuery) {
-    [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
-    self.currentlyLoadingSearchQuery = nil;
+  if (![self isLoadErrorAnotherRequest:error]) {
+    NSURL *file = [[NSBundle mainBundle] URLForResource:@"LoadSearchError" withExtension:@"html"];
+    NSStringEncoding *encoding = nil;
+    NSError *loadTextError;
+    NSString *htmlStringFormat = [NSString stringWithContentsOfFile:file.path
+                                                       usedEncoding:encoding
+                                                              error:&loadTextError];
+    NSString *htmlString = [NSString stringWithFormat:htmlStringFormat,
+                            error.localizedDescription, self.lastAttemptedURL.absoluteString];
+    DDLogVerbose(@"%@", htmlString);
+    [self.webView loadHTMLString:htmlString baseURL:nil];
+    
+    if (self.currentlyLoadingSearchQuery) {
+      [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
+      self.currentlyLoadingSearchQuery = nil;
+    }
   }
+  
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+}
+
+- (BOOL)isLoadErrorAnotherRequest:(NSError *)error
+{
+  return (error.domain == NSURLErrorDomain && error.code == -999);
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
@@ -336,8 +359,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-  
-  
   
   if (self.currentlyLoadingSearchQuery) {
     [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
@@ -413,8 +434,12 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)searchBarSearchButtonClicked:(DFSearchBar *)searchBar
 {
-  [self executeSearchForQuery:self.searchBar.text];
-  [self updateUIForSearchBarHasFocus:NO];
+  if ([searchBar.text isEqualToString:@""] || [[searchBar.text lowercaseString] isEqualToString:@"everything"]) {
+    [self loadDefaultSearch];
+  } else {
+    [self executeSearchForQuery:self.searchBar.text];
+    [self updateUIForSearchBarHasFocus:NO];
+  }
 }
 
 - (void)searchBarCancelButtonClicked:(DFSearchBar *)searchBar
@@ -450,14 +475,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   
   NSMutableArray *sections = [self defaultSectionNames];
   NSMutableDictionary *searchResults = [[self defaultSearchResults] mutableCopy];
-  
-  if ([query length] > 0)
-  {
-    DFPeanutSuggestion *freeFormSuggestion = [[DFPeanutSuggestion alloc] init];
-    freeFormSuggestion.name = query;
-    [sections insertObject:FREE_FORM_SECTION_NAME atIndex:0];
-    searchResults[FREE_FORM_SECTION_NAME] = [NSArray arrayWithObject:freeFormSuggestion];
-  }
   
   if ([self isDateInQuery:query]) {
     [searchResults removeObjectForKey:DATE_SECTION_NAME];
@@ -569,15 +586,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
               indexPath.description, self.searchResultsBySectionName.description);
   }
   
-  if (![[self sectionNameForIndex:indexPath.section] isEqualToString:FREE_FORM_SECTION_NAME]) {
-    if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
-    self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
-    [self updateSearchResults:self.searchBar.text];
-  } else {
-    [self executeSearchForQuery:self.searchBar.text];
-    [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    [self updateUIForSearchBarHasFocus:NO];
-  }
+  if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
+  self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
+  [self updateSearchResults:self.searchBar.text];
 }
 
 
