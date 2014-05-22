@@ -15,6 +15,8 @@
 
 @property (nonatomic) NSUInteger currentPhotoIndex;
 @property (nonatomic, retain) NSArray *photos;
+@property (nonatomic) BOOL hideStatusBar;
+
 
 
 @end
@@ -116,6 +118,54 @@
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photo = photo;
   return pvc;
+}
+
+- (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled
+{
+  [self setTheatreModeEnabled:theatreModeEnabled animated:NO];
+}
+
+- (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled animated:(BOOL)animated
+{
+  if (theatreModeEnabled == _theatreModeEnabled) return;
+  
+  _theatreModeEnabled = theatreModeEnabled;
+  
+  [self.navigationController setNavigationBarHidden:theatreModeEnabled animated:animated];
+  self.hideStatusBar = theatreModeEnabled;
+  self.currentPhotoViewController.view.backgroundColor =
+  [self colorForTheatreModeEnabled:theatreModeEnabled];
+  self.view.backgroundColor = [self colorForTheatreModeEnabled:theatreModeEnabled];
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers
+{
+  if (pendingViewControllers.count > 0) {
+    DFPhotoViewController *pvc = [pendingViewControllers firstObject];
+    pvc.view.backgroundColor = [self colorForTheatreModeEnabled:self.theatreModeEnabled];
+  }
+}
+
+- (UIColor *)colorForTheatreModeEnabled:(BOOL)theatreModeEnabled
+{
+  if (theatreModeEnabled) {
+    return [UIColor blackColor];
+  } else {
+    return [UIColor whiteColor];
+  }
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return self.hideStatusBar;
+}
+
+- (void)setHideStatusBar:(BOOL)hideStatusBar
+{
+  if (hideStatusBar != _hideStatusBar) {
+    _hideStatusBar = hideStatusBar;
+    [self setNeedsStatusBarAppearanceUpdate];
+  }
 }
 
 

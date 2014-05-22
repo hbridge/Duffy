@@ -15,8 +15,11 @@
 UIPageViewControllerDataSource>
 
 @property (readonly, nonatomic, retain) DFPhotoViewController *currentPhotoViewController;
+@property (nonatomic) BOOL theatreModeEnabled;
 
 
 - (id)initWithActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos;
+
+- (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled animated:(BOOL)animated;
 
 @end

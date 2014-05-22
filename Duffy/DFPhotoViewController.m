@@ -15,12 +15,17 @@
 #import "DFPhoto+FaceDetection.h"
 #import "NSDictionary+DFJSON.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFMultiPhotoViewController.h"
 
 @interface DFPhotoViewController ()
+
+@property (nonatomic) BOOL hideStatusBar;
 
 @end
 
 @implementation DFPhotoViewController
+
+@synthesize theatreModeEnabled;
 
 - (id)init
 {
@@ -46,7 +51,13 @@
                                  initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                  target:self
                                  action:@selector(actionButtonClicked:)];
-  self.parentViewController.navigationItem.rightBarButtonItem = actionItem;
+  
+  if (self.parentViewController) {
+    // if this is part of a multi-photo view, set the action for the parent
+    self.parentViewController.navigationItem.rightBarButtonItem = actionItem;
+  } else {
+    self.navigationItem.rightBarButtonItem = actionItem;
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -126,6 +137,36 @@
   [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
+- (IBAction)imageTapped:(id)sender {
+  DDLogVerbose(@"image tapped");
+  if (self.parentViewController && [self.parentViewController.class isSubclassOfClass:[DFMultiPhotoViewController class]]) {
+    DFMultiPhotoViewController *mpvc = (DFMultiPhotoViewController *)self.parentViewController;
+    [mpvc setTheatreModeEnabled:!mpvc.theatreModeEnabled animated:YES];
+  } else {
+    self.theatreModeEnabled = !self.theatreModeEnabled;
+    
+    [self.navigationController setNavigationBarHidden:self.theatreModeEnabled animated:YES];
+    [self setHideStatusBar:self.theatreModeEnabled];
+    if (self.theatreModeEnabled) {
+      self.view.backgroundColor = [UIColor blackColor];
+    } else {
+      self.view.backgroundColor = [UIColor whiteColor];
+    }
+  }
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return self.hideStatusBar;
+}
+
+- (void)setHideStatusBar:(BOOL)hideStatusBar
+{
+  if (hideStatusBar != _hideStatusBar) {
+    _hideStatusBar = hideStatusBar;
+    [self setNeedsStatusBarAppearanceUpdate];
+  }
+}
 
 
 @end

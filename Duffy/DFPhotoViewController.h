@@ -19,4 +19,8 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet DFImageView *imageView;
 
+@property (nonatomic) BOOL theatreModeEnabled;
+
+- (IBAction)imageTapped:(id)sender;
+
 @end
