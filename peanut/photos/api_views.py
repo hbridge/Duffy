@@ -240,7 +240,6 @@ def search(request):
 		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
 		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
 		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow()):
-			print pageEndDate
 			pageEndDate = pageEndDate+relativedelta(months=3)
 			page +=1
 			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
