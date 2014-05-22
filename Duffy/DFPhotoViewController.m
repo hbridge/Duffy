@@ -41,6 +41,12 @@
     if (self.imageView && self.photo) {
         self.imageView.image = self.photo.fullScreenImage;
     }
+  
+  UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                 target:self
+                                 action:@selector(actionButtonClicked:)];
+  self.parentViewController.navigationItem.rightBarButtonItem = actionItem;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -104,6 +110,20 @@
 //            self.imageView.boundingBoxesInImageCoordinates = boundingBoxes;
 //        });
 //    }];
+}
+
+- (void)actionButtonClicked:(id)sender
+{
+  [self showShareActivity];
+}
+
+- (void)showShareActivity
+{
+  NSURL *assetURL = [NSURL URLWithString:self.photo.alAssetURLString];
+  UIActivityViewController *activityViewController = [[UIActivityViewController alloc]
+                                                      initWithActivityItems:@[assetURL]
+                                                      applicationActivities:nil];
+  [self presentViewController:activityViewController animated:YES completion:nil];
 }
 
 
