@@ -104,7 +104,6 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   
   
   [self loadDefaultSearch];
-  [self updateUIForSearchBarHasFocus:NO];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -255,7 +254,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   [self executeSearchForQuery:@"''" reverseResults:YES];
   self.searchBar.text = @"Everything";
   self.navigationItem.title = @"Everything";
-  [self updateUIForSearchBarHasFocus:NO];
+  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:YES];
 }
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
@@ -426,7 +425,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)searchBarTextDidBeginEditing:(DFSearchBar *)searchBar
 {
-  [self updateUIForSearchBarHasFocus:YES];
+  [self updateUIForSearchBarHasFocus:YES showingDefaultQuery:NO];
 }
 
 - (void)searchBar:(DFSearchBar *)searchBar textDidChange:(NSString *)searchText
@@ -440,13 +439,13 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self loadDefaultSearch];
   } else {
     [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
-    [self updateUIForSearchBarHasFocus:NO];
+    [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:NO];
   }
 }
 
 - (void)searchBarCancelButtonClicked:(DFSearchBar *)searchBar
 {
-  [self updateUIForSearchBarHasFocus:NO];
+  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:[self.searchBar.text isEqualToString:SEARCH_DEFAULT_QUERY]];
 }
 
 - (void)searchBarClearButtonClicked:(DFSearchBar *)searchBar
@@ -456,6 +455,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+              showingDefaultQuery:(BOOL)showingDefault
 {
   if (searchBarHasFocus) {
     self.searchResultsTableView.hidden = NO;
@@ -463,7 +463,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self.searchBar setShowsClearButton:NO animated:YES];
   } else {
     [self.searchBar setShowsCancelButton:NO animated:YES];
-    [self.searchBar setShowsClearButton:YES animated:YES];
+    if (showingDefault) {
+      [self.searchBar setShowsClearButton:NO animated:YES];
+    } else {
+      [self.searchBar setShowsClearButton:YES animated:YES];
+    }
     self.searchResultsTableView.hidden = YES;
     [self.searchBar resignFirstResponder];
   }
