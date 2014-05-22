@@ -22,5 +22,6 @@
 @property (nonatomic) BOOL theatreModeEnabled;
 
 - (IBAction)imageTapped:(id)sender;
+- (void)showShareActivity;
 
 @end

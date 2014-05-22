@@ -30,7 +30,6 @@
 @property (nonatomic, retain) NSMutableDictionary *searchResultsBySectionName;
 @property (nonatomic, retain) NSMutableArray *sectionNames;
 @property (nonatomic, retain) NSMutableArray *searchResultPhotoIDs;
-@property (nonatomic) NSUInteger currentPhotoIDIndex;
 @property (nonatomic) NSUInteger lastSeenNumUploaded;
 
 @property (nonatomic, retain) NSURL *lastAttemptedURL;
@@ -409,9 +408,6 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
       [self.searchResultPhotoIDs addObject:@([idString longLongValue])];
     }
   }
-  self.currentPhotoIDIndex = [self.searchResultPhotoIDs
-                              indexOfObject:@([photoIDString longLongValue])];
-  
   DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:[photoIDString longLongValue]];
   
   if (photo) {
@@ -684,14 +680,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
      viewControllerBeforeViewController:(UIViewController *)viewController
 {
-  
-  if (self.currentPhotoIDIndex > 0) {
-    self.currentPhotoIDIndex -= 1;
+  NSUInteger currentPhotoIDIndex = [self
+                                    indexOfPhotoController:(DFPhotoViewController*)viewController];
+  NSUInteger newPhotoIDIndex;
+  if (currentPhotoIDIndex > 0) {
+    newPhotoIDIndex = currentPhotoIDIndex - 1;
   } else {
-    self.currentPhotoIDIndex = self.searchResultPhotoIDs.count - 1;
+    newPhotoIDIndex = self.searchResultPhotoIDs.count - 1;
   }
   
-  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:self.currentPhotoIDIndex];
+  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
+  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
   DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
                     [newPhotoID longLongValue]];
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
@@ -702,18 +701,30 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
-  if (self.currentPhotoIDIndex < self.searchResultPhotoIDs.count - 1) {
-    self.currentPhotoIDIndex += 1;
+  NSUInteger currentPhotoIDIndex =
+  [self indexOfPhotoController:(DFPhotoViewController *)viewController];
+  
+  NSUInteger newPhotoIDIndex;
+  if (currentPhotoIDIndex < self.searchResultPhotoIDs.count - 1) {
+    newPhotoIDIndex = currentPhotoIDIndex + 1;
   } else {
-    self.currentPhotoIDIndex = 0;
+    newPhotoIDIndex = 0;
   }
   
-  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:self.currentPhotoIDIndex];
+  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
+  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
   DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
                     [newPhotoID longLongValue]];
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photo = photo;
   return pvc;
+}
+
+- (NSUInteger)indexOfPhotoController:(DFPhotoViewController *)pvc
+{
+  DFPhotoIDType currentPhotoID = pvc.photo.photoID;
+  NSNumber *photoIDNumber = [NSNumber numberWithUnsignedLongLong:currentPhotoID];
+  return [self.searchResultPhotoIDs indexOfObject:photoIDNumber];
 }
 
 #pragma mark - UIScrollViewDelegate

@@ -53,6 +53,12 @@
 {
     [super viewDidLoad];
     [self.navigationController setNavigationBarHidden:NO animated:YES];
+  
+  UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                 target:self
+                                 action:@selector(actionButtonClicked:)];
+  self.navigationItem.rightBarButtonItem = actionItem;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -175,6 +181,11 @@
     _hideStatusBar = hideStatusBar;
     [self setNeedsStatusBarAppearanceUpdate];
   }
+}
+
+- (void)actionButtonClicked:(id)sender
+{
+  [self.currentPhotoViewController showShareActivity];
 }
 
 

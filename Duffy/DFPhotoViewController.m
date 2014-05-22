@@ -46,34 +46,27 @@
     if (self.imageView && self.photo) {
         self.imageView.image = self.photo.fullScreenImage;
     }
-  
-  UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
-                                 initWithBarButtonSystemItem:UIBarButtonSystemItemAction
-                                 target:self
-                                 action:@selector(actionButtonClicked:)];
-  
-  if (self.parentViewController) {
-    // if this is part of a multi-photo view, set the action for the parent
-    self.parentViewController.navigationItem.rightBarButtonItem = actionItem;
-  } else {
-    self.navigationItem.rightBarButtonItem = actionItem;
-  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  //[self logPhotoMetadata];
+}
+
+- (void)logPhotoMetadata
+{
   DDLogVerbose(@"\n*** photo_id:%lld user:%lld, photo creation hash:%@, \n***current hash:%@",
                self.photo.photoID,
                self.photo.userID,
                self.photo.creationHashData.description,
                self.photo.currentHashData.description);
-  
+
   DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved]
                                        JSONStringPrettyPrinted:YES]);
-//  [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
-//    DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
-//  }];
+  [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
+    DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
+  }];
   NSSet *faceFeatures = self.photo.faceFeatures;
   DDLogVerbose(@"DFFaceFeatures sources:%du count:%lu", self.photo.faceFeatureSources,
                (unsigned long)faceFeatures.count);
@@ -121,11 +114,6 @@
 //            self.imageView.boundingBoxesInImageCoordinates = boundingBoxes;
 //        });
 //    }];
-}
-
-- (void)actionButtonClicked:(id)sender
-{
-  [self showShareActivity];
 }
 
 - (void)showShareActivity
