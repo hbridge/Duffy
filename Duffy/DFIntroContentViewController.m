@@ -19,7 +19,7 @@
 #import "DFCameraRollSyncController.h"
 
 unsigned long MinNumThumbnailsToTransition = 100;
-unsigned int MaxAutocompleteFetchRetryCount = 3;
+unsigned int MaxAutocompleteFetchRetryCount = 5;
 
 DFIntroContentType DFIntroContentWelcome = @"DFIntroContentWelcome";
 DFIntroContentType DFIntroContentUploading = @"DFIntroContentUploading";
@@ -168,42 +168,30 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
   NSMutableAttributedString *attributedFormatString = [[self attributedStringForPage:2] mutableCopy];
   NSMutableString *formatString = [attributedFormatString mutableString];
   
+  NSMutableString *categoriesString = [[NSMutableString alloc] init];
   DFPeanutSuggestion *timeSuggestion = [timeSuggestions firstObject];
   if (timeSuggestion) {
-    [formatString replaceOccurrencesOfString:@"%TimeNumber"
-                                            withString:[NSString stringWithFormat:@"%d", timeSuggestion.count]
-                                               options:0
-                                                 range:NSMakeRange(0, attributedFormatString.length)];
-    [formatString replaceOccurrencesOfString:@"%TimeString"
-                                            withString:[timeSuggestion.name capitalizedString]
-                                               options:0
-                                                 range:NSMakeRange(0, attributedFormatString.length)];
+    [categoriesString appendString:[NSString stringWithFormat:@"%d photos from %@\n",
+                                    timeSuggestion.count,
+                                    timeSuggestion.name.capitalizedString]];
   }
   
   DFPeanutSuggestion *locationSuggestion = [locationSuggestions firstObject];
   if (locationSuggestion) {
-    [formatString replaceOccurrencesOfString:@"%LocationNumber"
-                                            withString:[NSString stringWithFormat:@"%d", locationSuggestion.count]
-                                               options:0
-                                                 range:NSMakeRange(0, attributedFormatString.length)];
-    [formatString replaceOccurrencesOfString:@"%LocationString"
-                                            withString:[locationSuggestion.name capitalizedString]
-                                               options:0
-                                                 range:NSMakeRange(0, attributedFormatString.length)];
+    [categoriesString appendString:[NSString stringWithFormat:@"%d photos in %@\n",
+                                    locationSuggestion.count, locationSuggestion.name]];
   }
   
   DFPeanutSuggestion *thingSuggestion = [thingSuggestions firstObject];
   if (locationSuggestion) {
-    [formatString replaceOccurrencesOfString:@"%ThingNumber"
-                                            withString:[NSString stringWithFormat:@"%d", thingSuggestion.count]
-                                               options:0
-                                                 range:NSMakeRange(0, attributedFormatString.length)];
-    [formatString replaceOccurrencesOfString:@"%ThingString"
-                                            withString:[thingSuggestion.name capitalizedString]
-                                               options:0
-                                                 range:NSMakeRange(0, attributedFormatString.length)];
+    [categoriesString appendString:[NSString stringWithFormat:@"%d photos of %@\n",
+                                    thingSuggestion.count, thingSuggestion.name]];
   }
-  
+  [formatString replaceOccurrencesOfString:@"%CategoriesString"
+                                withString:categoriesString
+                                   options:0
+                                     range:NSMakeRange(0, attributedFormatString.length)];
+
   self.contentLabel.attributedText = attributedFormatString;
 }
 
@@ -379,11 +367,10 @@ static int retryCount = 0;
   [self.autoCompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
                                                   NSArray *locationPeanutSuggestions,
                                                   NSArray *timePeanutSuggestions) {
-    if (categoryPeanutSuggestions.count == 0 &&
-        locationPeanutSuggestions.count == 0 &&
+    if (locationPeanutSuggestions.count == 0 ||
         timePeanutSuggestions.count == 0) {
       if (sessionStats.numThumbnailsUploaded > 0 || retryCount <= MaxAutocompleteFetchRetryCount) {
-        sleep(1);
+        sleep(2);
         retryCount++;
         [weakSelf checkForAutocompleteUntilDone:sessionStats];
       } else {
