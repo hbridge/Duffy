@@ -50,12 +50,14 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
     [DFAnalytics logViewController:self appearedWithParameters:nil];
+
 }
 
 - (void)viewDidDisappear:(BOOL)animated

@@ -35,6 +35,9 @@
 
 @property (nonatomic, retain) NSURL *lastAttemptedURL;
 
+@property (nonatomic) float lastOffsetY;
+@property (nonatomic) BOOL hideStatusBar;
+
 @end
 
 static NSString *DATE_SECTION_NAME = @"Time";
@@ -80,6 +83,8 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
     self.tabBarItem.title = @"Search";
     self.tabBarItem.image = [UIImage imageNamed:@"Icons/Search"];
     
+    self.hideStatusBar = NO;
+    
     self.autcompleteController = [[DFAutocompleteController alloc] init];
     [self setupNavBar];
     [self registerForKeyboardNotifications];
@@ -97,13 +102,20 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   
   [self setupTableView];
   [self populateDefaultAutocompleteSearchResults];
-  [self.webView setDelegate:self];
+  self.webView.delegate = self;
+  self.webView.scrollView.delegate = self;
   
   [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
   self.automaticallyAdjustsScrollViewInsets = YES;
   
   
   [self loadDefaultSearch];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+  self.hideStatusBar = NO;
+  [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -702,6 +714,32 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photo = photo;
   return pvc;
+}
+
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+  self.lastOffsetY = scrollView.contentOffset.y;
+}
+
+- (void) scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
+{
+  bool hide = (scrollView.contentOffset.y > self.lastOffsetY);
+  [[self navigationController] setNavigationBarHidden:hide animated:YES];
+  self.hideStatusBar = hide;
+}
+
+- (void)setHideStatusBar:(BOOL)hideStatusBar
+{
+  if (_hideStatusBar != hideStatusBar) {
+    _hideStatusBar = hideStatusBar;
+    [self setNeedsStatusBarAppearanceUpdate];
+  }
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return self.hideStatusBar;
 }
 
 
