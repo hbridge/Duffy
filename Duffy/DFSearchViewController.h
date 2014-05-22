@@ -21,7 +21,7 @@
 
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;
 
-- (void)executeSearchForQuery:(NSString *)query;
+- (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults;
 
 
 @end

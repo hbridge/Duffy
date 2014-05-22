@@ -52,6 +52,7 @@ static NSString *SearchPath = @"/viz/search/";
 static NSString *PhoneIDURLParameter = @"phone_id";
 static NSString *UserIDURLParameter = @"user_id";
 static NSString *QueryURLParameter = @"q";
+static NSString *ReverseResultsURLParameter = @"r";
 
 static CGFloat SearchResultsRowHeight = 38;
 static CGFloat SearchResultsCellFontSize = 15;
@@ -251,13 +252,13 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 
 - (void)loadDefaultSearch
 {
-  [self executeSearchForQuery:@"''"];
+  [self executeSearchForQuery:@"''" reverseResults:YES];
   self.searchBar.text = @"Everything";
   self.navigationItem.title = @"Everything";
   [self updateUIForSearchBarHasFocus:NO];
 }
 
-- (void)executeSearchForQuery:(NSString *)query
+- (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
   if (self.webView.isLoading) {
     [self.webView stopLoading];
@@ -265,11 +266,12 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   
   self.currentlyLoadingSearchQuery = query;
   
-  NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@",
+  NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@&%@=%d",
                               [[[DFUser currentUser] serverURL] absoluteString],
                               SearchPath,
                               UserIDURLParameter, [NSNumber numberWithUnsignedLongLong:[[DFUser currentUser] userID]],
-                              QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+                              QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+                              ReverseResultsURLParameter, reverseResults ? 1 : 0];
   NSURL *queryURL = [NSURL URLWithString:queryURLString];
   self.lastAttemptedURL = queryURL;
   
@@ -437,7 +439,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   if ([searchBar.text isEqualToString:@""] || [[searchBar.text lowercaseString] isEqualToString:@"everything"]) {
     [self loadDefaultSearch];
   } else {
-    [self executeSearchForQuery:self.searchBar.text];
+    [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
     [self updateUIForSearchBarHasFocus:NO];
   }
 }
