@@ -367,8 +367,8 @@ static int retryCount = 0;
   [self.autoCompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
                                                   NSArray *locationPeanutSuggestions,
                                                   NSArray *timePeanutSuggestions) {
-    if (locationPeanutSuggestions.count == 0 ||
-        timePeanutSuggestions.count == 0) {
+    if (timePeanutSuggestions.count == 0 ||
+        locationPeanutSuggestions.count == 0) {
       if (sessionStats.numThumbnailsUploaded > 0 || retryCount <= MaxAutocompleteFetchRetryCount) {
         sleep(2);
         retryCount++;
