@@ -138,7 +138,6 @@
 }
 
 - (IBAction)imageTapped:(id)sender {
-  DDLogVerbose(@"image tapped");
   if (self.parentViewController && [self.parentViewController.class isSubclassOfClass:[DFMultiPhotoViewController class]]) {
     DFMultiPhotoViewController *mpvc = (DFMultiPhotoViewController *)self.parentViewController;
     [mpvc setTheatreModeEnabled:!mpvc.theatreModeEnabled animated:YES];

@@ -131,11 +131,20 @@
   
   _theatreModeEnabled = theatreModeEnabled;
   
-  [self.navigationController setNavigationBarHidden:theatreModeEnabled animated:animated];
-  self.hideStatusBar = theatreModeEnabled;
-  self.currentPhotoViewController.view.backgroundColor =
-  [self colorForTheatreModeEnabled:theatreModeEnabled];
-  self.view.backgroundColor = [self colorForTheatreModeEnabled:theatreModeEnabled];
+  NSTimeInterval duration;
+  if (animated) {
+    duration = 0.5;
+  } else {
+    duration = 0.0;
+  }
+  
+  [UIView animateWithDuration:duration animations:^{
+    self.hideStatusBar = theatreModeEnabled;
+    [self.navigationController setNavigationBarHidden:theatreModeEnabled animated:animated];
+    self.currentPhotoViewController.view.backgroundColor =
+    [self colorForTheatreModeEnabled:theatreModeEnabled];
+    self.view.backgroundColor = [self colorForTheatreModeEnabled:theatreModeEnabled];
+  }];
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers
