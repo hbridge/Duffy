@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13D65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -54,6 +54,7 @@
                 </textField>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <gestureRecognizers/>
             <constraints>
                 <constraint firstAttribute="centerY" secondItem="NNO-gn-7DZ" secondAttribute="centerY" id="8Kx-85-ic5"/>
                 <constraint firstItem="xPT-ud-47f" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="GlK-N8-eMa"/>
@@ -70,8 +71,14 @@
                 <outlet property="cancelButton" destination="NNO-gn-7DZ" id="A8I-HT-YGd"/>
                 <outlet property="clearButton" destination="4Cf-oq-Jsq" id="rIV-Y3-E86"/>
                 <outlet property="textField" destination="0FW-ga-xjZ" id="Sy1-HA-r8g"/>
+                <outletCollection property="gestureRecognizers" destination="Sg2-M2-G8V" appends="YES" id="iiS-1f-pJb"/>
             </connections>
         </view>
+        <tapGestureRecognizer id="Sg2-M2-G8V">
+            <connections>
+                <action selector="searchBarTapped:" destination="iN0-l3-epB" id="HdE-kQ-Eez"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
     <resources>
         <image name="Icons/SearchBarIcon.png" width="26" height="26"/>

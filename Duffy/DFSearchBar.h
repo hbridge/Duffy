@@ -32,6 +32,7 @@
 
 - (IBAction)clearButtonClicked:(id)sender;
 - (IBAction)cancelButtonClicked:(id)sender;
+- (IBAction)searchBarTapped:(id)sender;
 
 
 @end

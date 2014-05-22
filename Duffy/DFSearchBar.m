@@ -97,6 +97,10 @@
   [self.delegate searchBarCancelButtonClicked:self];
 }
 
+- (IBAction)searchBarTapped:(id)sender {
+  [self.textField becomeFirstResponder];
+}
+
 #pragma mark - Internal View Delegates
 - (void)textFieldDidBeginEditing:(UITextField *)textField
 {
@@ -115,6 +119,7 @@
   DDLogVerbose(@"serach button clicked");
   [self.delegate searchBarSearchButtonClicked:self];
 }
+
 
 
 @end
