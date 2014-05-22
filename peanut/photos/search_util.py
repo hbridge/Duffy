@@ -74,10 +74,10 @@ def getNMonthsOut(startDate, nMonths):
 """
 def pageToDates(page, origStartDate):
 	if (page > 1):
-		pageStartDate = getNMonthsOut(origStartDate, 2*(page-1))
+		pageStartDate = getNMonthsOut(origStartDate, 3*(page-1))
 	else:
 		pageStartDate = origStartDate
-	pageEndDate = getNMonthsOut(origStartDate, 2*page)
+	pageEndDate = getNMonthsOut(origStartDate, 3*page)
 	return (pageStartDate, pageEndDate)
 
 """

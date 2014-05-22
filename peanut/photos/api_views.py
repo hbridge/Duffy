@@ -35,6 +35,7 @@ from photos.serializers import PhotoSerializer
 from .forms import ManualAddPhoto
 
 import urllib
+from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger(__name__)
 
@@ -238,6 +239,11 @@ def search(request):
 			startDate = allResults[0].timeTaken
 		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
 		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow()):
+			print pageEndDate
+			pageEndDate = pageEndDate+relativedelta(months=3)
+			page +=1
+			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
 
 		for entry in photoResults:
