@@ -103,7 +103,6 @@
   return nil;
 }
 
-
 - (void)stopLoading
 {
   self.isCancelled = YES;
