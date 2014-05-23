@@ -15,6 +15,7 @@
 
 // We need to store the managed object context so it sticks around between functions
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (atomic) BOOL isCancelled;
 
 @end
 
@@ -36,6 +37,8 @@
 - (void)startLoading
 {
   NSArray *pathComponents = self.request.URL.absoluteString.pathComponents;
+  
+  if (self.isCancelled) return;
   if (pathComponents.count != 3) {
     NSError *error = [NSError errorWithDomain:@"com.duffyapp.DFURLProtocol"
                                          code:-1
@@ -46,6 +49,7 @@
     return;
   }
   
+    if (self.isCancelled) return;
   DFPhoto *photo = [self photoForPathComponents:pathComponents];
   if (!photo) {
     NSError *error = [NSError errorWithDomain:@"com.duffyapp.DFURLProtocol"
@@ -57,7 +61,7 @@
     return;
   }
   
-  
+  if (self.isCancelled) return;
   NSData *data = [self imageDataForPathComponents:pathComponents photo:photo];
   
   if (!data){
@@ -70,11 +74,13 @@
     return;
   }
   
+  if (self.isCancelled) return;
   NSURLResponse *response = [[NSURLResponse alloc] initWithURL:self.request.URL
                                                       MIMEType:@"image/jpg"
                                          expectedContentLength:-1
                                               textEncodingName:nil];
   
+  if (self.isCancelled) return;
   [[self client] URLProtocol:self didReceiveResponse:response cacheStoragePolicy:NSURLCacheStorageNotAllowed];
   [[self client] URLProtocol:self didLoadData:data];
   [[self client] URLProtocolDidFinishLoading:self];
@@ -100,7 +106,7 @@
 
 - (void)stopLoading
 {
-  NSLog(@"request cancelled. stop loading the response, if possible");
+  self.isCancelled = YES;
 }
 
 
