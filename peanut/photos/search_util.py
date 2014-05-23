@@ -72,18 +72,25 @@ def getNMonthsOut(startDate, nMonths):
 """
 	Given a "page", returns starts and end dates of this page
 """
-def pageToDates(page, origStartDate):
-	if (page > 1):
-		pageStartDate = getNMonthsOut(origStartDate, 3*(page-1))
+def pageToDates(page, origStartDate, reversed=False):
+	if (reversed):
+		dateNow = datetime.datetime.utcnow()
+		if (page > 1):
+			pageEndDate = getNMonthsOut(dateNow, -6*(page-1))
+		else:
+			pageEndDate = datetime.datetime.utcnow()
+		pageStartDate = getNMonthsOut(dateNow, -6*page)
+		return (pageStartDate, pageEndDate)
 	else:
-		pageStartDate = origStartDate
-	pageEndDate = getNMonthsOut(origStartDate, 3*page)
-	return (pageStartDate, pageEndDate)
+		if (page > 1):
+			pageStartDate = getNMonthsOut(origStartDate, 6*(page-1))
+		else:
+			pageStartDate = origStartDate
+		pageEndDate = getNMonthsOut(origStartDate, 6*page)
+		return (pageStartDate, pageEndDate)
 
 """
 	Returns false if searchResults are incomplete
 """
-def areSearchResultsComplete(userId):
-	if (Photo.objects.filter(user_id=userId).filter(full_filename=None).count() > 0):
-		return False
-	return True
+def incompletePhotos(userId):
+	return Photo.objects.filter(user_id=userId).filter(full_filename=None).count()

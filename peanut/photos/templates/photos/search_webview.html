@@ -9,7 +9,7 @@
 	<meta name="mobile-web-app-capable" content="yes">
 	<title>Search your photos</title> 
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-	<script src="http://asood123.no-ip.biz/static/jquery.jscroll.js"></script>
+	<script src="/static/jquery.jscroll.js"></script>
 <style>
 	html, body { padding: 0; margin: 0; }
 	html, .ui-mobile, .ui-mobile body {
@@ -33,7 +33,7 @@
 		padding: 4px 0px 4px 10px;
 		background-color: rgba(239, 239, 239, 0.3);
 	}
-	.ui-image {
+	.i {
 		padding-right: 2px;
 		float:left;
 		position: relative;
@@ -41,7 +41,7 @@
 		height: {{ imageSize|add:+2 }}px;
 		width: {{ imageSize }}px;
 	}
-	.ui-image-count {
+	.ui-i-c {
 		position:absolute;
 		background-color: transparent;
 		top: 44px;
@@ -54,7 +54,7 @@
 		padding-right: 2px;
 		color: rgb(245, 166, 35);
 	}
-	.ui-arrow-down {
+	.ui-a-d {
 		width: 0; 
 		height: 0; 
 		border-top: 25px solid transparent;
@@ -64,15 +64,12 @@
 		top: 28px;
 		left: 53px;
 	}
-	.ui-loader {
-
-	}
 	.ui-warning {
 		background-color: rgba(241,155,43,0.7);
 		padding: 5px 5px 5px 5px;
 		font-size: 14px;
 	}
-	.text {
+	.t {
 		font-family: sans-serif;
 	}
 	.center {
@@ -113,8 +110,8 @@
 <body>
 
 <div role="main" class="ui-content">
-	{% if resultsDict.incompleteResults %}
-		<div class='ui-warning text'>
+	{% if resultsDict.incompleteResults > 9 %}
+		<div class='ui-warning t'>
 		Incomplete searches for things like animals, food, etc. Get on WiFi to upload rest of your photos.
 		</div>
 	{% endif %}
@@ -130,76 +127,141 @@
 
 	<div class="results-footer"> 
 		{% if resultsDict.totalResults == 0 %}
-			<div class="text center"> No results found! </div>
+			<div class="t center"> No results found! </div>
 			<br>
 		{% endif %}
-		<div class="text" > Your searchable images: {{ resultsDict.indexSize }}  </div>
+		<div class="t" > Your searchable images: {{ resultsDict.indexSize }}  </div>
 
-		<div id="stats" class="text">
+		<div id="stats" class="t">
 			<!-- STATS: Time: %(total_time).2fs | P: %(python_time).2fs | DB: %(db_time).2fs | Q: %(db_queries)d ENDSTATS -->
 		</div>
 	</div>
 
 </div>
-
 </body>
 	<script>
-		function loadImages() {
-			$('#allImages').find('div.ui-photo-block.hidden').each(function(){
-				$(this).find('img.lazy').each(function() {
-					$(this).attr('src', $(this).attr('data-lazy-src'));	
-				});
-				clusterClickHandler($(this).find('div.ui-image'));
-				$(this).removeClass('hidden');
-				});
-		}
-
-		loadImages();
-
-		/*
-			used to display clusters
-		*/
-		
-		function clusterClickHandler(clusters){
-			clusters.click(function() {
-				if ($(this).hasClass('cluster')) {
-					$(this).removeClass('cluster');
-					$(this).children('div').addClass('hidden');
-					current = $(this).next()
-					while (current.hasClass('hidden')){
-						current.find('img.lazy-cluster').each(function() {
-							$(this).attr('src', $(this).attr('data-lazy-src'));
-						});
-						current.show("fast");
-						current.removeClass('hidden');
-						current = current.next();
-					}
-				}
-				else {
-					window.location.href = $(this).attr('redirect')+'?photoIdArray='+photoIdArray().toString();
-				}
+	/*
+	Loads the src value in img tag and attaches click handlers for images and clusters
+	*/
+	function loadImages() {
+		$('#allImages').find('div.ui-photo-block.not-loaded').each(function(){
+			$(this).find('img.l').each(function() {
+				$(this).attr('src', $(this).attr('l-src'));
+				$(this).removeClass('l');
 			});
-		}
-		/*
-			returns an array of photoIds that are currently open/expanded
-		*/
-		function photoIdArray(){
-			var pArray = [];
-			$('#allImages').find('div.ui-image').each(function(){
-				if (!($(this).hasClass('hidden'))) {
-					pArray.push($(this).attr('photoId'));
-				}
+			clusterClickHandler($(this).find('div.i'));
+			$(this).removeClass('not-loaded');
 			});
-			return pArray;
-		}	
-		$('div.ui-gallery').jscroll({
-			nextSelector: 'a.jscroll-next:last',
-			debug: true,
-			autoTrigger: true,
-			callback: function(){
-				loadImages();
-			},
-			loadingHtml: '<div class="ui-loader center text"> Loading... </p>'
+	}
+
+	/*
+		click handler for clusters and images
+	*/
+	function clusterClickHandler(clusters){
+		clusters.click(function() {
+			if ($(this).hasClass('cluster')) {
+				$(this).removeClass('cluster');
+				$(this).children('div').addClass('hidden');
+				current = $(this).next()
+				while (current.hasClass('hidden')){
+					current.find('img.l-c').each(function() {
+						$(this).attr('src', $(this).attr('l-src'));
+						$(this).removeClass('l-c');
+					});
+					current.show("fast");
+					current.removeClass('hidden');
+					current = current.next();
+				}
+			}
+			else {
+				window.location.href = $(this).attr('r')+'?photoIdArray='+photoIdArray().toString();
+			}
 		});
-		</script>
+	}
+		
+	/*
+		returns an array of pIds that are currently open/expanded
+	*/
+	function photoIdArray(){
+		var pArray = [];
+		$('#allImages').find('div.i').each(function(){
+			if (!($(this).hasClass('hidden'))) {
+				pArray.push($(this).attr('pId'));
+			}
+		});
+		return pArray;
+	}	
+
+	/*
+	Infinite scrolling
+	*/
+	$('div.ui-gallery').jscroll({
+		nextSelector: 'a.jscroll-next:last',
+		debug: false,
+		autoTrigger: true,
+		{% if resultsDict.reverse %}reverse: true,{% endif %}			
+		callback: function(){
+			loadImages();
+		},
+		loadingHtml: '<div class="ui-loader center t"> Loading... </p>'
+	});
+
+
+	function showImages(divs) {
+		divs.each(function(){
+			var prevScrollTop = $(window).scrollTop();
+			var prevDocHeight = $(document).height();
+			$(this).removeClass('hidden');
+			var amountAdded = $(document).height() - prevDocHeight;
+			{% if resultsDict.reverse %}
+				$('body').scrollTop($('body').scrollTop()+amountAdded);
+			{% endif %}
+		})
+	}
+
+	function hideImages(divs) {
+		divs.each(function(){
+			$(this).addClass('hidden');
+		});
+	}	
+
+	loadImages();
+	showImages($('div.ui-photo-block.hidden'));
+
+	var scrollRunning = false;
+
+	$(window).scroll(function() {
+		if (scrollRunning == true){
+			return;
+		}
+		scrollRunning = true;
+
+		pDivs = $('div.ui-photo-block');
+		
+		// scrolling up
+		if ($(window).scrollTop() < $(window).height()*2){
+			pDivs.each(function(i,d){
+				var nextP = i<pDivs.length-1?$(pDivs[i+1]):false;
+				if (nextP && !nextP.hasClass('hidden')){
+					loadImages();
+					showImages($(this));
+					return false;
+				}
+			})
+		}
+		if ($(window).scrollTop() + $(window).height()*3 >= $(document).height()){
+			// scrolling down
+			// find the next div to show as you scroll to the bottom
+			for (var i=pDivs.length-1; i >=0; i--){
+				var prevP = i>0?$(pDivs[i-1]):false;
+				if (prevP && !prevP.hasClass('hidden')){
+					showImages($(pDivs[i]));
+					break;
+				}
+			}
+		}
+		scrollRunning = false;
+	});
+		
+	</script>
 </html>

@@ -25,7 +25,8 @@
             nextSelector: 'a:last',
             contentSelector: '',
             pagingSelector: '',
-            callback: false
+            callback: false,
+            reverse: false
         }
     };
 
@@ -148,12 +149,25 @@
                 data = $e.data('jscroll');
 
             data.waiting = true;
-            $inner.append('<div class="jscroll-added" />')
-                .children('.jscroll-added').last()
-                .html('<div class="jscroll-loading">' + _options.loadingHtml + '</div>');
+            if (_options.reverse) {
+                $inner.prepend('<div class="jscroll-added" />')
+                    .children('.jscroll-added').first()
+                    .html('<div class="jscroll-loading">' + _options.loadingHtml + '</div>');
+            }
+            else {
+                $inner.append('<div class="jscroll-added" />')
+                    .children('.jscroll-added').last()
+                    .html('<div class="jscroll-loading">' + _options.loadingHtml + '</div>');
+            }
 
             return $e.animate({scrollTop: $inner.outerHeight()}, 0, function() {
-                $inner.find('div.jscroll-added').last().load(data.nextHref, function(r, status, xhr) {
+                if (_options.reverse) {
+                    innerScroll = $inner.find('div.jscroll-added').first();
+                }
+                else {
+                    innerScroll = $inner.find('div.jscroll-added').last();
+                }
+                innerScroll.load(data.nextHref, function(r, status, xhr) {
                     if (status === 'error') {
                         return _destroy();
                     }

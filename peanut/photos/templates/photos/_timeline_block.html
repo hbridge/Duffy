@@ -1,31 +1,24 @@
 {% load dictionary_extras %}
-
-<div class="ui-photo-block hidden">
+<div class="ui-photo-block not-loaded hidden">
 <div class="ui-time-header">
-{{ entry.date }} ({{ entry.clusterList|length }})
+	{{ entry.date }} ({{ entry.clusterList|length }})
 </div>
-{% for cluster in entry.clusterList %}
-	{% for imageEntry in cluster %}
-	<div class = "ui-image 
-		{% if imageEntry.dist == None and cluster|length > 1 %} cluster {% elif imageEntry.dist != None %} hidden {% endif %}" redirect="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" photoId="{{ imageEntry.photo.photoId }}">
-	<img data-lazy-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
-		class="{% if imageEntry.dist != None %} lazy-cluster {% else %} lazy {% endif %}"
-		height="{{ imageSize }}px" width="{{ imageSize }}px" 
-		{% if debug %}
-		title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
-		SIMROW: {{ imageEntry.simrow }} |
-		SIMROWS:
-		{% for sim in imageEntry.simrows %}
-			{{ sim }}
-		{% endfor %}
-		" 
-		{% endif %}
-		>
-		{% if imageEntry.dist == None and cluster|length > 1 %}
-			<div class='ui-arrow-down'></div>
-			<div class="ui-image-count text">{{ cluster|length }}</div>
-		{% endif %}
-	</div>
-	{% endfor %}
-{% endfor %}
+{% for cluster in entry.clusterList %}{% for imageEntry in cluster %}
+<div class="i {% if imageEntry.dist == None and cluster|length > 1 %} cluster{% elif imageEntry.dist != None %} hidden{% endif %}" r="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" pId="{{ imageEntry.photo.photoId }}">
+<img l-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
+	class="{% if imageEntry.dist != None %}l-c{% else %}l{% endif %}"
+	height="{{ imageSize }}px" width="{{ imageSize }}px" 
+	{% if debug %}
+	title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
+	SIMROW: {{ imageEntry.simrow }} |
+	SIMROWS:
+	{% for sim in imageEntry.simrows %}
+		{{ sim }}
+	{% endfor %}"
+	{% endif %}>
+	{% if imageEntry.dist == None and cluster|length > 1 %}
+	<div class='ui-a-d'></div><div class="ui-i-c t">{{ cluster|length }}</div>
+	{% endif %}
+</div>
+{% endfor %}{% endfor %}
 </div>

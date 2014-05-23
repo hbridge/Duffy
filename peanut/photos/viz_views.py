@@ -64,6 +64,14 @@ def search(request):
 	else:
 		page = 1
 
+	if data.has_key('r'):
+		if (data['r'] == '1'):
+			reverse = True
+		else:
+			reverse = False
+	else:
+		reverse = True
+
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -92,20 +100,23 @@ def search(request):
 	if (resultsDict['indexSize'] > 0):
 		if (startDate == None):
 			startDate = allResults[0].timeTaken
-		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
+		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
 		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
-		while (searchResults.count() < 25 and pageEndDate < datetime.utcnow()):
-			pageEndDate = pageEndDate+relativedelta(months=3)
+		while (searchResults.count() < 25 and pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
+			if (reverse):
+				pageStartDate = pageStartDate+relativedelta(months=-6)
+			else:
+				pageEndDate = pageEndDate+relativedelta(months=6)
 			page +=1
 			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold, startDate=pageStartDate, endDate=pageEndDate)
 		totalResults = searchResults.count()
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
-		resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)
+		resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
 
-	if (not search_util.areSearchResultsComplete(user.id)):
-		resultsDict['incompleteResults'] = True
+	resultsDict['reverse'] = reverse
+	resultsDict['incompleteResults'] = search_util.incompletePhotos(user.id)
 
 	context = {	'user' : user,
 				'imageSize': imageSize,

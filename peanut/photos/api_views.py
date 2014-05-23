@@ -215,6 +215,14 @@ def search(request):
 	else:
 		page = 1
 
+	if data.has_key('r'):
+		if (data['r'] == '1'):
+			reverse = True
+		else:
+			reverse = False
+	else:
+		reverse = True
+
 	if data.has_key('q'):
 		query = data['q']
 	else:
@@ -237,10 +245,13 @@ def search(request):
 	if (allResults.count() > 0):
 		if (startDate == None):
 			startDate = allResults[0].timeTaken
-		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
+		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
 		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
-		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow()):
-			pageEndDate = pageEndDate+relativedelta(months=3)
+		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow() and pageStartDate >= startDate):
+			if (reverse):
+				pageStartDate = pageStartDate+relativedelta(months=-6)
+			else:
+				pageEndDate = pageEndDate+relativedelta(months=6)
 			page +=1
 			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
@@ -254,8 +265,8 @@ def search(request):
 			html = render_to_string('photos/_timeline_block.html', context)
 			response += html
 	
-		if (pageEndDate < datetime.datetime.utcnow()):
-			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) +'">Next</a>'
+		if (pageEndDate < datetime.datetime.utcnow() and pageStartDate > startDate):
+			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))+'">Next</a>'
 			response += nextLink
 	return HttpResponse(response, content_type="application/html")
 
