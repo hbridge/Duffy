@@ -8,7 +8,10 @@ import logging
 import thread
 import pprint
 import datetime
+import HTMLParser
+import operator
 from random import randint
+from collections import Counter
 
 from django.shortcuts import render
 from django.template.loader import render_to_string
@@ -198,6 +201,7 @@ class PhotoBulkAPI(APIView):
 def autocomplete(request):
 	startTime = time.time()
 	data = getRequestData(request)
+	htmlParser = HTMLParser.HTMLParser()
 	
 	if data.has_key('user_id'):
 		userId = data['user_id']
@@ -205,35 +209,58 @@ def autocomplete(request):
 		return returnFailure(response, "Need user_id")
 
 	if data.has_key('q'):
-		query = data['q']
+		query = htmlParser.unescape(data['q'])
 	else:
 		return returnFailure(response, "Need q")
 
-	sqs = SearchQuerySet().autocomplete(content_auto=query).filter(userId=userId)
+	# For now, we're going to search for only the first word, and we'll filter later
+	firstWord = query.split(" ")[0]
+	sqs = SearchQuerySet().autocomplete(content_auto=firstWord).filter(userId=userId)[:1000]
 
-	suggestionCounts = dict()
+	# Create a list of suggestions, which are the phrases the user will see
 	suggestions = list()
 	for photo in sqs:
 		phrases = photo.content_auto.split('\n')
 		for phrase in phrases:
 			suggestions.extend([a.strip() for a in phrase.split(',')])
 
-		for suggestion in suggestions:
-			if suggestion.lower().find(query) >= 0:
-				if suggestion in suggestionCounts:
-					suggestionCounts[suggestion] += 1
-				else:
-					suggestionCounts[suggestion] = 1
-			
+	# This turns our list of suggestions into a dict of suggestion : count
+	suggestionCounts = Counter(suggestions)
+	resultSuggestions = dict()
+
+	for suggestionPhrase in suggestionCounts:
+		# We'll search based on lower case but maintain case for the results
+		lowerPhrase = suggestionPhrase.lower()
+		if len(query.split(" ")) > 1:
+			# If we have a space in the query then we're going to do substring
+			if lowerPhrase.find(query) >= 0:
+				resultSuggestions[suggestionPhrase] = suggestionCounts[suggestionPhrase]
+		else:
+			# there's no space, then we'll break apart the words and do a startswith
+			for suggestionWord in lowerPhrase.split(" "):
+				if suggestionWord.startswith(query):
+					resultSuggestions[suggestionPhrase] = suggestionCounts[suggestionPhrase]
+
+	sortedSuggestions = sorted(resultSuggestions.iteritems(), key=operator.itemgetter(1), reverse=True)
+
+	# Reformat into a list so we can hand back 
+	results = list()
+	order = 0
+	for suggestion in sortedSuggestions:
+		phrase, count = suggestion
+		entry = {'phrase': phrase, 'count': count, 'order': order}
+		order += 1
+		results.append(entry)
+
 	# Make sure you return a JSON object, not a bare list.
 	# Otherwise, you could be vulnerable to an XSS attack.
-	the_data = json.dumps({
-		'results': suggestionCounts,
-		'query_time': (time.time() - startTime)
+	responseJson = json.dumps({
+		'results': results,
+		'query_time': (time.time() - startTime),
 	})
 
 	
-	return HttpResponse(the_data, content_type='application/json')
+	return HttpResponse(responseJson, content_type='application/json')
 
 """
 Search api function that returns the search view. Used by the /viz/search?user_id=<userID>
@@ -259,14 +286,6 @@ def search(request):
 	else:
 		page = 1
 
-	if data.has_key('r'):
-		if (data['r'] == '1'):
-			reverse = True
-		else:
-			reverse = False
-	else:
-		reverse = False
-
 	if data.has_key('q'):
 		query = data['q']
 	else:
@@ -289,13 +308,10 @@ def search(request):
 	if (allResults.count() > 0):
 		if (startDate == None):
 			startDate = allResults[0].timeTaken
-		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
+		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
 		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
-		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow() and pageStartDate >= startDate):
-			if (reverse):
-				pageStartDate = pageStartDate+relativedelta(months=-6)
-			else:
-				pageEndDate = pageEndDate+relativedelta(months=6)
+		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow()):
+			pageEndDate = pageEndDate+relativedelta(months=3)
 			page +=1
 			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
@@ -309,8 +325,8 @@ def search(request):
 			html = render_to_string('photos/_timeline_block.html', context)
 			response += html
 	
-		if (pageEndDate < datetime.datetime.utcnow() and pageStartDate > startDate):
-			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))+'">Next</a>'
+		if (pageEndDate < datetime.datetime.utcnow()):
+			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) +'">Next</a>'
 			response += nextLink
 	return HttpResponse(response, content_type="application/html")
 

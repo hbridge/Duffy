@@ -18,7 +18,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	classes = indexes.MultiValueField(faceted=True, indexed=False)
 
 	# Used for auto-complete
-	content_auto = indexes.NgramField()
+	content_auto = indexes.EdgeNgramField()
 	
 	logger = None
 
