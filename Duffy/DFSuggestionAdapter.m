@@ -11,13 +11,13 @@
 #import "DFUser.h"
 
 // Private DFAutocompleteResponse Class
-@interface DFAutocompleteResponse : NSObject
+@interface DFPeanutSuggestionResponse : NSObject
 @property (nonatomic, retain) NSString *result;
 @property (nonatomic, retain) NSArray *top_times;
 @property (nonatomic, retain) NSArray *top_locations;
 @property (nonatomic, retain) NSArray *top_categories;
 @end
-@implementation DFAutocompleteResponse
+@implementation DFPeanutSuggestionResponse
 @end
 
 @interface DFSuggestionAdapter()
@@ -57,7 +57,7 @@ static NSString *UserIDParameterKey = @"user_id";
      objectRequestOperationWithRequest:getRequest
      success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
      {
-         DFAutocompleteResponse *response = [mappingResult firstObject];
+         DFPeanutSuggestionResponse *response = [mappingResult firstObject];
          DDLogVerbose(@"Autocomplete response received.  result:%@", response.result);
 
          if ([response.result isEqualToString:@"true"]) {
@@ -83,7 +83,7 @@ static NSString *UserIDParameterKey = @"user_id";
 
 - (NSMutableURLRequest *)autocompleteGetRequest
 {
-    NSMutableURLRequest *request = [[self objectManager] requestWithObject:[[DFAutocompleteResponse alloc] init]
+    NSMutableURLRequest *request = [[self objectManager] requestWithObject:[[DFPeanutSuggestionResponse alloc] init]
                                                                     method:RKRequestMethodGET
                                                                       path:SuggestionsPathPattern
                                                                 parameters:@{UserIDParameterKey: [NSNumber numberWithUnsignedLongLong:[[DFUser currentUser] userID]]}];
@@ -99,7 +99,7 @@ static NSString *UserIDParameterKey = @"user_id";
         NSURL *baseURL = [[DFUser currentUser] apiURL];
         _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
 
-        RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFAutocompleteResponse class]];
+        RKObjectMapping *autocompleteResponseMapping = [RKObjectMapping mappingForClass:[DFPeanutSuggestionResponse class]];
         [autocompleteResponseMapping addAttributeMappingsFromArray:@[@"result"]];
 
         

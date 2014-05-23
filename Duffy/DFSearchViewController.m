@@ -23,6 +23,8 @@
 #import "NSDictionary+DFJSON.h"
 #import "DFSettingsViewController.h"
 #import "DFURLProtocol.h"
+#import "DFAutocompleteAdapter.h"
+#import "DFPeanutAutocompleteResult.h"
 
 @interface DFSearchViewController ()
 
@@ -37,6 +39,8 @@
 
 @property (nonatomic) float webviewLastOffsetY;
 @property (nonatomic) BOOL hideStatusBar;
+
+@property (readonly, nonatomic, retain) DFAutocompleteAdapter *autocompleteAdapter;
 
 @end
 
@@ -65,6 +69,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 @implementation DFSearchViewController
 
 @synthesize defaultSearchResults = _defaultSearchResults;
+@synthesize autocompleteAdapter = _autocompleteAdapter;
 
 + (void)initialize
 {
@@ -440,7 +445,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)searchBar:(DFSearchBar *)searchBar textDidChange:(NSString *)searchText
 {
-  [self updateSearchResults:searchText];
+  if (searchText.length == 0 || [searchText characterAtIndex:searchText.length - 1] == ' ') {
+    [self updateSearchResults:searchText];
+  } else {
+    [self showAutocompleteResults:searchText];
+  }
 }
 
 - (void)searchBarSearchButtonClicked:(DFSearchBar *)searchBar
@@ -510,6 +519,40 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   
   [self.searchResultsTableView reloadData];
   
+}
+
+- (void)showAutocompleteResults:(NSString *)searchText
+{
+  NSArray *components = [searchText componentsSeparatedByString:@" "];
+  NSString *lastComponent = [components lastObject];
+  
+  [self.autocompleteAdapter fetchResultsForQuery:lastComponent
+                             withCompletionBlock:^(NSArray *peanutAutocompleteResults) {
+                               if (peanutAutocompleteResults.count == 0) return;
+      self.sectionNames = [@[@"Suggestions"] mutableCopy];
+                               NSMutableArray *peanutSuggestions = [[NSMutableArray alloc] initWithCapacity:peanutAutocompleteResults.count];
+                               for (DFPeanutAutocompleteResult *autocompleteResult in peanutAutocompleteResults) {
+                                 DFPeanutSuggestion *suggestion = [[DFPeanutSuggestion alloc] init];
+                                 suggestion.name = autocompleteResult.phrase;
+                                 suggestion.count = autocompleteResult.count;
+                                 suggestion.order = autocompleteResult.order;
+                                 [peanutSuggestions addObject:suggestion];
+                               }
+                               self.searchResultsBySectionName[@"Suggestions"] = peanutSuggestions;
+                               dispatch_async(dispatch_get_main_queue(), ^{
+                                 [self.searchResultsTableView reloadData];
+                               });
+                             }];
+}
+
+
+- (DFAutocompleteAdapter *)autocompleteAdapter
+{
+  if (!_autocompleteAdapter) {
+    _autocompleteAdapter = [[DFAutocompleteAdapter alloc] init];
+  }
+  
+  return _autocompleteAdapter;
 }
 
 

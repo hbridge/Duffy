@@ -40,4 +40,21 @@ static NSMutableSet *registeredAdapters;
     return [RKObjectManager sharedManager];
 }
 
++ (NSMutableURLRequest *)requestWithObject:(id)object
+                                    method:(RKRequestMethod)method
+                                      path:(NSString *)path
+                                parameters:(NSDictionary *)parameters
+{
+  NSMutableDictionary *cumulativeParameters = [[NSMutableDictionary alloc] init];
+  cumulativeParameters[DFUserIDParameterKey] = [NSNumber numberWithUnsignedLongLong:
+                                      [[DFUser currentUser] userID]];
+  [cumulativeParameters addEntriesFromDictionary:parameters];
+  
+  return [[RKObjectManager sharedManager] requestWithObject:object
+                                                     method:method
+                                                       path:path
+                                                 parameters:cumulativeParameters];
+}
+
+
 @end

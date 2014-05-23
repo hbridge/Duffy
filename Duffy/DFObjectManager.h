@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFNetworkAdapter.h"
+#import <RestKit/RestKit.h>
 
 @class RKObjectManager;
 
@@ -15,5 +16,9 @@
 
 + (void)registerAdapterClass:(Class <DFNetworkAdapter>)adapter;
 + (RKObjectManager *)sharedManager;
++ (NSMutableURLRequest *)requestWithObject:(id)object
+                                    method:(RKRequestMethod)method
+                                      path:(NSString *)path
+                                parameters:(NSDictionary *)parameters;
 
 @end
