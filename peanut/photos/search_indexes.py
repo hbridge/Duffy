@@ -16,10 +16,24 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	locations = indexes.MultiValueField(faceted=True, indexed=False)
 	classes = indexes.MultiValueField(faceted=True, indexed=False)
+
+	# Used for auto-complete
+	content_auto = indexes.NgramField()
 	
 	logger = None
 
 	altDict = None
+
+	def prepare_content_auto(self, obj):
+		items = list()
+		items.extend(self.getTwoFishesData(obj))
+		items.extend(self.getClassData(obj, 20))
+		items.extend(self.getMetadataKeywords(obj, forSearch=False))
+		items.extend(self.getAltTerms(obj, 20))
+		items.extend(self.getFaceKeywords(obj, forSearch=False))
+
+		# we break down the words in the code by \n
+		return '\n'.join(items)
 
 	def prepare_locations(self, obj):
 		locItems = self.getTwoFishesData(obj)

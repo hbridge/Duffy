@@ -192,6 +192,50 @@ class PhotoBulkAPI(APIView):
 			return Response(response, status=status.HTTP_400_BAD_REQUEST)
 
 """
+	Temporary start to autocomplete
+"""
+@csrf_exempt
+def autocomplete(request):
+	startTime = time.time()
+	data = getRequestData(request)
+	
+	if data.has_key('user_id'):
+		userId = data['user_id']
+	else:
+		return returnFailure(response, "Need user_id")
+
+	if data.has_key('q'):
+		query = data['q']
+	else:
+		return returnFailure(response, "Need q")
+
+	sqs = SearchQuerySet().autocomplete(content_auto=query).filter(userId=userId)
+
+	suggestionCounts = dict()
+	suggestions = list()
+	for photo in sqs:
+		phrases = photo.content_auto.split('\n')
+		for phrase in phrases:
+			suggestions.extend([a.strip() for a in phrase.split(',')])
+
+		for suggestion in suggestions:
+			if suggestion.lower().find(query) >= 0:
+				if suggestion in suggestionCounts:
+					suggestionCounts[suggestion] += 1
+				else:
+					suggestionCounts[suggestion] = 1
+			
+	# Make sure you return a JSON object, not a bare list.
+	# Otherwise, you could be vulnerable to an XSS attack.
+	the_data = json.dumps({
+		'results': suggestionCounts,
+		'query_time': (time.time() - startTime)
+	})
+
+	
+	return HttpResponse(the_data, content_type='application/json')
+
+"""
 Search api function that returns the search view. Used by the /viz/search?user_id=<userID>
 """
 @csrf_exempt
