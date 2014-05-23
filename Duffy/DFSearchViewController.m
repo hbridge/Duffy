@@ -10,7 +10,7 @@
 #import "DFUser.h"
 #import "DFPhotoWebViewController.h"
 #import "DFTableHeaderView.h"
-#import "DFAutocompleteController.h"
+#import "DFSuggestionAdapter.h"
 #import "DFAnalytics.h"
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
@@ -85,7 +85,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
     
     self.hideStatusBar = NO;
     
-    self.autcompleteController = [[DFAutocompleteController alloc] init];
+    self.autcompleteController = [[DFSuggestionAdapter alloc] init];
     [self setupNavBar];
     [self registerForKeyboardNotifications];
     [[NSNotificationCenter defaultCenter] addObserver:self

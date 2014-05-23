@@ -9,7 +9,7 @@
 #import "DFIntroContentViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPeanutSuggestion.h"
-#import "DFAutocompleteController.h"
+#import "DFSuggestionAdapter.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "DFLocationPinger.h"
@@ -29,7 +29,7 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
 
 @interface DFIntroContentViewController ()
 
-@property (nonatomic, retain) DFAutocompleteController *autoCompleteController;
+@property (nonatomic, retain) DFSuggestionAdapter *autoCompleteController;
 @property (nonatomic) dispatch_semaphore_t nextStepSemaphore;
 
 @end
@@ -137,7 +137,7 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
   self.titleLabel.text = @"Ready to Search";
   
   DFIntroContentViewController __weak *weakSelf = self;
-  self.autoCompleteController = [[DFAutocompleteController alloc] init];
+  self.autoCompleteController = [[DFSuggestionAdapter alloc] init];
   [self.autoCompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
                                                   NSArray *locationPeanutSuggestions,
                                                   NSArray *timePeanutSuggestions) {
@@ -363,7 +363,7 @@ static int retryCount = 0;
 - (void)checkForAutocompleteUntilDone:(DFUploadSessionStats *)sessionStats
 {
   DFIntroContentViewController __weak *weakSelf = self;
-  self.autoCompleteController = [[DFAutocompleteController alloc] init];
+  self.autoCompleteController = [[DFSuggestionAdapter alloc] init];
   [self.autoCompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
                                                   NSArray *locationPeanutSuggestions,
                                                   NSArray *timePeanutSuggestions) {

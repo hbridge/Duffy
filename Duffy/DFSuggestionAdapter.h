@@ -9,12 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "DFPeanutSuggestion.h"
 
-@interface DFAutocompleteController : NSObject
+@interface DFSuggestionAdapter : NSObject
 
-typedef void (^DFAutocompleteCompletionBlock)(NSArray *categoryPeanutSuggestions,
+typedef void (^DFSuggestionCompletionBlock)(NSArray *categoryPeanutSuggestions,
                                               NSArray *locationPeanutSuggestions,
                                               NSArray *timePeanutSuggestions);
 
-- (void)fetchSuggestions:(DFAutocompleteCompletionBlock)mainThreadCompletionBlock;
+- (void)fetchSuggestions:(DFSuggestionCompletionBlock)mainThreadCompletionBlock;
 
 @end

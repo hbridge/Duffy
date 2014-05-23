@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFAutocompleteController.h"
+#import "DFSuggestionAdapter.h"
 #import <RestKit/RestKit.h>
 #import "DFUser.h"
 
@@ -20,13 +20,13 @@
 @implementation DFAutocompleteResponse
 @end
 
-@interface DFAutocompleteController()
+@interface DFSuggestionAdapter()
 
 @property (readonly, atomic, retain) RKObjectManager* objectManager;
 
 @end
 
-@implementation DFAutocompleteController
+@implementation DFSuggestionAdapter
 
 @synthesize objectManager = _objectManager;
 
@@ -34,7 +34,7 @@ static NSString *SuggestionsPathPattern = @"get_suggestions";
 static NSString *UserIDParameterKey = @"user_id";
 
 
-- (void)fetchSuggestions:(DFAutocompleteCompletionBlock)mainThreadCompletionBlock
+- (void)fetchSuggestions:(DFSuggestionCompletionBlock)mainThreadCompletionBlock
 {
     if ([[DFUser currentUser] userID]) {
         [self fetchAutocompleteResults:mainThreadCompletionBlock];
@@ -48,7 +48,7 @@ static NSString *UserIDParameterKey = @"user_id";
 #pragma mark - Internal Network Fetch Functions
 
 
-- (void)fetchAutocompleteResults:(DFAutocompleteCompletionBlock)completionBlock
+- (void)fetchAutocompleteResults:(DFSuggestionCompletionBlock)completionBlock
 {
     NSURLRequest *getRequest = [self autocompleteGetRequest];
     

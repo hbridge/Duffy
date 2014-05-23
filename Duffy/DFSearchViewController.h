@@ -10,14 +10,14 @@
 #import "DFUploadProgressView.h"
 #import "DFSearchBar.h"
 
-@class DFAutocompleteController;
+@class DFSuggestionAdapter;
 
 @interface DFSearchViewController : UIViewController <UIWebViewDelegate, DFSearchBarDelegate, UITableViewDataSource, UITableViewDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
 @property (nonatomic, retain) NSMutableDictionary *defaultSearchResults;
-@property (nonatomic, retain) DFAutocompleteController *autcompleteController;
+@property (nonatomic, retain) DFSuggestionAdapter *autcompleteController;
 
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;
 

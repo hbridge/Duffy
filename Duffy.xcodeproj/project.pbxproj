@@ -52,7 +52,7 @@
 		5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB92018F6092F00F4EEB6 /* HockeySDK.xcconfig */; };
 		5AACB92418F6092F00F4EEB6 /* HockeySDKResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */; };
 		5AB32EA818F0CD3B004FC27B /* DFKeyboardResizingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */; };
-		5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */; };
+		5AB32EAB18F1E1B7004FC27B /* DFSuggestionAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32EAA18F1E1B7004FC27B /* DFSuggestionAdapter.m */; };
 		5AB3983719252D9700E6E69E /* DFIntro.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5AB3983619252D9700E6E69E /* DFIntro.storyboard */; };
 		5AB3983D192530F200E6E69E /* DFIntroContentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB3983C192530F200E6E69E /* DFIntroContentViewController.m */; };
 		5AB39840192533D800E6E69E /* DFIntroPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB3983F192533D800E6E69E /* DFIntroPageViewController.m */; };
@@ -199,8 +199,8 @@
 		5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = HockeySDKResources.bundle; sourceTree = "<group>"; };
 		5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFKeyboardResizingViewController.h; sourceTree = "<group>"; };
 		5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFKeyboardResizingViewController.m; sourceTree = "<group>"; };
-		5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAutocompleteController.h; sourceTree = "<group>"; };
-		5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAutocompleteController.m; sourceTree = "<group>"; };
+		5AB32EA918F1E1B7004FC27B /* DFSuggestionAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionAdapter.h; sourceTree = "<group>"; };
+		5AB32EAA18F1E1B7004FC27B /* DFSuggestionAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionAdapter.m; sourceTree = "<group>"; };
 		5AB3983619252D9700E6E69E /* DFIntro.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = DFIntro.storyboard; sourceTree = "<group>"; };
 		5AB3983B192530F200E6E69E /* DFIntroContentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIntroContentViewController.h; sourceTree = "<group>"; };
 		5AB3983C192530F200E6E69E /* DFIntroContentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIntroContentViewController.m; sourceTree = "<group>"; };
@@ -598,8 +598,8 @@
 		5AD8AD42191D396700782144 /* Autocomplete */ = {
 			isa = PBXGroup;
 			children = (
-				5AB32EA918F1E1B7004FC27B /* DFAutocompleteController.h */,
-				5AB32EAA18F1E1B7004FC27B /* DFAutocompleteController.m */,
+				5AB32EA918F1E1B7004FC27B /* DFSuggestionAdapter.h */,
+				5AB32EAA18F1E1B7004FC27B /* DFSuggestionAdapter.m */,
 				5AD8AD43191D398200782144 /* DFPeanutSuggestion.h */,
 				5AD8AD44191D398200782144 /* DFPeanutSuggestion.m */,
 			);
@@ -998,7 +998,7 @@
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
 				5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */,
 				5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */,
-				5AB32EAB18F1E1B7004FC27B /* DFAutocompleteController.m in Sources */,
+				5AB32EAB18F1E1B7004FC27B /* DFSuggestionAdapter.m in Sources */,
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */,
 				5A8C98E5190AEAD700AE9F88 /* DFUploadOperation.m in Sources */,
