@@ -106,6 +106,7 @@
 		5AE3BF8118E6301B00ACB5DC /* DFPhoto+FaceDetection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF8018E6301B00ACB5DC /* DFPhoto+FaceDetection.m */; };
 		5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF8318E724A200ACB5DC /* DFPhotoImageCache.m */; };
 		5AF12167192E879400EB0232 /* LoadSearchError.html in Resources */ = {isa = PBXBuildFile; fileRef = 5AF12166192E879400EB0232 /* LoadSearchError.html */; };
+		5AF1216A192FA7E000EB0232 /* DFURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF12169192FA7E000EB0232 /* DFURLProtocol.m */; };
 		5AFBCA3518D0C87E00998793 /* DFUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3418D0C87E00998793 /* DFUser.m */; };
 		5AFBCA3918D0E0FD00998793 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3718D0E0FD00998793 /* DFSettingsViewController.m */; };
 		5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFBCA3818D0E0FD00998793 /* DFSettingsViewController.xib */; };
@@ -285,6 +286,8 @@
 		5AE3BF8218E724A200ACB5DC /* DFPhotoImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoImageCache.h; sourceTree = "<group>"; };
 		5AE3BF8318E724A200ACB5DC /* DFPhotoImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoImageCache.m; sourceTree = "<group>"; };
 		5AF12166192E879400EB0232 /* LoadSearchError.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = LoadSearchError.html; sourceTree = "<group>"; };
+		5AF12168192FA7E000EB0232 /* DFURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFURLProtocol.h; sourceTree = "<group>"; };
+		5AF12169192FA7E000EB0232 /* DFURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFURLProtocol.m; sourceTree = "<group>"; };
 		5AFBCA3318D0C87E00998793 /* DFUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUser.h; sourceTree = "<group>"; };
 		5AFBCA3418D0C87E00998793 /* DFUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUser.m; sourceTree = "<group>"; };
 		5AFBCA3618D0E0FD00998793 /* DFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettingsViewController.h; sourceTree = "<group>"; };
@@ -575,6 +578,8 @@
 				5A8C98FD1913D6C200AE9F88 /* DFPhoto */,
 				5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */,
 				5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */,
+				5AF12168192FA7E000EB0232 /* DFURLProtocol.h */,
+				5AF12169192FA7E000EB0232 /* DFURLProtocol.m */,
 			);
 			name = Networking;
 			sourceTree = "<group>";
@@ -997,6 +1002,7 @@
 				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */,
 				5A8C98E5190AEAD700AE9F88 /* DFUploadOperation.m in Sources */,
+				5AF1216A192FA7E000EB0232 /* DFURLProtocol.m in Sources */,
 				5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */,
 				5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */,
 				5ADB24C9189985590016CA02 /* main.m in Sources */,

@@ -22,6 +22,7 @@
 #import "DFSearchResultTableViewCell.h"
 #import "NSDictionary+DFJSON.h"
 #import "DFSettingsViewController.h"
+#import "DFURLProtocol.h"
 
 @interface DFSearchViewController ()
 
@@ -103,6 +104,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   [self populateDefaultAutocompleteSearchResults];
   self.webView.delegate = self;
   self.webView.scrollView.delegate = self;
+  [NSURLProtocol registerClass:[DFURLProtocol class]];
   
   [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
   self.automaticallyAdjustsScrollViewInsets = YES;

@@ -196,10 +196,10 @@ static int const FetchStride = 500;
   return [[DFPhotoCollection alloc] initWithPhotos:result];
 }
 
-- (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID
++ (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID inContext:(NSManagedObjectContext *)context
 {
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"photoID == %llu", photoID];
-  DFPhotoCollection *results = [DFPhotoStore photosWithPredicate:predicate inContext:[self managedObjectContext]];
+  DFPhotoCollection *results = [DFPhotoStore photosWithPredicate:predicate inContext:context];
   if (results.photoSet.count > 1) {
     [NSException raise:@"Multiple photos matching ID" format:@"%lu photos matching id:%llu",
      (unsigned long)results.photoSet.count, photoID];
@@ -208,6 +208,11 @@ static int const FetchStride = 500;
   }
   
   return [[results photosByDateAscending:YES] firstObject];
+}
+
+- (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID
+{
+  return [DFPhotoStore photoWithPhotoID:photoID inContext:[self managedObjectContext]];
 }
 
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
