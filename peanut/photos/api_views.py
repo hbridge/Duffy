@@ -221,7 +221,7 @@ def search(request):
 		else:
 			reverse = False
 	else:
-		reverse = True
+		reverse = False
 
 	if data.has_key('q'):
 		query = data['q']
