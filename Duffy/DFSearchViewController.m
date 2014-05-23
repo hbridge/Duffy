@@ -34,7 +34,7 @@
 
 @property (nonatomic, retain) NSURL *lastAttemptedURL;
 
-@property (nonatomic) float lastOffsetY;
+@property (nonatomic) float webviewLastOffsetY;
 @property (nonatomic) BOOL hideStatusBar;
 
 @end
@@ -730,14 +730,18 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-  self.lastOffsetY = scrollView.contentOffset.y;
+  if (scrollView == self.webView.scrollView) {
+    self.webviewLastOffsetY = scrollView.contentOffset.y;
+  }
 }
 
 - (void) scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
 {
-  bool hide = (scrollView.contentOffset.y > self.lastOffsetY);
-  [[self navigationController] setNavigationBarHidden:hide animated:YES];
-  self.hideStatusBar = hide;
+  if (scrollView == self.webView.scrollView) {
+    bool hide = (scrollView.contentOffset.y > self.webviewLastOffsetY);
+    [[self navigationController] setNavigationBarHidden:hide animated:YES];
+    self.hideStatusBar = hide;
+  }
 }
 
 - (void)setHideStatusBar:(BOOL)hideStatusBar
