@@ -328,7 +328,7 @@ def search(request):
 		if (pageEndDate < datetime.datetime.utcnow()):
 			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) +'">Next</a>'
 			response += nextLink
-	return HttpResponse(response, content_type="application/html")
+	return HttpResponse(response, content_type="text/html")
 
 
 """
