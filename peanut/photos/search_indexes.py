@@ -13,6 +13,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	photoId = indexes.CharField(model_attr="id", indexed=False)
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
 	updated = indexes.DateField()
+	added = indexes.DateField()
 
 	locations = indexes.MultiValueField(faceted=True, indexed=False)
 	classes = indexes.MultiValueField(faceted=True, indexed=False)
@@ -87,7 +88,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		if obj.time_taken:
 			return obj.time_taken
 		else:
-			return "1900-01-01T01:01:01Z"
+			return obj.added
 
 ### Helper functions to clean up data before adding to index
 

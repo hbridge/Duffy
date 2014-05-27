@@ -181,6 +181,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		photo.save()
 
 		createThumbnail(photo)
+	return photo
 
 def handleUploadedImage(request, fileKey, photo):
 	if fileKey in request.FILES:

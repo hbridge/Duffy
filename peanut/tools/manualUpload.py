@@ -15,8 +15,7 @@ import Image
 def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 	try:
 		im = Image.open(origFilepath)
-		print ("opened")
-
+		
 		#calc ratios and new min size
 		wratio = (size/float(im.size[0])) #width check
 		hratio = (size/float(im.size[1])) #height check
@@ -36,12 +35,8 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 				buffer = int((im.size[1]-size)/2)
 				im = im.crop((0, buffer, size, (im.size[1] - buffer)))
 		
-		print ("here1")
-
 		im.load()
 		im.save(newFilepath, "JPEG")
-
-		print ("here2")
 
 		if (copyExif):
 			# This part copies over the EXIF information to the new image
@@ -73,7 +68,7 @@ def getFilesAndData(rootdir, userId, maxNum):
 				keyName = "key" + str(len(dataArray))
 				filepath = os.path.join(rootdir, filename)
 
-				tmpfile = tempfile.mkstemp()
+				tmpfile = os.path.join(tempfile.gettempdir(), filename)
 
 				if (resizeImage(filepath, tmpfile, size, False, True)):
 					files[keyName] = open(tmpfile, "r")
@@ -97,7 +92,7 @@ def getFilesAndData(rootdir, userId, maxNum):
 	add api for the specified user
 """
 def main(argv):
-	url = "http://asood123.no-ip.biz/api/photos/bulk/"
+	url = "http://asood123.no-ip.biz:8000/api/photos/bulk/"
 	maxNum = 10
 	imagePath = None
 	userId = None
