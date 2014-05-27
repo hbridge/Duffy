@@ -1177,8 +1177,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/hbridge/Documents/Repos/Duffy,
 					"$(PROJECT_DIR)/Duffy/HockeySDK-iOS/HockeySDK.embeddedframework",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";
@@ -1211,8 +1211,8 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Henry Bridge (Y83XBMV536)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/hbridge/Documents/Repos/Duffy,
 					"$(PROJECT_DIR)/Duffy/HockeySDK-iOS/HockeySDK.embeddedframework",
+					"$(PROJECT_DIR)",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "Duffy/Duffy-Prefix.pch";

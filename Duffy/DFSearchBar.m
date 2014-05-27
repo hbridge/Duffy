@@ -30,6 +30,7 @@
 - (void)setText:(NSString *)text
 {
   self.textField.text = text;
+  [self.delegate searchBar:self textDidChange:text];
 }
 
 - (NSString *)text
@@ -93,7 +94,10 @@
 
 - (IBAction)cancelButtonClicked:(id)sender {
   [self.textField resignFirstResponder];
-  self.text = self.textBeforeLastEdit;
+  if (![self.text isEqualToString:self.textBeforeLastEdit]) {
+    self.text = self.textBeforeLastEdit;
+    [self.delegate searchBar:self textDidChange:self.text];
+  }
   [self.delegate searchBarCancelButtonClicked:self];
 }
 

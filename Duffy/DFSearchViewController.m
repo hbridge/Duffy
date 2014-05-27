@@ -47,6 +47,7 @@
 static NSString *DATE_SECTION_NAME = @"Time";
 static NSString *LOCATION_SECTION_NAME = @"Location";
 static NSString *CATEGORY_SECTION_NAME = @"Subject";
+static NSString *SUGGESTION_SECTION_NAME = @"Suggestions";
 
 static NSString *SEARCH_PLACEHOLDER = @"Search Photos";
 static NSString *SEARCH_DEFAULT_QUERY = @"Everything";
@@ -75,7 +76,8 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 {
   SectionNameToTitles = @{DATE_SECTION_NAME: @"Time",
                           LOCATION_SECTION_NAME: @"Location",
-                          CATEGORY_SECTION_NAME: @"Things"
+                          CATEGORY_SECTION_NAME: @"Things",
+                          SUGGESTION_SECTION_NAME : @"Suggestions",
                           };
 }
 
@@ -170,7 +172,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   [self.searchResultsTableView registerClass:[DFSearchResultTableViewCell class]
                       forCellReuseIdentifier:@"DFSearchResultTableViewCell"];
   
-  [self updateSearchResults:nil];
+  [self showSuggestions:nil];
 }
 
 - (void)registerForKeyboardNotifications
@@ -224,7 +226,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
       [self.sectionNames removeObject:DATE_SECTION_NAME];
     }
     
-    [self updateSearchResults:self.searchBar.text];
+    [self showSuggestions:self.searchBar.text];
     
     [self saveDefaultSearchResults:self.defaultSearchResults];
   }];
@@ -270,8 +272,8 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:@"''" reverseResults:YES];
-  self.searchBar.text = @"Everything";
-  self.navigationItem.title = @"Everything";
+  self.searchBar.text = SEARCH_DEFAULT_QUERY;
+  self.navigationItem.title = SEARCH_DEFAULT_QUERY;
   [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:YES];
 }
 
@@ -445,8 +447,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)searchBar:(DFSearchBar *)searchBar textDidChange:(NSString *)searchText
 {
-  if (searchText.length == 0 || [searchText characterAtIndex:searchText.length - 1] == ' ') {
-    [self updateSearchResults:searchText];
+  if (searchText.length == 0 ||
+      [searchText isEqualToString:SEARCH_DEFAULT_QUERY] ||
+      [searchText characterAtIndex:searchText.length - 1] == ' ') {
+    [self showSuggestions:searchText];
   } else {
     [self showAutocompleteResults:searchText];
   }
@@ -454,7 +458,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)searchBarSearchButtonClicked:(DFSearchBar *)searchBar
 {
-  if ([searchBar.text isEqualToString:@""] || [[searchBar.text lowercaseString] isEqualToString:@"everything"]) {
+  if ([searchBar.text isEqualToString:@""] || [[searchBar.text lowercaseString]
+                                               isEqualToString:[SEARCH_DEFAULT_QUERY lowercaseString]]) {
     [self loadDefaultSearch];
   } else {
     [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
@@ -492,7 +497,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   }
 }
 
-- (void)updateSearchResults:(NSString *)query
+- (void)showSuggestions:(NSString *)query
 {
 	/*
 	 Update the filtered array based on the search text and scope.
@@ -528,8 +533,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   
   [self.autocompleteAdapter fetchResultsForQuery:lastComponent
                              withCompletionBlock:^(NSArray *peanutAutocompleteResults) {
-                               if (peanutAutocompleteResults.count == 0) return;
-      self.sectionNames = [@[@"Suggestions"] mutableCopy];
+      self.sectionNames = [@[SUGGESTION_SECTION_NAME] mutableCopy];
                                NSMutableArray *peanutSuggestions = [[NSMutableArray alloc] initWithCapacity:peanutAutocompleteResults.count];
                                for (DFPeanutAutocompleteResult *autocompleteResult in peanutAutocompleteResults) {
                                  DFPeanutSuggestion *suggestion = [[DFPeanutSuggestion alloc] init];
@@ -538,7 +542,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                  suggestion.order = autocompleteResult.order;
                                  [peanutSuggestions addObject:suggestion];
                                }
-                               self.searchResultsBySectionName[@"Suggestions"] = peanutSuggestions;
+                               self.searchResultsBySectionName[SUGGESTION_SECTION_NAME] = peanutSuggestions;
                                dispatch_async(dispatch_get_main_queue(), ^{
                                  [self.searchResultsTableView reloadData];
                                });
@@ -645,9 +649,19 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
               indexPath.description, self.searchResultsBySectionName.description);
   }
   
-  if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
-  self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
-  [self updateSearchResults:self.searchBar.text];
+  //if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
+  if (self.searchBar.text.length > 0
+      && [self.searchBar.text characterAtIndex:self.searchBar.text.length - 1] != ' '){
+    NSString *partialTerm = [[self.searchBar.text componentsSeparatedByString:@" "] lastObject];
+    self.searchBar.text = [self.searchBar.text
+                           stringByReplacingOccurrencesOfString:partialTerm
+                           withString:[selectionString stringByAppendingString:@" "]
+                           options:0
+                           range:(NSRange){self.searchBar.text.length-partialTerm.length, partialTerm.length}];
+    
+  } else {
+    self.searchBar.text = [NSString stringWithFormat:@"%@%@ ", self.searchBar.text, selectionString];
+  }
 }
 
 
