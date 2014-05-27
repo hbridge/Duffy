@@ -27,12 +27,12 @@ def initClassifier():
     return (socket_send, socket_recv)
 
 def getIdFromImagePath(imagePath):
-    base, origFilename = os.path.split(imagepath)
+    base, origFilename = os.path.split(imagePath)
     photoId, ext = os.path.splitext(origFilename)
 
-    if isinstance(photoId, (int, long))
-        return photoId
-    else:
+    try:
+        return int(photoId)
+    except ValueError:
         return None
 
 def getPhotoFromList(photoId, photos):
@@ -44,6 +44,7 @@ def getPhotoFromList(photoId, photos):
 
 def processResponse(response):
     photoIds = list()
+    photosToSave = list()
 
     # We might get back responses for different images
     for imagepath in response['images']:
@@ -51,7 +52,7 @@ def processResponse(response):
         if photoId:
             photoIds.append(photoId)
 
-    photos = Photo.objects.get(id__in=photoIds)
+    photos = Photo.objects.filter(id__in=photoIds)
 
     for imagepath in response['images']:
         photoId = getIdFromImagePath(imagepath)
@@ -79,7 +80,8 @@ def processResponse(response):
         else:
             logging.info("*** Photo not found: " + imagepath)
 
-    Photo.bulkUpdate(photosToSave, ["classification_data"])
+    if (len(photosToSave) > 0):
+        Photo.bulkUpdate(photosToSave, ["classification_data"])
 
     return photosToSave
 
