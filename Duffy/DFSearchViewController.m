@@ -39,6 +39,7 @@
 
 @property (nonatomic) float webviewLastOffsetY;
 @property (nonatomic) BOOL hideStatusBar;
+@property (nonatomic) BOOL startedDragging;
 
 @property (readonly, nonatomic, retain) DFAutocompleteAdapter *autocompleteAdapter;
 
@@ -791,17 +792,20 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
   if (scrollView == self.webView.scrollView) {
     self.webviewLastOffsetY = scrollView.contentOffset.y;
+    self.startedDragging = YES;
   }
 }
 
-- (void) scrollViewWillBeginDecelerating:(UIScrollView *)scrollView
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  if (scrollView == self.webView.scrollView) {
+  if (scrollView == self.webView.scrollView && self.startedDragging) {
     bool hide = (scrollView.contentOffset.y > self.webviewLastOffsetY);
     [[self navigationController] setNavigationBarHidden:hide animated:YES];
     self.hideStatusBar = hide;
+    self.startedDragging = NO;
   }
 }
+
 
 - (void)setHideStatusBar:(BOOL)hideStatusBar
 {
