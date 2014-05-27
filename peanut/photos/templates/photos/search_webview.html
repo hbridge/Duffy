@@ -12,16 +12,8 @@
 	<script src="/static/jquery.jscroll.js"></script>
 <style>
 	html, body { padding: 0; margin: 0; }
-	html, .ui-mobile, .ui-mobile body {
-	}
-	.ui-mobile, .ui-mobile .ui-page {
-	}
 	.ui-content{
 		padding:0px 0px 0px 0px;
-	}
-
-	.ui-gallery{
-		/*overflow: auto;*/
 	}
 	.ui-photo-block {
 		float: left;
@@ -30,7 +22,7 @@
 	.ui-time-header {
 		font-family: arial;
 		font-size: 1em;
-		padding: 4px 0px 4px 10px;
+		padding: 11px 0px 11px 10px;
 		background-color: rgba(239, 239, 239, 0.3);
 	}
 	.i {
@@ -68,6 +60,12 @@
 		background-color: rgba(241,155,43,0.7);
 		padding: 5px 5px 5px 5px;
 		font-size: 14px;
+	}
+	.ui-more {
+		padding: 11px 0px 11px 0px;
+	}
+	.ui-loader {
+		padding: 11px 0px 11px 0px;
 	}
 	.t {
 		font-family: sans-serif;
@@ -116,11 +114,16 @@
 		</div>
 	{% endif %}
 	<div class="ui-gallery" id="allImages">
+
+	{% if resultsDict.nextLink and resultsDict.reverse %}
+		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}"></a>
+	{% endif %}		
+
 	{% for entry in resultsDict.photoResults %}
 		{% include "photos/_timeline_block.html" %}
 	{% endfor %}
-	{% if resultsDict.nextLink %}
-		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}">Next</a>
+	{% if resultsDict.nextLink and not resultsDict.reverse %}
+		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}"></a>
 	{% endif %}
 
 	</div>
@@ -140,45 +143,13 @@
 </div>
 </body>
 	<script>
-	/*
-	Loads the src value in img tag and attaches click handlers for images and clusters
-	*/
-	function loadImages() {
-		$('#allImages').find('div.ui-photo-block.not-loaded').each(function(){
-			$(this).find('img.l').each(function() {
-				$(this).attr('src', $(this).attr('l-src'));
-				$(this).removeClass('l');
-			});
-			clusterClickHandler($(this).find('div.i'));
-			$(this).removeClass('not-loaded');
-			});
-	}
 
-	/*
-		click handler for clusters and images
-	*/
-	function clusterClickHandler(clusters){
-		clusters.click(function() {
-			if ($(this).hasClass('cluster')) {
-				$(this).removeClass('cluster');
-				$(this).children('div').addClass('hidden');
-				current = $(this).next()
-				while (current.hasClass('hidden')){
-					current.find('img.l-c').each(function() {
-						$(this).attr('src', $(this).attr('l-src'));
-						$(this).removeClass('l-c');
-					});
-					current.show("fast");
-					current.removeClass('hidden');
-					current = current.next();
-				}
-			}
-			else {
-				window.location.href = $(this).attr('r')+'?photoIdArray='+photoIdArray().toString();
-			}
-		});
-	}
-		
+	{% if resultsDict.reverse %}
+	var reversed  = true;
+	{% else %}
+	var reversed = false;
+	{% endif %}
+
 	/*
 		returns an array of pIds that are currently open/expanded
 	*/
@@ -193,75 +164,115 @@
 	}	
 
 	/*
+		click handler for clusters and images
+	*/
+	function clusterClickHandler(clusters){
+		clusters.click(function() {
+			if ($(this).hasClass('cluster')) {
+				$(this).removeClass('cluster');
+				$(this).children('div').addClass('hidden'); // hides white triangle and cluster size
+				current = $(this).next()
+				while (current.hasClass('hidden')){
+						current.find('img.l-c').each(function() {
+						$(this).attr('src', $(this).attr('l-src'));
+						$(this).removeClass('l-c');
+					});					
+					current.show("fast");
+					current.removeClass('hidden');
+					current = current.next();
+				}
+			}
+			else {
+				window.location.href = $(this).attr('r')+'?photoIdArray='+photoIdArray().toString();
+			}
+		});
+	}
+
+	/*
+	Loads the src value in img tag and attaches click handlers for images and clusters
+	*/
+	function processImages() {
+		$('#allImages').find('div.ui-photo-block.n-p').each(function(){
+			clusterClickHandler($(this).find('div.i'));
+			$(this).removeClass('n-p');
+			});
+		updateMoreLink();
+	}
+
+	function updateMoreLink(){
+		$('#allImages').find('div.ui-more').remove();
+		var moreLink = '<div class="ui-more center t">More</div>';
+		if ($('div.ui-photo-block.hidden').length > 0){
+			if (reversed){
+				$('#allImages').prepend(moreLink);
+			}
+			else {
+				$('#allImages').append(moreLink);
+			}
+			$('div.ui-loader').hide();
+			moreClickHandler();			
+		}
+		else if ($('div.ui-loader').length > 0){
+			$('div.ui-loader').show();
+		}
+		else {}
+	}
+
+	/*
+	Shows preloaded images
+	*/
+	function moreClickHandler(){
+		$('div.ui-more').click(function(){
+			$('#allImages').find('div.ui-more').remove();
+			if (reversed){
+				divs = $($('div.ui-photo-block.hidden').get().reverse());
+			}
+			else {
+				divs = $('div.ui-photo-block.hidden');
+			}
+			showImages($(divs).slice(0,6))
+			updateMoreLink();
+		});
+	}
+
+	/*
+	Unhides preloaded images
+	*/
+	function showImages(divs){
+		curHeight = $(document).height();		
+		divs.each(function(){
+			divs.removeClass('hidden');
+		});
+		newHeight = $(document).height();
+		if (reversed){
+			$(window).scrollTop(newHeight - curHeight);
+		}
+	}
+
+	// This is for images that came on first load
+	$('#allImages').find('div.ui-photo-block.hidden').each(function(){
+		$(this).removeClass('hidden');
+		});
+	if (reversed){
+		$('body').scrollTop($(document).height());
+	}
+	processImages();
+
+	/*
 	Infinite scrolling
 	*/
+	
 	$('div.ui-gallery').jscroll({
 		nextSelector: 'a.jscroll-next:last',
 		debug: false,
 		autoTrigger: true,
-		{% if resultsDict.reverse %}reverse: true,{% endif %}			
+		{% if resultsDict.reverse %}reverse: true,{% endif %}	
 		callback: function(){
-			loadImages();
+			processImages();			
 		},
-		loadingHtml: '<div class="ui-loader center t"> Loading... </p>'
+		loadingHtml: '<div class="ui-loader center t hidden"> Loading... </div>'
 	});
+	
 
-
-	function showImages(divs) {
-		divs.each(function(){
-			var prevScrollTop = $(window).scrollTop();
-			var prevDocHeight = $(document).height();
-			$(this).removeClass('hidden');
-			var amountAdded = $(document).height() - prevDocHeight;
-			{% if resultsDict.reverse %}
-				$('body').scrollTop($('body').scrollTop()+amountAdded);
-			{% endif %}
-		})
-	}
-
-	function hideImages(divs) {
-		divs.each(function(){
-			$(this).addClass('hidden');
-		});
-	}	
-
-	loadImages();
-	showImages($('div.ui-photo-block.hidden'));
-
-	var scrollRunning = false;
-
-	$(window).scroll(function() {
-		if (scrollRunning == true){
-			return;
-		}
-		scrollRunning = true;
-
-		pDivs = $('div.ui-photo-block');
-		
-		// scrolling up
-		if ($(window).scrollTop() < $(window).height()*2){
-			pDivs.each(function(i,d){
-				var nextP = i<pDivs.length-1?$(pDivs[i+1]):false;
-				if (nextP && !nextP.hasClass('hidden')){
-					loadImages();
-					showImages($(this));
-					return false;
-				}
-			})
-		}
-		if ($(window).scrollTop() + $(window).height()*3 >= $(document).height()){
-			// scrolling down
-			// find the next div to show as you scroll to the bottom
-			for (var i=pDivs.length-1; i >=0; i--){
-				var prevP = i>0?$(pDivs[i-1]):false;
-				if (prevP && !prevP.hasClass('hidden')){
-					showImages($(pDivs[i]));
-					break;
-				}
-			}
-		}
-		scrollRunning = false;
-	});
-		
 	</script>
 </html>

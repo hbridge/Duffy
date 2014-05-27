@@ -1,11 +1,16 @@
 {% load dictionary_extras %}
-<div class="ui-photo-block not-loaded hidden">
+<div class="ui-photo-block n-p hidden">
 <div class="ui-time-header">
 	{{ entry.date }} ({{ entry.clusterList|length }})
 </div>
 {% for cluster in entry.clusterList %}{% for imageEntry in cluster %}
 <div class="i {% if imageEntry.dist == None and cluster|length > 1 %} cluster{% elif imageEntry.dist != None %} hidden{% endif %}" r="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" pId="{{ imageEntry.photo.photoId }}">
-<img l-src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
+<img 
+{% if imageEntry.dist != None %} 
+l-src="duffyapp://t/{{ imageEntry.photo.photoId }}"
+{% else %}
+src="duffyapp://t/{{ imageEntry.photo.photoId }}"
+{% endif %}
 	class="{% if imageEntry.dist != None %}l-c{% else %}l{% endif %}"
 	height="{{ imageSize }}px" width="{{ imageSize }}px" 
 	{% if debug %}

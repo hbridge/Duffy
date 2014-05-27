@@ -70,7 +70,7 @@ def search(request):
 		else:
 			reverse = False
 	else:
-		reverse = True
+		reverse = False
 
 	try:
 		user = User.objects.get(id=userId)
@@ -109,11 +109,13 @@ def search(request):
 				pageEndDate = pageEndDate+relativedelta(months=6)
 			page +=1
 			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+		
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold, startDate=pageStartDate, endDate=pageEndDate)
 		totalResults = searchResults.count()
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
-		resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
+		if (pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
+			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
 
 	resultsDict['reverse'] = reverse
 	resultsDict['incompleteResults'] = search_util.incompletePhotos(user.id)

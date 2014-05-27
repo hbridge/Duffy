@@ -74,19 +74,24 @@ def getNMonthsOut(startDate, nMonths):
 """
 def pageToDates(page, origStartDate, reversed=False):
 	if (reversed):
+		pageSize = 6 #Number of months; shorter window for full gallery view
+	else:
+		pageSize = 6 #could do a longer window for searches
+
+	if (reversed):
 		dateNow = datetime.datetime.utcnow()
 		if (page > 1):
-			pageEndDate = getNMonthsOut(dateNow, -6*(page-1))
+			pageEndDate = getNMonthsOut(dateNow, -1*pageSize*(page-1))
 		else:
 			pageEndDate = datetime.datetime.utcnow()
-		pageStartDate = getNMonthsOut(dateNow, -6*page)
+		pageStartDate = getNMonthsOut(dateNow, -1*pageSize*page)
 		return (pageStartDate, pageEndDate)
 	else:
 		if (page > 1):
-			pageStartDate = getNMonthsOut(origStartDate, 6*(page-1))
+			pageStartDate = getNMonthsOut(origStartDate, pageSize*(page-1))
 		else:
 			pageStartDate = origStartDate
-		pageEndDate = getNMonthsOut(origStartDate, 6*page)
+		pageEndDate = getNMonthsOut(origStartDate, pageSize*page)
 		return (pageStartDate, pageEndDate)
 
 """
