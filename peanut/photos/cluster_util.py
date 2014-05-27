@@ -50,22 +50,23 @@ def addToClustersBulk(photos, threshold=100):
 		photosToUpdate[photo.id] = photo
 
 	if (len(simRows) > 0):
-		if (len(simRows) == 1):
-			simRows[0].save()
-		else:
-			uniqueSimRows = getUniqueSimRows(simRows)
-			allIds = getAllPhotoIds(uniqueSimRows)
+		uniqueSimRows = getUniqueSimRows(simRows)
+		allIds = getAllPhotoIds(uniqueSimRows)
 
-			existingSims = Similarity.objects.select_related().filter(photo_1__in=allIds).filter(photo_2__in=allIds)
-			(simsToCreate, simsToUpdate) = processWithExisting(existingSims, uniqueSimRows)
-			Similarity.objects.bulk_create(simsToCreate)
-			if (len(simsToUpdate) == 1):
-				simsToUpdate[0].save()
-			elif (len(simsToUpdate) > 1):
-				bulk_update(simsToUpdate)
+		# Break apart the sim rows based on what needs creating and what needs updating
+		existingSims = Similarity.objects.select_related().filter(photo_1__in=allIds).filter(photo_2__in=allIds)
+		(simsToCreate, simsToUpdate) = processWithExisting(existingSims, uniqueSimRows)
 
-	# If we wrote put the Similarities correctly, then update photos to update the clustered_time
-	if (len(photosToUpdate) > 0):
+		# Do a bulk create for new sim rows
+		Similarity.objects.bulk_create(simsToCreate)
+
+		# Update existing sim rows
+		if (len(simsToUpdate) == 1):
+			simsToUpdate[0].save()
+		elif (len(simsToUpdate) > 1):
+			bulk_update(simsToUpdate)
+
+		# If we wrote put the Similarities correctly, then update photos to update the clustered_time
 		smartBulkUpdate(photosToUpdate)
 
 	return len(simsToCreate) + len(simsToUpdate)
