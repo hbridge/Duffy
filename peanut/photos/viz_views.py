@@ -184,13 +184,19 @@ def userbaseSummary(request):
 					entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
 				else:
 					entry['twofish'] = '-'
-				entry['fullimagesCount'] = dbQuery.exclude(full_filename=None).count()
+				fullimagesCount = dbQuery.exclude(full_filename=None).count()
+				entry['fullimagesCount'] = fullimagesCount
 				entry['fullimages'] = entry['fullimagesCount']*100/totalCount
 				searchResults = SearchQuerySet().all().filter(userId=userId)
 				entry['resultsCount'] = searchResults.count()*100/totalCount
 				entry['clusteredCount'] = dbQuery.exclude(clustered_time=None).count()
 				entry['clustered'] = entry['clusteredCount']*100/totalCount
-				entry['classifications'] = dbQuery.exclude(classification_data=None).count()*100/totalCount
+
+				if (fullimagesCount > 0):
+					entry['classifications'] = dbQuery.exclude(classification_data=None).count()*100/fullimagesCount
+				else:
+					entry['classifications'] = 0
+					
 				entry['faces'] = dbQuery.exclude(faces_data=None).count()*100/totalCount
 				entry['internal'] = False
 
