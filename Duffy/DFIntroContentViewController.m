@@ -190,7 +190,7 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
   }
   
   DFPeanutSuggestion *thingSuggestion = [thingSuggestions firstObject];
-  if (locationSuggestion) {
+  if (thingSuggestion) {
     [categoriesString appendString:[NSString stringWithFormat:@"%d photos of %@\n",
                                     thingSuggestion.count, thingSuggestion.name]];
   }
