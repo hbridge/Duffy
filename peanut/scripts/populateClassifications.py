@@ -26,48 +26,43 @@ def initClassifier():
 
     return (socket_send, socket_recv)
 
-def classifyPhotos(photos, socket_send, socket_recv):
-    successfullyClassified = list()
-    cmd = dict()
-    cmd['cmd'] = 'process'
-    cmd['images'] = list()
+def getIdFromImagePath(imagePath):
+    base, origFilename = os.path.split(imagepath)
+    photoId, ext = os.path.splitext(origFilename)
 
-    pathToPhoto = dict()
+    if isinstance(photoId, (int, long))
+        return photoId
+    else:
+        return None
 
-    logging.info("About to process files (at " + time.strftime("%c") + "):")
-    for photo in photos:
-        imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.full_filename)
-        pathToPhoto[imagepath] = photo
+def getPhotoFromList(photoId, photos):
+    if photoId:
+        for photo in photos:
+            if photo.id == photoId:
+                return photo
+    return None
 
-        cmd['images'].append(imagepath)
-
-    logging.info("Sending:  " + str(cmd))
-    socket_send.send_json(cmd)
-    
-    logging.info("Waiting for response...")
-    result = socket_recv.recv_json()
-    logging.info("Got back: " + str(result))
-
+def processResponse(response):
+    photoIds = list()
 
     # We might get back responses for different images
-    for imagepath in result['images']:
-        if imagepath in pathToPhoto:
-            photo = pathToPhoto[imagepath]
-        else:
-            # need to do a lookup
-            base, origFilename = os.path.split(imagepath)
+    for imagepath in response['images']:
+        photoId = getIdFromImagePath(imagepath)
+        if photoId:
+            photoIds.append(photoId)
 
-            photoId, ext = os.path.splitext(origFilename)
-            logging.info("*** Unkonwn file - looking up in db by photoid: " + photoId)
+    photos = Photo.objects.get(id__in=photoIds)
 
-            photo = Photo.objects.get(id=int(photoId))
-            logging.info("Found photo id: %s" % (photo.id))
+    for imagepath in response['images']:
+        photoId = getIdFromImagePath(imagepath)
 
-        if result['images'][imagepath] is not "not_found" and photo:
+        photo = getPhotoFromList(photoId, photos)
+
+        if response['images'][imagepath] is not "not_found" and photo:
             Classification.objects.filter(user_id = photo.user.id, photo_id = photo.id).delete()
 
             classificationDataInPhoto = list()
-            for classInfo in result['images'][imagepath]:
+            for classInfo in response['images'][imagepath]:
                 classification = Classification(class_name = classInfo['name'], rating = classInfo['confidence'])
                 classification.user_id = photo.user.id
                 classification.photo_id = photo.id
@@ -80,12 +75,34 @@ def classifyPhotos(photos, socket_send, socket_recv):
                 classificationDataInPhoto.append(infoCopy)
 
             photo.classification_data = json.dumps(classificationDataInPhoto)
-            photo.save()
-
-            successfullyClassified.append(photo)
+            photosToSave.append(photo)
         else:
-            logging.info("*** File not found: " + imagepath)
-    return successfullyClassified
+            logging.info("*** Photo not found: " + imagepath)
+
+    Photo.bulkUpdate(photosToSave, ["classification_data"])
+
+    return photosToSave
+
+def classifyPhotos(photos, socket_send, socket_recv):
+    cmd = dict()
+    cmd['cmd'] = 'process'
+    cmd['images'] = list()
+
+    logging.info("About to process files (at " + time.strftime("%c") + "):")
+    for photo in photos:
+        imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.full_filename)
+        cmd['images'].append(imagepath)
+
+    logging.info("Sending:  " + str(cmd))
+    socket_send.send_json(cmd)
+    
+    logging.info("Waiting for response...")
+    result = socket_recv.recv_json()
+    logging.info("Got back: " + str(result))
+
+    savedPhotos = processResponse(result)
+
+    return savedPhotos
     
 def copyPhotos(photos):
     successfullyCopied = list()
