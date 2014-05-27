@@ -30,11 +30,11 @@ DEPENDENCIES:
   - RestKit (~> 0.20.0)
 
 SPEC CHECKSUMS:
-  AFNetworking: e403d4333a4e1956cb3fe42364c3c879f820c9a0
-  CocoaLumberjack: 020378ec400d658923bf5887178394f65f052c90
-  JDStatusBarNotification: a77275c66f1dfb1d1e4c2a49ab5a6498cb5a9b62
-  RestKit: 1f181c180105a92f11ec4f6cd7de37625e516d83
-  SOCKit: 8871d058926a6c6cc144f0c5eee82c5d0ec274a3
-  TransitionKit: d0e3344aac92991395d4c2e72d9c5a8ceeb12910
+  AFNetworking: 80c4e0652b08eb34e25b9c0ff3c82556fe5967b4
+  CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
+  JDStatusBarNotification: c68611370dedc0ef865fb0fc1768dfbaf8fd961f
+  RestKit: 7f9490e709ee745e166c4d2aa7a8d132831275b0
+  SOCKit: d8d0dd3688ae1026c12367570da8fa8e1a6980fb
+  TransitionKit: b573f93c422f6aedf7d40e93e7c2f202d1295063
 
-COCOAPODS: 0.32.1
+COCOAPODS: 0.33.1
