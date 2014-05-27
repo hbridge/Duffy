@@ -17,6 +17,7 @@
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFCameraRollSyncController.h"
+#import "DFPhotoStore.h"
 
 unsigned long MinNumThumbnailsToTransition = 100;
 unsigned int MaxAutocompleteFetchRetryCount = 5;
@@ -58,7 +59,12 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
     [self getUserID];
   } else if (self.introContent == DFIntroContentUploading) {
     [self configureUploadScreen];
-    [self runUploadProcess];
+    if ([[[[DFPhotoStore sharedStore] cameraRoll] photoURLSet] count] > 0) {
+      [self runUploadProcess];
+    } else {
+      self.introContent = DFIntroContentDone;
+      [self configureDoneScreen];
+    }
   } else if (self.introContent == DFIntroContentDone) {
     [self configureDoneScreen];
   } else if (self.introContent == DFIntroContentErrorUploading) {
@@ -154,8 +160,9 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
     
   }];
   
-  [self.actionButton setTitle:@"Get Started" forState:UIControlStateNormal];
   self.activityIndicator.hidden = YES;
+  self.actionButton.hidden = NO;
+  [self.actionButton setTitle:@"Get Started" forState:UIControlStateNormal];
   [self.actionButton addTarget:self
                         action:@selector(dimsissIntro:)
               forControlEvents:UIControlEventTouchUpInside];
@@ -214,16 +221,20 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
 
 - (void)askForPermissions:(id)sender
 {
-  DDLogInfo(@"Asking for user permissions.");
-  
-  [self checkForAndRequestPhotoAccess];
-  dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
-  [[DFCameraRollSyncController sharedSyncController] asyncSyncToCameraRoll];
-  
-  [self checkForAndRequestLocationAccess];
-  dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
-  
-  [self.pageViewController showNextContentViewController:DFIntroContentUploading];
+  // dispatch these off main thread so we don't block it
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    DDLogInfo(@"Asking for user permissions.");
+    // first semaphore wait is to wait for the get userID to complete
+    dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+    [self checkForAndRequestPhotoAccess];
+    dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+    [[DFCameraRollSyncController sharedSyncController] asyncSyncToCameraRoll];
+    
+    [self checkForAndRequestLocationAccess];
+    dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+    
+    [self.pageViewController showNextContentViewController:DFIntroContentUploading];
+  });
 }
 
 - (void)dimsissIntro:(id)sender
@@ -247,6 +258,9 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
   } else if (photoAuthStatus == ALAuthorizationStatusNotDetermined) {
     DDLogInfo(@"Photo access not determined, asking.");
     [self askForPhotosPermission];
+    //while ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusNotDetermined) {
+    //  sleep(0.5);
+    //}
   } else if (photoAuthStatus == ALAuthorizationStatusAuthorized) {
     DDLogInfo(@"Already have photo access.");
     dispatch_semaphore_signal(self.nextStepSemaphore);

@@ -390,7 +390,7 @@
 		5A67606318E3384900E355B6 /* View Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				5AB3983519252D8100E6E69E /* First run */,
+				5AB3983519252D8100E6E69E /* Intro */,
 				5AB32EAC18F30121004FC27B /* Camera Roll */,
 				5AB32EAD18F3012D004FC27B /* Search View */,
 				5AB32EAE18F30136004FC27B /* Settings View */,
@@ -560,7 +560,7 @@
 			name = "Settings View";
 			sourceTree = "<group>";
 		};
-		5AB3983519252D8100E6E69E /* First run */ = {
+		5AB3983519252D8100E6E69E /* Intro */ = {
 			isa = PBXGroup;
 			children = (
 				5A5FCB3D192D50FE00A060A7 /* Intro Text */,
@@ -570,7 +570,7 @@
 				5AB3983B192530F200E6E69E /* DFIntroContentViewController.h */,
 				5AB3983C192530F200E6E69E /* DFIntroContentViewController.m */,
 			);
-			name = "First run";
+			name = Intro;
 			sourceTree = "<group>";
 		};
 		5AC40EE5190AD0F100ED3532 /* Networking */ = {
