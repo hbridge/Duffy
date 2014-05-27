@@ -265,7 +265,6 @@
                                 code:-3
                             userInfo:@{
                                        NSLocalizedDescriptionKey: @"The server result peanut photos array was nil or count=0"}];
-    return error;
   }
   
   
