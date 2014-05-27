@@ -123,7 +123,6 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 
 	Returns a datetime object which can be put straight into the database
 
-	TODO(Derek):  Not used now, move or remove
 """
 def getTimeTaken(metadataJson, origFilename, photoPath):
 	# first see if the data is in the metadata json
@@ -201,6 +200,11 @@ def handleUploadedImagesBulk(request, photos):
 		if photo.file_key in request.FILES:
 			writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
 			updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
+			
+			if not updatedPhoto.time_taken:
+				updatedPhoto.time_taken = getTimeTaken(updatedPhoto.metadata, updatedPhoto.orig_filename, updatedPhoto.getThumbPath())
+				logger.debug("Didn't find time_taken, looked myself and found %s" % (updatedPhoto.time_taken))
+	
 			photosToUpdate.append(updatedPhoto)
 		else:
 			logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)

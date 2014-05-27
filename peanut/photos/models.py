@@ -38,6 +38,7 @@ class Photo(models.Model):
 	twofishes_data = models.TextField(null=True)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	iphone_hash = models.CharField(max_length=100, null=True)
+	is_local = models.BooleanField()
 	classification_data = models.CharField(max_length=10000, null=True)
 	faces_data = models.TextField(null=True)
 	time_taken = models.DateTimeField(null=True)
@@ -92,7 +93,8 @@ class Photo(models.Model):
 	"""
 	def getThumbPath(self):
 		if self.thumb_filename:
-			return os.path.join(self.user.getUserDataPath(), self.thumb_filename)
+			userPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(self.user_id))
+			return os.path.join(userPath, self.thumb_filename)
 		else:
 			return None
 
