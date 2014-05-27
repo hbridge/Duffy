@@ -9,11 +9,12 @@ from datetime import datetime
 
 class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	text = indexes.CharField(document=True, use_template=False)
-	userId = indexes.CharField()
+	userId = indexes.CharField(model_attr="user_id")
 	photoId = indexes.CharField(model_attr="id", indexed=False)
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
 	updated = indexes.DateField()
 	added = indexes.DateField()
+	isLocal = indexes.BooleanField(model_attr="is_local")
 
 	locations = indexes.MultiValueField(faceted=True, indexed=False)
 	classes = indexes.MultiValueField(faceted=True, indexed=False)

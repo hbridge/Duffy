@@ -6,23 +6,26 @@
 {% for cluster in entry.clusterList %}{% for imageEntry in cluster %}
 <div class="i {% if imageEntry.dist == None and cluster|length > 1 %} cluster{% elif imageEntry.dist != None %} hidden{% endif %}" r="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" pId="{{ imageEntry.photo.photoId }}">
 <img 
-{% if imageEntry.dist != None %} 
-l-src="duffyapp://t/{{ imageEntry.photo.photoId }}"
-{% else %}
-src="duffyapp://t/{{ imageEntry.photo.photoId }}"
-{% endif %}
+	{% if imageEntry.photo.isLocal == False %} 
+		src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
+	{% elif imageEntry.dist != None %} 
+		l-src="duffyapp://t/{{ imageEntry.photo.photoId }}"
+	{% else %}
+		src="duffyapp://t/{{ imageEntry.photo.photoId }}"
+	{% endif %}
+
 	class="{% if imageEntry.dist != None %}l-c{% else %}l{% endif %}"
-	height="{{ imageSize }}px" width="{{ imageSize }}px" 
+	height="{{ imageSize }}px" width="{{ imageSize }}px" blah="{{ imageEntry.photo.isLocal }}"
 	{% if debug %}
-	title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
-	SIMROW: {{ imageEntry.simrow }} |
-	SIMROWS:
-	{% for sim in imageEntry.simrows %}
-		{{ sim }}
-	{% endfor %}"
+		title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
+		SIMROW: {{ imageEntry.simrow }} |
+		SIMROWS:
+		{% for sim in imageEntry.simrows %}
+			{{ sim }}
+		{% endfor %}"
 	{% endif %}>
 	{% if imageEntry.dist == None and cluster|length > 1 %}
-	<div class='ui-a-d'></div><div class="ui-i-c t">{{ cluster|length }}</div>
+		<div class='ui-a-d'></div><div class="ui-i-c t">{{ cluster|length }}</div>
 	{% endif %}
 </div>
 {% endfor %}{% endfor %}
