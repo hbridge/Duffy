@@ -259,9 +259,19 @@
 {
   NSError *error;
   
+  
+  if (resultPeanutPhotos == nil || resultPeanutPhotos.count == 0) {
+    error = [NSError errorWithDomain:@"com.duffyapp.DFPhotoMetadataAdapter"
+                                code:-3
+                            userInfo:@{
+                                       NSLocalizedDescriptionKey: @"The server result peanut photos array was nil or count=0"}];
+    return error;
+  }
+  
+  
   for (DFPeanutPhoto *peanutPhoto in resultPeanutPhotos) {
     if (peanutPhoto.file_key == nil) {
-      error = [NSError errorWithDomain:@"com.duffyappp.DFPhotoMetadataAdapter"
+      error = [NSError errorWithDomain:@"com.duffyapp.DFPhotoMetadataAdapter"
                                  code:-1
                              userInfo:@{
                                         NSLocalizedDescriptionKey: @"The server returned a peanutPhoto with file_key == nil"}];
@@ -270,7 +280,7 @@
     
     if (![[DFPhotoStore persistentStoreCoordinator]
           managedObjectIDForURIRepresentation:peanutPhoto.file_key]){
-      error = [NSError errorWithDomain:@"com.duffyappp.DFPhotoMetadataAdapter"
+      error = [NSError errorWithDomain:@"com.duffyapp.DFPhotoMetadataAdapter"
                                   code:-2
                               userInfo:@{
                                          NSLocalizedDescriptionKey: @"The server returned a peanutPhoto with file_key that does not exist locally"}];
