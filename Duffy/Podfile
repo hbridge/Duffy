@@ -9,6 +9,7 @@
 xcodeproj '../Duffy.xcodeproj'
 
 platform :ios, '7.0' 
+inhibit_all_warnings!
 
 pod 'RestKit', '~> 0.20.0'
 pod 'JDStatusBarNotification', '~> 1.4.7'
