@@ -477,7 +477,7 @@ def newresults_check(request):
 	if (newUpdatedTime > lastUpdated):
 		response['newData'] = True
 	else:
-		response['newData'] = True # TODO: change to False before checking in
+		response['newData'] = False
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
