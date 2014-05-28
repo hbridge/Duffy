@@ -93,13 +93,12 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 def getExifData(photo):
 	exif_data = {}
 
-	"""Returns a dictionary from the exif data of an PIL Image item. Also converts the GPS Tags"""
-	image = Image.open(photo.getThumbPath())
-	info = image._getexif()
+	if not photo.getFullPath():
+		return exif_data
 
-	if not info or len(info) == 0:
-		image = Image.open(photo.getFullPath())
-		info = image._getexif()
+	"""Returns a dictionary from the exif data of an PIL Image item. Also converts the GPS Tags"""
+	image = Image.open(photo.getFullPath())
+	info = image._getexif()
 
 	if info:
 		for tag, value in info.items():
