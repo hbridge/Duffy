@@ -93,10 +93,19 @@ static int NumChangesFlushThreshold = 100;
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   
+  // scan camera roll
   ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
   [library
-   enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos | ALAssetsGroupAlbum
-   usingBlock:[self enumerateGroupsBlock]
+   enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos
+   usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:nil]
+   failureBlock:[self libraryAccessFailureBlock]];
+  dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
+  [self flushChanges];
+  
+  // scan other items
+  [library
+   enumerateGroupsWithTypes: ALAssetsGroupAlbum
+   usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:@[@"Camera Roll"]]
    failureBlock:[self libraryAccessFailureBlock]];
   
    dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
@@ -114,7 +123,9 @@ static int NumChangesFlushThreshold = 100;
   return self.allObjectIDsToChanges;
 }
 
-- (ALAssetsLibraryGroupsEnumerationResultsBlock)enumerateGroupsBlock
+
+
+- (ALAssetsLibraryGroupsEnumerationResultsBlock)enumerateGroupsBlockSkippingGroupsNamed:(NSArray *)groupNamesToSkip
 {
   return ^(ALAssetsGroup *group, BOOL *stop) {
     if (self.isCancelled) {
@@ -123,12 +134,14 @@ static int NumChangesFlushThreshold = 100;
       return;
     }
     if(group != nil) {
+      NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
+      if ([groupNamesToSkip containsObject:groupName]) {
+        return;
+      }
+      
       [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
       DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
       [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:[self photosEnumerationBlock]];
-      if ([[group valueForProperty:ALAssetsGroupPropertyName] isEqualToString:@"Camera Roll"]){
-        [self flushChanges]; // don't need to transfer toSaveChanges because they've already been rolled into the objectIdToChanges dict
-      }
     } else {
       dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
     }
