@@ -38,7 +38,7 @@ class Photo(models.Model):
 	twofishes_data = models.TextField(null=True)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	iphone_hash = models.CharField(max_length=100, null=True)
-	is_local = models.BooleanField()
+	is_local = models.BooleanField(default=1)
 	classification_data = models.CharField(max_length=10000, null=True)
 	faces_data = models.TextField(null=True)
 	time_taken = models.DateTimeField(null=True)
