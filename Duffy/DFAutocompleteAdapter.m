@@ -43,7 +43,7 @@ NSString *const AutocompletePathPattern = @"autocomplete";
 }
 
 
-- (void)fetchResultsForQuery:(NSString *)query
+- (void)fetchSuggestionsForQuery:(NSString *)query
          withCompletionBlock:(DFAutocompleteFetchCompletionBlock)completionBlock
 {
   NSURLRequest *getRequest = [self autocompleteGetRequestForQuery:query];

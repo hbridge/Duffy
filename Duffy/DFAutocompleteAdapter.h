@@ -12,9 +12,9 @@
 @interface DFAutocompleteAdapter : NSObject 
 
 
-typedef void (^DFAutocompleteFetchCompletionBlock)(NSArray *peanutAutocompleteResults);
+typedef void (^DFAutocompleteFetchCompletionBlock)(NSArray *peanutSuggestions);
 
-- (void)fetchResultsForQuery:(NSString *)query
+- (void)fetchSuggestionsForQuery:(NSString *)query
          withCompletionBlock:(DFAutocompleteFetchCompletionBlock)completionBlock;
 
 @end

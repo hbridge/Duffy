@@ -24,7 +24,7 @@
 #import "DFSettingsViewController.h"
 #import "DFURLProtocol.h"
 #import "DFAutocompleteAdapter.h"
-#import "DFPeanutAutocompleteResult.h"
+#import "DFPeanutSuggestion.h"
 
 @interface DFSearchViewController ()
 
@@ -532,18 +532,14 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   NSArray *components = [searchText componentsSeparatedByString:@" "];
   NSString *lastComponent = [components lastObject];
   
-  [self.autocompleteAdapter fetchResultsForQuery:lastComponent
-                             withCompletionBlock:^(NSArray *peanutAutocompleteResults) {
+  [self.autocompleteAdapter fetchSuggestionsForQuery:lastComponent
+                             withCompletionBlock:^(NSArray *peanutSuggestions) {
       self.sectionNames = [@[SUGGESTION_SECTION_NAME] mutableCopy];
-                               NSMutableArray *peanutSuggestions = [[NSMutableArray alloc] initWithCapacity:peanutAutocompleteResults.count];
-                               for (DFPeanutAutocompleteResult *autocompleteResult in peanutAutocompleteResults) {
-                                 DFPeanutSuggestion *suggestion = [[DFPeanutSuggestion alloc] init];
-                                 suggestion.name = autocompleteResult.phrase;
-                                 suggestion.count = autocompleteResult.count;
-                                 suggestion.order = autocompleteResult.order;
-                                 [peanutSuggestions addObject:suggestion];
+                               if (peanutSuggestions) {
+                                 self.searchResultsBySectionName[SUGGESTION_SECTION_NAME] = peanutSuggestions;
+                               } else {
+                                 self.searchResultsBySectionName[SUGGESTION_SECTION_NAME] = @[];
                                }
-                               self.searchResultsBySectionName[SUGGESTION_SECTION_NAME] = peanutSuggestions;
                                dispatch_async(dispatch_get_main_queue(), ^{
                                  [self.searchResultsTableView reloadData];
                                });
