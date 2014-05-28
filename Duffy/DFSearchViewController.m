@@ -683,6 +683,11 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (NSString *)sectionNameForIndex:(NSInteger)index
 {
+  if (index > self.sectionNames.count) {
+    DDLogWarn(@"sectionNameForIndex exceeds sectionName.count.  index:%d, sectionNames:%@, searchResultsBySectionName:%@",
+              (int)index, self.sectionNames.description, self.searchResultsBySectionName.description);
+    return nil;
+  }
   return self.sectionNames[index];
 }
 
