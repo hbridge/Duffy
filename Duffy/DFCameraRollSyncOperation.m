@@ -21,6 +21,13 @@ static int NumChangesFlushThreshold = 100;
 @interface DFCameraRollSyncOperation()
 
 @property (nonatomic, retain) NSManagedObjectContext *managedObjectContext;
+@property (nonatomic, retain) DFPhotoCollection *knownPhotos;
+@property (nonatomic) dispatch_semaphore_t enumerationCompleteSemaphore;
+@property (nonatomic, retain) NSMutableSet *foundURLs;
+@property (nonatomic, retain) NSMutableSet *knownNotFoundURLs;
+@property (nonatomic, retain) NSMutableDictionary *knownAndFoundURLsToHashes;
+@property (nonatomic, retain) NSMutableDictionary *allObjectIDsToChanges;
+@property (nonatomic, retain) NSMutableDictionary *unsavedObjectIDsToChanges;
 
 @end
 
@@ -35,9 +42,8 @@ static int NumChangesFlushThreshold = 100;
       [self cancelled];
       return;
     }
-    DFPhotoCollection *knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
-    NSDictionary *knownPhotoURLsToHashes = [self mapKnownPhotoURLsToHashes:knownPhotos];
-    NSDictionary *changes = [self findChangesWithKnownPhotos:knownPhotos urlsToHashes:knownPhotoURLsToHashes];
+    self.knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
+    NSDictionary *changes = [self findChanges];
     
     if (self.isCancelled) {
       [self cancelled];
@@ -49,7 +55,7 @@ static int NumChangesFlushThreshold = 100;
     NSUInteger numAdded = [(NSNumber *)changeTypesToCounts[DFPhotoChangeTypeAdded] unsignedIntegerValue];
     NSUInteger numDeleted = [(NSNumber *)changeTypesToCounts[DFPhotoChangeTypeRemoved] unsignedIntegerValue];
     dispatch_async(dispatch_get_main_queue(), ^{
-      [DFAnalytics logCameraRollScanTotalAssets:knownPhotos.photoSet.count + numAdded - numDeleted
+      [DFAnalytics logCameraRollScanTotalAssets:self.knownPhotos.photoSet.count + numAdded - numDeleted
                                     addedAssets:numAdded];
       [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
     });
@@ -77,106 +83,116 @@ static int NumChangesFlushThreshold = 100;
   return mapping;
 }
 
-- (NSDictionary *)findChangesWithKnownPhotos:(DFPhotoCollection *)knownPhotos
-                                urlsToHashes:(NSDictionary *)knownPhotosURLsToHashes
+- (NSDictionary *)findChanges
 {
-  dispatch_semaphore_t enumerationCompleteSemaphore = dispatch_semaphore_create(0);
-  NSMutableSet __block *foundURLs = [[knownPhotos photoURLSet] mutableCopy];
-  NSMutableSet __block *knownNotFoundURLs = [[knownPhotos photoURLSet] mutableCopy];
-  NSMutableDictionary __block *knownAndFoundURLsToHashes = [knownPhotosURLsToHashes mutableCopy];
+  self.enumerationCompleteSemaphore = dispatch_semaphore_create(0);
+  self.foundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
+  self.knownNotFoundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
+  self.knownAndFoundURLsToHashes = [[self mapKnownPhotoURLsToHashes:self.knownPhotos] mutableCopy];
   
-  NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
-  NSMutableDictionary __block *objectIDsToChanges = [[NSMutableDictionary alloc] init];
-  NSMutableDictionary __block *toSaveObjectIDsToChanges = [[NSMutableDictionary alloc] init];
+  self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
+  self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   
-  void (^assetEnumerator)(ALAsset *, NSUInteger, BOOL *) = ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
-    if(photoAsset != NULL) {
-      if (self.isCancelled) {
-        *stop = YES;
-        return;
-      }
-      if (toSaveObjectIDsToChanges.count > NumChangesFlushThreshold) {
-        [groupObjectIDsToChanges addEntriesFromDictionary:toSaveObjectIDsToChanges];
-        [self flushChanges:toSaveObjectIDsToChanges];
-      }
-      NSString *assetURLString = [[photoAsset valueForProperty: ALAssetPropertyAssetURL] absoluteString];
-      NSData *assetHash = [DFDataHasher hashDataForALAsset:photoAsset];
-      [knownNotFoundURLs removeObject:assetURLString];
-      
-      
-      // We have this asset in our DB, see if it matches what we expect
-      if ([knownPhotos.photoURLSet containsObject:assetURLString]) {
-        // Check the actual asset hash against our stored hash, if it doesn't match, delete and recreate the DFPhoto with new info.
-        if (![assetHash isEqual:knownAndFoundURLsToHashes[assetURLString]]){
-          NSDictionary *changes = [self assetDataChangedForAsset:photoAsset withNewHashData:assetHash];
-          [toSaveObjectIDsToChanges addEntriesFromDictionary:changes];
-          // set to the new known hash
-          knownAndFoundURLsToHashes[assetURLString] = assetHash;
-        }
-      } else {//(![knownAndFoundURLs containsObject:assetURLString])
-              // Check to see whether this is a dupe of an already known photo, if it's not, create a new one
-        if (![[knownAndFoundURLsToHashes allValues] containsObject:assetHash]) {
-          DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:photoAsset
-                                                     withHashData:assetHash
-                                                        inContext:self.managedObjectContext];
-          
-          // store information about the new photo to notify
-          toSaveObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
-          // add to list of knownURLs so we don't duplicate add it
-        }
-        // in either case, add mappings
-        [foundURLs addObject:assetURLString];
-        knownAndFoundURLsToHashes[assetURLString] = assetHash;
-      }
-    } else {
-      [groupObjectIDsToChanges addEntriesFromDictionary:toSaveObjectIDsToChanges];
-      DDLogInfo(@"...all assets in group enumerated, changes: \n%@", [self changeTypesToCountsForChanges:groupObjectIDsToChanges].description);
-      [objectIDsToChanges addEntriesFromDictionary:groupObjectIDsToChanges];
-      [groupObjectIDsToChanges removeAllObjects];
-    }
-  };
+  ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+  [library
+   enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos | ALAssetsGroupAlbum
+   usingBlock:[self enumerateGroupsBlock]
+   failureBlock:[self libraryAccessFailureBlock]];
   
-  void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) =  ^(ALAssetsGroup *group, BOOL *stop) {
+   dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
+  
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
+  }
+  
+  NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
+  [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  [self flushChanges];
+  DDLogInfo(@"Scan complete.  Change summary for all groups: \n%@", [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
+  
+  return self.allObjectIDsToChanges;
+}
+
+- (ALAssetsLibraryGroupsEnumerationResultsBlock)enumerateGroupsBlock
+{
+  return ^(ALAssetsGroup *group, BOOL *stop) {
     if (self.isCancelled) {
       *stop = YES;
-      dispatch_semaphore_signal(enumerationCompleteSemaphore);
+      dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
       return;
     }
     if(group != nil) {
       [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
       DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-      [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:assetEnumerator];
+      [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:[self photosEnumerationBlock]];
       if ([[group valueForProperty:ALAssetsGroupPropertyName] isEqualToString:@"Camera Roll"]){
-        [self flushChanges:toSaveObjectIDsToChanges]; // don't need to transfer toSaveChanges because they've already been rolled into the objectIdToChanges dict
+        [self flushChanges]; // don't need to transfer toSaveChanges because they've already been rolled into the objectIdToChanges dict
       }
     } else {
-      dispatch_semaphore_signal(enumerationCompleteSemaphore);
+      dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
     }
   };
-  
-  
-  ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-  [library
-   enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos | ALAssetsGroupAlbum
-   usingBlock:assetGroupEnumerator
-   failureBlock: ^(NSError *error) {
-     DDLogError(@"Failed to enumerate photo groups: %@", error.localizedDescription);
-     dispatch_semaphore_signal(enumerationCompleteSemaphore);
-   }];
-  dispatch_semaphore_wait(enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
-  
-  if (self.isCancelled) {
-    return objectIDsToChanges;
-  }
-  
-  NSDictionary *removeChanges = [self removePhotosNotFound:knownNotFoundURLs];
-  [objectIDsToChanges addEntriesFromDictionary:removeChanges];
-  [toSaveObjectIDsToChanges addEntriesFromDictionary:removeChanges];
-  [self flushChanges:toSaveObjectIDsToChanges];
-  DDLogInfo(@"Scan complete.  Change summary for all groups: \n%@", [self changeTypesToCountsForChanges:objectIDsToChanges]);
-  
-  return objectIDsToChanges;
 }
+
+- (ALAssetsLibraryAccessFailureBlock)libraryAccessFailureBlock {
+  return ^(NSError *error) {
+    DDLogError(@"Failed to enumerate photo groups: %@", error.localizedDescription);
+    dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
+  };
+}
+
+- (ALAssetsGroupEnumerationResultsBlock)photosEnumerationBlock
+{
+  NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
+  return ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
+    if(photoAsset != NULL) {
+      if (self.isCancelled) {
+        *stop = YES;
+        return;
+      }
+      if (self.unsavedObjectIDsToChanges.count > NumChangesFlushThreshold) {
+        [groupObjectIDsToChanges addEntriesFromDictionary:self.unsavedObjectIDsToChanges];
+        [self flushChanges];
+      }
+      NSString *assetURLString = [[photoAsset valueForProperty: ALAssetPropertyAssetURL] absoluteString];
+      NSData *assetHash = [DFDataHasher hashDataForALAsset:photoAsset];
+      [self.knownNotFoundURLs removeObject:assetURLString];
+      
+      
+      // We have this asset in our DB, see if it matches what we expect
+      if ([self.knownPhotos.photoURLSet containsObject:assetURLString]) {
+        // Check the actual asset hash against our stored hash, if it doesn't match, delete and recreate the DFPhoto with new info.
+        if (![assetHash isEqual:self.knownAndFoundURLsToHashes[assetURLString]]){
+          NSDictionary *changes = [self assetDataChangedForAsset:photoAsset withNewHashData:assetHash];
+          [self.unsavedObjectIDsToChanges addEntriesFromDictionary:changes];
+          // set to the new known hash
+          self.knownAndFoundURLsToHashes[assetURLString] = assetHash;
+        }
+      } else {//(![knownAndFoundURLs containsObject:assetURLString])
+              // Check to see whether this is a dupe of an already known photo, if it's not, create a new one
+        if (![[self.knownAndFoundURLsToHashes allValues] containsObject:assetHash]) {
+          DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:photoAsset
+                                                     withHashData:assetHash
+                                                        inContext:self.managedObjectContext];
+          
+          // store information about the new photo to notify
+          self.unsavedObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
+          // add to list of knownURLs so we don't duplicate add it
+        }
+        // in either case, add mappings
+        [self.foundURLs addObject:assetURLString];
+        self.knownAndFoundURLsToHashes[assetURLString] = assetHash;
+      }
+    } else {
+      [groupObjectIDsToChanges addEntriesFromDictionary:self.unsavedObjectIDsToChanges];
+      DDLogInfo(@"...all assets in group enumerated, changes: \n%@", [self changeTypesToCountsForChanges:groupObjectIDsToChanges].description);
+      [self.allObjectIDsToChanges addEntriesFromDictionary:groupObjectIDsToChanges];
+      [groupObjectIDsToChanges removeAllObjects];
+    }
+  };
+}
+
 
 - (NSDictionary *)assetDataChangedForAsset:(ALAsset *)asset withNewHashData:(NSData *)newHashData
 {
@@ -210,10 +226,10 @@ static int NumChangesFlushThreshold = 100;
 }
 
 
-- (void)flushChanges:(NSMutableDictionary *)changes
+- (void)flushChanges
 {
-  [self saveChanges:[changes copy]];
-  [changes removeAllObjects];
+  [self saveChanges:[self.unsavedObjectIDsToChanges copy]];
+  [self.unsavedObjectIDsToChanges removeAllObjects];
 }
 
 - (void)saveChanges:(NSDictionary *)changes
