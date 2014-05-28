@@ -248,7 +248,7 @@ def autocomplete(request):
 	order = 0
 	for suggestion in sortedSuggestions:
 		phrase, count = suggestion
-		entry = {'phrase': phrase, 'count': count, 'order': order}
+		entry = {'name': phrase, 'count': count, 'order': order}
 		order += 1
 		results.append(entry)
 
