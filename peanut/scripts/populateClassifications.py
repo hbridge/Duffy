@@ -7,6 +7,7 @@ import json
 import socket
 import time
 import zmq
+import Image
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -114,11 +115,18 @@ def copyPhotos(photos):
         userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, userId)
         imagepath = os.path.join(userDataPath, photo.full_filename)
 
-        logging.info("Sending to image server:  " + imagepath + " to " + settings.PIPELINE_REMOTE_PATH)
-        ret = subprocess.call(['scp', imagepath, settings.PIPELINE_REMOTE_HOST + ":" + settings.PIPELINE_REMOTE_PATH])
-        
-        if ret == 0:
-            successfullyCopied.append(photo)
+        # Check that there are three channels
+        im = Image.open(imagepath)
+        if (im.getbands() != ('R', 'G', 'B')):
+            logging.warning("Found image with wrong channels:  " + imagepath)            
+            photo.classification_data = json.dumps([{"class_name": "wrong_channels", "rating": 1.0}])
+            photo.save()
+        else:
+            logging.info("Sending to image server:  " + imagepath + " to " + settings.PIPELINE_REMOTE_PATH)
+            ret = subprocess.call(['scp', imagepath, settings.PIPELINE_REMOTE_HOST + ":" + settings.PIPELINE_REMOTE_PATH])
+            
+            if ret == 0:
+                successfullyCopied.append(photo)
 
     return successfullyCopied
 
