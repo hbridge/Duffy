@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from haystack.query import SearchQuerySet
 
 from django.template import RequestContext, loader
+from django.db.models import Q
 
 import os, datetime
 import json
