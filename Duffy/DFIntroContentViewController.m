@@ -59,7 +59,8 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
     [self getUserID];
   } else if (self.introContent == DFIntroContentUploading) {
     [self configureUploadScreen];
-    if ([[[[DFPhotoStore sharedStore] cameraRoll] photoURLSet] count] > 0) {
+    if ([[[[DFPhotoStore sharedStore] cameraRoll] photoURLSet] count] > 0
+        || [[DFCameraRollSyncController  sharedSyncController] isSyncInProgress]) {
       [self runUploadProcess];
     } else {
       self.introContent = DFIntroContentDone;

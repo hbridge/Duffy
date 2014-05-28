@@ -13,5 +13,6 @@
 + (DFCameraRollSyncController *)sharedSyncController;
 - (void)asyncSyncToCameraRoll;
 - (void)cancelSyncOperations;
+- (BOOL)isSyncInProgress;
 
 @end

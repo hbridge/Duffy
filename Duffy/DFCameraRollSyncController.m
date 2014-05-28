@@ -53,6 +53,11 @@ static DFCameraRollSyncController *defaultSyncController;
   [self.syncOperationQueue addOperation:syncOperation];
 }
 
+- (BOOL)isSyncInProgress
+{
+  return (self.syncOperationQueue.operationCount > 0);
+}
+
 - (void)cancelSyncOperations
 {
   [self.syncOperationQueue cancelAllOperations];
