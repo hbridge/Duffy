@@ -168,6 +168,8 @@ class Similarity(models.Model):
 	photo_2 = models.ForeignKey(Photo, related_name="photo_2")
 	user = models.ForeignKey(User)
 	similarity = models.IntegerField()
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
 
 	class Meta:
 		unique_together = ("photo_1", "photo_2")

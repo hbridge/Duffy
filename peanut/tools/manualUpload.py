@@ -94,8 +94,10 @@ def getFilesAndData(rootdir, userId, maxNum):
 	add api for the specified user
 """
 def main(argv):
-	url = "http://asood123.no-ip.biz:8000/api/photos/bulk/"
-	maxNum = 10
+	url = "http://asood123.no-ip.biz/api/photos/bulk/"
+	numAtTime = 10
+	maxNum = 10000
+	count = 0
 	imagePath = None
 	userId = None
 
@@ -119,9 +121,9 @@ def main(argv):
 	if not imagePath or not userId:
 		print ("Pelase enter -u userId and -d imagePath")
 	
-	(files, dataArray, filepathsDict) = getFilesAndData(imagePath, userId, maxNum)
+	(files, dataArray, filepathsDict) = getFilesAndData(imagePath, userId, numAtTime)
 
-	while (len(dataArray) > 0):
+	while (len(dataArray) > 0 and count < maxNum):
 		payload = {'bulk_photos': json.dumps(dataArray)}
 		responseJson = requests.post(url, files=files, data=payload)
 
@@ -133,8 +135,9 @@ def main(argv):
 
 			print "Removing %s" % (filepath)
 			os.remove(filepath)
+			count += 1
 
-		(files, dataArray, filepathsDict) = getFilesAndData(imagePath, userId, maxNum)
+		(files, dataArray, filepathsDict) = getFilesAndData(imagePath, userId, numAtTime)
 		
 
 if __name__ == "__main__":
