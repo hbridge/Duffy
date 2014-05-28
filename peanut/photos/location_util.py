@@ -169,7 +169,7 @@ def populateLocationInfo(photos):
 
 	logger.info("Got back %s results from twofishes" % len(twoFishesResults))
 
-	photosToUpdate = dict()
+	photosToUpdate = list()
 	for i, photo in enumerate(photosWithLL):
 		city = getCity(twoFishesResults[i])
 		if city:
@@ -177,7 +177,7 @@ def populateLocationInfo(photos):
 
 		formattedResult = {"interpretations": twoFishesResults[i]}
 		photo.twofishes_data = json.dumps(formattedResult)
-		photosToUpdate[photo.id] = photo
+		photosToUpdate.append(photo)
 
 	logger.info("Updating %s photos" % len(photosToUpdate))
 
