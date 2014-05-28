@@ -12,7 +12,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	userId = indexes.CharField(model_attr="user_id")
 	photoId = indexes.CharField(model_attr="id", indexed=False)
 	timeTaken = indexes.DateTimeField(model_attr="time_taken", default="")
-	updated = indexes.DateField(model_attr="updated")
+	updated = indexes.DateTimeField(model_attr="updated")
 	isLocal = indexes.BooleanField(model_attr="is_local")
 
 	locations = indexes.MultiValueField(faceted=True, indexed=False)
