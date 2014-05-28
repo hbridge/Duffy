@@ -1,6 +1,6 @@
 import json
 import datetime
-
+import dateutil.parser
 import urllib2
 import urllib
 
@@ -98,4 +98,16 @@ def pageToDates(page, origStartDate, reversed=False):
 	Returns false if searchResults are incomplete
 """
 def incompletePhotos(userId):
-	return Photo.objects.filter(user_id=userId).filter(full_filename=None).count()
+	if Photo.objects.filter(user_id=userId).filter(full_filename=None).count() > 20:
+		return True
+	return False
+
+"""
+	Returns the last updated time for search searchResults
+"""
+def lastUpdatedSearchResults(userId):
+	allResults = SearchQuerySet().all().filter(userId=userId).order_by('-updated')
+	if (allResults.count() > 0):
+		return allResults.order_by('-updated')[0].updated
+	else:
+		return None

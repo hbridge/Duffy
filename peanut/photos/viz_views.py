@@ -4,7 +4,6 @@ from django.http import HttpResponse
 from haystack.query import SearchQuerySet
 
 from django.template import RequestContext, loader
-from django.db.models import Q
 
 import os, datetime
 import json
@@ -117,9 +116,14 @@ def search(request):
 		resultsDict['photoResults'] = photoResults
 		if (pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
 			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
+		resultsDict['lastUpdated'] = search_util.lastUpdatedSearchResults(userId).strftime('%m/%d/%Y %H:%M:%S')
+	else:
+		if (len(Photo.objects.filter(user_id=userId)) > 0):
+			resultsDict['autoRefresh'] = True
 
 	resultsDict['reverse'] = reverse
-	resultsDict['incompleteResults'] = search_util.incompletePhotos(user.id)
+	if (query != "''"):
+		resultsDict['incompleteResults'] = search_util.incompletePhotos(user.id)
 
 	context = {	'user' : user,
 				'imageSize': imageSize,

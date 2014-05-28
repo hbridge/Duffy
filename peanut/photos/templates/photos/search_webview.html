@@ -5,11 +5,14 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	{% if resultsDict.autoRefresh %}
+		<meta http-equiv="refresh" content="3">
+	{% endif %}
 	<meta name="mobile-web-app-capable" content="yes">
 	<title>Search your photos</title> 
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
-	<script src="/static/jquery.jscroll.js"></script>
+	<script src="http://asood123.no-ip.biz/static/jquery.jscroll.js"></script>
 <style>
 	html, body { padding: 0; margin: 0; }
 	.ui-content{
@@ -67,6 +70,11 @@
 	.ui-loader {
 		padding: 11px 0px 11px 0px;
 	}
+	.ui-refresh {
+		padding: 11px 10px 11px 10px;
+		overflow: auto;
+		background-color: rgba(241, 155, 43, 0.7);
+	}
 	.t {
 		font-family: sans-serif;
 	}
@@ -108,33 +116,41 @@
 <body>
 
 <div role="main" class="ui-content">
-	{% if resultsDict.incompleteResults > 9 %}
+	<div class='ui-refresh center t hidden'>
+	More photos uploaded. Tap to Refresh!
+	</div>
+	
+	{% if resultsDict.incompleteResults %}
 		<div class='ui-warning t'>
-		Incomplete searches for things like animals, food, etc. Get on WiFi to upload rest of your photos.
+		Incomplete searches for things like animals, food, etc. We are still uploading rest of your photos.
 		</div>
 	{% endif %}
-	<div class="ui-gallery" id="allImages">
 
-	{% if resultsDict.nextLink and resultsDict.reverse %}
-		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}"></a>
-	{% endif %}		
-
-	{% for entry in resultsDict.photoResults %}
-		{% include "photos/_timeline_block.html" %}
-	{% endfor %}
-	{% if resultsDict.nextLink and not resultsDict.reverse %}
-		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}"></a>
+	{% if resultsDict.reverse %}
+	<div class="ui-more center t hidden">More</div>
 	{% endif %}
 
+	<div class="ui-gallery" id="allImages">
+
+		{% for entry in resultsDict.photoResults %}
+			{% include "photos/_timeline_block.html" %}
+		{% endfor %}
+		{% if resultsDict.nextLink %}
+		<a class='jscroll-next' href= "{{ resultsDict.nextLink }}"></a>
+		{% endif %}	
 	</div>
+
+	{% if not resultsDict.reverse %}
+		<div class="ui-more center t hidden">More</div>
+	{% endif %}	
 
 	<div class="results-footer"> 
 		{% if resultsDict.totalResults == 0 %}
 			<div class="t center"> No results found! </div>
 			<br>
 		{% endif %}
-		<div class="t" > Your searchable images: {{ resultsDict.indexSize }}  </div>
-
+		<div class="t"> Your searchable images: {{ resultsDict.indexSize }}  </div>
+		<div class="t"> Last Update: {{ resultsDict.lastUpdated }} </div>
 		<div id="stats" class="t">
 			<!-- STATS: Time: %(total_time).2fs | P: %(python_time).2fs | DB: %(db_time).2fs | Q: %(db_queries)d ENDSTATS -->
 		</div>
@@ -200,22 +216,21 @@
 	}
 
 	function updateMoreLink(){
-		$('#allImages').find('div.ui-more').remove();
-		var moreLink = '<div class="ui-more center t">More</div>';
 		if ($('div.ui-photo-block.hidden').length > 0){
-			if (reversed){
-				$('#allImages').prepend(moreLink);
+			if ($('div.ui-more').hasClass('hidden')) {
+				//$('div.ui-loader').addClass('hidden');
+				hideDiv($('div.ui-loader'));
+				showDiv($('div.ui-more'));
+				moreClickHandler();	
 			}
-			else {
-				$('#allImages').append(moreLink);
-			}
-			$('div.ui-loader').hide();
-			moreClickHandler();			
 		}
 		else if ($('div.ui-loader').length > 0){
 			$('div.ui-loader').show();
+			hideDiv($('div.ui-more'));
 		}
-		else {}
+		else {
+			hideDiv($('div.ui-more'));
+		}
 	}
 
 	/*
@@ -223,29 +238,43 @@
 	*/
 	function moreClickHandler(){
 		$('div.ui-more').click(function(){
-			$('#allImages').find('div.ui-more').remove();
 			if (reversed){
 				divs = $($('div.ui-photo-block.hidden').get().reverse());
 			}
 			else {
 				divs = $('div.ui-photo-block.hidden');
 			}
-			showImages($(divs).slice(0,6))
+			$(divs).slice(0,6).each(function(){
+				showDiv($(this));
+			});
 			updateMoreLink();
 		});
 	}
 
 	/*
-	Unhides preloaded images
+	Shows a div and attempts to not scroll the view
 	*/
-	function showImages(divs){
-		curHeight = $(document).height();		
-		divs.each(function(){
-			divs.removeClass('hidden');
-		});
+	function showDiv(div){
+		curHeight = $(document).height();
+		div.removeClass('hidden');
 		newHeight = $(document).height();
 		if (reversed){
-			$(window).scrollTop(newHeight - curHeight);
+			$(window).scrollTop($(window).scrollTop() + newHeight - curHeight);
+		}
+	}
+
+	/*
+	Hides a div and attempts to not scroll the view
+	*/
+	function hideDiv(div){
+		curHeight = $(document).height();
+		div.addClass('hidden');
+		newHeight = $(document).height();
+		if (reversed){
+			newST = $(window).scrollTop() + newHeight - curHeight;
+			if (newST > 0){
+				$(window).scrollTop(newST);
+			}
 		}
 	}
 
@@ -272,7 +301,38 @@
 		},
 		loadingHtml: '<div class="ui-loader center t hidden"> Loading... </div>'
 	});
+
+	/*
+	Check to see if there are newer results
+	*/
+	function checkForNewResultsNow(){
+		var lastUpdated = '{{ resultsDict.lastUpdated }}';
+		$.ajax({
+			url: "/api/newresults_check",
+			dataType: "json",
+			crossDomain: true,
+			data: {
+				user_id: "{{ user.id }}",
+				last_updated: lastUpdated,
+			}
+		})
+		.then( function ( response ) {
+			if (response['newData']){
+				showDiv($('div.ui-refresh'));
+				refreshClickHandler();
+			}
+		});
+	}
 	
+	function refreshClickHandler(){
+		$('div.ui-refresh').click(function(){
+			location.reload();
+		});
+	}
+
+	if (reversed){
+		window.setTimeout(checkForNewResultsNow, 5000);
+	}
 
 	</script>
 </html>

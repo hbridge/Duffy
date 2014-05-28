@@ -26,8 +26,6 @@ from django.utils import timezone
 from django.forms.models import model_to_dict
 from django.http import Http404
 
-from django.contrib.gis.geos import Point, fromstr
-
 from haystack.query import SearchQuerySet
 
 from rest_framework import status
@@ -44,8 +42,8 @@ from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger(__name__)
 
-
-class BasePhotoAPI(APIView):
+class PhotoAPI(APIView):
+	# TODO(derek)  pull this out to shared class
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
 		for key in jsonDict:
@@ -56,28 +54,7 @@ class BasePhotoAPI(APIView):
 				ret[key] = str(var)
 
 		return ret
-
-	"""
-		Fill in extra data that needs a bit more processing.
-		Right now time_taken and location_point.  Both will look at the file exif data if
-		  we don't have iphone metadata
-	"""
-	def populateExtraData(self, photos):
-		for photo in photos:
-			if not photo.time_taken:
-				photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
-				logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
-
-			if not photo.location_point:
-				lat, lon = location_util.getLatLonFromExtraData(photo, True)
-				
-				if lat and lon:
-					photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-					logger.debug("looked for lat lon and got %s" % (photo.location_point))
-		return photos
-
-
-class PhotoAPI(BasePhotoAPI):
+		
 	def getObject(self, photoId):
 		try:
 			return Photo.objects.get(id=photoId)
@@ -119,10 +96,6 @@ class PhotoAPI(BasePhotoAPI):
 			try:
 				serializer.save()
 				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
-				
-				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				photosToUpdate = self.populateExtraData([serializer.object])
-
 			except IntegrityError:
 				logger.error("IntegrityError")
 				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -130,7 +103,19 @@ class PhotoAPI(BasePhotoAPI):
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class PhotoBulkAPI(BasePhotoAPI):
+class PhotoBulkAPI(APIView):
+	# TODO(derek)  pull this out to shared class
+	def jsonDictToSimple(self, jsonDict):
+		ret = dict()
+		for key in jsonDict:
+			var = jsonDict[key]
+			if type(var) is dict or type(var) is list:
+				ret[key] = json.dumps(jsonDict[key])
+			else:
+				ret[key] = str(var)
+
+		return ret
+
 	"""
 		This goes through and tries to save each photo and deals with IntegrityError's (dups)
 		If we find one, grab the current one in the db (which could be wrong), and update it
@@ -153,7 +138,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 				if len(dup) > 1:
 					logger.error("Validation error for user id: " + str(photo.user) + " and " + photo.iphone_hash)
 		return photoDups
-
 
 	def post(self, request, format=None):
 		response = list()
@@ -179,9 +163,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 					logger.error("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
 					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 			
-			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
-			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
-			#   ones were created
 			dups = list()
 			try:
 				Photo.objects.bulk_create(objsToCreate)
@@ -196,26 +177,14 @@ class PhotoBulkAPI(BasePhotoAPI):
 			# with dups
 			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
 
-			# Now that we've created the images in the db, we need to deal with any uploaded images
-			#   and fill in any EXIF data (time_taken, gps, etc)
-			photosToUpdate = list()
+			updatedPhotos = list()
 			if len(createdPhotos) > 0:
-				# This will move the uploaded image over to the filesystem, and create needed thumbs
-				photosToUpdate = image_util.handleUploadedImagesBulk(request, createdPhotos)
+				updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
 
-				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				photosToUpdate = self.populateExtraData(photosToUpdate)
-
-				# These are all the fields that we might want to update.  List of the extra fields from above
-				# TODO(Derek):  Probably should do this more intelligently
-				Photo.bulkUpdate(photosToUpdate, ["location_point", "full_filename", "thumb_filename", "time_taken"])
-
-			for photo in photosToUpdate:
+			for photo in updatedPhotos:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
 
-			# We don't need to update/save the dups since other code does that, but we still
-			#   want to add it to the response
 			for photo in dups:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
@@ -317,6 +286,14 @@ def search(request):
 	else:
 		page = 1
 
+	if data.has_key('r'):
+		if (data['r'] == '1'):
+			reverse = True
+		else:
+			reverse = False
+	else:
+		reverse = False
+
 	if data.has_key('q'):
 		query = data['q']
 	else:
@@ -339,10 +316,13 @@ def search(request):
 	if (allResults.count() > 0):
 		if (startDate == None):
 			startDate = allResults[0].timeTaken
-		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate)
+		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
 		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
-		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow()):
-			pageEndDate = pageEndDate+relativedelta(months=3)
+		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow() and pageStartDate >= startDate):
+			if (reverse):
+				pageStartDate = pageStartDate+relativedelta(months=-6)
+			else:
+				pageEndDate = pageEndDate+relativedelta(months=6)
 			page +=1
 			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
@@ -355,9 +335,9 @@ def search(request):
 
 			html = render_to_string('photos/_timeline_block.html', context)
 			response += html
-	
-		if (pageEndDate < datetime.datetime.utcnow()):
-			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) +'">Next</a>'
+
+		if (pageEndDate < datetime.datetime.utcnow() and pageStartDate > startDate):
+			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))+'">Next</a>'
 			response += nextLink
 	return HttpResponse(response, content_type="text/html")
 
@@ -467,6 +447,40 @@ def create_user(request):
 
 	response['user'] = model_to_dict(user)
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+"""
+	Returns true if last updated index time stamp is greater than the one sent
+"""
+def newresults_check(request):
+	response = dict({'result': True})
+	data = getRequestData(request)
+
+	if data.has_key('user_id'):
+		userId = data['user_id']
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return returnFailure(response, "user_id not found")
+
+	else:
+		return returnFailure(response, "Need user_id")
+
+	if data.has_key('last_updated'):
+		lastUpdated = datetime.datetime.strptime(data['last_updated'],'%m/%d/%Y %H:%M:%S')
+	else:
+		return returnFailure(response, "Need last_updated field")
+
+	newUpdatedTime = search_util.lastUpdatedSearchResults(userId)
+
+	print lastUpdated
+	print newUpdatedTime
+	if (newUpdatedTime > lastUpdated):
+		response['newData'] = True
+	else:
+		response['newData'] = True # TODO: change to False before checking in
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 """
 Helper functions

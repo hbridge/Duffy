@@ -8,6 +8,7 @@ urlpatterns = patterns('photos.api_views',
 	url(r'^get_suggestions$', 'get_suggestions'),
 	url(r'^get_user$', 'get_user'),
 	url(r'^create_user$', 'create_user'),
+	url(r'^newresults_check$', 'newresults_check'),
 
 	# REST API
 	#url(r'^photos/$', 'photo_list'),
