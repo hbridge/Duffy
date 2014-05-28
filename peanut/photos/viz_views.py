@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from haystack.query import SearchQuerySet
 
 from django.template import RequestContext, loader
+from django.db.models import Q
 
 import os, datetime
 import json
@@ -180,7 +181,7 @@ def userbaseSummary(request):
 				entry['dbCount'] = totalCount
 				entry['thumbsCount'] = dbQuery.exclude(thumb_filename=None).count()
 				entry['thumbs'] = int(math.floor(entry['thumbsCount']/totalCount*100))
-				photosWithGPS = dbQuery.filter(metadata__contains='{GPS}').count()
+				photosWithGPS = dbQuery.filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False)).count()
 
 				if photosWithGPS > 0:
 					entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))

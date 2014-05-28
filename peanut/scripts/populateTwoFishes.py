@@ -9,7 +9,7 @@ if parentPath not in sys.path:
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
-from django.db.models import Count
+from django.db.models import Q
 from photos.models import Photo
 from peanut import settings
 from photos import location_util
@@ -18,8 +18,10 @@ def main(argv):
 	logger = logging.getLogger(__name__)
 	
 	logger.info("Starting... ")
+	baseQuery = Photo.objects.all().filter(twofishes_data=None).exclude(thumb_filename=None)
 	while True:
-		photos = Photo.objects.all().filter(twofishes_data=None).filter(metadata__contains='{GPS}').filter(metadata__contains='Latitude').exclude(thumb_filename=None)
+		# If we have the iphone metadata or we have location_point
+		photos = baseQuery.filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False))
 
 		if len(photos) > 0:
 			logger.info("Found {0} images that need two fishes data".format(len(photos)))
