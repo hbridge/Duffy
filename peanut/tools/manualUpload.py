@@ -59,6 +59,7 @@ def getFilesAndData(rootdir, userId, maxNum):
 
 	files = dict()
 	dataArray = list()
+	filepathsDict = dict()
 
 	for subdir, dirs, filenames in os.walk(rootdir):
 		for filename in filenames:
@@ -67,6 +68,7 @@ def getFilesAndData(rootdir, userId, maxNum):
 			if (ext in [".jpg", ".JPG"]):
 				keyName = "key" + str(len(dataArray))
 				filepath = os.path.join(rootdir, filename)
+				filepathsDict[keyName] = filepath
 
 				tmpfile = os.path.join(tempfile.gettempdir(), filename)
 
@@ -81,9 +83,9 @@ def getFilesAndData(rootdir, userId, maxNum):
 					dataArray.append(data)
 
 			if len(dataArray) == maxNum:
-				return (files, dataArray)
+				return (files, dataArray, filepathsDict)
 
-	return (files, dataArray)
+	return (files, dataArray, filepathsDict)
 
 """
 	Script to manually upload files from local computer
@@ -117,12 +119,23 @@ def main(argv):
 	if not imagePath or not userId:
 		print ("Pelase enter -u userId and -d imagePath")
 	
-	(files, dataArray) = getFilesAndData(imagePath, userId, maxNum)
+	(files, dataArray, filepathsDict) = getFilesAndData(imagePath, userId, maxNum)
 
-	payload = {'bulk_photos': json.dumps(dataArray)}
-	r = requests.post(url, files=files, data=payload)
+	while (len(dataArray) > 0):
+		payload = {'bulk_photos': json.dumps(dataArray)}
+		responseJson = requests.post(url, files=files, data=payload)
 
-	print r.text
+		print responseJson.text
+		response = json.loads(responseJson.text)
+		for photoResponse in response:
+			keyName = photoResponse["file_key"]
+			filepath = filepathsDict[keyName]
+
+			print "Removing %s" % (filepath)
+			os.remove(filepath)
+
+		(files, dataArray, filepathsDict) = getFilesAndData(imagePath, userId, maxNum)
+		
 
 if __name__ == "__main__":
 	main(sys.argv[1:])
