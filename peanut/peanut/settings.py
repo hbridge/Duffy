@@ -36,6 +36,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     'photos',
     # Added.
     'haystack',
@@ -72,7 +73,7 @@ WSGI_APPLICATION = 'peanut.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', 
+        'ENGINE': 'django.contrib.gis.db.backends.mysql', 
         'NAME': 'duffy',
         'USER': 'duffy',
         'PASSWORD': 'duffy',

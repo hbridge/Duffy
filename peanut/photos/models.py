@@ -2,11 +2,12 @@ import os
 import json
 import datetime
 
-from django.db import models
+from django.contrib.gis.db import models
 
 from peanut import settings
 
-from bulk_update.helper import bulk_update
+from photos import bulk_updater
+
 
 # Create your models here.
 class User(models.Model):
@@ -35,6 +36,7 @@ class Photo(models.Model):
 	metadata = models.CharField(max_length=10000, null=True)
 	location_data = models.TextField(null=True)
 	location_city =  models.CharField(max_length=1000, null=True)
+	location_point = models.PointField(null=True)
 	twofishes_data = models.TextField(null=True)
 	iphone_faceboxes_topleft = models.CharField(max_length=10000, null=True)
 	iphone_hash = models.CharField(max_length=100, null=True)
@@ -47,6 +49,9 @@ class Photo(models.Model):
 	bulk_batch_key = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	 # You MUST use GeoManager to make Geo Queries
+	objects = models.GeoManager()
 
 	class Meta:
 		unique_together = ("user", "iphone_hash")
@@ -139,27 +144,14 @@ class Photo(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		idsToUpdate = list()
-		oldObjsById = dict()
-		objsToUpdate = list()
-
 		for obj in objs:
-			idsToUpdate.append(obj.id)
-			oldObjsById[obj.id] = obj
+			obj.updated = datetime.datetime.now()
 
-		results = cls.objects.in_bulk(idsToUpdate)
-
-		for id, obj in results.iteritems():
-			for attributeName in attributesList:
-				newAttribute = getattr(oldObjsById[id], attributeName)
-				setattr(obj, attributeName, newAttribute)
-				obj.updated = datetime.datetime.now()
-			objsToUpdate.append(obj)
-
-		if (len(objsToUpdate) == 1):
-			objsToUpdate[0].save()
+		if (len(objs) == 1):
+			objs[0].save()
 		else:
-			bulk_update(objsToUpdate)
+			attributesList.append("updated")
+			bulk_updater.bulk_update(objs, update_fields=attributesList)
 		
 
 class Classification(models.Model):

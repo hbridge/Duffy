@@ -5,6 +5,8 @@ import sys
 import os
 import logging
 
+from photos import image_util
+
 from bulk_update.helper import bulk_update
 
 from photos.models import Photo
@@ -31,8 +33,72 @@ def chunks(l, n):
 	"""
 	for i in xrange(0, len(l), n):
 		yield l[i:i+n]
+
+
+
+# copied from https://gist.github.com/erans/983821
+def _get_if_exist(data, key):
+	if key in data:
+		return data[key]
 		
-def getLatLon(photo):
+	return None
+	
+def _convert_to_degress(value):
+	"""Helper function to convert the GPS coordinates stored in the EXIF to degress in float format"""
+	d0 = value[0][0]
+	d1 = value[0][1]
+	d = float(d0) / float(d1)
+ 
+	m0 = value[1][0]
+	m1 = value[1][1]
+	m = float(m0) / float(m1)
+ 
+	s0 = value[2][0]
+	s1 = value[2][1]
+	s = float(s0) / float(s1)
+ 
+	return d + (m / 60.0) + (s / 3600.0)
+ 
+
+"""
+	Looks for location info from passed in exif data.
+	Uses data from image_util.getExifData
+
+	Returns back the lat, lon as a tuple
+	If not found, returns (None, None)
+"""
+def getLatLonFromExif(exif_data):
+	"""Returns the latitude and longitude, if available, from the provided exif_data (obtained through get_exif_data above)"""
+	lat = None
+	lon = None
+ 
+	if "GPSInfo" in exif_data:		
+		gps_info = exif_data["GPSInfo"]
+ 
+		gps_latitude = _get_if_exist(gps_info, "GPSLatitude")
+		gps_latitude_ref = _get_if_exist(gps_info, 'GPSLatitudeRef')
+		gps_longitude = _get_if_exist(gps_info, 'GPSLongitude')
+		gps_longitude_ref = _get_if_exist(gps_info, 'GPSLongitudeRef')
+ 
+		if gps_latitude and gps_latitude_ref and gps_longitude and gps_longitude_ref:
+			lat = _convert_to_degress(gps_latitude)
+			if gps_latitude_ref != "N":                     
+				lat = 0 - lat
+ 
+			lon = _convert_to_degress(gps_longitude)
+			if gps_longitude_ref != "E":
+				lon = 0 - lon
+ 
+	return (lat, lon)
+
+
+"""
+	Looks for lat/lon data in metadata, then if told, looks at exif info in the actual file
+
+	Returns back the lat, lon as a tuple
+	If not found, returns (None, None)
+"""
+def getLatLonFromExtraData(photo, tryFile=False):
 	if photo.metadata:
 		metadata = json.loads(photo.metadata)
 		if "{GPS}" in metadata:
@@ -52,8 +118,16 @@ def getLatLon(photo):
 				return (lat, lon)
 			else:
 				logger.error("Thought I should have found GPS data but didn't in photo %s and metadata: %s" % (photo.id, metadata))
-				return None
-	return None
+				return (None, None)
+		
+	if (tryFile):
+		exif = image_util.getExifData(photo)
+		
+		lat, lon = getLatLonFromExif(exif)
+		if lat and lon:
+			return (lat, lon)
+
+	return (None, None)
 
 def getCity(twoFishesResult):
 	for entry in twoFishesResult:
@@ -70,17 +144,6 @@ def populateLocationInfoByIds(photoIds):
 	return populateLocationInfo(photos)
 
 
-def smartBulkUpdate(objectDict):
-	objsToUpdate = list()
-	results = Photo.objects.in_bulk(objectDict.keys())
-
-	for id, photo in results.iteritems():
-		photo.twofishes_data = objectDict[id].twofishes_data
-		photo.location_city = objectDict[id].location_city
-		objsToUpdate.append(photo)
-
-	bulk_update(objsToUpdate)
-
 """
 	Static method for populating extra info like twoFishes.
 
@@ -91,9 +154,13 @@ def populateLocationInfo(photos):
 	photosWithLL = list()
 	logger.info("Starting populateLocationInfo with %s photos" % len(photos))
 	for photo in photos:
-		ll = getLatLon(photo)
-		if (ll):
-			latLonList.append(ll)
+		if photo.location_point:
+			lat, lon = (photo.location_point.y, photo.location_point.x)
+		else:
+			lat, lon = getLatLonFromExtraData(photo)
+
+		if lat and lon:
+			latLonList.append((lat, lon))
 			photosWithLL.append(photo)
 
 	logger.info("Found %s lat/lon" % len(latLonList))
@@ -114,10 +181,7 @@ def populateLocationInfo(photos):
 
 	logger.info("Updating %s photos" % len(photosToUpdate))
 
-	if len(photosToUpdate) == 1:
-		photosToUpdate.values()[0].save()
-	else:
-		smartBulkUpdate(photosToUpdate)
+	Photo.bulkUpdate(photosToUpdate, ["twofishes_data", "location_city"])
 
 	return len(photosToUpdate)
 
@@ -148,7 +212,6 @@ def getDataFromTwoFishesBulk(latLonList):
 					result.append(twoFishesResult["interpretations"][index])
 				resultList.append(result)
 	return resultList
-	return None
 
 """
 	This is used only for testing purposes

@@ -1,7 +1,7 @@
 import os, sys, os.path
 import Image
+from PIL.ExifTags import TAGS, GPSTAGS
 import pyexiv2
-import exifread
 import json
 import tempfile
 import logging
@@ -42,33 +42,6 @@ def createThumbnail(photo):
 			logger.info("cannot create thumbnail for '%s'" % fullFilePath)
 	else:
 		return None
-
-
-"""
-	Generates a thumbnail of the given image to the given size
-	Creates a new file in the same directory as the existing filename of the format:
-	PHOTOID-thumb-SIZE.jpg
-
-	TODO(derek):  remove this and move to createThumbnail
-"""
-def imageThumbnail(photoFname, size, userId):
-	path = '/home/derek/user_data/' + str(userId) + '/'
-	newFilename = str.split(str(photoFname), '.')[0] + "-thumb-" + str(size) + '.jpg'
-	outfilePath = path + newFilename
-	infilePath = path + str(photoFname)
-	
-	if (not os.path.isfile(infilePath)):
-		logger.info("File not found: '%s'" % infilePath)
-		return None
-
-	if (os.path.isfile(outfilePath)):
-		return newFilename
-
-	if(resizeImage(infilePath, outfilePath, size, True, False)):
-		logger.info("generated thumbnail: '%s" % outfilePath)
-		return newFilename
-	else:
-		logger.info("cannot create thumbnail for '%s'" % infilePath)
 
 """
 	Does image resizes and creates a new file (JPG) of the specified size
@@ -116,6 +89,34 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 		return False
 
 
+# copied from https://gist.github.com/erans/983821
+def getExifData(photo):
+	exif_data = {}
+
+	"""Returns a dictionary from the exif data of an PIL Image item. Also converts the GPS Tags"""
+	image = Image.open(photo.getThumbPath())
+	info = image._getexif()
+
+	if not info or len(info) == 0:
+		image = Image.open(photo.getFullPath())
+		info = image._getexif()
+
+	if info:
+		for tag, value in info.items():
+			decoded = TAGS.get(tag, tag)
+			if decoded == "GPSInfo":
+				gps_data = {}
+				for t in value:
+					sub_decoded = GPSTAGS.get(t, t)
+					gps_data[sub_decoded] = value[t]
+ 
+				exif_data[decoded] = gps_data
+			else:
+				exif_data[decoded] = value
+ 
+	return exif_data
+
+
 """
 	This looks at the metadata for the photo and the photo itself to see if it can figure out the time time.
 	First it looks in the Exif Metadata, this comes from the iPhone
@@ -124,10 +125,10 @@ def resizeImage(origFilepath, newFilepath, size, crop, copyExif):
 	Returns a datetime object which can be put straight into the database
 
 """
-def getTimeTaken(metadataJson, origFilename, photoPath):
+def getTimeTakenFromExtraData(photo, tryFile=False):
 	# first see if the data is in the metadata json
-	if (metadataJson):
-		metadata = json.loads(metadataJson)
+	if (photo.metadata):
+		metadata = json.loads(photo.metadata)
 		if "{Exif}" in metadata:
 			if "DateTimeOriginal" in metadata["{Exif}"]:
 				timeStr = metadata["{Exif}"]["DateTimeOriginal"]
@@ -139,18 +140,17 @@ def getTimeTaken(metadataJson, origFilename, photoPath):
 				timeStr = metadata["{DFCameraRollExtras}"]["DateTimeCreated"]
 				dt = datetime.strptime(timeStr, "%Y:%m:%d %H:%M:%S")
 				return dt
-							
-	# If not, check the file's EXIF data
-	f = open(photoPath, 'rb')
-	tags = exifread.process_file(f)
+	
+	if tryFile:
+		exif = getExifData(photo)
 
-	if "EXIF DateTimeOriginal" in tags:
-		origTime = tags["EXIF DateTimeOriginal"]
-		dt = datetime.strptime(str(origTime), "%Y:%m:%d %H:%M:%S")
-		return dt
+		if "DateTimeOriginal" in exif:
+			origTime = exif["DateTimeOriginal"]
+			dt = datetime.strptime(str(origTime), "%Y:%m:%d %H:%M:%S")
+			return dt
 
 	try:
-		filenameNoExt = os.path.splitext(os.path.basename(origFilename))[0]
+		filenameNoExt = os.path.splitext(os.path.basename(photo.orig_filename))[0]
 		dt = datetime.strptime(filenameNoExt, "%Y-%m-%d %H.%M.%S")
 		return dt
 	except ValueError:
@@ -201,21 +201,10 @@ def handleUploadedImagesBulk(request, photos):
 		if photo.file_key in request.FILES:
 			writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
 			updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
-			
-			if not updatedPhoto.time_taken:
-				updatedPhoto.time_taken = getTimeTaken(updatedPhoto.metadata, updatedPhoto.orig_filename, updatedPhoto.getThumbPath())
-				logger.debug("Didn't find time_taken, looked myself and found %s" % (updatedPhoto.time_taken))
-	
+					
 			photosToUpdate.append(updatedPhoto)
 		else:
 			logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
-
-
-	if (len(photosToUpdate) == 1):
-		photosToUpdate[0].save()
-	else:
-		logger.info("Updating %s photos in db" % (len(photosToUpdate)))
-		bulk_update(photosToUpdate)
 
 	if (len(request.FILES) != len(photosToUpdate)):
 		logger.error("Have request with %s files and only %s photos updated" % (len(request.FILES), len(photosToUpdate)))
