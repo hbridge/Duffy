@@ -80,7 +80,7 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
   SectionNameToTitles = @{DATE_SECTION_NAME: @"Time",
                           LOCATION_SECTION_NAME: @"Location",
                           CATEGORY_SECTION_NAME: @"Things",
-                          SUGGESTION_SECTION_NAME : @"Suggestions",
+                          SUGGESTION_SECTION_NAME : @"Suggestions from your photos",
                           };
 }
 
