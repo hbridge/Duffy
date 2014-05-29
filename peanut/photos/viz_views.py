@@ -118,7 +118,9 @@ def search(request):
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
 		if (pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
-			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse)) + '&debug='
+			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
+			if debug:
+				resultsDict['nextLink'] += '&debug'
 		resultsDict['lastUpdated'] = search_util.lastUpdatedSearchResults(userId).strftime('%m/%d/%Y %H:%M:%S')
 	else:
 		if (len(Photo.objects.filter(user_id=userId)) > 0):

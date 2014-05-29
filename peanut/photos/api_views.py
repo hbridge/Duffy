@@ -315,6 +315,11 @@ def search(request):
 	else:
 		page = 1
 
+	if data.has_key('debug'):
+		debug = True
+	else:
+		debug = False
+
 	if data.has_key('r'):
 		if (data['r'] == '1'):
 			reverse = True
@@ -360,13 +365,19 @@ def search(request):
 			context = {	'imageSize': imageSize,
 						'userId': userId,
 						'entry': entry,
-						'thumbnailBasepath': thumbnailBasepath}
+						'thumbnailBasepath': thumbnailBasepath,
+						'debug': debug}
 
 			html = render_to_string('photos/_timeline_block.html', context)
 			response += html
 
 		if (pageEndDate < datetime.datetime.utcnow() and pageStartDate > startDate):
-			nextLink = '<a class="jscroll-next" href="/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))+'">Next</a>'
+			url = '/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))
+			print "HERE0"
+			if debug:
+				print "HERE1"
+				url += '&debug'
+			nextLink = '<a class="jscroll-next" href="' + url + '"></a>'
 			response += nextLink
 	return HttpResponse(response, content_type="text/html")
 
