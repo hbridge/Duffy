@@ -42,6 +42,7 @@
 		5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */; };
 		5A8D0B5618EF525800A1D9A7 /* DFTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B5518EF525800A1D9A7 /* DFTableHeaderView.m */; };
 		5A8D0B5818EF526E00A1D9A7 /* DFTableHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */; };
+		5A97DC861937809700FA4718 /* DFSearchBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A97DC851937809700FA4718 /* DFSearchBarController.m */; };
 		5AACB8F418F4574400F4EEB6 /* DFUserPeanutAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */; };
 		5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AACB8F918F4599800F4EEB6 /* DFNetworkingConstants.m */; };
 		5AACB90918F49AED00F4EEB6 /* libFlurry_4.4.0.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AACB90818F49AED00F4EEB6 /* libFlurry_4.4.0.a */; };
@@ -185,6 +186,8 @@
 		5A8D0B5418EF525800A1D9A7 /* DFTableHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTableHeaderView.h; sourceTree = "<group>"; };
 		5A8D0B5518EF525800A1D9A7 /* DFTableHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTableHeaderView.m; sourceTree = "<group>"; };
 		5A8D0B5718EF526E00A1D9A7 /* DFTableHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFTableHeaderView.xib; sourceTree = "<group>"; };
+		5A97DC841937809700FA4718 /* DFSearchBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchBarController.h; sourceTree = "<group>"; };
+		5A97DC851937809700FA4718 /* DFSearchBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchBarController.m; sourceTree = "<group>"; };
 		5AACB8F218F4574400F4EEB6 /* DFUserPeanutAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUserPeanutAdapter.h; sourceTree = "<group>"; };
 		5AACB8F318F4574400F4EEB6 /* DFUserPeanutAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserPeanutAdapter.m; sourceTree = "<group>"; };
 		5AACB8F818F4599800F4EEB6 /* DFNetworkingConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNetworkingConstants.h; sourceTree = "<group>"; };
@@ -535,6 +538,8 @@
 				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
 				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
 				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
+				5A97DC841937809700FA4718 /* DFSearchBarController.h */,
+				5A97DC851937809700FA4718 /* DFSearchBarController.m */,
 				5A5FCB34192D478F00A060A7 /* DFSearchBar.h */,
 				5A5FCB35192D478F00A060A7 /* DFSearchBar.m */,
 				5A5FCB36192D478F00A060A7 /* DFSearchBar.xib */,
@@ -994,6 +999,7 @@
 				5AC40EE11909B2C000ED3532 /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,
 				5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */,
+				5A97DC861937809700FA4718 /* DFSearchBarController.m in Sources */,
 				5AD62B0F1923E33700EE22D7 /* DFDevelopmentSettingsViewController.m in Sources */,
 				5AD62A541921648D00EE22D7 /* DFCameraRollSyncOperation.m in Sources */,
 				5A8C98F91911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
