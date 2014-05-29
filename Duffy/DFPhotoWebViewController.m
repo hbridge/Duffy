@@ -35,6 +35,7 @@
 {
     [super viewDidLoad];
 
+  [self.navigationController setNavigationBarHidden:NO animated:YES];
     self.webView.scalesPageToFit = YES;
     [self setupNavBar];
     
