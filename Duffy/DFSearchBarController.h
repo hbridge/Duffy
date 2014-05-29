@@ -7,7 +7,19 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFSearchBar.h"
 
-@interface DFSearchBarController : NSObject
+@class DFSearchBar;
+
+
+@interface DFSearchBarController : NSObject <DFSearchBarDelegate, UITableViewDataSource, UITableViewDelegate>
+
+@property (nonatomic, retain) DFSearchBar *searchBar;
+@property (nonatomic, retain) UITableView *tableView;
+@property (nonatomic, weak) UIViewController *parentViewController;
+@property (readonly, nonatomic, retain) NSMutableDictionary *suggestionsBySection;
+
+- (void)clearSearchBar;
+- (NSDictionary *)suggestionsStrings;
 
 @end

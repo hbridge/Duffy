@@ -16,8 +16,6 @@
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
-@property (nonatomic, retain) NSMutableDictionary *defaultSearchResults;
-@property (nonatomic, retain) DFSuggestionAdapter *autcompleteController;
 
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;
 
