@@ -57,7 +57,8 @@ def search(request):
 
 	if data.has_key('debug'):
 		debug = True
-		dupThreshold = -1
+		# TODO(Derek): commented out for hack, but longer term if we want, make this own param
+		#dupThreshold = -1
 	else:
 		debug = False
 
@@ -117,7 +118,7 @@ def search(request):
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
 		if (pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
-			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
+			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse)) + '&debug='
 		resultsDict['lastUpdated'] = search_util.lastUpdatedSearchResults(userId).strftime('%m/%d/%Y %H:%M:%S')
 	else:
 		if (len(Photo.objects.filter(user_id=userId)) > 0):
