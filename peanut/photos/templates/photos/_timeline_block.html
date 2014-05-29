@@ -16,6 +16,7 @@
 
 	class="{% if imageEntry.dist != None %}l-c{% else %}l{% endif %}"
 	height="{{ imageSize }}px" width="{{ imageSize }}px" blah="{{ imageEntry.photo.isLocal }}"
+	onError="this.onerror=null;this.src='{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg';"	
 	{% if debug %}
 		title="ID: {{ imageEntry.photo.photoId }}  | TEXT: {{ imageEntry.photo.text }} | TIME: {{ imageEntry.photo.timeTaken }} | ORIG_CLASSIFICATIONS: {{ imageEntry.photo.classificationData }} |
 		SIMROW: {{ imageEntry.simrow }} |
