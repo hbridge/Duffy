@@ -25,6 +25,7 @@ from django.template import RequestContext, loader
 from django.utils import timezone
 from django.forms.models import model_to_dict
 from django.http import Http404
+from django.contrib.gis.geos import Point, fromstr
 
 from haystack.query import SearchQuerySet
 
@@ -42,8 +43,8 @@ from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger(__name__)
 
-class PhotoAPI(APIView):
-	# TODO(derek)  pull this out to shared class
+
+class BasePhotoAPI(APIView):
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
 		for key in jsonDict:
@@ -54,7 +55,28 @@ class PhotoAPI(APIView):
 				ret[key] = str(var)
 
 		return ret
-		
+
+	"""
+		Fill in extra data that needs a bit more processing.
+		Right now time_taken and location_point.  Both will look at the file exif data if
+		  we don't have iphone metadata
+	"""
+	def populateExtraData(self, photos):
+		for photo in photos:
+			if not photo.time_taken:
+				photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
+				logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
+
+			if not photo.location_point:
+				lat, lon = location_util.getLatLonFromExtraData(photo, True)
+
+				if lat and lon:
+					photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+					logger.debug("looked for lat lon and got %s" % (photo.location_point))
+		return photos
+
+
+class PhotoAPI(BasePhotoAPI):
 	def getObject(self, photoId):
 		try:
 			return Photo.objects.get(id=photoId)
@@ -96,26 +118,18 @@ class PhotoAPI(APIView):
 			try:
 				serializer.save()
 				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
+
+				# This will look at the uploaded metadata or exif data in the file to populate more fields
+				photosToUpdate = self.populateExtraData([serializer.object])
+
 			except IntegrityError:
 				logger.error("IntegrityError")
 				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-				
+
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class PhotoBulkAPI(APIView):
-	# TODO(derek)  pull this out to shared class
-	def jsonDictToSimple(self, jsonDict):
-		ret = dict()
-		for key in jsonDict:
-			var = jsonDict[key]
-			if type(var) is dict or type(var) is list:
-				ret[key] = json.dumps(jsonDict[key])
-			else:
-				ret[key] = str(var)
-
-		return ret
-
+class PhotoBulkAPI(BasePhotoAPI):
 	"""
 		This goes through and tries to save each photo and deals with IntegrityError's (dups)
 		If we find one, grab the current one in the db (which could be wrong), and update it
@@ -139,9 +153,10 @@ class PhotoBulkAPI(APIView):
 					logger.error("Validation error for user id: " + str(photo.user) + " and " + photo.iphone_hash)
 		return photoDups
 
+
 	def post(self, request, format=None):
 		response = list()
-		
+
 		if "bulk_photos" in request.DATA:
 			logger.info("Got request for bulk photo update with %s files" % len(request.FILES))
 			photosData = json.loads(request.DATA["bulk_photos"])
@@ -162,7 +177,10 @@ class PhotoBulkAPI(APIView):
 				else:
 					logger.error("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
 					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-			
+
+			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
+			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
+			#   ones were created
 			dups = list()
 			try:
 				Photo.objects.bulk_create(objsToCreate)
@@ -177,14 +195,26 @@ class PhotoBulkAPI(APIView):
 			# with dups
 			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
 
-			updatedPhotos = list()
+			# Now that we've created the images in the db, we need to deal with any uploaded images
+			#   and fill in any EXIF data (time_taken, gps, etc)
+			photosToUpdate = list()
 			if len(createdPhotos) > 0:
-				updatedPhotos = image_util.handleUploadedImagesBulk(request, createdPhotos)
+				# This will move the uploaded image over to the filesystem, and create needed thumbs
+				photosToUpdate = image_util.handleUploadedImagesBulk(request, createdPhotos)
 
-			for photo in updatedPhotos:
+				# This will look at the uploaded metadata or exif data in the file to populate more fields
+				photosToUpdate = self.populateExtraData(photosToUpdate)
+
+				# These are all the fields that we might want to update.  List of the extra fields from above
+				# TODO(Derek):  Probably should do this more intelligently
+				Photo.bulkUpdate(photosToUpdate, ["location_point", "full_filename", "thumb_filename", "time_taken"])
+
+			for photo in photosToUpdate:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
 
+			# We don't need to update/save the dups since other code does that, but we still
+			#   want to add it to the response
 			for photo in dups:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
@@ -193,7 +223,6 @@ class PhotoBulkAPI(APIView):
 		else:
 			logger.error("Got request with no bulk_photos, returning 400")
 			return Response(response, status=status.HTTP_400_BAD_REQUEST)
-
 """
 	Temporary start to autocomplete
 """

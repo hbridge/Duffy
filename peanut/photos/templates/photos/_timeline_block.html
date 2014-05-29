@@ -6,7 +6,7 @@
 {% for cluster in entry.clusterList %}{% for imageEntry in cluster %}
 <div class="i {% if imageEntry.dist == None and cluster|length > 1 %} cluster{% elif imageEntry.dist != None %} hidden{% endif %}" r="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}.jpg" pId="{{ imageEntry.photo.photoId }}">
 <img 
-	{% if imageEntry.photo.isLocal == False %} 
+	{% if imageEntry.photo.isLocal == False or debug %} 
 		src="{{ thumbnailBasepath }}{{ imageEntry.photo.photoId }}-thumb-156.jpg"
 	{% elif imageEntry.dist != None %} 
 		l-src="duffyapp://t/{{ imageEntry.photo.photoId }}"
