@@ -45,7 +45,7 @@
                                      userInfo:@{NSLocalizedDescriptionKey: @"Path components for request don't match expected lenth of 3.",
                                                 NSLocalizedRecoverySuggestionErrorKey : pathComponents.description
                                                 }];
-    DDLogError(@"DFURLProtocol error: %@", error.localizedDescription);
+    DDLogError(@"DFURLProtocol error: %@", error.description);
     [self.client URLProtocol:self didFailWithError:error];
     return;
   }
@@ -58,7 +58,7 @@
                                      userInfo:@{NSLocalizedDescriptionKey: @"No local photo found for ID",
                                                 NSLocalizedRecoverySuggestionErrorKey : [NSString stringWithFormat:@"Request url: %@", self.request.URL.description]
                                                 }];
-    DDLogError(@"DFURLProtocol error: %@", error.localizedDescription);
+    DDLogError(@"DFURLProtocol error: %@", error.description);
     [self.client URLProtocol:self didFailWithError:error];
     return;
   }
@@ -72,7 +72,7 @@
                                      userInfo:@{NSLocalizedDescriptionKey: @"Invalid phototype in path",
                                                 NSLocalizedRecoverySuggestionErrorKey : [NSString stringWithFormat:@"Request url: %@", self.request.URL.description]
                                                 }];
-    DDLogError(@"DFURLProtocol error: %@", error.localizedDescription);
+    DDLogError(@"DFURLProtocol error: %@", error.description);
     [self.client URLProtocol:self didFailWithError:error];
     return;
   }
