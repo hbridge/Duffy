@@ -40,6 +40,7 @@
 @property (nonatomic) float webviewLastOffsetY;
 @property (nonatomic) BOOL hideStatusBar;
 @property (nonatomic) BOOL startedDragging;
+@property (nonatomic, retain) NSDate *lastSuggestionFetch;
 
 @property (readonly, nonatomic, retain) DFAutocompleteAdapter *autocompleteAdapter;
 
@@ -66,6 +67,7 @@ static NSString *ReverseResultsURLParameter = @"r";
 static CGFloat SearchResultsRowHeight = 38;
 static CGFloat SearchResultsCellFontSize = 15;
 static NSUInteger RefreshSuggestionsThreshold = 50;
+static float MinTimeBetweenSuggestionFetch = 60.0;
 
 
 @implementation DFSearchViewController
@@ -109,7 +111,8 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   [super viewDidLoad];
   
   [self setupTableView];
-  [self populateDefaultAutocompleteSearchResults];
+  [self refreshSuggestionsIgnoreLastFetchTime:NO];
+  [self showSuggestions:self.searchBar.text];
   self.webView.delegate = self;
   self.webView.scrollView.delegate = self;
   [NSURLProtocol registerClass:[DFURLProtocol class]];
@@ -204,8 +207,16 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
   return _defaultSearchResults;
 }
 
-- (void)populateDefaultAutocompleteSearchResults
+- (void)refreshSuggestionsIgnoreLastFetchTime:(BOOL)ignoreLastFetchTime
 {
+  if (!ignoreLastFetchTime) {
+    if (self.lastSuggestionFetch &&
+        [[NSDate date] timeIntervalSinceDate:self.lastSuggestionFetch] < MinTimeBetweenSuggestionFetch) {
+      return;
+    }
+  }
+  self.lastSuggestionFetch = [NSDate date];
+  
   [self.autcompleteController fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
                                                  NSArray *locationPeanutSuggestions,
                                                  NSArray *timePeanutSuggestions) {
@@ -227,8 +238,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
       [self.sectionNames removeObject:DATE_SECTION_NAME];
     }
     
-    [self showSuggestions:self.searchBar.text];
-    
+    [self.searchResultsTableView reloadData];
     [self saveDefaultSearchResults:self.defaultSearchResults];
   }];
 }
@@ -523,8 +533,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   self.sectionNames = sections;
   self.searchResultsBySectionName = searchResults;
   
-  [self.searchResultsTableView reloadData];
+  [self refreshSuggestionsIgnoreLastFetchTime:NO];
   
+  [self.searchResultsTableView reloadData];
 }
 
 - (void)showAutocompleteResults:(NSString *)searchText
@@ -730,7 +741,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
   DFUploadSessionStats *sessionStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
   if (sessionStats.numThumbnailsUploaded - self.lastSeenNumUploaded > RefreshSuggestionsThreshold) {
-    [self populateDefaultAutocompleteSearchResults];
+    [self refreshSuggestionsIgnoreLastFetchTime:YES];
   }
   
   self.lastSeenNumUploaded = sessionStats.numThumbnailsUploaded;

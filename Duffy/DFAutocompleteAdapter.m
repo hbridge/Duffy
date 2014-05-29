@@ -53,8 +53,14 @@ NSString *const AutocompletePathPattern = @"autocomplete";
    objectRequestOperationWithRequest:getRequest
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
-     DFPeanutAutocompleteResponse *response = mappingResult.firstObject;
-     completionBlock(response.results);
+     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutAutocompleteResponse class]]){
+       DFPeanutAutocompleteResponse *response = mappingResult.firstObject;
+       completionBlock(response.results);
+     } else {
+       DDLogWarn(@"Autocomplete fetch resulted in a non autocomplete response.  Mapping result: %@",
+                 mappingResult.description);
+       completionBlock(nil);
+     }
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
