@@ -2,8 +2,9 @@ from photos.models import Photo, Similarity
 
 from collections import OrderedDict
 
-from datetime import datetime, date
+import datetime
 from dateutil.relativedelta import relativedelta
+from peanut import settings
 
 from haystack.query import SearchQuerySet
 from django.db.models import Q
@@ -33,7 +34,7 @@ def splitPhotosFromDBbyMonth(userId, photoSet=None, groupThreshold=None):
 
 	for date in dates:
 		entry = dict()
-		entry['date'] = date.strftime('%b %Y')
+		entry['date'] = datetime.date.strftime('%b %Y')
 		entry['mainPhotos'] = list(photoSet.exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[:groupThreshold])
 		entry['subPhotos'] = list(photoSet.exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[groupThreshold:])
 		entry['count'] = len(entry['subPhotos'])
@@ -70,7 +71,7 @@ def getSimCaches(photoIds):
 	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
 """
 
-def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=75, dupThreshold=40, startDate = date(1900,1,1), endDate=date(2016,1,1)):
+def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, startDate = datetime.date(1900,1,1), endDate = datetime.date(2016,1,1)):
 
 	# Buckets all the search queries by month
 	dateFacet = solrPhotoSet.date_facet('timeTaken', start_date=startDate, end_date=endDate, gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
@@ -92,7 +93,7 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=75, dupThreshold
 
 	for dateKey, countVal in od.items():
 		entry = dict()
-		startDate = datetime.strptime(dateKey[:-1], '%Y-%m-%dT%H:%M:%S')
+		startDate = datetime.datetime.strptime(dateKey[:-1], '%Y-%m-%dT%H:%M:%S')
 		entry['date'] = startDate.strftime('%b %Y')
 		newDate = startDate+relativedelta(months=1)
 
@@ -223,9 +224,10 @@ def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 		if (lowestDist != None):
 			print "lowest dist %s" % lowestDist
 			if (lowestDist < dupThreshold):
-				
 				pass
-			elif (lowestDist < threshold):
+			elif (lowestDist < threshold and longestTime < datetime.timedelta(minutes=5)):
+				print "%s is lower thean %s" % (lowestDist, threshold)
+				print "adding %s to cluster %s" % (solrPhoto.photoId, lowestIndex)
 				addToCluster(currentCluster, solrPhoto, lowestIndex, lowestDist, simCaches)
 			else:
 				clusterList.append([{'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])

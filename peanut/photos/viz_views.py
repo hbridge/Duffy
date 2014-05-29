@@ -13,6 +13,7 @@ from collections import OrderedDict
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util, cluster_util
 from .forms import ManualAddPhoto
+from peanut import settings
 
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
@@ -47,12 +48,12 @@ def search(request):
 	if data.has_key('threshold'):
 		threshold = int(data['threshold'])
 	else:
-		threshold = 75;
+		threshold = settings.DEFAULT_CLUSTER_THRESHOLD;
 
 	if data.has_key('dupthreshold'):
 		dupThreshold = int(data['dupthreshold'])
 	else:
-		dupThreshold = 40
+		dupThreshold = settings.DEFAULT_DUP_THRESHOLD
 
 	if data.has_key('debug'):
 		debug = True

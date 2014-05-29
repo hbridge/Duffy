@@ -201,7 +201,8 @@ STATE_NEW = 0
 STATE_COPIED = 1
 STATE_CLASSIFIED = 2
 
-
+DEFAULT_CLUSTER_THRESHOLD = 65
+DEFAULT_DUP_THRESHOLD = 40
 # Added to suppress timezone warnings
 import warnings
 warnings.filterwarnings('ignore',
