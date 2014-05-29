@@ -162,6 +162,16 @@ def getLowestDistance(cluster, solrPhoto, simCaches):
 			
 	return (lowestIndex, lowestDist)
 
+def getLongestTimeSince(cluster, solrPhoto):
+	longestTime = None
+	for i, entry in enumerate(cluster):
+		dist = abs(entry['photo'].timeTaken - solrPhoto.timeTaken)
+		if not longestTime:
+			longestTime = dist
+		elif dist > longestTime:
+			logestTime = dist
+	return longestTime
+
 """
 	Adds the given solrPhoto to the cluster, also grabs the sim from the simCache
 	and adds that for debugging
@@ -207,8 +217,13 @@ def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 		# If so, add it
 		# Else, start a new cluster
 		lowestIndex, lowestDist = getLowestDistance(currentCluster, solrPhoto, simCaches)
+		longestTime = getLongestTimeSince(currentCluster, solrPhoto)
+
+		print "Longest time:  %s %s" % (longestTime, lowestDist)
 		if (lowestDist != None):
+			print "lowest dist %s" % lowestDist
 			if (lowestDist < dupThreshold):
+				
 				pass
 			elif (lowestDist < threshold):
 				addToCluster(currentCluster, solrPhoto, lowestIndex, lowestDist, simCaches)
