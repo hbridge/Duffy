@@ -373,9 +373,7 @@ def search(request):
 
 		if (pageEndDate < datetime.datetime.utcnow() and pageStartDate > startDate):
 			url = '/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))
-			print "HERE0"
 			if debug:
-				print "HERE1"
 				url += '&debug'
 			nextLink = '<a class="jscroll-next" href="' + url + '"></a>'
 			response += nextLink

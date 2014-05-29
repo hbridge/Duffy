@@ -220,14 +220,10 @@ def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 		lowestIndex, lowestDist = getLowestDistance(currentCluster, solrPhoto, simCaches)
 		longestTime = getLongestTimeSince(currentCluster, solrPhoto)
 
-		print "Longest time:  %s %s" % (longestTime, lowestDist)
 		if (lowestDist != None):
-			print "lowest dist %s" % lowestDist
 			if (lowestDist < dupThreshold):
 				pass
-			elif (lowestDist < threshold and longestTime < datetime.timedelta(minutes=5)):
-				print "%s is lower thean %s" % (lowestDist, threshold)
-				print "adding %s to cluster %s" % (solrPhoto.photoId, lowestIndex)
+			elif (lowestDist < threshold and longestTime < datetime.timedelta(minutes=settings.DEFAULT_MINUTES_TO_CLUSTER)):
 				addToCluster(currentCluster, solrPhoto, lowestIndex, lowestDist, simCaches)
 			else:
 				clusterList.append([{'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])

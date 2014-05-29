@@ -203,6 +203,8 @@ STATE_CLASSIFIED = 2
 
 DEFAULT_CLUSTER_THRESHOLD = 80
 DEFAULT_DUP_THRESHOLD = 40
+DEFAULT_MINUTES_TO_CLUSTER = 5
+
 # Added to suppress timezone warnings
 import warnings
 warnings.filterwarnings('ignore',
