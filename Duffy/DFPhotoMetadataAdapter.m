@@ -118,7 +118,7 @@
   RKResponseDescriptor *photoResponseDescriptor =
   [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutPhoto objectMapping]
                                                method:RKRequestMethodAny
-                                          pathPattern:nil
+                                          pathPattern:@"photos/:id/"
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   
