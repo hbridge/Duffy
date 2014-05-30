@@ -12,6 +12,8 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFSearchResultTableViewCell.h"
 #import "NSDictionary+DFJSON.h"
+#import "DFTableHeaderView.h"
+#import "DFUploadSessionStats.h"
 
 
 static NSDictionary *SectionNameToTitles;
@@ -26,16 +28,25 @@ static CGFloat SearchResultsRowHeight = 38;
 static CGFloat SearchResultsCellFontSize = 15;
 static NSUInteger RefreshSuggestionsThreshold = 50;
 static float MinTimeBetweenSuggestionFetch = 60.0;
+static float MinTimeBetweenAutocompleteFetch = 60.0;
+
+
+typedef enum {
+  DFSearchResultTypeAutocomplete,
+  DFSearchResultTypeSuggestions,
+} DFSearchResultType;
 
 @interface DFSearchBarController()
 
-@property (nonatomic, retain) NSMutableDictionary *searchResultsBySectionName;
-@property (nonatomic, retain) NSMutableArray *sectionNames;
-@property (nonatomic, retain) NSDate *lastSuggestionFetch;
+@property (nonatomic, retain) NSDate *lastSuggestionFetchDate;
+
+@property (nonatomic, retain) NSMutableDictionary *autocompleteResultsByQuery;
+@property (nonatomic, retain) NSMutableDictionary *autocompleteFetchDateByQuery;
 
 @property (readonly, nonatomic, retain) DFAutocompleteAdapter *autocompleteAdapter;
 @property (readonly, nonatomic, retain) DFSuggestionAdapter *suggestionAdapter;
 
+@property (nonatomic) NSUInteger lastSeenNumUploaded;
 @end
 
 
@@ -61,6 +72,8 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
   if (self) {
     _suggestionAdapter = [[DFSuggestionAdapter alloc] init];
     _autocompleteAdapter = [[DFAutocompleteAdapter alloc] init];
+    self.autocompleteResultsByQuery = [[NSMutableDictionary alloc] init];
+    self.autocompleteFetchDateByQuery = [[NSMutableDictionary alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(uploadStatusChanged:)
                                                  name:DFUploadStatusNotificationName
@@ -69,6 +82,8 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
   }
   return self;
 }
+
+#pragma mark - Public methods
 
 - (void)setSearchBar:(DFSearchBar *)searchBar
 {
@@ -80,6 +95,7 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
 
 - (void)setTableView:(UITableView *)tableView
 {
+  _tableView = tableView;
   tableView.delegate = self;
   tableView.dataSource = self;
   tableView.rowHeight = SearchResultsRowHeight;
@@ -93,22 +109,110 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
 }
 
 
-
-#pragma mark - Private helpers
-
-
-- (NSMutableArray *)defaultSectionNames
+- (void)setActive:(BOOL)visible animated:(BOOL)animated
 {
-  return [@[DATE_SECTION_NAME, LOCATION_SECTION_NAME, CATEGORY_SECTION_NAME] mutableCopy];
+  
+
 }
+
+#pragma mark - Search Bar delegate and helpers
+
+- (void)searchBarTextDidBeginEditing:(DFSearchBar *)searchBar
+{
+  [self.delegate searchBarControllerSearchBegan:self];
+  [self updateUIForSearchBarHasFocus:YES showingDefaultQuery:NO];
+}
+
+- (void)searchBar:(DFSearchBar *)searchBar textDidChange:(NSString *)searchText
+{
+  [self.tableView reloadData];
+}
+
+- (void)searchBarSearchButtonClicked:(DFSearchBar *)searchBar
+{
+  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:NO];
+  [self.delegate searchBarController:self searchExecutedWithQuery:searchBar.text];
+}
+
+- (void)searchBarCancelButtonClicked:(DFSearchBar *)searchBar
+{
+  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:[self.searchBar.text isEqualToString:SEARCH_DEFAULT_QUERY]];
+  [self.delegate searchBarControllerSearchCancelled:self];
+}
+
+- (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+                 showingDefaultQuery:(BOOL)showingDefault
+{
+  if (searchBarHasFocus) {
+    [self.searchBar setShowsCancelButton:YES animated:YES];
+    [self.searchBar setShowsClearButton:NO animated:YES];
+  } else {
+    [self.searchBar setShowsCancelButton:NO animated:YES];
+    if (showingDefault) {
+      [self.searchBar setShowsClearButton:NO animated:YES];
+    } else {
+      [self.searchBar setShowsClearButton:YES animated:YES];
+    }
+    [self.searchBar resignFirstResponder];
+  }
+}
+
+- (void)searchBarClearButtonClicked:(DFSearchBar *)searchBar
+{
+  searchBar.text = searchBar.defaultQuery;
+  [self.delegate searchBarControllerSearchCleared:self];
+}
+  
+#pragma mark - Search results filtering
+  
+
+- (DFSearchResultType) searchResultTypeToShow
+{
+  NSString *searchText = self.searchBar.text;
+  if (searchText.length == 0 ||
+      [searchText isEqualToString:SEARCH_DEFAULT_QUERY] ||
+      [searchText characterAtIndex:searchText.length - 1] == ' ')
+    return DFSearchResultTypeSuggestions;
+  
+  return DFSearchResultTypeAutocomplete;
+}
+
+- (NSArray *)sectionsToDisplay
+{
+  if ([self searchResultTypeToShow] == DFSearchResultTypeAutocomplete) {
+    return @[SUGGESTION_SECTION_NAME];
+  } else if ([self searchResultTypeToShow] == DFSearchResultTypeSuggestions) {
+    NSMutableArray *suggestionSections = [@[DATE_SECTION_NAME, LOCATION_SECTION_NAME, CATEGORY_SECTION_NAME] mutableCopy];
+    [suggestionSections removeObjectsInArray:
+     [[self categorySuggestionsInQuery:self.searchBar.text] allObjects]];
+    return suggestionSections;
+  }
+  
+  return nil;
+}
+
+- (NSMutableSet *)categorySuggestionsInQuery:(NSString *)query
+{
+  NSMutableSet *categories = [[NSMutableSet alloc] init];
+  for (NSString *sectionName in self.suggestionsBySection.allKeys) {
+    for (DFPeanutSuggestion *suggestion in (NSArray *)self.suggestionsBySection[sectionName]) {
+      if ([query rangeOfString:suggestion.name].location != NSNotFound) {
+        [categories addObject:sectionName];
+      }
+    }
+  }
+  
+  return categories;
+}
+
+#pragma mark - Suggestions Dictionary management
 
 - (NSMutableDictionary *)suggestionsBySection
 {
   if (!_suggestionsBySection) {
     _suggestionsBySection = [[NSMutableDictionary alloc] init];
-    [_suggestionsBySection addEntriesFromDictionary:[self loadDefaultSearchResults]];
+    [_suggestionsBySection addEntriesFromDictionary:[self loadSuggestions]];
   }
-  
   
   return _suggestionsBySection;
 }
@@ -116,61 +220,41 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
 - (void)refreshSuggestionsIgnoreLastFetchTime:(BOOL)ignoreLastFetchTime
 {
   if (!ignoreLastFetchTime) {
-    if (self.lastSuggestionFetch &&
-        [[NSDate date] timeIntervalSinceDate:self.lastSuggestionFetch] < MinTimeBetweenSuggestionFetch) {
+    if (self.lastSuggestionFetchDate &&
+        [[NSDate date] timeIntervalSinceDate:self.lastSuggestionFetchDate] < MinTimeBetweenSuggestionFetch) {
       return;
     }
   }
-  self.lastSuggestionFetch = [NSDate date];
+  self.lastSuggestionFetchDate = [NSDate date];
   
   [self.suggestionAdapter fetchSuggestions:^(NSArray *categoryPeanutSuggestions,
-                                                 NSArray *locationPeanutSuggestions,
-                                                 NSArray *timePeanutSuggestions) {
+                                             NSArray *locationPeanutSuggestions,
+                                             NSArray *timePeanutSuggestions) {
     if (categoryPeanutSuggestions) {
       self.suggestionsBySection[CATEGORY_SECTION_NAME] = categoryPeanutSuggestions;
-    } else {
-      [self.sectionNames removeObject:CATEGORY_SECTION_NAME];
     }
     
     if (locationPeanutSuggestions) {
       self.suggestionsBySection[LOCATION_SECTION_NAME] = locationPeanutSuggestions;
-    } else {
-      [self.sectionNames removeObject:LOCATION_SECTION_NAME];
     }
     
     if (timePeanutSuggestions) {
       self.suggestionsBySection[DATE_SECTION_NAME] = timePeanutSuggestions;
-    } else {
-      [self.sectionNames removeObject:DATE_SECTION_NAME];
     }
     
     [self.tableView reloadData];
-    [self saveDefaultSearchResults:self.suggestionsBySection];
+    [self saveSuggestions:self.suggestionsBySection];
   }];
 }
 
-- (NSDictionary *)suggestionsStrings
-{
-  NSMutableDictionary *result = self.suggestionsBySection.mutableCopy;
-  for (NSString *key in result.allKeys) {
-    NSMutableArray *suggestions = [(NSArray *)result[key] mutableCopy];
-    for (int i = 0; i < suggestions.count; i++) {
-      DFPeanutSuggestion *suggestion = suggestions[i];
-      suggestions[i] = suggestion.name;
-    }
-    result[key] = suggestions;
-  }
-  return result;
-}
-
-- (void)saveDefaultSearchResults:(NSDictionary *)searchResults
+- (void)saveSuggestions:(NSDictionary *)searchResults
 {
   NSString *jsonString = [[searchResults dictionaryWithNonJSONRemoved] JSONString];
   [[NSUserDefaults standardUserDefaults] setObject:jsonString
                                             forKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
 }
 
-- (NSDictionary *)loadDefaultSearchResults
+- (NSDictionary *)loadSuggestions
 {
   NSString *loadedDictString = [[NSUserDefaults standardUserDefaults]
                                 objectForKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
@@ -191,151 +275,62 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
   return resultsDict;
 }
 
+#pragma mark - Autocomplete Results
 
-#pragma mark - Search Bar delegate and helpers
-
-- (void)searchBarTextDidBeginEditing:(DFSearchBar *)searchBar
+- (NSString *)autocompleteTextInSearchBar
 {
-  [self updateUIForSearchBarHasFocus:YES showingDefaultQuery:NO];
-}
-
-- (void)searchBar:(DFSearchBar *)searchBar textDidChange:(NSString *)searchText
-{
-  if (searchText.length == 0 ||
-      [searchText isEqualToString:SEARCH_DEFAULT_QUERY] ||
-      [searchText characterAtIndex:searchText.length - 1] == ' ') {
-    [self showSuggestions:searchText];
-  } else {
-    [self showAutocompleteResults:searchText];
-  }
-}
-
-- (void)searchBarSearchButtonClicked:(DFSearchBar *)searchBar
-{
-  if ([searchBar.text isEqualToString:@""] || [[searchBar.text lowercaseString]
-                                               isEqualToString:[SEARCH_DEFAULT_QUERY lowercaseString]]) {
-    [self loadDefaultSearch];
-  } else {
-    [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
-    [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:NO];
-  }
-}
-
-- (void)searchBarCancelButtonClicked:(DFSearchBar *)searchBar
-{
-  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:[self.searchBar.text isEqualToString:SEARCH_DEFAULT_QUERY]];
-}
-
-- (void)searchBarClearButtonClicked:(DFSearchBar *)searchBar
-{
-  searchBar.text = searchBar.defaultQuery;
-  [self loadDefaultSearch];
-}
-
-- (void)showSuggestions:(NSString *)query
-{
-	/*
-	 Update the filtered array based on the search text and scope.
-	 */
-  
-  NSMutableArray *sections = [self defaultSectionNames];
-  NSMutableDictionary *searchResults = [[self defaultSearchResults] mutableCopy];
-  
-  if ([self isDateInQuery:query]) {
-    [searchResults removeObjectForKey:DATE_SECTION_NAME];
-    [sections removeObject:DATE_SECTION_NAME];
-  }
-  if ([self isLocationInQuery:query]){
-    [searchResults removeObjectForKey:LOCATION_SECTION_NAME];
-    [sections removeObject:LOCATION_SECTION_NAME];
-  }
-  if ([self isCategoryInQuery:query]) {
-    [searchResults removeObjectForKey:CATEGORY_SECTION_NAME];
-    [sections removeObject:CATEGORY_SECTION_NAME];
-  }
-  
-  self.sectionNames = sections;
-  self.searchResultsBySectionName = searchResults;
-  
-  [self refreshSuggestionsIgnoreLastFetchTime:NO];
-  
-  [self.searchResultsTableView reloadData];
-}
-
-- (void)showAutocompleteResults:(NSString *)searchText
-{
-  NSArray *components = [searchText componentsSeparatedByString:@" "];
+  NSArray *components = [self.searchBar.text componentsSeparatedByString:@" "];
   NSString *lastComponent = [components lastObject];
+  return lastComponent;
+}
+
+- (void)refreshAutocompleteResultsForQuery:(NSString *)query
+                       ignoreLastFetchDate:(BOOL)ignoreLastDate
+{
+  if (!ignoreLastDate) {
+    NSDate *lastDate = self.autocompleteFetchDateByQuery[query];
+    if (lastDate && [[NSDate date] timeIntervalSinceDate:lastDate] < MinTimeBetweenAutocompleteFetch)
+      return;
+  }
   
-  [self.autocompleteAdapter fetchSuggestionsForQuery:lastComponent
+  self.autocompleteFetchDateByQuery[query] = [NSDate date];
+  [self fetchAutocompeteResultsForQuery:query];
+}
+
+
+- (void)fetchAutocompeteResultsForQuery:(NSString *)query
+{
+  [self.autocompleteAdapter fetchSuggestionsForQuery:query
                                  withCompletionBlock:^(NSArray *peanutSuggestions) {
-                                   self.sectionNames = [@[SUGGESTION_SECTION_NAME] mutableCopy];
                                    if (peanutSuggestions) {
-                                     self.searchResultsBySectionName[SUGGESTION_SECTION_NAME] = peanutSuggestions;
-                                   } else {
-                                     self.searchResultsBySectionName[SUGGESTION_SECTION_NAME] = @[];
+                                     self.autocompleteResultsByQuery[query] = peanutSuggestions;
                                    }
+                                   
                                    dispatch_async(dispatch_get_main_queue(), ^{
-                                     [self.searchResultsTableView reloadData];
+                                     [self.tableView reloadData];
                                    });
                                  }];
-}
-
-
-- (BOOL)isDateInQuery:(NSString *)query
-{
-  if (query == nil) return NO;
-  for (DFPeanutSuggestion *dateSuggestion in [[self defaultSearchResults] objectForKey:DATE_SECTION_NAME])
-  {
-    if([query rangeOfString:dateSuggestion.name].location != NSNotFound) {
-      return YES;
-    }
-  }
-  return NO;
-}
-
-- (BOOL)isLocationInQuery:(NSString *)query
-{
-  if (query == nil) return NO;
-  for (DFPeanutSuggestion *locationSuggestion in [[self defaultSearchResults] objectForKey:LOCATION_SECTION_NAME])
-  {
-    if([query rangeOfString:locationSuggestion.name].location != NSNotFound) {
-      return YES;
-    }
-  }
-  return NO;
-}
-
-- (BOOL)isCategoryInQuery:(NSString *)query
-{
-  if (query == nil) return NO;
-  for (DFPeanutSuggestion *categorySuggestion in [[self defaultSearchResults] objectForKey:CATEGORY_SECTION_NAME])
-  {
-    if([query rangeOfString:categorySuggestion.name].location != NSNotFound) {
-      return YES;
-    }
-  }
-  return NO;
 }
 
 #pragma mark - UITableView datasource and delegate
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return self.sectionNames.count;
+  return [[self sectionsToDisplay] count];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 
 {
-  NSInteger countForSection = [self resultsForSectionWithIndex:section].count;
-  return countForSection;
+  NSArray *results = [self resultsForSectionWithIndex:section];
+
+  return results.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutSuggestion *peanutSuggestion = [[self resultsForSectionWithIndex:indexPath.section]
-                                          objectAtIndex:indexPath.row];
+  NSArray *results = [self resultsForSectionWithIndex:indexPath.section];
+  DFPeanutSuggestion *peanutSuggestion = results[indexPath.row];
   
   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"DFSearchResultTableViewCell"];
   cell.textLabel.text = peanutSuggestion.name ? peanutSuggestion.name : @"None";
@@ -348,11 +343,16 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
 {
   DFTableHeaderView *view = [[[UINib nibWithNibName:@"DFTableHeaderView" bundle:nil] instantiateWithOwner:self options:nil] firstObject];
   
-  NSString *sectionName = self.sectionNames[section];
-  view.textLabel.text = SectionNameToTitles[sectionName];
-  
-  NSString *imageName = [NSString stringWithFormat:@"Icons/%@%@", self.sectionNames[section], @"SectionHeader"];
-  view.imageView.image = [UIImage imageNamed:imageName];
+  NSArray *sectionsToDisplay = [self sectionsToDisplay];
+  if (section < sectionsToDisplay.count) {
+    NSString *sectionID = [sectionsToDisplay objectAtIndex:section];
+    view.textLabel.text = SectionNameToTitles[sectionID];
+    NSString *imageName = [NSString stringWithFormat:@"Icons/%@%@", sectionID, @"SectionHeader"];
+    view.imageView.image = [UIImage imageNamed:imageName];
+  } else {
+    DDLogWarn(@"Race: view for header in section called with higher number than number of sections");
+    
+  }
   
   return view;
 }
@@ -367,11 +367,10 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
     selectionString = suggestion.name;
   } else {
     selectionString = @"";
-    DDLogWarn(@"DFSearchViewController user selected blank indexPath: %@ searchResultsBySecitonName:%@",
-              indexPath.description, self.searchResultsBySectionName.description);
+    DDLogWarn(@"DFSearchViewController user selected blank indexPath: %@",
+              indexPath.description);
   }
   
-  //if (!self.searchBar.isFirstResponder) [self.searchBar becomeFirstResponder];
   if (self.searchBar.text.length > 0
       && [self.searchBar.text characterAtIndex:self.searchBar.text.length - 1] != ' '){
     NSString *partialTerm = [[self.searchBar.text componentsSeparatedByString:@" "] lastObject];
@@ -386,29 +385,20 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
   }
 }
 
-
-#pragma mark - Data Accessors
-
-
-- (NSArray *)resultsForSectionWithIndex:(NSInteger)sectionIndex
+- (NSArray *)resultsForSectionWithIndex:(NSUInteger)sectionIndex
 {
-  return self.searchResultsBySectionName[[self sectionNameForIndex:sectionIndex]];
-}
-
-- (NSArray *)resultsForSectionWithName:(NSString *)sectionName
-{
-  return self.searchResultsBySectionName[sectionName];
-}
-
-- (NSString *)sectionNameForIndex:(NSInteger)index
-{
-  if (index > self.sectionNames.count) {
-    DDLogWarn(@"sectionNameForIndex exceeds sectionName.count.  index:%d, sectionNames:%@, searchResultsBySectionName:%@",
-              (int)index, self.sectionNames.description, self.searchResultsBySectionName.description);
-    return nil;
+  NSArray *results;
+  if ([self searchResultTypeToShow] == DFSearchResultTypeAutocomplete) {
+    NSString *query = [self autocompleteTextInSearchBar];
+    results = self.autocompleteResultsByQuery[query];
+    [self refreshAutocompleteResultsForQuery:query ignoreLastFetchDate:NO];
+  } else {
+    NSString *sectionID = [[self sectionsToDisplay] objectAtIndex:sectionIndex];
+    results = self.suggestionsBySection[sectionID];
   }
-  return self.sectionNames[index];
+  return results;
 }
+
 
 #pragma mark - Upload notificatoin handler
 
@@ -422,6 +412,22 @@ static float MinTimeBetweenSuggestionFetch = 60.0;
   self.lastSeenNumUploaded = sessionStats.numThumbnailsUploaded;
 }
 
+
+#pragma mark - Silly helpers that should die
+
+- (NSDictionary *)suggestionsStrings
+{
+  NSMutableDictionary *result = self.suggestionsBySection.mutableCopy;
+  for (NSString *key in result.allKeys) {
+    NSMutableArray *suggestions = [(NSArray *)result[key] mutableCopy];
+    for (int i = 0; i < suggestions.count; i++) {
+      DFPeanutSuggestion *suggestion = suggestions[i];
+      suggestions[i] = suggestion.name;
+    }
+    result[key] = suggestions;
+  }
+  return result;
+}
 
 
 @end

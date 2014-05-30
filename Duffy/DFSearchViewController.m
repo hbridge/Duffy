@@ -76,7 +76,6 @@ static NSString *ReverseResultsURLParameter = @"r";
   [super viewDidLoad];
   
   [self configureSearchBarController];
-  [self showSuggestions:self.searchBar.text];
   self.webView.delegate = self;
   self.webView.scrollView.delegate = self;
   [NSURLProtocol registerClass:[DFURLProtocol class]];
@@ -91,6 +90,7 @@ static NSString *ReverseResultsURLParameter = @"r";
 - (void)configureSearchBarController
 {
   self.searchBarController = [[DFSearchBarController alloc] init];
+  self.searchBarController.delegate = self;
   self.searchBar = [[[UINib nibWithNibName:@"DFSearchBar" bundle:nil]
                      instantiateWithOwner:self options:nil]
                     firstObject];
@@ -103,7 +103,8 @@ static NSString *ReverseResultsURLParameter = @"r";
   
   self.searchBarController.tableView = self.searchResultsTableView;
   
-  [self showSuggestions:nil];
+  [self.searchBarController setActive:YES animated:NO];
+  self.searchResultsTableView.hidden = NO;
 }
 
 - (void)registerForKeyboardNotifications
@@ -151,7 +152,34 @@ static NSString *ReverseResultsURLParameter = @"r";
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:@"''" reverseResults:YES];
-  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:YES];
+  [self updateUIForSearchBarHasFocus:NO];
+}
+
+- (void)searchBarControllerSearchBegan:(DFSearchBarController *)searchBarController
+{
+  [self updateUIForSearchBarHasFocus:YES];
+}
+
+- (void)searchBarControllerSearchCancelled:(DFSearchBarController *)searchBarController
+{
+  [self updateUIForSearchBarHasFocus:NO];
+}
+
+- (void)searchBarControllerSearchCleared:(DFSearchBarController *)searchBarController
+{
+  [self loadDefaultSearch];
+  [self updateUIForSearchBarHasFocus:NO];
+}
+
+- (void)searchBarController:(DFSearchBarController *)searchBarController searchExecutedWithQuery:(NSString *)query
+{
+  if ([query isEqualToString:@""] || [[query lowercaseString]
+                                               isEqualToString:[self.searchBarController.defaultQuery lowercaseString]]) {
+    [self loadDefaultSearch];
+  } else {
+    [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
+    [self updateUIForSearchBarHasFocus:NO];
+  }
 }
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
@@ -180,21 +208,11 @@ static NSString *ReverseResultsURLParameter = @"r";
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
-                 showingDefaultQuery:(BOOL)showingDefault
 {
   if (searchBarHasFocus) {
     self.searchResultsTableView.hidden = NO;
-    [self.searchBar setShowsCancelButton:YES animated:YES];
-    [self.searchBar setShowsClearButton:NO animated:YES];
   } else {
-    [self.searchBar setShowsCancelButton:NO animated:YES];
-    if (showingDefault) {
-      [self.searchBar setShowsClearButton:NO animated:YES];
-    } else {
-      [self.searchBar setShowsClearButton:YES animated:YES];
-    }
     self.searchResultsTableView.hidden = YES;
-    [self.searchBar resignFirstResponder];
   }
 }
 

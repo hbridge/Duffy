@@ -9,10 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "DFUploadProgressView.h"
 #import "DFSearchBar.h"
+#import "DFSearchBarControllerDelegate.h"
 
 @class DFSuggestionAdapter;
 
-@interface DFSearchViewController : UIViewController <UIWebViewDelegate, DFSearchBarDelegate, UITableViewDataSource, UITableViewDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate>
+@interface DFSearchViewController : UIViewController <UIWebViewDelegate, DFSearchBarControllerDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;

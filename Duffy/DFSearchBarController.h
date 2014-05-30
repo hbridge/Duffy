@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFSearchBar.h"
+#import "DFSearchBarControllerDelegate.h"
 
 @class DFSearchBar;
 
@@ -16,10 +17,12 @@
 
 @property (nonatomic, retain) DFSearchBar *searchBar;
 @property (nonatomic, retain) UITableView *tableView;
-@property (nonatomic, weak) UIViewController *parentViewController;
+@property (nonatomic, weak) id<DFSearchBarControllerDelegate> delegate;
 @property (readonly, nonatomic, retain) NSMutableDictionary *suggestionsBySection;
+@property (readonly, nonatomic, retain) NSString *defaultQuery;
 
 - (void)clearSearchBar;
 - (NSDictionary *)suggestionsStrings;
+- (void)setActive:(BOOL)visible animated:(BOOL)animated;
 
 @end
