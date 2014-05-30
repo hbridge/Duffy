@@ -36,7 +36,7 @@ from rest_framework.response import Response
 from photos.models import Photo, User, Classification
 from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
 from photos.serializers import PhotoSerializer
-from .forms import ManualAddPhoto
+from .forms import SearchQueryForm
 
 import urllib
 from dateutil.relativedelta import relativedelta
@@ -224,7 +224,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			logger.error("Got request with no bulk_photos, returning 400")
 			return Response(response, status=status.HTTP_400_BAD_REQUEST)
 """
-	Temporary start to autocomplete
+	Autocomplete which takes in user_id and q and returns back matches and counts
 """
 @csrf_exempt
 def autocomplete(request):
@@ -293,6 +293,8 @@ def autocomplete(request):
 
 """
 Search api function that returns the search view. Used by the /viz/search?user_id=<userID>
+
+TODO(Derek): remove this once V2 is good
 """
 @csrf_exempt
 def search(request):
@@ -378,6 +380,87 @@ def search(request):
 			nextLink = '<a class="jscroll-next" href="' + url + '"></a>'
 			response += nextLink
 	return HttpResponse(response, content_type="text/html")
+
+"""
+	Turns groups by month, called from gallery_util and turns it into sections
+	  that is converted to json and returned to the user
+
+	Limit the number of objects we add in by 'num'
+"""
+def turnGroupsIntoSections(monthGroupings, num):
+	result = list()
+	lastDate = None
+	count = 0
+	for monthGroup in monthGroupings:
+		section = {'type': 'section', 'title': monthGroup['title'], 'objects': list()}
+		for cluster in monthGroup['clusters']:
+			if len(cluster) == 1:
+				entry = cluster[0]
+				section['objects'].append({'type': 'photo', 'id': entry['photo'].photoId})
+				lastDate = entry['photo'].timeTaken
+			else:
+				clusterObj = {'type': 'cluster', 'objects': list()}
+				for entry in cluster:
+					clusterObj['objects'].append({'type': 'photo', 'id': entry['photo'].photoId})
+					lastDate = entry['photo'].timeTaken
+				section['objects'].append(clusterObj)
+
+			count += 1
+			if count == num:
+				result.append(section)
+				return lastDate, result
+				
+		result.append(section)
+	return lastDate, result
+	
+"""
+Search API
+
+Takes in a query, number of entries to fetch, and a startDate (all fields in forms.py SearchQueryForm)
+
+TODO(Derek): replace this instead of search once its ready
+"""
+@csrf_exempt
+def searchV2(request):
+	response = dict()
+
+	form = SearchQueryForm(request.GET) # A form bound to the POST data
+	if form.is_valid(): # All validation rules pass
+		query = form.cleaned_data['q']
+		user_id = form.cleaned_data['user_id']
+		startDateTime = form.cleaned_data['startDateTime']
+		num = form.cleaned_data['num']
+		# Reversed
+		r = form.cleaned_data['r']
+		
+		# See if out query has a time associated within it
+		(nattyStartDate, newQuery) = search_util.getNattyInfo(query)
+
+		if not startDateTime:
+			if (nattyStartDate):
+				startDateTime = nattyStartDate
+			else:
+				startDateTime = datetime.date(1901,1,1)
+		
+		# Get a search for 2 times the number of entries we want to return, we will filter it down loater
+		searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit = num*2)
+		
+		# Group into months
+		monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults)
+
+		# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
+		#   which is the key for the next call
+		lastDate, sections = turnGroupsIntoSections(monthGroupings, num)
+
+		response['objects'] = sections
+		response['nextKey'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
+		response['result'] = True
+		return HttpResponse(json.dumps(response), content_type="application/json")
+
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+		return HttpResponse(json.dumps(response), content_type="application/json")
 
 
 """

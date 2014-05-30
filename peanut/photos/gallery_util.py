@@ -9,38 +9,7 @@ from peanut import settings
 from haystack.query import SearchQuerySet
 from django.db.models import Q
 
-"""
-	Splits a DB query of Photo objects into timeline view with headers and set of photo clusters
-"""
-
-def splitPhotosFromDBbyMonth(userId, photoSet=None, groupThreshold=None):
-	if (photoSet == None):
-		photoSet = Photo.objects.filter(user_id=userId)
-
-	if (groupThreshold == None):
-		groupThreshold = 11
-
-	dates = photoSet.datetimes('time_taken', 'month')
-	
-	photos = list()
-
-	entry = dict()
-	entry['date'] = 'Undated'
-	entry['mainPhotos'] = list(photoSet.filter(time_taken=None)[:groupThreshold])
-	entry['subPhotos'] = list(photoSet.filter(time_taken=None)[groupThreshold:])
-	entry['count'] = len(entry['subPhotos'])
-	if (len(entry['mainPhotos']) > 0):
-		photos.append(entry)
-
-	for date in dates:
-		entry = dict()
-		entry['date'] = datetime.date.strftime('%b %Y')
-		entry['mainPhotos'] = list(photoSet.exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[:groupThreshold])
-		entry['subPhotos'] = list(photoSet.exclude(time_taken=None).exclude(time_taken__lt=date).exclude(time_taken__gt=date+relativedelta(months=1)).order_by('time_taken')[groupThreshold:])
-		entry['count'] = len(entry['subPhotos'])
-		photos.append(entry)
-
-	return photos
+from itertools import groupby
 
 """
 	Fetch all Similarities for the given photo ideas then put into a hash table keyed on the id
@@ -69,6 +38,8 @@ def getSimCaches(photoIds):
 
 """
 	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
+
+	Used by old search
 """
 
 def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, startDate = datetime.date(1900,1,1), endDate = datetime.date(2016,1,1)):
@@ -103,6 +74,56 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 		photos.append(entry)
 
 	return photos
+
+"""
+	Splits a SearchQuerySet into groups of months as well as clusters the images
+
+	Returns:
+	[
+	  {
+		'title' = "May 2013"
+		'clusters' = [
+						[
+							{
+								'photo' = solrPhoto
+								'dist' = (shortest distance to any photo in set)
+							}
+						],
+						[
+							{
+								'photo' = solrPhoto
+								'dist' = (shortest distance to any photo in set)
+							},
+							{
+								'photo' = solrPhoto
+								'dist' = (shortest distance to any photo in set)
+								'simrow' = (only for 2nd and later elements)
+							},
+						],
+					]
+	  },
+	]
+
+	TODO (Derek): move this up and removed unused code
+"""
+def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD):
+	photoIds = list()
+	for solrPhoto in solrPhotoSet:
+		photoIds.append(solrPhoto.photoId)
+
+	# Fetch all the similarities at once so we can process in memory
+	simCaches = getSimCaches(photoIds)
+	
+	clusters = getClusters(solrPhotoSet, threshold, dupThreshold, simCaches)
+
+	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
+	results = list()
+	for key, items in groupby(clusters, f):
+		monthEntry = {'title': key, 'clusters': list()}
+		for item in items:
+			monthEntry['clusters'].append(item)
+		results.append(monthEntry)
+	return results
 
 """
 	Look up in the hash table cache for the Similarity
@@ -187,13 +208,13 @@ def addToCluster(cluster, solrPhoto, lowestIndex, lowestDist, simCaches):
 	Returns clusters for a set of photos based on the threshold
 
 	Returns:
-	clusterList
-		cluster
-			--> entry
-				--> photo
+	clusterList (list)
+		cluster (list)
+			--> entry (dict)
+				--> photo (solrPhoto)
 				--> dist (shortest distance to any photo in set)
 			--> entry
-				--> photo
+				--> photo (solrPhoto)
 				--> dist (shortest distance to any photo in set)
 				--> simrow (only for 2nd and later elements)
 			--> ...
