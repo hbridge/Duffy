@@ -2,7 +2,7 @@ import os, sys, os.path
 import Image
 import json
 import logging
-from datetime import datetime
+import datetime
 from time import time
 
 from django.utils import timezone
@@ -33,7 +33,7 @@ def addToClustersBulk(photos, threshold=100):
 	
 	for photo in photos:
 		simRows.extend(addToClusters(photo, histCache, userPhotoCache))
-		photo.clustered_time = datetime.now()
+		photo.clustered_time = datetime.datetime.now()
 		photosToUpdate.append(photo)
 
 	if (len(simRows) > 0):
@@ -98,23 +98,28 @@ def processWithExisting(existingSims, newSims):
 	return (simsToCreate, simsToUpdate)
 
 """
-	Get a list of photos that are "near" this photo: meaning pre and post in the timeline
+	Get a list of photos that are "near" this photo: Within DEFAULT_MINUTES_TO_CLUSTER minutes of this photo
 """
 def getNearbyPhotos(photo, range, userPhotoCache):
 	for i, p in enumerate(userPhotoCache):
 		if photo == p:
-			# We want the RANGE before and RANGE after our current photo
-			# If index - RANGE is below 0, if so lets use 0
-			lowIndex = max(0, i - range)
-			# If index + RANGE is above len, then use len
-			highIndex = min(len(userPhotoCache) - 1, i + range)
 
 			nearbyPhotos = list()
-			if i > 0:
-				nearbyPhotos.extend(userPhotoCache[lowIndex:i])
+			timeTaken = p.time_taken # current photo's time tkaen
 
-			if i < len(userPhotoCache):
-				nearbyPhotos.extend(userPhotoCache[i+1:highIndex])
+			if i > 0:
+				for a in xrange(i, 0, -1):
+					if (userPhotoCache[a-1].time_taken+datetime.timedelta(seconds=60*settings.DEFAULT_MINUTES_TO_CLUSTER)>timeTaken):
+						nearbyPhotos.append(userPhotoCache[a-1])
+					else:
+						break
+
+			if i < len(userPhotoCache)-1:
+				for a in xrange(i+1, len(userPhotoCache)):
+					if (userPhotoCache[a].time_taken-datetime.timedelta(seconds=60*settings.DEFAULT_MINUTES_TO_CLUSTER)<timeTaken):
+						nearbyPhotos.append(userPhotoCache[a])
+					else:
+						break
 				
 			return nearbyPhotos
 	return []
