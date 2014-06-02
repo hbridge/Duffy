@@ -28,6 +28,7 @@ public class WordNetNav {
 	public String docAltWords;
 	public String[] swapIn; //list of words that exist in Wordnet
 	public String[] swapOut; // list of words to swap them with using the same index
+	public String[] skipCats;
 	
 
 	public WordNetNav() {
@@ -125,6 +126,8 @@ public class WordNetNav {
 					"disk", "crab", "fridge", "phone",
 					"tv", "burger"};
 
+		skipCats = new String[] {"menu"}; //skip these when you come across them
+
 		whiteList =  merge(wlAnimals, 
 							wlFoods, 
 							wlFurniture, 
@@ -207,6 +210,11 @@ public class WordNetNav {
 		String sTemp;
 
 		nsTemp = ns;
+
+		if (skipCats(cs.sCategory)){
+			return;
+		}
+
 		while (nsTemp != null) {
 			nsHypernyms = nsTemp.getHypernyms();
 			if (nsHypernyms.length > 0) {
@@ -255,6 +263,15 @@ public class WordNetNav {
 			}
 		}
 		return "";
+	}
+
+	public boolean skipCats(String input) {
+		for (int i = 0; i< skipCats.length; i++) {
+			if (skipCats[i].equalsIgnoreCase(input.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
