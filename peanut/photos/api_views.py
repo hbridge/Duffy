@@ -453,7 +453,7 @@ def searchV2(request):
 		lastDate, sections = turnGroupsIntoSections(monthGroupings, num)
 
 		response['objects'] = sections
-		response['next_key'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
+		response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
 		response['result'] = True
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
