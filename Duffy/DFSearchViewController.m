@@ -62,9 +62,7 @@ static NSString *ReverseResultsURLParameter = @"r";
     self.tabBarItem.title = @"Search";
     self.tabBarItem.image = [UIImage imageNamed:@"Icons/Search"];
     self.hideStatusBar = NO;
-    
-    self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
-    
+  
     [self registerForKeyboardNotifications];
   }
   return self;
@@ -128,6 +126,10 @@ static NSString *ReverseResultsURLParameter = @"r";
   [super viewDidAppear:animated];
   [self setTableViewInsets];
   
+  if (self.isMovingToParentViewController) {
+    [self scrollToBottom];
+  }
+  
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -150,6 +152,7 @@ static NSString *ReverseResultsURLParameter = @"r";
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:@"''" reverseResults:YES];
+  self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
 }
 
@@ -183,12 +186,22 @@ static NSString *ReverseResultsURLParameter = @"r";
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
   // TODO stop loading other query first
+  if ([query isEqualToString:@"''"]) {
+    [self loadCachedDefaultQuery];
+  }
+  
   
   self.currentlyLoadingSearchQuery = query;
   
   //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
   
+  
+}
+
+- (void)loadCachedDefaultQuery
+{
+  self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
@@ -280,58 +293,6 @@ static NSString *ReverseResultsURLParameter = @"r";
   // reset the header view frame
   self.searchResultsTableView.tableHeaderView.frame = headerViewFrame;
 }
-
-
-//
-//- (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
-//     viewControllerBeforeViewController:(UIViewController *)viewController
-//{
-//  NSUInteger currentPhotoIDIndex = [self
-//                                    indexOfPhotoController:(DFPhotoViewController*)viewController];
-//  NSUInteger newPhotoIDIndex;
-//  if (currentPhotoIDIndex > 0) {
-//    newPhotoIDIndex = currentPhotoIDIndex - 1;
-//  } else {
-//    newPhotoIDIndex = self.searchResultPhotoIDs.count - 1;
-//  }
-//  
-//  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
-//  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
-//  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
-//                    [newPhotoID longLongValue]];
-//  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-//  pvc.photo = photo;
-//  return pvc;
-//}
-//
-//- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-//       viewControllerAfterViewController:(UIViewController *)viewController
-//{
-//  NSUInteger currentPhotoIDIndex =
-//  [self indexOfPhotoController:(DFPhotoViewController *)viewController];
-//  
-//  NSUInteger newPhotoIDIndex;
-//  if (currentPhotoIDIndex < self.searchResultPhotoIDs.count - 1) {
-//    newPhotoIDIndex = currentPhotoIDIndex + 1;
-//  } else {
-//    newPhotoIDIndex = 0;
-//  }
-//  
-//  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
-//  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
-//  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
-//                    [newPhotoID longLongValue]];
-//  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-//  pvc.photo = photo;
-//  return pvc;
-//}
-//
-//- (NSUInteger)indexOfPhotoController:(DFPhotoViewController *)pvc
-//{
-//  DFPhotoIDType currentPhotoID = pvc.photo.photoID;
-//  NSNumber *photoIDNumber = [NSNumber numberWithUnsignedLongLong:currentPhotoID];
-//  return [self.searchResultPhotoIDs indexOfObject:photoIDNumber];
-//}
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView

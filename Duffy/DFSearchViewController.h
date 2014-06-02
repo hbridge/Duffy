@@ -19,7 +19,4 @@
 @property (nonatomic, retain) UITableView *searchResultsTableView;
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;
 
-- (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults;
-
-
 @end

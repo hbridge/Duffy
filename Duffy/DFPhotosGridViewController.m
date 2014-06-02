@@ -87,6 +87,16 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     [self.collectionView reloadData];
 }
 
+- (void)scrollToBottom
+{
+  NSInteger section = 0;
+  NSInteger item = [self collectionView:self.collectionView numberOfItemsInSection:section] - 1;
+  NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
+  if (lastIndexPath.section >= 0 && lastIndexPath.row >= 0) {
+    [self.collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
+  }
+}
+
 
 #pragma mark - UICollectionView datasource/delegate methods
 

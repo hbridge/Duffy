@@ -21,5 +21,6 @@
 
 
 - (CGRect)frameForCellAtIndexPath:(NSIndexPath *)indexPath;
+- (void)scrollToBottom;
 
 @end
