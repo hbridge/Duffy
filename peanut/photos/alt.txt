@@ -800,7 +800,7 @@ drumstick
 shield
 Christmas stocking
 hoopskirt,skirt
-menu
+menu,documents,document,docs,doc
 stage
 bonnet,hat
 meat loaf,dish,food

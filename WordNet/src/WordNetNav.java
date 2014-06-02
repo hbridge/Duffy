@@ -212,6 +212,9 @@ public class WordNetNav {
 		nsTemp = ns;
 
 		if (skipCats(cs.sCategory)){
+			if (isADocWord(cs.sCategory)){
+				cs.sOutputTerms.add(docAltWords);
+			}
 			return;
 		}
 
