@@ -119,6 +119,7 @@ static DFUser *currentUser;
 - (void)setUserOverriddenServerURLString:(NSString *)userOverriddenServerURLString
 {
     [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerURLString forKey:DFOverrideServerURLKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (NSString *)userOverriddenServerPortString
@@ -129,6 +130,7 @@ static DFUser *currentUser;
 - (void)setUserOverriddenServerPortString:(NSString *)userOverriddenServerPortString
 {
     [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerPortString forKey:DFOverrideServerPortKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 
