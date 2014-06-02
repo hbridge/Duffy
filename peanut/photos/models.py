@@ -42,6 +42,7 @@ class Photo(models.Model):
 	iphone_hash = models.CharField(max_length=100, null=True)
 	is_local = models.BooleanField(default=1)
 	classification_data = models.CharField(max_length=10000, null=True)
+	overfeat_data = models.TextField(null=True)
 	faces_data = models.TextField(null=True)
 	time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
@@ -147,10 +148,11 @@ class Photo(models.Model):
 		for obj in objs:
 			obj.updated = datetime.datetime.now()
 
+		attributesList.append("updated")
+
 		if (len(objs) == 1):
-			objs[0].save()
+			objs[0].save(update_fields=attributesList)
 		else:
-			attributesList.append("updated")
 			bulk_updater.bulk_update(objs, update_fields=attributesList)
 		
 
