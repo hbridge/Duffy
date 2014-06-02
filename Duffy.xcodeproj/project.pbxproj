@@ -37,7 +37,6 @@
 		5A8C99001913D6F400AE9F88 /* DFPeanutPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8C98FF1913D6F400AE9F88 /* DFPeanutPhoto.m */; };
 		5A8D0AED18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */; };
 		5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */; };
-		5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */; };
 		5A8D0B4B18EF174F00A1D9A7 /* DFPhotoWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4918EF174F00A1D9A7 /* DFPhotoWebViewController.m */; };
 		5A8D0B4C18EF174F00A1D9A7 /* DFPhotoWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */; };
 		5A8D0B5618EF525800A1D9A7 /* DFTableHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8D0B5518EF525800A1D9A7 /* DFTableHeaderView.m */; };
@@ -180,7 +179,6 @@
 		5A8D0AEC18EB36D600A1D9A7 /* NSNotificationCenter+DFThreadingAddons.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNotificationCenter+DFThreadingAddons.m"; sourceTree = "<group>"; };
 		5A8D0AF118EB6A9600A1D9A7 /* DFNotificationSharedConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationSharedConstants.h; sourceTree = "<group>"; };
 		5A8D0AF218EB6A9600A1D9A7 /* DFNotificationSharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationSharedConstants.m; sourceTree = "<group>"; };
-		5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchViewController.xib; sourceTree = "<group>"; };
 		5A8D0B4818EF174F00A1D9A7 /* DFPhotoWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoWebViewController.h; sourceTree = "<group>"; };
 		5A8D0B4918EF174F00A1D9A7 /* DFPhotoWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoWebViewController.m; sourceTree = "<group>"; };
 		5A8D0B4A18EF174F00A1D9A7 /* DFPhotoWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoWebViewController.xib; sourceTree = "<group>"; };
@@ -538,7 +536,6 @@
 			children = (
 				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
 				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
-				5A8D0B4618EDD87400A1D9A7 /* DFSearchViewController.xib */,
 				5A97DC841937809700FA4718 /* DFSearchBarController.h */,
 				5A97DC851937809700FA4718 /* DFSearchBarController.m */,
 				5A50EE561938D44A00B78333 /* DFSearchBarControllerDelegate.h */,
@@ -905,7 +902,6 @@
 				5AD62B101923E33700EE22D7 /* DFDevelopmentSettingsViewController.xib in Resources */,
 				5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
-				5A8D0B4718EDD87400A1D9A7 /* DFSearchViewController.xib in Resources */,
 				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
 				5AB39842192563E700E6E69E /* IntroPage1.rtf in Resources */,
 				5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */,

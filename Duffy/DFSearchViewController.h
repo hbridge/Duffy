@@ -10,14 +10,13 @@
 #import "DFUploadProgressView.h"
 #import "DFSearchBar.h"
 #import "DFSearchBarControllerDelegate.h"
+#import "DFPhotosGridViewController.h"
 
 @class DFSuggestionAdapter;
 
-@interface DFSearchViewController : UIViewController <UIWebViewDelegate, DFSearchBarControllerDelegate, UIPageViewControllerDataSource, UIScrollViewDelegate>
+@interface DFSearchViewController : DFPhotosGridViewController <DFSearchBarControllerDelegate>
 
-@property (weak, nonatomic) IBOutlet UIWebView *webView;
-@property (weak, nonatomic) IBOutlet UITableView *searchResultsTableView;
-
+@property (nonatomic, retain) UITableView *searchResultsTableView;
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults;

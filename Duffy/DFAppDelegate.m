@@ -130,7 +130,7 @@
   [self startCameraRollSync];
   
   DFSearchViewController *searchViewController = [[DFSearchViewController alloc] init];
-  UINavigationController *searchViewNav = [[UINavigationController alloc] initWithRootViewController:searchViewController];
+  UINavigationController *searchViewNav = [[DFPhotoNavigationControllerViewController alloc] initWithRootViewController:searchViewController];
   
     [[self window] setRootViewController:searchViewNav];
 }

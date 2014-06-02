@@ -63,6 +63,8 @@ static NSString *ReverseResultsURLParameter = @"r";
     self.tabBarItem.image = [UIImage imageNamed:@"Icons/Search"];
     self.hideStatusBar = NO;
     
+    self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
+    
     [self registerForKeyboardNotifications];
   }
   return self;
@@ -73,19 +75,18 @@ static NSString *ReverseResultsURLParameter = @"r";
   [super viewDidLoad];
   
   [self configureSearchBarController];
-  self.webView.delegate = self;
-  self.webView.scrollView.delegate = self;
-  [NSURLProtocol registerClass:[DFURLProtocol class]];
-  
-  [self.view insertSubview:self.searchResultsTableView aboveSubview:self.webView];
   self.automaticallyAdjustsScrollViewInsets = YES;
-  
   
   [self loadDefaultSearch];
 }
 
 - (void)configureSearchBarController
 {
+
+  self.searchResultsTableView = [[UITableView alloc] init];
+  [self.view insertSubview:self.searchResultsTableView aboveSubview:self.collectionView];
+  self.searchResultsTableView.frame = self.collectionView.frame;
+  
   self.searchBarController = [[DFSearchBarController alloc] init];
   self.searchBarController.delegate = self;
   self.searchBar = [[[UINib nibWithNibName:@"DFSearchBar" bundle:nil]
@@ -181,27 +182,13 @@ static NSString *ReverseResultsURLParameter = @"r";
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
-  if (self.webView.isLoading) {
-    [self.webView stopLoading];
-  }
+  // TODO stop loading other query first
   
   self.currentlyLoadingSearchQuery = query;
   
-  NSString *queryURLString = [NSString stringWithFormat:@"%@%@?%@=%@&%@=%@&%@=%d",
-                              [[[DFUser currentUser] serverURL] absoluteString],
-                              SearchPath,
-                              UserIDURLParameter, [NSNumber numberWithUnsignedLongLong:[[DFUser currentUser] userID]],
-                              QueryURLParameter, [query stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
-                              ReverseResultsURLParameter, reverseResults ? 1 : 0];
-  NSURL *queryURL = [NSURL URLWithString:queryURLString];
-  self.lastAttemptedURL = queryURL;
-  
-  
-  DDLogVerbose(@"Executing search for URL: %@", queryURL.absoluteString);
-  NSDictionary *suggestionsStrings = [self.searchBarController suggestionsStrings];
-  [DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
+  //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
-  [self.webView loadRequest:[NSURLRequest requestWithURL:queryURL]];
+  
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
@@ -213,90 +200,6 @@ static NSString *ReverseResultsURLParameter = @"r";
   }
 }
 
-
-#pragma mark - Webview Delegate Methods
-
-
-- (BOOL)webView:(UIWebView *)webView
-shouldStartLoadWithRequest:(NSURLRequest *)request
- navigationType:(UIWebViewNavigationType)navigationType
-{
-  NSString *requestURLString = request.URL.absoluteString;
-  if ([requestURLString rangeOfString:@"user_data"].location != NSNotFound) {
-    [webView stopLoading];
-    DDLogVerbose(@"Search result clicked for photo with URL: %@", requestURLString);
-    
-    [self pushPhotoView:requestURLString];
-    return NO;
-  } else if ([requestURLString rangeOfString:@"settings"].location != NSNotFound) {
-    [webView stopLoading];
-    DDLogInfo(@"Settings request detect in search string with URL: %@", requestURLString);
-    
-    DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
-    self.navigationItem.title = @"Search";
-    [self.navigationController pushViewController:svc animated:YES];
-    
-    return NO;
-  }
-  
-  return YES;
-}
-
-- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
-{
-  if (![self isLoadErrorAnotherRequest:error]) {
-    NSURL *file = [[NSBundle mainBundle] URLForResource:@"LoadSearchError" withExtension:@"html"];
-    NSStringEncoding *encoding = nil;
-    NSError *loadTextError;
-    NSString *htmlStringFormat = [NSString stringWithContentsOfFile:file.path
-                                                       usedEncoding:encoding
-                                                              error:&loadTextError];
-    NSString *htmlString = [NSString stringWithFormat:htmlStringFormat,
-                            error.localizedDescription, self.lastAttemptedURL.absoluteString];
-    DDLogVerbose(@"%@", htmlString);
-    [self.webView loadHTMLString:htmlString baseURL:nil];
-    
-    if (self.currentlyLoadingSearchQuery) {
-      [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
-      self.currentlyLoadingSearchQuery = nil;
-    }
-  }
-  
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-}
-
-- (BOOL)isLoadErrorAnotherRequest:(NSError *)error
-{
-  return (error.domain == NSURLErrorDomain && error.code == -999);
-}
-
-- (void)webViewDidStartLoad:(UIWebView *)webView
-{
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-}
-
-- (void)webViewDidFinishLoad:(UIWebView *)webView
-{
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-  
-  if (self.currentlyLoadingSearchQuery) {
-    [DFAnalytics logSearchLoadEndedWithQuery:self.currentlyLoadingSearchQuery];
-    self.currentlyLoadingSearchQuery = nil;
-  }
-  
-  NSString *requestURLString = self.webView.request.URL.absoluteString;
-  
-  NSError *error;
-  NSRegularExpression *pageNumRegex = [NSRegularExpression regularExpressionWithPattern:@"page\\=(\\d+)" options:0 error:&error];
-  NSArray *matches = [pageNumRegex matchesInString:requestURLString options:0 range:[requestURLString rangeOfString:requestURLString]];
-  if (matches && matches.count > 0) {
-    NSRange pageCountRange = [[matches firstObject] rangeAtIndex:1];
-    NSString *pageCountString = [requestURLString substringWithRange:pageCountRange];
-    NSInteger pageCount = [pageCountString integerValue];
-    [DFAnalytics logSearchResultPageLoaded:pageCount];
-  }
-  
-}
 
 - (void)pushPhotoView:(NSString *)photoURLString
 {
@@ -379,61 +282,61 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 }
 
 
-
-- (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
-     viewControllerBeforeViewController:(UIViewController *)viewController
-{
-  NSUInteger currentPhotoIDIndex = [self
-                                    indexOfPhotoController:(DFPhotoViewController*)viewController];
-  NSUInteger newPhotoIDIndex;
-  if (currentPhotoIDIndex > 0) {
-    newPhotoIDIndex = currentPhotoIDIndex - 1;
-  } else {
-    newPhotoIDIndex = self.searchResultPhotoIDs.count - 1;
-  }
-  
-  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
-  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
-  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
-                    [newPhotoID longLongValue]];
-  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-  pvc.photo = photo;
-  return pvc;
-}
-
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-       viewControllerAfterViewController:(UIViewController *)viewController
-{
-  NSUInteger currentPhotoIDIndex =
-  [self indexOfPhotoController:(DFPhotoViewController *)viewController];
-  
-  NSUInteger newPhotoIDIndex;
-  if (currentPhotoIDIndex < self.searchResultPhotoIDs.count - 1) {
-    newPhotoIDIndex = currentPhotoIDIndex + 1;
-  } else {
-    newPhotoIDIndex = 0;
-  }
-  
-  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
-  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
-  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
-                    [newPhotoID longLongValue]];
-  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-  pvc.photo = photo;
-  return pvc;
-}
-
-- (NSUInteger)indexOfPhotoController:(DFPhotoViewController *)pvc
-{
-  DFPhotoIDType currentPhotoID = pvc.photo.photoID;
-  NSNumber *photoIDNumber = [NSNumber numberWithUnsignedLongLong:currentPhotoID];
-  return [self.searchResultPhotoIDs indexOfObject:photoIDNumber];
-}
+//
+//- (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
+//     viewControllerBeforeViewController:(UIViewController *)viewController
+//{
+//  NSUInteger currentPhotoIDIndex = [self
+//                                    indexOfPhotoController:(DFPhotoViewController*)viewController];
+//  NSUInteger newPhotoIDIndex;
+//  if (currentPhotoIDIndex > 0) {
+//    newPhotoIDIndex = currentPhotoIDIndex - 1;
+//  } else {
+//    newPhotoIDIndex = self.searchResultPhotoIDs.count - 1;
+//  }
+//  
+//  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
+//  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
+//  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
+//                    [newPhotoID longLongValue]];
+//  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+//  pvc.photo = photo;
+//  return pvc;
+//}
+//
+//- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+//       viewControllerAfterViewController:(UIViewController *)viewController
+//{
+//  NSUInteger currentPhotoIDIndex =
+//  [self indexOfPhotoController:(DFPhotoViewController *)viewController];
+//  
+//  NSUInteger newPhotoIDIndex;
+//  if (currentPhotoIDIndex < self.searchResultPhotoIDs.count - 1) {
+//    newPhotoIDIndex = currentPhotoIDIndex + 1;
+//  } else {
+//    newPhotoIDIndex = 0;
+//  }
+//  
+//  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
+//  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
+//  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
+//                    [newPhotoID longLongValue]];
+//  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+//  pvc.photo = photo;
+//  return pvc;
+//}
+//
+//- (NSUInteger)indexOfPhotoController:(DFPhotoViewController *)pvc
+//{
+//  DFPhotoIDType currentPhotoID = pvc.photo.photoID;
+//  NSNumber *photoIDNumber = [NSNumber numberWithUnsignedLongLong:currentPhotoID];
+//  return [self.searchResultPhotoIDs indexOfObject:photoIDNumber];
+//}
 
 #pragma mark - UIScrollViewDelegate
 - (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
 {
-  if (scrollView == self.webView.scrollView) {
+  if (scrollView == self.collectionView) {
     self.webviewLastOffsetY = scrollView.contentOffset.y;
     self.startedDragging = YES;
   }
@@ -441,7 +344,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  if (scrollView == self.webView.scrollView && self.startedDragging) {
+  if (scrollView == self.collectionView && self.startedDragging) {
     bool hide = (scrollView.contentOffset.y > self.webviewLastOffsetY);
     [[self navigationController] setNavigationBarHidden:hide animated:YES];
     self.hideStatusBar = hide;
