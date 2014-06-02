@@ -48,15 +48,14 @@
   [[BITHockeyManager sharedHockeyManager].authenticator setIdentificationType:BITAuthenticatorIdentificationTypeDevice];
   [[BITHockeyManager sharedHockeyManager] startManager];
   
-  //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
-  RKLogConfigureByName("RestKit/Network", RKLogLevelError);
-  
-  
   [Flurry setCrashReportingEnabled:NO];
 #ifdef DEBUG
   [Flurry startSession:@"YFWFVHZXVX8ZCWX643B9"];
   //[Flurry setLogLevel:FlurryLogLevelDebug];
+  
+  //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
+  RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  RKLogConfigureByName("RestKit/Network", RKLogLevelError);
 #else
   [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];
 #endif

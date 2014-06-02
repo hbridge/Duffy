@@ -26,6 +26,8 @@
 #import "DFAutocompleteAdapter.h"
 #import "DFPeanutSuggestion.h"
 #import "DFSearchBarController.h"
+#import "DFPeanutSearchAdapter.h"
+#import "DFPeanutSearchObject.h"
 
 @interface DFSearchViewController ()
 
@@ -41,9 +43,9 @@
 @property (nonatomic) BOOL hideStatusBar;
 @property (nonatomic) BOOL startedDragging;
 
+@property (nonatomic, retain) DFPeanutSearchAdapter *searchAdapter;
+
 @end
-
-
 
 static NSString *GroupsPath = @"/viz/groups/";
 static NSString *SearchPath = @"/viz/search/";
@@ -62,6 +64,7 @@ static NSString *ReverseResultsURLParameter = @"r";
     self.tabBarItem.title = @"Search";
     self.tabBarItem.image = [UIImage imageNamed:@"Icons/Search"];
     self.hideStatusBar = NO;
+    self.searchAdapter = [[DFPeanutSearchAdapter alloc] init];
   
     [self registerForKeyboardNotifications];
   }
@@ -152,6 +155,7 @@ static NSString *ReverseResultsURLParameter = @"r";
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:@"''" reverseResults:YES];
+  [self loadCachedDefaultQuery];
   self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
 }
@@ -185,13 +189,39 @@ static NSString *ReverseResultsURLParameter = @"r";
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
-  // TODO stop loading other query first
-  if ([query isEqualToString:@"''"]) {
-    [self loadCachedDefaultQuery];
-  }
-  
-  
   self.currentlyLoadingSearchQuery = query;
+  
+  
+  [self.searchAdapter fetchSearchResultsForQuery:query maxResults:100 minDateString:nil withCompletionBlock:^(DFPeanutSearchResponse *response) {
+    DDLogVerbose(@"SearchViewController got search response: %@", response);
+    if (response.result == TRUE) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        NSMutableArray *sectionNames = [[NSMutableArray alloc] init];
+        NSMutableDictionary *sections = [[NSMutableDictionary alloc] init];
+        for (DFPeanutSearchObject *sectionObject in response.objects) {
+          if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
+            NSMutableArray *photoIDs = [[NSMutableArray alloc] init];
+            for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
+              if ([searchObject.type isEqualToString:DFSearchObjectPhoto]){
+                [photoIDs addObject:@(searchObject.id)];
+              }
+              
+            }
+            NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:photoIDs];
+            [sectionNames addObject:sectionObject.title];
+            sections[sectionObject.title] = photos;
+          }
+        }
+        
+        [self setSectionNames:sectionNames photosBySection:sections];
+        
+        [self.collectionView reloadData];
+      });
+    } else {
+      DDLogWarn(@"SearchViewController got a non true response.");
+    }
+    
+  }];
   
   //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
@@ -201,7 +231,8 @@ static NSString *ReverseResultsURLParameter = @"r";
 
 - (void)loadCachedDefaultQuery
 {
-  self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
+  [self setSectionNames:@[@"All"]
+        photosBySection:@{@"All" : [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES]}];
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus

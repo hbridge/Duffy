@@ -18,5 +18,6 @@
 
 @property (nonatomic, retain) UITableView *searchResultsTableView;
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;
+@property (nonatomic, retain) NSArray *searchObjects;
 
 @end

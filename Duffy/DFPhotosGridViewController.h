@@ -15,12 +15,14 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic) UICollectionViewFlowLayout *flowLayout;
 
-@property (nonatomic, retain) NSArray *photos;
+@property (readonly, nonatomic, retain) NSDictionary *photosBySection;
+@property (readonly, nonatomic, retain) NSArray *sectionNames;
 @property (nonatomic) CGFloat photoSquareSize;
 @property (nonatomic) CGFloat photoSpacing;
 
 
 - (CGRect)frameForCellAtIndexPath:(NSIndexPath *)indexPath;
 - (void)scrollToBottom;
+- (void)setSectionNames:(NSArray *)sectionNames photosBySection:(NSDictionary *)photosBySection;
 
 @end

@@ -144,37 +144,53 @@ static DFPhotoStore *defaultStore;
 
 static int const FetchStride = 500;
 
-+ (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
++ (NSArray *)photosWithValueStrings:(NSArray *)values
+                             forKey:(NSString *)key
+            comparisonString:(NSString *)comparisonString
+                          inContext:(NSManagedObjectContext *)context
 {
-    NSMutableArray *allObjects = [[NSMutableArray alloc] init];
-    unsigned int numFetched = 0;
-    while (numFetched < assetURLStrings.count) {
-        NSFetchRequest *request = [[NSFetchRequest alloc] init];
-        NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
-        request.entity = entity;
-        
-        NSMutableArray *predicates = [[NSMutableArray alloc] init];
-        for (int i = numFetched; i < MIN(numFetched + FetchStride, assetURLStrings.count); i++) {
-            NSPredicate *predicate = [NSPredicate predicateWithFormat:@"alAssetURLString ==[c] %@", assetURLStrings[i]];
-            [predicates addObject:predicate];
-        }
-        
-        NSPredicate *orPredicate = [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
-        request.predicate = orPredicate;
-        
-        NSError *error;
-        NSArray *result = [context executeFetchRequest:request error:&error];
-        if (!result) {
-            [NSException raise:@"Could search for photos with ALAssetURLs."
-                        format:@"Error: %@", [error localizedDescription]];
-        }
-        
-        [allObjects addObjectsFromArray:result];
-        numFetched += predicates.count; // we use the predicates count to avoid getting into an infinite loop
-                                        // in case one of the search terms wasn't found in the DB
+  NSString *predicateFormat = [NSString stringWithFormat:@"%@ %@ %@",
+                              key, comparisonString ? comparisonString : @"=", @"%@"];
+  
+  NSMutableArray *allObjects = [[NSMutableArray alloc] init];
+  unsigned int numFetched = 0;
+  while (numFetched < values.count) {
+    NSFetchRequest *request = [[NSFetchRequest alloc] init];
+    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    request.entity = entity;
+    
+    NSMutableArray *predicates = [[NSMutableArray alloc] init];
+    for (int i = numFetched; i < MIN(numFetched + FetchStride, values.count); i++) {
+      NSPredicate *predicate = [NSPredicate predicateWithFormat:predicateFormat,
+                                values[i]];
+      [predicates addObject:predicate];
     }
     
-    return allObjects;
+    NSPredicate *orPredicate = [NSCompoundPredicate orPredicateWithSubpredicates:predicates];
+    request.predicate = orPredicate;
+    
+    NSError *error;
+    NSArray *result = [context executeFetchRequest:request error:&error];
+    if (!result) {
+      [NSException raise:@"Could search for photos"
+                  format:@"Error: %@", error.description];
+    }
+    
+    [allObjects addObjectsFromArray:result];
+    numFetched += predicates.count; // we use the predicates count to avoid getting into an infinite loop
+                                    // in case one of the search terms wasn't found in the DB
+  }
+  
+  return allObjects;
+}
+
+
++ (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
+{
+  return [self photosWithValueStrings:assetURLStrings
+                               forKey:@"alAssetURLString"
+              comparisonString:@"==[c]"
+                            inContext:context];
 }
 
 
@@ -194,6 +210,17 @@ static int const FetchStride = 500;
   }
   
   return [[DFPhotoCollection alloc] initWithPhotos:result];
+}
+
++ (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
+                                inContext:(NSManagedObjectContext *)context
+{
+  return [self photosWithValueStrings:photoIDs forKey:@"photoID" comparisonString:@"=" inContext:context];
+}
+
+- (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
+{
+  return [DFPhotoStore photosWithPhotoIDs:photoIDs inContext:[self managedObjectContext]];
 }
 
 + (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID inContext:(NSManagedObjectContext *)context

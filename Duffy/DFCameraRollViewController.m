@@ -14,6 +14,8 @@
 #import "DFAnalytics.h"
 #import "DFNotificationSharedConstants.h"
 
+NSString *const AllSectionName = @"All";
+
 @interface DFCameraRollViewController ()
 
 @end
@@ -28,7 +30,6 @@
                                                  selector:@selector(cameraRollScanComplete)
                                                      name:DFPhotoStoreCameraRollScanComplete
                                                    object:nil];
-        self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
       
         self.navigationController.navigationItem.title = @"Camera Roll";
         self.tabBarItem.title = @"Camera Roll";
@@ -42,6 +43,10 @@
                                                  selector:@selector(cameraRollUpdated)
                                                      name:DFPhotoStoreCameraRollUpdated
                                                    object:nil];
+      
+      [self setSectionNames:@[AllSectionName]
+            photosBySection:@{AllSectionName : [[[DFPhotoStore sharedStore] cameraRoll]
+                                        photosByDateAscending:YES]}];
     }
     return self;
 }
@@ -91,14 +96,18 @@
                             waitUntilDone:NO];
         return;
     }
-    
-    self.photos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
+  
+  NSArray *allPhotos = [[[DFPhotoStore sharedStore] cameraRoll]
+                        photosByDateAscending:YES];
+  [self setSectionNames:@[AllSectionName]
+        photosBySection:@{AllSectionName : allPhotos}];
     [self.collectionView reloadData];
   if ([[DFUser currentUser] autoUploadEnabled]){
     [[DFUploadController sharedUploadController] uploadPhotos];
   }
 
-    DDLogInfo(@"cameraViewController view updated. %lu photos in camera roll.", (unsigned long)self.photos.count);
+  
+    DDLogInfo(@"cameraViewController view updated. %lu photos in camera roll.", (unsigned long)allPhotos.count);
 }
 
 - (void)cameraRollScanComplete
@@ -122,7 +131,7 @@
 {
     UICollectionViewCell *cell = [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
-    DFPhoto *photo = [self.photos objectAtIndex:indexPath.row];
+    DFPhoto *photo = [self.photosBySection[AllSectionName] objectAtIndex:indexPath.row];
     if (photo.upload157Date == nil) {
         cell.alpha = 0.2;
     }
@@ -141,7 +150,7 @@
     NSSet *photos = [[DFPhotoStore sharedStore] photosWithObjectIDs:objectIDsWithMetadataChange];
     NSMutableArray *cellsToReload = [[NSMutableArray alloc] initWithCapacity:photos.count];
     for (DFPhoto *photo in photos) {
-        NSUInteger photoIndex = [self.photos indexOfObject:photo];
+        NSUInteger photoIndex = [self.photosBySection[AllSectionName] indexOfObject:photo];
         [cellsToReload addObject:[NSIndexPath indexPathForRow:photoIndex inSection:0]];
     }
     

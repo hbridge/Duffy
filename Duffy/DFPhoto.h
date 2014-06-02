@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import "DFTypedefs.h"
 
 
 @class ALAsset;
@@ -16,9 +17,6 @@
 
 + (NSURL *)localFullImagesDirectoryURL;
 + (NSURL *)localThumbnailsDirectoryURL;
-
-
-typedef UInt64 DFPhotoIDType;
 
 typedef enum {
   DFFaceFeatureDetectionNone = 0,
