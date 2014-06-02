@@ -63,6 +63,7 @@
 			<td class='index-count'> Indexed <br> Photos (%) </td>
 			<td class='faces'> Face <br> Rec (%)  </td>
 			<td class='db-fullimage'> Full <br>images (%) </td>
+			<td class='overfeat'> Overfeat <br> Num (%)  </td>
 			<td class='classifications'> Image <br> Rec (%)  </td>
 			<td class='last-uploaded-timestamp'> Last Upload (GMT) </td>
 		</tr>
@@ -78,7 +79,8 @@
 			<td class='clustered right' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
 			<td class='index-count right'> {{ entry.resultsCount }} </td>
 			<td class='faces right'> {{ entry.faces }} </td>
-			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>			
+			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
+			<td class='overfeat right'> {{ entry.overfeat }} </td>		
 			<td class='classifications right'> {{ entry.classifications }} </td>
 			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime|date:'m/d h:i.s A' }} </td>
 		</tr>

@@ -205,6 +205,12 @@ def userbaseSummary(request):
 				entry['clustered'] = entry['clusteredCount']*100/totalCount
 
 				if (fullimagesCount > 0):
+					count = dbQuery.exclude(overfeat_data=None).count()
+					entry['overfeat'] = "%s (%s)" % (count, count*100/fullimagesCount)
+				else:
+					entry['overfeat'] = 0
+
+				if (fullimagesCount > 0):
 					entry['classifications'] = dbQuery.exclude(classification_data=None).count()*100/fullimagesCount
 				else:
 					entry['classifications'] = 0
