@@ -645,8 +645,5 @@ def createUser(phoneId, firstName):
 		os.mkdir(userBasePath)
 		os.chmod(userBasePath, 0775)
 
-	userRemoteStagingPath = os.path.join(remoteStagingPath, userId)
-	subprocess.call(['ssh', remoteHost, "mkdir -p " + userRemoteStagingPath])
-
 	return user
 
