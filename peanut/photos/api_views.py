@@ -455,12 +455,12 @@ def searchV2(request):
 		response['objects'] = sections
 		response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
 		response['result'] = True
-		return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(response), content_type="text/html")
 
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
-		return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(response), content_type="text/html")
 
 
 """
