@@ -29,7 +29,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		items = list()
 		items.extend(self.getTwoFishesData(obj))
 		items.extend(self.getMetadataKeywords(obj, forSearch=False))
-		items.extend(self.getAltTerms(obj, 20))
+		items.extend(self.getAltTerms(obj, 15))
 		items.extend(self.getFaceKeywords(obj, forSearch=False))
 
 		# we break down the words in the code by \n
@@ -42,7 +42,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def prepare_classes(self, obj):
 		items = list()
 		items.extend(self.getMetadataKeywords(obj, forSearch=False))
-		items.extend(self.getAltTerms(obj, 20))
+		items.extend(self.getAltTerms(obj, 15))
 		items.extend(self.getFaceKeywords(obj, forSearch=False))
 
 		return items
@@ -122,8 +122,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 	def getClassData(self, obj, threshold):
 		classes = list()
-		if (obj.classification_data):
-			catList = json.loads(obj.classification_data)
+		if (obj.overfeat_data):
+			catList = json.loads(obj.overfeat_data)
 			for entry in catList:
 				if (entry['rating'] > threshold):
 					classes.append(entry['class_name'].replace('_', ' ').encode('ascii'))
@@ -147,8 +147,8 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def getAltTerms(self, obj, threshold):
 		altTermItems = list()
 
-		if (obj.classification_data):
-			catList = json.loads(obj.classification_data)
+		if (obj.overfeat_data):
+			catList = json.loads(obj.overfeat_data)
 			for entry in catList:
 				if (entry['rating'] > threshold):
 					className = entry['class_name'].replace('_', ' ')
