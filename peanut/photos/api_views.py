@@ -428,7 +428,7 @@ def searchV2(request):
 	if form.is_valid(): # All validation rules pass
 		query = form.cleaned_data['q']
 		user_id = form.cleaned_data['user_id']
-		startDateTime = form.cleaned_data['startDateTime']
+		startDateTime = form.cleaned_data['start_date_time']
 		num = form.cleaned_data['num']
 		# Reversed
 		r = form.cleaned_data['r']
@@ -453,7 +453,7 @@ def searchV2(request):
 		lastDate, sections = turnGroupsIntoSections(monthGroupings, num)
 
 		response['objects'] = sections
-		response['nextKey'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
+		response['next_key'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
 		response['result'] = True
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
