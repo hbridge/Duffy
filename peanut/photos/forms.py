@@ -16,4 +16,4 @@ class SearchQueryForm(forms.Form):
 	debug = forms.BooleanField(required=False)
 	q = forms.CharField(max_length=50)
 	num = forms.IntegerField(min_value=1, max_value=10000, initial=30, required=False)
-	startDateTime = forms.DateTimeField(required=False, initial=datetime.date(1901,1,1))
+	start_date_time = forms.DateTimeField(required=False, initial=datetime.date(1901,1,1))
