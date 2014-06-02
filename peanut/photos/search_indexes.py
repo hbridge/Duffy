@@ -28,7 +28,6 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def prepare_content_auto(self, obj):
 		items = list()
 		items.extend(self.getTwoFishesData(obj))
-		items.extend(self.getClassData(obj, 20))
 		items.extend(self.getMetadataKeywords(obj, forSearch=False))
 		items.extend(self.getAltTerms(obj, 20))
 		items.extend(self.getFaceKeywords(obj, forSearch=False))
