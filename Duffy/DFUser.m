@@ -206,7 +206,11 @@ static DFUser *currentUser;
   [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
-
+- (NSString *)description
+{
+  return [NSString stringWithFormat:@"{\n firstName: %@ \n lastName:%@ \n id:%llu \n} ",
+          self.firstName, self.lastName, self.userID];
+}
 
 
 

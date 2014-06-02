@@ -52,9 +52,6 @@ static NSString *UserIDURLParameter = @"user_id";
 static NSString *QueryURLParameter = @"q";
 static NSString *ReverseResultsURLParameter = @"r";
 
-
-
-
 @implementation DFSearchViewController
 
 - (id)init

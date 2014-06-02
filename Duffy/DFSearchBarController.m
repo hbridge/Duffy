@@ -83,6 +83,13 @@ typedef enum {
   return self;
 }
 
+- (void)dealloc
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                  name:DFUploadStatusNotificationName
+                                                object:nil];
+}
+
 #pragma mark - Public methods
 
 - (void)setSearchBar:(DFSearchBar *)searchBar

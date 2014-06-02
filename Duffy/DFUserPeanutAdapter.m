@@ -48,7 +48,6 @@
      success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
      {
          DFUserInfoFetchResponse *response = [mappingResult firstObject];
-         DDLogInfo(@"User Info response received.  result:%@", response.result);
          
          DFUser *result;
          if ([response.result isEqualToString:@"true"]) {
@@ -56,6 +55,11 @@
          }  else {
              result = nil;
          }
+       
+       DDLogInfo(@"User Info response received.  result:%@, User:%@",
+                 response.result,
+                 result.description);
+       
          dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
              successBlock(result);
          });

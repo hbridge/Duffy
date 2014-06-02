@@ -227,6 +227,9 @@ DFIntroContentType DFIntroContentErrorNoUser = @"DFIntroContentErrorNoUser";
     DDLogInfo(@"Asking for user permissions.");
     // first semaphore wait is to wait for the get userID to complete
     dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
+    if ([[DFUser currentUser] userID] == 0) {
+      DDLogError(@"User create failed, not asking for permissions.");
+    }
     [self checkForAndRequestPhotoAccess];
     dispatch_semaphore_wait(self.nextStepSemaphore, DISPATCH_TIME_FOREVER);
     [[DFCameraRollSyncController sharedSyncController] asyncSyncToCameraRoll];
@@ -384,7 +387,7 @@ static int retryCount = 0;
                                                   NSArray *timePeanutSuggestions) {
     if (timePeanutSuggestions.count == 0 ||
         locationPeanutSuggestions.count == 0) {
-      if (sessionStats.numThumbnailsUploaded > 0 || retryCount <= MaxAutocompleteFetchRetryCount) {
+      if (sessionStats.numThumbnailsUploaded > 0 && retryCount <= MaxAutocompleteFetchRetryCount) {
         sleep(2);
         retryCount++;
         [weakSelf checkForAutocompleteUntilDone:sessionStats];
