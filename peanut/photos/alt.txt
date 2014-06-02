@@ -308,7 +308,7 @@ barber chair,chair,seat,furniture
 throne,chair,seat,furniture
 folding chair,chair,seat,furniture
 rocking chair,chair,seat,furniture
-studio couch,sofa,seat,furniture
+studio couch,couch,sofa,seat,furniture
 toilet seat,seat,furniture
 desk,desk,table,furniture
 pool table,pool table,table,furniture

@@ -121,10 +121,10 @@ public class WordNetNav {
 
 		swapIn = new String[] {"sailing vessel", "military plane", "steel drum", 
 					"hard disk", "hermit crab", "refrigerator", "telephone",
-					"television", "hamburger"};
+					"television", "hamburger", "studio couch"};
 		swapOut = new String[] {"sailboat", "airplane", "drum", 
 					"disk", "crab", "fridge", "phone",
-					"tv", "burger"};
+					"tv", "burger", "couch"};
 
 		skipCats = new String[] {"menu"}; //skip these when you come across them
 
