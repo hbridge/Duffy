@@ -1,0 +1,11 @@
+This generates the alt.txt needed for heirarchical categorization by the index.
+
+Note: requires you to install wordnet3.0 on the system
+
+compile: script to compile
+runTest: script to run program and output to command line. Good for testing.
+runProd: when ready, run this to generate the alt.txt file in the right place for search_indexes.py.
+
+jaws-bin.jar: 3rd party java library to access Wordnet
+txtfiles/classlist.csv: read in by the program
+

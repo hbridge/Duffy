@@ -1,0 +1,2 @@
+rm *.class
+javac -cp jaws-bin.jar:. src/WordNetNav.java -d .
