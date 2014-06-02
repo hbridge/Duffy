@@ -42,7 +42,6 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	def prepare_classes(self, obj):
 		items = list()
-		items.extend(self.getClassData(obj, 20))
 		items.extend(self.getMetadataKeywords(obj, forSearch=False))
 		items.extend(self.getAltTerms(obj, 20))
 		items.extend(self.getFaceKeywords(obj, forSearch=False))
@@ -73,7 +72,6 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 		items = list()
 		items.extend(self.getTwoFishesData(obj))
-		items.extend(self.getClassData(obj, 20))
 		items.extend(self.getMetadataKeywords(obj))
 		items.extend(self.getAltTerms(obj, 20))
 		items.extend(self.getFaceKeywords(obj))
