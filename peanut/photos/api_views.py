@@ -277,7 +277,8 @@ def autocomplete(request):
 	order = 0
 	for suggestion in sortedSuggestions:
 		phrase, count = suggestion
-		entry = {'name': phrase, 'count': count, 'order': order}
+		countPhrase = getCountPhrase(count)
+		entry = {'name': phrase, 'count': count, 'count_phrase': countPhrase, 'order': order}
 		order += 1
 		results.append(entry)
 
@@ -647,3 +648,12 @@ def createUser(phoneId, firstName):
 
 	return user
 
+def getCountPhrase(count):
+	if count == 0:
+		return ""
+	elif count < 10:
+		return "few"
+	elif count >= 10 and count < 100:
+		return "10s"
+	else:
+		return "100s"
