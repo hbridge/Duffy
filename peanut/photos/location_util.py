@@ -7,7 +7,7 @@ import logging
 
 from photos import image_util
 
-from bulk_update.helper import bulk_update
+from photos import bulk_updater
 
 from photos.models import Photo
 
