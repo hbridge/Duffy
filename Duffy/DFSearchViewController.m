@@ -47,6 +47,8 @@
 
 @end
 
+const unsigned int MaxResultsPerSearchRequest = 100;
+
 static NSString *GroupsPath = @"/viz/groups/";
 static NSString *SearchPath = @"/viz/search/";
 static NSString *PhoneIDURLParameter = @"phone_id";
@@ -191,8 +193,10 @@ static NSString *ReverseResultsURLParameter = @"r";
 {
   self.currentlyLoadingSearchQuery = query;
   
-  
-  [self.searchAdapter fetchSearchResultsForQuery:query maxResults:100 minDateString:nil withCompletionBlock:^(DFPeanutSearchResponse *response) {
+  [self.searchAdapter fetchSearchResultsForQuery:query
+                                      maxResults:MaxResultsPerSearchRequest
+                                   minDateString:nil
+                             withCompletionBlock:^(DFPeanutSearchResponse *response) {
     DDLogVerbose(@"SearchViewController got search response: %@", response);
     if (response.result == TRUE) {
       dispatch_async(dispatch_get_main_queue(), ^{

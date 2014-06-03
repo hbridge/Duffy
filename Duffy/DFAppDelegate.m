@@ -54,7 +54,7 @@
   //[Flurry setLogLevel:FlurryLogLevelDebug];
   
   //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-  RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
 #else
   [Flurry startSession:@"MMJXFR6J7J5Y3YB9MK6N"];

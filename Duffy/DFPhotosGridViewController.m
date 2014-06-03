@@ -58,7 +58,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     self.flowLayout.minimumLineSpacing = self.photoSpacing;
     [self.collectionView setCollectionViewLayout:self.flowLayout];
     self.collectionView.contentInset = UIEdgeInsetsMake(self.photoSpacing, 0, 0, 0);
-  self.flowLayout.headerReferenceSize = CGSizeMake(320, 80);
+  self.flowLayout.headerReferenceSize = CGSizeMake(320, 33);
 
     
     // register cell type
