@@ -229,6 +229,8 @@ def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 	
 	# start building clusters
 	clusterList = list()
+	if len(solrPhotoSet) == 0:
+		return clusterList
 	solrPhotoSetIter = iter(solrPhotoSet)
 	firstPhoto = next(solrPhotoSetIter)
 	clusterList.append([{'photo': firstPhoto, 'dist': None, 'simrows': getAllSims(firstPhoto, simCaches)}])

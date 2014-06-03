@@ -445,16 +445,17 @@ def searchV2(request):
 		
 		# Get a search for 2 times the number of entries we want to return, we will filter it down loater
 		searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit = num*2)
-		
-		# Group into months
-		monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults)
 
-		# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
-		#   which is the key for the next call
-		lastDate, sections = turnGroupsIntoSections(monthGroupings, num)
+		if (len(searchResults) > 0):	
+			# Group into months
+			monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults)
 
-		response['objects'] = sections
-		response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
+			# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
+			#   which is the key for the next call
+			lastDate, sections = turnGroupsIntoSections(monthGroupings, num)
+
+			response['objects'] = sections
+			response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
 		response['result'] = True
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
