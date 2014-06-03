@@ -27,8 +27,16 @@ def runOverfeat(photo):
     h0 = image.shape[0]
     w0 = image.shape[1]
     d0 = float(min(h0, w0))
-    image = image[int(round((h0-d0)/2.)):int(round((h0-d0)/2.)+d0),
+
+    try:
+        image = image[int(round((h0-d0)/2.)):int(round((h0-d0)/2.)+d0),
                   int(round((w0-d0)/2.)):int(round((w0-d0)/2.)+d0), :]
+    except IndexError:
+        # Deal with exception:
+        # File "/home/derek/prod/Duffy/peanut/scripts/populateOverfeat.py", line 31, in runOverfeat
+        #   int(round((w0-d0)/2.)):int(round((w0-d0)/2.)+d0), :]
+        return []
+        
     image = imresize(image, (231, 231)).astype(numpy.float32)
 
     # numpy loads image with colors as last dimension, transpose tensor
