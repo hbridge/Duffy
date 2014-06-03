@@ -46,6 +46,7 @@ class Photo(models.Model):
 	faces_data = models.TextField(null=True)
 	time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
+	neighbored_time = models.DateTimeField(null=True)
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
@@ -150,10 +151,7 @@ class Photo(models.Model):
 
 		attributesList.append("updated")
 
-		if (len(objs) == 1):
-			objs[0].save(update_fields=attributesList)
-		else:
-			bulk_updater.bulk_update(objs, update_fields=attributesList)
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
 		
 
 class Classification(models.Model):
@@ -176,3 +174,18 @@ class Similarity(models.Model):
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}'.format(self.photo_1.id, self.photo_2.id, self.similarity)
+
+
+class Neighbor(models.Model):
+	user_1 = models.ForeignKey(User, related_name="neighbor_user_1")
+	user_2 = models.ForeignKey(User, related_name="neighbor_user_2")
+	photo_1 = models.ForeignKey(Photo, related_name="neighbor_photo_1")
+	photo_2 = models.ForeignKey(Photo, related_name="neighbor_photo_2")
+	time_distance_sec = models.IntegerField()
+	geo_distance_m = models.IntegerField()
+
+	class Meta:
+		unique_together = ("photo_1", "photo_2")
+
+	def __unicode__(self):
+		return '{0}, {1}, {2}, {3}'.format(self.photo_1.id, self.photo_2.id, self.time_distance_sec, self.geo_distance_m)

@@ -12,6 +12,10 @@ def bulk_update(objs, update_fields=None, exclude_fields=None,
 			using='default', batch_size=None):
 	assert batch_size is None or batch_size > 0
 
+	if len(objs) == 1:
+		objs[0].save(update_fields=update_fields)
+		return
+
 	batch_size = batch_size or len(objs)
 	connection = connections[using]
 	ref_obj = objs[0]
