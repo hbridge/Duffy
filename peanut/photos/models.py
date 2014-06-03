@@ -189,3 +189,4 @@ class Neighbor(models.Model):
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}, {3}'.format(self.photo_1.id, self.photo_2.id, self.time_distance_sec, self.geo_distance_m)
+
