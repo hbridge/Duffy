@@ -30,51 +30,51 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (id)init
 {
-    self = [super initWithNibName:@"DFPhotosGridViewController" bundle:[NSBundle mainBundle]];
-    if (self) {
-        self.tabBarItem.title = @"Photos";
-        self.tabBarItem.image = [UIImage imageNamed:@"Icons/Timeline"];
-        
-        UINavigationItem *n = [self navigationItem];
-        [n setTitle:@"Photos"];
-        
-        photoSquareSize = DEFAULT_PHOTO_SQUARE_SIZE;
-        photoSpacing = DEFAULT_PHOTO_SPACING;
-        
-      _photosBySection = [[NSDictionary alloc] init];
-      _sectionNames = [[NSArray alloc] init];
-    }
-    return self;
+  self = [super initWithNibName:@"DFPhotosGridViewController" bundle:[NSBundle mainBundle]];
+  if (self) {
+    self.tabBarItem.title = @"Photos";
+    self.tabBarItem.image = [UIImage imageNamed:@"Icons/Timeline"];
+    
+    UINavigationItem *n = [self navigationItem];
+    [n setTitle:@"Photos"];
+    
+    photoSquareSize = DEFAULT_PHOTO_SQUARE_SIZE;
+    photoSpacing = DEFAULT_PHOTO_SPACING;
+    
+    _photosBySection = [[NSDictionary alloc] init];
+    _sectionNames = [[NSArray alloc] init];
+  }
+  return self;
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    
-    // configure our flow layout
-    self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
-    self.flowLayout.itemSize =CGSizeMake(self.photoSquareSize, self.photoSquareSize);
-    self.flowLayout.minimumInteritemSpacing = self.photoSpacing;
-    self.flowLayout.minimumLineSpacing = self.photoSpacing;
-    [self.collectionView setCollectionViewLayout:self.flowLayout];
-    self.collectionView.contentInset = UIEdgeInsetsMake(self.photoSpacing, 0, 0, 0);
+  [super viewDidLoad];
+  
+  // configure our flow layout
+  self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
+  self.flowLayout.itemSize =CGSizeMake(self.photoSquareSize, self.photoSquareSize);
+  self.flowLayout.minimumInteritemSpacing = self.photoSpacing;
+  self.flowLayout.minimumLineSpacing = self.photoSpacing;
+  [self.collectionView setCollectionViewLayout:self.flowLayout];
+  self.collectionView.contentInset = UIEdgeInsetsMake(self.photoSpacing, 0, 0, 0);
   self.flowLayout.headerReferenceSize = CGSizeMake(320, 33);
-
-    
-    // register cell type
-    [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
+  
+  
+  // register cell type
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoSectionHeader" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"HeaderView"];
-    
-    // set background
-    self.collectionView.backgroundColor = [UIColor whiteColor];
+  
+  // set background
+  self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 - (void)setSectionNames:(NSArray *)sectionNames photosBySection:(NSDictionary *)photosBySection
@@ -138,7 +138,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     DFPhotoSectionHeader *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"HeaderView" forIndexPath:indexPath];
     NSString *title = self.sectionNames[indexPath.section];
     headerView.titleLabel.text = title;
-  
+    
     reusableview = headerView;
   }
   
@@ -156,7 +156,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (void)assetsEnumerated
 {
-    [self.collectionView reloadData];
+  [self.collectionView reloadData];
 }
 
 
@@ -173,25 +173,25 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (void)pushPhotoViewForPhoto:(DFPhoto *)photo
                   atIndexPath:(NSIndexPath *)indexPath
 {
-    
-    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.photo = photo;
-    pvc.indexPathInParent = indexPath;
-    
-    
-    DFMultiPhotoViewController *multiPhotoController = [[DFMultiPhotoViewController alloc] init];
-    multiPhotoController.dataSource = self;
-    [multiPhotoController setViewControllers:[NSArray arrayWithObject:pvc]
-                                   direction:UIPageViewControllerNavigationDirectionForward
-                                    animated:NO
-                                  completion:^(BOOL finished) {
-                                  }];
-    
-    DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
-    [photoNavController pushMultiPhotoViewController:multiPhotoController
-                        withFrontPhotoViewController:pvc
-                            fromPhotosGridController:self
-                                     itemAtIndexPath:indexPath];
+  
+  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+  pvc.photo = photo;
+  pvc.indexPathInParent = indexPath;
+  
+  
+  DFMultiPhotoViewController *multiPhotoController = [[DFMultiPhotoViewController alloc] init];
+  multiPhotoController.dataSource = self;
+  [multiPhotoController setViewControllers:[NSArray arrayWithObject:pvc]
+                                 direction:UIPageViewControllerNavigationDirectionForward
+                                  animated:NO
+                                completion:^(BOOL finished) {
+                                }];
+  
+  DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
+  [photoNavController pushMultiPhotoViewController:multiPhotoController
+                      withFrontPhotoViewController:pvc
+                          fromPhotosGridController:self
+                                   itemAtIndexPath:indexPath];
 }
 
 
@@ -201,46 +201,46 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
      viewControllerBeforeViewController:(UIViewController *)viewController
 {
-    NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
-    
-    if (indexPath.row == 0) return nil;
+  NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
+  
+  if (indexPath.row == 0) return nil;
   
   NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
   DFPhoto *photo = photosForSection[indexPath.row - 1];
-
-    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.photo = photo;
-    pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
-    return pvc;
+  
+  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+  pvc.photo = photo;
+  pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
+  return pvc;
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
-    NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
+  NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
   
   NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
-    if (indexPath.row == photosForSection.count -1) return nil;
-    
-    DFPhoto *photo = [photosForSection objectAtIndex:indexPath.row + 1];
-    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.photo = photo;
-    pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
-    return pvc;
+  if (indexPath.row == photosForSection.count -1) return nil;
+  
+  DFPhoto *photo = [photosForSection objectAtIndex:indexPath.row + 1];
+  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+  pvc.photo = photo;
+  pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
+  return pvc;
 }
 
 - (CGRect)frameForCellAtIndexPath:(NSIndexPath *)indexPath
 {
-    UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
-    if (layoutAttributes) {
-        CGRect frame = layoutAttributes.frame;
-        return CGRectMake(frame.origin.x,
-                                 frame.origin.y + self.topLayoutGuide.length - self.collectionView.contentOffset.y,
-                                 frame.size.width,
-                                 frame.size.height);
-    }
-    
-    return CGRectZero;
+  UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout layoutAttributesForItemAtIndexPath:indexPath];
+  if (layoutAttributes) {
+    CGRect frame = layoutAttributes.frame;
+    return CGRectMake(frame.origin.x,
+                      frame.origin.y + self.topLayoutGuide.length - self.collectionView.contentOffset.y,
+                      frame.size.width,
+                      frame.size.height);
+  }
+  
+  return CGRectZero;
 }
 
 @end
