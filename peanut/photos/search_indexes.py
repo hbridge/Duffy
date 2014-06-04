@@ -29,8 +29,9 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		items = list()
 		items.extend(self.getTwoFishesData(obj))
 		items.extend(self.getMetadataKeywords(obj, forSearch=False))
-		items.extend(self.getAltTermsClassifier(obj, 15))
-		items.extend(self.getAltTermsOverfeat(obj, 10))		
+		items.extend(self.getScreenshotKeywords(obj, forSearch=False))
+		items.extend(self.getAltTerms(obj))
+		items.extend(self.getDocsData(obj))
 		items.extend(self.getFaceKeywords(obj, forSearch=False))
 
 		# we break down the words in the code by \n
@@ -43,8 +44,9 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	def prepare_classes(self, obj):
 		items = list()
 		items.extend(self.getMetadataKeywords(obj, forSearch=False))
-		items.extend(self.getAltTermsClassifier(obj, 15))
-		items.extend(self.getAltTermsOverfeat(obj, 10))
+		items.extend(self.getScreenshotKeywords(obj, forSearch=False))		
+		items.extend(self.getAltTerms(obj))
+		items.extend(self.getDocsData(obj))
 		items.extend(self.getFaceKeywords(obj, forSearch=False))
 
 		return items
@@ -74,8 +76,9 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		items = list()
 		items.extend(self.getTwoFishesData(obj))
 		items.extend(self.getMetadataKeywords(obj))
-		items.extend(self.getAltTermsClassifier(obj, 15))
-		items.extend(self.getAltTermsOverfeat(obj, 10))		
+		items.extend(self.getScreenshotKeywords(obj))		
+		items.extend(self.getAltTerms(obj))
+		items.extend(self.getDocsData(obj))
 		items.extend(self.getFaceKeywords(obj))
 		return self.add_locData(obj) + '\n' + \
 				u', '.join(items)
@@ -132,6 +135,24 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 					classes.append(entry['class_name'].replace('_', ' ').encode('ascii'))
 		return classes
 
+
+	'''
+	Add documents data. Uses a lower threshold to increase document recall
+	'''
+	def getDocsData(self, obj):
+		docClasses = {'menu', 'crossword puzzle', 'envelope'}
+		terms = {'docs'}
+		threshold = 10
+
+		if (obj.classification_data):
+			catList = json.loads(obj.classification_data)
+			# only lower threshold if one of the docClasses is the first entry
+			if (len(catList) > 0):
+				if (catList[0]['class_name'].replace('_', ' ').lower() in docClasses):
+					if (catList[0]['rating'] > threshold):
+						return terms
+		return list()
+
 	def prepAltList(self):
 		altFilePath = '/home/derek/prod/Duffy/peanut/photos/'
 		f = open(altFilePath + 'alt.txt', 'r')
@@ -145,35 +166,24 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 	'''
 	loads the list of alternate terms, adds them to the index for any classification 
-	*from classifier* that is greater than threshold
+	from either classifier or overfeat that is greater than threshold
 	'''
-	def getAltTermsClassifier(self, obj, threshold):
+	def getAltTerms(self, obj):
 		altTermItems = list()
+		classifierThreshold = 15
+		overfeatThreshold = 10
 
 		if (obj.classification_data):
 			catList = json.loads(obj.classification_data)
 			for entry in catList:
-				if (entry['rating'] > threshold):
+				if (entry['rating'] > classifierThreshold):
 					className = entry['class_name'].replace('_', ' ')
 					if (className in self.altDict):
 						altTermItems.extend(self.altDict[className])
-		return altTermItems
-
-	'''
-	loads the list of alternate terms , adds them to the index for any classification 
-	*from overfeat* that is greater than threshold
-	'''
-	def getAltTermsOverfeat(self, obj, threshold):
-		altTermItems = list()
-
-		# if classification_data exists, skip this
-		if (obj.classification_data):
-			return altTermItems
-
-		if (obj.overfeat_data):
+		elif (obj.overfeat_data):
 			catList = json.loads(obj.overfeat_data)
 			for entry in catList:
-				if (entry['rating'] > threshold):
+				if (entry['rating'] > overfeatThreshold):
 					className = entry['class_name'].replace('_', ' ')
 					if (className in self.altDict):
 						altTermItems.extend(self.altDict[className])
@@ -224,8 +234,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 	def getMetadataKeywords(self, obj, forSearch=True):
 		foundTerms = list()
-		keywords = {"front camera" : ['selfies', 'selfie', 'selfy'],
-					"{PNG}" : ['screenshots', 'screenshot']}
+		keywords = {"front camera" : ['selfies', 'selfie', 'selfy']}
 
 		if (obj.metadata):
 			for key in keywords:
@@ -237,6 +246,22 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 
 		return foundTerms
 
+	'''
+		Adds screenshot keyword
+	'''
+	def getScreenshotKeywords(self, obj, forSearch=True):
+		foundTerms = ['screenshots', 'screenshot']
+		keywords = [['"PixelHeight": 960', '"PixelWidth": 640'], 
+					['"PixelHeight": 1136', '"PixelWidth": 640']]
+
+		if (obj.metadata):
+			for entry in keywords:
+				if (str(obj.metadata).find(entry[0]) >= 0 and str(obj.metadata).find(entry[1]) >= 0):
+					if forSearch:
+						return foundTerms
+					else:
+						return list(foundTerms[0])
+		return list()
 
 	def getTwoFishesData(self, obj):
 		locItems = list()
