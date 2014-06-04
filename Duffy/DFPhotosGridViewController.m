@@ -110,6 +110,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
+  if (section > self.sectionNames.count) return 0;
   NSArray *items = [self resultsForSectionIndex:section];
   return items.count;
 }

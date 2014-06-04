@@ -180,7 +180,9 @@ static NSString *ReverseResultsURLParameter = @"r";
 
 - (void)searchBarController:(DFSearchBarController *)searchBarController searchExecutedWithQuery:(NSString *)query
 {
-  if ([query isEqualToString:@""] || [[query lowercaseString]
+  if ([[query lowercaseString] isEqualToString:@"settings"]) {
+    [self showSettings];
+  } else if ([query isEqualToString:@""] || [[query lowercaseString]
                                                isEqualToString:[self.searchBarController.defaultQuery lowercaseString]]) {
     [self loadDefaultSearch];
   } else {
@@ -274,47 +276,7 @@ static NSString *ReverseResultsURLParameter = @"r";
   }
 }
 
-
-- (void)pushPhotoView:(NSString *)photoURLString
-{
-  NSURL *photoURL = [NSURL URLWithString:photoURLString];
-  NSString *photoIDString = [[photoURL lastPathComponent] stringByDeletingPathExtension];
-  DDLogVerbose(@"photoURL:%@, photo id string: %@", photoURL, photoIDString);
-  
-  
-  NSRange photoIDArrayRange = [photoURLString rangeOfString:@"?photoIdArray="];
-  if (photoIDArrayRange.location != NSNotFound) {
-    NSString *searchResultIDs = [photoURLString
-                                 substringFromIndex:photoIDArrayRange.location+photoIDArrayRange.length];
-    DDLogVerbose(@"searchResultIDs:%@", searchResultIDs);
-    self.searchResultPhotoIDs = [[NSMutableArray alloc] init];
-    for (NSString *idString in [searchResultIDs componentsSeparatedByString:@","]) {
-      [self.searchResultPhotoIDs addObject:@([idString longLongValue])];
-    }
-  }
-  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:[photoIDString longLongValue]];
-  
-  if (photo) {
-    DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-    pvc.photo = photo;
-    DFMultiPhotoViewController *mvc = [[DFMultiPhotoViewController alloc] init];
-    [mvc setViewControllers:[NSArray arrayWithObject:pvc]
-                  direction:UIPageViewControllerNavigationDirectionForward
-                   animated:NO
-                 completion:^(BOOL finished) {
-                 }];
-    mvc.dataSource = self;
-    [self.navigationController pushViewController:mvc animated:YES];
-  } else {
-    DDLogError(@"Error: no local photo found for photoID:%llu, showing web view", [photoIDString longLongValue]);
-    DFPhotoWebViewController *pvc = [[DFPhotoWebViewController alloc] initWithPhotoURL:photoURL];
-    [self.navigationController pushViewController:pvc animated:YES];
-  }
-}
-
-
-
-- (void)showSettings:(id)sender
+- (void)showSettings
 {
   DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
   [self.navigationController pushViewController:svc animated:YES];
