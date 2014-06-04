@@ -57,10 +57,7 @@ def solrSearch(userId, startDate, query, reverse=False, limit=None, endDate=date
 	for word in query.split():
 		searchResults = searchResults.filter(content__contain=word)
 
-	#if not reverse:
 	searchResults = searchResults.order_by('timeTaken')
-	#else:
-	#	searchResults = searchResults.order_by('-timeTaken')
 
 	if limit:
 		searchResults = searchResults[:limit]
