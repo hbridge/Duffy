@@ -8,6 +8,7 @@ import socket
 import time
 import zmq
 import Image
+import datetime
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -86,7 +87,7 @@ def processResponse(response):
 
     return photosToSave
 
-def classifyPhotos(photos, socket_send, socket_recv):
+def classifyPhotos(photos, socket_send, socket_recv, poller):
     cmd = dict()
     cmd['cmd'] = 'process'
     cmd['images'] = list()
@@ -96,10 +97,20 @@ def classifyPhotos(photos, socket_send, socket_recv):
         imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.full_filename)
         cmd['images'].append(imagepath)
 
-    logging.info("Sending:  " + str(cmd))
-    socket_send.send_json(cmd)
+    gotResponse = False
+    while gotResponse == False:
+        timeStart = datetime.datetime.now()
+        timeEnd = timeStart + datetime.timedelta(minutes=1) 
+
+        logging.info("Sending:  " + str(cmd))
+        socket_send.send_json(cmd)
+        logging.info("Waiting 1 minute for response...")
     
-    logging.info("Waiting for response...")
+        while datetime.datetime.now() < timeEnd and gotResponse == False:
+            result = poller.poll(1000)
+            if len(result) > 0:
+                gotResponse = True
+    
     result = socket_recv.recv_json()
     logging.info("Got back: " + str(result))
 
@@ -146,6 +157,10 @@ def main(argv):
     logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
 
     socket_send, socket_recv = initClassifier()
+    poller = zmq.Poller()
+    poller.register(socket_recv, zmq.POLLIN)
+
+
 
     logging.info("Starting pipeline at " + time.strftime("%c"))
     
@@ -160,7 +175,7 @@ def main(argv):
             # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
             successfullyCopied = copyPhotos(nonProcessedPhotos)
             if (len(successfullyCopied) > 0):
-                successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv)
+                successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv, poller)
 
             if len(successfullyClassified) > 0:
                 logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
