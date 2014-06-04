@@ -25,6 +25,7 @@
   [self.textField addTarget:self action:@selector(textChanged:)
            forControlEvents:UIControlEventEditingChanged];
   self.text = self.defaultQuery;
+  self.textField.font = [UIFont fontWithName:@"ProximaNova-Regular" size:19.0];
 }
 
 - (void)setText:(NSString *)text

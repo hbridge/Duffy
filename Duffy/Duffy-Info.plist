@@ -31,11 +31,24 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>4495</string>
+	<string>4512</string>
 	<key>LSApplicationCategoryType</key>
 	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fonts/ProximaNova-Regular.otf</string>
+		<string>Fonts/ProximaNova-Black.otf</string>
+		<string>Fonts/ProximaNova-Bold.otf</string>
+		<string>Fonts/ProximaNova-BoldIt.otf</string>
+		<string>Fonts/ProximaNova-Extrabold.otf</string>
+		<string>Fonts/ProximaNova-Light.otf</string>
+		<string>Fonts/ProximaNova-LightItalic.otf</string>
+		<string>Fonts/ProximaNova-RegularItalic.otf</string>
+		<string>Fonts/ProximaNova-Semibold.otf</string>
+		<string>Fonts/ProximaNova-SemiboldItalic.otf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
