@@ -27,8 +27,8 @@
 @synthesize itemsBySection = _itemsBySection;
 @synthesize sectionNames = _sectionNames;
 
-static const CGFloat DEFAULT_PHOTO_SQUARE_SIZE = 78.5;
-static const CGFloat DEFAULT_PHOTO_SPACING = 2;
+static const CGFloat DEFAULT_PHOTO_SQUARE_SIZE = 105;
+static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
 
 - (id)init
 {

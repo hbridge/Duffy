@@ -10,13 +10,17 @@
             <rect key="frame" x="0.0" y="0.0" width="77" height="77"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="cPL-tb-lqo" userLabel="photoImageView">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cPL-tb-lqo" userLabel="photoImageView">
                     <rect key="frame" x="0.0" y="0.0" width="77" height="77"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                 </imageView>
-                <imageView opaque="NO" userInteractionEnabled="NO" alpha="0.79999999999999982" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Icons/PhotoStackOverlay.png" translatesAutoresizingMaskIntoConstraints="NO" id="1dA-2O-3kS" userLabel="overlayImageView">
+                <imageView opaque="NO" userInteractionEnabled="NO" alpha="0.79999999999999982" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Icons/PhotoStackOverlay.png" translatesAutoresizingMaskIntoConstraints="NO" id="1dA-2O-3kS" userLabel="overlayImageView">
                     <rect key="frame" x="0.0" y="0.0" width="77" height="77"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="77" id="bM1-UC-QFW"/>
+                        <constraint firstAttribute="width" constant="77" id="u5s-6Q-5vc"/>
+                    </constraints>
                 </imageView>
                 <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="2" textAlignment="center" lineBreakMode="clip" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="VJ5-MG-akj">
                     <rect key="frame" x="54" y="55" width="25" height="21"/>
@@ -25,7 +29,7 @@
                         <constraint firstAttribute="height" constant="21" id="68f-Td-Ptf"/>
                         <constraint firstAttribute="width" constant="25" id="kS5-lC-hg0"/>
                     </constraints>
-                    <fontDescription key="fontDescription" type="boldSystem" pointSize="11"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
                     <color key="textColor" red="0.93333339691162109" green="0.40000003576278687" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
@@ -34,6 +38,12 @@
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="VJ5-MG-akj" secondAttribute="bottom" constant="1" id="2QT-Eh-boW"/>
                 <constraint firstAttribute="trailing" secondItem="VJ5-MG-akj" secondAttribute="trailing" constant="-2" id="CUu-3f-Act"/>
+                <constraint firstAttribute="trailing" secondItem="1dA-2O-3kS" secondAttribute="trailing" id="YcT-47-NrT"/>
+                <constraint firstAttribute="bottom" secondItem="cPL-tb-lqo" secondAttribute="bottom" id="YkS-AY-8Ob"/>
+                <constraint firstItem="cPL-tb-lqo" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="gGz-GY-lj4"/>
+                <constraint firstAttribute="trailing" secondItem="cPL-tb-lqo" secondAttribute="trailing" id="r1B-GG-lFa"/>
+                <constraint firstAttribute="bottom" secondItem="1dA-2O-3kS" secondAttribute="bottom" id="sCi-SM-qI7"/>
+                <constraint firstItem="cPL-tb-lqo" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="vk4-Fe-crr"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
