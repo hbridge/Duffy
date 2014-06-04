@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.http import HttpResponse
 from django.core import serializers
 from django.utils import timezone
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.db import IntegrityError
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.template import RequestContext, loader
@@ -33,9 +33,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from photos.models import Photo, User, Classification
+from photos.models import Photo, User, Neighbor
 from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
-from photos.serializers import PhotoSerializer
+from photos.serializers import PhotoSerializer, SmallPhotoSerializer, UserSerializer
 from .forms import SearchQueryForm
 
 import urllib
@@ -591,7 +591,6 @@ def newresults_check(request):
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
 			return returnFailure(response, "user_id not found")
-
 	else:
 		return returnFailure(response, "Need user_id")
 
@@ -609,7 +608,43 @@ def newresults_check(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+class TimeEnabledEncoder(json.JSONEncoder):
 
+	def default(self, obj):
+		if isinstance(obj, datetime.datetime):
+			return int(time.mktime(obj.timetuple()))
+
+		return json.JSONEncoder.default(self, obj)
+
+def neighbors(request):
+	response = dict({'result': True})
+	data = getRequestData(request)
+
+	if data.has_key('user_id'):
+		userId = data['user_id']
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return returnFailure(response, "user_id not found")
+	else:
+		return returnFailure(response, "Need user_id")
+
+	results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user))
+
+	neighbors = list()
+	for neighbor in results:
+		obj = {'photo_1': SmallPhotoSerializer(neighbor.photo_1).data,
+			   'photo_2': SmallPhotoSerializer(neighbor.photo_2).data,
+			   'user_1': UserSerializer(neighbor.user_1).data,
+			   'user_2': UserSerializer(neighbor.user_2).data,
+			   'time_distance_sec': neighbor.time_distance_sec,
+			   'geo_distance_m': neighbor.geo_distance_m
+			   }
+		neighbors.append(obj)
+		
+	response['neighbors'] = neighbors
+	return HttpResponse(json.dumps(response, cls=TimeEnabledEncoder), content_type="application/json")
+	
 """
 Helper functions
 """

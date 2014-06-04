@@ -245,6 +245,20 @@ def userbaseSummary(request):
 	context = {	'resultList': resultList}
 	return render(request, 'admin/userbaseSummary.html', context)
 
+def neighbors(request):
+	if request.method == 'GET':
+		data = request.GET
+	elif request.method == 'POST':
+		data = request.POST
+
+	if data.has_key('user_id'):
+		photo = data['user_id']
+	else:
+		return HttpResponse("Please specify a user")
+
+	context = {}
+	return render(request, 'photos/neighbors.html', context)
+
 # Helper functions
 
 def setSession(request, userId):
