@@ -19,6 +19,11 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+  self.countLabel.font = [UIFont fontWithName:@"ProximaNova-Semibold" size:13];
+}
+
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.
