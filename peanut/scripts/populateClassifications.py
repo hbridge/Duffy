@@ -87,7 +87,35 @@ def processResponse(response):
 
     return photosToSave
 
-def classifyPhotos(photos, socket_send, socket_recv, poller):
+def recvPhotos(socket_recv, poller, timeToWaitSec=60, keepGoing=False):
+    processedPhotos = list()
+    timeStart = datetime.datetime.now()
+    timeDelta = datetime.timedelta(seconds=timeToWaitSec) 
+    timeEnd = timeStart + timeDelta
+    
+    logging.info("Waiting %s seconds for response..." % (timeToWaitSec))
+    gotResponse = False
+    while datetime.datetime.now() < timeEnd:
+        result = poller.poll(1000)
+        if len(result) > 0:
+            gotResponse = True
+
+        if gotResponse:
+            result = socket_recv.recv_json()
+            logging.info("Got back: " + str(result))
+
+            savedPhotos = processResponse(result)
+            processedPhotos.extend(savedPhotos)
+
+            if keepGoing:
+                timeEnd = datetime.datetime.now() + timeDelta
+                gotResponse = False
+            else:
+                timeEnd = datetime.datetime.now()
+        
+    return processedPhotos
+
+def sendPhotos(photos, socket_send):
     cmd = dict()
     cmd['cmd'] = 'process'
     cmd['images'] = list()
@@ -98,25 +126,9 @@ def classifyPhotos(photos, socket_send, socket_recv, poller):
         cmd['images'].append(imagepath)
 
     gotResponse = False
-    while gotResponse == False:
-        timeStart = datetime.datetime.now()
-        timeEnd = timeStart + datetime.timedelta(minutes=1) 
-
-        logging.info("Sending:  " + str(cmd))
-        socket_send.send_json(cmd)
-        logging.info("Waiting 1 minute for response...")
     
-        while datetime.datetime.now() < timeEnd and gotResponse == False:
-            result = poller.poll(1000)
-            if len(result) > 0:
-                gotResponse = True
-    
-    result = socket_recv.recv_json()
-    logging.info("Got back: " + str(result))
-
-    savedPhotos = processResponse(result)
-
-    return savedPhotos
+    logging.info("Sending:  " + str(cmd))
+    socket_send.send_json(cmd)
     
 def copyPhotos(photos):
     successfullyCopied = list()
@@ -160,10 +172,12 @@ def main(argv):
     poller = zmq.Poller()
     poller.register(socket_recv, zmq.POLLIN)
 
-
-
     logging.info("Starting pipeline at " + time.strftime("%c"))
-    
+
+    logging.info("Seeing if there's any pending photos to process...")
+    successfullyClassified = recvPhotos(socket_recv, poller, timeToWaitSec=5, keepGoing=True)
+    logging.info("Found pending photos and successfully completed " + str(len(successfullyClassified)) + " photos")
+
     while True:
         successfullyClassified = list()
         # Get all photos which don't have classification data yet
@@ -175,13 +189,21 @@ def main(argv):
             # TODO(Derek):  This is inefficient, we could parallalize uploads and classification but simplifying to start
             successfullyCopied = copyPhotos(nonProcessedPhotos)
             if (len(successfullyCopied) > 0):
-                successfullyClassified = classifyPhotos(successfullyCopied, socket_send, socket_recv, poller)
+                sendPhotos(successfullyCopied, socket_send)
+                successfullyClassified = recvPhotos(socket_recv, poller)
 
             if len(successfullyClassified) > 0:
                 logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
             else:
-                logging.error("Did not complete classification")
-                time.sleep(5)
+                logging.error("Did not complete classification...sleeping for 30 minutes then will try to reconnect and resend")
+                time.sleep(60*30)
+                
+                socket_send, socket_recv = initClassifier()
+                poller = zmq.Poller()
+                poller.register(socket_recv, zmq.POLLIN)
+                
+                successfullyClassified = recvPhotos(socket_recv, poller, timeToWaitSec=5, keepGoing=True)
+                logging.info("Recovered and successfully completed " + str(len(successfullyClassified)) + " photos")
         else:
             time.sleep(5)
 
