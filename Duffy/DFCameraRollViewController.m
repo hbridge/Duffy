@@ -45,7 +45,7 @@ NSString *const AllSectionName = @"All";
                                                    object:nil];
       
       [self setSectionNames:@[AllSectionName]
-            photosBySection:@{AllSectionName : [[[DFPhotoStore sharedStore] cameraRoll]
+            itemsBySection:@{AllSectionName : [[[DFPhotoStore sharedStore] cameraRoll]
                                         photosByDateAscending:YES]}];
     }
     return self;
@@ -100,7 +100,7 @@ NSString *const AllSectionName = @"All";
   NSArray *allPhotos = [[[DFPhotoStore sharedStore] cameraRoll]
                         photosByDateAscending:YES];
   [self setSectionNames:@[AllSectionName]
-        photosBySection:@{AllSectionName : allPhotos}];
+        itemsBySection:@{AllSectionName : allPhotos}];
     [self.collectionView reloadData];
   if ([[DFUser currentUser] autoUploadEnabled]){
     [[DFUploadController sharedUploadController] uploadPhotos];
@@ -131,7 +131,7 @@ NSString *const AllSectionName = @"All";
 {
     UICollectionViewCell *cell = [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
     
-    DFPhoto *photo = [self.photosBySection[AllSectionName] objectAtIndex:indexPath.row];
+    DFPhoto *photo = [self.itemsBySection[AllSectionName] objectAtIndex:indexPath.row];
     if (photo.upload157Date == nil) {
         cell.alpha = 0.2;
     }
@@ -150,7 +150,7 @@ NSString *const AllSectionName = @"All";
     NSSet *photos = [[DFPhotoStore sharedStore] photosWithObjectIDs:objectIDsWithMetadataChange];
     NSMutableArray *cellsToReload = [[NSMutableArray alloc] initWithCapacity:photos.count];
     for (DFPhoto *photo in photos) {
-        NSUInteger photoIndex = [self.photosBySection[AllSectionName] indexOfObject:photo];
+        NSUInteger photoIndex = [self.itemsBySection[AllSectionName] indexOfObject:photo];
         [cellsToReload addObject:[NSIndexPath indexPathForRow:photoIndex inSection:0]];
     }
     

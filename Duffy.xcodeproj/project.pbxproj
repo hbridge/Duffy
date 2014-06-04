@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		502B025BD24C4FB89333BFED /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 68ED45F75CA648D08A506609 /* libPods.a */; };
+		5A28CEAB193E7C9500A2CBD3 /* DFPhotoStackCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */; };
+		5A28CEAD193E7CD700A2CBD3 /* DFPhotoStackCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */; };
 		5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */; };
 		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
@@ -135,6 +137,9 @@
 
 /* Begin PBXFileReference section */
 		514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Duffy/Pods/Pods.xcconfig; sourceTree = "<group>"; };
+		5A28CEA9193E7C9500A2CBD3 /* DFPhotoStackCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoStackCell.h; sourceTree = "<group>"; };
+		5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoStackCell.m; sourceTree = "<group>"; };
+		5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoStackCell.xib; sourceTree = "<group>"; };
 		5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController.h; sourceTree = "<group>"; };
 		5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController.m; sourceTree = "<group>"; };
 		5A45E9BB18D9F7B8002663EB /* DFPhotoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoCollection.h; sourceTree = "<group>"; };
@@ -481,6 +486,9 @@
 				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
 				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
 				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
+				5A28CEA9193E7C9500A2CBD3 /* DFPhotoStackCell.h */,
+				5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */,
+				5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */,
 				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
 				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
 				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
@@ -941,6 +949,7 @@
 				5AFBCA3A18D0E0FD00998793 /* DFSettingsViewController.xib in Resources */,
 				5ADB24D2189985590016CA02 /* Images.xcassets in Resources */,
 				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
+				5A28CEAD193E7CD700A2CBD3 /* DFPhotoStackCell.xib in Resources */,
 				5AB39842192563E700E6E69E /* IntroPage1.rtf in Resources */,
 				5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */,
 				5A50EE69193D20E500B78333 /* DFPhotoSectionHeader.xib in Resources */,
@@ -1091,6 +1100,7 @@
 				5AFBCA4E18D236A900998793 /* UIImage+Alpha.m in Sources */,
 				5A8C98F61911793B00AE9F88 /* DFObjectManager.m in Sources */,
 				5AD8AD49191D462500782144 /* DFSearchResultTableViewCell.m in Sources */,
+				5A28CEAB193E7C9500A2CBD3 /* DFPhotoStackCell.m in Sources */,
 				5A67605C18E210B000E355B6 /* NSDictionary+DFJSON.m in Sources */,
 				5AC40EDE1908738C00ED3532 /* DFLogConfig.m in Sources */,
 				5AB3983D192530F200E6E69E /* DFIntroContentViewController.m in Sources */,

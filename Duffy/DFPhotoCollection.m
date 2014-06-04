@@ -96,5 +96,11 @@
     return [photoAssetURLSet containsObject:assetURLString];
 }
 
+- (UIImage *)thumbnail
+{
+  if (self.photoSet.count < 1) return nil;
+  return [[[self photosByDateAscending:YES] firstObject] thumbnail];
+}
+
 
 @end

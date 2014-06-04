@@ -13,6 +13,8 @@
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotoSectionHeader.h"
+#import "DFPhotoStackCell.h"
+#import "DFPhotoCollection.h"
 
 @interface DFPhotosGridViewController ()
 
@@ -20,9 +22,9 @@
 
 @implementation DFPhotosGridViewController
 
-@synthesize photoSpacing;
-@synthesize photoSquareSize;
-@synthesize photosBySection = _photosBySection;
+@synthesize itemSpacing;
+@synthesize itemSquareSize;
+@synthesize itemsBySection = _itemsBySection;
 @synthesize sectionNames = _sectionNames;
 
 static const CGFloat DEFAULT_PHOTO_SQUARE_SIZE = 77;
@@ -38,10 +40,10 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
     UINavigationItem *n = [self navigationItem];
     [n setTitle:@"Photos"];
     
-    photoSquareSize = DEFAULT_PHOTO_SQUARE_SIZE;
-    photoSpacing = DEFAULT_PHOTO_SPACING;
+    itemSquareSize = DEFAULT_PHOTO_SQUARE_SIZE;
+    itemSpacing = DEFAULT_PHOTO_SPACING;
     
-    _photosBySection = [[NSDictionary alloc] init];
+    _itemsBySection = [[NSDictionary alloc] init];
     _sectionNames = [[NSArray alloc] init];
   }
   return self;
@@ -53,16 +55,19 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
   
   // configure our flow layout
   self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
-  self.flowLayout.itemSize =CGSizeMake(self.photoSquareSize, self.photoSquareSize);
-  self.flowLayout.minimumInteritemSpacing = self.photoSpacing;
-  self.flowLayout.minimumLineSpacing = self.photoSpacing;
+  self.flowLayout.itemSize =CGSizeMake(self.itemSquareSize, self.itemSquareSize);
+  self.flowLayout.minimumInteritemSpacing = self.itemSpacing;
+  self.flowLayout.minimumLineSpacing = self.itemSpacing;
   [self.collectionView setCollectionViewLayout:self.flowLayout];
-  self.collectionView.contentInset = UIEdgeInsetsMake(self.photoSpacing, 0, 0, 0);
+  self.collectionView.contentInset = UIEdgeInsetsMake(self.itemSpacing, 0, 0, 0);
   self.flowLayout.headerReferenceSize = CGSizeMake(320, 33);
   
   
   // register cell type
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil] forCellWithReuseIdentifier:@"DFPhotoViewCell"];
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
+        forCellWithReuseIdentifier:@"DFPhotoViewCell"];
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoStackCell" bundle:nil]
+        forCellWithReuseIdentifier:@"DFPhotoStackCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoSectionHeader" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"HeaderView"];
@@ -77,10 +82,10 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
   // Dispose of any resources that can be recreated.
 }
 
-- (void)setSectionNames:(NSArray *)sectionNames photosBySection:(NSDictionary *)photosBySection
+- (void)setSectionNames:(NSArray *)sectionNames itemsBySection:(NSDictionary *)photosBySection
 {
   _sectionNames = sectionNames;
-  _photosBySection = photosBySection;
+  _itemsBySection = photosBySection;
   
   [self.collectionView reloadData];
 }
@@ -105,20 +110,38 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  NSArray *photos = [self resultsForSectionIndex:section];
-  return photos.count;
+  NSArray *items = [self resultsForSectionIndex:section];
+  return items.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
-  DFPhoto *photo = photosForSection[indexPath.row];
+  UICollectionViewCell *result;
   
-  DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
-                                              dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell" forIndexPath:indexPath];
-  [cell.imageView setImage:[photo thumbnail]];
+  NSArray *itemsForSection = [self resultsForSectionIndex:indexPath.section];
+  id item = itemsForSection[indexPath.row];
+  if ([item isKindOfClass:[DFPhoto class]]) {
+    DFPhoto *photo = (DFPhoto *)item;
   
-  return cell;
+    DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView
+                                                dequeueReusableCellWithReuseIdentifier:@"DFPhotoViewCell"
+                                                forIndexPath:indexPath];
+    cell.imageView.image = photo.thumbnail;
+    result = cell;
+  } else if ([item isKindOfClass:[DFPhotoCollection class]]){
+    DFPhotoCollection *photoCollection = (DFPhotoCollection *)item;
+    DFPhotoStackCell *stackCell =
+    (DFPhotoStackCell *)[self.collectionView
+                         dequeueReusableCellWithReuseIdentifier:@"DFPhotoStackCell"
+                         forIndexPath:indexPath];
+    
+    stackCell.photoImageView.image = photoCollection.thumbnail;
+    stackCell.countLabel.text = [NSString stringWithFormat:@"%d",
+                                (int)photoCollection.photoSet.count];
+    result = stackCell;
+  }
+  
+  return result;
 }
 
 
@@ -126,16 +149,21 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
   if (index > self.sectionNames.count) return nil;
   NSString *sectionName = self.sectionNames[index];
-  NSArray *photos = self.photosBySection[sectionName];
-  return photos;
+  NSArray *items = self.itemsBySection[sectionName];
+  return items;
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath
 {
   UICollectionReusableView *reusableview = nil;
   
   if (kind == UICollectionElementKindSectionHeader) {
-    DFPhotoSectionHeader *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"HeaderView" forIndexPath:indexPath];
+    DFPhotoSectionHeader *headerView =
+    [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                       withReuseIdentifier:@"HeaderView"
+                                              forIndexPath:indexPath];
     NSString *title = self.sectionNames[indexPath.section];
     headerView.titleLabel.text = title;
     
@@ -143,7 +171,10 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
   }
   
   if (kind == UICollectionElementKindSectionFooter) {
-    UICollectionReusableView *footerview = [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"FooterView" forIndexPath:indexPath];
+    UICollectionReusableView *footerview =
+    [collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+                                       withReuseIdentifier:@"FooterView"
+                                              forIndexPath:indexPath];
     
     reusableview = footerview;
   }
@@ -165,9 +196,27 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   
-  NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
-  DFPhoto *photo = photosForSection[indexPath.row];
-  [self pushPhotoViewForPhoto:photo atIndexPath:indexPath];
+  NSArray *itemsForSection = [self resultsForSectionIndex:indexPath.section];
+  id item = itemsForSection[indexPath.row];
+  if ([item isKindOfClass:[DFPhoto class]]) {
+    DFPhoto *photo = (DFPhoto *)item;
+    [self pushPhotoViewForPhoto:photo atIndexPath:indexPath];
+  } else if ([item isKindOfClass:[DFPhotoCollection class]]){
+    // get the photos to replace the collection with
+    DFPhotoCollection *stackCollection = item;
+    NSArray *photos = [stackCollection photosByDateAscending:YES];
+    
+    NSMutableArray *newItemsForSection = itemsForSection.mutableCopy;
+    [newItemsForSection replaceObjectsInRange:(NSRange){indexPath.row, 1}
+                         withObjectsFromArray:photos];
+    NSMutableDictionary *newSections = self.itemsBySection.mutableCopy;
+    newSections[self.sectionNames[indexPath.section]] = newItemsForSection;
+    _itemsBySection = newSections;
+    [UIView animateWithDuration:0.3 animations:^{
+      [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]];
+    }];
+    
+  }
 }
 
 - (void)pushPhotoViewForPhoto:(DFPhoto *)photo
@@ -202,30 +251,37 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
      viewControllerBeforeViewController:(UIViewController *)viewController
 {
   NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
-  
   if (indexPath.row == 0) return nil;
   
-  NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
-  DFPhoto *photo = photosForSection[indexPath.row - 1];
-  
-  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-  pvc.photo = photo;
-  pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
-  return pvc;
+  NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:indexPath.row - 1 inSection:indexPath.section];
+  return [self photoViewControllerForIndexPath:newIndexPath];
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
   NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
-  
   NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
-  if (indexPath.row == photosForSection.count -1) return nil;
+  if (indexPath.row >= photosForSection.count -1) return nil;
   
-  DFPhoto *photo = [photosForSection objectAtIndex:indexPath.row + 1];
+  NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
+  return [self photoViewControllerForIndexPath:newIndexPath];
+}
+
+- (UIViewController *)photoViewControllerForIndexPath:(NSIndexPath *)indexPath
+{
+  NSArray *itemsForSection = [self resultsForSectionIndex:indexPath.section];
+  id item = itemsForSection[indexPath.row];
+  DFPhoto *photo;
+  if ([item isKindOfClass:[DFPhoto class]]) {
+    photo = (DFPhoto *)item;
+  } else if ([item isKindOfClass:[DFPhotoCollection class]]) {
+    photo = (DFPhoto *)[[item photosByDateAscending:YES] firstObject];
+  }
+  
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photo = photo;
-  pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
+  pvc.indexPathInParent = [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
   return pvc;
 }
 

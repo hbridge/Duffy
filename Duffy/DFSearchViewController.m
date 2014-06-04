@@ -47,7 +47,7 @@
 
 @end
 
-const unsigned int MaxResultsPerSearchRequest = 100;
+const unsigned int MaxResultsPerSearchRequest = 5000;
 
 static NSString *GroupsPath = @"/viz/groups/";
 static NSString *SearchPath = @"/viz/search/";
@@ -204,20 +204,34 @@ static NSString *ReverseResultsURLParameter = @"r";
         NSMutableDictionary *sections = [[NSMutableDictionary alloc] init];
         for (DFPeanutSearchObject *sectionObject in response.objects) {
           if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
-            NSMutableArray *photoIDs = [[NSMutableArray alloc] init];
+            NSMutableArray *contiguousPhotoIDsToAdd = [[NSMutableArray alloc] init];
+            NSMutableArray *sectionItems = [[NSMutableArray alloc] init];
+            
             for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
               if ([searchObject.type isEqualToString:DFSearchObjectPhoto]){
-                [photoIDs addObject:@(searchObject.id)];
+                [contiguousPhotoIDsToAdd addObject:@(searchObject.id)];
+              }
+              
+              if ([searchObject.type isEqualToString:DFSearchObjectCluster]) {
+                NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
+                [sectionItems addObjectsFromArray:previousContitguousPhotos];
+                [contiguousPhotoIDsToAdd removeAllObjects];
+                
+                DFPhotoCollection *clusterCollection = [[DFPhotoCollection alloc]
+                                                        initWithPhotos:[self photosForCluster:searchObject]];
+                [sectionItems addObject:clusterCollection];
               }
               
             }
-            NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:photoIDs];
+            
+            NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
+            [sectionItems addObjectsFromArray:photos];
             [sectionNames addObject:sectionObject.title];
-            sections[sectionObject.title] = photos;
+            sections[sectionObject.title] = sectionItems;
           }
         }
         
-        [self setSectionNames:sectionNames photosBySection:sections];
+        [self setSectionNames:sectionNames itemsBySection:sections];
         
         [self.collectionView reloadData];
       });
@@ -229,14 +243,26 @@ static NSString *ReverseResultsURLParameter = @"r";
   
   //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
+}
+
+- (NSArray *)photosForCluster:(DFPeanutSearchObject *)cluster
+{
+  NSMutableArray *clusterPhotoIDs = [[NSMutableArray alloc] init];
+  for (DFPeanutSearchObject *subSearchObject in cluster.objects) {
+    if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
+      [clusterPhotoIDs addObject:@(subSearchObject.id)];
+    }
+  }
   
   
+  NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:clusterPhotoIDs];
+  return  photos;
 }
 
 - (void)loadCachedDefaultQuery
 {
   [self setSectionNames:@[@"All"]
-        photosBySection:@{@"All" : [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES]}];
+        itemsBySection:@{@"All" : [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES]}];
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus

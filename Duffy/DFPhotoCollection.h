@@ -22,4 +22,11 @@
 - (NSArray *)photosByDateAscending:(BOOL)ascending;
 - (NSArray *)objectIDsByDateAscending:(BOOL)ascending;
 
+/* (UIImage *)thumbnail 
+ Returns a thumbnail representation of the photo collection.  Currently just the thumbnail of the
+ earliest photo in the collection.
+ */
+
+- (UIImage *)thumbnail;
+
 @end
