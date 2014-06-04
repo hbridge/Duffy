@@ -60,11 +60,32 @@ def processWithExisting(existingRows, newRows):
 def getAllPhotoIds(rows):
 	photoIds = list()
 	for row in rows:
-		photoIds.append(row.photo_1)
-		photoIds.append(row.photo_2)
+		photoIds.append(row.photo_1_id)
+		photoIds.append(row.photo_2_id)
 
 	return set(photoIds)
 
+def getUniqueRows(rows):
+	uniqueRows = dict()
+
+	for row in rows:
+		id = (row.photo_1.id, row.photo_2.id)
+		if id not in uniqueRows:
+			uniqueRows[id] = row
+	return uniqueRows.values()
+
+def getNearbyPhotos(refPhoto, photosCache):
+	nearbyPhotos = list()
+
+	for photo in photosCache:
+		timeDistance = refPhoto.time_taken - photo.time_taken
+
+		if refPhoto.id != photo.id and refPhoto.user_id != photo.user_id and int(math.fabs(timeDistance.total_seconds())) < 3*60*60:
+			geoDistance = int(haversine(refPhoto.location_point.x, refPhoto.location_point.y, photo.location_point.x, photo.location_point.y) * 1000)
+			if geoDistance < 100:
+				nearbyPhotos.append((refPhoto, photo, timeDistance, geoDistance))
+	return nearbyPhotos
+	
 def main(argv):
 	maxFilesAtTime = 100
 	logger = logging.getLogger(__name__)
@@ -75,48 +96,48 @@ def main(argv):
 
 		if len(photos) > 0:
 			rowsToWrite = list()
+			photos = list(photos)
 
 			timeHigh = photos[0].time_taken + datetime.timedelta(hours=3)
 			timeLow = photos[-1].time_taken - datetime.timedelta(hours=3)
 
-			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh)
+			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None)
 
 			for refPhoto in photos:
-				timeLow = refPhoto.time_taken - datetime.timedelta(hours=3)
-				timeHigh = refPhoto.time_taken + datetime.timedelta(hours=3)
-				nearbyPhotos = Photo.objects.filter(location_point__within=refPhoto.location_point.buffer(.1)).filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(user_id=refPhoto.user_id)
-
-				for nearbyPhoto in nearbyPhotos:
-					geoDistance = int(haversine(refPhoto.location_point.x, refPhoto.location_point.y, nearbyPhoto.location_point.x, nearbyPhoto.location_point.y) * 1000)
-					if geoDistance < 100:
-						logger.debug("For %s/%s found %s/%s of dist %s" % (refPhoto.user_id, refPhoto.id, nearbyPhoto.user_id, nearbyPhoto.id, geoDistance))
-						
-						timeDistance = refPhoto.time_taken - nearbyPhoto.time_taken
-
-						if (refPhoto.id < nearbyPhoto.id):
-							photo_1 = refPhoto
-							photo_2 = nearbyPhoto
-						else:
-							photo_1 = nearbyPhoto
-							photo_2 = refPhoto
-												
-						neighbor = Neighbor(photo_1 = photo_1,
-								photo_2 = photo_2,
-								user_1_id = photo_1.user_id,
-								user_2_id = photo_2.user_id,
-								time_distance_sec = int(math.fabs(timeDistance.total_seconds())),
-								geo_distance_m = geoDistance)
-						rowsToWrite.append(neighbor)
+				nearbyPhotos = getNearbyPhotos(refPhoto, photosCache)
+				
+				for nearbyPhotoData in nearbyPhotos:
+					refPhoto, nearbyPhoto, timeDistance, geoDistance = nearbyPhotoData
+				
+					if (refPhoto.id < nearbyPhoto.id):
+						photo_1 = refPhoto
+						photo_2 = nearbyPhoto
+					else:
+						photo_1 = nearbyPhoto
+						photo_2 = refPhoto
+											
+					neighbor = Neighbor(photo_1 = photo_1,
+							photo_2 = photo_2,
+							user_1_id = photo_1.user_id,
+							user_2_id = photo_2.user_id,
+							time_distance_sec = int(math.fabs(timeDistance.total_seconds())),
+							geo_distance_m = geoDistance)
+					rowsToWrite.append(neighbor)
+					print neighbor
+					
 				refPhoto.neighbored_time = datetime.datetime.now()
 
-			allIds = getAllPhotoIds(rowsToWrite)
+			uniqueRows = getUniqueRows(rowsToWrite)
+
+			allIds = getAllPhotoIds(uniqueRows)
 			existingRows = Neighbor.objects.filter(photo_1__in=allIds).filter(photo_2__in=allIds)
-			rowsToCreate = processWithExisting(existingRows, rowsToWrite)
+			rowsToCreate = processWithExisting(existingRows, uniqueRows)
 
 			Neighbor.objects.bulk_create(rowsToCreate)
 			Photo.bulkUpdate(photos, ["neighbored_time"])
 			
-			logger.info("Wrote out %s new neighbor entries for %s photos" % (len(rowsToWrite), len(photos)))
+			logger.info("Wrote out %s new neighbor entries for %s photos" % (len(uniqueRows), len(photos)))
+			
 		else:
 			time.sleep(1)	
 
