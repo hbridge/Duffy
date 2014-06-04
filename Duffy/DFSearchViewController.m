@@ -302,6 +302,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
 
 - (void)saveDefaultPeanutObjects:(NSArray *)defaultPeanutObjects
 {
+  if (!defaultPeanutObjects) return;
   NSDictionary *dictToWrite = @{DFObjectsKey : defaultPeanutObjects.copy};
   NSString *jsonString = [[dictToWrite dictionaryWithNonJSONRemoved] JSONString];
   [[NSUserDefaults standardUserDefaults] setObject:jsonString forKey:UserDefaultsEverythingResultsKey];
