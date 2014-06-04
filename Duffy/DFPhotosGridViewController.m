@@ -60,7 +60,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
   self.flowLayout.minimumLineSpacing = self.itemSpacing;
   [self.collectionView setCollectionViewLayout:self.flowLayout];
   self.collectionView.contentInset = UIEdgeInsetsMake(self.itemSpacing, 0, self.itemSpacing, 0);
-  self.flowLayout.headerReferenceSize = CGSizeMake(320, 33);
+  self.flowLayout.headerReferenceSize = CGSizeMake(320, 40);
   
   
   // register cell type
@@ -173,6 +173,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
                                               forIndexPath:indexPath];
     NSString *title = self.sectionNames[indexPath.section];
     headerView.titleLabel.text = title;
+    headerView.titleLabel.font = [UIFont fontWithName:@"ProximaNova-Semibold" size:17];
     
     reusableview = headerView;
   }
