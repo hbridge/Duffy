@@ -110,8 +110,8 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  if (section > self.sectionNames.count) return 0;
-  NSArray *items = [self resultsForSectionIndex:section];
+  if (section >= self.sectionNames.count) return 0;
+  NSArray *items = [self itemsForSectionIndex:section];
   return items.count;
 }
 
@@ -119,7 +119,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 {
   UICollectionViewCell *result;
   
-  NSArray *itemsForSection = [self resultsForSectionIndex:indexPath.section];
+  NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
   id item = itemsForSection[indexPath.row];
   if ([item isKindOfClass:[DFPhoto class]]) {
     DFPhoto *photo = (DFPhoto *)item;
@@ -146,9 +146,9 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 }
 
 
-- (NSArray *)resultsForSectionIndex:(NSInteger)index
+- (NSArray *)itemsForSectionIndex:(NSInteger)index
 {
-  if (index > self.sectionNames.count) return nil;
+  if (index >= self.sectionNames.count) return nil;
   NSString *sectionName = self.sectionNames[index];
   NSArray *items = self.itemsBySection[sectionName];
   return items;
@@ -197,7 +197,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   
-  NSArray *itemsForSection = [self resultsForSectionIndex:indexPath.section];
+  NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
   id item = itemsForSection[indexPath.row];
   if ([item isKindOfClass:[DFPhoto class]]) {
     DFPhoto *photo = (DFPhoto *)item;
@@ -262,7 +262,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
        viewControllerAfterViewController:(UIViewController *)viewController
 {
   NSIndexPath *indexPath = ((DFPhotoViewController*)viewController).indexPathInParent;
-  NSArray *photosForSection = [self resultsForSectionIndex:indexPath.section];
+  NSArray *photosForSection = [self itemsForSectionIndex:indexPath.section];
   if (indexPath.row >= photosForSection.count -1) return nil;
   
   NSIndexPath *newIndexPath = [NSIndexPath indexPathForRow:indexPath.row + 1 inSection:indexPath.section];
@@ -271,7 +271,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
 
 - (UIViewController *)photoViewControllerForIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *itemsForSection = [self resultsForSectionIndex:indexPath.section];
+  NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
   id item = itemsForSection[indexPath.row];
   DFPhoto *photo;
   if ([item isKindOfClass:[DFPhoto class]]) {

@@ -30,6 +30,7 @@ static NSUInteger RefreshSuggestionsThreshold = 50;
 static float MinTimeBetweenSuggestionFetch = 60.0;
 static float MinTimeBetweenAutocompleteFetch = 60.0;
 
+NSString *const UserDefaultsSuggestionsKey = @"DFSearchBarControllerDefaultSuggestionsJSON";
 
 typedef enum {
   DFSearchResultTypeAutocomplete,
@@ -259,13 +260,13 @@ typedef enum {
 {
   NSString *jsonString = [[searchResults dictionaryWithNonJSONRemoved] JSONString];
   [[NSUserDefaults standardUserDefaults] setObject:jsonString
-                                            forKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
+                                            forKey:UserDefaultsSuggestionsKey];
 }
 
 - (NSDictionary *)loadSuggestions
 {
   NSString *loadedDictString = [[NSUserDefaults standardUserDefaults]
-                                objectForKey:@"DFSearchViewControllerDefaultSearchResultsJSON"];
+                                objectForKey:UserDefaultsSuggestionsKey];
   NSMutableDictionary *resultsDict = [[NSDictionary dictionaryWithJSONString:loadedDictString] mutableCopy];
   [resultsDict enumerateKeysAndObjectsUsingBlock:^(NSString *sectionName, NSArray *suggestions, BOOL *stop) {
     if (suggestions) {

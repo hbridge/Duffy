@@ -9,8 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutObject.h"
 #import "DFTypedefs.h"
+#import "DFJSONConvertible.h"
 
-@interface DFPeanutSearchObject : NSObject<DFPeanutObject>
+@interface DFPeanutSearchObject : NSObject<DFPeanutObject, DFJSONConvertible>
 
 typedef NSString *const DFSearchObjectType;
 

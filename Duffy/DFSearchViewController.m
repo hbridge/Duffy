@@ -55,6 +55,10 @@ static NSString *PhoneIDURLParameter = @"phone_id";
 static NSString *UserIDURLParameter = @"user_id";
 static NSString *QueryURLParameter = @"q";
 static NSString *ReverseResultsURLParameter = @"r";
+NSString *const EverythingSearchQuery = @"''";
+
+NSString *const DFObjectsKey = @"DFObjects";
+NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEverythingResultsJSON";
 
 @implementation DFSearchViewController
 
@@ -156,7 +160,7 @@ static NSString *ReverseResultsURLParameter = @"r";
 
 - (void)loadDefaultSearch
 {
-  [self executeSearchForQuery:@"''" reverseResults:YES];
+  [self executeSearchForQuery:EverythingSearchQuery reverseResults:YES];
   [self loadCachedDefaultQuery];
   self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
@@ -202,40 +206,16 @@ static NSString *ReverseResultsURLParameter = @"r";
     DDLogVerbose(@"SearchViewController got search response: %@", response);
     if (response.result == TRUE) {
       dispatch_async(dispatch_get_main_queue(), ^{
-        NSMutableArray *sectionNames = [[NSMutableArray alloc] init];
-        NSMutableDictionary *sections = [[NSMutableDictionary alloc] init];
-        for (DFPeanutSearchObject *sectionObject in response.objects) {
-          if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
-            NSMutableArray *contiguousPhotoIDsToAdd = [[NSMutableArray alloc] init];
-            NSMutableArray *sectionItems = [[NSMutableArray alloc] init];
-            
-            for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
-              if ([searchObject.type isEqualToString:DFSearchObjectPhoto]){
-                [contiguousPhotoIDsToAdd addObject:@(searchObject.id)];
-              }
-              
-              if ([searchObject.type isEqualToString:DFSearchObjectCluster]) {
-                NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
-                [sectionItems addObjectsFromArray:previousContitguousPhotos];
-                [contiguousPhotoIDsToAdd removeAllObjects];
-                
-                DFPhotoCollection *clusterCollection = [[DFPhotoCollection alloc]
-                                                        initWithPhotos:[self photosForCluster:searchObject]];
-                [sectionItems addObject:clusterCollection];
-              }
-              
-            }
-            
-            NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
-            [sectionItems addObjectsFromArray:photos];
-            [sectionNames addObject:sectionObject.title];
-            sections[sectionObject.title] = sectionItems;
-          }
-        }
+        NSArray *peanutObjects = response.objects;
+        NSArray *sectionNames = [DFSearchViewController topLevelSectionNamesForPeanutObjects:peanutObjects];
+        NSDictionary *itemsBySection = [DFSearchViewController itemsBySectionForPeanutObjects:peanutObjects];
         
-        [self setSectionNames:sectionNames itemsBySection:sections];
-        
+        [self setSectionNames:sectionNames itemsBySection:itemsBySection];
         [self.collectionView reloadData];
+        
+        if ([query isEqualToString:EverythingSearchQuery]) {
+          [self saveDefaultPeanutObjects:peanutObjects];
+        }
       });
     } else {
       DDLogWarn(@"SearchViewController got a non true response.");
@@ -247,7 +227,53 @@ static NSString *ReverseResultsURLParameter = @"r";
   self.navigationItem.title = [query capitalizedString];
 }
 
-- (NSArray *)photosForCluster:(DFPeanutSearchObject *)cluster
+
++ (NSArray *)topLevelSectionNamesForPeanutObjects:(NSArray *)peanutObjects
+{
+  NSMutableArray *result = [[NSMutableArray alloc] init];
+  for (DFPeanutSearchObject *searchObject in peanutObjects) {
+     if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
+       [result addObject:searchObject.title];
+     }
+  }
+  return result;
+}
+
++ (NSDictionary *)itemsBySectionForPeanutObjects:(NSArray *)peanutObjects
+{
+  NSMutableDictionary *itemsBySectionResult = [[NSMutableDictionary alloc] init];
+  for (DFPeanutSearchObject *sectionObject in peanutObjects) {
+    if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
+      NSMutableArray *contiguousPhotoIDsToAdd = [[NSMutableArray alloc] init];
+      NSMutableArray *sectionItems = [[NSMutableArray alloc] init];
+      
+      for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
+        if ([searchObject.type isEqualToString:DFSearchObjectPhoto]){
+          [contiguousPhotoIDsToAdd addObject:@(searchObject.id)];
+        }
+        
+        if ([searchObject.type isEqualToString:DFSearchObjectCluster]) {
+          NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
+          [sectionItems addObjectsFromArray:previousContitguousPhotos];
+          [contiguousPhotoIDsToAdd removeAllObjects];
+          
+          DFPhotoCollection *clusterCollection = [[DFPhotoCollection alloc]
+                                                  initWithPhotos:[self photosForCluster:searchObject]];
+          [sectionItems addObject:clusterCollection];
+        }
+        
+      }
+      
+      NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
+      [sectionItems addObjectsFromArray:photos];
+      itemsBySectionResult[sectionObject.title] = sectionItems;
+    }
+  }
+  
+  return itemsBySectionResult;
+}
+
++ (NSArray *)photosForCluster:(DFPeanutSearchObject *)cluster
 {
   NSMutableArray *clusterPhotoIDs = [[NSMutableArray alloc] init];
   for (DFPeanutSearchObject *subSearchObject in cluster.objects) {
@@ -261,10 +287,37 @@ static NSString *ReverseResultsURLParameter = @"r";
   return  photos;
 }
 
+- (void)saveDefaultPeanutObjects:(NSArray *)defaultPeanutObjects
+{
+  NSDictionary *dictToWrite = @{DFObjectsKey : defaultPeanutObjects.copy};
+  NSString *jsonString = [[dictToWrite dictionaryWithNonJSONRemoved] JSONString];
+  [[NSUserDefaults standardUserDefaults] setObject:jsonString forKey:UserDefaultsEverythingResultsKey];
+}
+
 - (void)loadCachedDefaultQuery
 {
-  [self setSectionNames:@[@"All"]
-        itemsBySection:@{@"All" : [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES]}];
+  NSString *jsonString = [[NSUserDefaults standardUserDefaults]
+                          objectForKey:UserDefaultsEverythingResultsKey];
+  if (jsonString && ![jsonString isEqualToString:@""]) {
+    @try {
+      NSArray *peanutObjectJSONDicts = [[NSDictionary dictionaryWithJSONString:jsonString]
+                                objectForKey:DFObjectsKey];
+      NSMutableArray *peanutObjects = [[NSMutableArray alloc] initWithCapacity:peanutObjectJSONDicts.count];
+      for (NSDictionary *jsonDict in peanutObjectJSONDicts) {
+        [peanutObjects addObject:[[DFPeanutSearchObject alloc] initWithJSONDict:jsonDict]];
+      }
+      
+      NSArray *sectionNames = [DFSearchViewController topLevelSectionNamesForPeanutObjects:peanutObjects];
+      NSDictionary *itemsBySection = [DFSearchViewController itemsBySectionForPeanutObjects:peanutObjects];
+      [self setSectionNames:sectionNames itemsBySection:itemsBySection];
+    } @catch (NSException *exception) {
+      DDLogError(@"Couldn't load default search.  JSONString:%@", jsonString);
+      [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:UserDefaultsEverythingResultsKey];
+    }
+  } else {
+    [self setSectionNames:@[@"All"]
+           itemsBySection:@{@"All" : [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES]}];
+  }
 }
 
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus

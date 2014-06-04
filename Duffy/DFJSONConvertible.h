@@ -11,6 +11,7 @@
 @protocol DFJSONConvertible <NSObject>
 
 @required
+- (id)initWithJSONDict:(NSDictionary *)jsonDict;
 - (NSDictionary *)JSONDictionary;
 
 @optional
