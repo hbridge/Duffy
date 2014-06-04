@@ -33,11 +33,11 @@
                     </connections>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4Cf-oq-Jsq">
-                    <rect key="frame" x="286" y="12" width="34" height="40"/>
+                    <rect key="frame" x="272" y="0.0" width="48" height="63"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="34" id="7P2-Xh-l7u"/>
-                        <constraint firstAttribute="height" constant="40" id="7bv-rK-Vbo"/>
+                        <constraint firstAttribute="width" constant="48" id="7P2-Xh-l7u"/>
+                        <constraint firstAttribute="height" constant="63" id="7bv-rK-Vbo"/>
                     </constraints>
                     <state key="normal" image="Icons/SearchClearButton.png">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -60,7 +60,7 @@
                 <constraint firstAttribute="centerY" secondItem="NNO-gn-7DZ" secondAttribute="centerY" id="8Kx-85-ic5"/>
                 <constraint firstItem="xPT-ud-47f" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="GlK-N8-eMa"/>
                 <constraint firstAttribute="centerY" secondItem="4Cf-oq-Jsq" secondAttribute="centerY" id="HVp-5N-KqD"/>
-                <constraint firstItem="4Cf-oq-Jsq" firstAttribute="leading" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="900" id="Uxv-AV-GXx"/>
+                <constraint firstItem="4Cf-oq-Jsq" firstAttribute="leading" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="900" constant="-14" id="Uxv-AV-GXx"/>
                 <constraint firstAttribute="trailing" secondItem="4Cf-oq-Jsq" secondAttribute="trailing" id="aJ6-eo-Y6b"/>
                 <constraint firstAttribute="centerY" secondItem="0FW-ga-xjZ" secondAttribute="centerY" id="s0J-UA-Prm"/>
                 <constraint firstAttribute="trailing" secondItem="NNO-gn-7DZ" secondAttribute="trailing" id="tAx-UH-zIc"/>
