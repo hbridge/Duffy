@@ -336,6 +336,11 @@ def search(request):
 	else:
 		query = ''
 
+	if data.has_key('exclude'):
+		exclude = data['exclude']
+	else:
+		exclude = ''
+
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -354,14 +359,14 @@ def search(request):
 		if (startDate == None):
 			startDate = allResults[0].timeTaken
 		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
-		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate, exclude=exclude)
 		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow() and pageStartDate >= startDate):
 			if (reverse):
 				pageStartDate = pageStartDate+relativedelta(months=-6)
 			else:
 				pageEndDate = pageEndDate+relativedelta(months=6)
 			page +=1
-			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate, exclude=exclude)
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
 
 		for entry in photoResults:
@@ -378,6 +383,8 @@ def search(request):
 			url = '/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))
 			if debug:
 				url += '&debug'
+			url += '&exclude='
+			url += urllib.quote(exclude)
 			nextLink = '<a class="jscroll-next" href="' + url + '"></a>'
 			response += nextLink
 	return HttpResponse(response, content_type="text/html")
@@ -595,8 +602,6 @@ def newresults_check(request):
 
 	newUpdatedTime = search_util.lastUpdatedSearchResults(userId)
 
-	print lastUpdated
-	print newUpdatedTime
 	if (newUpdatedTime > lastUpdated):
 		response['newData'] = True
 	else:

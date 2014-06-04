@@ -75,6 +75,11 @@ def search(request):
 	else:
 		reverse = False
 
+	if data.has_key('exclude'):
+		exclude = data['exclude']
+	else:
+		exclude = ''
+
 	try:
 		user = User.objects.get(id=userId)
 	except User.DoesNotExist:
@@ -104,21 +109,21 @@ def search(request):
 		if (startDate == None):
 			startDate = allResults[0].timeTaken
 		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
-		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate, exclude=exclude)
 		while (searchResults.count() < 25 and pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
 			if (reverse):
 				pageStartDate = pageStartDate+relativedelta(months=-6)
 			else:
 				pageEndDate = pageEndDate+relativedelta(months=6)
 			page +=1
-			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate)
+			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate, exclude=exclude)
 		
 		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, threshold, dupThreshold, startDate=pageStartDate, endDate=pageEndDate)
 		totalResults = searchResults.count()
 		resultsDict['totalResults'] = totalResults
 		resultsDict['photoResults'] = photoResults
 		if (pageEndDate < datetime.utcnow() and pageStartDate >= startDate):
-			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse))
+			resultsDict['nextLink'] = '/api/search?user_id=' + str(user.id) + '&q=' + urllib.quote(query) + '&page=' + str(page+1) + '&r=' + str(int(reverse)) + '&exclude=' + urllib.quote(exclude)
 			if debug:
 				resultsDict['nextLink'] += '&debug'
 		resultsDict['lastUpdated'] = search_util.lastUpdatedSearchResults(userId).strftime('%m/%d/%Y %H:%M:%S')
