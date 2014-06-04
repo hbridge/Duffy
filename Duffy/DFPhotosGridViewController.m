@@ -59,7 +59,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
   self.flowLayout.minimumInteritemSpacing = self.itemSpacing;
   self.flowLayout.minimumLineSpacing = self.itemSpacing;
   [self.collectionView setCollectionViewLayout:self.flowLayout];
-  self.collectionView.contentInset = UIEdgeInsetsMake(self.itemSpacing, 0, 0, 0);
+  self.collectionView.contentInset = UIEdgeInsetsMake(self.itemSpacing, 0, self.itemSpacing, 0);
   self.flowLayout.headerReferenceSize = CGSizeMake(320, 33);
   
   
@@ -90,11 +90,17 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 4;
   [self.collectionView reloadData];
 }
 
+- (void)scrollToTop
+{
+  self.collectionView.contentOffset = CGPointMake(-self.collectionView.contentInset.left,
+                                                  -self.collectionView.contentInset.top);
+}
+
 - (void)scrollToBottom
 {
-  NSInteger section = 0;
-  NSInteger item = [self collectionView:self.collectionView numberOfItemsInSection:section] - 1;
-  NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
+  NSInteger sectionIndex = [self numberOfSectionsInCollectionView:self.collectionView] - 1;
+  NSInteger item = [self collectionView:self.collectionView numberOfItemsInSection:sectionIndex] - 1;
+  NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:item inSection:sectionIndex];
   if (lastIndexPath.section >= 0 && lastIndexPath.row >= 0) {
     [self.collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
   }

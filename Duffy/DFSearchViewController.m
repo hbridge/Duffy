@@ -164,6 +164,9 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   [self loadCachedDefaultQuery];
   self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self scrollToBottom];
+  });
 }
 
 - (void)searchBarControllerSearchBegan:(DFSearchBarController *)searchBarController
@@ -215,6 +218,13 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
         
         if ([query isEqualToString:EverythingSearchQuery]) {
           [self saveDefaultPeanutObjects:peanutObjects];
+          dispatch_async(dispatch_get_main_queue(), ^{
+            [self scrollToBottom];
+          });
+        } else {
+          dispatch_async(dispatch_get_main_queue(), ^{
+            [self scrollToTop];
+          });
         }
       });
     } else {

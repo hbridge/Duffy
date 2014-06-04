@@ -23,6 +23,7 @@
 
 - (CGRect)frameForCellAtIndexPath:(NSIndexPath *)indexPath;
 - (void)scrollToBottom;
+- (void)scrollToTop;
 - (void)setSectionNames:(NSArray *)sectionNames
          itemsBySection:(NSDictionary *)photosBySection;
 
