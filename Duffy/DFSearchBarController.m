@@ -108,6 +108,7 @@ typedef enum {
   tableView.rowHeight = SearchResultsRowHeight;
   [tableView registerClass:[DFSearchResultTableViewCell class]
                       forCellReuseIdentifier:@"DFSearchResultTableViewCell"];
+  tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 }
 
 - (void)clearSearchBar
