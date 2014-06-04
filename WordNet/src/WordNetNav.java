@@ -38,7 +38,7 @@ public class WordNetNav {
 		classList = new ArrayList<CatSynonyms>();
 
 		docClassList = new String[] {"menu", "crossword puzzle", "envelope"};
-		docAltWords = new String("documents,document,docs,doc");
+		docAltWords = new String("docs");
 		
 		/* Only these whitelisted words make it through to the search index */
 
@@ -78,7 +78,7 @@ public class WordNetNav {
 					"mower", "hammer", "bottle opener", "can opener", "plunger",
 					"screwdriver", "shovel", "plow", "chainsaw", "brush",
 					"hair dryer", "speaker", "screen", "display", "mouse",
-					"fan", "heater", "stove", "instrument", "scale", "clock",
+					"fan", "heater", "stove", "scale", "clock",
 					"hourglass", "sundial", "timer", "watch", "compass", 
 					"syringe", "binoculars", "sunglasses", "telescope",
 					"bow", "keyboard","crane", "calculator", "atm", "notebook",
@@ -94,7 +94,7 @@ public class WordNetNav {
 					"roof", "dish", "cap", "teddy bear", "photocopier", "gown",
 					"crossword", "suit", "skirt", "glass", "bag", "bowl", "sweater",
 					"backpack", "camera", "racket", "traffic light", "pen",
-					"hat", "bus", "tub","dress", "cellphone", "boot", "package",
+					"hat", "bus", "tub","dress", "cellphone", "boot",
 					"pole", "wallet", "magazine", "sign", "purse", "television",
 					"swimsuit", "spoon", "t-shirt", "puzzle", "game", "mat",
 					"bikini", "sock", "mug"};

@@ -216,7 +216,7 @@ echidna,animal
 wallaby,animal
 platypus,animal
 wombat,animal
-revolver,gun,instrument
+revolver,gun
 umbrella,umbrella
 schooner,sailboat
 soccer ball,ball
@@ -514,32 +514,32 @@ oil filter
 strainer
 space heater,heater
 stove,stove,heater
-guillotine,instrument
-barometer,instrument
-rule,instrument
-odometer,instrument
-scale,scale,instrument
-analog clock,clock,instrument
-digital clock,clock,instrument
-wall clock,clock,instrument
-hourglass,hourglass,instrument
-sundial,sundial,instrument
-parking meter,timer,instrument
-stopwatch,timer,instrument
-digital watch,watch,instrument
-stethoscope,instrument
-syringe,syringe,instrument
-magnetic compass,compass,instrument
-binoculars,binoculars,instrument
-projector,instrument
-sunglasses,sunglasses,instrument
-loupe,instrument
-radio telescope,telescope,instrument
-bow,bow,instrument
-cannon,gun,instrument
-assault rifle,gun,instrument
-rifle,gun,instrument
-projectile,instrument
+guillotine
+barometer
+rule
+odometer
+scale,scale
+analog clock,clock
+digital clock,clock
+wall clock,clock
+hourglass,hourglass
+sundial,sundial
+parking meter,timer
+stopwatch,timer
+digital watch,watch
+stethoscope
+syringe,syringe
+magnetic compass,compass
+binoculars,binoculars
+projector
+sunglasses,sunglasses
+loupe
+radio telescope,telescope
+bow,bow
+cannon,gun
+assault rifle,gun
+rifle,gun
+projectile
 computer keyboard,keyboard
 typewriter keyboard,keyboard
 crane,crane
@@ -788,7 +788,7 @@ holster
 pop bottle,bottle
 photocopier,photocopier
 vestment,gown
-crossword puzzle,puzzle,game,documents,document,docs,doc
+crossword puzzle,puzzle,game,docs
 golf ball,ball
 trifle,dessert,food
 suit,suit
@@ -800,7 +800,7 @@ drumstick
 shield
 Christmas stocking
 hoopskirt,skirt
-menu,documents,document,docs,doc
+menu,docs
 stage
 bonnet,hat
 meat loaf,dish,food
@@ -876,7 +876,7 @@ milk can
 rugby ball,ball
 paper towel
 earthstar
-envelope,documents,document,docs,doc
+envelope,docs
 miniskirt,skirt
 cowboy hat,hat
 trolleybus,bus
@@ -918,7 +918,7 @@ mailbox,box
 lab coat,coat
 fire screen,screen
 minibus,bus
-packet,package
+packet
 maze
 pole,pole
 horizontal bar
