@@ -37,10 +37,11 @@ extern NSString *const DFPhotoStoreCameraRollScanComplete;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 + (DFPhoto *)photoWithALAssetURLString:(NSString *)assetURLString context:(NSManagedObjectContext *)context;
 + (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
+                    retainOrder:(BOOL)retainOrder
                       inContext:(NSManagedObjectContext *)context;
 + (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID inContext:(NSManagedObjectContext *)context;
 - (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID;
-- (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs;
+- (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs retainOrder:(BOOL)retainOrder;
 
 - (void)clearUploadInfo;
 

@@ -213,14 +213,37 @@ static int const FetchStride = 500;
 }
 
 + (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
+                    retainOrder:(BOOL)retainOrder
                                 inContext:(NSManagedObjectContext *)context
 {
-  return [self photosWithValueStrings:photoIDs forKey:@"photoID" comparisonString:@"=" inContext:context];
+  NSArray *results = [self photosWithValueStrings:photoIDs
+                                           forKey:@"photoID"
+                                 comparisonString:@"="
+                                        inContext:context];
+  if (results == nil || results.count == 0 || !retainOrder) return results;
+  
+  NSMutableDictionary *photoIDsToPhotos = [[NSMutableDictionary alloc] init];
+  for (DFPhoto *photo in results) {
+    photoIDsToPhotos[@(photo.photoID)] = photo;
+  }
+  NSMutableArray *sortedResults = [[NSMutableArray alloc] init];
+  for (NSNumber *photoID in photoIDs) {
+    DFPhoto *photo = photoIDsToPhotos[photoID];
+    if (photo) {
+      [sortedResults addObject:photo];
+    } else {
+      DDLogVerbose(@"Requested photo with id not found: %llu", photoID.longLongValue);
+    }
+  }
+  
+  return sortedResults;
 }
 
-- (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
+- (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs retainOrder:(BOOL)retainOrder
 {
-  return [DFPhotoStore photosWithPhotoIDs:photoIDs inContext:[self managedObjectContext]];
+  return [DFPhotoStore photosWithPhotoIDs:photoIDs
+                              retainOrder:retainOrder
+                                inContext:[self managedObjectContext]];
 }
 
 + (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID inContext:(NSManagedObjectContext *)context

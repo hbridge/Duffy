@@ -263,7 +263,9 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
         }
         
         if ([searchObject.type isEqualToString:DFSearchObjectCluster]) {
-          NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
+          NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore]
+                                                photosWithPhotoIDs:contiguousPhotoIDsToAdd
+                                                retainOrder:YES];
           [sectionItems addObjectsFromArray:previousContitguousPhotos];
           [contiguousPhotoIDsToAdd removeAllObjects];
           
@@ -274,7 +276,8 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
         
       }
       
-      NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:contiguousPhotoIDsToAdd];
+      NSArray *photos = [[DFPhotoStore sharedStore]
+                         photosWithPhotoIDs:contiguousPhotoIDsToAdd retainOrder:YES];
       [sectionItems addObjectsFromArray:photos];
       itemsBySectionResult[sectionObject.title] = sectionItems;
     }
@@ -293,7 +296,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   }
   
   
-  NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:clusterPhotoIDs];
+  NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:clusterPhotoIDs retainOrder:YES];
   return  photos;
 }
 
