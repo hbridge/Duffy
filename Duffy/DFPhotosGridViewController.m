@@ -173,7 +173,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
                                               forIndexPath:indexPath];
     NSString *title = self.sectionNames[indexPath.section];
     headerView.titleLabel.text = title;
-    headerView.titleLabel.font = [UIFont fontWithName:@"ProximaNova-Semibold" size:17];
+    headerView.titleLabel.font = [UIFont fontWithName:@"ProximaNova-Regular" size:17];
     
     reusableview = headerView;
   }
