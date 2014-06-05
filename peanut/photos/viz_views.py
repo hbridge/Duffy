@@ -192,6 +192,11 @@ def userbaseSummary(request):
 				for photo in photoSet:
 					entry['lastUploadTime'] = photo.added
 					break
+				photoSet = dbQuery.order_by('-updated')[:1]
+				for photo in photoSet:
+					entry['lastUpdatedTime'] = photo.updated
+					break	
+
 				entry['dbCount'] = totalCount
 				entry['thumbsCount'] = dbQuery.exclude(thumb_filename=None).count()
 				entry['thumbs'] = int(math.floor(entry['thumbsCount']/totalCount*100))
@@ -211,7 +216,8 @@ def userbaseSummary(request):
 
 				if (fullimagesCount > 0):
 					count = dbQuery.exclude(overfeat_data=None).count()
-					entry['overfeat'] = "%s (%s)" % (count, count*100/fullimagesCount)
+					entry['overfeatCount'] = count
+					entry['overfeat'] = count*100/fullimagesCount
 				else:
 					entry['overfeat'] = 0
 

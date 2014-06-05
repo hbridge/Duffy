@@ -33,6 +33,9 @@
 	.ui-key {
 		padding: 0px 0px 10px 0px;
 	}
+	.red {
+		color: red;
+	}
 	#stats{
 		text-align: right;
 		font-size: 10px;
@@ -57,9 +60,9 @@
 			<td class='userid'> UserId </td>
 			<td class='name'> Name </td>
 			<td class='phoneid'> PhoneId </td>
-			<td class='created'> Created (GMT) </td>
+			<td class='created'> Created </td>
 			<td class='db-count'> DBPhotos </td>
-			<td class='db-thumbnails'> Thumbnails <br> (%)</td>
+			<td class='db-thumbnails'> Thumbs <br> (%)</td>
 			<td class='twofish'> TwoFish <br> (%) </td>
 			<td class='clustered'> Clustered <br> (%)  </td>
 			<td class='index-count'> Indexed <br> Photos (%) </td>
@@ -67,7 +70,8 @@
 			<td class='db-fullimage'> Full <br>images (%) </td>
 			<td class='overfeat'> Overfeat <br> Num (%)  </td>
 			<td class='classifications'> Image <br> Rec (%)  </td>
-			<td class='last-uploaded-timestamp'> Last Upload (GMT) </td>
+			<td class='last-uploaded-timestamp'> Last Upload </td>
+			<td class='last-updated-timestamp'> Last updated </td>			
 		</tr>
 	{% for entry in resultList %}
 		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
@@ -76,15 +80,16 @@
 			<td class='phoneid' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
 			<td class='created timeago' title="{{ entry.user.added|date:'Y-m-d H:i:s' }}">  </td>
 			<td class='db-count right'> {{ entry.dbCount }} </td>
-			<td class='db-thumbnails right' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
-			<td class='twofish right'>{{ entry.twofish }} </td>
-			<td class='clustered right' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
-			<td class='index-count right'> {{ entry.resultsCount }} </td>
-			<td class='faces right'> {{ entry.faces }} </td>
+			<td class='db-thumbnails right percent' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
+			<td class='twofish right percent'>{{ entry.twofish }} </td>
+			<td class='clustered right percent' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
+			<td class='index-count right percent'> {{ entry.resultsCount }} </td>
+			<td class='faces right percent'> {{ entry.faces }} </td>
 			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
-			<td class='overfeat right'> {{ entry.overfeat }} </td>		
-			<td class='classifications right'> {{ entry.classifications }} </td>
+			<td class='overfeat right percent' title="{{ entry.overfeatCount }} "> {{ entry.overfeat }} </td>		
+			<td class='classifications right percent'> {{ entry.classifications }} </td>
 			<td class='last-uploaded-timestamp timeago' title="{{ entry.lastUploadTime|date:'Y-m-d H:i:s' }}"> </td>
+			<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime|date:'Y-m-d H:i:s' }}"> </td>			
 		</tr>
 	{% endfor %}
 	</table>
@@ -99,6 +104,11 @@
 
 $(document).ready(function() {
   $("td.timeago").timeago();
+  $("td.percent").each(function(){
+  	if ($.trim($(this).text()) != '100') {
+  		$(this).addClass("red");
+  	}
+  });
 });
 </script>
 </html>
