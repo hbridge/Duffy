@@ -608,8 +608,17 @@ def newresults_check(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
-class TimeEnabledEncoder(json.JSONEncoder):
 
+
+
+
+"""
+
+EXPERIMENTAL CODE
+
+"""
+
+class TimeEnabledEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime.datetime):
 			return int(time.mktime(obj.timetuple()))
@@ -662,6 +671,11 @@ def neighbors(request):
 	response['neighbors'] = sortedClusters
 	return HttpResponse(json.dumps(response, cls=TimeEnabledEncoder), content_type="application/json")
 	
+
+
+
+
+
 """
 Helper functions
 """
