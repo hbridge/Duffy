@@ -33,7 +33,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from photos.models import Photo, User, Neighbor
+from photos.models import Photo, User, Neighbor, Similarity
 from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
 from photos.serializers import PhotoSerializer, SmallPhotoSerializer, UserSerializer
 from .forms import SearchQueryForm
@@ -666,11 +666,14 @@ def neighbors(request):
 				cluster.append(SmallPhotoSerializer(neighbor.photo_1).data)
 			else:
 				clusters.append([SmallPhotoSerializer(neighbor.photo_1).data, SmallPhotoSerializer(neighbor.photo_2).data])
-	
+
 	sortedClusters = list()
 	for cluster in clusters:
-		sortedCluster = sorted(cluster, key=lambda x: x['time_taken'], reverse=True)
+		sortedCluster = sorted(cluster, key=lambda x: x['time_taken'])
 		sortedClusters.append(sortedCluster)
+
+	# now sort clusters by the time_taken of the first photo in each cluster
+	sortedClusters = sorted(sortedClusters, key=lambda x: x[0]['time_taken'])
 
 	response['neighbors'] = sortedClusters
 	return HttpResponse(json.dumps(response, cls=TimeEnabledEncoder), content_type="application/json")
