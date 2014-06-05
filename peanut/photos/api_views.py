@@ -189,7 +189,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 				dups = self.handleDups(objsToCreate, dupPhotoData)
 
 			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
-			dt = datetime.datetime.utcnow() - datetime.timedelta(seconds=60)
+			dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
 
 			# This grabs all photos created in bulk_create and dups, since we're updating the batch_key
 			# with dups
@@ -210,7 +210,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 				# TODO(Derek):  Probably should do this more intelligently
 				Photo.bulkUpdate(photosToUpdate, ["location_point", "full_filename", "thumb_filename", "time_taken"])
 			else:
-				logger.error("For some reason got back 0 photos created.  Using batch key %s", batchKey)
+				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
 			for photo in photosToUpdate:
 				serializer = PhotoSerializer(photo)
