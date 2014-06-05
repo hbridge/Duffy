@@ -251,8 +251,10 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	'''
 	def getScreenshotKeywords(self, obj, forSearch=True):
 		foundTerms = ['screenshots', 'screenshot']
-		keywords = [['"PixelHeight": 960', '"PixelWidth": 640'], 
-					['"PixelHeight": 1136', '"PixelWidth": 640']]
+		keywords = [['"PixelHeight": 960', '"PixelWidth": 640'],
+					['"PixelHeight": 640', '"PixelWidth": 960'],
+					['"PixelHeight": 1136', '"PixelWidth": 640'],
+					['"PixelHeight": 640', '"PixelWidth": 1136']]
 
 		if (obj.metadata):
 			for entry in keywords:
