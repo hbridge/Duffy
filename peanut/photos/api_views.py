@@ -199,6 +199,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			#   and fill in any EXIF data (time_taken, gps, etc)
 			photosToUpdate = list()
 			if len(createdPhotos) > 0:
+				logger.debug("Successfully created %s entries in db, now processing photos" % (len(createdPhotos)))
 				# This will move the uploaded image over to the filesystem, and create needed thumbs
 				photosToUpdate = image_util.handleUploadedImagesBulk(request, createdPhotos)
 

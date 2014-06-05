@@ -199,8 +199,11 @@ def handleUploadedImagesBulk(request, photos):
 
 		if photo.file_key in request.FILES:
 			writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
+			logger.debug("Wrote out photo to " % (tempFilepath))
+
 			updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
-					
+			
+			logger.debug("Processed photo, now called %s %s" % (updatedPhoto.thumb_filename, updatedPhoto.full_filename))
 			photosToUpdate.append(updatedPhoto)
 		else:
 			logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
