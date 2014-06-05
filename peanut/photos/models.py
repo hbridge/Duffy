@@ -154,7 +154,12 @@ class Photo(models.Model):
 		bulk_updater.bulk_update(objs, update_fields=attributesList)
 	
 	def __eq__(self, other):
-		return self.id == other['id']
+		# Apparently django is sending different types of objects as 'other'.  Sometimes its an object
+		# and sometimes its an id
+		try:
+			return self.id == other['id']
+		except TypeError:
+			return self.id == other.id
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
