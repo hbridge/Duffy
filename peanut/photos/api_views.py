@@ -466,6 +466,8 @@ def searchV2(request):
 
 			response['objects'] = sections
 			response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
+		else:
+			response['retry_suggestions'] = suggestions_util.getTopCombos(user_id)
 		response['result'] = True
 		return HttpResponse(json.dumps(response), content_type="application/json")
 

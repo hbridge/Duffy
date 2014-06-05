@@ -72,7 +72,7 @@ def getTopTimes(userId):
 	# generate last month str
 	lastMonthStr = (datetime.datetime.utcnow()- datetime.timedelta(seconds=2592000)).strftime('%b %Y')
 	timeQueries = ['last week', lastMonthStr.lower(), 'last summer', '6 months ago', 'last year']
-	order = 1
+	order = 0
 	sugList = list()
 	for timeQuery in timeQueries:
 		(startDate, newQuery) = search_util.getNattyInfo(timeQuery)
@@ -85,5 +85,50 @@ def getTopTimes(userId):
 			order += 1
 			sugList.append(entry)
 	return sugList
+
+"""
+	Uses the top 3 from each of the above and tries to find combos to search
+"""
+def getTopCombos(userId, limit=None):
+
+	timeQueries = ['last fall', 'last summer', '6 months ago', 'last year']
+
+	topLocations = getTopLocations(userId, limit=10)
+	topCategories = getTopCategories(userId, limit=10)
+
+	comboList = list()
+
+	for i in range(len(topLocations[:3])):
+		query = topLocations[i]['name'] + ' ' + timeQueries[i]
+		(startDate, newQuery) = search_util.getNattyInfo(query)
+		count = search_util.solrSearch(userId, startDate, newQuery).count()
+		if (count > 0):
+			entry = dict()
+			entry['name'] = query
+			entry['count'] = count
+			comboList.append(entry)
+
+	for i in range(len(topCategories[:3])):
+		query = topCategories[i]['name'] + ' ' + timeQueries[i]
+		(startDate, newQuery) = search_util.getNattyInfo(query)
+		count = search_util.solrSearch(userId, startDate, newQuery).count()
+		if (count > 0):
+			entry = dict()
+			entry['name'] = query
+			entry['count'] = count
+			comboList.append(entry)
+
+
+	sortedList = sorted(comboList, key=lambda k: k['count'], reverse=True)
+
+	order = 0
+	for entry in sortedList:
+		entry['order'] = order
+		order += 1
+
+	if (limit):
+		sortedList = sortedList[:limit]
+	return sortedList
+
 
 
