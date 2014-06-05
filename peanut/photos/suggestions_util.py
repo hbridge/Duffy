@@ -22,12 +22,13 @@ def getTopLocations(userId, limit=None):
 
 	for location in queryResult["fields"]["locations"]:
 		if (location[1] > 0):
-			entry = dict()
-			entry['name'] = location[0]
-			entry['count'] = location[1]
-			entry['order'] = order
-			order += 1
-			photoLocations.append(entry)
+			if (location[0].lower() not in 'united states'):
+				entry = dict()
+				entry['name'] = location[0]
+				entry['count'] = location[1]
+				entry['order'] = order
+				order += 1
+				photoLocations.append(entry)
 	
 	sortedList = sorted(photoLocations, key=lambda k: k['count'], reverse=True)
 

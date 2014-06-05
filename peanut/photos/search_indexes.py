@@ -262,7 +262,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 					if forSearch:
 						return foundTerms
 					else:
-						return list(foundTerms[0])
+						return [foundTerms[0]]
 		return list()
 
 	def getTwoFishesData(self, obj):
@@ -275,7 +275,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 				if "woeType" in data["feature"]:
 					#  Filter out states and countries
 					# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
-					if data["feature"]["woeType"] != 8 and data["feature"]["woeType"] != 12:
-						locItems.append(data["feature"]["displayName"])
+					#if data["feature"]["woeType"] != 8 and data["feature"]["woeType"] != 12:
+					locItems.append(data["feature"]["displayName"])
 
 		return locItems
