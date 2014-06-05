@@ -209,7 +209,9 @@ class PhotoBulkAPI(BasePhotoAPI):
 				# These are all the fields that we might want to update.  List of the extra fields from above
 				# TODO(Derek):  Probably should do this more intelligently
 				Photo.bulkUpdate(photosToUpdate, ["location_point", "full_filename", "thumb_filename", "time_taken"])
-
+			else:
+				logger.error("For some reason got back 0 photos created.  Using batch key %s", batchKey)
+			
 			for photo in photosToUpdate:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
