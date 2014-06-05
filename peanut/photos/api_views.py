@@ -616,6 +616,13 @@ class TimeEnabledEncoder(json.JSONEncoder):
 
 		return json.JSONEncoder.default(self, obj)
 
+
+def getClusterForPhoto(photo, clusters):
+	for cluster in clusters:
+		if photo in cluster:
+			return cluster
+	return None
+
 def neighbors(request):
 	response = dict({'result': True})
 	data = getRequestData(request)
@@ -629,20 +636,30 @@ def neighbors(request):
 	else:
 		return returnFailure(response, "Need user_id")
 
-	results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user))
+	results = Neighbor.objects.select_related().exclude(user_1_id=1).exclude(user_2_id=1).filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
-	neighbors = list()
+	clusters = list()
 	for neighbor in results:
-		obj = {'photo_1': SmallPhotoSerializer(neighbor.photo_1).data,
-			   'photo_2': SmallPhotoSerializer(neighbor.photo_2).data,
-			   'user_1': UserSerializer(neighbor.user_1).data,
-			   'user_2': UserSerializer(neighbor.user_2).data,
-			   'time_distance_sec': neighbor.time_distance_sec,
-			   'geo_distance_m': neighbor.geo_distance_m
-			   }
-		neighbors.append(obj)
-		
-	response['neighbors'] = neighbors
+		cluster = getClusterForPhoto(neighbor.photo_1, clusters)
+		data = getNeighborData(neighbor)
+
+		if (cluster):
+			if neighbor.photo_2 not in cluster:
+				cluster.append(SmallPhotoSerializer(neighbor.photo_2).data)
+		else:
+			cluster = getClusterForPhoto(neighbor.photo_2, clusters)
+
+			if (cluster):
+				cluster.append(SmallPhotoSerializer(neighbor.photo_1).data)
+			else:
+				clusters.append([SmallPhotoSerializer(neighbor.photo_1).data, SmallPhotoSerializer(neighbor.photo_2).data])
+	
+	sortedClusters = list()
+	for cluster in clusters:
+		sortedCluster = sorted(cluster, key=lambda x: x['time_taken'], reverse=True)
+		sortedClusters.append(sortedCluster)
+
+	response['neighbors'] = sortedClusters
 	return HttpResponse(json.dumps(response, cls=TimeEnabledEncoder), content_type="application/json")
 	
 """

@@ -152,7 +152,9 @@ class Photo(models.Model):
 		attributesList.append("updated")
 
 		bulk_updater.bulk_update(objs, update_fields=attributesList)
-		
+	
+	def __eq__(self, other):
+		return self.id == other['id']
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)

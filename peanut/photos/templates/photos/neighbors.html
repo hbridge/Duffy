@@ -1,33 +1,42 @@
-
-<!DOCTYPE html> 
 <html> 
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1"> 
 	<title>Neighbors</title> 
 	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
-	<script src="http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js"></script>
-
 	<script>
-		url = "/api/neighbors?user_id=205"
+		function getURLParameter(name) {
+			return decodeURI(
+				(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
+			);
+		}
 
-		$.getJSON(url, function( data ) {
-		  var items = [];
-		  $.each( data.neighbors, function( key, neighbor ) {
-			items.push( neighbor.photo_1 );
-		  });
-		 
-		  $( "<ul/>", {
-			"class": "my-new-list",
-			html: items.join( "<br>" )
-		  }).appendTo( "body" );
+		userId = getURLParameter("user_id")
+		url = "/api/neighbors?user_id=" + userId
+
+		$.get(url, function( data ) {
+			$.each( data.neighbors, function( i, cluster ) {
+				row = ""
+				city = ""
+				date = ""
+				$.each(cluster, function( i, photo) {
+					thumbUrl = "/user_data/" + photo.user + "/" + photo.thumb_filename
+					img = "<img src='" + thumbUrl + "' alt='" + photo.user + "'/>"
+					html = "<table style='display: inline'><tr><td>" + img + "</td></tr><tr><td>" + photo.user + "</td></tr></table>";
+
+					row += html
+					city = photo.location_city
+					d = new Date(photo.time_taken * 1000);
+					time = d.toLocaleDateString("en-US")
+				});
+				$("<div>"+ city + "<br/>" + time + "<br/>" + row + "</div><br><br><br><br><br><br>").appendTo( "#images" );
+		
+			});
 		});
 	</script>
 </head> 
 
 <body> 
-
+<div id="images"/>
 
 </body>
 
