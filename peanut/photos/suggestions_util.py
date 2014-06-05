@@ -87,7 +87,7 @@ def getTopTimes(userId):
 	return sugList
 
 """
-	Uses the top 3 from each of the above and tries to find combos to search
+	Used to return combos of term that might have results in database
 """
 def getTopCombos(userId, limit=None):
 
