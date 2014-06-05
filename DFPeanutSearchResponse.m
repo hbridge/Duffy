@@ -9,6 +9,7 @@
 #import "DFPeanutSearchResponse.h"
 #import <RestKit/RestKit.h>
 #import "DFPeanutSearchObject.h"
+#import "DFPeanutSuggestion.h"
 
 @implementation DFPeanutSearchResponse
 
@@ -18,6 +19,8 @@
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects"
                                                  mapping:[DFPeanutSearchObject objectMapping]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"retry_suggestions"
+                                                 mapping:[DFPeanutSuggestion objectMapping]];
   
   return objectMapping;
 }

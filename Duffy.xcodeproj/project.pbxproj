@@ -11,6 +11,8 @@
 		5A28CEAB193E7C9500A2CBD3 /* DFPhotoStackCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */; };
 		5A28CEAD193E7CD700A2CBD3 /* DFPhotoStackCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */; };
 		5A28CEB3193FD38400A2CBD3 /* Fonts in Resources */ = {isa = PBXBuildFile; fileRef = 5A28CEB2193FD38400A2CBD3 /* Fonts */; };
+		5A28CEB61940FEE900A2CBD3 /* DFSearchNoResultsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A28CEB51940FEE900A2CBD3 /* DFSearchNoResultsView.m */; };
+		5A28CEB81940FEFD00A2CBD3 /* DFSearchNoResultsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A28CEB71940FEFD00A2CBD3 /* DFSearchNoResultsView.xib */; };
 		5A30E4DA18D3AC5F00E41DBC /* DFSearchViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */; };
 		5A45E9BD18D9F7B8002663EB /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9BC18D9F7B8002663EB /* DFPhotoCollection.m */; };
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
@@ -142,6 +144,9 @@
 		5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoStackCell.m; sourceTree = "<group>"; };
 		5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoStackCell.xib; sourceTree = "<group>"; };
 		5A28CEB2193FD38400A2CBD3 /* Fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Fonts; path = Resources/Fonts; sourceTree = "<group>"; };
+		5A28CEB41940FEE900A2CBD3 /* DFSearchNoResultsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchNoResultsView.h; sourceTree = "<group>"; };
+		5A28CEB51940FEE900A2CBD3 /* DFSearchNoResultsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchNoResultsView.m; sourceTree = "<group>"; };
+		5A28CEB71940FEFD00A2CBD3 /* DFSearchNoResultsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchNoResultsView.xib; sourceTree = "<group>"; };
 		5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController.h; sourceTree = "<group>"; };
 		5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController.m; sourceTree = "<group>"; };
 		5A45E9BB18D9F7B8002663EB /* DFPhotoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoCollection.h; sourceTree = "<group>"; };
@@ -580,6 +585,9 @@
 			children = (
 				5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */,
 				5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */,
+				5A28CEB41940FEE900A2CBD3 /* DFSearchNoResultsView.h */,
+				5A28CEB51940FEE900A2CBD3 /* DFSearchNoResultsView.m */,
+				5A28CEB71940FEFD00A2CBD3 /* DFSearchNoResultsView.xib */,
 				5A97DC841937809700FA4718 /* DFSearchBarController.h */,
 				5A97DC851937809700FA4718 /* DFSearchBarController.m */,
 				5A50EE561938D44A00B78333 /* DFSearchBarControllerDelegate.h */,
@@ -954,6 +962,7 @@
 				5AACB91718F5D63500F4EEB6 /* DFUploadProgressView.xib in Resources */,
 				5A28CEAD193E7CD700A2CBD3 /* DFPhotoStackCell.xib in Resources */,
 				5AB39842192563E700E6E69E /* IntroPage1.rtf in Resources */,
+				5A28CEB81940FEFD00A2CBD3 /* DFSearchNoResultsView.xib in Resources */,
 				5AACB92318F6092F00F4EEB6 /* HockeySDK.xcconfig in Resources */,
 				5A50EE69193D20E500B78333 /* DFPhotoSectionHeader.xib in Resources */,
 				5A28CEB3193FD38400A2CBD3 /* Fonts in Resources */,
@@ -1046,6 +1055,7 @@
 				5A50EE64193CE94A00B78333 /* DFTypedefs.m in Sources */,
 				5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */,
 				5AE3BF7B18E4D5C900ACB5DC /* DFCGRectHelpers.m in Sources */,
+				5A28CEB61940FEE900A2CBD3 /* DFSearchNoResultsView.m in Sources */,
 				5A8D0B5618EF525800A1D9A7 /* DFTableHeaderView.m in Sources */,
 				5AC40EE11909B2C000ED3532 /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5AFBCA5018D236A900998793 /* UIImage+RoundedCorner.m in Sources */,

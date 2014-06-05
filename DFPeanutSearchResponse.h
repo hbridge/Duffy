@@ -14,5 +14,6 @@
 @property (nonatomic) BOOL result;
 @property (nonatomic, retain) NSString *next_start_date_time;
 @property (nonatomic, retain) NSArray *objects;
+@property (nonatomic, retain) NSArray *retry_suggestions;
 
 @end

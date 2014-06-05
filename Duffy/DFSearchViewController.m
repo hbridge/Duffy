@@ -215,7 +215,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
     DDLogVerbose(@"SearchViewController got search response with result %d and top level objects count:%d",
                  response.result, (int)response.objects.count);
     if (response.result == TRUE) {
-      if (response.objects.count == 0) [self showNoSearchResults];
+      if (response.objects.count == 0) [self showNoSearchResults:response.retry_suggestions];
       
       // We need to do this work on the main thread because the DFPhoto objects that get created
       // have to be on the main thread so they can be accessed by colleciton view datasource methods
@@ -248,13 +248,17 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   self.navigationItem.title = [query capitalizedString];
 }
 
-- (void)showNoSearchResults
+- (void)showNoSearchResults:(NSArray *)retrySuggestions
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     [self setSectionNames:nil itemsBySection:nil];
+    
+//    UIView *view = [[[UINib nibWithNibName:@"DFSearchNoResultsView" bundle:nil]
+//                     instantiateWithOwner:self options:nil]
+//                    firstObject];
     UILabel *noResultsLabel = [[UILabel alloc] init];
     noResultsLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    noResultsLabel.numberOfLines = 5;
+    noResultsLabel.numberOfLines = 0;
     noResultsLabel.textAlignment = NSTextAlignmentCenter;
     noResultsLabel.textColor = [UIColor lightGrayColor];
     noResultsLabel.font = [UIFont fontWithName:@"ProximaNova-Regular" size:20];
@@ -267,36 +271,35 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
     [noResultsLabel sizeToFit];
     noResultsLabel.frame =
     CGRectMake(self.collectionView.frame.size.width * sideMarginPercent,
-               self.collectionView.bounds.origin.y,
+               CGRectGetMidY(self.collectionView.frame) - self.collectionView.frame.size.height / 5.0,
                self.collectionView.frame.size.width * (1 - 2*sideMarginPercent),
-               self.collectionView.frame.size.height / 2.0
+               self.collectionView.frame.size.height / 5.0
                );
     
     self.tryAgainViews = @[noResultsLabel];
     
-    if (self.searchBarController.suggestionsBySection.count > 0) {
-      NSDictionary *suggestionsBySection = self.searchBarController.suggestionsBySection;
-      int randSectionIndex = (rand() / (float)RAND_MAX) * (suggestionsBySection.allKeys.count - 1);
-      NSString *sectionKey = [[suggestionsBySection allKeys] objectAtIndex:randSectionIndex];
-      NSArray *suggestions = suggestionsBySection[sectionKey];
-      int randSuggestionIndex = (rand() / (float)RAND_MAX) * (suggestions.count - 1);
-      DFPeanutSuggestion *suggestion = suggestions[randSuggestionIndex];
-      self.tryAgainSearchQuery = suggestion.name;
-
+    if (retrySuggestions.count > 0) {
+      DFPeanutSuggestion *retrySuggestion = [retrySuggestions
+                                             objectAtIndex:arc4random_uniform((u_int32_t)retrySuggestions.count)];
+      self.tryAgainSearchQuery = retrySuggestion.name;
       
       UIButton *tryAgainButton = [[UIButton alloc] init];
-      NSString *tryAgainText = [NSString stringWithFormat:@"Try '%@' instead", suggestion.name];
+      NSString *tryAgainText = [NSString stringWithFormat:@"Try '%@' instead", retrySuggestion.name];
       [tryAgainButton setTitle:tryAgainText forState:UIControlStateNormal];
       [tryAgainButton setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-      [tryAgainButton setUserInteractionEnabled:YES];
+      tryAgainButton.userInteractionEnabled = YES;
+      tryAgainButton.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+      tryAgainButton.titleLabel.numberOfLines = 0;
+      tryAgainButton.titleLabel.textAlignment = NSTextAlignmentCenter;
       [tryAgainButton addTarget:self
                          action:@selector(tryAgainButtonClicked)
                forControlEvents:UIControlEventTouchUpInside];
+
       
       [self.collectionView addSubview:tryAgainButton];
       tryAgainButton.frame =
       CGRectMake(self.collectionView.frame.size.width * sideMarginPercent,
-                 CGRectGetMidY(self.collectionView.frame),
+                 CGRectGetMaxY(noResultsLabel.frame) + 8.0,
                  self.collectionView.frame.size.width * (1 - 2 *sideMarginPercent),
                  [tryAgainButton sizeThatFits:tryAgainButton.frame.size].height);
       
