@@ -195,15 +195,20 @@ def main(argv):
             if len(successfullyClassified) > 0:
                 logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
             else:
-                logging.error("Did not complete classification...sleeping for 30 minutes then will try to reconnect and resend")
-                time.sleep(60*30)
+                logging.error("Did not hear back, server probably died, reconnecting sockets")
                 
                 socket_send, socket_recv = initClassifier()
                 poller = zmq.Poller()
                 poller.register(socket_recv, zmq.POLLIN)
                 
-                successfullyClassified = recvPhotos(socket_recv, poller, timeToWaitSec=5, keepGoing=True)
-                logging.info("Recovered and successfully completed " + str(len(successfullyClassified)) + " photos")
+                successfullyClassified = recvPhotos(socket_recv, poller, timeToWaitSec=60, keepGoing=True)
+
+                if len(successfullyClassified) > 0:
+                    logging.info("Recovered and successfully completed " + str(len(successfullyClassified)) + " photos")
+                else:
+                    logging.error("Did not complete classification...sleeping for 5 minutes then will try to reconnect and resend")
+                    time.sleep(60*5)
+                    logging.error("Back from sleep")
         else:
             time.sleep(5)
 
