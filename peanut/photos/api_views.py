@@ -650,7 +650,6 @@ def neighbors(request):
 	clusters = list()
 	for neighbor in results:
 		cluster = getClusterForPhoto(neighbor.photo_1, clusters)
-		data = getNeighborData(neighbor)
 
 		if (cluster):
 			if neighbor.photo_2 not in cluster:
