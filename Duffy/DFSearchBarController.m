@@ -99,6 +99,7 @@ typedef enum {
   searchBar.delegate = self;
   searchBar.placeholder = SEARCH_PLACEHOLDER;
   searchBar.defaultQuery = SEARCH_DEFAULT_QUERY;
+  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:YES];
 }
 
 - (void)setTableView:(UITableView *)tableView
@@ -149,6 +150,14 @@ typedef enum {
   [self.delegate searchBarControllerSearchCancelled:self];
 }
 
+- (void)searchBarClearButtonClicked:(DFSearchBar *)searchBar
+{
+  searchBar.text = searchBar.defaultQuery;
+  [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:YES];
+  [self.delegate searchBarControllerSearchCleared:self];
+}
+
+
 - (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
                  showingDefaultQuery:(BOOL)showingDefault
 {
@@ -166,12 +175,7 @@ typedef enum {
   }
 }
 
-- (void)searchBarClearButtonClicked:(DFSearchBar *)searchBar
-{
-  searchBar.text = searchBar.defaultQuery;
-  [self.delegate searchBarControllerSearchCleared:self];
-}
-  
+
 #pragma mark - Search results filtering
   
 
