@@ -45,6 +45,8 @@
 	}
 
 </style>
+<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="http://asood123.no-ip.biz/static/jquery.timeago.js"></script>
 <body>
 <div class="ui-content">
 	<div class="ui-key">
@@ -72,7 +74,7 @@
 			<td class='userid'> {{ entry.user.id }} </td>
 			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
 			<td class='phoneid' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
-			<td class='created'> {{ entry.user.added|date:'m/d h:i.s A' }} </td>
+			<td class='created timeago' title="{{ entry.user.added|date:'Y-m-d H:i:s' }}">  </td>
 			<td class='db-count right'> {{ entry.dbCount }} </td>
 			<td class='db-thumbnails right' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
 			<td class='twofish right'>{{ entry.twofish }} </td>
@@ -82,7 +84,7 @@
 			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
 			<td class='overfeat right'> {{ entry.overfeat }} </td>		
 			<td class='classifications right'> {{ entry.classifications }} </td>
-			<td class='last-uploaded-timestamp'> {{ entry.lastUploadTime|date:'m/d h:i.s A' }} </td>
+			<td class='last-uploaded-timestamp timeago' title="{{ entry.lastUploadTime|date:'Y-m-d H:i:s' }}"> </td>
 		</tr>
 	{% endfor %}
 	</table>
@@ -93,4 +95,10 @@
 
 
 </body>
+<script>
+
+$(document).ready(function() {
+  $("td.timeago").timeago();
+});
+</script>
 </html>
