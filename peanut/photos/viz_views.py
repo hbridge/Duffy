@@ -17,6 +17,7 @@ from peanut import settings
 
 from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
+from dateutil import tz
 import time, math, urllib
 
 	
@@ -179,22 +180,25 @@ def userbaseSummary(request):
 						'26A1609E-BBBA-4684-8DF0-A394500FA96B',
 						'BEEF'}
 	resultList = list()
+	to_zone = tz.gettz('America/New_York')
 	for i in range(1000):
 		userId = i
 		try:
 			user = User.objects.get(id=userId)
 			entry = dict()
 			entry['user'] = user
+			if (user.added):
+				entry['userCreated'] = user.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 			dbQuery = Photo.objects.filter(user_id=user.id)
 			totalCount = dbQuery.count()
 			if (totalCount > 0):
 				photoSet = dbQuery.order_by('-added')[:1]
 				for photo in photoSet:
-					entry['lastUploadTime'] = photo.added
+					entry['lastUploadTime'] = photo.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 					break
 				photoSet = dbQuery.order_by('-updated')[:1]
 				for photo in photoSet:
-					entry['lastUpdatedTime'] = photo.updated
+					entry['lastUpdatedTime'] = photo.updated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 					break	
 
 				entry['dbCount'] = totalCount

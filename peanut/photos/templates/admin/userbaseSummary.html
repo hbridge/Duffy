@@ -78,7 +78,7 @@
 			<td class='userid'> {{ entry.user.id }} </td>
 			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
 			<td class='phoneid' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
-			<td class='created timeago' title="{{ entry.user.added|date:'Y-m-d H:i:s' }}">  </td>
+			<td class='created timeago' title="{{ entry.userCreated }}">  </td>
 			<td class='db-count right'> {{ entry.dbCount }} </td>
 			<td class='db-thumbnails right percent' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
 			<td class='twofish right percent'>{{ entry.twofish }} </td>
@@ -88,8 +88,8 @@
 			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
 			<td class='overfeat right percent' title="{{ entry.overfeatCount }} "> {{ entry.overfeat }} </td>		
 			<td class='classifications right percent'> {{ entry.classifications }} </td>
-			<td class='last-uploaded-timestamp timeago' title="{{ entry.lastUploadTime|date:'Y-m-d H:i:s' }}"> </td>
-			<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime|date:'Y-m-d H:i:s' }}"> </td>			
+			<td class='last-uploaded-timestamp timeago' title="{{ entry.lastUploadTime }}"> </td>
+			<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime }}"> </td>			
 		</tr>
 	{% endfor %}
 	</table>
