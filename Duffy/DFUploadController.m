@@ -131,14 +131,9 @@ static DFUploadController *defaultUploadController;
             [DFPhotoStore photosWithThumbnailUploadStatus:NO fullUploadStatus:NO inContext:self.managedObjectContext];
         DFPhotoCollection *eligibleFullImagesToUpload =
             [DFPhotoStore photosWithThumbnailUploadStatus:YES fullUploadStatus:NO inContext:self.managedObjectContext];
-        
-//        DDLogVerbose(@"thumbnailsObjectIDQueue:%@ adding photos to \nthumbnails queue: %@ \nfullImageQueue: %@",
-//                     self.thumbnailsObjectIDQueue.description, photosWithThumbsToUpload.description, eligibleFullImagesToUpload.description);
-        
+      
         [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
         [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
-        
-      //        DDLogVerbose(@"result thumbnailsObjectIDQueue: %@", self.thumbnailsObjectIDQueue.description);
     }]];
 }
 
