@@ -28,6 +28,7 @@
 #import "DFSearchBarController.h"
 #import "DFPeanutSearchAdapter.h"
 #import "DFPeanutSearchObject.h"
+#import "DFSearchNoResultsView.h"
 
 @interface DFSearchViewController ()
 
@@ -253,59 +254,27 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   dispatch_async(dispatch_get_main_queue(), ^{
     [self setSectionNames:nil itemsBySection:nil];
     
-//    UIView *view = [[[UINib nibWithNibName:@"DFSearchNoResultsView" bundle:nil]
-//                     instantiateWithOwner:self options:nil]
-//                    firstObject];
-    UILabel *noResultsLabel = [[UILabel alloc] init];
-    noResultsLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    noResultsLabel.numberOfLines = 0;
-    noResultsLabel.textAlignment = NSTextAlignmentCenter;
-    noResultsLabel.textColor = [UIColor lightGrayColor];
-    noResultsLabel.font = [UIFont fontWithName:@"ProximaNova-Regular" size:20];
-    
-    noResultsLabel.text = @"Sorry, we couldn't find any photos for that search.";
-    
-    CGFloat sideMarginPercent = 0.125;
-    
-    [self.collectionView addSubview:noResultsLabel];
-    [noResultsLabel sizeToFit];
-    noResultsLabel.frame =
-    CGRectMake(self.collectionView.frame.size.width * sideMarginPercent,
-               CGRectGetMidY(self.collectionView.frame) - self.collectionView.frame.size.height / 5.0,
-               self.collectionView.frame.size.width * (1 - 2*sideMarginPercent),
-               self.collectionView.frame.size.height / 5.0
-               );
-    
-    self.tryAgainViews = @[noResultsLabel];
+    DFSearchNoResultsView *noResultsView = [[
+                                             [UINib nibWithNibName:@"DFSearchNoResultsView" bundle:nil]
+                                             instantiateWithOwner:self
+                                             options:nil] firstObject];
     
     if (retrySuggestions.count > 0) {
-      DFPeanutSuggestion *retrySuggestion = [retrySuggestions
-                                             objectAtIndex:arc4random_uniform((u_int32_t)retrySuggestions.count)];
-      self.tryAgainSearchQuery = retrySuggestion.name;
+      DFPeanutSuggestion *randomRetrySuggestion =
+      [retrySuggestions objectAtIndex:arc4random_uniform((u_int32_t)retrySuggestions.count)];
+      self.tryAgainSearchQuery = randomRetrySuggestion.name;
       
-      UIButton *tryAgainButton = [[UIButton alloc] init];
-      NSString *tryAgainText = [NSString stringWithFormat:@"Try '%@' instead", retrySuggestion.name];
-      [tryAgainButton setTitle:tryAgainText forState:UIControlStateNormal];
-      [tryAgainButton setTitleColor:[UIColor blueColor] forState:UIControlStateNormal];
-      tryAgainButton.userInteractionEnabled = YES;
-      tryAgainButton.titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
-      tryAgainButton.titleLabel.numberOfLines = 0;
-      tryAgainButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-      [tryAgainButton addTarget:self
-                         action:@selector(tryAgainButtonClicked)
-               forControlEvents:UIControlEventTouchUpInside];
-
-      
-      [self.collectionView addSubview:tryAgainButton];
-      tryAgainButton.frame =
-      CGRectMake(self.collectionView.frame.size.width * sideMarginPercent,
-                 CGRectGetMaxY(noResultsLabel.frame) + 8.0,
-                 self.collectionView.frame.size.width * (1 - 2 *sideMarginPercent),
-                 [tryAgainButton sizeThatFits:tryAgainButton.frame.size].height);
-      
-      self.tryAgainViews = @[noResultsLabel, tryAgainButton];
+      [noResultsView.searchSuggestionButton setTitle:randomRetrySuggestion.name
+                                            forState:UIControlStateNormal];
+      [noResultsView.searchSuggestionButton addTarget:self
+                                                action:@selector(tryAgainButtonClicked)
+                                      forControlEvents:UIControlEventTouchUpInside];
     }
     
+    
+    [self.collectionView addSubview:noResultsView];
+    noResultsView.frame = self.collectionView.frame;
+    self.tryAgainViews = @[noResultsView];
     
   });
 }
