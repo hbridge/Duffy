@@ -57,7 +57,9 @@ static int NumChangesFlushThreshold = 100;
     dispatch_async(dispatch_get_main_queue(), ^{
       [DFAnalytics logCameraRollScanTotalAssets:self.knownPhotos.photoSet.count + numAdded - numDeleted
                                     addedAssets:numAdded];
-      [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollScanComplete object:self];
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFPhotoStoreCameraRollUpdatedNotificationName
+       object:self];
     });
   }
 }

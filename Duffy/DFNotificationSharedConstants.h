@@ -30,6 +30,8 @@ extern NSString *DFPhotoChangeTypeMetadata;
 
 extern NSString *DFUploadStatusNotificationName;
 extern NSString *DFUploadStatusUpdateSessionUserInfoKey;
+extern NSString *const DFPhotoStoreCameraRollUpdatedNotificationName;
+extern NSString *const DFCameraRollSyncCompleteNotificationName;
 
 
 

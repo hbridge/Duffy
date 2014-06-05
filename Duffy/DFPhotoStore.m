@@ -25,10 +25,6 @@
 
 @synthesize assetsLibrary = _assetsLibrary;
 
-
-NSString *const DFPhotoStoreCameraRollUpdated = @"DFPhotoStoreCameraRollUpdated";
-NSString *const DFPhotoStoreCameraRollScanComplete = @"DFPhotoStoreCameraRollScanComplete";
-
 static DFPhotoStore *defaultStore;
 
 + (DFPhotoStore *)sharedStore {
@@ -113,7 +109,9 @@ static DFPhotoStore *defaultStore;
 {
     self.cameraRoll = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
     
-    [[NSNotificationCenter defaultCenter] postNotificationName:DFPhotoStoreCameraRollUpdated object:self];
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:DFPhotoStoreCameraRollUpdatedNotificationName
+     object:self];
 }
 
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context

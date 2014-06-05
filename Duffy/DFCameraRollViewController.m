@@ -28,7 +28,7 @@ NSString *const AllSectionName = @"All";
     if (self) {
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(cameraRollScanComplete)
-                                                     name:DFPhotoStoreCameraRollScanComplete
+                                                     name:DFCameraRollSyncCompleteNotificationName
                                                    object:nil];
       
         self.navigationController.navigationItem.title = @"Camera Roll";
@@ -41,7 +41,7 @@ NSString *const AllSectionName = @"All";
                                                    object:nil];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(cameraRollUpdated)
-                                                     name:DFPhotoStoreCameraRollUpdated
+                                                     name:DFPhotoStoreCameraRollUpdatedNotificationName
                                                    object:nil];
       
       [self setSectionNames:@[AllSectionName]

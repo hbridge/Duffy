@@ -79,6 +79,10 @@ static DFUploadController *defaultUploadController;
                                                  selector:@selector(backgroundContextDidSave:)
                                                      name:NSManagedObjectContextDidSaveNotification
                                                    object:nil];
+      [[NSNotificationCenter defaultCenter] addObserver:self
+                                               selector:@selector(cameraRollSyncCompleted:)
+                                                   name:DFCameraRollSyncCompleteNotificationName
+                                                 object:nil];
       
       [self observeNetworkChanges];
     }
@@ -522,10 +526,14 @@ static DFUploadController *defaultUploadController;
 /* Save notification handler for the background context */
 - (void)backgroundContextDidSave:(NSNotification *)notification {
     /* merge in the changes to the main context */
-    [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
+    [self scheduleWithDispatchUploads:NO operation:[NSBlockOperation blockOperationWithBlock:^{
         [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
         [self uploadPhotos];
     }]];
+}
+
+- (void)cameraRollSyncCompleted:(NSNotification *)notification {
+  [self uploadPhotos];
 }
 
 # pragma mark - Background task helper

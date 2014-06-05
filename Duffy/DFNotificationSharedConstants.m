@@ -20,5 +20,9 @@ NSString const *DFPhotoChangeTypeMetadata = @"DFPhotoChangeTypeMetadata";
 NSString *DFUploadStatusNotificationName = @"DFUploadStatusUpdate";
 NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 
+NSString *const DFPhotoStoreCameraRollUpdatedNotificationName = @"DFPhotoStoreCameraRollUpdatedNotificationName";
+NSString *const DFCameraRollSyncCompleteNotificationName = @"DFCameraRollSyncCompleteNotificationName";
+
+
 
 @end

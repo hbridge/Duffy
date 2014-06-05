@@ -14,9 +14,6 @@
 
 @interface DFPhotoStore : NSObject
 
-extern NSString *const DFPhotoStoreCameraRollUpdated;
-extern NSString *const DFPhotoStoreCameraRollScanComplete;
-
 // Get the store instance for the main thread
 + (DFPhotoStore *)sharedStore;
 
