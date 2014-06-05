@@ -10,6 +10,7 @@ import zmq
 import Image
 import datetime
 
+
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
     sys.path.insert(0, parentPath)
@@ -20,13 +21,22 @@ from photos.models import Photo, User, Classification
 from peanut import settings
 
 def initClassifier():
-    context = zmq.Context()
-    socket_send = context.socket(zmq.PUSH)
-    socket_recv = context.socket(zmq.PULL)
-    socket_send.connect("tcp://titanblack.no-ip.biz:14921")
-    socket_recv.connect("tcp://titanblack.no-ip.biz:14920")
+    attempts = 0
 
-    return (socket_send, socket_recv)
+    while attempts < 1000:
+        try:
+            context = zmq.Context()
+            socket_send = context.socket(zmq.PUSH)
+            socket_recv = context.socket(zmq.PULL)
+            socket_send.connect("tcp://titanblack.no-ip.biz:14921")
+            socket_recv.connect("tcp://titanblack.no-ip.biz:14920")
+
+            return (context, socket_send, socket_recv)
+        except zmq.error.ZMQError:
+            logging.error("Got connection error to titanblack.  sleeping for 10 seconds then trying again")
+            time.sleep(10)
+            attempts += 1
+    logging.error("Tried to connect and failed")
 
 def getIdFromImagePath(imagePath):
     base, origFilename = os.path.split(imagePath)
@@ -87,20 +97,16 @@ def processResponse(response):
 
     return photosToSave
 
-def recvPhotos(socket_recv, poller, timeToWaitSec=60, keepGoing=False):
+def recvPhotos(socket_recv, timeToWaitSec=60, keepGoing=False):
     processedPhotos = list()
     timeStart = datetime.datetime.now()
     timeDelta = datetime.timedelta(seconds=timeToWaitSec) 
     timeEnd = timeStart + timeDelta
     
     logging.info("Waiting %s seconds for response..." % (timeToWaitSec))
-    gotResponse = False
     while datetime.datetime.now() < timeEnd:
-        result = poller.poll(1000)
-        if len(result) > 0:
-            gotResponse = True
-
-        if gotResponse:
+        result = socket_recv.poll(500)
+        if result > 0:
             result = socket_recv.recv_json()
             logging.info("Got back: " + str(result))
 
@@ -109,9 +115,8 @@ def recvPhotos(socket_recv, poller, timeToWaitSec=60, keepGoing=False):
 
             if keepGoing:
                 timeEnd = datetime.datetime.now() + timeDelta
-                gotResponse = False
             else:
-                timeEnd = datetime.datetime.now()
+                return processedPhotos
         
     return processedPhotos
 
@@ -168,14 +173,13 @@ def main(argv):
                         format='%(asctime)s %(levelname)s %(message)s')
     logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
 
-    socket_send, socket_recv = initClassifier()
-    poller = zmq.Poller()
-    poller.register(socket_recv, zmq.POLLIN)
+    context, socket_send, socket_recv = initClassifier()
+    
 
     logging.info("Starting pipeline at " + time.strftime("%c"))
 
     logging.info("Seeing if there's any pending photos to process...")
-    successfullyClassified = recvPhotos(socket_recv, poller, timeToWaitSec=5, keepGoing=True)
+    successfullyClassified = recvPhotos(socket_recv, timeToWaitSec=5, keepGoing=True)
     logging.info("Found pending photos and successfully completed " + str(len(successfullyClassified)) + " photos")
 
     while True:
@@ -190,25 +194,27 @@ def main(argv):
             successfullyCopied = copyPhotos(nonProcessedPhotos)
             if (len(successfullyCopied) > 0):
                 sendPhotos(successfullyCopied, socket_send)
-                successfullyClassified = recvPhotos(socket_recv, poller)
+                successfullyClassified = recvPhotos(socket_recv)
 
             if len(successfullyClassified) > 0:
                 logging.info("Successfully completed " + str(len(successfullyClassified)) + " photos")
             else:
                 logging.error("Did not hear back, server probably died, reconnecting sockets")
                 
-                socket_send, socket_recv = initClassifier()
-                poller = zmq.Poller()
-                poller.register(socket_recv, zmq.POLLIN)
+                context.destroy()
+                context, socket_send, socket_recv = initClassifier()
                 
-                successfullyClassified = recvPhotos(socket_recv, poller, timeToWaitSec=60, keepGoing=True)
+                successfullyClassified = recvPhotos(socket_recv, timeToWaitSec=60, keepGoing=True)
 
                 if len(successfullyClassified) > 0:
                     logging.info("Recovered and successfully completed " + str(len(successfullyClassified)) + " photos")
                 else:
                     logging.error("Did not complete classification...sleeping for 5 minutes then will try to reconnect and resend")
                     time.sleep(60*5)
-                    logging.error("Back from sleep")
+                    
+                    logging.error("Back from sleep, trying to reconnect")
+                    context.destroy()
+                    context, socket_send, socket_recv = initClassifier()
         else:
             time.sleep(5)
 
