@@ -51,6 +51,7 @@
 @property (nonatomic, retain) NSString *tryAgainSearchQuery;
 
 @property (nonatomic, retain) NSArray *recentUnuploadedPhotos;
+@property (nonatomic) BOOL isViewTransitioning;
 
 @end
 
@@ -139,13 +140,17 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
 
 - (void)viewWillAppear:(BOOL)animated
 {
+  [super viewWillAppear:animated];
+  self.isViewTransitioning = YES;
   self.hideStatusBar = NO;
+  [self showNavBar];
   [self.navigationController setNavigationBarHidden:NO animated:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  self.isViewTransitioning = NO;
   [self setTableViewInsets];
   
   if (self.isMovingToParentViewController) {
@@ -157,12 +162,15 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
 
 - (void)viewWillDisappear:(BOOL)animated
 {
-  [self showNavBar];
+  [super viewWillDisappear:animated];
+  self.isViewTransitioning = YES;
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
+  self.isViewTransitioning = NO;
+  [self showNavBar];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
@@ -496,6 +504,7 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
+  if (self.isViewTransitioning) return;
   CGRect frame = self.navigationController.navigationBar.frame;
   CGFloat size = frame.size.height;
   CGFloat framePercentageHidden = ((20 - frame.origin.y) / (frame.size.height - 1));
@@ -565,8 +574,10 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
 
 - (void)showNavBar
 {
-  [self animateNavBarTo:10];
-  [self updateBarButtonItems:1.0];
+  if (self.navigationController.navigationBar.frame.origin.y < 0) {
+    [self animateNavBarTo:20];
+    //[self updateBarButtonItems:1.0];
+  }
 }
 
 #pragma mark - Hide and show status bar
