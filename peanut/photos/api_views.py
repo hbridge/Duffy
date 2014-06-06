@@ -754,9 +754,15 @@ def createUser(phoneId, firstName):
 def getCountPhrase(count):
 	if count == 0:
 		return ""
+	elif count == 1:
+		return "1"
+	elif count < 5:
+		return "2+"
 	elif count < 10:
-		return "few"
-	elif count >= 10 and count < 100:
-		return "10s"
+		return "5+"
+	elif count < 50:
+		return "20+"
+	elif count < 150:
+		return "50+"
 	else:
-		return "100s"
+		return "100+"
