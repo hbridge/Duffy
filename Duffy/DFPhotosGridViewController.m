@@ -15,6 +15,7 @@
 #import "DFPhotoSectionHeader.h"
 #import "DFPhotoStackCell.h"
 #import "DFPhotoCollection.h"
+#import "UICollectionView+DFExtras.h"
 
 @interface DFPhotosGridViewController ()
 
@@ -98,9 +99,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
 
 - (void)scrollToBottom
 {
-  NSInteger sectionIndex = [self numberOfSectionsInCollectionView:self.collectionView] - 1;
-  NSInteger item = [self collectionView:self.collectionView numberOfItemsInSection:sectionIndex] - 1;
-  NSIndexPath *lastIndexPath = [NSIndexPath indexPathForItem:item inSection:sectionIndex];
+  NSIndexPath *lastIndexPath = [self.collectionView indexPathForLastCell];
   if (lastIndexPath.section >= 0 && lastIndexPath.row >= 0) {
     [self.collectionView scrollToItemAtIndexPath:lastIndexPath atScrollPosition:UICollectionViewScrollPositionBottom animated:NO];
   }

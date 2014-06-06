@@ -125,6 +125,11 @@ typedef enum {
 
 }
 
+- (BOOL)isShowingDefaultQuery
+{
+  return (self.searchBar.text == self.defaultQuery || [self.searchBar.text isEqualToString:@""]);
+}
+
 #pragma mark - Search Bar delegate and helpers
 
 - (void)searchBarTextDidBeginEditing:(DFSearchBar *)searchBar

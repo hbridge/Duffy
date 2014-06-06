@@ -24,5 +24,6 @@
 - (void)clearSearchBar;
 - (NSDictionary *)suggestionsStrings;
 - (void)setActive:(BOOL)visible animated:(BOOL)animated;
+- (BOOL)isShowingDefaultQuery;
 
 @end

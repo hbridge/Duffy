@@ -29,6 +29,7 @@
 #import "DFPeanutSearchAdapter.h"
 #import "DFPeanutSearchObject.h"
 #import "DFSearchNoResultsView.h"
+#import "UICollectionView+DFExtras.h"
 
 @interface DFSearchViewController ()
 
@@ -79,6 +80,10 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
     self.searchAdapter = [[DFPeanutSearchAdapter alloc] init];
   
     [self registerForKeyboardNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(cameraRollUpdated:)
+                                                 name:DFPhotoStoreCameraRollUpdatedNotificationName
+                                               object:nil];
   }
   return self;
 }
@@ -91,7 +96,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   [self configureSearchBarController];
   self.automaticallyAdjustsScrollViewInsets = YES;
   
-  [self loadDefaultSearch];
+  [self loadDefaultSearchAndFetchNewResults:YES scrollToBottom:YES];
 }
 
 - (void)configureSearchBarController
@@ -170,15 +175,17 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   self.searchResultsTableView.contentInset = UIEdgeInsetsMake(self.topLayoutGuide.length, 0, 0, 0);
 }
 
-- (void)loadDefaultSearch
+- (void)loadDefaultSearchAndFetchNewResults:(BOOL)fetchNewResults scrollToBottom:(BOOL)scrollToBottom
 {
-  [self executeSearchForQuery:EverythingSearchQuery reverseResults:YES];
+  if (fetchNewResults) {
+    [self executeSearchForQuery:EverythingSearchQuery reverseResults:YES];
+  }
   [self updateRecentUnuploadedPhotos];
-    [self loadCachedDefaultQuery];
+  [self loadCachedDefaultQuery];
   self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self scrollToBottom];
+    if (scrollToBottom) [self scrollToBottom];
   });
 }
 
@@ -203,7 +210,8 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
     }
   }
   
-  self.recentUnuploadedPhotos = latestUnuploaded;
+  //the items are in date desc, make them asc
+  self.recentUnuploadedPhotos = [[latestUnuploaded reverseObjectEnumerator] allObjects];
 }
 
 - (void)searchBarControllerSearchBegan:(DFSearchBarController *)searchBarController
@@ -218,7 +226,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
 
 - (void)searchBarControllerSearchCleared:(DFSearchBarController *)searchBarController
 {
-  [self loadDefaultSearch];
+  [self loadDefaultSearchAndFetchNewResults:YES scrollToBottom:YES];
   [self updateUIForSearchBarHasFocus:NO];
 }
 
@@ -228,7 +236,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
     [self showSettings];
   } else if ([query isEqualToString:@""] || [[query lowercaseString]
                                                isEqualToString:[self.searchBarController.defaultQuery lowercaseString]]) {
-    [self loadDefaultSearch];
+    [self loadDefaultSearchAndFetchNewResults:YES scrollToBottom:YES];
   } else {
     [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
     [self updateUIForSearchBarHasFocus:NO];
@@ -572,6 +580,15 @@ NSString *const RecentPhotosSectionName = @"Recent photos (not uploaded)";
 - (BOOL)prefersStatusBarHidden
 {
   return self.hideStatusBar;
+}
+
+#pragma mark - Notification handlers
+
+- (void)cameraRollUpdated:(NSNotification *)note
+{
+  if ([self.searchBarController isShowingDefaultQuery]) {
+    [self loadDefaultSearchAndFetchNewResults:NO scrollToBottom:NO];
+  }
 }
 
 
