@@ -215,6 +215,7 @@ def main(argv):
                     logging.error("Back from sleep, trying to reconnect")
                     context.destroy()
                     context, socket_send, socket_recv = initClassifier()
+                    logging.info("Got back from init:  %s %s %s" % context, socket_send, socket_recv)
         else:
             time.sleep(5)
 
