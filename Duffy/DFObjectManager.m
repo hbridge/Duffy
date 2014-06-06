@@ -21,6 +21,7 @@ static NSMutableSet *registeredAdapters;
 {
     RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:[[DFUser currentUser] apiURL]];
     [RKObjectManager setSharedManager:objectManager];
+  [[objectManager HTTPClient] setDefaultHeader:@"Accept-Encoding" value:@"gzip, deflate"];
     
     registeredAdapters = [[NSMutableSet alloc] init];
 }
