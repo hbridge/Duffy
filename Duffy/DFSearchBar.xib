@@ -42,12 +42,13 @@
                     </connections>
                 </button>
                 <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NNO-gn-7DZ">
-                    <rect key="frame" x="272" y="17" width="48" height="30"/>
+                    <rect key="frame" x="260" y="17" width="60" height="30"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
-                        <constraint firstAttribute="width" constant="48" id="5Dm-cL-xWC"/>
+                        <constraint firstAttribute="width" constant="60" id="YSh-CL-ckO"/>
                         <constraint firstAttribute="height" constant="30" id="wQT-HK-jgJ"/>
                     </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="18"/>
                     <state key="normal" title="Cancel">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
@@ -59,11 +60,11 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <gestureRecognizers/>
             <constraints>
-                <constraint firstAttribute="centerY" secondItem="NNO-gn-7DZ" secondAttribute="centerY" id="8Kx-85-ic5"/>
                 <constraint firstItem="xPT-ud-47f" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="GlK-N8-eMa"/>
                 <constraint firstAttribute="centerY" secondItem="4Cf-oq-Jsq" secondAttribute="centerY" id="HVp-5N-KqD"/>
                 <constraint firstItem="4Cf-oq-Jsq" firstAttribute="leading" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="900" constant="-35" id="Uxv-AV-GXx"/>
                 <constraint firstAttribute="trailing" secondItem="4Cf-oq-Jsq" secondAttribute="trailing" id="aJ6-eo-Y6b"/>
+                <constraint firstItem="0FW-ga-xjZ" firstAttribute="centerY" secondItem="NNO-gn-7DZ" secondAttribute="centerY" id="k9a-lZ-zrD"/>
                 <constraint firstAttribute="centerY" secondItem="0FW-ga-xjZ" secondAttribute="centerY" id="s0J-UA-Prm"/>
                 <constraint firstAttribute="trailing" secondItem="NNO-gn-7DZ" secondAttribute="trailing" id="tAx-UH-zIc"/>
                 <constraint firstItem="0FW-ga-xjZ" firstAttribute="leading" secondItem="xPT-ud-47f" secondAttribute="trailing" constant="8" id="tMX-Ge-Vyo"/>

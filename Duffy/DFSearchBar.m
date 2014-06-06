@@ -25,7 +25,10 @@
   [self.textField addTarget:self action:@selector(textChanged:)
            forControlEvents:UIControlEventEditingChanged];
   self.text = self.defaultQuery;
-  self.textField.font = [UIFont fontWithName:@"ProximaNova-Regular" size:19.0];
+  UIFont *newFont = [UIFont fontWithName:@"ProximaNova-Regular" size:19.0];
+  self.textField.font = newFont;
+  self.cancelButton.titleLabel.font = newFont;
+  [self.cancelButton sizeToFit];
 }
 
 - (void)setText:(NSString *)text
