@@ -208,7 +208,6 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
     NSArray *unuploadedPhotosDateDesc = [unuploadedPhotos photosByDateAscending:NO];
     DFPhoto *latestUploadedPhoto = [[DFPhotoStore sharedStore] mostRecentUploadedThumbnail];
     
-    
     NSUInteger idx = 0;
     while (idx < unuploadedPhotosDateDesc.count
       && [[unuploadedPhotosDateDesc[idx] creationDate]
