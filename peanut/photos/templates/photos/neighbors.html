@@ -2,6 +2,54 @@
 
 <head>
 	<title>Neighbors</title> 
+	<style>
+		html, body { 
+			padding: 0; margin: 0; 
+			font-family: sans-serif;
+		}
+		.ui-section {
+			float:left;
+			width:100%;
+			padding-bottom:4px;
+		}
+		.ui-section-header {
+			float: left;
+			font-size: 14px;
+			width:100%;
+			background-color: rgba(239, 239, 239, 0.3);
+			padding: 0px 4px 0px 4px;
+		}
+		.ui-sec-head-lhs {
+			float:left;
+			width: 49%;
+		}
+		.ui-sec-head-title {
+			float:left;
+			font-size: 14px;
+			width: 100%;
+		}
+		.ui-sec-head-names {
+
+		}
+		.ui-sec-head-rhs {
+			float:left;
+			text-align: right;
+			width: 49%;
+			font-size: 12px;
+		}
+
+		.ui-imageblock {
+			float:left;
+			padding: 0px 2px 0px 0px;
+		}
+		.ui-image {
+			float:left;
+		}
+		.ui-userid {
+			float: clear;
+			font-size: 10px;
+		}
+	</style>
 	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
 	<script>
 		function getURLParameter(name) {
@@ -21,20 +69,20 @@
 				date = ""
 				$.each(cluster, function( i, photo) {
 					thumbUrl = "/user_data/" + photo.user + "/" + photo.thumb_filename
-					img = "<img src='" + thumbUrl + "' alt='" + photo.user + "'/>"
-					html = "<table style='display: inline'><tr><td>" + img + "</td></tr><tr><td>" + photo.user + "</td></tr></table>";
+					img = "<img height='78px' width='78px' src='" + thumbUrl + "' alt='" + photo.user + "'/>"
+					html = "<div class='ui-imageblock'><div class='ui-image' title='" + photo.user + "'>" + img + "</div><div class='ui-userid'>" + photo.user + "</div></div>";
 
 					row += html
 					city = photo.location_city
-					d = new Date(photo.time_taken * 1000);
+					d = new Date(photo.time_taken * 1000); // TODO: Need to change this to format Mar 27, 2014
 					time = d.toLocaleDateString("en-US")
 				});
-				$("<div>"+ city + "<br/>" + time + "<br/>" + row + "</div><br><br><br><br><br><br>").appendTo( "#images" );
+				$("<div class='ui-section'><div class='ui-section-header'><div class='ui-sec-head-lhs'><div class='ui-sec-head-title'>"+ city + "</div><div class='ui-sec-head-names'>[Insert names of people in group. ex: Henry, Derek]</div></div><div class='ui-sec-head-rhs'>" + time + "</div></div>" + row + "</div>").appendTo( "#images" );
 		
 			});
 		});
 	</script>
-</head> 
+</head>
 
 <body> 
 <div id="images"/>
