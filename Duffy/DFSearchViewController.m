@@ -87,6 +87,10 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
                                              selector:@selector(cameraRollUpdated:)
                                                  name:DFPhotoStoreCameraRollUpdatedNotificationName
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(showNavBar)
+                                                 name:UIApplicationWillEnterForegroundNotification
+                                               object:nil];
   }
   return self;
 }
@@ -144,8 +148,8 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   [super viewWillAppear:animated];
   self.isViewTransitioning = YES;
   self.hideStatusBar = NO;
-  [self showNavBar];
   [self.navigationController setNavigationBarHidden:NO animated:YES];
+  [self showNavBar];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -502,7 +506,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   if (self.isViewTransitioning) return;
   CGRect frame = self.navigationController.navigationBar.frame;
   CGFloat size = frame.size.height;
-  CGFloat framePercentageHidden = ((20 - frame.origin.y) / (frame.size.height - 1));
+  
   CGFloat scrollOffset = scrollView.contentOffset.y;
   CGFloat scrollDiff = scrollOffset - self.previousScrollViewYOffset;
   CGFloat scrollHeight = scrollView.frame.size.height;
@@ -517,6 +521,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   }
   
   [self.navigationController.navigationBar setFrame:frame];
+  CGFloat framePercentageHidden = ((20 - frame.origin.y) / (frame.size.height - 1));
   [self updateBarButtonItems:(1 - framePercentageHidden)];
   self.previousScrollViewYOffset = scrollOffset;
 }
