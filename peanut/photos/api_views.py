@@ -470,7 +470,7 @@ def searchV2(request):
 			searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit = num*2)
 			docResults = None
 
-		if (len(searchResults) > 0):	
+		if (len(searchResults) > 0 or len(docResults) > 0):	
 			# Group into months
 			monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults, docResults=docResults)
 
