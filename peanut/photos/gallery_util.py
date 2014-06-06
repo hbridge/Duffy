@@ -106,7 +106,7 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 
 	TODO (Derek): move this up and removed unused code
 """
-def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD):
+def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, docResults=None):
 	photoIds = list()
 	for solrPhoto in solrPhotoSet:
 		photoIds.append(solrPhoto.photoId)
@@ -116,13 +116,27 @@ def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAU
 	
 	clusters = getClusters(solrPhotoSet, threshold, dupThreshold, simCaches)
 
+	# process docstack results first
+	docs = dict()
+	if (docResults):
+		f = lambda x: x.timeTaken.strftime('%b %Y')
+		results = list()
+		for key, items in groupby(docResults, f):
+			docs[key] = list()
+			for item in items:
+				docs[key].append({'photo': item, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)})
+
+	# process regular photos next
 	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
 	results = list()
 	for key, items in groupby(clusters, f):
-		monthEntry = {'title': key, 'clusters': list()}
+		monthEntry = {'title': key, 'clusters': list(), 'docs': list()}
 		for item in items:
 			monthEntry['clusters'].append(item)
+		if key in docs:
+			monthEntry['docs'].extend(docs[key])
 		results.append(monthEntry)
+	
 	return results
 
 """

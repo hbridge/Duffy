@@ -43,7 +43,7 @@ def getNattyInfo(query):
 	Send a request to the Solr search index.  This filters by the userId and grabs everything
 	after the requested startDate
 """
-def solrSearch(userId, startDate, query, reverse=False, limit=None, endDate=datetime.datetime.utcnow(), exclude=None):
+def solrSearch(userId, startDate, query, reverse=False, limit=None, endDate=datetime.datetime.utcnow(), exclude=None, operator='AND'):
 	searchResults = SearchQuerySet().all().filter(userId=userId)
 
 	if (startDate):
@@ -54,8 +54,11 @@ def solrSearch(userId, startDate, query, reverse=False, limit=None, endDate=date
 	else:
 		searchResults = searchResults.exclude(timeTaken__gte=endDate.strftime("%Y-%m-%dT%H:%M:%SZ"))
 
-	for word in query.split():
-		searchResults = searchResults.filter(content__contain=word)
+	if (operator == 'AND'):
+		for word in query.split():
+			searchResults = searchResults.filter(content__contain=word)
+	else:
+		searchResults = searchResults.filter(content__in=query.split())
 
 	if exclude:
 		for word in exclude.split():

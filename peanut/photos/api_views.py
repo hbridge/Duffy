@@ -451,6 +451,7 @@ def searchV2(request):
 		num = form.cleaned_data['num']
 		# Reversed
 		r = form.cleaned_data['r']
+		docstack = form.cleaned_data['docstack']
 		
 		# See if out query has a time associated within it
 		(nattyStartDate, newQuery) = search_util.getNattyInfo(query)
@@ -462,7 +463,7 @@ def searchV2(request):
 				startDateTime = datetime.date(1901,1,1)
 		
 		# Get a search for 2 times the number of entries we want to return, we will filter it down loater
-		if (query == "''"):
+		if (query == "''" and docstack):
 			searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit=num*2, exclude='docs screenshot')
 			docResults = search_util.solrSearch(user_id, startDateTime, 'docs screenshot', reverse = r, limit=num, operator='OR')
 		else:
