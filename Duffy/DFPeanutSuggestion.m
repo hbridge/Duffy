@@ -13,6 +13,7 @@
 
 @synthesize name;
 @synthesize count;
+@synthesize count_phrase;
 @synthesize order;
 
 
@@ -27,7 +28,7 @@
 
 + (NSArray *)attributes
 {
-  return @[@"name", @"count", @"order"];
+  return @[@"name", @"count", @"order", @"count_phrase"];
 }
 
 + (RKObjectMapping *)objectMapping

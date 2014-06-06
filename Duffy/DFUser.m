@@ -107,7 +107,8 @@ static DFUser *currentUser;
 {
     _userID = userID;
     if (self == [DFUser currentUser]) {
-        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedLongLong:userID] forKey:DFUserIDUserDefaultsKey];
+        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedLongLong:userID]
+                                                  forKey:DFUserIDUserDefaultsKey];
     }
 }
 
@@ -129,7 +130,8 @@ static DFUser *currentUser;
 
 - (void)setUserOverriddenServerPortString:(NSString *)userOverriddenServerPortString
 {
-    [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerPortString forKey:DFOverrideServerPortKey];
+  [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerPortString
+                                            forKey:DFOverrideServerPortKey];
   [[NSUserDefaults standardUserDefaults] synchronize];
 }
 

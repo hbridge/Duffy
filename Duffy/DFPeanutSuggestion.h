@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) NSString *name;
 @property (nonatomic) unsigned int count;
+@property (nonatomic, retain) NSString *count_phrase;
 @property (nonatomic) unsigned int order;
 
 + (RKObjectMapping *)objectMapping;

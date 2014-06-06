@@ -359,7 +359,7 @@ typedef enum {
   
   UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"DFSearchResultTableViewCell"];
   cell.textLabel.text = peanutSuggestion.name ? peanutSuggestion.name : @"None";
-  cell.detailTextLabel.text = [NSString stringWithFormat:@"%d", peanutSuggestion.count];
+  cell.detailTextLabel.text = peanutSuggestion.count_phrase;
   cell.textLabel.font = [cell.textLabel.font fontWithSize:SearchResultsCellFontSize];
   return cell;
 }
