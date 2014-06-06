@@ -1,0 +1,63 @@
+# Duffy Changes
+
+## Jun 6th, 2014
+
+### New
+
+We've been focused on making Duffy a full-fledged gallery replacement with awesome search.  If there's something that's keeping you from using Duffy instead of the default "Photos" app, we want to hear from you!
+
+- Speed speed speed! The new Duffy has been shown to be a bajillion times faster in independent lab evaluations.
+- A fresh coat of paint: cleaner look, bigger image previews, better animations
+- Recent photos: all your recent photos appear at the bottom of "Everything" even if they haven't been uploaded
+- Cleaned up autocomplete results: no more wacky thing suggestions like "nutriment"
+- Offline: "Everything" now works offline.  Searches still require a network connection
+
+## May 29th, 2014
+
+### New
+- New app name to make clear that it's a Photos app replacement
+
+### Bugs fixed
+- Autocomplete crashes
+- Missing thumbnails
+
+## May 28th, 2014
+
+### New
+- Autocomplete: we suggest things and places we’ve found in your photos as you type
+
+## May 22nd, 2014
+
+### New
+
+- Unified search/gallery view. No more tabs! Default view is gallery and search bar is always at top.
+- Settings moved: type “settings” in the search field. We know. We’ll find a better home for it eventually.
+- First run tweaks to make it more likely we’ll have good suggestions.
+- New cluster indicator
+
+## May 13th, 2014
+
+### New
+
+- More upload tweaks: uploads start faster
+- Results should return faster
+- Better grouping of similar photos
+
+### Bugs fixed
+
+- Duffy resets itself when it’s out of sync with the server
+
+##May 9th, 2014
+
+###New
+
+- Much faster uploads! We first upload smaller versions of your photos so you can start searching almost immediately.
+- Similar photos are clustered in search results
+- Tapping on a photo in search results is faster, and you can swipe between photos in your results.
+- See how many results are there for different categories before you search
+
+### Known issues
+
+- Counts for “Things” category searches are always 0
+- Can’t search for “Things” until full photos are uploaded.
+- Searching for “People” doesn’t work

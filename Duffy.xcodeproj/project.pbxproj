@@ -150,6 +150,7 @@
 		5A28CEB71940FEFD00A2CBD3 /* DFSearchNoResultsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSearchNoResultsView.xib; sourceTree = "<group>"; };
 		5A28CEB91942165200A2CBD3 /* UICollectionView+DFExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UICollectionView+DFExtras.h"; sourceTree = "<group>"; };
 		5A28CEBA1942165200A2CBD3 /* UICollectionView+DFExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UICollectionView+DFExtras.m"; sourceTree = "<group>"; };
+		5A28CEBC194233D600A2CBD3 /* ChangeLog.md */ = {isa = PBXFileReference; lastKnownFileType = text; name = ChangeLog.md; path = Duffy/ChangeLog.md; sourceTree = "<group>"; };
 		5A30E4D718D3AC5F00E41DBC /* DFSearchViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSearchViewController.h; sourceTree = "<group>"; };
 		5A30E4D818D3AC5F00E41DBC /* DFSearchViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSearchViewController.m; sourceTree = "<group>"; };
 		5A45E9BB18D9F7B8002663EB /* DFPhotoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoCollection.h; sourceTree = "<group>"; };
@@ -678,6 +679,7 @@
 				5ADB24B9189985590016CA02 /* Frameworks */,
 				5ADB24B8189985590016CA02 /* Products */,
 				514DAA1BD6B44149AD7F0216 /* Pods.xcconfig */,
+				5A28CEBC194233D600A2CBD3 /* ChangeLog.md */,
 			);
 			sourceTree = "<group>";
 		};
