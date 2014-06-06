@@ -30,6 +30,8 @@
 
 static const CGFloat DEFAULT_PHOTO_SQUARE_SIZE = 105;
 static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
+static const CGFloat SectionHeaderWidth = 320;
+static const CGFloat SectionHeaderHeight = 48;
 
 - (id)init
 {
@@ -61,7 +63,7 @@ static const CGFloat DEFAULT_PHOTO_SPACING = 2.5;
   self.flowLayout.minimumLineSpacing = self.itemSpacing;
   [self.collectionView setCollectionViewLayout:self.flowLayout];
   self.collectionView.contentInset = UIEdgeInsetsMake(self.itemSpacing, 0, self.itemSpacing, 0);
-  self.flowLayout.headerReferenceSize = CGSizeMake(320, 40);
+  self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
   
   
   // register cell type
