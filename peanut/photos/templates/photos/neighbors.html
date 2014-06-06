@@ -13,6 +13,7 @@
 		userId = getURLParameter("user_id")
 		url = "/api/neighbors?user_id=" + userId
 
+		console.log("Sending request to " + url)
 		$.get(url, function( data ) {
 			$.each( data.neighbors, function( i, cluster ) {
 				row = ""

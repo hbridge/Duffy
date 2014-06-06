@@ -637,6 +637,19 @@ def getClusterForPhoto(photo, clusters):
 			return cluster
 	return None
 
+def removeDups(seq, idFunction=None): 
+   # order preserving
+   if idFunction is None:
+	   def idFunction(x): return x
+   seen = {}
+   result = []
+   for item in seq:
+	   id = idFunction(item)
+	   if id in seen: continue
+	   seen[id] = 1
+	   result.append(item)
+   return result
+
 def neighbors(request):
 	response = dict({'result': True})
 	data = getRequestData(request)
@@ -657,20 +670,31 @@ def neighbors(request):
 		cluster = getClusterForPhoto(neighbor.photo_1, clusters)
 
 		if (cluster):
+			# If the first photo is in a cluster, see if the other photo is in there already
+			#   if it isn't, and this isn't a dup, then add photo_2 in
 			if neighbor.photo_2 not in cluster:
 				cluster.append(SmallPhotoSerializer(neighbor.photo_2).data)
 		else:
+			# If the first photo isn't in a cluster, see if the second one is
 			cluster = getClusterForPhoto(neighbor.photo_2, clusters)
 
 			if (cluster):
+				# If the second photo is in a cluster and this isn't a dup then add in
 				cluster.append(SmallPhotoSerializer(neighbor.photo_1).data)
 			else:
+				# If neither photo is in a cluster, we create a new one
 				clusters.append([SmallPhotoSerializer(neighbor.photo_1).data, SmallPhotoSerializer(neighbor.photo_2).data])
 
 	sortedClusters = list()
 	for cluster in clusters:
 		sortedCluster = sorted(cluster, key=lambda x: x['time_taken'])
-		sortedClusters.append(sortedCluster)
+
+		# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
+		#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
+		#   So using location_city instead.  This means we might cut out some photos that were taken
+		#   at the exact same time in the same city
+		uniqueCluster = removeDups(sortedCluster, lambda x: (x['time_taken'], x['location_city']))
+		sortedClusters.append(uniqueCluster)
 
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedClusters = sorted(sortedClusters, key=lambda x: x[0]['time_taken'])
