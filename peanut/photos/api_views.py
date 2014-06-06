@@ -285,6 +285,10 @@ def autocomplete(request):
 		order += 1
 		results.append(entry)
 
+	if ('settings'.startswith(query.lower())):
+		entry = {'name': 'settings', 'count': 1, 'count_phrase': 1, 'order': order}
+		results.append(entry)
+
 	# Make sure you return a JSON object, not a bare list.
 	# Otherwise, you could be vulnerable to an XSS attack.
 	responseJson = json.dumps({
