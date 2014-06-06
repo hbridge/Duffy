@@ -66,6 +66,7 @@ NSString *const EverythingSearchQuery = @"''";
 
 NSString *const DFObjectsKey = @"DFObjects";
 NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEverythingResultsJSON";
+NSString *const RecentPhotosSectionName = @"Recent photos";
 
 @implementation DFSearchViewController
 
@@ -294,8 +295,6 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
 }
-
-NSString *const RecentPhotosSectionName = @"Recent photos (not uploaded)";
 
 - (void)setSectionNames:(NSArray *)sectionNames
          itemsBySection:(NSDictionary *)photosBySection
@@ -540,14 +539,17 @@ NSString *const RecentPhotosSectionName = @"Recent photos (not uploaded)";
 
 - (void)updateBarButtonItems:(CGFloat)alpha
 {
-  [self.navigationItem.leftBarButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem* item, NSUInteger i, BOOL *stop) {
+  [self.navigationItem.leftBarButtonItems enumerateObjectsUsingBlock:
+   ^(UIBarButtonItem* item, NSUInteger i, BOOL *stop) {
     item.customView.alpha = alpha;
   }];
-  [self.navigationItem.rightBarButtonItems enumerateObjectsUsingBlock:^(UIBarButtonItem* item, NSUInteger i, BOOL *stop) {
+  [self.navigationItem.rightBarButtonItems enumerateObjectsUsingBlock:
+   ^(UIBarButtonItem* item, NSUInteger i, BOOL *stop) {
     item.customView.alpha = alpha;
   }];
   self.navigationItem.titleView.alpha = alpha;
-  self.navigationController.navigationBar.tintColor = [self.navigationController.navigationBar.tintColor colorWithAlphaComponent:alpha];
+  self.navigationController.navigationBar.tintColor =
+  [self.navigationController.navigationBar.tintColor colorWithAlphaComponent:alpha];
 }
 
 - (void)animateNavBarTo:(CGFloat)y
