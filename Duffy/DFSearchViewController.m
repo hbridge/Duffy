@@ -50,7 +50,7 @@
 @property (nonatomic, retain) NSArray *tryAgainViews;
 @property (nonatomic, retain) NSString *tryAgainSearchQuery;
 
-@property (nonatomic, retain) NSArray *recentUnuploadedPhotos;
+@property (nonatomic, retain) NSArray *recentPhotos;
 @property (nonatomic) BOOL isViewTransitioning;
 
 @end
@@ -68,6 +68,7 @@ NSString *const EverythingSearchQuery = @"''";
 NSString *const DFObjectsKey = @"DFObjects";
 NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEverythingResultsJSON";
 NSString *const RecentPhotosSectionName = @"Recent photos";
+NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 days
 
 @implementation DFSearchViewController
 
@@ -189,7 +190,7 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
   if (fetchNewResults) {
     [self executeSearchForQuery:EverythingSearchQuery reverseResults:YES];
   }
-  [self updateRecentUnuploadedPhotos];
+  [self updateRecentPhotos];
   [self loadCachedDefaultQuery];
   self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
@@ -198,28 +199,23 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
   });
 }
 
-- (void)updateRecentUnuploadedPhotos
+- (void)updateRecentPhotos
 {
-  NSMutableArray *latestUnuploaded = [[NSMutableArray alloc] init];
-  DFPhotoCollection *unuploadedPhotos = [[DFPhotoStore sharedStore]
-                                         photosWithThumbnailUploadStatus:NO
-                                         fullUploadStatus:NO];
-  if (unuploadedPhotos.photoSet.count  > 0) {
-    NSArray *unuploadedPhotosDateDesc = [unuploadedPhotos photosByDateAscending:NO];
-    DFPhoto *latestUploadedPhoto = [[DFPhotoStore sharedStore] mostRecentUploadedThumbnail];
-    
-    NSUInteger idx = 0;
-    while (idx < unuploadedPhotosDateDesc.count
-      && [[unuploadedPhotosDateDesc[idx] creationDate]
-            timeIntervalSinceDate:latestUploadedPhoto.creationDate] > 0)
-    {
-      [latestUnuploaded addObject:unuploadedPhotosDateDesc[idx]];
-      idx++;
-    }
+  DFPhotoCollection *cameraRoll = [[DFPhotoStore sharedStore] cameraRoll];
+  NSArray *allPhotosDateDesc = [cameraRoll photosByDateAscending:NO];
+  NSMutableArray *recentPhotos = [[NSMutableArray alloc] init];
+  
+  NSUInteger idx = 0;
+  while (idx < allPhotosDateDesc.count
+         && [[allPhotosDateDesc[idx] creationDate] timeIntervalSinceNow] > -RecentPhotosTimeInterval)
+  {
+    [recentPhotos addObject:allPhotosDateDesc[idx]];
+    idx++;
   }
   
+  
   //the items are in date desc, make them asc
-  self.recentUnuploadedPhotos = [[latestUnuploaded reverseObjectEnumerator] allObjects];
+  self.recentPhotos = [[recentPhotos reverseObjectEnumerator] allObjects];
 }
 
 - (void)searchBarControllerSearchBegan:(DFSearchBarController *)searchBarController
@@ -307,10 +303,10 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
          itemsBySection:(NSDictionary *)photosBySection
   showUnuploadedSection:(BOOL)showUnuploaded
 {
-  if (showUnuploaded && self.recentUnuploadedPhotos.count > 0) {
+  if (showUnuploaded && self.recentPhotos.count > 0) {
     sectionNames = [sectionNames arrayByAddingObject:RecentPhotosSectionName];
     NSMutableDictionary *newItemsBySection = photosBySection.mutableCopy;
-    newItemsBySection[RecentPhotosSectionName] = self.recentUnuploadedPhotos;
+    newItemsBySection[RecentPhotosSectionName] = self.recentPhotos;
     photosBySection = newItemsBySection;
   }
   
@@ -575,7 +571,7 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
 {
   if (self.navigationController.navigationBar.frame.origin.y < 0) {
     [self animateNavBarTo:20];
-    //[self updateBarButtonItems:1.0];
+    [self updateBarButtonItems:1.0];
   }
 }
 
