@@ -14,6 +14,7 @@
 DFSearchObjectType DFSearchObjectSection = @"section";
 DFSearchObjectType DFSearchObjectPhoto = @"photo";
 DFSearchObjectType DFSearchObjectCluster = @"cluster";
+DFSearchObjectType DFSearchObjectDocstack = @"docstack";
 
 
 

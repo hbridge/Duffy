@@ -385,18 +385,23 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
           [contiguousPhotoIDsToAdd addObject:@(searchObject.id)];
         }
         
-        if ([searchObject.type isEqualToString:DFSearchObjectCluster]) {
+        if ([searchObject.type isEqualToString:DFSearchObjectCluster]
+            || [searchObject.type isEqualToString:DFSearchObjectDocstack]) {
           NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore]
                                                 photosWithPhotoIDs:contiguousPhotoIDsToAdd
                                                 retainOrder:YES];
           [sectionItems addObjectsFromArray:previousContitguousPhotos];
           [contiguousPhotoIDsToAdd removeAllObjects];
           
-          DFPhotoCollection *clusterCollection = [[DFPhotoCollection alloc]
+          DFPhotoCollection *collection = [[DFPhotoCollection alloc]
                                                   initWithPhotos:[self photosForCluster:searchObject]];
-          [sectionItems addObject:clusterCollection];
+          
+          if ([searchObject.type isEqualToString:DFSearchObjectDocstack]) {
+            collection.thumbnail = [UIImage imageNamed:@"Icons/DocStackCell"];
+          }
+          
+          [sectionItems addObject:collection];
         }
-        
       }
       
       NSArray *photos = [[DFPhotoStore sharedStore]

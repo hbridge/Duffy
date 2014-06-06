@@ -18,6 +18,7 @@ typedef NSString *const DFSearchObjectType;
 extern DFSearchObjectType DFSearchObjectSection;
 extern DFSearchObjectType DFSearchObjectPhoto;
 extern DFSearchObjectType DFSearchObjectCluster;
+extern DFSearchObjectType DFSearchObjectDocstack;
 
 
 @property (nonatomic, retain) DFSearchObjectType type;
