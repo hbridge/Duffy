@@ -240,7 +240,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
 
 - (void)searchBarController:(DFSearchBarController *)searchBarController searchExecutedWithQuery:(NSString *)query
 {
-  if ([[query lowercaseString] isEqualToString:@"settings"]) {
+  if ([DFSearchViewController isSettingsQuery:query]) {
     [self showSettings];
   } else if ([query isEqualToString:@""] || [[query lowercaseString]
                                                isEqualToString:[self.searchBarController.defaultQuery lowercaseString]]) {
@@ -249,6 +249,14 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
     [self executeSearchForQuery:self.searchBar.text reverseResults:NO];
     [self updateUIForSearchBarHasFocus:NO];
   }
+}
+
++ (BOOL)isSettingsQuery:(NSString *)query
+{
+  NSString *regularizedString = [[query lowercaseString]
+                                 stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+  
+  return [regularizedString isEqualToString:@"settings"];
 }
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
