@@ -2,9 +2,9 @@
 
 ## Jun 6th, 2014
 
-### New
-
 We've been focused on making Duffy a full-fledged gallery replacement with awesome search.  If there's something that's keeping you from using Duffy instead of the default "Photos" app, we want to hear from you!
+
+### New
 
 - Speed speed speed! The new Duffy has been shown to be a bajillion times faster in independent lab evaluations.
 - A fresh coat of paint: cleaner look, bigger image previews, better animations
