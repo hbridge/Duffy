@@ -10,6 +10,8 @@ We've been focused on making Duffy a full-fledged gallery replacement with aweso
 - A fresh coat of paint: cleaner look, bigger image previews, better animations
 - Recent photos: all your recent photos appear at the bottom of "Everything" even if they haven't been uploaded
 - Cleaned up autocomplete results: no more wacky thing suggestions like "nutriment"
+- New "No results" page if you search for something with no results
+- Fuzzy suggestion counts: we now return 2+, 50+ approximations instead of an exact (but often incorrect) count
 - Offline: "Everything" now works offline.  Searches still require a network connection
 
 ## May 29th, 2014
