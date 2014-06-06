@@ -424,7 +424,11 @@ def turnGroupsIntoSections(monthGroupings, num):
 			if count == num:
 				result.append(section)
 				return lastDate, result
-				
+		if (len(monthGroup['docs']) > 0):
+			docObj = {'type': 'docstack', 'title': 'Your docs', 'objects': list()}
+			for entry in monthGroup['docs']:
+				docObj['objects'].append({'type': 'photo', 'id': entry['photo'].photoId})
+			section['objects'].append(docObj)
 		result.append(section)
 	return lastDate, result
 	
@@ -458,11 +462,16 @@ def searchV2(request):
 				startDateTime = datetime.date(1901,1,1)
 		
 		# Get a search for 2 times the number of entries we want to return, we will filter it down loater
-		searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit = num*2)
+		if (query == "''"):
+			searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit=num*2, exclude='docs screenshot')
+			docResults = search_util.solrSearch(user_id, startDateTime, 'docs screenshot', reverse = r, limit=num, operator='OR')
+		else:
+			searchResults = search_util.solrSearch(user_id, startDateTime, newQuery, reverse = r, limit = num*2)
+			docResults = None
 
 		if (len(searchResults) > 0):	
 			# Group into months
-			monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults)
+			monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults, docResults=docResults)
 
 			# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
 			#   which is the key for the next call
