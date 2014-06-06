@@ -19,7 +19,7 @@
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, weak) id<DFSearchBarControllerDelegate> delegate;
 @property (readonly, nonatomic, retain) NSMutableDictionary *suggestionsBySection;
-@property (readonly, nonatomic, retain) NSString *defaultQuery;
+@property (nonatomic, retain) NSString *defaultQuery;
 
 - (void)clearSearchBar;
 - (NSDictionary *)suggestionsStrings;

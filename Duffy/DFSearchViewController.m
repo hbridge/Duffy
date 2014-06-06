@@ -598,6 +598,8 @@ NSString *const RecentPhotosSectionName = @"Recent photos";
 
 - (void)cameraRollUpdated:(NSNotification *)note
 {
+  DDLogInfo(@"DFSearchViewController cameraRollUpdated.  Current query:%@ isShowingDefaultQuery:%@",
+            self.searchBar.text, @([self.searchBarController isShowingDefaultQuery]));
   if ([self.searchBarController isShowingDefaultQuery]) {
     [self loadDefaultSearchAndFetchNewResults:NO scrollToBottom:NO];
   }

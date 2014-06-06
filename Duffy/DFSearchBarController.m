@@ -75,6 +75,7 @@ typedef enum {
     _autocompleteAdapter = [[DFAutocompleteAdapter alloc] init];
     self.autocompleteResultsByQuery = [[NSMutableDictionary alloc] init];
     self.autocompleteFetchDateByQuery = [[NSMutableDictionary alloc] init];
+    self.defaultQuery = SEARCH_DEFAULT_QUERY;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(uploadStatusChanged:)
                                                  name:DFUploadStatusNotificationName
@@ -98,7 +99,7 @@ typedef enum {
   _searchBar = searchBar;
   searchBar.delegate = self;
   searchBar.placeholder = SEARCH_PLACEHOLDER;
-  searchBar.defaultQuery = SEARCH_DEFAULT_QUERY;
+  searchBar.defaultQuery =_defaultQuery;
   [self updateUIForSearchBarHasFocus:NO showingDefaultQuery:YES];
 }
 
@@ -118,7 +119,6 @@ typedef enum {
   self.searchBar.text = SEARCH_DEFAULT_QUERY;
 }
 
-
 - (void)setActive:(BOOL)visible animated:(BOOL)animated
 {
   
@@ -127,7 +127,14 @@ typedef enum {
 
 - (BOOL)isShowingDefaultQuery
 {
-  return (self.searchBar.text == self.defaultQuery || [self.searchBar.text isEqualToString:@""]);
+  return ([self.searchBar.text isEqualToString:self.defaultQuery]
+          || [self.searchBar.text isEqualToString:@""]);
+}
+
+- (void)setDefaultQuery:(NSString *)defaultQuery
+{
+  _defaultQuery = defaultQuery;
+  self.searchBar.defaultQuery = defaultQuery;
 }
 
 #pragma mark - Search Bar delegate and helpers
