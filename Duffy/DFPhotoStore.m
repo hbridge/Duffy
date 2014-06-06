@@ -263,6 +263,38 @@ static int const FetchStride = 500;
   return [DFPhotoStore photoWithPhotoID:photoID inContext:[self managedObjectContext]];
 }
 
+
+- (DFPhoto *)mostRecentUploadedThumbnail
+{
+  
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+  request.entity = entity;
+  
+  request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
+  request.predicate = [NSPredicate predicateWithFormat:@"upload157Date != nil"];
+  request.fetchLimit = 1;
+  
+  NSError *error;
+  NSArray *result = [[self managedObjectContext] executeFetchRequest:request error:&error];
+  if (!result) {
+    [NSException raise:@"Could fetch photos"
+                format:@"Error: %@", [error localizedDescription]];
+  }
+  
+  if (!result.count) return nil;
+  
+  return [result firstObject];
+}
+
+- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
+                                      fullUploadStatus:(BOOL)isFullPhotoUploaded
+{
+  return [DFPhotoStore photosWithThumbnailUploadStatus:isThumbnailUploaded
+                                      fullUploadStatus:isFullPhotoUploaded
+                                             inContext:[self managedObjectContext]];
+}
+
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
                                       fullUploadStatus:(BOOL)isFullPhotoUploaded
                                              inContext:(NSManagedObjectContext *)context;

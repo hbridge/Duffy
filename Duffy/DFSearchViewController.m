@@ -49,6 +49,8 @@
 @property (nonatomic, retain) NSArray *tryAgainViews;
 @property (nonatomic, retain) NSString *tryAgainSearchQuery;
 
+@property (nonatomic, retain) NSArray *recentUnuploadedPhotos;
+
 @end
 
 const unsigned int MaxResultsPerSearchRequest = 5000;
@@ -147,6 +149,11 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
+- (void)viewWillDisappear:(BOOL)animated
+{
+  [self showNavBar];
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
@@ -166,12 +173,37 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
 - (void)loadDefaultSearch
 {
   [self executeSearchForQuery:EverythingSearchQuery reverseResults:YES];
-  [self loadCachedDefaultQuery];
+  [self updateRecentUnuploadedPhotos];
+    [self loadCachedDefaultQuery];
   self.navigationItem.title = self.searchBarController.defaultQuery;
   [self updateUIForSearchBarHasFocus:NO];
   dispatch_async(dispatch_get_main_queue(), ^{
     [self scrollToBottom];
   });
+}
+
+- (void)updateRecentUnuploadedPhotos
+{
+  NSMutableArray *latestUnuploaded = [[NSMutableArray alloc] init];
+  DFPhotoCollection *unuploadedPhotos = [[DFPhotoStore sharedStore]
+                                         photosWithThumbnailUploadStatus:NO
+                                         fullUploadStatus:NO];
+  if (unuploadedPhotos.photoSet.count  > 0) {
+    NSArray *unuploadedPhotosDateDesc = [unuploadedPhotos photosByDateAscending:NO];
+    DFPhoto *latestUploadedPhoto = [[DFPhotoStore sharedStore] mostRecentUploadedThumbnail];
+    
+    
+    NSUInteger idx = 0;
+    while (idx < unuploadedPhotosDateDesc.count
+      && [[unuploadedPhotosDateDesc[idx] creationDate]
+            timeIntervalSinceDate:latestUploadedPhoto.creationDate] > 0)
+    {
+      [latestUnuploaded addObject:unuploadedPhotosDateDesc[idx]];
+      idx++;
+    }
+  }
+  
+  self.recentUnuploadedPhotos = latestUnuploaded;
 }
 
 - (void)searchBarControllerSearchBegan:(DFSearchBarController *)searchBarController
@@ -226,19 +258,24 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
         NSArray *sectionNames = [DFSearchViewController topLevelSectionNamesForPeanutObjects:peanutObjects];
         NSDictionary *itemsBySection = [DFSearchViewController itemsBySectionForPeanutObjects:peanutObjects];
         
-        [self setSectionNames:sectionNames itemsBySection:itemsBySection];
-        [self.collectionView reloadData];
-        
         if ([query isEqualToString:EverythingSearchQuery]) {
+          [self setSectionNames:sectionNames
+                 itemsBySection:itemsBySection
+          showUnuploadedSection:YES];
           [self saveDefaultPeanutObjects:peanutObjects];
           dispatch_async(dispatch_get_main_queue(), ^{
             [self scrollToBottom];
           });
         } else {
+          [self setSectionNames:sectionNames
+                 itemsBySection:itemsBySection
+          showUnuploadedSection:NO];
           dispatch_async(dispatch_get_main_queue(), ^{
             [self scrollToTop];
           });
         }
+        
+        [self.collectionView reloadData];
       });
     } else {
       DDLogWarn(@"SearchViewController got a non true response.");
@@ -248,6 +285,22 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   
   //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
+}
+
+NSString *const RecentPhotosSectionName = @"Recent photos (not uploaded)";
+
+- (void)setSectionNames:(NSArray *)sectionNames
+         itemsBySection:(NSDictionary *)photosBySection
+  showUnuploadedSection:(BOOL)showUnuploaded
+{
+  if (showUnuploaded && self.recentUnuploadedPhotos.count > 0) {
+    sectionNames = [sectionNames arrayByAddingObject:RecentPhotosSectionName];
+    NSMutableDictionary *newItemsBySection = photosBySection.mutableCopy;
+    newItemsBySection[RecentPhotosSectionName] = self.recentUnuploadedPhotos;
+    photosBySection = newItemsBySection;
+  }
+  
+  [super setSectionNames:sectionNames itemsBySection:photosBySection];
 }
 
 - (void)showNoSearchResults:(NSArray *)retrySuggestions
@@ -371,7 +424,7 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
       
       NSArray *sectionNames = [DFSearchViewController topLevelSectionNamesForPeanutObjects:peanutObjects];
       NSDictionary *itemsBySection = [DFSearchViewController itemsBySectionForPeanutObjects:peanutObjects];
-      [self setSectionNames:sectionNames itemsBySection:itemsBySection];
+      [self setSectionNames:sectionNames itemsBySection:itemsBySection showUnuploadedSection:YES];
     } @catch (NSException *exception) {
       DDLogError(@"Couldn't load default search.  JSONString:%@", jsonString);
       [[NSUserDefaults standardUserDefaults] setObject:@"" forKey:UserDefaultsEverythingResultsKey];
@@ -433,24 +486,6 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
 }
 
 #pragma mark - UIScrollViewDelegate
-//- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-//{
-//  if (scrollView == self.collectionView) {
-//    self.webviewLastOffsetY = scrollView.contentOffset.y;
-//    self.startedDragging = YES;
-//  }
-//}
-//
-//- (void)scrollViewDidScroll:(UIScrollView *)scrollView
-//{
-//  if (scrollView == self.collectionView && self.startedDragging) {
-//    bool hide = (scrollView.contentOffset.y > self.webviewLastOffsetY);
-//    [[self navigationController] setNavigationBarHidden:hide animated:YES];
-//    self.hideStatusBar = hide;
-//    self.startedDragging = NO;
-//  }
-//}
-
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
@@ -518,6 +553,11 @@ NSString *const UserDefaultsEverythingResultsKey = @"DFSearchViewControllerEvery
   }];
 }
 
+- (void)showNavBar
+{
+  [self animateNavBarTo:10];
+  [self updateBarButtonItems:1.0];
+}
 
 #pragma mark - Hide and show status bar
 

@@ -26,6 +26,9 @@
 // Main accessors for data
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context; // used for accessing on another thread using a different context
 - (DFPhotoCollection *)cameraRoll;
+- (DFPhoto *)mostRecentUploadedThumbnail;
+- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
+                                      fullUploadStatus:(BOOL)isFullPhotoUploaded;
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
                                       fullUploadStatus:(BOOL)isFullPhotoUploaded
                                              inContext:(NSManagedObjectContext *)context;
