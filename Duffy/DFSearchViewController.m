@@ -503,7 +503,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
-  if (self.isViewTransitioning) return;
+  if (![self shouldHandleScrollChange]) return;
   CGRect frame = self.navigationController.navigationBar.frame;
   CGFloat size = frame.size.height;
   
@@ -526,6 +526,15 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   self.previousScrollViewYOffset = scrollOffset;
 }
 
+- (BOOL)shouldHandleScrollChange
+{
+  if (self.isViewTransitioning
+      || !self.searchResultsTableView.hidden
+      || !self.view.window) return NO;
+  
+  return YES;
+}
+
 - (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
 {
   [self stoppedScrolling];
@@ -540,6 +549,8 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
 }
 - (void)stoppedScrolling
 {
+  if (![self shouldHandleScrollChange]) return;
+  
   CGRect frame = self.navigationController.navigationBar.frame;
   if (frame.origin.y < 20) {
     [self animateNavBarTo:-(frame.size.height)];
