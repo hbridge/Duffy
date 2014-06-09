@@ -7,31 +7,38 @@
 //
 
 #import "RootViewController.h"
-#import "ModelController.h"
-#import "DataViewController.h"
+#import "SubviewsController.h"
 
 @interface RootViewController ()
             
-@property (readonly, strong, nonatomic) ModelController *modelController;
+@property (readonly, strong, nonatomic) SubviewsController *subviewController;
 
 @end
 
 @implementation RootViewController
             
-@synthesize modelController = _modelController;
+@synthesize subviewController = _subviewController;
 
 - (void)viewDidLoad {
   [super viewDidLoad];
   // Do any additional setup after loading the view, typically from a nib.
   // Configure the page view controller and add it as a child view controller.
-  self.pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStylePageCurl navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal options:nil];
+  self.pageViewController = [[UIPageViewController alloc]
+                             initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+                             navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+                             options:nil];
   self.pageViewController.delegate = self;
 
-  DataViewController *startingViewController = [self.modelController viewControllerAtIndex:0 storyboard:self.storyboard];
+  UIViewController *startingViewController = [self.subviewController
+                                                viewControllerAtIndex:0
+                                                storyboard:self.storyboard];
   NSArray *viewControllers = @[startingViewController];
-  [self.pageViewController setViewControllers:viewControllers direction:UIPageViewControllerNavigationDirectionForward animated:NO completion:nil];
+  [self.pageViewController setViewControllers:viewControllers
+                                    direction:UIPageViewControllerNavigationDirectionForward
+                                     animated:NO
+                                   completion:nil];
 
-  self.pageViewController.dataSource = self.modelController;
+  self.pageViewController.dataSource = self.subviewController;
 
   [self addChildViewController:self.pageViewController];
   [self.view addSubview:self.pageViewController.view];
@@ -51,18 +58,19 @@
   // Dispose of any resources that can be recreated.
 }
 
-- (ModelController *)modelController {
+- (SubviewsController *)subviewController {
   // Return the model controller object, creating it if necessary.
   // In more complex implementations, the model controller may be passed to the view controller.
-  if (!_modelController) {
-      _modelController = [[ModelController alloc] init];
+  if (!_subviewController) {
+      _subviewController = [[SubviewsController alloc] init];
   }
-  return _modelController;
+  return _subviewController;
 }
 
 #pragma mark - UIPageViewController delegate methods
 
-- (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation {
+- (UIPageViewControllerSpineLocation)pageViewController:(UIPageViewController *)pageViewController
+                   spineLocationForInterfaceOrientation:(UIInterfaceOrientation)orientation {
   // Set the spine position to "min" and the page view controller's view controllers array to contain just one view controller. Setting the spine position to 'UIPageViewControllerSpineLocationMid' in landscape orientation sets the doubleSided property to YES, so set it to NO here.
   UIViewController *currentViewController = self.pageViewController.viewControllers[0];
   NSArray *viewControllers = @[currentViewController];
