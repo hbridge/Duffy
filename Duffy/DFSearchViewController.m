@@ -251,6 +251,21 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   }
 }
 
+- (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+{
+  if (searchBarHasFocus) {
+    self.searchResultsTableView.hidden = NO;
+  } else {
+    self.searchResultsTableView.hidden = YES;
+  }
+}
+
+- (void)showSettings
+{
+  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
+  [self.navigationController pushViewController:svc animated:YES];
+}
+
 + (BOOL)isSettingsQuery:(NSString *)query
 {
   NSString *regularizedString = [[query lowercaseString]
@@ -258,6 +273,8 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   
   return [regularizedString isEqualToString:@"settings"];
 }
+
+# pragma mark - Query execution and response handler
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
@@ -305,6 +322,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
       });
     } else {
       DDLogWarn(@"SearchViewController got a non true response.");
+      
     }
     
   }];
@@ -430,6 +448,9 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   return  photos;
 }
 
+
+#pragma mark - Save and load default queries
+
 - (void)saveDefaultPeanutObjects:(NSArray *)defaultPeanutObjects
 {
   if (!defaultPeanutObjects) return;
@@ -464,22 +485,24 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   }
 }
 
-- (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+
+- (void)showErrorAlert
 {
-  if (searchBarHasFocus) {
-    self.searchResultsTableView.hidden = NO;
-  } else {
-    self.searchResultsTableView.hidden = YES;
+  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Couldn't search"
+                                                  message:@"Sorry, we couldn't perform that search.  Check your connection. If this keeps happening please send us a report."
+                                                 delegate:self
+                                        cancelButtonTitle:@"OK"
+                                        otherButtonTitles:@"Report", nil];
+  [alert show];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  if (buttonIndex > 0) {
+    
   }
+    
 }
-
-- (void)showSettings
-{
-  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
-  [self.navigationController pushViewController:svc animated:YES];
-}
-
-
 
 
 #pragma mark - Keyboard handlers

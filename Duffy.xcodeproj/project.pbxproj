@@ -109,6 +109,7 @@
 		5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */; };
 		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
 		5ADB99A61946147700ADAC57 /* DFPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99A51946147700ADAC57 /* DFPhotoView.m */; };
+		5ADB99A919461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99A819461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m */; };
 		5AE3BF7118E4CCC600ACB5DC /* DFBoundingBoxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF7018E4CCC600ACB5DC /* DFBoundingBoxView.m */; };
 		5AE3BF7318E4D08F00ACB5DC /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */; };
 		5AE3BF7518E4D1BF00ACB5DC /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE3BF7418E4D1BF00ACB5DC /* ImageIO.framework */; };
@@ -308,6 +309,8 @@
 		5ADB2508189ABBB50016CA02 /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoto.m; sourceTree = "<group>"; };
 		5ADB99A41946147700ADAC57 /* DFPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoView.h; sourceTree = "<group>"; };
 		5ADB99A51946147700ADAC57 /* DFPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoView.m; sourceTree = "<group>"; };
+		5ADB99A719461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDiagnosticInfoMailComposeController.h; sourceTree = "<group>"; };
+		5ADB99A819461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDiagnosticInfoMailComposeController.m; sourceTree = "<group>"; };
 		5AE3BF6F18E4CCC600ACB5DC /* DFBoundingBoxView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBoundingBoxView.h; sourceTree = "<group>"; };
 		5AE3BF7018E4CCC600ACB5DC /* DFBoundingBoxView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBoundingBoxView.m; sourceTree = "<group>"; };
 		5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -392,6 +395,8 @@
 				5AACB91318F5D61300F4EEB6 /* DFUploadProgressView.h */,
 				5AACB91418F5D61300F4EEB6 /* DFUploadProgressView.m */,
 				5AACB91618F5D63500F4EEB6 /* DFUploadProgressView.xib */,
+				5ADB99A719461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.h */,
+				5ADB99A819461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m */,
 			);
 			name = "Generic Views";
 			sourceTree = "<group>";
@@ -1114,6 +1119,7 @@
 				5AB3983D192530F200E6E69E /* DFIntroContentViewController.m in Sources */,
 				5A50EE5D193CD45E00B78333 /* DFPeanutSearchResponse.m in Sources */,
 				5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */,
+				5ADB99A919461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AF12170192FE1AD00EB0232 /* DFAutocompleteAdapter.m in Sources */,
 				5AACB91518F5D61300F4EEB6 /* DFUploadProgressView.m in Sources */,
 				5AFBCA4F18D236A900998793 /* UIImage+Resize.m in Sources */,
