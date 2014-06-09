@@ -1,213 +1,0 @@
-TPods-SOCKit
-v6
-r1
-cCheck dependencies
-cProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-cLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a normal arm64
-
-N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk
-c000000005348343E0000000000000132
-t1397240894
-s306
-
-N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/SDKSettings.plist
-c00000000531F2579000000000000036B
-t1394550137
-s875
-
-N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/CoreServices/SystemVersion.plist
-c00000000531F2579000000000000019E
-t1394550137
-s414
-
-N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework/Foundation
-c00000000531F257A0000000000A90C10
-t1394550138
-s11078672
-
-N/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/5.1/include/module.map
-c00000000531F25950000000000000ADC
-t1394550165
-s2780
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o
-t1402348356
-s4224
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit.LinkFileList
-c00000000539623430000000000000141
-t1402348355
-s321
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o
-t1402348356
-s54356
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch
-t1402348356
-s123780
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch
-t1402348356
-s123780
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a
-t2
-s0
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m
-c000000005386079A000000000000007E
-t1401292698
-s126
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch
-c000000005386079A000000000000004D
-t1401292698
-s77
-
-N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m
-c00000000538606C200000000000047E7
-t1401292482
-s18407
-
-CBuild AST from /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m
-r0
-
-CBuild AST from /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m
-r0
-
-CCheck dependencies
-r0
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies18"Check dependencies719222c35a46b941^529a65c35a46b941^---0#1#1#--18"Check dependencies36"59D66DBE-8996-4974-B893-580EAD835FF6-
-
-CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s424041156.379631
-e424041156.435178
-r1
-xCompileC
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m
-xnormal
-xarm64
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection75"Compile /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m263"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o Pods-SOCKit-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compilerb49361c45a46b941^06686fc45a46b941^---0#0#1#-19%DVTDocumentLocation2@74"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m0000000000000000^4706"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o Pods-SOCKit-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -include /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.d --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.dia -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit-dummy.o36"83D47C81-4A47-47E1-807F-3AFE966EA158-
-b3C5B33D7-D4F0-45D5-8E0E-DEC55B09C288
-
-CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s424041156.436765
-e424041156.559334
-r1
-xCompileC
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m
-xnormal
-xarm64
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.h
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection71"Compile /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m248"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o SOCKit/SOCKit.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compilerc3f26fc45a46b941^c6308fc45a46b941^---0#0#1#-19%DVTDocumentLocation2@70"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m0000000000000000^4694"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o SOCKit/SOCKit.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -w -Xanalyzer -analyzer-disable-checker -include /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.d --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.dia -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/SOCKit.o36"3052894A-FC34-4778-92BF-93F9D0623722-
-b3C5B33D7-D4F0-45D5-8E0E-DEC55B09C288
-
-CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/armv7/Pods-SOCKit-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/armv7/SOCKit.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/armv7s/Pods-SOCKit-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-dummy.m normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/armv7s/SOCKit.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/SOCKit/SOCKit.m normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CCreateUniversalBinary /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a normal armv7\ armv7s\ arm64
-r0
-
-CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/libPods-SOCKit.a normal arm64
-r0
-
-CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/armv7/libPods-SOCKit.a normal armv7
-r0
-
-CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/armv7s/libPods-SOCKit.a normal armv7s
-r0
-
-CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a normal arm64
-s424041156.593818
-e424041156.601322
-r1
-xLibtool
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a
-xnormal
-xarm64
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection128"Libtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a normal arm64128"Libtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a normal arm648b1698c45a46b941^ef019ac45a46b941^---0#0#1#--1059"Libtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a normal arm64    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export IPHONEOS_DEPLOYMENT_TARGET=7.0    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -static -arch_only arm64 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -L/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -filelist /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Objects-normal/arm64/Pods-SOCKit.LinkFileList -framework Foundation -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-SOCKit.a36"9115C3F4-A340-4CAC-BD9F-2144F33FFB75-
-b3C5B33D7-D4F0-45D5-8E0E-DEC55B09C288
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-bvonatkmjngnsyfsassghdgwnzjc/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s424041155.235965
-e424041156.310010
-r1
-xProcessPCH
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch
-xPods-SOCKit-prefix.pch
-xnormal
-xarm64
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-environment.h
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection33"Precompile Pods-SOCKit-prefix.pch277"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler0b9c3cc35a46b941^d45f4fc45a46b941^---0#0#1#-19%DVTDocumentLocation2@77"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch0000000000000000^4613"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c-header -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -w -Xanalyzer -analyzer-disable-checker --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.dia -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.d -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-dvdoctgfylteknaiedmvlpnksxzo/Pods-SOCKit-prefix.pch.pch36"DE7F61D5-3BFE-4DA4-BED8-4D0023100DF0-
-b3C5B33D7-D4F0-45D5-8E0E-DEC55B09C288
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-ebifutojxnzstxferutyjvnvtgmk/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-fyfbiwwcrnprwsdowekjzeugadjt/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hfaoxgmlgrvuqvaxldzkzxsusjkn/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
-s424041155.234955
-e424041156.311079
-r1
-xProcessPCH
-x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch
-xPods-SOCKit-prefix.pch
-xnormal
-xarm64
-xobjective-c
-xcom.apple.compilers.llvm.clang.1_0.compiler
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch
-d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-environment.h
-lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection33"Precompile Pods-SOCKit-prefix.pch277"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compilerb4563cc35a46b941^75af4fc45a46b941^---0#0#1#-19%DVTDocumentLocation2@77"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch0000000000000000^4573"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c-header -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/Pods-SOCKit-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-SOCKit.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.dia -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.d -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-SOCKit-prefix.pch -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-SOCKit-prefix-hjqkrzwycfrnzvbpazetlvrebzzd/Pods-SOCKit-prefix.pch.pch36"99F9EFA8-3E40-41CF-98B6-F85ED93C1F07-
-b3C5B33D7-D4F0-45D5-8E0E-DEC55B09C288
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-SOCKit-prefix-bqgombmjizcxzvamuywulkowcwyc_ast/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-SOCKit-prefix-brdygmmpgvluelbgnkxuesgoxxto_ast/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-SOCKit-prefix-ctwwjykecagamocfrfocktjkmezl_ast/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-SOCKit-prefix-dnglamwptztrdiepaathxayukxhe_ast/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-SOCKit-prefix-fkaxltdnaohtaabxheywodegkguc_ast/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
-r0
-
-CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-SOCKit-prefix-fzhhizokxcsxjiekpthmvlcnkbto_ast/Pods-SOCKit-prefix.pch.pch Pods-SOCKit-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
-r0
-
