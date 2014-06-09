@@ -1,0 +1,27 @@
+dependencies: \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/CoreData/RKManagedObjectImporter.m \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/CoreData/RKManagedObjectImporter.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKMapperOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKObjectMapping.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKMacros.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKMapping.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKMappingOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKAttributeMapping.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKPropertyMapping.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKMappingResult.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKMappingOperationDataSource.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKErrors.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/CoreData/RKManagedObjectMappingOperationDataSource.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/CoreData/RKInMemoryManagedObjectCache.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/CoreData/RKManagedObjectCaching.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/CoreData/RKFetchRequestManagedObjectCache.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKMIMETypeSerialization.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKMIMETypes.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKSerialization.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKPathUtilities.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKLog.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Vendor/LibComponentLogging/Core/lcl_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/lcl_config_components_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/lcl_config_logger_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Vendor/LibComponentLogging/NSLog/LCLNSLog_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/lcl_config_extensions_RK.h

@@ -1,0 +1,21 @@
+dependencies: \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Network/RKHTTPRequestOperation.m \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Network/RKHTTPRequestOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFNetworking.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFURLConnectionOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFHTTPRequestOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFJSONRequestOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFXMLRequestOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFPropertyListRequestOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFHTTPClient.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFImageRequestOperation.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/AFNetworkActivityIndicatorManager.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/AFNetworking/AFNetworking/UIImageView+AFNetworking.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKLog.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Vendor/LibComponentLogging/Core/lcl_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/lcl_config_components_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/lcl_config_logger_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Vendor/LibComponentLogging/NSLog/LCLNSLog_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/lcl_config_extensions_RK.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/ObjectMapping/RKHTTPUtilities.h \
+  /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/RestKit/Code/Support/RKMIMETypes.h

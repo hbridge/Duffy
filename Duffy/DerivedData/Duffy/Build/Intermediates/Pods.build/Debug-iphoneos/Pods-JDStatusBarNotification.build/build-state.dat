@@ -1,0 +1,290 @@
+TPods-JDStatusBarNotification
+v6
+r1
+cCheck dependencies
+cProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+cLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a normal arm64
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk
+c000000005348343E0000000000000132
+t1397240894
+s306
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/SDKSettings.plist
+c00000000531F2579000000000000036B
+t1394550137
+s875
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/CoreServices/SystemVersion.plist
+c00000000531F2579000000000000019E
+t1394550137
+s414
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/Foundation.framework/Foundation
+c00000000531F257A0000000000A90C10
+t1394550138
+s11078672
+
+N/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk/System/Library/Frameworks/QuartzCore.framework/QuartzCore
+c00000000531F257B0000000000649DB0
+t1394550139
+s6593968
+
+N/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/5.1/include/module.map
+c00000000531F25950000000000000ADC
+t1394550165
+s2780
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o
+t1402348356
+s136264
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o
+t1402348356
+s37656
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o
+t1402348356
+s54620
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o
+t1402348356
+s4356
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification.LinkFileList
+c000000005396234300000000000002F0
+t1402348355
+s752
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch
+t1402348356
+s118444
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch
+t1402348356
+s118044
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a
+t2
+s0
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m
+c00000000538606BF0000000000004680
+t1401292479
+s18048
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m
+c00000000538606BF0000000000000F5E
+t1401292479
+s3934
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m
+c00000000538606BF0000000000000B6F
+t1401292479
+s2927
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m
+c000000005386079A00000000000000A0
+t1401292698
+s160
+
+N/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch
+c000000005386079A000000000000004D
+t1401292698
+s77
+
+CBuild AST from /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m
+r0
+
+CBuild AST from /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m
+r0
+
+CBuild AST from /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m
+r0
+
+CBuild AST from /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m
+r0
+
+CCheck dependencies
+r0
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection18"Check dependencies18"Check dependenciesf5a222c35a46b941^3cfa33c35a46b941^---0#1#1#--18"Check dependencies36"7A4EE80E-DEFA-4AE0-BA2A-2179FBB14499-
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s424041156.110406
+e424041156.239682
+r1
+xCompileC
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m
+xnormal
+xarm64
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.h
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.h
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection129"Compile /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m340"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compilerbc581cc45a46b941^4a5e3dc45a46b941^---0#0#1#-19%DVTDocumentLocation2@128"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m0000000000000000^5178"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -fobjc-arc -w -Xanalyzer -analyzer-disable-checker -include /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.d --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.dia -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarNotification.o36"C11A3B11-57F0-4CEB-9A6E-A62975F1D1BA-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s424041156.121982
+e424041156.180109
+r1
+xCompileC
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m
+xnormal
+xarm64
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection122"Compile /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m326"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler65561fc45a46b941^2e1e2ec45a46b941^---0#0#1#-19%DVTDocumentLocation2@121"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m0000000000000000^5136"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -fobjc-arc -w -Xanalyzer -analyzer-disable-checker -include /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.d --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.dia -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarStyle.o36"9777626C-DF9D-4260-AB1E-C07331AB3E69-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s424041156.124908
+e424041156.186278
+r1
+xCompileC
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m
+xnormal
+xarm64
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection121"Compile /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m324"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compileraa0f20c45a46b941^ffb22fc45a46b941^---0#0#1#-19%DVTDocumentLocation2@120"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m0000000000000000^5130"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -fobjc-arc -w -Xanalyzer -analyzer-disable-checker -include /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.d --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.dia -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/JDStatusBarView.o36"212EAB1B-75EC-428C-8489-00BBE528FB21-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s424041156.180335
+e424041156.208021
+r1
+xCompileC
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m
+xnormal
+xarm64
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection92"Compile /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m314"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o Pods-JDStatusBarNotification-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler683f2ec45a46b941^894435c45a46b941^---0#0#1#-19%DVTDocumentLocation2@91"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m0000000000000000^5097"CompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o Pods-JDStatusBarNotification-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -include /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.d --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.dia -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification-dummy.o36"9602B9E8-B1C9-4221-A672-55EB03D654B5-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7/JDStatusBarNotification.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7/JDStatusBarStyle.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7/JDStatusBarView.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7/Pods-JDStatusBarNotification-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7s/JDStatusBarNotification.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarNotification.m normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7s/JDStatusBarStyle.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarStyle.m normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7s/JDStatusBarView.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/JDStatusBarNotification/JDStatusBarNotification/JDStatusBarView.m normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCompileC /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7s/Pods-JDStatusBarNotification-dummy.o /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-dummy.m normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CCreateUniversalBinary /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a normal armv7\ armv7s\ arm64
+r0
+
+CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/libPods-JDStatusBarNotification.a normal arm64
+r0
+
+CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7/libPods-JDStatusBarNotification.a normal armv7
+r0
+
+CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/armv7s/libPods-JDStatusBarNotification.a normal armv7s
+r0
+
+CLibtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a normal arm64
+s424041156.257793
+e424041156.264727
+r1
+xLibtool
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a
+xnormal
+xarm64
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection145"Libtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a normal arm64145"Libtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a normal arm64771142c45a46b941^60c743c45a46b941^---0#0#1#--1149"Libtool /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a normal arm64    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export IPHONEOS_DEPLOYMENT_TARGET=7.0    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -static -arch_only arm64 -syslibroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -L/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -filelist /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Objects-normal/arm64/Pods-JDStatusBarNotification.LinkFileList -framework Foundation -framework QuartzCore -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/libPods-JDStatusBarNotification.a36"2AE0EED6-73ED-406D-9640-0A510A0072B9-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-aqwbgxcoxrtxywcrjqbhpqrnzjvr/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-cjycsptnklzkdzcsjrfgiesmumgj/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-fwaumbmrwjieidfkdakwknbqxxsv/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s424041155.204363
+e424041156.087555
+r1
+xProcessPCH
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch
+xPods-JDStatusBarNotification-prefix.pch
+xnormal
+xarm64
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-environment.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection50"Precompile Pods-JDStatusBarNotification-prefix.pch328"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compilera18134c35a46b941^e36c16c45a46b941^---0#0#1#-19%DVTDocumentLocation2@94"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch0000000000000000^4981"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c-header -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos -fobjc-arc -w -Xanalyzer -analyzer-disable-checker --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.dia -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.d -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gkusukchrhsowjftogvroavgkydo/Pods-JDStatusBarNotification-prefix.pch.pch36"508F6A46-B85A-4021-A9CB-AB83053C938C-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+s424041155.205030
+e424041156.085063
+r1
+xProcessPCH
+x/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch
+xPods-JDStatusBarNotification-prefix.pch
+xnormal
+xarm64
+xobjective-c
+xcom.apple.compilers.llvm.clang.1_0.compiler
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch
+d/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-environment.h
+lSLF06#21%IDEActivityLogSection1@2#32"com.apple.dt.IDE.BuildLogSection50"Precompile Pods-JDStatusBarNotification-prefix.pch328"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler26a934c35a46b941^acc715c45a46b941^---0#0#1#-19%DVTDocumentLocation2@94"file:///Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch0000000000000000^4930"ProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler    cd /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods    export LANG=en_US.US-ASCII    export PATH="/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin:/Applications/Xcode.app/Contents/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c-header -arch arm64 -fmessage-length=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit=0 -std=gnu99 -fmodules -fmodules-cache-path=/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/ModuleCache -Wno-trigraphs -fpascal-strings -O0 -Wno-missing-field-initializers -Wno-missing-prototypes -Wno-implicit-atomic-properties -Wno-receiver-is-weak -Wno-arc-repeated-use-of-weak -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wno-deprecated-implementations -DDEBUG=1 -DCOCOAPODS=1 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS7.1.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -g -Wno-sign-conversion -miphoneos-version-min=7.0 -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-generated-files.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-own-target-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-all-target-headers.hmap -iquote /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/Pods-JDStatusBarNotification-project-headers.hmap -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos/include -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/BuildHeaders/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/AFNetworking -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/CocoaLumberjack -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/JDStatusBarNotification -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/CoreData -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Network -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/ObjectMapping -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/RestKit/RestKit/Support -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/SOCKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Headers/TransitionKit -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources/arm64 -I/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/Pods.build/Debug-iphoneos/Pods-JDStatusBarNotification.build/DerivedSources -F/Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Products/Debug-iphoneos --serialize-diagnostics /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.dia -MMD -MT dependencies -MF /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.d -c /Users/hbridge/Documents/Repos/Duffy/Duffy/Pods/Pods-JDStatusBarNotification-prefix.pch -o /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-gqgjaqhfzjqwegaimehzvntzgvyy/Pods-JDStatusBarNotification-prefix.pch.pch36"33E7AA66-86C9-4484-B553-6C5F2D2E75A7-
+b9B329CDA-2CA7-469E-AA21-001FEF4D8419
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Build/Intermediates/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-hcspfagsmphzkncpvxubjzgkwvhg/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.compiler
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-aoeypqhfjcgrltejjfdytjtmgppl_ast/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-cbxyspfztqvxkhbgjipqfpyubajb_ast/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-cfnmnwxplpcmzsddkcsvfczzrnjb_ast/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-cnyejjmahxzcwjgwdsslvpilgymr_ast/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-fnsyvuhfteaxoibdatkudkwsriec_ast/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7 objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
+CProcessPCH /Users/hbridge/Documents/Repos/Duffy/Duffy/DerivedData/Duffy/Index/PrecompiledHeaders/Pods-JDStatusBarNotification-prefix-fxakqnuafgwvsogvzyrrcsgucalm_ast/Pods-JDStatusBarNotification-prefix.pch.pch Pods-JDStatusBarNotification-prefix.pch normal armv7s objective-c com.apple.compilers.llvm.clang.1_0.astbuilder
+r0
+
