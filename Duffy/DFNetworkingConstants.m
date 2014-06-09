@@ -10,7 +10,7 @@
 
 @implementation DFNetworkingConstants
 
-NSString const *DFServerBaseURL = @"http://asood123.no-ip.biz";
+NSString const *DFServerBaseURL = @"http://prod.duffyapp.com";
 NSString const *DFServerAPIPath = @"/api/";
 NSString const *DFServerPortDefault = @"";
 
