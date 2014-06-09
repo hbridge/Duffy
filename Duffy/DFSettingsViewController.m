@@ -15,6 +15,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFAppInfo.h"
 #import "DFDevelopmentSettingsViewController.h"
+#import "DFDiagnosticInfoMailComposeController.h"
 
 @interface DFSettingsViewController ()
 
@@ -104,47 +105,14 @@
 
 - (IBAction)sendInfoClicked:(UIButton *)sender {
   if ([MFMailComposeViewController canSendMail]) {
-    MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
+    DFDiagnosticInfoMailComposeController *mailViewController = [[DFDiagnosticInfoMailComposeController alloc] init];
     mailViewController.mailComposeDelegate = self;
-    NSMutableData *errorLogData = [NSMutableData data];
-    for (NSData *errorLogFileData in [self errorLogData]) {
-      [errorLogData appendData:errorLogFileData];
-    }
-    [mailViewController addAttachmentData:errorLogData mimeType:@"text/plain" fileName:@"DuffyLog.txt"];
-    [mailViewController setSubject:[NSString stringWithFormat:@"Diagnostic info for %@", [DFAppInfo appInfoString]]];
-    [mailViewController setToRecipients:[NSArray arrayWithObject:@"hbridge@gmail.com"]];
-    
     [self presentViewController:mailViewController animated:YES completion:nil];
-  }
-  
-  else {
+  } else {
     NSString *message = NSLocalizedString(@"Sorry, your issue can't be reported right now. This is most likely because no mail accounts are set up on your mobile device.", @"");
     [[[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil] show];
   }
   
-}
-
-- (IBAction)developerSettingsClicked:(UIButton *)sender {
-  DFDevelopmentSettingsViewController *dsvc = [[DFDevelopmentSettingsViewController alloc] init];
-  [self.navigationController pushViewController:dsvc animated:YES];
-}
-
-static const int MaxLogFiles = 10;
-
-- (NSMutableArray *)errorLogData
-{
-  DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
-  NSArray *sortedLogFileInfos = [[[fileLogger.logFileManager sortedLogFileInfos] reverseObjectEnumerator] allObjects];
-  int numFilesToUpload = MIN((unsigned int)sortedLogFileInfos.count, MaxLogFiles);
-  
-  NSMutableArray *errorLogFiles = [NSMutableArray arrayWithCapacity:numFilesToUpload];
-  for (int i = 0; i < numFilesToUpload; i++) {
-    DDLogFileInfo *logFileInfo = [sortedLogFileInfos objectAtIndex:i];
-    NSData *fileData = [NSData dataWithContentsOfFile:logFileInfo.filePath];
-    [errorLogFiles addObject:fileData];
-  }
-  
-  return errorLogFiles;
 }
 
 - (void)mailComposeController:(MFMailComposeViewController*)controller
@@ -157,6 +125,13 @@ static const int MaxLogFiles = 10;
   
   [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+- (IBAction)developerSettingsClicked:(UIButton *)sender {
+  DFDevelopmentSettingsViewController *dsvc = [[DFDevelopmentSettingsViewController alloc] init];
+  [self.navigationController pushViewController:dsvc animated:YES];
+}
+
+
 
 
 

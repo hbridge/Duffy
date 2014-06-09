@@ -56,7 +56,7 @@ static const CGFloat AnimationDuration = 0.3f;
     [self animateTappedCell:tappedCell
                   withFrame:tappedCellFrame
               upToFullImage:photoViewController.photo.fullScreenImage
-       displayedInImageView:photoViewController.imageView];
+       displayedInImageView:photoViewController.photoView.imageView];
     
     [super pushViewController:multiPhotoViewController animated:NO];
 }

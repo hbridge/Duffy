@@ -30,6 +30,7 @@
 #import "DFPeanutSearchObject.h"
 #import "DFSearchNoResultsView.h"
 #import "UICollectionView+DFExtras.h"
+#import "DFDiagnosticInfoMailComposeController.h"
 
 @interface DFSearchViewController ()
 
@@ -251,6 +252,21 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   }
 }
 
+- (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+{
+  if (searchBarHasFocus) {
+    self.searchResultsTableView.hidden = NO;
+  } else {
+    self.searchResultsTableView.hidden = YES;
+  }
+}
+
+- (void)showSettings
+{
+  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
+  [self.navigationController pushViewController:svc animated:YES];
+}
+
 + (BOOL)isSettingsQuery:(NSString *)query
 {
   NSString *regularizedString = [[query lowercaseString]
@@ -259,8 +275,11 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   return [regularizedString isEqualToString:@"settings"];
 }
 
+# pragma mark - Query execution and response handler
+
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
+  [self.searchBar setSearchInProgress:YES];
   self.currentlyLoadingSearchQuery = query;
   for (UIView *view in self.tryAgainViews) {
     [view removeFromSuperview];
@@ -300,9 +319,12 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
         }
         
         [self.collectionView reloadData];
+        [self.searchBar setSearchInProgress:NO];
       });
     } else {
       DDLogWarn(@"SearchViewController got a non true response.");
+      [self showErrorAlert];
+      [self.searchBar setSearchInProgress:NO];
     }
     
   }];
@@ -385,18 +407,23 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
           [contiguousPhotoIDsToAdd addObject:@(searchObject.id)];
         }
         
-        if ([searchObject.type isEqualToString:DFSearchObjectCluster]) {
+        if ([searchObject.type isEqualToString:DFSearchObjectCluster]
+            || [searchObject.type isEqualToString:DFSearchObjectDocstack]) {
           NSArray *previousContitguousPhotos = [[DFPhotoStore sharedStore]
                                                 photosWithPhotoIDs:contiguousPhotoIDsToAdd
                                                 retainOrder:YES];
           [sectionItems addObjectsFromArray:previousContitguousPhotos];
           [contiguousPhotoIDsToAdd removeAllObjects];
           
-          DFPhotoCollection *clusterCollection = [[DFPhotoCollection alloc]
+          DFPhotoCollection *collection = [[DFPhotoCollection alloc]
                                                   initWithPhotos:[self photosForCluster:searchObject]];
-          [sectionItems addObject:clusterCollection];
+          
+          if ([searchObject.type isEqualToString:DFSearchObjectDocstack]) {
+            collection.thumbnail = [UIImage imageNamed:@"Icons/DocStackCell"];
+          }
+          
+          [sectionItems addObject:collection];
         }
-        
       }
       
       NSArray *photos = [[DFPhotoStore sharedStore]
@@ -422,6 +449,9 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:clusterPhotoIDs retainOrder:YES];
   return  photos;
 }
+
+
+#pragma mark - Save and load default queries
 
 - (void)saveDefaultPeanutObjects:(NSArray *)defaultPeanutObjects
 {
@@ -457,22 +487,41 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
   }
 }
 
-- (void)updateUIForSearchBarHasFocus:(BOOL)searchBarHasFocus
+
+- (void)showErrorAlert
 {
-  if (searchBarHasFocus) {
-    self.searchResultsTableView.hidden = NO;
-  } else {
-    self.searchResultsTableView.hidden = YES;
+  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Couldn't Search"
+                                                  message:@"Sorry, we couldn't perform that search. Please check your connection. If this keeps happening please send us a report."
+                                                 delegate:self
+                                        cancelButtonTitle:@"OK"
+                                        otherButtonTitles:@"Report", nil];
+  [alert show];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  if (buttonIndex > 0) {
+    if ([MFMailComposeViewController canSendMail]) {
+      DFDiagnosticInfoMailComposeController *mailViewController = [[DFDiagnosticInfoMailComposeController alloc] init];
+      mailViewController.mailComposeDelegate = self;
+      [self presentViewController:mailViewController animated:YES completion:nil];
+    } else {
+      NSString *message = NSLocalizedString(@"Sorry, your issue can't be reported right now. This is most likely because no mail accounts are set up on your mobile device.", @"");
+      [[[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil] show];
+    }
   }
 }
 
-- (void)showSettings
+- (void)mailComposeController:(MFMailComposeViewController*)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError*)error;
 {
-  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
-  [self.navigationController pushViewController:svc animated:YES];
+  if (result == MFMailComposeResultSent) {
+    DDLogInfo(@"Feedback email sent.");
+  }
+  
+  [self dismissViewControllerAnimated:YES completion:nil];
 }
-
-
 
 
 #pragma mark - Keyboard handlers

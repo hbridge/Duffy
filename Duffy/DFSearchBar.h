@@ -13,9 +13,11 @@
 
 @interface DFSearchBar : UIView <UITextFieldDelegate>
 
+@property (weak, nonatomic) IBOutlet UIImageView *leftImageView;
 @property (weak, nonatomic) IBOutlet UITextField *textField;
 @property (weak, nonatomic) IBOutlet UIButton *clearButton;
 @property (weak, nonatomic) IBOutlet UIButton *cancelButton;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
 
 @property (nonatomic) BOOL showsCancelButton;
 @property (nonatomic) BOOL showsClearButton;
@@ -29,6 +31,7 @@
 
 - (void)setShowsCancelButton:(BOOL)showsCancelButton animated:(BOOL)animated;
 - (void)setShowsClearButton:(BOOL)showsCancelButton animated:(BOOL)animated;
+- (void)setSearchInProgress:(BOOL)isSearchInProgress;
 
 - (IBAction)clearButtonClicked:(id)sender;
 - (IBAction)cancelButtonClicked:(id)sender;

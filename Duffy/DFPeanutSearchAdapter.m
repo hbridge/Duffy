@@ -16,6 +16,7 @@ NSString *const SearchPath = @"searchV2";
 NSString *const QueryParameter = @"q";
 NSString *const MaxNumberResultsParameter = @"num";
 NSString *const MinDateParameter = @"start_date_time";
+NSString *const DocstackParameter = @"docstack";
 
 @implementation DFPeanutSearchAdapter
 
@@ -58,7 +59,8 @@ NSString *const MinDateParameter = @"start_date_time";
                               parameters:@{
                                            QueryParameter : query,
                                            MaxNumberResultsParameter: @(maxResults),
-                                           MinDateParameter : minDateString
+                                           MinDateParameter : minDateString,
+                                           DocstackParameter : [query isEqualToString:@"''"] ? @(1) : @(0),
                                            }];
   DDLogInfo(@"Executing search: %@", getRequest.URL.absoluteString);
   

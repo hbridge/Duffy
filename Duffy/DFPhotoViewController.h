@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DFImageView.h"
+#import "DFPhotoView.h"
 
 @class DFPhoto;
 
@@ -17,7 +17,7 @@
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
-@property (weak, nonatomic) IBOutlet DFImageView *imageView;
+@property (weak, nonatomic) IBOutlet DFPhotoView *photoView;
 
 @property (nonatomic) BOOL theatreModeEnabled;
 

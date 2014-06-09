@@ -15,18 +15,16 @@
 @property (readonly, nonatomic, retain) NSSet *photoSet;
 @property (readonly, nonatomic, retain) NSSet *photoURLSet;
 
+/* (UIImage *)thumbnail
+ Returns a thumbnail representation of the photo collection.  If not set, returns a thumbnail of the
+ earliest photo in the collection.
+ */
+@property (nonatomic, retain) UIImage *thumbnail;
 
 - (id)initWithPhotos:(NSArray *)photos;
 - (void)addPhotos:(NSArray *)newPhotos;
 - (BOOL)containsPhotoWithAssetURL:(NSString *)assetURLString;
 - (NSArray *)photosByDateAscending:(BOOL)ascending;
 - (NSArray *)objectIDsByDateAscending:(BOOL)ascending;
-
-/* (UIImage *)thumbnail 
- Returns a thumbnail representation of the photo collection.  Currently just the thumbnail of the
- earliest photo in the collection.
- */
-
-- (UIImage *)thumbnail;
 
 @end

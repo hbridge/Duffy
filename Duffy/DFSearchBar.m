@@ -91,6 +91,17 @@
   }
 }
 
+- (void)setSearchInProgress:(BOOL)isSearchInProgress
+{
+  if (isSearchInProgress) {
+    [self.activityIndicator startAnimating];
+    self.leftImageView.hidden = YES;
+  } else {
+    [self.activityIndicator stopAnimating];
+    self.leftImageView.hidden = NO;
+  }
+}
+
 
 - (IBAction)clearButtonClicked:(id)sender {
   [self.delegate searchBarClearButtonClicked:self];

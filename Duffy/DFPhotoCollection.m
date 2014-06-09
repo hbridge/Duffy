@@ -98,8 +98,12 @@
 
 - (UIImage *)thumbnail
 {
-  if (self.photoSet.count < 1) return nil;
-  return [[[self photosByDateAscending:YES] firstObject] thumbnail];
+  if (!_thumbnail) {
+    if (self.photoSet.count < 1) return nil;
+    return [[[self photosByDateAscending:YES] firstObject] thumbnail];
+  }
+  
+  return _thumbnail;
 }
 
 
