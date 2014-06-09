@@ -1,5 +1,16 @@
 # Duffy Changes
 
+## Jun 9th, 2014
+
+### New
+
+- Magnifying glass changes to a spinner to show you when a search is in progress
+- We show you an error message when we couldn't perform a search with an option to send us logs.
+
+###Bugs fixed
+
+- Viewing photos in landscape works again
+
 ## Jun 6th, 2014
 
 We've been focused on making Duffy a full-fledged gallery replacement with awesome search.  If there's something that's keeping you from using Duffy instead of the default "Photos" app, we want to hear from you!
