@@ -19,8 +19,6 @@
 		5A45E9C618DA44F6002663EB /* DFCameraRollSyncController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9C518DA44F6002663EB /* DFCameraRollSyncController.m */; };
 		5A45E9CC18DB990D002663EB /* DFUploadSessionStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A45E9CB18DB990D002663EB /* DFUploadSessionStats.m */; };
 		5A50EE59193CD39E00B78333 /* DFPeanutSearchAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A50EE58193CD39E00B78333 /* DFPeanutSearchAdapter.m */; };
-		5A50EE5D193CD45E00B78333 /* DFPeanutSearchResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A50EE5C193CD45E00B78333 /* DFPeanutSearchResponse.m */; };
-		5A50EE61193CE59400B78333 /* DFPeanutSearchObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A50EE60193CE59400B78333 /* DFPeanutSearchObject.m */; };
 		5A50EE64193CE94A00B78333 /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A50EE63193CE94A00B78333 /* DFTypedefs.m */; };
 		5A50EE67193D20CB00B78333 /* DFPhotoSectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A50EE66193D20CB00B78333 /* DFPhotoSectionHeader.m */; };
 		5A50EE69193D20E500B78333 /* DFPhotoSectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A50EE68193D20E500B78333 /* DFPhotoSectionHeader.xib */; };
@@ -110,6 +108,8 @@
 		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
 		5ADB99A61946147700ADAC57 /* DFPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99A51946147700ADAC57 /* DFPhotoView.m */; };
 		5ADB99A919461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99A819461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m */; };
+		5ADB99B419465AA600ADAC57 /* DFPeanutSearchObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99B119465AA600ADAC57 /* DFPeanutSearchObject.m */; };
+		5ADB99B519465AA600ADAC57 /* DFPeanutSearchResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99B319465AA600ADAC57 /* DFPeanutSearchResponse.m */; };
 		5AE3BF7118E4CCC600ACB5DC /* DFBoundingBoxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF7018E4CCC600ACB5DC /* DFBoundingBoxView.m */; };
 		5AE3BF7318E4D08F00ACB5DC /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */; };
 		5AE3BF7518E4D1BF00ACB5DC /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE3BF7418E4D1BF00ACB5DC /* ImageIO.framework */; };
@@ -162,11 +162,7 @@
 		5A50EE561938D44A00B78333 /* DFSearchBarControllerDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFSearchBarControllerDelegate.h; sourceTree = "<group>"; };
 		5A50EE57193CD39E00B78333 /* DFPeanutSearchAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSearchAdapter.h; sourceTree = "<group>"; };
 		5A50EE58193CD39E00B78333 /* DFPeanutSearchAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSearchAdapter.m; sourceTree = "<group>"; };
-		5A50EE5B193CD45E00B78333 /* DFPeanutSearchResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPeanutSearchResponse.h; path = ../DFPeanutSearchResponse.h; sourceTree = "<group>"; };
-		5A50EE5C193CD45E00B78333 /* DFPeanutSearchResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPeanutSearchResponse.m; path = ../DFPeanutSearchResponse.m; sourceTree = "<group>"; };
 		5A50EE5E193CE3CE00B78333 /* DFPeanutObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFPeanutObject.h; sourceTree = "<group>"; };
-		5A50EE5F193CE59400B78333 /* DFPeanutSearchObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPeanutSearchObject.h; path = ../DFPeanutSearchObject.h; sourceTree = "<group>"; };
-		5A50EE60193CE59400B78333 /* DFPeanutSearchObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPeanutSearchObject.m; path = ../DFPeanutSearchObject.m; sourceTree = "<group>"; };
 		5A50EE62193CE94A00B78333 /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTypedefs.h; sourceTree = "<group>"; };
 		5A50EE63193CE94A00B78333 /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTypedefs.m; sourceTree = "<group>"; };
 		5A50EE65193D20CB00B78333 /* DFPhotoSectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoSectionHeader.h; sourceTree = "<group>"; };
@@ -311,6 +307,10 @@
 		5ADB99A51946147700ADAC57 /* DFPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoView.m; sourceTree = "<group>"; };
 		5ADB99A719461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDiagnosticInfoMailComposeController.h; sourceTree = "<group>"; };
 		5ADB99A819461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDiagnosticInfoMailComposeController.m; sourceTree = "<group>"; };
+		5ADB99B019465AA600ADAC57 /* DFPeanutSearchObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSearchObject.h; sourceTree = "<group>"; };
+		5ADB99B119465AA600ADAC57 /* DFPeanutSearchObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSearchObject.m; sourceTree = "<group>"; };
+		5ADB99B219465AA600ADAC57 /* DFPeanutSearchResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSearchResponse.h; sourceTree = "<group>"; };
+		5ADB99B319465AA600ADAC57 /* DFPeanutSearchResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSearchResponse.m; sourceTree = "<group>"; };
 		5AE3BF6F18E4CCC600ACB5DC /* DFBoundingBoxView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBoundingBoxView.h; sourceTree = "<group>"; };
 		5AE3BF7018E4CCC600ACB5DC /* DFBoundingBoxView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBoundingBoxView.m; sourceTree = "<group>"; };
 		5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreImage.framework; path = System/Library/Frameworks/CoreImage.framework; sourceTree = SDKROOT; };
@@ -406,10 +406,10 @@
 			children = (
 				5A50EE57193CD39E00B78333 /* DFPeanutSearchAdapter.h */,
 				5A50EE58193CD39E00B78333 /* DFPeanutSearchAdapter.m */,
-				5A50EE5B193CD45E00B78333 /* DFPeanutSearchResponse.h */,
-				5A50EE5C193CD45E00B78333 /* DFPeanutSearchResponse.m */,
-				5A50EE5F193CE59400B78333 /* DFPeanutSearchObject.h */,
-				5A50EE60193CE59400B78333 /* DFPeanutSearchObject.m */,
+				5ADB99B019465AA600ADAC57 /* DFPeanutSearchObject.h */,
+				5ADB99B119465AA600ADAC57 /* DFPeanutSearchObject.m */,
+				5ADB99B219465AA600ADAC57 /* DFPeanutSearchResponse.h */,
+				5ADB99B319465AA600ADAC57 /* DFPeanutSearchResponse.m */,
 			);
 			name = Search;
 			sourceTree = "<group>";
@@ -1065,7 +1065,7 @@
 				5A8C98F91911811F00AE9F88 /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5AE3BF8418E724A200ACB5DC /* DFPhotoImageCache.m in Sources */,
 				5AC677E81906F027002F9D42 /* DFDataHasher.m in Sources */,
-				5A50EE61193CE59400B78333 /* DFPeanutSearchObject.m in Sources */,
+				5ADB99B419465AA600ADAC57 /* DFPeanutSearchObject.m in Sources */,
 				5A8C98EE19115BB800AE9F88 /* DFPhotoMetadataAdapter.m in Sources */,
 				5AD62A5119215C6300EE22D7 /* ALAsset+DFExtensions.m in Sources */,
 				5AE3BF7E18E4E91700ACB5DC /* UIImage+DFHelpers.m in Sources */,
@@ -1100,6 +1100,7 @@
 				5ADB24CD189985590016CA02 /* DFAppDelegate.m in Sources */,
 				5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */,
 				5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */,
+				5ADB99B519465AA600ADAC57 /* DFPeanutSearchResponse.m in Sources */,
 				5AB32EAB18F1E1B7004FC27B /* DFSuggestionAdapter.m in Sources */,
 				5A50EE67193D20CB00B78333 /* DFPhotoSectionHeader.m in Sources */,
 				5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */,
@@ -1117,7 +1118,6 @@
 				5A28CEBB1942165200A2CBD3 /* UICollectionView+DFExtras.m in Sources */,
 				5AC40EDE1908738C00ED3532 /* DFLogConfig.m in Sources */,
 				5AB3983D192530F200E6E69E /* DFIntroContentViewController.m in Sources */,
-				5A50EE5D193CD45E00B78333 /* DFPeanutSearchResponse.m in Sources */,
 				5A8D0AF318EB6A9600A1D9A7 /* DFNotificationSharedConstants.m in Sources */,
 				5ADB99A919461FC400ADAC57 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AF12170192FE1AD00EB0232 /* DFAutocompleteAdapter.m in Sources */,
