@@ -261,6 +261,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
 
 - (void)executeSearchForQuery:(NSString *)query reverseResults:(BOOL)reverseResults
 {
+  [self.searchBar setSearchInProgress:YES];
   self.currentlyLoadingSearchQuery = query;
   for (UIView *view in self.tryAgainViews) {
     [view removeFromSuperview];
@@ -300,6 +301,7 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
         }
         
         [self.collectionView reloadData];
+        [self.searchBar setSearchInProgress:NO];
       });
     } else {
       DDLogWarn(@"SearchViewController got a non true response.");

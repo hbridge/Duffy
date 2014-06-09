@@ -12,7 +12,6 @@
 #import <CocoaLumberjack/DDFileLogger.h>
 #import "Flurry/Flurry.h"
 #import "DFPhotoStore.h"
-#import "DFCameraRollViewController.h"
 #import "DFSettingsViewController.h"
 #import "DFSearchViewController.h"
 #import "DFCameraRollSyncController.h"
