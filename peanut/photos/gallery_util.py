@@ -37,45 +37,6 @@ def getSimCaches(photoIds):
 	return (simCacheLowHigh, simCacheHighLow)
 
 """
-	Splits a SearchQuerySet into timeline view with headers and set of photo clusters
-
-	Used by old search
-"""
-
-def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, startDate = datetime.date(1900,1,1), endDate = datetime.date(2016,1,1)):
-
-	# Buckets all the search queries by month
-	dateFacet = solrPhotoSet.date_facet('timeTaken', start_date=startDate, end_date=endDate, gap_by='month').facet('timeTaken', mincount=1, limit=-1, sort=False)
-	facetCounts = dateFacet.facet_counts()
-
-	photoIds = list()
-	for solrPhoto in solrPhotoSet:
-		photoIds.append(solrPhoto.photoId)
-
-	# Fetch all the similarities at once so we can process in memory
-	simCaches = getSimCaches(photoIds)
-	
-	del facetCounts['dates']['timeTaken']['start']
-	del facetCounts['dates']['timeTaken']['end']
-	del facetCounts['dates']['timeTaken']['gap']
-
-	photos = list()
-	od = OrderedDict(sorted(facetCounts['dates']['timeTaken'].items()))
-
-	for dateKey, countVal in od.items():
-		entry = dict()
-		startDate = datetime.datetime.strptime(dateKey[:-1], '%Y-%m-%dT%H:%M:%S')
-		entry['date'] = startDate.strftime('%b %Y')
-		newDate = startDate+relativedelta(months=1)
-
-		filteredPhotos = solrPhotoSet.exclude(timeTaken__lt=startDate).exclude(timeTaken__gt=newDate).order_by('timeTaken')
-		
-		entry['clusterList'] = getClusters(filteredPhotos, threshold, dupThreshold, simCaches)
-		photos.append(entry)
-
-	return photos
-
-"""
 	Splits a SearchQuerySet into groups of months as well as clusters the images
 
 	Returns:
@@ -101,19 +62,11 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 							},
 						],
 					]
-		'docs' = [
-					[
-							{
-								'photo' = solrPhoto
-							}
-						],
-					]
 	  },
 	]
 
-	TODO (Derek): move this up and removed unused code
 """
-def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, docResults=None):
+def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, docResults=None):
 	photoIds = list()
 	for solrPhoto in solrPhotoSet:
 		photoIds.append(solrPhoto.photoId)
@@ -123,52 +76,27 @@ def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAU
 	
 	clusters = getClusters(solrPhotoSet, threshold, dupThreshold, simCaches)
 
-	# These are keyed off of the month
-	docItems = dict()
-	clusterItems = dict()
-	titles = dict()
-
-	# This is used to keep track of all the months we've seen.  Docs and Clusters might have different results
-	allMonthKeys = dict()
-
 	# process docstack results first
+	docs = dict()
 	if (docResults):
-		# Group each of our docs results by month, then
-		f = lambda x: x.timeTaken.strftime('%Y-%m')
-
+		f = lambda x: x.timeTaken.strftime('%b %Y')
+		results = list()
 		for key, items in groupby(docResults, f):
-			docItems[key] = list()
+			docs[key] = list()
 			for item in items:
-				# We have to construct the photo item here, clusters is already done for us
-				docItems[key].append({'photo': item})
-				titles[key] = item.timeTaken.strftime('%b %Y')
-
-			allMonthKeys[key] = True
+				docs[key].append({'photo': item, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)})
 
 	# process regular photos next
-	f = lambda x: x[0]['photo'].timeTaken.strftime('%Y-%m')
-	for key, items in groupby(clusters, f):
-		clusterItems[key] = list()
-		for item in items:
-			# clusterItems are already in the PhotoItem format we want
-			clusterItems[key].append(item)
-			titles[key] = item[0]['photo'].timeTaken.strftime('%b %Y')
-			
-		allMonthKeys[key] = True
-
-	# This is a sorted and unique list
-	monthKeys = sorted(allMonthKeys.keys())
+	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
 	results = list()
-
-	for key in monthKeys:
-		monthEntry = {'title': titles[key], 'clusters': list(), 'docs': list()}
-		
-		if key in clusterItems:
-			monthEntry['clusters'].extend(clusterItems[key])			
-		if key in docItems:
-			monthEntry['docs'].extend(docItems[key])
+	for key, items in groupby(clusters, f):
+		monthEntry = {'title': key, 'clusters': list(), 'docs': list()}
+		for item in items:
+			monthEntry['clusters'].append(item)
+		if key in docs:
+			monthEntry['docs'].extend(docs[key])
 		results.append(monthEntry)
-
+	
 	return results
 
 """

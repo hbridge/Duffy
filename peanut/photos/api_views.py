@@ -300,103 +300,6 @@ def autocomplete(request):
 	return HttpResponse(responseJson, content_type='application/json')
 
 """
-Search api function that returns the search view. Used by the /viz/search?user_id=<userID>
-
-TODO(Derek): remove this once V2 is good
-"""
-@csrf_exempt
-def search(request):
-	data = getRequestData(request)
-	
-	if data.has_key('user_id'):
-		userId = data['user_id']
-	else:
-		return returnFailure(response, "Need user_id")
-
-	if data.has_key('imagesize'):
-		query = data['imagesize']
-	else:
-		imageSize = 78
-
-	width = imageSize*2 #doubled  for retina
-
-	if data.has_key('page'):
-		page = int(data['page'])
-	else:
-		page = 1
-
-	if data.has_key('debug'):
-		debug = True
-	else:
-		debug = False
-
-	if data.has_key('r'):
-		if (data['r'] == '1'):
-			reverse = True
-		else:
-			reverse = False
-	else:
-		reverse = False
-
-	if data.has_key('q'):
-		query = data['q']
-	else:
-		query = ''
-
-	if data.has_key('exclude'):
-		exclude = data['exclude']
-	else:
-		exclude = ''
-
-	try:
-		user = User.objects.get(id=userId)
-	except User.DoesNotExist:
-		return returnFailure(response, "Invalid user_id")
-
-	
-	thumbnailBasepath = "/user_data/" + userId + "/"
-
-	response = ''
-
-	allResults = SearchQuerySet().all().filter(userId=userId).order_by('timeTaken')
-
-	(startDate, newQuery) = search_util.getNattyInfo(query)
-
-	if (allResults.count() > 0):
-		if (startDate == None):
-			startDate = allResults[0].timeTaken
-		(pageStartDate, pageEndDate) = search_util.pageToDates(page, startDate, reverse)
-		searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate, exclude=exclude)
-		while (searchResults.count() < 10 and pageEndDate < datetime.datetime.utcnow() and pageStartDate >= startDate):
-			if (reverse):
-				pageStartDate = pageStartDate+relativedelta(months=-6)
-			else:
-				pageEndDate = pageEndDate+relativedelta(months=6)
-			page +=1
-			searchResults = search_util.solrSearch(user.id, pageStartDate, newQuery, pageEndDate, exclude=exclude)
-		photoResults = gallery_util.splitPhotosFromIndexbyMonth(user.id, searchResults, startDate=pageStartDate, endDate=pageEndDate)
-
-		for entry in photoResults:
-			context = {	'imageSize': imageSize,
-						'userId': userId,
-						'entry': entry,
-						'thumbnailBasepath': thumbnailBasepath,
-						'debug': debug}
-
-			html = render_to_string('photos/_timeline_block.html', context)
-			response += html
-
-		if (pageEndDate < datetime.datetime.utcnow() and pageStartDate > startDate):
-			url = '/api/search?user_id=' + str(userId) + '&q=' + urllib.quote(query) + '&page=' + str(page+1)  + '&r=' + str(int(reverse))
-			if debug:
-				url += '&debug'
-			url += '&exclude='
-			url += urllib.quote(exclude)
-			nextLink = '<a class="jscroll-next" href="' + url + '"></a>'
-			response += nextLink
-	return HttpResponse(response, content_type="text/html")
-
-"""
 	Turns groups by month, called from gallery_util and turns it into sections
 	  that is converted to json and returned to the user
 
@@ -437,10 +340,9 @@ Search API
 
 Takes in a query, number of entries to fetch, and a startDate (all fields in forms.py SearchQueryForm)
 
-TODO(Derek): replace this instead of search once its ready
 """
 @csrf_exempt
-def searchV2(request):
+def search(request):
 	response = dict()
 
 	form = SearchQueryForm(request.GET) # A form bound to the POST data
@@ -472,7 +374,7 @@ def searchV2(request):
 
 		if (len(searchResults) > 0 or docResults and len(docResults) > 0):	
 			# Group into months
-			monthGroupings = gallery_util.splitPhotosFromIndexbyMonthV2(user_id, searchResults, docResults=docResults)
+			monthGroupings = gallery_util.splitPhotosFromIndexbyMonth(user_id, searchResults, docResults=docResults)
 
 			# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
 			#   which is the key for the next call
@@ -596,38 +498,6 @@ def create_user(request):
 
 	response['user'] = model_to_dict(user)
 	return HttpResponse(json.dumps(response), content_type="application/json")
-
-"""
-	Returns true if last updated index time stamp is greater than the one sent
-"""
-def newresults_check(request):
-	response = dict({'result': True})
-	data = getRequestData(request)
-
-	if data.has_key('user_id'):
-		userId = data['user_id']
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return returnFailure(response, "user_id not found")
-	else:
-		return returnFailure(response, "Need user_id")
-
-	if data.has_key('last_updated'):
-		lastUpdated = datetime.datetime.strptime(data['last_updated'],'%m/%d/%Y %H:%M:%S')
-	else:
-		return returnFailure(response, "Need last_updated field")
-
-	newUpdatedTime = search_util.lastUpdatedSearchResults(userId)
-
-	if (newUpdatedTime > lastUpdated):
-		response['newData'] = True
-	else:
-		response['newData'] = False
-
-	return HttpResponse(json.dumps(response), content_type="application/json")
-
-
 
 
 
