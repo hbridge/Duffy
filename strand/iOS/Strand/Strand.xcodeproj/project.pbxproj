@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
+		5A8F05311946724A003C69E0 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8F05301946724A003C69E0 /* DFCameraOverlayView.xib */; };
 		5ADD857519465C790037A6D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857419465C790037A6D5 /* main.m */; };
 		5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857719465C790037A6D5 /* AppDelegate.m */; };
 		5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857A19465C790037A6D5 /* RootViewController.m */; };
@@ -29,6 +31,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
+		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
+		5A8F05301946724A003C69E0 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
 		5ADD856F19465C790037A6D5 /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADD857319465C790037A6D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5ADD857419465C790037A6D5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -96,6 +101,9 @@
 				5ADD858019465C790037A6D5 /* SubviewsController.m */,
 				5ADD859B19465F520037A6D5 /* DFCameraViewController.h */,
 				5ADD859C19465F520037A6D5 /* DFCameraViewController.m */,
+				5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */,
+				5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */,
+				5A8F05301946724A003C69E0 /* DFCameraOverlayView.xib */,
 				5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */,
 				5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */,
 				5ADD858219465C790037A6D5 /* Main.storyboard */,
@@ -211,6 +219,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A8F05311946724A003C69E0 /* DFCameraOverlayView.xib in Resources */,
 				5ADD858419465C790037A6D5 /* Main.storyboard in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 			);
@@ -235,6 +244,7 @@
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,
 				5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */,
+				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
 				5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -424,6 +434,7 @@
 				5ADD859719465C790037A6D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		5ADD859819465C790037A6D5 /* Build configuration list for PBXNativeTarget "StrandTests" */ = {
 			isa = XCConfigurationList;
@@ -432,6 +443,7 @@
 				5ADD859A19465C790037A6D5 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

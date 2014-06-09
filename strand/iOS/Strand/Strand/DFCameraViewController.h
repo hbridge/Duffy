@@ -8,6 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFCameraViewController : UIViewController
+@class DFCameraOverlayView;
+
+@interface DFCameraViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
+- (IBAction)cameraButtonPressed:(UIButton *)sender;
+
+@property (nonatomic, readonly, retain) DFCameraOverlayView *cameraOverlayView;
+@property (nonatomic, readonly, retain) UIImagePickerController *imagePickerController;
 
 @end
