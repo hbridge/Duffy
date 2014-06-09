@@ -115,11 +115,6 @@
   
 }
 
-- (IBAction)developerSettingsClicked:(UIButton *)sender {
-  DFDevelopmentSettingsViewController *dsvc = [[DFDevelopmentSettingsViewController alloc] init];
-  [self.navigationController pushViewController:dsvc animated:YES];
-}
-
 - (void)mailComposeController:(MFMailComposeViewController*)controller
           didFinishWithResult:(MFMailComposeResult)result
                         error:(NSError*)error;
@@ -130,6 +125,13 @@
   
   [self dismissViewControllerAnimated:YES completion:nil];
 }
+
+- (IBAction)developerSettingsClicked:(UIButton *)sender {
+  DFDevelopmentSettingsViewController *dsvc = [[DFDevelopmentSettingsViewController alloc] init];
+  [self.navigationController pushViewController:dsvc animated:YES];
+}
+
+
 
 
 
