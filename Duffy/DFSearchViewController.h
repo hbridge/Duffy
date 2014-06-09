@@ -11,10 +11,12 @@
 #import "DFSearchBar.h"
 #import "DFSearchBarControllerDelegate.h"
 #import "DFPhotosGridViewController.h"
+#import <MessageUI/MFMailComposeViewController.h>
+
 
 @class DFSuggestionAdapter;
 
-@interface DFSearchViewController : DFPhotosGridViewController <DFSearchBarControllerDelegate>
+@interface DFSearchViewController : DFPhotosGridViewController <DFSearchBarControllerDelegate, MFMailComposeViewControllerDelegate>
 
 @property (nonatomic, retain) UITableView *searchResultsTableView;
 @property (atomic, retain) NSString *currentlyLoadingSearchQuery;

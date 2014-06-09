@@ -30,6 +30,7 @@
 #import "DFPeanutSearchObject.h"
 #import "DFSearchNoResultsView.h"
 #import "UICollectionView+DFExtras.h"
+#import "DFDiagnosticInfoMailComposeController.h"
 
 @interface DFSearchViewController ()
 
@@ -322,7 +323,8 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
       });
     } else {
       DDLogWarn(@"SearchViewController got a non true response.");
-      
+      [self showErrorAlert];
+      [self.searchBar setSearchInProgress:NO];
     }
     
   }];
@@ -488,8 +490,8 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
 
 - (void)showErrorAlert
 {
-  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Couldn't search"
-                                                  message:@"Sorry, we couldn't perform that search.  Check your connection. If this keeps happening please send us a report."
+  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Couldn't Search"
+                                                  message:@"Sorry, we couldn't perform that search. Please check your connection. If this keeps happening please send us a report."
                                                  delegate:self
                                         cancelButtonTitle:@"OK"
                                         otherButtonTitles:@"Report", nil];
@@ -499,9 +501,26 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
   if (buttonIndex > 0) {
-    
+    if ([MFMailComposeViewController canSendMail]) {
+      DFDiagnosticInfoMailComposeController *mailViewController = [[DFDiagnosticInfoMailComposeController alloc] init];
+      mailViewController.mailComposeDelegate = self;
+      [self presentViewController:mailViewController animated:YES completion:nil];
+    } else {
+      NSString *message = NSLocalizedString(@"Sorry, your issue can't be reported right now. This is most likely because no mail accounts are set up on your mobile device.", @"");
+      [[[UIAlertView alloc] initWithTitle:nil message:message delegate:nil cancelButtonTitle:NSLocalizedString(@"OK", @"") otherButtonTitles: nil] show];
+    }
   }
-    
+}
+
+- (void)mailComposeController:(MFMailComposeViewController*)controller
+          didFinishWithResult:(MFMailComposeResult)result
+                        error:(NSError*)error;
+{
+  if (result == MFMailComposeResultSent) {
+    DDLogInfo(@"Feedback email sent.");
+  }
+  
+  [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
