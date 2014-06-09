@@ -17,8 +17,8 @@ if parentPath not in sys.path:
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
-from photos.models import Photo, User, Classification
 from peanut import settings
+from common.models import Photo, User, Classification
 
 def initClassifier():
     attempts = 0

@@ -9,12 +9,13 @@ from datetime import datetime
 
 from django.utils import timezone
 
-from peanut import settings
-from photos.models import Photo, User, Classification, Similarity
 import cv2
 import cv2.cv as cv
 
 from bulk_update.helper import bulk_update
+
+from peanut import settings
+from common.models import Photo, User, Classification, Similarity
 
 logger = logging.getLogger(__name__)
 

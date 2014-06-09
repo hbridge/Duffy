@@ -9,8 +9,9 @@ if parentPath not in sys.path:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
 from django.db.models import Count
-from photos.models import Photo, User
+
 from peanut import settings
+from common.models import Photo, User
 
 import cv2
 import cv2.cv as cv

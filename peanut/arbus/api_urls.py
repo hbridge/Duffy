@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
-from photos import api_views
+from arbus import api_views
 
 urlpatterns = patterns('photos.api_views',
 	url(r'^search$', 'search'),

@@ -11,11 +11,12 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from peanut import settings
 
-from photos import image_util
+from arbus import image_util
+from common.models import Photo, User, Classification
 
 from pprint import pprint
 
-from photos.models import Photo, User, Classification
+
 
 
 """

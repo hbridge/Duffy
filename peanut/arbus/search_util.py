@@ -6,7 +6,7 @@ import urllib
 
 from haystack.query import SearchQuerySet
 
-from photos.models import Photo
+from common.models import Photo
 
 """
 	Helper method to get a startDate and a new filtered query from Natty.

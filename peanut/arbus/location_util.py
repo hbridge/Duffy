@@ -5,11 +5,10 @@ import sys
 import os
 import logging
 
-from photos import image_util
+from common.models import Photo
 
-from photos import bulk_updater
-
-from photos.models import Photo
+from arbus import image_util
+from common import bulk_updater
 
 logger = logging.getLogger(__name__)
 

@@ -12,8 +12,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from photos.models import Photo, User, Classification
 from peanut import settings
+from common.models import Photo, User, Classification
 
 def getDataFromTwoFishes(lat, lon):
     queryStr = "%s,%s" % (lat, lon)

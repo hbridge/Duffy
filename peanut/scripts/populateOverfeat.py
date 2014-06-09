@@ -17,8 +17,8 @@ if parentPath not in sys.path:
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
-from photos.models import Photo
 from peanut import settings
+from common.models import Photo
 
 def runOverfeat(photo):
     image = imread(photo.getFullPath())

@@ -2,10 +2,10 @@ import datetime
 
 from django.db.models import Count
 
-from photos.models import Photo, User
-from photos import search_util
-
 from haystack.query import SearchQuerySet
+
+from common.models import Photo, User
+from arbus import search_util
 
 """
 	Fetches all photos for the given user and returns back the all non-state and non-country

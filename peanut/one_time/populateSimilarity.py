@@ -6,13 +6,14 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
 parentPath = os.path.abspath("..")
 if parentPath not in sys.path:
-    sys.path.insert(0, parentPath)
+	sys.path.insert(0, parentPath)
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
-from photos.models import Photo, User, Classification, Similarity
 from peanut import settings
-from photos import cluster_util, image_util
+
+from common.models import Photo, User, Classification, Similarity
+from arbus import cluster_util, image_util
 
 
 def main(argv):
@@ -41,4 +42,4 @@ def main(argv):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+	main(sys.argv[1:])

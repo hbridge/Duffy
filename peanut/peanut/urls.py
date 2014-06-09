@@ -9,8 +9,8 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'peanut.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
-    url(r'^api/', include('photos.api_urls')),
-    url(r'^viz/', include('photos.viz_urls')),
+    url(r'^api/', include('arbus.api_urls')),
+    url(r'^viz/', include('arbus.viz_urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^search/', include('haystack.urls')),
 )

@@ -33,10 +33,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from photos.models import Photo, User, Neighbor, Similarity
-from photos import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
-from photos.serializers import PhotoSerializer, SmallPhotoSerializer, UserSerializer
-from .forms import SearchQueryForm
+from common.models import Photo, User, Neighbor, Similarity
+from common.serializers import PhotoSerializer, SmallPhotoSerializer, UserSerializer
+
+from arbus import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
+from arbus.forms import SearchQueryForm
 
 import urllib
 from dateutil.relativedelta import relativedelta

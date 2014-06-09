@@ -12,9 +12,10 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.gis.geos import Point, fromstr
 
-from photos.models import Photo, User, Classification
 from peanut import settings
-from photos import location_util
+
+from common.models import Photo, User, Classification
+from arbus import location_util
 
 
 def chunks(l, n):

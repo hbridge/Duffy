@@ -9,9 +9,9 @@ if "/home/derek/Duffy/peanut" not in sys.path:
 from django.shortcuts import render
 from django.http import HttpResponse
 
-from photos.models import Photo, User, Classification
 from peanut import settings
 
+from common.models import Photo, User, Classification
 
 """
     Onetime script that looks for all photos without time_taken and tries to add it.

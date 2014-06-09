@@ -1,16 +1,15 @@
-from photos.models import Photo, Similarity
-
 from collections import OrderedDict
 
 import datetime
 from dateutil.relativedelta import relativedelta
-from peanut import settings
 
 from haystack.query import SearchQuerySet
 from django.db.models import Q
 
 from itertools import groupby
 
+from peanut import settings
+from common.models import Photo, Similarity
 """
 	Fetch all Similarities for the given photo ideas then put into a hash table keyed on the id
 	Note:  Make sure to refer to photo_1_id instead of photo_1.id to avoid an extra lookup

@@ -7,13 +7,15 @@ from time import time
 
 from django.utils import timezone
 
-from peanut import settings
-from photos.models import Photo, User, Classification, Similarity
-from photos import image_util
 import cv2
 import cv2.cv as cv
 
+#TODO(Derek): move this over to our common one
 from bulk_update.helper import bulk_update
+
+from peanut import settings
+from common.models import Photo, User, Classification, Similarity
+from arbus import image_util
 
 ### Clustering/deduping functions
 """

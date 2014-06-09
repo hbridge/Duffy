@@ -1,11 +1,11 @@
 import datetime
-from haystack import indexes
-from photos.models import Photo
 import json
 import time
 import logging
 from datetime import datetime
 
+from haystack import indexes
+from common.models import Photo
 
 class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 	text = indexes.CharField(document=True, use_template=False)

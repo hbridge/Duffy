@@ -6,7 +6,7 @@ from django.contrib.gis.db import models
 
 from peanut import settings
 
-from photos import bulk_updater
+from common import bulk_updater
 
 
 # Create your models here.
@@ -16,6 +16,9 @@ class User(models.Model):
 	phone_id = models.CharField(max_length=100)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'photos_user'
 
 	"""
 		Returns back the full localfile path where the user's photos are located
@@ -57,6 +60,7 @@ class Photo(models.Model):
 
 	class Meta:
 		unique_together = ("user", "iphone_hash")
+		db_table = 'photos_photo'
 
 	def __unicode__(self):
 		return str(self.id)
@@ -167,6 +171,9 @@ class Classification(models.Model):
 	class_name = models.CharField(max_length=100)
 	rating = models.FloatField()
 
+	class Meta:
+		db_table = 'photos_classification'
+
 	def __unicode__(self): 
 		return str(self.photo.id) + " " + self.class_name
 
@@ -178,6 +185,7 @@ class Similarity(models.Model):
 
 	class Meta:
 		unique_together = ("photo_1", "photo_2")
+		db_table = 'photos_similarity'
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}'.format(self.photo_1.id, self.photo_2.id, self.similarity)
@@ -193,6 +201,7 @@ class Neighbor(models.Model):
 
 	class Meta:
 		unique_together = ("photo_1", "photo_2")
+		db_table = 'photos_neighbor'
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}, {3}'.format(self.photo_1.id, self.photo_2.id, self.time_distance_sec, self.geo_distance_m)

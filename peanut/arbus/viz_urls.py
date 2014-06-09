@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from photos import viz_views
+from arbus import viz_views
 
 urlpatterns = patterns('',
 	url(r'^manualAddPhoto$', viz_views.manualAddPhoto, name='manualAddPhoto'),

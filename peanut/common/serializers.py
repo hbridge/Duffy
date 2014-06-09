@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from photos.models import Photo, User
+from common.models import Photo, User
 
 
 class PhotoSerializer(serializers.ModelSerializer):

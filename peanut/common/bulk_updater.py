@@ -5,7 +5,6 @@ from django.db.models.fields import (
 	AutoField, GenericIPAddressField, IPAddressField)
 from django.contrib.gis.db.models.fields import PointField
 
-
 from django.utils.functional import SimpleLazyObject
 
 def bulk_update(objs, update_fields=None, exclude_fields=None,

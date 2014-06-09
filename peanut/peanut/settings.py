@@ -37,7 +37,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.gis',
-    'photos',
+    'arbus',
+    'common',
     # Added.
     'haystack',
     'rest_framework'

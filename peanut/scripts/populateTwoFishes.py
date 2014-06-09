@@ -10,9 +10,10 @@ if parentPath not in sys.path:
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 
 from django.db.models import Q
-from photos.models import Photo
+
 from peanut import settings
-from photos import location_util
+from common.models import Photo
+from arbus import location_util
 
 def main(argv):
 	logger = logging.getLogger(__name__)
