@@ -108,7 +108,6 @@
 		5ADB24FB189992180016CA02 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */; };
 		5ADB24FD189992A00016CA02 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */; };
 		5ADB2509189ABBB50016CA02 /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2508189ABBB50016CA02 /* DFPhoto.m */; };
-		5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */; };
 		5ADB99A61946147700ADAC57 /* DFPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADB99A51946147700ADAC57 /* DFPhotoView.m */; };
 		5AE3BF7118E4CCC600ACB5DC /* DFBoundingBoxView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AE3BF7018E4CCC600ACB5DC /* DFBoundingBoxView.m */; };
 		5AE3BF7318E4D08F00ACB5DC /* CoreImage.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AE3BF7218E4D08F00ACB5DC /* CoreImage.framework */; };
@@ -307,8 +306,6 @@
 		5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoViewCell.xib; sourceTree = "<group>"; };
 		5ADB2507189ABBB50016CA02 /* DFPhoto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoto.h; sourceTree = "<group>"; };
 		5ADB2508189ABBB50016CA02 /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoto.m; sourceTree = "<group>"; };
-		5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollViewController.h; sourceTree = "<group>"; };
-		5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollViewController.m; sourceTree = "<group>"; };
 		5ADB99A41946147700ADAC57 /* DFPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoView.h; sourceTree = "<group>"; };
 		5ADB99A51946147700ADAC57 /* DFPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoView.m; sourceTree = "<group>"; };
 		5AE3BF6F18E4CCC600ACB5DC /* DFBoundingBoxView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBoundingBoxView.h; sourceTree = "<group>"; };
@@ -437,7 +434,6 @@
 			isa = PBXGroup;
 			children = (
 				5AB3983519252D8100E6E69E /* Intro */,
-				5AB32EAC18F30121004FC27B /* Camera Roll */,
 				5AB32EAD18F3012D004FC27B /* Search View */,
 				5AB32EAE18F30136004FC27B /* Settings View */,
 			);
@@ -573,15 +569,6 @@
 				5AACB92118F6092F00F4EEB6 /* HockeySDKResources.bundle */,
 			);
 			path = Resources;
-			sourceTree = "<group>";
-		};
-		5AB32EAC18F30121004FC27B /* Camera Roll */ = {
-			isa = PBXGroup;
-			children = (
-				5ADB2512189AED860016CA02 /* DFCameraRollViewController.h */,
-				5ADB2513189AED860016CA02 /* DFCameraRollViewController.m */,
-			);
-			name = "Camera Roll";
 			sourceTree = "<group>";
 		};
 		5AB32EAD18F3012D004FC27B /* Search View */ = {
@@ -1109,7 +1096,6 @@
 				5AD8AD45191D398200782144 /* DFPeanutSuggestion.m in Sources */,
 				5AD8AD3D191AD76F00782144 /* DFFaceFeature.m in Sources */,
 				5AB32EAB18F1E1B7004FC27B /* DFSuggestionAdapter.m in Sources */,
-				5ADB2514189AED860016CA02 /* DFCameraRollViewController.m in Sources */,
 				5A50EE67193D20CB00B78333 /* DFPhotoSectionHeader.m in Sources */,
 				5AACB8FA18F4599800F4EEB6 /* DFNetworkingConstants.m in Sources */,
 				5A8C98E5190AEAD700AE9F88 /* DFUploadOperation.m in Sources */,
