@@ -56,7 +56,7 @@
                         <action selector="cancelButtonClicked:" destination="iN0-l3-epB" eventType="touchUpInside" id="uAw-nl-3AL"/>
                     </connections>
                 </button>
-                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="FyO-bs-7gR">
+                <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="FyO-bs-7gR">
                     <rect key="frame" x="0.0" y="22" width="20" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                 </activityIndicatorView>
@@ -64,6 +64,7 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <gestureRecognizers/>
             <constraints>
+                <constraint firstItem="FyO-bs-7gR" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Eay-Hc-v20"/>
                 <constraint firstItem="xPT-ud-47f" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="GlK-N8-eMa"/>
                 <constraint firstAttribute="centerY" secondItem="4Cf-oq-Jsq" secondAttribute="centerY" id="HVp-5N-KqD"/>
                 <constraint firstItem="4Cf-oq-Jsq" firstAttribute="leading" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="900" constant="-35" id="Uxv-AV-GXx"/>
@@ -73,6 +74,7 @@
                 <constraint firstAttribute="trailing" secondItem="NNO-gn-7DZ" secondAttribute="trailing" id="tAx-UH-zIc"/>
                 <constraint firstItem="0FW-ga-xjZ" firstAttribute="leading" secondItem="xPT-ud-47f" secondAttribute="trailing" constant="8" id="tMX-Ge-Vyo"/>
                 <constraint firstAttribute="trailing" secondItem="0FW-ga-xjZ" secondAttribute="trailing" priority="700" id="vDg-90-3SN"/>
+                <constraint firstAttribute="centerY" secondItem="FyO-bs-7gR" secondAttribute="centerY" id="vld-1C-6gR"/>
                 <constraint firstAttribute="centerY" secondItem="xPT-ud-47f" secondAttribute="centerY" id="yat-VX-CBX"/>
             </constraints>
             <connections>
