@@ -101,6 +101,13 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 							},
 						],
 					]
+		'docs' = [
+					[
+							{
+								'photo' = solrPhoto
+							}
+						],
+					]
 	  },
 	]
 
@@ -116,27 +123,52 @@ def splitPhotosFromIndexbyMonthV2(userId, solrPhotoSet, threshold=settings.DEFAU
 	
 	clusters = getClusters(solrPhotoSet, threshold, dupThreshold, simCaches)
 
+	# These are keyed off of the month
+	docItems = dict()
+	clusterItems = dict()
+	titles = dict()
+
+	# This is used to keep track of all the months we've seen.  Docs and Clusters might have different results
+	allMonthKeys = dict()
+
 	# process docstack results first
-	docs = dict()
 	if (docResults):
-		f = lambda x: x.timeTaken.strftime('%b %Y')
-		results = list()
+		# Group each of our docs results by month, then
+		f = lambda x: x.timeTaken.strftime('%Y-%m')
+
 		for key, items in groupby(docResults, f):
-			docs[key] = list()
+			docItems[key] = list()
 			for item in items:
-				docs[key].append({'photo': item, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)})
+				# We have to construct the photo item here, clusters is already done for us
+				docItems[key].append({'photo': item})
+				titles[key] = item.timeTaken.strftime('%b %Y')
+
+			allMonthKeys[key] = True
 
 	# process regular photos next
-	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
-	results = list()
+	f = lambda x: x[0]['photo'].timeTaken.strftime('%Y-%m')
 	for key, items in groupby(clusters, f):
-		monthEntry = {'title': key, 'clusters': list(), 'docs': list()}
+		clusterItems[key] = list()
 		for item in items:
-			monthEntry['clusters'].append(item)
-		if key in docs:
-			monthEntry['docs'].extend(docs[key])
+			# clusterItems are already in the PhotoItem format we want
+			clusterItems[key].append(item)
+			titles[key] = item[0]['photo'].timeTaken.strftime('%b %Y')
+			
+		allMonthKeys[key] = True
+
+	# This is a sorted and unique list
+	monthKeys = sorted(allMonthKeys.keys())
+	results = list()
+
+	for key in monthKeys:
+		monthEntry = {'title': titles[key], 'clusters': list(), 'docs': list()}
+		
+		if key in clusterItems:
+			monthEntry['clusters'].extend(clusterItems[key])			
+		if key in docItems:
+			monthEntry['docs'].extend(docItems[key])
 		results.append(monthEntry)
-	
+
 	return results
 
 """
