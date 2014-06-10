@@ -14,9 +14,10 @@ class TimeEnabledEncoder(json.JSONEncoder):
 		
 def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
-	if 'solr_photo' in entry:
+	photo = entry['photo']
+
+	if hasattr(photo, 'photoId'):
 		# This is a solr photo
-		photo = entry['solr_photo']
 		
 		photoData.update({
 			'id': photo.photoId,
@@ -24,22 +25,18 @@ def getPhotoObject(entry):
 		})
 		
 		return photoData
-	elif 'db_photo' in entry:
+	else:
 		# This is a database photo
-		photo = entry['db_photo']
 		
 		photoData.update(SmallPhotoSerializer(photo).data)
 		return photoData
-	else:
-		return None
+
 
 """
 	Turns groups by month, called from gallery_util and turns it into sections
 	  that is converted to json and returned to the user
 
 	Limit the number of objects we add in by 'num'
-
-	Takes in solr_photo or db_photo
 	
 	Takes as input:
 	groupings = [
@@ -48,16 +45,16 @@ def getPhotoObject(entry):
 						'clusters': 
 							[
 								[
-									{'solr_photo': Photo}
+									{'photo': Photo or SolrPhoto}
 								],
 								[
-									{'solr_photo': Photo},
-									{'solr_photo': Photo}
+									{'photo': Photo or SolrPhoto},
+									{'photo': Photo or SolrPhoto}
 								]
 							]
 						'docs': [
-							{'solr_photo': Photo},
-							{'solr_photo': Photo}
+							{'photo': Photo or SolrPhoto},
+							{'photo': Photo or SolrPhoto}
 						]
 					}
 				]

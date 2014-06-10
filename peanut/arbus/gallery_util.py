@@ -83,10 +83,10 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 		for key, solrPhotos in groupby(docResults, f):
 			docs[key] = list()
 			for solrPhoto in solrPhotos:
-				docs[key].append({'solr_photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)})
+				docs[key].append({'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)})
 
 	# process regular photos next
-	f = lambda x: x[0]['solr_photo'].timeTaken.strftime('%b %Y')
+	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
 	results = list()
 	for key, items in groupby(clusters, f):
 		monthEntry = {'title': key, 'clusters': list(), 'docs': list()}
@@ -145,7 +145,7 @@ def getLowestDistance(cluster, solrPhoto, simCaches):
 	lowestIndex = None
 
 	for i, entry in enumerate(cluster):
-		sim = getSim(entry['solr_photo'], solrPhoto, simCaches)
+		sim = getSim(entry['photo'], solrPhoto, simCaches)
 		if (sim):
 			dist = sim.similarity
 			if (not lowestDist):
@@ -160,7 +160,7 @@ def getLowestDistance(cluster, solrPhoto, simCaches):
 def getLongestTimeSince(cluster, solrPhoto):
 	longestTime = None
 	for i, entry in enumerate(cluster):
-		dist = abs(entry['solr_photo'].timeTaken - solrPhoto.timeTaken)
+		dist = abs(entry['photo'].timeTaken - solrPhoto.timeTaken)
 		if not longestTime:
 			longestTime = dist
 		elif dist > longestTime:
@@ -173,7 +173,7 @@ def getLongestTimeSince(cluster, solrPhoto):
 """		
 def addToCluster(cluster, solrPhoto, lowestIndex, lowestDist, simCaches):
 	sim = getSim(solrPhoto, cluster[lowestIndex]['photo'], simCaches)
-	cluster.append({'solr_photo': solrPhoto, 'dist': lowestDist, 'simrow': sim, 'simrows': getAllSims(solrPhoto, simCaches)})
+	cluster.append({'photo': solrPhoto, 'dist': lowestDist, 'simrow': sim, 'simrows': getAllSims(solrPhoto, simCaches)})
 
 	return cluster
 
@@ -206,7 +206,7 @@ def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 		return clusterList
 	solrPhotoSetIter = iter(solrPhotoSet)
 	firstPhoto = next(solrPhotoSetIter)
-	clusterList.append([{'solr_photo': firstPhoto, 'dist': None, 'simrows': getAllSims(firstPhoto, simCaches)}])
+	clusterList.append([{'photo': firstPhoto, 'dist': None, 'simrows': getAllSims(firstPhoto, simCaches)}])
 
 	for solrPhoto in solrPhotoSetIter:
 		currentCluster = clusterList[-1]
@@ -222,9 +222,9 @@ def getClusters(solrPhotoSet, threshold, dupThreshold, simCaches):
 			elif (lowestDist < threshold and longestTime < datetime.timedelta(minutes=settings.DEFAULT_MINUTES_TO_CLUSTER)):
 				addToCluster(currentCluster, solrPhoto, lowestIndex, lowestDist, simCaches)
 			else:
-				clusterList.append([{'solr_photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])
+				clusterList.append([{'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])
 		else:
-			clusterList.append([{'solr_photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])
+			clusterList.append([{'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)}])
 	return clusterList
 
 

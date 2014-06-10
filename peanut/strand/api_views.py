@@ -47,7 +47,7 @@ def getGroups(groupings):
 		entry['clusters'] = list()
 
 		for photo in group:
-			entry['clusters'].append([{'db_photo': photo}])
+			entry['clusters'].append([{'photo': photo}])
 
 		output.append(entry)
 	return output
