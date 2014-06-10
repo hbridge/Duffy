@@ -388,7 +388,8 @@
 				5A8C98E6190AFBF200AE9F88 /* DFStatusBarNotificationManager.h */,
 				5A8C98E7190AFBF200AE9F88 /* DFStatusBarNotificationManager.m */,
 				5A8D0B5318EF51BD00A1D9A7 /* Table view */,
-				5A8D0B5218EF515900A1D9A7 /* Photos grid and nav */,
+				5A548D7819475DAF0089CF02 /* Photo grid */,
+				5A8D0B5218EF515900A1D9A7 /* Photo/multiphoto view */,
 				5A8D0B5118EF515100A1D9A7 /* Custom image view */,
 				5AB32EA618F0CD3B004FC27B /* DFKeyboardResizingViewController.h */,
 				5AB32EA718F0CD3B004FC27B /* DFKeyboardResizingViewController.m */,
@@ -412,6 +413,27 @@
 				5ADB99B319465AA600ADAC57 /* DFPeanutSearchResponse.m */,
 			);
 			name = Search;
+			sourceTree = "<group>";
+		};
+		5A548D7819475DAF0089CF02 /* Photo grid */ = {
+			isa = PBXGroup;
+			children = (
+				5A67606418E3389900E355B6 /* DFPhotoNavigationControllerViewController.h */,
+				5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */,
+				5A50EE65193D20CB00B78333 /* DFPhotoSectionHeader.h */,
+				5A50EE66193D20CB00B78333 /* DFPhotoSectionHeader.m */,
+				5A50EE68193D20E500B78333 /* DFPhotoSectionHeader.xib */,
+				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
+				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
+				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
+				5A28CEA9193E7C9500A2CBD3 /* DFPhotoStackCell.h */,
+				5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */,
+				5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */,
+				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
+				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
+				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
+			);
+			name = "Photo grid";
 			sourceTree = "<group>";
 		};
 		5A5FCB3D192D50FE00A060A7 /* Intro Text */ = {
@@ -490,32 +512,18 @@
 			name = "Custom image view";
 			sourceTree = "<group>";
 		};
-		5A8D0B5218EF515900A1D9A7 /* Photos grid and nav */ = {
+		5A8D0B5218EF515900A1D9A7 /* Photo/multiphoto view */ = {
 			isa = PBXGroup;
 			children = (
-				5ADB24F9189992180016CA02 /* DFPhotoViewCell.h */,
-				5ADB24FA189992180016CA02 /* DFPhotoViewCell.m */,
-				5ADB24FC189992A00016CA02 /* DFPhotoViewCell.xib */,
-				5A28CEA9193E7C9500A2CBD3 /* DFPhotoStackCell.h */,
-				5A28CEAA193E7C9500A2CBD3 /* DFPhotoStackCell.m */,
-				5A28CEAC193E7CD700A2CBD3 /* DFPhotoStackCell.xib */,
-				5ADB24EF189985A20016CA02 /* DFPhotosGridViewController.h */,
-				5ADB24F0189985A20016CA02 /* DFPhotosGridViewController.m */,
-				5ADB24F1189985A20016CA02 /* DFPhotosGridViewController.xib */,
+				5A67606718E3558500E355B6 /* DFMultiPhotoViewController.h */,
+				5A67606818E3558500E355B6 /* DFMultiPhotoViewController.m */,
+				5ADB99A41946147700ADAC57 /* DFPhotoView.h */,
+				5ADB99A51946147700ADAC57 /* DFPhotoView.m */,
 				5A67605D18E2444E00E355B6 /* DFPhotoViewController.h */,
 				5A67605E18E2444E00E355B6 /* DFPhotoViewController.m */,
 				5A67605F18E2444E00E355B6 /* DFPhotoViewController.xib */,
-				5A67606718E3558500E355B6 /* DFMultiPhotoViewController.h */,
-				5A67606818E3558500E355B6 /* DFMultiPhotoViewController.m */,
-				5A67606418E3389900E355B6 /* DFPhotoNavigationControllerViewController.h */,
-				5A67606518E3389900E355B6 /* DFPhotoNavigationControllerViewController.m */,
-				5A50EE65193D20CB00B78333 /* DFPhotoSectionHeader.h */,
-				5A50EE66193D20CB00B78333 /* DFPhotoSectionHeader.m */,
-				5A50EE68193D20E500B78333 /* DFPhotoSectionHeader.xib */,
-				5ADB99A41946147700ADAC57 /* DFPhotoView.h */,
-				5ADB99A51946147700ADAC57 /* DFPhotoView.m */,
 			);
-			name = "Photos grid and nav";
+			name = "Photo/multiphoto view";
 			sourceTree = "<group>";
 		};
 		5A8D0B5318EF51BD00A1D9A7 /* Table view */ = {
