@@ -10,10 +10,8 @@
 
 @class DFCameraOverlayView;
 
-@interface DFCameraViewController : UIViewController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
-- (IBAction)cameraButtonPressed:(UIButton *)sender;
+@interface DFCameraViewController : UIImagePickerController <UIImagePickerControllerDelegate, UINavigationControllerDelegate>
 
-@property (nonatomic, readonly, retain) DFCameraOverlayView *cameraOverlayView;
-@property (nonatomic, readonly, retain) UIImagePickerController *imagePickerController;
+@property (nonatomic, readonly, retain) DFCameraOverlayView *customCameraOverlayView;
 
 @end

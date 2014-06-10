@@ -31,11 +31,10 @@
 - (instancetype)init {
   self = [super init];
   if (self) {
-    UIStoryboard *mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
     _subviewControllers =
     @[
-      [mainStoryboard instantiateViewControllerWithIdentifier:@"DFCameraViewController"],
-      [mainStoryboard instantiateViewControllerWithIdentifier:@"DFGalleryWebViewController"]
+     [[DFGalleryWebViewController alloc] init],
+     [[DFCameraViewController alloc] init]
       ];
   }
   return self;

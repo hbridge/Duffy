@@ -8,6 +8,7 @@
 
 #import "DFCameraViewController.h"
 #import "DFCameraOverlayView.h"
+#import "RootViewController.h"
 
 @interface DFCameraViewController ()
 
@@ -15,22 +16,27 @@
 
 @implementation DFCameraViewController
 
-@synthesize imagePickerController = _imagePickerController;
-@synthesize cameraOverlayView = _cameraOverlayView;
+@synthesize customCameraOverlayView = _customCameraOverlayView;
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    // Custom initialization
+    
   }
   return self;
 }
 
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
+  self.sourceType = UIImagePickerControllerSourceTypeCamera;
+  self.delegate = self;
   
+  self.showsCameraControls = NO;
+  self.cameraOverlayView = self.cameraOverlayView;
+  [self setNeedsStatusBarAppearanceUpdate];
 }
 
 
@@ -39,17 +45,6 @@
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
 }
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
- {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 #pragma mark - Image Picker Controller delegate methods
 
@@ -67,47 +62,33 @@
   
 }
 
-
-- (IBAction)cameraButtonPressed:(UIButton *)sender {
-  [self presentViewController:self.imagePickerController animated:YES completion:NULL];
-}
-                              
-- (UIImagePickerController *)imagePickerController
-{
-  if (!_imagePickerController) {
-    UIImagePickerController *picker = [[UIImagePickerController alloc] init];
-    picker.delegate = self;
-    picker.sourceType = UIImagePickerControllerSourceTypeCamera;
-    picker.showsCameraControls = NO;
-    picker.cameraOverlayView = self.cameraOverlayView;
-    _imagePickerController = picker;
-  }
-  
-  return _imagePickerController;
-}
-
 - (UIView *)cameraOverlayView
 {
-  if (!_cameraOverlayView) {
-    _cameraOverlayView = [[[UINib nibWithNibName:@"DFCameraOverlayView" bundle:nil]
+  if (!_customCameraOverlayView) {
+    _customCameraOverlayView = [[[UINib nibWithNibName:@"DFCameraOverlayView" bundle:nil]
                            instantiateWithOwner:self options:nil]
                           firstObject];
   }
   
-  [_cameraOverlayView.dismissButton addTarget:self action:@selector(dismissButtonPressed:)
+  [_customCameraOverlayView.takePhotoButton addTarget:self action:@selector(takePhotoButtonPressed:)
                              forControlEvents:UIControlEventTouchUpInside];
-  [_cameraOverlayView.dismissButton addTarget:self action:@selector(takePhotoButtonPressed:)
-                             forControlEvents:UIControlEventTouchUpInside];
+  [_customCameraOverlayView.galleryButton addTarget:self action:@selector(galleryButtonPressed:)
+                                     forControlEvents:UIControlEventTouchUpInside];
   
-  return _cameraOverlayView;
+  return _customCameraOverlayView;
 }
 
 - (void)takePhotoButtonPressed:(UIButton *)sender {
   
 }
+\
+- (void)galleryButtonPressed:(UIButton *)sender {
+  [(RootViewController *)self.view.window.rootViewController showGallery];
+}
 
-- (void)dismissButtonPressed:(UIButton *)sender {
-  [self.imagePickerController dismissViewControllerAnimated:YES completion:nil];
+- (BOOL)prefersStatusBarHidden
+{
+  return YES;
 }
 
 

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @interface DFCameraOverlayView : UIView
-@property (weak, nonatomic) IBOutlet UIButton *dismissButton;
 @property (weak, nonatomic) IBOutlet UIButton *takePhotoButton;
+@property (weak, nonatomic) IBOutlet UIButton *galleryButton;
 
 @end

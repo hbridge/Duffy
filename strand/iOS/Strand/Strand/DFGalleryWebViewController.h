@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFGalleryWebViewController : UIViewController
+@interface DFGalleryWebViewController : UIViewController <UIWebViewDelegate>
+
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
 
 @end

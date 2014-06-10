@@ -12,5 +12,8 @@
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
 
+
+- (void)showGallery;
+
 @end
 

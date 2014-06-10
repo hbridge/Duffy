@@ -30,7 +30,7 @@
   self.pageViewController.delegate = self;
 
   UIViewController *startingViewController = [self.subviewController
-                                                viewControllerAtIndex:0
+                                                viewControllerAtIndex:1
                                                 storyboard:self.storyboard];
   NSArray *viewControllers = @[startingViewController];
   [self.pageViewController setViewControllers:viewControllers
@@ -59,12 +59,34 @@
 }
 
 - (SubviewsController *)subviewController {
-  // Return the model controller object, creating it if necessary.
-  // In more complex implementations, the model controller may be passed to the view controller.
   if (!_subviewController) {
       _subviewController = [[SubviewsController alloc] init];
   }
   return _subviewController;
+}
+
+- (void)showGallery
+{
+  UIViewController *galleryViewController = [self.subviewController
+                                              viewControllerAtIndex:0
+                                              storyboard:self.storyboard];
+  NSArray *viewControllers = @[galleryViewController];
+  [self.pageViewController setViewControllers:viewControllers
+                                    direction:UIPageViewControllerNavigationDirectionReverse
+                                     animated:YES
+                                   completion:nil];
+}
+
+- (void)showCamera
+{
+  UIViewController *galleryViewController = [self.subviewController
+                                             viewControllerAtIndex:1
+                                             storyboard:self.storyboard];
+  NSArray *viewControllers = @[galleryViewController];
+  [self.pageViewController setViewControllers:viewControllers
+                                    direction:UIPageViewControllerNavigationDirectionForward
+                                     animated:YES
+                                   completion:nil];
 }
 
 #pragma mark - UIPageViewController delegate methods
@@ -78,6 +100,11 @@
 
   self.pageViewController.doubleSided = NO;
   return UIPageViewControllerSpineLocationMin;
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return [self.pageViewController.viewControllers.firstObject prefersStatusBarHidden];
 }
 
 @end

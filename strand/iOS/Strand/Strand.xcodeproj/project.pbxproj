@@ -8,12 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
-		5A8F05311946724A003C69E0 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A8F05301946724A003C69E0 /* DFCameraOverlayView.xib */; };
+		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
+		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
+		5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */; };
 		5ADD857519465C790037A6D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857419465C790037A6D5 /* main.m */; };
 		5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857719465C790037A6D5 /* AppDelegate.m */; };
 		5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857A19465C790037A6D5 /* RootViewController.m */; };
 		5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD858019465C790037A6D5 /* SubviewsController.m */; };
-		5ADD858419465C790037A6D5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5ADD858219465C790037A6D5 /* Main.storyboard */; };
 		5ADD858619465C790037A6D5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ADD858519465C790037A6D5 /* Images.xcassets */; };
 		5ADD859219465C790037A6D5 /* StrandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859119465C790037A6D5 /* StrandTests.m */; };
 		5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859C19465F520037A6D5 /* DFCameraViewController.m */; };
@@ -33,7 +34,9 @@
 /* Begin PBXFileReference section */
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
-		5A8F05301946724A003C69E0 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
+		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
+		5AC4A8D019476F9000862D9C /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
+		5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFGalleryWebViewController.xib; sourceTree = "<group>"; };
 		5ADD856F19465C790037A6D5 /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADD857319465C790037A6D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5ADD857419465C790037A6D5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -43,7 +46,6 @@
 		5ADD857A19465C790037A6D5 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		5ADD857F19465C790037A6D5 /* SubviewsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubviewsController.h; sourceTree = "<group>"; };
 		5ADD858019465C790037A6D5 /* SubviewsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubviewsController.m; sourceTree = "<group>"; };
-		5ADD858319465C790037A6D5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		5ADD858519465C790037A6D5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		5ADD858B19465C790037A6D5 /* StrandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADD859019465C790037A6D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -103,10 +105,11 @@
 				5ADD859C19465F520037A6D5 /* DFCameraViewController.m */,
 				5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */,
 				5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */,
-				5A8F05301946724A003C69E0 /* DFCameraOverlayView.xib */,
+				5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */,
 				5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */,
 				5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */,
-				5ADD858219465C790037A6D5 /* Main.storyboard */,
+				5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */,
+				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
 				5ADD857219465C790037A6D5 /* Supporting Files */,
 			);
@@ -183,6 +186,7 @@
 		5ADD856719465C790037A6D5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				CLASSPREFIX = DF;
 				LastUpgradeCheck = 0600;
 				ORGANIZATIONNAME = "Duffy Inc";
 				TargetAttributes = {
@@ -219,8 +223,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5A8F05311946724A003C69E0 /* DFCameraOverlayView.xib in Resources */,
-				5ADD858419465C790037A6D5 /* Main.storyboard in Resources */,
+				5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */,
+				5AC4A8D119476F9000862D9C /* Assets in Resources */,
+				5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -266,17 +271,6 @@
 			targetProxy = 5ADD858C19465C790037A6D5 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
-
-/* Begin PBXVariantGroup section */
-		5ADD858219465C790037A6D5 /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				5ADD858319465C790037A6D5 /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
-/* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
 		5ADD859319465C790037A6D5 /* Debug */ = {
@@ -360,6 +354,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -372,6 +367,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -392,6 +388,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = StrandTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -408,6 +405,7 @@
 					"$(inherited)",
 				);
 				INFOPLIST_FILE = StrandTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				METAL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
