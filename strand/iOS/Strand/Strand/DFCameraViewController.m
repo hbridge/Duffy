@@ -31,11 +31,16 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  self.sourceType = UIImagePickerControllerSourceTypeCamera;
-  self.delegate = self;
+  if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+    self.sourceType = UIImagePickerControllerSourceTypeCamera;
+    self.showsCameraControls = NO;
+    self.cameraOverlayView = self.cameraOverlayView;
+  } else {
+    self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    self.cameraViewTransform
+  }
   
-  self.showsCameraControls = NO;
-  self.cameraOverlayView = self.cameraOverlayView;
+  self.delegate = self;
 }
 
 
@@ -78,7 +83,7 @@
 }
 
 - (void)takePhotoButtonPressed:(UIButton *)sender {
-  
+
 }
 
 - (void)galleryButtonPressed:(UIButton *)sender {
