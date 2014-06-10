@@ -31,7 +31,12 @@ class User(models.Model):
 		return os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(self.id))
 
 	def __unicode__(self):
-		return self.first_name + " " + self.last_name + " - " + self.phone_id
+		if self.product_id == 0:
+			productStr = "Arbus"
+		else:
+			productStr = "Strand"
+			
+		return "(%s - %s) %s - %s" % (self.id, productStr, self.first_name, self.phone_id)
 
 
 class Photo(models.Model):
@@ -204,7 +209,7 @@ class Neighbor(models.Model):
 
 	class Meta:
 		unique_together = ("photo_1", "photo_2")
-		db_table = 'photos_neighbor'
+		db_table = 'strand_neighbor'
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}, {3}'.format(self.photo_1.id, self.photo_2.id, self.time_distance_sec, self.geo_distance_m)

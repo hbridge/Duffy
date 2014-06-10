@@ -92,7 +92,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().exclude(user_id=1).exclude(thumb_filename=None).filter(neighbored_time=None).exclude(time_taken=None).exclude(location_point=None).order_by('-time_taken')[:maxFilesAtTime]
+		photos = Photo.objects.all().exclude(user_id=1).exclude(thumb_filename=None).filter(neighbored_time=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by('-time_taken')[:maxFilesAtTime]
 
 		if len(photos) > 0:
 			rowsToWrite = list()
@@ -101,7 +101,7 @@ def main(argv):
 			timeHigh = photos[0].time_taken + datetime.timedelta(hours=3)
 			timeLow = photos[-1].time_taken - datetime.timedelta(hours=3)
 
-			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None)
+			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None).filter(user__product_id=1)
 
 			for refPhoto in photos:
 				nearbyPhotos = getNearbyPhotos(refPhoto, photosCache)
