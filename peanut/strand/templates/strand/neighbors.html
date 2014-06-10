@@ -63,21 +63,21 @@
 
 		console.log("Sending request to " + url)
 		$.get(url, function( data ) {
-			$.each( data.neighbors, function( i, cluster ) {
+			$.each( data.objects, function( i, objects ) {
 				row = "";
 				city = "";
 				date = "";
 				users = [];
-				$.each(cluster, function( i, photo) {
+				$.each(objects.objects, function( i, photo) {
 					users.push(photo.user);
-					thumbUrl = "/user_data/" + photo.user + "/" + photo.thumb_filename
+					thumbUrl = "/user_data/" + photo.user + "/" + photo.id + "-thumb-156.jpg"
 					img = "<img height='78px' width='78px' src='" + thumbUrl + "' alt='" + photo.user + "'/>"
 					html = "<div class='ui-imageblock'><div class='ui-image' title='" + photo.user + "'>" + img + "</div></div>";
 
 					row += html
-					city = photo.location_city
-					d = new Date(photo.time_taken * 1000); // TODO: Need to change this to format Mar 27, 2014
-					time = d.toLocaleDateString("en-US")
+					city = objects.title
+					d = new Date(photo.time_taken * 1000);
+					time = d.toDateString().slice(4);
 				});
 
 				$("<div class='ui-section'><div class='ui-section-header'><div class='ui-sec-head-lhs'><div class='ui-sec-head-title'>"+ city + "</div><div class='ui-sec-head-names'> People: " + uniqueUser(users) + "</div></div><div class='ui-sec-head-rhs'>" + time + "</div></div>" + row + "</div>").appendTo( "#images" );
@@ -100,7 +100,8 @@
 	</script>
 </head>
 
-<body> 
+<body>
+	<div class="ui-header"> Shared Photos </div>
 <div id="images"/>
 
 </body>
