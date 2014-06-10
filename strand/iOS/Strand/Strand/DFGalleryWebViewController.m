@@ -7,6 +7,8 @@
 //
 
 #import "DFGalleryWebViewController.h"
+#import "DFNetworkingConstants.h"
+#import "DFUser.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -27,9 +29,12 @@
 {
   [super viewDidLoad];
   
-  NSURL *urlToLoad = [NSURL URLWithString:@"http://www.google.com"];
-  [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
+  NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
+                         DFServerBaseURL, [[DFUser currentUser] userID]];
+  NSURL *urlToLoad = [NSURL URLWithString:urlString];
   
+  DDLogInfo(@"Fetching url:%@", urlString);
+  [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
 }
 
 - (void)didReceiveMemoryWarning
