@@ -1,1 +1,1 @@
-java -cp jaws-bin.jar:. WordNetNav > ../peanut/photos/alt.txt
+java -cp jaws-bin.jar:. WordNetNav > ../peanut/arbus/alt.txt

@@ -154,7 +154,7 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		return list()
 
 	def prepAltList(self):
-		altFilePath = '/home/derek/prod/Duffy/peanut/photos/'
+		altFilePath = '/home/derek/prod/Duffy/peanut/arbus/'
 		f = open(altFilePath + 'alt.txt', 'r')
 		self.altDict = dict()
 
