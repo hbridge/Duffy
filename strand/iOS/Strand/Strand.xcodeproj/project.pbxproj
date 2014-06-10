@@ -12,6 +12,7 @@
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
 		5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */; };
+		5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D81947B01100862D9C /* DFLogConfig.m */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
@@ -42,6 +43,9 @@
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
 		5AC4A8D019476F9000862D9C /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFGalleryWebViewController.xib; sourceTree = "<group>"; };
+		5AC4A8D41947AEF500862D9C /* Strand-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strand-Prefix.pch"; sourceTree = "<group>"; };
+		5AC4A8D51947AF7C00862D9C /* DFLogConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFLogConfig.h; sourceTree = "<group>"; };
+		5AC4A8D81947B01100862D9C /* DFLogConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLogConfig.m; sourceTree = "<group>"; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5ACA39001947A6F100834D86 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -90,6 +94,48 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5AC4A8D61947AF8E00862D9C /* Camera View */ = {
+			isa = PBXGroup;
+			children = (
+				5ADD859B19465F520037A6D5 /* DFCameraViewController.h */,
+				5ADD859C19465F520037A6D5 /* DFCameraViewController.m */,
+				5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */,
+				5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */,
+				5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */,
+			);
+			name = "Camera View";
+			sourceTree = "<group>";
+		};
+		5AC4A8D71947AFA100862D9C /* Main Page View controller */ = {
+			isa = PBXGroup;
+			children = (
+				5ADD857919465C790037A6D5 /* RootViewController.h */,
+				5ADD857A19465C790037A6D5 /* RootViewController.m */,
+				5ADD857F19465C790037A6D5 /* SubviewsController.h */,
+				5ADD858019465C790037A6D5 /* SubviewsController.m */,
+			);
+			name = "Main Page View controller";
+			sourceTree = "<group>";
+		};
+		5AC4A8DA1947B01D00862D9C /* Logging and Analytics */ = {
+			isa = PBXGroup;
+			children = (
+				5AC4A8D51947AF7C00862D9C /* DFLogConfig.h */,
+				5AC4A8D81947B01100862D9C /* DFLogConfig.m */,
+			);
+			name = "Logging and Analytics";
+			sourceTree = "<group>";
+		};
+		5AC4A8DB1947B02C00862D9C /* Gallery View */ = {
+			isa = PBXGroup;
+			children = (
+				5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */,
+				5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */,
+				5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */,
+			);
+			name = "Gallery View";
+			sourceTree = "<group>";
+		};
 		5ADD856619465C790037A6D5 = {
 			isa = PBXGroup;
 			children = (
@@ -115,18 +161,10 @@
 			children = (
 				5ADD857619465C790037A6D5 /* AppDelegate.h */,
 				5ADD857719465C790037A6D5 /* AppDelegate.m */,
-				5ADD857919465C790037A6D5 /* RootViewController.h */,
-				5ADD857A19465C790037A6D5 /* RootViewController.m */,
-				5ADD857F19465C790037A6D5 /* SubviewsController.h */,
-				5ADD858019465C790037A6D5 /* SubviewsController.m */,
-				5ADD859B19465F520037A6D5 /* DFCameraViewController.h */,
-				5ADD859C19465F520037A6D5 /* DFCameraViewController.m */,
-				5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */,
-				5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */,
-				5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */,
-				5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */,
-				5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */,
-				5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */,
+				5AC4A8D71947AFA100862D9C /* Main Page View controller */,
+				5AC4A8D61947AF8E00862D9C /* Camera View */,
+				5AC4A8DB1947B02C00862D9C /* Gallery View */,
+				5AC4A8DA1947B01D00862D9C /* Logging and Analytics */,
 				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
 				5ADD857219465C790037A6D5 /* Supporting Files */,
@@ -137,6 +175,7 @@
 		5ADD857219465C790037A6D5 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				5AC4A8D41947AEF500862D9C /* Strand-Prefix.pch */,
 				5ADD857319465C790037A6D5 /* Info.plist */,
 				5ADD857419465C790037A6D5 /* main.m */,
 			);
@@ -311,6 +350,7 @@
 			files = (
 				5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
+				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,
 				5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */,
@@ -421,6 +461,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -436,6 +477,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
+				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

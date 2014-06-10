@@ -8,6 +8,9 @@
 
 #import "AppDelegate.h"
 #import "RootViewController.h"
+#import <CocoaLumberjack/DDTTYLogger.h>
+#import <CocoaLumberjack/DDASLLogger.h>
+#import <CocoaLumberjack/DDFileLogger.h>
 
 @interface AppDelegate ()
             
@@ -18,15 +21,27 @@
             
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [self configureLogs];
+  
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  
-  
   self.window.rootViewController = [[RootViewController alloc] init];
-  
   self.window.backgroundColor = [UIColor whiteColor];
   [self.window makeKeyAndVisible];
 
   return YES;
+}
+
+- (void)configureLogs
+{
+  [DDLog addLogger:[DDASLLogger sharedInstance]];
+  [DDLog addLogger:[DDTTYLogger sharedInstance]];
+  
+  DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
+  fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
+  fileLogger.logFileManager.maximumNumberOfLogFiles = 7; // 7 days of files
+  
+  // To simulate the amount of log data saved, use the release log level for the fileLogger
+  [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
