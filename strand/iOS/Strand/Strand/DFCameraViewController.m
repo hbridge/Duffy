@@ -9,6 +9,7 @@
 #import "DFCameraViewController.h"
 #import "DFCameraOverlayView.h"
 #import "RootViewController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface DFCameraViewController ()
 
@@ -37,7 +38,6 @@
     self.cameraOverlayView = self.cameraOverlayView;
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
-    self.cameraViewTransform
   }
   
   self.delegate = self;
@@ -50,21 +50,7 @@
   // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Image Picker Controller delegate methods
 
-- (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info {
-  
-  //UIImage *chosenImage = info[UIImagePickerControllerEditedImage];
-  
-  [picker dismissViewControllerAnimated:YES completion:NULL];
-  
-}
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-  
-  [picker dismissViewControllerAnimated:YES completion:NULL];
-  
-}
 
 - (UIView *)cameraOverlayView
 {
@@ -72,24 +58,65 @@
     _customCameraOverlayView = [[[UINib nibWithNibName:@"DFCameraOverlayView" bundle:nil]
                            instantiateWithOwner:self options:nil]
                           firstObject];
-  }
-  
-  [_customCameraOverlayView.takePhotoButton addTarget:self action:@selector(takePhotoButtonPressed:)
-                             forControlEvents:UIControlEventTouchUpInside];
-  [_customCameraOverlayView.galleryButton addTarget:self action:@selector(galleryButtonPressed:)
+    [_customCameraOverlayView.takePhotoButton addTarget:self action:@selector(takePhotoButtonPressed:)
+                                       forControlEvents:UIControlEventTouchUpInside];
+    [_customCameraOverlayView.galleryButton addTarget:self action:@selector(galleryButtonPressed:)
                                      forControlEvents:UIControlEventTouchUpInside];
-  
+  }
+
   return _customCameraOverlayView;
 }
 
-- (void)takePhotoButtonPressed:(UIButton *)sender {
-
+- (void)takePhotoButtonPressed:(UIButton *)sender
+{
+  DDLogVerbose(@"takePhotoButtonPressed");
+  [self takePicture];
 }
 
-- (void)galleryButtonPressed:(UIButton *)sender {
+- (void)galleryButtonPressed:(UIButton *)sender
+{
   [(RootViewController *)self.view.window.rootViewController showGallery];
 }
 
+
+#pragma mark - Image Picker Controller delegate methods
+
+- (void)imagePickerController:(UIImagePickerController *)picker
+didFinishPickingMediaWithInfo:(NSDictionary *)info {
+  DDLogInfo(@"Image picked, info: %@", info.description);
+  if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
+    NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
+    UIImage *originalImage, *editedImage, *imageToSave;
+    
+    // Handle a still image capture
+    if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0)
+        == kCFCompareEqualTo) {
+      
+      editedImage = (UIImage *) [info objectForKey:
+                                 UIImagePickerControllerEditedImage];
+      originalImage = (UIImage *) [info objectForKey:
+                                   UIImagePickerControllerOriginalImage];
+      
+      if (editedImage) {
+        imageToSave = editedImage;
+      } else {
+        imageToSave = originalImage;
+      }
+      
+      // Save the new image (original or edited) to the Camera Roll
+      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+      [library writeImageToSavedPhotosAlbum:imageToSave.CGImage
+                                   metadata:info[UIImagePickerControllerMediaMetadata]
+                            completionBlock:^(NSURL *assetURL, NSError *error) {
+                              //
+                            }];
+    }
+  }
+}
+
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
+  
+}
 
 
 @end
