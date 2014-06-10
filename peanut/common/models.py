@@ -14,11 +14,14 @@ class User(models.Model):
 	first_name = models.CharField(max_length=100, null=True)
 	last_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100)
+	product_id = models.IntegerField(default=0)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
 	class Meta:
 		db_table = 'photos_user'
+		unique_together = ("phone_id", "product_id")
+
 
 	"""
 		Returns back the full localfile path where the user's photos are located

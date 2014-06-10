@@ -449,7 +449,7 @@ def get_suggestions(request):
 	Returns the JSON equlivant of the user
 """
 @csrf_exempt
-def get_user(request):
+def get_user(request, productId = 0):
 	response = dict({'result': True})
 	user = None
 	data = getRequestData(request)
@@ -461,8 +461,9 @@ def get_user(request):
 	if data.has_key('phone_id'):
 		phoneId = data['phone_id']
 		try:
-			user = User.objects.get(phone_id=phoneId)
+			user = User.objects.get(Q(phone_id=phoneId) & Q(product_id=productId))
 		except User.DoesNotExist:
+			logger.error("Could not find user: %s %s" % (photoId, productId))
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
 	#if user is None:
@@ -477,7 +478,7 @@ def get_user(request):
 """
 
 @csrf_exempt
-def create_user(request):
+def create_user(request, productId = 0):
 	response = dict({'result': True})
 	user = None
 	data = getRequestData(request)
@@ -490,10 +491,10 @@ def create_user(request):
 	if data.has_key('phone_id'):
 		phoneId = data['phone_id']
 		try:
-			user = User.objects.get(phone_id=phoneId)
+			user = User.objects.get(Q(phone_id=phoneId) & Q(product_id=productId))
 			return returnFailure(response, "User already exists")
 		except User.DoesNotExist:
-			user = createUser(phoneId, firstName)
+			user = createUser(phoneId, firstName, productId)
 	else:
 		return returnFailure(response, "Need a phone_id")
 
@@ -524,13 +525,13 @@ def returnFailure(response, msg):
 
 	This could be located else where
 """
-def createUser(phoneId, firstName):
+def createUser(phoneId, firstName, productId):
 	uploadsPath = "/home/derek/pipeline/uploads"
 	basePath = "/home/derek/user_data"
 	remoteHost = 'duffy@titanblack.no-ip.biz'
 	remoteStagingPath = '/home/duffy/pipeline/staging'
 
-	user = User(first_name = firstName, last_name = "", phone_id = phoneId)
+	user = User(first_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
 	user.save()
 
 	userId = str(user.id)
