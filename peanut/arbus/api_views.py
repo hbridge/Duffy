@@ -35,6 +35,7 @@ from rest_framework.response import Response
 
 from common.models import Photo, User, Neighbor, Similarity
 from common.serializers import PhotoSerializer, SmallPhotoSerializer, UserSerializer
+from common import api_util
 
 from arbus import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
 from arbus.forms import SearchQueryForm
@@ -301,42 +302,6 @@ def autocomplete(request):
 	return HttpResponse(responseJson, content_type='application/json')
 
 """
-	Turns groups by month, called from gallery_util and turns it into sections
-	  that is converted to json and returned to the user
-
-	Limit the number of objects we add in by 'num'
-"""
-def turnGroupsIntoSections(monthGroupings, num):
-	result = list()
-	lastDate = None
-	count = 0
-	for monthGroup in monthGroupings:
-		section = {'type': 'section', 'title': monthGroup['title'], 'objects': list()}
-		for cluster in monthGroup['clusters']:
-			if len(cluster) == 1:
-				entry = cluster[0]
-				section['objects'].append({'type': 'photo', 'id': entry['photo'].photoId})
-				lastDate = entry['photo'].timeTaken
-			else:
-				clusterObj = {'type': 'cluster', 'objects': list()}
-				for entry in cluster:
-					clusterObj['objects'].append({'type': 'photo', 'id': entry['photo'].photoId})
-					lastDate = entry['photo'].timeTaken
-				section['objects'].append(clusterObj)
-
-			count += 1
-			if count == num:
-				result.append(section)
-				return lastDate, result
-		if (len(monthGroup['docs']) > 0):
-			docObj = {'type': 'docstack', 'title': 'Your docs', 'objects': list()}
-			for entry in monthGroup['docs']:
-				docObj['objects'].append({'type': 'photo', 'id': entry['photo'].photoId})
-			section['objects'].append(docObj)
-		result.append(section)
-	return lastDate, result
-	
-"""
 Search API
 
 Takes in a query, number of entries to fetch, and a startDate (all fields in forms.py SearchQueryForm)
@@ -379,7 +344,7 @@ def search(request):
 
 			# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
 			#   which is the key for the next call
-			lastDate, sections = turnGroupsIntoSections(monthGroupings, num)
+			lastDate, sections = api_util.turnGroupsIntoSections(monthGroupings, num)
 
 			response['objects'] = sections
 			response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
@@ -463,7 +428,7 @@ def get_user(request, productId = 0):
 		try:
 			user = User.objects.get(Q(phone_id=phoneId) & Q(product_id=productId))
 		except User.DoesNotExist:
-			logger.error("Could not find user: %s %s" % (photoId, productId))
+			logger.error("Could not find user: %s %s" % (phoneId, productId))
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
 	#if user is None:
