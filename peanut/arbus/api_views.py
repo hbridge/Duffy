@@ -34,7 +34,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from common.models import Photo, User, Neighbor, Similarity
-from common.serializers import PhotoSerializer, SmallPhotoSerializer, UserSerializer
+from common.serializers import PhotoSerializer, UserSerializer
 from common import api_util
 
 from arbus import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
@@ -351,12 +351,12 @@ def search(request):
 		else:
 			response['retry_suggestions'] = suggestions_util.getTopCombos(user_id)
 		response['result'] = True
-		return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
 
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
-		return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
 
 
 """

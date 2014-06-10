@@ -38,6 +38,20 @@ def removeDups(seq, idFunction=None):
 	   result.append(item)
    return result
 
+def getGroups(groupings):
+	output = list()
+
+	for group in groupings:
+		title = group[0].location_city
+		entry = {'title': title}
+		entry['clusters'] = list()
+
+		for photo in group:
+			entry['clusters'].append([{'db_photo': photo}])
+
+		output.append(entry)
+	return output
+	
 def neighbors(request):
 	response = dict({'result': True})
 	data = getRequestData(request)
@@ -53,6 +67,8 @@ def neighbors(request):
 
 	results = Neighbor.objects.select_related().exclude(user_1_id=1).exclude(user_2_id=1).filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
+	# Creates a list of lists for the sections then groups.
+	# We'll first get this list setup, de-duped and sorted
 	groupings = list()
 	for neighbor in results:
 		group = getGroupForPhoto(neighbor.photo_1, groupings)
@@ -61,35 +77,40 @@ def neighbors(request):
 			# If the first photo is in a cluster, see if the other photo is in there already
 			#   if it isn't, and this isn't a dup, then add photo_2 in
 			if neighbor.photo_2 not in group:
-				group['clusters'].append(neighbor.photo_2)
+				group.append(neighbor.photo_2)
 		else:
 			# If the first photo isn't in a cluster, see if the second one is
 			group = getGroupForPhoto(neighbor.photo_2, groupings)
 
 			if (group):
 				# If the second photo is in a cluster and this isn't a dup then add in
-				group['clusters'].append(neighbor.photo_1)
+				group.append(neighbor.photo_1)
 			else:
-				title = neighbor.photo_1.location_city
 				# If neither photo is in a cluster, we create a new one
-				group = {'title': title, 'clusters': [neighbor.photo_1, neighbor.photo_2]}			
+				group = [neighbor.photo_1, neighbor.photo_2]
+
 				groupings.append(group)
 
-	sortedClusters = list()
-	for cluster in clusters:
-		sortedCluster = sorted(cluster, key=lambda x: x['time_taken'])
+	sortedGroups = list()
+	for group in groupings:
+		group = sorted(group, key=lambda x: x.time_taken)
 
 		# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
 		#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
 		#   So using location_city instead.  This means we might cut out some photos that were taken
 		#   at the exact same time in the same city
-		uniqueCluster = removeDups(sortedCluster, lambda x: (x['time_taken'], x['location_city']))
-		sortedClusters.append(uniqueCluster)
+		uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
+		sortedGroups.append(uniqueGroup)
 
 	# now sort clusters by the time_taken of the first photo in each cluster
-	sortedClusters = sorted(sortedClusters, key=lambda x: x[0]['time_taken'])
+	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken)
 
-	response['neighbors'] = sortedClusters
+	# Now we have to turn into our Duffy JSON, first, convert into the right format
+
+	groups = getGroups(sortedGroups)
+	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+	response['objects'] = objects
+	response['next_start_date_time'] = lastDate
 	return HttpResponse(json.dumps(response, cls=TimeEnabledEncoder), content_type="application/json")
 	
 """

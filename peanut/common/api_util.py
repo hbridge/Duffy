@@ -1,18 +1,37 @@
+import json
+import datetime
+import time
+
 from common.models import Photo
 from common.serializers import SmallPhotoSerializer
 
-def getPhotoObject(solrOrDBPhoto):
+class TimeEnabledEncoder(json.JSONEncoder):
+	def default(self, obj):
+		if isinstance(obj, datetime.datetime):
+			return int(time.mktime(obj.timetuple()))
+
+		return json.JSONEncoder.default(self, obj)
+		
+def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
-	if (solrOrDBPhoto.photoId):
+	if 'solr_photo' in entry:
 		# This is a solr photo
+		photo = entry['solr_photo']
+		
 		photoData.update({
-			'id': solrOrDBPhoto.photoId
+			'id': photo.photoId,
+			'time_taken': photo.timeTaken
 		})
 		
-		return photoData 
-	else:
+		return photoData
+	elif 'db_photo' in entry:
 		# This is a database photo
-		return photoData.update(SmallPhotoSerializer(solrOrDBPhoto).data)
+		photo = entry['db_photo']
+		
+		photoData.update(SmallPhotoSerializer(photo).data)
+		return photoData
+	else:
+		return None
 
 """
 	Turns groups by month, called from gallery_util and turns it into sections
@@ -20,6 +39,8 @@ def getPhotoObject(solrOrDBPhoto):
 
 	Limit the number of objects we add in by 'num'
 
+	Takes in solr_photo or db_photo
+	
 	Takes as input:
 	groupings = [
 					{
@@ -27,16 +48,16 @@ def getPhotoObject(solrOrDBPhoto):
 						'clusters': 
 							[
 								[
-									{'photo': Photo}
+									{'solr_photo': Photo}
 								],
 								[
-									{'photo': Photo},
-									{'photo': Photo}
+									{'solr_photo': Photo},
+									{'solr_photo': Photo}
 								]
 							]
 						'docs': [
-							{'photo': Photo},
-							{'photo': Photo}
+							{'solr_photo': Photo},
+							{'solr_photo': Photo}
 						]
 					}
 				]
@@ -50,26 +71,26 @@ def turnGroupsIntoSections(groupings, num):
 		section = {'type': 'section', 'title': group['title'], 'objects': list()}
 		for cluster in group['clusters']:
 			if len(cluster) == 1:
-				photo = cluster[0]['photo']
-				section['objects'].append(getPhotoObject(photo))
-				lastDate = photo.timeTaken
+				photoData = getPhotoObject(cluster[0])
+				section['objects'].append(photoData)
+				lastDate = photoData['time_taken']
 			else:
 				clusterObj = {'type': 'cluster', 'objects': list()}
 				for entry in cluster:
-					photo = entry['photo']
-					clusterObj['objects'].append(getPhotoObject(photo))
-					lastDate = photo.timeTaken
+					photoData = getPhotoObject(entry)
+					clusterObj['objects'].append(photoData)
+					lastDate = photoData['time_taken']
 				section['objects'].append(clusterObj)
 
 			count += 1
 			if count == num:
 				result.append(section)
 				return lastDate, result
-		if (len(group['docs']) > 0):
+		if ('docs' in group and len(group['docs']) > 0):
 			docObj = {'type': 'docstack', 'title': 'Your docs', 'objects': list()}
 			for entry in group['docs']:
-				photo = entry['photo']
-				docObj['objects'].append(getPhotoObject(photo))
+				photoData = getPhotoObject(entry)
+				docObj['objects'].append(photoData)
 			section['objects'].append(docObj)
 		result.append(section)
 	return lastDate, result
