@@ -9,6 +9,8 @@ from django.db.models import Q
 from common.models import Photo, User, Neighbor
 from common.serializers import SmallPhotoSerializer
 
+from common import api_util
+
 class TimeEnabledEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime.datetime):
@@ -17,7 +19,7 @@ class TimeEnabledEncoder(json.JSONEncoder):
 		return json.JSONEncoder.default(self, obj)
 
 
-def getClusterForPhoto(photo, clusters):
+def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
 		if photo in cluster:
 			return cluster
@@ -51,25 +53,27 @@ def neighbors(request):
 
 	results = Neighbor.objects.select_related().exclude(user_1_id=1).exclude(user_2_id=1).filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
-	clusters = list()
+	groupings = list()
 	for neighbor in results:
-		cluster = getClusterForPhoto(neighbor.photo_1, clusters)
+		group = getGroupForPhoto(neighbor.photo_1, groupings)
 
-		if (cluster):
+		if (group):
 			# If the first photo is in a cluster, see if the other photo is in there already
 			#   if it isn't, and this isn't a dup, then add photo_2 in
-			if neighbor.photo_2 not in cluster:
-				cluster.append(SmallPhotoSerializer(neighbor.photo_2).data)
+			if neighbor.photo_2 not in group:
+				group['clusters'].append(neighbor.photo_2)
 		else:
 			# If the first photo isn't in a cluster, see if the second one is
-			cluster = getClusterForPhoto(neighbor.photo_2, clusters)
+			group = getGroupForPhoto(neighbor.photo_2, groupings)
 
-			if (cluster):
+			if (group):
 				# If the second photo is in a cluster and this isn't a dup then add in
-				cluster.append(SmallPhotoSerializer(neighbor.photo_1).data)
+				group['clusters'].append(neighbor.photo_1)
 			else:
+				title = neighbor.photo_1.location_city
 				# If neither photo is in a cluster, we create a new one
-				clusters.append([SmallPhotoSerializer(neighbor.photo_1).data, SmallPhotoSerializer(neighbor.photo_2).data])
+				group = {'title': title, 'clusters': [neighbor.photo_1, neighbor.photo_2]}			
+				groupings.append(group)
 
 	sortedClusters = list()
 	for cluster in clusters:
