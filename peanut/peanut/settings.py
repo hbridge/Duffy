@@ -39,6 +39,7 @@ INSTALLED_APPS = (
     'django.contrib.gis',
     'arbus',
     'common',
+    'strand',
     # Added.
     'haystack',
     'rest_framework'

@@ -13,6 +13,8 @@ urlpatterns = patterns('',
     url(r'^viz/', include('arbus.viz_urls')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^search/', include('haystack.urls')),
+    url(r'^strand/api/', include('strand.api_urls')),
+    url(r'^strand/viz/', include('strand.viz_urls')),
 )
 
 if settings.DEBUG:

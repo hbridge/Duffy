@@ -59,7 +59,7 @@
 		}
 
 		userId = getURLParameter("user_id")
-		url = "/api/neighbors?user_id=" + userId
+		url = "/strand/api/neighbors?user_id=" + userId
 
 		console.log("Sending request to " + url)
 		$.get(url, function( data ) {
@@ -88,12 +88,12 @@
 		function uniqueUser(array){
 			var flags = [], output = [], l = array.length, i;
 			for( i=0; i<l; i++) {
-   				if( flags[array[i]]) {
-   					continue;
-   				}
+				if( flags[array[i]]) {
+					continue;
+				}
 
-    			flags[array[i]] = true;
-    			output.push(array[i]);
+				flags[array[i]] = true;
+				output.push(array[i]);
 			}
 			return output.join(', ');
 		}
