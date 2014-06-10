@@ -2,7 +2,7 @@ from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
 from arbus import api_views
 
-urlpatterns = patterns('photos.api_views',
+urlpatterns = patterns('arbus.api_views',
 	url(r'^search$', 'search'),
 	url(r'^searchV2$', 'search'),
 	url(r'^autocomplete$', 'autocomplete'),
