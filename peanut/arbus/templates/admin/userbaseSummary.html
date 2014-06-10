@@ -7,9 +7,9 @@
 	html, body { padding: 0; margin: 0; font-family: arial; font-size: 12px;}
 	table {
 		border-collapse: collapse;
+		margin-bottom: 20px;
 	}
 	table, th, td {
-		border: 1px solid black;
 		font-size: 12px;
 	}
 	td {
@@ -27,19 +27,24 @@
 	.ui-row {
 
 	}
+	.ui-header {
+		font-size: 16px;
+		font-weight: bold;
+		text-align: left;
+		padding-bottom: 4px;
+	}
 	.ui-row-header {
 		font-weight: bold;
 		font-size: 12px;
+		border: 1px solid black;
 	}
 	.ui-key {
-		padding: 0px 0px 10px 0px;
 	}
 	.red {
 		color: red;
 	}
 	#stats{
-		text-align: right;
-		font-size: 10px;
+		text-align: left;
 	}
 	.right{
 		text-align: right;
@@ -47,53 +52,88 @@
 	.center{
 		text-align: center;
 	}
+	.b-r{
+		border-right: 1px solid black;
+	}
 
 </style>
 <script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="http://asood123.no-ip.biz/static/jquery.timeago.js"></script>
 <body>
 <div class="ui-content">
-	<div class="ui-key">
-		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are external users.
-	</div>
+	<div class='ui-header'> Search/Photos/Arbus </div>
 	<table class='ui-table' cellpadding='3'>
 		<tr class='ui-row-header' >
-			<td class='userid'> UserId </td>
-			<td class='name'> Name </td>
-			<td class='phoneid'> PhoneId </td>
-			<td class='created'> Created </td>
-			<td class='db-count'> DBPhotos </td>
-			<td class='db-thumbnails'> Thumbs <br> (%)</td>
-			<td class='twofish'> TwoFish <br> (%) </td>
-			<td class='clustered'> Clustered <br> (%)  </td>
-			<td class='index-count'> Indexed <br> Photos (%) </td>
-			<td class='faces'> Face <br> Rec (%)  </td>
-			<td class='db-fullimage'> Full <br>images (%) </td>
-			<td class='overfeat'> Overfeat <br> Num (%)  </td>
-			<td class='classifications'> Image <br> Rec (%)  </td>
-			<td class='last-uploaded-timestamp'> Last Upload </td>
+			<td class='userid b-r'> UserId </td>
+			<td class='name b-r'> Name </td>
+			<td class='phoneid b-r'> PhoneId </td>
+			<td class='created b-r'> Created </td>
+			<td class='db-count b-r'> DBPhotos </td>
+			<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
+			<td class='twofish b-r'> TwoFish <br> (%) </td>
+			<td class='clustered b-r'> Clustered <br> (%)  </td>
+			<td class='index-count b-r'> Indexed <br> Photos (%) </td>
+			<td class='faces b-r'> Face <br> Rec (%)  </td>
+			<td class='db-fullimage b-r'> Full <br>images (%) </td>
+			<td class='overfeat b-r'> Overfeat <br> Num (%)  </td>
+			<td class='classifications b-r'> Image <br> Rec (%)  </td>
+			<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 			<td class='last-updated-timestamp'> Last updated </td>			
 		</tr>
-	{% for entry in resultList %}
+	{% for entry in arbusList %}
 		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
-			<td class='userid'> {{ entry.user.id }} </td>
-			<td class='name'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
-			<td class='phoneid' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
-			<td class='created timeago' title="{{ entry.userCreated }}">  </td>
-			<td class='db-count right'> {{ entry.dbCount }} </td>
-			<td class='db-thumbnails right percent' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
-			<td class='twofish right percent'>{{ entry.twofish }} </td>
-			<td class='clustered right percent' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
-			<td class='index-count right percent'> {{ entry.resultsCount }} </td>
-			<td class='faces right percent'> {{ entry.faces }} </td>
-			<td class='db-fullimage right' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
-			<td class='overfeat right percent' title="{{ entry.overfeatCount }} "> {{ entry.overfeat }} </td>		
-			<td class='classifications right percent'> {{ entry.classifications }} </td>
-			<td class='last-uploaded-timestamp timeago' title="{{ entry.lastUploadTime }}"> </td>
+			<td class='userid b-r'> {{ entry.user.id }} </td>
+			<td class='name b-r'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
+			<td class='phoneid b-r' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
+			<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
+			<td class='db-count right b-r'> {{ entry.dbCount }} </td>
+			<td class='db-thumbnails right percent b-r' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
+			<td class='twofish right percent b-r'>{{ entry.twofish }} </td>
+			<td class='clustered right percent b-r' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
+			<td class='index-count right percent b-r'> {{ entry.resultsCount }} </td>
+			<td class='faces right percent b-r'> {{ entry.faces }} </td>
+			<td class='db-fullimage right b-r' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
+			<td class='overfeat right percent b-r' title="{{ entry.overfeatCount }} "> {{ entry.overfeat }} </td>		
+			<td class='classifications right percent b-r'> {{ entry.classifications }} </td>
+			<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 			<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime }}"> </td>			
 		</tr>
 	{% endfor %}
 	</table>
+	<div class='ui-header'> Strand </div>
+	<table class='ui-table' cellpadding='3'>
+		<tr class='ui-row-header' >
+			<td class='userid b-r'> UserId </td>
+			<td class='name b-r'> Name </td>
+			<td class='phoneid b-r'> PhoneId </td>
+			<td class='created b-r'> Created </td>
+			<td class='db-count b-r'> DBPhotos </td>
+			<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
+			<td class='twofish b-r'> TwoFish <br> (%) </td>
+			<td class='clustered b-r'> Clustered <br> (%)  </td>
+			<td class='db-fullimage b-r'> Full <br>images (%) </td>
+			<td class='last-uploaded-timestamp b-r'> Last Upload </td>
+			<td class='last-updated-timestamp'> Last updated </td>			
+		</tr>
+	{% for entry in strandList %}
+		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
+			<td class='userid b-r'> {{ entry.user.id }} </td>
+			<td class='name b-r'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
+			<td class='phoneid b-r' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
+			<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
+			<td class='db-count right b-r'> {{ entry.dbCount }} </td>
+			<td class='db-thumbnails right percent b-r' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
+			<td class='twofish right percent b-r'>{{ entry.twofish }} </td>
+			<td class='clustered right percent b-r' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
+			<td class='db-fullimage right b-r' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>	
+			<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
+			<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime }}"> </td>			
+		</tr>
+	{% endfor %}
+	</table>
+	<div class="ui-key">
+		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are external users.
+	</div>
 <div id="stats" class="text">
 	<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
 </div>
