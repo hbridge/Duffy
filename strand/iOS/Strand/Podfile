@@ -1,0 +1,17 @@
+# To use this file install CocoaPods.  From terminal
+#    sudo gem install cocoapods
+#    pod setup
+# then close the Strand project in XCode and in this directory type
+#    pod install
+#    open Strand.xcworkspace
+# From now on use Strand.xcworkspace
+
+xcodeproj 'Strand.xcodeproj'
+
+platform :ios, '7.0' 
+inhibit_all_warnings!
+
+pod 'RestKit', '~> 0.20.0'
+pod 'JDStatusBarNotification', '~> 1.4.7'
+pod 'CocoaLumberjack', '~> 1.8.1'
+
