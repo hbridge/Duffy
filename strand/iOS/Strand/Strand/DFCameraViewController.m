@@ -36,7 +36,6 @@
   
   self.showsCameraControls = NO;
   self.cameraOverlayView = self.cameraOverlayView;
-  [self setNeedsStatusBarAppearanceUpdate];
 }
 
 
@@ -81,15 +80,11 @@
 - (void)takePhotoButtonPressed:(UIButton *)sender {
   
 }
-\
+
 - (void)galleryButtonPressed:(UIButton *)sender {
   [(RootViewController *)self.view.window.rootViewController showGallery];
 }
 
-- (BOOL)prefersStatusBarHidden
-{
-  return YES;
-}
 
 
 @end
