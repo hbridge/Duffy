@@ -4,6 +4,7 @@
 
 ### New
 
+- Pictures of documents and screenshots are now grouped at the end of each month so they don't clutter up the rest of your pictures.
 - Magnifying glass changes to a spinner to show you when a search is in progress
 - We show you an error message when we couldn't perform a search with an option to send us logs.
 
