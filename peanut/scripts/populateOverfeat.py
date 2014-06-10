@@ -95,7 +95,7 @@ def main(argv):
     while True:
         # Get all photos which don't have classification data yet
         #  But also filter out test users and any photo which only has a thumb
-        nonProcessedPhotos = Photo.objects.filter(overfeat_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True).order_by('-added')[:maxFileAtTime]
+        nonProcessedPhotos = Photo.objects.filter(overfeat_data__isnull=True).exclude(user=1).exclude(full_filename__isnull=True).filter(user__product_id=0).order_by('-added')[:maxFileAtTime]
 
         if len(nonProcessedPhotos) > 0:
             logging.info("Got the next " + str(len(nonProcessedPhotos)) + " photos that are not processed")
