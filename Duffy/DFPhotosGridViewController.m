@@ -231,7 +231,10 @@ static const CGFloat SectionHeaderHeight = 48;
 - (void)pushPhotoViewForPhoto:(DFPhoto *)photo
                   atIndexPath:(NSIndexPath *)indexPath
 {
-  
+  if (!(self == self.navigationController.viewControllers.lastObject)) {
+    // if we're not the top of the view controller stack, don't do anything
+    return;
+  }
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photo = photo;
   pvc.indexPathInParent = indexPath;
