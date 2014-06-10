@@ -233,6 +233,8 @@ static const CGFloat SectionHeaderHeight = 48;
 {
   if (!(self == self.navigationController.viewControllers.lastObject)) {
     // if we're not the top of the view controller stack, don't do anything
+    DDLogError(@"Attempt to handle pushPhotoViewForPhoto when not the top view controller.  ViewControllers: %@",
+              self.navigationController.viewControllers);
     return;
   }
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
