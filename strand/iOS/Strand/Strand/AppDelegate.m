@@ -11,6 +11,11 @@
 #import <CocoaLumberjack/DDTTYLogger.h>
 #import <CocoaLumberjack/DDASLLogger.h>
 #import <CocoaLumberjack/DDFileLogger.h>
+#import "DFUploadController.h"
+#import "DFPhotoStore.h"
+#import "DFUser.h"
+#import "DFUserPeanutAdapter.h"
+#import "DFFirstTimeSetupViewController.h"
 
 @interface AppDelegate ()
             
@@ -24,8 +29,15 @@
   [self configureLogs];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  self.window.rootViewController = [[RootViewController alloc] init];
   self.window.backgroundColor = [UIColor whiteColor];
+  
+  if (![self isAppSetupComplete]) {
+    [self showFirstTimeSetup];
+  } else {
+    [self startUserIDCheck];
+    [self showMainView];
+  }
+  
   [self.window makeKeyAndVisible];
 
   return YES;
@@ -42,6 +54,62 @@
   
   // To simulate the amount of log data saved, use the release log level for the fileLogger
   [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
+}
+
+- (void)startUserIDCheck
+{
+  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID] withSuccessBlock:^(DFUser *user) {
+    if (!user || user.userID != [[DFUser currentUser] userID]) {
+      DDLogWarn(@"Server uid:%llu, phone uid:%llu.  Requesting reset.", user.userID, [[DFUser currentUser ]userID]);
+      [self resetApplication];
+    }
+  } failureBlock:nil];
+}
+
+- (void)getUserID
+{
+  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
+  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
+                   withSuccessBlock:^(DFUser *user) {
+                     if (user) {
+                       DDLogInfo(@"Got user: %@", user.description);
+                       [[DFUser currentUser] setUserID:user.userID];
+                     } else {
+                       // the request succeeded, but the user doesn't exist, we have to create it
+                       [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
+                                               deviceName:[[DFUser currentUser] deviceName]
+                                         withSuccessBlock:^(DFUser *user) {
+                                           DDLogInfo(@"Created user: %@", user.description);
+                                           [[DFUser currentUser] setUserID:user.userID];
+                                         }
+                                             failureBlock:^(NSError *error) {
+                                               DDLogWarn(@"Create user failed: %@", error.localizedDescription);
+                                             }];
+                     }
+                   } failureBlock:^(NSError *error) {
+                     DDLogWarn(@"Get user failed: %@", error.localizedDescription);
+                   }];
+}
+
+- (BOOL)isAppSetupComplete
+{
+  return  ([[DFUser currentUser] userID]
+           && ![[DFUser currentUser] userID] == 0);
+}
+
+- (void)showFirstTimeSetup
+{
+  DFFirstTimeSetupViewController *setupViewController = [[DFFirstTimeSetupViewController alloc] init];
+  self.window.rootViewController = setupViewController;
+}
+
+- (void)showMainView
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [DFPhotoStore sharedStore];
+    self.window.rootViewController = [[RootViewController alloc] init];
+  });
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -64,6 +132,23 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application {
   // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+- (void)resetApplication
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    DDLogInfo(@"Resetting application.");
+    [[DFUploadController sharedUploadController] cancelUploads];
+    [[DFPhotoStore sharedStore] resetStore];
+    
+    // clear user defaults
+    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
+    [[NSUserDefaults standardUserDefaults] removePersistentDomainForName:appDomain];
+    
+    DDLogInfo(@"App reset complete.  Showing first time setup.");
+    [self showFirstTimeSetup];
+  });
+
 }
 
 @end

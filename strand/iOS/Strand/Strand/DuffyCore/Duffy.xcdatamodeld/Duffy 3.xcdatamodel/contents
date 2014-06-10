@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13C64" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="DFFaceFeature" representedClassName="DFFaceFeature" syncable="YES">
+        <attribute name="boundsString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="hasBlink" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="hasSmile" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <relationship name="photo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DFPhoto" inverseName="faceFeatures" inverseEntity="DFPhoto" syncable="YES"/>
+    </entity>
+    <entity name="DFPhoto" representedClassName="DFPhoto" syncable="YES">
+        <attribute name="alAssetURLString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="creationHashData" optional="YES" attributeType="Binary" syncable="YES"/>
+        <attribute name="faceFeatureSources" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="hasLocation" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="locationCLPlacemark" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="upload157Date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="upload569Date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="faceFeatures" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="DFFaceFeature" inverseName="photo" inverseEntity="DFFaceFeature" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="DFFaceFeature" positionX="0" positionY="54" width="128" height="105"/>
+        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="210"/>
+    </elements>
+</model>
