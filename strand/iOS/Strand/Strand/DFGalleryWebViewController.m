@@ -9,6 +9,7 @@
 #import "DFGalleryWebViewController.h"
 #import "DFNetworkingConstants.h"
 #import "DFUser.h"
+#import "RootViewController.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -94,6 +95,7 @@
   // Dispose of any resources that can be recreated.
 }
 
-
-
+- (IBAction)cameraButtonPressed:(UIButton *)sender {
+  [(RootViewController *)self.view.window.rootViewController showCamera];
+}
 @end

@@ -14,6 +14,7 @@
 
 
 - (void)showGallery;
+- (void)showCamera;
 
 @end
 

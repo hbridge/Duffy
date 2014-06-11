@@ -14,5 +14,8 @@
 @property (strong, nonatomic) UIBarButtonItem *backButtonItem;
 @property (strong, nonatomic) UIBarButtonItem *forwardButtonItem;
 @property (strong, nonatomic) UIBarButtonItem *refreshButtonItem;
+@property (weak, nonatomic) IBOutlet UIButton *cameraButton;
+
+- (IBAction)cameraButtonPressed:(UIButton *)sender;
 
 @end
