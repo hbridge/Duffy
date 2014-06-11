@@ -10,6 +10,10 @@
 #import "DFCameraOverlayView.h"
 #import "RootViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "DFPhoto.h"
+#import "DFPhotoStore.h"
+#import "DFDataHasher.h"
+#import "DFUploadController.h"
 
 @interface DFCameraViewController ()
 
@@ -107,12 +111,36 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
       ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
       [library writeImageToSavedPhotosAlbum:imageToSave.CGImage
                                    metadata:info[UIImagePickerControllerMediaMetadata]
-                            completionBlock:^(NSURL *assetURL, NSError *error) {
-                              //
-                            }];
+                            completionBlock:[self writeImageCompletionBlock]
+       ];
     }
   }
 }
+       
+- (ALAssetsLibraryWriteImageCompletionBlock)writeImageCompletionBlock
+{
+  return ^(NSURL *assetURL, NSError *error) {
+    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+    
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    [library assetForURL:assetURL resultBlock:^(ALAsset *asset) {
+      NSData *hashData = [DFDataHasher hashDataForALAsset:asset];
+      [DFPhoto insertNewDFPhotoForALAsset:asset withHashData:hashData inContext:context];
+      
+      NSError *error;
+      [context save:&error];
+      if (error) {
+        [NSException raise:@"Could not save DB" format:@"%@", error.description];
+      }
+      [[DFUploadController sharedUploadController] uploadPhotos];
+      
+      
+    } failureBlock:^(NSError *error) {
+      [NSException raise:@"Could not get asset just created." format:@"%@", error.description];
+    }];
+  };
+}
+
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   

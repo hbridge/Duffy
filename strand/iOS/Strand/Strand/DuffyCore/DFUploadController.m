@@ -172,13 +172,10 @@ static DFUploadController *defaultUploadController;
             uploadOperation.photoIDs = nextThumbnailIDs;
             uploadOperation.uploadOperationType = DFPhotoUploadOperationThumbnailData;
         } else {
-          if ([self shouldUploadFullPhotos]) {
-            NSArray *nextFullImageIDs = [self.fullImageObjectIDQueue takeNextObjects:1];
-            uploadOperation.photoIDs = nextFullImageIDs;
-            uploadOperation.uploadOperationType = DFPhotoUploadOperationFullImageData;
-          }
+          NSArray *nextFullImageIDs = [self.fullImageObjectIDQueue takeNextObjects:1];
+          uploadOperation.photoIDs = nextFullImageIDs;
+          uploadOperation.uploadOperationType = DFPhotoUploadOperationFullImageData;
         }
-        
         if (uploadOperation.photoIDs.count > 0) {
           [self postStatusUpdateWithError:nil];
             [self beginBackgroundUpdateTask];

@@ -107,6 +107,7 @@
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     [DFPhotoStore sharedStore];
+    [[DFUploadController sharedUploadController] uploadPhotos];
     self.window.rootViewController = [[RootViewController alloc] init];
   });
 }
