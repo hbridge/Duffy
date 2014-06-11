@@ -19,9 +19,11 @@ from arbus import image_util
 
 ### Clustering/deduping functions
 """
-	Cluster for multiple photos
+	Create similarity rows for a set of db photos
+
+	This finds all the simrows to create and update, then does the actual db work
 """
-def addToClustersBulk(photos, threshold=100):
+def createSimsForPhotos(photos, threshold=100):
 	if len(photos) == 0:
 		return 0
 
@@ -33,8 +35,9 @@ def addToClustersBulk(photos, threshold=100):
 	
 	userPhotoCache = list(Photo.objects.select_related().filter(user=photos[0].user.id).exclude(time_taken=None).exclude(thumb_filename=None).order_by('time_taken'))
 	
+	# Go through each photo and gather the sim rows
 	for photo in photos:
-		simRows.extend(addToClusters(photo, histCache, userPhotoCache))
+		simRows.extend(getSimRowsForPhoto(photo, histCache, userPhotoCache))
 		photo.clustered_time = datetime.datetime.now()
 		photosToUpdate.append(photo)
 
@@ -127,9 +130,9 @@ def getNearbyPhotos(photo, range, userPhotoCache):
 	return []
 
 """
-	Populates similarity table for a new photo
+	Gets sim rows for the given photo.
 """
-def addToClusters(photo, histCache, userPhotoCache, threshold=100):
+def getSimRowsForPhoto(photo, histCache, userPhotoCache, threshold=100):
 	if (photo.thumb_filename == None):
 		return 0
 

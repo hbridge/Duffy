@@ -13,7 +13,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
 from peanut import settings
 
 from common.models import Photo, User, Classification, Similarity
-from arbus import cluster_util, image_util
+from arbus import similarity_util, image_util
 
 
 def main(argv):
@@ -37,7 +37,9 @@ def main(argv):
 		for photo in photoQuery:
 			if (photo.full_filename and not photo.thumb_filename):
 				image_util.createThumbnail(photo) # check in case thumbnails haven't been created
-			cluster_util.addToClusters(photo)
+
+			# TODO(Derek):  This has been refactored and is probably broken now.
+			similarity_util.addToClusters(photo)
 		print "Done"
 
 

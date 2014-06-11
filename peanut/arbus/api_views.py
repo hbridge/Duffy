@@ -37,7 +37,7 @@ from common.models import Photo, User, Neighbor, Similarity
 from common.serializers import PhotoSerializer, UserSerializer
 from common import api_util
 
-from arbus import image_util, search_util, gallery_util, location_util, cluster_util, suggestions_util
+from arbus import image_util, search_util, gallery_util, location_util, suggestions_util
 from arbus.forms import SearchQueryForm
 
 import urllib

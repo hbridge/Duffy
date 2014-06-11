@@ -13,7 +13,7 @@ from django.db.models import Count
 
 from peanut import settings
 from common.models import Photo, User
-from arbus import cluster_util
+from arbus import similarity_util
 
 def main(argv):
 	logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def main(argv):
 				
 				tStart = datetime.datetime.utcnow()
 				logger.info("{0}: Unclustered photos: {1}".format(tStart, len(nonClusteredPhotos)))
-				count = cluster_util.addToClustersBulk(nonClusteredPhotos)
+				count = similarity_util.createSimilaritiesBulk(nonClusteredPhotos)
 				logger.info("{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, count))
 		else:
 			time.sleep(1)	

@@ -17,7 +17,7 @@ from haystack.query import SearchQuerySet
 from peanut import settings
 from common.models import Photo, User, Classification
 
-from arbus import image_util, search_util, gallery_util, cluster_util
+from arbus import image_util, search_util, gallery_util
 from arbus.forms import ManualAddPhoto
 
 	

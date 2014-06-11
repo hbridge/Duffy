@@ -17,7 +17,6 @@ from bulk_update.helper import bulk_update
 
 from peanut import settings
 from common.models import Photo, User, Neighbor
-from arbus import cluster_util
 
 def haversine(lon1, lat1, lon2, lat2):
 	"""
