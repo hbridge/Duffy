@@ -47,6 +47,18 @@
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
   }
   
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(startLocationUpdates)
+                                               name:UIApplicationWillEnterForegroundNotification
+                                             object:nil];
+  
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(stopLocationUpdates)
+                                               name:UIApplicationDidEnterBackgroundNotification
+                                             object:nil];
+
+
   self.delegate = self;
 }
 
@@ -72,11 +84,13 @@
 
 - (void)startLocationUpdates
 {
+  DDLogVerbose(@"DFCameraViewController starting location updates.");
   [self.locationManager startUpdatingLocation];
 }
 
 - (void)stopLocationUpdates
 {
+  DDLogVerbose(@"DFCameraViewController stopping location updates.");
   [self.locationManager stopUpdatingLocation];
 }
 
@@ -146,7 +160,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
       // Save the new image (original or edited) to the Camera Roll
       ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
       [library writeImageToSavedPhotosAlbum:imageToSave.CGImage
-                                   metadata:info[UIImagePickerControllerMediaMetadata]
+                                   metadata:metadata
                             completionBlock:[self writeImageCompletionBlock]
        ];
     }
