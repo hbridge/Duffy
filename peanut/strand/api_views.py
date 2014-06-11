@@ -42,8 +42,13 @@ def getGroups(groupings):
 	# Fetch all the similarities at once so we can process in memory
 	simCaches = cluster_util.getSimCaches(photoIds)
 
-	for group in groupings:
-		title = group[0].location_city
+	for i, group in enumerate(groupings):
+		if i == 0:
+			# If first group, assume this is "Recent"
+			title = "Recent"
+		else:
+			title = group[0].location_city
+			
 		clusters = cluster_util.getClustersFromPhotos(group, settings.DEFAULT_CLUSTER_THRESHOLD, settings.DEFAULT_DUP_THRESHOLD, simCaches)
 
 		output.append({'title': title, 'clusters': clusters})
@@ -101,6 +106,13 @@ def neighbors(request):
 
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
+
+	lastPhotoTime = sortedGroups[0][-1].time_taken
+
+	recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
+
+	if (len(recentPhotos) > 0):
+		sortedGroups.insert(0, recentPhotos)
 
 	# Now we have to turn into our Duffy JSON, first, convert into the right format
 
