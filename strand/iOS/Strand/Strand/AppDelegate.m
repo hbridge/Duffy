@@ -29,7 +29,6 @@
   [self configureLogs];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  self.window.backgroundColor = [UIColor whiteColor];
   
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
@@ -108,12 +107,17 @@
 
 - (void)showMainView
 {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [DFPhotoStore sharedStore];
-    [self checkForAndRequestLocationAccess];
-    [[DFUploadController sharedUploadController] uploadPhotos];
-    self.window.rootViewController = [[RootViewController alloc] init];
-  });
+  if (![NSThread isMainThread]) {
+    [self performSelectorOnMainThread:@selector(showMainView)
+                           withObject:nil
+                        waitUntilDone:NO];
+    return;
+  }
+  
+  [DFPhotoStore sharedStore];
+  [self checkForAndRequestLocationAccess];
+  [[DFUploadController sharedUploadController] uploadPhotos];
+  self.window.rootViewController = [[RootViewController alloc] init];
 }
 
 - (void)checkForAndRequestLocationAccess

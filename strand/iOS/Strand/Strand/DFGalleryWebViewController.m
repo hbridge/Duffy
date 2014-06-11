@@ -42,6 +42,16 @@
   [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  if (![self.webView isLoading]) {
+    [self.webView reload];
+  }
+  
+  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
+}
+
 - (void)setNavigationButtons
 {
   if (!(self.navigationItem.leftBarButtonItems.count > 0)) {

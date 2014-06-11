@@ -11,7 +11,7 @@
 @interface RootViewController : UIViewController <UIPageViewControllerDelegate>
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
-
+@property (nonatomic) BOOL hideStatusBar;
 
 - (void)showGallery;
 - (void)showCamera;

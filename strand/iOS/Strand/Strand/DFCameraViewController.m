@@ -29,7 +29,7 @@
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    
+
   }
   return self;
 }
@@ -39,6 +39,7 @@
 {
   [super viewDidLoad];
   if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+    self.view.backgroundColor = [UIColor blackColor];
     self.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.showsCameraControls = NO;
     self.cameraOverlayView = self.cameraOverlayView;
@@ -60,6 +61,12 @@
 
 
   self.delegate = self;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated

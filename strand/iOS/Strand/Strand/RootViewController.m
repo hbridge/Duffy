@@ -19,6 +19,15 @@
             
 @synthesize subviewController = _subviewController;
 
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    self.hideStatusBar = YES;
+  }
+  return self;
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   // Do any additional setup after loading the view, typically from a nib.
@@ -105,9 +114,15 @@
   return UIPageViewControllerSpineLocationMin;
 }
 
+- (void)setHideStatusBar:(BOOL)hideStatusBar
+{
+  _hideStatusBar = hideStatusBar;
+  [self setNeedsStatusBarAppearanceUpdate];
+}
+
 - (BOOL)prefersStatusBarHidden
 {
-  return YES;
+  return self.hideStatusBar;
 }
 
 @end
