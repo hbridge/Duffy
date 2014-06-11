@@ -131,7 +131,7 @@ def userbaseSummary(request):
 			entry['dbCount'] = totalCount
 			entry['thumbsCount'] = dbQuery.exclude(thumb_filename=None).count()
 			entry['thumbs'] = int(math.floor(entry['thumbsCount']/totalCount*100))
-			photosWithGPS = dbQuery.filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False)).count()
+			photosWithGPS = dbQuery.filter(location_point__isnull=False).count()
 
 			if photosWithGPS > 0:
 				entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
@@ -146,6 +146,11 @@ def userbaseSummary(request):
 			
 			entry['clusteredCount'] = dbQuery.exclude(clustered_time=None).count()
 			entry['clustered'] = entry['clusteredCount']*100/totalCount
+
+			if photosWithGPS > 0:
+				entry['neighbor'] = dbQuery.exclude(neighbored_time=None).count()*100/photosWithGPS
+			else:
+				entry['neighbor'] = '-'
 
 			entry['internal'] = False
 
