@@ -56,7 +56,7 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 	# process docstack results first
 	docs = dict()
 	if (docResults):
-		f = lambda x: x.timeTaken.strftime('%b %Y')
+		f = lambda x: x.time_taken.strftime('%b %Y')
 		results = list()
 		for key, solrPhotos in groupby(docResults, f):
 			docs[key] = list()
@@ -64,7 +64,7 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 				docs[key].append({'photo': solrPhoto, 'dist': None, 'simrows': getAllSims(solrPhoto, simCaches)})
 
 	# process regular photos next
-	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
+	f = lambda x: x[0]['photo'].time_taken.strftime('%b %Y')
 	groupings = list()
 	for key, items in groupby(clusters, f):
 		monthEntry = {'title': key, 'clusters': list(), 'docs': list()}
