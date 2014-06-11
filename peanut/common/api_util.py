@@ -3,7 +3,6 @@ import datetime
 import time
 
 from common.models import Photo
-from common.serializers import SmallPhotoSerializer
 
 class TimeEnabledEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -16,20 +15,12 @@ def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
 	photo = entry['photo']
 
-	if hasattr(photo, 'photoId'):
-		# This is a solr photo
+	photoData.update(photo.serialize())
+
+	if 'dist' in entry:
+		photoData['dist'] = entry['dist']
 		
-		photoData.update({
-			'id': photo.photoId,
-			'time_taken': photo.timeTaken
-		})
-		
-		return photoData
-	else:
-		# This is a database photo
-		
-		photoData.update(SmallPhotoSerializer(photo).data)
-		return photoData
+	return photoData
 
 
 """
@@ -45,16 +36,16 @@ def getPhotoObject(entry):
 						'clusters': 
 							[
 								[
-									{'photo': Photo or SolrPhoto}
+									{'photo': SimplePhoto, 'dist': distance}
 								],
 								[
-									{'photo': Photo or SolrPhoto},
-									{'photo': Photo or SolrPhoto}
+									{'photo': SimplePhoto},
+									{'photo': SimplePhoto}
 								]
 							]
 						'docs': [
-							{'photo': Photo or SolrPhoto},
-							{'photo': Photo or SolrPhoto}
+							{'photo': SimplePhoto},
+							{'photo': SimplePhoto}
 						]
 					}
 				]

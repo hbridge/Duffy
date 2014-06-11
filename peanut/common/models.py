@@ -174,18 +174,26 @@ class Photo(models.Model):
 			return self.id == other.id
 
 class SimplePhoto:
-	photoId = None
-	timeTaken = None
+	id = None
+	time_taken = None
+	user_id = None
+	first_name = None
+
+	def serialize(self):
+		return {key:value for key, value in self.__dict__.items() if not key.startswith('__') and not callable(key)}
 
 	def __init__(self, solrOrDbPhoto):
 		if hasattr(solrOrDbPhoto, 'photoId'):
 			# This is a solr photo
-			self.photoId = solrOrDbPhoto.photoId
-			self.timeTaken = solrOrDbPhoto.timeTaken
+			self.id = solrOrDbPhoto.photoId
+			self.time_taken = solrOrDbPhoto.timeTaken
+			self.user_id = solrOrDbPhoto.userId
 		else:
 			# This is a database photo
-			self.photoId = solrOrDbPhoto.id
-			self.timeTaken = solrOrDbPhoto.time_taken
+			self.id = solrOrDbPhoto.id
+			self.time_taken = solrOrDbPhoto.time_taken
+			self.user_id = solrOrDbPhoto.user_id
+			self.first_name = solrOrDbPhoto.user.first_name
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)

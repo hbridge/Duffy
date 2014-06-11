@@ -65,16 +65,16 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT
 
 	# process regular photos next
 	f = lambda x: x[0]['photo'].timeTaken.strftime('%b %Y')
-	results = list()
+	groupings = list()
 	for key, items in groupby(clusters, f):
 		monthEntry = {'title': key, 'clusters': list(), 'docs': list()}
 		for item in items:
 			monthEntry['clusters'].append(item)
 		if key in docs:
 			monthEntry['docs'].extend(docs[key])
-		results.append(monthEntry)
+		groupings.append(monthEntry)
 	
-	return results
+	return groupings
 
 
 
@@ -166,12 +166,12 @@ def getSimCaches(photoIds):
 """
 def getSim(photo1, photo2, simCaches):
 	simsCacheLowHigh, simsCacheHighLow = simCaches
-	if (photo1.photoId < photo2.photoId):
-		lowerPhotoId = int(photo1.photoId)
-		higherPhotoId = int(photo2.photoId)
+	if (photo1.id < photo2.id):
+		lowerPhotoId = int(photo1.id)
+		higherPhotoId = int(photo2.id)
 	else:
-		lowerPhotoId = int(photo2.photoId)
-		higherPhotoId = int(photo1.photoId)
+		lowerPhotoId = int(photo2.id)
+		higherPhotoId = int(photo1.id)
 
 	if (lowerPhotoId in simsCacheLowHigh):
 		if (higherPhotoId in simsCacheLowHigh[lowerPhotoId]):
@@ -182,7 +182,7 @@ def getSim(photo1, photo2, simCaches):
 
 def getAllSims(photo, simCaches):
 	sims = list()
-	photoId = int(photo.photoId)
+	photoId = int(photo.id)
 	simsCacheLowHigh, simsCacheHighLow = simCaches
 
 	if (photoId in simsCacheLowHigh):
@@ -223,7 +223,7 @@ def getLowestDistance(cluster, photo, simCaches):
 def getLongestTimeSince(cluster, photo):
 	longestTime = None
 	for i, entry in enumerate(cluster):
-		dist = abs(entry['photo'].timeTaken - photo.timeTaken)
+		dist = abs(entry['photo'].time_taken - photo.time_taken)
 		if not longestTime:
 			longestTime = dist
 		elif dist > longestTime:

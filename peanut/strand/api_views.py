@@ -6,10 +6,11 @@ from django.http import HttpResponse
 
 from django.db.models import Q
 
-from common.models import Photo, User, Neighbor
-from common.serializers import SmallPhotoSerializer
+from peanut import settings
 
-from common import api_util
+from common.models import Photo, User, Neighbor
+
+from common import api_util, cluster_util
 
 def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
@@ -33,15 +34,19 @@ def removeDups(seq, idFunction=None):
 def getGroups(groupings):
 	output = list()
 
+	photoIds = list()
+	for group in groupings:
+		for photo in group:
+			photoIds.append(photo.id)
+
+	# Fetch all the similarities at once so we can process in memory
+	simCaches = cluster_util.getSimCaches(photoIds)
+
 	for group in groupings:
 		title = group[0].location_city
-		entry = {'title': title}
-		entry['clusters'] = list()
+		clusters = cluster_util.getClustersFromPhotos(group, settings.DEFAULT_CLUSTER_THRESHOLD, settings.DEFAULT_DUP_THRESHOLD, simCaches)
 
-		for photo in group:
-			entry['clusters'].append([{'photo': photo}])
-
-		output.append(entry)
+		output.append({'title': title, 'clusters': clusters})
 	return output
 	
 def neighbors(request):

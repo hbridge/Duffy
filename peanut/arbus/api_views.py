@@ -35,9 +35,9 @@ from rest_framework.response import Response
 
 from common.models import Photo, User, Neighbor, Similarity
 from common.serializers import PhotoSerializer, UserSerializer
-from common import api_util
+from common import api_util, cluster_util
 
-from arbus import image_util, search_util, cluster_util, location_util, suggestions_util
+from arbus import image_util, search_util, location_util, suggestions_util
 from arbus.forms import SearchQueryForm
 
 import urllib
