@@ -1,0 +1,74 @@
+/* 
+Duffy css file
+Created by: Aseem Sood
+Date: 6/11/2014
+*/
+
+html, body { 
+	padding: 0; 
+	margin: 0;
+	font-family: sans-serif; 
+}
+.ui-content {
+	padding:0px 0px 0px 0px;
+}
+.ui-section {
+	float: left;
+	width: 100%;
+}
+.ui-sec-header {
+	font-family: arial;
+	font-size: 1em;
+	padding: 11px 0px 11px 10px;
+	background-color: rgba(239, 239, 239, 0.3);
+}
+.image {
+	padding-right: 2px;
+	float:left;
+	position: relative;
+	cursor: pointer;
+	height: 80px;
+	width: 78px;
+}
+.ui-img-ct {
+	position:absolute;
+	background-color: transparent;
+	top: 44px;
+	left: 45px;
+	font-size: 0.9em;
+	text-align: right;
+	width: 33px;
+	height:33px;
+	line-height: 50px;
+	padding-right: 2px;
+	color: rgb(245, 166, 35);
+}
+.ui-arrow-down {
+	width: 0; 
+	height: 0; 
+	border-top: 25px solid transparent;
+	border-left: 25px solid transparent;
+	border-bottom: 25px solid #fff;
+	position:absolute;
+	top: 28px;
+	left: 53px;
+}
+.text {
+	font-family: sans-serif;
+}
+.center {
+	text-align: center;
+}
+.hidden {
+	display: none;
+}
+a:link{
+	text-decoration: none;
+	font-weight: bold;
+	color: #0000FF;
+}
+a.visited {
+	text-decoration: none;
+	font-weight: bold;
+	color: #0000FF;	
+}
