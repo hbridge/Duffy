@@ -33,7 +33,7 @@ def getPhotoObject(entry):
 
 
 """
-	Turns groups by month, called from gallery_util and turns it into sections
+	Called from api_views, turns groups (by month or something else) into sections
 	  that is converted to json and returned to the user
 
 	Limit the number of objects we add in by 'num'

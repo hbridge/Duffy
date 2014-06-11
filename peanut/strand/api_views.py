@@ -11,14 +11,6 @@ from common.serializers import SmallPhotoSerializer
 
 from common import api_util
 
-class TimeEnabledEncoder(json.JSONEncoder):
-	def default(self, obj):
-		if isinstance(obj, datetime.datetime):
-			return int(time.mktime(obj.timetuple()))
-
-		return json.JSONEncoder.default(self, obj)
-
-
 def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
 		if photo in cluster:
@@ -111,7 +103,7 @@ def neighbors(request):
 	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 	response['objects'] = objects
 	response['next_start_date_time'] = lastDate
-	return HttpResponse(json.dumps(response, cls=TimeEnabledEncoder), content_type="application/json")
+	return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
 	
 """
 Helper functions

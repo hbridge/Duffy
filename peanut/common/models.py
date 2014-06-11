@@ -173,6 +173,20 @@ class Photo(models.Model):
 		except TypeError:
 			return self.id == other.id
 
+class SimplePhoto:
+	photoId = None
+	timeTaken = None
+
+	def __init__(self, solrOrDbPhoto):
+		if hasattr(solrOrDbPhoto, 'photoId'):
+			# This is a solr photo
+			self.photoId = solrOrDbPhoto.photoId
+			self.timeTaken = solrOrDbPhoto.timeTaken
+		else:
+			# This is a database photo
+			self.photoId = solrOrDbPhoto.id
+			self.timeTaken = solrOrDbPhoto.time_taken
+
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
 	user = models.ForeignKey(User)

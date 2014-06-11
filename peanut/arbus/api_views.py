@@ -37,7 +37,7 @@ from common.models import Photo, User, Neighbor, Similarity
 from common.serializers import PhotoSerializer, UserSerializer
 from common import api_util
 
-from arbus import image_util, search_util, gallery_util, location_util, suggestions_util
+from arbus import image_util, search_util, cluster_util, location_util, suggestions_util
 from arbus.forms import SearchQueryForm
 
 import urllib
@@ -340,7 +340,7 @@ def search(request):
 
 		if (len(searchResults) > 0 or docResults and len(docResults) > 0):	
 			# Group into months
-			monthGroupings = gallery_util.splitPhotosFromIndexbyMonth(user_id, searchResults, docResults=docResults)
+			monthGroupings = cluster_util.splitPhotosFromIndexbyMonth(user_id, searchResults, docResults=docResults)
 
 			# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
 			#   which is the key for the next call
