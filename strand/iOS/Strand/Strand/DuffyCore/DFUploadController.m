@@ -160,12 +160,6 @@ static DFUploadController *defaultUploadController;
             return;
         }
         
-        if (![self isDeviceStateGoodForBackgroundUploads]) {
-            DDLogInfo(@"Device is not in good state for uploads.  Not scheduling upload.");
-            if (self.uploadOperationQueue.operationCount == 0) [self endBackgroundUpdateTask];
-            return;
-        }
-        
         DFUploadOperation *uploadOperation = [[DFUploadOperation alloc] init];
         NSArray *nextThumbnailIDs = [self.thumbnailsObjectIDQueue takeNextObjects:MaxThumbnailsPerRequest];
         if (nextThumbnailIDs.count > 0) {
