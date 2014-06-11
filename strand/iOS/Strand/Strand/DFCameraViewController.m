@@ -119,8 +119,8 @@
 
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
-  DDLogVerbose(@"takePhotoButtonPressed");
   [self takePicture];
+  [self flashCameraView];
 }
 
 - (void)galleryButtonPressed:(UIButton *)sender
@@ -128,6 +128,17 @@
   [(RootViewController *)self.view.window.rootViewController showGallery];
 }
 
+
+- (void)flashCameraView
+{
+  [UIView animateWithDuration:0.1 animations:^{
+    self.cameraOverlayView.backgroundColor = [UIColor whiteColor];
+  } completion:^(BOOL finished) {
+    if (finished) [UIView animateWithDuration:0.1 animations:^{
+      self.cameraOverlayView.backgroundColor = [UIColor clearColor];
+    }];
+  }];
+}
 
 #pragma mark - Image Picker Controller delegate methods
 
