@@ -10,27 +10,31 @@
 
 @implementation DFCameraOverlayView
 
-- (instancetype)initWithFrame:(CGRect)frame
+NSString *const FlashOnTitle = @"On";
+NSString *const FlashOffTitle = @"Off";
+NSString *const FlashAutoTitle = @"Auto";
+
+- (void)awakeFromNib
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code
-    }
-    return self;
+  self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
+- (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode
 {
-    // Drawing code
-}
-*/
+  if (flashMode == UIImagePickerControllerCameraFlashModeOn) {
+    [self.flashButton setTitle:@"On" forState:UIControlStateNormal];
+    [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashOnButton.png"]
+                      forState:UIControlStateNormal];
+  } else if (flashMode == UIImagePickerControllerCameraFlashModeOff) {
+    [self.flashButton setTitle:@"Off" forState:UIControlStateNormal];
+    [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashOffButton.png"]
+                      forState:UIControlStateNormal];
+  } else if (flashMode == UIImagePickerControllerCameraFlashModeAuto) {
+    [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashOnButton.png"]
+                      forState:UIControlStateNormal];
+    [self.flashButton setTitle:@"Auto" forState:UIControlStateNormal];
+  }
 
-- (IBAction)dismissButtonPressed:(UIButton *)sender {
 }
 
-- (IBAction)takePhotoButtonPressed:(UIButton *)sender {
-}
 @end

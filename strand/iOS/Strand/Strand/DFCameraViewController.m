@@ -42,7 +42,9 @@
     self.view.backgroundColor = [UIColor blackColor];
     self.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.showsCameraControls = NO;
-    self.cameraOverlayView = self.cameraOverlayView;
+    self.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
+    self.cameraOverlayView = self.customCameraOverlayView;
+    [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
     [self configureLocationManager];
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
@@ -62,6 +64,8 @@
 
   self.delegate = self;
 }
+
+
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -109,16 +113,24 @@
 
 
 
-- (UIView *)cameraOverlayView
+- (DFCameraOverlayView *)customCameraOverlayView
 {
   if (!_customCameraOverlayView) {
     _customCameraOverlayView = [[[UINib nibWithNibName:@"DFCameraOverlayView" bundle:nil]
                            instantiateWithOwner:self options:nil]
                           firstObject];
-    [_customCameraOverlayView.takePhotoButton addTarget:self action:@selector(takePhotoButtonPressed:)
+    [_customCameraOverlayView.takePhotoButton addTarget:self
+                                                 action:@selector(takePhotoButtonPressed:)
                                        forControlEvents:UIControlEventTouchUpInside];
-    [_customCameraOverlayView.galleryButton addTarget:self action:@selector(galleryButtonPressed:)
+    [_customCameraOverlayView.galleryButton addTarget:self
+                                               action:@selector(galleryButtonPressed:)
                                      forControlEvents:UIControlEventTouchUpInside];
+    [_customCameraOverlayView.flashButton addTarget:self
+                                             action:@selector(flashButtonPressed:)
+                                   forControlEvents:UIControlEventTouchUpInside];
+    [_customCameraOverlayView.swapCameraButton addTarget:self
+                                                  action:@selector(swapCameraButtonPressed:)
+                                        forControlEvents:UIControlEventTouchUpInside];
   }
 
   return _customCameraOverlayView;
@@ -133,6 +145,26 @@
 - (void)galleryButtonPressed:(UIButton *)sender
 {
   [(RootViewController *)self.view.window.rootViewController showGallery];
+}
+
+- (void)flashButtonPressed:(UIButton *)flashButton
+{
+  UIImagePickerControllerCameraFlashMode newMode;
+  if ([flashButton.titleLabel.text isEqualToString:FlashAutoTitle]) {
+    newMode = UIImagePickerControllerCameraFlashModeOn;
+  } else if ([flashButton.titleLabel.text isEqualToString:FlashOnTitle]) {
+    newMode = UIImagePickerControllerCameraFlashModeOff;
+  } else if ([flashButton.titleLabel.text isEqualToString:FlashOffTitle]) {
+    newMode = UIImagePickerControllerCameraFlashModeAuto;
+  }
+  
+  self.cameraFlashMode = newMode;
+  [self.customCameraOverlayView updateUIForFlashMode:newMode];
+}
+
+- (void)swapCameraButtonPressed:(UIButton *)sender
+{
+  
 }
 
 

@@ -44,22 +44,64 @@
                         <constraint firstAttribute="height" constant="142" id="uDN-GU-l0T"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xJB-6z-Yhn">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oNo-vb-nP7" userLabel="Flash - Button">
+                            <rect key="frame" x="0.0" y="5" width="50" height="20"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                            <state key="normal" title="Auto" image="Assets/Icons/FlashOnButton.png">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mF1-Q6-VZs" userLabel="SwapCamera - Button">
+                            <rect key="frame" x="270" y="0.0" width="50" height="50"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <constraints>
+                                <constraint firstAttribute="height" constant="50" id="DXf-4a-aBG"/>
+                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="DZD-tb-qhv"/>
+                                <constraint firstAttribute="width" constant="50" id="JBR-J1-7nT"/>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="xgX-cC-7AQ"/>
+                            </constraints>
+                            <state key="normal" image="Assets/Icons/SwapCameraButton">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="mF1-Q6-VZs" secondAttribute="trailing" id="OHr-QC-iEx"/>
+                        <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="xJB-6z-Yhn" secondAttribute="top" constant="5" id="a5y-Vh-sUW"/>
+                        <constraint firstAttribute="height" constant="50" id="mf3-Vf-BR8"/>
+                        <constraint firstItem="mF1-Q6-VZs" firstAttribute="top" secondItem="xJB-6z-Yhn" secondAttribute="top" id="vyx-ff-e2Z"/>
+                        <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="xJB-6z-Yhn" secondAttribute="leading" id="zzk-za-aqz"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="80R-J1-Wxm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="25K-LW-h4d"/>
                 <constraint firstAttribute="trailing" secondItem="80R-J1-Wxm" secondAttribute="trailing" id="86N-KE-QkX"/>
                 <constraint firstAttribute="bottom" secondItem="80R-J1-Wxm" secondAttribute="bottom" id="8ww-zf-zZW"/>
+                <constraint firstItem="xJB-6z-Yhn" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Hqb-UE-QAY"/>
+                <constraint firstAttribute="trailing" secondItem="xJB-6z-Yhn" secondAttribute="trailing" id="UOX-aB-Vlp"/>
+                <constraint firstItem="xJB-6z-Yhn" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="zse-gj-vnI"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>
+                <outlet property="flashButton" destination="oNo-vb-nP7" id="JcR-gA-MXN"/>
                 <outlet property="galleryButton" destination="c4Q-fB-mQc" id="JyU-Po-uqs"/>
+                <outlet property="swapCameraButton" destination="mF1-Q6-VZs" id="91A-gy-EHU"/>
                 <outlet property="takePhotoButton" destination="FDr-hg-nDc" id="2eh-0G-EFo"/>
             </connections>
         </view>
     </objects>
     <resources>
+        <image name="Assets/Icons/FlashOnButton.png" width="16" height="16"/>
         <image name="Assets/Icons/GalleryButton.png" width="16" height="16"/>
         <image name="Assets/Icons/ShutterButton.png" width="16" height="16"/>
+        <image name="Assets/Icons/SwapCameraButton" width="16" height="16"/>
     </resources>
 </document>
