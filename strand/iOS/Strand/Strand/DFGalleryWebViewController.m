@@ -34,12 +34,12 @@
   // setup webview
   self.webView.delegate = self;
   
-  NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
-                         DFServerBaseURL, [[DFUser currentUser] userID]];
-  NSURL *urlToLoad = [NSURL URLWithString:urlString];
-  
-  DDLogInfo(@"Fetching url:%@", urlString);
-  [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
+                           DFServerBaseURL, [[DFUser currentUser] userID]];
+    NSURL *urlToLoad = [NSURL URLWithString:urlString];
+    [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
+  });
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -83,6 +83,7 @@
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
 {
+  DDLogInfo(@"Fetching url:%@", webView.request.URL.absoluteString);
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self setNavigationButtons];
 }
