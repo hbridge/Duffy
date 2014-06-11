@@ -2,107 +2,117 @@
 
 <head>
 	<title>Neighbors</title> 
+	<link rel="stylesheet" type="text/css" href="/static/duffy.css" media="screen" />
+
 	<style>
-		html, body { 
-			padding: 0; margin: 0; 
-			font-family: sans-serif;
-		}
 		.ui-section {
-			float:left;
-			width:100%;
 			padding-bottom:4px;
 		}
-		.ui-section-header {
-			float: left;
-			font-size: 14px;
-			width:100%;
-			background-color: rgba(239, 239, 239, 0.3);
-			padding: 0px 4px 0px 4px;
+		.ui-sec-header{
+			overflow: hidden;
 		}
 		.ui-sec-head-lhs {
-			float:left;
-			width: 49%;
-		}
-		.ui-sec-head-title {
-			float:left;
-			font-size: 14px;
-			width: 100%;
-		}
-		.ui-sec-head-names {
-
+			display: inline-block;
 		}
 		.ui-sec-head-rhs {
-			float:left;
-			text-align: right;
-			width: 49%;
-			font-size: 12px;
+			float: right;
 		}
-
-		.ui-imageblock {
-			float:left;
-			padding: 0px 2px 0px 0px;
-		}
-		.ui-image {
-			float:left;
-		}
-		.ui-userid {
-			float: clear;
-			font-size: 10px;
+		.ui-sec-users {
+			clear: left;
 		}
 	</style>
-	<script src="http://code.jquery.com/jquery-1.6.4.min.js"></script>
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
+	<script src="/static/jquery.timeago.js"></script>	
+	<script src="/static/duffy.js"></script>
 	<script>
-		function getURLParameter(name) {
-			return decodeURI(
-				(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-			);
-		}
-
 		userId = getURLParameter("user_id")
 		url = "/strand/api/neighbors?user_id=" + userId
 
 		console.log("Sending request to " + url)
+
 		$.get(url, function( data ) {
 			$.each( data.objects, function( i, objects ) {
-				row = "";
-				city = "";
-				date = "";
-				users = [];
-				$.each(objects.objects, function( i, photo) {
-					users.push(photo.user);
-					thumbUrl = "/user_data/" + photo.user + "/" + photo.id + "-thumb-156.jpg"
-					img = "<img height='78px' width='78px' src='" + thumbUrl + "' alt='" + photo.user + "'/>"
-					html = "<div class='ui-imageblock'><div class='ui-image' title='" + photo.user + "'>" + img + "</div></div>";
-
-					row += html
-					city = objects.title
-					d = new Date(photo.time_taken * 1000);
-					time = d.toDateString().slice(4);
-				});
-
-				$("<div class='ui-section'><div class='ui-section-header'><div class='ui-sec-head-lhs'><div class='ui-sec-head-title'>"+ city + "</div><div class='ui-sec-head-names'> People: " + uniqueUser(users) + "</div></div><div class='ui-sec-head-rhs'>" + time + "</div></div>" + row + "</div>").appendTo( "#images" );
+				if (objects.type == 'section') {
+					row = "";
+					userList = [];
+					$.each(objects.objects, function( i, photos) {
+						if (photos.type == 'photo') {
+							row += addPhoto(photos, userList);
+						}
+						else if (photos.type == 'cluster'){
+							row += addCluster(photos.objects, userList);
+						}
+						else {
+							console.log('unknown type detected: ' + photos);
+						}
+					});
+					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");	
+				}
 			});
+			$('div.image').each(function(){
+				clusterClickHandler($(this));
+			});
+			$('div.timeago').timeago();
 		});
 
-		// Takes list of user ids from photos and gives back a unique list
+		/*
+		Generates the header for a section. Typically custom for each view
+		*/
+
+		function genHeader(section, userList){
+			html = "";
+			$.each( section.objects, function(i, photos ) {
+				if (photos.type == 'photo') {
+					t = new Date(photos.time_taken * 1000).toISOString();
+					return;
+				}
+				else if (photos.type == 'cluster') {
+					$.each(photos.objects, function(i, photos){
+						t = new Date(photos.time_taken * 1000).toISOString();
+					});
+				}
+			});
+			users = "<div class='ui-sec-users'>" + uniqueUser(userList) + "</div>";
+			lhs = "<div class='ui-sec-head-lhs'>"+ section.title + "</div>";
+			rhs = "<div class='ui-sec-head-rhs timeago' title='" + t + "'></div>";
+			html = "<div class='ui-sec-header'>" + rhs + lhs + users + "</div>";
+			return html;
+		}
+
+		// Takes an array of duplicates and gives back a unique list
 		function uniqueUser(array){
 			var flags = [], output = [], l = array.length, i;
 			for( i=0; i<l; i++) {
-				if( flags[array[i]]) {
+				var val = cleanName(array[i]);
+				if( flags[val]) {
 					continue;
 				}
 
-				flags[array[i]] = true;
-				output.push(array[i]);
+				flags[val] = true;
+				output.push(val);
 			}
 			return output.join(', ');
+		}
+		/*
+		Cleans names of apostrophes and if multiple words, picks the first one
+		*/
+		function cleanName(str) {
+			if (str.indexOf(' ') > -1) {
+				str = str.substr(0, str.indexOf(' '));
+			}
+			if (str.indexOf("'") > -1) {
+				str = str.substr(0, str.indexOf("'"));
+			}
+			return str;
 		}
 	</script>
 </head>
 
 <body>
-	<div class="ui-header"> Shared Photos </div>
-<div id="images"/>
+	<div class="ui-header"> Your photos </div>
+<div class="ui-content">
+	<div class="ui-gallery" id="allImages"/>
+</div>
 
 </body>
 

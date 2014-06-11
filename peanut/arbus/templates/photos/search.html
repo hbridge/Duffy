@@ -7,85 +7,11 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="mobile-web-app-capable" content="yes">
+	<link rel="stylesheet" type="text/css" href="/static/duffy.css" media="screen" />
 	<title>Search your photos</title> 
-	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
+	<script src="/static/duffy.js"></script>
 <style>
-	html, body { padding: 0; margin: 0; }
-	.ui-content{
-		padding:0px 0px 0px 0px;
-	}
-	.ui-photo-block {
-		float: left;
-		width: 100%;
-	}
-	.ui-time-header {
-		font-family: arial;
-		font-size: 1em;
-		padding: 11px 0px 11px 10px;
-		background-color: rgba(239, 239, 239, 0.3);
-	}
-	.i {
-		padding-right: 2px;
-		float:left;
-		position: relative;
-		cursor: pointer;
-		height: 80px;
-		width: 78px;
-	}
-	.ui-i-c {
-		position:absolute;
-		background-color: transparent;
-		top: 44px;
-		left: 45px;
-		font-size: 0.9em;
-		text-align: right;
-		width: 33px;
-		height:33px;
-		line-height: 50px;
-		padding-right: 2px;
-		color: rgb(245, 166, 35);
-	}
-	.ui-a-d {
-		width: 0; 
-		height: 0; 
-		border-top: 25px solid transparent;
-		border-left: 25px solid transparent;
-		border-bottom: 25px solid #fff;
-		position:absolute;
-		top: 28px;
-		left: 53px;
-	}
-	.ui-warning {
-		background-color: rgba(241,155,43,0.7);
-		padding: 5px 5px 5px 5px;
-		font-size: 14px;
-	}
-	.ui-more {
-		padding: 11px 0px 11px 0px;
-	}
-	.ui-loader {
-		padding: 11px 0px 11px 0px;
-	}
-	.ui-refresh {
-		padding: 11px 10px 11px 10px;
-		overflow: auto;
-		background-color: rgba(241, 155, 43, 0.7);
-	}
-	.t {
-		font-family: sans-serif;
-	}
-	.center {
-		text-align: center;
-	}
-	.hidden {
-		display: none;
-	}
-	.fixed-pos {
-		position: fixed;
-		top: 0px;
-		left: 0px;
-		width: 100%;
-	}
 	.results-footer {
 		float: left;
 		margin: 0px 0px 0px 0px;
@@ -94,127 +20,16 @@
 		font-size: 10px;
 		text-align: left;
 	}
-	a:link{
-		text-decoration: none;
-		font-weight: bold;
-		color: #0000FF;
-	}
-	a.visited {
-		text-decoration: none;
-		font-weight: bold;
-		color: #0000FF;	
-	}
 	</style>
 </head>
 
 <body>
 
-<div role="main" class="ui-content">
-
-	<div class="ui-gallery" id="allImages">
-
-
-	</div>
-
+<div class="ui-content">
+	<div class="ui-gallery" id="allImages"/>
 </div>
 </body>
 	<script>
-
-	/*
-		click handler for clusters and images
-	*/
-	function clusterClickHandler(clusters){
-		clusters.click(function() {
-			if ($(this).hasClass('cluster')) {
-				$(this).removeClass('cluster');
-				$(this).children('div').addClass('hidden'); // hides white triangle and cluster size
-				current = $(this).next()
-				while (current.hasClass('hidden')){
-						current.find('img.l-c').each(function() {
-						$(this).attr('src', $(this).attr('l-src'));
-						$(this).removeClass('l-c');
-					});					
-					current.show("fast");
-					current.removeClass('hidden');
-					current = current.next();
-				}
-			}
-			else {
-				window.location.href = $(this).attr('r');
-			}
-		});
-	}
-
-	function getURLParameter(name) {
-			return decodeURI(
-				(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
-			);
-		}
-
-		function addPhoto(userId, photo, photoType, photosLength){
-		// photoType = 0: regular photo
-		// photoType = 1: clusterTop
-		// photoType = 2: clusterBottom
-		// photoType = 3: docStackTop
-		if (photo) {
-			thumbUrl = "/user_data/" + userId + "/" + photo.id + "-thumb-156.jpg";
-			img = "<img class='l' height='78px' width='78px' src='" + thumbUrl + "'/>";
-		}
-		if (!photoType) {
-			var photoType = 0; // means regular photo
-		}
-		if (!photosLength) {
-			var photosLength = 1;
-		}
-		switch (photoType) {
-			case 1:
-				html = "<div class='i cluster'>" + img + "<div class='ui-a-d'></div><div class='ui-i-c t'>" + photosLength + "</div></div>";
-				break;
-			case 2:
-				html = "<div class='i hidden'>" + img + "</div>";
-				break;
-			case 3:
-				img = "<img class='l' height='78px' width='78px' src='/static/docstack.png' />";
-				html = "<div class='i cluster'>" + img + "<div class='ui-a-d'></div><div class='ui-i-c t'>" + photosLength + "</div></div>";
-				break;
-			default: // covers case 0
-				html = "<div class='i'>" + img + "</div>";
-				break;
-		}
-		return html;
-	}
-
-	function addCluster(userId, photos){
-		html = "";
-		$.each(photos, function(i, photo) {
-			if (photo.type == 'photo'){
-				if (i == 0) { // meaning clusterTop
-					html += addPhoto(userId, photo, 1, photos.length);
-				}
-				else {
-					html += addPhoto(userId, photo, 2);
-				}
-			}
-			else {
-				console.log("unexpected type within cluster");
-			}
-		});
-		return html;
-	}
-
-	function addDocstack(userId, photos){
-		html = "";
-		html += addPhoto(userId, null, 3, photos.length);
-		$.each(photos, function(i, photo) {
-			if (photo.type == 'photo'){
-				html += addPhoto(userId, photo, 2);
-			}
-			else {
-				console.log("unexpected type within docstack");
-			}
-		});
-		return html;
-	}
 
 	userId = getURLParameter("user_id");
 	query = getURLParameter("q");
@@ -232,22 +47,22 @@
 				row = "";
 				$.each(objects.objects, function( i, photos) {
 					if (photos.type == 'photo') {
-						row += addPhoto(userId, photos);
+						row += addPhoto(photos);
 					}
 					else if (photos.type == 'cluster'){
-						row += addCluster(userId, photos.objects);
+						row += addCluster(photos.objects);
 					}
 					else if (photos.type == 'docstack'){
-						row += addDocstack(userId, photos.objects);
+						row += addDocstack(photos.objects);
 					}
 					else {
 						console.log('unknown type detected: ' + photos);
 					}
 				});
-				$("<div class='ui-photo-block'><div class='ui-time-header'>"+ objects.title + "</div>" + row + "</div>").appendTo( "#allImages" );
+				$("<div class='ui-section'><div class='ui-sec-header'>"+ objects.title + "</div>" + row + "</div>").appendTo( "#allImages" );
 			}
 		});
-		$('div.i').each(function(){
+		$('div.image').each(function(){
 			clusterClickHandler($(this));
 		});
 	});

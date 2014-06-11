@@ -10,14 +10,17 @@ Date: 6/11/2014
 Processes our standard json format for type=photo
 */
 
-function addPhoto(userId, photo, photoType, photosLength){
+function addPhoto(photo, userList, photoType, photosLength){
 	// photoType = 0: regular photo
 	// photoType = 1: clusterTop
 	// photoType = 2: clusterBottom
 	// photoType = 3: docStackTop
 	if (photo) {
-		thumbUrl = "/user_data/" + userId + "/" + photo.id + "-thumb-156.jpg";
+		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
 		img = "<img class='l' height='78px' width='78px' src='" + thumbUrl + "'/>";
+		if (userList) {
+			userList.push(photo.first_name);
+		}
 	}
 	if (!photoType) {
 		var photoType = 0; // means regular photo
@@ -47,15 +50,15 @@ function addPhoto(userId, photo, photoType, photosLength){
 Processes our standard json type=cluster
 */
 
-function addCluster(userId, photos){
+function addCluster(photos, userList){
 	html = "";
 	$.each(photos, function(i, photo) {
 		if (photo.type == 'photo'){
 			if (i == 0) { // meaning clusterTop
-				html += addPhoto(userId, photo, 1, photos.length);
+				html += addPhoto(photo, userList, 1, photos.length);
 			}
 			else {
-				html += addPhoto(userId, photo, 2);
+				html += addPhoto(photo, userList, 2);
 			}
 		}
 		else {
@@ -69,18 +72,39 @@ function addCluster(userId, photos){
 Processes our standard json type=docstack
 */
 
-function addDocstack(userId, photos){
+function addDocstack(photos){
 	html = "";
-	html += addPhoto(userId, null, 3, photos.length);
+	html += addPhoto(null, 3, photos.length);
 	$.each(photos, function(i, photo) {
 		if (photo.type == 'photo'){
-			html += addPhoto(userId, photo, 2);
+			html += addPhoto(photo, 2);
 		}
 		else {
 			console.log("unexpected type within docstack");
 		}
 	});
 	return html;
+}
+
+/*
+	click handler for clusters and images
+*/
+function clusterClickHandler(clusters){
+	clusters.click(function() {
+		if ($(this).hasClass('cluster')) {
+			$(this).removeClass('cluster');
+			$(this).children('div').addClass('hidden'); // hides white triangle and cluster size
+			current = $(this).next();
+			while (current.hasClass('hidden')){					
+				current.show("fast");
+				current.removeClass('hidden');
+				current = current.next();
+			}
+		}
+		else {
+			window.location.href = $(this).attr('r'); //TODO: Need to update link
+		}
+	});
 }
 
 /*
