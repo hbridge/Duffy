@@ -164,7 +164,11 @@
 
 - (void)swapCameraButtonPressed:(UIButton *)sender
 {
-  
+  if (self.cameraDevice == UIImagePickerControllerCameraDeviceFront) {
+    self.cameraDevice = UIImagePickerControllerCameraDeviceRear;
+  } else if (self.cameraDevice == UIImagePickerControllerCameraDeviceRear) {
+    self.cameraDevice = UIImagePickerControllerCameraDeviceFront;
+  }
 }
 
 
