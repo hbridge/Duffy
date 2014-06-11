@@ -33,15 +33,13 @@
   // setup webview
   self.webView.delegate = self;
   
-//  NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
-//                         DFServerBaseURL, [[DFUser currentUser] userID]];
-  NSString *urlString = [NSString stringWithFormat:@"http://www.google.com"];
+  NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
+                         DFServerBaseURL, [[DFUser currentUser] userID]];
   NSURL *urlToLoad = [NSURL URLWithString:urlString];
   
   DDLogInfo(@"Fetching url:%@", urlString);
   [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
 }
-
 
 - (void)setNavigationButtons
 {
