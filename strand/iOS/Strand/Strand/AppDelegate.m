@@ -16,6 +16,7 @@
 #import "DFUser.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFFirstTimeSetupViewController.h"
+#import "DFLocationPinger.h"
 
 @interface AppDelegate ()
             
@@ -97,6 +98,8 @@
            && ![[DFUser currentUser] userID] == 0);
 }
 
+
+
 - (void)showFirstTimeSetup
 {
   DFFirstTimeSetupViewController *setupViewController = [[DFFirstTimeSetupViewController alloc] init];
@@ -107,9 +110,20 @@
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     [DFPhotoStore sharedStore];
+    [self checkForAndRequestLocationAccess];
     [[DFUploadController sharedUploadController] uploadPhotos];
     self.window.rootViewController = [[RootViewController alloc] init];
   });
+}
+
+- (void)checkForAndRequestLocationAccess
+{
+  if ([[DFLocationPinger sharedInstance] haveLocationPermisison]) {
+    DDLogInfo(@"Already have location access.");
+  } else if ([[DFLocationPinger sharedInstance] canAskForLocationPermission])
+  {
+    [[DFLocationPinger sharedInstance] askForLocationPermission];
+  }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

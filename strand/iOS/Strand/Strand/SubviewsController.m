@@ -33,7 +33,7 @@
   if (self) {
     _subviewControllers =
     @[
-     [[DFGalleryWebViewController alloc] init],
+     [[UINavigationController alloc] initWithRootViewController:[[DFGalleryWebViewController alloc] init]],
      [[DFCameraViewController alloc] init]
       ];
   }

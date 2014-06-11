@@ -20,7 +20,7 @@
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    // Custom initialization
+    self.navigationItem.title = @"Gallery";
   }
   return self;
 }
@@ -28,13 +28,66 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
+  [self setNavigationButtons];
+
+  // setup webview
+  self.webView.delegate = self;
   
-  NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
-                         DFServerBaseURL, [[DFUser currentUser] userID]];
+//  NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
+//                         DFServerBaseURL, [[DFUser currentUser] userID]];
+  NSString *urlString = [NSString stringWithFormat:@"http://www.google.com"];
   NSURL *urlToLoad = [NSURL URLWithString:urlString];
   
   DDLogInfo(@"Fetching url:%@", urlString);
   [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
+}
+
+
+- (void)setNavigationButtons
+{
+  if (!(self.navigationItem.leftBarButtonItems.count > 0)) {
+    self.backButtonItem = [[UIBarButtonItem alloc]
+                           initWithImage:[UIImage imageNamed:@"Assets/Icons/BackBarButtonIcon.png"]
+                           style:UIBarButtonItemStylePlain
+                           target:self.webView
+                           action:@selector(goBack)];
+    
+    self.forwardButtonItem = [[UIBarButtonItem alloc]
+                              initWithImage:[UIImage imageNamed:@"Assets/Icons/ForwardBarButtonIcon.png"]
+                              style:UIBarButtonItemStylePlain
+                              target:self.webView
+                              action:@selector(goForward)];
+    self.refreshButtonItem = [[UIBarButtonItem alloc]
+                              initWithImage:[UIImage imageNamed:@"Assets/Icons/RefreshBarButtonIcon.png"]
+                              style:UIBarButtonItemStylePlain
+                              target:self.webView
+                              action:@selector(reload)];
+    
+    self.navigationItem.leftBarButtonItems = @[self.backButtonItem, self.forwardButtonItem];
+    self.navigationItem.rightBarButtonItem = self.refreshButtonItem;
+  }
+      
+  self.backButtonItem.enabled = self.webView.canGoBack;
+  self.forwardButtonItem.enabled = self.webView.canGoForward;
+  self.refreshButtonItem.enabled = YES;
+}
+
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  [self setNavigationButtons];
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+  [self setNavigationButtons];
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+  [self setNavigationButtons];
 }
 
 - (void)didReceiveMemoryWarning
@@ -43,15 +96,6 @@
   // Dispose of any resources that can be recreated.
 }
 
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender
- {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
+
 
 @end
