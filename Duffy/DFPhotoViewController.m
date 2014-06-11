@@ -46,6 +46,7 @@
     if (self.photoView && self.photo) {
         self.photoView.image = self.photo.fullScreenImage;
     }
+  [self logPhotoMetadata];
 }
 
 

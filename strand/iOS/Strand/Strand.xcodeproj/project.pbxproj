@@ -50,6 +50,7 @@
 		5AC4A94F1947C54C00862D9C /* Duffy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */; };
 		5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */; };
 		5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */; };
+		5AC4A9571948A59200862D9C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AC4A9561948A59200862D9C /* CoreLocation.framework */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
@@ -160,6 +161,7 @@
 		5AC4A9511947C77300862D9C /* DFFirstTimeSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFirstTimeSetupViewController.h; sourceTree = "<group>"; };
 		5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFirstTimeSetupViewController.m; sourceTree = "<group>"; };
 		5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFirstTimeSetupViewController.xib; sourceTree = "<group>"; };
+		5AC4A9561948A59200862D9C /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5ACA39001947A6F100834D86 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -190,6 +192,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5AC4A9571948A59200862D9C /* CoreLocation.framework in Frameworks */,
 				5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */,
 				5ACA39031947A71700834D86 /* CFNetwork.framework in Frameworks */,
 				5AC4A93F1947C33E00862D9C /* libFlurry_4.4.0.a in Frameworks */,
@@ -423,6 +426,7 @@
 		6708F8FDC18C412C9AA3CF21 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5AC4A9561948A59200862D9C /* CoreLocation.framework */,
 				5AC4A93E1947C33E00862D9C /* libFlurry_4.4.0.a */,
 				5ACA39021947A71700834D86 /* CFNetwork.framework */,
 				5ACA39001947A6F100834D86 /* Foundation.framework */,

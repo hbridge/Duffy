@@ -17,6 +17,8 @@
 
 @interface DFCameraViewController ()
 
+@property (nonatomic, retain) CLLocationManager *locationManager;
+
 @end
 
 @implementation DFCameraViewController
@@ -40,6 +42,7 @@
     self.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.showsCameraControls = NO;
     self.cameraOverlayView = self.cameraOverlayView;
+    [self configureLocationManager];
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
   }
@@ -47,6 +50,35 @@
   self.delegate = self;
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [self startLocationUpdates];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [self stopLocationUpdates];
+}
+
+- (void)configureLocationManager
+{
+  self.locationManager = [[CLLocationManager alloc] init];
+  self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+  self.locationManager.delegate = self;
+  self.locationManager.pausesLocationUpdatesAutomatically = NO;
+}
+
+- (void)startLocationUpdates
+{
+  [self.locationManager startUpdatingLocation];
+}
+
+- (void)stopLocationUpdates
+{
+  [self.locationManager stopUpdatingLocation];
+}
 
 - (void)didReceiveMemoryWarning
 {
@@ -107,6 +139,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
         imageToSave = originalImage;
       }
       
+      NSMutableDictionary *metadata = [(NSDictionary *)info[UIImagePickerControllerMediaMetadata]
+                                       mutableCopy];
+      [self addLocationToMetadata:metadata];
+      
       // Save the new image (original or edited) to the Camera Roll
       ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
       [library writeImageToSavedPhotosAlbum:imageToSave.CGImage
@@ -115,6 +151,23 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
        ];
     }
   }
+}
+
+- (void)addLocationToMetadata:(NSMutableDictionary *)metadata
+{
+  CLLocation *location = self.locationManager.location;
+  if (location == nil) return;
+  
+  CLLocationCoordinate2D coords = location.coordinate;
+  
+  NSDictionary *latlongDict = @{@"Latitude": @(fabs(coords.latitude)),
+                                @"LatitudeRef" : coords.latitude >= 0.0 ? @"N" : @"S",
+                                @"Longitude" : @(fabs(coords.longitude)),
+                                @"LongitudeRef" : coords.longitude >= 0.0 ? @"E" : @"W",
+                                @"Altitude" : @(location.altitude),
+                                };
+  
+  metadata[@"{GPS}"] = latlongDict;
 }
        
 - (ALAssetsLibraryWriteImageCompletionBlock)writeImageCompletionBlock
@@ -145,6 +198,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   
 }
+
 
 
 @end
