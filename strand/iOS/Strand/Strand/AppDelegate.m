@@ -19,6 +19,8 @@
 #import "DFLocationPinger.h"
 #import "HockeySDK.h"
 #import "DFBackgroundRefreshController.h"
+#import <RestKit/RestKit.h>
+#import "DFAppInfo.h"
 
 
 @interface AppDelegate ()
@@ -57,6 +59,14 @@
   
   // To simulate the amount of log data saved, use the release log level for the fileLogger
   [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
+
+#ifdef DEBUG
+  //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
+  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  RKLogConfigureByName("RestKit/Network", RKLogLevelError);
+#else
+  RKLogConfigureByName("RestKit/Network", RKLogLevelError);
+#endif
 }
 
 - (void)configureHockey
@@ -128,9 +138,19 @@
   
   [DFPhotoStore sharedStore];
   [self checkForAndRequestLocationAccess];
-  [[DFUploadController sharedUploadController] uploadPhotos];
+  [self performForegroundOperations];
   self.window.rootViewController = [[RootViewController alloc] init];
   [[DFBackgroundRefreshController sharedBackgroundController] startBackgroundRefresh];
+}
+
+- (void)performForegroundOperations
+{
+  DDLogInfo(@"Strand app %@ became active.", [DFAppInfo appInfoString]);
+  if ([self isAppSetupComplete]) {
+    [[DFUploadController sharedUploadController] uploadPhotos];
+    [[DFBackgroundRefreshController sharedBackgroundController] updateJoinableStrands];
+    [[DFBackgroundRefreshController sharedBackgroundController] updateNewPhotos];
+  }
 }
 
 - (void)checkForAndRequestLocationAccess
@@ -154,12 +174,11 @@
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
-  if ([self isAppSetupComplete]) {
-    [[DFUploadController sharedUploadController] uploadPhotos];
-  }
+  
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+  [self performForegroundOperations];
   // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
