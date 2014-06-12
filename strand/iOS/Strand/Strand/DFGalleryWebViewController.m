@@ -30,11 +30,12 @@
 {
   [super viewDidLoad];
   [self setNavigationButtons];
+  self.navigationController.navigationBar.tintColor =
+  [UIColor orangeColor];
 
   // setup webview
   self.webView.delegate = self;
-  self.navigationController.navigationBar.tintColor =
-  [UIColor orangeColor];
+  self.webView.scalesPageToFit = YES;
   
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
