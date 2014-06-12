@@ -16,6 +16,7 @@
 
 - (UIBackgroundFetchResult)performBackgroundFetch;
 
-
+- (void)updateJoinableStrands;
+- (void)updateNewPhotos;
 
 @end

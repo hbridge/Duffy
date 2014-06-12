@@ -27,4 +27,6 @@ typedef enum {
                                    numRemaining:(unsigned long)numRemaining
                                        progress:(float)progress;
 
+- (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout;
+
 @end

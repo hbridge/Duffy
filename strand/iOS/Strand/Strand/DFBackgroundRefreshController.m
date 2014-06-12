@@ -11,6 +11,8 @@
 #import "DFStrandConstants.h"
 #import "DFPeanutJoinableStrandsAdapter.h"
 #import "DFPeanutSearchObject.h"
+#import "DFStatusBarNotificationManager.h"
+
 
 @interface DFBackgroundRefreshController()
 
@@ -94,6 +96,15 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 {
   DDLogInfo(@"Performing background fetch.");
   
+  [self updateJoinableStrands];
+  [self updateNewPhotos];
+  
+  return UIBackgroundFetchResultNewData;
+}
+
+- (void)updateJoinableStrands
+{
+  DDLogInfo(@"Updating joinable strands.");
   [self.joinableStrandsAdapter fetchJoinableStrandsWithCompletionBlock:^(DFPeanutSearchResponse *response) {
     if (!response || !response.result) {
       DDLogError(@"DFBackgroundRefreshController couldn't get joinable strands");
@@ -105,27 +116,40 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     unsigned int count = 0;
     
     for (DFPeanutSearchObject *searchObject in response.objects) {
-      if (searchObject.type == DFSearchObjectSection) {
+      if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
         for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
-          if (subSearchObject.type == DFSearchObjectPhoto) {
+          if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
             count++;
           }
         }
       }
     }
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [[UIApplication sharedApplication] cancelAllLocalNotifications];
-      UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-      NSDate *now = [NSDate date];
-      localNotification.fireDate = now;
-      localNotification.alertBody = [NSString stringWithFormat:@"Take a picture to join a Strand with %du photos.", count];
-      localNotification.applicationIconBadgeNumber = count;
-      [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-    });
+    DDLogInfo(@"Found joinable strands with %d photos nearby.", count);
+    if (count < 1) return;
+    
+    NSString *notificationString = [NSString stringWithFormat:@"Take a picture to join a Strand with %d photos.",
+                                    count];
+    
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+      [[DFStatusBarNotificationManager sharedInstance] showNotificationWithString:notificationString timeout:2];
+    } else {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+        NSDate *now = [NSDate date];
+        localNotification.fireDate = now;
+        localNotification.alertBody = notificationString;
+        localNotification.applicationIconBadgeNumber = count;
+        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+      });
+    }
   }];
-  
-  return UIBackgroundFetchResultNewData;
+}
+
+- (void)updateNewPhotos
+{
+  DDLogInfo(@"Updating new photo counts.");
 }
 
 #pragma mark Networking

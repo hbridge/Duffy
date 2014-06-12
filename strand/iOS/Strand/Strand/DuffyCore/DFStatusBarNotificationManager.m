@@ -77,5 +77,10 @@ static DFStatusBarNotificationManager *defaultManager;
     });
 }
 
+- (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout
+{
+  [JDStatusBarNotification showWithStatus:string dismissAfter:timeout];
+}
+
 
 @end
