@@ -1,0 +1,28 @@
+<html>
+<style>
+	html, body { 
+		padding: 0; 
+		margin: 0;
+		height: 100%;
+		width: 100%; 
+		display: table;
+	}
+	.ui-photo{
+		width: 100%;
+		height:100%;
+		display: table-cell;
+		vertical-align: middle;
+	}
+	.ui-img-tag {
+		margin-left: auto;
+		margin-right: auto;
+		display: block; 
+	}
+</style>
+<body>
+<div class="ui-photo">
+	<img class='ui-img-tag' src="{{ thumbnailBasepath }}{{ photoId }}.jpg" 
+		onError="this.onerror=null;this.src='{{ thumbnailBasepath }}{{ photoId }}-thumb-156.jpg';">
+</div>
+</body>
+</html>

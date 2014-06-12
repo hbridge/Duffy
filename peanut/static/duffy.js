@@ -18,7 +18,7 @@ function addPhoto(photo, userList, photoType, photosLength){
 	if (photo) {
 		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
 		img = "<img class='l' height='78px' width='78px' src='" + thumbUrl + "'/>";
-		fullUrl = "/user_data/" + photo.user_id + "/" + photo.id + ".jpg";
+		fullUrl = "/strand/viz/images?user_id=" + photo.user_id + "&photo_id=" + photo.id;
 		if (userList) {
 			userList.push(photo.first_name);
 		}
