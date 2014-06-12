@@ -18,6 +18,7 @@ function addPhoto(photo, userList, photoType, photosLength){
 	if (photo) {
 		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
 		img = "<img class='l' height='78px' width='78px' src='" + thumbUrl + "'/>";
+		fullUrl = "/user_data/" + photo.user_id + "/" + photo.id + ".jpg";
 		if (userList) {
 			userList.push(photo.first_name);
 		}
@@ -30,17 +31,17 @@ function addPhoto(photo, userList, photoType, photosLength){
 	}
 	switch (photoType) {
 		case 1:
-			html = "<div class='image cluster'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
+			html = "<div class='image cluster' title='" + cleanName(photo.first_name) +"' r='" + fullUrl + "'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
 			break;
 		case 2:
-			html = "<div class='image hidden'>" + img + "</div>";
+			html = "<div class='image hidden' title='" + cleanName(photo.first_name) +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 		case 3:
 			img = "<img class='l' height='78px' width='78px' src='/static/docstack.png' />";
 			html = "<div class='image cluster'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
 			break;
 		default: // covers case 0
-			html = "<div class='image'>" + img + "</div>";
+			html = "<div class='image' title='" + cleanName(photo.first_name) +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 	}
 	return html;
@@ -106,6 +107,20 @@ function clusterClickHandler(clusters){
 		}
 	});
 }
+
+/*
+Cleans names of apostrophes and if multiple words, picks the first one
+*/
+function cleanName(str) {
+	if (str.indexOf(' ') > -1) {
+		str = str.substr(0, str.indexOf(' '));
+	}
+	if (str.indexOf("'") > -1) {
+		str = str.substr(0, str.indexOf("'"));
+	}
+	return str;
+}
+
 
 /*
 Gets a parameter in the URL

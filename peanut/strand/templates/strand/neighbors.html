@@ -2,33 +2,48 @@
 
 <head>
 	<title>Neighbors</title> 
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" type="text/css" href="/static/duffy.css" media="screen" />
 
+
 	<style>
+		html, body {
+			font-family: helveticaNeue;
+		}
 		.ui-section {
 			padding-bottom:4px;
 		}
 		.ui-sec-header{
 			overflow: hidden;
+			background-color: #ffffff;
+			padding-top: 21px;
+			padding-bottom: 21px;
 		}
-		.ui-sec-head-lhs {
-			display: inline-block;
+		.ui-sec-head-top {
+			width: 100%;
+			float:left;
+			font-size: 18px;
+			color: #000000;
+			line-height: 21px;
+			letter-spacing: 0px;
+
 		}
-		.ui-sec-head-rhs {
-			float: right;
-		}
-		.ui-sec-users {
-			clear: left;
+		.ui-sec-head-bottom {
+			width: 100%;
+			float:left;
+			font-size: 15px;
+			color: #929292;
+			line-height: 17px;
+			letter-spacing: 0px;			
 		}
 	</style>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
 	<script src="/static/jquery.timeago.js"></script>	
 	<script src="/static/duffy.js"></script>
 	<script>
-		userId = getURLParameter("user_id")
-		url = "/strand/api/neighbors?user_id=" + userId
-
-		console.log("Sending request to " + url)
+		userId = getURLParameter("user_id");
+		url = "/strand/api/neighbors?user_id=" + userId;
+		console.log("Sending request to " + url);
 
 		$.get(url, function( data ) {
 			$.each( data.objects, function( i, objects ) {
@@ -49,10 +64,13 @@
 					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");	
 				}
 			});
+			if (data.objects.length === 0){
+				$('div.ui-msg').removeClass('hidden');
+			}
 			$('div.image').each(function(){
 				clusterClickHandler($(this));
 			});
-			$('div.timeago').timeago();
+			$('span.timeago').timeago();
 		});
 
 		/*
@@ -61,21 +79,23 @@
 
 		function genHeader(section, userList){
 			html = "";
+			offset = new Date().getTimezoneOffset()*60;
 			$.each( section.objects, function(i, photos ) {
 				if (photos.type == 'photo') {
-					t = new Date(photos.time_taken * 1000).toISOString();
-					return;
+					t = new Date((photos.time_taken+offset) * 1000).toISOString();
+					return false;
 				}
 				else if (photos.type == 'cluster') {
 					$.each(photos.objects, function(i, photos){
-						t = new Date(photos.time_taken * 1000).toISOString();
+						t = new Date((photos.time_taken+offset) * 1000).toISOString();
+						return false;
 					});
+					return false;
 				}
 			});
-			users = "<div class='ui-sec-users'>" + uniqueUser(userList) + "</div>";
-			lhs = "<div class='ui-sec-head-lhs'>"+ section.title + "</div>";
-			rhs = "<div class='ui-sec-head-rhs timeago' title='" + t + "'></div>";
-			html = "<div class='ui-sec-header'>" + rhs + lhs + users + "</div>";
+			secTop = "<div class='ui-sec-head-top'>With " + uniqueUser(userList) + "</div>";
+			secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span> in " + section.title +"</div>";
+			html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
 			return html;
 		}
 
@@ -93,25 +113,13 @@
 			}
 			return output.join(', ');
 		}
-		/*
-		Cleans names of apostrophes and if multiple words, picks the first one
-		*/
-		function cleanName(str) {
-			if (str.indexOf(' ') > -1) {
-				str = str.substr(0, str.indexOf(' '));
-			}
-			if (str.indexOf("'") > -1) {
-				str = str.substr(0, str.indexOf("'"));
-			}
-			return str;
-		}
 	</script>
 </head>
 
 <body>
-	<div class="ui-header"> Your photos </div>
 <div class="ui-content">
 	<div class="ui-gallery" id="allImages"/>
+	<div class="ui-msg hidden">No photos. Go take some photos!</div>
 </div>
 
 </body>
