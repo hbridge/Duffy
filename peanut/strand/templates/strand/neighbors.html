@@ -92,9 +92,17 @@
 					return false;
 				}
 			});
-			secTop = "<div class='ui-sec-head-top'>With " + uniqueUser(userList) + "</div>";
-			secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span> in " + section.title +"</div>";
-			html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
+			if (section.title == 'Recent') {
+				secTop = "<div class='ui-sec-head-top'>Recent photos (not shared :()</div>";
+				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span></div>";
+				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
+			}
+			else {
+				secTop = "<div class='ui-sec-head-top'>With " + uniqueUser(userList) + "</div>";
+				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span> in " + section.title +"</div>";
+				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
+			}
+
 			return html;
 		}
 
