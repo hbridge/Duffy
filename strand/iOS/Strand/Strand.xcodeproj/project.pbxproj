@@ -51,6 +51,8 @@
 		5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */; };
 		5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */; };
 		5AC4A9571948A59200862D9C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AC4A9561948A59200862D9C /* CoreLocation.framework */; };
+		5AC4A960194A25A300862D9C /* DFBackgroundRefreshController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A95F194A25A300862D9C /* DFBackgroundRefreshController.m */; };
+		5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A962194A295700862D9C /* DFStrandConstants.m */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
@@ -162,6 +164,10 @@
 		5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFirstTimeSetupViewController.m; sourceTree = "<group>"; };
 		5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFirstTimeSetupViewController.xib; sourceTree = "<group>"; };
 		5AC4A9561948A59200862D9C /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
+		5AC4A95E194A25A300862D9C /* DFBackgroundRefreshController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBackgroundRefreshController.h; sourceTree = "<group>"; };
+		5AC4A95F194A25A300862D9C /* DFBackgroundRefreshController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBackgroundRefreshController.m; sourceTree = "<group>"; };
+		5AC4A961194A295700862D9C /* DFStrandConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandConstants.h; sourceTree = "<group>"; };
+		5AC4A962194A295700862D9C /* DFStrandConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandConstants.m; sourceTree = "<group>"; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5ACA39001947A6F100834D86 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -356,6 +362,17 @@
 			name = "First Time Setup";
 			sourceTree = "<group>";
 		};
+		5AC4A95D194A257E00862D9C /* Background manager */ = {
+			isa = PBXGroup;
+			children = (
+				5AC4A95E194A25A300862D9C /* DFBackgroundRefreshController.h */,
+				5AC4A95F194A25A300862D9C /* DFBackgroundRefreshController.m */,
+				5AC4A961194A295700862D9C /* DFStrandConstants.h */,
+				5AC4A962194A295700862D9C /* DFStrandConstants.m */,
+			);
+			name = "Background manager";
+			sourceTree = "<group>";
+		};
 		5ADD856619465C790037A6D5 = {
 			isa = PBXGroup;
 			children = (
@@ -386,6 +403,7 @@
 				5AC4A8D71947AFA100862D9C /* Main Page View controller */,
 				5AC4A8D61947AF8E00862D9C /* Camera View */,
 				5AC4A8DB1947B02C00862D9C /* Gallery View */,
+				5AC4A95D194A257E00862D9C /* Background manager */,
 				5AC4A8DA1947B01D00862D9C /* Logging and Analytics */,
 				5AC4A8DC1947B61900862D9C /* Database */,
 				5AC4A8D019476F9000862D9C /* Assets */,
@@ -491,6 +509,11 @@
 				TargetAttributes = {
 					5ADD856E19465C790037A6D5 = {
 						CreatedOnToolsVersion = 6.0;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+						};
 					};
 					5ADD858A19465C790037A6D5 = {
 						CreatedOnToolsVersion = 6.0;
@@ -614,6 +637,7 @@
 				5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */,
 				5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */,
 				5AC4A9251947C30800862D9C /* DFLocationPinger.m in Sources */,
+				5AC4A960194A25A300862D9C /* DFBackgroundRefreshController.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
@@ -624,6 +648,7 @@
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
+				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
 				5AC4A9301947C30800862D9C /* DFStatusBarNotificationManager.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,

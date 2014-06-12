@@ -18,6 +18,7 @@
 #import "DFFirstTimeSetupViewController.h"
 #import "DFLocationPinger.h"
 #import "HockeySDK.h"
+#import "DFBackgroundRefreshController.h"
 
 
 @interface AppDelegate ()
@@ -129,6 +130,7 @@
   [self checkForAndRequestLocationAccess];
   [[DFUploadController sharedUploadController] uploadPhotos];
   self.window.rootViewController = [[RootViewController alloc] init];
+  [[DFBackgroundRefreshController sharedBackgroundController] startBackgroundRefresh];
 }
 
 - (void)checkForAndRequestLocationAccess
@@ -164,6 +166,15 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
   // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
+
+-(void)application:(UIApplication *)application
+performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
+  
+  UIBackgroundFetchResult result = [[DFBackgroundRefreshController sharedBackgroundController]
+                                    performBackgroundFetch];
+  completionHandler(result);
+}
+
 
 - (void)resetApplication
 {

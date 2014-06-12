@@ -188,7 +188,7 @@
 
 - (void)imagePickerController:(UIImagePickerController *)picker
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
-  DDLogInfo(@"Image picked, info: %@", info.description);
+  DDLogVerbose(@"Image picked, info: %@", info.description);
   if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
     NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
     UIImage *originalImage, *editedImage, *imageToSave;
@@ -251,8 +251,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
                                                  withHashData:hashData
                                                      photoTimeZone:[NSTimeZone defaultTimeZone]
                                                     inContext:context];
-      DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter] stringFromDate:newPhoto.creationDate]);
-      
+      DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter]
+                                          stringFromDate:newPhoto.creationDate]);
       
       NSError *error;
       [context save:&error];
