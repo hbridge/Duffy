@@ -134,13 +134,17 @@ def neighbors(request):
 		uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
 		sortedGroups.append(uniqueGroup)
 
+	
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
+	# Try to find recent photos
+	# If there are no previous groups, then fetch all photos and call them recent
+	recentPhotos = Photo.objects.filter(user_id=userId).order_by("time_taken")
 	if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
 		lastPhotoTime = sortedGroups[0][0].time_taken
+		sortedGroups = sortedGroups.filter(time_taken__gt=lastPhotoTime)
 
-	recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
 	haveRecentPhotos = len(recentPhotos) > 0
 	
 	if (haveRecentPhotos):
