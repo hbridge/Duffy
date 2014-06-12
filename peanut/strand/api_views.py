@@ -137,12 +137,13 @@ def neighbors(request):
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
-	lastPhotoTime = sortedGroups[0][0].time_taken
+	if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
+		lastPhotoTime = sortedGroups[0][0].time_taken
 
-	recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
+		recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
 
-	if (len(recentPhotos) > 0):
-		sortedGroups.insert(0, recentPhotos)
+		if (len(recentPhotos) > 0):
+			sortedGroups.insert(0, recentPhotos)
 
 	# Now we have to turn into our Duffy JSON, first, convert into the right format
 
