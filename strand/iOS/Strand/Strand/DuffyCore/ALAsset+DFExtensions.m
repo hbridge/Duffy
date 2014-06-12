@@ -11,7 +11,7 @@
 
 @implementation ALAsset (DFExtensions)
 
-- (NSDate *)creationDate
+- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone
 {
   if (self.defaultRepresentation.metadata) {
     NSDictionary *metadata = self.defaultRepresentation.metadata;
@@ -19,6 +19,7 @@
     if (exifDict) {
       if (exifDict[@"DateTimeOriginal"]){
         NSDateFormatter *exifFormatter = [NSDateFormatter EXIFDateFormatter];
+        exifFormatter.timeZone = timezone;
         NSDate *date = [exifFormatter dateFromString:exifDict[@"DateTimeOriginal"]];
         return date;
       }
@@ -26,6 +27,11 @@
   }
   
   return [self valueForProperty:ALAssetPropertyDate];
+}
+
+- (NSDate *)creationDate
+{
+  return [self creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 }
 
 

@@ -43,13 +43,16 @@
 NSString *const DFCameraRollExtraMetadataKey = @"{DFCameraRollExtras}";
 NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
-+ (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset withHashData:(NSData *)hashData inContext:(NSManagedObjectContext *)context
++ (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset
+                           withHashData:(NSData *)hashData
+                          photoTimeZone:(NSTimeZone *)timeZone
+                              inContext:(NSManagedObjectContext *)context
 {
   DFPhoto *newPhoto = [NSEntityDescription
                        insertNewObjectForEntityForName:@"DFPhoto"
                        inManagedObjectContext:context];
   newPhoto.alAssetURLString = [[asset valueForProperty:ALAssetPropertyAssetURL] absoluteString];
-  newPhoto.creationDate = [asset creationDate];
+  newPhoto.creationDate = [asset creationDateForTimeZone:timeZone];
   newPhoto.creationHashData = hashData;
   newPhoto.hasLocation = ([asset valueForProperty:ALAssetPropertyLocation] != nil);
   newPhoto.userID = [[DFUser currentUser] userID];

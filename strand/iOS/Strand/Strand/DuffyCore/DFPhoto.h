@@ -50,7 +50,10 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 - (void)fetchReverseGeocodeDictionary:(DFPhotoReverseGeocodeCompletionBlock)completionBlock;
 
 // Create a new DFPhoto in a context
-+ (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset withHashData:(NSData *)hashData inContext:(NSManagedObjectContext *)context;
++ (DFPhoto *)insertNewDFPhotoForALAsset:(ALAsset *)asset
+                           withHashData:(NSData *)hashData
+                          photoTimeZone:(NSTimeZone *)timeZone
+                              inContext:(NSManagedObjectContext *)context;
 
 // Get a DF Photo instance from its URL
 + (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext;

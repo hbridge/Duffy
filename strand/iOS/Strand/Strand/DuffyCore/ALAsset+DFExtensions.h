@@ -12,5 +12,6 @@
 
 
 - (NSDate *)creationDate;
+- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone;
 
 @end
