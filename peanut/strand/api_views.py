@@ -141,13 +141,13 @@ def neighbors(request):
 		lastPhotoTime = sortedGroups[0][0].time_taken
 
 	recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
-
-	if (len(recentPhotos) > 0):
+	haveRecentPhotos = 
+	if (haveRecentPhotos):
 		sortedGroups.insert(0, recentPhotos)
 
 	# Now we have to turn into our Duffy JSON, first, convert into the right format
 
-	groups = getGroups(sortedGroups)
+	groups = getGroups(sortedGroups, labelRecent = haveRecentPhotos)
 	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 	response['objects'] = objects
 	response['next_start_date_time'] = lastDate
