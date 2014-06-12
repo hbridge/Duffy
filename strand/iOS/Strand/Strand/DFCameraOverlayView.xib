@@ -14,21 +14,21 @@
                     <rect key="frame" x="0.0" y="426" width="320" height="142"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FDr-hg-nDc" userLabel="Shutter Button">
-                            <rect key="frame" x="123" y="34" width="75" height="75"/>
+                            <rect key="frame" x="119" y="30" width="82" height="82"/>
                             <constraints>
-                                <constraint firstAttribute="width" constant="75" id="SLW-bJ-fte"/>
-                                <constraint firstAttribute="height" constant="75" id="jSc-iH-Mco"/>
+                                <constraint firstAttribute="width" constant="82" id="SLW-bJ-fte"/>
+                                <constraint firstAttribute="height" constant="82" id="jSc-iH-Mco"/>
                             </constraints>
                             <state key="normal" image="Assets/Icons/ShutterButton.png">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                         </button>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c4Q-fB-mQc" userLabel="Gallery Button">
-                            <rect key="frame" x="20" y="46" width="50" height="50"/>
+                            <rect key="frame" x="25" y="94" width="23" height="23"/>
                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <constraints>
-                                <constraint firstAttribute="height" constant="50" id="2dW-bl-1yn"/>
-                                <constraint firstAttribute="width" constant="50" id="6gB-jg-Ehg"/>
+                                <constraint firstAttribute="height" constant="23" id="2dW-bl-1yn"/>
+                                <constraint firstAttribute="width" constant="23" id="6gB-jg-Ehg"/>
                             </constraints>
                             <state key="normal" image="Assets/Icons/GalleryButton.png">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -38,56 +38,41 @@
                     <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="centerX" secondItem="FDr-hg-nDc" secondAttribute="centerX" id="D7i-fS-tad"/>
-                        <constraint firstAttribute="centerY" secondItem="c4Q-fB-mQc" secondAttribute="centerY" id="S6N-cx-cVO"/>
-                        <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="80R-J1-Wxm" secondAttribute="leading" constant="20" id="VDU-fh-b7v"/>
+                        <constraint firstAttribute="centerY" secondItem="c4Q-fB-mQc" secondAttribute="centerY" constant="-34.5" id="S6N-cx-cVO"/>
+                        <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="80R-J1-Wxm" secondAttribute="leading" constant="25" id="VDU-fh-b7v"/>
                         <constraint firstAttribute="centerY" secondItem="FDr-hg-nDc" secondAttribute="centerY" id="W6C-Qu-eLW"/>
                         <constraint firstAttribute="height" constant="142" id="uDN-GU-l0T"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xJB-6z-Yhn">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oNo-vb-nP7" userLabel="Flash - Button">
+                    <rect key="frame" x="0.0" y="5" width="50" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                    <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oNo-vb-nP7" userLabel="Flash - Button">
-                            <rect key="frame" x="0.0" y="5" width="50" height="20"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
-                            <state key="normal" title="Auto" image="Assets/Icons/FlashOnButton.png">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mF1-Q6-VZs" userLabel="SwapCamera - Button">
-                            <rect key="frame" x="270" y="0.0" width="50" height="50"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="50" id="DXf-4a-aBG"/>
-                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="50" id="DZD-tb-qhv"/>
-                                <constraint firstAttribute="width" constant="50" id="JBR-J1-7nT"/>
-                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="50" id="xgX-cC-7AQ"/>
-                            </constraints>
-                            <state key="normal" image="Assets/Icons/SwapCameraButton">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                        </button>
-                    </subviews>
-                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                    <state key="normal" title="Auto" image="Assets/Icons/FlashOnButton.png">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="mF1-Q6-VZs" userLabel="SwapCamera - Button">
+                    <rect key="frame" x="270" y="0.0" width="50" height="50"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
-                        <constraint firstAttribute="trailing" secondItem="mF1-Q6-VZs" secondAttribute="trailing" id="OHr-QC-iEx"/>
-                        <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="xJB-6z-Yhn" secondAttribute="top" constant="5" id="a5y-Vh-sUW"/>
-                        <constraint firstAttribute="height" constant="50" id="mf3-Vf-BR8"/>
-                        <constraint firstItem="mF1-Q6-VZs" firstAttribute="top" secondItem="xJB-6z-Yhn" secondAttribute="top" id="vyx-ff-e2Z"/>
-                        <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="xJB-6z-Yhn" secondAttribute="leading" id="zzk-za-aqz"/>
+                        <constraint firstAttribute="height" constant="50" id="DXf-4a-aBG"/>
+                        <constraint firstAttribute="width" constant="50" id="JBR-J1-7nT"/>
                     </constraints>
-                </view>
+                    <state key="normal" image="Assets/Icons/SwapCameraButton">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="80R-J1-Wxm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="25K-LW-h4d"/>
+                <constraint firstItem="mF1-Q6-VZs" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="83g-dU-jJ8"/>
                 <constraint firstAttribute="trailing" secondItem="80R-J1-Wxm" secondAttribute="trailing" id="86N-KE-QkX"/>
+                <constraint firstAttribute="trailing" secondItem="mF1-Q6-VZs" secondAttribute="trailing" id="8lJ-hI-he6"/>
                 <constraint firstAttribute="bottom" secondItem="80R-J1-Wxm" secondAttribute="bottom" id="8ww-zf-zZW"/>
-                <constraint firstItem="xJB-6z-Yhn" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="Hqb-UE-QAY"/>
-                <constraint firstAttribute="trailing" secondItem="xJB-6z-Yhn" secondAttribute="trailing" id="UOX-aB-Vlp"/>
-                <constraint firstItem="xJB-6z-Yhn" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="zse-gj-vnI"/>
+                <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="5" id="Maa-Zp-mSY"/>
+                <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="NfH-IQ-XeU"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>
