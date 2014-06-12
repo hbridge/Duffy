@@ -1,6 +1,7 @@
 import time
 import json
 import datetime
+import pytz
 
 from django.http import HttpResponse
 
@@ -104,7 +105,7 @@ def neighbors(request):
 
 	sortedGroups = list()
 	for group in groupings:
-		group = sorted(group, key=lambda x: x.time_taken)
+		group = sorted(group, key=lambda x: x.time_taken, reverse=True)
 
 		# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
 		#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
@@ -116,7 +117,7 @@ def neighbors(request):
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
-	lastPhotoTime = sortedGroups[0][-1].time_taken
+	lastPhotoTime = sortedGroups[0][0].time_taken
 
 	recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
 
@@ -147,6 +148,9 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 		startTime = form.cleaned_data['start_date_time']
+
+		if not startTime:
+			startTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
 		timeLow = startTime - datetime.timedelta(hours=timeWithinHours)
 

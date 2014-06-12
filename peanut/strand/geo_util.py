@@ -25,6 +25,7 @@ def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPh
 	nearbyPhotos = list()
 
 	for photo in photosCache:
+		print baseTime
 		timeDistance = baseTime - photo.time_taken
 
 		if ((filterPhotoId and filterPhotoId == photo.id) or 
