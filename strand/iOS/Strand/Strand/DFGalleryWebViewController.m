@@ -35,7 +35,6 @@
 
   // setup webview
   self.webView.delegate = self;
-  self.webView.scalesPageToFit = YES;
   
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
@@ -80,8 +79,8 @@
                                      target:self
                                      action:@selector(cameraButtonPressed:)];
     
-    self.navigationItem.leftBarButtonItems = @[self.backButtonItem, self.forwardButtonItem];
-    self.navigationItem.rightBarButtonItems = @[cameraButton, self.refreshButtonItem];
+    self.navigationItem.leftBarButtonItems = @[self.backButtonItem, self.refreshButtonItem];
+    self.navigationItem.rightBarButtonItems = @[cameraButton];
   }
       
   self.backButtonItem.enabled = self.webView.canGoBack;
