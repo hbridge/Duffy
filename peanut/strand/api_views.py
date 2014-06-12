@@ -12,6 +12,9 @@ from common.models import Photo, User, Neighbor
 
 from common import api_util, cluster_util
 
+from strand import geo_util
+from strand.forms import NearbyPhotosForm
+
 def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
 		if photo in cluster:
@@ -31,7 +34,7 @@ def removeDups(seq, idFunction=None):
 	   result.append(item)
    return result
 
-def getGroups(groupings):
+def getGroups(groupings, labelRecent = True):
 	output = list()
 
 	photoIds = list()
@@ -43,7 +46,7 @@ def getGroups(groupings):
 	simCaches = cluster_util.getSimCaches(photoIds)
 
 	for i, group in enumerate(groupings):
-		if i == 0:
+		if i == 0 and labelRecent:
 			# If first group, assume this is "Recent"
 			title = "Recent"
 		else:
@@ -121,7 +124,41 @@ def neighbors(request):
 	response['objects'] = objects
 	response['next_start_date_time'] = lastDate
 	return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
-	
+
+def get_joinable_strands(request):
+	response = dict({'result': True})
+
+	timeWithinHours = 3
+
+	form = NearbyPhotosForm(request.GET) # A form bound to the POST data
+	if form.is_valid(): # All validation rules pass
+		userId = form.cleaned_data['user_id']
+		lon = form.cleaned_data['lon']
+		lat = form.cleaned_data['lat']
+		startTime = form.cleaned_data['start_date_time']
+
+		timeLow = startTime - datetime.timedelta(hours=timeWithinHours)
+
+		photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).filter(user__product_id=1)
+
+		nearbyPhotosData = geo_util.getNearbyPhotos(startTime, lon, lat, photosCache, secondsWithin = timeWithinHours * 60 * 60)
+
+		nearbyPhotos = list()
+		for nearbyPhotoData in nearbyPhotosData:
+			photo, timeDistance, geoDistance = nearbyPhotoData
+			nearbyPhotos.append(photo)
+
+		groups = getGroups([nearbyPhotos], labelRecent=False)
+		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+		response['objects'] = objects
+		response['next_start_date_time'] = lastDate
+
+		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+		return HttpResponse(json.dumps(response), content_type="application/json")
+
 """
 Helper functions
 """

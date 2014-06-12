@@ -13,6 +13,7 @@ urlpatterns = patterns('',
 	url(r'^photos/bulk/$', arbus_api_views.PhotoBulkAPI.as_view()),
 
 	url(r'^neighbors', 'strand.api_views.neighbors'),
+	url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands')
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -3,7 +3,6 @@ import sys, os
 import time, datetime
 import logging
 import math
-from math import radians, cos, sin, asin, sqrt
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -18,21 +17,7 @@ from bulk_update.helper import bulk_update
 from peanut import settings
 from common.models import Photo, User, Neighbor
 
-def haversine(lon1, lat1, lon2, lat2):
-	"""
-	Calculate the great circle distance between two points 
-	on the earth (specified in decimal degrees)
-	"""
-	# convert decimal degrees to radians 
-	lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
-	# haversine formula 
-	dlon = lon2 - lon1 
-	dlat = lat2 - lat1 
-	a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
-	c = 2 * asin(sqrt(a)) 
-	km = 6367 * c
-	return km
-
+from strand import geo_util
 
 def processWithExisting(existingRows, newRows):
 	existing = dict()
@@ -73,17 +58,6 @@ def getUniqueRows(rows):
 			uniqueRows[id] = row
 	return uniqueRows.values()
 
-def getNearbyPhotos(refPhoto, photosCache):
-	nearbyPhotos = list()
-
-	for photo in photosCache:
-		timeDistance = refPhoto.time_taken - photo.time_taken
-
-		if refPhoto.id != photo.id and refPhoto.user_id != photo.user_id and int(math.fabs(timeDistance.total_seconds())) < 3*60*60:
-			geoDistance = int(haversine(refPhoto.location_point.x, refPhoto.location_point.y, photo.location_point.x, photo.location_point.y) * 1000)
-			if geoDistance < 100:
-				nearbyPhotos.append((refPhoto, photo, timeDistance, geoDistance))
-	return nearbyPhotos
 	
 def main(argv):
 	maxFilesAtTime = 100
@@ -103,10 +77,10 @@ def main(argv):
 			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None).filter(user__product_id=1)
 
 			for refPhoto in photos:
-				nearbyPhotos = getNearbyPhotos(refPhoto, photosCache)
+				nearbyPhotos = geo_util.getNearbyPhotosByPhoto(refPhoto, photosCache)
 				
 				for nearbyPhotoData in nearbyPhotos:
-					refPhoto, nearbyPhoto, timeDistance, geoDistance = nearbyPhotoData
+					nearbyPhoto, timeDistance, geoDistance = nearbyPhotoData
 				
 					if (refPhoto.id < nearbyPhoto.id):
 						photo_1 = refPhoto
