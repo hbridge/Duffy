@@ -14,6 +14,7 @@
 #import "DFPhotoStore.h"
 #import "DFDataHasher.h"
 #import "DFUploadController.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 @interface DFCameraViewController ()
 
@@ -246,7 +247,12 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library assetForURL:assetURL resultBlock:^(ALAsset *asset) {
       NSData *hashData = [DFDataHasher hashDataForALAsset:asset];
-      [DFPhoto insertNewDFPhotoForALAsset:asset withHashData:hashData inContext:context];
+      DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:asset
+                                                 withHashData:hashData
+                                                     photoTimeZone:[NSTimeZone defaultTimeZone]
+                                                    inContext:context];
+      DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter] stringFromDate:newPhoto.creationDate]);
+      
       
       NSError *error;
       [context save:&error];

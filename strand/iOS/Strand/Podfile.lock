@@ -5,6 +5,7 @@ PODS:
   - CocoaLumberjack/Core (1.8.1)
   - CocoaLumberjack/Extensions (1.8.1):
     - CocoaLumberjack/Core
+  - HockeySDK (3.5.5)
   - JDStatusBarNotification (1.4.8)
   - RestKit (0.20.3):
     - RestKit/Core
@@ -26,12 +27,14 @@ PODS:
 
 DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
+  - HockeySDK (~> 3.5.5)
   - JDStatusBarNotification (~> 1.4.7)
   - RestKit (~> 0.20.0)
 
 SPEC CHECKSUMS:
   AFNetworking: 80c4e0652b08eb34e25b9c0ff3c82556fe5967b4
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
+  HockeySDK: f9af97c2f5df4eb6ca6d2a9c408f2ff498edd608
   JDStatusBarNotification: c68611370dedc0ef865fb0fc1768dfbaf8fd961f
   RestKit: 7f9490e709ee745e166c4d2aa7a8d132831275b0
   SOCKit: d8d0dd3688ae1026c12367570da8fa8e1a6980fb

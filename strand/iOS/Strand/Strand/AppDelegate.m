@@ -17,6 +17,8 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFFirstTimeSetupViewController.h"
 #import "DFLocationPinger.h"
+#import "HockeySDK.h"
+
 
 @interface AppDelegate ()
             
@@ -27,6 +29,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [self configureLogs];
+  [self configureHockey];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   
@@ -53,6 +56,14 @@
   
   // To simulate the amount of log data saved, use the release log level for the fileLogger
   [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
+}
+
+- (void)configureHockey
+{
+  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"f4cd14764b2b5695063cdfc82e5097f6"];
+  [[BITHockeyManager sharedHockeyManager] startManager];
+  [[BITHockeyManager sharedHockeyManager].authenticator
+   authenticateInstallation];
 }
 
 - (void)startUserIDCheck
