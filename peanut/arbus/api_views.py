@@ -493,7 +493,7 @@ def returnFailure(response, msg):
 def createUser(phoneId, firstName, productId):
 	uploadsPath = "/home/derek/pipeline/uploads"
 	basePath = "/home/derek/user_data"
-	remoteHost = 'duffy@titanblack.no-ip.biz'
+	remoteHost = 'duffy@titanblack.duffyapp.com'
 	remoteStagingPath = '/home/duffy/pipeline/staging'
 
 	user = User(first_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
