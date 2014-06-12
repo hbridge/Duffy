@@ -33,6 +33,8 @@
 
   // setup webview
   self.webView.delegate = self;
+  self.navigationController.navigationBar.tintColor =
+  [UIColor orangeColor];
   
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
@@ -71,9 +73,14 @@
                               style:UIBarButtonItemStylePlain
                               target:self.webView
                               action:@selector(reload)];
+    UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
+                                     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                                     style:UIBarButtonItemStylePlain
+                                     target:self
+                                     action:@selector(cameraButtonPressed:)];
     
     self.navigationItem.leftBarButtonItems = @[self.backButtonItem, self.forwardButtonItem];
-    self.navigationItem.rightBarButtonItem = self.refreshButtonItem;
+    self.navigationItem.rightBarButtonItems = @[cameraButton, self.refreshButtonItem];
   }
       
   self.backButtonItem.enabled = self.webView.canGoBack;
