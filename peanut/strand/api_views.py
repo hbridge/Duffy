@@ -64,6 +64,26 @@ def getGroups(groupings, labelRecent = True):
 		output.append({'title': title, 'clusters': clusters})
 	return output
 	
+"""
+	Get photos that have neighbor entries for this user and are after the given startTime
+"""
+def getNeighboredPhotos(userId, startTime):
+	# Get all neighbors for this user's photos
+	neighbors = Neighbor.objects.select_related().filter(Q(user_1_id=userId) | Q(user_2_id=userId)).filter(Q(photo_1__time_taken__gt=startTime) | Q(photo_2__time_taken__gt=startTime)).order_by('photo_1')
+
+	latestPhotos = list()
+
+	# For each neighbor, find the other people's photos that were taken after the given start time
+	for neighbor in neighbors:
+		if neighbor.user_1_id == userId and neighbor.photo_2.time_taken > startTime:
+			latestPhotos.append(neighbor.photo_2)
+		elif neighbor.user_2_id == userId and neighbor.photo_1.time_taken > startTime:
+			latestPhotos.append(neighbor.photo_1)
+
+	uniquePhotos = removeDups(latestPhotos, lambda x: x.id)
+
+	return uniquePhotos
+
 def neighbors(request):
 	response = dict({'result': True})
 	data = getRequestData(request)
@@ -135,7 +155,8 @@ def neighbors(request):
 """
 	Sees what strands the user would join if they took a picture at the given startTime (defaults to now)
 
-	Searches for all photos of their friends within the time range and geo range
+	Searches for all photos of their friends within the time range and geo range but that don't have a
+	  neighbor entry
 """
 def get_joinable_strands(request):
 	response = dict({'result': True})
@@ -163,7 +184,13 @@ def get_joinable_strands(request):
 			photo, timeDistance, geoDistance = nearbyPhotoData
 			nearbyPhotos.append(photo)
 
-		groups = getGroups([nearbyPhotos], labelRecent=False)
+		neighboredPhotos = getNeighboredPhotos(userId, timeLow)
+
+		# We want to remove any photos that are already neighbored
+		ids = Photo.getPhotosIds(neighboredPhotos)
+		nonNeighboredPhotos = [item for item in nearbyPhotos if item.id not in ids]
+
+		groups = getGroups([nonNeighboredPhotos], labelRecent=False)
 		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
@@ -190,21 +217,9 @@ def get_new_photos(request):
 		userId = form.cleaned_data['user_id']
 		startTime = form.cleaned_data['start_date_time']
 
-		# Get all neighbors for this user's photos
-		neighbors = Neighbor.objects.select_related().filter(Q(user_1_id=userId) | Q(user_2_id=userId)).filter(Q(photo_1__time_taken__gt=startTime) | Q(photo_2__time_taken__gt=startTime)).order_by('photo_1')
+		photos = getNeighboredPhotos(userId, startTime)
 
-		latestPhotos = list()
-
-		# For each neighbor, find the other people's photos that were taken after the given start time
-		for neighbor in neighbors:
-			if neighbor.user_1_id == userId and neighbor.photo_2.time_taken > startTime:
-				latestPhotos.append(neighbor.photo_2)
-			elif neighbor.user_2_id == userId and neighbor.photo_1.time_taken > startTime:
-				latestPhotos.append(neighbor.photo_1)
-
-		uniquePhotos = removeDups(latestPhotos, lambda x: x.id)
-
-		groups = getGroups([uniquePhotos], labelRecent=False)
+		groups = getGroups([photos], labelRecent=False)
 		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate

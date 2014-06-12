@@ -164,6 +164,14 @@ class Photo(models.Model):
 		attributesList.append("updated")
 
 		bulk_updater.bulk_update(objs, update_fields=attributesList)
+
+	@classmethod
+	def getPhotosIds(cls, photos):
+		ids = list()
+		for photo in photos:
+			ids.append(photo.id)
+
+		return ids
 	
 	def __eq__(self, other):
 		# Apparently django is sending different types of objects as 'other'.  Sometimes its an object
