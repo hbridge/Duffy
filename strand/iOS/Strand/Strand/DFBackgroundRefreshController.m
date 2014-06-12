@@ -9,16 +9,20 @@
 #import "DFBackgroundRefreshController.h"
 #import <CoreLocation/CoreLocation.h>
 #import "DFStrandConstants.h"
+#import "DFPeanutJoinableStrandsAdapter.h"
+#import "DFPeanutSearchObject.h"
 
 @interface DFBackgroundRefreshController()
 
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
+@property (readonly, nonatomic, retain) DFPeanutJoinableStrandsAdapter *joinableStrandsAdapter;
 
 @end
 
 @implementation DFBackgroundRefreshController
 
 @synthesize locationManager = _locationManager;
+@synthesize joinableStrandsAdapter = _joinableStrandsAdapter;
 
 // We want the upload controller to be a singleton
 static DFBackgroundRefreshController *defaultBackgroundController;
@@ -90,17 +94,50 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 {
   DDLogInfo(@"Performing background fetch.");
   
-  [[UIApplication sharedApplication] cancelAllLocalNotifications];
-  UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-  NSDate *now = [NSDate date];
-  localNotification.fireDate = now;
-  localNotification.alertBody = [NSString stringWithFormat:@"Strand background fetch called!"];
-  localNotification.applicationIconBadgeNumber = 1;
-  [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+  [self.joinableStrandsAdapter fetchJoinableStrandsWithCompletionBlock:^(DFPeanutSearchResponse *response) {
+    if (!response || !response.result) {
+      DDLogError(@"DFBackgroundRefreshController couldn't get joinable strands");
+      return;
+    }
+    
+    if (response.objects.count < 1) return;
+    
+    unsigned int count = 0;
+    
+    for (DFPeanutSearchObject *searchObject in response.objects) {
+      if (searchObject.type == DFSearchObjectSection) {
+        for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
+          if (subSearchObject.type == DFSearchObjectPhoto) {
+            count++;
+          }
+        }
+      }
+    }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [[UIApplication sharedApplication] cancelAllLocalNotifications];
+      UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+      NSDate *now = [NSDate date];
+      localNotification.fireDate = now;
+      localNotification.alertBody = [NSString stringWithFormat:@"Take a picture to join a Strand with %du photos.", count];
+      localNotification.applicationIconBadgeNumber = count;
+      [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+    });
+  }];
   
   return UIBackgroundFetchResultNewData;
 }
 
+#pragma mark Networking
+
+- (DFPeanutJoinableStrandsAdapter *)joinableStrandsAdapter
+{
+  if (!_joinableStrandsAdapter) {
+    _joinableStrandsAdapter = [[DFPeanutJoinableStrandsAdapter alloc] init];
+  }
+  
+  return _joinableStrandsAdapter;
+}
 
 
 @end

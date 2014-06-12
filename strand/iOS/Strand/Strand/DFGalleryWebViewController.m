@@ -54,6 +54,12 @@
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+}
+
 - (void)setNavigationButtons
 {
   if (!(self.navigationItem.leftBarButtonItems.count > 0)) {
