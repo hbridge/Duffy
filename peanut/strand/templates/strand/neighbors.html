@@ -79,15 +79,14 @@
 
 		function genHeader(section, userList){
 			html = "";
-			offset = new Date().getTimezoneOffset()*60;
 			$.each( section.objects, function(i, photos ) {
 				if (photos.type == 'photo') {
-					t = new Date((photos.time_taken+offset) * 1000).toISOString();
+					t = new Date(photos.time_taken * 1000).toISOString();
 					return false;
 				}
 				else if (photos.type == 'cluster') {
 					$.each(photos.objects, function(i, photos){
-						t = new Date((photos.time_taken+offset) * 1000).toISOString();
+						t = new Date(photos.time_taken * 1000).toISOString();
 						return false;
 					});
 					return false;
