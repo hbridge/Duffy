@@ -54,6 +54,11 @@ NSString *const LongitudeParameter = @"lon";
   NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
                              objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
   
+  if (!lastLatitude || !lastLongitude) {
+    completionBlock(nil);
+    return;
+  }
+  
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutSearchResponse alloc] init]
                               method:RKRequestMethodGET
@@ -62,7 +67,7 @@ NSString *const LongitudeParameter = @"lon";
                                            LatitudeParameter : lastLatitude,
                                            LongitudeParameter : lastLongitude
                                            }];
-  DDLogInfo(@"DFPeanutNearbyClusters getting endpoint: %@", getRequest.URL.absoluteString);
+  DDLogInfo(@"DFPeanutJoinableStrandsAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]
