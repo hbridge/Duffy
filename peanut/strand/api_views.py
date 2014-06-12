@@ -13,7 +13,7 @@ from common.models import Photo, User, Neighbor
 from common import api_util, cluster_util
 
 from strand import geo_util
-from strand.forms import NearbyPhotosForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm
 
 def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
@@ -35,6 +35,9 @@ def removeDups(seq, idFunction=None):
    return result
 
 def getGroups(groupings, labelRecent = True):
+	if len(groupings) == 0:
+		return []
+
 	output = list()
 
 	photoIds = list()
@@ -46,6 +49,9 @@ def getGroups(groupings, labelRecent = True):
 	simCaches = cluster_util.getSimCaches(photoIds)
 
 	for i, group in enumerate(groupings):
+		if len(group) == 0:
+			continue
+			
 		if i == 0 and labelRecent:
 			# If first group, assume this is "Recent"
 			title = "Recent"
@@ -98,7 +104,7 @@ def neighbors(request):
 
 	sortedGroups = list()
 	for group in groupings:
-		group = sorted(group, key=lambda x: x.time_taken, reverse=True)
+		group = sorted(group, key=lambda x: x.time_taken)
 
 		# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
 		#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
@@ -110,7 +116,7 @@ def neighbors(request):
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
-	lastPhotoTime = sortedGroups[0][0].time_taken
+	lastPhotoTime = sortedGroups[0][-1].time_taken
 
 	recentPhotos = Photo.objects.filter(user_id=userId).filter(time_taken__gt=lastPhotoTime).order_by("time_taken")
 
@@ -125,13 +131,18 @@ def neighbors(request):
 	response['next_start_date_time'] = lastDate
 	return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
 
+"""
+	Sees what strands the user would join if they took a picture at the given startTime (defaults to now)
+
+	Searches for all photos of their friends within the time range and geo range
+"""
 def get_joinable_strands(request):
 	response = dict({'result': True})
 
 	timeWithinHours = 3
 
-	form = NearbyPhotosForm(request.GET) # A form bound to the POST data
-	if form.is_valid(): # All validation rules pass
+	form = GetJoinableStrandsForm(request.GET) 
+	if form.is_valid():
 		userId = form.cleaned_data['user_id']
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
@@ -149,6 +160,47 @@ def get_joinable_strands(request):
 			nearbyPhotos.append(photo)
 
 		groups = getGroups([nearbyPhotos], labelRecent=False)
+		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+		response['objects'] = objects
+		response['next_start_date_time'] = lastDate
+
+		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+		return HttpResponse(json.dumps(response), content_type="application/json")
+
+"""
+	Returns back any new photos in the user's strands after the given date and time
+
+	This looks at all the neighbor rows and see's if there's any ones with other people's photos
+	taken after the startTime
+"""
+def get_new_photos(request):
+	response = dict({'result': True})
+
+	timeWithinHours = 3
+
+	form = GetNewPhotosForm(request.GET)
+	if form.is_valid():
+		userId = form.cleaned_data['user_id']
+		startTime = form.cleaned_data['start_date_time']
+
+		# Get all neighbors for this user's photos
+		neighbors = Neighbor.objects.select_related().filter(Q(user_1_id=userId) | Q(user_2_id=userId)).filter(Q(photo_1__time_taken__gt=startTime) | Q(photo_2__time_taken__gt=startTime)).order_by('photo_1')
+
+		latestPhotos = list()
+
+		# For each neighbor, find the other people's photos that were taken after the given start time
+		for neighbor in neighbors:
+			if neighbor.user_1_id == userId and neighbor.photo_2.time_taken > startTime:
+				latestPhotos.append(neighbor.photo_2)
+			elif neighbor.user_2_id == userId and neighbor.photo_1.time_taken > startTime:
+				latestPhotos.append(neighbor.photo_1)
+
+		uniquePhotos = removeDups(latestPhotos, lambda x: x.id)
+
+		groups = getGroups([uniquePhotos], labelRecent=False)
 		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
