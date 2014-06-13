@@ -28,8 +28,8 @@ def initClassifier():
             context = zmq.Context()
             socket_send = context.socket(zmq.PUSH)
             socket_recv = context.socket(zmq.PULL)
-            socket_send.connect("tcp://titanblack.no-ip.biz:14921")
-            socket_recv.connect("tcp://titanblack.no-ip.biz:14920")
+            socket_send.connect("tcp://titanblack.duffyapp.com:14921")
+            socket_recv.connect("tcp://titanblack.duffyapp.com:14920")
 
             return (context, socket_send, socket_recv)
         except zmq.error.ZMQError:
