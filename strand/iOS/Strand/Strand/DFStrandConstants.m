@@ -18,4 +18,7 @@ NSString *const DFStrandUnseenCountDefaultsKey = @"com.duffyapp.Strand.unseenCou
 NSString *const DFStrandUnseenPhotosUpdatedNotificationName = @"DFStrandUnseenPhotosUpdatedNotification";
 NSString *const DFStrandUnseenPhotosUpdatedCountKey = @"DFStrandUnseenPhotosUpdatedCountKey";
 
+NSString *const DFStrandJoinableStrandsNearbyNotificationName = @"DFStrandJoinableStrandsNearbyNotificationName";
+NSString *const DFStrandJoinableStrandsCountKey = @"DFStrandJoinableStrandsCountKey";
+
 @end

@@ -67,6 +67,11 @@
                                            selector:@selector(updateUnseenCount)
                                                name:DFStrandUnseenPhotosUpdatedNotificationName
                                              object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(joinableStrandsUpdated:)
+                                               name:DFStrandJoinableStrandsNearbyNotificationName
+                                             object:nil];
 
   self.delegate = self;
 }
@@ -138,6 +143,7 @@
     _customCameraOverlayView = [[[UINib nibWithNibName:@"DFCameraOverlayView" bundle:nil]
                            instantiateWithOwner:self options:nil]
                           firstObject];
+    _customCameraOverlayView.frame = self.view.frame;
     [_customCameraOverlayView.takePhotoButton addTarget:self
                                                  action:@selector(takePhotoButtonPressed:)
                                        forControlEvents:UIControlEventTouchUpInside];
@@ -289,6 +295,19 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   
+}
+
+
+- (void)joinableStrandsUpdated:(NSNotification *)note
+{
+  NSNumber *count = note.userInfo[DFStrandJoinableStrandsCountKey];
+  if (count.intValue > 0) {
+    self.customCameraOverlayView.takePhotoButton.imageView.image =
+    [UIImage imageNamed:@"Assets/Icons/ShutterButtonHighlighted.png"];
+  } else {
+    self.customCameraOverlayView.takePhotoButton.imageView.image =
+        [UIImage imageNamed:@"Assets/Icons/ShutterButton.png"];
+  }
 }
 
 
