@@ -41,42 +41,9 @@
 	<script src="/static/jquery.timeago.js"></script>	
 	<script src="/static/duffy.js"></script>
 	<script>
-		userId = getURLParameter("user_id");
-		url = "/strand/api/neighbors?user_id=" + userId;
-		console.log("Sending request to " + url);
-
-		$.get(url, function( data ) {
-			$.each( data.objects, function( i, objects ) {
-				if (objects.type == 'section') {
-					row = "";
-					userList = [];
-					$.each(objects.objects, function( i, photos) {
-						if (photos.type == 'photo') {
-							row += addPhoto(photos, userList);
-						}
-						else if (photos.type == 'cluster'){
-							row += addCluster(photos.objects, userList);
-						}
-						else {
-							console.log('unknown type detected: ' + photos);
-						}
-					});
-					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");	
-				}
-			});
-			if (data.objects.length === 0){
-				$('div.ui-msg').removeClass('hidden');
-			}
-			$('div.image').each(function(){
-				clusterClickHandler($(this));
-			});
-			$('span.timeago').timeago();
-		});
-
 		/*
 		Generates the header for a section. Typically custom for each view
 		*/
-
 		function genHeader(section, userList){
 			html = "";
 			$.each( section.objects, function(i, photos ) {
@@ -120,6 +87,86 @@
 			}
 			return output.join(', ');
 		}
+
+		function getPhotoCount(data) {
+			var count = 0;
+			$.each( data.objects, function( i, objects ) {
+				if (objects.type == 'section') {
+					$.each(objects.objects, function(i, photos) {
+						count++;
+					});	
+				}
+			});
+			return count;
+		}
+
+		function processData(data) {
+			$.each( data.objects, function( i, objects ) {
+				if (objects.type == 'section') {
+					row = "";
+					userList = [];
+					$.each(objects.objects, function( i, photos) {
+						if (photos.type == 'photo') {
+							row += addPhoto(photos, userList);
+						}
+						else if (photos.type == 'cluster'){
+							row += addCluster(photos.objects, userList);
+						}
+						else {
+							console.log('unknown type detected: ' + photos);
+						}
+					});
+					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");	
+				}
+			});
+			if (data.objects.length === 0){
+				$('div.ui-msg').removeClass('hidden');
+			}
+			$('div.image').each(function(){
+				clusterClickHandler($(this));
+			});
+			$('span.timeago').timeago();
+		};
+
+
+		/**
+			Main code here
+		*/
+		var userId = getURLParameter("user_id");
+		var url = "/strand/api/neighbors?user_id=" + userId;
+		var oldDataCount;
+		
+		$(document).ready(function(){
+
+			// Have to do the initial load, using an interval will actually wait the amount of time first
+			console.log("Sending request to " + url);
+			$.get(url, function( data ) {
+				oldDataCount = getPhotoCount(data)
+				processData(data)
+			});
+			
+			// Now set it up so that every 1 second, we see if we have different data.  If we do, then
+			// 
+			setInterval(function() {
+				console.log("Sending request to " + url);
+
+				$.get(url, function( data ) {
+					if (data.objects.length > 0) {
+						photoCount = getPhotoCount(data)
+						if (photoCount != oldDataCount) {
+							oldDataCount = photoCount
+
+							console.log("Refreshing data")
+							$('#allImages').empty();
+							processData(data)
+						}
+					}
+					
+				});
+			}, 1000);
+		});
+
+		
 	</script>
 </head>
 
