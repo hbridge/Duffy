@@ -29,19 +29,25 @@ function addPhoto(photo, userList, photoType, photosLength){
 	if (!photosLength) {
 		var photosLength = 1;
 	}
+	if (photo.first_name) {
+		title = cleanName(photo.first_name);
+	}
+	else {
+		title = photo.dist;
+	}
 	switch (photoType) {
 		case 1:
-			html = "<div class='image cluster' title='" + cleanName(photo.first_name) +"' r='" + fullUrl + "'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
+			html = "<div class='image cluster' title='" + title +"' r='" + fullUrl + "'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
 			break;
 		case 2:
-			html = "<div class='image hidden' title='" + cleanName(photo.first_name) +"' r='" + fullUrl + "'>" + img + "</div>";
+			html = "<div class='image hidden' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 		case 3:
 			img = "<img class='l' height='78px' width='78px' src='/static/docstack.png' />";
 			html = "<div class='image cluster'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
 			break;
 		default: // covers case 0
-			html = "<div class='image' title='" + cleanName(photo.first_name) +"' r='" + fullUrl + "'>" + img + "</div>";
+			html = "<div class='image' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 	}
 	return html;
