@@ -31,7 +31,7 @@ def main(argv):
 				
 				tStart = datetime.datetime.utcnow()
 				logger.info("{0}: Unclustered photos: {1}".format(tStart, len(nonClusteredPhotos)))
-				count = similarity_util.createSimilaritiesBulk(nonClusteredPhotos)
+				count = similarity_util.createSimsForPhotos(nonClusteredPhotos)
 				logger.info("{0}: {1} rows added".format(datetime.datetime.utcnow()-tStart, count))
 		else:
 			time.sleep(1)	
