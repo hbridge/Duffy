@@ -57,7 +57,12 @@ def getGroups(groupings, labelRecent = True):
 			# If first group, assume this is "Recent"
 			title = "Recent"
 		else:
-			title = group[0].location_city
+			# Grab title from the location_city of a photo...but find the first one that has
+			#   a valid location_city
+			title = None
+			i = 0
+			while (not title) and i < len(group):
+				title = group[i].location_city
 			
 		clusters = cluster_util.getClustersFromPhotos(group, settings.DEFAULT_CLUSTER_THRESHOLD, settings.DEFAULT_DUP_THRESHOLD, simCaches)
 
