@@ -10,14 +10,17 @@
 #import <CoreLocation/CoreLocation.h>
 #import "DFStrandConstants.h"
 #import "DFPeanutJoinableStrandsAdapter.h"
+#import "DFPeanutNewPhotosAdapter.h"
 #import "DFPeanutSearchObject.h"
 #import "DFStatusBarNotificationManager.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 
 @interface DFBackgroundRefreshController()
 
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
 @property (readonly, nonatomic, retain) DFPeanutJoinableStrandsAdapter *joinableStrandsAdapter;
+@property (readonly, nonatomic, retain) DFPeanutNewPhotosAdapter *newPhotosAdapter;
 
 @end
 
@@ -25,6 +28,7 @@
 
 @synthesize locationManager = _locationManager;
 @synthesize joinableStrandsAdapter = _joinableStrandsAdapter;
+@synthesize newPhotosAdapter = _newPhotosAdapter;
 
 // We want the upload controller to be a singleton
 static DFBackgroundRefreshController *defaultBackgroundController;
@@ -150,6 +154,64 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 - (void)updateNewPhotos
 {
   DDLogInfo(@"Updating new photo counts.");
+  
+  NSString *lastFetchDateString = [[NSUserDefaults standardUserDefaults]
+                                   objectForKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
+  if (!lastFetchDateString) lastFetchDateString = @"";
+  
+  [self.newPhotosAdapter fetchNewPhotosAfterDate:lastFetchDateString
+                                 completionBlock:^(DFPeanutSearchResponse *response)
+  {
+    if (!response || response.result == NO) {
+      DDLogError(@"DFBackgroundRefreshController: update new photos failed.");
+      return;
+    }
+    
+    unsigned int count = 0;
+    
+    for (DFPeanutSearchObject *searchObject in response.objects) {
+      if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
+        for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
+          if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
+            count++;
+          }
+        }
+      }
+    }
+    
+    DDLogInfo(@"Found joined strands with %d new photos.", count);
+    if (count < 1) return;
+    
+    NSNumber *totalUnseenCount = [[NSUserDefaults standardUserDefaults]
+                                  objectForKey:DFStrandUnseenCountDefaultsKey];
+    totalUnseenCount = @(totalUnseenCount.intValue + count);
+    [[NSUserDefaults standardUserDefaults] setObject:totalUnseenCount
+                                              forKey:DFStrandUnseenCountDefaultsKey];
+    
+    NSString *notificationString = [NSString stringWithFormat:@"%d new photos in your Strands",
+                                    totalUnseenCount.intValue];
+    
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+      [[DFStatusBarNotificationManager sharedInstance] showNotificationWithString:notificationString timeout:2];
+    } else {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [[UIApplication sharedApplication] cancelAllLocalNotifications];
+        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
+        NSDate *now = [NSDate date];
+        localNotification.fireDate = now;
+        localNotification.alertBody = notificationString;
+        localNotification.applicationIconBadgeNumber = count;
+        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
+      });
+    }
+
+    
+    
+    [[NSUserDefaults standardUserDefaults]
+     setObject:[[NSDateFormatter DjangoDateFormatter] stringFromDate:[NSDate date]]
+     forKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+  }];
 }
 
 #pragma mark Networking
@@ -161,6 +223,15 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   }
   
   return _joinableStrandsAdapter;
+}
+
+- (DFPeanutNewPhotosAdapter *)newPhotosAdapter
+{
+  if (!_newPhotosAdapter) {
+    _newPhotosAdapter = [[DFPeanutNewPhotosAdapter alloc] init];
+  }
+  
+  return _newPhotosAdapter;
 }
 
 
