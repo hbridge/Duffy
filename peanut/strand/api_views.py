@@ -143,7 +143,7 @@ def neighbors(request):
 	recentPhotos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
 	if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
 		lastPhotoTime = sortedGroups[0][0].time_taken
-		sortedGroups = sortedGroups.filter(time_taken__gt=lastPhotoTime)
+		recentPhotos = recentPhotos.filter(time_taken__gt=lastPhotoTime)
 
 	haveRecentPhotos = len(recentPhotos) > 0
 	
