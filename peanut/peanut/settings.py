@@ -194,7 +194,7 @@ STATICFILES_FINDERS = (
 
 PIPELINE_UPLOADED_PATH = "/home/derek/pipeline/uploads/"
 PIPELINE_LOCAL_BASE_PATH = "/home/derek/user_data/"
-PIPELINE_REMOTE_HOST = 'duffy@titanblack.duffyapp.com'
+PIPELINE_REMOTE_HOST = 'duffy@titanblack.no-ip.biz'
 PIPELINE_REMOTE_PATH = '/home/duffy/pipeline/staging'
 
 THUMBNAIL_SIZE = 156
