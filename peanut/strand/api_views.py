@@ -63,6 +63,7 @@ def getGroups(groupings, labelRecent = True):
 			i = 0
 			while (not title) and i < len(group):
 				title = group[i].location_city
+				i += 1
 			
 		clusters = cluster_util.getClustersFromPhotos(group, settings.DEFAULT_CLUSTER_THRESHOLD, settings.DEFAULT_DUP_THRESHOLD, simCaches)
 
