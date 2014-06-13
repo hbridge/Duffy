@@ -39,6 +39,7 @@ def userbaseSummary(request):
 						'F7092B08-EF4D-40EF-896D-0539CB102D3D',
 						'3E8018C0-1BE5-483D-89C4-85CD66F81298',
 						'26A1609E-BBBA-4684-8DF0-A394500FA96B',
+						'1067880F-AB7B-4B06-95AB-DE5216DD3CA0',
 						'BEEF'}
 	arbusList = list()
 	to_zone = tz.gettz('America/New_York')
