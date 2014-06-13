@@ -77,7 +77,7 @@ def main(argv):
 			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None).filter(user__product_id=1)
 
 			for refPhoto in photos:
-				nearbyPhotos = geo_util.getNearbyPhotosByPhoto(refPhoto, photosCache)
+				nearbyPhotos = geo_util.getNearbyPhotosToPhoto(refPhoto, photosCache)
 				
 				for nearbyPhotoData in nearbyPhotos:
 					nearbyPhoto, timeDistance, geoDistance = nearbyPhotoData
