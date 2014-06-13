@@ -53,7 +53,7 @@ NSString *const StartDateTimeParameter = @"start_date_time";
                               parameters:@{
                                            StartDateTimeParameter : startDateTime,
                                            }];
-  DDLogInfo(@"DFPeanutNearbyClusters getting endpoint: %@", getRequest.URL.absoluteString);
+  DDLogInfo(@"DFPeanutNewPhotosAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]

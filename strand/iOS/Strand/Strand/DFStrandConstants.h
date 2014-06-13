@@ -15,4 +15,7 @@ extern NSString *const DFStrandLastKnownLongitudeDefaultsKey;
 extern NSString *const DFStrandLastNewPhotosFetchDateDefaultsKey;
 extern NSString *const DFStrandUnseenCountDefaultsKey;
 
+extern NSString *const DFStrandUnseenPhotosUpdatedNotificationName;
+extern NSString *const DFStrandUnseenPhotosUpdatedCountKey;
+
 @end

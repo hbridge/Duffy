@@ -22,6 +22,9 @@
 @property (readonly, nonatomic, retain) DFPeanutJoinableStrandsAdapter *joinableStrandsAdapter;
 @property (readonly, nonatomic, retain) DFPeanutNewPhotosAdapter *newPhotosAdapter;
 
+@property (atomic) BOOL isNewPhotoCountFetchInProgress;
+@property (atomic) BOOL isJoinableStrandsFetchInProgress;
+
 @end
 
 @implementation DFBackgroundRefreshController
@@ -108,32 +111,26 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 
 - (void)updateJoinableStrands
 {
+  if (self.isJoinableStrandsFetchInProgress) {
+    DDLogInfo(@"DFBackgroundRefreshController: joinable strands update already in progress.");
+    return;
+  } else {
+    self.isJoinableStrandsFetchInProgress = YES;
+  }
   DDLogInfo(@"Updating joinable strands.");
   [self.joinableStrandsAdapter fetchJoinableStrandsWithCompletionBlock:^(DFPeanutSearchResponse *response) {
+    self.isJoinableStrandsFetchInProgress = NO;
     if (!response || !response.result) {
       DDLogError(@"DFBackgroundRefreshController couldn't get joinable strands");
       return;
     }
     
+    DDLogInfo(@"%d joinable strands nearby.", (int)response.objects.count);
+    
     if (response.objects.count < 1) return;
     
-    unsigned int count = 0;
-    
-    for (DFPeanutSearchObject *searchObject in response.objects) {
-      if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
-        for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
-          if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
-            count++;
-          }
-        }
-      }
-    }
-    
-    DDLogInfo(@"Found joinable strands with %d photos nearby.", count);
-    if (count < 1) return;
-    
-    NSString *notificationString = [NSString stringWithFormat:@"Take a picture to join a Strand with %d photos.",
-                                    count];
+    NSString *notificationString = [NSString stringWithFormat:@"Take a picture to join a %d Strands nearby.", (int)
+                                    response.objects.count];
     
     if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
       [[DFStatusBarNotificationManager sharedInstance] showNotificationWithString:notificationString timeout:2];
@@ -144,7 +141,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
         NSDate *now = [NSDate date];
         localNotification.fireDate = now;
         localNotification.alertBody = notificationString;
-        localNotification.applicationIconBadgeNumber = count;
+        localNotification.applicationIconBadgeNumber = 0;
         [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
       });
     }
@@ -153,15 +150,23 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 
 - (void)updateNewPhotos
 {
+  if (self.isNewPhotoCountFetchInProgress) {
+    DDLogInfo(@"DFBackgroundRefreshController: newPhotoCount update already in progress.");
+    return;
+  } else {
+    self.isNewPhotoCountFetchInProgress = YES;
+  }
   DDLogInfo(@"Updating new photo counts.");
   
   NSString *lastFetchDateString = [[NSUserDefaults standardUserDefaults]
                                    objectForKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
-  if (!lastFetchDateString) lastFetchDateString = @"";
+  if (!lastFetchDateString) lastFetchDateString = [[NSDateFormatter DjangoDateFormatter]
+                                                   stringFromDate:[NSDate dateWithTimeIntervalSinceNow:-60*60*3]];
   
   [self.newPhotosAdapter fetchNewPhotosAfterDate:lastFetchDateString
                                  completionBlock:^(DFPeanutSearchResponse *response)
   {
+    self.isNewPhotoCountFetchInProgress = NO;
     if (!response || response.result == NO) {
       DDLogError(@"DFBackgroundRefreshController: update new photos failed.");
       return;
@@ -179,9 +184,8 @@ static DFBackgroundRefreshController *defaultBackgroundController;
       }
     }
     
-    DDLogInfo(@"Found joined strands with %d new photos.", count);
+    DDLogInfo(@"%d new photos in joined strands.", count);
     if (count < 1) return;
-    
     NSNumber *totalUnseenCount = [[NSUserDefaults standardUserDefaults]
                                   objectForKey:DFStrandUnseenCountDefaultsKey];
     totalUnseenCount = @(totalUnseenCount.intValue + count);
@@ -211,6 +215,11 @@ static DFBackgroundRefreshController *defaultBackgroundController;
      setObject:[[NSDateFormatter DjangoDateFormatter] stringFromDate:[NSDate date]]
      forKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
     [[NSUserDefaults standardUserDefaults] synchronize];
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
+     object:self
+     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(count)}];
+
   }];
 }
 

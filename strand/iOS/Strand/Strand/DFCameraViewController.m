@@ -15,6 +15,7 @@
 #import "DFDataHasher.h"
 #import "DFUploadController.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFStrandConstants.h"
 
 @interface DFCameraViewController ()
 
@@ -61,7 +62,11 @@
                                            selector:@selector(stopLocationUpdates)
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
-
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(updateUnseenCount)
+                                               name:DFStrandUnseenPhotosUpdatedNotificationName
+                                             object:nil];
 
   self.delegate = self;
 }
@@ -72,6 +77,19 @@
 {
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
+  [self updateUnseenCount];
+}
+
+- (void)updateUnseenCount
+{
+  NSNumber *unseenCount = [[NSUserDefaults standardUserDefaults]
+                           objectForKey:DFStrandUnseenCountDefaultsKey];
+  if (unseenCount.intValue > 0) {
+    self.customCameraOverlayView.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+    self.customCameraOverlayView.galleryButton.titleLabel.text = [unseenCount stringValue];
+  } else {
+    self.customCameraOverlayView.galleryButton.titleLabel.text = @"";
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated

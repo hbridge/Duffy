@@ -10,6 +10,7 @@
 #import "DFNetworkingConstants.h"
 #import "DFUser.h"
 #import "RootViewController.h"
+#import "DFStrandConstants.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -58,6 +59,11 @@
 {
   [super viewDidAppear:animated];
   [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+  [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:DFStrandUnseenCountDefaultsKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+  [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
+                                                      object:nil
+                                                    userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(0)}];
 }
 
 - (void)setNavigationButtons
