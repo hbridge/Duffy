@@ -14,6 +14,7 @@ typedef void (^DFPeanutNearbyClustersCompletionBlock)(DFPeanutSearchResponse *re
 
 @interface DFPeanutJoinableStrandsAdapter : NSObject <DFNetworkAdapter>
 
-- (void)fetchJoinableStrandsWithCompletionBlock:(DFPeanutNearbyClustersCompletionBlock)completionBlock;
-
+- (void)fetchJoinableStrandsNearLatitude:(double)latitude
+                               longitude:(double)longitude
+                         completionBlock:(DFPeanutNearbyClustersCompletionBlock)completionBlock;
 @end

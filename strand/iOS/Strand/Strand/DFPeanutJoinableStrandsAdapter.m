@@ -47,14 +47,12 @@ NSString *const LongitudeParameter = @"lon";
 
 
 
-- (void)fetchJoinableStrandsWithCompletionBlock:(DFPeanutNearbyClustersCompletionBlock)completionBlock
+- (void)fetchJoinableStrandsNearLatitude:(double)latitude
+                               longitude:(double)longitude
+                     completionBlock:(DFPeanutNearbyClustersCompletionBlock)completionBlock
 {
-  NSNumber *lastLatitude = [[NSUserDefaults standardUserDefaults]
-                            objectForKey:DFStrandLastKnownLatitudeDefaultsKey];
-  NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
-                             objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
   
-  if (!lastLatitude || !lastLongitude) {
+  if (latitude == 0.0 || longitude == 0.0) {
     completionBlock(nil);
     return;
   }
@@ -64,8 +62,8 @@ NSString *const LongitudeParameter = @"lon";
                               method:RKRequestMethodGET
                               path:NearbyClustersPath
                               parameters:@{
-                                           LatitudeParameter : lastLatitude,
-                                           LongitudeParameter : lastLongitude
+                                           LatitudeParameter : @(latitude),
+                                           LongitudeParameter : @(longitude)
                                            }];
   DDLogInfo(@"DFPeanutJoinableStrandsAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   

@@ -117,8 +117,24 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   } else {
     self.isJoinableStrandsFetchInProgress = YES;
   }
+  
+  NSNumber *lastLatitude = [[NSUserDefaults standardUserDefaults]
+                            objectForKey:DFStrandLastKnownLatitudeDefaultsKey];
+  NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
+                             objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
+
+  if ((!lastLatitude || lastLatitude.floatValue == 0.0)
+      && (!lastLongitude || lastLongitude.floatValue == 0.0)) {
+    DDLogWarn(@"DFBackgroundRefreshController: lastlatlong [0.0,0.0], not updating joinable strands");
+    self.isJoinableStrandsFetchInProgress = NO;
+    return;
+  }
+  
   DDLogInfo(@"Updating joinable strands.");
-  [self.joinableStrandsAdapter fetchJoinableStrandsWithCompletionBlock:^(DFPeanutSearchResponse *response) {
+  [self.joinableStrandsAdapter fetchJoinableStrandsNearLatitude:lastLatitude.doubleValue
+                                                      longitude:lastLongitude.doubleValue
+                                                completionBlock:^(DFPeanutSearchResponse *response)
+  {
     self.isJoinableStrandsFetchInProgress = NO;
     if (!response || !response.result) {
       DDLogError(@"DFBackgroundRefreshController couldn't get joinable strands");

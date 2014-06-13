@@ -301,13 +301,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)joinableStrandsUpdated:(NSNotification *)note
 {
   NSNumber *count = note.userInfo[DFStrandJoinableStrandsCountKey];
+  UIImage *newImage;
   if (count.intValue > 0) {
-    self.customCameraOverlayView.takePhotoButton.imageView.image =
-    [UIImage imageNamed:@"Assets/Icons/ShutterButtonHighlighted.png"];
+    newImage = [UIImage imageNamed:@"Assets/Icons/ShutterButtonHighlighted.png"];
   } else {
-    self.customCameraOverlayView.takePhotoButton.imageView.image =
-        [UIImage imageNamed:@"Assets/Icons/ShutterButton.png"];
+    newImage = [UIImage imageNamed:@"Assets/Icons/ShutterButton.png"];
   }
+  [self.customCameraOverlayView.takePhotoButton
+   setImage:newImage
+   forState:UIControlStateNormal];
 }
 
 
