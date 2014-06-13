@@ -140,7 +140,7 @@ def neighbors(request):
 
 	# Try to find recent photos
 	# If there are no previous groups, then fetch all photos and call them recent
-	recentPhotos = Photo.objects.filter(user_id=userId).order_by("time_taken")
+	recentPhotos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
 	if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
 		lastPhotoTime = sortedGroups[0][0].time_taken
 		sortedGroups = sortedGroups.filter(time_taken__gt=lastPhotoTime)
