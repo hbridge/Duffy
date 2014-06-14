@@ -126,6 +126,9 @@ function cleanName(str) {
 	if (str.indexOf("'") > -1) {
 		str = str.substr(0, str.indexOf("'"));
 	}
+	if (str.indexOf("’") > -1) {
+		str = str.substr(0, str.indexOf("’"));
+	}
 	return str;
 }
 
