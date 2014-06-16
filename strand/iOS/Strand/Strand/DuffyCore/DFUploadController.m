@@ -421,7 +421,7 @@ static DFUploadController *defaultUploadController;
       [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateComplete
                                                                                   numRemaining:0
                                                                                       progress:1.0];
-        [self showBackgroundUploadCompleteNotif];
+      //[self showBackgroundUploadCompleteNotif];
         [self endBackgroundUpdateTask];
         [self.thumbnailsObjectIDQueue clearCompleted];
         [self.fullImageObjectIDQueue clearCompleted];
