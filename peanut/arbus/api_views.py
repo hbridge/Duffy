@@ -69,6 +69,11 @@ class BasePhotoAPI(APIView):
 				photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
 				logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
 
+			# Bug fix for bad data in photo where date was before 1900
+			# Initial bug was from a photo in iPhone 1, guessing at the date
+			if (photo.time_taken < datetime.date(1900, 1, 1)):
+				photo.time_taken = datetime.date(2007, 9, 1)
+
 			if not photo.location_point:
 				lat, lon = location_util.getLatLonFromExtraData(photo, True)
 
