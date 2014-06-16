@@ -1,5 +1,11 @@
 # Duffy Changes
 
+## Jun 16th, 2014
+
+### Bugs fixed
+
+- Minor bug fixes.
+
 ## Jun 9th, 2014
 
 ### New

@@ -56,8 +56,6 @@
                                            selector:@selector(startLocationUpdates)
                                                name:UIApplicationWillEnterForegroundNotification
                                              object:nil];
-  
-  
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(stopLocationUpdates)
                                                name:UIApplicationDidEnterBackgroundNotification
@@ -75,8 +73,6 @@
 
   self.delegate = self;
 }
-
-
 
 - (void)viewWillAppear:(BOOL)animated
 {
@@ -114,7 +110,6 @@
   self.locationManager = [[CLLocationManager alloc] init];
   self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
   self.locationManager.delegate = self;
-  self.locationManager.pausesLocationUpdatesAutomatically = NO;
 }
 
 - (void)startLocationUpdates
