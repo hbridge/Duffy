@@ -18,6 +18,7 @@
 @interface DFPhotoViewController ()
 
 @property (nonatomic) BOOL hideStatusBar;
+@property (atomic) BOOL isPhotoLoadInProgress;
 
 @end
 
@@ -46,7 +47,7 @@
     if (self.photo) {
       self.photoView.image = self.photo.fullScreenImage;
       //[self logPhotoMetadata];
-    } else if (self.photoURL) {
+    } else if (self.photoURL && !self.photoView.image) {
       [self setImageFromPhotoURL:self.photoURL];
     }
   }
@@ -54,11 +55,15 @@
 
 - (void)setImageFromPhotoURL:(NSURL *)photoURL
 {
+  if (self.isPhotoLoadInProgress) return;
+  self.isPhotoLoadInProgress = YES;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    DDLogVerbose(@"Fetching full photo at %@", photoURL.description);
     NSData *data = [NSData dataWithContentsOfURL:self.photoURL];
     UIImage *img = [UIImage imageWithData:data];
     dispatch_async(dispatch_get_main_queue(), ^{
       self.photoView.image = img;
+      self.isPhotoLoadInProgress = NO;
     });
   });
 }

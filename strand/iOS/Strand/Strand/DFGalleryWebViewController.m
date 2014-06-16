@@ -12,8 +12,12 @@
 #import "RootViewController.h"
 #import "DFStrandConstants.h"
 #import "DFMultiPhotoViewController.h"
+#import "DFPhotoViewController.h"
 
 @interface DFGalleryWebViewController ()
+
+@property (nonatomic, retain) NSURL *currentPhotoURL;
+@property (nonatomic, retain) NSArray *currentPhotoArrayURLStrings;
 
 @end
 
@@ -52,7 +56,6 @@
   if (![self.webView isLoading]) {
     [self.webView reload];
   }
-  
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
@@ -65,6 +68,7 @@
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
                                                       object:nil
                                                     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(0)}];
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
 }
 
 - (void)setNavigationButtons
@@ -117,9 +121,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [webView stopLoading];
     DDLogVerbose(@"Search result clicked for photo with URL: %@", requestURLString);
     
-    //[self fullPhotoRequestedWithURL:requestURLString];
-    //return NO;
-    return YES;
+    [self fullPhotoRequestedWithURL:requestURLString];
+    return NO;
   }
   return YES;
 }
@@ -144,7 +147,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
   NSRange rangeOfQmark = [requestURLString rangeOfCharacterFromSet:
                            [NSCharacterSet characterSetWithCharactersInString:@"?"]];
-                           NSString *singlePhotoURLString = [requestURLString substringToIndex:rangeOfQmark.location];
+  NSString *singlePhotoURLString = [requestURLString substringToIndex:rangeOfQmark.location];
   NSURL *singlePhotoURL = [NSURL URLWithString:singlePhotoURLString];
   
   DDLogVerbose(@"photoURL:%@", singlePhotoURL.description);
@@ -153,72 +156,83 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   NSString *searchResultURLs = [requestURLString
                                substringFromIndex:photoIDArrayRange.location+photoIDArrayRange.length];
   DDLogVerbose(@"searchResultURLs:%@", searchResultURLs);
-  NSMutableArray *photoURLs = [[NSMutableArray alloc] init];
+  NSMutableArray *photoURLStrings = [[NSMutableArray alloc] init];
   for (NSString *idString in [searchResultURLs componentsSeparatedByString:@","]) {
-    NSURL *url = [[[DFUser currentUser] serverURL] URLByAppendingPathComponent:idString];
-    [photoURLs addObject:url];
-
-    
-    
-
+    NSURL *url = [[[[DFUser currentUser] serverURL]
+                   URLByAppendingPathComponent:@"user_data"]
+                   URLByAppendingPathComponent:idString];
+    [photoURLStrings addObject:url.absoluteString];
   }
  
-  DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc]
-                                      initWithActivePhotoURL:singlePhotoURL
-                                      inURLs:photoURLs];
-  [self.navigationController pushViewController:mpvc animated:YES];
+  [self pushPhotoDetailViewForURL:singlePhotoURL inPhotos:photoURLStrings];
 }
 
-//
-//- (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
-//     viewControllerBeforeViewController:(UIViewController *)viewController
-//{
-//  NSUInteger currentPhotoIDIndex = [self
-//                                    indexOfPhotoController:(DFPhotoViewController*)viewController];
-//  NSUInteger newPhotoIDIndex;
-//  if (currentPhotoIDIndex > 0) {
-//    newPhotoIDIndex = currentPhotoIDIndex - 1;
-//  } else {
-//    newPhotoIDIndex = self.searchResultPhotoIDs.count - 1;
-//  }
-//
-//  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
-//  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
-//  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
-//                    [newPhotoID longLongValue]];
-//  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-//  pvc.photo = photo;
-//  return pvc;
-//}
-//
-//- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-//       viewControllerAfterViewController:(UIViewController *)viewController
-//{
-//  NSUInteger currentPhotoIDIndex =
-//  [self indexOfPhotoController:(DFPhotoViewController *)viewController];
-//
-//  NSUInteger newPhotoIDIndex;
-//  if (currentPhotoIDIndex < self.searchResultPhotoIDs.count - 1) {
-//    newPhotoIDIndex = currentPhotoIDIndex + 1;
-//  } else {
-//    newPhotoIDIndex = 0;
-//  }
-//
-//  NSNumber *newPhotoID = [self.searchResultPhotoIDs objectAtIndex:newPhotoIDIndex];
-//  DDLogVerbose(@"oldPhotoIDIndex = %d, newPhotoIDIndex = %d, newPhotoID=%d", (int)currentPhotoIDIndex, (int)newPhotoIDIndex, [newPhotoID intValue]);
-//  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:
-//                    [newPhotoID longLongValue]];
-//  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-//  pvc.photo = photo;
-//  return pvc;
-//}
-//
-//- (NSUInteger)indexOfPhotoController:(DFPhotoViewController *)pvc
-//{
-//  DFPhotoIDType currentPhotoID = pvc.photo.photoID;
-//  NSNumber *photoIDNumber = [NSNumber numberWithUnsignedLongLong:currentPhotoID];
-//  return [self.searchResultPhotoIDs indexOfObject:photoIDNumber];
-//}
+- (void)pushPhotoDetailViewForURL:(NSURL *)photoURL inPhotos:(NSArray *)otherPhotoURLs
+{
+  self.currentPhotoArrayURLStrings = otherPhotoURLs;
+  self.currentPhotoURL = photoURL;
+  
+  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+  pvc.photoURL = photoURL;
+  DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc] init];
+  [mpvc setViewControllers:@[pvc]
+                 direction:UIPageViewControllerNavigationDirectionForward
+                  animated:NO
+                completion:nil];
+  mpvc.dataSource = self;
+  
+  [self.navigationController pushViewController:mpvc animated:YES];
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:NO];
+}
+
+
+- (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
+     viewControllerBeforeViewController:(UIViewController *)viewController
+{
+  NSUInteger currentPhotoIDIndex = [self
+                                    indexOfPhotoController:(DFPhotoViewController*)viewController];
+  NSUInteger newPhotoIDIndex;
+  if (currentPhotoIDIndex > 0) {
+    newPhotoIDIndex = currentPhotoIDIndex - 1;
+  } else {
+    newPhotoIDIndex = self.currentPhotoArrayURLStrings.count - 1;
+  }
+
+  return [self viewControllerRequestedForIndex:newPhotoIDIndex];
+}
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+       viewControllerAfterViewController:(UIViewController *)viewController
+{
+  NSUInteger currentPhotoIDIndex =
+  [self indexOfPhotoController:(DFPhotoViewController *)viewController];
+
+  NSUInteger newPhotoIDIndex;
+  if (currentPhotoIDIndex < self.currentPhotoArrayURLStrings.count - 1) {
+    newPhotoIDIndex = currentPhotoIDIndex + 1;
+  } else {
+    newPhotoIDIndex = 0;
+  }
+
+  return [self viewControllerRequestedForIndex:newPhotoIDIndex];
+}
+
+- (UIViewController *)viewControllerRequestedForIndex:(NSUInteger)index
+{
+  if (index >= self.currentPhotoArrayURLStrings.count) return nil;
+  
+  NSURL *newPhotoURL = [NSURL URLWithString:[self.currentPhotoArrayURLStrings objectAtIndex:index]];
+  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
+  pvc.photoURL = newPhotoURL;
+  return pvc;
+}
+
+
+- (NSUInteger)indexOfPhotoController:(DFPhotoViewController *)pvc
+{
+  NSString *currentURLString = pvc.photoURL.absoluteString;
+  return [self.currentPhotoArrayURLStrings indexOfObject:currentURLString];
+}
 
 
 

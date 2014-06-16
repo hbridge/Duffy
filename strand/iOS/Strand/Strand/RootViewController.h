@@ -16,5 +16,7 @@
 - (void)showGallery;
 - (void)showCamera;
 
+- (void)setSwipingEnabled:(BOOL)isSwipingEnabled;
+
 @end
 

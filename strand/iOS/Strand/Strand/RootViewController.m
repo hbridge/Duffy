@@ -125,4 +125,13 @@
   return self.hideStatusBar;
 }
 
+- (void)setSwipingEnabled:(BOOL)isSwipingEnabled
+{
+  for (UIScrollView *view in self.pageViewController.view.subviews) {
+    if ([view isKindOfClass:[UIScrollView class]]) {
+      view.scrollEnabled = isSwipingEnabled;
+    }
+  }
+}
+
 @end

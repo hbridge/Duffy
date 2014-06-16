@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFGalleryWebViewController : UIViewController <UIWebViewDelegate>
+@interface DFGalleryWebViewController : UIViewController <UIWebViewDelegate, UIPageViewControllerDataSource>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (strong, nonatomic) UIBarButtonItem *backButtonItem;
