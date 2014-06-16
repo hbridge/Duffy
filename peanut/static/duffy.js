@@ -18,7 +18,8 @@ function addPhoto(photo, userList, photoType, photosLength){
 	if (photo) {
 		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
 		img = "<img class='l' height='78px' width='78px' src='" + thumbUrl + "'/>";
-		fullUrl = "/strand/viz/images?user_id=" + photo.user_id + "&photo_id=" + photo.id;
+		//fullUrl = "/strand/viz/images?user_id=" + photo.user_id + "&photo_id=" + photo.id;
+		fullUrl = "/user_data/" + photo.user_id + "/" + photo.id+ ".jpg";
 		if (userList) {
 			if (getURLParameter("user_id") != photo.user_id) {
 				userList.push(photo.first_name);
@@ -111,7 +112,7 @@ function clusterClickHandler(clusters){
 			}
 		}
 		else {
-			window.location.href = $(this).attr('r'); //TODO: Need to update link
+			window.location.href = $(this).attr('r')+'?photoList='+photoList($(this)).toString(); //TODO: Need to update link
 		}
 	});
 }
@@ -142,3 +143,21 @@ function getURLParameter(name) {
 		(RegExp(name + '=' + '(.+?)(&|$)').exec(location.search)||[,null])[1]
 	);
 }
+
+/*
+Gives an array of other photos in this section
+*/
+
+function photoList(photo) {
+	console.log('reachinghere');
+	var pArray = [];
+	// find the section
+	parent = photo.parent();
+	parent.find('div.image').each(function(){
+		if (!($(this).hasClass('hidden'))) {
+			console.log()
+			pArray.push($(this).attr('r').replace('/user_data/', ''));
+		}
+	});
+	return pArray;
+}	
