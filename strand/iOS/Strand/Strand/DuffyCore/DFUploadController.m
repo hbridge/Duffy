@@ -469,9 +469,7 @@ static DFUploadController *defaultUploadController;
         [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateFullImageProgress
                                                                                     numRemaining:currentStats.numFullPhotosRemaining
                                                                                         progress:currentStats.fullPhotosProgress];
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:currentStats.numFullPhotosRemaining];
-      });
+      
     }
   
     DDLogInfo(@"\n%@", currentStats.description);
