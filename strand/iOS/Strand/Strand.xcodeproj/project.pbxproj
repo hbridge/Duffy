@@ -12,6 +12,8 @@
 		5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEA0194F70FE00C4EBA6 /* DFPhotoViewController.m */; };
 		5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A02CEA1194F70FE00C4EBA6 /* DFPhotoViewController.xib */; };
 		5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */; };
+		5A02CEA9194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEA8194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.m */; };
+		5A02CEAC194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEAB194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.m */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
@@ -94,6 +96,10 @@
 		5A02CEA1194F70FE00C4EBA6 /* DFPhotoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = DFPhotoViewController.xib; path = DuffyCore/DFPhotoViewController.xib; sourceTree = "<group>"; };
 		5A02CEA4194F711700C4EBA6 /* DFPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoView.h; path = DuffyCore/DFPhotoView.h; sourceTree = "<group>"; };
 		5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoView.m; path = DuffyCore/DFPhotoView.m; sourceTree = "<group>"; };
+		5A02CEA7194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutPushTokenAdapter.h; sourceTree = "<group>"; };
+		5A02CEA8194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutPushTokenAdapter.m; sourceTree = "<group>"; };
+		5A02CEAA194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutTrueFalseResponse.h; sourceTree = "<group>"; };
+		5A02CEAB194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutTrueFalseResponse.m; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -419,6 +425,10 @@
 				5AC4A966194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m */,
 				5AC4A974194A4AB900862D9C /* DFPeanutNewPhotosAdapter.h */,
 				5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */,
+				5A02CEA7194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.h */,
+				5A02CEA8194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.m */,
+				5A02CEAA194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.h */,
+				5A02CEAB194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.m */,
 			);
 			name = "Network Adapters";
 			sourceTree = "<group>";
@@ -699,6 +709,7 @@
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
+				5A02CEAC194F9F9B00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
@@ -706,6 +717,7 @@
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
+				5A02CEA9194F9E2900C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */,
 				5AC4A9301947C30800862D9C /* DFStatusBarNotificationManager.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
