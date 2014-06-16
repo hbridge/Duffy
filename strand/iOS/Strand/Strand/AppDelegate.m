@@ -35,6 +35,7 @@
   [self configureHockey];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  [self requestPushNotifs];
   
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
@@ -163,6 +164,13 @@
   }
 }
 
+- (void)requestPushNotifs
+{
+  DDLogInfo(@"Requesting push notifications.");
+  [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+   (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+}
+
 - (void)applicationWillResignActive:(UIApplication *)application {
   // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
   // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
@@ -192,6 +200,16 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   UIBackgroundFetchResult result = [[DFBackgroundRefreshController sharedBackgroundController]
                                     performBackgroundFetch];
   completionHandler(result);
+}
+
+- (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
+{
+	DDLogInfo(@"Push token: %@", deviceToken);
+}
+
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+	DDLogWarn(@"Failed to get push token, error: %@", error);
 }
 
 
