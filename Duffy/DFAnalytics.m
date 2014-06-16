@@ -160,7 +160,7 @@ static DFAnalytics *defaultLogger;
     NSDictionary *params = @{
                              QueryKey: sharedLogger.inProgressQueryString,
                              SuggestionsKey: sharedLogger.inProgressQuerySuggestions,
-                             SLatencyKey: [NSNumber numberWithDouble:queryDuration],
+                             SLatencyKey: [NSString stringWithFormat:@"%.01f", queryDuration],
                              };
     
     [Flurry logEvent:SearchExecutedEvent withParameters:params];
@@ -184,7 +184,7 @@ static DFAnalytics *defaultLogger;
     NSDictionary *params = @{
                              QueryKey: sharedLogger.inProgressQueryString,
                              SuggestionsKey: sharedLogger.inProgressQuerySuggestions,
-                             SLatencyKey: [NSNumber numberWithDouble:queryDuration],
+                             SLatencyKey:  [NSString stringWithFormat:@"%.01f", queryDuration],
                              };
     [Flurry logEvent:SearchAbortedEvent withParameters:params];
     

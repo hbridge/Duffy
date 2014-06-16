@@ -285,51 +285,54 @@ NSTimeInterval const RecentPhotosTimeInterval = 60.0 * 60 * 24 * 5; // last 5 da
     [view removeFromSuperview];
   }
   
-  [self.searchAdapter fetchSearchResultsForQuery:query
-                                      maxResults:MaxResultsPerSearchRequest
-                                   minDateString:nil
-                             withCompletionBlock:^(DFPeanutSearchResponse *response) {
-    DDLogVerbose(@"SearchViewController got search response with result %d and top level objects count:%d",
-                 response.result, (int)response.objects.count);
-    if (response.result == TRUE) {
-      if (response.objects.count == 0) [self showNoSearchResults:response.retry_suggestions];
-      
-      // We need to do this work on the main thread because the DFPhoto objects that get created
-      // have to be on the main thread so they can be accessed by colleciton view datasource methods
-      dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *peanutObjects = response.objects;
-        NSArray *sectionNames = [DFSearchViewController topLevelSectionNamesForPeanutObjects:peanutObjects];
-        NSDictionary *itemsBySection = [DFSearchViewController itemsBySectionForPeanutObjects:peanutObjects];
-        
-        if ([query isEqualToString:EverythingSearchQuery]) {
-          [self setSectionNames:sectionNames
-                 itemsBySection:itemsBySection
-          showUnuploadedSection:YES];
-          [self saveDefaultPeanutObjects:peanutObjects];
-          dispatch_async(dispatch_get_main_queue(), ^{
-            [self scrollToBottom];
-          });
-        } else {
-          [self setSectionNames:sectionNames
-                 itemsBySection:itemsBySection
-          showUnuploadedSection:NO];
-          dispatch_async(dispatch_get_main_queue(), ^{
-            [self scrollToTop];
-          });
-        }
-        
-        [self.collectionView reloadData];
-        [self.searchBar setSearchInProgress:NO];
-      });
-    } else {
-      DDLogWarn(@"SearchViewController got a non true response.");
-      [self showErrorAlert];
-      [self.searchBar setSearchInProgress:NO];
-    }
-    
-  }];
+  [self.searchAdapter
+   fetchSearchResultsForQuery:query
+   maxResults:MaxResultsPerSearchRequest
+   minDateString:nil
+   withCompletionBlock:^(DFPeanutSearchResponse *response) {
+     DDLogVerbose(@"SearchViewController got search response with result %d and top level objects count:%d",
+                  response.result, (int)response.objects.count);
+     [DFAnalytics logSearchLoadEndedWithQuery:query];
+     if (response.result == TRUE) {
+       if (response.objects.count == 0) [self showNoSearchResults:response.retry_suggestions];
+       
+       // We need to do this work on the main thread because the DFPhoto objects that get created
+       // have to be on the main thread so they can be accessed by colleciton view datasource methods
+       dispatch_async(dispatch_get_main_queue(), ^{
+         NSArray *peanutObjects = response.objects;
+         NSArray *sectionNames = [DFSearchViewController topLevelSectionNamesForPeanutObjects:peanutObjects];
+         NSDictionary *itemsBySection = [DFSearchViewController itemsBySectionForPeanutObjects:peanutObjects];
+         
+         if ([query isEqualToString:EverythingSearchQuery]) {
+           [self setSectionNames:sectionNames
+                  itemsBySection:itemsBySection
+           showUnuploadedSection:YES];
+           [self saveDefaultPeanutObjects:peanutObjects];
+           dispatch_async(dispatch_get_main_queue(), ^{
+             [self scrollToBottom];
+           });
+         } else {
+           [self setSectionNames:sectionNames
+                  itemsBySection:itemsBySection
+           showUnuploadedSection:NO];
+           dispatch_async(dispatch_get_main_queue(), ^{
+             [self scrollToTop];
+           });
+         }
+         
+         [self.collectionView reloadData];
+         [self.searchBar setSearchInProgress:NO];
+       });
+     } else {
+       DDLogWarn(@"SearchViewController got a non true response.");
+       [self showErrorAlert];
+       [self.searchBar setSearchInProgress:NO];
+     }
+     
+   }];
   
-  //[DFAnalytics logSearchLoadStartedWithQuery:query suggestions:suggestionsStrings];
+  [DFAnalytics logSearchLoadStartedWithQuery:query
+                                 suggestions:self.searchBarController.suggestionsStrings];
   self.navigationItem.title = [query capitalizedString];
 }
 
