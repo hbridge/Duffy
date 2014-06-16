@@ -181,7 +181,7 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
- # '/home/aseem/repos/Duffy/peanut/static',
+#   '/home/aseem/repos/Duffy/peanut/static',
 )
 
 # List of finder classes that know how to find static files in
@@ -213,3 +213,12 @@ import warnings
 warnings.filterwarnings('ignore',
                         r".*received a naive datetime",
                         RuntimeWarning, r'.*')
+
+# iOS Notifications
+
+IOS_NOTIFICATIONS_AUTHENTICATION = 'AuthNone'
+IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME = 'gateway.sandbox.push.apple.com'
+IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME = 'StrandDev'
+
+IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME = 'gateway.push.apple.com'
+IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME = 'StrandProd'

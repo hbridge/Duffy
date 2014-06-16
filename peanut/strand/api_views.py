@@ -14,7 +14,10 @@ from common.models import Photo, User, Neighbor
 from common import api_util, cluster_util
 
 from strand import geo_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm
+
+''' test '''
+from ios_notifications.models import APNService, Device, Notification
 
 def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
@@ -241,6 +244,61 @@ def get_new_photos(request):
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
 		return HttpResponse(json.dumps(response), content_type="application/json")
+
+"""
+	Receives device tokens for APNS notifications
+"""
+def register_apns_token(request):
+	response = dict({'result': True})	
+	form = RegisterAPNSTokenForm(request.GET)
+
+	if (form.is_valid()):
+		userId = form.cleaned_data['user_id']
+		deviceToken = form.cleaned_data['device_token'].replace(' ', '').replace('<', '').replace('>', '')
+
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			logger.error("Could not find user: %s " % (userId))
+			return HttpResponse(json.dumps(response), content_type="application/json")
+
+		if (user.device_token):
+			# mark old token as inactive
+			device = Device.objects.get(token=deviceToken)
+			if (device):
+				device.is_active = False
+				device.save()
+
+		user.device_token = deviceToken
+		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
+		device = Device(token=deviceToken, is_active=True, service=apns)
+		device.save()
+		user.save()
+		response['success'] = True
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+	
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
+
+def send_notifications_test(request):
+
+	data = getRequestData(request)
+
+	if data.has_key('user_id'):
+		userId = data['user_id']
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return returnFailure(response, "user_id not found")
+	else:
+		return returnFailure(response, "Need user_id")
+
+	apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
+	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
+	notification = Notification.objects.create(message='First API Message!', service=apns)
+	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
 
 """
 Helper functions

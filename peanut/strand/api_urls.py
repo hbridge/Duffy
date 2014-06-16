@@ -11,10 +11,15 @@ urlpatterns = patterns('',
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/(?P<photoId>[0-9]+)/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/bulk/$', arbus_api_views.PhotoBulkAPI.as_view()),
-
+	
 	url(r'^neighbors', 'strand.api_views.neighbors'),
 	url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands'),
 	url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
+
+	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
+
+	# experimental
+	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -15,6 +15,7 @@ class User(models.Model):
 	last_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100)
 	product_id = models.IntegerField(default=0)
+	device_token = models.TextField()
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 

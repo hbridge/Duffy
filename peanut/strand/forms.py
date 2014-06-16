@@ -10,3 +10,7 @@ class GetJoinableStrandsForm(forms.Form):
 class GetNewPhotosForm(forms.Form):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 	start_date_time = forms.DateTimeField(input_formats=['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%d %H:%M:%S'])
+
+class RegisterAPNSTokenForm(forms.Form):
+	user_id = forms.IntegerField(min_value=1, max_value=10000)
+	device_token = forms.CharField(min_length=1, max_length=100)
