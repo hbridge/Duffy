@@ -153,6 +153,7 @@ def populateLocationInfoByIds(photoIds):
 def populateLocationInfo(photos):
 	latLonList = list()
 	photosWithLL = list()
+	photosToUpdate = list()
 	logger.info("Starting populateLocationInfo with %s photos" % len(photos))
 	for photo in photos:
 		if photo.location_point:
@@ -163,6 +164,9 @@ def populateLocationInfo(photos):
 		if lat and lon:
 			latLonList.append((lat, lon))
 			photosWithLL.append(photo)
+		else:
+			photo.twofishes_data = json.dumps({})
+			photosToUpdate.append(photo)
 
 	logger.info("Found %s lat/lon" % len(latLonList))
 
@@ -170,7 +174,6 @@ def populateLocationInfo(photos):
 
 	logger.info("Got back %s results from twofishes" % len(twoFishesResults))
 
-	photosToUpdate = list()
 	for i, photo in enumerate(photosWithLL):
 		city = getCity(twoFishesResults[i])
 		if city:
