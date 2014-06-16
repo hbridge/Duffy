@@ -9,12 +9,15 @@ urlpatterns = patterns('',
     # Examples:
     # url(r'^$', 'peanut.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
+    url(r'^admin/', include(admin.site.urls)),
+
     url(r'^api/', include('arbus.api_urls')),
     url(r'^viz/', include('arbus.viz_urls')),
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^search/', include('haystack.urls')),
+    
     url(r'^strand/api/', include('strand.api_urls')),
     url(r'^strand/viz/', include('strand.viz_urls')),
+    
+    url(r'^ios-notifications/', include('ios_notifications.urls')),
 )
 
 if settings.DEBUG:

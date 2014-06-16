@@ -42,7 +42,8 @@ INSTALLED_APPS = (
     'strand',
     # Added.
     'haystack',
-    'rest_framework'
+    'rest_framework',
+    'ios_notifications'
 )
 
 MIDDLEWARE_CLASSES = (
