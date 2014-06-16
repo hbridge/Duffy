@@ -263,11 +263,15 @@ def register_apns_token(request):
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
 		if (user.device_token):
-			# mark old token as inactive
-			device = Device.objects.get(token=deviceToken)
-			if (device):
-				device.is_active = False
-				device.save()
+			if (user.device_token == deviceToken):
+				response['success'] = True
+				return HttpResponse(json.dumps(response), content_type="application/json")
+			else:
+				# mark old token as inactive
+				device = Device.objects.get(token=deviceToken)
+				if (device):
+					device.is_active = False
+					device.save()
 
 		user.device_token = deviceToken
 		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
