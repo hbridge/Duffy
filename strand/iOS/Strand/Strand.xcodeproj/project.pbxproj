@@ -835,7 +835,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Henry Bridge (2AJ4WA5ATM)";
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -845,7 +845,7 @@
 					"$(PROJECT_DIR)/Strand/Flurry",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "2766CFAF-C6D6-4D60-ABF0-87FF943766D2";
+				PROVISIONING_PROFILE = "F212B25C-7473-4456-A8EB-3C073D471E33";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
