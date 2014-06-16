@@ -57,6 +57,7 @@
 {
   if (self.isPhotoLoadInProgress) return;
   self.isPhotoLoadInProgress = YES;
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     DDLogVerbose(@"Fetching full photo at %@", photoURL.description);
     NSData *data = [NSData dataWithContentsOfURL:self.photoURL];
@@ -64,6 +65,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       self.photoView.image = img;
       self.isPhotoLoadInProgress = NO;
+      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
     });
   });
 }
