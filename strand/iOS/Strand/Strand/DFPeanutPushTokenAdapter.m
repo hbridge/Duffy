@@ -39,15 +39,15 @@ static NSString *const DeviceTokenKey = @"device_token";
   return nil;
 }
 
-- (void)registerAPNSToken:(NSString *)apnsTokenString
+- (void)registerAPNSToken:(NSData *)apnsToken
           completionBlock:(DFPushTokenResponseBlock)completionBlock
 {
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutTrueFalseResponse alloc] init]
-                              method:RKRequestMethodPUT
+                              method:RKRequestMethodGET
                               path:RegisterTokenPath
                               parameters:@{
-                                           DeviceTokenKey : apnsTokenString,
+                                           DeviceTokenKey : apnsToken 
                                            }];
   DDLogInfo(@"DFPeanutPushTokenAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   

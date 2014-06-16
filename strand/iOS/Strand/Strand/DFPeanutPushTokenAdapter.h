@@ -14,6 +14,6 @@ typedef void (^DFPushTokenResponseBlock)(BOOL success);
 @interface DFPeanutPushTokenAdapter : NSObject <DFNetworkAdapter>
 
 
-- (void)registerAPNSToken:(NSString *)apnsTokenString
+- (void)registerAPNSToken:(NSData *)apnsToken
           completionBlock:(DFPushTokenResponseBlock)completionBlock;
 @end
