@@ -113,6 +113,9 @@ def getLatLonFromExtraData(photo, tryFile=False):
 				if gpsData["LongitudeRef"] == "W":
 					lon = lon * -1
 
+			print lat
+			print lon
+
 			if lat and lon:
 				return (lat, lon)
 			else:
