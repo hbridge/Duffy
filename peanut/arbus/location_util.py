@@ -104,11 +104,11 @@ def getLatLonFromExtraData(photo, tryFile=False):
 			gpsData = metadata["{GPS}"]
 			lat = lon = None
 
-			if "Latitude" in gpsData:
+			if "Latitude" in gpsData and gpsData['Latitude'] != 0:
 				lat = gpsData["Latitude"]
 				if gpsData["LatitudeRef"] == "S":
 					lat = lat * -1
-			if "Longitude" in gpsData:
+			if "Longitude" in gpsData and gpsData['Longitude'] != 0:
 				lon = gpsData["Longitude"]
 				if gpsData["LongitudeRef"] == "W":
 					lon = lon * -1
