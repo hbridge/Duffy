@@ -70,6 +70,7 @@ def userbaseSummary(request):
 			photosWithGPS = dbQuery.filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False)).count()
 
 			if photosWithGPS > 0:
+				entry['twofishCount'] = photosWithGPS
 				entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
 			else:
 				entry['twofish'] = '-'
@@ -136,6 +137,7 @@ def userbaseSummary(request):
 			photosWithGPS = dbQuery.filter(location_point__isnull=False).count()
 
 			if photosWithGPS > 0:
+				entry['twofishCount'] = photosWithGPS
 				entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
 			else:
 				entry['twofish'] = '-'
