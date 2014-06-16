@@ -12,6 +12,7 @@
 
 extern NSString *const DFStrandLastKnownLatitudeDefaultsKey;
 extern NSString *const DFStrandLastKnownLongitudeDefaultsKey;
+extern NSString *const DFStrandLastKnownLocationRecordedDefaultsKey;
 extern NSString *const DFStrandLastNewPhotosFetchDateDefaultsKey;
 extern NSString *const DFStrandUnseenCountDefaultsKey;
 

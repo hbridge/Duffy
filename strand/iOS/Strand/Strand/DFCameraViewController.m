@@ -244,15 +244,32 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)addLocationToMetadata:(NSMutableDictionary *)metadata
 {
   CLLocation *location = self.locationManager.location;
-  if (location == nil) return;
+  
+  
+  NSDate *cachedLocationDate = [[NSUserDefaults standardUserDefaults]
+                                objectForKey:DFStrandLastKnownLocationRecordedDefaultsKey];
+  
+  
+  if (location == nil && cachedLocationDate == nil) return;
   
   CLLocationCoordinate2D coords = location.coordinate;
+  NSNumber *lastLatitude = [[NSUserDefaults standardUserDefaults]
+                            objectForKey:DFStrandLastKnownLatitudeDefaultsKey];
+  NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
+                             objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
+  CLLocationCoordinate2D cachedCoords = (CLLocationCoordinate2D){lastLatitude.doubleValue, lastLongitude.doubleValue};
   
   NSDictionary *latlongDict = @{@"Latitude": @(fabs(coords.latitude)),
                                 @"LatitudeRef" : coords.latitude >= 0.0 ? @"N" : @"S",
                                 @"Longitude" : @(fabs(coords.longitude)),
                                 @"LongitudeRef" : coords.longitude >= 0.0 ? @"E" : @"W",
                                 @"Altitude" : @(location.altitude),
+                                @"DateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:location.timestamp],
+                                @"CachedLatitude": @(fabs(cachedCoords.latitude)),
+                                @"CachedLatitudeRef" : cachedCoords.latitude >= 0.0 ? @"N" : @"S",
+                                @"CachedLongitude" : @(fabs(cachedCoords.longitude)),
+                                @"CachedLongitudeRef" : cachedCoords.longitude >= 0.0 ? @"E" : @"W",
+                                @"CachedDateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:cachedLocationDate],
                                 };
   
   metadata[@"{GPS}"] = latlongDict;

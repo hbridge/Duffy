@@ -79,6 +79,9 @@ static DFBackgroundRefreshController *defaultBackgroundController;
                                             forKey:DFStrandLastKnownLatitudeDefaultsKey];
   [[NSUserDefaults standardUserDefaults] setObject:@(coordinate.longitude)
                                             forKey:DFStrandLastKnownLongitudeDefaultsKey];
+  [[NSUserDefaults standardUserDefaults] setObject:[NSDate date]
+                                            forKey:DFStrandLastKnownLocationRecordedDefaultsKey];
+  
   [[NSUserDefaults standardUserDefaults] synchronize];
   DDLogInfo(@"Recorded new location: [%.04f,%.04f]", coordinate.latitude, coordinate.longitude);
 }

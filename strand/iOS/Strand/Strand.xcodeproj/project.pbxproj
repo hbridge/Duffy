@@ -8,6 +8,10 @@
 
 /* Begin PBXBuildFile section */
 		3729F1363E3E4E67A8F3A729 /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9CFF5D7C92B449CB884517E2 /* libPods.a */; };
+		5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CE9D194F70E200C4EBA6 /* DFMultiPhotoViewController.m */; };
+		5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEA0194F70FE00C4EBA6 /* DFPhotoViewController.m */; };
+		5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A02CEA1194F70FE00C4EBA6 /* DFPhotoViewController.xib */; };
+		5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
@@ -83,6 +87,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5A02CE9C194F70E200C4EBA6 /* DFMultiPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFMultiPhotoViewController.h; path = DuffyCore/DFMultiPhotoViewController.h; sourceTree = "<group>"; };
+		5A02CE9D194F70E200C4EBA6 /* DFMultiPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFMultiPhotoViewController.m; path = DuffyCore/DFMultiPhotoViewController.m; sourceTree = "<group>"; };
+		5A02CE9F194F70FE00C4EBA6 /* DFPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoViewController.h; path = DuffyCore/DFPhotoViewController.h; sourceTree = "<group>"; };
+		5A02CEA0194F70FE00C4EBA6 /* DFPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoViewController.m; path = DuffyCore/DFPhotoViewController.m; sourceTree = "<group>"; };
+		5A02CEA1194F70FE00C4EBA6 /* DFPhotoViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = DFPhotoViewController.xib; path = DuffyCore/DFPhotoViewController.xib; sourceTree = "<group>"; };
+		5A02CEA4194F711700C4EBA6 /* DFPhotoView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoView.h; path = DuffyCore/DFPhotoView.h; sourceTree = "<group>"; };
+		5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoView.m; path = DuffyCore/DFPhotoView.m; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -286,6 +297,13 @@
 		5AC4A8E01947C2E700862D9C /* Duffy Core */ = {
 			isa = PBXGroup;
 			children = (
+				5A02CEA4194F711700C4EBA6 /* DFPhotoView.h */,
+				5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */,
+				5A02CE9F194F70FE00C4EBA6 /* DFPhotoViewController.h */,
+				5A02CEA0194F70FE00C4EBA6 /* DFPhotoViewController.m */,
+				5A02CEA1194F70FE00C4EBA6 /* DFPhotoViewController.xib */,
+				5A02CE9C194F70E200C4EBA6 /* DFMultiPhotoViewController.h */,
+				5A02CE9D194F70E200C4EBA6 /* DFMultiPhotoViewController.m */,
 				5AC4A971194A434700862D9C /* DFPeanutSuggestion.h */,
 				5AC4A972194A434700862D9C /* DFPeanutSuggestion.m */,
 				5AC4A96E194A42EE00862D9C /* DFPeanutSearchResponse.h */,
@@ -583,6 +601,7 @@
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
 				5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
+				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -664,6 +683,7 @@
 				5AC4A9261947C30800862D9C /* DFNetworkingConstants.m in Sources */,
 				5AC4A9311947C30800862D9C /* DFTypedefs.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
+				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5AC4A93C1947C30800862D9C /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
@@ -674,6 +694,7 @@
 				5AC4A960194A25A300862D9C /* DFBackgroundRefreshController.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
+				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
@@ -691,6 +712,7 @@
 				5AC4A9361947C30800862D9C /* DFURLProtocol.m in Sources */,
 				5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
+				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
@@ -844,7 +866,7 @@
 					"$(PROJECT_DIR)/Strand/Flurry",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "377F32FA-D43B-4788-8201-E28D4DB024C8";
+				PROVISIONING_PROFILE = "6FC27F16-4351-4E58-BD24-9E880782D595";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
