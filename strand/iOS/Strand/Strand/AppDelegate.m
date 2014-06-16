@@ -22,12 +22,11 @@
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
 #import "DFPeanutPushTokenAdapter.h"
-#import "DFDataHasher.h"
 
 
 @interface AppDelegate ()
 
-@property DFPeanutPushTokenAdapter *pushTokenAdapter;
+@property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
             
 @end
 
@@ -208,12 +207,12 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
-  if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
+	if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
   [self.pushTokenAdapter registerAPNSToken:deviceToken completionBlock:^(BOOL success) {
     if (success) {
-      DDLogInfo(@"Push token: %@ successfully registered with server.", deviceToken);
+      DDLogInfo(@"Push token successfuly registered with server.");
     } else {
-      DDLogInfo(@"Push token: %@ FAILED to register with server.", deviceToken);
+      DDLogInfo(@"Push token FAILED to register with server");
     }
   }];
 }
