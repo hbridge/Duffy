@@ -71,7 +71,8 @@ class BasePhotoAPI(APIView):
 
 			# Bug fix for bad data in photo where date was before 1900
 			# Initial bug was from a photo in iPhone 1, guessing at the date
-			if (photo.time_taken < datetime.date(1900, 1, 1)):
+			if (photo.time_taken.date() < datetime.date(1900, 1, 1)):
+				logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
 				photo.time_taken = datetime.date(2007, 9, 1)
 
 			if not photo.location_point:
