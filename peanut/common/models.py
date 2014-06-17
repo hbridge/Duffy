@@ -250,10 +250,14 @@ class Neighbor(models.Model):
 
 class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
-	notification = models.ForeignKey(Notification)
 	device_token = models.TextField()
+	msg = models.TextField()
 	apns = models.IntegerField()
 	added = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		db_table = 'strand_notification_log'
+
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}, {3}, {4}'.format(self.user_id, self.notification_id, device_token, apns)
