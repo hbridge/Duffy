@@ -31,7 +31,7 @@
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-
+    [self configureLocationManager];
   }
   return self;
 }
@@ -47,7 +47,7 @@
     self.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
     self.cameraOverlayView = self.customCameraOverlayView;
     [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
-    [self configureLocationManager];
+    
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
   }
@@ -115,6 +115,7 @@
 - (void)startLocationUpdates
 {
   DDLogVerbose(@"DFCameraViewController starting location updates.");
+  [self.locationManager stopUpdatingLocation];
   [self.locationManager startUpdatingLocation];
 }
 
