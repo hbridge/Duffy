@@ -111,7 +111,7 @@ LOGGING = {
     },
     'handlers': {
         'djangofile': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'filename': '/home/derek/logs/duffy-django.log',
             'formatter': 'verbose'
