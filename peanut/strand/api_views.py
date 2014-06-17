@@ -38,6 +38,22 @@ def removeDups(seq, idFunction=None):
 	   result.append(item)
    return result
 
+def getBestLocation(photo):
+	twoFishesData = json.loads(photo.twofishes_data)
+	bestLocationName = None
+	bestWoeType = 100
+	for data in twoFishesData["interpretations"]:
+		if "woeType" in data["feature"]:
+			# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
+			if data["feature"]["woeType"] < bestWoeType:
+				bestLocationName = data["feature"]["displayName"]
+				bestWoeType = data["feature"]["woeType"]
+				if bestLocationName:
+					return bestLocationName
+				else:
+					return photo.location_city
+
+
 def getGroups(groupings, labelRecent = True):
 	if len(groupings) == 0:
 		return []
@@ -65,7 +81,7 @@ def getGroups(groupings, labelRecent = True):
 			title = None
 			i = 0
 			while (not title) and i < len(group):
-				title = group[i].location_city
+				title = getBestLocation(group[i])
 				i += 1
 			
 		clusters = cluster_util.getClustersFromPhotos(group, settings.DEFAULT_CLUSTER_THRESHOLD, settings.DEFAULT_DUP_THRESHOLD, simCaches)
