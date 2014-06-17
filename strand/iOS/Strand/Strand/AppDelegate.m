@@ -208,7 +208,14 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
 	if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
-  [self.pushTokenAdapter registerAPNSToken:deviceToken completionBlock:^(BOOL success) {
+  
+  DFBuildType buildType = DFBuildTypeDebug;
+  #ifndef DEBUG
+    buildType = DFBuildTypeAdHoc;
+  #endif
+  
+  
+  [self.pushTokenAdapter registerAPNSToken:deviceToken forBuildType:buildType completionBlock:^(BOOL success) {
     if (success) {
       DDLogInfo(@"Push token successfuly registered with server.");
     } else {
