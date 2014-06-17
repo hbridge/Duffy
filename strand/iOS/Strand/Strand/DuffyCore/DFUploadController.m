@@ -16,7 +16,6 @@
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
 #import <RestKit/RestKit.h>
-#import "DFLocationPinger.h"
 #import "DFPeanutPhoto.h"
 #import "AppDelegate.h"
 #import "NSDictionary+DFJSON.h"
@@ -533,10 +532,7 @@ static DFUploadController *defaultUploadController;
         return;
     }
     
-    [[DFLocationPinger sharedInstance] addObjectRequestingKeepAlive:self];
-    if ([[DFLocationPinger sharedInstance] canMonitorLocation]) {
-        [[DFLocationPinger sharedInstance] startPings];
-    }
+
     self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
         DDLogInfo(@"Background upload task about to expire.  Canceling uploads...");
         
@@ -552,7 +548,6 @@ static DFUploadController *defaultUploadController;
 - (void) endBackgroundUpdateTask
 {
     DDLogInfo(@"Ending background update task.");
-    [[DFLocationPinger sharedInstance] removeObjectRequestingKeepAlive:self];
     [[UIApplication sharedApplication] endBackgroundTask: self.backgroundUpdateTask];
     self.backgroundUpdateTask = UIBackgroundTaskInvalid;
 }
