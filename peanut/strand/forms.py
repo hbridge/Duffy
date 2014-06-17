@@ -15,4 +15,4 @@ class RegisterAPNSTokenForm(forms.Form):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 	device_token = forms.CharField(min_length=1, max_length=100)
 	# build_type: 0 is devel, 1 is adhoc, 2 is app store
-	build_type = forms.IntegerField(min_value=0, max_value=2)
+	build_type = forms.IntegerField(required=False, min_value=0, max_value=2)
