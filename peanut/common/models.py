@@ -8,6 +8,8 @@ from peanut import settings
 
 from common import bulk_updater
 
+from ios_notifications.models import Notification
+
 
 # Create your models here.
 class User(models.Model):
@@ -244,4 +246,14 @@ class Neighbor(models.Model):
 
 	def __unicode__(self):
 		return '{0}, {1}, {2}, {3}'.format(self.photo_1.id, self.photo_2.id, self.time_distance_sec, self.geo_distance_m)
+
+class NotificationLog(models.Model):
+	user = models.ForeignKey(User)
+	notification = models.ForeignKey(Notification)
+	device_token = models.TextField()
+	apns = models.IntegerField()
+	added = models.DateTimeField(auto_now_add=True)
+
+	def __unicode__(self):
+		return '{0}, {1}, {2}, {3}, {4}'.format(self.user_id, self.notification_id, device_token, apns)
 
