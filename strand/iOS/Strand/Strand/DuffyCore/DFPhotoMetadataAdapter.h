@@ -8,9 +8,12 @@
 
 #import <Foundation/Foundation.h>
 #import "DFNetworkAdapter.h"
+#import "DFTypedefs.h"
 
 @class RKObjectManager;
 @class DFPhoto;
+
+typedef void (^DFMetadataFetchCompletionBlock)(NSDictionary *metadata);
 
 @interface DFPhotoMetadataAdapter : NSObject <DFNetworkAdapter>
 
@@ -21,6 +24,7 @@
 - (NSDictionary *)putPhoto:(DFPhoto *)photo
             updateMetadata:(BOOL)updateMetadata
       appendLargeImageData:(BOOL)uploadImage;
-
+- (void)getPhotoMetadata:(DFPhotoIDType)photoID
+         completionBlock:(DFMetadataFetchCompletionBlock)completionBlock;
 
 @end

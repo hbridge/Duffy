@@ -87,6 +87,15 @@
   return self;
 }
 
+- (id)init
+{
+  self = [super init];
+  if (self) {
+    self.objectManager = [DFObjectManager sharedManager];
+  }
+  return self;
+}
+
 
 + (NSArray *)requestDescriptors
 {
@@ -251,6 +260,36 @@
   }
   
   return  result;
+}
+
+- (void)getPhotoMetadata:(DFPhotoIDType)photoID
+         completionBlock:(DFMetadataFetchCompletionBlock)completionBlock
+{
+  DFPeanutPhoto *requestPhoto = [[DFPeanutPhoto alloc] init];
+  requestPhoto.id = @(photoID);
+  
+  NSMutableURLRequest *request =
+  [self.objectManager
+   requestWithObject:requestPhoto
+   method:RKRequestMethodGET
+   path:[NSString stringWithFormat:@"photos/%llu", photoID]
+   parameters:nil];
+  
+  DDLogInfo(@"DFPhotoMetadataAdapter getting endpoint: %@", request.URL.absoluteString);
+  
+  RKObjectRequestOperation *requestOperation =
+  [self.objectManager
+   objectRequestOperationWithRequest:request
+   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+     DFPeanutPhoto *resultPeanutPhoto = mappingResult.firstObject;
+     NSDictionary *resultDict = [NSDictionary dictionaryWithJSONString:resultPeanutPhoto.metadata.allKeys.firstObject];
+     completionBlock(resultDict);
+   } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+     DDLogWarn(@"DFPhotoMetadataAdapter metadata fetch failed: %@", error.description);
+     completionBlock(nil);
+   }];
+                                                
+  [self.objectManager enqueueObjectRequestOperation:requestOperation];
 }
 
 

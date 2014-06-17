@@ -14,11 +14,14 @@
 #import "NSDictionary+DFJSON.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFMultiPhotoViewController.h"
+#import "DFPhotoMetadataAdapter.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface DFPhotoViewController ()
 
 @property (nonatomic) BOOL hideStatusBar;
 @property (atomic) BOOL isPhotoLoadInProgress;
+@property (nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 
 @end
 
@@ -114,14 +117,41 @@
   NSURL *urlToShare;
   if (self.photo) {
     urlToShare = [NSURL URLWithString:self.photo.alAssetURLString];
+    UIActivityViewController *activityViewController = [[UIActivityViewController alloc]
+                                                       initWithActivityItems:@[urlToShare]
+                                                       applicationActivities:nil];
+    [self presentViewController:activityViewController animated:YES completion:nil];
   } else if (self.photoURL) {
-    urlToShare = self.photoURL;
+    NSString *photoIDString = [self.photoURL.lastPathComponent stringByDeletingPathExtension];
+    DFPhotoIDType photoID = [photoIDString longLongValue];
+    [self.photoAdapter getPhotoMetadata:photoID completionBlock:^(NSDictionary *metadata) {
+      DDLogVerbose(@"Photo metadata: %@", metadata[@"{Exif}"]);
+      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+      [library writeImageToSavedPhotosAlbum:self.photoView.image.CGImage
+                                   metadata:metadata
+                            completionBlock:^(NSURL *assetURL, NSError *error) {
+                              if (error) {
+                                DDLogError(@"Failed to save photo: %@", error.description);
+                                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
+                                                                                    message:error.localizedDescription
+                                                                                   delegate:nil
+                                                                          cancelButtonTitle:@"OK"
+                                                                          otherButtonTitles:nil];
+                                [alertView show];
+                              } else {
+                                DDLogInfo(@"Photo saved with assetURL: %@", assetURL);
+                                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
+                                                                                    message:@"Photo saved to your camera roll"
+                                                                                   delegate:nil
+                                                                          cancelButtonTitle:@"OK"
+                                                                          otherButtonTitles:nil];
+                                [alertView show];
+                              }
+                              
+                            }
+       ];
+    }];
   }
-  UIActivityViewController *activityViewController = [[UIActivityViewController alloc]
-                                                      initWithActivityItems:@[urlToShare]
-                                                      applicationActivities:nil];
-  [self presentViewController:activityViewController animated:YES completion:nil];
-  
 }
 
 - (IBAction)imageTapped:(id)sender {
@@ -154,5 +184,11 @@
   }
 }
 
+
+- (DFPhotoMetadataAdapter *)photoAdapter
+{
+  if (!_photoAdapter) _photoAdapter = [[DFPhotoMetadataAdapter alloc] init];
+  return _photoAdapter;
+}
 
 @end
