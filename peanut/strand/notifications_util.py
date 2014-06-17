@@ -11,6 +11,7 @@ def sendNotification(user, msg):
 		notification = Notification()
 		notification.message = msg
 		notification.service = device.service
+		notification.sound = 'default'
 		apns = APNService.objects.get(id=device.service_id)
 		apns.push_notification_to_devices(notification, [device])
 		NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, apns=apns.id)

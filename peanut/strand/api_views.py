@@ -288,8 +288,7 @@ def register_apns_token(request):
 				# if it's not the same, then mark the old one as inactive
 				devices = Device.objects.filter(token=user.device_token)
 				for device in devices: 
-					device.is_active = False
-					device.save()
+					device.delete()
 
 		user.device_token = deviceToken
 		apnsDev = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_DEV_APNS_ID)
@@ -331,7 +330,7 @@ def send_notifications_test(request):
 	else:
 		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
 	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
-	notification = Notification.objects.create(message="A Message with badge!", service=apns)
+	notification = Notification.objects.create(message="A Message with sound!", sound='default', service=apns)
 	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
