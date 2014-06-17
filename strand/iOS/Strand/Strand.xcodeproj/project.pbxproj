@@ -14,6 +14,7 @@
 		5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */; };
 		5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */; };
 		5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */; };
+		5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
@@ -100,6 +101,8 @@
 		5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutPushTokenAdapter.m; sourceTree = "<group>"; };
 		5A02CEB0194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutTrueFalseResponse.h; sourceTree = "<group>"; };
 		5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutTrueFalseResponse.m; sourceTree = "<group>"; };
+		5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationStore.h; sourceTree = "<group>"; };
+		5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationStore.m; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -296,6 +299,8 @@
 		5AC4A8DC1947B61900862D9C /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */,
+				5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */,
 			);
 			name = Database;
 			sourceTree = "<group>";
@@ -708,6 +713,7 @@
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
+				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,

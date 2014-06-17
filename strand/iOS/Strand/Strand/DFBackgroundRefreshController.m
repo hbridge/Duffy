@@ -14,6 +14,7 @@
 #import "DFPeanutSearchObject.h"
 #import "DFStatusBarNotificationManager.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFLocationStore.h"
 
 
 @interface DFBackgroundRefreshController()
@@ -74,16 +75,11 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 
 - (void)recordManagerLocation
 {
-  CLLocationCoordinate2D coordinate = self.locationManager.location.coordinate;
-  [[NSUserDefaults standardUserDefaults] setObject:@(coordinate.latitude)
-                                            forKey:DFStrandLastKnownLatitudeDefaultsKey];
-  [[NSUserDefaults standardUserDefaults] setObject:@(coordinate.longitude)
-                                            forKey:DFStrandLastKnownLongitudeDefaultsKey];
-  [[NSUserDefaults standardUserDefaults] setObject:[NSDate date]
-                                            forKey:DFStrandLastKnownLocationRecordedDefaultsKey];
-  
-  [[NSUserDefaults standardUserDefaults] synchronize];
-  DDLogInfo(@"Recorded new location: [%.04f,%.04f]", coordinate.latitude, coordinate.longitude);
+  CLLocation *location = self.locationManager.location;
+  [DFLocationStore StoreLastLocation:location];
+  DDLogInfo(@"DFBAckgroundRefreshController recorded new location: [%.04f,%.04f]",
+            location.coordinate.latitude,
+            location.coordinate.longitude);
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
@@ -121,21 +117,17 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     self.isJoinableStrandsFetchInProgress = YES;
   }
   
-  NSNumber *lastLatitude = [[NSUserDefaults standardUserDefaults]
-                            objectForKey:DFStrandLastKnownLatitudeDefaultsKey];
-  NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
-                             objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
+  CLLocation *lastLocation = [DFLocationStore LoadLastLocation];
 
-  if ((!lastLatitude || lastLatitude.floatValue == 0.0)
-      && (!lastLongitude || lastLongitude.floatValue == 0.0)) {
-    DDLogWarn(@"DFBackgroundRefreshController: lastlatlong [0.0,0.0], not updating joinable strands");
+  if (!lastLocation) {
+    DDLogWarn(@"DFBackgroundRefreshController: last location nil, not updating joinable strands");
     self.isJoinableStrandsFetchInProgress = NO;
     return;
   }
   
   DDLogInfo(@"Updating joinable strands.");
-  [self.joinableStrandsAdapter fetchJoinableStrandsNearLatitude:lastLatitude.doubleValue
-                                                      longitude:lastLongitude.doubleValue
+  [self.joinableStrandsAdapter fetchJoinableStrandsNearLatitude:lastLocation.coordinate.latitude
+                                                      longitude:lastLocation.coordinate.longitude
                                                 completionBlock:^(DFPeanutSearchResponse *response)
   {
     self.isJoinableStrandsFetchInProgress = NO;

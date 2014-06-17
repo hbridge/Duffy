@@ -16,6 +16,7 @@
 #import "DFUploadController.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFStrandConstants.h"
+#import "DFLocationStore.h"
 
 @interface DFCameraViewController ()
 
@@ -32,6 +33,24 @@
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     [self configureLocationManager];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(startLocationUpdates)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(stopLocationUpdates)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateUnseenCount)
+                                                 name:DFStrandUnseenPhotosUpdatedNotificationName
+                                               object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(joinableStrandsUpdated:)
+                                                 name:DFStrandJoinableStrandsNearbyNotificationName
+                                               object:nil];
   }
   return self;
 }
@@ -52,25 +71,6 @@
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
   }
   
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(startLocationUpdates)
-                                               name:UIApplicationDidBecomeActiveNotification
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(stopLocationUpdates)
-                                               name:UIApplicationDidEnterBackgroundNotification
-                                             object:nil];
-  
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(updateUnseenCount)
-                                               name:DFStrandUnseenPhotosUpdatedNotificationName
-                                             object:nil];
-  
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(joinableStrandsUpdated:)
-                                               name:DFStrandJoinableStrandsNearbyNotificationName
-                                             object:nil];
-
   self.delegate = self;
 }
 
@@ -109,6 +109,7 @@
 {
   self.locationManager = [[CLLocationManager alloc] init];
   self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+  self.locationManager.distanceFilter = 10;
   self.locationManager.delegate = self;
 }
 
@@ -246,26 +247,32 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)addLocationToMetadata:(NSMutableDictionary *)metadata
 {
   CLLocation *location = self.locationManager.location;
+  CLLocation *cachedLocation = [DFLocationStore LoadLastLocation];
   
+  DDLogInfo(@"DFCameraViewController addLocationToMetadata location age %.01fs cached location age %.01fs",
+            [[NSDate date] timeIntervalSinceDate:location.timestamp],
+            [[NSDate date] timeIntervalSinceDate:cachedLocation.timestamp]);
   
+  if (location == nil && cachedLocation == nil) return;
+
+  CLLocation *locationToUse;
+  if ([location.timestamp timeIntervalSinceDate:cachedLocation.timestamp] >= 0.0 && location) {
+    // if our location manager has updated since the cached location has, use the newer val
+    DDLogInfo(@"DFCameraViewController using uncached location data");
+    locationToUse = location;
+  } else {
+    DDLogInfo(@"DFCameraViewController using cached location data");
+    locationToUse = cachedLocation;
+  }
   
-  
-  
-  if (location == nil) return;
-  
-  CLLocationCoordinate2D coords = location.coordinate;
-  
-  DDLogInfo(@"Adding location to photo with latlong:[%.04f,%.04f] created %.01fs ago.",
-            coords.latitude,
-            coords.longitude,
-            [[NSDate date] timeIntervalSinceDate:location.timestamp]);
-  
+  CLLocationCoordinate2D coords = locationToUse.coordinate;
+  CLLocationDistance altitude = locationToUse.altitude;
 
   NSDictionary *latlongDict = @{@"Latitude": @(fabs(coords.latitude)),
                                 @"LatitudeRef" : coords.latitude >= 0.0 ? @"N" : @"S",
                                 @"Longitude" : @(fabs(coords.longitude)),
                                 @"LongitudeRef" : coords.longitude >= 0.0 ? @"E" : @"W",
-                                @"Altitude" : @(location.altitude),
+                                @"Altitude" : @(altitude),
                                 };
   
   metadata[@"{GPS}"] = latlongDict;
@@ -273,19 +280,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)addCachedLocationToMetadata:(NSMutableDictionary *)metadata
 {
-  NSDate *cachedLocationDate = [[NSUserDefaults standardUserDefaults]
-                                objectForKey:DFStrandLastKnownLocationRecordedDefaultsKey];
-  NSNumber *lastLatitude = [[NSUserDefaults standardUserDefaults]
-                            objectForKey:DFStrandLastKnownLatitudeDefaultsKey];
-  NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
-                             objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
-  CLLocationCoordinate2D cachedCoords = (CLLocationCoordinate2D){lastLatitude.doubleValue, lastLongitude.doubleValue};
-  
-  DDLogInfo(@"Adding cached location to photo with latlong:[%.04f,%.04f] created %.01fs ago.",
-            cachedCoords.latitude,
-            cachedCoords.longitude,
-            [[NSDate date] timeIntervalSinceDate:cachedLocationDate]);
-  
+  CLLocation *lastCachedLocation = [DFLocationStore LoadLastLocation];
+  CLLocationCoordinate2D cachedCoords = lastCachedLocation.coordinate;
   
   NSMutableDictionary *exifDict = [metadata[@"{Exif}"] mutableCopy];
   
@@ -293,7 +289,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
                                       @"CachedLatitudeRef" : cachedCoords.latitude >= 0.0 ? @"N" : @"S",
                                       @"CachedLongitude" : @(fabs(cachedCoords.longitude)),
                                       @"CachedLongitudeRef" : cachedCoords.longitude >= 0.0 ? @"E" : @"W",
-                                      @"CachedDateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:cachedLocationDate],
+                                      @"CachedDateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:lastCachedLocation.timestamp],
                                       @"GPSTagDateTimeRecored" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:self.locationManager.location.timestamp],
                                       };
   exifDict[@"UserComment"] = cachedLatlongDict.description;
@@ -349,6 +345,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
    forState:UIControlStateNormal];
 }
 
+
+- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+{
+  CLLocation *location = locations.lastObject;
+  DDLogInfo(@"DFCameraViewContrller updated location: [%f, %f]",
+            location.coordinate.latitude,
+            location.coordinate.longitude);
+}
 
 
 @end
