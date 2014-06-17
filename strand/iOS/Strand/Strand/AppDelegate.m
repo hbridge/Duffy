@@ -214,7 +214,6 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     buildType = DFBuildTypeAdHoc;
   #endif
   
-  
   [self.pushTokenAdapter registerAPNSToken:deviceToken forBuildType:buildType completionBlock:^(BOOL success) {
     if (success) {
       DDLogInfo(@"Push token successfuly registered with server.");
