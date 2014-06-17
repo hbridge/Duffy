@@ -13,7 +13,7 @@
 
 static NSString *const RegisterTokenPath = @"register_apns_token";
 static NSString *const DeviceTokenKey = @"device_token";
-static NSString *const BuildTypeKey = @"built_type";
+static NSString *const BuildTypeKey = @"build_type";
 
 @implementation DFPeanutPushTokenAdapter
 
