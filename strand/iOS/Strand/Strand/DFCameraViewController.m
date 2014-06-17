@@ -54,7 +54,7 @@
   
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(startLocationUpdates)
-                                               name:UIApplicationWillEnterForegroundNotification
+                                               name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(stopLocationUpdates)
