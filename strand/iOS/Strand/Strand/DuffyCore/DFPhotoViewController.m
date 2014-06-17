@@ -127,8 +127,12 @@
     [self.photoAdapter getPhotoMetadata:photoID completionBlock:^(NSDictionary *metadata) {
       DDLogVerbose(@"Photo metadata: %@", metadata[@"{Exif}"]);
       ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-      [library writeImageToSavedPhotosAlbum:self.photoView.image.CGImage
-                                   metadata:metadata
+      UIImage *image = self.photoView.image;
+      NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
+      [self addOrientationToMetadata:mutableMetadata forImage:image];
+      
+      [library writeImageToSavedPhotosAlbum:image.CGImage
+                                   metadata:mutableMetadata
                             completionBlock:^(NSURL *assetURL, NSError *error) {
                               if (error) {
                                 DDLogError(@"Failed to save photo: %@", error.description);
@@ -152,6 +156,15 @@
        ];
     }];
   }
+}
+
+- (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image
+{
+  NSMutableDictionary *exif = [metadata[@"{Exif}"] mutableCopy];
+  if (image.imageOrientation == UIImageOrientationUp) {
+    exif[@"Orientation"] = @(1);
+  }
+  metadata[@"{Exif}"] = exif;
 }
 
 - (IBAction)imageTapped:(id)sender {
