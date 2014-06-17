@@ -239,6 +239,7 @@ class Neighbor(models.Model):
 	photo_2 = models.ForeignKey(Photo, related_name="neighbor_photo_2")
 	time_distance_sec = models.IntegerField()
 	geo_distance_m = models.IntegerField()
+	added = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		unique_together = ("photo_1", "photo_2")
