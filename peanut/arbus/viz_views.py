@@ -156,17 +156,17 @@ def userbaseSummary(request):
 			else:
 				entry['neighbor'] = '-'
 
-			entry['internal'] = False
+		entry['internal'] = False
 
-			if (user.added == None or len(user.first_name) == 0):
-				entry['internal'] = True
-			else:
-				for phoneid in knownPhoneIds:
-					if ((phoneid.lower() in user.phone_id.lower()) or 
-						('iphone simulator'.lower() in user.first_name.lower()) or
-						('ipad simulator'.lower() in user.first_name.lower())):
-						entry['internal'] = True
-						break
+		if (len(user.first_name) == 0):
+			entry['internal'] = True
+		else:
+			for phoneid in knownPhoneIds:
+				if ((phoneid.lower() in user.phone_id.lower()) or 
+					('iphone simulator'.lower() in user.first_name.lower()) or
+					('ipad simulator'.lower() in user.first_name.lower())):
+					entry['internal'] = True
+					break
 		strandList.append(entry)
 
 
