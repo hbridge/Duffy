@@ -16,7 +16,6 @@ from common import api_util, cluster_util
 from strand import geo_util
 from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm
 
-''' test '''
 from ios_notifications.models import APNService, Device, Notification
 
 def getGroupForPhoto(photo, clusters):
@@ -271,7 +270,7 @@ def register_apns_token(request):
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
 		deviceToken = form.cleaned_data['device_token'].replace(' ', '').replace('<', '').replace('>', '')
-		buildType = form.cleaned_data['build_type']
+		buildType = form.cleaned_data['build_type'] # not used but possible future use
 
 		try:
 			user = User.objects.get(id=userId)
@@ -279,25 +278,24 @@ def register_apns_token(request):
 			logger.error("Could not find user: %s " % (userId))
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
+		# check if a device_token already exists for this user
 		if (user.device_token):
+			# if it's the same as the current one, return success
 			if (user.device_token == deviceToken):
 				response['success'] = True
 				return HttpResponse(json.dumps(response), content_type="application/json")
 			else:
-				# mark old token as inactive
-				device = Device.objects.get(token=deviceToken)
-				if (device):
+				# if it's not the same, then mark the old one as inactive
+				devices = Device.objects.filter(token=user.device_token)
+				for device in devices: 
 					device.is_active = False
 					device.save()
 
 		user.device_token = deviceToken
-		# change when buildType==2 is needed (in app store)
-		if (buildType == 0):
-			apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
-		else:
-			apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
-		device = Device(token=deviceToken, is_active=True, service=apns)
-		device.save()
+		apnsDev = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_DEV_APNS_ID)
+		apnsProd = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_PROD_APNS_ID)
+		Device.objects.create(token=deviceToken, is_active=True, service=apnsDev)
+		Device.objects.create(token=deviceToken, is_active=True, service=apnsProd)
 		user.save()
 		response['success'] = True
 	else:
