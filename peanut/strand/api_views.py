@@ -271,6 +271,7 @@ def register_apns_token(request):
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
 		deviceToken = form.cleaned_data['device_token'].replace(' ', '').replace('<', '').replace('>', '')
+		buildType = form.cleaned_data['build_type']
 
 		try:
 			user = User.objects.get(id=userId)
@@ -290,7 +291,11 @@ def register_apns_token(request):
 					device.save()
 
 		user.device_token = deviceToken
-		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
+		# change when buildType==2 is needed (in app store)
+		if (buildType == 0):
+			apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
+		else:
+			apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
 		device = Device(token=deviceToken, is_active=True, service=apns)
 		device.save()
 		user.save()
@@ -301,9 +306,12 @@ def register_apns_token(request):
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+"""
+	Sends a notification to the device/build_type based on the user_id
+"""
 
 def send_notifications_test(request):
-
+	response = dict()
 	data = getRequestData(request)
 
 	if data.has_key('user_id'):
@@ -315,10 +323,20 @@ def send_notifications_test(request):
 	else:
 		return returnFailure(response, "Need user_id")
 
-	apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
+	if data.has_key('build_type'):
+		buildType = data['build_type']
+	else:
+		buildType = 0
+	
+	if (buildType == 0):
+		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
+	else:
+		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
 	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
-	notification = Notification.objects.create(message='First API Message!', service=apns)
+	notification = Notification.objects.create(message="A Message with badge!", service=apns)
 	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
 Helper functions
