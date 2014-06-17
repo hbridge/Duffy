@@ -231,6 +231,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
       NSMutableDictionary *metadata = [(NSDictionary *)info[UIImagePickerControllerMediaMetadata]
                                        mutableCopy];
       [self addLocationToMetadata:metadata];
+      [self addCachedLocationToMetadata:metadata];
       
       // Save the new image (original or edited) to the Camera Roll
       ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
@@ -247,35 +248,58 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   CLLocation *location = self.locationManager.location;
   
   
-  NSDate *cachedLocationDate = [[NSUserDefaults standardUserDefaults]
-                                objectForKey:DFStrandLastKnownLocationRecordedDefaultsKey];
   
   
-  if (location == nil && cachedLocationDate == nil) return;
+  
+  if (location == nil) return;
   
   CLLocationCoordinate2D coords = location.coordinate;
+  
+  DDLogInfo(@"Adding location to photo with latlong:[%.04f,%.04f] created %.01fs ago.",
+            coords.latitude,
+            coords.longitude,
+            [[NSDate date] timeIntervalSinceDate:location.timestamp]);
+  
+
+  NSDictionary *latlongDict = @{@"Latitude": @(fabs(coords.latitude)),
+                                @"LatitudeRef" : coords.latitude >= 0.0 ? @"N" : @"S",
+                                @"Longitude" : @(fabs(coords.longitude)),
+                                @"LongitudeRef" : coords.longitude >= 0.0 ? @"E" : @"W",
+                                @"Altitude" : @(location.altitude),
+                                };
+  
+  metadata[@"{GPS}"] = latlongDict;
+}
+
+- (void)addCachedLocationToMetadata:(NSMutableDictionary *)metadata
+{
+  NSDate *cachedLocationDate = [[NSUserDefaults standardUserDefaults]
+                                objectForKey:DFStrandLastKnownLocationRecordedDefaultsKey];
   NSNumber *lastLatitude = [[NSUserDefaults standardUserDefaults]
                             objectForKey:DFStrandLastKnownLatitudeDefaultsKey];
   NSNumber *lastLongitude = [[NSUserDefaults standardUserDefaults]
                              objectForKey:DFStrandLastKnownLongitudeDefaultsKey];
   CLLocationCoordinate2D cachedCoords = (CLLocationCoordinate2D){lastLatitude.doubleValue, lastLongitude.doubleValue};
   
-  NSDictionary *latlongDict = @{@"Latitude": @(fabs(coords.latitude)),
-                                @"LatitudeRef" : coords.latitude >= 0.0 ? @"N" : @"S",
-                                @"Longitude" : @(fabs(coords.longitude)),
-                                @"LongitudeRef" : coords.longitude >= 0.0 ? @"E" : @"W",
-                                @"Altitude" : @(location.altitude),
-                                @"DateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:location.timestamp],
-                                @"CachedLatitude": @(fabs(cachedCoords.latitude)),
-                                @"CachedLatitudeRef" : cachedCoords.latitude >= 0.0 ? @"N" : @"S",
-                                @"CachedLongitude" : @(fabs(cachedCoords.longitude)),
-                                @"CachedLongitudeRef" : cachedCoords.longitude >= 0.0 ? @"E" : @"W",
-                                @"CachedDateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:cachedLocationDate],
-                                };
+  DDLogInfo(@"Adding cached location to photo with latlong:[%.04f,%.04f] created %.01fs ago.",
+            cachedCoords.latitude,
+            cachedCoords.longitude,
+            [[NSDate date] timeIntervalSinceDate:cachedLocationDate]);
   
-  metadata[@"{GPS}"] = latlongDict;
+  
+  NSMutableDictionary *exifDict = [metadata[@"{Exif}"] mutableCopy];
+  
+  NSDictionary *cachedLatlongDict = @{@"CachedLatitude": @(fabs(cachedCoords.latitude)),
+                                      @"CachedLatitudeRef" : cachedCoords.latitude >= 0.0 ? @"N" : @"S",
+                                      @"CachedLongitude" : @(fabs(cachedCoords.longitude)),
+                                      @"CachedLongitudeRef" : cachedCoords.longitude >= 0.0 ? @"E" : @"W",
+                                      @"CachedDateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:cachedLocationDate],
+                                      @"GPSTagDateTimeRecored" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:self.locationManager.location.timestamp],
+                                      };
+  exifDict[@"UserComment"] = cachedLatlongDict.description;
+  metadata[@"{Exif}"] = exifDict;
 }
-       
+
 - (ALAssetsLibraryWriteImageCompletionBlock)writeImageCompletionBlock
 {
   return ^(NSURL *assetURL, NSError *error) {
