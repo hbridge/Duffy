@@ -112,20 +112,19 @@ LOGGING = {
     'handlers': {
         'djangofile': {
             'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/home/derek/logs/duffy-django.log',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': '/home/derek/logs/duffy-all.log',
             'formatter': 'verbose'
         },
         'djangoerror': {
             'level': 'ERROR',
-            'class': 'logging.FileHandler',
-            'filename': '/home/derek/logs/duffy-django-error.log',
+            'class':'logging.handlers.RotatingFileHandler',
+            'filename': '/home/derek/logs/duffy-error.log',
             'formatter': 'verbose'
         },
         'duffyfile': {
             'level': 'DEBUG',
             'class':'logging.handlers.RotatingFileHandler',
-            'class': 'logging.FileHandler',
             'filename': '/home/derek/logs/duffy-photos.log',
             'formatter': 'verbose'
         },
@@ -134,7 +133,7 @@ LOGGING = {
         'django': {
             'handlers':['djangofile', 'djangoerror'],
             'propagate': True,
-            'level':'INFO',
+            'level':'DEBUG',
         },
         'photos': {
             'handlers': ['duffyfile'],
