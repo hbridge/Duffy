@@ -264,7 +264,7 @@ def get_new_photos(request):
 	Receives device tokens for APNS notifications
 """
 def register_apns_token(request):
-	response = dict({'result': True})	
+	response = dict({'result': True})
 	form = RegisterAPNSTokenForm(request.GET)
 
 	if (form.is_valid()):
@@ -308,7 +308,7 @@ def register_apns_token(request):
 """
 
 def send_notifications_test(request):
-	response = dict()
+	response = dict({'result': True})
 	data = getRequestData(request)
 
 	if data.has_key('user_id'):
@@ -321,7 +321,7 @@ def send_notifications_test(request):
 		return returnFailure(response, "Need user_id")
 
 	if data.has_key('build_type'):
-		buildType = data['build_type']
+		buildType = int(data['build_type'])
 	else:
 		buildType = 0
 	
@@ -332,6 +332,10 @@ def send_notifications_test(request):
 	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
 	notification = Notification.objects.create(message="A Message with sound!", sound='default', service=apns)
 	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
+
+	response['apns'] = str(apns)
+	response['device_token'] = str(user.device_token)
+	response['notification'] = str(notification)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
