@@ -17,8 +17,10 @@ from common.models import Neighbor, NotificationLog
 
 import strand.notifications_util as notifications_util
 
+def cleanName(str):
+	return str.split(' ')[0].split("'")[0].split('’')[0]
 
-	
+
 def main(argv):
 	maxFilesAtTime = 100
 	logger = logging.getLogger(__name__)
@@ -56,13 +58,13 @@ def main(argv):
 			for neighbor in neighbors:
 				if (neighbor.user_1.id not in lastNotTime and 
 					neighbor.photo_1.time_taken < neighbor.photo_2.time_taken):
-						msg = neighbor.user_2.first_name + " added new photos!"
+						msg = cleanName(neighbor.user_2.first_name) + " added new photos!"
 						logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_1_id))						
 						notifications_util.sendNotification(neighbor.user_1, msg)
 						lastNotTime[neighbor.user_1_id] = datetime.datetime.utcnow()
 				if (neighbor.user_2.id not in lastNotTime and 
 					neighbor.photo_2.time_taken < neighbor.photo_1.time_taken):
-						msg = neighbor.user_1.first_name + " added new photos!"
+						msg = cleanName(neighbor.user_1.first_name) + " added new photos!"
 						notifications_util.sendNotification(neighbor.user_2, msg)
 						logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_2_id))
 						lastNotTime[neighbor.user_2_id] = datetime.datetime.utcnow()
