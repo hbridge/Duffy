@@ -15,7 +15,7 @@ from django.db.models import Q
 from haystack.query import SearchQuerySet
 
 from peanut import settings
-from common.models import Photo, User, Classification
+from common.models import Photo, User, Classification, NotificationLog
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -150,6 +150,8 @@ def userbaseSummary(request):
 			
 			entry['clusteredCount'] = dbQuery.exclude(clustered_time=None).count()
 			entry['clustered'] = entry['clusteredCount']*100/totalCount
+
+			entry['notifications'] = NotificationLog.objects.filter(user_id=user.id).count()
 
 			if photosWithGPS > 0:
 				entry['neighbor'] = dbQuery.exclude(neighbored_time=None).count()*100/photosWithGPS
