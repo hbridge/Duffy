@@ -18,8 +18,7 @@ from common.models import Neighbor, NotificationLog
 import strand.notifications_util as notifications_util
 
 def cleanName(str):
-	return str.split(' ')[0].split("'")[0].split('’')[0]
-
+	return str.split(' ')[0].split("'")[0].split('\xe2')[0]
 
 def main(argv):
 	maxFilesAtTime = 100
