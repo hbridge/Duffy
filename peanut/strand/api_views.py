@@ -4,8 +4,8 @@ import datetime
 import pytz
 
 from django.http import HttpResponse
-
 from django.db.models import Q
+from django.contrib.gis.geos import Point, fromstr
 
 from peanut import settings
 
@@ -14,7 +14,7 @@ from common.models import Photo, User, Neighbor
 from common import api_util, cluster_util
 
 from strand import geo_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, SendUserLocation
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -259,6 +259,39 @@ def get_new_photos(request):
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
 		return HttpResponse(json.dumps(response), content_type="application/json")
+
+"""
+	Registers a user's current location (and only stores the last location)
+"""
+def send_user_location(request):
+	response = dict({'result': True})
+	form = SendUserLocation(request.GET)
+
+	if (form.is_valid()):
+		userId = form.cleaned_data['user_id']
+		lon = form.cleaned_data['lon']
+		lat = form.cleaned_data['lat']
+		timestamp = form.cleaned_data['timestamp']
+
+		if (not timestamp):
+			timestamp = datetime.datetime.utcnow()
+
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			logger.error("Could not find user: %s " % (userId))
+			response['error'] = 'userId not found'
+			return HttpResponse(json.dumps(response), content_type="application/json")
+
+		user.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+		user.location_timestamp = timestamp
+		user.save()
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 """
 	Receives device tokens for APNS notifications

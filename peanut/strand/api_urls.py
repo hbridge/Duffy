@@ -17,6 +17,7 @@ urlpatterns = patterns('',
 	url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
 
 	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
+	url(r'^send_user_location', 'strand.api_views.send_user_location'),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
