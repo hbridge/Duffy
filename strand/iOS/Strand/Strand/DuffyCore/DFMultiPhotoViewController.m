@@ -64,7 +64,7 @@
     [self.navigationController setNavigationBarHidden:NO animated:YES];
   
   UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
-                                 initWithBarButtonSystemItem:UIBarButtonSystemItemAction
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemSave
                                  target:self
                                  action:@selector(actionButtonClicked:)];
   self.navigationItem.rightBarButtonItem = actionItem;
