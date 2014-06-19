@@ -16,6 +16,7 @@
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotoMetadataAdapter.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "UIImage+DFHelpers.h"
 
 @interface DFPhotoViewController ()
 
@@ -122,50 +123,48 @@
                                                        applicationActivities:nil];
     [self presentViewController:activityViewController animated:YES completion:nil];
   } else if (self.photoURL) {
-    NSString *photoIDString = [self.photoURL.lastPathComponent stringByDeletingPathExtension];
-    DFPhotoIDType photoID = [photoIDString longLongValue];
-    [self.photoAdapter getPhotoMetadata:photoID completionBlock:^(NSDictionary *metadata) {
-      DDLogVerbose(@"Photo metadata: %@", metadata[@"{Exif}"]);
-      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-      UIImage *image = self.photoView.image;
-      NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
-      [self addOrientationToMetadata:mutableMetadata forImage:image];
-      
-      [library writeImageToSavedPhotosAlbum:image.CGImage
-                                   metadata:mutableMetadata
-                            completionBlock:^(NSURL *assetURL, NSError *error) {
-                              if (error) {
-                                DDLogError(@"Failed to save photo: %@", error.description);
-                                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
-                                                                                    message:error.localizedDescription
-                                                                                   delegate:nil
-                                                                          cancelButtonTitle:@"OK"
-                                                                          otherButtonTitles:nil];
-                                [alertView show];
-                              } else {
-                                DDLogInfo(@"Photo saved with assetURL: %@", assetURL);
-                                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
-                                                                                    message:@"Photo saved to your camera roll"
-                                                                                   delegate:nil
-                                                                          cancelButtonTitle:@"OK"
-                                                                          otherButtonTitles:nil];
-                                [alertView show];
+    @autoreleasepool {
+      NSString *photoIDString = [self.photoURL.lastPathComponent stringByDeletingPathExtension];
+      DFPhotoIDType photoID = [photoIDString longLongValue];
+      [self.photoAdapter getPhotoMetadata:photoID completionBlock:^(NSDictionary *metadata) {
+        DDLogVerbose(@"Photo metadata: %@", metadata[@"{Exif}"]);
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        UIImage *image = self.photoView.image;
+        NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
+        [self addOrientationToMetadata:mutableMetadata forImage:image];
+        
+        [library writeImageToSavedPhotosAlbum:image.CGImage
+                                     metadata:mutableMetadata
+                              completionBlock:^(NSURL *assetURL, NSError *error) {
+                                if (error) {
+                                  DDLogError(@"Failed to save photo: %@", error.description);
+                                  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
+                                                                                      message:error.localizedDescription
+                                                                                     delegate:nil
+                                                                            cancelButtonTitle:@"OK"
+                                                                            otherButtonTitles:nil];
+                                  [alertView show];
+                                } else {
+                                  DDLogInfo(@"Photo saved with assetURL: %@", assetURL);
+                                  UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
+                                                                                      message:@"Photo saved to your camera roll"
+                                                                                     delegate:nil
+                                                                            cancelButtonTitle:@"OK"
+                                                                            otherButtonTitles:nil];
+                                  [alertView show];
+                                }
+                                
                               }
-                              
-                            }
-       ];
-    }];
+         ];
+      }];
+    }
   }
 }
 
-- (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image
-{
-  NSMutableDictionary *exif = [metadata[@"{Exif}"] mutableCopy];
-  if (image.imageOrientation == UIImageOrientationUp) {
-    exif[@"Orientation"] = @(1);
+  - (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image
+  {
+    metadata[@"Orientation"] = @([image CGImageOrientation]);
   }
-  metadata[@"{Exif}"] = exif;
-}
 
 - (IBAction)imageTapped:(id)sender {
   if (self.parentViewController && [self.parentViewController.class isSubclassOfClass:[DFMultiPhotoViewController class]]) {
