@@ -53,9 +53,6 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  if (![self.webView isLoading]) {
-    [self.webView reload];
-  }
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
