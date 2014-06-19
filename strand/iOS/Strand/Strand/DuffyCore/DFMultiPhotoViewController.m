@@ -192,7 +192,7 @@
 
 - (void)actionButtonClicked:(id)sender
 {
-  [self.currentPhotoViewController showShareActivity];
+  [self.currentPhotoViewController savePhotoToCameraRoll];
 }
 
 

@@ -24,5 +24,6 @@
 
 - (IBAction)imageTapped:(id)sender;
 - (void)showShareActivity;
+- (void)savePhotoToCameraRoll;
 
 @end
