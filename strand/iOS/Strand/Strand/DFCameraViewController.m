@@ -17,6 +17,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFStrandConstants.h"
 #import "DFLocationStore.h"
+#import "DFBackgroundRefreshController.h"
 
 @interface DFCameraViewController ()
 
@@ -83,11 +84,11 @@
 
 - (void)updateUnseenCount
 {
-  NSNumber *unseenCount = [[NSUserDefaults standardUserDefaults]
-                           objectForKey:DFStrandUnseenCountDefaultsKey];
-  if (unseenCount.intValue > 0) {
+  int unseenCount =  [[DFBackgroundRefreshController sharedBackgroundController] numUnseenPhotos];
+  if (unseenCount > 0) {
     self.customCameraOverlayView.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-    self.customCameraOverlayView.galleryButton.titleLabel.text = [unseenCount stringValue];
+    self.customCameraOverlayView.galleryButton.titleLabel.text =
+    [NSString stringWithFormat:@"%d", unseenCount];
   } else {
     self.customCameraOverlayView.galleryButton.titleLabel.text = @"";
   }
@@ -96,6 +97,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  [self updateUnseenCount];
   [self startLocationUpdates];
 }
 

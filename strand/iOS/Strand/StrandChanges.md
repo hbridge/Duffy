@@ -1,5 +1,11 @@
 # Strand
 
+## Jun 19th, 2014
+
+## New
+
+- Save Strand photos your friends took to your Camera Roll
+
 ## Jun 17th, 2014
 
 ### Bugs fixed

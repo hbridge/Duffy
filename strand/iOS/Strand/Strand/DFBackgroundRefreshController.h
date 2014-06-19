@@ -19,4 +19,6 @@
 - (void)updateJoinableStrands;
 - (void)updateNewPhotos;
 
+- (int)numUnseenPhotos;
+
 @end

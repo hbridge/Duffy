@@ -15,6 +15,7 @@
 #import "DFStatusBarNotificationManager.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFLocationStore.h"
+#import "DFStrandStore.h"
 
 
 @interface DFBackgroundRefreshController()
@@ -141,7 +142,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     
     if (response.objects.count < 1) return;
     
-    NSString *notificationString = [NSString stringWithFormat:@"Take a picture to join a %d Strands nearby.", (int)
+    NSString *notificationString = [NSString stringWithFormat:@"Take a picture to join %d Strands nearby.", (int)
                                     joinableStrandsCount];
     
     if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
@@ -203,30 +204,8 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     
     DDLogInfo(@"%d new photos in joined strands.", count);
     if (count < 1) return;
-    NSNumber *totalUnseenCount = [[NSUserDefaults standardUserDefaults]
-                                  objectForKey:DFStrandUnseenCountDefaultsKey];
-    totalUnseenCount = @(totalUnseenCount.intValue + count);
-    [[NSUserDefaults standardUserDefaults] setObject:totalUnseenCount
-                                              forKey:DFStrandUnseenCountDefaultsKey];
-    
-    NSString *notificationString = [NSString stringWithFormat:@"%d new photos in your Strands",
-                                    totalUnseenCount.intValue];
-    
-    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-      [[DFStatusBarNotificationManager sharedInstance] showNotificationWithString:notificationString timeout:2];
-    } else {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] cancelAllLocalNotifications];
-        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-        NSDate *now = [NSDate date];
-        localNotification.fireDate = now;
-        localNotification.alertBody = notificationString;
-        localNotification.applicationIconBadgeNumber = count;
-        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-      });
-    }
-
-    
+    int totalUnseenCount = [DFStrandStore UnseenPhotosCount] + count;
+    [DFStrandStore SaveUnseenPhotosCount:totalUnseenCount];
     
     [[NSUserDefaults standardUserDefaults]
      setObject:[[NSDateFormatter DjangoDateFormatter] stringFromDate:[NSDate date]]
@@ -260,5 +239,9 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   return _newPhotosAdapter;
 }
 
+- (int)numUnseenPhotos
+{
+  return [DFStrandStore UnseenPhotosCount];
+}
 
 @end
