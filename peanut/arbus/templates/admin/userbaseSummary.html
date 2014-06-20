@@ -43,6 +43,9 @@
 	.red {
 		color: red;
 	}
+	.recent {
+		color: green;
+	}
 	#stats{
 		text-align: left;
 	}
@@ -152,6 +155,13 @@ $(document).ready(function() {
   $("td.percent").each(function(){
   	if ($.trim($(this).text()) != '100') {
   		$(this).addClass("red");
+  	}
+  });
+  $('td.timeago').each(function(){
+  	if ($(this).html().search('minute') > -1 || 
+  		$(this).html().search('hour') > -1 ||
+  		$(this).html().search('now') > -1){
+  		$(this).addClass('recent');
   	}
   });
 });
