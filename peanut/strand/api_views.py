@@ -312,23 +312,22 @@ def register_apns_token(request):
 			logger.error("Could not find user: %s " % (userId))
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
-		# check if a device_token already exists for this user
-		if (user.device_token):
-			# if it's the same as the current one, return success
-			if (user.device_token == deviceToken):
-				response['success'] = True
-				return HttpResponse(json.dumps(response), content_type="application/json")
-			else:
-				# if it's not the same, then mark the old one as inactive
-				devices = Device.objects.filter(token=user.device_token)
-				for device in devices: 
-					device.delete()
-
+		# TODO (Aseem): Make this more efficient. Assume nothing!
 		user.device_token = deviceToken
 		apnsDev = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_DEV_APNS_ID)
 		apnsProd = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_PROD_APNS_ID)
-		Device.objects.create(token=deviceToken, is_active=True, service=apnsDev)
-		Device.objects.create(token=deviceToken, is_active=True, service=apnsProd)
+		devices = Device.objects.filter(token=deviceToken)
+
+		if (len(devices) == 0):
+			Device.objects.create(token=deviceToken, is_active=True, service=apnsDev)
+			Device.objects.create(token=deviceToken, is_active=True, service=apnsProd)
+		else:
+			for device in devices:
+				if (not(device.token == deviceToken)):
+					device.token = deviceToken
+				if (not device.is_active):
+					device.is_active = True
+				device.save()
 		user.save()
 		response['success'] = True
 	else:
@@ -364,6 +363,7 @@ def send_notifications_test(request):
 	else:
 		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
 	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
+	print str(devices)
 	notification = Notification.objects.create(message="A Message with sound!", sound='default', service=apns)
 	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
 
