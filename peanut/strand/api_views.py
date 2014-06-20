@@ -14,7 +14,7 @@ from common.models import Photo, User, Neighbor
 from common import api_util, cluster_util
 
 from strand import geo_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, SendUserLocation
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -263,9 +263,9 @@ def get_new_photos(request):
 """
 	Registers a user's current location (and only stores the last location)
 """
-def send_user_location(request):
+def update_user_location(request):
 	response = dict({'result': True})
-	form = SendUserLocation(request.GET)
+	form = UpdateUserLocationForm(request.GET)
 
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
@@ -283,9 +283,10 @@ def send_user_location(request):
 			response['error'] = 'userId not found'
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
-		user.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-		user.location_timestamp = timestamp
+		user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
+		user.last_location_timestamp = timestamp
 		user.save()
+		response['success'] = True
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)

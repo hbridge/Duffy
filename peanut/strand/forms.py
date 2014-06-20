@@ -17,7 +17,7 @@ class RegisterAPNSTokenForm(forms.Form):
 	# build_type: 0 is devel, 1 is adhoc, 2 is app store
 	build_type = forms.IntegerField(required=False, min_value=0, max_value=2)
 
-class SendUserLocation(forms.Form):
+class UpdateUserLocationForm(forms.Form):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 	lat = forms.FloatField(min_value=-90, max_value=90)
 	lon = forms.FloatField(min_value=-180, max_value=180)

@@ -18,8 +18,8 @@ class User(models.Model):
 	phone_id = models.CharField(max_length=100)
 	product_id = models.IntegerField(default=0)
 	device_token = models.TextField()
-	location_point = models.PointField(null=True)
-	location_timestamp = models.DateTimeField(null=True)
+	last_location_point = models.PointField(null=True)
+	last_location_timestamp = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
