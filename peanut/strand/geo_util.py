@@ -25,7 +25,6 @@ def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPh
 	nearbyPhotos = list()
 
 	for photo in photosCache:
-		print baseTime
 		timeDistance = baseTime - photo.time_taken
 
 		if ((filterPhotoId and filterPhotoId == photo.id) or 
@@ -33,8 +32,7 @@ def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPh
 			continue
 
 		# If this photo is within the timerange and isn't a photo belonging to the filtered user and 
-		if ( int(math.fabs(timeDistance.total_seconds())) < secondsWithin ):
-
+		if (int(math.fabs(timeDistance.total_seconds())) < secondsWithin):
 			geoDistance = int(haversine(lon, lat, photo.location_point.x, photo.location_point.y) * 1000)
 			if geoDistance < 100:
 				nearbyPhotos.append((photo, timeDistance, geoDistance))

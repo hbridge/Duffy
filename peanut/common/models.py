@@ -27,6 +27,8 @@ class User(models.Model):
 		db_table = 'photos_user'
 		unique_together = ("phone_id", "product_id")
 
+	# You MUST use GeoManager to make Geo Queries
+	objects = models.GeoManager()
 
 	"""
 		Returns back the full localfile path where the user's photos are located
