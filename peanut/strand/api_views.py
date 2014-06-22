@@ -357,6 +357,11 @@ def send_notifications_test(request):
 		buildType = int(data['build_type'])
 	else:
 		buildType = 0
+
+	if data.has_key('msg'):
+		msg = str(data['msg']) + ' ' + str(datetime.datetime.utcnow())
+	else:
+		msg = 'Strand test msg at ' + str(datetime.datetime.utcnow())
 	
 	if (buildType == 0):
 		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
@@ -364,7 +369,7 @@ def send_notifications_test(request):
 		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
 	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
 	print str(devices)
-	notification = Notification.objects.create(message="A Message with sound!", sound='default', service=apns)
+	notification = Notification.objects.create(message=msg, sound='default', service=apns)
 	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
 
 	response['apns'] = str(apns)
