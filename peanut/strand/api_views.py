@@ -2,6 +2,7 @@ import time
 import json
 import datetime
 import pytz
+import logging
 
 from django.http import HttpResponse
 from django.db.models import Q
@@ -17,6 +18,8 @@ from strand import geo_util
 from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm
 
 from ios_notifications.models import APNService, Device, Notification
+
+logger = logging.getLogger(__name__)
 
 def getGroupForPhoto(photo, clusters):
 	for cluster in clusters:
@@ -274,7 +277,7 @@ def update_user_location(request):
 		timestamp = form.cleaned_data['timestamp']
 
 		if (not timestamp):
-			timestamp = datetime.datetime.utcnow()
+			timestamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
 		try:
 			user = User.objects.get(id=userId)
@@ -283,9 +286,13 @@ def update_user_location(request):
 			response['error'] = 'userId not found'
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
-		user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
-		user.last_location_timestamp = timestamp
-		user.save()
+		if (timestamp > user.last_location_timestamp and ((not lon == 0) or (not lat == 0) )):
+			user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
+			user.last_location_timestamp = timestamp
+			user.save()
+		else:
+			logger.info("Location not updated: %s " % (userId))
+
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
