@@ -6,6 +6,10 @@
 
 - Better "Joinable Strands nearby" notifications
 
+# Bugs fixed
+
+- Fixed the badge count when you have new photos in your gallery.
+
 ## Jun 19th, 2014
 
 ## New
