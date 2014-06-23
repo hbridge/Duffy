@@ -11,6 +11,9 @@
 
 @interface DFBackgroundRefreshController : NSObject <CLLocationManagerDelegate>
 
+
+@property (nonatomic, retain) NSDate *lastUnseenPhotosFetchDate;
+
 + (DFBackgroundRefreshController *)sharedBackgroundController;
 - (void)startBackgroundRefresh;
 

@@ -20,14 +20,14 @@
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c4Q-fB-mQc" userLabel="Gallery Button">
-                    <rect key="frame" x="20" y="515" width="23" height="23"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="c4Q-fB-mQc" userLabel="Gallery Button">
+                    <rect key="frame" x="10" y="505" width="50" height="50"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="23" id="2dW-bl-1yn"/>
-                        <constraint firstAttribute="width" constant="23" id="6gB-jg-Ehg"/>
+                        <constraint firstAttribute="height" constant="50" id="2dW-bl-1yn"/>
+                        <constraint firstAttribute="width" constant="50" id="6gB-jg-Ehg"/>
                     </constraints>
-                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="17"/>
+                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="16"/>
                     <state key="normal" backgroundImage="Assets/Icons/GalleryButton.png">
                         <color key="titleColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
                     </state>
@@ -52,13 +52,13 @@
                     </state>
                 </button>
             </subviews>
-            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="12I-m1-2LR"/>
+                <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="12I-m1-2LR"/>
                 <constraint firstItem="mF1-Q6-VZs" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="83g-dU-jJ8"/>
                 <constraint firstAttribute="trailing" secondItem="mF1-Q6-VZs" secondAttribute="trailing" id="8lJ-hI-he6"/>
                 <constraint firstAttribute="centerX" secondItem="FDr-hg-nDc" secondAttribute="centerX" id="Dq7-Ts-nDS"/>
-                <constraint firstAttribute="bottom" secondItem="c4Q-fB-mQc" secondAttribute="bottom" constant="30" id="Faf-xr-73O"/>
+                <constraint firstAttribute="bottom" secondItem="c4Q-fB-mQc" secondAttribute="bottom" constant="13" id="Faf-xr-73O"/>
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="5" id="Maa-Zp-mSY"/>
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="NfH-IQ-XeU"/>
                 <constraint firstAttribute="bottom" secondItem="FDr-hg-nDc" secondAttribute="bottom" constant="30" id="Qn3-xw-Pdn"/>

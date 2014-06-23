@@ -163,11 +163,8 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   }
   DDLogInfo(@"Updating new photo counts.");
   
-  NSString *lastFetchDateString = [[NSUserDefaults standardUserDefaults]
-                                   objectForKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
-  if (!lastFetchDateString) lastFetchDateString = [[NSDateFormatter DjangoDateFormatter]
-                                                   stringFromDate:[NSDate dateWithTimeIntervalSinceNow:-60*60*3]];
-  
+  NSString *lastFetchDateString = [[NSDateFormatter DjangoDateFormatter]
+                                   stringFromDate:self.lastUnseenPhotosFetchDate];
   [self.newPhotosAdapter fetchNewPhotosAfterDate:lastFetchDateString
                                  completionBlock:^(DFPeanutSearchResponse *response)
   {
@@ -178,7 +175,6 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     }
     
     unsigned int count = 0;
-    
     for (DFPeanutSearchObject *searchObject in response.objects) {
       if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
         for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
@@ -190,20 +186,32 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     }
     
     DDLogInfo(@"%d new photos in joined strands.", count);
-    if (count < 1) return;
     int totalUnseenCount = [DFStrandStore UnseenPhotosCount] + count;
     [DFStrandStore SaveUnseenPhotosCount:totalUnseenCount];
     
-    [[NSUserDefaults standardUserDefaults]
-     setObject:[[NSDateFormatter DjangoDateFormatter] stringFromDate:[NSDate date]]
-     forKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
-    [[NSUserDefaults standardUserDefaults] synchronize];
+    self.lastUnseenPhotosFetchDate = [NSDate date];
     [[NSNotificationCenter defaultCenter]
      postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
      object:self
-     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(count)}];
-
+     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(totalUnseenCount)}];
   }];
+}
+
+#pragma mark - Unseen photos fetch date
+
+- (NSDate *)lastUnseenPhotosFetchDate
+{
+  NSDate *lastFetchDate = [[NSUserDefaults standardUserDefaults]
+                           objectForKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
+  if (!lastFetchDate) lastFetchDate = [NSDate dateWithTimeIntervalSinceNow:-60*60*3];
+  return lastFetchDate;
+}
+
+- (void)setLastUnseenPhotosFetchDate:(NSDate *)lastUnseenPhotosFetchDate
+{
+  [[NSUserDefaults standardUserDefaults]
+   setObject:lastUnseenPhotosFetchDate
+   forKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
 }
 
 #pragma mark Networking
@@ -237,6 +245,10 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 
 - (int)numUnseenPhotos
 {
+  if ([[NSDate date] timeIntervalSinceDate:self.lastUnseenPhotosFetchDate] > 1.0) {
+    [self updateNewPhotos];
+  }
+  
   return [DFStrandStore UnseenPhotosCount];
 }
 

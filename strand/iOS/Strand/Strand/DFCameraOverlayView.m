@@ -25,6 +25,7 @@ NSString *const FlashAutoTitle = @"Auto";
 {
   self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   [self configureHelpTextLabel];
+  self.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
 }
 
 - (void)configureHelpTextLabel

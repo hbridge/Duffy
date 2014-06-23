@@ -91,12 +91,15 @@ static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown
 - (void)updateUnseenCount
 {
   int unseenCount =  [[DFBackgroundRefreshController sharedBackgroundController] numUnseenPhotos];
-  if (unseenCount > 0) {
-    self.customCameraOverlayView.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-    self.customCameraOverlayView.galleryButton.titleLabel.text =
-    [NSString stringWithFormat:@"%d", unseenCount];
-  } else {
-    self.customCameraOverlayView.galleryButton.titleLabel.text = @"";
+  NSString *unseenCountString = [NSString stringWithFormat:@"%d", unseenCount];
+  if (![self.customCameraOverlayView.galleryButton.titleLabel.text isEqualToString:unseenCountString]) {
+    if (unseenCount > 0) {
+      self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
+      [self.customCameraOverlayView.galleryButton setTitle:unseenCountString forState:UIControlStateNormal];
+    } else {
+      self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor grayColor];
+      [self.customCameraOverlayView.galleryButton setTitle:@"" forState:UIControlStateNormal];
+    }
   }
 }
 
@@ -286,7 +289,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   if (location == nil && cachedLocation == nil) return;
 
   CLLocation *locationToUse;
-  if ([location.timestamp timeIntervalSinceDate:cachedLocation.timestamp] >= 0.0 && location) {
+  if (!cachedLocation || [location.timestamp timeIntervalSinceDate:cachedLocation.timestamp] >= 0.0) {
     // if our location manager has updated since the cached location has, use the newer val
     DDLogInfo(@"DFCameraViewController using uncached location data");
     locationToUse = location;
@@ -311,6 +314,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)addCachedLocationToMetadata:(NSMutableDictionary *)metadata
 {
   CLLocation *lastCachedLocation = [DFLocationStore LoadLastLocation];
+  if (!lastCachedLocation) return;
+  
   CLLocationCoordinate2D cachedCoords = lastCachedLocation.coordinate;
   
   NSMutableDictionary *exifDict = [metadata[@"{Exif}"] mutableCopy];
