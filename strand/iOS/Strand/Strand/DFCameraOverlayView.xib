@@ -52,7 +52,7 @@
                     </state>
                 </button>
             </subviews>
-            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="12I-m1-2LR"/>
                 <constraint firstItem="mF1-Q6-VZs" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="83g-dU-jJ8"/>
