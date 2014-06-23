@@ -286,7 +286,6 @@ def update_user_location(request):
 		user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
 		user.last_location_timestamp = timestamp
 		user.save()
-		response['success'] = True
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
@@ -329,7 +328,6 @@ def register_apns_token(request):
 					device.is_active = True
 				device.save()
 		user.save()
-		response['success'] = True
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
