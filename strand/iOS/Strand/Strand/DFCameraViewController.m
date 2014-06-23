@@ -357,7 +357,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogInfo(@"DFCameraViewContrller updated location: [%f, %f]",
             location.coordinate.latitude,
             location.coordinate.longitude);
-  
   [self.locationAdapter updateLocation:location
                          withTimestamp:location.timestamp
                        completionBlock:^(BOOL success) {

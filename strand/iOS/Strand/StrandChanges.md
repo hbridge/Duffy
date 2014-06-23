@@ -1,5 +1,11 @@
 # Strand
 
+## Jun 23rd, 2014
+
+## New
+
+- Better "Joinable Strands nearby" notifications
+
 ## Jun 19th, 2014
 
 ## New
