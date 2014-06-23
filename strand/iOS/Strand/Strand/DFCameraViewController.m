@@ -18,16 +18,19 @@
 #import "DFStrandConstants.h"
 #import "DFLocationStore.h"
 #import "DFBackgroundRefreshController.h"
+#import "DFPeanutLocationAdapter.h"
 
 @interface DFCameraViewController ()
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
 
 @end
 
 @implementation DFCameraViewController
 
 @synthesize customCameraOverlayView = _customCameraOverlayView;
+@synthesize locationAdapter = _locationAdapter;
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -354,6 +357,20 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogInfo(@"DFCameraViewContrller updated location: [%f, %f]",
             location.coordinate.latitude,
             location.coordinate.longitude);
+  
+  [self.locationAdapter updateLocation:location
+                         withTimestamp:location.timestamp
+                       completionBlock:^(BOOL success) {
+                       }];
+}
+
+- (DFPeanutLocationAdapter *)locationAdapter
+{
+  if (!_locationAdapter) {
+    _locationAdapter = [[DFPeanutLocationAdapter alloc] init];
+  }
+  
+  return _locationAdapter;
 }
 
 

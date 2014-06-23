@@ -16,6 +16,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFLocationStore.h"
 #import "DFStrandStore.h"
+#import "DFPeanutLocationAdapter.h"
 
 
 @interface DFBackgroundRefreshController()
@@ -23,6 +24,7 @@
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
 @property (readonly, nonatomic, retain) DFPeanutJoinableStrandsAdapter *joinableStrandsAdapter;
 @property (readonly, nonatomic, retain) DFPeanutNewPhotosAdapter *newPhotosAdapter;
+@property (readonly, nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
 
 @property (atomic) BOOL isNewPhotoCountFetchInProgress;
 @property (atomic) BOOL isJoinableStrandsFetchInProgress;
@@ -34,6 +36,7 @@
 @synthesize locationManager = _locationManager;
 @synthesize joinableStrandsAdapter = _joinableStrandsAdapter;
 @synthesize newPhotosAdapter = _newPhotosAdapter;
+@synthesize locationAdapter = _locationAdapter;
 
 // We want the upload controller to be a singleton
 static DFBackgroundRefreshController *defaultBackgroundController;
@@ -65,7 +68,6 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   if ([CLLocationManager locationServicesEnabled]) {
     DDLogInfo(@"Starting to monitor for significant location change.");
     [self.locationManager startMonitoringSignificantLocationChanges];
-    [self recordManagerLocation];
   } else {
     DDLogWarn(@"DFBackgroundRefreshController location services not enabled.");
   }
@@ -78,7 +80,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 {
   CLLocation *location = self.locationManager.location;
   [DFLocationStore StoreLastLocation:location];
-  DDLogInfo(@"DFBAckgroundRefreshController recorded new location: [%.04f,%.04f]",
+  DDLogInfo(@"DFBackgroundRefreshController recorded new location: [%.04f,%.04f]",
             location.coordinate.latitude,
             location.coordinate.longitude);
 }
@@ -87,6 +89,10 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 {
   DDLogInfo(@"DFBackgroundRefreshController updated location");
   [self recordManagerLocation];
+  [self.locationAdapter updateLocation:manager.location
+                         withTimestamp:manager.location.timestamp
+                       completionBlock:^(BOOL success) {
+                       }];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
@@ -237,6 +243,15 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   }
   
   return _newPhotosAdapter;
+}
+
+- (DFPeanutLocationAdapter *)locationAdapter
+{
+  if (!_locationAdapter) {
+    _locationAdapter = [[DFPeanutLocationAdapter alloc] init];
+  }
+  
+  return _locationAdapter;
 }
 
 - (int)numUnseenPhotos
