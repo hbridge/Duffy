@@ -7,6 +7,13 @@
 //
 
 #import "DFCameraOverlayView.h"
+#import "MMPopLabel.h"
+
+@interface DFCameraOverlayView()
+
+@property (nonatomic, retain) MMPopLabel *label;
+
+@end
 
 @implementation DFCameraOverlayView
 
@@ -17,6 +24,34 @@ NSString *const FlashAutoTitle = @"Auto";
 - (void)awakeFromNib
 {
   self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  [self configureHelpTextLabel];
+}
+
+- (void)configureHelpTextLabel
+{
+  // set appearance style
+  [[MMPopLabel appearance] setLabelColor:[UIColor orangeColor]];
+  [[MMPopLabel appearance] setLabelTextColor:[UIColor whiteColor]];
+  [[MMPopLabel appearance] setLabelTextHighlightColor:[UIColor redColor]];
+  [[MMPopLabel appearance] setLabelFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14.0f]];
+  [[MMPopLabel appearance] setButtonFont:[UIFont fontWithName:@"HelveticaNeue" size:14.0f]];
+  
+  // _label is a view controller property
+  _label = [MMPopLabel popLabelWithText:
+            @"Take a picture to share it with nearby friends."];
+  
+  // add it to your view
+  [self addSubview:_label];
+}
+
+- (void)showHelpText
+{
+  [_label popAtView:self.takePhotoButton];
+}
+
+- (void)hideHelpText
+{
+  [_label dismiss];
 }
 
 - (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode
@@ -34,7 +69,11 @@ NSString *const FlashAutoTitle = @"Auto";
                       forState:UIControlStateNormal];
     [self.flashButton setTitle:@"Auto" forState:UIControlStateNormal];
   }
+}
 
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
 }
 
 @end

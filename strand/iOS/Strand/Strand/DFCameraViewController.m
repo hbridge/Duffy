@@ -20,6 +20,9 @@
 #import "DFBackgroundRefreshController.h"
 #import "DFPeanutLocationAdapter.h"
 
+
+static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
+
 @interface DFCameraViewController ()
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
@@ -102,7 +105,9 @@
   [super viewDidAppear:animated];
   [self updateUnseenCount];
   [self startLocationUpdates];
+  [self showHelpTextIfNeeded];
 }
+
 
 - (void)viewDidDisappear:(BOOL)animated
 {
@@ -137,7 +142,7 @@
   // Dispose of any resources that can be recreated.
 }
 
-
+#pragma mark - Overlay setup
 
 - (DFCameraOverlayView *)customCameraOverlayView
 {
@@ -163,10 +168,30 @@
   return _customCameraOverlayView;
 }
 
+- (void)showHelpTextIfNeeded
+{
+  BOOL wasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraHelpWasShown];
+  if (wasShown) return;
+  
+  NSTimer *timer = [NSTimer timerWithTimeInterval:2.0
+                                           target:self.customCameraOverlayView
+                                         selector:@selector(showHelpText)
+                                         userInfo:nil
+                                          repeats:NO];
+  [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+}
+
+#pragma mark - User actions
+
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
   [self takePicture];
   [self flashCameraView];
+  BOOL helpWasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraHelpWasShown];
+  if (!helpWasShown) {
+    [self.customCameraOverlayView hideHelpText];
+    [[NSUserDefaults standardUserDefaults] setBool:YES forKey:DFStrandCameraHelpWasShown];
+  };
 }
 
 - (void)galleryButtonPressed:(UIButton *)sender

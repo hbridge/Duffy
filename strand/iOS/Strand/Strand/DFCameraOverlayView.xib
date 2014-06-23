@@ -10,41 +10,28 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="80R-J1-Wxm" userLabel="Background">
-                    <rect key="frame" x="0.0" y="426" width="320" height="142"/>
-                    <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FDr-hg-nDc" userLabel="Shutter Button">
-                            <rect key="frame" x="119" y="30" width="82" height="82"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="82" id="SLW-bJ-fte"/>
-                                <constraint firstAttribute="height" constant="82" id="jSc-iH-Mco"/>
-                            </constraints>
-                            <state key="normal" image="Assets/Icons/ShutterButton.png">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                        </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c4Q-fB-mQc" userLabel="Gallery Button">
-                            <rect key="frame" x="25" y="94" width="23" height="23"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="23" id="2dW-bl-1yn"/>
-                                <constraint firstAttribute="width" constant="23" id="6gB-jg-Ehg"/>
-                            </constraints>
-                            <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="17"/>
-                            <state key="normal" backgroundImage="Assets/Icons/GalleryButton.png">
-                                <color key="titleColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
-                            </state>
-                        </button>
-                    </subviews>
-                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="FDr-hg-nDc" userLabel="Shutter Button">
+                    <rect key="frame" x="119" y="456" width="82" height="82"/>
                     <constraints>
-                        <constraint firstAttribute="centerX" secondItem="FDr-hg-nDc" secondAttribute="centerX" id="D7i-fS-tad"/>
-                        <constraint firstAttribute="centerY" secondItem="c4Q-fB-mQc" secondAttribute="centerY" constant="-34.5" id="S6N-cx-cVO"/>
-                        <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="80R-J1-Wxm" secondAttribute="leading" constant="25" id="VDU-fh-b7v"/>
-                        <constraint firstAttribute="centerY" secondItem="FDr-hg-nDc" secondAttribute="centerY" id="W6C-Qu-eLW"/>
-                        <constraint firstAttribute="height" constant="142" id="uDN-GU-l0T"/>
+                        <constraint firstAttribute="width" constant="82" id="SLW-bJ-fte"/>
+                        <constraint firstAttribute="height" constant="82" id="jSc-iH-Mco"/>
                     </constraints>
-                </view>
+                    <state key="normal" image="Assets/Icons/ShutterButton.png">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="c4Q-fB-mQc" userLabel="Gallery Button">
+                    <rect key="frame" x="20" y="515" width="23" height="23"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="23" id="2dW-bl-1yn"/>
+                        <constraint firstAttribute="width" constant="23" id="6gB-jg-Ehg"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="17"/>
+                    <state key="normal" backgroundImage="Assets/Icons/GalleryButton.png">
+                        <color key="titleColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
+                    </state>
+                </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="oNo-vb-nP7" userLabel="Flash - Button">
                     <rect key="frame" x="0.0" y="5" width="50" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
@@ -67,13 +54,14 @@
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="80R-J1-Wxm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="25K-LW-h4d"/>
+                <constraint firstItem="c4Q-fB-mQc" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="12I-m1-2LR"/>
                 <constraint firstItem="mF1-Q6-VZs" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="83g-dU-jJ8"/>
-                <constraint firstAttribute="trailing" secondItem="80R-J1-Wxm" secondAttribute="trailing" id="86N-KE-QkX"/>
                 <constraint firstAttribute="trailing" secondItem="mF1-Q6-VZs" secondAttribute="trailing" id="8lJ-hI-he6"/>
-                <constraint firstAttribute="bottom" secondItem="80R-J1-Wxm" secondAttribute="bottom" id="8ww-zf-zZW"/>
+                <constraint firstAttribute="centerX" secondItem="FDr-hg-nDc" secondAttribute="centerX" id="Dq7-Ts-nDS"/>
+                <constraint firstAttribute="bottom" secondItem="c4Q-fB-mQc" secondAttribute="bottom" constant="30" id="Faf-xr-73O"/>
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="5" id="Maa-Zp-mSY"/>
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="NfH-IQ-XeU"/>
+                <constraint firstAttribute="bottom" secondItem="FDr-hg-nDc" secondAttribute="bottom" constant="30" id="Qn3-xw-Pdn"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>
