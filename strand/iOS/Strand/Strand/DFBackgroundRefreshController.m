@@ -146,25 +146,6 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     unsigned int joinableStrandsCount = (unsigned int)response.objects.count;
     DDLogInfo(@"%d joinable strands nearby.", joinableStrandsCount);
     
-    if (response.objects.count < 1) return;
-    
-    NSString *notificationString = [NSString stringWithFormat:@"Take a picture to join %d Strands nearby.", (int)
-                                    joinableStrandsCount];
-    
-    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-      [[DFStatusBarNotificationManager sharedInstance] showNotificationWithString:notificationString timeout:2];
-    } else {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [[UIApplication sharedApplication] cancelAllLocalNotifications];
-        UILocalNotification *localNotification = [[UILocalNotification alloc] init];
-        NSDate *now = [NSDate date];
-        localNotification.fireDate = now;
-        localNotification.alertBody = notificationString;
-        localNotification.applicationIconBadgeNumber = 0;
-        [[UIApplication sharedApplication] scheduleLocalNotification:localNotification];
-      });
-    }
-    
     [[NSNotificationCenter defaultCenter]
      postNotificationName:DFStrandJoinableStrandsNearbyNotificationName
      object:self
