@@ -67,32 +67,52 @@ def sendNewPhotosNotification(neighbors, notificationLogs):
 					lastNotificationTimes[neighbor.user_2_id] = datetime.datetime.utcnow()
 
 """
+	See if the given user has a photo neighbored with the given photo
+"""
+def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
+	if (user.id == photo.user_id):
+		return False
+
+	for neighbor in neighbors:
+		if (photo.id == neighbor.photo_1_id and user.id == neighbor.user_2_id):
+			return True
+		elif (photo.id == neighbor.photo_2_id and user.id == neighbor.user_1_id):
+			return True	
+
+"""
 	Look through all recent photos from last 30 minutes and see if any users have a 
 	  last_location_point near there...and haven't been notified recently
 
+
+	Check the photo we want to use to say if someone is nearby but we havent'
+	neighbored with them yet (basically, they shouldn't know I'm there)
 """
-def sendJoinStrandNotification(photos, users, notificationLogs):
-	msgType = settings.IOS_NOTIFICATIONS_PROD_APNS_ID
+def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
+	msgType = settings.NOTIFICATIONS_JOIN_STRAND_ID
 
 	lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
 
 	nonNotifiedUsers = filter(lambda x: x.id not in lastNotificationTimes, users)
-
-	print "using users"
-	print nonNotifiedUsers
-	
-	print "user photos"
-	print photos
 	
 	for user in nonNotifiedUsers:
-		nearbyPhotos = geo_util.getNearbyPhotos(datetime.datetime.utcnow().replace(tzinfo=pytz.utc), user.last_location_point.x, user.last_location_point.y, photos, filterUserId=user.id)
-		if len(nearbyPhotos) > 0:
-			(photo, timeDistance, geoDistance) = nearbyPhotos[0]
-			name = cleanName(photo.user.first_name)
-			msg = name + " took a photo near you!"
+		nearbyPhotosData = geo_util.getNearbyPhotos(datetime.datetime.utcnow().replace(tzinfo=pytz.utc), user.last_location_point.x, user.last_location_point.y, photos, filterUserId=user.id)
+		names = list()
 
-			print "Sending %s to %s" % (msg, user.first_name)
+		for nearbyPhotoData in nearbyPhotosData:
+			(photo, timeDistance, geoDistance) = nearbyPhotoData
+
+			# If we found a photo that has been neighbored and it isn't neighbored with
+			#   the current user, then lets tell them to join up!
+			# Otherwise, we want to skip it since we want to sent the new photo notification
+			if photo.neighbored_time and not hasNeighboredPhotoWithPhoto(user, photo, neighbors):
+				names.append(cleanName(photo.user.first_name))
+
+		if len(names) > 0:
+			msg = " ".join(names) + " took a photo near you!"
+
+			logger.debug("Sending %s to %s" % (msg, user.first_name))
 			notifications_util.sendNotification(user, msg, msgType)
+				
 
 
 def main(argv):
@@ -103,15 +123,17 @@ def main(argv):
 		newPhotosStartTime = datetime.datetime.utcnow()-datetime.timedelta(seconds=30)
 		neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTime) | Q(photo_2__time_taken__gt=newPhotosStartTime)).order_by('photo_1')
 		
+		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
 		notificationLogs = NotificationLog.objects.select_related().filter(added__gt=datetime.datetime.utcnow()-datetime.timedelta(minutes=60))
 		
 		sendNewPhotosNotification(neighbors, notificationLogs)
 		
+		# 30 minute cut off for join strand messages
 		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(minutes=30)
 		photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTime).filter(user__product_id=1)
 		users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=joinStrandStartTime)
 
-		sendJoinStrandNotification(photos, users, notificationLogs)
+		sendJoinStrandNotification(photos, users, neighbors, notificationLogs)
 
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)

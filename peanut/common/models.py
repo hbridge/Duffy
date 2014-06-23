@@ -258,6 +258,7 @@ class NotificationLog(models.Model):
 	msg = models.TextField()
 	apns = models.IntegerField()
 	added = models.DateTimeField(auto_now_add=True)
+	msg_type = models.IntegerField()
 
 	class Meta:
 		db_table = 'strand_notification_log'
