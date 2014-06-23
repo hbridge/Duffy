@@ -10,12 +10,6 @@ start duffy-faces
 
 sleep 5
 
-stop duffy-overfeat
-sleep 1
-start duffy-overfeat
-
-sleep 5
-
 stop duffy-twofishes
 sleep 1
 start duffy-twofishes
