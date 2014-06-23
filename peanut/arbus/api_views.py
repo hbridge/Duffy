@@ -441,7 +441,8 @@ def get_user(request, productId = 0):
 	#	return returnFailure(response, "User not found.  Need valid user_id or phone_id")
 
 	if (user):
-		response['user'] = model_to_dict(user)
+		serializer = UserSerializer(user)
+		response['user'] = serializer.data
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
@@ -469,7 +470,8 @@ def create_user(request, productId = 0):
 	else:
 		return returnFailure(response, "Need a phone_id")
 
-	response['user'] = model_to_dict(user)
+	serializer = UserSerializer(photo)
+	response['user'] = serializer.data
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
