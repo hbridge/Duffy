@@ -5,10 +5,12 @@
 ## New
 
 - Better "Joinable Strands nearby" notifications
+- Added explanatory help text until you take a photo for the first time
 
 # Bugs fixed
 
 - Fixed the badge count when you have new photos in your gallery.
+- More location bugs fixed
 
 ## Jun 19th, 2014
 
