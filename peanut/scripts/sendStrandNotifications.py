@@ -49,6 +49,7 @@ def getLastNotificationTimesForType(notificationLogs, msgType):
 """
 def sendNewPhotosNotification(neighbors, notificationLogs):
 	msgType = settings.NOTIFICATIONS_NEW_PHOTO_ID
+	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_GALLERY}
 
 	if (len(neighbors) > 0):
 		lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
@@ -57,12 +58,12 @@ def sendNewPhotosNotification(neighbors, notificationLogs):
 				neighbor.photo_1.time_taken < neighbor.photo_2.time_taken):
 					msg = cleanName(neighbor.user_2.first_name) + " added new photos!"
 					logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_1_id))						
-					notifications_util.sendNotification(neighbor.user_1, msg, msgType)
+					notifications_util.sendNotification(neighbor.user_1, msg, msgType, customPayload)
 					lastNotificationTimes[neighbor.user_1_id] = datetime.datetime.utcnow()
 			if (neighbor.user_2.id not in lastNotificationTimes and 
 				neighbor.photo_2.time_taken < neighbor.photo_1.time_taken):
 					msg = cleanName(neighbor.user_1.first_name) + " added new photos!"
-					notifications_util.sendNotification(neighbor.user_2, msg, msgType)
+					notifications_util.sendNotification(neighbor.user_2, msg, msgType, customPayload)
 					logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_2_id))
 					lastNotificationTimes[neighbor.user_2_id] = datetime.datetime.utcnow()
 
@@ -89,6 +90,7 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 """
 def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 	msgType = settings.NOTIFICATIONS_JOIN_STRAND_ID
+	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_CAMERA}
 
 	lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
 
@@ -111,7 +113,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			msg = " ".join(names) + " took a photo near you!"
 
 			logger.debug("Sending %s to %s" % (msg, user.first_name))
-			notifications_util.sendNotification(user, msg, msgType)
+			notifications_util.sendNotification(user, msg, msgType, customPayload)
 				
 
 

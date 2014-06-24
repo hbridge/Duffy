@@ -14,7 +14,7 @@ from common.models import Photo, User, Neighbor
 
 from common import api_util, cluster_util
 
-from strand import geo_util
+from strand import geo_util, notifications_util
 from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm
 
 from ios_notifications.models import APNService, Device, Notification
@@ -372,18 +372,9 @@ def send_notifications_test(request):
 	else:
 		msg = 'Strand test msg at ' + str(datetime.datetime.utcnow())
 	
-	if (buildType == 0):
-		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_DEV_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_DEV_APNS_SERVICENAME)
-	else:
-		apns = APNService.objects.get(hostname=settings.IOS_NOTIFICATIONS_PROD_APNS_HOSTNAME, name=settings.IOS_NOTIFICATIONS_PROD_APNS_SERVICENAME)
-	devices = Device.objects.filter(token__in=[user.device_token], service=apns)
-	print str(devices)
-	notification = Notification.objects.create(message=msg, sound='default', service=apns)
-	apns.push_notification_to_devices(notification, devices, chunk_size=200)  # Override the default chunk size to 200 (instead of 100)
+	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_GALLERY}
 
-	response['apns'] = str(apns)
-	response['device_token'] = str(user.device_token)
-	response['notification'] = str(notification)
+	notifications_util.sendNotification(user, msg, settings.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
