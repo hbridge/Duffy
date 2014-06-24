@@ -470,7 +470,7 @@ def create_user(request, productId = 0):
 	else:
 		return returnFailure(response, "Need a phone_id")
 
-	serializer = UserSerializer(photo)
+	serializer = UserSerializer(user)
 	response['user'] = serializer.data
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
