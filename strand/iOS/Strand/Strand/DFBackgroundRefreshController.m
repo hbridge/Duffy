@@ -74,7 +74,6 @@ static DFBackgroundRefreshController *defaultBackgroundController;
     _locationManager.delegate = self;
     _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
     _locationManager.distanceFilter = 30;
-
   }
   
   return _locationManager;
