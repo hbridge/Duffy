@@ -51,6 +51,11 @@
   }
   
   [self.window makeKeyAndVisible];
+  
+  if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
+    [self application:application didReceiveRemoteNotification:
+     launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]];
+  }
 
   return YES;
 }
@@ -192,21 +197,17 @@
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+  [[NSUserDefaults standardUserDefaults] synchronize];
   // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
   // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 
-- (void)applicationWillEnterForeground:(UIApplication *)application {
-  
-}
-
 - (void)applicationDidBecomeActive:(UIApplication *)application {
   [self performForegroundOperations];
-  // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-  // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+  [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 -(void)application:(UIApplication *)application
@@ -241,6 +242,21 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 	DDLogWarn(@"Failed to get push token, error: %@", error);
 }
 
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+  DDLogInfo(@"App received background notification dict: %@",
+            userInfo.description);
+  if ([application applicationState] != UIApplicationStateActive) {
+    if (!userInfo[@"view"]) return;
+    int viewNumber = [(NSNumber *)userInfo[@"view"] intValue];
+    if (viewNumber == 0) {
+      [(RootViewController *)self.window.rootViewController showCamera];
+    } else if (viewNumber == 1) {
+      [(RootViewController *)self.window.rootViewController showGallery];
+    }
+    [DFAnalytics logNotificationOpened:[NSString stringWithFormat:@"%d", viewNumber]];
+  }
+}
 
 - (void)resetApplication
 {
