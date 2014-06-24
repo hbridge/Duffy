@@ -17,6 +17,7 @@
 #import "DFPhotoMetadataAdapter.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIImage+DFHelpers.h"
+#import "DFAnalytics.h"
 
 @interface DFPhotoViewController ()
 
@@ -64,8 +65,11 @@
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     DDLogVerbose(@"Fetching full photo at %@", photoURL.description);
+    [DFAnalytics logPhotoLoadBegan];
     NSData *data = [NSData dataWithContentsOfURL:self.photoURL];
     UIImage *img = [UIImage imageWithData:data];
+    [DFAnalytics logPhotoLoadEndedWithResult:
+     img ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultFailure];
     dispatch_async(dispatch_get_main_queue(), ^{
       self.photoView.image = img;
       self.isPhotoLoadInProgress = NO;

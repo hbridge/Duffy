@@ -74,7 +74,6 @@
 {
     [super viewDidAppear:animated];
     [DFAnalytics logViewController:self appearedWithParameters:nil];
-
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -98,7 +97,6 @@
        transitionCompleted:(BOOL)completed
 {
     [DFAnalytics logSwitchBetweenPhotos:DFAnalyticsActionTypeSwipe];
-
 }
 
 
