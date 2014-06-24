@@ -75,12 +75,22 @@ NSString* const SessionAvgKBPSKey = @"sessionAvgKBPS";
 NSString* const PhotoLoadEvent = @"PhotoLoad";
 NSString* const DFAnalyticsValueResultAborted = @"aborted";
 
-// Settings
-NSString* const SettingAutoUploadChanged = @"SettingAutoUploadChanged";
+// Take picture
+NSString* const PhotoTakenEvent = @"PhotoTaken";
+NSString* const FlashModeKey = @"flashMode";
+NSString* const CameraDeviceKey = @"cameraDevice";
 
-// Maps
-NSString *const MapsServiceRequestFailed = @"MapsServiceRequestFailed";
-NSString *const PossibleThrottleKey = @"isPossibleThrottle";
+// Save pictire
+NSString* const PhotoSavedEvent = @"PhotoSaved";
+
+// App refresh
+NSString* const BackgroundRefreshEvent = @"BackgroundRefresh";
+NSString* const LocationUpdateEvent = @"LocationUpdated";
+NSString* const AppInBackgroundKey = @"appInBackground";
+
+
+NSString* const NotificationOpenedEvent = @"NotificationOpened";
+NSString* const NotificationTypeKey = @"notificationType";
 
 
 static DFAnalytics *defaultLogger;
@@ -183,6 +193,44 @@ static DFAnalytics *defaultLogger;
 {
     [Flurry endTimedEvent:PhotoLoadEvent withParameters:@{ResultKey: resultString}];
 }
+
++ (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
+                      flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
+{
+  [Flurry logEvent:PhotoTakenEvent withParameters:@{
+                                                    CameraDeviceKey: @(camera),
+                                                    FlashModeKey: @(flashMode)
+                                                    }];
+}
+
++ (void)logPhotoSavedWithResult:(NSString *)result
+{
+  [Flurry logEvent:PhotoSavedEvent withParameters:@{ResultKey: result}];
+}
+
+
++ (void)logBackgroundAppRefreshOccurred
+{
+  [Flurry logEvent:BackgroundRefreshEvent];
+}
+
++ (void)logLocationUpdatedInBackground:(BOOL)inBackground
+{
+  NSString *backgroundString = [[UIApplication sharedApplication] applicationState]
+  == UIApplicationStateBackground ? @"true" : @"false";
+  
+  [Flurry logEvent:LocationUpdateEvent withParameters:@{
+                                                        AppInBackgroundKey: backgroundString
+                                                        }];
+}
+
++ (void)logNotificationOpened:(NSString *)notificationType
+{
+  [Flurry logEvent:NotificationOpenedEvent withParameters:@{
+                                                            NotificationTypeKey: notificationType
+                                                            }];
+}
+
 
 
 @end

@@ -58,6 +58,18 @@
   }
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
 - (void)setImageFromPhotoURL:(NSURL *)photoURL
 {
   if (self.isPhotoLoadInProgress) return;
@@ -151,6 +163,7 @@
                                                                           cancelButtonTitle:@"OK"
                                                                           otherButtonTitles:nil];
                                 [alertView show];
+                                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
                               } else {
                                 DDLogInfo(@"Photo saved with assetURL: %@", assetURL);
                                 UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil
@@ -159,6 +172,7 @@
                                                                           cancelButtonTitle:@"OK"
                                                                           otherButtonTitles:nil];
                                 [alertView show];
+                                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
                               }
                               
                             }

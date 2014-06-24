@@ -31,4 +31,12 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logPhotoLoadEnded;
 + (void)logPhotoLoadEndedWithResult:(NSString *)resultString;
 
++ (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
+                      flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
++ (void)logPhotoSavedWithResult:(NSString *)result;
+
++ (void)logBackgroundAppRefreshOccurred;
++ (void)logLocationUpdatedInBackground:(BOOL)inBackground;
++ (void)logNotificationOpened:(NSString *)notificationType;
+
 @end

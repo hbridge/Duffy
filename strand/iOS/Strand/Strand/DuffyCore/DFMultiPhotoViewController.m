@@ -96,7 +96,9 @@
    previousViewControllers:(NSArray *)previousViewControllers
        transitionCompleted:(BOOL)completed
 {
+  if (completed) {
     [DFAnalytics logSwitchBetweenPhotos:DFAnalyticsActionTypeSwipe];
+  }
 }
 
 
