@@ -11,6 +11,7 @@
 #import <CocoaLumberjack/DDTTYLogger.h>
 #import <CocoaLumberjack/DDASLLogger.h>
 #import <CocoaLumberjack/DDFileLogger.h>
+#import "Flurry/Flurry.h"
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFUser.h"
@@ -36,6 +37,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [self configureLogs];
   [self configureHockey];
+  [self configureFlurry];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   [self requestPushNotifs];
@@ -79,6 +81,16 @@
   [[BITHockeyManager sharedHockeyManager] startManager];
   [[BITHockeyManager sharedHockeyManager].authenticator
    authenticateInstallation];
+}
+
+- (void)configureFlurry
+{
+#ifdef DEBUG
+  [Flurry startSession:@"DT9THCNBPHCST3B6BG4C"];
+  [Flurry setLogLevel:FlurryLogLevelDebug];
+#else
+  [Flurry startSession:@"6JYTNZB8ZZNJXN8DP4Q"];
+#endif
 }
 
 - (void)startUserIDCheck
