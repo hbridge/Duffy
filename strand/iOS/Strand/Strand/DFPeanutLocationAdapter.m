@@ -48,6 +48,7 @@ static NSString *const TimestampKey = @"timestamp";
        completionBlock:(DFUpdateLocationResponseBlock)completionBlock
 {
   NSString *timestampString = [[NSDateFormatter DjangoDateFormatter] stringFromDate:date];
+  if (!timestampString) timestampString = @"";
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutTrueFalseResponse alloc] init]
                               method:RKRequestMethodGET

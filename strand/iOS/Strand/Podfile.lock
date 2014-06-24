@@ -5,6 +5,7 @@ PODS:
   - CocoaLumberjack/Core (1.8.1)
   - CocoaLumberjack/Extensions (1.8.1):
     - CocoaLumberjack/Core
+  - CRToast (0.0.7)
   - HockeySDK (3.5.5)
   - JDStatusBarNotification (1.4.8)
   - MMPopLabel (0.1.1)
@@ -28,6 +29,7 @@ PODS:
 
 DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
+  - CRToast (~> 0.0.7)
   - HockeySDK (~> 3.5.5)
   - JDStatusBarNotification (~> 1.4.7)
   - MMPopLabel (~> 0.1.1)
@@ -36,6 +38,7 @@ DEPENDENCIES:
 SPEC CHECKSUMS:
   AFNetworking: 80c4e0652b08eb34e25b9c0ff3c82556fe5967b4
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
+  CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   HockeySDK: f9af97c2f5df4eb6ca6d2a9c408f2ff498edd608
   JDStatusBarNotification: c68611370dedc0ef865fb0fc1768dfbaf8fd961f
   MMPopLabel: 93cf43ff12eb7d102d0cfac7f8d78ec7a5477285
