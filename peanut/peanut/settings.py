@@ -140,6 +140,17 @@ LOGGING = {
             'propagate': True,
             'level': 'DEBUG',
         },
+        'arbus': {
+            'handlers': ['duffyfile'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+        'strand': {
+            'handlers': ['duffyfile'],
+            'propagate': True,
+            'level': 'DEBUG',
+        },
+
     }
 }
 
