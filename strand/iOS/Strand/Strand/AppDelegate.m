@@ -23,6 +23,7 @@
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
 #import "DFPeanutPushTokenAdapter.h"
+#import "DFAnalytics.h"
 
 
 @interface AppDelegate ()
@@ -210,9 +211,10 @@
 
 -(void)application:(UIApplication *)application
 performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  
   UIBackgroundFetchResult result = [[DFBackgroundRefreshController sharedBackgroundController]
                                     performFetch];
+  [DFAnalytics logBackgroundAppRefreshOccurred];
+  
   completionHandler(result);
 }
 

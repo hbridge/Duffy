@@ -16,6 +16,7 @@
 #import "DFLocationStore.h"
 #import "DFStrandStore.h"
 #import "DFPeanutLocationAdapter.h"
+#import "DFAnalytics.h"
 
 
 @interface DFBackgroundRefreshController()
@@ -110,6 +111,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
                        completionBlock:^(BOOL success) {
                        }];
   [self performFetch];
+  [DFAnalytics logLocationUpdated];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error

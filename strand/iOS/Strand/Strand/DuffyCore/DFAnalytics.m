@@ -214,7 +214,7 @@ static DFAnalytics *defaultLogger;
   [Flurry logEvent:BackgroundRefreshEvent];
 }
 
-+ (void)logLocationUpdatedInBackground:(BOOL)inBackground
++ (void)logLocationUpdated
 {
   NSString *backgroundString = [[UIApplication sharedApplication] applicationState]
   == UIApplicationStateBackground ? @"true" : @"false";

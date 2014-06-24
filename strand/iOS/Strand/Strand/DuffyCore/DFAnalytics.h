@@ -36,7 +36,7 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logPhotoSavedWithResult:(NSString *)result;
 
 + (void)logBackgroundAppRefreshOccurred;
-+ (void)logLocationUpdatedInBackground:(BOOL)inBackground;
++ (void)logLocationUpdated;
 + (void)logNotificationOpened:(NSString *)notificationType;
 
 @end
