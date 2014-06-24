@@ -87,6 +87,7 @@
                                     direction:UIPageViewControllerNavigationDirectionReverse
                                      animated:YES
                                    completion:nil];
+  self.hideStatusBar = NO;
 }
 
 - (void)showCamera
@@ -99,6 +100,7 @@
                                     direction:UIPageViewControllerNavigationDirectionForward
                                      animated:YES
                                    completion:nil];
+  self.hideStatusBar = YES;
 }
 
 #pragma mark - UIPageViewController delegate methods

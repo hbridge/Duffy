@@ -66,6 +66,7 @@
                                                       object:nil
                                                     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(0)}];
   [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
+  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
 - (void)setNavigationButtons
