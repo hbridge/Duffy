@@ -29,7 +29,7 @@ def getFilesAndData(rootdir, num):
 	return (files, dataArray)
 
 def main(argv):
-	url = "http://asood123.no-ip.biz/api/photos/bulk/"
+	url = "http://prod.duffyapp.com/api/photos/bulk/"
 	(files, dataArray) = getFilesAndData("/Users/derek/Dropbox/Projects/Duffy/thumbs/", 100)
 
 	payload = {'bulk_photos': json.dumps(dataArray)}

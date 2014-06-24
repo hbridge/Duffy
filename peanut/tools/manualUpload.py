@@ -94,7 +94,7 @@ def getFilesAndData(rootdir, userId, maxNum):
 	add api for the specified user
 """
 def main(argv):
-	url = "http://asood123.no-ip.biz/api/photos/bulk/"
+	url = "http://prod.duffyapp.com/api/photos/bulk/"
 	numAtTime = 10
 	maxNum = 10000
 	count = 0

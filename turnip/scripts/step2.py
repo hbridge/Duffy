@@ -91,7 +91,7 @@ def main(argv):
 	processingDir = 'processing'
 	processedDir = 'processed'
 	outputDir = 'output'
-	remoteHost = 'derek@asood123.no-ip.biz'
+	remoteHost = 'derek@duffyapp.com'
 	remoteBasePath = '/home/derek/pipeline'
 
 	step3Script = "/home/derek/Duffy/turnip/scripts/step3.py"
