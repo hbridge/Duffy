@@ -11,7 +11,8 @@
 
 @interface DFCameraOverlayView()
 
-@property (nonatomic, retain) MMPopLabel *label;
+@property (nonatomic, retain) MMPopLabel *cameraHelpPopLabel;
+@property (nonatomic, retain) MMPopLabel *cameraJoinableHelpPopLabel;
 
 @end
 
@@ -24,11 +25,11 @@ NSString *const FlashAutoTitle = @"Auto";
 - (void)awakeFromNib
 {
   self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-  [self configureHelpTextLabel];
+  [self configureHelpTextLabels];
   self.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
 }
 
-- (void)configureHelpTextLabel
+- (void)configureHelpTextLabels
 {
   // set appearance style
   [[MMPopLabel appearance] setLabelColor:[UIColor orangeColor]];
@@ -37,22 +38,36 @@ NSString *const FlashAutoTitle = @"Auto";
   [[MMPopLabel appearance] setLabelFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14.0f]];
   [[MMPopLabel appearance] setButtonFont:[UIFont fontWithName:@"HelveticaNeue" size:14.0f]];
   
-  // _label is a view controller property
-  _label = [MMPopLabel popLabelWithText:
+  // create the labels
+  _cameraHelpPopLabel = [MMPopLabel popLabelWithText:
             @"Take a picture to share it with nearby friends."];
+  _cameraJoinableHelpPopLabel = [MMPopLabel
+                                 popLabelWithText:@"Someone's taken a photo nearby!"
+                                 "\nTake a photo to see it and share yours."];
   
-  // add it to your view
-  [self addSubview:_label];
+  // add add them to the view
+  [self addSubview:_cameraHelpPopLabel];
+  [self addSubview:_cameraJoinableHelpPopLabel];
 }
 
 - (void)showHelpText
 {
-  [_label popAtView:self.takePhotoButton];
+  [_cameraHelpPopLabel popAtView:self.takePhotoButton];
 }
 
 - (void)hideHelpText
 {
-  [_label dismiss];
+  [_cameraHelpPopLabel dismiss];
+}
+
+- (void)showJoinableHelpText
+{
+  [_cameraJoinableHelpPopLabel popAtView:self.takePhotoButton];
+}
+
+- (void)hideJoinableHelpText
+{
+  [_cameraJoinableHelpPopLabel dismiss];
 }
 
 - (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode

@@ -13,11 +13,12 @@
 
 
 @property (nonatomic, retain) NSDate *lastUnseenPhotosFetchDate;
+@property (nonatomic, retain) NSDate *lastFetchAttemptDate;
 
 + (DFBackgroundRefreshController *)sharedBackgroundController;
 - (void)startBackgroundRefresh;
 
-- (UIBackgroundFetchResult)performBackgroundFetch;
+- (UIBackgroundFetchResult)performFetch;
 
 - (void)updateJoinableStrands;
 - (void)updateNewPhotos;

@@ -51,12 +51,30 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   return [self sharedBackgroundController];
 }
 
+- (id)init
+{
+  self = [super init];
+  if (self) {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appEnteredForeground)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appEnteredBackground)
+                                                 name:UIApplicationDidEnterBackgroundNotification
+                                               object:nil];
+  }
+  return self;
+}
+
 - (CLLocationManager *)locationManager
 {
   if (!_locationManager) {
     _locationManager = [[CLLocationManager alloc] init];
     _locationManager.delegate = self;
     _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
+    _locationManager.distanceFilter = 30;
+
   }
   
   return _locationManager;
@@ -92,6 +110,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
                          withTimestamp:manager.location.timestamp
                        completionBlock:^(BOOL success) {
                        }];
+  [self performFetch];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
@@ -104,9 +123,12 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   }
 }
 
-- (UIBackgroundFetchResult)performBackgroundFetch
+- (UIBackgroundFetchResult)performFetch
 {
-  DDLogInfo(@"Performing background fetch.");
+  DDLogInfo(@"DFBackgroundRefreshController performing fetch.");
+  
+  if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] < 1.0)
+    return UIBackgroundFetchResultNoData;
   
   [self updateJoinableStrands];
   [self updateNewPhotos];
@@ -213,6 +235,20 @@ static DFBackgroundRefreshController *defaultBackgroundController;
    forKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
 }
 
+- (NSDate *)lastFetchAttemptDate
+{
+  NSDate *lastFetchDate = [[NSUserDefaults standardUserDefaults]
+                           objectForKey:DFStrandLastFetchAttemptDateDefaultsKey];
+  if (!lastFetchDate) lastFetchDate = [NSDate dateWithTimeIntervalSince1970:0.0];
+  return lastFetchDate;
+}
+
+- (void)setLastFetchAttemptDate:(NSDate *)date
+{
+  [[NSUserDefaults standardUserDefaults] setObject:date
+                                            forKey:DFStrandLastFetchAttemptDateDefaultsKey];
+}
+
 #pragma mark Networking
 
 - (DFPeanutJoinableStrandsAdapter *)joinableStrandsAdapter
@@ -250,5 +286,21 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   
   return [DFStrandStore UnseenPhotosCount];
 }
+
+
+#pragma mark - Foreground/background handlers
+
+- (void)appEnteredForeground
+{
+  DDLogVerbose(@"DFBackgroundRefreshController starting continuous updates.");
+  [self.locationManager startUpdatingLocation];
+}
+
+- (void)appEnteredBackground
+{
+  DDLogVerbose(@"DFBackgroundRefreshController stopping continuous updates.");
+  [self.locationManager stopUpdatingLocation];
+}
+
 
 @end

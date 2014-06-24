@@ -21,5 +21,7 @@ extern NSString *const FlashAutoTitle;
 - (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 - (void)showHelpText;
 - (void)hideHelpText;
+- (void)showJoinableHelpText;
+- (void)hideJoinableHelpText;
 
 @end

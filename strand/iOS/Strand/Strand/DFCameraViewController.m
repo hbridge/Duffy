@@ -21,6 +21,7 @@
 #import "DFPeanutLocationAdapter.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
+static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
 
 @interface DFCameraViewController ()
 
@@ -183,17 +184,43 @@ static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown
   [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
 }
 
+- (void)showJoinableHelpTextIfNeeded
+{
+  BOOL wasShown = [[NSUserDefaults standardUserDefaults]
+                   boolForKey:DFStrandCameraJoinableHelpWasShown];
+  if (wasShown) return;
+  
+  NSTimer *timer = [NSTimer timerWithTimeInterval:2.0
+                                           target:self.customCameraOverlayView
+                                         selector:@selector(showJoinableHelpText)
+                                         userInfo:nil
+                                          repeats:NO];
+  [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
+}
+
 #pragma mark - User actions
 
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
   [self takePicture];
   [self flashCameraView];
-  BOOL helpWasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraHelpWasShown];
-  if (!helpWasShown) {
+  [self hideNuxLabels];
+}
+
+- (void)hideNuxLabels
+{
+  BOOL cameraHelpWasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraHelpWasShown];
+  BOOL joinableHelpWasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraJoinableHelpWasShown];
+
+  if (!cameraHelpWasShown) {
     [self.customCameraOverlayView hideHelpText];
     [[NSUserDefaults standardUserDefaults] setBool:YES forKey:DFStrandCameraHelpWasShown];
-  };
+  } else {
+    if (!joinableHelpWasShown) {
+      [self.customCameraOverlayView hideJoinableHelpText];
+      [[NSUserDefaults standardUserDefaults] setBool:YES forKey:DFStrandCameraJoinableHelpWasShown];
+    }
+  }
 }
 
 - (void)galleryButtonPressed:(UIButton *)sender
@@ -371,6 +398,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   UIImage *newImage;
   if (count.intValue > 0) {
     newImage = [UIImage imageNamed:@"Assets/Icons/ShutterButtonHighlighted.png"];
+    [self showJoinableHelpTextIfNeeded];
   } else {
     newImage = [UIImage imageNamed:@"Assets/Icons/ShutterButton.png"];
   }
@@ -386,10 +414,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogInfo(@"DFCameraViewContrller updated location: [%f, %f]",
             location.coordinate.latitude,
             location.coordinate.longitude);
-  [self.locationAdapter updateLocation:location
-                         withTimestamp:location.timestamp
-                       completionBlock:^(BOOL success) {
-                       }];
 }
 
 - (DFPeanutLocationAdapter *)locationAdapter

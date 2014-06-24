@@ -19,7 +19,7 @@ extern NSString *const DFStrandUnseenPhotosUpdatedCountKey;
 
 extern NSString *const DFStrandJoinableStrandsNearbyNotificationName;
 extern NSString *const DFStrandJoinableStrandsCountKey;
-
+extern NSString *const DFStrandLastFetchAttemptDateDefaultsKey;
 
 
 @end

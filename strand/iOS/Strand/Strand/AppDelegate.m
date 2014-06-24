@@ -152,8 +152,7 @@
   DDLogInfo(@"Strand app %@ became active.", [DFAppInfo appInfoString]);
   if ([self isAppSetupComplete]) {
     [[DFUploadController sharedUploadController] uploadPhotos];
-    [[DFBackgroundRefreshController sharedBackgroundController] updateJoinableStrands];
-    [[DFBackgroundRefreshController sharedBackgroundController] updateNewPhotos];
+    [[DFBackgroundRefreshController sharedBackgroundController] performFetch];
   }
 }
 
@@ -201,7 +200,7 @@
 performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
   
   UIBackgroundFetchResult result = [[DFBackgroundRefreshController sharedBackgroundController]
-                                    performBackgroundFetch];
+                                    performFetch];
   completionHandler(result);
 }
 
