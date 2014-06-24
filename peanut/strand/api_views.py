@@ -286,13 +286,16 @@ def update_user_location(request):
 			response['error'] = 'userId not found'
 			return HttpResponse(json.dumps(response), content_type="application/json")
 
-		if (timestamp > user.last_location_timestamp and ((not lon == 0) or (not lat == 0) )):
-			user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
-			user.last_location_timestamp = timestamp
-			user.save()
-			logger.info("Location updated. %s: %s, %s" % (datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point))
+		if ((not lon == 0) or (not lat == 0)):
+			if ((user.last_location_timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
+				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
+				user.last_location_timestamp = timestamp
+				user.save()
+				logger.info("Location updated. %s: %s, %s" % (datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point))
+			else:
+				logger.info("Location NOT updated. Old Timestamp. %s: %s, %s" % (timestamp, userId, str((lon, lat))))
 		else:
-			logger.info("Location not updated: %s " % (userId))
+			logger.info("Location NOT updated. Lat/Lon Zero. %s: %s, %s" % (datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, str((lon, lat))))
 
 	else:
 		response['result'] = False
