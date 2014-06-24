@@ -19,13 +19,7 @@ extern NSString* const DFAnalyticsValueResultAborted;
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
-+ (void)logCameraRollScanTotalAssets:(NSUInteger)totalAssets addedAssets:(NSUInteger)numAdded;
 + (void)logSwitchBetweenPhotos:(NSString *)actionType;
-
-+ (void)logSearchLoadStartedWithQuery:(NSString *)query
-                       suggestions:(NSDictionary *)suggestions;
-+ (void)logSearchLoadEndedWithQuery:(NSString *)query;
-+ (void)logSearchResultPageLoaded:(NSInteger)searchPage;
 
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
 + (void)logUploadEndedWithResult:(NSString *)resultValue numPhotos:(unsigned long)numPhotos sessionAvgThroughputKBPS:(double)KBPS;
@@ -33,13 +27,8 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logUploadCancelledWithIsError:(BOOL)isError;
 + (void)logUploadRetryCountExceededWithCount:(unsigned int)count;
 
-+ (void)logPhotoWebviewLoadBegan;
-+ (void)logPhotoWebviewLoadEnded;
-+ (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString;
-
-+ (void)logAutoUploadSettingChanged:(BOOL)isOn;
-
-+ (void)logMapsServiceErrorWithCode:(long)errorCode isPossibleRateLimit:(BOOL)isPossibleRateLimit;
-
++ (void)logPhotoLoadBegan;
++ (void)logPhotoLoadEnded;
++ (void)logPhotoLoadEndedWithResult:(NSString *)resultString;
 
 @end

@@ -13,6 +13,7 @@
 #import "DFStrandConstants.h"
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotoViewController.h"
+#import "DFAnalytics.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -67,6 +68,13 @@
                                                     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(0)}];
   [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)setNavigationButtons

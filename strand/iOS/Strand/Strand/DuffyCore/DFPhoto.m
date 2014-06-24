@@ -185,7 +185,6 @@ return returnAsset;
       DDLogError(@"fetchReverseGeocodeDict error:%@, Possible rate limit:%@",
                  [error localizedDescription],
                  possibleThrottle ? @"YES" : @"NO");
-      [DFAnalytics logMapsServiceErrorWithCode:error.code isPossibleRateLimit:possibleThrottle];
     }
     
     completionBlock(locationDict);

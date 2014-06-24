@@ -72,7 +72,7 @@ NSString* const UploadRetriesExceeded = @"UploadRetriesExceeded";
 NSString* const SessionAvgKBPSKey = @"sessionAvgKBPS";
 
 // Individual photo loads
-NSString* const PhotoWebviewLoadEvent = @"PhotoWebviewLoad";
+NSString* const PhotoLoadEvent = @"PhotoLoad";
 NSString* const DFAnalyticsValueResultAborted = @"aborted";
 
 // Settings
@@ -131,67 +131,6 @@ static DFAnalytics *defaultLogger;
     [Flurry logEvent:SwitchedPhotoToPhotoEvent withParameters:@{ActionTypeKey: actionType}];
 }
 
-
-+ (void)logSearchLoadStartedWithQuery:(NSString *)query
-           suggestions:(NSDictionary *)suggestions
-{
-    DFAnalytics *sharedLogger = [DFAnalytics sharedLogger];
-    if (sharedLogger.inProgressQueryString) {
-        // there was already a search in progress, log it as aborted
-        [DFAnalytics logSearchAborted:sharedLogger.inProgressQueryString];
-    }
-    
-    sharedLogger.inProgressQueryString = query;
-    sharedLogger.inProgressQuerySuggestions = [suggestions JSONString];
-    sharedLogger.inProgressQueryStart = [NSDate date];
-}
-
-+ (void)logSearchLoadEndedWithQuery:(NSString *)endQuery
-{
-    DFAnalytics *sharedLogger = [DFAnalytics sharedLogger];
-    if (![endQuery isEqualToString:sharedLogger.inProgressQueryString]) {
-        DDLogError(@"Analytics error: search load end query is different form start query.  Start query: %@ End Query: %@",
-              sharedLogger.inProgressQueryString, endQuery);
-        return;
-    }
-    
-    
-    NSTimeInterval queryDuration = [[NSDate date] timeIntervalSinceDate:sharedLogger.inProgressQueryStart];
-    NSDictionary *params = @{
-                             QueryKey: sharedLogger.inProgressQueryString,
-                             SuggestionsKey: sharedLogger.inProgressQuerySuggestions,
-                             SLatencyKey: [NSNumber numberWithDouble:queryDuration],
-                             };
-    
-    [Flurry logEvent:SearchExecutedEvent withParameters:params];
-    
-    sharedLogger.inProgressQueryString = nil;
-    sharedLogger.inProgressQueryStart = nil;
-    sharedLogger.inProgressQuerySuggestions = nil;
-}
-
-
-+ (void)logSearchAborted:(NSString *)query
-{
-    DFAnalytics *sharedLogger = [DFAnalytics sharedLogger];
-    if (![query isEqualToString:sharedLogger.inProgressQueryString]) {
-        DDLogError(@"Analytics error: logging search aported with different query from start query.  Query aborted: %@ End Query: %@",
-              query, sharedLogger.inProgressQueryString);
-        return;
-    }
-    
-    NSTimeInterval queryDuration = [[NSDate date] timeIntervalSinceDate:sharedLogger.inProgressQueryStart];
-    NSDictionary *params = @{
-                             QueryKey: sharedLogger.inProgressQueryString,
-                             SuggestionsKey: sharedLogger.inProgressQuerySuggestions,
-                             SLatencyKey: [NSNumber numberWithDouble:queryDuration],
-                             };
-    [Flurry logEvent:SearchAbortedEvent withParameters:params];
-    
-    sharedLogger.inProgressQueryString = nil;
-    sharedLogger.inProgressQueryStart = nil;
-}
-
 + (void)logUploadEndedWithResult:(NSString *)resultValue
 {
     [Flurry logEvent:UploadPhotoEvent withParameters:@{
@@ -230,39 +169,19 @@ static DFAnalytics *defaultLogger;
     [Flurry logEvent:UploadRetriesExceeded withParameters:@{NumberKey: [NSNumber numberWithUnsignedInt:count]}];
 }
 
-
-+ (void)logSearchResultPageLoaded:(NSInteger)searchPage
++ (void)logPhotoLoadBegan
 {
-    [Flurry logEvent:SearchPageLoaded withParameters:@{NumberKey: [NSNumber numberWithInteger:searchPage]}];
+    [Flurry logEvent:PhotoLoadEvent withParameters:nil timed:YES];
 }
 
-+ (void)logPhotoWebviewLoadBegan
++ (void)logPhotoLoadEnded
 {
-    [Flurry logEvent:PhotoWebviewLoadEvent withParameters:nil timed:YES];
+    [Flurry endTimedEvent:PhotoLoadEvent withParameters:nil];
 }
 
-+ (void)logPhotoWebviewLoadEnded
++ (void)logPhotoLoadEndedWithResult:(NSString *)resultString
 {
-    [Flurry endTimedEvent:PhotoWebviewLoadEvent withParameters:nil];
-}
-
-+ (void)logPhotoWebviewLoadEndedWithResult:(NSString *)resultString
-{
-    [Flurry endTimedEvent:PhotoWebviewLoadEvent withParameters:@{ResultKey: resultString}];
-}
-
-+ (void)logAutoUploadSettingChanged:(BOOL)isOn
-{
-    [Flurry logEvent:SettingAutoUploadChanged withParameters:@{NewValueKey: [NSNumber numberWithBool:isOn]}];
-}
-
-+ (void)logMapsServiceErrorWithCode:(long)errorCode isPossibleRateLimit:(BOOL)isPossibleRateLimit
-{
-    [Flurry logEvent:MapsServiceRequestFailed
-      withParameters:@{
-                       ResultKey : [NSNumber numberWithLong:errorCode],
-                       PossibleThrottleKey: (isPossibleRateLimit ? @"true" : @"false")
-                       }];
+    [Flurry endTimedEvent:PhotoLoadEvent withParameters:@{ResultKey: resultString}];
 }
 
 

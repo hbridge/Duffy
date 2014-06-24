@@ -19,6 +19,7 @@
 #import "DFLocationStore.h"
 #import "DFBackgroundRefreshController.h"
 #import "DFPeanutLocationAdapter.h"
+#import "DFAnalytics.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -109,6 +110,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   [self updateUnseenCount];
   [self startLocationUpdates];
   [self showHelpTextIfNeeded];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 
@@ -116,6 +118,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 {
   [super viewDidDisappear:animated];
   [self stopLocationUpdates];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)configureLocationManager
