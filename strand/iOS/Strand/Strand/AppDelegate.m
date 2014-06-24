@@ -93,7 +93,7 @@
 {
 #ifdef DEBUG
   [Flurry startSession:@"DT9THCNBPHCST3B6BG4C"];
-  [Flurry setLogLevel:FlurryLogLevelDebug];
+  //[Flurry setLogLevel:FlurryLogLevelDebug];
 #else
   [Flurry startSession:@"6JYTNZB8ZZNJXN8DP4Q"];
 #endif
