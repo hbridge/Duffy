@@ -12,7 +12,6 @@
 #import "DFPeanutJoinableStrandsAdapter.h"
 #import "DFPeanutNewPhotosAdapter.h"
 #import "DFPeanutSearchObject.h"
-#import "DFStatusBarNotificationManager.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFLocationStore.h"
 #import "DFStrandStore.h"

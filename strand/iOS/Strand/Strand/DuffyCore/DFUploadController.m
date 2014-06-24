@@ -12,7 +12,7 @@
 #import "DFUploadQueue.h"
 #import "DFUploadOperation.h"
 #import "DFAnalytics.h"
-#import "DFStatusBarNotificationManager.h"
+#import "DFToastNotificationManager.h"
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFNotificationSharedConstants.h"
 #import <RestKit/RestKit.h>
@@ -184,8 +184,6 @@ static DFUploadController *defaultUploadController;
             if (self.thumbnailsObjectIDQueue.numObjectsIncomplete == 0 && self.fullImageObjectIDQueue.numObjectsIncomplete == 0
                 && (self.thumbnailsObjectIDQueue.numObjectsComplete > 0 || self.fullImageObjectIDQueue.numObjectsComplete > 0)) {
                 [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
-            } else if (![self shouldUploadFullPhotos] && self.fullImageObjectIDQueue.numObjectsIncomplete > 0) {
-              [self scheduleWithDispatchUploads:NO operation:[self cannotContinueFullUploadsOperation]];
             }
         }
     }];
@@ -215,39 +213,6 @@ static DFUploadController *defaultUploadController;
     }
     
     return YES;
-}
-
-- (BOOL)shouldUploadFullPhotos
-{
-  AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
-  BOOL result = NO;
-  
-  if (![[DFUser currentUser] conserveDataEnabled]) {
-    result = YES;;
-  } else if ([[DFUser currentUser] conserveDataEnabled] &&
-             reachabilityStatus == AFNetworkReachabilityStatusReachableViaWiFi) {
-    result = YES;
-  }
-  
-  if (!result) {
-    DDLogInfo(@"shouldUploadFullPhotos:NO. Reachability:%d conserveData:%d",
-              reachabilityStatus,
-              [[DFUser currentUser] conserveDataEnabled]);
-  }
-  
-  return result;
-}
-
-- (NSOperation *)cannotContinueFullUploadsOperation
-{
-  NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
-    DFUploadSessionStats *stats = self.currentSessionStats;
-    [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateFullPhotosStopped
-                                                                                numRemaining:stats.numFullPhotosRemaining
-                                                                                    progress:stats.fullPhotosProgress];
-  }];
-  
-  return operation;
 }
 
 #pragma mark - Upload operation response handlers
@@ -397,13 +362,8 @@ static DFUploadController *defaultUploadController;
     
     if (!isSilent){
       if (isError) {
-        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateError
-                                                                                    numRemaining:0
-                                                                                        progress:0.0];
-      } else {
-        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateCancelled
-                                                                                    numRemaining:0
-                                                                                        progress:0.0];
+        [[DFToastNotificationManager sharedInstance]
+         showNotificationWithType:DFStatusUploadError];
       }
       [DFAnalytics logUploadCancelledWithIsError:isError];
     }
@@ -417,10 +377,7 @@ static DFUploadController *defaultUploadController;
         DDLogInfo(@"All uploads complete.");
       [self postStatusUpdateWithError:nil];
         _currentSessionStats = nil;
-      [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateComplete
-                                                                                  numRemaining:0
-                                                                                      progress:1.0];
-      //[self showBackgroundUploadCompleteNotif];
+      
         [self endBackgroundUpdateTask];
         [self.thumbnailsObjectIDQueue clearCompleted];
         [self.fullImageObjectIDQueue clearCompleted];
@@ -459,18 +416,7 @@ static DFUploadController *defaultUploadController;
     [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFUploadStatusNotificationName
                                                                   object:self
                                                                 userInfo:@{DFUploadStatusUpdateSessionUserInfoKey: currentStats}];
-    
-    if (currentStats.numThumbnailsRemaining > 0) {
-        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateThumbnailProgress
-                                                                                    numRemaining:currentStats.numThumbnailsRemaining
-                                                                                        progress:currentStats.thumbnailProgress];
-    } else if (currentStats.numFullPhotosRemaining > 0) {
-        [[DFStatusBarNotificationManager sharedInstance] showUploadStatusBarNotificationWithType:DFStatusUpdateFullImageProgress
-                                                                                    numRemaining:currentStats.numFullPhotosRemaining
-                                                                                        progress:currentStats.fullPhotosProgress];
       
-    }
-  
     DDLogInfo(@"\n%@", currentStats.description);
 }
 

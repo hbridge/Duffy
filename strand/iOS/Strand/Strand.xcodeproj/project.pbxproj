@@ -38,7 +38,7 @@
 		5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8FF1947C30800862D9C /* DFPhotoMetadataAdapter.m */; };
 		5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9011947C30800862D9C /* DFPhotoStore.m */; };
 		5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */; };
-		5AC4A9301947C30800862D9C /* DFStatusBarNotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9051947C30800862D9C /* DFStatusBarNotificationManager.m */; };
+		5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9051947C30800862D9C /* DFToastNotificationManager.m */; };
 		5AC4A9311947C30800862D9C /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9071947C30800862D9C /* DFTypedefs.m */; };
 		5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9091947C30800862D9C /* DFUploadController.m */; };
 		5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A90B1947C30800862D9C /* DFUploadOperation.m */; };
@@ -152,8 +152,8 @@
 		5AC4A9011947C30800862D9C /* DFPhotoStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoStore.m; path = DuffyCore/DFPhotoStore.m; sourceTree = "<group>"; };
 		5AC4A9021947C30800862D9C /* DFPhotoStore+IntegrityCheck.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "DFPhotoStore+IntegrityCheck.h"; path = "DuffyCore/DFPhotoStore+IntegrityCheck.h"; sourceTree = "<group>"; };
 		5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "DFPhotoStore+IntegrityCheck.m"; path = "DuffyCore/DFPhotoStore+IntegrityCheck.m"; sourceTree = "<group>"; };
-		5AC4A9041947C30800862D9C /* DFStatusBarNotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFStatusBarNotificationManager.h; path = DuffyCore/DFStatusBarNotificationManager.h; sourceTree = "<group>"; };
-		5AC4A9051947C30800862D9C /* DFStatusBarNotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFStatusBarNotificationManager.m; path = DuffyCore/DFStatusBarNotificationManager.m; sourceTree = "<group>"; };
+		5AC4A9041947C30800862D9C /* DFToastNotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFToastNotificationManager.h; path = DuffyCore/DFToastNotificationManager.h; sourceTree = "<group>"; };
+		5AC4A9051947C30800862D9C /* DFToastNotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFToastNotificationManager.m; path = DuffyCore/DFToastNotificationManager.m; sourceTree = "<group>"; };
 		5AC4A9061947C30800862D9C /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFTypedefs.h; path = DuffyCore/DFTypedefs.h; sourceTree = "<group>"; };
 		5AC4A9071947C30800862D9C /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFTypedefs.m; path = DuffyCore/DFTypedefs.m; sourceTree = "<group>"; };
 		5AC4A9081947C30800862D9C /* DFUploadController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUploadController.h; path = DuffyCore/DFUploadController.h; sourceTree = "<group>"; };
@@ -364,8 +364,8 @@
 				5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */,
 				5AC4A9001947C30800862D9C /* DFPhotoStore.h */,
 				5AC4A9011947C30800862D9C /* DFPhotoStore.m */,
-				5AC4A9041947C30800862D9C /* DFStatusBarNotificationManager.h */,
-				5AC4A9051947C30800862D9C /* DFStatusBarNotificationManager.m */,
+				5AC4A9041947C30800862D9C /* DFToastNotificationManager.h */,
+				5AC4A9051947C30800862D9C /* DFToastNotificationManager.m */,
 				5AC4A9061947C30800862D9C /* DFTypedefs.h */,
 				5AC4A9071947C30800862D9C /* DFTypedefs.m */,
 				5AC4A9081947C30800862D9C /* DFUploadController.h */,
@@ -734,7 +734,7 @@
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
 				5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */,
-				5AC4A9301947C30800862D9C /* DFStatusBarNotificationManager.m in Sources */,
+				5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
 				5AC4A9361947C30800862D9C /* DFURLProtocol.m in Sources */,

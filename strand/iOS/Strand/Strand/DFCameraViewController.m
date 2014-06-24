@@ -20,7 +20,6 @@
 #import "DFBackgroundRefreshController.h"
 #import "DFPeanutLocationAdapter.h"
 
-
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 
 @interface DFCameraViewController ()
