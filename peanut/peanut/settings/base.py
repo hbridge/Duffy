@@ -86,64 +86,6 @@ HAYSTACK_CONNECTIONS = {
 
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
-# settings.py
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'djangofile': {
-            'level': 'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/home/derek/logs/duffy-all.log',
-            'formatter': 'verbose'
-        },
-        'djangoerror': {
-            'level': 'ERROR',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/home/derek/logs/duffy-error.log',
-            'formatter': 'verbose'
-        },
-        'duffyfile': {
-            'level': 'DEBUG',
-            'class':'logging.handlers.RotatingFileHandler',
-            'filename': '/home/derek/logs/duffy-photos.log',
-            'formatter': 'verbose'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers':['djangofile', 'djangoerror'],
-            'propagate': True,
-            'level':'DEBUG',
-        },
-        'photos': {
-            'handlers': ['duffyfile'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'arbus': {
-            'handlers': ['duffyfile'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-        'strand': {
-            'handlers': ['duffyfile'],
-            'propagate': True,
-            'level': 'DEBUG',
-        },
-
-    }
-}
-
 TEMPLATE_CONTEXT_PROCESSORS = (                                       
     'django.core.context_processors.request',
     "django.contrib.auth.context_processors.auth",                  
