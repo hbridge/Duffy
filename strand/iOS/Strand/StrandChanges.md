@@ -1,5 +1,20 @@
 # Strand
 
+## Jun 24th, 2014
+
+## New
+
+- Swiping a strand notification takes you to the right view
+- More readable error messages
+- Added help text for the orange shutter button
+- Better flash on/off icon
+- Analytics
+
+## Bugs fixed
+
+- Status bar shows and hides more reliably and shouldn't flicker
+- Fixed crashes when the GPS doesn't get a value
+
 ## Jun 23rd, 2014
 
 ## New
