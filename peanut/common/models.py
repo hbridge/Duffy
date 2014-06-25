@@ -68,7 +68,7 @@ class Photo(models.Model):
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
+	updated = models.DateTimeField(auto_now=True, db_index=True)
 
 	 # You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
