@@ -16,6 +16,7 @@ parsedatetime==1.2
 python-dateutil==2.2
 pytz==2012c
 pyzmq==14.1.1
+pysolr==3.2.0
 requests==2.2.1
 simplejson==3.3.0
 wsgiref==0.1.2
