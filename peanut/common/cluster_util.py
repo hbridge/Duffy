@@ -8,7 +8,7 @@ from django.db.models import Q
 
 from itertools import groupby
 
-from peanut import settings
+from peanut.settings import constants
 from common.models import Photo, Similarity, SimplePhoto
 
 """
@@ -43,7 +43,7 @@ from common.models import Photo, Similarity, SimplePhoto
 	THIS ONLY WORKS FOR SOLR PHOTOS RIGHT NOW
 	Can refactor to do either though pretty easily
 """
-def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=settings.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=settings.DEFAULT_DUP_THRESHOLD, docResults=None):
+def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=constants.DEFAULT_CLUSTER_THRESHOLD, dupThreshold=constants.DEFAULT_DUP_THRESHOLD, docResults=None):
 	photoIds = list()
 	for solrPhoto in solrPhotoSet:
 		photoIds.append(solrPhoto.photoId)
@@ -127,7 +127,7 @@ def getClustersFromPhotos(photoSet, threshold, dupThreshold, simCaches):
 		if (lowestDist != None):
 			if (lowestDist < dupThreshold):
 				pass
-			elif (lowestDist < threshold and longestTime < datetime.timedelta(minutes=settings.DEFAULT_MINUTES_TO_CLUSTER)):
+			elif (lowestDist < threshold and longestTime < datetime.timedelta(minutes=constants.DEFAULT_MINUTES_TO_CLUSTER)):
 				addToCluster(currentCluster, photo, lowestIndex, lowestDist, simCaches)
 			else:
 				clusterList.append([{'photo': photo, 'dist': None, 'simrows': getAllSims(photo, simCaches)}])

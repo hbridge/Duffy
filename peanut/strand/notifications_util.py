@@ -1,8 +1,6 @@
 import datetime
 import json
 
-from peanut import settings
-
 from common.models import NotificationLog
 from ios_notifications.models import APNService, Device, Notification
 

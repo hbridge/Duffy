@@ -8,12 +8,10 @@ parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
-
 from django.db.models import Count
 from django.db.models import Q
 
-from peanut import settings
+from peanut.settings import constants
 from common.models import Neighbor, NotificationLog, Photo, User
 
 import strand.notifications_util as notifications_util
@@ -48,8 +46,8 @@ def getLastNotificationTimesForType(notificationLogs, msgType):
 					send notification
 """
 def sendNewPhotosNotification(neighbors, notificationLogs):
-	msgType = settings.NOTIFICATIONS_NEW_PHOTO_ID
-	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_GALLERY}
+	msgType = constants.NOTIFICATIONS_NEW_PHOTO_ID
+	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_GALLERY}
 
 	if (len(neighbors) > 0):
 		lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
@@ -89,8 +87,12 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 	neighbored with them yet (basically, they shouldn't know I'm there)
 """
 def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
+<<<<<<< HEAD
 	msgType = settings.NOTIFICATIONS_JOIN_STRAND_ID
 	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_CAMERA}
+=======
+	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
+>>>>>>> massive refactoring to move settings to prod and dev
 
 	lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
 

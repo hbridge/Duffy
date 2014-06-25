@@ -8,7 +8,7 @@ from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 
-from peanut import settings
+from peanut.settings import constants
 
 from common.models import Photo, User, Neighbor
 
@@ -86,7 +86,7 @@ def getGroups(groupings, labelRecent = True):
 				title = getBestLocation(group[i])
 				i += 1
 			
-		clusters = cluster_util.getClustersFromPhotos(group, settings.DEFAULT_CLUSTER_THRESHOLD, settings.DEFAULT_DUP_THRESHOLD, simCaches)
+		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, constants.DEFAULT_DUP_THRESHOLD, simCaches)
 
 		output.append({'title': title, 'clusters': clusters})
 	return output
@@ -324,8 +324,8 @@ def register_apns_token(request):
 
 		# TODO (Aseem): Make this more efficient. Assume nothing!
 		user.device_token = deviceToken
-		apnsDev = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_DEV_APNS_ID)
-		apnsProd = APNService.objects.get(id=settings.IOS_NOTIFICATIONS_PROD_APNS_ID)
+		apnsDev = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_DEV_APNS_ID)
+		apnsProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_PROD_APNS_ID)
 		devices = Device.objects.filter(token=deviceToken)
 
 		if (len(devices) == 0):
@@ -372,9 +372,9 @@ def send_notifications_test(request):
 	else:
 		msg = 'Strand test msg at ' + str(datetime.datetime.utcnow())
 	
-	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_GALLERY}
+	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_GALLERY}
 
-	notifications_util.sendNotification(user, msg, settings.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
+	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 

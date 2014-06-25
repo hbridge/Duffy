@@ -14,7 +14,6 @@ from django.db.models import Q
 
 from haystack.query import SearchQuerySet
 
-from peanut import settings
 from common.models import Photo, User, Classification, NotificationLog
 
 from arbus import image_util, search_util

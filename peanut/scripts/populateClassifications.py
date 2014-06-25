@@ -10,14 +10,11 @@ import zmq
 import Image
 import datetime
 
-
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
     sys.path.insert(0, parentPath)
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
-
-from peanut import settings
+from peanut.settings import constants
 from common.models import Photo, User, Classification
 
 def initClassifier():
@@ -127,7 +124,7 @@ def sendPhotos(photos, socket_send):
 
     logging.info("About to process files (at " + time.strftime("%c") + "):")
     for photo in photos:
-        imagepath = os.path.join(settings.PIPELINE_REMOTE_PATH, photo.full_filename)
+        imagepath = os.path.join(constants.PIPELINE_REMOTE_PATH, photo.full_filename)
         cmd['images'].append(imagepath)
 
     gotResponse = False
@@ -140,7 +137,7 @@ def copyPhotos(photos):
     for photo in photos:
         userId = str(photo.user.id)
         # Setup user's staging dir on duffy
-        userDataPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, userId)
+        userDataPath = os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, userId)
         imagepath = os.path.join(userDataPath, photo.full_filename)
 
         # Check that there are three channels
@@ -150,8 +147,8 @@ def copyPhotos(photos):
             photo.classification_data = json.dumps([{"class_name": "wrong_channels", "rating": 1.0}])
             photo.save()
         else:
-            logging.info("Sending to image server:  " + imagepath + " to " + settings.PIPELINE_REMOTE_PATH)
-            ret = subprocess.call(['scp', imagepath, settings.PIPELINE_REMOTE_HOST + ":" + settings.PIPELINE_REMOTE_PATH])
+            logging.info("Sending to image server:  " + imagepath + " to " + constants.PIPELINE_REMOTE_PATH)
+            ret = subprocess.call(['scp', imagepath, constants.PIPELINE_REMOTE_HOST + ":" + constants.PIPELINE_REMOTE_PATH])
             
             if ret == 0:
                 successfullyCopied.append(photo)

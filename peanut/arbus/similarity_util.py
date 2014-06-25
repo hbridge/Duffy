@@ -13,7 +13,7 @@ import cv2.cv as cv
 #TODO(Derek): move this over to our common one
 from bulk_update.helper import bulk_update
 
-from peanut import settings
+from peanut.settings import constants
 from common.models import Photo, User, Classification, Similarity
 from arbus import image_util
 
@@ -114,14 +114,14 @@ def getNearbyPhotos(photo, range, userPhotoCache):
 
 			if i > 0:
 				for a in xrange(i, 0, -1):
-					if (userPhotoCache[a-1].time_taken+datetime.timedelta(seconds=60*settings.DEFAULT_MINUTES_TO_CLUSTER)>timeTaken):
+					if (userPhotoCache[a-1].time_taken+datetime.timedelta(seconds=60*constants.DEFAULT_MINUTES_TO_CLUSTER)>timeTaken):
 						nearbyPhotos.append(userPhotoCache[a-1])
 					else:
 						break
 
 			if i < len(userPhotoCache)-1:
 				for a in xrange(i+1, len(userPhotoCache)):
-					if (userPhotoCache[a].time_taken-datetime.timedelta(seconds=60*settings.DEFAULT_MINUTES_TO_CLUSTER)<timeTaken):
+					if (userPhotoCache[a].time_taken-datetime.timedelta(seconds=60*constants.DEFAULT_MINUTES_TO_CLUSTER)<timeTaken):
 						nearbyPhotos.append(userPhotoCache[a])
 					else:
 						break

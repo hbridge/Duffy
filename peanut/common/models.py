@@ -4,7 +4,7 @@ import datetime
 
 from django.contrib.gis.db import models
 
-from peanut import settings
+from peanut.settings import constants
 
 from common import bulk_updater
 
@@ -35,7 +35,7 @@ class User(models.Model):
 		So:  /home/blah/1/
 	"""
 	def getUserDataPath(self):
-		return os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(self.id))
+		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.id))
 
 	def __unicode__(self):
 		if self.product_id == 0:
@@ -110,7 +110,7 @@ class Photo(models.Model):
 		This is used as a stopgap, the db also has this name
 	"""
 	def getDefaultThumbFilename(self):
-		return str(self.id) + "-thumb-" + str(settings.THUMBNAIL_SIZE) + '.jpg'
+		return str(self.id) + "-thumb-" + str(constants.THUMBNAIL_SIZE) + '.jpg'
 
 	"""
 		Returns back the full localfile path of the thumb
@@ -119,7 +119,7 @@ class Photo(models.Model):
 	"""
 	def getThumbPath(self):
 		if self.thumb_filename:
-			userPath = os.path.join(settings.PIPELINE_LOCAL_BASE_PATH, str(self.user_id))
+			userPath = os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.user_id))
 			return os.path.join(userPath, self.thumb_filename)
 		else:
 			return None

@@ -14,7 +14,7 @@ import cv2.cv as cv
 
 from bulk_update.helper import bulk_update
 
-from peanut import settings
+from peanut.settings import constants
 from common.models import Photo, User, Classification, Similarity
 
 logger = logging.getLogger(__name__)
@@ -35,7 +35,7 @@ def createThumbnail(photo):
 				photo.save()
 			return photo.getDefaultThumbFilename()
 
-		if(resizeImage(fullFilePath, thumbFilePath, settings.THUMBNAIL_SIZE, True, False)):
+		if(resizeImage(fullFilePath, thumbFilePath, constants.THUMBNAIL_SIZE, True, False)):
 			photo.thumb_filename = photo.getDefaultThumbFilename()
 			photo.save()
 			logger.info("generated thumbnail: '%s" % thumbFilePath)
