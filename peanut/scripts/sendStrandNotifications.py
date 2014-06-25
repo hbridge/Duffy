@@ -87,12 +87,8 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 	neighbored with them yet (basically, they shouldn't know I'm there)
 """
 def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
-<<<<<<< HEAD
-	msgType = settings.NOTIFICATIONS_JOIN_STRAND_ID
-	customPayload = {'view': settings.NOTIFICATIONS_APP_VIEW_CAMERA}
-=======
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
->>>>>>> massive refactoring to move settings to prod and dev
+	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_CAMERA}
 
 	lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
 
