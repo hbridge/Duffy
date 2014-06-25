@@ -37,6 +37,8 @@ from common.models import Photo, User, Neighbor, Similarity
 from common.serializers import PhotoSerializer, UserSerializer
 from common import api_util, cluster_util
 
+from peanut.settings import constants
+
 from arbus import image_util, search_util, location_util, suggestions_util
 from arbus.forms import SearchQueryForm
 
@@ -499,17 +501,11 @@ def returnFailure(response, msg):
 	This could be located else where
 """
 def createUser(phoneId, firstName, productId):
-	uploadsPath = "/home/derek/pipeline/uploads"
-	basePath = "/home/derek/user_data"
-	remoteHost = 'duffy@titanblack.duffyapp.com'
-	remoteStagingPath = '/home/duffy/pipeline/staging'
-
 	user = User(first_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
 	user.save()
 
 	userId = str(user.id)
-	userUploadsPath = os.path.join(uploadsPath, userId)
-	userBasePath = os.path.join(basePath, userId)
+	userBasePath = os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, userId)
 
 	try:
 		os.stat(userBasePath)

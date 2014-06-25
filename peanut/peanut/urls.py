@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib import admin
 admin.autodiscover()
 
+from peanut.settings import constants
 
 urlpatterns = patterns('',
     # Examples:
@@ -22,5 +23,5 @@ urlpatterns = patterns('',
 
 if settings.DEBUG:
     urlpatterns += patterns('',
-        (r'^user_data/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/home/derek/user_data'}),
+        (r'^user_data/(?P<path>.*)$', 'django.views.static.serve', {'document_root': constants.PIPELINE_LOCAL_BASE_PATH}),
     )
