@@ -2,7 +2,7 @@ import parsedatetime as pdt
 import os, sys
 import json
 import subprocess
-import Image
+from PIL import Image
 import time
 import logging
 import thread

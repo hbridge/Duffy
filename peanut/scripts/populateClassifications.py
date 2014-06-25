@@ -7,7 +7,7 @@ import json
 import socket
 import time
 import zmq
-import Image
+from PIL import Image
 import datetime
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")

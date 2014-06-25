@@ -1,5 +1,5 @@
 import os, sys, os.path
-import Image
+from PIL import Image
 import json
 import logging
 import datetime

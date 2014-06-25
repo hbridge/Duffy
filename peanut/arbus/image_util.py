@@ -1,5 +1,5 @@
 import os, sys, os.path
-import Image
+from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 import pyexiv2
 import json

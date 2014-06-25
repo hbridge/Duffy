@@ -5,7 +5,7 @@ import json
 import tempfile
 import pyexiv2
 
-import Image
+from PIL import Image
 
 
 """

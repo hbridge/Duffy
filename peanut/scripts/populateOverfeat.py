@@ -4,7 +4,7 @@ import logging
 import time
 import json
 import time
-import Image
+from PIL import Image
 
 import overfeat
 import numpy
