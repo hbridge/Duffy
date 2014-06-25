@@ -1,6 +1,4 @@
-
-PIPELINE_UPLOADED_PATH = "/home/derek/pipeline/uploads/"
-PIPELINE_LOCAL_BASE_PATH = "/home/derek/user_data/"
+PIPELINE_LOCAL_BASE_PATH = "/var/duffy/user_data/"
 PIPELINE_REMOTE_HOST = 'duffy@titanblack.duffyapp.com'
 PIPELINE_REMOTE_PATH = '/home/duffy/pipeline/staging'
 
