@@ -7,11 +7,17 @@ For more information on this file, see
 https://docs.djangoproject.com/en/1.6/howto/deployment/wsgi/
 """
 
-import os, sys
+import os, sys, site
 
-sys.path.append('/home/derek/prod/Duffy/peanut')
+site.addsitedir('/home/ubuntu/env/local/lib/python2.7/site-packages')
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings")
+sys.path.append('/home/ubuntu/Duffy/peanut')
+
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "peanut.settings.prod")
+
+# Activate your virtual env
+activate_env=os.path.expanduser("/home/ubuntu/env/bin/activate_this.py")
+execfile(activate_env, dict(__file__=activate_env))
 
 from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
