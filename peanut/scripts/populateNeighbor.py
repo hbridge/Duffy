@@ -10,8 +10,6 @@ if parentPath not in sys.path:
 
 from django.db.models import Count
 
-from bulk_update.helper import bulk_update
-
 from common.models import Photo, User, Neighbor
 
 from strand import geo_util
