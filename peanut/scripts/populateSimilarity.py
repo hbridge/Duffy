@@ -17,7 +17,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		baseQuery = Photo.objects.all().filter(user_id__gt=75).exclude(thumb_filename=None).filter(clustered_time=None).exclude(time_taken=None)
+		baseQuery = Photo.objects.all().exclude(thumb_filename=None).filter(clustered_time=None).exclude(time_taken=None)
 		results = baseQuery.values('user').annotate(Count('user'))
 
 		if len(results) > 0:	

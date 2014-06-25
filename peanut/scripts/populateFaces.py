@@ -53,7 +53,7 @@ def main(argv):
 	while True:
 		count = 0
 		# Find all photos that have thumbs, don't have full's and don't have any face data
-		nonProcessedThumbs = Photo.objects.all().filter(user__gt=75).exclude(thumb_filename=None).filter(faces_data=None).filter(full_filename=None)
+		nonProcessedThumbs = Photo.objects.all().exclude(thumb_filename=None).filter(faces_data=None).filter(full_filename=None)
 		count += len(nonProcessedThumbs)
 		if len(nonProcessedThumbs) > 0:
 			logger.info("Found %s thumbs that need processing" % (len(nonProcessedThumbs)))
@@ -61,7 +61,7 @@ def main(argv):
 				populateFaceData(chunk, faceDetector, "thumb")
 
 		# Kinda hacky, looking for all photos which have a full image but don't have full face data yt
-		nonProcessedFulls = Photo.objects.all().filter(user__gt=75).exclude(full_filename=None).exclude(faces_data__contains="full")
+		nonProcessedFulls = Photo.objects.all().exclude(full_filename=None).exclude(faces_data__contains="full")
 		count += len(nonProcessedFulls)
 		if len(nonProcessedFulls) > 0:
 			logger.info("Found %s fulls that need processing" % (len(nonProcessedFulls)))
