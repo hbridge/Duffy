@@ -11,6 +11,9 @@ DATABASES = {
 	}
 }
 
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'f(*vzc)x9!1-5nisajkfl3kjlflalsk!7)x9#x@&n2s=-)vb'
+
 
 # settings.py
 LOGGING = {
