@@ -139,6 +139,16 @@ class PhotoAPI(BasePhotoAPI):
 			return Response(serializer.data, status=status.HTTP_201_CREATED)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+	def delete(self, request, photoId, format=None):
+		photo = self.getObject(photoId)
+
+		userId = photo.user_id
+
+		photo.delete()
+
+		logger.info("DELETE - User %s deleted photo %s" % (userId, photoId))
+		return Response(status=status.HTTP_204_NO_CONTENT)
+
 class PhotoBulkAPI(BasePhotoAPI):
 	"""
 		This goes through and tries to save each photo and deals with IntegrityError's (dups)
