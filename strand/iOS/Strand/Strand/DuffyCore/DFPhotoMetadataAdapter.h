@@ -14,6 +14,7 @@
 @class DFPhoto;
 
 typedef void (^DFMetadataFetchCompletionBlock)(NSDictionary *metadata);
+typedef void (^DFPhotoDeleteCompletionBlock)(BOOL success);
 
 @interface DFPhotoMetadataAdapter : NSObject <DFNetworkAdapter>
 
@@ -26,5 +27,8 @@ typedef void (^DFMetadataFetchCompletionBlock)(NSDictionary *metadata);
       appendLargeImageData:(BOOL)uploadImage;
 - (void)getPhotoMetadata:(DFPhotoIDType)photoID
          completionBlock:(DFMetadataFetchCompletionBlock)completionBlock;
+
+- (void)deletePhoto:(DFPhotoIDType)photoID
+    completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock;
 
 @end

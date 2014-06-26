@@ -64,7 +64,7 @@
     [self.navigationController setNavigationBarHidden:NO animated:YES];
   
   UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
-                                 initWithBarButtonSystemItem:UIBarButtonSystemItemSave
+                                 initWithBarButtonSystemItem:UIBarButtonSystemItemAction
                                  target:self
                                  action:@selector(actionButtonClicked:)];
   self.navigationItem.rightBarButtonItem = actionItem;
@@ -192,7 +192,7 @@
 
 - (void)actionButtonClicked:(id)sender
 {
-  [self.currentPhotoViewController savePhotoToCameraRoll];
+  [self.currentPhotoViewController showPhotoActions:sender];
 }
 
 

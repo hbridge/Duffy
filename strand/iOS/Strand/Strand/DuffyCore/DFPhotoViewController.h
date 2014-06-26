@@ -11,7 +11,7 @@
 
 @class DFPhoto;
 
-@interface DFPhotoViewController : UIViewController
+@interface DFPhotoViewController : UIViewController <UIActionSheetDelegate>
 
 @property (strong, nonatomic) DFPhoto *photo;
 @property (strong, nonatomic) NSURL *photoURL;
@@ -24,6 +24,6 @@
 
 - (IBAction)imageTapped:(id)sender;
 - (void)showShareActivity;
-- (void)savePhotoToCameraRoll;
+- (void)showPhotoActions:(id)sender;
 
 @end

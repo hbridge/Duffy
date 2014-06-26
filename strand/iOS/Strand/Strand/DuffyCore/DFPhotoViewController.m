@@ -140,6 +140,40 @@
   }
 }
 
+NSString *const CancelButtonTitle = @"Cancel";
+NSString *const DeleteButtonTitle = @"Delete";
+NSString *const SaveButtonTitle = @"Save to Camera Roll";
+
+- (void)showPhotoActions:(id)sender
+{
+  UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                           delegate:self
+                                                  cancelButtonTitle:CancelButtonTitle
+                                             destructiveButtonTitle:DeleteButtonTitle
+                                                  otherButtonTitles:SaveButtonTitle, nil];
+  
+  if ([[sender class] isSubclassOfClass:[UIBarButtonItem class]]) {
+    [actionSheet showFromBarButtonItem:sender animated:YES];
+  } else {
+    [actionSheet showInView:self.view];
+  }
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+  NSString *buttonTitle = [actionSheet buttonTitleAtIndex:buttonIndex];
+  DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
+  
+   if ([buttonTitle isEqualToString:DeleteButtonTitle]) {
+    
+  } else if ([buttonTitle isEqualToString:SaveButtonTitle]) {
+    [self savePhotoToCameraRoll];
+  }
+
+  [actionSheet dismissWithClickedButtonIndex:buttonIndex animated:YES];
+}
+
+
 - (void)savePhotoToCameraRoll
 {
   @autoreleasepool {
