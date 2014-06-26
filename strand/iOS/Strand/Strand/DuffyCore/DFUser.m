@@ -57,7 +57,7 @@ static DFUser *currentUser;
 - (NSString *)hardwareDeviceID
 {
     if (!_hardwareDeviceID && self == [DFUser currentUser]) {
-        NSUUID *oNSUUID = [[ASIdentifierManager sharedManager] advertisingIdentifier];
+        NSUUID *oNSUUID = [[UIDevice currentDevice] identifierForVendor];
         _hardwareDeviceID = [oNSUUID UUIDString];
     }
     
