@@ -242,20 +242,17 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 {
   DFPhotoMetadataAdapter *metadataAdapter = [[DFPhotoMetadataAdapter alloc] init];
   [metadataAdapter deletePhoto:self.photoID completionBlock:^(BOOL success) {
-    NSString *resultString;
     if (success) {
-      resultString = @"Photo successfully deleted.";
+      [self.navigationController popViewControllerAnimated:YES];
     } else {
-      resultString = @"Sorry, an error occurred.  Please try again or contact support.";
+      UIAlertView *alertView = [[UIAlertView alloc]
+                                initWithTitle:@"Error"
+                                message:@"Sorry, an error occurred.  Please try again or contact support."
+                                delegate:nil
+                                cancelButtonTitle:@"OK"
+                                otherButtonTitles:nil];
+      [alertView show];
     }
-    
-    UIAlertView *alertView = [[UIAlertView alloc]
-                              initWithTitle:@"Delete Photo"
-                              message:resultString
-                              delegate:nil
-                              cancelButtonTitle:@"OK"
-                              otherButtonTitles:nil];
-    [alertView show];
   }];
 }
 
