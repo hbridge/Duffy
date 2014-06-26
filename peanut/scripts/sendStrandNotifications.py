@@ -107,8 +107,11 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			if photo.neighbored_time and not hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 				names.append(cleanName(photo.user.first_name))
 
+		# Grab unique names
+		names = set(names)
+		
 		if len(names) > 0:
-			msg = " ".join(names) + " took a photo near you!"
+			msg = " & ".join(names) + " took a photo near you!"
 
 			logger.debug("Sending %s to %s" % (msg, user.first_name))
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
