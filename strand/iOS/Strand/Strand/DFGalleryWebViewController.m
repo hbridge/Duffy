@@ -28,7 +28,7 @@
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    self.navigationItem.title = @"Gallery";
+    self.navigationItem.title = @"Shared";
   }
   return self;
 }
