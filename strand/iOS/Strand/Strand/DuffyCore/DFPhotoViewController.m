@@ -18,6 +18,8 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIImage+DFHelpers.h"
 #import "DFAnalytics.h"
+#import "DFPhotoStore.h"
+#import "DFUser.h"
 
 @interface DFPhotoViewController ()
 
@@ -157,10 +159,17 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 
 - (void)showPhotoActions:(id)sender
 {
+  NSString *deleteTitle;
+  if ([self isPhotoDeletableByUser]) {
+    deleteTitle = DeleteButtonTitle;
+  } else {
+    deleteTitle = nil;
+  }
+  
   UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                            delegate:self
                                                   cancelButtonTitle:CancelButtonTitle
-                                             destructiveButtonTitle:DeleteButtonTitle
+                                             destructiveButtonTitle:deleteTitle
                                                   otherButtonTitles:SaveButtonTitle, nil];
   
   if ([[sender class] isSubclassOfClass:[UIBarButtonItem class]]) {
@@ -170,15 +179,34 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   }
 }
 
+/*
+ We only want users to be able to delete photos that they uploaded.
+ */
+
+- (BOOL)isPhotoDeletableByUser
+{
+  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:self.photoID];
+  DDLogVerbose(@"photo null: %d userID %llu currentUserID: %llu",
+               photo == nil,
+               photo.userID,
+               [[DFUser currentUser] userID]);
+  if (photo && photo.userID == [[DFUser currentUser] userID]) {
+    return YES;
+  }
+  
+  return NO;
+}
+
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
   NSString *buttonTitle = [actionSheet buttonTitleAtIndex:buttonIndex];
   DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
-  
    if ([buttonTitle isEqualToString:DeleteButtonTitle]) {
      UIAlertView *alertView = [[UIAlertView alloc]
                                initWithTitle:@"Delete Photo"
-                               message:@"Are you sure you want to delete this photo from Strand?  This photo will remain in your camera roll, but other Strand users will no longer be able to see it."
+                               message:@"Are you sure you want to delete this photo from Strand?"
+                               " This photo will remain in your Camera Roll, but other Strand users"
+                               " will no longer be able to see it."
                                delegate:self
                                cancelButtonTitle:@"Cancel"
                                otherButtonTitles:@"Delete", nil];
@@ -192,7 +220,6 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {
-  DDLogVerbose(@"The delete index = %d", buttonIndex);
   if (buttonIndex == 1) {
     [self deletePhoto];
   }
@@ -231,7 +258,6 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
                                 [alertView show];
                                 [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
                               }
-                              
                             }
        ];
     }];
