@@ -8,13 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPhotoView.h"
+#import "DFTypedefs.h"
 
 @class DFPhoto;
 
-@interface DFPhotoViewController : UIViewController <UIActionSheetDelegate>
+@interface DFPhotoViewController : UIViewController <UIActionSheetDelegate, UIAlertViewDelegate>
 
 @property (strong, nonatomic) DFPhoto *photo;
 @property (strong, nonatomic) NSURL *photoURL;
+@property (readonly) DFPhotoIDType photoID;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;

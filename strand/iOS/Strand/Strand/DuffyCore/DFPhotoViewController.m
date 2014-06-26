@@ -129,6 +129,17 @@
   [self setImageFromPhotoURL:photoURL];
 }
 
+- (DFPhotoIDType)photoID
+{
+  if (self.photo) return self.photo.photoID;
+  if (self.photoURL) {
+    NSString *photoIDString = [self.photoURL.lastPathComponent stringByDeletingPathExtension];
+    return [photoIDString longLongValue];
+  }
+  
+  return 0;
+}
+
 - (void)showShareActivity
 {
   if (self.photo) {
@@ -165,7 +176,13 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
   
    if ([buttonTitle isEqualToString:DeleteButtonTitle]) {
-    
+     UIAlertView *alertView = [[UIAlertView alloc]
+                               initWithTitle:@"Delete Photo"
+                               message:@"Are you sure you want to delete this photo from Strand?  This photo will remain in your camera roll, but other Strand users will no longer be able to see it."
+                               delegate:self
+                               cancelButtonTitle:@"Cancel"
+                               otherButtonTitles:@"Delete", nil];
+     [alertView show];
   } else if ([buttonTitle isEqualToString:SaveButtonTitle]) {
     [self savePhotoToCameraRoll];
   }
@@ -173,13 +190,19 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   [actionSheet dismissWithClickedButtonIndex:buttonIndex animated:YES];
 }
 
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  DDLogVerbose(@"The delete index = %d", buttonIndex);
+  if (buttonIndex == 1) {
+    [self deletePhoto];
+  }
+}
+
 
 - (void)savePhotoToCameraRoll
 {
   @autoreleasepool {
-    NSString *photoIDString = [self.photoURL.lastPathComponent stringByDeletingPathExtension];
-    DFPhotoIDType photoID = [photoIDString longLongValue];
-    [self.photoAdapter getPhotoMetadata:photoID completionBlock:^(NSDictionary *metadata) {
+    [self.photoAdapter getPhotoMetadata:self.photoID completionBlock:^(NSDictionary *metadata) {
       DDLogVerbose(@"Photo metadata: %@", metadata[@"{Exif}"]);
       ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
       UIImage *image = self.photoView.image;
@@ -213,6 +236,27 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
        ];
     }];
   }
+}
+
+- (void)deletePhoto
+{
+  DFPhotoMetadataAdapter *metadataAdapter = [[DFPhotoMetadataAdapter alloc] init];
+  [metadataAdapter deletePhoto:self.photoID completionBlock:^(BOOL success) {
+    NSString *resultString;
+    if (success) {
+      resultString = @"Photo successfully deleted.";
+    } else {
+      resultString = @"Sorry, an error occurred.  Please try again or contact support.";
+    }
+    
+    UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:@"Delete Photo"
+                              message:resultString
+                              delegate:nil
+                              cancelButtonTitle:@"OK"
+                              otherButtonTitles:nil];
+    [alertView show];
+  }];
 }
 
 - (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image
