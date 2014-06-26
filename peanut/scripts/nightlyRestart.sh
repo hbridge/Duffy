@@ -4,36 +4,36 @@
 #
 # Needed because long running python scripts have memory leaks.
 #
-stop duffy-faces
+service duffy-faces stop
 sleep 1
-start duffy-faces
+service duffy-faces start
 
 sleep 5
 
-stop duffy-twofishes
+service duffy-twofishes stop
 sleep 1
-start duffy-twofishes
+service duffy-twofishes start
 
 sleep 5
 
-stop duffy-classifier
+service duffy-classifier stop
 sleep 1
-start duffy-classifier
+service duffy-classifier start
 
 sleep 5
 
-stop duffy-neighbor
+service duffy-neighbor stop
 sleep 1
-start duffy-neighbor
+service duffy-neighbor start
 
 sleep 5
 
-stop duffy-similarity
+service duffy-similarity stop
 sleep 1
-start duffy-similarity
+service duffy-similarity start
 
 sleep 5
 
-stop duffy-strand-notifications
+service duffy-strand-notifications stop
 sleep 1
-start duffy-strand-notifications
+service duffy-strand-notifications start
