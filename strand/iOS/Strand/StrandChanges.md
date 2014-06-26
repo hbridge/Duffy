@@ -1,12 +1,20 @@
 # Strand
 
+## Jun 26th, 2014
+
+Strand now has much more reliable notifications and lets you save your favorite photos from your strands.
+
+### New
+
+- Changed "Gallery" to "Shared"
+
 ## Jun 24th, 2014
 
 ## New
 
 - Swiping a strand notification takes you to the right view
 - More readable error messages
-- Added help text for the orange shutter button
+- Added help text to explain that the orange shutter button means someone took a photo nearby
 - Better flash on/off icon
 - Analytics
 
