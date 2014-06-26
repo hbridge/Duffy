@@ -20,6 +20,7 @@
 #import "DFBackgroundRefreshController.h"
 #import "DFPeanutLocationAdapter.h"
 #import "DFAnalytics.h"
+#import "UIImage+Resize.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -74,7 +75,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
     self.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
     self.cameraOverlayView = self.customCameraOverlayView;
     [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
-    
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
   }
@@ -169,9 +169,27 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
     [_customCameraOverlayView.swapCameraButton addTarget:self
                                                   action:@selector(swapCameraButtonPressed:)
                                         forControlEvents:UIControlEventTouchUpInside];
+    [_customCameraOverlayView.lastPhotoButton addTarget:self
+                                                 action:@selector(lastPhotoButtonPressed:)
+                                       forControlEvents:UIControlEventTouchUpInside];
+    
+    [_customCameraOverlayView.lastPhotoButton setBackgroundImage:[self imageForLastPhoto]
+                                                        forState:UIControlStateNormal];
+    
   }
 
   return _customCameraOverlayView;
+}
+
+
+- (UIImage *)imageForLastPhoto
+{
+  DFPhoto *photo = [[[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:NO] firstObject];
+  if (photo) return [[photo thumbnail] thumbnailImage:46
+                                    transparentBorder:(100 - 46)/2
+                                         cornerRadius:3
+                                 interpolationQuality:kCGInterpolationDefault];
+  return nil;
 }
 
 - (void)showHelpTextIfNeeded
@@ -255,6 +273,10 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   }
 }
 
+- (void)lastPhotoButtonPressed:(id)sender
+{
+  DDLogVerbose(@"Last photo button pressed");
+}
 
 - (void)flashCameraView
 {

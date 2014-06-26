@@ -52,6 +52,17 @@
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tsx-uE-Vea">
+                    <rect key="frame" x="10" y="455" width="50" height="50"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="cyG-F7-FYT"/>
+                        <constraint firstAttribute="width" constant="50" id="fDA-JP-LUW"/>
+                    </constraints>
+                    <state key="normal">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
@@ -63,11 +74,14 @@
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="5" id="Maa-Zp-mSY"/>
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="NfH-IQ-XeU"/>
                 <constraint firstAttribute="bottom" secondItem="FDr-hg-nDc" secondAttribute="bottom" constant="30" id="Qn3-xw-Pdn"/>
+                <constraint firstItem="c4Q-fB-mQc" firstAttribute="top" secondItem="Tsx-uE-Vea" secondAttribute="bottom" id="r1q-5X-qxQ"/>
+                <constraint firstItem="Tsx-uE-Vea" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="yjy-Ua-EZz"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>
                 <outlet property="flashButton" destination="oNo-vb-nP7" id="JcR-gA-MXN"/>
                 <outlet property="galleryButton" destination="c4Q-fB-mQc" id="JyU-Po-uqs"/>
+                <outlet property="lastPhotoButton" destination="Tsx-uE-Vea" id="EP0-sD-Qxk"/>
                 <outlet property="swapCameraButton" destination="mF1-Q6-VZs" id="91A-gy-EHU"/>
                 <outlet property="takePhotoButton" destination="FDr-hg-nDc" id="2eh-0G-EFo"/>
             </connections>
