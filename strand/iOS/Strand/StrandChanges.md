@@ -8,6 +8,10 @@
 - Delete and unshare photos you've taken from Strand: use the action button when viewing a photo you took.
 - Switched analytics to Localytics
 
+### Bugs fixed
+
+- No more double help text on startup if there is a joinable Strand nearby
+
 ## Jun 26th, 2014
 
 Strand now has much more reliable notifications and lets you save your favorite photos from your strands.
