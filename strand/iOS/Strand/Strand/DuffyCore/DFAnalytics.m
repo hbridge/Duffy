@@ -120,44 +120,51 @@ static DFAnalytics *defaultLogger;
   [[LocalyticsSession shared] upload];
 }
 
+
++ (void)logEvent:(NSString *)eventName withParameters:(NSDictionary *)parameters
+{
+  [[LocalyticsSession shared] tagEvent:eventName attributes:parameters];
+}
+
+
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params
 {
-    NSMutableDictionary *allParams = [[NSMutableDictionary alloc] initWithDictionary:params];
-    
-//    [Flurry logEvent:[self eventNameForControllerViewed:viewController]
-//      withParameters:allParams timed:YES];
+  [[LocalyticsSession shared] tagScreen:[self eventNameForControllerViewed:viewController]];
 }
 
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params
 {
-//    [Flurry endTimedEvent:[self eventNameForControllerViewed:viewController]
-//           withParameters:params];
+  // Do nothing for now
 }
 
 + (NSString *)eventNameForControllerViewed:(UIViewController *)viewController
 {
-    return [NSString stringWithFormat:@"%@%@", [viewController.class description], ControllerViewedEventSuffix];
-}
-
-+ (void)logCameraRollScanTotalAssets:(NSUInteger)totalAssets addedAssets:(NSUInteger)numAdded
-{
-//    [Flurry logEvent:CameraRollScannedEvent
-//      withParameters:@{
-//                       PhotosTotalKey: [NSNumber numberWithUnsignedInteger:totalAssets],
-//                       PhotosAddedKey: [NSNumber numberWithUnsignedInteger:numAdded],
-//                       }];
+  NSMutableString *className = [[viewController.class description] mutableCopy];
+  //remove DF
+  [className replaceOccurrencesOfString:@"DF"
+                             withString:@""
+                                options:0
+                                  range:(NSRange){0,2}];
+  //remove ViewController
+  [className replaceOccurrencesOfString:@"ViewController"
+                             withString:@""
+                                options:0
+                                  range:(NSRange) {0, className.length}];
+  
+  
+  return className;
 }
 
 + (void)logSwitchBetweenPhotos:(NSString *)actionType
 {
-//    [Flurry logEvent:SwitchedPhotoToPhotoEvent withParameters:@{ActionTypeKey: actionType}];
+    [DFAnalytics logEvent:SwitchedPhotoToPhotoEvent withParameters:@{ActionTypeKey: actionType}];
 }
 
 + (void)logUploadEndedWithResult:(NSString *)resultValue
 {
-//    [Flurry logEvent:UploadPhotoEvent withParameters:@{
-//                                                            ResultKey: resultValue,
-//                                                            }];
+    [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
+                                                            ResultKey: resultValue,
+                                                            }];
 }
 
 
