@@ -1,5 +1,12 @@
 # Strand
 
+## Jun 27th, 2014
+
+### New
+
+- Quick access to photos you've taken in strand
+- Delete and unshare photos you've taken from Strand
+
 ## Jun 26th, 2014
 
 Strand now has much more reliable notifications and lets you save your favorite photos from your strands.
