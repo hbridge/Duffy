@@ -40,4 +40,6 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logLocationUpdated;
 + (void)logNotificationOpened:(NSString *)notificationType;
 
++ (void)logPhotoDeletedWithResult:(NSString *)result;
+
 @end
