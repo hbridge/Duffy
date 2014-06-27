@@ -39,7 +39,6 @@
   [self configureHockey];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  [self requestPushNotifs];
   
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
@@ -147,6 +146,7 @@
   
   [DFPhotoStore sharedStore];
   [self checkForAndRequestLocationAccess];
+  [self requestPushNotifs];
   [self performForegroundOperations];
   self.window.rootViewController = [[RootViewController alloc] init];
   [[DFBackgroundRefreshController sharedBackgroundController] startBackgroundRefresh];
