@@ -2,6 +2,8 @@ import json
 import datetime
 import time
 
+from django.http import HttpResponse
+
 from common.models import Photo
 
 class TimeEnabledEncoder(json.JSONEncoder):
@@ -82,3 +84,16 @@ def turnGroupsIntoSections(groupings, num):
 			section['objects'].append(docObj)
 		result.append(section)
 	return lastDate, result
+
+def getRequestData(request):
+	if request.method == 'GET':
+		data = request.GET
+	elif request.method == 'POST':
+		data = request.POST
+
+	return data
+
+def returnFailure(response, msg):
+	response['result'] = False
+	response['debug'] = msg
+	return HttpResponse(json.dumps(response), content_type="application/json")

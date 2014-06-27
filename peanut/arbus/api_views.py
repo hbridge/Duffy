@@ -257,18 +257,18 @@ class PhotoBulkAPI(BasePhotoAPI):
 @csrf_exempt
 def autocomplete(request):
 	startTime = time.time()
-	data = getRequestData(request)
+	data = api_util.getRequestData(request)
 	htmlParser = HTMLParser.HTMLParser()
 	
 	if data.has_key('user_id'):
 		userId = data['user_id']
 	else:
-		return returnFailure(response, "Need user_id")
+		return api_util.returnFailure(response, "Need user_id")
 
 	if data.has_key('q'):
 		query = htmlParser.unescape(data['q'])
 	else:
-		return returnFailure(response, "Need q")
+		return api_util.returnFailure(response, "Need q")
 
 	# For now, we're going to search for only the first word, and we'll filter later
 	firstWord = query.split(" ")[0]
@@ -411,12 +411,12 @@ def search(request):
 def get_suggestions(request):
 	response = dict({'result': True})
 
-	data = getRequestData(request)
+	data = api_util.getRequestData(request)
 	
 	if data.has_key('user_id'):
 		userId = data['user_id']
 	else:
-		return returnFailure(response, "Need user_id")
+		return api_util.returnFailure(response, "Need user_id")
 
 	if data.has_key('limit'):
 		limit = int(data['limit'])
@@ -440,7 +440,7 @@ def get_suggestions(request):
 def get_user(request, productId = 0):
 	response = dict({'result': True})
 	user = None
-	data = getRequestData(request)
+	data = api_util.getRequestData(request)
 	
 	if data.has_key('user_id'):
 		userId = data['user_id']
@@ -470,7 +470,7 @@ def get_user(request, productId = 0):
 def create_user(request, productId = 0):
 	response = dict({'result': True})
 	user = None
-	data = getRequestData(request)
+	data = api_util.getRequestData(request)
 
 	if data.has_key('device_name'):
 		firstName =  data['device_name']
@@ -481,11 +481,11 @@ def create_user(request, productId = 0):
 		phoneId = data['phone_id']
 		try:
 			user = User.objects.get(Q(phone_id=phoneId) & Q(product_id=productId))
-			return returnFailure(response, "User already exists")
+			return api_util.returnFailure(response, "User already exists")
 		except User.DoesNotExist:
 			user = createUser(phoneId, firstName, productId)
 	else:
-		return returnFailure(response, "Need a phone_id")
+		return api_util.returnFailure(response, "Need a phone_id")
 
 	serializer = UserSerializer(user)
 	response['user'] = serializer.data
@@ -494,20 +494,6 @@ def create_user(request, productId = 0):
 """
 Helper functions
 """
-# TODO(Derek): pull this out to common, used in strand
-def getRequestData(request):
-	if request.method == 'GET':
-		data = request.GET
-	elif request.method == 'POST':
-		data = request.POST
-
-	return data
-	
-def returnFailure(response, msg):
-	response['result'] = False
-	response['debug'] = msg
-	return HttpResponse(json.dumps(response), content_type="application/json")
-
 	
 """
 	Utility method to create a user in the database and create all needed file top_locations

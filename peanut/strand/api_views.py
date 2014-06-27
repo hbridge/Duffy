@@ -113,16 +113,16 @@ def getNeighboredPhotos(userId, startTime):
 
 def neighbors(request):
 	response = dict({'result': True})
-	data = getRequestData(request)
+	data = api_util.getRequestData(request)
 
 	if data.has_key('user_id'):
 		userId = data['user_id']
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
-			return returnFailure(response, "user_id not found")
+			return api_util.returnFailure(response, "user_id not found")
 	else:
-		return returnFailure(response, "Need user_id")
+		return api_util.returnFailure(response, "Need user_id")
 
 	results = Neighbor.objects.select_related().exclude(user_1_id=1).exclude(user_2_id=1).filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
@@ -351,16 +351,16 @@ def register_apns_token(request):
 
 def send_notifications_test(request):
 	response = dict({'result': True})
-	data = getRequestData(request)
+	data = api_util.getRequestData(request)
 
 	if data.has_key('user_id'):
 		userId = data['user_id']
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
-			return returnFailure(response, "user_id not found")
+			return api_util.returnFailure(response, "user_id not found")
 	else:
-		return returnFailure(response, "Need user_id")
+		return api_util.returnFailure(response, "Need user_id")
 
 	if data.has_key('build_type'):
 		buildType = int(data['build_type'])
@@ -377,17 +377,4 @@ def send_notifications_test(request):
 	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
-
-"""
-Helper functions
-"""
-# TODO(Derek): pull this out to common, used in arbus
-def getRequestData(request):
-	if request.method == 'GET':
-		data = request.GET
-	elif request.method == 'POST':
-		data = request.POST
-
-	return data
-
 
