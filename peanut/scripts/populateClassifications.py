@@ -14,6 +14,8 @@ parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
     sys.path.insert(0, parentPath)
 
+os.environ['DJANGO_SETTINGS_MODULE'] = 'peanut.settings.dev'
+
 from peanut.settings import constants
 from common.models import Photo, User, Classification
 
