@@ -19,6 +19,7 @@ UIPageViewControllerDataSource>
 
 
 - (void)setActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos;
+- (void)activePhotoDeleted;
 
 - (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled animated:(BOOL)animated;
 

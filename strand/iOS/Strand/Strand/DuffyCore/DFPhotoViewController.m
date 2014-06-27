@@ -214,8 +214,6 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   } else if ([buttonTitle isEqualToString:SaveButtonTitle]) {
     [self savePhotoToCameraRoll];
   }
-
-  [actionSheet dismissWithClickedButtonIndex:buttonIndex animated:YES];
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
@@ -267,13 +265,19 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 - (void)deletePhoto
 {
   DFPhotoMetadataAdapter *metadataAdapter = [[DFPhotoMetadataAdapter alloc] init];
-  [metadataAdapter deletePhoto:self.photoID completionBlock:^(BOOL success) {
-    if (success) {
-      [self.navigationController popViewControllerAnimated:YES];
+  [metadataAdapter deletePhoto:self.photoID completionBlock:^(NSError *error) {
+    if (!error) {
+      // tell the multi photo view controller to select another
+      DFMultiPhotoViewController *parentMPVC = (DFMultiPhotoViewController *)self.parentViewController;
+      [parentMPVC activePhotoDeleted];
+      
+      // remove it from the db
+      [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.photoID];
     } else {
       UIAlertView *alertView = [[UIAlertView alloc]
                                 initWithTitle:@"Error"
-                                message:@"Sorry, an error occurred.  Please try again or contact support."
+                                message:[NSString stringWithFormat:@"Sorry, an error occurred: %@",
+                                         error.localizedRecoverySuggestion]
                                 delegate:nil
                                 cancelButtonTitle:@"OK"
                                 otherButtonTitles:nil];

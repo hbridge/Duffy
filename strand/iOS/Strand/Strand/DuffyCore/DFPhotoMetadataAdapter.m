@@ -313,10 +313,10 @@
    objectRequestOperationWithRequest:request
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
      DDLogVerbose(@"Delete server response: %@", mappingResult.firstObject);
-     completionBlock(YES);
+     completionBlock(nil);
    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
      DDLogWarn(@"DFPhotoMetadataAdapter delete failed: %@", error.description);
-     completionBlock(NO);
+     completionBlock(error);
    }];
   
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
