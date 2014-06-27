@@ -140,7 +140,12 @@ class PhotoAPI(BasePhotoAPI):
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	def delete(self, request, photoId, format=None):
-		photo = self.getObject(photoId)
+		# TODO: Derek. Remove this hack that currently handles repetitive requests to delete same photo
+		try:
+			photo = Photo.objects.get(id=photoId)
+		except Photo.DoesNotExist:
+			logger.info("Photo id does not exist in delete: %s   returning 204" % (photoId))
+			return Response(status=status.HTTP_204_NO_CONTENT)
 
 		userId = photo.user_id
 
