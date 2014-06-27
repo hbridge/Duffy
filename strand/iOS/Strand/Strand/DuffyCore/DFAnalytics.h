@@ -30,9 +30,7 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logUploadCancelledWithIsError:(BOOL)isError;
 + (void)logUploadRetryCountExceededWithCount:(unsigned int)count;
 
-+ (void)logPhotoLoadBegan;
-+ (void)logPhotoLoadEnded;
-+ (void)logPhotoLoadEndedWithResult:(NSString *)resultString;
++ (void)logPhotoLoadWithResult:(NSString *)result;
 
 + (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
                       flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;

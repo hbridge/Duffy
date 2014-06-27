@@ -126,6 +126,11 @@ static DFAnalytics *defaultLogger;
   [[LocalyticsSession shared] tagEvent:eventName attributes:parameters];
 }
 
++ (void)logEvent:(NSString *)eventName
+{
+  [[LocalyticsSession shared] tagEvent:eventName];
+}
+
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params
 {
@@ -170,84 +175,107 @@ static DFAnalytics *defaultLogger;
 
 + (void)logUploadEndedWithResult:(NSString *)resultValue numPhotos:(unsigned long)numPhotos sessionAvgThroughputKBPS:(double)KBPS;
 {
-//    [Flurry logEvent:UploadPhotoEvent withParameters:@{
-//                                                            ResultKey: resultValue,
-//                                                            NumberKey: [NSNumber numberWithUnsignedInteger:numPhotos],
-//                                                            SessionAvgKBPSKey: [NSNumber numberWithDouble:KBPS]
-//                                                            }];
+    [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
+                                                            ResultKey: resultValue,
+                                                            NumberKey: [self bucketStringForNumPhotos:numPhotos],
+                                                            SessionAvgKBPSKey: [DFAnalytics bucketStringForKBPS:KBPS]
+                                                            }];
 }
+
++ (NSString *)bucketStringForNumPhotos:(NSUInteger)numPhotos
+{
+  if (numPhotos == 0) return @"0";
+  if (numPhotos == 1) return @"1";
+  if (numPhotos == 2) return @"2";
+  if (numPhotos <= 5) return @"3-5";
+  if (numPhotos <= 10) return @"6-10";
+  if (numPhotos <= 20) return @"11-20";
+  if (numPhotos <= 50) return @"21-50";
+  if (numPhotos <= 100) return @"51-100";
+  if (numPhotos <= 500) return @"101-500";
+  if (numPhotos <= 1000) return @"501-1000";
+  if (numPhotos <= 2000) return @"1001-2000";
+  if (numPhotos <= 4000) return @"2001-4000";
+  if (numPhotos <= 8000) return @"4001-8000";
+  return @">8000";
+}
+
++ (NSString *)bucketStringForKBPS:(double)KBPS
+{
+  if (KBPS < 0.1) return @"<0.1";
+  if (KBPS <= 1.0) return @"0.1-1.0";
+  if (KBPS <= 10.0) return @"1.01-10";
+  if (KBPS <= 50.0) return @"10.1-50.0";
+  if (KBPS <= 100.0) return @"50.1-100.0";
+  if (KBPS <= 200.0) return @"100.1-200.0";
+  if (KBPS <= 500.0) return @"200.1-500.0";
+  if (KBPS <= 1000.0) return @"500.1-1000.0";
+  return @">1000.0";
+}
+
 
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug
 {
-//    [Flurry logEvent:UploadPhotoEvent withParameters:@{
-//                                                            ResultKey: resultValue,
-//                                                            DebugStringKey: debug
-//                                                            }];
+  [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
+                                                          ResultKey: resultValue,
+                                                          DebugStringKey: debug
+                                                          }];
 }
 
 
 + (void)logUploadCancelledWithIsError:(BOOL)isError
 {
-//    [Flurry logEvent:UploadPhotoCancelled withParameters:@{DFAnalyticsIsErrorKey: [NSNumber numberWithBool:isError]}];
+    [DFAnalytics logEvent:UploadPhotoCancelled withParameters:@{DFAnalyticsIsErrorKey: [NSNumber numberWithBool:isError]}];
 }
 
 
 
 + (void)logUploadRetryCountExceededWithCount:(unsigned int)count
 {
-//    [Flurry logEvent:UploadRetriesExceeded withParameters:@{NumberKey: [NSNumber numberWithUnsignedInt:count]}];
+    [DFAnalytics logEvent:UploadRetriesExceeded withParameters:@{NumberKey: [NSNumber numberWithUnsignedInt:count]}];
 }
 
-+ (void)logPhotoLoadBegan
-{
-//    [Flurry logEvent:PhotoLoadEvent withParameters:nil timed:YES];
-}
 
-+ (void)logPhotoLoadEnded
++ (void)logPhotoLoadWithResult:(NSString *)result
 {
-//    [Flurry endTimedEvent:PhotoLoadEvent withParameters:nil];
-}
-
-+ (void)logPhotoLoadEndedWithResult:(NSString *)resultString
-{
-//    [Flurry endTimedEvent:PhotoLoadEvent withParameters:@{ResultKey: resultString}];
+  [DFAnalytics logEvent:PhotoLoadEvent withParameters:@{ResultKey: result}];
 }
 
 + (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
                       flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 {
-//  [Flurry logEvent:PhotoTakenEvent withParameters:@{
-//                                                    CameraDeviceKey: @(camera),
-//                                                    FlashModeKey: @(flashMode)
-//                                                    }];
+  [DFAnalytics logEvent:PhotoTakenEvent withParameters:@{
+                                                    CameraDeviceKey: @(camera),
+                                                    FlashModeKey: @(flashMode)
+                                                    }];
 }
 
 + (void)logPhotoSavedWithResult:(NSString *)result
 {
-//  [Flurry logEvent:PhotoSavedEvent withParameters:@{ResultKey: result}];
+  [DFAnalytics logEvent:PhotoSavedEvent withParameters:@{ResultKey: result}];
 }
 
 
 + (void)logBackgroundAppRefreshOccurred
 {
-//  [Flurry logEvent:BackgroundRefreshEvent];
+  [DFAnalytics logEvent:BackgroundRefreshEvent];
 }
 
 + (void)logLocationUpdated
 {
-//  NSString *backgroundString = [[UIApplication sharedApplication] applicationState]
-//  == UIApplicationStateBackground ? @"true" : @"false";
-//  
-//  [Flurry logEvent:LocationUpdateEvent withParameters:@{
-//                                                        AppInBackgroundKey: backgroundString
-//                                                        }];
+  NSString *backgroundString = [[UIApplication sharedApplication] applicationState]
+  == UIApplicationStateBackground ? @"true" : @"false";
+  
+  [DFAnalytics logEvent:LocationUpdateEvent withParameters:@{
+                                                        AppInBackgroundKey: backgroundString
+                                                        }];
 }
 
 + (void)logNotificationOpened:(NSString *)notificationType
 {
-//  [Flurry logEvent:NotificationOpenedEvent withParameters:@{
-//                                                            NotificationTypeKey: notificationType
-//                                                            }];
+  [DFAnalytics logEvent:NotificationOpenedEvent withParameters:@{
+                                                            NotificationTypeKey: notificationType
+                                                            }];
 }
 
 
