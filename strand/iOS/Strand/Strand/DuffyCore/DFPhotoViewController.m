@@ -276,6 +276,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
       
       // remove it from the db
       [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.photoID];
+      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess];
     } else {
       UIAlertView *alertView = [[UIAlertView alloc]
                                 initWithTitle:@"Error"
@@ -286,6 +287,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
                                 cancelButtonTitle:@"OK"
                                 otherButtonTitles:nil];
       [alertView show];
+      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure];
     }
   }];
 }
