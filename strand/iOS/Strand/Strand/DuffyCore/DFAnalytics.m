@@ -91,6 +91,9 @@ NSString* const AppInBackgroundKey = @"appInBackground";
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
 NSString* const NotificationTypeKey = @"notificationType";
 
+// Delete
+NSString* const PhotoDeletedEvent = @"PhotoDeleted";
+
 
 static DFAnalytics *defaultLogger;
 
@@ -278,6 +281,10 @@ static DFAnalytics *defaultLogger;
                                                             }];
 }
 
++ (void)logPhotoDeletedWithResult:(NSString *)result
+{
+  [DFAnalytics logEvent:PhotoDeletedEvent withParameters:@{ResultKey: result}];
+}
 
 
 @end
