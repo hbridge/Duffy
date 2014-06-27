@@ -7,20 +7,22 @@
 //
 
 #import "DFCameraViewController.h"
+#import "DFAnalytics.h"
+#import "DFBackgroundRefreshController.h"
 #import "DFCameraOverlayView.h"
-#import "RootViewController.h"
-#import <AssetsLibrary/AssetsLibrary.h>
+#import "DFDataHasher.h"
+#import "DFLocationStore.h"
+#import "DFMultiPhotoViewController.h"
+#import "DFPeanutLocationAdapter.h"
 #import "DFPhoto.h"
 #import "DFPhotoStore.h"
-#import "DFDataHasher.h"
+#import "DFPhotoViewController.h"
+#import "DFStrandConstants.h"
 #import "DFUploadController.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "DFStrandConstants.h"
-#import "DFLocationStore.h"
-#import "DFBackgroundRefreshController.h"
-#import "DFPeanutLocationAdapter.h"
-#import "DFAnalytics.h"
+#import "RootViewController.h"
 #import "UIImage+Resize.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -84,8 +86,11 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
 - (void)viewWillAppear:(BOOL)animated
 {
+  DDLogVerbose(@"VIEWWILLAPPEAR %@ viewDidAppear", [self class]);
+
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [self updateUnseenCount];
 }
 
@@ -110,6 +115,8 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   [self updateUnseenCount];
   [self startLocationUpdates];
   [self showHelpTextIfNeeded];
+  
+  DDLogVerbose(@"VIEWDIDAPPEAR %@ viewDidAppear", [self class]);
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -185,8 +192,8 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 - (UIImage *)imageForLastPhoto
 {
   DFPhoto *photo = [[[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:NO] firstObject];
-  if (photo) return [[photo thumbnail] thumbnailImage:46
-                                    transparentBorder:(100 - 46)/2
+  if (photo) return [[photo thumbnail] thumbnailImage:100
+                                    transparentBorder:0
                                          cornerRadius:3
                                  interpolationQuality:kCGInterpolationDefault];
   return nil;
@@ -275,7 +282,25 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
 - (void)lastPhotoButtonPressed:(id)sender
 {
-  DDLogVerbose(@"Last photo button pressed");
+  NSArray *takenPhotos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
+  if (takenPhotos.count == 0) return;
+  
+  DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc]
+                                      init];
+  [mpvc setActivePhoto:[takenPhotos lastObject] inPhotos:takenPhotos];
+  
+  // Creating a nav controller and pushing it modally is a bit of a hack, but just calling
+  // [self pushViewController] results in not getting viewWillAppear/didAppear on return,
+  // and trying to manually send them resulted in strange bugs so this seems like the lesser
+  // of two evils
+  UINavigationController *photoNav = [[UINavigationController alloc] initWithRootViewController:mpvc];
+  mpvc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Camera"
+                                                                           style:UIBarButtonItemStylePlain
+                                                                          target:photoNav
+                                                                          action:@selector(dismissModalViewControllerAnimated:)];
+  mpvc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:photoNav action:@selector(dismissModalViewControllerAnimated:)];
+  [self presentViewController:photoNav animated:YES completion:nil];
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:NO];
 }
 
 - (void)flashCameraView

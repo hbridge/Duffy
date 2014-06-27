@@ -65,6 +65,13 @@
   [self setNeedsStatusBarAppearanceUpdate];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  DDLogVerbose(@"VIEWDIDAPPEAR %@ viewDidAppear", [self class]);
+
+}
+
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.

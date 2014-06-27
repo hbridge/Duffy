@@ -53,7 +53,7 @@
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Tsx-uE-Vea">
-                    <rect key="frame" x="10" y="455" width="50" height="50"/>
+                    <rect key="frame" x="250" y="505" width="50" height="50"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="50" id="cyG-F7-FYT"/>
@@ -74,8 +74,8 @@
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="5" id="Maa-Zp-mSY"/>
                 <constraint firstItem="oNo-vb-nP7" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="NfH-IQ-XeU"/>
                 <constraint firstAttribute="bottom" secondItem="FDr-hg-nDc" secondAttribute="bottom" constant="30" id="Qn3-xw-Pdn"/>
-                <constraint firstItem="c4Q-fB-mQc" firstAttribute="top" secondItem="Tsx-uE-Vea" secondAttribute="bottom" id="r1q-5X-qxQ"/>
-                <constraint firstItem="Tsx-uE-Vea" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="10" id="yjy-Ua-EZz"/>
+                <constraint firstItem="c4Q-fB-mQc" firstAttribute="top" secondItem="Tsx-uE-Vea" secondAttribute="bottom" constant="-50" id="r1q-5X-qxQ"/>
+                <constraint firstItem="Tsx-uE-Vea" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="250" id="yjy-Ua-EZz"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>

@@ -18,8 +18,7 @@ UIPageViewControllerDataSource>
 @property (nonatomic) BOOL theatreModeEnabled;
 
 
-- (id)initWithActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos;
-- (id)initWithActivePhotoURL:(NSURL *)url inURLs:(NSArray *)photoURLs;
+- (void)setActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos;
 
 - (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled animated:(BOOL)animated;
 

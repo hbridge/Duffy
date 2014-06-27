@@ -16,7 +16,6 @@
 @property (nonatomic) NSUInteger currentPhotoIndex;
 @property (nonatomic, retain) NSArray *photos;
 @property (nonatomic) BOOL hideStatusBar;
-@property (nonatomic, retain) NSArray *photoURLs;
 
 @end
 
@@ -36,32 +35,21 @@
     return self;
 }
 
-- (id)initWithActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos
+- (void)setActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos
 {
-  self = [self init];
-  if (self) {
-    self.photos = photos;
-    self.dataSource = self;
-  }
-  
-  return self;
-}
-
-- (id)initWithActivePhotoURL:(NSURL *)url inURLs:(NSArray *)photoURLs
-{
-  self = [self init];
-  if (self) {
-    self.photoURLs = photoURLs;
-    self.dataSource = self;
-  }
-  
-  return self;
+  self.dataSource = self;
+  self.photos = photos;
+  DFPhotoViewController *viewController = [[DFPhotoViewController alloc] init];
+  viewController.photo = photo;
+  [self setViewControllers:@[viewController]
+                 direction:UIPageViewControllerNavigationDirectionForward
+                  animated:NO
+                completion:nil];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self.navigationController setNavigationBarHidden:NO animated:YES];
   
   UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
                                  initWithBarButtonSystemItem:UIBarButtonSystemItemAction
@@ -72,13 +60,15 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-    [super viewDidAppear:animated];
-    [DFAnalytics logViewController:self appearedWithParameters:nil];
+  [super viewDidAppear:animated];
+  [self.navigationController setNavigationBarHidden:NO animated:YES];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
+  
     [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 - (void)didReceiveMemoryWarning
@@ -107,30 +97,45 @@
 - (UIViewController*)pageViewController:(UIPageViewController *)pageViewController
      viewControllerBeforeViewController:(UIViewController *)viewController
 {
-  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   if (self.photos) {
-    DFPhoto *photo = [self.photos objectAtIndex:self.currentPhotoIndex];
-    pvc.photo = photo;
-  } else if (self.photoURLs) {
-    NSURL *photoURL = self.photoURLs[self.currentPhotoIndex];
-    pvc.photoURL = photoURL;
+    NSInteger currentPhotoIndex = [self photoIndexForViewController:viewController];
+    if (currentPhotoIndex <= 0 || currentPhotoIndex == NSNotFound) return nil;
+    
+    DFPhoto *photoBefore = self.photos[currentPhotoIndex - 1];
+    DFPhotoViewController *beforePVC = [[DFPhotoViewController alloc] init];
+    beforePVC.photo = photoBefore;
+    return beforePVC;
   }
-  return pvc;
+  
+  return nil;
 }
 
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
-  if (self.currentPhotoIndex < self.photos.count - 1) {
-    self.currentPhotoIndex += 1;
-  } else {
-    self.currentPhotoIndex = 0;
+  if (self.photos) {
+    NSInteger currentPhotoIndex = [self photoIndexForViewController:viewController];
+    if (currentPhotoIndex >= self.photos.count - 1 || currentPhotoIndex == NSNotFound) return nil;
+    
+    DFPhoto *photoAfter = self.photos[currentPhotoIndex + 1];
+    DFPhotoViewController *PVCAfter = [[DFPhotoViewController alloc] init];
+    PVCAfter.photo = photoAfter;
+    return PVCAfter;
   }
   
-  DFPhoto *photo = [self.photos objectAtIndex:self.currentPhotoIndex];
-  DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
-  pvc.photo = photo;
-  return pvc;
+  return nil;
+}
+
+- (NSUInteger)photoIndexForViewController:(UIViewController *)viewController
+{
+  if (self.photos) {
+    DFPhotoViewController *currentPVC = (DFPhotoViewController *)viewController;
+    DFPhoto *photo = currentPVC.photo;
+    NSUInteger index = [self.photos indexOfObject:photo];
+    return index;
+  }
+  
+  return NSNotFound;
 }
 
 - (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled
