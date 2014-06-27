@@ -91,6 +91,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
   [self updateUnseenCount];
+  [self.customCameraOverlayView setLastPhotoButtonImage:[self imageForLastPhoto]];
 }
 
 - (void)updateUnseenCount
@@ -179,8 +180,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
     [_customCameraOverlayView.lastPhotoButton addTarget:self
                                                  action:@selector(lastPhotoButtonPressed:)
                                        forControlEvents:UIControlEventTouchUpInside];
-    
-    [_customCameraOverlayView setLastPhotoButtonImage:[self imageForLastPhoto]];
   }
 
   return _customCameraOverlayView;
