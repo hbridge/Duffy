@@ -115,8 +115,10 @@ static DFPhotoStore *defaultStore;
 }
 
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context
+                                              maxCount:(NSUInteger)maxCount
 {
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  request.fetchLimit = maxCount;
   
   NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
   request.entity = entity;
@@ -132,6 +134,11 @@ static DFPhotoStore *defaultStore;
   }
   
   return [[DFPhotoCollection alloc] initWithPhotos:result];
+}
+
++ (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context
+{
+  return [DFPhotoStore allPhotosCollectionUsingContext:context maxCount:0];
 }
 
 
@@ -263,6 +270,26 @@ static int const FetchStride = 500;
   return [DFPhotoStore photoWithPhotoID:photoID inContext:[self managedObjectContext]];
 }
 
+- (DFPhotoCollection *)mostRecentPhotos:(NSUInteger)maxCount
+{
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  request.fetchLimit = maxCount;
+  
+  NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+  request.entity = entity;
+  
+  NSSortDescriptor *dateSort = [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO];
+  request.sortDescriptors = [NSArray arrayWithObject:dateSort];
+  
+  NSError *error;
+  NSArray *result = [[self managedObjectContext] executeFetchRequest:request error:&error];
+  if (!result) {
+    [NSException raise:@"Could not fetch photos"
+                format:@"Error: %@", [error localizedDescription]];
+  }
+  
+  return [[DFPhotoCollection alloc] initWithPhotos:result];
+}
 
 - (DFPhoto *)mostRecentUploadedThumbnail
 {
@@ -558,6 +585,14 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   }
   [self saveContext];
 }
+
+- (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID
+{
+  DFPhoto *photo = [self photoWithPhotoID:photoID];
+  [[self managedObjectContext] deleteObject:photo];
+}
+
+
 
 #pragma mark - Application's Documents directory
 

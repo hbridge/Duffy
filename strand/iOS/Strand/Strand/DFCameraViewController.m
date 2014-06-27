@@ -90,7 +90,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
-  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [self updateUnseenCount];
 }
 
@@ -117,6 +116,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   [self showHelpTextIfNeeded];
   
   DDLogVerbose(@"VIEWDIDAPPEAR %@ viewDidAppear", [self class]);
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -180,22 +180,19 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
                                                  action:@selector(lastPhotoButtonPressed:)
                                        forControlEvents:UIControlEventTouchUpInside];
     
-    [_customCameraOverlayView.lastPhotoButton setBackgroundImage:[self imageForLastPhoto]
-                                                        forState:UIControlStateNormal];
-    
+    [_customCameraOverlayView setLastPhotoButtonImage:[self imageForLastPhoto]];
   }
 
   return _customCameraOverlayView;
 }
 
-
 - (UIImage *)imageForLastPhoto
 {
-  DFPhoto *photo = [[[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:NO] firstObject];
-  if (photo) return [[photo thumbnail] thumbnailImage:100
-                                    transparentBorder:0
-                                         cornerRadius:3
-                                 interpolationQuality:kCGInterpolationDefault];
+  NSArray *allPhotos = [[[DFPhotoStore sharedStore] mostRecentPhotos:1] photosByDateAscending:NO];
+  DDLogVerbose(@"imageForLastPhoto allPhotos count: %d", (int)allPhotos.count);
+  DFPhoto *photo =  [allPhotos firstObject];
+  if (photo) return photo.thumbnail;
+  
   return nil;
 }
 
@@ -282,7 +279,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
 - (void)lastPhotoButtonPressed:(id)sender
 {
-  NSArray *takenPhotos = [[[DFPhotoStore sharedStore] cameraRoll] photosByDateAscending:YES];
+  NSArray *takenPhotos = [[[DFPhotoStore sharedStore] mostRecentPhotos:100] photosByDateAscending:YES];
   if (takenPhotos.count == 0) return;
   
   DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc]
@@ -319,6 +316,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 - (void)imagePickerController:(UIImagePickerController *)picker
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogVerbose(@"Image picked, info: %@", info.description);
+  
   if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
     NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
     UIImage *originalImage, *editedImage, *imageToSave;
@@ -338,6 +336,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
         imageToSave = originalImage;
       }
       
+
+      [self.customCameraOverlayView setLastPhotoButtonImage:imageToSave];
+       
       NSMutableDictionary *metadata = [(NSDictionary *)info[UIImagePickerControllerMediaMetadata]
                                        mutableCopy];
       [self addLocationToMetadata:metadata];
@@ -428,8 +429,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
         [NSException raise:@"Could not save DB" format:@"%@", error.description];
       }
       [[DFUploadController sharedUploadController] uploadPhotos];
-      
-      
     } failureBlock:^(NSError *error) {
       [NSException raise:@"Could not get asset just created." format:@"%@", error.description];
     }];

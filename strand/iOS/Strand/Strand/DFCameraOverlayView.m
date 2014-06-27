@@ -8,6 +8,7 @@
 
 #import "DFCameraOverlayView.h"
 #import "MMPopLabel.h"
+#import "UIImage+Resize.h"
 
 @interface DFCameraOverlayView()
 
@@ -21,6 +22,9 @@
 NSString *const FlashOnTitle = @"On";
 NSString *const FlashOffTitle = @"Off";
 NSString *const FlashAutoTitle = @"Auto";
+
+static NSInteger LastPhotoImageSize = 100;
+static NSUInteger LastPhotoImageCornerRadius = 3;
 
 - (void)awakeFromNib
 {
@@ -90,6 +94,17 @@ NSString *const FlashAutoTitle = @"Auto";
 - (void)layoutSubviews
 {
   [super layoutSubviews];
+}
+
+
+- (void)setLastPhotoButtonImage:(UIImage *)image
+{
+  UIImage *resizedImage = [image thumbnailImage:LastPhotoImageSize
+                               transparentBorder:0
+                                    cornerRadius:LastPhotoImageCornerRadius
+                            interpolationQuality:kCGInterpolationDefault];
+  [self.lastPhotoButton setBackgroundImage:resizedImage
+                        forState:UIControlStateNormal];
 }
 
 @end

@@ -26,6 +26,7 @@
 // Main accessors for data
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context; // used for accessing on another thread using a different context
 - (DFPhotoCollection *)cameraRoll;
+- (DFPhotoCollection *)mostRecentPhotos:(NSUInteger)maxCount;
 - (DFPhoto *)mostRecentUploadedThumbnail;
 - (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
                                       fullUploadStatus:(BOOL)isFullPhotoUploaded;
@@ -44,6 +45,8 @@
 - (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs retainOrder:(BOOL)retainOrder;
 
 - (void)clearUploadInfo;
+
+- (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID;
 
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;

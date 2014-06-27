@@ -25,4 +25,6 @@ extern NSString *const FlashAutoTitle;
 - (void)showJoinableHelpText;
 - (void)hideJoinableHelpText;
 
+- (void)setLastPhotoButtonImage:(UIImage *)image;
+
 @end
