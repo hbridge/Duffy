@@ -265,5 +265,5 @@ class NotificationLog(models.Model):
 
 
 	def __unicode__(self):
-		return '{0}, {1}, {2}, {3}, {4}'.format(self.user_id, self.notification_id, device_token, apns)
+		return "%s %s %s %s" % (self.user_id, self.id, self.device_token, self.apns)
 
