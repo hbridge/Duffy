@@ -4,8 +4,9 @@
 
 ### New
 
-- Quick access to photos you've taken in strand
-- Delete and unshare photos you've taken from Strand
+- Quick access to photos you've taken in Strand from the right side of the Camera
+- Delete and unshare photos you've taken from Strand: use the action button when viewing a photo you took.
+- Switched analytics to Localytics
 
 ## Jun 26th, 2014
 
