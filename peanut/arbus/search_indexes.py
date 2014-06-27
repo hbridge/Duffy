@@ -271,11 +271,12 @@ class PhotoIndex(indexes.SearchIndex, indexes.Indexable):
 		if (obj.twofishes_data):
 			twoFishesData = json.loads(obj.twofishes_data)
 			
-			for data in twoFishesData["interpretations"]:
-				if "woeType" in data["feature"]:
-					#  Filter out states and countries
-					# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
-					#if data["feature"]["woeType"] != 8 and data["feature"]["woeType"] != 12:
-					locItems.append(data["feature"]["displayName"])
+			if "interpretations" in twoFishesData:
+				for data in twoFishesData["interpretations"]:
+					if "woeType" in data["feature"]:
+						#  Filter out states and countries
+						# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
+						#if data["feature"]["woeType"] != 8 and data["feature"]["woeType"] != 12:
+						locItems.append(data["feature"]["displayName"])
 
 		return locItems
