@@ -16,6 +16,9 @@ extern NSString* const DFAnalyticsValueResultSuccess;
 extern NSString* const DFAnalyticsValueResultFailure;
 extern NSString* const DFAnalyticsValueResultAborted;
 
++ (void)StartAnalyticsSession;
++ (void)ResumeAnalyticsSession;
++ (void)CloseAnalyticsSession;
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
