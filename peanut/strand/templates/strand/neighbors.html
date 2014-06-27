@@ -36,6 +36,17 @@
 			line-height: 17px;
 			letter-spacing: 0px;			
 		}
+		.ui-msg {
+			padding: 10px 10px 10px 10px;
+			text-align: center;
+			font-size: 35px;
+			color: #000000;
+		}
+		.ui-left-arrow {
+			font-size: 120px;
+			text-align: center;
+			color: rgb(245, 166, 35);
+		}
 	</style>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
 	<script src="/static/jquery.timeago.js"></script>	
@@ -151,7 +162,7 @@
 				console.log("Sending request to " + url);
 
 				$.get(url, function( data ) {
-					if (data.objects.length > 0) {
+					if (data.objects && data.objects.length > 0) {
 						photoCount = getPhotoCount(data)
 						if (photoCount != oldDataCount) {
 							oldDataCount = photoCount
@@ -173,7 +184,7 @@
 <body>
 <div class="ui-content">
 	<div class="ui-gallery" id="allImages"/>
-	<div class="ui-msg hidden">No photos. Go take some photos!</div>
+	<div class="ui-msg hidden"> <br> <br> Swipe left to take a photo! <div class='ui-left-arrow'> &larr; </div></div>
 </div>
 
 </body>
