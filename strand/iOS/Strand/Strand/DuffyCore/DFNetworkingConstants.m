@@ -11,7 +11,7 @@
 @implementation DFNetworkingConstants
 
 #ifdef DEBUG
-NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com";
+NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com:7000";
 #else
 NSString const *DFServerBaseURL = @"http://prod.strand.duffyapp.com";
 #endif

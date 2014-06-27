@@ -276,8 +276,9 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
     } else {
       UIAlertView *alertView = [[UIAlertView alloc]
                                 initWithTitle:@"Error"
-                                message:[NSString stringWithFormat:@"Sorry, an error occurred: %@",
-                                         error.localizedRecoverySuggestion]
+                                message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
+                                         error.localizedRecoverySuggestion ?
+                                          error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]
                                 delegate:nil
                                 cancelButtonTitle:@"OK"
                                 otherButtonTitles:nil];
