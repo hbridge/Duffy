@@ -210,9 +210,11 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
 - (void)showJoinableHelpTextIfNeeded
 {
-  BOOL wasShown = [[NSUserDefaults standardUserDefaults]
+  BOOL helpWasShown = [[NSUserDefaults standardUserDefaults]
+                                boolForKey:DFStrandCameraHelpWasShown];
+  BOOL joinableWasShown = [[NSUserDefaults standardUserDefaults]
                    boolForKey:DFStrandCameraJoinableHelpWasShown];
-  if (wasShown) return;
+  if (!helpWasShown || joinableWasShown) return;
   
   NSTimer *timer = [NSTimer timerWithTimeInterval:2.0
                                            target:self.customCameraOverlayView
