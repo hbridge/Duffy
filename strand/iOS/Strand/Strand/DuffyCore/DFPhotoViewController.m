@@ -202,15 +202,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   NSString *buttonTitle = [actionSheet buttonTitleAtIndex:buttonIndex];
   DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
    if ([buttonTitle isEqualToString:DeleteButtonTitle]) {
-     UIAlertView *alertView = [[UIAlertView alloc]
-                               initWithTitle:@"Delete Photo"
-                               message:@"Are you sure you want to delete this photo from Strand?"
-                               " This photo will remain in your Camera Roll, but other Strand users"
-                               " will no longer be able to see it."
-                               delegate:self
-                               cancelButtonTitle:@"Cancel"
-                               otherButtonTitles:@"Delete", nil];
-     [alertView show];
+     [self confirmDeletePhoto];
   } else if ([buttonTitle isEqualToString:SaveButtonTitle]) {
     [self savePhotoToCameraRoll];
   }
@@ -260,6 +252,18 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
        ];
     }];
   }
+}
+
+- (void)confirmDeletePhoto
+{
+  UIAlertView *alertView = [[UIAlertView alloc]
+                            initWithTitle:@"Delete Photo?"
+                            message:@"Strand users will no longer be able to see it, "
+                            "but it will remain in your Camera Roll."
+                            delegate:self
+                            cancelButtonTitle:@"Cancel"
+                            otherButtonTitles:@"Delete", nil];
+  [alertView show];
 }
 
 - (void)deletePhoto
