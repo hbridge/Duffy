@@ -290,11 +290,11 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   // and trying to manually send them resulted in strange bugs so this seems like the lesser
   // of two evils
   UINavigationController *photoNav = [[UINavigationController alloc] initWithRootViewController:mpvc];
-  mpvc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Camera"
-                                                                           style:UIBarButtonItemStylePlain
-                                                                          target:photoNav
-                                                                          action:@selector(dismissModalViewControllerAnimated:)];
-  mpvc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:photoNav action:@selector(dismissModalViewControllerAnimated:)];
+  mpvc.navigationItem.title = @"My Photos";
+  mpvc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                           target:photoNav
+                                           action:@selector(dismissModalViewControllerAnimated:)];
   [self presentViewController:photoNav animated:YES completion:nil];
   [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:NO];
 }
