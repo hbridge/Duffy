@@ -133,8 +133,9 @@ def main(argv):
 		
 		# 30 minute cut off for join strand messages
 		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(minutes=30)
+		frequencyOfGpsUpdates = datetime.datetime.utcnow()-datetime.timedelta(hours=8)
 		photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTime).filter(user__product_id=1)
-		users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=joinStrandStartTime)
+		users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdates)
 
 		sendJoinStrandNotification(photos, users, neighbors, notificationLogs)
 
