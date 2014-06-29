@@ -16,7 +16,6 @@
 #import "DFUser.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFFirstTimeSetupViewController.h"
-#import "DFLocationPinger.h"
 #import "HockeySDK.h"
 #import "DFBackgroundRefreshController.h"
 #import <RestKit/RestKit.h>
@@ -145,7 +144,6 @@
   }
   
   [DFPhotoStore sharedStore];
-  [self checkForAndRequestLocationAccess];
   [self requestPushNotifs];
   [self performForegroundOperations];
   self.window.rootViewController = [[RootViewController alloc] init];
@@ -158,16 +156,6 @@
   if ([self isAppSetupComplete]) {
     [[DFUploadController sharedUploadController] uploadPhotos];
     [[DFBackgroundRefreshController sharedBackgroundController] performFetch];
-  }
-}
-
-- (void)checkForAndRequestLocationAccess
-{
-  if ([[DFLocationPinger sharedInstance] haveLocationPermisison]) {
-    DDLogInfo(@"Already have location access.");
-  } else if ([[DFLocationPinger sharedInstance] canAskForLocationPermission])
-  {
-    [[DFLocationPinger sharedInstance] askForLocationPermission];
   }
 }
 
