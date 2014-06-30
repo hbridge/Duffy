@@ -23,6 +23,8 @@
 #import "RootViewController.h"
 #import "UIImage+Resize.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "DFPhotoAsset.h"
+#import "DFCameraRollPhotoAsset.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -190,7 +192,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   NSArray *allPhotos = [[[DFPhotoStore sharedStore] mostRecentPhotos:1] photosByDateAscending:NO];
   DDLogVerbose(@"imageForLastPhoto allPhotos count: %d", (int)allPhotos.count);
   DFPhoto *photo =  [allPhotos firstObject];
-  if (photo) return photo.thumbnail;
+  if (photo) return photo.asset.thumbnail;
   
   return nil;
 }
@@ -416,13 +418,16 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     
     ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
     [library assetForURL:assetURL resultBlock:^(ALAsset *asset) {
-      NSData *hashData = [DFDataHasher hashDataForALAsset:asset];
-      DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:asset
-                                                 withHashData:hashData
-                                                     photoTimeZone:[NSTimeZone defaultTimeZone]
-                                                    inContext:context];
+      DFCameraRollPhotoAsset *newAsset = [DFCameraRollPhotoAsset createWithALAsset:asset
+                                                                         inContext:context];
+     
+      DFPhoto *photo = [DFPhoto createWithAsset:newAsset
+                                         userID:[[DFUser currentUser] userID]
+                                       timeZone:[NSTimeZone defaultTimeZone]
+                                      inContext:context];
+      
       DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter]
-                                          stringFromDate:newPhoto.creationDate]);
+                                          stringFromDate:photo.creationDate]);
       
       NSError *error;
       [context save:&error];

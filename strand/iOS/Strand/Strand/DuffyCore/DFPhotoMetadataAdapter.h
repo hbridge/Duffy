@@ -7,11 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPhoto.h"
 #import "DFNetworkAdapter.h"
-#import "DFTypedefs.h"
 
 @class RKObjectManager;
-@class DFPhoto;
 
 typedef void (^DFMetadataFetchCompletionBlock)(NSDictionary *metadata);
 typedef void (^DFPhotoDeleteCompletionBlock)(NSError *error);

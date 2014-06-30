@@ -33,11 +33,8 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
       self.id = [NSNumber numberWithUnsignedLongLong:photo.photoID];
       NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
       self.time_taken = [djangoFormatter stringFromDate:photo.creationDate];
-      self.metadata = [self trimmedMetadataDict:photo.metadataDictionary];
-      if (!photo.creationHashString || [photo.creationHashString isEqualToString:@""]) {
-        [NSException raise:@"No hash" format:@"Cannot create a DFPeanutPhoto from DFPhoto with no creation hash."];
-      }
-      self.iphone_hash = photo.creationHashString;
+      self.metadata = [self trimmedMetadataDict:photo.asset.metadata];
+      self.iphone_hash = photo.asset.hashString;
       self.file_key = photo.objectID.URIRepresentation;
     }
   }

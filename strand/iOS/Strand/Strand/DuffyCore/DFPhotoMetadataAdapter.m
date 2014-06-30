@@ -160,11 +160,11 @@
      if (appendThumbnailData) {
        for (DFPhoto *photo in photos) {
          @autoreleasepool {
-           NSData *thumbnailData = [photo thumbnailJPEGData];
+           NSData *thumbnailData = photo.asset.thumbnailJPEGData;
            numBytes += thumbnailData.length;
            [formData appendPartWithFileData:thumbnailData
                                        name:photo.objectID.URIRepresentation.absoluteString
-                                   fileName:[NSString stringWithFormat:@"%@.jpg", photo.creationHashString]
+                                   fileName:[NSString stringWithFormat:@"%@.jpg", photo.asset.hashString]
                                    mimeType:@"image/jpg"];
          }
        }
@@ -225,7 +225,7 @@
        @autoreleasepool {
          if (uploadImage) {
            NSData *imageData = //photo.thumbnailData;
-           [photoToUpload scaledJPEGDataWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION
+           [photoToUpload.asset scaledJPEGDataWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION
                                  compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY];
            imageDataBytes += imageData.length;
            [formData appendPartWithFileData:imageData

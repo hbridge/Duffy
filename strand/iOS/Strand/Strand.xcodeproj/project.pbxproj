@@ -15,6 +15,8 @@
 		5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */; };
 		5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */; };
 		5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */; };
+		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
+		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
@@ -38,12 +40,10 @@
 		5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9011947C30800862D9C /* DFPhotoStore.m */; };
 		5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */; };
 		5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9051947C30800862D9C /* DFToastNotificationManager.m */; };
-		5AC4A9311947C30800862D9C /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9071947C30800862D9C /* DFTypedefs.m */; };
 		5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9091947C30800862D9C /* DFUploadController.m */; };
 		5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A90B1947C30800862D9C /* DFUploadOperation.m */; };
 		5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A90D1947C30800862D9C /* DFUploadQueue.m */; };
 		5AC4A9351947C30800862D9C /* DFUploadSessionStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A90F1947C30800862D9C /* DFUploadSessionStats.m */; };
-		5AC4A9361947C30800862D9C /* DFURLProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9111947C30800862D9C /* DFURLProtocol.m */; };
 		5AC4A9371947C30800862D9C /* DFUser.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9131947C30800862D9C /* DFUser.m */; };
 		5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9151947C30800862D9C /* DFUserPeanutAdapter.m */; };
 		5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9171947C30800862D9C /* NSArray+DFJSON.m */; };
@@ -103,6 +103,11 @@
 		5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutTrueFalseResponse.m; sourceTree = "<group>"; };
 		5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationStore.h; sourceTree = "<group>"; };
 		5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationStore.m; sourceTree = "<group>"; };
+		5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 4.xcdatamodel"; sourceTree = "<group>"; };
+		5A40343B196083A9003D7546 /* DFPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoAsset.h; path = DuffyCore/DFPhotoAsset.h; sourceTree = "<group>"; };
+		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
+		5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFCameraRollPhotoAsset.m; path = DuffyCore/DFCameraRollPhotoAsset.m; sourceTree = "<group>"; };
+		5A40344119609163003D7546 /* DFPhotoAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoAsset.m; path = DuffyCore/DFPhotoAsset.m; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -150,8 +155,6 @@
 		5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "DFPhotoStore+IntegrityCheck.m"; path = "DuffyCore/DFPhotoStore+IntegrityCheck.m"; sourceTree = "<group>"; };
 		5AC4A9041947C30800862D9C /* DFToastNotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFToastNotificationManager.h; path = DuffyCore/DFToastNotificationManager.h; sourceTree = "<group>"; };
 		5AC4A9051947C30800862D9C /* DFToastNotificationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFToastNotificationManager.m; path = DuffyCore/DFToastNotificationManager.m; sourceTree = "<group>"; };
-		5AC4A9061947C30800862D9C /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFTypedefs.h; path = DuffyCore/DFTypedefs.h; sourceTree = "<group>"; };
-		5AC4A9071947C30800862D9C /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFTypedefs.m; path = DuffyCore/DFTypedefs.m; sourceTree = "<group>"; };
 		5AC4A9081947C30800862D9C /* DFUploadController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUploadController.h; path = DuffyCore/DFUploadController.h; sourceTree = "<group>"; };
 		5AC4A9091947C30800862D9C /* DFUploadController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFUploadController.m; path = DuffyCore/DFUploadController.m; sourceTree = "<group>"; };
 		5AC4A90A1947C30800862D9C /* DFUploadOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUploadOperation.h; path = DuffyCore/DFUploadOperation.h; sourceTree = "<group>"; };
@@ -160,8 +163,6 @@
 		5AC4A90D1947C30800862D9C /* DFUploadQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFUploadQueue.m; path = DuffyCore/DFUploadQueue.m; sourceTree = "<group>"; };
 		5AC4A90E1947C30800862D9C /* DFUploadSessionStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUploadSessionStats.h; path = DuffyCore/DFUploadSessionStats.h; sourceTree = "<group>"; };
 		5AC4A90F1947C30800862D9C /* DFUploadSessionStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFUploadSessionStats.m; path = DuffyCore/DFUploadSessionStats.m; sourceTree = "<group>"; };
-		5AC4A9101947C30800862D9C /* DFURLProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFURLProtocol.h; path = DuffyCore/DFURLProtocol.h; sourceTree = "<group>"; };
-		5AC4A9111947C30800862D9C /* DFURLProtocol.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFURLProtocol.m; path = DuffyCore/DFURLProtocol.m; sourceTree = "<group>"; };
 		5AC4A9121947C30800862D9C /* DFUser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUser.h; path = DuffyCore/DFUser.h; sourceTree = "<group>"; };
 		5AC4A9131947C30800862D9C /* DFUser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFUser.m; path = DuffyCore/DFUser.m; sourceTree = "<group>"; };
 		5AC4A9141947C30800862D9C /* DFUserPeanutAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUserPeanutAdapter.h; path = DuffyCore/DFUserPeanutAdapter.h; sourceTree = "<group>"; };
@@ -264,6 +265,10 @@
 		5A40343219607B92003D7546 /* PhotoAsset */ = {
 			isa = PBXGroup;
 			children = (
+				5A40343B196083A9003D7546 /* DFPhotoAsset.h */,
+				5A40344119609163003D7546 /* DFPhotoAsset.m */,
+				5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */,
+				5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */,
 				5AC4A8E11947C30800862D9C /* ALAsset+DFExtensions.h */,
 				5AC4A8E21947C30800862D9C /* ALAsset+DFExtensions.m */,
 			);
@@ -338,8 +343,6 @@
 				5AC4A90D1947C30800862D9C /* DFUploadQueue.m */,
 				5AC4A90E1947C30800862D9C /* DFUploadSessionStats.h */,
 				5AC4A90F1947C30800862D9C /* DFUploadSessionStats.m */,
-				5AC4A9101947C30800862D9C /* DFURLProtocol.h */,
-				5AC4A9111947C30800862D9C /* DFURLProtocol.m */,
 				5AC4A9141947C30800862D9C /* DFUserPeanutAdapter.h */,
 				5AC4A9151947C30800862D9C /* DFUserPeanutAdapter.m */,
 			);
@@ -371,6 +374,7 @@
 				5AC4A9011947C30800862D9C /* DFPhotoStore.m */,
 				5AC4A9021947C30800862D9C /* DFPhotoStore+IntegrityCheck.h */,
 				5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */,
+				5A40343219607B92003D7546 /* PhotoAsset */,
 			);
 			name = "Photo DB";
 			sourceTree = "<group>";
@@ -440,10 +444,11 @@
 		5AC4A8E01947C2E700862D9C /* Duffy Core */ = {
 			isa = PBXGroup;
 			children = (
-				5A40343119607B84003D7546 /* Analytics */,
-				5A40343219607B92003D7546 /* PhotoAsset */,
 				5AC4A8E51947C30800862D9C /* DFAppInfo.h */,
 				5AC4A8E61947C30800862D9C /* DFAppInfo.m */,
+				5AC4A9121947C30800862D9C /* DFUser.h */,
+				5AC4A9131947C30800862D9C /* DFUser.m */,
+				5A40343119607B84003D7546 /* Analytics */,
 				5A40343319607BB2003D7546 /* Utils */,
 				5A40343419607BBF003D7546 /* JSON conversion */,
 				5A40343519607C32003D7546 /* PhotoViewer */,
@@ -451,10 +456,6 @@
 				5A40343719607C4E003D7546 /* Notificatinos (intra-app) */,
 				5A40343919607CA0003D7546 /* Notifications (User in-app) */,
 				5A40343819607C74003D7546 /* Photo DB */,
-				5AC4A9061947C30800862D9C /* DFTypedefs.h */,
-				5AC4A9071947C30800862D9C /* DFTypedefs.m */,
-				5AC4A9121947C30800862D9C /* DFUser.h */,
-				5AC4A9131947C30800862D9C /* DFUser.m */,
 			);
 			name = "Duffy Core";
 			path = Strand;
@@ -768,7 +769,6 @@
 				5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */,
 				5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */,
 				5AC4A9261947C30800862D9C /* DFNetworkingConstants.m in Sources */,
-				5AC4A9311947C30800862D9C /* DFTypedefs.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
@@ -798,7 +798,6 @@
 				5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
-				5AC4A9361947C30800862D9C /* DFURLProtocol.m in Sources */,
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
 				5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
@@ -818,6 +817,8 @@
 				5AC4A92C1947C30800862D9C /* DFPhotoImageCache.m in Sources */,
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,
+				5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */,
+				5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */,
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,
@@ -1032,11 +1033,12 @@
 		5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */,
 				5AC4A94C1947C54C00862D9C /* Duffy 2.xcdatamodel */,
 				5AC4A94D1947C54C00862D9C /* Duffy 3.xcdatamodel */,
 				5AC4A94E1947C54C00862D9C /* Duffy.xcdatamodel */,
 			);
-			currentVersion = 5AC4A94D1947C54C00862D9C /* Duffy 3.xcdatamodel */;
+			currentVersion = 5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */;
 			name = Duffy.xcdatamodeld;
 			path = DuffyCore/Duffy.xcdatamodeld;
 			sourceTree = "<group>";

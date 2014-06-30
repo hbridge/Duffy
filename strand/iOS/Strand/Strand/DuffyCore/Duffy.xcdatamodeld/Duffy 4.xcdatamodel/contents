@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5064" systemVersion="13D65" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="DFCameraRollPhotoAsset" representedClassName="DFCameraRollPhotoAsset" parentEntity="DFPhotoAsset" syncable="YES">
+        <attribute name="alAssetURLString" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="DFPhoto" representedClassName="DFPhoto" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="upload157Date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="upload569Date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <relationship name="asset" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DFPhotoAsset" inverseName="photo" inverseEntity="DFPhotoAsset" syncable="YES"/>
+    </entity>
+    <entity name="DFPhotoAsset" isAbstract="YES" syncable="YES">
+        <relationship name="photo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DFPhoto" inverseName="asset" inverseEntity="DFPhoto" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="133"/>
+        <element name="DFCameraRollPhotoAsset" positionX="45" positionY="117" width="128" height="58"/>
+        <element name="DFPhotoAsset" positionX="63" positionY="126" width="128" height="58"/>
+    </elements>
+</model>
