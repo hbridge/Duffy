@@ -11,26 +11,114 @@
 
 @implementation DFPhotoAsset
 
-@synthesize canonicalURL;
-@synthesize fullResolutionImage;
-@synthesize fullScreenImage;
-@synthesize highResolutionImage;
-@synthesize thumbnail;
-@synthesize hashString;
-@synthesize location;
-@synthesize metadata;
+#pragma mark - Property wrappers
 
 
-+ (NSError *)abstractClassError
+- (UIImage *)thumbnail
 {
-  return [NSError errorWithDomain:@"com.DuffyApp.DuffyCore"
-                             code:-1
-                         userInfo:@{NSLocalizedDescriptionKey: @"DFPhotoAsset is an abstract class. This method must be implemented"}];
+  UIImage __block *loadedThumbnail;
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  
+  // Synchronously load the thunbnail
+  // must dispatch this off the main thread or it will deadlock!
+  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [self loadUIImageForThumbnail:^(UIImage *thumbnailImage) {
+      loadedThumbnail = thumbnailImage;
+      dispatch_semaphore_signal(sema);
+    } failureBlock:^(NSError *error) {
+      dispatch_semaphore_signal(sema);
+    }];
+  });
+  
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+  
+  return  loadedThumbnail;
 }
 
-+ (void)abstractClassException
+- (UIImage *)fullResolutionImage
 {
-  [NSException raise:@"Attempting to call abstract DFPhotoAsset method" format:@"This DFPhotoAsset method is abstract.  You cannot call methods on it directly."];
+  UIImage __block *loadedFullImage;
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  
+  // Synchronously load the thunbnail
+  // must dispatch this off the main thread or it will deadlock!
+  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [self loadUIImageForFullImage:^(UIImage *image) {
+      loadedFullImage = image;
+      dispatch_semaphore_signal(sema);
+    } failureBlock:^(NSError *error) {
+      dispatch_semaphore_signal(sema);
+    }];
+  });
+  
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+  return loadedFullImage;
+}
+
+- (UIImage *)highResolutionImage
+{
+  UIImage __block *loadedImage;
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  
+  // Synchronously load the thunbnail
+  // must dispatch this off the main thread or it will deadlock!
+  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [self loadHighResImage:^(UIImage *image) {
+      loadedImage = image;
+      dispatch_semaphore_signal(sema);
+    } failureBlock:^(NSError *error) {
+      dispatch_semaphore_signal(sema);
+    }];
+  });
+  
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+  return loadedImage;
+}
+
+- (UIImage *)fullScreenImage
+{
+  UIImage __block *loadedImage;
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  
+  // Synchronously load the thunbnail
+  // must dispatch this off the main thread or it will deadlock!
+  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [self loadFullScreenImage:^(UIImage *image) {
+      loadedImage = image;
+      dispatch_semaphore_signal(sema);
+    } failureBlock:^(NSError *error) {
+      dispatch_semaphore_signal(sema);
+    }];
+  });
+  
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+  return loadedImage;
+}
+
+#pragma mark Methods to Override from here down
+
+- (NSURL *)canonicalURL
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
+}
+
+- (NSDictionary *)metadata
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
+}
+
+- (CLLocation *)location
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
+}
+
+- (NSString *)hashString
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
 }
 
 - (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone
@@ -39,31 +127,7 @@
   return nil;
 }
 
-- (UIImage *)imageResizedToFitSize:(CGSize)size
-{
-  [DFPhotoAsset abstractClassException];
-  return nil;
-}
-
-- (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
-{
-  [DFPhotoAsset abstractClassException];
-  return nil;
-}
-
-- (NSData *)scaledJPEGDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality
-{
-  [DFPhotoAsset abstractClassException];
-  return nil;
-}
-
-- (NSData *)scaledJPEGDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality
-{
-  [DFPhotoAsset abstractClassException];
-  return nil;
-}
-
-- (NSData *)thumbnailJPEGData
+- (UIImage *)imageResizedToLength:(CGFloat)length
 {
   [DFPhotoAsset abstractClassException];
   return nil;
@@ -79,9 +143,46 @@
   [DFPhotoAsset abstractClassException];
 }
 
+- (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  [DFPhotoAsset abstractClassException];
+}
+
+- (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  [DFPhotoAsset abstractClassException];
+}
+
+#pragma mark
 
 
+- (NSData *)thumbnailJPEGData
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
+}
 
+- (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
+}
+
+
+#pragma mark - Abstract class helpers
+
+
++ (NSError *)abstractClassError
+{
+  return [NSError errorWithDomain:@"com.DuffyApp.DuffyCore"
+                             code:-1
+                         userInfo:@{NSLocalizedDescriptionKey: @"DFPhotoAsset is an abstract class. This method must be implemented"}];
+}
+
++ (void)abstractClassException
+{
+  [NSException raise:@"Attempting to call abstract DFPhotoAsset method" format:@"This DFPhotoAsset method is abstract.  You cannot call methods on it directly."];
+}
 
 
 

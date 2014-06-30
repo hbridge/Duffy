@@ -14,9 +14,15 @@
     <entity name="DFPhotoAsset" isAbstract="YES" syncable="YES">
         <relationship name="photo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DFPhoto" inverseName="asset" inverseEntity="DFPhoto" syncable="YES"/>
     </entity>
+    <entity name="DFStrandPhotoAsset" representedClassName="DFStrandPhotoAsset" parentEntity="DFPhotoAsset" syncable="YES">
+        <attribute name="localURLString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="metadata" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="remoteURLString" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <elements>
-        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="133"/>
         <element name="DFCameraRollPhotoAsset" positionX="45" positionY="117" width="128" height="58"/>
+        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="133"/>
         <element name="DFPhotoAsset" positionX="63" positionY="126" width="128" height="58"/>
+        <element name="DFStrandPhotoAsset" positionX="81" positionY="126" width="128" height="88"/>
     </elements>
 </model>

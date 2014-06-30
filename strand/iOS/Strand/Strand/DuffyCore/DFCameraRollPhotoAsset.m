@@ -155,55 +155,11 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   return loadedFullImage;
 }
 
-- (UIImage *)highResolutionImage
+- (UIImage *)imageResizedToLength:(CGFloat)length
 {
-  if (self.asset) {
-    @autoreleasepool {
-      UIImage *image = [self aspectImageWithMaxPixelSize:2048];
-      return image;
-    }
-  } else {
-    DDLogError(@"Could not get asset for photo: %@", self.description);
-  }
-  
-  return nil;
-}
-
-- (UIImage *)fullScreenImage
-{
-  CGImageRef imageRef = self.asset.defaultRepresentation.fullScreenImage;
-  UIImage *image = [UIImage imageWithCGImage:imageRef];
-  return image;
-}
-
-- (UIImage *)imageResizedToFitSize:(CGSize)size
-{
-  UIImage *resizedImage = [self aspectImageWithMaxPixelSize:MAX(size.height, size.width)];
+  UIImage *resizedImage = [self aspectImageWithMaxPixelSize:length];
   return resizedImage;
 }
-
-- (CGSize)scaledSizeWithSmallerDimension:(CGFloat)length
-{
-  CGSize originalSize = self.asset.defaultRepresentation.dimensions;
-  CGSize newSize;
-  if (originalSize.height < originalSize.width) {
-    CGFloat scaleFactor = length/originalSize.height;
-    newSize = CGSizeMake(ceil(originalSize.width * scaleFactor), length);
-  } else {
-    CGFloat scaleFactor = length/originalSize.width;
-    newSize = CGSizeMake(length, ceil(originalSize.height * scaleFactor));
-  }
-  
-  return newSize;
-}
-
-- (UIImage *)scaledImageWithSmallerDimension:(CGFloat)length
-{
-  CGSize newSize = [self scaledSizeWithSmallerDimension:length];
-  return [self imageResizedToFitSize:newSize];
-}
-
-
 
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
@@ -227,6 +183,35 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
       UIImage *image = [UIImage imageWithCGImage:imageRef
                                            scale:self.asset.defaultRepresentation.scale
                                      orientation:(UIImageOrientation)self.asset.defaultRepresentation.orientation];
+      successBlock(image);
+    }
+  } else {
+    failureBlock([NSError errorWithDomain:@"" code:-1
+                                 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
+  }
+}
+
+- (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock
+            failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  if (self.asset) {
+    @autoreleasepool {
+      UIImage *image = [self aspectImageWithMaxPixelSize:2048];
+      successBlock(image);
+    }
+  } else {
+    failureBlock([NSError errorWithDomain:@"" code:-1
+                                 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
+  }
+}
+
+- (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
+               failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  if (self.asset) {
+    @autoreleasepool {
+      CGImageRef imageRef = self.asset.defaultRepresentation.fullScreenImage;
+      UIImage *image = [UIImage imageWithCGImage:imageRef];
       successBlock(image);
     }
   } else {
@@ -320,36 +305,20 @@ static void releaseAssetCallback(void *info) {
 #pragma mark - JPEGData Access
 
 
-
-- (NSData *)scaledJPEGDataWithSmallerDimension:(CGFloat)length compressionQuality:(float)quality
+- (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality
 {
-  CGSize newSize = [self scaledSizeWithSmallerDimension:length];
-  return [self scaledJPEGDataResizedToFitSize:newSize compressionQuality:quality];
-}
-
-- (NSData *)scaledJPEGDataResizedToFitSize:(CGSize)size compressionQuality:(float)quality
-{
-  return [self aspectJPEGDataWithMaxPixelSize:MAX(size.height, size.width) compressionQuality:quality];
-}
-
-- (NSData *)aspectJPEGDataWithMaxPixelSize:(NSUInteger)size
-                        compressionQuality:(float)quality {
-  CGImageRef imageRef = [self createAspectCGImageWithMaxPixelSize:size];
+  CGImageRef imageRef = [self createAspectCGImageWithMaxPixelSize:length];
   NSData *outputData = [self JPEGDataForCGImage:imageRef withQuality:quality];
   CGImageRelease(imageRef);
   
   return outputData;
 }
 
-
-
 - (NSData *)thumbnailJPEGData
 {
   CGImageRef thumbnail = [self.asset thumbnail];
   return [self JPEGDataForCGImage:thumbnail withQuality:0.7];
 }
-
-
 
 - (NSData *)JPEGDataForCGImage:(CGImageRef)imageRef withQuality:(float)quality
 {

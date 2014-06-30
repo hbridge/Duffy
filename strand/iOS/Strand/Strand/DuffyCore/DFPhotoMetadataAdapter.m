@@ -225,7 +225,7 @@
        @autoreleasepool {
          if (uploadImage) {
            NSData *imageData = //photo.thumbnailData;
-           [photoToUpload.asset scaledJPEGDataWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION
+           [photoToUpload.asset JPEGDataWithImageLength:IMAGE_UPLOAD_MAX_LENGTH
                                  compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY];
            imageDataBytes += imageData.length;
            [formData appendPartWithFileData:imageData

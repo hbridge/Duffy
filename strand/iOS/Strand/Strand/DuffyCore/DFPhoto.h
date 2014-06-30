@@ -36,7 +36,4 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
                     timeZone:(NSTimeZone *)timeZone
                    inContext:(NSManagedObjectContext *)context;
 
-// Get a DF Photo instance from its URL
-//+ (DFPhoto *)photoWithURL:(NSString *)url inContext:(NSManagedObjectContext *)managedObjectContext;
-
 @end

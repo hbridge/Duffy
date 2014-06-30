@@ -31,6 +31,7 @@ NSString const *DFDeviceNameParameterKey = @"device_name";
 // Upload quality constants
 CGFloat const IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;
 float const IMAGE_UPLOAD_JPEG_QUALITY = 90.0;
+CGFloat const IMAGE_UPLOAD_MAX_LENGTH = 1136.0;
 
 
 DFPhotoUploadOperationImageDataType DFPhotoUploadOperationThumbnailData = @"DFPhotoUploadOperationThumbnailData";
