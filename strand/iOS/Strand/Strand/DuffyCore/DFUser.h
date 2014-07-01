@@ -10,11 +10,13 @@
 
 @interface DFUser : NSObject
 
+typedef UInt64 DFUserIDType;
+
 @property (readonly, nonatomic, retain) NSString *deviceID;
 @property (nonatomic, retain) NSString *hardwareDeviceID;
 @property (nonatomic, readonly) unsigned int devicePhysicalMemoryMB;
 @property (nonatomic, retain) NSString *userOverriddenDeviceID;
-@property (nonatomic) UInt64 userID;
+@property (nonatomic) DFUserIDType userID;
 @property (nonatomic, retain) NSString *firstName;
 @property (nonatomic, retain) NSString *lastName;
 @property (nonatomic, retain, readonly) NSString *deviceName;

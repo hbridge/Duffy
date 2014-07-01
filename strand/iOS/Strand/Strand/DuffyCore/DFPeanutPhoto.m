@@ -33,11 +33,8 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
       self.id = [NSNumber numberWithUnsignedLongLong:photo.photoID];
       NSDateFormatter *djangoFormatter = [NSDateFormatter DjangoDateFormatter];
       self.time_taken = [djangoFormatter stringFromDate:photo.creationDate];
-      self.metadata = [self trimmedMetadataDict:photo.metadataDictionary];
-      if (!photo.creationHashString || [photo.creationHashString isEqualToString:@""]) {
-        [NSException raise:@"No hash" format:@"Cannot create a DFPeanutPhoto from DFPhoto with no creation hash."];
-      }
-      self.iphone_hash = photo.creationHashString;
+      self.metadata = [[self trimmedMetadataDict:photo.asset.metadata] JSONString];
+      self.iphone_hash = photo.asset.hashString;
       self.file_key = photo.objectID.URIRepresentation;
     }
   }
@@ -46,7 +43,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 - (NSDictionary *)trimmedMetadataDict:(NSDictionary *)dictionary
 {
-  NSMutableDictionary *metadata = dictionary.mutableCopy;
+  NSMutableDictionary *metadata = [[dictionary dictionaryWithNonJSONRemoved] mutableCopy];
   NSMutableDictionary *exif = [metadata[@"{Exif}"] mutableCopy];
   if (exif) {
     // the UserComment section of Exif data seems to be a dumping ground for app vendors
@@ -65,7 +62,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 + (NSArray *)attributes
 {
   return @[@"user", @"id", @"time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
-           @"full_filename"];
+           @"full_filename", @"full_image_path"];
 }
 
 - (NSDictionary *)dictionaryForAttributes:(NSArray *)attributes
@@ -88,6 +85,11 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 - (NSDictionary *)dictionary
 {
   return [self dictionaryForAttributes:[DFPeanutPhoto attributes]];
+}
+
+- (NSDictionary *)metadataDictionary
+{
+  return [NSDictionary dictionaryWithJSONString:self.metadata];
 }
 
 - (NSString *)JSONString
@@ -140,7 +142,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 - (NSString *)description
 {
   return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, iphone_hash:%@, file_key:%@, metadata:%@, thumb_filename:%@ full_filename:%@ iphone_faceboxes_topleft:%@}",
-          (int)self.user, (int)self.id, self.time_taken, self.iphone_hash, self.file_key.absoluteString, self.metadata.description, self.thumb_filename, self.full_filename, self.iphone_faceboxes_topleft];
+          (int)self.user, (int)self.id, self.time_taken, self.iphone_hash, self.file_key.absoluteString, self.metadata, self.thumb_filename, self.full_filename, self.iphone_faceboxes_topleft];
 }
 
 @end

@@ -34,8 +34,8 @@
         NSMutableSet *urlsNotTaken = [allPhotos.photoURLSet mutableCopy];
         
         for (DFPhoto *photo in allPhotos.photoSet) {
-            if ([urlsNotTaken containsObject:photo.alAssetURLString]) {
-                [urlsNotTaken removeObject:photo.alAssetURLString];
+            if ([urlsNotTaken containsObject:photo.asset.canonicalURL]) {
+                [urlsNotTaken removeObject:photo.asset.canonicalURL];
             } else {
                 [managedObjectContext deleteObject:photo];
                 numDupesRemoved++;

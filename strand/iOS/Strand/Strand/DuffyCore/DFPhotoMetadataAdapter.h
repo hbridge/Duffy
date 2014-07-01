@@ -7,12 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPhoto.h"
 #import "DFNetworkAdapter.h"
-#import "DFTypedefs.h"
+
+@class DFPeanutPhoto;
 
 @class RKObjectManager;
-@class DFPhoto;
 
+typedef void (^DFPhotoFetchCompletionBlock)(DFPeanutPhoto *peanutPhoto,
+                                            NSData *fullImageData,
+                                            NSError *error);
 typedef void (^DFMetadataFetchCompletionBlock)(NSDictionary *metadata);
 typedef void (^DFPhotoDeleteCompletionBlock)(NSError *error);
 
@@ -27,8 +31,11 @@ typedef void (^DFPhotoDeleteCompletionBlock)(NSError *error);
       appendLargeImageData:(BOOL)uploadImage;
 - (void)getPhotoMetadata:(DFPhotoIDType)photoID
          completionBlock:(DFMetadataFetchCompletionBlock)completionBlock;
-
+- (void)getPhoto:(DFPhotoIDType)photoID
+ completionBlock:(DFPhotoFetchCompletionBlock)completionBlock;
 - (void)deletePhoto:(DFPhotoIDType)photoID
     completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock;
+
++ (NSURL *)urlForPhotoID:(DFPhotoIDType)photoID;
 
 @end

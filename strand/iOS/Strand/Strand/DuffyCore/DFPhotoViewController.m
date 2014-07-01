@@ -52,7 +52,7 @@
   [super viewDidLoad];
   if (self.photoView) {
     if (self.photo) {
-      self.photoView.image = self.photo.fullScreenImage;
+      self.photoView.image = self.photo.asset.fullScreenImage;
       //[self logPhotoMetadata];
     } else if (self.photoURL && !self.photoView.image) {
       [self setImageFromPhotoURL:self.photoURL];
@@ -93,20 +93,11 @@
 
 - (void)logPhotoMetadata
 {
-  DDLogVerbose(@"\n*** photo_id:%lld user:%lld, photo creation hash:%@, \n***current hash:%@",
-               self.photo.photoID,
-               self.photo.userID,
-               self.photo.creationHashData.description,
-               self.photo.currentHashData.description);
-
-  DDLogVerbose(@"photo metadata: %@", [[self.photo.metadataDictionary dictionaryWithNonJSONRemoved]
+  DDLogVerbose(@"photo metadata: %@", [[self.photo.asset.metadata dictionaryWithNonJSONRemoved]
                                        JSONStringPrettyPrinted:YES]);
   [self.photo fetchReverseGeocodeDictionary:^(NSDictionary *locationDict) {
     DDLogVerbose(@"photo reverse Geocode: %@", locationDict.description);
   }];
-  NSSet *faceFeatures = self.photo.faceFeatures;
-  DDLogVerbose(@"DFFaceFeatures sources:%du count:%lu", self.photo.faceFeatureSources,
-               (unsigned long)faceFeatures.count);
 }
 
 - (void)didReceiveMemoryWarning
@@ -120,7 +111,7 @@
     _photo = photo;
     
     if (self.photoView) {
-        self.photoView.image = photo.fullScreenImage;
+        self.photoView.image = photo.asset.fullScreenImage;
     }
 }
 
@@ -144,7 +135,7 @@
 - (void)showShareActivity
 {
   if (self.photo) {
-    NSURL *urlToShare = [NSURL URLWithString:self.photo.alAssetURLString];
+    NSURL *urlToShare = self.photo.asset.canonicalURL;
     UIActivityViewController *activityViewController = [[UIActivityViewController alloc]
                                                        initWithActivityItems:@[urlToShare]
                                                        applicationActivities:nil];

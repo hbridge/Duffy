@@ -28,4 +28,19 @@
 	return CGRectIntegral(newRect);
 }
 
+
++ (CGSize)scaledSize:(CGSize)originalSize withNewSmallerDimension:(CGFloat)length
+{
+  CGSize newSize;
+  if (originalSize.height < originalSize.width) {
+    CGFloat scaleFactor = length/originalSize.height;
+    newSize = CGSizeMake(ceil(originalSize.width * scaleFactor), length);
+  } else {
+    CGFloat scaleFactor = length/originalSize.width;
+    newSize = CGSizeMake(length, ceil(originalSize.height * scaleFactor));
+  }
+  
+  return newSize;
+}
+
 @end

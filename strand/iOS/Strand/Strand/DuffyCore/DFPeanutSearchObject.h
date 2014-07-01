@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutObject.h"
-#import "DFTypedefs.h"
 #import "DFJSONConvertible.h"
+#import "DFPhoto.h"
 
 @interface DFPeanutSearchObject : NSObject<DFPeanutObject, DFJSONConvertible>
 

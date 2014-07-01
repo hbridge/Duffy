@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPhotoView.h"
-#import "DFTypedefs.h"
+#import "DFPhoto.h"
 
 @class DFPhoto;
 

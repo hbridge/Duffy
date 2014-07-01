@@ -23,6 +23,9 @@
 #import "RootViewController.h"
 #import "UIImage+Resize.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "DFPhotoAsset.h"
+#import "DFCameraRollPhotoAsset.h"
+#import "DFStrandPhotoAsset.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -190,7 +193,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   NSArray *allPhotos = [[[DFPhotoStore sharedStore] mostRecentPhotos:1] photosByDateAscending:NO];
   DDLogVerbose(@"imageForLastPhoto allPhotos count: %d", (int)allPhotos.count);
   DFPhoto *photo =  [allPhotos firstObject];
-  if (photo) return photo.thumbnail;
+  if (photo) return photo.asset.thumbnail;
   
   return nil;
 }
@@ -319,6 +322,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogVerbose(@"Image picked, info: %@", info.description);
   
   if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
+    
     NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
     UIImage *originalImage, *editedImage, *imageToSave;
     
@@ -340,24 +344,49 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
       [self.customCameraOverlayView setLastPhotoButtonImage:imageToSave];
        
-      NSMutableDictionary *metadata = [(NSDictionary *)info[UIImagePickerControllerMediaMetadata]
-                                       mutableCopy];
-      [self addLocationToMetadata:metadata];
-      [self addCachedLocationToMetadata:metadata];
-      
-      // Save the new image (original or edited) to the Camera Roll
-      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-      [library writeImageToSavedPhotosAlbum:imageToSave.CGImage
-                                   metadata:metadata
-                            completionBlock:[self writeImageCompletionBlock]
-       ];
+      NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
+      [self saveImage:imageToSave withMetadata:metadata];
+      [[DFUploadController sharedUploadController] uploadPhotos];
     }
   }
 }
 
-- (void)addLocationToMetadata:(NSMutableDictionary *)metadata
+- (void)saveImage:(UIImage *)image withMetadata:(NSDictionary *)metadata
 {
   CLLocation *location = self.locationManager.location;
+  NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
+  [self addLocation:location toMetadata:mutableMetadata];
+  [self addCachedLocationToMetadata:mutableMetadata];
+  
+  // Save the assset locally
+  NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+  NSData *data = UIImageJPEGRepresentation(image, 0.8);
+  DFStrandPhotoAsset *asset = [DFStrandPhotoAsset createAssetForImageData:data
+                                      photoID:0
+                                     metadata:mutableMetadata
+                                     location:location
+                                 creationDate:[NSDate date]
+                                    inContext:context];
+  
+  DFPhoto *photo = [DFPhoto createWithAsset:asset
+                    userID:[[DFUser currentUser] userID]
+                  timeZone:[NSTimeZone defaultTimeZone]
+                 inContext:context];
+  
+  DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter]
+                                      stringFromDate:photo.creationDate]);
+  
+  // Save the database changes
+  NSError *error;
+  [context save:&error];
+  if (error) {
+    [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
+                format:@"Error: %@", error.description];
+  }
+}
+
+- (void)addLocation:(CLLocation *)location toMetadata:(NSMutableDictionary *)metadata
+{
   CLLocation *cachedLocation = [DFLocationStore LoadLastLocation];
   
   DDLogInfo(@"DFCameraViewController addLocationToMetadata location age %.01fs cached location age %.01fs",
@@ -408,34 +437,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   exifDict[@"UserComment"] = cachedLatlongDict.description;
   metadata[@"{Exif}"] = exifDict;
 }
-
-- (ALAssetsLibraryWriteImageCompletionBlock)writeImageCompletionBlock
-{
-  return ^(NSURL *assetURL, NSError *error) {
-    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-    
-    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    [library assetForURL:assetURL resultBlock:^(ALAsset *asset) {
-      NSData *hashData = [DFDataHasher hashDataForALAsset:asset];
-      DFPhoto *newPhoto = [DFPhoto insertNewDFPhotoForALAsset:asset
-                                                 withHashData:hashData
-                                                     photoTimeZone:[NSTimeZone defaultTimeZone]
-                                                    inContext:context];
-      DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter]
-                                          stringFromDate:newPhoto.creationDate]);
-      
-      NSError *error;
-      [context save:&error];
-      if (error) {
-        [NSException raise:@"Could not save DB" format:@"%@", error.description];
-      }
-      [[DFUploadController sharedUploadController] uploadPhotos];
-    } failureBlock:^(NSError *error) {
-      [NSException raise:@"Could not get asset just created." format:@"%@", error.description];
-    }];
-  };
-}
-
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   

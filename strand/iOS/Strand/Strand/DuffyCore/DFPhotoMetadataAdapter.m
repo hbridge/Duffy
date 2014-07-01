@@ -17,6 +17,7 @@
 #import <AFNetworking.h>
 #import "DFUser.h"
 #import "DFPhotoStore.h"
+#import "DFAnalytics.h"
 
 /* DFPeanutBulkPhotos Mapping Class */
 
@@ -160,11 +161,11 @@
      if (appendThumbnailData) {
        for (DFPhoto *photo in photos) {
          @autoreleasepool {
-           NSData *thumbnailData = [photo thumbnailJPEGData];
+           NSData *thumbnailData = photo.asset.thumbnailJPEGData;
            numBytes += thumbnailData.length;
            [formData appendPartWithFileData:thumbnailData
                                        name:photo.objectID.URIRepresentation.absoluteString
-                                   fileName:[NSString stringWithFormat:@"%@.jpg", photo.creationHashString]
+                                   fileName:[NSString stringWithFormat:@"%@.jpg", photo.asset.hashString]
                                    mimeType:@"image/jpg"];
          }
        }
@@ -225,7 +226,7 @@
        @autoreleasepool {
          if (uploadImage) {
            NSData *imageData = //photo.thumbnailData;
-           [photoToUpload scaledJPEGDataWithSmallerDimension:IMAGE_UPLOAD_SMALLER_DIMENSION
+           [photoToUpload.asset JPEGDataWithImageLength:IMAGE_UPLOAD_MAX_LENGTH
                                  compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY];
            imageDataBytes += imageData.length;
            [formData appendPartWithFileData:imageData
@@ -282,7 +283,7 @@
    objectRequestOperationWithRequest:request
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
      DFPeanutPhoto *resultPeanutPhoto = mappingResult.firstObject;
-     NSDictionary *resultDict = [NSDictionary dictionaryWithJSONString:resultPeanutPhoto.metadata.allKeys.firstObject];
+     NSDictionary *resultDict = [NSDictionary dictionaryWithJSONString:resultPeanutPhoto.metadata];
      completionBlock(resultDict);
    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
      DDLogWarn(@"DFPhotoMetadataAdapter metadata fetch failed: %@", error.description);
@@ -292,6 +293,48 @@
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
 }
 
+- (void)getPhoto:(DFPhotoIDType)photoID completionBlock:(DFPhotoFetchCompletionBlock)completionBlock
+{
+  DFPeanutPhoto *requestPhoto = [[DFPeanutPhoto alloc] init];
+  requestPhoto.id = @(photoID);
+  
+  NSMutableURLRequest *request =
+  [self.objectManager
+   requestWithObject:requestPhoto
+   method:RKRequestMethodGET
+   path:[NSString stringWithFormat:@"photos/%llu", photoID]
+   parameters:nil];
+  
+  DDLogInfo(@"DFPhotoMetadataAdapter getting endpoint: %@", request.URL.absoluteString);
+  
+  RKObjectRequestOperation *requestOperation =
+  [self.objectManager
+   objectRequestOperationWithRequest:request
+   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+     DFPeanutPhoto *resultPeanutPhoto = mappingResult.firstObject;
+     if (resultPeanutPhoto.full_image_path) {
+       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+         @autoreleasepool {
+           NSURL *fullImageURL = [[[DFUser currentUser] serverURL]
+                                  URLByAppendingPathComponent:resultPeanutPhoto.full_image_path];
+           NSData *data = [NSData dataWithContentsOfURL:fullImageURL];
+           [DFAnalytics logPhotoLoadWithResult:
+            data ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultFailure];
+           completionBlock(resultPeanutPhoto, data, nil);
+         }
+       });
+     } else {
+       DDLogWarn(@"DFPhotoMetadataAdapter: got peanut photo with no full_image_path. result peanut photo: %@",
+                 resultPeanutPhoto.description);
+       completionBlock(resultPeanutPhoto, nil, nil);
+     }
+   } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+     DDLogWarn(@"DFPhotoMetadataAdapter photo fetch failed: %@", error.description);
+     completionBlock(nil, nil, error);
+   }];
+  
+  [self.objectManager enqueueObjectRequestOperation:requestOperation];
+}
 
 - (void)deletePhoto:(DFPhotoIDType)photoID
     completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock
@@ -364,7 +407,11 @@
   return error;
 }
 
-
++ (NSURL *)urlForPhotoID:(DFPhotoIDType)photoID
+{
+  return [[[DFUser currentUser] apiURL]
+          URLByAppendingPathComponent:[NSString stringWithFormat:@"photos/%llu", photoID]];
+}
 
 
 @end

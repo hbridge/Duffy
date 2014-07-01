@@ -46,8 +46,8 @@
         if ([self.photoSet containsObject:newPhoto]) continue;
         
         [photosSet addObject:newPhoto];
-        if (![photoAssetURLSet containsObject:newPhoto.alAssetURLString]) {
-            [photoAssetURLSet addObject:newPhoto.alAssetURLString];
+        if (![photoAssetURLSet containsObject:newPhoto.asset.canonicalURL]) {
+            [photoAssetURLSet addObject:newPhoto.asset.canonicalURL];
         } else {
             DDLogError(@"Error, adding another DFPhoto with the same universal ID as another in the set");
         }
