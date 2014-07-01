@@ -15,9 +15,6 @@ typedef UInt64 DFPhotoIDType;
 
 @interface DFPhoto : NSManagedObject
 
-+ (NSURL *)localFullImagesDirectoryURL;
-+ (NSURL *)localThumbnailsDirectoryURL;
-
 // stored properties
 @property (nonatomic) UInt64 userID;
 @property (nonatomic) DFPhotoIDType photoID;

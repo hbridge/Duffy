@@ -73,28 +73,4 @@
 }
 
 
-#pragma mark - File Paths
-
-+ (NSURL *)localFullImagesDirectoryURL
-{
-  return [[DFPhoto userLibraryURL] URLByAppendingPathComponent:@"fullsize"];
-}
-
-+ (NSURL *)localThumbnailsDirectoryURL
-{
-  return [[DFPhoto userLibraryURL] URLByAppendingPathComponent:@"thumbnails"];
-}
-
-
-+ (NSURL *)userLibraryURL
-{
-  NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
-  
-  if ([paths count] > 0)
-  {
-    return [paths objectAtIndex:0];
-  }
-  return nil;
-}
-
 @end

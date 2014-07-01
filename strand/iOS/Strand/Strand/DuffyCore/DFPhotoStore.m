@@ -87,8 +87,8 @@ static DFPhotoStore *defaultStore;
   // thumbnails
   NSFileManager *fm = [NSFileManager defaultManager];
   
-  NSArray *directoriesToCreate = @[[[DFPhoto localThumbnailsDirectoryURL] path],
-                                   [[DFPhoto localFullImagesDirectoryURL] path]];
+  NSArray *directoriesToCreate = @[[[DFPhotoStore localThumbnailsDirectoryURL] path],
+                                   [[DFPhotoStore localFullImagesDirectoryURL] path]];
   
   for (NSString *path in directoriesToCreate) {
     if (![fm fileExistsAtPath:path]) {
@@ -603,7 +603,17 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 }
 
 
+#pragma mark - File Paths
 
++ (NSURL *)localFullImagesDirectoryURL
+{
+  return [[self userLibraryURL] URLByAppendingPathComponent:@"fullsize"];
+}
+
++ (NSURL *)localThumbnailsDirectoryURL
+{
+  return [[self userLibraryURL] URLByAppendingPathComponent:@"thumbnails"];
+}
 
 @end
 

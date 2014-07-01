@@ -60,7 +60,8 @@
 
 
 + (NSURL *)applicationDocumentsDirectory;
-
++ (NSURL *)localFullImagesDirectoryURL;
++ (NSURL *)localThumbnailsDirectoryURL;
 
 
 

@@ -7,14 +7,24 @@
 //
 
 #import "DFPhotoAsset.h"
-
+#import "DFPhoto.h"
 
 @interface DFStrandPhotoAsset : DFPhotoAsset
 
 @property (nonatomic, retain) NSString * localURLString;
-@property (nonatomic, retain) NSString * remoteURLString;
-@property (nonatomic, retain) id metadata;
-@property (nonatomic, retain) id location;
+@property (nonatomic) UInt64 photoID;
+@property (nonatomic, retain) id storedMetadata;
+@property (nonatomic, retain) id storedLocation;
 @property (nonatomic, retain) NSDate *creationDate;
+
++ (DFStrandPhotoAsset *)createAssetForImageData:(NSData *)imageData
+                                        photoID:(DFPhotoIDType)photoID
+                                       metadata:(NSDictionary *)metadata
+                                       location:(CLLocation *)location
+                                   creationDate:(NSDate *)creationDate
+                                      inContext:(NSManagedObjectContext *)context;
+
+
+
 
 @end
