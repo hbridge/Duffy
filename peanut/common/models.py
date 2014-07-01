@@ -163,6 +163,12 @@ class Photo(models.Model):
 		return os.path.join(self.user.getUserDataPath(), self.getDefaultFullFilename())
 
 
+	"""
+		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
+	"""
+	def getFullUrlImagePath(self):
+		return "/user_data/%s/%s" % (self.user_id, self.full_filename) 
+
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		for obj in objs:
