@@ -28,7 +28,6 @@
   return [DFDataHasher hashDataForData:[DFDataHasher JPEGDataForCGImage:asset.thumbnail withQuality:0.8]];
 }
 
-
 + (NSString *)hashStringForHashData:(NSData *)hashData
 {
     uint8_t bytes[hashData.length];

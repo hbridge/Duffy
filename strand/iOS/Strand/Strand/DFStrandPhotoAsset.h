@@ -14,5 +14,7 @@
 @property (nonatomic, retain) NSString * localURLString;
 @property (nonatomic, retain) NSString * remoteURLString;
 @property (nonatomic, retain) id metadata;
+@property (nonatomic, retain) id location;
+@property (nonatomic, retain) NSDate *creationDate;
 
 @end
