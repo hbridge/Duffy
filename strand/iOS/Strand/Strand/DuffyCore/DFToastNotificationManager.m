@@ -37,7 +37,7 @@ static DFToastNotificationManager *defaultManager;
 - (NSDictionary *)defaultNotificationOptions
 {
   NSDictionary *options = @{
-                            kCRToastTextAlignmentKey : @(NSTextAlignmentLeft),
+                            kCRToastTextAlignmentKey : @(NSTextAlignmentCenter),
                             kCRToastBackgroundColorKey : [UIColor orangeColor],
                             kCRToastAnimationInTypeKey : @(CRToastAnimationTypeLinear),
                             kCRToastAnimationOutTypeKey : @(CRToastAnimationTypeLinear),
@@ -48,8 +48,8 @@ static DFToastNotificationManager *defaultManager;
                             kCRToastSubtitleTextMaxNumberOfLinesKey : @(0),
                             kCRToastSubtitleTextAlignmentKey : @(NSTextAlignmentLeft),
                             kCRToastNotificationTypeKey: @(CRToastTypeNavigationBar),
-                            kCRToastImageKey: [UIImage imageNamed:@"Assets/Icons/WarningIcon.png"],
-                          
+                            kCRToastInteractionRespondersKey: @[[DFToastNotificationManager
+                                                                 dismissInteractionHandler]]
                             };
   
   return options;
@@ -68,9 +68,11 @@ static DFToastNotificationManager *defaultManager;
 - (void)showErrorWithTitle:(NSString *)title subTitle:(NSString *)subtitle
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
+  options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
   options[kCRToastTimeIntervalKey] = @(5.0);
   options[kCRToastTextKey] = title;
   options[kCRToastSubtitleTextKey] = subtitle;
+  options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/WarningIcon.png"];
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
                               }];
@@ -86,4 +88,16 @@ static DFToastNotificationManager *defaultManager;
                               completionBlock:^{
                               }];
 }
+
+
++ (id)dismissInteractionHandler
+{
+  return [CRToastInteractionResponder
+          interactionResponderWithInteractionType:CRToastInteractionTypeAll
+          automaticallyDismiss:YES
+          block:^(CRToastInteractionType interactionType) {
+            DDLogVerbose(@"CRToast notification dismissed by user.");
+          }];
+}
+
 @end

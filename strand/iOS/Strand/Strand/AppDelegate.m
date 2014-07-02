@@ -22,6 +22,7 @@
 #import "DFAppInfo.h"
 #import "DFPeanutPushTokenAdapter.h"
 #import "DFAnalytics.h"
+#import "DFToastNotificationManager.h"
 
 
 @interface AppDelegate ()
@@ -230,7 +231,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
-  DDLogInfo(@"App received background notification dict: %@",
+  DDLogVerbose(@"App received background notification dict: %@",
             userInfo.description);
   if ([application applicationState] != UIApplicationStateActive) {
     if (!userInfo[@"view"]) return;
@@ -241,6 +242,23 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
       [(RootViewController *)self.window.rootViewController showGallery];
     }
     [DFAnalytics logNotificationOpened:[NSString stringWithFormat:@"%d", viewNumber]];
+  } else {
+    NSDictionary *apsDict = userInfo[@"aps"];
+    NSString *alertString;
+    id alert = apsDict[@"alert"];
+    if ([[alert class] isSubclassOfClass:[NSDictionary class]]) {
+      NSDictionary *alertDict = (NSDictionary *)alert;
+      alertString = alertDict[@"body"];
+    } else if ([[alert class] isSubclassOfClass:[NSString class]]) {
+      alertString = alert;
+    } else {
+      DDLogWarn(@"App received background notif of unknown format.  userInfo:%@", userInfo);
+    }
+    
+    if (alertString) {
+      [[DFToastNotificationManager sharedInstance] showNotificationWithString:alertString
+                                                                      timeout:10.0];
+    }
   }
 }
 
