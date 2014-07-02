@@ -137,7 +137,9 @@ static DFAnalytics *defaultLogger;
 
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params
 {
-  [[LocalyticsSession shared] tagScreen:[self eventNameForControllerViewed:viewController]];
+  NSString *screenName = [self screenNameForControllerViewed:viewController];
+  [[LocalyticsSession shared] tagScreen:screenName];
+  [DFAnalytics logEvent:[NSString stringWithFormat:@"%@Viewed",screenName]];
 }
 
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params
@@ -145,7 +147,7 @@ static DFAnalytics *defaultLogger;
   // Do nothing for now
 }
 
-+ (NSString *)eventNameForControllerViewed:(UIViewController *)viewController
++ (NSString *)screenNameForControllerViewed:(UIViewController *)viewController
 {
   NSMutableString *className = [[viewController.class description] mutableCopy];
   //remove DF
@@ -206,13 +208,13 @@ static DFAnalytics *defaultLogger;
 + (NSString *)bucketStringForKBPS:(double)KBPS
 {
   if (KBPS < 0.1) return @"<0.1";
-  if (KBPS <= 1.0) return @"0.1-1.0";
-  if (KBPS <= 10.0) return @"1.01-10";
-  if (KBPS <= 50.0) return @"10.1-50.0";
-  if (KBPS <= 100.0) return @"50.1-100.0";
-  if (KBPS <= 200.0) return @"100.1-200.0";
-  if (KBPS <= 500.0) return @"200.1-500.0";
-  if (KBPS <= 1000.0) return @"500.1-1000.0";
+  if (KBPS <= 1.0) return @"0.1-1";
+  if (KBPS <= 10.0) return @"1-10";
+  if (KBPS <= 50.0) return @"10-50";
+  if (KBPS <= 100.0) return @"50-100";
+  if (KBPS <= 200.0) return @"100-200";
+  if (KBPS <= 500.0) return @"200-500";
+  if (KBPS <= 1000.0) return @"500-1000";
   return @">1000.0";
 }
 
