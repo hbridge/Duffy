@@ -21,7 +21,7 @@ def haversine(lon1, lat1, lon2, lat2):
 
 	Returns: (photo, timeDistance, geoDistance)
 """
-def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPhotoId=None, secondsWithin=3*60*60):
+def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPhotoId=None, secondsWithin=3*60*60, distanceWithin=100):
 	nearbyPhotos = list()
 
 	for photo in photosCache:
@@ -34,7 +34,7 @@ def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPh
 		# If this photo is within the timerange and isn't a photo belonging to the filtered user and 
 		if (int(math.fabs(timeDistance.total_seconds())) < secondsWithin):
 			geoDistance = int(haversine(lon, lat, photo.location_point.x, photo.location_point.y) * 1000)
-			if geoDistance < 100:
+			if geoDistance < distanceWithin:
 				nearbyPhotos.append((photo, timeDistance, geoDistance))
 	return nearbyPhotos
 
@@ -45,3 +45,15 @@ def getNearbyPhotosToPhoto(refPhoto, photosCache):
 							photosCache,
 							filterUserId = refPhoto.user_id,
 							filterPhotoId = refPhoto.id)
+
+"""
+	Go through the user list and pick out any users that are within
+"""
+def getNearbyUsers(lon, lat, users, filterUserId=None, distanceWithin=100):
+	nearbyUsers = list()
+	for user in users:
+		if user.id != filterUserId and user.last_location_point:
+			geoDistance = int(haversine(lon, lat, user.last_location_point.x, user.last_location_point.y) * 1000)
+			if geoDistance < distanceWithin:
+				nearbyUsers.append(user)
+	return nearbyUsers

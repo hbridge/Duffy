@@ -18,6 +18,7 @@ urlpatterns = patterns('',
 
 	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
 	url(r'^update_user_location', 'strand.api_views.update_user_location'),
+	url(r'^get_nearby_friends_message', 'strand.api_views.get_nearby_friends_message'),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),

@@ -15,7 +15,7 @@ from common.models import Photo, User, Neighbor
 from common import api_util, cluster_util
 
 from strand import geo_util, notifications_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -201,16 +201,14 @@ def get_joinable_strands(request):
 		userId = form.cleaned_data['user_id']
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
-		startTime = form.cleaned_data['start_date_time']
+		
+		nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-		if not startTime:
-			startTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-		timeLow = startTime - datetime.timedelta(hours=timeWithinHours)
+		timeLow = nowTime - datetime.timedelta(hours=timeWithinHours)
 
 		photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).filter(user__product_id=1)
 
-		nearbyPhotosData = geo_util.getNearbyPhotos(startTime, lon, lat, photosCache, secondsWithin = timeWithinHours * 60 * 60)
+		nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinHours * 60 * 60)
 
 		nearbyPhotos = list()
 		for nearbyPhotoData in nearbyPhotosData:
@@ -347,6 +345,39 @@ def register_apns_token(request):
 		response['errors'] = json.dumps(form.errors)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+"""
+	Returns a string that describes who is around.
+	If people are around but haven't taken a photo, returns:  "5 friends are nearby"
+	If people are around and someone has taken a photo, returns:  "Henry + 4 friends are nearby"
+	If more than one person is nearby, returns:  "Henry and Aseem
+"""
+def get_nearby_friends_message(request):
+	response = dict({'result': True})
+	form = GetFriendsNearbyMessageForm(request.GET)
+
+	timeWithinHours = 3
+	
+	if (form.is_valid()):
+		userId = form.cleaned_data['user_id']
+		lat = form.cleaned_data['lat']
+		lon = form.cleaned_data['lon']
+
+		timeWithin = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(hours=timeWithinHours)
+
+		# For now, search through all Users, when we have more, do something more efficent
+		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
+
+		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
+
+		response['message'] = "There are %s friends near you" % (len(nearbyUsers))
+		response['result'] = True
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+	
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 
 """
 	Sends a notification to the device/build_type based on the user_id
