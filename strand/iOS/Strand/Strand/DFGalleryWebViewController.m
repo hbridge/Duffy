@@ -60,15 +60,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
-  [[NSUserDefaults standardUserDefaults] setObject:@(0) forKey:DFStrandUnseenCountDefaultsKey];
-  [[NSUserDefaults standardUserDefaults] synchronize];
-  [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
-                                                      object:nil
-                                                    userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(0)}];
   [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
-  DDLogVerbose(@"VIEWDIDAPPEAR %@ viewDidAppear", [self class]);
+  [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
+                                                      object:self
+                                                    userInfo:nil];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 

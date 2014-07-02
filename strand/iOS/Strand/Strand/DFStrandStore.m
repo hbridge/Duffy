@@ -11,11 +11,20 @@
 
 @implementation DFStrandStore
 
++ (void) setGalleryLastSeenDate:(NSDate *)date
+{
+  [[NSUserDefaults standardUserDefaults] setObject:date forKey:DFStrandGallerySeenDate];
+}
+
++ (NSDate *)galleryLastSeenDate
+{
+  return [[NSUserDefaults standardUserDefaults] objectForKey:DFStrandGallerySeenDate];
+}
+
 + (void) SaveUnseenPhotosCount:(int)count
 {
   [[NSUserDefaults standardUserDefaults] setObject:@(count)
                                             forKey:DFStrandUnseenCountDefaultsKey];
-  [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 + (int) UnseenPhotosCount

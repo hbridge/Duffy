@@ -11,7 +11,6 @@
 
 @interface DFStrandsManager : NSObject <CLLocationManagerDelegate>
 
-@property (nonatomic, retain) NSDate *lastUnseenPhotosFetchDate;
 @property (nonatomic, retain) NSDate *lastFetchAttemptDate;
 
 + (DFStrandsManager *)sharedStrandsManager;

@@ -17,6 +17,8 @@ NSString *const DFStrandLastKnownLocationDefaultsKey = @"com.duffyapp.Strand.DFS
 NSString *const DFStrandLastNewPhotosFetchDateDefaultsKey = @"com.duffapp.Strand.lastNewPhotosFetchDate";
 NSString *const DFStrandLastFetchAttemptDateDefaultsKey = @"com.duffapp.Strand.lastFetchAttemptDate";
 NSString *const DFStrandUnseenCountDefaultsKey = @"com.duffyapp.Strand.unseenCount";
+NSString *const DFStrandGallerySeenDate = @"com.duffyapp.Strand.gallerySeen";
+NSString *const DFStrandGalleryAppearedNotificationName = @"DFStrandGalleryAppearedNotification";
 
 NSString *const DFStrandUnseenPhotosUpdatedNotificationName = @"DFStrandUnseenPhotosUpdatedNotification";
 NSString *const DFStrandUnseenPhotosUpdatedCountKey = @"DFStrandUnseenPhotosUpdatedCountKey";

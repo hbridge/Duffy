@@ -13,6 +13,9 @@
 extern NSString *const DFStrandLastKnownLocationDefaultsKey;
 extern NSString *const DFStrandLastNewPhotosFetchDateDefaultsKey;
 extern NSString *const DFStrandUnseenCountDefaultsKey;
+extern NSString *const DFStrandGallerySeenDate;
+
+extern NSString *const DFStrandGalleryAppearedNotificationName;
 
 extern NSString *const DFStrandUnseenPhotosUpdatedNotificationName;
 extern NSString *const DFStrandUnseenPhotosUpdatedCountKey;

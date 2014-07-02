@@ -10,6 +10,8 @@
 
 @interface DFStrandStore : NSObject
 
++ (void) setGalleryLastSeenDate:(NSDate *)date;
++ (NSDate *)galleryLastSeenDate;
 + (void) SaveUnseenPhotosCount:(int)count;
 + (int) UnseenPhotosCount;
 

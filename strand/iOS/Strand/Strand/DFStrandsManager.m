@@ -18,6 +18,7 @@
 #import "DFPeanutLocationAdapter.h"
 #import "DFAnalytics.h"
 
+const NSTimeInterval MinSecondsBetweenFetch = 1.0;
 
 @interface DFStrandsManager()
 
@@ -52,7 +53,11 @@ static DFStrandsManager *defaultStrandsManager;
 {
   self = [super init];
   if (self) {
-    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(galleryAppeared:)
+                                                 name:DFStrandGalleryAppearedNotificationName
+                                               object:self];
+
   }
   return self;
 }
@@ -61,7 +66,7 @@ static DFStrandsManager *defaultStrandsManager;
 {
   DDLogInfo(@"DFStrandsManager performing fetch.");
   
-  if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] < 1.0)
+  if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] < MinSecondsBetweenFetch)
     return UIBackgroundFetchResultNoData;
   
   [self updateJoinableStrands];
@@ -120,9 +125,9 @@ static DFStrandsManager *defaultStrandsManager;
   }
   DDLogInfo(@"Updating new photo counts.");
   
-  NSString *lastFetchDateString = [[NSDateFormatter DjangoDateFormatter]
-                                   stringFromDate:self.lastUnseenPhotosFetchDate];
-  [self.newPhotosAdapter fetchNewPhotosAfterDate:lastFetchDateString
+  NSString *galleryLastSeenDate = [[NSDateFormatter DjangoDateFormatter]
+                                   stringFromDate:[DFStrandStore galleryLastSeenDate]];
+  [self.newPhotosAdapter fetchNewPhotosAfterDate:galleryLastSeenDate
                                  completionBlock:^(DFPeanutSearchResponse *response)
   {
     self.isNewPhotoCountFetchInProgress = NO;
@@ -131,45 +136,31 @@ static DFStrandsManager *defaultStrandsManager;
       return;
     }
     
-    unsigned int count = 0;
+    unsigned int oldCount = [DFStrandStore UnseenPhotosCount];
+    unsigned int newCount = 0;
     for (DFPeanutSearchObject *searchObject in response.objects) {
       if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
         for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
           if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
-            count++;
+            newCount++;
           }
         }
       }
     }
     
-    DDLogInfo(@"%d new photos in joined strands.", count);
-    int totalUnseenCount = [DFStrandStore UnseenPhotosCount] + count;
-    [DFStrandStore SaveUnseenPhotosCount:totalUnseenCount];
+    DDLogInfo(@"%d unseen photos in joined strands since %@", newCount, galleryLastSeenDate);
+    [DFStrandStore SaveUnseenPhotosCount:newCount];
     
-    self.lastUnseenPhotosFetchDate = [NSDate date];
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
-     object:self
-     userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(totalUnseenCount)}];
+    if (newCount != oldCount) {
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
+       object:self
+       userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(newCount)}];
+    }
   }];
 }
 
 #pragma mark - Unseen photos fetch date
-
-- (NSDate *)lastUnseenPhotosFetchDate
-{
-  NSDate *lastFetchDate = [[NSUserDefaults standardUserDefaults]
-                           objectForKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
-  if (!lastFetchDate) lastFetchDate = [NSDate dateWithTimeIntervalSinceNow:-60*60*3];
-  return lastFetchDate;
-}
-
-- (void)setLastUnseenPhotosFetchDate:(NSDate *)lastUnseenPhotosFetchDate
-{
-  [[NSUserDefaults standardUserDefaults]
-   setObject:lastUnseenPhotosFetchDate
-   forKey:DFStrandLastNewPhotosFetchDateDefaultsKey];
-}
 
 - (NSDate *)lastFetchAttemptDate
 {
@@ -208,11 +199,28 @@ static DFStrandsManager *defaultStrandsManager;
 
 - (int)numUnseenPhotos
 {
-  if ([[NSDate date] timeIntervalSinceDate:self.lastUnseenPhotosFetchDate] > 1.0) {
-    [self updateNewPhotos];
+  if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] > MinSecondsBetweenFetch) {
+    [self performFetch];
   }
   
   return [DFStrandStore UnseenPhotosCount];
+}
+
+- (void)clearUnseenPhotos
+{
+  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
+  [DFStrandStore SaveUnseenPhotosCount:0];
+  [[NSNotificationCenter defaultCenter]
+   postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
+   object:nil
+   userInfo:@{DFStrandUnseenPhotosUpdatedCountKey: @(0)}];
+}
+
+
+- (void)galleryAppeared:(NSNotification *)note
+{
+  [DFStrandStore setGalleryLastSeenDate:[NSDate date]];
+  [self clearUnseenPhotos];
 }
 
 
