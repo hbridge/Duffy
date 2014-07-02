@@ -23,9 +23,6 @@ NSString *const FlashOnTitle = @"On";
 NSString *const FlashOffTitle = @"Off";
 NSString *const FlashAutoTitle = @"Auto";
 
-static NSInteger LastPhotoImageSize = 100;
-static NSUInteger LastPhotoImageCornerRadius = 3;
-
 - (void)awakeFromNib
 {
   self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];

@@ -21,14 +21,14 @@
                     </state>
                 </button>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="c4Q-fB-mQc" userLabel="Gallery Button">
-                    <rect key="frame" x="10" y="505" width="50" height="50"/>
+                    <rect key="frame" x="10" y="495" width="60" height="60"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="50" id="2dW-bl-1yn"/>
-                        <constraint firstAttribute="width" constant="50" id="6gB-jg-Ehg"/>
+                        <constraint firstAttribute="height" constant="60" id="2dW-bl-1yn"/>
+                        <constraint firstAttribute="width" constant="60" id="6gB-jg-Ehg"/>
                     </constraints>
                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="16"/>
-                    <state key="normal" backgroundImage="Assets/Icons/GalleryButton.png">
+                    <state key="normal" title="5" backgroundImage="Assets/Icons/GalleryButton.png">
                         <color key="titleColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
                     </state>
                 </button>

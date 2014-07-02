@@ -105,7 +105,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
       self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
       [self.customCameraOverlayView.galleryButton setTitle:unseenCountString forState:UIControlStateNormal];
     } else {
-      self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor grayColor];
+      self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
       [self.customCameraOverlayView.galleryButton setTitle:@"" forState:UIControlStateNormal];
     }
   }

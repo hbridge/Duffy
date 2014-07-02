@@ -1,5 +1,13 @@
 # Strand
 
+## Jul 2nd, 2014
+
+### New
+
+- Photos are no longer saved to your camera roll by default, but can still be saved to your camera roll by opening the photo and pressing the action menu.
+- Removed the last photo button from the right side of the camera.  You can still delete photos, you just get them by opening them from the gallery.
+- Notifications that are received while the app is open now show at the top of the screen.
+
 ## Jun 27th, 2014
 
 ### New
