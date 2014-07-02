@@ -8,6 +8,7 @@
 
 #import "DFToastNotificationManager.h"
 #import "CRToast.h"
+#import <AudioToolbox/AudioServices.h>
 
 @implementation DFToastNotificationManager
 
@@ -68,7 +69,7 @@ static DFToastNotificationManager *defaultManager;
 - (void)showErrorWithTitle:(NSString *)title subTitle:(NSString *)subtitle
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
-  options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
+
   options[kCRToastTimeIntervalKey] = @(5.0);
   options[kCRToastTextKey] = title;
   options[kCRToastSubtitleTextKey] = subtitle;
@@ -76,17 +77,34 @@ static DFToastNotificationManager *defaultManager;
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
                               }];
+  AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
 - (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
+  options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
   options[kCRToastTimeIntervalKey] = @(timeout);
   options[kCRToastTextKey] = string;
   
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
                               }];
+  AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
+}
+
+- (void)showPhotoNotificationWithString:(NSString *)string
+{
+  NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
+  options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
+  options[kCRToastTimeIntervalKey] = @(10);
+  options[kCRToastTextKey] = string;
+  options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/PhotoNotificationIcon.png"];
+  
+  [CRToastManager showNotificationWithOptions:options
+                              completionBlock:^{
+                              }];
+  AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
 

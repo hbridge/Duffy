@@ -256,8 +256,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     }
     
     if (alertString) {
-      [[DFToastNotificationManager sharedInstance] showNotificationWithString:alertString
-                                                                      timeout:10.0];
+      [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:alertString];
     }
   }
 }

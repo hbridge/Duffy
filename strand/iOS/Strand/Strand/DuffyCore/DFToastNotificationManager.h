@@ -18,7 +18,7 @@ typedef enum {
 + (DFToastNotificationManager *)sharedInstance;
 
 - (void)showNotificationWithType:(DFToastNotificationType)notificationType;
-
+- (void)showPhotoNotificationWithString:(NSString *)string;
 - (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout;
 
 @end
