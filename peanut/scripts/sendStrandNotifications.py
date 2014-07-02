@@ -111,7 +111,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 		names = set(names)
 		
 		if len(names) > 0:
-			msg = " & ".join(names) + " took a photo near you!"
+			msg = " & ".join(names) + " took a photo near you! Take a photo to see it."
 
 			logger.debug("Sending %s to %s" % (msg, user.first_name))
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
