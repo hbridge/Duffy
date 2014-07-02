@@ -94,7 +94,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
   [self updateUnseenCount];
-  [self.customCameraOverlayView setLastPhotoButtonImage:[self imageForLastPhoto]];
 }
 
 - (void)updateUnseenCount
@@ -180,9 +179,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
     [_customCameraOverlayView.swapCameraButton addTarget:self
                                                   action:@selector(swapCameraButtonPressed:)
                                         forControlEvents:UIControlEventTouchUpInside];
-    [_customCameraOverlayView.lastPhotoButton addTarget:self
-                                                 action:@selector(lastPhotoButtonPressed:)
-                                       forControlEvents:UIControlEventTouchUpInside];
   }
 
   return _customCameraOverlayView;
@@ -341,9 +337,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
         imageToSave = originalImage;
       }
       
-
-      [self.customCameraOverlayView setLastPhotoButtonImage:imageToSave];
-       
       NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
       [self saveImage:imageToSave withMetadata:metadata];
       [[DFUploadController sharedUploadController] uploadPhotos];

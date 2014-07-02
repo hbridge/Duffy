@@ -17,14 +17,11 @@ extern NSString *const FlashAutoTitle;
 @property (weak, nonatomic) IBOutlet UIButton *galleryButton;
 @property (weak, nonatomic) IBOutlet UIButton *flashButton;
 @property (weak, nonatomic) IBOutlet UIButton *swapCameraButton;
-@property (weak, nonatomic) IBOutlet UIButton *lastPhotoButton;
 
 - (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 - (void)showHelpText;
 - (void)hideHelpText;
 - (void)showJoinableHelpText;
 - (void)hideJoinableHelpText;
-
-- (void)setLastPhotoButtonImage:(UIImage *)image;
 
 @end

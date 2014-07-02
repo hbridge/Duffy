@@ -97,14 +97,4 @@ static NSUInteger LastPhotoImageCornerRadius = 3;
 }
 
 
-- (void)setLastPhotoButtonImage:(UIImage *)image
-{
-  UIImage *resizedImage = [image thumbnailImage:LastPhotoImageSize
-                               transparentBorder:0
-                                    cornerRadius:LastPhotoImageCornerRadius
-                            interpolationQuality:kCGInterpolationDefault];
-  [self.lastPhotoButton setBackgroundImage:resizedImage
-                        forState:UIControlStateNormal];
-}
-
 @end
