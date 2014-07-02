@@ -1,12 +1,12 @@
 //
-//  DFBackgroundRefreshController.m
+//  DFStrandsManager.m
 //  Strand
 //
 //  Created by Henry Bridge on 6/12/14.
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFBackgroundRefreshController.h"
+#import "DFStrandsManager.h"
 #import <CoreLocation/CoreLocation.h>
 #import "DFStrandConstants.h"
 #import "DFPeanutJoinableStrandsAdapter.h"
@@ -19,114 +19,47 @@
 #import "DFAnalytics.h"
 
 
-@interface DFBackgroundRefreshController()
+@interface DFStrandsManager()
 
-@property (readonly, nonatomic, retain) CLLocationManager *locationManager;
 @property (readonly, nonatomic, retain) DFPeanutJoinableStrandsAdapter *joinableStrandsAdapter;
 @property (readonly, nonatomic, retain) DFPeanutNewPhotosAdapter *newPhotosAdapter;
-@property (readonly, nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
 
 @property (atomic) BOOL isNewPhotoCountFetchInProgress;
 @property (atomic) BOOL isJoinableStrandsFetchInProgress;
 
 @end
 
-@implementation DFBackgroundRefreshController
+@implementation DFStrandsManager
 
-@synthesize locationManager = _locationManager;
 @synthesize joinableStrandsAdapter = _joinableStrandsAdapter;
 @synthesize newPhotosAdapter = _newPhotosAdapter;
-@synthesize locationAdapter = _locationAdapter;
 
 // We want the upload controller to be a singleton
-static DFBackgroundRefreshController *defaultBackgroundController;
-+ (DFBackgroundRefreshController *)sharedBackgroundController {
-  if (!defaultBackgroundController) {
-    defaultBackgroundController = [[super allocWithZone:nil] init];
+static DFStrandsManager *defaultStrandsManager;
++ (DFStrandsManager *)sharedStrandsManager {
+  if (!defaultStrandsManager) {
+    defaultStrandsManager = [[super allocWithZone:nil] init];
   }
-  return defaultBackgroundController;
+  return defaultStrandsManager;
 }
 
 + (id)allocWithZone:(NSZone *)zone
 {
-  return [self sharedBackgroundController];
+  return [self sharedStrandsManager];
 }
 
 - (id)init
 {
   self = [super init];
   if (self) {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(appEnteredForeground)
-                                                 name:UIApplicationDidBecomeActiveNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(appEnteredBackground)
-                                                 name:UIApplicationDidEnterBackgroundNotification
-                                               object:nil];
+    
   }
   return self;
 }
 
-- (CLLocationManager *)locationManager
-{
-  if (!_locationManager) {
-    _locationManager = [[CLLocationManager alloc] init];
-    _locationManager.delegate = self;
-    _locationManager.desiredAccuracy = kCLLocationAccuracyBest;
-    _locationManager.distanceFilter = 30;
-  }
-  
-  return _locationManager;
-}
-
-- (void)startBackgroundRefresh
-{
-  if ([CLLocationManager locationServicesEnabled]) {
-    DDLogInfo(@"Starting to monitor for significant location change.");
-    [self.locationManager startMonitoringSignificantLocationChanges];
-  } else {
-    DDLogWarn(@"DFBackgroundRefreshController location services not enabled.");
-  }
-  
-  [[UIApplication sharedApplication]
-   setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-}
-
-- (void)recordManagerLocation
-{
-  CLLocation *location = self.locationManager.location;
-  [DFLocationStore StoreLastLocation:location];
-  DDLogInfo(@"DFBackgroundRefreshController recorded new location: [%.04f,%.04f]",
-            location.coordinate.latitude,
-            location.coordinate.longitude);
-}
-
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
-{
-  DDLogInfo(@"DFBackgroundRefreshController updated location");
-  [self recordManagerLocation];
-  [self.locationAdapter updateLocation:manager.location
-                         withTimestamp:manager.location.timestamp
-                       completionBlock:^(BOOL success) {
-                       }];
-  [self performFetch];
-  [DFAnalytics logLocationUpdated];
-}
-
-- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
-{
-  NSLog(@"Location manager failed with error: %@", error);
-  if ([error.domain isEqualToString:kCLErrorDomain] && error.code == kCLErrorDenied) {
-    //user denied location services so stop updating manager
-    [manager stopUpdatingLocation];
-    DDLogWarn(@"DFBackgroundRefreshController couldn't start updating location:%@", error.description);
-  }
-}
-
 - (UIBackgroundFetchResult)performFetch
 {
-  DDLogInfo(@"DFBackgroundRefreshController performing fetch.");
+  DDLogInfo(@"DFStrandsManager performing fetch.");
   
   if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] < 1.0)
     return UIBackgroundFetchResultNoData;
@@ -140,7 +73,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 - (void)updateJoinableStrands
 {
   if (self.isJoinableStrandsFetchInProgress) {
-    DDLogInfo(@"DFBackgroundRefreshController: joinable strands update already in progress.");
+    DDLogInfo(@"DFStrandsManager: joinable strands update already in progress.");
     return;
   } else {
     self.isJoinableStrandsFetchInProgress = YES;
@@ -149,19 +82,21 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   CLLocation *lastLocation = [DFLocationStore LoadLastLocation];
 
   if (!lastLocation) {
-    DDLogWarn(@"DFBackgroundRefreshController: last location nil, not updating joinable strands");
+    DDLogWarn(@"DFStrandsManager: last location nil, not updating joinable strands");
     self.isJoinableStrandsFetchInProgress = NO;
     return;
   }
   
-  DDLogInfo(@"Updating joinable strands.");
+  DDLogInfo(@"Updating joinable strands with location: [%f, %f]",
+            lastLocation.coordinate.latitude,
+            lastLocation.coordinate.longitude);
   [self.joinableStrandsAdapter fetchJoinableStrandsNearLatitude:lastLocation.coordinate.latitude
                                                       longitude:lastLocation.coordinate.longitude
                                                 completionBlock:^(DFPeanutSearchResponse *response)
   {
     self.isJoinableStrandsFetchInProgress = NO;
     if (!response || !response.result) {
-      DDLogError(@"DFBackgroundRefreshController couldn't get joinable strands");
+      DDLogError(@"DFStrandsManager couldn't get joinable strands");
       return;
     }
     
@@ -178,7 +113,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 - (void)updateNewPhotos
 {
   if (self.isNewPhotoCountFetchInProgress) {
-    DDLogInfo(@"DFBackgroundRefreshController: newPhotoCount update already in progress.");
+    DDLogInfo(@"DFStrandsManager: newPhotoCount update already in progress.");
     return;
   } else {
     self.isNewPhotoCountFetchInProgress = YES;
@@ -192,7 +127,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   {
     self.isNewPhotoCountFetchInProgress = NO;
     if (!response || response.result == NO) {
-      DDLogError(@"DFBackgroundRefreshController: update new photos failed.");
+      DDLogError(@"DFStrandsManager: update new photos failed.");
       return;
     }
     
@@ -270,14 +205,6 @@ static DFBackgroundRefreshController *defaultBackgroundController;
   return _newPhotosAdapter;
 }
 
-- (DFPeanutLocationAdapter *)locationAdapter
-{
-  if (!_locationAdapter) {
-    _locationAdapter = [[DFPeanutLocationAdapter alloc] init];
-  }
-  
-  return _locationAdapter;
-}
 
 - (int)numUnseenPhotos
 {
@@ -289,19 +216,7 @@ static DFBackgroundRefreshController *defaultBackgroundController;
 }
 
 
-#pragma mark - Foreground/background handlers
 
-- (void)appEnteredForeground
-{
-  DDLogVerbose(@"DFBackgroundRefreshController starting continuous updates.");
-  [self.locationManager startUpdatingLocation];
-}
-
-- (void)appEnteredBackground
-{
-  DDLogVerbose(@"DFBackgroundRefreshController stopping continuous updates.");
-  [self.locationManager stopUpdatingLocation];
-}
 
 
 @end

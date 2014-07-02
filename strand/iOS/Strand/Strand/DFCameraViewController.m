@@ -8,7 +8,7 @@
 
 #import "DFCameraViewController.h"
 #import "DFAnalytics.h"
-#import "DFBackgroundRefreshController.h"
+#import "DFStrandsManager.h"
 #import "DFCameraOverlayView.h"
 #import "DFDataHasher.h"
 #import "DFLocationStore.h"
@@ -98,7 +98,7 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
 - (void)updateUnseenCount
 {
-  int unseenCount =  [[DFBackgroundRefreshController sharedBackgroundController] numUnseenPhotos];
+  int unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
   NSString *unseenCountString = [NSString stringWithFormat:@"%d", unseenCount];
   if (![self.customCameraOverlayView.galleryButton.titleLabel.text isEqualToString:unseenCountString]) {
     if (unseenCount > 0) {
@@ -435,7 +435,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
   
 }
-
 
 - (void)joinableStrandsUpdated:(NSNotification *)note
 {

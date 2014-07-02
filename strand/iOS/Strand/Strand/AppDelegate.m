@@ -17,12 +17,13 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFFirstTimeSetupViewController.h"
 #import "HockeySDK.h"
-#import "DFBackgroundRefreshController.h"
+#import "DFStrandsManager.h"
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
 #import "DFPeanutPushTokenAdapter.h"
 #import "DFAnalytics.h"
 #import "DFToastNotificationManager.h"
+#import "DFBackgroundLocationManager.h"
 
 
 @interface AppDelegate ()
@@ -148,7 +149,8 @@
   [self requestPushNotifs];
   [self performForegroundOperations];
   self.window.rootViewController = [[RootViewController alloc] init];
-  [[DFBackgroundRefreshController sharedBackgroundController] startBackgroundRefresh];
+  [[DFBackgroundLocationManager sharedBackgroundLocationManager]
+   startUpdatingOnSignificantLocationChange];
 }
 
 - (void)performForegroundOperations
@@ -156,7 +158,7 @@
   DDLogInfo(@"Strand app %@ became active.", [DFAppInfo appInfoString]);
   if ([self isAppSetupComplete]) {
     [[DFUploadController sharedUploadController] uploadPhotos];
-    [[DFBackgroundRefreshController sharedBackgroundController] performFetch];
+    [[DFStrandsManager sharedStrandsManager] performFetch];
   }
 }
 
@@ -195,15 +197,6 @@
   [[NSUserDefaults standardUserDefaults] synchronize];
   [[DFPhotoStore sharedStore] saveContext];
   [DFAnalytics CloseAnalyticsSession];
-}
-
--(void)application:(UIApplication *)application
-performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler {
-  UIBackgroundFetchResult result = [[DFBackgroundRefreshController sharedBackgroundController]
-                                    performFetch];
-  [DFAnalytics logBackgroundAppRefreshOccurred];
-  
-  completionHandler(result);
 }
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
@@ -258,6 +251,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     if (alertString) {
       [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:alertString];
     }
+    [[DFStrandsManager sharedStrandsManager] performFetch];
   }
 }
 

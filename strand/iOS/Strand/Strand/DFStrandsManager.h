@@ -9,14 +9,12 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CLLocationManagerDelegate.h>
 
-@interface DFBackgroundRefreshController : NSObject <CLLocationManagerDelegate>
-
+@interface DFStrandsManager : NSObject <CLLocationManagerDelegate>
 
 @property (nonatomic, retain) NSDate *lastUnseenPhotosFetchDate;
 @property (nonatomic, retain) NSDate *lastFetchAttemptDate;
 
-+ (DFBackgroundRefreshController *)sharedBackgroundController;
-- (void)startBackgroundRefresh;
++ (DFStrandsManager *)sharedStrandsManager;
 
 - (UIBackgroundFetchResult)performFetch;
 

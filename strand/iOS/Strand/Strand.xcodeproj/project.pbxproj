@@ -23,6 +23,7 @@
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
+		5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
 		5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */; };
@@ -61,7 +62,7 @@
 		5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */; };
 		5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */; };
 		5AC4A9571948A59200862D9C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AC4A9561948A59200862D9C /* CoreLocation.framework */; };
-		5AC4A960194A25A300862D9C /* DFBackgroundRefreshController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A95F194A25A300862D9C /* DFBackgroundRefreshController.m */; };
+		5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A95F194A25A300862D9C /* DFStrandsManager.m */; };
 		5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A962194A295700862D9C /* DFStrandConstants.m */; };
 		5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A966194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m */; };
 		5AC4A96D194A422300862D9C /* DFPeanutSearchObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A96C194A422300862D9C /* DFPeanutSearchObject.m */; };
@@ -121,6 +122,8 @@
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
 		5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutLocationAdapter.h; sourceTree = "<group>"; };
 		5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutLocationAdapter.m; sourceTree = "<group>"; };
+		5AA4527E19648A120099CBD2 /* DFBackgroundLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBackgroundLocationManager.h; sourceTree = "<group>"; };
+		5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBackgroundLocationManager.m; sourceTree = "<group>"; };
 		5AB32B5A19537A610082F716 /* DFStrandStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandStore.h; sourceTree = "<group>"; };
 		5AB32B5B19537A610082F716 /* DFStrandStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandStore.m; sourceTree = "<group>"; };
 		5AC4A8D019476F9000862D9C /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
@@ -198,8 +201,8 @@
 		5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFirstTimeSetupViewController.m; sourceTree = "<group>"; };
 		5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFirstTimeSetupViewController.xib; sourceTree = "<group>"; };
 		5AC4A9561948A59200862D9C /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
-		5AC4A95E194A25A300862D9C /* DFBackgroundRefreshController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBackgroundRefreshController.h; sourceTree = "<group>"; };
-		5AC4A95F194A25A300862D9C /* DFBackgroundRefreshController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBackgroundRefreshController.m; sourceTree = "<group>"; };
+		5AC4A95E194A25A300862D9C /* DFStrandsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandsManager.h; sourceTree = "<group>"; };
+		5AC4A95F194A25A300862D9C /* DFStrandsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandsManager.m; sourceTree = "<group>"; };
 		5AC4A961194A295700862D9C /* DFStrandConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandConstants.h; sourceTree = "<group>"; };
 		5AC4A962194A295700862D9C /* DFStrandConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandConstants.m; sourceTree = "<group>"; };
 		5AC4A965194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutJoinableStrandsAdapter.h; sourceTree = "<group>"; };
@@ -500,8 +503,10 @@
 		5AC4A95D194A257E00862D9C /* Background manager */ = {
 			isa = PBXGroup;
 			children = (
-				5AC4A95E194A25A300862D9C /* DFBackgroundRefreshController.h */,
-				5AC4A95F194A25A300862D9C /* DFBackgroundRefreshController.m */,
+				5AC4A95E194A25A300862D9C /* DFStrandsManager.h */,
+				5AC4A95F194A25A300862D9C /* DFStrandsManager.m */,
+				5AA4527E19648A120099CBD2 /* DFBackgroundLocationManager.h */,
+				5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */,
 				5AC4A961194A295700862D9C /* DFStrandConstants.h */,
 				5AC4A962194A295700862D9C /* DFStrandConstants.m */,
 			);
@@ -791,7 +796,7 @@
 				5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */,
 				5AC4A970194A42EE00862D9C /* DFPeanutSearchResponse.m in Sources */,
 				5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */,
-				5AC4A960194A25A300862D9C /* DFBackgroundRefreshController.m in Sources */,
+				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
@@ -818,6 +823,7 @@
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
+				5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
 				5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */,
