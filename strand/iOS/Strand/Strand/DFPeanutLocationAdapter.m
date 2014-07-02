@@ -17,6 +17,7 @@ static NSString *const UpdateLocationPath = @"update_user_location";
 static NSString *const LatitudeKey = @"lat";
 static NSString *const LongitudeKey = @"lon";
 static NSString *const TimestampKey = @"timestamp";
+static NSString *const AccuracyKey = @"accuracy";
 
 @implementation DFPeanutLocationAdapter
 
@@ -45,7 +46,8 @@ static NSString *const TimestampKey = @"timestamp";
 
 - (void)updateLocation:(CLLocation *)location
          withTimestamp:(NSDate *)date
-       completionBlock:(DFUpdateLocationResponseBlock)completionBlock
+              accuracy:(CLLocationAccuracy)accuracy
+       completionBlock:(DFUpdateLocationResponseBlock)completionBlock;
 {
   NSString *timestampString = [[NSDateFormatter DjangoDateFormatter] stringFromDate:date];
   if (!timestampString) timestampString = @"";
@@ -57,6 +59,7 @@ static NSString *const TimestampKey = @"timestamp";
                                            LatitudeKey: @(location.coordinate.latitude),
                                            LongitudeKey: @(location.coordinate.longitude),
                                            TimestampKey: timestampString,
+                                           AccuracyKey: @(location.horizontalAccuracy),
                                            }];
   DDLogInfo(@"DFPeanutLocationAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   

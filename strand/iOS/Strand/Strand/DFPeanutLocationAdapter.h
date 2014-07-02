@@ -16,6 +16,7 @@ typedef void (^DFUpdateLocationResponseBlock)(BOOL success);
 
 - (void)updateLocation:(CLLocation *)location
          withTimestamp:(NSDate *)date
+              accuracy:(CLLocationAccuracy)accuracy
        completionBlock:(DFUpdateLocationResponseBlock)completionBlock;
 
 @end

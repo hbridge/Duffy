@@ -110,6 +110,7 @@ static DFBackgroundLocationManager *defaultManager;
     [self recordManagerLocation];
     [self.locationAdapter updateLocation:newLocation
                            withTimestamp:newLocation.timestamp
+                                accuracy:newLocation.horizontalAccuracy
                          completionBlock:^(BOOL success) {
                          }];
     [DFAnalytics logLocationUpdated];
