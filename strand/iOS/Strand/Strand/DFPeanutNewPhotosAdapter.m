@@ -11,6 +11,7 @@
 #import "DFObjectManager.h"
 #import "DFPeanutSearchResponse.h"
 #import "DFStrandConstants.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 NSString *const NewPhotosPath = @"get_new_photos";
 
@@ -43,15 +44,16 @@ NSString *const StartDateTimeParameter = @"start_date_time";
 
 
 
-- (void)fetchNewPhotosAfterDate:(NSString *)startDateTime
+- (void)fetchNewPhotosAfterDate:(NSDate *)date
                 completionBlock:(DFPeanutNewPhotosCompletionBlock)completionBlock
 {
+  NSString *dateString = [[NSDateFormatter DjangoDateFormatter] stringFromDate:date];
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutSearchResponse alloc] init]
                               method:RKRequestMethodGET
                               path:NewPhotosPath
                               parameters:@{
-                                           StartDateTimeParameter : startDateTime,
+                                           StartDateTimeParameter : dateString,
                                            }];
   DDLogInfo(@"DFPeanutNewPhotosAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   

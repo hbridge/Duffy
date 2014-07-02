@@ -455,9 +455,12 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
   CLLocation *location = locations.lastObject;
-  DDLogInfo(@"DFCameraViewContrller updated location: [%f, %f]",
+  DDLogInfo(@"DFCameraViewController updated location: <%f, %f> +/- %.02fm @ %@",
             location.coordinate.latitude,
-            location.coordinate.longitude);
+            location.coordinate.longitude,
+            location.horizontalAccuracy,
+            location.timestamp
+            );
 }
 
 - (DFPeanutLocationAdapter *)locationAdapter

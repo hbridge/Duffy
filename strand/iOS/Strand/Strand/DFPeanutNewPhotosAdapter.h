@@ -15,7 +15,7 @@ typedef void (^DFPeanutNewPhotosCompletionBlock)(DFPeanutSearchResponse *respons
 
 @interface DFPeanutNewPhotosAdapter : NSObject <DFNetworkAdapter>
 
-- (void)fetchNewPhotosAfterDate:(NSString *)startDateTime
+- (void)fetchNewPhotosAfterDate:(NSDate *)date
                 completionBlock:(DFPeanutNewPhotosCompletionBlock)completionBlock;
 
 @end

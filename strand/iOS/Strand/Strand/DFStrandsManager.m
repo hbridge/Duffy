@@ -56,7 +56,7 @@ static DFStrandsManager *defaultStrandsManager;
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(galleryAppeared:)
                                                  name:DFStrandGalleryAppearedNotificationName
-                                               object:self];
+                                               object:nil];
 
   }
   return self;
@@ -125,8 +125,9 @@ static DFStrandsManager *defaultStrandsManager;
   }
   DDLogInfo(@"Updating new photo counts.");
   
-  NSString *galleryLastSeenDate = [[NSDateFormatter DjangoDateFormatter]
-                                   stringFromDate:[DFStrandStore galleryLastSeenDate]];
+  NSDate *galleryLastSeenDate = [DFStrandStore galleryLastSeenDate];
+  if (!galleryLastSeenDate) galleryLastSeenDate = [NSDate dateWithTimeIntervalSince1970:0];
+
   [self.newPhotosAdapter fetchNewPhotosAfterDate:galleryLastSeenDate
                                  completionBlock:^(DFPeanutSearchResponse *response)
   {

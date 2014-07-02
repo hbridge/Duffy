@@ -98,8 +98,13 @@ static DFBackgroundLocationManager *defaultManager;
     distance = [newLocation distanceFromLocation:lastLocation];
   }
   
-  DDLogInfo(@"DFBackgroundLocationManager updated location.  Distance:%.02fkm AppState: %d",
-            distance/1000, (int)[[UIApplication sharedApplication] applicationState]);
+  DDLogInfo(@"DFBackgroundLocationManager updated location: <%f, %f> +/- %.02fm @ %@ distance from last:%.02fkm AppState: %d",
+            newLocation.coordinate.latitude,
+            newLocation.coordinate.longitude,
+            newLocation.horizontalAccuracy,
+            newLocation.timestamp,
+            distance/1000,
+            (int)[[UIApplication sharedApplication] applicationState]);
   
   if (distance > 30.0) {
     [self recordManagerLocation];
