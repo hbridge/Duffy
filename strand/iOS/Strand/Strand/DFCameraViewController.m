@@ -340,6 +340,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
       NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
       [self saveImage:imageToSave withMetadata:metadata];
       [[DFUploadController sharedUploadController] uploadPhotos];
+      [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
     }
   }
 }
