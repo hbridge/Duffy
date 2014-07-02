@@ -39,13 +39,19 @@
 		.ui-msg {
 			padding: 10px 10px 10px 10px;
 			text-align: center;
-			font-size: 35px;
 			color: #000000;
 		}
-		.ui-left-arrow {
-			font-size: 120px;
+		.ui-msg-tag {
+			font-size: 30px;
+			padding-top: 30px;
+		}
+
+		.ui-msg-action {
+			padding: 150px 0px 10px 0px;
+			font-size: 30px;
 			text-align: center;
-			color: rgb(245, 166, 35);
+			/*color: rgb(241, 126, 48);*/
+			color: #606060;
 		}
 	</style>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
@@ -184,7 +190,10 @@
 <body>
 <div class="ui-content">
 	<div class="ui-gallery" id="allImages"/>
-	<div class="ui-msg hidden"> <br> <br> Swipe left to take a photo! <div class='ui-left-arrow'> &larr; </div></div>
+	<div class="ui-msg hidden"> 
+		<div class="ui-msg-tag hidden">Share photos automatically with nearby friends. </div>
+		<div class="ui-msg-action">Take a photo <img height='35px' width='35px' src='/static/camera.png'> to get started!</div>
+	</div>
 </div>
 
 </body>
