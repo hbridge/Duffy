@@ -338,16 +338,34 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
       }
       
       NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
-      [self saveImage:imageToSave withMetadata:metadata];
+      [self saveImage:imageToSave withMetadata:metadata retryAttempt:0];
       [[DFUploadController sharedUploadController] uploadPhotos];
       [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
     }
   }
 }
 
-- (void)saveImage:(UIImage *)image withMetadata:(NSDictionary *)metadata
+const unsigned int MaxRetryCount = 3;
+const CLLocationAccuracy MinLocationAccuracy = 65.0;
+const NSTimeInterval MaxLocationAge = 15 * 60;
+const unsigned int RetryDelaySecs = 5;
+
+- (void)saveImage:(UIImage *)image
+     withMetadata:(NSDictionary *)metadata
+     retryAttempt:(unsigned int)retryAttempt
 {
   CLLocation *location = self.locationManager.location;
+  
+  if (![self isGoodLocation:location] && retryAttempt <= MaxRetryCount) {
+    //wait for a better location fix
+    DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self saveImage:image withMetadata:metadata retryAttempt:retryAttempt + 1];
+    });
+    
+    return;
+  }
+  
   NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
   [self addLocation:location toMetadata:mutableMetadata];
   [self addCachedLocationToMetadata:mutableMetadata];
@@ -377,6 +395,16 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
                 format:@"Error: %@", error.description];
   }
+}
+
+- (BOOL)isGoodLocation:(CLLocation *)location
+{
+  if (location.horizontalAccuracy <= MinLocationAccuracy &&
+      [[NSDate date] timeIntervalSinceDate:location.timestamp] <= MaxLocationAge) {
+    return YES;
+  }
+  
+  return NO;
 }
 
 - (void)addLocation:(CLLocation *)location toMetadata:(NSMutableDictionary *)metadata
