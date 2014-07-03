@@ -24,11 +24,9 @@ html, body {
 }
 .image {
 	padding-right: 2px;
-	float:left;
 	position: relative;
 	cursor: pointer;
-	height: 80px;
-	width: 78px;
+	margin-bottom: 5px;
 }
 .ui-img-ct {
 	position:absolute;
