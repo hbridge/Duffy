@@ -74,8 +74,8 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 {
   [super viewDidLoad];
   if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-    self.view.backgroundColor = [UIColor blackColor];
     self.sourceType = UIImagePickerControllerSourceTypeCamera;
+    self.view.backgroundColor = [UIColor blackColor];
     self.showsCameraControls = NO;
     self.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
     self.cameraOverlayView = self.customCameraOverlayView;
@@ -89,8 +89,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 
 - (void)viewWillAppear:(BOOL)animated
 {
-  DDLogVerbose(@"VIEWWILLAPPEAR %@ viewDidAppear", [self class]);
-
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
   [self updateUnseenCount];
@@ -118,7 +116,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   [self startLocationUpdates];
   [self showHelpTextIfNeeded];
   
-  DDLogVerbose(@"VIEWDIDAPPEAR %@ viewDidAppear", [self class]);
   [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
@@ -275,29 +272,6 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
   } else if (self.cameraDevice == UIImagePickerControllerCameraDeviceRear) {
     self.cameraDevice = UIImagePickerControllerCameraDeviceFront;
   }
-}
-
-- (void)lastPhotoButtonPressed:(id)sender
-{
-  NSArray *takenPhotos = [[[DFPhotoStore sharedStore] mostRecentPhotos:100] photosByDateAscending:YES];
-  if (takenPhotos.count == 0) return;
-  
-  DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc]
-                                      init];
-  [mpvc setActivePhoto:[takenPhotos lastObject] inPhotos:takenPhotos];
-  
-  // Creating a nav controller and pushing it modally is a bit of a hack, but just calling
-  // [self pushViewController] results in not getting viewWillAppear/didAppear on return,
-  // and trying to manually send them resulted in strange bugs so this seems like the lesser
-  // of two evils
-  UINavigationController *photoNav = [[UINavigationController alloc] initWithRootViewController:mpvc];
-  mpvc.navigationItem.title = @"My Photos";
-  mpvc.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                           target:photoNav
-                                           action:@selector(dismissModalViewControllerAnimated:)];
-  [self presentViewController:photoNav animated:YES completion:nil];
-  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:NO];
 }
 
 - (void)flashCameraView
@@ -474,9 +448,11 @@ const unsigned int RetryDelaySecs = 5;
   } else {
     newImage = [UIImage imageNamed:@"Assets/Icons/ShutterButton.png"];
   }
-  [self.customCameraOverlayView.takePhotoButton
-   setImage:newImage
-   forState:UIControlStateNormal];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.customCameraOverlayView.takePhotoButton
+     setImage:newImage
+     forState:UIControlStateNormal];
+  });
 }
 
 
