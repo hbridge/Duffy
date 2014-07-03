@@ -98,15 +98,17 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 {
   int unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
   NSString *unseenCountString = [NSString stringWithFormat:@"%d", unseenCount];
-  if (![self.customCameraOverlayView.galleryButton.titleLabel.text isEqualToString:unseenCountString]) {
-    if (unseenCount > 0) {
-      self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
-      [self.customCameraOverlayView.galleryButton setTitle:unseenCountString forState:UIControlStateNormal];
-    } else {
-      self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
-      [self.customCameraOverlayView.galleryButton setTitle:@"" forState:UIControlStateNormal];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (![self.customCameraOverlayView.galleryButton.titleLabel.text isEqualToString:unseenCountString]) {
+      if (unseenCount > 0) {
+        self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
+        [self.customCameraOverlayView.galleryButton setTitle:unseenCountString forState:UIControlStateNormal];
+      } else {
+        self.customCameraOverlayView.galleryButton.titleLabel.textColor = [UIColor orangeColor];
+        [self.customCameraOverlayView.galleryButton setTitle:@"" forState:UIControlStateNormal];
+      }
     }
-  }
+  });
 }
 
 - (void)viewDidAppear:(BOOL)animated
