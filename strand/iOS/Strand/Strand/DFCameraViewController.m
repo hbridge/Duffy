@@ -293,29 +293,21 @@ static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoin
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogVerbose(@"Image picked, info: %@", info.description);
   
-  if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
+  
+  NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
+  UIImage *imageToSave;
+  
+  // Handle a still image capture
+  if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0)
+      == kCFCompareEqualTo) {
     
-    NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
-    UIImage *originalImage, *editedImage, *imageToSave;
     
-    // Handle a still image capture
-    if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0)
-        == kCFCompareEqualTo) {
-      
-      editedImage = (UIImage *) [info objectForKey:
-                                 UIImagePickerControllerEditedImage];
-      originalImage = (UIImage *) [info objectForKey:
-                                   UIImagePickerControllerOriginalImage];
-      
-      if (editedImage) {
-        imageToSave = editedImage;
-      } else {
-        imageToSave = originalImage;
-      }
-      
-      NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
-      [self saveImage:imageToSave withMetadata:metadata retryAttempt:0];
-      [[DFUploadController sharedUploadController] uploadPhotos];
+    imageToSave = (UIImage *) [info objectForKey:
+                               UIImagePickerControllerOriginalImage];
+    NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
+    [self saveImage:imageToSave withMetadata:metadata retryAttempt:0];
+    [[DFUploadController sharedUploadController] uploadPhotos];
+    if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
       [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
     }
   }
@@ -342,7 +334,7 @@ const unsigned int RetryDelaySecs = 5;
     return;
   }
   
-  NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
+  NSMutableDictionary *mutableMetadata = [[NSMutableDictionary alloc] initWithDictionary:metadata];
   [self addLocation:location toMetadata:mutableMetadata];
   [self addCachedLocationToMetadata:mutableMetadata];
   
@@ -423,14 +415,21 @@ const unsigned int RetryDelaySecs = 5;
   
   CLLocationCoordinate2D cachedCoords = lastCachedLocation.coordinate;
   
-  NSMutableDictionary *exifDict = [metadata[@"{Exif}"] mutableCopy];
+  NSMutableDictionary *exifDict = [[NSMutableDictionary alloc]
+                                   initWithDictionary:metadata[@"{Exif}"]];
   
-  NSDictionary *cachedLatlongDict = @{@"CachedLatitude": @(fabs(cachedCoords.latitude)),
+  NSNumber *cachedLat = @(fabs(cachedCoords.latitude));
+  NSNumber *cachedLon = @(fabs(cachedCoords.longitude));
+  NSString *cachedDateRec = [[NSDateFormatter DjangoDateFormatter]
+                          stringFromDate:lastCachedLocation.timestamp];
+  NSString *GPSTagDateRec = [[NSDateFormatter DjangoDateFormatter] stringFromDate:self.locationManager.location.timestamp];
+  
+  NSDictionary *cachedLatlongDict = @{@"CachedLatitude": cachedLat,
                                       @"CachedLatitudeRef" : cachedCoords.latitude >= 0.0 ? @"N" : @"S",
-                                      @"CachedLongitude" : @(fabs(cachedCoords.longitude)),
+                                      @"CachedLongitude" : cachedLon,
                                       @"CachedLongitudeRef" : cachedCoords.longitude >= 0.0 ? @"E" : @"W",
-                                      @"CachedDateTimeRecorded" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:lastCachedLocation.timestamp],
-                                      @"GPSTagDateTimeRecored" : [[NSDateFormatter DjangoDateFormatter] stringFromDate:self.locationManager.location.timestamp],
+                                      @"CachedDateTimeRecorded" : cachedDateRec ? cachedDateRec : @"",
+                                      @"GPSTagDateTimeRecored" : GPSTagDateRec ? GPSTagDateRec : @""
                                       };
   exifDict[@"UserComment"] = cachedLatlongDict.description;
   metadata[@"{Exif}"] = exifDict;
