@@ -177,7 +177,7 @@
 {
   UIImage *image = self.imageCache[[self keyForIndexPath:indexPath]];
   if (image) return [DFCGRectHelpers
-                     aspectFittedSize:image.size max:CGRectMake(0,0,300, 640)].size.height;
+                     aspectFittedSize:image.size max:CGRectMake(0,0,290, 640)].size.height;
   
   return 100;
 }
