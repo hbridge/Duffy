@@ -22,5 +22,6 @@ UIPageViewControllerDataSource>
 - (void)activePhotoDeleted;
 
 - (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled animated:(BOOL)animated;
++ (UIColor *)colorForTheatreModeEnabled:(BOOL)theatreModeEnabled;
 
 @end

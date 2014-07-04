@@ -16,7 +16,7 @@ typedef UInt64 DFPhotoIDType;
 @interface DFPhoto : NSManagedObject
 
 // stored properties
-@property (nonatomic) UInt64 userID;
+@property (nonatomic) DFUserIDType userID;
 @property (nonatomic) DFPhotoIDType photoID;
 @property (nonatomic, retain) DFPhotoAsset *asset;
 
@@ -32,5 +32,7 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
                         userID:(DFUserIDType)userID
                     timeZone:(NSTimeZone *)timeZone
                    inContext:(NSManagedObjectContext *)context;
+
+- (BOOL)isDeleteableByUser:(DFUserIDType)userID;
 
 @end

@@ -7,6 +7,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPhotoViewController">
             <connections>
                 <outlet property="photoView" destination="qLd-yU-pjU" id="rYp-6S-C2q"/>
+                <outlet property="toolbar" destination="RoJ-UU-ZGf" id="iI5-rK-Buf"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -19,7 +20,16 @@
                     <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="9nG-T9-qUv" appends="YES" id="XQh-8Q-IlC"/>
+                    </connections>
                 </view>
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RoJ-UU-ZGf">
+                    <rect key="frame" x="0.0" y="524" width="320" height="44"/>
+                    <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <items/>
+                    <color key="tintColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
+                </toolbar>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <gestureRecognizers/>
@@ -33,9 +43,6 @@
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
             <simulatedToolbarMetrics key="simulatedBottomBarMetrics" barStyle="black"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
-            <connections>
-                <outletCollection property="gestureRecognizers" destination="9nG-T9-qUv" appends="YES" id="wu8-2K-rdg"/>
-            </connections>
         </view>
         <tapGestureRecognizer id="9nG-T9-qUv">
             <connections>

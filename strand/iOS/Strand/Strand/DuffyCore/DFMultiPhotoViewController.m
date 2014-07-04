@@ -160,9 +160,8 @@
   [UIView animateWithDuration:duration animations:^{
     self.hideStatusBar = theatreModeEnabled;
     [self.navigationController setNavigationBarHidden:theatreModeEnabled animated:animated];
-    self.currentPhotoViewController.view.backgroundColor =
-    [self colorForTheatreModeEnabled:theatreModeEnabled];
-    self.view.backgroundColor = [self colorForTheatreModeEnabled:theatreModeEnabled];
+    self.currentPhotoViewController.theatreModeEnabled = theatreModeEnabled;
+    self.view.backgroundColor = [DFMultiPhotoViewController colorForTheatreModeEnabled:theatreModeEnabled];
   }];
 }
 
@@ -170,11 +169,12 @@
 {
   if (pendingViewControllers.count > 0) {
     DFPhotoViewController *pvc = [pendingViewControllers firstObject];
-    pvc.view.backgroundColor = [self colorForTheatreModeEnabled:self.theatreModeEnabled];
+    pvc.view.backgroundColor = [DFMultiPhotoViewController
+                                colorForTheatreModeEnabled:self.theatreModeEnabled];
   }
 }
 
-- (UIColor *)colorForTheatreModeEnabled:(BOOL)theatreModeEnabled
++ (UIColor *)colorForTheatreModeEnabled:(BOOL)theatreModeEnabled
 {
   if (theatreModeEnabled) {
     return [UIColor blackColor];

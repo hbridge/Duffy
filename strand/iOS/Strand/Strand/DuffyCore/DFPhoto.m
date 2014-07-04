@@ -72,5 +72,14 @@
   }];
 }
 
+- (BOOL)isDeleteableByUser:(DFUserIDType)userID
+{
+  if (self.userID == userID) {
+    return YES;
+  }
+  
+  return NO;
+}
+
 
 @end

@@ -18,6 +18,7 @@
 @property (strong, nonatomic) NSURL *photoURL;
 @property (readonly) DFPhotoIDType photoID;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
+@property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet DFPhotoView *photoView;

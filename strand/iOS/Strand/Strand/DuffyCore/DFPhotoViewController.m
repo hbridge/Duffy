@@ -7,19 +7,18 @@
 //
 
 #import "DFPhotoViewController.h"
-#import <CoreImage/CoreImage.h>
-#import <ImageIO/ImageIO.h>
-#import "UIImage+DFHelpers.h"
-#import "DFPhoto.h"
-#import "NSDictionary+DFJSON.h"
-#import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "DFMultiPhotoViewController.h"
-#import "DFPhotoMetadataAdapter.h"
-#import <AssetsLibrary/AssetsLibrary.h>
-#import "UIImage+DFHelpers.h"
 #import "DFAnalytics.h"
+#import "DFMultiPhotoViewController.h"
+#import "DFPhoto.h"
+#import "DFPhotoMetadataAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFUser.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "NSDictionary+DFJSON.h"
+#import "UIImage+DFHelpers.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import <CoreImage/CoreImage.h>
+#import <ImageIO/ImageIO.h>
 
 @interface DFPhotoViewController ()
 
@@ -30,8 +29,6 @@
 @end
 
 @implementation DFPhotoViewController
-
-@synthesize theatreModeEnabled;
 
 - (id)init
 {
@@ -58,6 +55,21 @@
       [self setImageFromPhotoURL:self.photoURL];
     }
   }
+  
+  [self configureToolbar];
+}
+
+- (void)configureToolbar
+{
+  UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+  UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc]
+                                   initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
+                                   target:self
+                                   action:@selector(confirmDeletePhoto)];
+  self.toolbar.items = @[flexibleSpace,deleteButton];
+  if (![self isPhotoDeletableByUser]) {
+    deleteButton.enabled = NO;
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -70,6 +82,28 @@
 {
   [super viewDidDisappear:animated];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
+- (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled
+{
+  _theatreModeEnabled = theatreModeEnabled;
+  self.view.backgroundColor = [DFMultiPhotoViewController
+                               colorForTheatreModeEnabled:theatreModeEnabled];
+  [self setToolbarHidden:theatreModeEnabled];
+}
+
+- (void)setToolbarHidden:(BOOL)hidden
+{
+  CGFloat destOpacity;
+  if (hidden) {
+    destOpacity = 0.0;
+  } else {
+    destOpacity = 1.0;
+  }
+  [UIView animateWithDuration:0.5 animations:^{
+    self.toolbar.alpha = destOpacity;
+  }];
+
 }
 
 - (void)setImageFromPhotoURL:(NSURL *)photoURL
@@ -149,17 +183,10 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 
 - (void)showPhotoActions:(id)sender
 {
-  NSString *deleteTitle;
-  if ([self isPhotoDeletableByUser]) {
-    deleteTitle = DeleteButtonTitle;
-  } else {
-    deleteTitle = nil;
-  }
-  
-  UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+ UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
                                                            delegate:self
                                                   cancelButtonTitle:CancelButtonTitle
-                                             destructiveButtonTitle:deleteTitle
+                                             destructiveButtonTitle:nil
                                                   otherButtonTitles:SaveButtonTitle, nil];
   
   if ([[sender class] isSubclassOfClass:[UIBarButtonItem class]]) {
@@ -180,7 +207,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
                photo == nil,
                photo.userID,
                [[DFUser currentUser] userID]);
-  if (photo && photo.userID == [[DFUser currentUser] userID]) {
+  if (photo && [photo isDeleteableByUser:[[DFUser currentUser] userID]]) {
     return YES;
   }
   
@@ -248,8 +275,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 {
   UIAlertView *alertView = [[UIAlertView alloc]
                             initWithTitle:@"Delete Photo?"
-                            message:@"Strand users will no longer be able to see it, "
-                            "but it will remain in your Camera Roll."
+                            message:@"You and other strand users will no longer be able to see it."
                             delegate:self
                             cancelButtonTitle:@"Cancel"
                             otherButtonTitles:@"Delete", nil];
