@@ -61,12 +61,17 @@
 
 - (void)configureToolbar
 {
+  UIBarButtonItem *likeButton = [[UIBarButtonItem alloc]
+                                 initWithImage:[UIImage imageNamed:@"Assets/Icons/LikeToolbarIcon.png"]
+                                 style:UIBarButtonItemStylePlain
+                                 target:self
+                                 action:@selector(likeButtonPressed:)];
   UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
   UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
                                    target:self
                                    action:@selector(confirmDeletePhoto)];
-  self.toolbar.items = @[flexibleSpace,deleteButton];
+  self.toolbar.items = @[likeButton, flexibleSpace, deleteButton];
   if (![self isPhotoDeletableByUser]) {
     deleteButton.enabled = NO;
   }
@@ -165,6 +170,8 @@
   
   return 0;
 }
+
+#pragma mark - User action handlers
 
 - (void)showShareActivity
 {
@@ -331,6 +338,14 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   }
 }
 
+- (void)likeButtonPressed:(id)sender
+{
+  DDLogVerbose(@"Like button pressed");
+}
+
+
+#pragma mark - Status bar
+
 - (BOOL)prefersStatusBarHidden
 {
   return self.hideStatusBar;
@@ -343,6 +358,9 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
     [self setNeedsStatusBarAppearanceUpdate];
   }
 }
+
+
+#pragma mark - Adapter Getters
 
 
 - (DFPhotoMetadataAdapter *)photoAdapter
