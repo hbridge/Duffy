@@ -4,7 +4,8 @@
 
 ### New
 
-- Delete photo action moved to an action bar
+- Native shared photos view (and switched to feed)
+- Delete photo action moved to an action bar, and now works for photos you took even after re-installing app
 - Added a heart button to the photo action bar, doesn't do anything yet
 
 ### Bugs fixed

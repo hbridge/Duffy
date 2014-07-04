@@ -78,15 +78,17 @@
 
 + (NSArray *)photosForCluster:(DFPeanutSearchObject *)cluster
 {
-  NSMutableArray *clusterPhotoIDs = [[NSMutableArray alloc] init];
+  NSMutableArray *photos = [[NSMutableArray alloc] init];
   for (DFPeanutSearchObject *subSearchObject in cluster.objects) {
     if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
-      [clusterPhotoIDs addObject:@(subSearchObject.id)];
+      DFPhoto *photo = [DFPhoto createWithPhotoID:subSearchObject.id
+                               inContext:[[DFPhotoStore sharedStore] managedObjectContext]];
+      photo.upload157Date = [NSDate date];
+      photo.upload569Date = [NSDate date];
+      [photos addObject:photo];
     }
   }
   
-  
-  NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:clusterPhotoIDs retainOrder:YES];
   return  photos;
 }
 

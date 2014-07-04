@@ -128,7 +128,7 @@
   DFPhoto *representativePhoto;
   if ([[item class] isSubclassOfClass:[DFPhoto class]]) {
     representativePhoto = item;
-  } else if ([[item class] isSubclassOfClass:[DFPhoto class]]) {
+  } else if ([[item class] isSubclassOfClass:[DFPhotoCollection class]]) {
     DFPhotoCollection *photoCollection = item;
     representativePhoto = [[photoCollection photosByDateAscending:YES] firstObject];
   }
@@ -195,6 +195,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   NSArray *items = [self itemsForSectionIndex:indexPath.section];
+  DDLogVerbose(@"item tapped at [%d, %d]", (int)indexPath.section, (int)indexPath.row);
   id item = items[indexPath.row];
   if ([[item class] isSubclassOfClass:[DFPhoto class]]) {
     DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc] init];
@@ -207,7 +208,19 @@
 
 - (void)expandCollection:(DFPhotoCollection *)collection atIndexPath:(NSIndexPath *)indexPath
 {
+  // get the photos to replace the collection with
+  NSArray *photos = [collection photosByDateAscending:YES];
   
+  NSMutableArray *newItemsForSection = [self itemsForSectionIndex:indexPath.section].mutableCopy;
+  [newItemsForSection replaceObjectsInRange:(NSRange){indexPath.row, 1}
+                       withObjectsFromArray:photos];
+  NSMutableDictionary *newSections = self.itemsBySection.mutableCopy;
+  newSections[self.sectionNames[indexPath.section]] = newItemsForSection;
+  _itemsBySection = newSections;
+  [UIView animateWithDuration:0.3 animations:^{
+    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]
+                  withRowAnimation:UITableViewRowAnimationTop];
+  }];
 }
 
 - (void)cameraButtonPressed:(id)sender

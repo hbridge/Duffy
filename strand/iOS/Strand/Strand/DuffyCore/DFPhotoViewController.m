@@ -49,7 +49,15 @@
   [super viewDidLoad];
   if (self.photoView) {
     if (self.photo) {
-      self.photoView.image = self.photo.asset.fullScreenImage;
+      [self.photo.asset loadFullScreenImage:^(UIImage *image) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          self.photoView.image = image;
+        });
+      } failureBlock:^(NSError *error) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          self.photoView.image = nil;
+        });
+      }];
       //[self logPhotoMetadata];
     } else if (self.photoURL && !self.photoView.image) {
       [self setImageFromPhotoURL:self.photoURL];
