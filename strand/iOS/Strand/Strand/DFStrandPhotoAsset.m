@@ -47,6 +47,16 @@
   return newAsset;
 }
 
++ (DFStrandPhotoAsset *)createAssetForPhotoID:(DFPhotoIDType)photoID
+                                    inContext:(NSManagedObjectContext *)context
+{
+  DFStrandPhotoAsset *newAsset = [NSEntityDescription
+                                  insertNewObjectForEntityForName:[[self class] description]
+                                  inManagedObjectContext:context];
+  newAsset.photoID = photoID;
+  return newAsset;
+}
+
 - (NSURL *)canonicalURL
 {
   if (self.photoID) return [DFPhotoMetadataAdapter urlForPhotoID:self.photoID];
@@ -131,6 +141,7 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
                                                 NSError *error) {
       [DFStrandPhotoAsset cacheImageData:fullImageData
                                 metadata:[peanutPhoto metadataDictionary]
+                                  userID:peanutPhoto.user.longLongValue
                           forAssetWithID:photoID];
       completionBlock([DFStrandPhotoAsset localURLForPhotoID:photoID], nil);
     }];
@@ -199,6 +210,7 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
 
 + (void)cacheImageData:(NSData *)imageData
           metadata:(NSDictionary *)metadata
+                userID:(DFUserIDType)userID
     forAssetWithID:(DFPhotoIDType)photoID
 {
   NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
@@ -209,16 +221,22 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
   NSError *error;
   NSArray *result = [context executeFetchRequest:reqeust error:&error];
   if (result.count == 0 || error) {
-    DDLogWarn(@"DFStrandPhotoAsset: attempted to cache data for assetWithID:%llu not found or error:%@",
+    DDLogWarn(@"DFStrandPhotoAsset: attempted to cache data for asset with ID:%llu not found or error:%@",
               photoID, error.description);
     return;
   }
 
+  // Set the assets data
   DFStrandPhotoAsset *asset = result.firstObject;
   asset.storedMetadata = metadata;
   NSURL *localFileURL = [DFStrandPhotoAsset localURLForPhotoID:photoID];
   [imageData writeToURL:localFileURL atomically:YES];
   asset.localURLString = localFileURL.absoluteString;
+  
+  // Set the DFPhoto's data
+  asset.photo.creationDate = asset.creationDate;
+  asset.photo.userID = userID;
+  
   [context save:&error];
   if (error) {
   #ifdef DEBUG

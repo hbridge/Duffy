@@ -16,4 +16,8 @@
 @property (nonatomic, retain) NSArray *objects;
 @property (nonatomic, retain) NSArray *retry_suggestions;
 
+- (NSArray *)topLevelSectionNames;
++ (NSDictionary *)photosBySectionForSearchObjects:(NSArray *)peanutSearchObjects;
+
+
 @end

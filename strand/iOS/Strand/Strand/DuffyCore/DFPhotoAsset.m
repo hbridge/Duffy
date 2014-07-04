@@ -11,6 +11,8 @@
 
 @implementation DFPhotoAsset
 
+@dynamic photo;
+
 #pragma mark - Property wrappers
 
 

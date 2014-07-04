@@ -10,6 +10,7 @@
 #import <RestKit/RestKit.h>
 #import "DFPeanutSuggestion.h"
 #import "DFPeanutSearchObject.h"
+#import "DFPhotoStore.h"
 
 @implementation DFPeanutSearchResponse
 
@@ -28,6 +29,74 @@
 + (NSArray *)simpleAttributeKeys {
   return @[@"result", @"next_start_date_time"];
 }
+
+
+- (NSArray *)topLevelSectionNames
+{
+  NSMutableArray *result = [[NSMutableArray alloc] init];
+  for (DFPeanutSearchObject *searchObject in self.objects) {
+    if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
+      [result addObject:searchObject.title];
+    }
+  }
+  return result;
+}
+
+
++ (NSDictionary *)photosBySectionForSearchObjects:(NSArray *)peanutSearchObjects
+{
+  NSMutableDictionary *itemsBySectionResult = [[NSMutableDictionary alloc] init];
+  for (DFPeanutSearchObject *sectionObject in peanutSearchObjects) {
+    if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
+      NSMutableArray *contiguousPhotoIDsToAdd = [[NSMutableArray alloc] init];
+      NSMutableArray *sectionItems = [[NSMutableArray alloc] init];
+      
+      for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
+        if ([searchObject.type isEqualToString:DFSearchObjectPhoto]){
+          DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:searchObject.id];
+          if (!photo) {
+            photo = [DFPhoto createWithPhotoID:searchObject.id
+                                     inContext:[[DFPhotoStore sharedStore] managedObjectContext]];
+            photo.upload157Date = [NSDate date];
+            photo.upload569Date = [NSDate date];
+            
+            [[DFPhotoStore sharedStore] saveContext];
+          }
+          [sectionItems addObject:photo];
+        } else if ([searchObject.type isEqualToString:DFSearchObjectCluster]
+                   || [searchObject.type isEqualToString:DFSearchObjectDocstack]) {
+          [contiguousPhotoIDsToAdd removeAllObjects];
+          
+          DFPhotoCollection *collection = [[DFPhotoCollection alloc]
+                                           initWithPhotos:[self photosForCluster:searchObject]];
+          [sectionItems addObject:collection];
+        }
+      }
+      
+      NSArray *photos = [[DFPhotoStore sharedStore]
+                         photosWithPhotoIDs:contiguousPhotoIDsToAdd retainOrder:YES];
+      [sectionItems addObjectsFromArray:photos];
+      itemsBySectionResult[sectionObject.title] = sectionItems;
+    }
+  }
+  
+  return itemsBySectionResult;
+}
+
++ (NSArray *)photosForCluster:(DFPeanutSearchObject *)cluster
+{
+  NSMutableArray *clusterPhotoIDs = [[NSMutableArray alloc] init];
+  for (DFPeanutSearchObject *subSearchObject in cluster.objects) {
+    if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
+      [clusterPhotoIDs addObject:@(subSearchObject.id)];
+    }
+  }
+  
+  
+  NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:clusterPhotoIDs retainOrder:YES];
+  return  photos;
+}
+
 
 
 @end

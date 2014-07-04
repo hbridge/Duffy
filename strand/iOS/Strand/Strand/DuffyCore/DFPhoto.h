@@ -33,6 +33,9 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
                     timeZone:(NSTimeZone *)timeZone
                    inContext:(NSManagedObjectContext *)context;
 
++ (DFPhoto *)createWithPhotoID:(DFPhotoIDType)photoID
+                     inContext:(NSManagedObjectContext *)context;
+
 - (BOOL)isDeleteableByUser:(DFUserIDType)userID;
 
 @end

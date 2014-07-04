@@ -16,6 +16,7 @@
 #import "DFAnalytics.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "ALAsset+DFExtensions.h"
+#import "DFStrandPhotoAsset.h"
 
 @implementation DFPhoto
 
@@ -38,6 +39,19 @@
   newPhoto.asset = asset;
   newPhoto.creationDate = [asset creationDateForTimezone:timeZone];
   newPhoto.userID = userID;
+  
+  return newPhoto;
+}
+
++ (DFPhoto *)createWithPhotoID:(DFPhotoIDType)photoID
+                     inContext:(NSManagedObjectContext *)context
+{
+  DFStrandPhotoAsset *newAsset = [DFStrandPhotoAsset createAssetForPhotoID:photoID
+                                                                 inContext:context];
+  DFPhoto *newPhoto = [NSEntityDescription
+                       insertNewObjectForEntityForName:@"DFPhoto"
+                       inManagedObjectContext:context];
+  newPhoto.asset = newAsset;
   
   return newPhoto;
 }

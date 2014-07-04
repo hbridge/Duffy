@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
+@class DFPhoto;
 @class CLLocation;
 
 @interface DFPhotoAsset : NSManagedObject
@@ -19,6 +20,7 @@
 @property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
 @property (readonly, nonatomic, retain) UIImage *highResolutionImage; //max 2048x2048, aspect fit
 @property (readonly, nonatomic, retain) UIImage *fullScreenImage;
+@property (nonatomic, retain) DFPhoto *photo;
 
 // Use these to access image data asynchronously
 typedef void (^DFPhotoAssetLoadSuccessBlock)(UIImage *image);

@@ -51,6 +51,7 @@
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;
 + (NSPersistentStoreCoordinator *)persistentStoreCoordinator;
+- (NSManagedObjectContext *)managedObjectContext;
 
 // Saves changes to disk
 - (void)saveContext;

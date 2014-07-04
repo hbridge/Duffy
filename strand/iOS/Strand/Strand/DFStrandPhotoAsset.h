@@ -24,6 +24,8 @@
                                    creationDate:(NSDate *)creationDate
                                       inContext:(NSManagedObjectContext *)context;
 
++ (DFStrandPhotoAsset *)createAssetForPhotoID:(DFPhotoIDType)photoID
+                                    inContext:(NSManagedObjectContext *)context;
 
 
 
