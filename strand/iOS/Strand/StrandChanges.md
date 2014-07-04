@@ -1,5 +1,18 @@
 # Strand
 
+## Jul 4th, 2014
+
+### New
+
+- Delete photo action moved to an action bar
+- Added a heart button to the photo action bar, doesn't do anything yet
+
+### Bugs fixed
+
+- Hopeful fix for the camera viewfinder sometimes being black.  Please let me know if you still see this.
+- Fixed crashes when there is no location or a bad location fix.
+- Made picking a photo in the simulator upload it to strand.  This makes testing easier.
+
 ## Jul 2nd, 2014
 
 ### New
