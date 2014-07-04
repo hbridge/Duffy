@@ -30,6 +30,11 @@
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
 
+const unsigned int MaxRetryCount = 3;
+const CLLocationAccuracy MinLocationAccuracy = 65.0;
+const NSTimeInterval MaxLocationAge = 15 * 60;
+const unsigned int RetryDelaySecs = 5;
+
 @interface DFCameraViewController ()
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
@@ -313,10 +318,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   }
 }
 
-const unsigned int MaxRetryCount = 3;
-const CLLocationAccuracy MinLocationAccuracy = 65.0;
-const NSTimeInterval MaxLocationAge = 15 * 60;
-const unsigned int RetryDelaySecs = 5;
+- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
+{
+  [self galleryButtonPressed:nil];
+}
 
 - (void)saveImage:(UIImage *)image
      withMetadata:(NSDictionary *)metadata
@@ -435,9 +440,6 @@ const unsigned int RetryDelaySecs = 5;
   metadata[@"{Exif}"] = exifDict;
 }
 
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker {
-  
-}
 
 - (void)joinableStrandsUpdated:(NSNotification *)note
 {
