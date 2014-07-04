@@ -48,7 +48,6 @@
   NSMutableDictionary *itemsBySectionResult = [[NSMutableDictionary alloc] init];
   for (DFPeanutSearchObject *sectionObject in peanutSearchObjects) {
     if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
-      NSMutableArray *contiguousPhotoIDsToAdd = [[NSMutableArray alloc] init];
       NSMutableArray *sectionItems = [[NSMutableArray alloc] init];
       
       for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
@@ -59,27 +58,21 @@
                                      inContext:[[DFPhotoStore sharedStore] managedObjectContext]];
             photo.upload157Date = [NSDate date];
             photo.upload569Date = [NSDate date];
-            
-            [[DFPhotoStore sharedStore] saveContext];
           }
           [sectionItems addObject:photo];
         } else if ([searchObject.type isEqualToString:DFSearchObjectCluster]
                    || [searchObject.type isEqualToString:DFSearchObjectDocstack]) {
-          [contiguousPhotoIDsToAdd removeAllObjects];
-          
           DFPhotoCollection *collection = [[DFPhotoCollection alloc]
                                            initWithPhotos:[self photosForCluster:searchObject]];
           [sectionItems addObject:collection];
         }
       }
       
-      NSArray *photos = [[DFPhotoStore sharedStore]
-                         photosWithPhotoIDs:contiguousPhotoIDsToAdd retainOrder:YES];
-      [sectionItems addObjectsFromArray:photos];
       itemsBySectionResult[sectionObject.title] = sectionItems;
     }
   }
   
+  [[DFPhotoStore sharedStore] saveContext];
   return itemsBySectionResult;
 }
 

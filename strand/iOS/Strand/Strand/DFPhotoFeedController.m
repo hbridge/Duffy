@@ -12,6 +12,9 @@
 #import "DFPhotoCollection.h"
 #import "DFMultiPhotoViewController.h"
 #import "RootViewController.h"
+#import "DFCGRectHelpers.h"
+#import "DFStrandConstants.h"
+#import "DFAnalytics.h"
 
 @interface DFPhotoFeedController ()
 
@@ -47,7 +50,7 @@
   [super viewDidLoad];
   
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
-  self.tableView.separatorStyle = UITableViewCellSeparatorStyleSingleLineEtched;
+  self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
 }
 
@@ -66,15 +69,28 @@
         
         [self setSectionNames:sectionNames itemsBySection:itemsBySection];
       });
-      
     }
   }];
+  
+  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
+  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
+  [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
+                                                      object:self
+                                                    userInfo:nil];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
 {
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
+  self.imageCache = [[NSMutableDictionary alloc] init];
 }
 
 #pragma mark - Table view data source: sections
@@ -131,15 +147,17 @@
   if (image) {
     cell.imageView.image = image;
   } else {
+    cell.imageView.image = nil;
+    cell.imageView.backgroundColor = [UIColor grayColor];
+    
     DFPhoto *representativePhoto = [self representativePhotoForIndexPath:indexPath];
     if (representativePhoto) {
       [representativePhoto.asset loadFullScreenImage:^(UIImage *image) {
-        self.imageCache[indexPath] = image;
+        self.imageCache[[self keyForIndexPath:indexPath]] = image;
         dispatch_async(dispatch_get_main_queue(), ^{
           [self.tableView reloadData];
         });
       } failureBlock:^(NSError *error) {
-        DDLogError(@"Failed to load full photo for cell.");
       }];
     }
   }
@@ -157,9 +175,11 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhoto *representativePhoto = [self representativePhotoForIndexPath:indexPath];
-  UIImage *image = representativePhoto.asset.fullScreenImage;
-  return image.size.height/4.0;
+  UIImage *image = self.imageCache[[self keyForIndexPath:indexPath]];
+  if (image) return [DFCGRectHelpers
+                     aspectFittedSize:image.size max:CGRectMake(0,0,300, 640)].size.height;
+  
+  return 100;
 }
 
 - (void)setSectionNames:(NSArray *)sectionNames itemsBySection:(NSDictionary *)photosBySection

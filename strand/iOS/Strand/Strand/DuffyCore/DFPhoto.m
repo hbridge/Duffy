@@ -46,11 +46,13 @@
 + (DFPhoto *)createWithPhotoID:(DFPhotoIDType)photoID
                      inContext:(NSManagedObjectContext *)context
 {
-  DFStrandPhotoAsset *newAsset = [DFStrandPhotoAsset createAssetForPhotoID:photoID
-                                                                 inContext:context];
   DFPhoto *newPhoto = [NSEntityDescription
                        insertNewObjectForEntityForName:@"DFPhoto"
                        inManagedObjectContext:context];
+  newPhoto.photoID = photoID;
+  
+  DFStrandPhotoAsset *newAsset = [DFStrandPhotoAsset createAssetForPhotoID:photoID
+                                                                 inContext:context];
   newPhoto.asset = newAsset;
   
   return newPhoto;

@@ -15,6 +15,8 @@
 #import "DFPhotoStore.h"
 #import "DFPhotoResizer.h"
 
+static NSMutableArray *idsBeingCached;
+
 @implementation DFStrandPhotoAsset
 
 @dynamic localURLString;
@@ -24,6 +26,10 @@
 @dynamic creationDate;
 @synthesize hashString = _hashString;
 
++ (void)initialize
+{
+  idsBeingCached = [[NSMutableArray alloc] init];
+}
 
 + (DFStrandPhotoAsset *)createAssetForImageData:(NSData *)imageData
                                     photoID:(DFPhotoIDType)photoID
@@ -126,6 +132,12 @@
   }];
 }
 
+- (BOOL)isCacheOperationUnderwayForID:(DFPhotoIDType)photoID
+{
+  return [idsBeingCached containsObject:@(photoID)];
+}
+
+
 typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
 
 - (void)ensureLocalDataAndCallback:(CacheCompleteBlock)completionBlock
@@ -134,6 +146,11 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
     NSURL *fileURL = [NSURL URLWithString:self.localURLString];
     completionBlock(fileURL, nil);
   } else if (self.photoID > 0) {
+    if ([self isCacheOperationUnderwayForID:self.photoID]) {
+      completionBlock(nil, nil);
+      return;
+    }
+    [idsBeingCached addObject:@(self.photoID)];
     DFPhotoIDType photoID = self.photoID;
     DFPhotoMetadataAdapter *adapter = [[DFPhotoMetadataAdapter alloc] init];
     [adapter getPhoto:photoID completionBlock:^(DFPeanutPhoto *peanutPhoto,
@@ -144,6 +161,7 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
                                   userID:peanutPhoto.user.longLongValue
                           forAssetWithID:photoID];
       completionBlock([DFStrandPhotoAsset localURLForPhotoID:photoID], nil);
+      [idsBeingCached removeObject:@(self.photoID)];
     }];
   } else {
     DDLogWarn(@"DFStrandPhotoAsset: attempting to load full image for asset without local URL or photoID.");
@@ -194,7 +212,7 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
                failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
   [self ensureLocalDataAndCallback:^(NSURL *localFileURL, NSError *error) {
-    if (!error) {
+    if (!error && localFileURL) {
       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
         @autoreleasepool {
           DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:localFileURL];
@@ -213,6 +231,7 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
                 userID:(DFUserIDType)userID
     forAssetWithID:(DFPhotoIDType)photoID
 {
+  DDLogInfo(@"Caching image data for photo id%llu", photoID);
   NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
   NSFetchRequest *reqeust = [NSFetchRequest fetchRequestWithEntityName:@"DFStrandPhotoAsset"];
   reqeust.predicate = [NSPredicate predicateWithFormat:@"photoID == %llu", photoID];
@@ -236,7 +255,8 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
   // Set the DFPhoto's data
   asset.photo.creationDate = asset.creationDate;
   asset.photo.userID = userID;
-  
+  [context setMergePolicy:[[NSMergePolicy alloc]
+                           initWithMergeType:NSMergeByPropertyObjectTrumpMergePolicyType]];
   [context save:&error];
   if (error) {
   #ifdef DEBUG
