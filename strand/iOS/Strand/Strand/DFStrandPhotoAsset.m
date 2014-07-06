@@ -217,7 +217,17 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
         @autoreleasepool {
           DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:localFileURL];
           UIImage *image = [resizer aspectImageWithMaxPixelSize:1136];
-          successBlock(image);
+          if (image) {
+            successBlock(image);
+          } else {
+            failureBlock([NSError
+                          errorWithDomain:@"com.duffyapp.strand"
+                          code:-7
+                          userInfo:@{NSLocalizedDescriptionKey:
+                                       [NSString stringWithFormat:@"Could not create read image at URL: %@",
+                                        localFileURL]
+                                     }]);
+          }
         }
       });
     } else {
