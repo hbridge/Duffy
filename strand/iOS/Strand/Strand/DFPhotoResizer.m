@@ -78,6 +78,8 @@ static void releaseAssetCallback(void *info) {
     source = [self createImageSourceRefForURL];
   }
   
+  if (!source) return nil;
+  
   NSDictionary *imageOptions =
   @{
     (NSString *)kCGImageSourceCreateThumbnailFromImageAlways : @YES,
