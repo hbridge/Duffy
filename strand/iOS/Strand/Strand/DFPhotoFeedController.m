@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSDictionary *itemsBySection;
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
 @property (atomic, retain) NSMutableDictionary *imageCache;
+@property (atomic, retain) NSMutableDictionary *rowHeightCache;
 
 @end
 
@@ -41,6 +42,7 @@
                                      action:@selector(cameraButtonPressed:)];
     self.navigationItem.rightBarButtonItem = cameraButton;
     self.imageCache = [[NSMutableDictionary alloc] init];
+    self.rowHeightCache = [[NSMutableDictionary alloc] init];
   }
   return self;
 }
@@ -175,11 +177,19 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UIImage *image = self.imageCache[[self keyForIndexPath:indexPath]];
-  if (image) return [DFCGRectHelpers
-                     aspectFittedSize:image.size max:CGRectMake(0,0,290, 640)].size.height;
+  id key = [self keyForIndexPath:indexPath];
+  NSNumber *cachedHeight = self.rowHeightCache[key];
+  if (cachedHeight) return cachedHeight.floatValue;
+
+  UIImage *image = self.imageCache[key];
+  if (image) {
+    CGFloat height = [DFCGRectHelpers
+                      aspectFittedSize:image.size max:CGRectMake(0,0,290, 640)].size.height;
+    self.rowHeightCache[key] = @(height);
+    return height;
+  }
   
-  return 100;
+  return 200;
 }
 
 - (void)setSectionNames:(NSArray *)sectionNames itemsBySection:(NSDictionary *)photosBySection
