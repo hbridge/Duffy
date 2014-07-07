@@ -8,10 +8,10 @@
 
 #import "SubviewsController.h"
 #import "DFCameraViewController.h"
-#import "DFGalleryWebViewController.h"
-#import "DFGalleryViewController.h"
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFPhotoFeedController.h"
+#import "DFGalleryViewController.h"
+#import "DFGalleryWebViewController.h"
 
 /*
  A controller object that manages a simple model -- a collection of month names.
@@ -37,7 +37,7 @@
     _subviewControllers =
     @[
      [[UINavigationController alloc]
-      initWithRootViewController:[[DFPhotoFeedController alloc] init]],
+      initWithRootViewController:[[DFGalleryWebViewController alloc] init]],
      [[DFCameraViewController alloc] init]
       ];
   }
