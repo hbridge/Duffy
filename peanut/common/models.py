@@ -37,6 +37,14 @@ class User(models.Model):
 	def getUserDataPath(self):
 		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.id))
 
+	@classmethod
+	def getIds(cls, objs):
+		ids = list()
+		for obj in objs:
+			ids.append(obj.id)
+
+		return ids
+
 	def __unicode__(self):
 		if self.product_id == 0:
 			productStr = "Arbus"

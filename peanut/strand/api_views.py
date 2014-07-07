@@ -348,9 +348,9 @@ def register_apns_token(request):
 
 """
 	Returns a string that describes who is around.
-	If people are around but haven't taken a photo, returns:  "5 friends are nearby"
-	If people are around and someone has taken a photo, returns:  "Henry + 4 friends are nearby"
-	If more than one person is nearby, returns:  "Henry and Aseem
+	If people are around but haven't taken a photo, returns:  "5 friends are near you"
+	If people are around and someone has taken a photo, returns:  "Henry & 4 other friends are near you"
+	If more than one person is nearby, returns:  "Henry & Aseem & 1 other friend are near you"
 """
 def get_nearby_friends_message(request):
 	response = dict({'result': True})
@@ -367,10 +367,51 @@ def get_nearby_friends_message(request):
 
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
-
+		
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
+		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
+		
+		photoUsers = list()
+		nonPhotoUsers = list()
+		for user in nearbyUsers:
+			hasPhoto = False
+			for photo in photos:
+				if photo.user_id == user.id:
+					hasPhoto = True
 
-		response['message'] = "There are %s friends near you" % (len(nearbyUsers))
+			if hasPhoto:
+				photoUsers.append(user)
+			else:
+				nonPhotoUsers.append(user)
+
+		if len(nearbyUsers) == 0:
+			message = ""
+		elif len(photoUsers) == 0:
+			if len(nearbyUsers) == 1:
+				message = "There is 1 friend near you"
+			else:
+				message = "There are %s friends near you" % (len(nearbyUsers))
+		elif len(photoUsers) > 0:
+			names = list()
+			for user in photoUsers:
+				names.append(cleanName(user.first_name))
+			names = set(names)
+		
+			if len(names) > 0:
+				message = " & ".join(names) 
+
+			if len(nonPhotoUsers) > 0:
+				if len(nonPhotoUsers) == 1:
+					message += " & 1 other friend"
+				else:
+					message += " & %s other friends" % len(nonPhotoUsers)
+
+			if len(nearbyUsers) == 1:
+				message += " is near you"
+			else:
+				message += " are near you"
+
+		response['message'] = message
 		response['result'] = True
 	else:
 		response['result'] = False
@@ -412,3 +453,6 @@ def send_notifications_test(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+# TODO(Derek): move to a common loc, used in sendStrandNotifications
+def cleanName(str):
+	return str.split(' ')[0].split("'")[0]
