@@ -453,6 +453,27 @@ def send_notifications_test(request):
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+"""
+	Sends a test text message to a phone number
+"""
+
+def send_sms_test(request):
+	response = dict({'result': True})
+	data = api_util.getRequestData(request)
+
+	if data.has_key('phone'):
+		phone = data['phone']
+	else:
+		phone = '6505759014'
+
+	if data.has_key('body'):
+		bodytext = data['body']
+	else:
+		bodytext = "Test msg from Strand/send_sms_test"
+	
+	notifications_util.sendSMS(phone, bodytext)
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]

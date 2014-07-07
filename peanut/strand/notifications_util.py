@@ -1,8 +1,11 @@
 import datetime
 import json
 
+from peanut.settings import constants
 from common.models import NotificationLog
+
 from ios_notifications.models import APNService, Device, Notification
+from twilio.rest import TwilioRestClient
 
 def sendNotification(user, msg, msgType, customPayload=None):
 	devices = Device.objects.select_related().filter(token=user.device_token)	
@@ -15,3 +18,7 @@ def sendNotification(user, msg, msgType, customPayload=None):
 		apns = APNService.objects.get(id=device.service_id)
 		apns.push_notification_to_devices(notification, [device])
 		NotificationLog.objects.create(user=user, device_token=device.token, msg=(msg+' ' + json.dumps(customPayload)), apns=apns.id, msg_type=msgType)
+
+def sendSMS(phone, msg):
+	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
+	twilioclient.sms.messages.create(to="+1" + phone, from_=constants.TWILIO_PHONE_NUM, body=msg)
