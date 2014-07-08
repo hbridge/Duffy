@@ -14,8 +14,8 @@
 #import "DFUserPeanutResponse.h"
 
 NSString *const GetUserPath = @"get_user";
-NSString *const CreateUserPath = @"create_user";
-NSString *const DeviceNameKey = @"device_name";
+NSString *const CreateUserPath = @"auth_phone";
+NSString *const DisplayNameKey = @"display_name";
 NSString *const DFUserPeanutPhoneNumberKey = @"phone_number";
 NSString *const SMSAccessCodeKey = @"sms_access_code";
 
@@ -72,7 +72,7 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
      DFUser *result = [[DFUser alloc] init];
      if (response.result) {
        result.userID = response.user.id;
-       result.deviceID = response.user.phone_id;
+       result.phoneNumberString = response.user.phone_number;
        result.displayName = response.user.display_name;
      }  else {
        result = nil;
@@ -103,17 +103,20 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
              withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                  failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
+  NSDictionary *parameters = @{
+                               DFDeviceIDParameterKey: deviceId,
+                               DisplayNameKey: deviceName,
+                               DFUserPeanutPhoneNumberKey: phoneNumberString,
+                               SMSAccessCodeKey: smsAuthString,
+                               };
   NSURLRequest *createRequest = [DFObjectManager
                                  requestWithObject:[[DFUserPeanutResponse alloc] init]
                                  method:RKRequestMethodPOST
                                  path:CreateUserPath
-                                 parameters:@{
-                                              DFDeviceIDParameterKey: deviceId,
-                                              DeviceNameKey: deviceName,
-                                              DFUserPeanutPhoneNumberKey: phoneNumberString,
-                                              SMSAccessCodeKey: smsAuthString,
-                                              }];
-  DDLogInfo(@"%@ getting endpoint: %@", [[self class] description], createRequest.URL.absoluteString);
+                                 parameters:parameters];
+  DDLogInfo(@"%@ getting endpoint: %@, parameters:%@", [[self class] description],
+            createRequest.URL.absoluteString,
+            parameters);
   
   RKObjectRequestOperation *operation =
   [[DFObjectManager sharedManager]
@@ -121,21 +124,22 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
      DFUserPeanutResponse *response = [mappingResult firstObject];
-     DDLogInfo(@"User create response received.  result:%d", response.result);
-     
+     DDLogInfo(@"User create response received. result:%d", response.result);
      
      if (response.result) {
-       DFUser *result = [[DFUser alloc] init];
-       result.userID = response.user.id;
-       result.deviceID = response.user.phone_id;
-       result.displayName = response.user.display_name;
-       successBlock(result);
+       DFUser *newUser = [[DFUser alloc] init];
+       newUser.userID = response.user.id;
+       newUser.phoneNumberString = response.user.phone_number;
+       newUser.displayName = response.user.display_name;
+       newUser.authToken = response.user.auth_token;
+       successBlock(newUser);
      }  else {
+       DFPeanutError *firstError = response.invalid_fields.firstObject;
        failureBlock([NSError errorWithDomain:@"com.duffyapp.Strand"
                                         code:-7
                                     userInfo:@{
-                                               NSLocalizedDescriptionKey: response.debug ?
-                                                 response.debug : @"Could not create account"
+                                               NSLocalizedDescriptionKey: firstError.description ?
+                                                 firstError.description : @"Could not create account"
                                                }
                      ]);
      }

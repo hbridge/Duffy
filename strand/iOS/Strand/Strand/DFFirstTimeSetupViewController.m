@@ -13,6 +13,7 @@
 #import "DFModalSpinnerViewController.h"
 #import "DFSMSCodeEntryViewController.h"
 #import "NSString+DFHelpers.h"
+#import "DFSMSVerificationAdapter.h"
 
 UInt16 const DFPhoneNumberLength = 10;
 
@@ -107,23 +108,40 @@ replacementString:(NSString *)string
     return;
   }
   DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
-                                        initWithMessage:@"connecting..."];
+                                        initWithMessage:@"Validating..."];
   [self presentViewController:msvc animated:YES completion:nil];
-  NSString __block *phoneNumberString = [self.phoneNumberField.text
-                                         stringByReplacingOccurrencesOfString:@"-" withString:@""];
+  NSString __block *phoneNumberString = [self enteredPhoneNumber];
   
-  dispatch_after(
-                 dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
-                 dispatch_get_main_queue(), ^{
-                   [msvc dismissViewControllerAnimated:YES completion:nil];
-                   DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
-                   codeEntryController.phoneNumberString = phoneNumberString;
-                   [self.navigationController pushViewController:codeEntryController
-                                                        animated:NO];
-  });
+  DFSMSVerificationAdapter *smsAdapter = [[DFSMSVerificationAdapter alloc] init];
+  [smsAdapter requestSMSCodeForPhoneNumber:phoneNumberString
+                       withCompletionBlock:^(DFPeanutTrueFalseResponse *response, NSError *error) {
+                         if (response.result) {
+                           DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
+                           codeEntryController.phoneNumberString = phoneNumberString;
+                           [self.navigationController pushViewController:codeEntryController
+                                                                animated:NO];
+                           [msvc dismissViewControllerAnimated:NO completion:nil];
+                         } else {
+                           UIAlertView *failureAlert = [DFFirstTimeSetupViewController smsVerificationRequestFailed:error];
+                           [failureAlert show];
+                         }
+  }];
+  
   
 }
 
++ (UIAlertView *)smsVerificationRequestFailed:(NSError *)error
+{
+  return [[UIAlertView alloc] initWithTitle:@"Error"
+                                    message:[NSString stringWithFormat:@"%@. %@",
+                                             error.localizedDescription,
+                                             error.localizedRecoverySuggestion ?
+                                             error.localizedRecoverySuggestion : @"Please try again."]
+                                   delegate:nil
+                          cancelButtonTitle:@"OK"
+                          otherButtonTitles:nil];
+
+}
 
 - (NSString *)enteredPhoneNumber
 {

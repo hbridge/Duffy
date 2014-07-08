@@ -12,7 +12,7 @@
 #import "AppDelegate.h"
 #import "NSString+DFHelpers.h"
 
-const UInt16 DFCodeLength = 6;
+const UInt16 DFCodeLength = 4;
 
 @interface DFSMSCodeEntryViewController ()
 
@@ -191,10 +191,7 @@ replacementString:(NSString *)string
 + (UIAlertView *)accountFailedAlert:(NSError *)error
 {
   return [[UIAlertView alloc] initWithTitle:@"Account Creation Failed"
-                                    message:[NSString stringWithFormat:@"%@. %@",
-                                             error.localizedDescription,
-                                             error.localizedRecoverySuggestion ?
-                                             error.localizedRecoverySuggestion : @"Please try again."]
+                                    message:error.localizedDescription
                                    delegate:nil
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];

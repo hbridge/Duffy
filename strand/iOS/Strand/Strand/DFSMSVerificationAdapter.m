@@ -57,12 +57,19 @@ NSString *const PhoneNumberKey = @"phone_number";
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
      DFPeanutTrueFalseResponse *response = mappingResult.firstObject;
-     completionBlock(response);
+     if (response.result) {
+       completionBlock(response, nil);
+     } else {
+       completionBlock(response, [NSError errorWithDomain:@"com.duffyapp.strand"
+                                                     code:-8
+                                                 userInfo:@{NSLocalizedDescriptionKey:
+                                                              response.firstInvalidFieldDescription}]);
+     }
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
      DDLogWarn(@"%@ get failed.  Error: %@", [[self class] description], error.description);
-     completionBlock(nil);
+     completionBlock(nil, error);
    }];
   
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];

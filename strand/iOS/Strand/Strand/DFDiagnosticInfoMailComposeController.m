@@ -23,7 +23,7 @@ static const int MaxLogFiles = 10;
       for (NSData *errorLogFileData in [self errorLogData]) {
         [errorLogData appendData:errorLogFileData];
       }
-      [self addAttachmentData:errorLogData mimeType:@"text/plain" fileName:@"DuffyLog.txt"];
+      [self addAttachmentData:errorLogData mimeType:@"text/plain" fileName:@"StrandLog.txt"];
       [self setSubject:[NSString stringWithFormat:@"Issue report for %@", [DFAppInfo appInfoString]]];
       [self setToRecipients:[NSArray arrayWithObject:@"strand-support@duffytech.co"]];
     } else if (mailType == DFMailTypeFeedback) {

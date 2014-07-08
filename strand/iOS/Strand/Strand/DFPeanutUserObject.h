@@ -13,7 +13,8 @@
 @interface DFPeanutUserObject : NSObject <DFPeanutObject>
 
 @property (nonatomic) DFUserIDType id;
-@property (nonatomic, retain) NSString *phone_id;
+@property (nonatomic, retain) NSString *phone_number;
 @property (nonatomic, retain) NSString *display_name;
+@property (nonatomic, retain) NSString *auth_token;
 
 @end

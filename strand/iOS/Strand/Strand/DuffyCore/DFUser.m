@@ -20,10 +20,11 @@ NSString *const userObjectDefaultsKey = @"com.duffysoft.User";
 static NSString *DFOverrideServerURLKey = @"com.duffysoft.DFOverrideServerURLKey";
 static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortKey";
 
-NSString *const userIDCodeKey = @"dserID";
+NSString *const userIDCodeKey = @"userID";
 NSString *const deviceIDCodeKey = @"deviceID";
 NSString *const displayNameCodeKey = @"displayName";
 NSString *const authTokenCodeKey = @"authToken";
+NSString *const phoneNumberCodeKey = @"phoneNumber";
 
 
 
@@ -70,6 +71,7 @@ static DFUser *currentUser;
     if (deviceID) _deviceID = deviceID;
     _displayName = [aDecoder decodeObjectForKey:displayNameCodeKey];
     _authToken = [aDecoder decodeObjectForKey:authTokenCodeKey];
+    _phoneNumberString = [aDecoder decodeObjectForKey:phoneNumberCodeKey];
   }
   return self;
 }
@@ -82,6 +84,7 @@ static DFUser *currentUser;
   }
   if (self.displayName) [aCoder encodeObject:self.displayName forKey:displayNameCodeKey];
   if (self.authToken) [aCoder encodeObject:self.authToken forKey:authTokenCodeKey];
+  if (self.phoneNumberString) [aCoder encodeObject:self.authToken forKey:phoneNumberCodeKey];
 }
 
 - (void)setDeviceID:(NSString *)deviceID

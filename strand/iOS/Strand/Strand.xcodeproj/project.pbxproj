@@ -28,6 +28,7 @@
 		5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172D7196C8C6300CA7693 /* DFWebViewController.m */; };
 		5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */; };
 		5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */; };
+		5A3172E0196C9EC100CA7693 /* DFPeanutError.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172DF196C9EC100CA7693 /* DFPeanutError.m */; };
 		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
 		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
@@ -156,6 +157,8 @@
 		5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFWebViewController.xib; sourceTree = "<group>"; };
 		5A3172DB196C927000CA7693 /* DFDiagnosticInfoMailComposeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDiagnosticInfoMailComposeController.h; sourceTree = "<group>"; };
 		5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDiagnosticInfoMailComposeController.m; sourceTree = "<group>"; };
+		5A3172DE196C9EC100CA7693 /* DFPeanutError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutError.h; sourceTree = "<group>"; };
+		5A3172DF196C9EC100CA7693 /* DFPeanutError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutError.m; sourceTree = "<group>"; };
 		5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 4.xcdatamodel"; sourceTree = "<group>"; };
 		5A40343B196083A9003D7546 /* DFPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoAsset.h; path = DuffyCore/DFPhotoAsset.h; sourceTree = "<group>"; };
 		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
@@ -650,6 +653,8 @@
 				5A02CEAD194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.h */,
 				5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */,
 				5A02CEB0194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.h */,
+				5A3172DE196C9EC100CA7693 /* DFPeanutError.h */,
+				5A3172DF196C9EC100CA7693 /* DFPeanutError.m */,
 				5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */,
 				5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */,
 				5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */,
@@ -935,6 +940,7 @@
 				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5AC4A93C1947C30800862D9C /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
 				5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */,
+				5A3172E0196C9EC100CA7693 /* DFPeanutError.m in Sources */,
 				5AC4A970194A42EE00862D9C /* DFPeanutSearchResponse.m in Sources */,
 				5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */,
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,

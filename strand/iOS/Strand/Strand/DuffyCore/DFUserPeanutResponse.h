@@ -9,11 +9,13 @@
 #import <Foundation/Foundation.h>
 #import "DFPeanutObject.h"
 #import "DFPeanutUserObject.h"
+#import "DFPeanutError.h"
 
 @interface DFUserPeanutResponse : NSObject <DFPeanutObject>
 
 @property (nonatomic) BOOL result;
 @property (nonatomic, retain) NSString *debug;
+@property (nonatomic, retain) NSArray *invalid_fields;
 @property (nonatomic, retain) DFPeanutUserObject *user;
 
 @end

@@ -10,8 +10,11 @@
 #import "DFNetworkAdapter.h"
 #import "DFPeanutTrueFalseResponse.h"
 
-typedef void (^DFPeanutSMSVerificationRequestCompletionBlock)(DFPeanutTrueFalseResponse *response);
+typedef void (^DFPeanutSMSVerificationRequestCompletionBlock)(DFPeanutTrueFalseResponse *response, NSError *error);
 
 @interface DFSMSVerificationAdapter : NSObject <DFNetworkAdapter>
+
+- (void)requestSMSCodeForPhoneNumber:(NSString *)phoneNumberString
+                 withCompletionBlock:(DFPeanutSMSVerificationRequestCompletionBlock)completionBlock;
 
 @end

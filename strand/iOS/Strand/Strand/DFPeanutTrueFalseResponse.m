@@ -8,12 +8,15 @@
 
 #import "DFPeanutTrueFalseResponse.h"
 #import <RestKit/RestKit.h>
+#import "DFPeanutError.h"
 
 @implementation DFPeanutTrueFalseResponse
 
 + (RKObjectMapping *)objectMapping {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"invalid_fields"
+                                                 mapping:[DFPeanutError objectMapping]];
   return objectMapping;
 }
 
@@ -21,5 +24,12 @@
 {
   return @[@"result"];
 }
+
+- (NSString *)firstInvalidFieldDescription
+{
+  DFPeanutError *firstInvalidField = [self.invalid_fields firstObject];
+  return firstInvalidField.description;
+}
+
 
 @end

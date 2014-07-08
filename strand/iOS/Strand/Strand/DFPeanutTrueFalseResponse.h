@@ -12,5 +12,7 @@
 @interface DFPeanutTrueFalseResponse : NSObject <DFPeanutObject>
 
 @property (nonatomic) BOOL result;
+@property (nonatomic, retain) NSArray *invalid_fields;
 
+- (NSString *)firstInvalidFieldDescription;
 @end

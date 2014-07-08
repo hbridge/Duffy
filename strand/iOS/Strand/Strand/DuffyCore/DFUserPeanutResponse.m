@@ -18,6 +18,8 @@
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"user"
                                                  mapping:[DFPeanutUserObject objectMapping]];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"invalid_fields"
+                                                 mapping:[DFPeanutError objectMapping]];
   
   return objectMapping;
 }

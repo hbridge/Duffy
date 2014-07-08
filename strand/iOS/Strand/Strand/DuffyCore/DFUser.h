@@ -16,6 +16,7 @@ typedef UInt64 DFUserIDType;
 @property (nonatomic, retain) NSString *deviceID;
 @property (nonatomic, retain) NSString *displayName;
 @property (nonatomic, retain) NSString *authToken;
+@property (nonatomic, retain) NSString *phoneNumberString;
 
 @property (readonly, nonatomic, retain) NSURL *serverURL;
 @property (readonly, nonatomic, retain) NSURL *apiURL;
