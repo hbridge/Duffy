@@ -9,6 +9,7 @@ import logging
 from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from peanut.settings import constants
 
@@ -557,7 +558,7 @@ def createUser(phoneNumber, displayName, smsAuth):
 @csrf_exempt
 def auth_phone(request):
 	response = dict({'result': True, 'errors': dict()})
-	form = AuthPhoneForm(request.GET)
+	form = AuthPhoneForm(api_util.getRequestData(request))
 
 	timeWithinMinutes = 10
 
