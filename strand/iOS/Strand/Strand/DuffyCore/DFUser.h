@@ -14,8 +14,7 @@ typedef UInt64 DFUserIDType;
 
 @property (nonatomic) DFUserIDType userID;
 @property (nonatomic, retain) NSString *deviceID;
-@property (nonatomic, retain) NSString *firstName;
-@property (nonatomic, retain) NSString *lastName;
+@property (nonatomic, retain) NSString *displayName;
 @property (nonatomic, retain) NSString *authToken;
 
 @property (readonly, nonatomic, retain) NSURL *serverURL;

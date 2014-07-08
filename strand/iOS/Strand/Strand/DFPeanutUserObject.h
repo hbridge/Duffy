@@ -14,7 +14,6 @@
 
 @property (nonatomic) DFUserIDType id;
 @property (nonatomic, retain) NSString *phone_id;
-@property (nonatomic, retain) NSString *first_name;
-@property (nonatomic, retain) NSString *last_name;
+@property (nonatomic, retain) NSString *display_name;
 
 @end

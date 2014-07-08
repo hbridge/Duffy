@@ -22,8 +22,7 @@ static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortK
 
 NSString *const userIDCodeKey = @"dserID";
 NSString *const deviceIDCodeKey = @"deviceID";
-NSString *const firstNameCodeKey = @"firstName";
-NSString *const lastNameCodeKey = @"lastName";
+NSString *const displayNameCodeKey = @"displayName";
 NSString *const authTokenCodeKey = @"authToken";
 
 
@@ -68,8 +67,7 @@ static DFUser *currentUser;
     _userID = [userIDNumber longLongValue];
     NSString *deviceID = [aDecoder decodeObjectForKey:deviceIDCodeKey];
     if (deviceID) _deviceID = deviceID;
-    _firstName = [aDecoder decodeObjectForKey:firstNameCodeKey];
-    _lastName = [aDecoder decodeObjectForKey:lastNameCodeKey];
+    _displayName = [aDecoder decodeObjectForKey:displayNameCodeKey];
     _authToken = [aDecoder decodeObjectForKey:authTokenCodeKey];
   }
   return self;
@@ -81,9 +79,8 @@ static DFUser *currentUser;
   if (self != [DFUser currentUser]) {
     [aCoder encodeObject:self.deviceID forKey:deviceIDCodeKey];
   }
-  if (self.firstName) [aCoder encodeObject:self.firstName forKey:_firstName];
-  if (self.lastName) [aCoder encodeObject:self.lastName forKey:_lastName];
-  if (self.authToken) [aCoder encodeObject:self.authToken forKey:_authToken];
+  if (self.displayName) [aCoder encodeObject:self.displayName forKey:displayNameCodeKey];
+  if (self.authToken) [aCoder encodeObject:self.authToken forKey:authTokenCodeKey];
 }
 
 - (void)setDeviceID:(NSString *)deviceID
@@ -161,8 +158,8 @@ static DFUser *currentUser;
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"{\n id: %llu\n deviceID: %@ \n firstName: %@\n lastName: %@\n authToken:%@\n } ",
-          self.userID, self.deviceID, self.firstName, self.lastName, self.authToken];
+  return [NSString stringWithFormat:@"{\n id: %llu\n deviceID: %@ \n displayName: %@\n authToken:%@\n } ",
+          self.userID, self.deviceID, self.displayName, self.authToken];
 }
 
 
