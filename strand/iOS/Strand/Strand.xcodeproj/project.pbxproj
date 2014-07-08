@@ -22,6 +22,7 @@
 		5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib */; };
 		5A3172C8196B616E00CA7693 /* DFUserPeanutResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C7196B616E00CA7693 /* DFUserPeanutResponse.m */; };
 		5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */; };
+		5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */; };
 		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
 		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
@@ -139,6 +140,8 @@
 		5A3172C7196B616E00CA7693 /* DFUserPeanutResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFUserPeanutResponse.m; path = DuffyCore/DFUserPeanutResponse.m; sourceTree = "<group>"; };
 		5A3172C9196B620100CA7693 /* DFPeanutUserObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutUserObject.h; sourceTree = "<group>"; };
 		5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutUserObject.m; sourceTree = "<group>"; };
+		5A3172CC196C442400CA7693 /* NSString+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+DFHelpers.h"; sourceTree = "<group>"; };
+		5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+DFHelpers.m"; sourceTree = "<group>"; };
 		5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 4.xcdatamodel"; sourceTree = "<group>"; };
 		5A40343B196083A9003D7546 /* DFPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoAsset.h; path = DuffyCore/DFPhotoAsset.h; sourceTree = "<group>"; };
 		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
@@ -354,6 +357,8 @@
 				5AC4A91F1947C30800862D9C /* UIImage+DFHelpers.m */,
 				5A40344B196340A0003D7546 /* DFPhotoResizer.h */,
 				5A40344C196340A0003D7546 /* DFPhotoResizer.m */,
+				5A3172CC196C442400CA7693 /* NSString+DFHelpers.h */,
+				5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -917,6 +922,7 @@
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
+				5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */,
 				5AA45293196708D00099CBD2 /* DFPhotoSectionHeader.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
 				5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */,

@@ -10,6 +10,9 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "AppDelegate.h"
+#import "NSString+DFHelpers.h"
+
+const UInt16 DFCodeLength = 6;
 
 @interface DFSMSCodeEntryViewController ()
 
@@ -21,7 +24,6 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
     }
     return self;
 }
@@ -44,6 +46,12 @@
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)setPhoneNumberString:(NSString *)phoneNumberString
+{
+  _phoneNumberString = phoneNumberString;
+  self.navigationItem.title = [NSString stringWithFormat:@"Verify %@", phoneNumberString];
 }
 
 - (void)textFieldDidBeginEditing:(UITextField *)textField
@@ -109,12 +117,53 @@ replacementString:(NSString *)string
 
 - (void)doneButtonPressed:(id)sender
 {
-  NSString *authCode = [self.codeTextField.text stringByReplacingOccurrencesOfString:@" "
-                                                                          withString:@""];
+  if (![self isEnteredCodeValid]) {
+    [self showInvalidCodeAlert:[self enteredCode]];
+    return;
+  }
+  NSString *authCode = [self enteredCode];
   [self getUserIDWithPhoneNumber:self.phoneNumberString authCode:authCode];
   DDLogInfo(@"User entered auth code: %@", authCode);
 }
 
+- (NSString *)enteredCode
+{
+  NSMutableString *mutableCode = self.codeTextField.text.mutableCopy;
+  [mutableCode replaceOccurrencesOfString:@" " withString:@"" options:0 range:mutableCode.fullRange];
+  [mutableCode replaceOccurrencesOfString:@"-" withString:@"" options:0 range:mutableCode.fullRange];
+  return mutableCode;
+}
+
+
+- (BOOL)isEnteredCodeValid
+{
+  NSError *error;
+  NSRegularExpression *regex = [[NSRegularExpression alloc]
+                                initWithPattern:[NSString stringWithFormat:@"\\d{%d}",DFCodeLength]
+                                options:0
+                                error:&error];
+  if (error) {
+    [NSException raise:@"Invalid Regex" format:@"Error: %@", error.description];
+  }
+  
+  return [regex numberOfMatchesInString:[self enteredCode]
+                                options:0
+                                  range:(NSRange){0, [[self enteredCode] length]}
+          ] == 1;
+}
+
+- (void)showInvalidCodeAlert:(NSString *)code
+{
+  UIAlertView *alert = [[UIAlertView alloc]
+                        initWithTitle:@"Invalid Code"
+                        message:[NSString stringWithFormat:@"%@ is an invalid code."
+                                 " Please enter the %d digit code you were sent "
+                                 " or press back to request a new one.", code, DFCodeLength]
+                        delegate:nil
+                        cancelButtonTitle:@"OK"
+                        otherButtonTitles:nil];
+  [alert show];
+}
 
 - (void)getUserIDWithPhoneNumber:(NSString *)phoneNumberString
                         authCode:(NSString *)authCodeString
