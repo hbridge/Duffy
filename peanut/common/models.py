@@ -57,9 +57,11 @@ class User(models.Model):
 			productStr = "Arbus"
 		else:
 			productStr = "Strand"
-			
-		return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)
 
+		if self.phone_id:
+			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)
+		else:
+			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_number)			
 
 class Photo(models.Model):
 	user = models.ForeignKey(User)

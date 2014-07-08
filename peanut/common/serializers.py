@@ -12,4 +12,4 @@ class PhotoSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
-		fields = ('id', 'display_name')
+		fields = ('id', 'display_name', 'phone_number', 'auth_token')

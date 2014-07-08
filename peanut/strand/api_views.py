@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from peanut.settings import constants
 
 from common.models import Photo, User, Neighbor, SmsAuth
+from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
 
@@ -580,9 +581,8 @@ def auth_phone(request):
 			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code expired'})
 		else:
 			user = createUser(phoneNumber, displayName, smsAuth[0])
-			response['phone_number'] = user.phone_number
-			response['id'] = user.id
-			response['auth_token'] = user.auth_token
+			serializer = UserSerializer(user)
+			response['user'] = serializer.data
 
 	else:
 		response['result'] = False
