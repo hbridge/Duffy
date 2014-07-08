@@ -1,9 +1,14 @@
+import logging
+
 from django.shortcuts import render
 from django.http import HttpResponse
 
 from common.models import Photo, User, Classification
 
 from arbus.forms import ManualAddPhoto
+from strand.forms import InappropriateContentForm
+
+logger = logging.getLogger(__name__)
 
 def neighbors(request):
 	if request.method == 'GET':
@@ -41,3 +46,18 @@ def serveImage(request):
 	context = {	'photoId': photoId,
 				'thumbnailBasepath': thumbnailBasepath}
 	return render(request, 'strand/serve_image.html', context)
+
+def innapropriateContentForm(request):
+	form = InappropriateContentForm(request.GET)
+
+	if form.is_valid():
+
+		logStr = ""
+		for key, value in form.cleaned_data.iteritems():
+			logStr += "%s=%s," % (key, value)
+
+		logger.error("INAPPROPRIATE: %s" % logStr)
+
+		return HttpResponse("Thank you for your submission, we will evaluate this shortly")
+	else:
+		return HttpResponse("Please click back and fix the following errors: %s", form.errors)

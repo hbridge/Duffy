@@ -3,6 +3,13 @@ import datetime
 
 from phonenumber_field.formfields import PhoneNumberField
 
+class InappropriateContentForm(forms.Form):
+	name = forms.CharField(required=False)
+	mail = forms.CharField(required=False)
+	offender = forms.CharField(required=False)
+	contenttime = forms.CharField(required=False)
+	discuss = forms.CharField(required=False)
+
 class GetJoinableStrandsForm(forms.Form):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
 	lat = forms.FloatField(min_value=-90, max_value=90)
