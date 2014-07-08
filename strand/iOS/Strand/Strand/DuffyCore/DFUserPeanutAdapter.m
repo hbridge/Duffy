@@ -17,7 +17,7 @@ NSString *const GetUserPath = @"get_user";
 NSString *const CreateUserPath = @"create_user";
 NSString *const DeviceNameKey = @"device_name";
 NSString *const DFUserPeanutPhoneNumberKey = @"phone_number";
-NSString *const SMSAccessCodeKey = @"access_code";
+NSString *const SMSAccessCodeKey = @"sms_access_code";
 
 @implementation DFUserPeanutAdapter
 

@@ -55,6 +55,7 @@ static DFUser *currentUser;
 + (void)setCurrentUser:(DFUser *)user
 {
   DDLogInfo(@"Setting current user to: %@", user.description);
+  currentUser = user;
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:user];
   [[NSUserDefaults standardUserDefaults] setObject:data forKey:userObjectDefaultsKey];
 }

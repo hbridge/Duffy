@@ -8,8 +8,21 @@
 
 #import "DFSettings.h"
 #import "DFAppInfo.h"
+#import "DFUser.h"
 
 @implementation DFSettings
+
+- (void)setDisplayName:(NSString *)displayName
+{
+  DFUser *currentUser = [DFUser currentUser];
+  currentUser.displayName = displayName;
+  [DFUser setCurrentUser:currentUser];
+}
+
+- (NSString *)displayName
+{
+  return [[DFUser currentUser] displayName];
+}
 
 - (NSString *)version
 {

@@ -47,7 +47,7 @@
   
   [FKFormMapping mappingForClass:[DFSettings class] block:^(FKFormMapping *mapping) {
     [mapping sectionWithTitle:@"Information" identifier:@"info"];
-    [mapping mapAttribute:@"version" title:@"Version" type:FKFormAttributeMappingTypeText];
+    [mapping mapAttribute:@"version" title:@"Version" type:FKFormAttributeMappingTypeLabel];
     
     [mapping sectionWithTitle:@"Profile" identifier:@"profile"];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
