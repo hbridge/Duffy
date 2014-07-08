@@ -29,7 +29,7 @@
     buildType = @"release";
 #endif
     return [NSString stringWithFormat:@"%@ %@ (%@) %@",
-            appName, majorVersion, minorVersion, buildType];
+            appName ? appName : @"", majorVersion, minorVersion, buildType];
   }
   
   return appInfoString;

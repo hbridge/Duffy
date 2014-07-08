@@ -23,6 +23,11 @@
 		5A3172C8196B616E00CA7693 /* DFUserPeanutResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C7196B616E00CA7693 /* DFUserPeanutResponse.m */; };
 		5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */; };
 		5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */; };
+		5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172D1196C84E400CA7693 /* DFSettingsViewController.m */; };
+		5A3172D5196C85F800CA7693 /* DFSettings.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172D4196C85F800CA7693 /* DFSettings.m */; };
+		5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172D7196C8C6300CA7693 /* DFWebViewController.m */; };
+		5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */; };
+		5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */; };
 		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
 		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
@@ -142,6 +147,15 @@
 		5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutUserObject.m; sourceTree = "<group>"; };
 		5A3172CC196C442400CA7693 /* NSString+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+DFHelpers.h"; sourceTree = "<group>"; };
 		5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+DFHelpers.m"; sourceTree = "<group>"; };
+		5A3172D0196C84E400CA7693 /* DFSettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettingsViewController.h; sourceTree = "<group>"; };
+		5A3172D1196C84E400CA7693 /* DFSettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSettingsViewController.m; sourceTree = "<group>"; };
+		5A3172D3196C85F800CA7693 /* DFSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSettings.h; sourceTree = "<group>"; };
+		5A3172D4196C85F800CA7693 /* DFSettings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSettings.m; sourceTree = "<group>"; };
+		5A3172D6196C8C6300CA7693 /* DFWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFWebViewController.h; sourceTree = "<group>"; };
+		5A3172D7196C8C6300CA7693 /* DFWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFWebViewController.m; sourceTree = "<group>"; };
+		5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFWebViewController.xib; sourceTree = "<group>"; };
+		5A3172DB196C927000CA7693 /* DFDiagnosticInfoMailComposeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDiagnosticInfoMailComposeController.h; sourceTree = "<group>"; };
+		5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDiagnosticInfoMailComposeController.m; sourceTree = "<group>"; };
 		5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 4.xcdatamodel"; sourceTree = "<group>"; };
 		5A40343B196083A9003D7546 /* DFPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoAsset.h; path = DuffyCore/DFPhotoAsset.h; sourceTree = "<group>"; };
 		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
@@ -322,6 +336,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5A3172CF196C7C6F00CA7693 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				5A3172D0196C84E400CA7693 /* DFSettingsViewController.h */,
+				5A3172D1196C84E400CA7693 /* DFSettingsViewController.m */,
+				5A3172D3196C85F800CA7693 /* DFSettings.h */,
+				5A3172D4196C85F800CA7693 /* DFSettings.m */,
+				5A3172D6196C8C6300CA7693 /* DFWebViewController.h */,
+				5A3172D7196C8C6300CA7693 /* DFWebViewController.m */,
+				5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */,
+			);
+			name = Settings;
+			sourceTree = "<group>";
+		};
 		5A40343119607B84003D7546 /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
@@ -550,6 +578,8 @@
 		5AC4A8E01947C2E700862D9C /* Duffy Core */ = {
 			isa = PBXGroup;
 			children = (
+				5A3172DB196C927000CA7693 /* DFDiagnosticInfoMailComposeController.h */,
+				5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */,
 				5AA45286196708B10099CBD2 /* Gallery */,
 				5AC4A8E51947C30800862D9C /* DFAppInfo.h */,
 				5AC4A8E61947C30800862D9C /* DFAppInfo.m */,
@@ -665,6 +695,7 @@
 				5AC4A95D194A257E00862D9C /* Background manager */,
 				5AC4A8DA1947B01D00862D9C /* Logging and Analytics */,
 				5AC4A8DC1947B61900862D9C /* Database */,
+				5A3172CF196C7C6F00CA7693 /* Settings */,
 				5AC4A964194A3FBF00862D9C /* Network Adapters */,
 				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
@@ -811,6 +842,7 @@
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
 				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
+				5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */,
 				5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
@@ -899,6 +931,7 @@
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
+				5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */,
 				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5AC4A93C1947C30800862D9C /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
 				5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */,
@@ -939,6 +972,7 @@
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */,
+				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
 				5AA452A3196709750099CBD2 /* DFGalleryViewController.m in Sources */,
@@ -959,8 +993,10 @@
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
 				5AA45297196708D00099CBD2 /* DFPhotoStackCell.m in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,
+				5A3172D5196C85F800CA7693 /* DFSettings.m in Sources */,
 				5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */,
 				5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */,
+				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
 				5AA4529D196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */,

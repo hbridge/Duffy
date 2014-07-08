@@ -14,6 +14,7 @@
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotoViewController.h"
 #import "DFAnalytics.h"
+#import "DFSettingsViewController.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -80,12 +81,18 @@
 - (void)setNavigationButtons
 {
   if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
+    UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc]
+                                     initWithImage:[[UIImage imageNamed:@"Assets/Icons/SettingsBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                                     style:UIBarButtonItemStylePlain
+                                     target:self
+                                     action:@selector(settingsButtonPressed:)];
     UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
                                      initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
                                      style:UIBarButtonItemStylePlain
                                      target:self
                                      action:@selector(cameraButtonPressed:)];
     
+    self.navigationItem.leftBarButtonItems = @[settingsButton];
     self.navigationItem.rightBarButtonItems = @[cameraButton];
   }
 }
@@ -228,7 +235,19 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   // Dispose of any resources that can be recreated.
 }
 
-- (IBAction)cameraButtonPressed:(UIButton *)sender {
+#pragma mark - User Actions
+
+- (void)cameraButtonPressed:(UIButton *)sender
+{
   [(RootViewController *)self.view.window.rootViewController showCamera];
 }
+
+- (void)settingsButtonPressed:(UIButton *)sender
+{
+  DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
+  [self.navigationController pushViewController:settingsViewController
+                                       animated:YES];
+}
+
+
 @end
