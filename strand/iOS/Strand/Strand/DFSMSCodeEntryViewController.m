@@ -171,11 +171,11 @@ replacementString:(NSString *)string
   DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
   
   [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
-                          deviceName:[[DFUser currentUser] deviceName]
+                          deviceName:[DFUser deviceName]
                          phoneNumber:phoneNumberString
                        smsAuthString:authCodeString
                     withSuccessBlock:^(DFUser *user) {
-                      [[DFUser currentUser] setUserID:user.userID];
+                      [DFUser setCurrentUser:user];
                       AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
                       [delegate showMainView];
                     }
@@ -184,7 +184,7 @@ replacementString:(NSString *)string
                           UIAlertView *failureAlert = [DFSMSCodeEntryViewController accountFailedAlert:error];
                           [failureAlert show];
                         }];
-
+  
 }
 
 

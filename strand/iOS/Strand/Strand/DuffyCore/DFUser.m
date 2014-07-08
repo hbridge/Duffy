@@ -12,16 +12,22 @@
 
 @implementation DFUser
 
-@synthesize hardwareDeviceID = _hardwareDeviceID, userID = _userID;
+@synthesize userID = _userID;
+@synthesize deviceID = _deviceID;
 
-static NSString *DFUserIDUserDefaultsKey = @"com.duffysoft.DFUserIDNumberUserDefaultsKey";
-static NSString *DFOverrideDeviceIDUserDefaultsKey = @"com.duffysoft.DFOverrideDeviceIDUserDefaultsKey";
+NSString *const userObjectDefaultsKey = @"com.duffysoft.User";
+
 static NSString *DFOverrideServerURLKey = @"com.duffysoft.DFOverrideServerURLKey";
 static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortKey";
 
+NSString *const userIDCodeKey = @"dserID";
+NSString *const deviceIDCodeKey = @"deviceID";
+NSString *const firstNameCodeKey = @"firstName";
+NSString *const lastNameCodeKey = @"lastName";
+NSString *const authTokenCodeKey = @"authToken";
 
-NSString *DFAutoUploadEnabledUserDefaultKey = @"DFAutoUploadEnabledUserDefaultKey";
-NSString *DFConserveDataEnabledUserDefaultKey = @"DFConserveDataEnabledUserDefaultKey";
+
+
 NSString *DFEnabledYes = @"YES";
 NSString *DFEnabledNo = @"NO";
 
@@ -29,103 +35,98 @@ static DFUser *currentUser;
 
 + (DFUser *)currentUser
 {
-    if (!currentUser) {
-        currentUser = [[super allocWithZone:nil] init];
-      [self checkUserDefaults];
+  if (!currentUser) {
+    NSData *userData = [[NSUserDefaults standardUserDefaults] valueForKey:userObjectDefaultsKey];
+    if (userData) {
+      currentUser = [NSKeyedUnarchiver unarchiveObjectWithData:userData];
+    } else {
+      currentUser = [[DFUser alloc] init];
     }
-    return currentUser;
+    
+    [self checkUserDefaults];
+  }
+  return currentUser;
 }
 
 + (void)checkUserDefaults
 {
-  if (![[NSUserDefaults standardUserDefaults] valueForKey:DFAutoUploadEnabledUserDefaultKey]){
-    [[NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
-  }
   
-  if (![[NSUserDefaults standardUserDefaults] valueForKey:DFConserveDataEnabledUserDefaultKey]){
-    [[NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFConserveDataEnabledUserDefaultKey];
+}
+
++ (void)setCurrentUser:(DFUser *)user
+{
+  DDLogInfo(@"Setting current user to: %@", user.description);
+  NSData *data = [NSKeyedArchiver archivedDataWithRootObject:user];
+  [[NSUserDefaults standardUserDefaults] setObject:data forKey:userObjectDefaultsKey];
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder
+{
+  self = [super init];
+  if (self) {
+    NSNumber *userIDNumber = [aDecoder decodeObjectForKey:userIDCodeKey];
+    _userID = [userIDNumber longLongValue];
+    NSString *deviceID = [aDecoder decodeObjectForKey:deviceIDCodeKey];
+    if (deviceID) _deviceID = deviceID;
+    _firstName = [aDecoder decodeObjectForKey:firstNameCodeKey];
+    _lastName = [aDecoder decodeObjectForKey:lastNameCodeKey];
+    _authToken = [aDecoder decodeObjectForKey:authTokenCodeKey];
   }
-  [[NSUserDefaults standardUserDefaults] synchronize];
+  return self;
+}
+
+- (void)encodeWithCoder:(NSCoder *)aCoder
+{
+  [aCoder encodeObject:@(self.userID) forKey:userIDCodeKey];
+  if (self != [DFUser currentUser]) {
+    [aCoder encodeObject:self.deviceID forKey:deviceIDCodeKey];
+  }
+  if (self.firstName) [aCoder encodeObject:self.firstName forKey:_firstName];
+  if (self.lastName) [aCoder encodeObject:self.lastName forKey:_lastName];
+  if (self.authToken) [aCoder encodeObject:self.authToken forKey:_authToken];
+}
+
+- (void)setDeviceID:(NSString *)deviceID
+{
+  if (self == [DFUser currentUser]) {
+    [NSException raise:@"Read only for current user" format:@"Cannot set device ID for current user"];
+  } else {
+    _deviceID = deviceID;
+  }
 }
 
 - (NSString *)deviceID
 {
-    if (self.userOverriddenDeviceID) return self.userOverriddenDeviceID;
-    return self.hardwareDeviceID;
+  if (self == [DFUser currentUser]) {
+    NSUUID *oNSUUID = [[UIDevice currentDevice] identifierForVendor];
+    return [oNSUUID UUIDString];
+  } else {
+    return _deviceID;
+  }
 }
 
-- (NSString *)hardwareDeviceID
++ (NSString *) deviceName
 {
-    if (!_hardwareDeviceID && self == [DFUser currentUser]) {
-        NSUUID *oNSUUID = [[ASIdentifierManager sharedManager] advertisingIdentifier];
-        _hardwareDeviceID = [oNSUUID UUIDString];
-    }
-    
-    return _hardwareDeviceID;
+  return [[UIDevice currentDevice] name];
 }
 
-- (void)setHardwareDeviceID:(NSString *)hardwareDeviceID
-{
-    if (self == [DFUser currentUser]) {
-        [NSException raise:@"Cannot set hardwareDeviceID for current user." format:@""];
-    }
-    _hardwareDeviceID = hardwareDeviceID;
-}
 
-- (NSString *) deviceName
-{
-    return [[UIDevice currentDevice] name];
-}
-
-- (NSString *)userOverriddenDeviceID
-{
-    NSString *userSetDeviceID = [[NSUserDefaults standardUserDefaults] valueForKey:DFOverrideDeviceIDUserDefaultsKey];
-    if (!userSetDeviceID || [userSetDeviceID isEqualToString:@""]) return nil;
-    
-    return userSetDeviceID;
-}
-
-- (void)setUserOverriddenDeviceID:(NSString *)userOverriddenDeviceID
-{
-    if (![userOverriddenDeviceID isEqualToString:self.userOverriddenDeviceID]) {
-        [[NSUserDefaults standardUserDefaults] setObject:userOverriddenDeviceID forKey:DFOverrideDeviceIDUserDefaultsKey];
-        // we set the user id to nil if the device is overriden, so that it will be refreshed on next load
-        self.userID = 0;
-    }
-}
-
-- (UInt64)userID
-{
-    if (!_userID && self == [DFUser currentUser]) {
-        _userID = [(NSNumber *)[[NSUserDefaults standardUserDefaults] valueForKey:DFUserIDUserDefaultsKey] unsignedLongLongValue];
-    }
-    
-    return _userID;
-}
-
-- (void)setUserID:(UInt64)userID
-{
-    _userID = userID;
-    if (self == [DFUser currentUser]) {
-        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithUnsignedLongLong:userID]
-                                                  forKey:DFUserIDUserDefaultsKey];
-    }
-}
+#pragma mark - Server URL and port
 
 - (NSString *)userOverriddenServerURLKey
 {
-    return [[NSUserDefaults standardUserDefaults] objectForKey:DFOverrideServerURLKey];
+  return [[NSUserDefaults standardUserDefaults] objectForKey:DFOverrideServerURLKey];
 }
 
 - (void)setUserOverriddenServerURLString:(NSString *)userOverriddenServerURLString
 {
-    [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerURLString forKey:DFOverrideServerURLKey];
+  [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerURLString forKey:DFOverrideServerURLKey];
   [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (NSString *)userOverriddenServerPortString
 {
-    return [[NSUserDefaults standardUserDefaults] stringForKey:DFOverrideServerPortKey];
+  return [[NSUserDefaults standardUserDefaults] stringForKey:DFOverrideServerPortKey];
 }
 
 - (void)setUserOverriddenServerPortString:(NSString *)userOverriddenServerPortString
@@ -138,82 +139,30 @@ static DFUser *currentUser;
 
 - (NSURL *)serverURL
 {
-    NSMutableString *URLString;
-    if (self.userOverriddenServerURLString && ![self.userOverriddenServerURLString isEqualToString:@""]) {
-        URLString = [self.userOverriddenServerURLString mutableCopy];
-    } else {
-        URLString = [DFServerBaseURL mutableCopy];
-    }
-    
-    if (self.userOverriddenServerPortString && ![self.userOverriddenServerPortString isEqualToString:@""]) {
-        [URLString appendString:[NSString stringWithFormat:@":%@", self.userOverriddenServerPortString]];
-    }
-    
-    return [NSURL URLWithString:URLString];
+  NSMutableString *URLString;
+  if (self.userOverriddenServerURLString && ![self.userOverriddenServerURLString isEqualToString:@""]) {
+    URLString = [self.userOverriddenServerURLString mutableCopy];
+  } else {
+    URLString = [DFServerBaseURL mutableCopy];
+  }
+  
+  if (self.userOverriddenServerPortString && ![self.userOverriddenServerPortString isEqualToString:@""]) {
+    [URLString appendString:[NSString stringWithFormat:@":%@", self.userOverriddenServerPortString]];
+  }
+  
+  return [NSURL URLWithString:URLString];
 }
 
 - (NSURL *)apiURL
 {
-    return [[self serverURL] URLByAppendingPathComponent:DFServerAPIPath isDirectory:NO];
+  return [[self serverURL] URLByAppendingPathComponent:DFServerAPIPath isDirectory:NO];
 }
 
-
-- (unsigned int) devicePhysicalMemoryMB
-{
-    unsigned long long memoryInBytes = [[NSProcessInfo processInfo] physicalMemory];
-    return (unsigned int)(memoryInBytes/1000/1000);
-}
-
-- (BOOL)autoUploadEnabled
-{
-  if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFAutoUploadEnabledUserDefaultKey]
-       isEqualToString:DFEnabledYes]){
-    return YES;
-  }
-  
-  return NO;
-}
-
-- (void)setAutoUploadEnabled:(BOOL)autoUploadEnabled
-{
-  if (autoUploadEnabled) {
-    DDLogInfo(@"Auto-upload now ON");
-    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFAutoUploadEnabledUserDefaultKey];
-  } else {
-    DDLogInfo(@"Auto-upload now OFF");
-    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFAutoUploadEnabledUserDefaultKey];
-  }
-  [[NSUserDefaults standardUserDefaults] synchronize];
-}
-
-
-- (BOOL)conserveDataEnabled
-{
-  if ([[[NSUserDefaults standardUserDefaults] valueForKeyPath:DFConserveDataEnabledUserDefaultKey]
-       isEqualToString:DFEnabledYes]){
-    return YES;
-  }
-  
-  return NO;
-}
-
-- (void)setConserveDataEnabled:(BOOL)conserveDataEnabled
-{
-  if (conserveDataEnabled) {
-    DDLogInfo(@"Conserve cellular data now ON");
-    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledYes forKey:DFConserveDataEnabledUserDefaultKey];
-  } else {
-    DDLogInfo(@"Conserve cell data now OFF");
-    [[ NSUserDefaults standardUserDefaults] setObject:DFEnabledNo forKey:DFConserveDataEnabledUserDefaultKey];
-  }
-  
-  [[NSUserDefaults standardUserDefaults] synchronize];
-}
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"{\n firstName: %@ \n lastName:%@ \n id:%llu \n} ",
-          self.firstName, self.lastName, self.userID];
+  return [NSString stringWithFormat:@"{\n id: %llu\n deviceID: %@, firstName: %@\n lastName: %@\n authToken:%@\n } ",
+          self.userID, self.deviceID, self.firstName, self.lastName, self.authToken];
 }
 
 

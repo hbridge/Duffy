@@ -72,7 +72,7 @@ NSString *const SMSAccessCodeKey = @"access_code";
      DFUser *result = [[DFUser alloc] init];
      if (response.result) {
        result.userID = response.user.id;
-       result.hardwareDeviceID = response.user.phone_id;
+       result.deviceID = response.user.phone_id;
        result.firstName = response.user.first_name;
        result.lastName = response.user.last_name;
      }  else {
@@ -128,9 +128,10 @@ NSString *const SMSAccessCodeKey = @"access_code";
      if (response.result) {
        DFUser *result = [[DFUser alloc] init];
        result.userID = response.user.id;
-       result.hardwareDeviceID = response.user.phone_id;
+       result.deviceID = response.user.phone_id;
        result.firstName = response.user.first_name;
        result.lastName = response.user.last_name;
+       successBlock(result);
      }  else {
        failureBlock([NSError errorWithDomain:@"com.duffyapp.Strand"
                                         code:-7
