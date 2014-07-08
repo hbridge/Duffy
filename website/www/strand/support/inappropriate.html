@@ -2,7 +2,77 @@
 <title>
 	Strand - Report inappropriate content
 </title>
+
+<style>
+body {
+	font-family: sans-serif;
+}
+fieldset {
+    margin:0;
+    padding:0;
+    border:0;
+    outline:0;
+    font-size:100%;
+    font:inherit;
+    vertical-align:baseline;
+    color: #666
+}
+form.support-form {
+	width: 100%;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: left;
+}
+form {
+	margin-bottom: 20px;
+}
+
+p.field {
+	width: 100%;
+}
+
+</style>
+
 <body>
-[Insert form and info here for inappropriate content reporting]
+	<h1>Report inappropriate content on Strand</h1>
+
+	<div class="ui-top-summary">
+		Please use the form below to report any inappropriate content and Strand users who shared that content.
+		<br>
+	</div>
+
+<div class="ui-fields">
+
+<form class="support-form" id="inappropriate-form" action="" method="post">
+
+<fieldset>
+
+
+<p class="field">
+<input type="text" name="form_your_num" value="" placeholder="What's your Strand phone number?" autocomplete="off">
+</p>
+
+<p class="field">
+<input type="text" name="form_your_email" value="" placeholder="What's your email address?" autocomplete="off">
+</p>
+<p class="field">
+<input type="text" name="form_offender" id="" value="" autocomplete="off" placeholder="Offender's phone number or name?">
+</p>
+
+<p class="field">
+<input type="text" id="form-date" value="" autocomplete="off" placeholder="Approximate time and date that the content was posted">
+</p>
+<p class="field">
+
+<div class="form-field-title">Please explain what happened:</div>
+<textarea id="message-body" name="email_body" rows="12" value="" autocomplete="off"> </textarea>
+</p>
+</fieldset>
+<div>
+<input type="submit" id="submit-button" value="Send"><br />
+</div>
+</form>
+
+</div>
 </body>
 </html>
