@@ -1,0 +1,14 @@
+body {
+	font-family: sans-serif;
+}
+.ui-header {
+	font-size: 20px;
+	font-weight: bold;
+	padding-bottom: 10px;
+}
+.ui-top-summary {
+	padding: 0px 0px 20px 0px;
+}
+.ui-footer {
+	padding: 10px 0px 10px 0px;
+}

@@ -2,11 +2,9 @@
 <title>
 	Strand - Report inappropriate content
 </title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" type="text/css" href="/strand/strand.css" media="screen" />
 <style>
-body {
-	font-family: sans-serif;
-}
 fieldset {
     margin:0;
     padding:0;
@@ -17,62 +15,46 @@ fieldset {
     vertical-align:baseline;
     color: #666
 }
-form.support-form {
+input[type="text"] {
 	width: 100%;
-	margin-left: auto;
-	margin-right: auto;
-	text-align: left;
 }
-form {
-	margin-bottom: 20px;
-}
-
-p.field {
+textarea {
 	width: 100%;
 }
 
 </style>
 
 <body>
-	<h1>Report inappropriate content on Strand</h1>
+	<div class='ui-header'>Report inappropriate content on Strand</div>
 
 	<div class="ui-top-summary">
-		Please use the form below to report any inappropriate content and Strand users who shared that content.
-		<br>
+		Please use the form below to report any inappropriate content and Strand user who shared that content.
 	</div>
 
 <div class="ui-fields">
 
-<form class="support-form" id="inappropriate-form" action="" method="post">
-
-<fieldset>
-
-
-<p class="field">
-<input type="text" name="form_your_num" value="" placeholder="What's your Strand phone number?" autocomplete="off">
-</p>
-
-<p class="field">
-<input type="text" name="form_your_email" value="" placeholder="What's your email address?" autocomplete="off">
-</p>
-<p class="field">
-<input type="text" name="form_offender" id="" value="" autocomplete="off" placeholder="Offender's phone number or name?">
-</p>
-
-<p class="field">
-<input type="text" id="form-date" value="" autocomplete="off" placeholder="Approximate time and date that the content was posted">
-</p>
-<p class="field">
-
-<div class="form-field-title">Please explain what happened:</div>
-<textarea id="message-body" name="email_body" rows="12" value="" autocomplete="off"> </textarea>
-</p>
-</fieldset>
-<div>
-<input type="submit" id="submit-button" value="Send"><br />
-</div>
+<form>
+  <fieldset>
+    <label for="name">Your phone #:</label>
+    <input type="text" name="name" id="name" autocomplete='off'/>
+    <br /><br />
+    <label for="mail">Your email:</label>
+    <input type="text" name="mail" id="mail" autocomplete='off'/>
+    <br /><br />
+    <label for="offender">Offender's phone # or username:</label>
+    <input type="text" name="offender" id="offender" />
+    <br /><br />
+    <label for="offender">Date and time of the content:</label>
+    <input type="text" name="contenttime" id="contenttime" autocomplete='off'/>    
+    <br /><br />
+    <label for="discuss">Please explain what happened:</label>
+    <textarea rows="7" name="discuss" autocomplete='off'></textarea>
+    <br /><br />
+    <input type="submit" id="submit-button" value="Send"/>
+    <br />
+  </fieldset>
 </form>
-
 </div>
+<div class="ui-footer"> &copy; 2014 Duffy, Inc.</div>  
 </body>
 </html>
