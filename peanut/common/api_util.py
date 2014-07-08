@@ -25,7 +25,11 @@ class DuffyJsonEncoder(json.JSONEncoder):
 def formatErrors(errors):
 	a = list()
 	for key, value in errors.iteritems():
-		a.append({"name": key, "descriptions": value})
+
+		if isinstance(value, list):
+			a.append({"name": key, "decription": value[0]})
+		else:
+			a.append({"name": key, "decription": value})
 
 	return json.dumps(a, cls=DuffyJsonEncoder)
 
