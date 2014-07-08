@@ -31,7 +31,7 @@ def formatErrors(errors):
 		else:
 			a.append({"name": key, "description": value})
 
-	return json.dumps(a, cls=DuffyJsonEncoder)
+	return a
 
 def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
