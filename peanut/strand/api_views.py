@@ -499,8 +499,6 @@ def send_sms_code(request):
 	else:
 		response['result'] = False
 
-		
-
 		response['invalid_fields'] = api_util.getFormErrors(form)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
@@ -573,13 +571,13 @@ def auth_phone(request):
 
 		if len(smsAuth) == 0 or len(smsAuth) > 1:
 			response['result'] = False
-			response['errors']['access_code'] = "Invalid code"
+			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Invalid code'})
 		elif smsAuth[0].user_created:
 			response['result'] = False
-			response['errors']['access_code'] = "Code already used"
+			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code already used'})
 		elif smsAuth[0].added < timeWithin:
 			response['result'] = False
-			response['errors']['access_code'] = "Code timed out"
+			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code expired'})
 		else:
 			user = createUser(phoneNumber, displayName, smsAuth[0])
 			response['phone_number'] = user.phone_number
@@ -588,7 +586,7 @@ def auth_phone(request):
 
 	else:
 		response['result'] = False
-		response['invalid_fields'] = api_util.getFormErrors(form)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 

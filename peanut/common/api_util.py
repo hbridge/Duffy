@@ -17,12 +17,17 @@ class DuffyJsonEncoder(json.JSONEncoder):
 			
 		return json.JSONEncoder.default(self, obj)
 
-def getFormErrors(form):
-	errors = list()
-	for key, value in form.errors.iteritems():
-		errors.append({"name": key, "descriptions": value})
+"""
+	Takes in a dict of the type:
 
-	return json.dumps(form.errors, cls=DuffyJsonEncoder)
+	'name': [description1, description2]
+"""
+def formatErrors(errors):
+	a = list()
+	for key, value in errors.iteritems():
+		a.append({"name": key, "descriptions": value})
+
+	return json.dumps(a, cls=DuffyJsonEncoder)
 
 def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
