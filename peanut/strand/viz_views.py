@@ -58,6 +58,6 @@ def innapropriateContentForm(request):
 
 		logger.error("INAPPROPRIATE: %s" % logStr)
 
-		return HttpResponse("Thank you for your submission, we will evaluate this shortly")
+		return HttpResponse("Thank you for your submission. We will evaluate it shortly and get back to you.")
 	else:
 		return HttpResponse("Please click back and fix the following errors: %s", form.errors)
