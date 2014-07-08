@@ -497,7 +497,10 @@ def send_sms_code(request):
 		SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+
+		
+
+		response['invalid_fields'] = api_util.getFormErrors(form)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -583,7 +586,7 @@ def auth_phone(request):
 
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+		response['invalid_fields'] = api_util.getFormErrors(form)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
