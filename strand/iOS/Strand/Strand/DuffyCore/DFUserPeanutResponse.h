@@ -13,6 +13,7 @@
 @interface DFUserPeanutResponse : NSObject <DFPeanutObject>
 
 @property (nonatomic) BOOL result;
+@property (nonatomic, retain) NSString *debug;
 @property (nonatomic, retain) DFPeanutUserObject *user;
 
 @end

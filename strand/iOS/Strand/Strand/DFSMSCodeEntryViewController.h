@@ -11,5 +11,6 @@
 @interface DFSMSCodeEntryViewController : UIViewController <UITextFieldDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextField *codeTextField;
+@property (nonatomic, retain) NSString *phoneNumberString;
 
 @end

@@ -24,7 +24,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"result"];
+  return @[@"result", @"debug"];
 }
 
 @end

@@ -51,12 +51,6 @@
   
   [self.window makeKeyAndVisible];
   
-  [self.window.rootViewController
-   presentViewController:[[UINavigationController alloc]
-                          initWithRootViewController:[[DFFirstTimeSetupViewController alloc] init]]
-   animated:NO
-   completion:nil];
-  
   if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
     [self application:application didReceiveRemoteNotification:
      launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]];
@@ -113,7 +107,8 @@
 - (void)showFirstTimeSetup
 {
   DFFirstTimeSetupViewController *setupViewController = [[DFFirstTimeSetupViewController alloc] init];
-  self.window.rootViewController = setupViewController;
+  self.window.rootViewController = [[UINavigationController alloc]
+                                    initWithRootViewController:setupViewController];
 }
 
 - (void)showMainView

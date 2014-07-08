@@ -45,18 +45,22 @@ NSString *const SMSAccessCodeKey = @"access_code";
   return @[getUserResponseDescriptor, createUserResponseDescriptor];
 }
 
++ (NSArray *)requestDescriptors
+{
+  return nil;
+}
+
 
 - (void)fetchUserForDeviceID:(NSString *)deviceId
             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                 failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
-  NSURLRequest *getRequest = [[DFObjectManager sharedManager]
-                              requestWithObject:[[DFUserPeanutResponse alloc] init]
-                              method:RKRequestMethodGET
-                              path:GetUserPath
-                              parameters:@{
-                                           DFDeviceIDParameterKey: deviceId
-                                           }];
+  NSURLRequest *getRequest = [DFObjectManager requestWithObject:[[DFUserPeanutResponse alloc] init]
+                                                         method:RKRequestMethodGET
+                                                           path:GetUserPath
+                                                     parameters:@{
+                                                                  DFDeviceIDParameterKey: deviceId
+                                                                  }];
   
   RKObjectRequestOperation *operation =
   [[DFObjectManager sharedManager]
@@ -100,7 +104,7 @@ NSString *const SMSAccessCodeKey = @"access_code";
              withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                  failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
-  NSURLRequest *createRequest = [[DFObjectManager sharedManager]
+  NSURLRequest *createRequest = [DFObjectManager
                                  requestWithObject:[[DFUserPeanutResponse alloc] init]
                                  method:RKRequestMethodPOST
                                  path:CreateUserPath
@@ -110,6 +114,7 @@ NSString *const SMSAccessCodeKey = @"access_code";
                                               DFUserPeanutPhoneNumberKey: phoneNumberString,
                                               SMSAccessCodeKey: smsAuthString,
                                               }];
+  DDLogInfo(@"%@ getting endpoint: %@", [[self class] description], createRequest.URL.absoluteString);
   
   RKObjectRequestOperation *operation =
   [[DFObjectManager sharedManager]
@@ -119,18 +124,22 @@ NSString *const SMSAccessCodeKey = @"access_code";
      DFUserPeanutResponse *response = [mappingResult firstObject];
      DDLogInfo(@"User create response received.  result:%d", response.result);
      
-     DFUser *result = [[DFUser alloc] init];
+     
      if (response.result) {
+       DFUser *result = [[DFUser alloc] init];
        result.userID = response.user.id;
        result.hardwareDeviceID = response.user.phone_id;
        result.firstName = response.user.first_name;
        result.lastName = response.user.last_name;
      }  else {
-       result = nil;
+       failureBlock([NSError errorWithDomain:@"com.duffyapp.Strand"
+                                        code:-7
+                                    userInfo:@{
+                                               NSLocalizedDescriptionKey: response.debug ?
+                                                 response.debug : @"Could not create account"
+                                               }
+                     ]);
      }
-     
-     successBlock(result);
-     
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {

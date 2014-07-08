@@ -111,6 +111,7 @@ replacementString:(NSString *)string
 {
   NSString *authCode = [self.codeTextField.text stringByReplacingOccurrencesOfString:@" "
                                                                           withString:@""];
+  [self getUserIDWithPhoneNumber:self.phoneNumberString authCode:authCode];
   DDLogInfo(@"User entered auth code: %@", authCode);
 }
 
@@ -140,9 +141,11 @@ replacementString:(NSString *)string
 
 + (UIAlertView *)accountFailedAlert:(NSError *)error
 {
-  return [[UIAlertView alloc] initWithTitle:@"Couldn't Create Account"
-                                    message:[NSString stringWithFormat:@"%@.  Please try again.",
-                                             error.localizedDescription]
+  return [[UIAlertView alloc] initWithTitle:@"Account Creation Failed"
+                                    message:[NSString stringWithFormat:@"%@. %@",
+                                             error.localizedDescription,
+                                             error.localizedRecoverySuggestion ?
+                                             error.localizedRecoverySuggestion : @"Please try again."]
                                    delegate:nil
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];

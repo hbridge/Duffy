@@ -23,7 +23,11 @@
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-        // Custom initialization
+      self.navigationItem.title = @"Register";
+      self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                                initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                                target:self
+                                                action:@selector(phoneNumberDoneButtonPressed:)];
     }
     return self;
 }
@@ -34,10 +38,7 @@
     // Do any additional setup after loading the view from its nib.
   self.phoneNumberField.delegate = self;
   [self.phoneNumberField becomeFirstResponder];
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                            target:self
-                                            action:@selector(phoneNumberDoneButtonPressed:)];
+  
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -89,13 +90,17 @@ replacementString:(NSString *)string
   DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
                                         initWithMessage:@"connecting..."];
   [self presentViewController:msvc animated:YES completion:nil];
+  NSString __block *phoneNumberString = [self.phoneNumberField.text
+                                         stringByReplacingOccurrencesOfString:@"-" withString:@""];
   
   dispatch_after(
                  dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
                  dispatch_get_main_queue(), ^{
                    [msvc dismissViewControllerAnimated:YES completion:nil];
-                   [self.navigationController
-                    pushViewController:[[DFSMSCodeEntryViewController alloc] init] animated:NO];
+                   DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
+                   codeEntryController.phoneNumberString = phoneNumberString;
+                   [self.navigationController pushViewController:codeEntryController
+                                                        animated:NO];
   });
   
 }
