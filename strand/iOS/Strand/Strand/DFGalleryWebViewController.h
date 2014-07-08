@@ -11,11 +11,9 @@
 @interface DFGalleryWebViewController : UIViewController <UIWebViewDelegate, UIPageViewControllerDataSource>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
-@property (strong, nonatomic) UIBarButtonItem *backButtonItem;
-@property (strong, nonatomic) UIBarButtonItem *forwardButtonItem;
-@property (strong, nonatomic) UIBarButtonItem *refreshButtonItem;
-@property (weak, nonatomic) IBOutlet UIButton *cameraButton;
+@property (weak, nonatomic)  UIButton *cameraButton;
+@property (nonatomic, retain) UIRefreshControl *refreshControl;
 
-- (IBAction)cameraButtonPressed:(UIButton *)sender;
+- (void)cameraButtonPressed:(UIButton *)sender;
 
 @end

@@ -42,6 +42,9 @@
 
   // setup webview
   self.webView.delegate = self;
+  self.refreshControl = [[UIRefreshControl alloc] init];
+  [self.refreshControl addTarget:self.webView action:@selector(reload) forControlEvents:UIControlEventValueChanged];
+  [_webView.scrollView addSubview:self.refreshControl]; //<- this is point to use. Add "scrollView" property.
   
   dispatch_async(dispatch_get_main_queue(), ^{
     NSString *urlString = [NSString stringWithFormat:@"%@/strand/viz/neighbors?user_id=%llu",
@@ -76,36 +79,15 @@
 
 - (void)setNavigationButtons
 {
-  if (!(self.navigationItem.leftBarButtonItems.count > 0)) {
-    self.backButtonItem = [[UIBarButtonItem alloc]
-                           initWithImage:[UIImage imageNamed:@"Assets/Icons/BackBarButtonIcon.png"]
-                           style:UIBarButtonItemStylePlain
-                           target:self.webView
-                           action:@selector(goBack)];
-    
-    self.forwardButtonItem = [[UIBarButtonItem alloc]
-                              initWithImage:[UIImage imageNamed:@"Assets/Icons/ForwardBarButtonIcon.png"]
-                              style:UIBarButtonItemStylePlain
-                              target:self.webView
-                              action:@selector(goForward)];
-    self.refreshButtonItem = [[UIBarButtonItem alloc]
-                              initWithImage:[UIImage imageNamed:@"Assets/Icons/RefreshBarButtonIcon.png"]
-                              style:UIBarButtonItemStylePlain
-                              target:self.webView
-                              action:@selector(reload)];
+  if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
     UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
                                      initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
                                      style:UIBarButtonItemStylePlain
                                      target:self
                                      action:@selector(cameraButtonPressed:)];
     
-    self.navigationItem.leftBarButtonItems = @[self.backButtonItem, self.refreshButtonItem];
     self.navigationItem.rightBarButtonItems = @[cameraButton];
   }
-      
-  self.backButtonItem.enabled = self.webView.canGoBack;
-  self.forwardButtonItem.enabled = self.webView.canGoForward;
-  self.refreshButtonItem.enabled = YES;
 }
 
 - (void)webViewDidStartLoad:(UIWebView *)webView
@@ -135,6 +117,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
   [self setNavigationButtons];
+  [self.refreshControl endRefreshing];
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
