@@ -17,6 +17,15 @@ class DuffyJsonEncoder(json.JSONEncoder):
 			
 		return json.JSONEncoder.default(self, obj)
 
+
+"""
+	Hack for now to make a better description message for errors
+"""
+def formatDescription(key, description):
+	if description == "This field is required.":
+		return "%s: %s" % (key, description)
+	return description
+
 """
 	Takes in a dict of the type:
 
@@ -27,9 +36,9 @@ def formatErrors(errors):
 	for key, value in errors.iteritems():
 
 		if isinstance(value, list):
-			a.append({"name": key, "description": value[0]})
+			a.append({"name": key, "description": formatDescription(key, value[0])})
 		else:
-			a.append({"name": key, "description": value})
+			a.append({"name": key, "description": formatDescription(key, value)})
 
 	return a
 
