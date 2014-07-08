@@ -499,7 +499,7 @@ def send_sms_code(request):
 	else:
 		response['result'] = False
 
-		response['invalid_fields'] = api_util.getFormErrors(form)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
