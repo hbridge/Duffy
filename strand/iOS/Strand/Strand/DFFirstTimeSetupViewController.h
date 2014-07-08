@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFFirstTimeSetupViewController : UIViewController
+@interface DFFirstTimeSetupViewController : UIViewController <UITextFieldDelegate>
+
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
+@property (weak, nonatomic) IBOutlet UITextField *phoneNumberField;
 
 @end

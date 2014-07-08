@@ -7,10 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFNetworkAdapter.h"
 
 @class DFUser;
 
-@interface DFUserPeanutAdapter : NSObject
+@interface DFUserPeanutAdapter : NSObject <DFNetworkAdapter>
 
 typedef void (^DFUserFetchSuccessBlock)(DFUser *user);
 typedef void (^DFUserFetchFailureBlock)(NSError *error);
@@ -21,9 +22,10 @@ typedef void (^DFUserFetchFailureBlock)(NSError *error);
 
 - (void)createUserForDeviceID:(NSString *)deviceId
                    deviceName:(NSString *)deviceName
-            withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
-                failureBlock:(DFUserFetchFailureBlock)failureBlock;
-
+                  phoneNumber:(NSString *)phoneNumberString
+                smsAuthString:(NSString *)smsAuthString
+             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
+                 failureBlock:(DFUserFetchFailureBlock)failureBlock;
 
 
 @end

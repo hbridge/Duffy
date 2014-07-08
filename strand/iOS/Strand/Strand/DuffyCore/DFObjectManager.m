@@ -47,8 +47,10 @@ static NSMutableSet *registeredAdapters;
                                 parameters:(NSDictionary *)parameters
 {
   NSMutableDictionary *cumulativeParameters = [[NSMutableDictionary alloc] init];
-  cumulativeParameters[DFUserIDParameterKey] = [NSNumber numberWithUnsignedLongLong:
-                                      [[DFUser currentUser] userID]];
+  if ([[DFUser currentUser] userID]) {
+    cumulativeParameters[DFUserIDParameterKey] = [NSNumber numberWithUnsignedLongLong:
+                                                  [[DFUser currentUser] userID]];
+  }
   [cumulativeParameters addEntriesFromDictionary:parameters];
   
   return [[RKObjectManager sharedManager] requestWithObject:object

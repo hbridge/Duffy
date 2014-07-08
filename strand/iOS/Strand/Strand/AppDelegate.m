@@ -44,11 +44,18 @@
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
   } else {
-    [self startUserIDCheck];
+     [self startUserIDCheck];
     [self showMainView];
-  }
+   }
+  
   
   [self.window makeKeyAndVisible];
+  
+  [self.window.rootViewController
+   presentViewController:[[UINavigationController alloc]
+                          initWithRootViewController:[[DFFirstTimeSetupViewController alloc] init]]
+   animated:NO
+   completion:nil];
   
   if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
     [self application:application didReceiveRemoteNotification:
@@ -97,38 +104,11 @@
   } failureBlock:nil];
 }
 
-- (void)getUserID
-{
-  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
-  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
-                   withSuccessBlock:^(DFUser *user) {
-                     if (user) {
-                       DDLogInfo(@"Got user: %@", user.description);
-                       [[DFUser currentUser] setUserID:user.userID];
-                     } else {
-                       // the request succeeded, but the user doesn't exist, we have to create it
-                       [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
-                                               deviceName:[[DFUser currentUser] deviceName]
-                                         withSuccessBlock:^(DFUser *user) {
-                                           DDLogInfo(@"Created user: %@", user.description);
-                                           [[DFUser currentUser] setUserID:user.userID];
-                                         }
-                                             failureBlock:^(NSError *error) {
-                                               DDLogWarn(@"Create user failed: %@", error.localizedDescription);
-                                             }];
-                     }
-                   } failureBlock:^(NSError *error) {
-                     DDLogWarn(@"Get user failed: %@", error.localizedDescription);
-                   }];
-}
-
 - (BOOL)isAppSetupComplete
 {
   return  ([[DFUser currentUser] userID]
            && ![[DFUser currentUser] userID] == 0);
 }
-
-
 
 - (void)showFirstTimeSetup
 {

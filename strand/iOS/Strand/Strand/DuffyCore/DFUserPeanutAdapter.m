@@ -10,159 +10,139 @@
 #import <RestKit/RestKit.h>
 #import "DFNetworkingConstants.h"
 #import "DFUser.h"
+#import "DFObjectManager.h"
+#import "DFUserPeanutResponse.h"
 
-@interface DFUserInfoFetchResponse : NSObject
-@property (nonatomic, retain) NSString *result;
-@property (nonatomic, retain) DFUser *user;
-@end
-@implementation DFUserInfoFetchResponse
-@end
-
-
-@interface DFUserPeanutAdapter()
-
-@property (readonly, atomic, retain) RKObjectManager* objectManager;
-
-@end
+NSString *const GetUserPath = @"get_user";
+NSString *const CreateUserPath = @"create_user";
+NSString *const DeviceNameKey = @"device_name";
+NSString *const DFUserPeanutPhoneNumberKey = @"phone_number";
+NSString *const SMSAccessCodeKey = @"access_code";
 
 @implementation DFUserPeanutAdapter
 
-@synthesize objectManager = _objectManager;
++ (void)initialize
+{
+  [DFObjectManager registerAdapterClass:[self class]];
+}
 
 
-#pragma mark - Internal Network Fetch Functions
++ (NSArray *)responseDescriptors
+{
+  RKResponseDescriptor *getUserResponseDescriptor =
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFUserPeanutResponse objectMapping]
+                                               method:RKRequestMethodGET
+                                          pathPattern:GetUserPath
+                                              keyPath:nil
+                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+  RKResponseDescriptor *createUserResponseDescriptor =
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFUserPeanutResponse objectMapping]
+                                               method:RKRequestMethodPOST
+                                          pathPattern:CreateUserPath
+                                              keyPath:nil
+                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+  
+  return @[getUserResponseDescriptor, createUserResponseDescriptor];
+}
 
 
 - (void)fetchUserForDeviceID:(NSString *)deviceId
             withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                 failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
-    NSURLRequest *getRequest = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
-                                                                    method:RKRequestMethodGET
-                                                                      path:DFGetUserPath
-                                                                parameters:@{DFDeviceIDParameterKey: deviceId}];
-    
-    RKObjectRequestOperation *operation =
-    [[self objectManager]
-     objectRequestOperationWithRequest:getRequest
-     success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-     {
-         DFUserInfoFetchResponse *response = [mappingResult firstObject];
-         
-         DFUser *result;
-         if ([response.result isEqualToString:@"true"]) {
-             result = response.user;
-         }  else {
-             result = nil;
-         }
-       
-       DDLogInfo(@"User Info response received.  result:%@, User:%@",
-                 response.result,
-                 result.description);
-       
-         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-             successBlock(result);
-         });
+  NSURLRequest *getRequest = [[DFObjectManager sharedManager]
+                              requestWithObject:[[DFUserPeanutResponse alloc] init]
+                              method:RKRequestMethodGET
+                              path:GetUserPath
+                              parameters:@{
+                                           DFDeviceIDParameterKey: deviceId
+                                           }];
+  
+  RKObjectRequestOperation *operation =
+  [[DFObjectManager sharedManager]
+   objectRequestOperationWithRequest:getRequest
+   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+   {
+     DFUserPeanutResponse *response = [mappingResult firstObject];
+     
+     DFUser *result = [[DFUser alloc] init];
+     if (response.result) {
+       result.userID = response.user.id;
+       result.hardwareDeviceID = response.user.phone_id;
+       result.firstName = response.user.first_name;
+       result.lastName = response.user.last_name;
+     }  else {
+       result = nil;
      }
-     failure:^(RKObjectRequestOperation *operation, NSError *error)
-     {
-         DDLogError(@"User Info fetch failed.  Error: %@", error.localizedDescription);
-       if (failureBlock) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-             failureBlock(error);
-         });
-       }
-     }];
-    
-    
-    [[self objectManager] enqueueObjectRequestOperation:operation];
+     
+     DDLogInfo(@"User Info response received.  result:%d, User:%@",
+               response.result,
+               result.description);
+     
+     successBlock(result);
+   }
+   failure:^(RKObjectRequestOperation *operation, NSError *error)
+   {
+     DDLogError(@"User Info fetch failed.  Error: %@", error.localizedDescription);
+     if (failureBlock) {
+       failureBlock(error);
+     }
+   }];
+  
+  
+  [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
 }
 
 - (void)createUserForDeviceID:(NSString *)deviceId
                    deviceName:(NSString *)deviceName
+                  phoneNumber:(NSString *)phoneNumberString
+                smsAuthString:(NSString *)smsAuthString
              withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                  failureBlock:(DFUserFetchFailureBlock)failureBlock
 {
-    NSURLRequest *createRequest = [[self objectManager] requestWithObject:[[DFUserInfoFetchResponse alloc] init]
-                                                                method:RKRequestMethodPOST
-                                                                  path:DFCreateUserPath
-                                                            parameters:@{DFDeviceIDParameterKey: deviceId,
-                                                                         DFDeviceNameParameterKey: deviceName}];
-        
-    RKObjectRequestOperation *operation =
-    [[self objectManager]
-     objectRequestOperationWithRequest:createRequest
-     success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-     {
-         DFUserInfoFetchResponse *response = [mappingResult firstObject];
-         DDLogInfo(@"User create response received.  result:%@", response.result);
-         
-         DFUser *result;
-         if ([response.result isEqualToString:@"true"]) {
-             result = response.user;
-         }  else {
-             result = nil;
-         }
-         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-             successBlock(result);
-         });
+  NSURLRequest *createRequest = [[DFObjectManager sharedManager]
+                                 requestWithObject:[[DFUserPeanutResponse alloc] init]
+                                 method:RKRequestMethodPOST
+                                 path:CreateUserPath
+                                 parameters:@{
+                                              DFDeviceIDParameterKey: deviceId,
+                                              DeviceNameKey: deviceName,
+                                              DFUserPeanutPhoneNumberKey: phoneNumberString,
+                                              SMSAccessCodeKey: smsAuthString,
+                                              }];
+  
+  RKObjectRequestOperation *operation =
+  [[DFObjectManager sharedManager]
+   objectRequestOperationWithRequest:createRequest
+   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+   {
+     DFUserPeanutResponse *response = [mappingResult firstObject];
+     DDLogInfo(@"User create response received.  result:%d", response.result);
+     
+     DFUser *result = [[DFUser alloc] init];
+     if (response.result) {
+       result.userID = response.user.id;
+       result.hardwareDeviceID = response.user.phone_id;
+       result.firstName = response.user.first_name;
+       result.lastName = response.user.last_name;
+     }  else {
+       result = nil;
      }
-     failure:^(RKObjectRequestOperation *operation, NSError *error)
-     {
-         DDLogError(@"User create failed.  Error: %@", error.localizedDescription);
-         dispatch_async(dispatch_get_main_queue(), ^{
-             failureBlock(error);
-         });
-     }];
-    
-    
-    [[self objectManager] enqueueObjectRequestOperation:operation];
+     
+     successBlock(result);
+     
+   }
+   failure:^(RKObjectRequestOperation *operation, NSError *error)
+   {
+     DDLogError(@"User create failed.  Error: %@", error.localizedDescription);
+     failureBlock(error);
+   }];
+  
+  
+  [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
 }
 
 
-
-
-
-#pragma mark - Internal Helper Functions
-
-
-- (RKObjectManager *)objectManager {
-    if (!_objectManager) {
-        NSURL *baseURL = [[DFUser currentUser] apiURL];
-        _objectManager = [RKObjectManager managerWithBaseURL:baseURL];
-        
-        //Aseem format
-        RKObjectMapping *userInfoResponseMapping = [RKObjectMapping mappingForClass:[DFUserInfoFetchResponse class]];
-        [userInfoResponseMapping addAttributeMappingsFromArray:@[@"result"]];
-        
-        RKObjectMapping *userDataMapping = [RKObjectMapping mappingForClass:[DFUser class]];
-        [userDataMapping addAttributeMappingsFromDictionary:@{@"first_name": @"firstName",
-                                                                  @"last_name" : @"lastName",
-                                                                  @"phone_id" : @"hardwareDeviceID",
-                                                                  @"id" : @"userID",
-                                                                  }];
-        
-        [userInfoResponseMapping addPropertyMapping:[RKRelationshipMapping relationshipMappingFromKeyPath:@"user"
-                                                                                                    toKeyPath:@"user"
-                                                                                                  withMapping:userDataMapping]];
-        
-        
-        RKResponseDescriptor *getUserResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:userInfoResponseMapping
-                                                                                                method:RKRequestMethodGET
-                                                                                           pathPattern:DFGetUserPath
-                                                                                               keyPath:nil
-                                                                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-        RKResponseDescriptor *createUserResponseDescriptor = [RKResponseDescriptor responseDescriptorWithMapping:userInfoResponseMapping
-                                                                                                       method:RKRequestMethodPOST
-                                                                                                  pathPattern:DFCreateUserPath
-                                                                                                      keyPath:nil
-                                                                                                  statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-
-        
-        [_objectManager addResponseDescriptorsFromArray:@[getUserResponseDescriptor, createUserResponseDescriptor]];
-    }
-    return _objectManager;
-}
 
 
 @end

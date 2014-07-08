@@ -22,11 +22,6 @@ NSString const *DFServerPortDefault = @"";
 NSString const *DFUserIDParameterKey = @"user_id";
 NSString const *DFDeviceIDParameterKey = @"phone_id";
 
-// User ID constants
-NSString const *DFGetUserPath = @"get_user";
-NSString const *DFCreateUserPath = @"create_user";
-NSString const *DFDeviceNameParameterKey = @"device_name";
-
 
 // Upload quality constants
 CGFloat const IMAGE_UPLOAD_SMALLER_DIMENSION = 569.0;

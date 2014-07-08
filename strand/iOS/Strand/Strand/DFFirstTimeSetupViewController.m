@@ -10,6 +10,8 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "AppDelegate.h"
+#import "DFModalSpinnerViewController.h"
+#import "DFSMSCodeEntryViewController.h"
 
 @interface DFFirstTimeSetupViewController ()
 
@@ -30,41 +32,17 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+  self.phoneNumberField.delegate = self;
+  [self.phoneNumberField becomeFirstResponder];
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                            target:self
+                                            action:@selector(phoneNumberDoneButtonPressed:)];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self getUserID];
-}
-
-- (void)getUserID
-{
-  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
-  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID]
-                   withSuccessBlock:^(DFUser *user) {
-                     if (user) {
-                       [[DFUser currentUser] setUserID:user.userID];
-                       AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-                       [delegate showMainView];
-                     } else {
-                       // the request succeeded, but the user doesn't exist, we have to create it
-                       [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
-                                               deviceName:[[DFUser currentUser] deviceName]
-                                         withSuccessBlock:^(DFUser *user) {
-                                           [[DFUser currentUser] setUserID:user.userID];
-                                           AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-                                           [delegate showMainView];
-                                         }
-                                             failureBlock:^(NSError *error) {
-                                               DDLogWarn(@"Create user failed: %@", error.localizedDescription);
-                                               self.statusLabel.text = [NSString stringWithFormat:@"Create failed: %@", error.localizedDescription];
-                                             }];
-                     }
-                   } failureBlock:^(NSError *error) {
-                     DDLogWarn(@"Get user failed: %@", error.localizedDescription);
-                     self.statusLabel.text = [NSString stringWithFormat:@"Get failed: %@", error.localizedDescription];
-                   }];
 }
 
 - (void)didReceiveMemoryWarning
@@ -72,5 +50,58 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+
+
+- (BOOL)textField:(UITextField *)textField
+shouldChangeCharactersInRange:(NSRange)range
+replacementString:(NSString *)string
+{
+  // dash after 3 numbers
+  if (range.location == 2 && ![string isEqualToString:@""]) {
+    textField.text = [textField.text stringByAppendingString:[NSString stringWithFormat:@"%@-", string]];
+    return  NO;
+  } else if (range.location == 3 && [string isEqualToString:@""]) {
+    textField.text = [textField.text substringToIndex:2];
+    return NO;
+  }
+  
+  // dash after 6 numbers
+  if (range.location == 6 && ![string isEqualToString:@""]) {
+    textField.text = [textField.text stringByAppendingString:[NSString stringWithFormat:@"%@-", string]];
+    return NO;
+  } else if (range.location == 7 && [string isEqualToString:@""]) {
+    textField.text = [textField.text substringToIndex:6];
+    return NO;
+  }
+  
+  // max length
+  if ([[textField.text stringByReplacingCharactersInRange:range withString:string] length] > 12) {
+    return NO;
+  }
+  
+  return YES;
+}
+
+
+- (void)phoneNumberDoneButtonPressed:(id)sender
+{
+  DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
+                                        initWithMessage:@"connecting..."];
+  [self presentViewController:msvc animated:YES completion:nil];
+  
+  dispatch_after(
+                 dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)),
+                 dispatch_get_main_queue(), ^{
+                   [msvc dismissViewControllerAnimated:YES completion:nil];
+                   [self.navigationController
+                    pushViewController:[[DFSMSCodeEntryViewController alloc] init] animated:NO];
+  });
+  
+}
+
+
+
+
 
 @end
