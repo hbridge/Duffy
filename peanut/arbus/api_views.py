@@ -374,12 +374,12 @@ def search(request):
 		else:
 			response['retry_suggestions'] = suggestions_util.getTopCombos(user_id)
 		response['result'] = True
-		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
-		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
 """

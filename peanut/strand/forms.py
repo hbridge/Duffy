@@ -34,5 +34,5 @@ class SendSmsCodeForm(forms.Form):
 
 class AuthPhoneForm(forms.Form):
 	phone_number = PhoneNumberField()
-	access_code = forms.IntegerField(min_value=1000, max_value=9999)
+	sms_access_code = forms.IntegerField(min_value=1000, max_value=9999)
 	display_name = forms.CharField(min_length=1, max_length=100)

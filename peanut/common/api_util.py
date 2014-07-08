@@ -3,14 +3,18 @@ import datetime
 import time
 
 from django.http import HttpResponse
+from phonenumber_field.phonenumber import PhoneNumber
 
 from common.models import Photo
 
-class TimeEnabledEncoder(json.JSONEncoder):
+class DuffyJsonEncoder(json.JSONEncoder):
 	def default(self, obj):
 		if isinstance(obj, datetime.datetime):
 			return int(time.mktime(obj.timetuple()))
 
+		if isinstance(obj, PhoneNumber):
+			return str(obj)
+			
 		return json.JSONEncoder.default(self, obj)
 		
 def getPhotoObject(entry):

@@ -4,6 +4,7 @@ import datetime
 
 from django.contrib.gis.db import models
 from phonenumber_field.modelfields import PhoneNumberField
+from uuidfield import UUIDField
 
 from peanut.settings import constants
 
@@ -14,9 +15,11 @@ from ios_notifications.models import Notification
 
 # Create your models here.
 class User(models.Model):
+	uuid = UUIDField(auto=True)
 	display_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100)
 	phone_number = PhoneNumberField(null=True)
+	auth_token = models.CharField(max_length=100)
 	product_id = models.IntegerField(default=0)
 	device_token = models.TextField()
 	last_location_point = models.PointField(null=True)
@@ -36,7 +39,10 @@ class User(models.Model):
 		So:  /home/blah/1/
 	"""
 	def getUserDataPath(self):
-		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.id))
+		if self.uuid:
+			return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.uuid))
+		else:
+			return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.id))
 
 	@classmethod
 	def getIds(cls, objs):
@@ -285,7 +291,7 @@ class NotificationLog(models.Model):
 class SmsAuth(models.Model):
 	phone_number =  models.CharField(max_length=50, db_index=True)
 	access_code = models.IntegerField()
-	user_id_created = models.ForeignKey(User, null=True)
+	user_created = models.ForeignKey(User, null=True)
 	added = models.DateTimeField(auto_now_add=True)
 
 	class Meta:

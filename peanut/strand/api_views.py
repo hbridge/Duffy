@@ -1,6 +1,7 @@
 import time
 import json
 import datetime
+import os
 import pytz
 import random
 import logging
@@ -184,7 +185,7 @@ def neighbors(request):
 	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 	response['objects'] = objects
 	response['next_start_date_time'] = lastDate
-	return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 	Sees what strands the user would join if they took a picture at the given startTime (defaults to now)
@@ -227,7 +228,7 @@ def get_joinable_strands(request):
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
 
-		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
@@ -256,7 +257,7 @@ def get_new_photos(request):
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
 
-		return HttpResponse(json.dumps(response, cls=api_util.TimeEnabledEncoder), content_type="application/json")
+		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
@@ -475,6 +476,12 @@ def send_sms_test(request):
 	notifications_util.sendSMS(phone, bodytext)
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+"""
+	Sends SMS code to the given phone number.
+
+	Right now theres no SPAM protection for numbers.  Can be added by looking at the last time
+	a code was sent to a number
+"""
 def send_sms_code(request):
 	response = dict({'result': True})
 
@@ -494,43 +501,91 @@ def send_sms_code(request):
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+"""
+	Helper Method for auth_phone
+
+	Strand specific code for creating a user.  If a user already exists, this will
+	archive the old one by changing the phone number to an archive format (2352+15555555555)
+
+	This also updates the SmsAuth object to point to this user
+
+	Lastly, this creates the local directory
+
+	TODO(Derek):  If we create users in more places, might want to move this
+"""
+def createUser(phoneNumber, displayName, smsAuth):
+	try:
+		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
+		
+		# User exists, so need to archive
+		# To do that, re-do the phone number, adding in an archive code
+		archiveCode = random.randrange(1000, 10000)
+		
+		user.phone_number = "%s%s" %(archiveCode, phoneNumber)
+		user.save()
+	except User.DoesNotExist:
+		pass
+
+	# TODO(Derek): Make this more interesting when we add auth to the APIs
+	authToken = random.randrange(10000, 10000000)
+
+	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, product_id = 1, auth_token = str(authToken))
+
+	smsAuth.user_created = user
+	smsAuth.save()
+
+	# Create directory for photos
+	# TODO(Derek): Might want to move to a more common location if more places that we create users
+	try:
+		userBasePath = user.getUserDataPath()
+		os.stat(userBasePath)
+	except:
+		os.mkdir(userBasePath)
+		os.chmod(userBasePath, 0775)
+
+	return user
+
+"""
+	Call to authorize a phone with an sms code.  The SMS code should have been sent with send_sms_code
+	above already.
+
+	This then takes in the display_name and creates a user account
+"""
 def auth_phone(request):
-	response = dict({'result': True})
+	response = dict({'result': True, 'errors': dict()})
 	form = AuthPhoneForm(request.GET)
 
 	timeWithinMinutes = 10
 
 	if (form.is_valid()):
-		phoneNumber = form.cleaned_data['phone_number']
-		accessCode = form.cleaned_data['access_code']
+		phoneNumber = str(form.cleaned_data['phone_number'])
+		accessCode = form.cleaned_data['sms_access_code']
 		displayName = form.cleaned_data['display_name']
 
 		timeWithin = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=timeWithinMinutes)
 
-		smsAuth = SmsAuth.objects.filter(phone_number=phoneNumber, access_code=accessCode, added__gt=timeWithin)
+		smsAuth = SmsAuth.objects.filter(phone_number=phoneNumber, access_code=accessCode)
 
-		if len(smsAuth) == 1:
-			response['auth_valid'] = True
-
-			try:
-				user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
-				
-				archiveCode = random.randrange(1000, 10000)
-				# User exists, so need to archive
-
-				user.phone_number = str(archiveCode) + phoneNumber
-				user.save()
-			except User.DoesNotExist:
-				pass
-
-			user = User.create(phone_number = phoneNumber, display_name = displayName, product_id = 1)
+		if len(smsAuth) == 0 or len(smsAuth) > 1:
+			response['result'] = False
+			response['errors']['access_code'] = "Invalid code"
+		elif smsAuth[0].user_created:
+			response['result'] = False
+			response['errors']['access_code'] = "Code already used"
+		elif smsAuth[0].added < timeWithin:
+			response['result'] = False
+			response['errors']['access_code'] = "Code timed out"
 		else:
-			response['auth_valid'] = False
+			user = createUser(phoneNumber, displayName, smsAuth[0])
+			response['phone_number'] = user.phone_number
+			response['id'] = user.id
+			response['auth_token'] = user.auth_token
+
 	else:
 		response['result'] = False
 		response['errors'] = json.dumps(form.errors)
 
-	return HttpResponse(json.dumps(response), content_type="application/json")
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):
