@@ -48,7 +48,6 @@
     [self showMainView];
    }
   
-  
   [self.window makeKeyAndVisible];
   
   if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {

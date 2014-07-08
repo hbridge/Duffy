@@ -1,5 +1,11 @@
 # Strand
 
+## Jul 8th, 2014
+
+- Sign up with your phone number with SMS 
+- Pull to refresh the gallery, but back to webview for now
+- Settings view where you can report issues etc
+
 ## Jul 4th, 2014
 
 ### New
