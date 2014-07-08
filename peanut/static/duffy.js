@@ -22,7 +22,7 @@ function addPhoto(photo, userList, photoType, photosLength){
 		fullUrl = "/user_data/" + photo.user_id + "/" + photo.id+ ".jpg";
 		if (userList) {
 			if (getURLParameter("user_id") != photo.user_id) {
-				userList.push(photo.first_name);
+				userList.push(photo.display_name);
 			}
 		}
 	}
@@ -32,8 +32,8 @@ function addPhoto(photo, userList, photoType, photosLength){
 	if (!photosLength) {
 		var photosLength = 1;
 	}
-	if (photo.first_name) {
-		title = cleanName(photo.first_name);
+	if (photo.display_name) {
+		title = cleanName(photo.display_name);
 	}
 	else {
 		title = photo.dist;

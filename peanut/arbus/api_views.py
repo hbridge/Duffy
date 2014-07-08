@@ -502,7 +502,7 @@ Helper functions
 	This could be located else where
 """
 def createUser(phoneId, firstName, productId):
-	user = User(first_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
+	user = User(display_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
 	user.save()
 
 	userId = str(user.id)

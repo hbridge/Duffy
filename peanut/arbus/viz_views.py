@@ -98,13 +98,13 @@ def userbaseSummary(request):
 			entry['faces'] = dbQuery.exclude(faces_data=None).count()*100/totalCount
 			entry['internal'] = False
 
-			if (user.added == None or len(user.first_name) == 0):
+			if (user.added == None or len(user.display_name) == 0):
 				entry['internal'] = True
 			else:
 				for phoneid in knownPhoneIds:
 					if ((phoneid.lower() in user.phone_id.lower()) or 
-						('iphone simulator'.lower() in user.first_name.lower()) or
-						('ipad simulator'.lower() in user.first_name.lower())):
+						('iphone simulator'.lower() in user.display_name.lower()) or
+						('ipad simulator'.lower() in user.display_name.lower())):
 						entry['internal'] = True
 						break
 		arbusList.append(entry)
@@ -159,13 +159,13 @@ def userbaseSummary(request):
 
 		entry['internal'] = False
 
-		if (len(user.first_name) == 0):
+		if (len(user.display_name) == 0):
 			entry['internal'] = True
 		else:
 			for phoneid in knownPhoneIds:
 				if ((phoneid.lower() in user.phone_id.lower()) or 
-					('iphone simulator'.lower() in user.first_name.lower()) or
-					('ipad simulator'.lower() in user.first_name.lower())):
+					('iphone simulator'.lower() in user.display_name.lower()) or
+					('ipad simulator'.lower() in user.display_name.lower())):
 					entry['internal'] = True
 					break
 		strandList.append(entry)

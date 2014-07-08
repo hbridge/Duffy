@@ -3,6 +3,7 @@ import json
 import datetime
 
 from django.contrib.gis.db import models
+from phonenumber_field.modelfields import PhoneNumberField
 
 from peanut.settings import constants
 
@@ -13,9 +14,9 @@ from ios_notifications.models import Notification
 
 # Create your models here.
 class User(models.Model):
-	first_name = models.CharField(max_length=100, null=True)
-	last_name = models.CharField(max_length=100, null=True)
+	display_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100)
+	phone_number = PhoneNumberField(null=True)
 	product_id = models.IntegerField(default=0)
 	device_token = models.TextField()
 	last_location_point = models.PointField(null=True)
@@ -25,7 +26,7 @@ class User(models.Model):
 
 	class Meta:
 		db_table = 'photos_user'
-		unique_together = ("phone_id", "product_id")
+		unique_together = (("phone_id", "product_id"), ("phone_number", "product_id"))
 
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
@@ -51,7 +52,7 @@ class User(models.Model):
 		else:
 			productStr = "Strand"
 			
-		return "(%s - %s) %s - %s" % (self.id, productStr, self.first_name, self.phone_id)
+		return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)
 
 
 class Photo(models.Model):
@@ -206,7 +207,7 @@ class SimplePhoto:
 	id = None
 	time_taken = None
 	user_id = None
-	first_name = None
+	display_name = None
 
 	def serialize(self):
 		return {key:value for key, value in self.__dict__.items() if not key.startswith('__') and not callable(key)}
@@ -222,7 +223,7 @@ class SimplePhoto:
 			self.id = solrOrDbPhoto.id
 			self.time_taken = solrOrDbPhoto.time_taken
 			self.user_id = solrOrDbPhoto.user_id
-			self.first_name = solrOrDbPhoto.user.first_name
+			self.display_name = solrOrDbPhoto.user.display_name
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)
@@ -280,4 +281,16 @@ class NotificationLog(models.Model):
 
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.user_id, self.id, self.device_token, self.apns)
+
+class SmsAuth(models.Model):
+	phone_number =  models.CharField(max_length=50, db_index=True)
+	access_code = models.IntegerField()
+	user_id_created = models.ForeignKey(User, null=True)
+	added = models.DateTimeField(auto_now_add=True)
+
+	class Meta:
+		db_table = 'strand_sms_auth'
+
+	def __unicode__(self):
+		return "%s %s %s" % (self.id, self.phone_number, self.added)
 

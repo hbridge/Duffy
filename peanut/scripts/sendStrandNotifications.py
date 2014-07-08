@@ -54,13 +54,13 @@ def sendNewPhotosNotification(neighbors, notificationLogs):
 		for neighbor in neighbors:
 			if (neighbor.user_1.id not in lastNotificationTimes and 
 				neighbor.photo_1.time_taken < neighbor.photo_2.time_taken):
-					msg = cleanName(neighbor.user_2.first_name) + " added new photos!"
+					msg = cleanName(neighbor.user_2.display_name) + " added new photos!"
 					logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_1_id))						
 					notifications_util.sendNotification(neighbor.user_1, msg, msgType, customPayload)
 					lastNotificationTimes[neighbor.user_1_id] = datetime.datetime.utcnow()
 			if (neighbor.user_2.id not in lastNotificationTimes and 
 				neighbor.photo_2.time_taken < neighbor.photo_1.time_taken):
-					msg = cleanName(neighbor.user_1.first_name) + " added new photos!"
+					msg = cleanName(neighbor.user_1.display_name) + " added new photos!"
 					notifications_util.sendNotification(neighbor.user_2, msg, msgType, customPayload)
 					logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_2_id))
 					lastNotificationTimes[neighbor.user_2_id] = datetime.datetime.utcnow()
@@ -105,7 +105,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			#   the current user, then lets tell them to join up!
 			# Otherwise, we want to skip it since we want to sent the new photo notification
 			if photo.neighbored_time and not hasNeighboredPhotoWithPhoto(user, photo, neighbors):
-				names.append(cleanName(photo.user.first_name))
+				names.append(cleanName(photo.user.display_name))
 
 		# Grab unique names
 		names = set(names)
@@ -113,7 +113,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 		if len(names) > 0:
 			msg = " & ".join(names) + " took a photo near you! Take a photo to see it."
 
-			logger.debug("Sending %s to %s" % (msg, user.first_name))
+			logger.debug("Sending %s to %s" % (msg, user.display_name))
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
 				
 

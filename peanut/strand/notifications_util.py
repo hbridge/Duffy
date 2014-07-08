@@ -19,6 +19,10 @@ def sendNotification(user, msg, msgType, customPayload=None):
 		apns.push_notification_to_devices(notification, [device])
 		NotificationLog.objects.create(user=user, device_token=device.token, msg=(msg+' ' + json.dumps(customPayload)), apns=apns.id, msg_type=msgType)
 
-def sendSMS(phone, msg):
+def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
-	twilioclient.sms.messages.create(to="+1" + phone, from_=constants.TWILIO_PHONE_NUM, body=msg)
+
+	if not phoneNumber.startswith('+'):
+		phoneNumber = "+1" + phoneNumber
+		
+	twilioclient.sms.messages.create(to=phoneNumber, from_=constants.TWILIO_PHONE_NUM, body=msg)

@@ -86,7 +86,7 @@
 	{% for entry in arbusList %}
 		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
 			<td class='userid b-r'> {{ entry.user.id }} </td>
-			<td class='name b-r'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
+			<td class='name b-r'> {{ entry.user.display_name}}</td>
 			<td class='phoneid b-r' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
 			<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 			<td class='db-count right b-r'> {{ entry.dbCount }} </td>
@@ -123,7 +123,7 @@
 	{% for entry in strandList %}
 		<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
 			<td class='userid b-r'> {{ entry.user.id }} </td>
-			<td class='name b-r'> {{ entry.user.first_name}} {{ entry.user.last_name }} </td>
+			<td class='name b-r'> {{ entry.user.display_name}}</td>
 			<td class='phoneid b-r' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
 			<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 			<td class='db-count right b-r'> {{ entry.dbCount }} </td>
@@ -153,16 +153,16 @@
 $(document).ready(function() {
   $("td.timeago").timeago();
   $("td.percent").each(function(){
-  	if ($.trim($(this).text()) != '100') {
-  		$(this).addClass("red");
-  	}
+	if ($.trim($(this).text()) != '100') {
+		$(this).addClass("red");
+	}
   });
   $('td.timeago').each(function(){
-  	if ($(this).html().search('minute') > -1 || 
-  		$(this).html().search('hour') > -1 ||
-  		$(this).html().search('now') > -1){
-  		$(this).addClass('recent');
-  	}
+	if ($(this).html().search('minute') > -1 || 
+		$(this).html().search('hour') > -1 ||
+		$(this).html().search('now') > -1){
+		$(this).addClass('recent');
+	}
   });
 });
 </script>

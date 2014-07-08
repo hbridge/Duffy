@@ -2,6 +2,7 @@ import time
 import json
 import datetime
 import pytz
+import random
 import logging
 
 from django.http import HttpResponse
@@ -10,12 +11,12 @@ from django.contrib.gis.geos import Point, fromstr
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor
+from common.models import Photo, User, Neighbor, SmsAuth
 
 from common import api_util, cluster_util
 
 from strand import geo_util, notifications_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -394,7 +395,7 @@ def get_nearby_friends_message(request):
 		elif len(photoUsers) > 0:
 			names = list()
 			for user in photoUsers:
-				names.append(cleanName(user.first_name))
+				names.append(cleanName(user.display_name))
 			names = set(names)
 		
 			if len(names) > 0:
@@ -472,6 +473,63 @@ def send_sms_test(request):
 		bodytext = "Test msg from Strand/send_sms_test"
 	
 	notifications_util.sendSMS(phone, bodytext)
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
+def send_sms_code(request):
+	response = dict({'result': True})
+
+	form = SendSmsCodeForm(request.GET)
+	if (form.is_valid()):
+		phoneNumber = str(form.cleaned_data['phone_number'])
+
+		accessCode = random.randrange(1000, 10000)
+
+		msg = "Your Strand code is:  %s" % (accessCode)
+	
+		notifications_util.sendSMS(phoneNumber, msg)
+		SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+	
+	return HttpResponse(json.dumps(response), content_type="application/json")
+
+def auth_phone(request):
+	response = dict({'result': True})
+	form = AuthPhoneForm(request.GET)
+
+	timeWithinMinutes = 10
+
+	if (form.is_valid()):
+		phoneNumber = form.cleaned_data['phone_number']
+		accessCode = form.cleaned_data['access_code']
+		displayName = form.cleaned_data['display_name']
+
+		timeWithin = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=timeWithinMinutes)
+
+		smsAuth = SmsAuth.objects.filter(phone_number=phoneNumber, access_code=accessCode, added__gt=timeWithin)
+
+		if len(smsAuth) == 1:
+			response['auth_valid'] = True
+
+			try:
+				user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
+				
+				archiveCode = random.randrange(1000, 10000)
+				# User exists, so need to archive
+
+				user.phone_number = str(archiveCode) + phoneNumber
+				user.save()
+			except User.DoesNotExist:
+				pass
+
+			user = User.create(phone_number = phoneNumber, display_name = displayName, product_id = 1)
+		else:
+			response['auth_valid'] = False
+	else:
+		response['result'] = False
+		response['errors'] = json.dumps(form.errors)
+
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
 # TODO(Derek): move to a common loc, used in sendStrandNotifications

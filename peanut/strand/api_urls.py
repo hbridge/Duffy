@@ -20,6 +20,9 @@ urlpatterns = patterns('',
 	url(r'^update_user_location', 'strand.api_views.update_user_location'),
 	url(r'^get_nearby_friends_message', 'strand.api_views.get_nearby_friends_message'),
 
+	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
+	url(r'^auth_phone', 'strand.api_views.auth_phone'),
+
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
 	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),	
