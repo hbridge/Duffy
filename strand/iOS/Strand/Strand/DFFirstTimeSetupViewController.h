@@ -12,5 +12,7 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UITextField *phoneNumberField;
+@property (nonatomic, retain) UIBarButtonItem *doneBarButtonItem;
+- (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender;
 
 @end

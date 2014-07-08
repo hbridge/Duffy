@@ -12,6 +12,9 @@
 #import "AppDelegate.h"
 #import "DFModalSpinnerViewController.h"
 #import "DFSMSCodeEntryViewController.h"
+#import "NSString+DFHelpers.h"
+
+UInt16 const DFPhoneNumberLength = 10;
 
 @interface DFFirstTimeSetupViewController ()
 
@@ -24,10 +27,13 @@
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
       self.navigationItem.title = @"Phone Number";
-      self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                                initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                                target:self
-                                                action:@selector(phoneNumberDoneButtonPressed:)];
+      self.doneBarButtonItem = [[UIBarButtonItem alloc]
+                                initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                target:self
+                                action:@selector(phoneNumberDoneButtonPressed:)];
+      self.doneBarButtonItem.enabled = NO;
+      self.navigationItem.rightBarButtonItem = self.doneBarButtonItem;
+      
     }
     return self;
 }
@@ -38,6 +44,7 @@
     // Do any additional setup after loading the view from its nib.
   self.phoneNumberField.delegate = self;
   [self.phoneNumberField becomeFirstResponder];
+  //  [self.phoneNumberField addTarget:self action:@se forControlEvents:<#(UIControlEvents)#>
   
 }
 
@@ -85,8 +92,20 @@ replacementString:(NSString *)string
 }
 
 
+- (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender {
+  if (sender.text.length > 0) {
+    self.doneBarButtonItem.enabled = YES;
+  } else {
+    self.doneBarButtonItem.enabled = NO;
+  }
+}
+
 - (void)phoneNumberDoneButtonPressed:(id)sender
 {
+  if (![self isCurrentPhoneNumberValid]) {
+    [self showInvalidNumberAlert:[self enteredPhoneNumber]];
+    return;
+  }
   DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
                                         initWithMessage:@"connecting..."];
   [self presentViewController:msvc animated:YES completion:nil];
@@ -105,6 +124,44 @@ replacementString:(NSString *)string
   
 }
 
+
+- (NSString *)enteredPhoneNumber
+{
+  NSMutableString *mutableCode = self.phoneNumberField.text.mutableCopy;
+  [mutableCode replaceOccurrencesOfString:@"-" withString:@"" options:0 range:mutableCode.fullRange];
+  return mutableCode;
+}
+
+
+- (BOOL)isCurrentPhoneNumberValid
+{
+  NSError *error;
+  NSRegularExpression *regex = [[NSRegularExpression alloc]
+                                initWithPattern:[NSString stringWithFormat:@"\\d{%d}",DFPhoneNumberLength]
+                                options:0
+                                error:&error];
+  if (error) {
+    [NSException raise:@"Invalid Regex" format:@"Error: %@", error.description];
+  }
+  
+  return [regex numberOfMatchesInString:[self enteredPhoneNumber]
+                                options:0
+                                  range:(NSRange){0, [[self enteredPhoneNumber] length]}
+          ] == 1;
+}
+
+- (void)showInvalidNumberAlert:(NSString *)phoneNumber
+{
+  UIAlertView *alert = [[UIAlertView alloc]
+                        initWithTitle:@"Invalid Phone Number"
+                        message:[NSString stringWithFormat:@"%@ is not a valid phone number."
+                                 " Please enter your %d digit mobile phone number.",
+                                 phoneNumber, DFPhoneNumberLength]
+                        delegate:nil
+                        cancelButtonTitle:@"OK"
+                        otherButtonTitles:nil];
+  [alert show];
+}
 
 
 

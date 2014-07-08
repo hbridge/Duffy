@@ -156,8 +156,8 @@ replacementString:(NSString *)string
 {
   UIAlertView *alert = [[UIAlertView alloc]
                         initWithTitle:@"Invalid Code"
-                        message:[NSString stringWithFormat:@"%@ is an invalid code."
-                                 " Please enter the %d digit code you were sent "
+                        message:[NSString stringWithFormat:@"'%@' is an invalid code."
+                                 " Please enter the %d digit code you were sent"
                                  " or press back to request a new one.", code, DFCodeLength]
                         delegate:nil
                         cancelButtonTitle:@"OK"
