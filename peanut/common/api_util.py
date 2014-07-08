@@ -20,7 +20,7 @@ class DuffyJsonEncoder(json.JSONEncoder):
 def getFormErrors(form):
 	errors = list()
 	for key, value in form.errors.iteritems():
-		errors.append({"field": key, "description": value})
+		errors.append({"name": key, "descriptions": value})
 
 	return json.dumps(form.errors, cls=DuffyJsonEncoder)
 
