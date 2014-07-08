@@ -554,6 +554,7 @@ def createUser(phoneNumber, displayName, smsAuth):
 
 	This then takes in the display_name and creates a user account
 """
+@csrf_exempt
 def auth_phone(request):
 	response = dict({'result': True, 'errors': dict()})
 	form = AuthPhoneForm(request.GET)
