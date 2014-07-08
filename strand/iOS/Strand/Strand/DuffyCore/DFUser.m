@@ -161,7 +161,7 @@ static DFUser *currentUser;
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"{\n id: %llu\n deviceID: %@, firstName: %@\n lastName: %@\n authToken:%@\n } ",
+  return [NSString stringWithFormat:@"{\n id: %llu\n deviceID: %@ \n firstName: %@\n lastName: %@\n authToken:%@\n } ",
           self.userID, self.deviceID, self.firstName, self.lastName, self.authToken];
 }
 
