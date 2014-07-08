@@ -129,6 +129,7 @@ replacementString:(NSString *)string
 {
   NSMutableString *mutableCode = self.phoneNumberField.text.mutableCopy;
   [mutableCode replaceOccurrencesOfString:@"-" withString:@"" options:0 range:mutableCode.fullRange];
+  [mutableCode insertString:@"+1" atIndex:0];
   return mutableCode;
 }
 
