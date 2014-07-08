@@ -245,8 +245,10 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)settingsButtonPressed:(UIButton *)sender
 {
   DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
-  [self.navigationController pushViewController:settingsViewController
-                                       animated:YES];
+  [self presentViewController:[[UINavigationController alloc]
+                               initWithRootViewController:settingsViewController]
+                     animated:YES
+                   completion:nil];
 }
 
 

@@ -26,6 +26,10 @@
   self = [super initWithStyle:UITableViewStyleGrouped];
   if (self) {
     self.settings = [[DFSettings alloc] init];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                             target:self
+                                             action:@selector(closeButtonPressed:)];
   }
   return self;
 }
@@ -84,6 +88,9 @@
   // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - Table view data source
+- (void)closeButtonPressed:(UIBarButtonItem *)sender
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 @end
