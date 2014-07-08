@@ -27,9 +27,9 @@ def formatErrors(errors):
 	for key, value in errors.iteritems():
 
 		if isinstance(value, list):
-			a.append({"name": key, "decription": value[0]})
+			a.append({"name": key, "description": value[0]})
 		else:
-			a.append({"name": key, "decription": value})
+			a.append({"name": key, "description": value})
 
 	return json.dumps(a, cls=DuffyJsonEncoder)
 
