@@ -59,6 +59,8 @@ static DFUser *currentUser;
   currentUser = user;
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:user];
   [[NSUserDefaults standardUserDefaults] setObject:data forKey:userObjectDefaultsKey];
+  // sync so we can be sure the user doesn't have to auth again if we crash etc
+  [[NSUserDefaults standardUserDefaults] synchronize];
 }
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder
