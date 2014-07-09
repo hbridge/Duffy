@@ -34,6 +34,8 @@
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
 		5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344C196340A0003D7546 /* DFPhotoResizer.m */; };
 		5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A40344E19646BC6003D7546 /* AudioToolbox.framework */; };
+		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
+		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
@@ -169,6 +171,10 @@
 		5A40344B196340A0003D7546 /* DFPhotoResizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoResizer.h; sourceTree = "<group>"; };
 		5A40344C196340A0003D7546 /* DFPhotoResizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoResizer.m; sourceTree = "<group>"; };
 		5A40344E19646BC6003D7546 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
+		5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsAdapter.m; sourceTree = "<group>"; };
+		5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutMessageResponse.h; sourceTree = "<group>"; };
+		5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutMessageResponse.m; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -662,6 +668,10 @@
 				5AA45284196706A60099CBD2 /* DFPeanutGalleryAdapter.m */,
 				5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */,
 				5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */,
+				5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */,
+				5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */,
+				5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */,
+				5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */,
 			);
 			name = "Network Adapters";
 			sourceTree = "<group>";
@@ -989,6 +999,8 @@
 				5A3172C8196B616E00CA7693 /* DFUserPeanutResponse.m in Sources */,
 				5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */,
 				5AA45295196708D00099CBD2 /* DFPhotosGridViewController.m in Sources */,
+				5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */,
+				5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */,
 				5AA452A6196739900099CBD2 /* DFPhotoFeedController.m in Sources */,
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
