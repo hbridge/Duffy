@@ -6,6 +6,10 @@
 - Pull to refresh the gallery, but back to webview for now
 - Settings view where you can report issues etc
 
+### Bugs fixed
+
+- Fixed another location bug
+
 ## Jul 4th, 2014
 
 ### New
