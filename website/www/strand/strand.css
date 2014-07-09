@@ -9,6 +9,12 @@ body {
 .ui-top-summary {
 	padding: 0px 0px 20px 0px;
 }
+.ui-content {
+
+}
 .ui-footer {
 	padding: 10px 0px 10px 0px;
+}
+.ui-indent {
+	padding-left: 40px;
 }
