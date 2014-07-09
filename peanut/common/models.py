@@ -64,6 +64,7 @@ class User(models.Model):
 			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_number)			
 
 class Photo(models.Model):
+	uuid = UUIDField(auto=True)
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
