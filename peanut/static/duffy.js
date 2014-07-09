@@ -16,10 +16,11 @@ function addPhoto(photo, userList, photoType, photosLength){
 	// photoType = 2: clusterBottom
 	// photoType = 3: docStackTop
 	if (photo) {
-		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + ".jpg";
-		img = "<img class='l' width='320px' src='" + thumbUrl + "'/>";
-		//fullUrl = "/strand/viz/images?user_id=" + photo.user_id + "&photo_id=" + photo.id;
+		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
 		fullUrl = "/user_data/" + photo.user_id + "/" + photo.id+ ".jpg";
+		onErrorStr='this.onerror=null;this.src="' + thumbUrl +'";';
+		img = "<img class='l' width='320px' onError='" + onErrorStr + "' src='" + fullUrl + "'/>";
+
 		if (userList) {
 			if (getURLParameter("user_id") != photo.user_id) {
 				userList.push(photo.display_name);
