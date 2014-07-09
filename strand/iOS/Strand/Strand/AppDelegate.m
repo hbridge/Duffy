@@ -44,7 +44,6 @@
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
   } else {
-     [self startUserIDCheck];
     [self showMainView];
    }
   
@@ -85,16 +84,6 @@
   [[BITHockeyManager sharedHockeyManager] startManager];
   [[BITHockeyManager sharedHockeyManager].authenticator
    authenticateInstallation];
-}
-- (void)startUserIDCheck
-{
-  DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
-  [userAdapter fetchUserForDeviceID:[[DFUser currentUser] deviceID] withSuccessBlock:^(DFUser *user) {
-    if (!user || user.userID != [[DFUser currentUser] userID]) {
-      DDLogWarn(@"Server uid:%llu, phone uid:%llu.  Requesting reset.", user.userID, [[DFUser currentUser ]userID]);
-      [self resetApplication];
-    }
-  } failureBlock:nil];
 }
 
 - (BOOL)isAppSetupComplete
