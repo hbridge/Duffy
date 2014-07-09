@@ -249,6 +249,7 @@ def getNonNeighboredPhotos(userId, lon, lat):
 
 	# We want to remove any photos that are already neighbored
 	neighboredPhotosIds = Photo.getPhotosIds(neighboredPhotos)
+
 	nonNeighboredPhotos = [item for item in nearbyPhotos if item.id not in neighboredPhotosIds]
 
 	return nonNeighboredPhotos
@@ -285,7 +286,7 @@ def get_joinable_strands(request):
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
@@ -314,7 +315,7 @@ def get_new_photos(request):
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 		return HttpResponse(json.dumps(response), content_type="application/json")
 
 """
@@ -353,7 +354,7 @@ def update_user_location(request):
 
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -398,7 +399,7 @@ def register_apns_token(request):
 		user.save()
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -471,7 +472,7 @@ def get_nearby_friends_message(request):
 		response['result'] = True
 	else:
 		response['result'] = False
-		response['errors'] = json.dumps(form.errors)
+		response['invalid_fields'] = api_util.formatErrors(form.errors)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -551,7 +552,6 @@ def send_sms_code(request):
 		SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
 	else:
 		response['result'] = False
-
 		response['invalid_fields'] = api_util.formatErrors(form.errors)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
