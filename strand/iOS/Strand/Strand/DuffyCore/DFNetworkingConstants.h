@@ -17,6 +17,7 @@ extern NSString *DFServerAPIPath;
 // common parameters
 extern NSString *DFUserIDParameterKey;
 extern NSString *DFDeviceIDParameterKey;
+extern NSString *DFAuthTokenParameterKey;
 
 // Upload quality constants
 extern const CGFloat IMAGE_UPLOAD_SMALLER_DIMENSION;

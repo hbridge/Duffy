@@ -51,6 +51,10 @@ static NSMutableSet *registeredAdapters;
     cumulativeParameters[DFUserIDParameterKey] = [NSNumber numberWithUnsignedLongLong:
                                                   [[DFUser currentUser] userID]];
   }
+  if (([[DFUser currentUser] authToken])) {
+    cumulativeParameters[DFAuthTokenParameterKey] = [[DFUser currentUser] authToken];
+  }
+  
   [cumulativeParameters addEntriesFromDictionary:parameters];
   
   return [[RKObjectManager sharedManager] requestWithObject:object

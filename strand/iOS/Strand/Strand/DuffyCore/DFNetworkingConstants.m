@@ -21,6 +21,7 @@ NSString const *DFServerPortDefault = @"";
 // common parameters
 NSString const *DFUserIDParameterKey = @"user_id";
 NSString const *DFDeviceIDParameterKey = @"phone_id";
+NSString const *DFAuthTokenParameterKey = @"auth_token";
 
 
 // Upload quality constants
