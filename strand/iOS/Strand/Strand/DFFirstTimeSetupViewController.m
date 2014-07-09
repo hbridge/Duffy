@@ -112,10 +112,12 @@ replacementString:(NSString *)string
     [self showInvalidNumberAlert:[self enteredPhoneNumber]];
     return;
   }
+    NSString __block *phoneNumberString = [self enteredPhoneNumber];
   DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
-                                        initWithMessage:@"Validating..."];
+                                        initWithMessage:[NSString stringWithFormat:@"Sending SMS to %@",
+                                                         phoneNumberString]];
   [self presentViewController:msvc animated:YES completion:nil];
-  NSString __block *phoneNumberString = [self enteredPhoneNumber];
+
   
   DFSMSVerificationAdapter *smsAdapter = [[DFSMSVerificationAdapter alloc] init];
   [smsAdapter requestSMSCodeForPhoneNumber:phoneNumberString
