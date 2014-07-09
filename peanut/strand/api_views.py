@@ -196,9 +196,11 @@ def neighbors(request):
 
 	# Now see if there are any non-neighbored photos
 	# These are shown on the web view as Lock symbols
-	nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
-
-	haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
+	if user.last_location_point:
+		nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
+		haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
+	else:
+		haveNonNeighboredPhotos = False
 
 	if nonNeighboredPhotos:
 		sortedGroups.insert(0, nonNeighboredPhotos)
