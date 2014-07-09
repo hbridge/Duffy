@@ -120,6 +120,8 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 
 def main(argv):
 	maxFilesAtTime = 100
+
+	notificationLogTimeWithSeconds = 30
 	
 	logger.info("Starting... ")
 	while True:
@@ -127,7 +129,7 @@ def main(argv):
 		neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTime) | Q(photo_2__time_taken__gt=newPhotosStartTime)).order_by('photo_1')
 		
 		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-		notificationLogs = NotificationLog.objects.select_related().filter(added__gt=datetime.datetime.utcnow()-datetime.timedelta(minutes=60))
+		notificationLogs = NotificationLog.objects.select_related().filter(added__gt=datetime.datetime.utcnow()-datetime.timedelta(seconds=notificationLogTimeWithSeconds))
 		
 		sendNewPhotosNotification(neighbors, notificationLogs)
 		
