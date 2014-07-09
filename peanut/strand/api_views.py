@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction
+from common.models import Photo, User, Neighbor, SmsAuth
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
