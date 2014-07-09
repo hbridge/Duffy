@@ -11,11 +11,9 @@ from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
-from rest_framework.views import APIView
-
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor, SmsAuth
+from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -281,7 +279,7 @@ def get_joinable_strands(request):
 		groups = getGroups([nonNeighboredPhotos])
 		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 
-		response['objects'] = lastDate
+		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
 
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -643,7 +641,7 @@ def auth_phone(request):
 		response['invalid_fields'] = api_util.formatErrors(form.errors)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
+	
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
