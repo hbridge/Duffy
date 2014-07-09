@@ -11,6 +11,8 @@ from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
+from rest_framework.views import APIView
+
 from peanut.settings import constants
 
 from common.models import Photo, User, Neighbor, SmsAuth
@@ -202,7 +204,7 @@ def neighbors(request):
 	else:
 		haveNonNeighboredPhotos = False
 
-	if nonNeighboredPhotos:
+	if haveNonNeighboredPhotos:
 		sortedGroups.insert(0, nonNeighboredPhotos)
 
 	# Now we have to turn into our Duffy JSON, first, convert into the right format
