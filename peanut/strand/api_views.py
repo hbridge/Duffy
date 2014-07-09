@@ -122,7 +122,7 @@ def getNeighboredPhotos(userId, startTime):
 			latestPhotos.append(neighbor.photo_2)
 		elif neighbor.user_2_id == userId and neighbor.photo_1.time_taken > startTime:
 			latestPhotos.append(neighbor.photo_1)
-
+			
 	uniquePhotos = removeDups(latestPhotos, lambda x: x.id)
 
 	return uniquePhotos
@@ -132,7 +132,7 @@ def neighbors(request):
 	data = api_util.getRequestData(request)
 
 	if data.has_key('user_id'):
-		userId = data['user_id']
+		userId = int(data['user_id'])
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
