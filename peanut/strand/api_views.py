@@ -59,8 +59,24 @@ def getBestLocation(photo):
 				else:
 					return photo.location_city
 
+"""
+	This turns a list of list of photos into groups that contain a title and cluster.
 
-def getGroups(groupings, labelRecent = True):
+	We do all the photos at once so we can load up the sims cache once
+
+	Returns format of:
+	[
+		{
+			'title': blah
+			'clusters': clusters
+		},
+		{
+			'title': blah2
+			'clusters': clusters
+		},
+	]
+"""
+def getGroups(groupings):
 	if len(groupings) == 0:
 		return []
 
@@ -74,21 +90,17 @@ def getGroups(groupings, labelRecent = True):
 	# Fetch all the similarities at once so we can process in memory
 	simCaches = cluster_util.getSimCaches(photoIds)
 
-	for i, group in enumerate(groupings):
+	for group in groupings:
 		if len(group) == 0:
 			continue
 			
-		if i == 0 and labelRecent:
-			# If first group, assume this is "Recent"
-			title = "Recent"
-		else:
-			# Grab title from the location_city of a photo...but find the first one that has
-			#   a valid location_city
-			title = None
-			i = 0
-			while (not title) and i < len(group):
-				title = getBestLocation(group[i])
-				i += 1
+		# Grab title from the location_city of a photo...but find the first one that has
+		#   a valid location_city
+		title = None
+		i = 0
+		while (not title) and i < len(group):
+			title = getBestLocation(group[i])
+			i += 1
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, constants.DEFAULT_DUP_THRESHOLD, simCaches)
 
@@ -165,35 +177,89 @@ def neighbors(request):
 		uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
 		sortedGroups.append(uniqueGroup)
 
-	
 	# now sort clusters by the time_taken of the first photo in each cluster
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
 	# Try to find recent photos
 	# If there are no previous groups, then fetch all photos and call them recent
+	# This query isn't executed raw, we add a filter for time_taken if there's any groups
+	# If there aren't any groups then the user probably doesn't have many photos
 	recentPhotos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
 	if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
 		lastPhotoTime = sortedGroups[0][0].time_taken
 		recentPhotos = recentPhotos.filter(time_taken__gt=lastPhotoTime)
 
 	haveRecentPhotos = len(recentPhotos) > 0
-	
-	if (haveRecentPhotos):
+
+	if haveRecentPhotos:
 		sortedGroups.insert(0, recentPhotos)
 
-	# Now we have to turn into our Duffy JSON, first, convert into the right format
+	# Now see if there are any non-neighbored photos
+	# These are shown on the web view as Lock symbols
+	nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
 
-	groups = getGroups(sortedGroups, labelRecent = haveRecentPhotos)
+	haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
+
+	if nonNeighboredPhotos:
+		sortedGroups.insert(0, nonNeighboredPhotos)
+
+	# Now we have to turn into our Duffy JSON, first, convert into the right format
+	groups = getGroups(sortedGroups)
+
+	# Now we need to update the titles for the groups before we turn it into sections
+	if haveRecentPhotos and haveNonNeighboredPhotos:
+		groups[0]['title'] = "Locked"
+		groups[1]['title'] = "Recent"
+	elif haveRecentPhotos:
+		groups[0]['title'] = "Recent"
+	elif haveNonNeighboredPhotos:
+		groups[0]['title'] = "Locked"
+
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 	response['objects'] = objects
 	response['next_start_date_time'] = lastDate
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
-	Sees what strands the user would join if they took a picture at the given startTime (defaults to now)
+	Utility method to find all nonNeighboredPhotos for the given user and location_point
+
+	Returns a list of photos
+"""
+def getNonNeighboredPhotos(userId, lon, lat):
+	# TODO(Derek):  Probably want to pull this out to some other place, maybe a param
+	timeWithinHours = 3
+
+	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+
+	timeLow = nowTime - datetime.timedelta(hours=timeWithinHours)
+
+	photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).filter(user__product_id=1)
+
+	nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinHours * 60 * 60)
+
+	nearbyPhotos = list()
+	for nearbyPhotoData in nearbyPhotosData:
+		photo, timeDistance, geoDistance = nearbyPhotoData
+		nearbyPhotos.append(photo)
+
+	neighboredPhotos = getNeighboredPhotos(userId, timeLow)
+
+	# We want to remove any photos that are already neighbored
+	neighboredPhotosIds = Photo.getPhotosIds(neighboredPhotos)
+	nonNeighboredPhotos = [item for item in nearbyPhotos if item.id not in neighboredPhotosIds]
+
+	return nonNeighboredPhotos
+
+"""
+	the user would join if they took a picture at the given startTime (defaults to now)
 
 	Searches for all photos of their friends within the time range and geo range but that don't have a
 	  neighbor entry
+
+	Used by the web view and the mobile client call
+
+	returns (lastDate, objects) which should be handed back in the response as response['objects']
 """
 def get_joinable_strands(request):
 	response = dict({'result': True})
@@ -205,29 +271,13 @@ def get_joinable_strands(request):
 		userId = form.cleaned_data['user_id']
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
-		
-		nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-		timeLow = nowTime - datetime.timedelta(hours=timeWithinHours)
+		nonNeighboredPhotos = getNonNeighboredPhotos(userId, lon, lat)
 
-		photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).filter(user__product_id=1)
-
-		nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinHours * 60 * 60)
-
-		nearbyPhotos = list()
-		for nearbyPhotoData in nearbyPhotosData:
-			photo, timeDistance, geoDistance = nearbyPhotoData
-			nearbyPhotos.append(photo)
-
-		neighboredPhotos = getNeighboredPhotos(userId, timeLow)
-
-		# We want to remove any photos that are already neighbored
-		ids = Photo.getPhotosIds(neighboredPhotos)
-		nonNeighboredPhotos = [item for item in nearbyPhotos if item.id not in ids]
-
-		groups = getGroups([nonNeighboredPhotos], labelRecent=False)
+		groups = getGroups([nonNeighboredPhotos])
 		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
-		response['objects'] = objects
+
+		response['objects'] = lastDate
 		response['next_start_date_time'] = lastDate
 
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -254,7 +304,7 @@ def get_new_photos(request):
 
 		photos = getNeighboredPhotos(userId, startTime)
 
-		groups = getGroups([photos], labelRecent=False)
+		groups = getGroups([photos])
 		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
