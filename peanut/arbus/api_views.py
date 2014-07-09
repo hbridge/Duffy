@@ -505,8 +505,7 @@ def createUser(phoneId, firstName, productId):
 	user = User(display_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
 	user.save()
 
-	userId = str(user.id)
-	userBasePath = os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, userId)
+	userBasePath = user.getUserDataPath()
 
 	try:
 		os.stat(userBasePath)

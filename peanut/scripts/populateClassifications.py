@@ -137,10 +137,7 @@ def sendPhotos(photos, socket_send):
 def copyPhotos(photos):
     successfullyCopied = list()
     for photo in photos:
-        userId = str(photo.user.id)
-        # Setup user's staging dir on duffy
-        userDataPath = os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, userId)
-        imagepath = os.path.join(userDataPath, photo.full_filename)
+        imagepath = photo.getFullPath()
 
         # Check that there are three channels
         im = Image.open(imagepath)

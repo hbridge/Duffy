@@ -39,10 +39,13 @@ class User(models.Model):
 		So:  /home/blah/1/
 	"""
 	def getUserDataPath(self):
+		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, self.getUserDataId())
+
+	def getUserDataId(self):
 		if self.uuid:
-			return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.uuid))
+			return str(self.uuid)
 		else:
-			return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.id))
+			return str(self.id)
 
 	@classmethod
 	def getIds(cls, objs):
@@ -136,8 +139,7 @@ class Photo(models.Model):
 	"""
 	def getThumbPath(self):
 		if self.thumb_filename:
-			userPath = os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, str(self.user_id))
-			return os.path.join(userPath, self.thumb_filename)
+			return os.path.join(self.user.getUserDataPath(), self.thumb_filename)
 		else:
 			return None
 
@@ -184,7 +186,7 @@ class Photo(models.Model):
 		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
 	"""
 	def getFullUrlImagePath(self):
-		return "/user_data/%s/%s" % (self.user_id, self.full_filename) 
+		return "/user_data/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
