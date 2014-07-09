@@ -54,6 +54,10 @@ static DFBackgroundLocationManager *defaultManager;
                                              selector:@selector(appEnteredBackground)
                                                  name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
+    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+      [self.locationManager startUpdatingLocation];
+    }
+    [self startUpdatingOnSignificantLocationChange];
   }
   return self;
 }
@@ -98,7 +102,7 @@ static DFBackgroundLocationManager *defaultManager;
     distance = [newLocation distanceFromLocation:lastLocation];
   }
   
-  DDLogInfo(@"DFBackgroundLocationManager updated location: <%f, %f> +/- %.02fm @ %@ distance from last:%.02fkm AppState: %d",
+  DDLogInfo(@"DFBackgroundLocationManager updated location: <%f, %f> +/- %.02fm @ %@ distance from last:%.6efkm AppState: %d",
             newLocation.coordinate.latitude,
             newLocation.coordinate.longitude,
             newLocation.horizontalAccuracy,
