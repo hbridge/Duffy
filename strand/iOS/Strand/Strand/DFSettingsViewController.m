@@ -57,7 +57,7 @@
     
     // User profile
     [mapping sectionWithTitle:@"Profile" footer:@"Your Display Name will be shown to other Strand users." identifier:@"profile"];
-    [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
+    [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeLabel];
     
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
