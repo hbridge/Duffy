@@ -34,4 +34,9 @@ extern NSString *DFUploadResultNumBytes;
 extern NSString *DFUploadResultPhotoID;
 extern NSString const *DFUploadResultOperationType;
 
+// Web pages
+extern NSString *const DFSupportPageURLString;
+extern NSString *const DFTermsPageURLString;
+extern NSString *const DFPrivacyPageURLString;
+
 @end

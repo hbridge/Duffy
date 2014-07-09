@@ -14,6 +14,8 @@
 #import "DFSMSCodeEntryViewController.h"
 #import "NSString+DFHelpers.h"
 #import "DFSMSVerificationAdapter.h"
+#import "DFWebViewController.h"
+#import "DFNetworkingConstants.h"
 
 UInt16 const DFPhoneNumberLength = 10;
 
@@ -46,7 +48,8 @@ UInt16 const DFPhoneNumberLength = 10;
   self.phoneNumberField.delegate = self;
   [self.phoneNumberField becomeFirstResponder];
   //  [self.phoneNumberField addTarget:self action:@se forControlEvents:<#(UIControlEvents)#>
-  
+  self.termsButton.titleLabel.numberOfLines = 0;
+  self.termsButton.titleLabel.textAlignment = NSTextAlignmentCenter;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -101,16 +104,20 @@ replacementString:(NSString *)string
   }
 }
 
+
+
 - (void)phoneNumberDoneButtonPressed:(id)sender
 {
   if (![self isCurrentPhoneNumberValid]) {
     [self showInvalidNumberAlert:[self enteredPhoneNumber]];
     return;
   }
+    NSString __block *phoneNumberString = [self enteredPhoneNumber];
   DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
-                                        initWithMessage:@"Validating..."];
+                                        initWithMessage:[NSString stringWithFormat:@"Sending SMS to %@",
+                                                         phoneNumberString]];
   [self presentViewController:msvc animated:YES completion:nil];
-  NSString __block *phoneNumberString = [self enteredPhoneNumber];
+
   
   DFSMSVerificationAdapter *smsAdapter = [[DFSMSVerificationAdapter alloc] init];
   [smsAdapter requestSMSCodeForPhoneNumber:phoneNumberString
@@ -182,6 +189,35 @@ replacementString:(NSString *)string
   [alert show];
 }
 
+#pragma mark - Terms button handlers
+
+- (IBAction)termsButtonPressed:(id)sender {
+  UIActionSheet *actionSheet = [[UIActionSheet alloc]
+                                initWithTitle:nil
+                                delegate:self
+                                cancelButtonTitle:@"Cancel"
+                                destructiveButtonTitle:nil
+                                otherButtonTitles:@"Terms and Conditions", @"Privacy Policy", nil];
+  [actionSheet showInView:self.view];
+  
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+  NSURL *url;
+  if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Terms and Conditions"]) {
+    url = [NSURL URLWithString:DFTermsPageURLString];
+  } else if ([[actionSheet buttonTitleAtIndex:buttonIndex] isEqualToString:@"Privacy Policy"]) {
+    url = [NSURL URLWithString:DFPrivacyPageURLString];
+  }
+  
+  if (url) {
+    DFWebViewController *wvc = [[DFWebViewController alloc] initWithURL:url];
+    UINavigationController *navController = [[UINavigationController alloc]
+                                             initWithRootViewController:wvc];
+    [self presentViewController:navController animated:YES completion:nil];
+  }
+}
 
 
 

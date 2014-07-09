@@ -11,6 +11,7 @@
 #import "DFSettings.h"
 #import "DFWebViewController.h"
 #import "DFDiagnosticInfoMailComposeController.h"
+#import "DFNetworkingConstants.h"
 
 @interface DFSettingsViewController ()
 
@@ -56,14 +57,14 @@
     
     // User profile
     [mapping sectionWithTitle:@"Profile" footer:@"Your Display Name will be shown to other Strand users." identifier:@"profile"];
-    [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
+    [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeLabel];
     
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
     [mapping button:@"Help"
          identifier:@"helpInfo"
             handler:[DFSettingsViewController
-                     webviewHandlerForURLString:@"http://www.duffyapp.com/strand/support"
+                     webviewHandlerForURLString:DFSupportPageURLString
                      navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Report Issue" identifier:@"reportIssue" handler:^(id object) {
@@ -82,12 +83,12 @@
     [mapping button:@"Terms"
          identifier:@"terms"
             handler:[DFSettingsViewController
-                     webviewHandlerForURLString:@"http://www.duffyapp.com/strand/terms.html" navigationController:self.navigationController]
+                     webviewHandlerForURLString:DFTermsPageURLString navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Privacy Policy"
          identifier:@"privacyPolicy"
             handler:[DFSettingsViewController
-                     webviewHandlerForURLString:@"http://www.duffyapp.com/strand/privacy.html" navigationController:self.navigationController]
+                     webviewHandlerForURLString:DFPrivacyPageURLString navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     
     [self.formModel registerMapping:mapping];

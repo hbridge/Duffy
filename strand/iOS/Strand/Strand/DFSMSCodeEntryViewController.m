@@ -11,6 +11,7 @@
 #import "DFUser.h"
 #import "AppDelegate.h"
 #import "NSString+DFHelpers.h"
+#import "DFModalSpinnerViewController.h"
 
 const UInt16 DFCodeLength = 4;
 
@@ -168,6 +169,10 @@ replacementString:(NSString *)string
 - (void)getUserIDWithPhoneNumber:(NSString *)phoneNumberString
                         authCode:(NSString *)authCodeString
 {
+  DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
+                                        initWithMessage:@"Verifying..."];
+  [self presentViewController:msvc animated:YES completion:nil];
+  
   DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
   
   [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
@@ -176,15 +181,25 @@ replacementString:(NSString *)string
                        smsAuthString:authCodeString
                     withSuccessBlock:^(DFUser *user) {
                       [DFUser setCurrentUser:user];
+                      [msvc dismissViewControllerAnimated:YES completion:nil];
                       AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
                       [delegate showMainView];
                     }
                         failureBlock:^(NSError *error) {
                           DDLogWarn(@"Create user failed: %@", error.localizedDescription);
-                          UIAlertView *failureAlert = [DFSMSCodeEntryViewController accountFailedAlert:error];
-                          [failureAlert show];
+                          [msvc dismissViewControllerAnimated:YES completion:^{
+                            UIAlertView *failureAlert = [DFSMSCodeEntryViewController accountFailedAlert:error];
+                            [failureAlert show];
+                            [self resetCodeField];
+                            [self.codeTextField becomeFirstResponder];
+                          }];
                         }];
   
+}
+
+- (void)resetCodeField
+{
+  self.codeTextField.text = @"- - - -";
 }
 
 
@@ -196,6 +211,7 @@ replacementString:(NSString *)string
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];
 }
+
 
 
 @end
