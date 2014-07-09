@@ -42,10 +42,7 @@ class User(models.Model):
 		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, self.getUserDataId())
 
 	def getUserDataId(self):
-		if self.uuid:
-			return str(self.uuid)
-		else:
-			return str(self.id)
+		return str(self.id)
 
 	@classmethod
 	def getIds(cls, objs):
