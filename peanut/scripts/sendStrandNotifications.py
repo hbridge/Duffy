@@ -35,9 +35,7 @@ def getLastNotificationTimesForType(notificationLogs, msgType):
 	return lastNotificationTimes
 """
 	Get all rows from Neighbor table in last 30 seconds
-	Get all rows from NotificationLog table in last 60 seconds
-	(can get this of second query by storing last notification time in the user table)
-	create dictionary per user on last notification time
+	Get dictionary per user on last notification time
 	for each row in neighbor table:
 		for each user 
 			look up the last notification time
@@ -121,7 +119,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 def main(argv):
 	maxFilesAtTime = 100
 
-	notificationLogTimeWithSeconds = 30
+	notificationLogTimeWithSeconds = 30 * 60 # 30 minutes
 	
 	logger.info("Starting... ")
 	while True:
