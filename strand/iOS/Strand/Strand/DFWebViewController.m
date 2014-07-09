@@ -28,6 +28,12 @@
   [super viewDidLoad];
   
   self.webView.delegate = self;
+  if (self.navigationController.viewControllers.firstObject == self) {
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                             target:self
+                                             action:@selector(doneButtonPressed:)];
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -74,4 +80,10 @@
 - (IBAction)forwardButtonPressed:(UIBarButtonItem *)sender {
   [self.webView goForward];
 }
+
+- (void)doneButtonPressed:(id)sender
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 @end

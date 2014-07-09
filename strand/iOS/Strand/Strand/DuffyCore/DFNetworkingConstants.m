@@ -41,8 +41,9 @@ NSString const *DFUploadResultPeanutPhotos = @"DFUploadResultPeanutPhotos";
 NSString const *DFUploadResultNumBytes = @"DFUploadNumBytes";
 NSString const *DFUploadResultPhotoID = @"DFUploadResultPhotoID";
 
-
-
+NSString *const DFSupportPageURLString = @"http://www.duffyapp.com/strand/support";
+NSString *const DFTermsPageURLString = @"http://www.duffyapp.com/strand/terms.html";
+NSString *const DFPrivacyPageURLString = @"http://www.duffyapp.com/strand/privacy.html";
 
 
 @end
