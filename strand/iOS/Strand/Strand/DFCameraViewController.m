@@ -26,6 +26,7 @@
 #import "DFPhotoAsset.h"
 #import "DFCameraRollPhotoAsset.h"
 #import "DFStrandPhotoAsset.h"
+#import "DFNearbyFriendsManager.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -53,16 +54,16 @@ const unsigned int RetryDelaySecs = 5;
   if (self) {
     [self configureLocationManager];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(startLocationUpdates)
+                                             selector:@selector(applicationDidBecomeActive:)
                                                  name:UIApplicationDidBecomeActiveNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(stopLocationUpdates)
+                                             selector:@selector(applicationDidEnterBackground:)
                                                  name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateUnseenCount)
+                                             selector:@selector(updateUnseenCount:)
                                                  name:DFStrandUnseenPhotosUpdatedNotificationName
                                                object:nil];
     
@@ -96,12 +97,19 @@ const unsigned int RetryDelaySecs = 5;
 {
   [super viewWillAppear:animated];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
-  [self updateUnseenCount];
+  [self updateUnseenCount:nil];
 }
 
-- (void)updateUnseenCount
+- (void)updateUnseenCount:(NSNotification *)note
 {
-  int unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
+  int unseenCount;
+  if (note) {
+    NSNumber *unseenNumber = note.userInfo[DFStrandUnseenPhotosUpdatedCountKey];
+    unseenCount = unseenNumber.intValue;
+  } else {
+    unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
+  }
+  
   NSString *unseenCountString = [NSString stringWithFormat:@"%d", unseenCount];
   dispatch_async(dispatch_get_main_queue(), ^{
     if (![self.customCameraOverlayView.galleryButton.titleLabel.text isEqualToString:unseenCountString]) {
@@ -119,20 +127,14 @@ const unsigned int RetryDelaySecs = 5;
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self updateUnseenCount];
-  [self startLocationUpdates];
-  [self showHelpTextIfNeeded];
-  
-  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+  [self viewDidAppearFromBackground:NO];
 }
 
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
-  [self stopLocationUpdates];
-  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+  [self viewDidDisappearToBackground:NO];
 }
 
 - (void)configureLocationManager
@@ -141,6 +143,37 @@ const unsigned int RetryDelaySecs = 5;
   self.locationManager.desiredAccuracy = kCLLocationAccuracyBest;
   self.locationManager.distanceFilter = 10;
   self.locationManager.delegate = self;
+}
+
+- (void)viewDidAppearFromBackground:(BOOL)fromBackground
+{
+  [self updateUnseenCount:nil];
+  [self startLocationUpdates];
+  [self showHelpTextIfNeeded];
+  [self updateNearbyFriendsBar];
+  
+  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappearToBackground:(BOOL)toBackground
+{
+  [self stopLocationUpdates];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
+- (void)applicationDidBecomeActive:(NSNotification *)note
+{
+  if (self.isViewLoaded && self.view.window) {
+    [self viewDidAppearFromBackground:YES];
+  }
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)note
+{
+  if (self.isViewLoaded && self.view.window) {
+    [self viewDidDisappearToBackground:YES];
+  }
 }
 
 - (void)startLocationUpdates
@@ -226,6 +259,19 @@ const unsigned int RetryDelaySecs = 5;
                                           repeats:NO];
   [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
 }
+
+- (void)updateNearbyFriendsBar
+{
+  NSString *message = [[DFNearbyFriendsManager sharedManager] nearbyFriendsMessage];
+  if (message && ![message isEqualToString:@""]) {
+    self.customCameraOverlayView.nearbyFriendsLabel.text = message;
+    self.customCameraOverlayView.nearbyFriendsBar.hidden = NO;
+  } else {
+    self.customCameraOverlayView.nearbyFriendsBar.hidden = YES;
+    self.customCameraOverlayView.nearbyFriendsLabel.text = @"";
+  }
+}
+
 
 #pragma mark - User actions
 
@@ -478,6 +524,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   
   return _locationAdapter;
 }
+
 
 
 @end

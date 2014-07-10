@@ -13,5 +13,6 @@
 
 + (DFBackgroundLocationManager *)sharedBackgroundLocationManager;
 - (void)startUpdatingOnSignificantLocationChange;
+- (CLLocation *)lastLocation;
 
 @end

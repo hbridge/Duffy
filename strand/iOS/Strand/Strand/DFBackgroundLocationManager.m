@@ -84,6 +84,19 @@ static DFBackgroundLocationManager *defaultManager;
   }
 }
 
+- (CLLocation *)lastLocation
+{
+  CLLocation *uncachedLoc = self.locationManager.location;
+  CLLocation *cachedLoc = [DFLocationStore LoadLastLocation];
+  if (uncachedLoc) {
+    return uncachedLoc;
+  } else if (cachedLoc) {
+    return cachedLoc;
+  }
+  
+  return nil;
+}
+
 - (void)recordManagerLocation
 {
   CLLocation *location = self.locationManager.location;
@@ -98,19 +111,22 @@ static DFBackgroundLocationManager *defaultManager;
   CLLocation *newLocation = manager.location;
   CLLocation *lastLocation = [DFLocationStore LoadLastLocation];
   CLLocationDistance distance = CLLocationDistanceMax;
+  NSTimeInterval timeDifference = [NSDate timeIntervalSinceReferenceDate];
   if (lastLocation) {
     distance = [newLocation distanceFromLocation:lastLocation];
+    timeDifference = [newLocation.timestamp timeIntervalSinceDate:lastLocation.timestamp];
   }
   
-  DDLogInfo(@"DFBackgroundLocationManager updated location: <%f, %f> +/- %.02fm @ %@ distance from last:%.6efkm AppState: %d",
+  DDLogInfo(@"DFBackgroundLocationManager updated location: <%f, %f> +/- %.02fm @ %@ distance from last:%.6efkm time from last:%.6efs AppState: %d",
             newLocation.coordinate.latitude,
             newLocation.coordinate.longitude,
             newLocation.horizontalAccuracy,
             newLocation.timestamp,
             distance/1000,
+            timeDifference,
             (int)[[UIApplication sharedApplication] applicationState]);
   
-  if (distance > 30.0) {
+  if (timeDifference > 0.0 && distance > 30.0) {
     [self recordManagerLocation];
     [self.locationAdapter updateLocation:newLocation
                            withTimestamp:newLocation.timestamp

@@ -17,6 +17,8 @@ extern NSString *const FlashAutoTitle;
 @property (weak, nonatomic) IBOutlet UIButton *galleryButton;
 @property (weak, nonatomic) IBOutlet UIButton *flashButton;
 @property (weak, nonatomic) IBOutlet UIButton *swapCameraButton;
+@property (weak, nonatomic) IBOutlet UILabel *nearbyFriendsLabel;
+@property (weak, nonatomic) IBOutlet UIView *nearbyFriendsBar;
 
 - (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 - (void)showHelpText;

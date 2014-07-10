@@ -13,6 +13,9 @@
 
 + (void)StoreLastLocation:(CLLocation *)location
 {
+  if (location.coordinate.longitude == -73.996000) {
+    [NSException raise:@"lost precision" format:@""];
+  }
   NSData *data = [NSKeyedArchiver archivedDataWithRootObject:location];
   [[NSUserDefaults standardUserDefaults] setObject:data forKey:DFStrandLastKnownLocationDefaultsKey];
   [[NSUserDefaults standardUserDefaults] synchronize];
