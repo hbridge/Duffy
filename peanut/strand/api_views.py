@@ -447,6 +447,8 @@ def get_nearby_friends_message(request):
 			else:
 				nonPhotoUsers.append(user)
 
+		logging.debug("Friends for %s:  photo:  %s non-photo: %s" % (userId, photoUsers, nonPhotoUsers))
+
 		if len(nearbyUsers) == 0:
 			message = ""
 		elif len(photoUsers) == 0:
