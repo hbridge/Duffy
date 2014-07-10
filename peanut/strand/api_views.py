@@ -45,20 +45,22 @@ def removeDups(seq, idFunction=None):
    return result
 
 def getBestLocation(photo):
-	twoFishesData = json.loads(photo.twofishes_data)
-	bestLocationName = None
-	bestWoeType = 100
-	for data in twoFishesData["interpretations"]:
-		if "woeType" in data["feature"]:
-			# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
-			if data["feature"]["woeType"] < bestWoeType:
-				bestLocationName = data["feature"]["displayName"]
-				bestWoeType = data["feature"]["woeType"]
-				if bestLocationName:
-					return bestLocationName
-				else:
-					return photo.location_city
-
+	if photo.twofishes_data:
+		twoFishesData = json.loads(photo.twofishes_data)
+		bestLocationName = None
+		bestWoeType = 100
+		for data in twoFishesData["interpretations"]:
+			if "woeType" in data["feature"]:
+				# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
+				if data["feature"]["woeType"] < bestWoeType:
+					bestLocationName = data["feature"]["displayName"]
+					bestWoeType = data["feature"]["woeType"]
+					if bestLocationName:
+						return bestLocationName
+					else:
+						return photo.location_city
+	else:
+		return "Earth"
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
