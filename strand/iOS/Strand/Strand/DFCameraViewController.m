@@ -294,11 +294,13 @@ const unsigned int RetryDelaySecs = 5;
     message = [[DFNearbyFriendsManager sharedManager] nearbyFriendsMessage];
   }
   
-  if (message && ![message isEqualToString:@""]) {
-    self.customCameraOverlayView.nearbyFriendsLabel.text = message;
-  } else {
-    self.customCameraOverlayView.nearbyFriendsLabel.text = @"";
-  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (message && ![message isEqualToString:@""]) {
+      self.customCameraOverlayView.nearbyFriendsLabel.text = message;
+    } else {
+      self.customCameraOverlayView.nearbyFriendsLabel.text = @"";
+    }
+  });
 }
 
 
