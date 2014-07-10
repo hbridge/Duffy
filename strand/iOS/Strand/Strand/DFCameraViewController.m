@@ -374,7 +374,7 @@ const unsigned int RetryDelaySecs = 5;
 
 - (void)imagePickerController:(UIImagePickerController *)picker
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
-  DDLogVerbose(@"Image picked, info: %@", info.description);
+  DDLogInfo(@"%@ image picked", [self.class description]);
   
   
   NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
