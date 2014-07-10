@@ -376,7 +376,6 @@ const unsigned int RetryDelaySecs = 5;
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogInfo(@"%@ image picked", [self.class description]);
   
-  
   NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
   UIImage *imageToSave;
   
@@ -388,8 +387,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     imageToSave = (UIImage *) [info objectForKey:
                                UIImagePickerControllerOriginalImage];
     NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
-    [self saveImage:imageToSave withMetadata:metadata retryAttempt:0];
-    [[DFUploadController sharedUploadController] uploadPhotos];
+    [self saveImage:imageToSave withMetadata:metadata retryAttempt:0 completionBlock:^{
+      [[DFUploadController sharedUploadController] uploadPhotos];
+    }];
     if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
       [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
     }
@@ -404,6 +404,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)saveImage:(UIImage *)image
      withMetadata:(NSDictionary *)metadata
      retryAttempt:(unsigned int)retryAttempt
+  completionBlock:(void (^)(void))completionBlock
 {
   CLLocation *location = self.locationManager.location;
   
@@ -411,7 +412,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     //wait for a better location fix
     DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self saveImage:image withMetadata:metadata retryAttempt:retryAttempt + 1];
+      [self saveImage:image withMetadata:metadata retryAttempt:retryAttempt + 1 completionBlock:completionBlock];
     });
     
     return;
@@ -446,6 +447,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
                 format:@"Error: %@", error.description];
   }
+  
+  if (completionBlock) completionBlock();
 }
 
 - (BOOL)isGoodLocation:(CLLocation *)location
