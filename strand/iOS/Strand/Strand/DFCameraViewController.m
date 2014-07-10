@@ -40,6 +40,7 @@ const unsigned int RetryDelaySecs = 5;
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
+@property (nonatomic, retain) NSTimer *updateUITimer;
 
 @end
 
@@ -53,28 +54,36 @@ const unsigned int RetryDelaySecs = 5;
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
     [self configureLocationManager];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationDidBecomeActive:)
-                                                 name:UIApplicationDidBecomeActiveNotification
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(applicationDidEnterBackground:)
-                                                 name:UIApplicationDidEnterBackgroundNotification
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(updateUnseenCount:)
-                                                 name:DFStrandUnseenPhotosUpdatedNotificationName
-                                               object:nil];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(joinableStrandsUpdated:)
-                                                 name:DFStrandJoinableStrandsNearbyNotificationName
-                                               object:nil];
+    [self observeNotifications];
   }
   return self;
 }
 
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(applicationDidBecomeActive:)
+                                               name:UIApplicationDidBecomeActiveNotification
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(applicationDidEnterBackground:)
+                                               name:UIApplicationDidEnterBackgroundNotification
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(updateUnseenCount:)
+                                               name:DFStrandUnseenPhotosUpdatedNotificationName
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(joinableStrandsUpdated:)
+                                               name:DFStrandJoinableStrandsNearbyNotificationName
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(updateNearbyFriendsBar:)
+                                               name:DFNearbyFriendsMessageUpdatedNotificationName
+                                             object:nil];
+}
 
 - (void)viewDidLoad
 {
@@ -84,6 +93,7 @@ const unsigned int RetryDelaySecs = 5;
     self.view.backgroundColor = [UIColor blackColor];
     self.showsCameraControls = NO;
     self.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
+    self.customCameraOverlayView.flashButton.tag = (NSInteger)UIImagePickerControllerCameraFlashModeAuto;
     self.cameraOverlayView = self.customCameraOverlayView;
     [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
   } else {
@@ -147,19 +157,34 @@ const unsigned int RetryDelaySecs = 5;
 
 - (void)viewDidAppearFromBackground:(BOOL)fromBackground
 {
-  [self updateUnseenCount:nil];
+  [self updateServerUI];
+  if (!self.updateUITimer) {
+    self.updateUITimer = [NSTimer scheduledTimerWithTimeInterval:30.0
+                                                          target:self
+                                                        selector:@selector(updateServerUI)
+                                                        userInfo:nil
+                                                         repeats:YES];
+  }
   [self startLocationUpdates];
   [self showHelpTextIfNeeded];
-  [self updateNearbyFriendsBar];
+  
   
   [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)updateServerUI
+{
+  [self updateUnseenCount:nil];
+  [self updateNearbyFriendsBar:nil];
 }
 
 - (void)viewDidDisappearToBackground:(BOOL)toBackground
 {
   [self stopLocationUpdates];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
+  [self.updateUITimer invalidate];
+  self.updateUITimer = nil;
 }
 
 - (void)applicationDidBecomeActive:(NSNotification *)note
@@ -260,14 +285,18 @@ const unsigned int RetryDelaySecs = 5;
   [[NSRunLoop mainRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
 }
 
-- (void)updateNearbyFriendsBar
+- (void)updateNearbyFriendsBar:(NSNotification *)note
 {
-  NSString *message = [[DFNearbyFriendsManager sharedManager] nearbyFriendsMessage];
+  NSString *message;
+  if (note) {
+    message = note.userInfo[DFNearbyFriendsNotificationMessageKey];
+  } else {
+    message = [[DFNearbyFriendsManager sharedManager] nearbyFriendsMessage];
+  }
+  
   if (message && ![message isEqualToString:@""]) {
     self.customCameraOverlayView.nearbyFriendsLabel.text = message;
-    self.customCameraOverlayView.nearbyFriendsBar.hidden = NO;
   } else {
-    self.customCameraOverlayView.nearbyFriendsBar.hidden = YES;
     self.customCameraOverlayView.nearbyFriendsLabel.text = @"";
   }
 }
@@ -306,14 +335,15 @@ const unsigned int RetryDelaySecs = 5;
 - (void)flashButtonPressed:(UIButton *)flashButton
 {
   UIImagePickerControllerCameraFlashMode newMode;
-  if ([flashButton.titleLabel.text isEqualToString:FlashAutoTitle]) {
+  if (flashButton.tag == (NSInteger)UIImagePickerControllerCameraFlashModeAuto) {
     newMode = UIImagePickerControllerCameraFlashModeOn;
-  } else if ([flashButton.titleLabel.text isEqualToString:FlashOnTitle]) {
+  } else if (flashButton.tag == (NSInteger)UIImagePickerControllerCameraFlashModeOn) {
     newMode = UIImagePickerControllerCameraFlashModeOff;
-  } else if ([flashButton.titleLabel.text isEqualToString:FlashOffTitle]) {
+  } else if (flashButton.tag == (NSInteger)UIImagePickerControllerCameraFlashModeOff) {
     newMode = UIImagePickerControllerCameraFlashModeAuto;
   }
   
+  flashButton.tag = newMode;
   self.cameraFlashMode = newMode;
   [self.customCameraOverlayView updateUIForFlashMode:newMode];
 }

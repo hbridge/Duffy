@@ -8,6 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
+extern NSString *const DFNearbyFriendsMessageUpdatedNotificationName;
+extern NSString *const DFNearbyFriendsNotificationMessageKey;
+
 @interface DFNearbyFriendsManager : NSObject
 
 + (DFNearbyFriendsManager *)sharedManager;

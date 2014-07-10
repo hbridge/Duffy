@@ -73,18 +73,20 @@ NSString *const FlashAutoTitle = @"Auto";
 
 - (void)updateUIForFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode
 {
+  [self.flashButton setTitle:@"" forState:UIControlStateNormal];
   if (flashMode == UIImagePickerControllerCameraFlashModeOn) {
-    [self.flashButton setTitle:@"On" forState:UIControlStateNormal];
+    //[self.flashButton setTitle:@"On" forState:UIControlStateNormal];
     [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashOnButton.png"]
                       forState:UIControlStateNormal];
   } else if (flashMode == UIImagePickerControllerCameraFlashModeOff) {
-    [self.flashButton setTitle:@"Off" forState:UIControlStateNormal];
+    //[self.flashButton setTitle:@"Off" forState:UIControlStateNormal];
     [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashOffButton.png"]
                       forState:UIControlStateNormal];
   } else if (flashMode == UIImagePickerControllerCameraFlashModeAuto) {
-    [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashOnButton.png"]
+    //[self.flashButton setTitle:@"Auto" forState:UIControlStateNormal];
+    [self.flashButton setImage:[UIImage imageNamed:@"/Assets/Icons/FlashAutoButton.png"]
                       forState:UIControlStateNormal];
-    [self.flashButton setTitle:@"Auto" forState:UIControlStateNormal];
+    
   }
 }
 
