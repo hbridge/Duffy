@@ -422,7 +422,8 @@ def get_nearby_friends_message(request):
 		lat = form.cleaned_data['lat']
 		lon = form.cleaned_data['lon']
 
-		timeWithin = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(hours=timeWithinHours)
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
 
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
@@ -430,11 +431,13 @@ def get_nearby_friends_message(request):
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
 		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
 		
+		nearbyPhotos = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
+		
 		photoUsers = list()
 		nonPhotoUsers = list()
 		for user in nearbyUsers:
 			hasPhoto = False
-			for photo in photos:
+			for photo in nearbyPhotos:
 				if photo.user_id == user.id:
 					hasPhoto = True
 
