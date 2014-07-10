@@ -48,6 +48,7 @@ static DFNearbyFriendsManager *defaultManager;
 - (void)updateNearbyFriendsMessage
 {
   if (self.isUpdatingNearbyFriends) return;
+  self.isUpdatingNearbyFriends = YES;
   [self.nearbyFriendsAdapter
    fetchNearbyFriendsMessageForLocation:[[DFBackgroundLocationManager
                                           sharedBackgroundLocationManager] lastLocation]

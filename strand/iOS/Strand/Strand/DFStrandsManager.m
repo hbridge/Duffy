@@ -77,13 +77,9 @@ static DFStrandsManager *defaultStrandsManager;
 
 - (void)updateJoinableStrands
 {
-  if (self.isJoinableStrandsFetchInProgress) {
-    DDLogInfo(@"DFStrandsManager: joinable strands update already in progress.");
-    return;
-  } else {
-    self.isJoinableStrandsFetchInProgress = YES;
-  }
+  if (self.isJoinableStrandsFetchInProgress) return;
   
+  self.isJoinableStrandsFetchInProgress = YES;
   CLLocation *lastLocation = [DFLocationStore LoadLastLocation];
 
   if (!lastLocation) {
@@ -117,12 +113,9 @@ static DFStrandsManager *defaultStrandsManager;
 
 - (void)updateNewPhotos
 {
-  if (self.isNewPhotoCountFetchInProgress) {
-    DDLogInfo(@"DFStrandsManager: newPhotoCount update already in progress.");
-    return;
-  } else {
-    self.isNewPhotoCountFetchInProgress = YES;
-  }
+  if (self.isNewPhotoCountFetchInProgress) return;
+  self.isNewPhotoCountFetchInProgress = YES;
+
   DDLogInfo(@"Updating new photo counts.");
   
   NSDate *galleryLastSeenDate = [DFStrandStore galleryLastSeenDate];
