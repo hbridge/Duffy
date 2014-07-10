@@ -46,7 +46,7 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 
 	switch (photoType) {
 		case 1:
-			img = "<img class='l " + lockedStr + "' width='78.5px' src='" + thumbUrl + "'/>";		
+			img = "<img class='l " + lockedStr + "' width='78px' src='" + thumbUrl + "'/>";		
 			html = "<div class='image image-thumb " + thirdStr + "' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 		default: // covers case 0
