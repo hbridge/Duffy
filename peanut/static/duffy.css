@@ -23,33 +23,17 @@ html, body {
 	background-color: rgba(239, 239, 239, 0.3);
 }
 .image {
-	padding-right: 2px;
-	position: relative;
+	padding-right: 1px;
 	cursor: pointer;
-	margin-bottom: 5px;
+	margin-bottom: 1px;
 }
-.ui-img-ct {
-	position:absolute;
-	background-color: transparent;
-	top: 44px;
-	left: 45px;
-	font-size: 0.9em;
-	text-align: right;
-	width: 33px;
-	height:33px;
-	line-height: 50px;
-	padding-right: 2px;
-	color: rgb(245, 166, 35);
+.image-thumb {
+	float: left;
+	width: 106px;
+	height: 106px;
 }
-.ui-arrow-down {
-	width: 0; 
-	height: 0; 
-	border-top: 25px solid transparent;
-	border-left: 25px solid transparent;
-	border-bottom: 25px solid #fff;
-	position:absolute;
-	top: 28px;
-	left: 53px;
+.is-third {
+	padding-right: 0px;
 }
 .text {
 	font-family: sans-serif;

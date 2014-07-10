@@ -26,7 +26,6 @@
 			color: #000000;
 			line-height: 21px;
 			letter-spacing: 0px;
-
 		}
 		.ui-sec-head-bottom {
 			width: 100%;
@@ -52,6 +51,9 @@
 			text-align: center;
 			/*color: rgb(241, 126, 48);*/
 			color: #606060;
+		}
+		.ui-locked {
+			-webkit-filter: blur(20px);
 		}
 	</style>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
@@ -80,6 +82,11 @@
 				secTop = "<div class='ui-sec-head-top'>Recent photos</div>";
 				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span></div>";
 				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
+			}
+			else if (section.title == 'Locked') {
+				secTop = "<div class='ui-sec-head-top'>Take a photo to unlock these photos</div>";
+				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span></div>";
+				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";	
 			}
 			else {
 				secTop = "<div class='ui-sec-head-top'>With " + uniqueUser(userList) + "</div>";
@@ -122,18 +129,20 @@
 				if (objects.type == 'section') {
 					row = "";
 					userList = [];
+					var isLocked = objects.title=='Locked' ? true : false;
+
 					$.each(objects.objects, function( i, photos) {
 						if (photos.type == 'photo') {
-							row += addPhoto(photos, userList);
+							row += addPhoto(photos, userList, 0, isLocked);
 						}
 						else if (photos.type == 'cluster'){
-							row += addCluster(photos.objects, userList);
+							row += addCluster(photos.objects, userList, isLocked);
 						}
 						else {
 							console.log('unknown type detected: ' + photos);
 						}
 					});
-					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");	
+					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");
 				}
 			});
 			if (data.objects.length === 0){
