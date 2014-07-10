@@ -37,6 +37,9 @@
 		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
 		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
 		5A7B1841196DFEB300E5A1D1 /* DFNearbyFriendsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */; };
+		5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1843196F2C0800E5A1D1 /* DFMapViewController.m */; };
+		5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */; };
+		5A7B1848196F2EAB00E5A1D1 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A7B1847196F2EAB00E5A1D1 /* MapKit.framework */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
@@ -178,6 +181,10 @@
 		5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutMessageResponse.m; sourceTree = "<group>"; };
 		5A7B183F196DFEB300E5A1D1 /* DFNearbyFriendsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsManager.h; sourceTree = "<group>"; };
 		5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsManager.m; sourceTree = "<group>"; };
+		5A7B1842196F2C0800E5A1D1 /* DFMapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFMapViewController.h; sourceTree = "<group>"; };
+		5A7B1843196F2C0800E5A1D1 /* DFMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFMapViewController.m; sourceTree = "<group>"; };
+		5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFMapViewController.xib; sourceTree = "<group>"; };
+		5A7B1847196F2EAB00E5A1D1 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -328,6 +335,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A7B1848196F2EAB00E5A1D1 /* MapKit.framework in Frameworks */,
 				5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */,
 				5AC4A9571948A59200862D9C /* CoreLocation.framework in Frameworks */,
 				5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */,
@@ -358,6 +366,9 @@
 				5A3172D6196C8C6300CA7693 /* DFWebViewController.h */,
 				5A3172D7196C8C6300CA7693 /* DFWebViewController.m */,
 				5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */,
+				5A7B1842196F2C0800E5A1D1 /* DFMapViewController.h */,
+				5A7B1843196F2C0800E5A1D1 /* DFMapViewController.m */,
+				5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -754,6 +765,7 @@
 		6708F8FDC18C412C9AA3CF21 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5A7B1847196F2EAB00E5A1D1 /* MapKit.framework */,
 				5A40344E19646BC6003D7546 /* AudioToolbox.framework */,
 				5AC4A9561948A59200862D9C /* CoreLocation.framework */,
 				5ACA39021947A71700834D86 /* CFNetwork.framework */,
@@ -862,6 +874,7 @@
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
 				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
+				5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */,
 				5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */,
 				5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */,
@@ -959,6 +972,7 @@
 				5A3172E0196C9EC100CA7693 /* DFPeanutError.m in Sources */,
 				5AC4A970194A42EE00862D9C /* DFPeanutSearchResponse.m in Sources */,
 				5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */,
+				5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */,
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,

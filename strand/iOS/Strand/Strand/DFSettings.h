@@ -19,5 +19,6 @@
 @property (readonly, nonatomic, retain) NSData *sendFeedback;
 @property (readonly, nonatomic, retain) NSString *terms;
 @property (readonly, nonatomic, retain) NSString *privacyPolicy;
+@property (readonly, nonatomic, retain) NSString *locationMap;
 
 @end

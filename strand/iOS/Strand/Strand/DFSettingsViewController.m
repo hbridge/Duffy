@@ -12,6 +12,8 @@
 #import "DFWebViewController.h"
 #import "DFDiagnosticInfoMailComposeController.h"
 #import "DFNetworkingConstants.h"
+#import "DFBackgroundLocationManager.h"
+#import "DFMapViewController.h"
 
 @interface DFSettingsViewController ()
 
@@ -76,6 +78,11 @@
       DFDiagnosticInfoMailComposeController *mailComposer =
       [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeFeedback];
       [self presentViewController:mailComposer animated:YES completion:nil];
+    } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+    [mapping button:@"Location Map" identifier:@"locationMap" handler:^(id object) {
+      CLLocation *location = [[DFBackgroundLocationManager sharedBackgroundLocationManager] lastLocation];
+      DFMapViewController *mapViewController = [[DFMapViewController alloc] initWithLocation:location];
+      [self.navigationController pushViewController:mapViewController animated:YES];
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     
     // Legal
