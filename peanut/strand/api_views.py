@@ -431,13 +431,14 @@ def get_nearby_friends_message(request):
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
 		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
 		
-		nearbyPhotos = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
+		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
 		
 		photoUsers = list()
 		nonPhotoUsers = list()
 		for user in nearbyUsers:
 			hasPhoto = False
-			for photo in nearbyPhotos:
+			for nearbyPhotoData in nearbyPhotosData:
+				photo, timeDistance, geoDistance = nearbyPhotoData
 				if photo.user_id == user.id:
 					hasPhoto = True
 
