@@ -1,5 +1,9 @@
 # Strand
 
+## Jul 10th, 2014
+
+- Added a bar to the top of the camera with who's nearby to see your photos
+
 ## Jul 8th, 2014
 
 - Sign up with your phone number with SMS 
