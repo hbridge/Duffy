@@ -302,3 +302,12 @@ class SmsAuth(models.Model):
 	def __unicode__(self):
 		return "%s %s %s" % (self.id, self.phone_number, self.added)
 
+
+class PhotoAction(models.Model):
+	photo = models.ForeignKey(Photo)
+	user = models.ForeignKey(User)
+	action = models.CharField(max_length=50, db_index=True)
+
+	class Meta:
+		db_table = 'strand_photo_action'
+
