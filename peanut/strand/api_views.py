@@ -104,7 +104,7 @@ def getGroups(groupings):
 			title = getBestLocation(group[i])
 			i += 1
 			
-		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, constants.DEFAULT_DUP_THRESHOLD, simCaches)
+		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		output.append({'title': title, 'clusters': clusters})
 	return output

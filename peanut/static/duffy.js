@@ -10,47 +10,43 @@ Date: 6/11/2014
 Processes our standard json format for type=photo
 */
 
-function addPhoto(photo, userList, photoType, photosLength){
+function addPhoto(photo, userList, photoType, isLocked, isThird){
 	// photoType = 0: regular photo
-	// photoType = 1: clusterTop
-	// photoType = 2: clusterBottom
-	// photoType = 3: docStackTop
-	if (photo) {
-		thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
-		fullUrl = "/user_data/" + photo.user_id + "/" + photo.id+ ".jpg";
-		onErrorStr='this.onerror=null;this.src="' + thumbUrl +'";';
-		img = "<img class='l' width='320px' onError='" + onErrorStr + "' src='" + fullUrl + "'/>";
+	// photoType = 1: clusterBottom
 
-		if (userList) {
-			if (getURLParameter("user_id") != photo.user_id) {
-				userList.push(photo.display_name);
-			}
+	thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
+	fullUrl = "/user_data/" + photo.user_id + "/" + photo.id+ ".jpg";
+	onErrorStr='this.onerror=null;this.src="' + thumbUrl +'";';
+	lockedStr = isLocked ? 'ui-locked' : 'ui-notlocked';
+
+	if (userList) {
+		if (getURLParameter("user_id") != photo.user_id) {
+			userList.push(photo.display_name);
 		}
 	}
 	if (!photoType) {
 		var photoType = 0; // means regular photo
 	}
-	if (!photosLength) {
-		var photosLength = 1;
+	if (!isThird) {
+		var thirdStr = '';
 	}
+	else {
+		var thirdStr = 'is-third';
+	}	
 	if (photo.display_name) {
 		title = cleanName(photo.display_name);
 	}
 	else {
 		title = photo.dist;
 	}
+
 	switch (photoType) {
 		case 1:
-			html = "<div class='image cluster' title='" + title +"' r='" + fullUrl + "'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
-			break;
-		case 2:
-			html = "<div class='image hidden' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
-			break;
-		case 3:
-			img = "<img class='l' height='78px' width='78px' src='/static/docstack.png' />";
-			html = "<div class='image cluster'>" + img + "<div class='ui-arrow-down'></div><div class='ui-img-ct text'>" + photosLength + "</div></div>";
+			img = "<img class='l " + lockedStr + "' width='106px' src='" + thumbUrl + "'/>";		
+			html = "<div class='image image-thumb " + thirdStr + "' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 		default: // covers case 0
+			img = "<img class='l " + lockedStr + "' width='320px' onError='" + onErrorStr + "' src='" + fullUrl + "'/>";		
 			html = "<div class='image' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 	}
@@ -61,15 +57,20 @@ function addPhoto(photo, userList, photoType, photosLength){
 Processes our standard json type=cluster
 */
 
-function addCluster(photos, userList){
+function addCluster(photos, userList, isLocked){
 	html = "";
 	$.each(photos, function(i, photo) {
 		if (photo.type == 'photo'){
-			if (i == 0) { // meaning clusterTop
-				html += addPhoto(photo, userList, 1, photos.length);
+			if (i == 0 && !isLocked) { // meaning first one in a cluster
+				html += addPhoto(photo, userList, 0, isLocked);
 			}
 			else {
-				html += addPhoto(photo, userList, 2);
+				if (i % 3 == 0) {
+					html += addPhoto(photo, userList, 1, isLocked, true);					
+				}
+				else {
+					html += addPhoto(photo, userList, 1, isLocked, false);
+				}
 			}
 		}
 		else {
@@ -150,13 +151,11 @@ Gives an array of other photos in this section
 */
 
 function photoList(photo) {
-	console.log('reachinghere');
 	var pArray = [];
 	// find the section
 	parent = photo.parent();
 	parent.find('div.image').each(function(){
 		if (!($(this).hasClass('hidden'))) {
-			console.log()
 			pArray.push($(this).attr('r').replace('/user_data/', ''));
 		}
 	});
