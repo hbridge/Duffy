@@ -104,7 +104,7 @@ def getGroups(groupings):
 			title = getBestLocation(group[i])
 			i += 1
 			
-		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
+		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, constants.DEFAULT_DUP_THRESHOLD, simCaches)
 
 		output.append({'title': title, 'clusters': clusters})
 	return output
@@ -447,28 +447,30 @@ def get_nearby_friends_message(request):
 			message = ""
 		elif len(photoUsers) == 0:
 			if len(nearbyUsers) == 1:
-				message = "There is 1 friend near you"
+				message = "1 friend will see this photo"
 			else:
-				message = "There are %s friends near you" % (len(nearbyUsers))
+				message = "%s friends will see this photo" % (len(nearbyUsers))
 		elif len(photoUsers) > 0:
 			names = list()
 			for user in photoUsers:
 				names.append(cleanName(user.display_name))
-			names = set(names)
 		
-			if len(names) > 0:
-				message = " & ".join(names) 
-
-			if len(nonPhotoUsers) > 0:
-				if len(nonPhotoUsers) == 1:
-					message += " & 1 other friend"
+			if len(nonPhotoUsers) == 0:
+				if len(names) <= 2:
+					message = "& ".join(names)
 				else:
-					message += " & %s other friends" % len(nonPhotoUsers)
-
-			if len(nearbyUsers) == 1:
-				message += " will see this photo"
+					numNames = len(names)
+					message = ", ".join(names[:numNames-2])
+					message += "& %s" % (names[numNames-1])
 			else:
-				message += " will see this photo"
+				message = ", ".join(names)
+
+				if len(nonPhotoUsers) == 1:
+					message += " & 1 friend"
+				else:
+					message += " & %s friends" % len(nonPhotoUsers)
+
+			message += " will see this photo"
 
 		response['message'] = message
 		response['result'] = True
