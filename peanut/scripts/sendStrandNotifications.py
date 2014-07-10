@@ -22,18 +22,6 @@ logger = logging.getLogger(__name__)
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
 
-def getLastNotificationTimesForType(notificationLogs, msgType):
-	lastNotificationTimes = dict()
-	# create a dictionary per user on last notification time of NewPhoto notifications
-	for notificationLog in notificationLogs:
-		if notificationLog.msg_type == msgType:
-			if notificationLog.user_id in lastNotificationTimes:
-				if (lastNotificationTimes[notificationLog.user_id] < notificationLog.added):
-					lastNotificationTimes[notificationLog.user_id] = notificationLog.added
-			else:
-				lastNotificationTimes[notificationLog.user_id] = notificationLog.added
-	return lastNotificationTimes
-
 """
 	See if the given user has a photo neighbored with the given photo
 """
@@ -59,7 +47,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
 	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_CAMERA}
 
-	lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
+	lastNotificationTimes = notification_util.getLastNotificationTimesForType(notificationLogs, msgType)
 
 	nonNotifiedUsers = filter(lambda x: x.id not in lastNotificationTimes, users)
 	
@@ -85,8 +73,6 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			logger.debug("Sending %s to %s" % (msg, user.display_name))
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
 				
-
-
 def main(argv):
 	maxFilesAtTime = 100
 
@@ -98,7 +84,7 @@ def main(argv):
 		neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTime) | Q(photo_2__time_taken__gt=newPhotosStartTime)).order_by('photo_1')
 		
 		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-		notificationLogs = NotificationLog.objects.select_related().filter(added__gt=datetime.datetime.utcnow()-datetime.timedelta(seconds=notificationLogTimeWithSeconds))
+		notificationLogs = notification_util.getNotificationLogs(timeWithinSec=notificationLogTimeWithSeconds)
 
 		# 30 minute cut off for join strand messages
 		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(minutes=30)
