@@ -47,7 +47,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
 	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_CAMERA}
 
-	lastNotificationTimes = notification_util.getLastNotificationTimesForType(notificationLogs, msgType)
+	lastNotificationTimes = notifications_util.getLastNotificationTimesForType(notificationLogs, msgType)
 
 	nonNotifiedUsers = filter(lambda x: x.id not in lastNotificationTimes, users)
 	
@@ -84,7 +84,7 @@ def main(argv):
 		neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTime) | Q(photo_2__time_taken__gt=newPhotosStartTime)).order_by('photo_1')
 		
 		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-		notificationLogs = notification_util.getNotificationLogs(timeWithinSec=notificationLogTimeWithSeconds)
+		notificationLogs = notifications_util.getNotificationLogs(timeWithinSec=notificationLogTimeWithSeconds)
 
 		# 30 minute cut off for join strand messages
 		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(minutes=30)
