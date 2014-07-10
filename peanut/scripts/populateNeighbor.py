@@ -10,9 +10,13 @@ if parentPath not in sys.path:
 
 from django.db.models import Count
 
+from peanut.settings import constants
 from common.models import Photo, User, Neighbor
 
 from strand import geo_util
+import strand.notifications_util as notifications_util
+
+logger = logging.getLogger(__name__)
 
 def processWithExisting(existingRows, newRows):
 	existing = dict()
@@ -53,10 +57,52 @@ def getUniqueRows(rows):
 			uniqueRows[id] = row
 	return uniqueRows.values()
 
+def cleanName(str):
+	return str.split(' ')[0].split("'")[0]
+
+def sendNotifications(neighbors):
+	msgType = constants.NOTIFICATIONS_NEW_PHOTO_ID
+	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_GALLERY}
+	
+	# Grab logs from last 30 seconds (default) then grab the last time they were notified
+	notificationLogs = notifications_util.getNotificationLogs()
+	lastNotificationTimesById = notifications_util.getLastNotificationTimesForType(notificationLogs, msgType)
+
+	# This is a dict with the user as the key and a list of other users w photos as the value
+	usersToNotify = dict()
+
+	for neighbor in neighbors:
+		# If photo2 time is after photo1, we want to notify user1 since they have the older one
+		# Else we want to notify user2
+		if neighbor.photo_1.time_taken < neighbor.photo_2.time_taken:
+			user = neighbor.user_1
+			otherUser = neighbor.user_2
+		else:
+			user = neighbor.user_2
+			otherUser = neighbor.user_1
+
+		if user not in usersToNotify:
+			usersToNotify[user] = list()
+		usersToNotify[user].append(otherUser)
+
+	for user, otherUsers in usersToNotify.iteritems():
+		otherUsers = set(otherUsers)
+
+		names = list()
+		for otherUser in otherUsers:
+			names.append(cleanName(otherUser.display_name))
+
+		msg = " & ".join(names) + " added new photos!"
+
+		# If the user doesn't show up in the array then they haven't been notified in that time period
+		if user.id not in lastNotificationTimesById:
+			logger.debug("Sending message '%s' to user %s" % (msg, user))
+			notifications_util.sendNotification(user, msg, msgType, customPayload)
+		else:
+			logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
 	
 def main(argv):
 	maxFilesAtTime = 100
-	logger = logging.getLogger(__name__)
 	
 	logger.info("Starting... ")
 	while True:
@@ -91,7 +137,7 @@ def main(argv):
 							time_distance_sec = int(math.fabs(timeDistance.total_seconds())),
 							geo_distance_m = geoDistance)
 					rowsToWrite.append(neighbor)
-					print neighbor
+					logger.debug("Writing out neighbor row %s" % (neighbor))
 					
 				refPhoto.neighbored_time = datetime.datetime.now()
 
@@ -105,7 +151,8 @@ def main(argv):
 			Photo.bulkUpdate(photos, ["neighbored_time"])
 			
 			logger.info("Wrote out %s new neighbor entries for %s photos" % (len(uniqueRows), len(photos)))
-			
+
+			sendNotifications(rowsToCreate)
 		else:
 			time.sleep(1)	
 

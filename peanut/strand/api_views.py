@@ -142,7 +142,7 @@ def neighbors(request):
 	else:
 		return api_util.returnFailure(response, "Need user_id")
 
-	results = Neighbor.objects.select_related().exclude(user_1_id=1).exclude(user_2_id=1).filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
+	results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
 	# Creates a list of lists for the sections then groups.
 	# We'll first get this list setup, de-duped and sorted

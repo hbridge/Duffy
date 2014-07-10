@@ -33,35 +33,6 @@ def getLastNotificationTimesForType(notificationLogs, msgType):
 			else:
 				lastNotificationTimes[notificationLog.user_id] = notificationLog.added
 	return lastNotificationTimes
-"""
-	Get all rows from Neighbor table in last 30 seconds
-	Get dictionary per user on last notification time
-	for each row in neighbor table:
-		for each user 
-			look up the last notification time
-			if notification_time > 1 hr, 
-				if they should get a notification (they have the older photo in the neighbor row)
-					send notification
-"""
-def sendNewPhotosNotification(neighbors, notificationLogs):
-	msgType = constants.NOTIFICATIONS_NEW_PHOTO_ID
-	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_GALLERY}
-
-	if (len(neighbors) > 0):
-		lastNotificationTimes = getLastNotificationTimesForType(notificationLogs, msgType)
-		for neighbor in neighbors:
-			if (neighbor.user_1.id not in lastNotificationTimes and 
-				neighbor.photo_1.time_taken < neighbor.photo_2.time_taken):
-					msg = cleanName(neighbor.user_2.display_name) + " added new photos!"
-					logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_1_id))						
-					notifications_util.sendNotification(neighbor.user_1, msg, msgType, customPayload)
-					lastNotificationTimes[neighbor.user_1_id] = datetime.datetime.utcnow()
-			if (neighbor.user_2.id not in lastNotificationTimes and 
-				neighbor.photo_2.time_taken < neighbor.photo_1.time_taken):
-					msg = cleanName(neighbor.user_1.display_name) + " added new photos!"
-					notifications_util.sendNotification(neighbor.user_2, msg, msgType, customPayload)
-					logger.debug("Sending message '%s' to user %s" % (msg, neighbor.user_2_id))
-					lastNotificationTimes[neighbor.user_2_id] = datetime.datetime.utcnow()
 
 """
 	See if the given user has a photo neighbored with the given photo
@@ -128,9 +99,7 @@ def main(argv):
 		
 		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
 		notificationLogs = NotificationLog.objects.select_related().filter(added__gt=datetime.datetime.utcnow()-datetime.timedelta(seconds=notificationLogTimeWithSeconds))
-		
-		sendNewPhotosNotification(neighbors, notificationLogs)
-		
+
 		# 30 minute cut off for join strand messages
 		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(minutes=30)
 		frequencyOfGpsUpdates = datetime.datetime.utcnow()-datetime.timedelta(hours=8)
