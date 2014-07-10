@@ -53,7 +53,10 @@
 			color: #606060;
 		}
 		.ui-locked {
-			-webkit-filter: blur(20px);
+			-webkit-filter: blur(6px);
+			-webkit-transform: scale(1.1, 1.1);
+			position: absolute;
+			clip: rect(5px, 77px, 77px, 5px);
 		}
 	</style>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
@@ -84,8 +87,8 @@
 				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
 			}
 			else if (section.title == 'Locked') {
-				secTop = "<div class='ui-sec-head-top'>Take a photo to unlock these photos</div>";
-				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span></div>";
+				secTop = "<div class='ui-sec-head-top'>Take a photo to unlock these photos </div>";
+				secBottom = "<div class='ui-sec-head-bottom'>" + "<span class='timeago' title='" + t + "'></span> with " + uniqueUser(userList) + "</div>";
 				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";	
 			}
 			else {
@@ -149,7 +152,7 @@
 				$('div.ui-msg').removeClass('hidden');
 			}
 			$('div.image').each(function(){
-				clusterClickHandler($(this));
+				imageClickHandler($(this));
 			});
 			$('span.timeago').timeago();
 		};

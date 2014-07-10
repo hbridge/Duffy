@@ -23,14 +23,14 @@ html, body {
 	background-color: rgba(239, 239, 239, 0.3);
 }
 .image {
-	padding-right: 1px;
+	padding-right: 2px;
 	cursor: pointer;
-	margin-bottom: 1px;
+	margin-bottom: 2px;
 }
 .image-thumb {
 	float: left;
-	width: 106px;
-	height: 106px;
+	width: 78.5px;
+	height: 78.5px;
 }
 .is-third {
 	padding-right: 0px;

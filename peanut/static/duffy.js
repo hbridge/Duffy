@@ -19,6 +19,10 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 	onErrorStr='this.onerror=null;this.src="' + thumbUrl +'";';
 	lockedStr = isLocked ? 'ui-locked' : 'ui-notlocked';
 
+	if (isLocked){
+		photoType = 1;
+	}
+
 	if (userList) {
 		if (getURLParameter("user_id") != photo.user_id) {
 			userList.push(photo.display_name);
@@ -42,7 +46,7 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 
 	switch (photoType) {
 		case 1:
-			img = "<img class='l " + lockedStr + "' width='106px' src='" + thumbUrl + "'/>";		
+			img = "<img class='l " + lockedStr + "' width='78.5px' src='" + thumbUrl + "'/>";		
 			html = "<div class='image image-thumb " + thirdStr + "' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 		default: // covers case 0
@@ -65,7 +69,7 @@ function addCluster(photos, userList, isLocked){
 				html += addPhoto(photo, userList, 0, isLocked);
 			}
 			else {
-				if (i % 3 == 0) {
+				if (i % 4 == 0) {
 					html += addPhoto(photo, userList, 1, isLocked, true);					
 				}
 				else {
@@ -101,19 +105,9 @@ function addDocstack(photos){
 /*
 	click handler for clusters and images
 */
-function clusterClickHandler(clusters){
+function imageClickHandler(clusters){
 	clusters.click(function() {
-		if ($(this).hasClass('cluster')) {
-			$(this).removeClass('cluster');
-			$(this).children('div').addClass('hidden'); // hides white triangle and cluster size
-			current = $(this).next();
-			while (current.hasClass('hidden')){					
-				current.show("fast");
-				current.removeClass('hidden');
-				current = current.next();
-			}
-		}
-		else {
+		if (!($(this).children('img').hasClass('ui-locked'))){
 			window.location.href = $(this).attr('r')+'?photoList='+photoList($(this)).toString(); //TODO: Need to update link
 		}
 	});
