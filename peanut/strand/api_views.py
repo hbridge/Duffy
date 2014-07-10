@@ -466,9 +466,9 @@ def get_nearby_friends_message(request):
 					message += " & %s other friends" % len(nonPhotoUsers)
 
 			if len(nearbyUsers) == 1:
-				message += " is near you"
+				message += " will see this photo"
 			else:
-				message += " are near you"
+				message += " will see this photo"
 
 		response['message'] = message
 		response['result'] = True
