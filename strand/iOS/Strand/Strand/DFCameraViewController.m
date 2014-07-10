@@ -98,6 +98,7 @@ const unsigned int RetryDelaySecs = 5;
     [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+    [self.view addSubview:self.customCameraOverlayView];
   }
   
   self.delegate = self;
@@ -229,18 +230,21 @@ const unsigned int RetryDelaySecs = 5;
                            instantiateWithOwner:self options:nil]
                           firstObject];
     _customCameraOverlayView.frame = self.view.frame;
-    [_customCameraOverlayView.takePhotoButton addTarget:self
-                                                 action:@selector(takePhotoButtonPressed:)
+    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
+      // only wire up buttons if we're not in the simulator
+      [_customCameraOverlayView.takePhotoButton addTarget:self
+                                                   action:@selector(takePhotoButtonPressed:)
+                                         forControlEvents:UIControlEventTouchUpInside];
+      [_customCameraOverlayView.galleryButton addTarget:self
+                                                 action:@selector(galleryButtonPressed:)
                                        forControlEvents:UIControlEventTouchUpInside];
-    [_customCameraOverlayView.galleryButton addTarget:self
-                                               action:@selector(galleryButtonPressed:)
+      [_customCameraOverlayView.flashButton addTarget:self
+                                               action:@selector(flashButtonPressed:)
                                      forControlEvents:UIControlEventTouchUpInside];
-    [_customCameraOverlayView.flashButton addTarget:self
-                                             action:@selector(flashButtonPressed:)
-                                   forControlEvents:UIControlEventTouchUpInside];
-    [_customCameraOverlayView.swapCameraButton addTarget:self
-                                                  action:@selector(swapCameraButtonPressed:)
-                                        forControlEvents:UIControlEventTouchUpInside];
+      [_customCameraOverlayView.swapCameraButton addTarget:self
+                                                    action:@selector(swapCameraButtonPressed:)
+                                          forControlEvents:UIControlEventTouchUpInside];
+    }
   }
 
   return _customCameraOverlayView;
