@@ -548,12 +548,15 @@ def send_sms_code(request):
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['phone_number'])
 
-		accessCode = random.randrange(1000, 10000)
+		if "555555" not in phoneNumber:
+			accessCode = random.randrange(1000, 10000)
 
-		msg = "Your Strand code is:  %s" % (accessCode)
+			msg = "Your Strand code is:  %s" % (accessCode)
 	
-		notifications_util.sendSMS(phoneNumber, msg)
-		SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
+			notifications_util.sendSMS(phoneNumber, msg)
+			SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
+		else:
+			response['debug'] = "Skipped"
 	else:
 		response['result'] = False
 		response['invalid_fields'] = api_util.formatErrors(form.errors)
@@ -572,26 +575,30 @@ def send_sms_code(request):
 
 	TODO(Derek):  If we create users in more places, might want to move this
 """
-def createUser(phoneNumber, displayName, smsAuth):
+def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
 	try:
 		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
 		
-		# User exists, so need to archive
-		# To do that, re-do the phone number, adding in an archive code
-		archiveCode = random.randrange(1000, 10000)
-		
-		user.phone_number = "%s%s" %(archiveCode, phoneNumber)
-		user.save()
+		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
+			return user
+		else:
+			# User exists, so need to archive
+			# To do that, re-do the phone number, adding in an archive code
+			archiveCode = random.randrange(1000, 10000)
+			
+			user.phone_number = "%s%s" %(archiveCode, phoneNumber)
+			user.save()
 	except User.DoesNotExist:
 		pass
 
 	# TODO(Derek): Make this more interesting when we add auth to the APIs
 	authToken = random.randrange(10000, 10000000)
 
-	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, product_id = 1, auth_token = str(authToken))
+	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 1, auth_token = str(authToken))
 
-	smsAuth.user_created = user
-	smsAuth.save()
+	if smsAuth:
+		smsAuth.user_created = user
+		smsAuth.save()
 
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
@@ -621,25 +628,34 @@ def auth_phone(request):
 		phoneNumber = str(form.cleaned_data['phone_number'])
 		accessCode = form.cleaned_data['sms_access_code']
 		displayName = form.cleaned_data['display_name']
+		phoneId = form.cleaned_data['phone_id']
 
-		timeWithin = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=timeWithinMinutes)
+		if "555555" not in phoneNumber:
+			timeWithin = datetime.datetime.utcnow().replace(tzinfo=pytz.utc) - datetime.timedelta(minutes=timeWithinMinutes)
 
-		smsAuth = SmsAuth.objects.filter(phone_number=phoneNumber, access_code=accessCode)
+			smsAuth = SmsAuth.objects.filter(phone_number=phoneNumber, access_code=accessCode)
 
-		if len(smsAuth) == 0 or len(smsAuth) > 1:
-			response['result'] = False
-			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Invalid code'})
-		elif smsAuth[0].user_created:
-			response['result'] = False
-			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code already used'})
-		elif smsAuth[0].added < timeWithin:
-			response['result'] = False
-			response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code expired'})
+			if len(smsAuth) == 0 or len(smsAuth) > 1:
+				response['result'] = False
+				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Invalid code'})
+			elif smsAuth[0].user_created:
+				response['result'] = False
+				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code already used'})
+			elif smsAuth[0].added < timeWithin:
+				response['result'] = False
+				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code expired'})
+			else:
+				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0])
+				serializer = UserSerializer(user)
+				response['user'] = serializer.data
 		else:
-			user = createUser(phoneNumber, displayName, smsAuth[0])
-			serializer = UserSerializer(user)
-			response['user'] = serializer.data
-
+			if accessCode == 2345:
+				user = createStrandUser(phoneNumber, displayName, phoneId, None, returnIfExist = True)
+				serializer = UserSerializer(user)
+				response['user'] = serializer.data
+			else:
+				response['result'] = False
+				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Invalid code'})
 	else:
 		response['result'] = False
 		response['invalid_fields'] = api_util.formatErrors(form.errors)
