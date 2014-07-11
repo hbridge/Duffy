@@ -10,10 +10,11 @@ from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.http import Http404
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor, SmsAuth
+from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -25,10 +26,10 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def getGroupForPhoto(photo, clusters):
-	for cluster in clusters:
-		if photo in cluster:
-			return cluster
+def getGroupForPhoto(photo, groupings):
+	for group in groupings:
+		if photo in group:
+			return group
 	return None
 
 def removeDups(seq, idFunction=None): 
@@ -61,6 +62,26 @@ def getBestLocation(photo):
 						return photo.location_city
 	else:
 		return "Earth"
+
+def getActionsByPhotoIdCache(photoIds):
+	actions = PhotoAction.objects.select_related().filter(photo_id__in=photoIds)
+	actionsByPhotoId = dict()
+
+	for action in actions:
+		if action.photo_id not in actionsByPhotoId:
+			actionsByPhotoId[action.photo_id] = list()
+		actionsByPhotoId[action.photo_id].append(action)
+
+	return actionsByPhotoId
+
+def addActionsToClusters(clusters, actionsByPhotoIdCache):
+	for cluster in clusters:
+		for entry in cluster:
+			entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
+
+	print clusters
+	return clusters
+
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -92,6 +113,9 @@ def getGroups(groupings):
 	# Fetch all the similarities at once so we can process in memory
 	simCaches = cluster_util.getSimCaches(photoIds)
 
+	# Do same with actions
+	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
+	
 	for group in groupings:
 		if len(group) == 0:
 			continue
@@ -106,6 +130,8 @@ def getGroups(groupings):
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, constants.DEFAULT_DUP_THRESHOLD, simCaches)
 
+		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
+		
 		output.append({'title': title, 'clusters': clusters})
 	return output
 	
@@ -144,26 +170,26 @@ def neighbors(request):
 
 	results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
-	# Creates a list of lists for the sections then groups.
+	# Creates a list of lists of photos, each one called a "group", the list of lists is "groupings"
 	# We'll first get this list setup, de-duped and sorted
 	groupings = list()
 	for neighbor in results:
 		group = getGroupForPhoto(neighbor.photo_1, groupings)
 
 		if (group):
-			# If the first photo is in a cluster, see if the other photo is in there already
+			# If the first photo is in a group, see if the other photo is in there already
 			#   if it isn't, and this isn't a dup, then add photo_2 in
 			if neighbor.photo_2 not in group:
 				group.append(neighbor.photo_2)
 		else:
-			# If the first photo isn't in a cluster, see if the second one is
+			# If the first photo isn't in a group, see if the second one is
 			group = getGroupForPhoto(neighbor.photo_2, groupings)
 
 			if (group):
-				# If the second photo is in a cluster and this isn't a dup then add in
+				# If the second photo is in a group and this isn't a dup then add in
 				group.append(neighbor.photo_1)
 			else:
-				# If neither photo is in a cluster, we create a new one
+				# If neither photo is in a group, we create a new one
 				group = [neighbor.photo_1, neighbor.photo_2]
 
 				groupings.append(group)
@@ -179,7 +205,7 @@ def neighbors(request):
 		uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
 		sortedGroups.append(uniqueGroup)
 
-	# now sort clusters by the time_taken of the first photo in each cluster
+	# now sort groups by the time_taken of the first photo in each group
 	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
 	# Try to find recent photos
@@ -287,9 +313,7 @@ def get_joinable_strands(request):
 
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
-		return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 """
 	Returns back any new photos in the user's strands after the given date and time
@@ -316,9 +340,7 @@ def get_new_photos(request):
 
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
-		return HttpResponse(json.dumps(response), content_type="application/json")
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 """
 	Registers a user's current location (and only stores the last location)
@@ -355,8 +377,7 @@ def update_user_location(request):
 			logger.info("Location NOT updated. Lat/Lon Zero. %s: %s, %s" % (datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, str((lon, lat))))
 
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -400,8 +421,7 @@ def register_apns_token(request):
 				device.save()
 		user.save()
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -479,8 +499,7 @@ def get_nearby_friends_message(request):
 		response['message'] = message
 		response['result'] = True
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -562,8 +581,7 @@ def send_sms_code(request):
 		else:
 			response['debug'] = "Skipped"
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
@@ -665,7 +683,7 @@ def auth_phone(request):
 		response['invalid_fields'] = api_util.formatErrors(form.errors)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-	
+
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]

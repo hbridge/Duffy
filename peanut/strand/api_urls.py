@@ -26,7 +26,7 @@ urlpatterns = patterns('',
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
-	url(r'^photo_actions/', CreateAPIView.as_view(model=PhotoAction, lookup_field='id')),
+	url(r'^photo_actions/$', CreateAPIView.as_view(model=PhotoAction, lookup_field='id')),
 	url(r'^photo_actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=PhotoAction, lookup_field='id')),
 
 	# experimental

@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from phonenumber_field.phonenumber import PhoneNumber
 
 from common.models import Photo
+from common.serializers import PhotoActionWithUserNameSerializer
 
 class DuffyJsonEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -17,40 +18,45 @@ class DuffyJsonEncoder(json.JSONEncoder):
 			
 		return json.JSONEncoder.default(self, obj)
 
-
 """
-	Hack for now to make a better description message for errors
+	Creates a photoData object which is what holds the photo data in our json object model
+
+	Looks like:
+
+	"user_id": 333,
+	"actions": [
+		{
+		"id": 1,
+		"photo": 295253,
+		"user": 297,
+		"action": "favorite"
+		},
+		{
+		"id": 2,
+		"photo": 295253,
+		"user": 342,
+		"action": "favorite"
+		}
+	],
+	"id": 295253,
+	"dist": null,
+	"type": "photo",
+	"time_taken": 1404933422,
+	"display_name": "iPhone Simulator"
 """
-def formatDescription(key, description):
-	if description == "This field is required.":
-		return "%s: %s" % (key, description)
-	return description
-
-"""
-	Takes in a dict of the type:
-
-	'name': [description1, description2]
-"""
-def formatErrors(errors):
-	a = list()
-	for key, value in errors.iteritems():
-
-		if isinstance(value, list):
-			a.append({"name": key, "description": formatDescription(key, value[0])})
-		else:
-			a.append({"name": key, "description": formatDescription(key, value)})
-
-	return a
-
 def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
 	photo = entry['photo']
 
 	photoData.update(photo.serialize())
 
+	# Add in extra fields that aren't a part of the SimplePhoto model
 	if 'dist' in entry:
 		photoData['dist'] = entry['dist']
-		
+	
+	if 'actions' in entry:
+		photoData['actions'] = [PhotoActionWithUserNameSerializer(photoAction).data for photoAction in entry['actions']]
+	
 	return photoData
 
 

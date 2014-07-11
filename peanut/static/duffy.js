@@ -14,8 +14,8 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 	// photoType = 0: regular photo
 	// photoType = 1: clusterBottom
 
-	thumbUrl = "/user_data/" + photo.user_id + "/" + photo.id + "-thumb-156.jpg";
-	fullUrl = "/user_data/" + photo.user_id + "/" + photo.id+ ".jpg";
+	thumbUrl = "/user_data/" + photo.user + "/" + photo.id + "-thumb-156.jpg";
+	fullUrl = "/user_data/" + photo.user + "/" + photo.id+ ".jpg";
 	onErrorStr='this.onerror=null;this.src="' + thumbUrl +'";';
 	lockedStr = isLocked ? 'ui-locked' : 'ui-notlocked';
 
