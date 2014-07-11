@@ -19,6 +19,9 @@
 @property (readonly) DFPhotoIDType photoID;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
+@property (nonatomic) BOOL isFavorited;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *favoriteButton;
+@property (weak, nonatomic) IBOutlet UIBarButtonItem *trashButton;
 
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet DFPhotoView *photoView;
@@ -28,5 +31,7 @@
 - (IBAction)imageTapped:(id)sender;
 - (void)showShareActivity;
 - (void)showPhotoActions:(id)sender;
+- (IBAction)deleteButtonPressed:(UIBarButtonItem *)sender;
+- (IBAction)favoriteButtonPressed:(UIBarButtonItem *)sender;
 
 @end

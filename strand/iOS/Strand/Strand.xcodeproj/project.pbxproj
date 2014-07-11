@@ -40,6 +40,10 @@
 		5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1843196F2C0800E5A1D1 /* DFMapViewController.m */; };
 		5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */; };
 		5A7B1848196F2EAB00E5A1D1 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A7B1847196F2EAB00E5A1D1 /* MapKit.framework */; };
+		5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B184C19707C7200E5A1D1 /* DFPeanutActionAdapter.m */; };
+		5A7B185019707D9600E5A1D1 /* DFPeanutActionResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B184F19707D9600E5A1D1 /* DFPeanutActionResponse.m */; };
+		5A7B185319707DE300E5A1D1 /* DFPeanutAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B185219707DE300E5A1D1 /* DFPeanutAction.m */; };
+		5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1858197097AC00E5A1D1 /* DFPeanutInvalidField.m */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
@@ -185,6 +189,14 @@
 		5A7B1843196F2C0800E5A1D1 /* DFMapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFMapViewController.m; sourceTree = "<group>"; };
 		5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFMapViewController.xib; sourceTree = "<group>"; };
 		5A7B1847196F2EAB00E5A1D1 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
+		5A7B184B19707C7200E5A1D1 /* DFPeanutActionAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutActionAdapter.h; sourceTree = "<group>"; };
+		5A7B184C19707C7200E5A1D1 /* DFPeanutActionAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutActionAdapter.m; sourceTree = "<group>"; };
+		5A7B184E19707D9600E5A1D1 /* DFPeanutActionResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutActionResponse.h; sourceTree = "<group>"; };
+		5A7B184F19707D9600E5A1D1 /* DFPeanutActionResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutActionResponse.m; sourceTree = "<group>"; };
+		5A7B185119707DE300E5A1D1 /* DFPeanutAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutAction.h; sourceTree = "<group>"; };
+		5A7B185219707DE300E5A1D1 /* DFPeanutAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutAction.m; sourceTree = "<group>"; };
+		5A7B1857197097AC00E5A1D1 /* DFPeanutInvalidField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutInvalidField.h; sourceTree = "<group>"; };
+		5A7B1858197097AC00E5A1D1 /* DFPeanutInvalidField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutInvalidField.m; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -518,6 +530,50 @@
 			name = "Notifications (User in-app)";
 			sourceTree = "<group>";
 		};
+		5A7B184919707C1D00E5A1D1 /* Adapters */ = {
+			isa = PBXGroup;
+			children = (
+				5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */,
+				5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */,
+				5A7B183F196DFEB300E5A1D1 /* DFNearbyFriendsManager.h */,
+				5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */,
+				5AA45283196706A60099CBD2 /* DFPeanutGalleryAdapter.h */,
+				5AA45284196706A60099CBD2 /* DFPeanutGalleryAdapter.m */,
+				5AC4A965194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.h */,
+				5AC4A966194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m */,
+				5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */,
+				5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */,
+				5AC4A974194A4AB900862D9C /* DFPeanutNewPhotosAdapter.h */,
+				5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */,
+				5A02CEAD194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.h */,
+				5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */,
+				5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */,
+				5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */,
+				5A7B184B19707C7200E5A1D1 /* DFPeanutActionAdapter.h */,
+				5A7B184C19707C7200E5A1D1 /* DFPeanutActionAdapter.m */,
+			);
+			name = Adapters;
+			sourceTree = "<group>";
+		};
+		5A7B184A19707C3D00E5A1D1 /* Peanut Objects */ = {
+			isa = PBXGroup;
+			children = (
+				5A02CEB0194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.h */,
+				5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */,
+				5A3172DE196C9EC100CA7693 /* DFPeanutError.h */,
+				5A3172DF196C9EC100CA7693 /* DFPeanutError.m */,
+				5A7B1857197097AC00E5A1D1 /* DFPeanutInvalidField.h */,
+				5A7B1858197097AC00E5A1D1 /* DFPeanutInvalidField.m */,
+				5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */,
+				5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */,
+				5A7B184E19707D9600E5A1D1 /* DFPeanutActionResponse.h */,
+				5A7B184F19707D9600E5A1D1 /* DFPeanutActionResponse.m */,
+				5A7B185119707DE300E5A1D1 /* DFPeanutAction.h */,
+				5A7B185219707DE300E5A1D1 /* DFPeanutAction.m */,
+			);
+			name = "Peanut Objects";
+			sourceTree = "<group>";
+		};
 		5AA45286196708B10099CBD2 /* Gallery */ = {
 			isa = PBXGroup;
 			children = (
@@ -666,28 +722,8 @@
 		5AC4A964194A3FBF00862D9C /* Network Adapters */ = {
 			isa = PBXGroup;
 			children = (
-				5AC4A965194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.h */,
-				5AC4A966194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m */,
-				5AC4A974194A4AB900862D9C /* DFPeanutNewPhotosAdapter.h */,
-				5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */,
-				5A02CEAD194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.h */,
-				5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */,
-				5A02CEB0194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.h */,
-				5A3172DE196C9EC100CA7693 /* DFPeanutError.h */,
-				5A3172DF196C9EC100CA7693 /* DFPeanutError.m */,
-				5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */,
-				5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */,
-				5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */,
-				5AA45283196706A60099CBD2 /* DFPeanutGalleryAdapter.h */,
-				5AA45284196706A60099CBD2 /* DFPeanutGalleryAdapter.m */,
-				5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */,
-				5A7B183F196DFEB300E5A1D1 /* DFNearbyFriendsManager.h */,
-				5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */,
-				5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */,
-				5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */,
-				5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */,
-				5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */,
-				5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */,
+				5A7B184A19707C3D00E5A1D1 /* Peanut Objects */,
+				5A7B184919707C1D00E5A1D1 /* Adapters */,
 			);
 			name = "Network Adapters";
 			sourceTree = "<group>";
@@ -978,6 +1014,7 @@
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
+				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5A3172C4196B1C4200CA7693 /* DFSMSCodeEntryViewController.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
@@ -988,6 +1025,7 @@
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
+				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
@@ -997,6 +1035,7 @@
 				5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */,
 				5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */,
 				5ADD857519465C790037A6D5 /* main.m in Sources */,
+				5A7B185019707D9600E5A1D1 /* DFPeanutActionResponse.m in Sources */,
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
 				5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */,
@@ -1033,6 +1072,7 @@
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,
 				5A3172D5196C85F800CA7693 /* DFSettings.m in Sources */,
 				5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */,
+				5A7B185319707DE300E5A1D1 /* DFPeanutAction.m in Sources */,
 				5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */,
 				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,

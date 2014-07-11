@@ -98,7 +98,7 @@ const unsigned int RetryDelaySecs = 5;
     [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
-    [self.view addSubview:self.customCameraOverlayView];
+    //[self.view addSubview:self.customCameraOverlayView];
   }
   
   self.delegate = self;

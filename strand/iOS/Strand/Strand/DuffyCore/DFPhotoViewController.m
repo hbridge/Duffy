@@ -19,6 +19,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
+#import "DFPeanutActionAdapter.h"
 
 @interface DFPhotoViewController ()
 
@@ -69,20 +70,22 @@
 
 - (void)configureToolbar
 {
-  UIBarButtonItem *likeButton = [[UIBarButtonItem alloc]
-                                 initWithImage:[UIImage imageNamed:@"Assets/Icons/LikeToolbarIcon.png"]
-                                 style:UIBarButtonItemStylePlain
-                                 target:self
-                                 action:@selector(likeButtonPressed:)];
-  UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-  UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc]
-                                   initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
-                                   target:self
-                                   action:@selector(confirmDeletePhoto)];
-  self.toolbar.items = @[likeButton, flexibleSpace, deleteButton];
+  [self updateFavoriteImage];
   if (![self isPhotoDeletableByUser]) {
-    deleteButton.enabled = NO;
+    self.trashButton.enabled = NO;
   }
+}
+
+- (void)updateFavoriteImage
+{
+  UIImage *newImage;
+  if (self.isFavorited) {
+    newImage = [UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"];
+  } else {
+    newImage = [UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"];
+
+  }
+  self.favoriteButton.image = newImage;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -211,6 +214,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   }
 }
 
+
 /*
  We only want users to be able to delete photos that they uploaded.
  */
@@ -285,6 +289,9 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
     }];
   }
 }
+- (IBAction)deleteButtonPressed:(UIBarButtonItem *)sender {
+  [self confirmDeletePhoto];
+}
 
 - (void)confirmDeletePhoto
 {
@@ -346,9 +353,33 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   }
 }
 
-- (void)likeButtonPressed:(id)sender
-{
-  DDLogVerbose(@"Like button pressed");
+- (IBAction)favoriteButtonPressed:(UIBarButtonItem *)sender {
+  DDLogVerbose(@"Favorite button pressed");
+  
+  DFPeanutAction *action = [[DFPeanutAction alloc] init];
+  action.user = [[DFUser currentUser] userID];
+  action.action_type = DFActionFavorite;
+  action.photo = self.photoID;
+   DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
+  
+  if (!self.isFavorited) {
+    self.isFavorited = YES;
+    [self updateFavoriteImage];
+    [adapter postAction:action withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
+      if (!error) {
+        
+      } else {
+        self.isFavorited = NO;
+        [self updateFavoriteImage];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                        message:error.localizedDescription
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
+        [alert show];
+      }
+    }];
+  }
 }
 
 
