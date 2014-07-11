@@ -44,6 +44,7 @@
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
   } else {
+    [self checkAuthTokenValid];
     [self showMainView];
    }
   
@@ -114,6 +115,15 @@
   self.window.rootViewController = [[RootViewController alloc] init];
   [[DFBackgroundLocationManager sharedBackgroundLocationManager]
    startUpdatingOnSignificantLocationChange];
+}
+
+- (void)checkAuthTokenValid
+{
+  NSString *authToken = [[DFUser currentUser] authToken];
+  // for now, if there is an authToken at all, we'll consider it valid
+  if (authToken && ![authToken isEqualToString:@""]) return;
+  
+  [self resetApplication];
 }
 
 - (void)performForegroundOperations
@@ -222,6 +232,13 @@
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     DDLogInfo(@"Resetting application.");
+    UIAlertView *alert = [[UIAlertView alloc]
+                          initWithTitle:@"Logged Out"
+                          message:@"You have been logged out of Strand.  Please re-verify your phone number."
+                          delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+    
+    
     [[DFUploadController sharedUploadController] cancelUploads];
     [[DFPhotoStore sharedStore] resetStore];
     
