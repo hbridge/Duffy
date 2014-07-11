@@ -58,12 +58,24 @@
 	.b-r{
 		border-right: 1px solid black;
 	}
+	.ui-server-id {
+		background-color: orange;
+		font-size: 24px;
+		text-align: center;
+		margin-bottom: 10px;
+	}
+	.ui-server-switch {
+		font-size: 16px
+	}
 
 </style>
 <script src="/static/jquery-1.10.2.min.js"></script>
 <script src="/static/jquery.timeago.js"></script>
 <body>
 <div class="ui-content">
+	<div class='ui-server'>
+		<div class='ui-server-id' id='ui-server-id'></div>
+	</div>
 	{% if arbusList %}
 		<div class='ui-header'> Search/Photos/Arbus &mdash; {{ arbusList|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
@@ -138,7 +150,9 @@
 							{{ entry.user.phone_number }}
 						{% endif %}
 					{% else %}
-						{{ entry.user.phone_id|truncatechars:12}} 
+						{% if entry.user.phone_id %}
+							Old account
+						{% endif %} 
 					{% endif %} </td>
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 				<td class='db-count right b-r'> {{ entry.dbCount }} </td>
@@ -179,6 +193,12 @@ $(document).ready(function() {
 		$(this).addClass("red");
 	}
   });
+  if (!(location.hostname.match('prod.strand.duffyapp.com'))){
+  	$("#ui-server-id").append('DEV <span class="ui-server-switch">(<a target=_new href="http://prod.strand.duffyapp.com/viz/summary">Switch to Prod</a>)</span>');
+  }
+  else {
+   	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_new href="http://dev.duffyapp.com/viz/summary">Switch to DEV</a>)</span>');
+  }
   $('td.timeago').each(function(){
 	if ($(this).html().search('min') > -1 || 
 		$(this).html().search('hr') > -1 ||
