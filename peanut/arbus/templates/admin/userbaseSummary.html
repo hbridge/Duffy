@@ -73,8 +73,7 @@
 <script src="/static/jquery.timeago.js"></script>
 <body>
 <div class="ui-content">
-	<div class='ui-server'>
-		<div class='ui-server-id' id='ui-server-id'></div>
+	<div class='ui-server-id' id='ui-server-id'>
 	</div>
 	{% if arbusList %}
 		<div class='ui-header'> Search/Photos/Arbus &mdash; {{ arbusList|length }} accounts </div>
@@ -195,9 +194,11 @@ $(document).ready(function() {
   });
   if (!(location.hostname.match('prod.strand.duffyapp.com'))){
   	$("#ui-server-id").append('DEV <span class="ui-server-switch">(<a target=_new href="http://prod.strand.duffyapp.com/viz/summary">Switch to Prod</a>)</span>');
+  	$("#ui-server-id").css('background-color', '#C0C0C0');
   }
   else {
    	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_new href="http://dev.duffyapp.com/viz/summary">Switch to DEV</a>)</span>');
+   	$("#ui-server-id").css('background-color', 'orange');
   }
   $('td.timeago').each(function(){
 	if ($(this).html().search('min') > -1 || 
