@@ -6,9 +6,11 @@
 
 ## Jul 8th, 2014
 
-- Sign up with your phone number with SMS 
-- Pull to refresh the gallery, but back to webview for now
-- Settings view where you can report issues etc
+- Sign up for a Strand account with your phone number.  In the future we'll be using the address book to limit sharing to your friends.
+- Smaller battery life impact.  Sorry if we've been draining your battery.
+- Switched to a feed format intead of a gallery view.
+- Pull down to refresh the gallery
+- Settings view where you can report issues, send feedback, and see a map of where the app thinks you are for debugging
 
 ### Bugs fixed
 
