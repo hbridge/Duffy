@@ -148,7 +148,11 @@
 				<td class='db-fullimage right b-r' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>
 				<td class='neighbor right b-r'> {{ entry.neighbor }} </td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
-				<td class='location right b-r'> <a target=_new href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a></td>
+				<td class='location right b-r'> 
+					{% if entry.user.last_location_point %}
+					<a target=_new href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a>
+					{% endif %}
+				</td>
 				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 				<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime }}"> </td>			
