@@ -15,7 +15,7 @@
 	td {
 		padding: 0px 5px 0px 5px;
 	}
-	.ui-row-external {
+	.ui-row-internal {
 		background-color: #C0C0C0;
 	}
 	.ui-content {
@@ -95,7 +95,7 @@
 				<td class='last-updated-timestamp'> Last updated </td>			
 			</tr>
 		{% for entry in arbusList %}
-			<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
+			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
 				<td class='userid b-r'> {{ entry.user.id }} </td>
 				<td class='name b-r'> {{ entry.user.display_name}}</td>
 				<td class='phoneid b-r' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
@@ -137,7 +137,7 @@
 				<td class='last-updated-timestamp'> Last updated </td>			
 			</tr>
 		{% for entry in strandList %}
-			<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
+			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
 				<td class='userid b-r'> {{ entry.user.id }} </td>
 				<td class='name b-r'> {{ entry.user.display_name}}</td>
 				<td class='phoneid b-r' title='{{ entry.user.phone_id }}  {{ entry.user.phone_number }}'> 
@@ -173,7 +173,7 @@
 		</table>
 	{% endif %}
 	<div class="ui-key">
-		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are external users.
+		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are internal users.
 	</div>
 <div id="stats" class="text">
 	<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
