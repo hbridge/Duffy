@@ -82,13 +82,13 @@
 				<td class='name b-r'> Name </td>
 				<td class='phoneid b-r'> PhoneId </td>
 				<td class='created b-r'> Created </td>
-				<td class='db-count b-r'> DBPhotos </td>
+				<td class='db-count b-r'> Photos </td>
 				<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
 				<td class='twofish b-r'> TwoFish <br> (%) </td>
 				<td class='clustered b-r'> Clustered <br> (%)  </td>
 				<td class='index-count b-r'> Indexed <br> Photos (%) </td>
 				<td class='faces b-r'> Face <br> Rec (%)  </td>
-				<td class='db-fullimage b-r'> Full <br>images (%) </td>
+				<td class='db-fullimage b-r'> Full <br>imgs (%) </td>
 				<td class='overfeat b-r'> Overfeat <br> (%)  </td>
 				<td class='classifications b-r'> Image <br> Rec (%)  </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
@@ -124,11 +124,11 @@
 				<td class='name b-r'> Name </td>
 				<td class='phoneid b-r'> Phone # </td>
 				<td class='created b-r'> Created </td>
-				<td class='db-count b-r'> DBPhotos </td>
+				<td class='db-count b-r'> Photos </td>
 				<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
 				<td class='twofish b-r'> TwoFish <br> (%) </td>
 				<td class='clustered b-r'> Clustered <br> (%)  </td>
-				<td class='db-fullimage b-r'> Full <br>images (%) </td>
+				<td class='db-fullimage b-r'> Full <br>imgs (%) </td>
 				<td class='neighbor b-r'> Neighbor <br> (%) </td>
 				<td class='notifications b-r'> Nots <br> sent </td>
 				<td class='last-not-timestamp b-r'> Last Not. <br> Timestamp </td>
@@ -195,7 +195,7 @@ $(document).ready(function() {
   	$("#ui-server-id").css('background-color', '#C0C0C0');
   }
   else {
-   	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_new href="http://dev.duffyapp.com/viz/summary">Switch to DEV</a>)</span>');
+   	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_new href="http://dev.duffyapp.com/viz/summary">Switch to Dev</a>)</span>');
    	$("#ui-server-id").css('background-color', 'orange');
   }
   $('td.timeago').each(function(){
