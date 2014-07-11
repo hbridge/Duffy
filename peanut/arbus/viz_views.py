@@ -10,7 +10,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from django.template import RequestContext, loader
-from django.db.models import Q
+from django.db.models import Q, Count, Max
 
 from haystack.query import SearchQuerySet
 
@@ -54,51 +54,51 @@ def userbaseSummary(request):
 		entry['user'] = user
 		if (user.added):
 			entry['userCreated'] = user.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-		dbQuery = Photo.objects.filter(user_id=user.id)
-		totalCount = dbQuery.count()
-		if (totalCount > 0):
-			photoSet = dbQuery.order_by('-added')[:1]
-			for photo in photoSet:
-				entry['lastUploadTime'] = photo.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-				break
-			photoSet = dbQuery.order_by('-updated')[:1]
-			for photo in photoSet:
-				entry['lastUpdatedTime'] = photo.updated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-				break	
 
-			entry['dbCount'] = totalCount
-			entry['thumbsCount'] = dbQuery.exclude(thumb_filename=None).count()
-			entry['thumbs'] = int(math.floor(entry['thumbsCount']/totalCount*100))
-			photosWithGPS = dbQuery.filter((Q(metadata__contains='{GPS}') & Q(metadata__contains='Latitude')) | Q(location_point__isnull=False)).count()
+		counts = Photo.objects.filter(user_id=user.id).aggregate(totalCount=Count('id'), thumbsCount=Count('thumb_filename'), 
+			photosWithGPS=Count('location_point'), twofishCount=Count('twofishes_data'), fullImagesCount=Count('full_filename'), 
+			clusteredCount=Count('clustered_time'), neighborCount=Count('neighbored_time'), overfeatCount=Count('overfeat_data'), 
+			classCount=Count('classification_data'), faceCount=Count('faces_data'), lastAdded=Max('added'), lastUpdated=Max('updated'))
 
-			if photosWithGPS > 0:
-				entry['twofishCount'] = photosWithGPS
-				entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
+		if (counts['totalCount'] > 0):
+
+			entry['lastUploadTime'] = counts['lastAdded'].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+			entry['lastUpdatedTime'] = counts['lastUpdated'].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+
+			entry['dbCount'] = counts['totalCount']
+			entry['thumbsCount'] = counts['thumbsCount']
+			entry['thumbs'] = int(math.floor(entry['thumbsCount']/counts['totalCount']*100))
+
+			if counts['photosWithGPS'] > 0:
+				entry['twofishCount'] = counts['photosWithGPS']
+				entry['twofish'] = int(math.floor(float(counts['twofishCount'])/float(counts['photosWithGPS'])*100))
 			else:
 				entry['twofish'] = '-'
-			fullimagesCount = dbQuery.exclude(full_filename=None).count()
-			entry['fullimagesCount'] = fullimagesCount
-			entry['fullimages'] = entry['fullimagesCount']*100/totalCount
 
-			searchResults = SearchQuerySet().all().filter(userId=user.id)
-			entry['resultsCount'] = searchResults.count()*100/totalCount
+			entry['fullimagesCount'] = counts['fullImagesCount']
+			entry['fullimages'] = entry['fullimagesCount']*100/counts['totalCount']
 			
-			entry['clusteredCount'] = dbQuery.exclude(clustered_time=None).count()
-			entry['clustered'] = entry['clusteredCount']*100/totalCount
+			entry['clusteredCount'] = counts['clusteredCount']
+			entry['clustered'] = entry['clusteredCount']*100/counts['totalCount']
 
-			if (fullimagesCount > 0):
-				count = dbQuery.exclude(overfeat_data=None).count()
-				entry['overfeatCount'] = count
-				entry['overfeat'] = count*100/fullimagesCount
+			if (counts['fullImagesCount'] > 0):
+				entry['overfeatCount'] = counts['overfeatCount']
+				entry['overfeat'] = counts['overfeatCount']*100/counts['fullImagesCount']
 			else:
 				entry['overfeat'] = 0
 
-			if (fullimagesCount > 0):
-				entry['classifications'] = dbQuery.exclude(classification_data=None).count()*100/fullimagesCount
+			if (counts['fullImagesCount'] > 0):
+				entry['classifications'] = counts['classCount']*100/counts['fullImagesCount']
 			else:
 				entry['classifications'] = 0
 				
-			entry['faces'] = dbQuery.exclude(faces_data=None).count()*100/totalCount
+			entry['faces'] = counts['faceCount']*100/counts['totalCount']
+
+			# Search results count
+			searchResults = SearchQuerySet().all().filter(userId=user.id)
+			entry['resultsCount'] = searchResults.count()*100/counts['totalCount']
+
+
 			entry['internal'] = False
 
 			if (user.added == None or len(user.display_name) == 0):
@@ -124,44 +124,42 @@ def userbaseSummary(request):
 			entry['userCreated'] = user.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 		if (user.last_location_timestamp):
 			entry['lastLocationTimestamp'] = user.last_location_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-		dbQuery = Photo.objects.filter(user_id=user.id)
-		totalCount = dbQuery.count()
-		if (totalCount > 0):
-			photoSet = dbQuery.order_by('-added')[:1]
-			for photo in photoSet:
-				entry['lastUploadTime'] = photo.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-				break
-			photoSet = dbQuery.order_by('-updated')[:1]
-			for photo in photoSet:
-				entry['lastUpdatedTime'] = photo.updated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-				break	
 
-			entry['dbCount'] = totalCount
-			entry['thumbsCount'] = dbQuery.exclude(thumb_filename=None).count()
-			entry['thumbs'] = int(math.floor(entry['thumbsCount']/totalCount*100))
-			photosWithGPS = dbQuery.filter(location_point__isnull=False).count()
+		counts = Photo.objects.filter(user_id=user.id).aggregate(totalCount=Count('id'), thumbsCount=Count('thumb_filename'), 
+			photosWithGPS=Count('location_point'), twofishCount=Count('twofishes_data'), fullImagesCount=Count('full_filename'), 
+			clusteredCount=Count('clustered_time'), neighborCount=Count('neighbored_time'), lastAdded=Max('added'))
 
-			if photosWithGPS > 0:
-				entry['twofishCount'] = photosWithGPS
-				entry['twofish'] = int(math.floor(float(dbQuery.exclude(twofishes_data=None).count())/float(photosWithGPS)*100))
+		notifsCounts = NotificationLog.objects.filter(user_id=user.id).aggregate(totalNotifs=Count('id'), lastSent=Max('added'))
+
+		if (counts['totalCount'] > 0):
+
+			entry['dbCount'] = counts['totalCount']
+			entry['thumbsCount'] = counts['thumbsCount']
+			entry['thumbs'] = int(math.floor(entry['thumbsCount']/counts['totalCount']*100))
+
+			if counts['photosWithGPS'] > 0:
+				entry['twofishCount'] = counts['photosWithGPS']
+				entry['twofish'] = int(math.floor(float(counts['twofishCount'])/float(counts['photosWithGPS'])*100))
 			else:
 				entry['twofish'] = '-'
-			fullimagesCount = dbQuery.exclude(full_filename=None).count()
-			entry['fullimagesCount'] = fullimagesCount
-			entry['fullimages'] = entry['fullimagesCount']*100/totalCount
+			entry['fullimagesCount'] = counts['fullImagesCount']
+			entry['fullimages'] = entry['fullimagesCount']*100/counts['totalCount']
 
-			searchResults = SearchQuerySet().all().filter(userId=user.id)
-			entry['resultsCount'] = searchResults.count()*100/totalCount
 			
-			entry['clusteredCount'] = dbQuery.exclude(clustered_time=None).count()
-			entry['clustered'] = entry['clusteredCount']*100/totalCount
+			entry['clusteredCount'] = counts['clusteredCount']
+			entry['clustered'] = entry['clusteredCount']*100/counts['totalCount']
 
-			entry['notifications'] = NotificationLog.objects.filter(user_id=user.id).count()
-
-			if photosWithGPS > 0:
-				entry['neighbor'] = dbQuery.exclude(neighbored_time=None).count()*100/photosWithGPS
+			if counts['photosWithGPS'] > 0:
+				entry['neighbor'] = counts['neighborCount']*100/counts['photosWithGPS']
 			else:
 				entry['neighbor'] = '-'
+
+			entry['lastUploadTime'] = counts['lastAdded'].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+
+			entry['notifications'] = notifsCounts['totalNotifs']
+			if notifsCounts['lastSent']:
+				entry['lastNotifSent'] = notifsCounts['lastSent'].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+
 
 		entry['internal'] = False
 
