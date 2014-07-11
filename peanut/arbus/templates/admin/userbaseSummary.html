@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="10">
+<meta http-equiv="refresh" content="30">
 	<title>Duffy Summary</title> 
 </head>
 <style>
@@ -112,7 +112,7 @@
 			<tr class='ui-row-header' >
 				<td class='userid b-r'> UserId </td>
 				<td class='name b-r'> Name </td>
-				<td class='phoneid b-r'> PhoneId </td>
+				<td class='phoneid b-r'> PhoneId/Num </td>
 				<td class='created b-r'> Created </td>
 				<td class='db-count b-r'> DBPhotos </td>
 				<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
@@ -120,7 +120,9 @@
 				<td class='clustered b-r'> Clustered <br> (%)  </td>
 				<td class='db-fullimage b-r'> Full <br>images (%) </td>
 				<td class='neighbor b-r'> Neighbor <br> (%) </td>
-				<td class='notifications b-r'> Notifications <br> sent </td>
+				<td class='notifications b-r'> Nots <br> sent </td>
+				<td class='location b-r'> Location </td>
+				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 				<td class='last-updated-timestamp'> Last updated </td>			
 			</tr>
@@ -128,7 +130,16 @@
 			<tr class='ui-row {% if entry.internal == False %} ui-row-external {% endif %}'>
 				<td class='userid b-r'> {{ entry.user.id }} </td>
 				<td class='name b-r'> {{ entry.user.display_name}}</td>
-				<td class='phoneid b-r' title='{{ entry.user.phone_id }}'> {{ entry.user.phone_id|truncatechars:12}} </td>
+				<td class='phoneid b-r' title='{{ entry.user.phone_id }}  {{ entry.user.phone_number }}'> 
+					{% if entry.user.phone_number %}
+						{% if entry.user.phone_number|length > 12 %}
+							Archived
+						{% else %}
+							{{ entry.user.phone_number }}
+						{% endif %}
+					{% else %}
+						{{ entry.user.phone_id|truncatechars:12}} 
+					{% endif %} </td>
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 				<td class='db-count right b-r'> {{ entry.dbCount }} </td>
 				<td class='db-thumbnails right percent b-r' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
@@ -137,6 +148,8 @@
 				<td class='db-fullimage right b-r' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>
 				<td class='neighbor right b-r'> {{ entry.neighbor }} </td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
+				<td class='location right b-r'> <a target=_new href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a></td>
+				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 				<td class='last-updated-timestamp timeago' title="{{ entry.lastUpdatedTime }}"> </td>			
 			</tr>
@@ -163,8 +176,8 @@ $(document).ready(function() {
 	}
   });
   $('td.timeago').each(function(){
-	if ($(this).html().search('minute') > -1 || 
-		$(this).html().search('hour') > -1 ||
+	if ($(this).html().search('min') > -1 || 
+		$(this).html().search('hr') > -1 ||
 		$(this).html().search('now') > -1){
 		$(this).addClass('recent');
 	}

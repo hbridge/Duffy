@@ -14,6 +14,8 @@ from django.db.models import Q
 
 from haystack.query import SearchQuerySet
 
+from peanut.settings import constants
+
 from common.models import Photo, User, Classification, NotificationLog
 
 from arbus import image_util, search_util
@@ -41,6 +43,7 @@ def userbaseSummary(request):
 						'1067880F-AB7B-4B06-95AB-DE5216DD3CA0',
 						'55BE5A34-0188-4B0B-805E-45B30808CA61',
 						'BEEF'}
+
 	arbusList = list()
 	to_zone = tz.gettz('America/New_York')
 
@@ -107,6 +110,7 @@ def userbaseSummary(request):
 						('ipad simulator'.lower() in user.display_name.lower())):
 						entry['internal'] = True
 						break
+
 		arbusList.append(entry)
 
 
@@ -118,6 +122,8 @@ def userbaseSummary(request):
 		entry['user'] = user
 		if (user.added):
 			entry['userCreated'] = user.added.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+		if (user.last_location_timestamp):
+			entry['lastLocationTimestamp'] = user.last_location_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 		dbQuery = Photo.objects.filter(user_id=user.id)
 		totalCount = dbQuery.count()
 		if (totalCount > 0):
@@ -159,7 +165,8 @@ def userbaseSummary(request):
 
 		entry['internal'] = False
 
-		if (len(user.display_name) == 0):
+		if ((len(user.display_name) == 0) or 
+			('555555' in str(user.phone_number))):
 			entry['internal'] = True
 		else:
 			for phoneid in knownPhoneIds:
@@ -168,6 +175,12 @@ def userbaseSummary(request):
 					('ipad simulator'.lower() in user.display_name.lower())):
 					entry['internal'] = True
 					break
+			
+			for phoneNum in constants.DEV_PHONE_NUMBERS:
+				if (user.phone_number and phoneNum in str(user.phone_number)):
+					entry['internal'] = True
+					break
+
 		strandList.append(entry)
 
 
