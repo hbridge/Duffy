@@ -214,7 +214,7 @@ class Photo(models.Model):
 class SimplePhoto:
 	id = None
 	time_taken = None
-	user_id = None
+	user = None
 	display_name = None
 
 	def serialize(self):
@@ -225,12 +225,12 @@ class SimplePhoto:
 			# This is a solr photo
 			self.id = solrOrDbPhoto.photoId
 			self.time_taken = solrOrDbPhoto.timeTaken
-			self.user_id = solrOrDbPhoto.userId
+			self.user = solrOrDbPhoto.userId
 		else:
 			# This is a database photo
 			self.id = solrOrDbPhoto.id
 			self.time_taken = solrOrDbPhoto.time_taken
-			self.user_id = solrOrDbPhoto.user_id
+			self.user = solrOrDbPhoto.user_id
 			self.display_name = solrOrDbPhoto.user.display_name
 
 class Classification(models.Model):
@@ -301,4 +301,13 @@ class SmsAuth(models.Model):
 
 	def __unicode__(self):
 		return "%s %s %s" % (self.id, self.phone_number, self.added)
+
+
+class PhotoAction(models.Model):
+	photo = models.ForeignKey(Photo, db_index=True)
+	user = models.ForeignKey(User)
+	action_type = models.CharField(max_length=50, db_index=True)
+
+	class Meta:
+		db_table = 'strand_photo_action'
 
