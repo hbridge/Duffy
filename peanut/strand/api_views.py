@@ -77,9 +77,9 @@ def getActionsByPhotoIdCache(photoIds):
 def addActionsToClusters(clusters, actionsByPhotoIdCache):
 	for cluster in clusters:
 		for entry in cluster:
-			entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
+			if entry["photo"].id in actionsByPhotoIdCache:
+				entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
 
-	print clusters
 	return clusters
 
 """
