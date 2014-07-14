@@ -408,7 +408,9 @@ def register_apns_token(request):
 		user.device_token = deviceToken
 		apnsDev = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_DEV_APNS_ID)
 		apnsProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_PROD_APNS_ID)
+		apnsDerekDev = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_DEREK_DEV_APNS_ID)
 		apnsEnterpriseProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_ENTERPRISE_PROD_APNS_ID)
+		apnsEnterpriseDev = APNService.objects.get(id=IOS_NOTIFICATIONS_ENTERPRISE_DEV_APNS_ID)
 
 		devices = Device.objects.filter(token=deviceToken)
 
@@ -416,6 +418,8 @@ def register_apns_token(request):
 			Device.objects.create(token=deviceToken, is_active=True, service=apnsDev)
 			Device.objects.create(token=deviceToken, is_active=True, service=apnsDerekDev)
 			Device.objects.create(token=deviceToken, is_active=True, service=apnsProd)
+			Device.objects.create(token=deviceToken, is_active=True, service=apnsEnterpriseProd)			
+			Device.objects.create(token=deviceToken, is_active=True, service=apnsEnterpriseDev)
 		else:
 			for device in devices:
 				if (not(device.token == deviceToken)):
