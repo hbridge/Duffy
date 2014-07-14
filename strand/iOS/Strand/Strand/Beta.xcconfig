@@ -6,5 +6,6 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-APP_BUNDLE_DISPLAY_NAME_SUFFIX = " Beta"
+EMPTY_STRING =
+APP_BUNDLE_DISPLAY_NAME_SUFFIX = $(EMPTY_STRING) Beta
 APP_BUNDLE_ID_SUFFIX = Enterprise
