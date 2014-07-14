@@ -92,12 +92,12 @@
 
   UIBarButtonItem *likeButton = [[UIBarButtonItem alloc] initWithCustomView:self.favoriteButton];
   UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-  UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc]
+  self.trashButton = [[UIBarButtonItem alloc]
                                    initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
                                    target:self
                                    action:@selector(confirmDeletePhoto)];
   
-  [self.toolbar setItems:@[likeButton, flexibleSpace, deleteButton] animated:NO];
+  [self.toolbar setItems:@[likeButton, flexibleSpace, self.trashButton] animated:NO];
   
   [self updateFavoriteButton];
   if (![self isPhotoDeletableByUser]) {

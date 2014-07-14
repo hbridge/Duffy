@@ -22,7 +22,7 @@
 @property (readonly, nonatomic) BOOL isUserFavorited;
 @property (nonatomic) unsigned int otherUsersFavoritedCount;
 @property (strong, nonatomic) UIButton *favoriteButton;
-@property (weak, nonatomic) IBOutlet UIBarButtonItem *trashButton;
+@property (strong, nonatomic)  UIBarButtonItem *trashButton;
 
 @property (weak, nonatomic) IBOutlet DFPhotoView *photoView;
 @property (nonatomic, retain) NSArray *photoActions;
