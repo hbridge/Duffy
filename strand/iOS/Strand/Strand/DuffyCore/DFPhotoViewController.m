@@ -20,6 +20,7 @@
 #import <CoreImage/CoreImage.h>
 #import <ImageIO/ImageIO.h>
 #import "DFPeanutActionAdapter.h"
+#import "DFPeanutAction.h"
 
 @interface DFPhotoViewController ()
 
@@ -70,6 +71,18 @@
 
 - (void)configureToolbar
 {
+  unsigned int otherFavoritesCount;
+  for (DFPeanutAction *action in self.photoActions) {
+    if ([action.action_type isEqualToString:DFActionFavorite]) {
+      if (action.user == [[DFUser currentUser] userID]) {
+        self.isUserFavorited = YES;
+      } else {
+        otherFavoritesCount++;
+      }
+    }
+  }
+  self.otherUsersFavoritedCount = otherFavoritesCount;
+  
   [self updateFavoriteImage];
   if (![self isPhotoDeletableByUser]) {
     self.trashButton.enabled = NO;
@@ -79,12 +92,15 @@
 - (void)updateFavoriteImage
 {
   UIImage *newImage;
-  if (self.isFavorited) {
+  if (self.isUserFavorited) {
     newImage = [UIImage imageNamed:@"Assets/Icons/LikeOnToolbarIcon"];
   } else {
     newImage = [UIImage imageNamed:@"Assets/Icons/LikeOffToolbarIcon"];
 
   }
+  
+  self.favoriteButton.title = [NSString stringWithFormat:@"%d", self.otherUsersFavoritedCount];
+  
   self.favoriteButton.image = newImage;
 }
 
@@ -362,14 +378,14 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   action.photo = self.photoID;
    DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
   
-  if (!self.isFavorited) {
-    self.isFavorited = YES;
+  if (!self.isUserFavorited) {
+    self.isUserFavorited = YES;
     [self updateFavoriteImage];
     [adapter postAction:action withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
       if (!error) {
         
       } else {
-        self.isFavorited = NO;
+        self.isUserFavorited = NO;
         [self updateFavoriteImage];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                         message:error.localizedDescription
@@ -378,6 +394,21 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
                                               otherButtonTitles:nil];
         [alert show];
       }
+    }];
+  } else {
+    self.isUserFavorited = NO;
+    [self updateFavoriteImage];
+    [adapter deleteAction:action withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
+      if (error) {
+        self.isUserFavorited = YES;
+        [self updateFavoriteImage];
+      }
+      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                      message:error.localizedDescription
+                                                     delegate:nil
+                                            cancelButtonTitle:@"OK"
+                                            otherButtonTitles:nil];
+      [alert show];
     }];
   }
 }

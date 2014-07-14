@@ -46,15 +46,22 @@ NSString *const ActionPostPath = @"photo_actions/";
 }
 
 
-
-- (void)postAction:(DFPeanutAction *)action
-withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock
+- (void)performAction:(DFPeanutAction *)action
+    withRequestMethod:(RKRequestMethod)method
+         useActionURL:(BOOL)useActionURL
+      completionBlock:(DFPeanutActionResponseBlock)completionBlock
 {
   NSDictionary *parameters = [action
                               dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]];
+  
+  NSString *path = ActionPostPath;
+  if (useActionURL) {
+    path = [NSString stringWithFormat:@"%@%@", ActionPostPath, @(action.id)];
+  }
+  
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutAction alloc] init]
-                              method:RKRequestMethodPOST
+                              method:method
                               path:ActionPostPath
                               parameters:parameters
                               ];
@@ -114,6 +121,24 @@ withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock
    }];
   
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
+}
+
+- (void)postAction:(DFPeanutAction *)action
+withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock
+{
+  [self performAction:action
+    withRequestMethod:RKRequestMethodPOST
+         useActionURL:NO
+      completionBlock:completionBlock];
+}
+
+- (void)deleteAction:(DFPeanutAction *)action
+ withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock
+{
+  [self performAction:action
+    withRequestMethod:RKRequestMethodDELETE
+   useActionURL:YES
+      completionBlock:completionBlock];
 }
 
 

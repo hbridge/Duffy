@@ -15,15 +15,21 @@
 #import "DFPhotoViewController.h"
 #import "DFAnalytics.h"
 #import "DFSettingsViewController.h"
+#import "DFPeanutGalleryAdapter.h"
+#import "DFPeanutSearchObject.h"
 
 @interface DFGalleryWebViewController ()
 
 @property (nonatomic, retain) NSURL *currentPhotoURL;
 @property (nonatomic, retain) NSArray *currentPhotoArrayURLStrings;
+@property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *peanutGalleryAdapter;
+@property (nonatomic, retain) NSMutableDictionary *photoActions;
 
 @end
 
-@implementation DFGalleryWebViewController
+@implementation DFGalleryWebViewController\
+
+@synthesize peanutGalleryAdapter = _peanutGalleryAdapter;
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -102,6 +108,7 @@
   DDLogInfo(@"Fetching url:%@", webView.request.URL.absoluteString);
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self setNavigationButtons];
+  [self updateGalleryActions];
 }
 
 - (BOOL)webView:(UIWebView *)webView
@@ -131,6 +138,36 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
   [self setNavigationButtons];
+}
+
+
+- (void)updateGalleryActions
+{
+  [self.peanutGalleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response) {
+    if (response.result) {
+      self.photoActions = [[NSMutableDictionary alloc] init];
+      for (DFPeanutSearchObject *object in response.objects) {
+        [DFGalleryWebViewController addObjectActionsForObject:object toDictionary:self.photoActions];
+      }
+    }
+  }];
+}
+
++ (void)addObjectActionsForObject:(DFPeanutSearchObject *)searchObject
+                     toDictionary:(NSMutableDictionary *)dict
+{
+  for (DFPeanutAction *action in searchObject.actions) {
+    NSMutableArray *actionsForPhoto = dict[@(action.photo)];
+    if (!actionsForPhoto) {
+      actionsForPhoto = [[NSMutableArray alloc] init];
+      dict[@(action.photo)] = actionsForPhoto;
+    }
+    [actionsForPhoto addObject:action];
+  }
+  
+  for (DFPeanutSearchObject *subObject in searchObject.objects) {
+    [DFGalleryWebViewController addObjectActionsForObject:subObject toDictionary:dict];
+  }
 }
 
 
@@ -167,6 +204,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photoURL = photoURL;
+  pvc.photoActions = self.photoActions[@(pvc.photoID)];
   DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc] init];
   [mpvc setViewControllers:@[pvc]
                  direction:UIPageViewControllerNavigationDirectionForward
@@ -217,6 +255,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   NSURL *newPhotoURL = [NSURL URLWithString:[self.currentPhotoArrayURLStrings objectAtIndex:index]];
   DFPhotoViewController *pvc = [[DFPhotoViewController alloc] init];
   pvc.photoURL = newPhotoURL;
+  pvc.photoActions = self.photoActions[@(pvc.photoID)];
   return pvc;
 }
 
@@ -249,6 +288,17 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
                                initWithRootViewController:settingsViewController]
                      animated:YES
                    completion:nil];
+}
+
+#pragma mark - Adapters
+
+- (DFPeanutGalleryAdapter *)peanutGalleryAdapter
+{
+  if (!_peanutGalleryAdapter) {
+    _peanutGalleryAdapter = [[DFPeanutGalleryAdapter alloc] init];
+  }
+  
+  return _peanutGalleryAdapter;
 }
 
 

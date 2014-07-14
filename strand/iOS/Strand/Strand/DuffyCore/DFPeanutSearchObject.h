@@ -10,6 +10,7 @@
 #import "DFPeanutObject.h"
 #import "DFJSONConvertible.h"
 #import "DFPhoto.h"
+#import "DFPeanutAction.h"
 
 @interface DFPeanutSearchObject : NSObject<DFPeanutObject, DFJSONConvertible>
 
@@ -25,5 +26,7 @@ extern DFSearchObjectType DFSearchObjectDocstack;
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) NSArray *objects;
 @property (nonatomic) DFPhotoIDType id;
+@property (nonatomic, retain) NSArray *actions;
+
 
 @end

@@ -17,5 +17,7 @@ typedef void (^DFPeanutActionResponseBlock)(DFPeanutAction *action, NSError *err
 
 - (void)postAction:(DFPeanutAction *)action
 withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock;
+- (void)deleteAction:(DFPeanutAction *)action
+ withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock;
 
 @end

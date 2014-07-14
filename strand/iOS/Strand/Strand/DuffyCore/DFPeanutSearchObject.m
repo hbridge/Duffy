@@ -40,6 +40,8 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects" mapping:objectMapping];
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"actions" mapping:[DFPeanutAction objectMapping]];
+  
   
   return objectMapping;
 }
@@ -60,6 +62,15 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
     }
     
     resultDict[@"objects"] = objectsJSONDicts;
+  }
+  
+  if (self.actions.count > 0) {
+    NSMutableArray *actionsJSONDicts = [[NSMutableArray alloc] initWithCapacity:self.actions.count];
+    for (DFPeanutAction *action in self.actions) {
+      NSDictionary *actionDict = [action dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]];
+      [actionsJSONDicts addObject:actionDict];
+    }
+    resultDict[@"actions"] = actionsJSONDicts;
   }
   
   return resultDict;
