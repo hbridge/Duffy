@@ -86,6 +86,10 @@
   [[BITHockeyManager sharedHockeyManager] startManager];
   [[BITHockeyManager sharedHockeyManager].authenticator
    authenticateInstallation];
+  
+  #ifdef DEBUG
+  [[BITHockeyManager sharedHockeyManager] setDisableUpdateManager:YES];
+  #endif
 }
 
 - (BOOL)isAppSetupComplete
