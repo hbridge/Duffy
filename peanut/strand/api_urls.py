@@ -6,7 +6,7 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView
 from strand import api_views as strand_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import PhotoActio
+from common.models import PhotoAction
 
 urlpatterns = patterns('',
 	url(r'^get_user', 'arbus.api_views.get_user', {'productId': '1'}),
