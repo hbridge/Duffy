@@ -485,7 +485,7 @@ def get_nearby_friends_message(request):
 		
 			if len(nonPhotoUsers) == 0:
 				if len(names) <= 2:
-					message = "& ".join(names)
+					message = " & ".join(names)
 				else:
 					numNames = len(names)
 					message = ", ".join(names[:numNames-2])
