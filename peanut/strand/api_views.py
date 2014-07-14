@@ -414,7 +414,7 @@ def register_apns_token(request):
 
 		if (len(devices) == 0):
 			Device.objects.create(token=deviceToken, is_active=True, service=apnsDev)
-			Device.objects.create(token=deviceToken, is_active=True, service=apnsEnterpriseProd)
+			Device.objects.create(token=deviceToken, is_active=True, service=apnsDerekDev)
 			Device.objects.create(token=deviceToken, is_active=True, service=apnsProd)
 		else:
 			for device in devices:
@@ -668,7 +668,8 @@ def auth_phone(request):
 			elif smsAuth[0].added < timeWithin:
 				return HttpResponse(json.dumps({'access_code': 'Code expired'}), content_type="application/json", status=400)
 			else:
-				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0])
+				# TODO(Derek):  End of August, change returnIfExists to False, so we start archiving again
+				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0], returnIfExist = True)
 				serializer = UserSerializer(user)
 				response['user'] = serializer.data
 		else:
