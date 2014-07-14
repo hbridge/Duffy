@@ -1,5 +1,9 @@
 # Strand
 
+## Jul 14th, 2014
+
+- Easier to add new users.
+
 ## Jul 10th, 2014
 
 - Added a bar to the top of the camera with who's nearby to see your photos
