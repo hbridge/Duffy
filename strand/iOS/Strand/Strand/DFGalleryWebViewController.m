@@ -17,6 +17,8 @@
 #import "DFSettingsViewController.h"
 #import "DFPeanutGalleryAdapter.h"
 #import "DFPeanutSearchObject.h"
+#import "DFInviteUserComposeController.h"
+#import "UIAlertView+DFHelpers.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -24,6 +26,7 @@
 @property (nonatomic, retain) NSArray *currentPhotoArrayURLStrings;
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *peanutGalleryAdapter;
 @property (nonatomic, retain) NSMutableDictionary *photoActions;
+@property (nonatomic, retain) DFInviteUserComposeController *inviteController;
 
 @end
 
@@ -121,6 +124,16 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     DDLogVerbose(@"Search result clicked for photo with URL: %@", requestURLString);
     
     [self fullPhotoRequestedWithURL:requestURLString];
+    return NO;
+  } else if ([requestURLString rangeOfString:@"/strand/viz/invite"].location != NSNotFound) {
+    self.inviteController = [[DFInviteUserComposeController alloc] init];
+    [self.inviteController loadMessageWithCompletion:^(NSError *error) {
+      if (!error) {
+      [self presentViewController:self.inviteController animated:YES completion:nil];
+      } else {
+        [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
+      }
+    }];
     return NO;
   }
   return YES;
