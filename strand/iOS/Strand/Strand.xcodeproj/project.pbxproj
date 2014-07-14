@@ -144,6 +144,7 @@
 		5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutTrueFalseResponse.m; sourceTree = "<group>"; };
 		5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationStore.h; sourceTree = "<group>"; };
 		5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationStore.m; sourceTree = "<group>"; };
+		5A0E121C1974465700B6FF04 /* Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Beta.xcconfig; sourceTree = "<group>"; };
 		5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFModalSpinnerViewController.h; sourceTree = "<group>"; };
 		5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFModalSpinnerViewController.m; sourceTree = "<group>"; };
 		5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFModalSpinnerViewController.xib; sourceTree = "<group>"; };
@@ -777,6 +778,7 @@
 				5AC4A8D41947AEF500862D9C /* Strand-Prefix.pch */,
 				5ADD857319465C790037A6D5 /* Info.plist */,
 				5ADD857419465C790037A6D5 /* main.m */,
+				5A0E121C1974465700B6FF04 /* Beta.xcconfig */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1147,6 +1149,7 @@
 		};
 		5ADD859419465C790037A6D5 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 5A0E121C1974465700B6FF04 /* Beta.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -1194,7 +1197,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "6E9CEC4E-1BA6-445F-9923-B837F11A5A95";
+				PROVISIONING_PROFILE = "18456445-25F2-4635-A9F3-9D1B05F9029A";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -1205,14 +1208,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Henry Bridge (2AJ4WA5ATM)";
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "C8622B44-1F9D-4CFE-963F-F0AA1B0C3135";
+				PROVISIONING_PROFILE = "6E9CEC4E-1BA6-445F-9923-B837F11A5A95";
 				SDKROOT = iphoneos;
 			};
 			name = Release;
