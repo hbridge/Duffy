@@ -20,5 +20,6 @@
 @property (readonly, nonatomic, retain) NSString *terms;
 @property (readonly, nonatomic, retain) NSString *privacyPolicy;
 @property (readonly, nonatomic, retain) NSString *locationMap;
+@property (nonatomic, retain) NSString *inviteUser;
 
 @end
