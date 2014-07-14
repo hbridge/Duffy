@@ -12,6 +12,10 @@ from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import Http404
 
+from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
+from rest_framework import status
+
 from peanut.settings import constants
 
 from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction
@@ -687,3 +691,24 @@ def auth_phone(request):
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
+
+"""
+	REST interface for creating new PhotoActions.
+
+	Use a custom overload of the create method so we don't double create likes
+"""
+class CreatePhotoActionAPI(CreateAPIView):
+	def post(self, request):
+		serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+
+		if serializer.is_valid():
+			obj = serializer.object
+			results = PhotoAction.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
+
+			if len(results) > 0:
+				serializer = self.get_serializer(results[0])
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			else:
+				return super(CreatePhotoActionAPI, self).post(request)
+		else:
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

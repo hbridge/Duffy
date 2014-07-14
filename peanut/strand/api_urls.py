@@ -1,6 +1,6 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
-from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 
 # If you're changing these, don't forget to change them below
 from strand import api_views as strand_api_views
@@ -26,7 +26,7 @@ urlpatterns = patterns('',
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
-	url(r'^photo_actions/$', CreateAPIView.as_view(model=PhotoAction, lookup_field='id')),
+	url(r'^photo_actions/$', strand_api_views.CreatePhotoActionAPI.as_view(model=PhotoAction, lookup_field='id')),
 	url(r'^photo_actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=PhotoAction, lookup_field='id')),
 
 	# experimental

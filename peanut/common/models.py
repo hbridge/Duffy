@@ -311,3 +311,5 @@ class PhotoAction(models.Model):
 	class Meta:
 		db_table = 'strand_photo_action'
 
+	def __unicode__(self):
+		return "%s %s %s %s" % (self.id, self.photo_id, self.user_id, self.action_type)
