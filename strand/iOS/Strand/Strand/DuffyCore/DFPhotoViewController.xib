@@ -6,10 +6,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPhotoViewController">
             <connections>
-                <outlet property="favoriteButton" destination="3hm-Wm-CE3" id="Tvh-Yx-8nj"/>
                 <outlet property="photoView" destination="qLd-yU-pjU" id="rYp-6S-C2q"/>
                 <outlet property="toolbar" destination="RoJ-UU-ZGf" id="iI5-rK-Buf"/>
-                <outlet property="trashButton" destination="ORz-bW-5Hu" id="YEX-VC-36f"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -29,19 +27,7 @@
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="RoJ-UU-ZGf">
                     <rect key="frame" x="0.0" y="524" width="320" height="44"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                    <items>
-                        <barButtonItem image="LikeOffToolbarIcon.png" id="3hm-Wm-CE3" userLabel="Favorite button">
-                            <connections>
-                                <action selector="favoriteButtonPressed:" destination="-1" id="ctU-ew-VZC"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem style="plain" systemItem="flexibleSpace" id="qko-80-vZ8"/>
-                        <barButtonItem systemItem="trash" id="ORz-bW-5Hu" userLabel="Trash button">
-                            <connections>
-                                <action selector="deleteButtonPressed:" destination="-1" id="ISq-EH-cw8"/>
-                            </connections>
-                        </barButtonItem>
-                    </items>
+                    <items/>
                     <color key="tintColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
                 </toolbar>
             </subviews>
@@ -67,7 +53,4 @@
             </connections>
         </tapGestureRecognizer>
     </objects>
-    <resources>
-        <image name="LikeOffToolbarIcon.png" width="22" height="22"/>
-    </resources>
 </document>

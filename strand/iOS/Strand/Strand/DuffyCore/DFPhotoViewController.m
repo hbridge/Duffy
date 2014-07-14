@@ -39,8 +39,8 @@
     if (self) {
         UINavigationItem *n = [self navigationItem];
         [n setTitle:@"Photo"];
-        
-        
+      self.otherUsersFavoritedCount = 0;
+      
         self.automaticallyAdjustsScrollViewInsets = NO;
         self.hidesBottomBarWhenPushed = YES;
     }
@@ -72,7 +72,7 @@
 
 - (void)configureToolbar
 {
-  unsigned int otherFavoritesCount;
+  unsigned int otherFavoritesCount = 0;
   for (DFPeanutAction *action in self.photoActions) {
     if ([action.action_type isEqualToString:DFActionFavorite]) {
       if (action.user == [[DFUser currentUser] userID]) {
@@ -84,13 +84,28 @@
   }
   self.otherUsersFavoritedCount = otherFavoritesCount;
   
-  [self updateFavoriteImage];
+  self.favoriteButton = [UIButton buttonWithType:UIButtonTypeCustom];
+  [self.favoriteButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
+  [self.favoriteButton addTarget:self
+                          action:@selector(favoriteButtonPressed:)
+                forControlEvents:UIControlEventTouchUpInside];
+
+  UIBarButtonItem *likeButton = [[UIBarButtonItem alloc] initWithCustomView:self.favoriteButton];
+  UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+  UIBarButtonItem *deleteButton = [[UIBarButtonItem alloc]
+                                   initWithBarButtonSystemItem:UIBarButtonSystemItemTrash
+                                   target:self
+                                   action:@selector(confirmDeletePhoto)];
+  
+  [self.toolbar setItems:@[likeButton, flexibleSpace, deleteButton] animated:NO];
+  
+  [self updateFavoriteButton];
   if (![self isPhotoDeletableByUser]) {
     self.trashButton.enabled = NO;
   }
 }
 
-- (void)updateFavoriteImage
+- (void)updateFavoriteButton
 {
   UIImage *newImage;
   if (self.isUserFavorited) {
@@ -100,9 +115,11 @@
 
   }
   
-  self.favoriteButton.title = [NSString stringWithFormat:@"%d", self.otherUsersFavoritedCount];
-  
-  self.favoriteButton.image = newImage;
+  [self.favoriteButton setTitle:[NSString stringWithFormat:@" %d ",
+                                 self.otherUsersFavoritedCount + self.isUserFavorited ? 1 : 0]
+   forState:UIControlStateNormal];
+  [self.favoriteButton setImage:newImage forState:UIControlStateNormal];
+  [self.favoriteButton sizeToFit];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -383,13 +400,13 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
     newAction.photo = self.photoID;
 
     self.userFavoritedAction = newAction;
-    [self updateFavoriteImage];
+    [self updateFavoriteButton];
     [adapter postAction:newAction withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
       if (!error) {
         self.userFavoritedAction = action;
       } else {
         self.userFavoritedAction = oldAction;
-        [self updateFavoriteImage];
+        [self updateFavoriteButton];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                         message:error.localizedDescription
                                                        delegate:nil
@@ -400,11 +417,11 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
     }];
   } else {
     self.userFavoritedAction = nil;
-    [self updateFavoriteImage];
+    [self updateFavoriteButton];
     [adapter deleteAction:oldAction withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
       if (error) {
         self.userFavoritedAction = oldAction;
-        [self updateFavoriteImage];
+        [self updateFavoriteButton];
       }
       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                       message:error.localizedDescription
