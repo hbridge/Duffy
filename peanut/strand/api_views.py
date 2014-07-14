@@ -408,7 +408,7 @@ def register_apns_token(request):
 		user.device_token = deviceToken
 		apnsDev = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_DEV_APNS_ID)
 		apnsProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_PROD_APNS_ID)
-		apnsEnterpriseProd = APNService.objects.get(id=IOS_NOTIFICATIONS_ENTERPRISE_PROD_APNS_ID)
+		apnsEnterpriseProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_ENTERPRISE_PROD_APNS_ID)
 
 		devices = Device.objects.filter(token=deviceToken)
 
