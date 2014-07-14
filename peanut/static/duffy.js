@@ -67,6 +67,7 @@ function addCluster(photos, userList, isLocked){
 		if (photo.type == 'photo'){
 			if (i == 0 && !isLocked) { // meaning first one in a cluster
 				html += addPhoto(photo, userList, 0, isLocked);
+				html += "<div class='ui-cluster-header'> Similar photos </div>";
 			}
 			else {
 				if (i % 4 == 0) {

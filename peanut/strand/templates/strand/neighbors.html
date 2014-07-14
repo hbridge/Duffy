@@ -58,6 +58,22 @@
 			position: absolute;
 			clip: rect(4px, 76px, 76px, 4px);
 		}
+		.ui-cluster-header {
+			padding: 11px 0px 11px 10px;
+		}
+		.ui-invite {
+			text-align: right;
+			float: right;
+			width: 50px;
+			height: 40px;
+		}
+		.ui-invite-icon {
+			width: 40px;
+			height: 40px;
+		}
+		.ui-sec-header-lhs {
+			width: 250px;
+		}
 	</style>
 	<script src="//code.jquery.com/jquery-1.10.2.min.js"> </script>
 	<script src="/static/jquery.timeago.js"></script>	
@@ -84,19 +100,19 @@
 			if (section.title == 'Recent') {
 				secTop = "<div class='ui-sec-head-top'>Recent photos</div>";
 				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span></div>";
-				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
+				
 			}
 			else if (section.title == 'Locked') {
 				secTop = "<div class='ui-sec-head-top'>Take a photo to unlock these photos </div>";
 				secBottom = "<div class='ui-sec-head-bottom'>" + "<span class='timeago' title='" + t + "'></span> with " + uniqueUser(userList) + "</div>";
-				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";	
 			}
 			else {
 				secTop = "<div class='ui-sec-head-top'>With " + uniqueUser(userList) + "</div>";
 				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span> in " + section.title +"</div>";
-				html = "<div class='ui-sec-header'>" + secTop + secBottom + "</div>";
 			}
 
+			inviteLink = "<div class='ui-invite'><a href='/strand/viz/invite'><img class='ui-invite-icon' src='/static/invite_icon.jpg'></a></div>";
+			html = "<div class='ui-sec-header'>" + inviteLink + "<div class='ui-sec-header-lhs'>" + secTop + secBottom + "</div></div>";
 			return html;
 		}
 
