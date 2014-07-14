@@ -15,11 +15,13 @@
 #import "DFBackgroundLocationManager.h"
 #import "DFMapViewController.h"
 #import "DFPeanutInviteMessageAdapter.h"
+#import "DFInviteUserComposeController.h"
 
 @interface DFSettingsViewController ()
 
 @property (nonatomic, retain) FKFormModel *formModel;
 @property (nonatomic, retain) DFSettings *settings;
+@property (nonatomic, retain) DFInviteUserComposeController *inviteController;
 
 @end
 
@@ -139,46 +141,12 @@
 - (FKFormMappingButtonHandlerBlock)inviteUserHandler
 {
   return ^(id object){
-    DFPeanutInviteMessageAdapter *inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
-    [inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
-      if (!error) {
-        MFMessageComposeViewController *messageController = [[MFMessageComposeViewController alloc] init];
-        messageController.messageComposeDelegate = self;
-        [messageController setBody:response.invite_message];
-        
-        // Present message view controller on screen
-        [self presentViewController:messageController animated:YES completion:nil];
-      } else {
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                        message:error.localizedDescription
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles: nil];
-        [alert show];
-      }
+    self.inviteController = [[DFInviteUserComposeController alloc] init];
+    [self.inviteController loadMessageWithCompletion:^(NSError *error) {
+      [self presentViewController:self.inviteController animated:YES completion:nil];
     }];
   };
 }
 
-
-- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
-                 didFinishWithResult:(MessageComposeResult)result
-{
-  [controller dismissViewControllerAnimated:YES completion:^{
-    DFPeanutInviteMessageAdapter *inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
-    [inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
-      if (!error) {
-        NSString *message = [NSString stringWithFormat:@"You have %d invites remaining.",
-                             response.invites_remaining];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Remaining Invites"
-                                                        message:message
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles: nil];
-        [alert show];
-      }
-    }];
-  }];
-}
 
 @end

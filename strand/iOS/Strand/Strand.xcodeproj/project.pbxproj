@@ -18,6 +18,7 @@
 		5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */; };
 		5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */; };
 		5A0E122A1974839200B6FF04 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0E12291974839200B6FF04 /* MessageUI.framework */; };
+		5A0E122D197487CC00B6FF04 /* DFInviteUserComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122C197487CC00B6FF04 /* DFInviteUserComposeController.m */; };
 		5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */; };
 		5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
@@ -153,6 +154,8 @@
 		5A0E122619747C6200B6FF04 /* DFPeanutInviteMessageAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutInviteMessageAdapter.h; sourceTree = "<group>"; };
 		5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutInviteMessageAdapter.m; sourceTree = "<group>"; };
 		5A0E12291974839200B6FF04 /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
+		5A0E122B197487CC00B6FF04 /* DFInviteUserComposeController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFInviteUserComposeController.h; sourceTree = "<group>"; };
+		5A0E122C197487CC00B6FF04 /* DFInviteUserComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFInviteUserComposeController.m; sourceTree = "<group>"; };
 		5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFModalSpinnerViewController.h; sourceTree = "<group>"; };
 		5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFModalSpinnerViewController.m; sourceTree = "<group>"; };
 		5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFModalSpinnerViewController.xib; sourceTree = "<group>"; };
@@ -391,6 +394,8 @@
 				5A7B1842196F2C0800E5A1D1 /* DFMapViewController.h */,
 				5A7B1843196F2C0800E5A1D1 /* DFMapViewController.m */,
 				5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */,
+				5A0E122B197487CC00B6FF04 /* DFInviteUserComposeController.h */,
+				5A0E122C197487CC00B6FF04 /* DFInviteUserComposeController.m */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -1040,6 +1045,7 @@
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */,
+				5A0E122D197487CC00B6FF04 /* DFInviteUserComposeController.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
