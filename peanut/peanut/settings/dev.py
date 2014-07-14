@@ -30,7 +30,7 @@ LOGGING = {
 	},
 	'handlers': {
 		'djangofile': {
-			'level': 'DEBUG',
+			'level': 'INFO',
 			'class':'logging.handlers.RotatingFileHandler',
 			'filename': '/home/derek/logs/duffy-all.log',
 			'formatter': 'verbose'

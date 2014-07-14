@@ -30,7 +30,7 @@ LOGGING = {
 	},
 	'handlers': {
 		'djangofile': {
-			'level': 'DEBUG',
+			'level': 'INFO',
 			'class':'logging.handlers.RotatingFileHandler',
 			'filename': '/home/ubuntu/logs/duffy-all.log',
 			'formatter': 'verbose'
