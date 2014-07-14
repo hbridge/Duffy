@@ -40,11 +40,12 @@
   [self configureHockey];
   
   self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  
-  if (![self isAppSetupComplete]) {
+
+   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
+  } else if (![self isAuthTokenValid]) {
+    [self resetApplication];
   } else {
-    [self checkAuthTokenValid];
     [self showMainView];
    }
   
@@ -117,13 +118,13 @@
    startUpdatingOnSignificantLocationChange];
 }
 
-- (void)checkAuthTokenValid
+- (BOOL)isAuthTokenValid
 {
   NSString *authToken = [[DFUser currentUser] authToken];
   // for now, if there is an authToken at all, we'll consider it valid
-  if (authToken && ![authToken isEqualToString:@""]) return;
+  if (authToken && ![authToken isEqualToString:@""]) return YES;
   
-  [self resetApplication];
+  return NO;
 }
 
 - (void)performForegroundOperations
