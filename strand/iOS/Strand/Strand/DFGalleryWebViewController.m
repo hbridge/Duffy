@@ -79,6 +79,7 @@
                                                       object:self
                                                     userInfo:nil];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
+  [self updateGalleryActions];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -111,7 +112,6 @@
   DDLogInfo(@"Fetching url:%@", webView.request.URL.absoluteString);
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self setNavigationButtons];
-  [self updateGalleryActions];
 }
 
 - (BOOL)webView:(UIWebView *)webView
