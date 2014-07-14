@@ -116,7 +116,7 @@
   }
   
   [self.favoriteButton setTitle:[NSString stringWithFormat:@" %d ",
-                                 self.otherUsersFavoritedCount + self.isUserFavorited ? 1 : 0]
+                                 self.otherUsersFavoritedCount + (self.isUserFavorited ? 1 : 0)]
    forState:UIControlStateNormal];
   [self.favoriteButton setImage:newImage forState:UIControlStateNormal];
   [self.favoriteButton sizeToFit];
