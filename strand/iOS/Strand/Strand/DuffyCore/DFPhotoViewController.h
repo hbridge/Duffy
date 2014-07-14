@@ -19,7 +19,7 @@
 @property (readonly) DFPhotoIDType photoID;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
-@property (nonatomic) unsigned int isUserFavorited;
+@property (readonly, nonatomic) BOOL isUserFavorited;
 @property (nonatomic) unsigned int otherUsersFavoritedCount;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *favoriteButton;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *trashButton;

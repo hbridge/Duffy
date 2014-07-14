@@ -27,6 +27,7 @@
 @property (nonatomic) BOOL hideStatusBar;
 @property (atomic) BOOL isPhotoLoadInProgress;
 @property (nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
+@property (nonatomic, retain) DFPeanutAction *userFavoritedAction;
 
 @end
 
@@ -75,7 +76,7 @@
   for (DFPeanutAction *action in self.photoActions) {
     if ([action.action_type isEqualToString:DFActionFavorite]) {
       if (action.user == [[DFUser currentUser] userID]) {
-        self.isUserFavorited = YES;
+        self.userFavoritedAction = action;
       } else {
         otherFavoritesCount++;
       }
@@ -372,20 +373,22 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 - (IBAction)favoriteButtonPressed:(UIBarButtonItem *)sender {
   DDLogVerbose(@"Favorite button pressed");
   
-  DFPeanutAction *action = [[DFPeanutAction alloc] init];
-  action.user = [[DFUser currentUser] userID];
-  action.action_type = DFActionFavorite;
-  action.photo = self.photoID;
-   DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
+  DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
   
+  DFPeanutAction *oldAction = self.userFavoritedAction;
   if (!self.isUserFavorited) {
-    self.isUserFavorited = YES;
+    DFPeanutAction *newAction = [[DFPeanutAction alloc] init];
+    newAction.user = [[DFUser currentUser] userID];
+    newAction.action_type = DFActionFavorite;
+    newAction.photo = self.photoID;
+
+    self.userFavoritedAction = newAction;
     [self updateFavoriteImage];
-    [adapter postAction:action withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
+    [adapter postAction:newAction withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
       if (!error) {
-        
+        self.userFavoritedAction = action;
       } else {
-        self.isUserFavorited = NO;
+        self.userFavoritedAction = oldAction;
         [self updateFavoriteImage];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                         message:error.localizedDescription
@@ -396,11 +399,11 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
       }
     }];
   } else {
-    self.isUserFavorited = NO;
+    self.userFavoritedAction = nil;
     [self updateFavoriteImage];
-    [adapter deleteAction:action withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
+    [adapter deleteAction:oldAction withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
       if (error) {
-        self.isUserFavorited = YES;
+        self.userFavoritedAction = oldAction;
         [self updateFavoriteImage];
       }
       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
@@ -413,6 +416,11 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   }
 }
 
+
+- (BOOL)isUserFavorited
+{
+  return (self.userFavoritedAction != nil);
+}
 
 #pragma mark - Status bar
 

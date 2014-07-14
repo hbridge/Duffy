@@ -12,6 +12,7 @@
 #import "DFPeanutInvalidField.h"
 
 NSString *const ActionPostPath = @"photo_actions/";
+NSString *const ActionIDPath = @"photo_actions/:id/";
 
 @implementation DFPeanutActionAdapter
 
@@ -35,9 +36,15 @@ NSString *const ActionPostPath = @"photo_actions/";
                                           pathPattern:ActionPostPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
+  RKResponseDescriptor *actionErrorResponse =
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+                                               method:RKRequestMethodAny
+                                          pathPattern:ActionIDPath
+                                              keyPath:nil
+                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
   
   
-  return [NSArray arrayWithObjects:successReponse, errorResponse, nil];
+  return [NSArray arrayWithObjects:successReponse, errorResponse, actionErrorResponse, nil];
 }
 
 + (NSArray *)requestDescriptors
@@ -62,7 +69,7 @@ NSString *const ActionPostPath = @"photo_actions/";
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutAction alloc] init]
                               method:method
-                              path:ActionPostPath
+                              path:path
                               parameters:parameters
                               ];
   DDLogInfo(@"%@ getting endpoint: %@, parameters:%@", [[self class] description],
@@ -78,15 +85,10 @@ NSString *const ActionPostPath = @"photo_actions/";
        DFPeanutAction *action = mappingResult.firstObject;
        DDLogInfo(@"%@ created peanut action with id: %llu", [self.class description], action.id);
        completionBlock(action, nil);
+     } else if (method == RKRequestMethodDELETE && mappingResult == nil) {
+       DDLogInfo(@"%@ deleted peanut action with id: %llu", [self.class description], action.id);
      } else {
-       DDLogVerbose(@"400 mapping result first object class: %@", [mappingResult.firstObject class]);
-       NSError *error =
-       [NSError errorWithDomain:@"com.duffapp.Strand"
-                           code:-10
-                       userInfo:@{
-                                  NSLocalizedDescriptionKey:[NSString stringWithFormat:@"%@", mappingResult.firstObject]
-                                  }];
-       completionBlock(nil, error);
+       DDLogError(@"%@ unexpected response: %@", [self.class description], mappingResult.firstObject);
      }
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
