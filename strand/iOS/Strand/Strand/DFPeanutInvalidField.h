@@ -12,5 +12,9 @@
 @interface DFPeanutInvalidField : NSObject <DFPeanutObject>
 @property (nonatomic, retain) NSString *field_name;
 @property (nonatomic, retain) NSArray *field_errors;
+
+
++ (NSError *)invalidFieldsErrorForError:(NSError *)error;
+
 @end
 

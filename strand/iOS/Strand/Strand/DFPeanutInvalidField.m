@@ -19,4 +19,26 @@
   return mapping;
 }
 
++ (NSError *)invalidFieldsErrorForError:(NSError *)error
+{
+  NSArray *invalidFields = error.userInfo[RKObjectMapperErrorObjectsKey];
+  if (invalidFields && invalidFields.count > 0) {
+    NSMutableString *invalidFieldsString = [[NSMutableString alloc] init];
+    for (DFPeanutInvalidField *invalidField in invalidFields) {
+      [invalidFieldsString appendString:[NSString stringWithFormat:@"%@: %@. ",
+                                         invalidField.field_name,
+                                         invalidField.field_errors.firstObject]];
+    }
+    
+    
+    NSError *betterError = [NSError errorWithDomain:@"com.duffyapp.duffy"
+                                      code:-11 userInfo:@{
+                                                          NSLocalizedDescriptionKey: invalidFieldsString
+                                                          }];
+    return betterError;
+  }
+  
+  return error;
+}
+
 @end

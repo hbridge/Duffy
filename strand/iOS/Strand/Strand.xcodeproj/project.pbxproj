@@ -15,6 +15,8 @@
 		5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */; };
 		5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */; };
 		5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */; };
+		5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */; };
+		5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */; };
 		5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */; };
 		5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
@@ -145,6 +147,10 @@
 		5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationStore.h; sourceTree = "<group>"; };
 		5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationStore.m; sourceTree = "<group>"; };
 		5A0E121C1974465700B6FF04 /* Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Beta.xcconfig; sourceTree = "<group>"; };
+		5A0E122319747BD800B6FF04 /* DFPeanutInviteMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutInviteMessageResponse.h; sourceTree = "<group>"; };
+		5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutInviteMessageResponse.m; sourceTree = "<group>"; };
+		5A0E122619747C6200B6FF04 /* DFPeanutInviteMessageAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutInviteMessageAdapter.h; sourceTree = "<group>"; };
+		5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutInviteMessageAdapter.m; sourceTree = "<group>"; };
 		5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFModalSpinnerViewController.h; sourceTree = "<group>"; };
 		5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFModalSpinnerViewController.m; sourceTree = "<group>"; };
 		5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFModalSpinnerViewController.xib; sourceTree = "<group>"; };
@@ -552,6 +558,8 @@
 				5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */,
 				5A7B184B19707C7200E5A1D1 /* DFPeanutActionAdapter.h */,
 				5A7B184C19707C7200E5A1D1 /* DFPeanutActionAdapter.m */,
+				5A0E122619747C6200B6FF04 /* DFPeanutInviteMessageAdapter.h */,
+				5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -571,6 +579,8 @@
 				5A7B184F19707D9600E5A1D1 /* DFPeanutActionResponse.m */,
 				5A7B185119707DE300E5A1D1 /* DFPeanutAction.h */,
 				5A7B185219707DE300E5A1D1 /* DFPeanutAction.m */,
+				5A0E122319747BD800B6FF04 /* DFPeanutInviteMessageResponse.h */,
+				5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -1001,6 +1011,7 @@
 				5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */,
 				5AA45299196708D00099CBD2 /* DFPhotoViewCell.m in Sources */,
 				5AC4A9261947C30800862D9C /* DFNetworkingConstants.m in Sources */,
+				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
@@ -1068,6 +1079,7 @@
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
 				5AC4A9351947C30800862D9C /* DFUploadSessionStats.m in Sources */,
 				5AC4A94F1947C54C00862D9C /* Duffy.xcdatamodeld in Sources */,
+				5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */,
 				5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */,
 				5AC4A92C1947C30800862D9C /* DFPhotoImageCache.m in Sources */,
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
