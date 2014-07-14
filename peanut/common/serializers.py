@@ -12,12 +12,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User
-		fields = ('id', 'display_name', 'phone_number', 'auth_token')
-
-class SimpleUserSerializer(serializers.ModelSerializer):
-	class Meta:
-		model = User
-		fields = ('id', 'display_name')
+		fields = ('id', 'display_name', 'phone_number', 'auth_token', 'invites_remaining')
 
 class PhotoActionWithUserNameSerializer(serializers.ModelSerializer):
 	user_display_name = serializers.SerializerMethodField('getUserDisplayName')
@@ -25,7 +20,6 @@ class PhotoActionWithUserNameSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PhotoAction
 		fields = ('id', 'photo', 'user', 'user_display_name', 'action_type')
-
 
 	def getUserDisplayName(self, obj):
 		return obj.user.display_name

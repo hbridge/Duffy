@@ -44,3 +44,6 @@ class AuthPhoneForm(forms.Form):
 	sms_access_code = forms.IntegerField(min_value=1000, max_value=9999)
 	display_name = forms.CharField(min_length=1, max_length=100)
 	phone_id = forms.CharField(min_length=1, max_length=100, required=False)
+
+class OnlyUserIdForm(forms.Form):
+	user_id = forms.IntegerField(min_value=1, max_value=10000)

@@ -24,7 +24,7 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util
 
 from strand import geo_util, notifications_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -645,7 +645,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 """
 @csrf_exempt
 def auth_phone(request):
-	response = dict({'result': True, 'errors': dict()})
+	response = dict({'result': True})
 	form = AuthPhoneForm(api_util.getRequestData(request))
 
 	timeWithinMinutes = 10
@@ -662,14 +662,11 @@ def auth_phone(request):
 			smsAuth = SmsAuth.objects.filter(phone_number=phoneNumber, access_code=accessCode)
 
 			if len(smsAuth) == 0 or len(smsAuth) > 1:
-				response['result'] = False
-				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Invalid code'})
+				return HttpResponse(json.dumps({'access_code': 'Invalid code'}), content_type="application/json", status=400)
 			elif smsAuth[0].user_created:
-				response['result'] = False
-				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code already used'})
+				return HttpResponse(json.dumps({'access_code': 'Code already used'}), content_type="application/json", status=400)
 			elif smsAuth[0].added < timeWithin:
-				response['result'] = False
-				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Code expired'})
+				return HttpResponse(json.dumps({'access_code': 'Code expired'}), content_type="application/json", status=400)
 			else:
 				user = createStrandUser(phoneNumber, displayName, phoneId, smsAuth[0])
 				serializer = UserSerializer(user)
@@ -680,13 +677,38 @@ def auth_phone(request):
 				serializer = UserSerializer(user)
 				response['user'] = serializer.data
 			else:
-				response['result'] = False
-				response['invalid_fields'] = api_util.formatErrors({'access_code': 'Invalid code'})
+				return HttpResponse(json.dumps({'access_code': 'Invalid code'}), content_type="application/json", status=400)
 	else:
-		response['result'] = False
-		response['invalid_fields'] = api_util.formatErrors(form.errors)
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+def get_invite_message(request):
+	response = dict({'result': True})
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	timeWithinMinutes = 10
+
+	if (form.is_valid()):
+		userId = str(form.cleaned_data['user_id'])
+
+		try:
+			user = User.objects.get(id=userId)
+			if user.invites_remaining == 0:
+				return HttpResponse(json.dumps({'user_id': 'No more invites remaining'}), content_type="application/json", status=400)
+			else:
+				user.invites_remaining -= 1
+				user.save()
+
+				response['invite_message'] = "Try out this new app so we can automatically share photos while we are hanging out:  bit.ly/1noDnx2"
+				response['invites_remaining'] = user.invites_remaining
+				return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+		except User.DoesNotExist:
+			return HttpResponse(json.dumps({'user_id': 'User does not exist'}), content_type="application/json", status=400)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
 
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):

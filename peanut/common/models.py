@@ -24,6 +24,7 @@ class User(models.Model):
 	device_token = models.TextField()
 	last_location_point = models.PointField(null=True)
 	last_location_timestamp = models.DateTimeField(null=True)
+	invites_remaining = models.IntegerField(default=10)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
