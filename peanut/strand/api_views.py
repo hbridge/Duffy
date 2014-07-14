@@ -12,6 +12,10 @@ from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import Http404
 
+from rest_framework.generics import CreateAPIView
+from rest_framework.response import Response
+from rest_framework import status
+
 from peanut.settings import constants
 
 from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction
@@ -370,11 +374,11 @@ def update_user_location(request):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
 				user.last_location_timestamp = timestamp
 				user.save()
-				logger.info("Location updated. %s: %s, %s" % (datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point))
+				logger.info("Location updated for user %s. %s: %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point))
 			else:
-				logger.info("Location NOT updated. Old Timestamp. %s: %s, %s" % (timestamp, userId, str((lon, lat))))
+				logger.info("Location NOT updated for user %s. Old Timestamp. %s: %s, %s" % (userId, timestamp, userId, str((lon, lat))))
 		else:
-			logger.info("Location NOT updated. Lat/Lon Zero. %s: %s, %s" % (datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, str((lon, lat))))
+			logger.info("Location NOT updated for user %s. Lat/Lon Zero. %s: %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, str((lon, lat))))
 
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
@@ -404,7 +408,7 @@ def register_apns_token(request):
 		user.device_token = deviceToken
 		apnsDev = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_DEV_APNS_ID)
 		apnsProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_PROD_APNS_ID)
-		apnsEnterpriseProd = APNService.objects.get(id=constants.IOS_NOTIFICATIONS_ENTERPRISE_PROD_APNS_ID)
+		apnsEnterpriseProd = APNService.objects.get(id=IOS_NOTIFICATIONS_ENTERPRISE_PROD_APNS_ID)
 
 		devices = Device.objects.filter(token=deviceToken)
 
@@ -709,3 +713,24 @@ def get_invite_message(request):
 # TODO(Derek): move to a common loc, used in sendStrandNotifications
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
+
+"""
+	REST interface for creating new PhotoActions.
+
+	Use a custom overload of the create method so we don't double create likes
+"""
+class CreatePhotoActionAPI(CreateAPIView):
+	def post(self, request):
+		serializer = self.get_serializer(data=request.DATA, files=request.FILES)
+
+		if serializer.is_valid():
+			obj = serializer.object
+			results = PhotoAction.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
+
+			if len(results) > 0:
+				serializer = self.get_serializer(results[0])
+				return Response(serializer.data, status=status.HTTP_201_CREATED)
+			else:
+				return super(CreatePhotoActionAPI, self).post(request)
+		else:
+			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
