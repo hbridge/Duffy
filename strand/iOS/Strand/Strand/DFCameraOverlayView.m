@@ -49,7 +49,7 @@ NSString *const FlashAutoTitle = @"Auto";
   _cameraHelpPopLabel = [MMPopLabel popLabelWithText:
             @"Take a picture to share it with nearby friends."];
   _cameraJoinableHelpPopLabel = [MMPopLabel
-                                 popLabelWithText:@"Someone's taken a photo nearby!"
+                                 popLabelWithText:@"Someone's taken a photo near you."
                                  "\nTake a photo to see it and share yours."];
   
   // add add them to the view
