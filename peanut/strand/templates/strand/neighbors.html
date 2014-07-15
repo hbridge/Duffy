@@ -154,16 +154,19 @@
 					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");
 				}
 			});
-			showNoPhotoMessage(data);
+			updateNoPhotoMessage(data);
 			$('div.image').each(function(){
 				imageClickHandler($(this));
 			});
 			$('span.timeago').timeago();
 		};
 
-		function showNoPhotoMessage(data){
+		function updateNoPhotoMessage(data){
 			if (data.objects && data.objects.length === 0){
 				$('div.ui-msg').removeClass('hidden');
+			}
+			else if (!($('.div.ui-msg').hasClass('hidden'))){
+				$('div.ui-msg').addClass('hidden');
 			}
 		}
 
@@ -192,13 +195,12 @@
 					if (data.objects && data.objects.length > 0) {
 						if (JSON.stringify(data) !== JSON.stringify(oldData)) {
 							oldData = data
-
 							console.log("Refreshing data")
 							processData(data)
 						}
 					}
 					else {
-						showNoPhotoMessage(data);
+						updateNoPhotoMessage(data);
 					}
 					
 				});
