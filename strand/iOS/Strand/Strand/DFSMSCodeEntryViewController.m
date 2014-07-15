@@ -12,6 +12,7 @@
 #import "AppDelegate.h"
 #import "NSString+DFHelpers.h"
 #import "DFModalSpinnerViewController.h"
+#import "DFAnalytics.h"
 
 const UInt16 DFCodeLength = 4;
 
@@ -41,6 +42,18 @@ const UInt16 DFCodeLength = 4;
                                             target:self
                                             action:@selector(doneButtonPressed:)];
   
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -120,6 +133,7 @@ replacementString:(NSString *)string
 {
   if (![self isEnteredCodeValid]) {
     [self showInvalidCodeAlert:[self enteredCode]];
+    [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultInvalidInput];
     return;
   }
   NSString *authCode = [self enteredCode];
@@ -183,6 +197,7 @@ replacementString:(NSString *)string
                       [DFUser setCurrentUser:user];
                       [msvc dismissViewControllerAnimated:YES completion:nil];
                       AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+                      [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
                       [delegate showMainView];
                     }
                         failureBlock:^(NSError *error) {
@@ -191,6 +206,7 @@ replacementString:(NSString *)string
                             UIAlertView *failureAlert = [DFSMSCodeEntryViewController accountFailedAlert:error];
                             [failureAlert show];
                             [self resetCodeField];
+                            [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultFailure];
                             [self.codeTextField becomeFirstResponder];
                           }];
                         }];

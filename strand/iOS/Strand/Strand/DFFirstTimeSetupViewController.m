@@ -16,6 +16,7 @@
 #import "DFSMSVerificationAdapter.h"
 #import "DFWebViewController.h"
 #import "DFNetworkingConstants.h"
+#import "DFAnalytics.h"
 
 UInt16 const DFPhoneNumberLength = 10;
 
@@ -43,11 +44,10 @@ UInt16 const DFPhoneNumberLength = 10;
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+  [super viewDidLoad];
+  // Do any additional setup after loading the view from its nib.
   self.phoneNumberField.delegate = self;
   [self.phoneNumberField becomeFirstResponder];
-  //  [self.phoneNumberField addTarget:self action:@se forControlEvents:<#(UIControlEvents)#>
   self.termsButton.titleLabel.numberOfLines = 0;
   self.termsButton.titleLabel.textAlignment = NSTextAlignmentCenter;
 }
@@ -55,6 +55,13 @@ UInt16 const DFPhoneNumberLength = 10;
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -110,6 +117,7 @@ replacementString:(NSString *)string
 {
   if (![self isCurrentPhoneNumberValid]) {
     [self showInvalidNumberAlert:[self enteredPhoneNumber]];
+    [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultInvalidInput];
     return;
   }
     NSString __block *phoneNumberString = [self enteredPhoneNumber];
@@ -128,9 +136,11 @@ replacementString:(NSString *)string
                            [self.navigationController pushViewController:codeEntryController
                                                                 animated:NO];
                            [msvc dismissViewControllerAnimated:NO completion:nil];
+                           [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultSuccess];
                          } else {
                            UIAlertView *failureAlert = [DFFirstTimeSetupViewController smsVerificationRequestFailed:error];
                            [failureAlert show];
+                           [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultFailure];
                          }
   }];
   

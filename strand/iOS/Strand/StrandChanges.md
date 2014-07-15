@@ -1,5 +1,9 @@
 # Strand
 
+## Jul 15th, 2014
+
+- Tap on the nearby friends message to get a more thorough explanation of who's nearby to share with.
+
 ## Jul 14th, 2014
 
 - Invite users to Strand by text from the shared photos view or from settings

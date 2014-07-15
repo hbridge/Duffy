@@ -31,6 +31,8 @@ NSString* const SizeInKBKey = @"sizeInKB";
 NSString* const ResultKey = @"result";
 NSString* const DFAnalyticsValueResultSuccess = @"success";
 NSString* const DFAnalyticsValueResultFailure = @"failure";
+NSString* const DFAnalyticsValueResultInvalidInput = @"invalidInput";
+
 
 NSString* const DFAnalyticsIsErrorKey = @"isError";
 
@@ -94,6 +96,10 @@ NSString* const NotificationTypeKey = @"notificationType";
 // Delete
 NSString* const PhotoDeletedEvent = @"PhotoDeleted";
 
+
+// App SEtup
+NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
+NSString* const SetupSMSCodeEntered = @"SetupSMSCodeEntered";
 
 static DFAnalytics *defaultLogger;
 
@@ -286,6 +292,16 @@ static DFAnalytics *defaultLogger;
 + (void)logPhotoDeletedWithResult:(NSString *)result
 {
   [DFAnalytics logEvent:PhotoDeletedEvent withParameters:@{ResultKey: result}];
+}
+
++ (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result
+{
+  [DFAnalytics logEvent:SetupPhoneNumberEntered withParameters:@{ResultKey: result}];
+}
+
++ (void)logSetupSMSCodeEnteredWithResult:(NSString *)result
+{
+  [DFAnalytics logEvent:SetupSMSCodeEntered withParameters:@{ResultKey: result}];
 }
 
 

@@ -15,6 +15,8 @@ extern NSString * const DFAnalyticsActionTypeSwipe;
 extern NSString* const DFAnalyticsValueResultSuccess;
 extern NSString* const DFAnalyticsValueResultFailure;
 extern NSString* const DFAnalyticsValueResultAborted;
+extern NSString* const DFAnalyticsValueResultInvalidInput;
+
 
 + (void)StartAnalyticsSession;
 + (void)ResumeAnalyticsSession;
@@ -41,5 +43,8 @@ extern NSString* const DFAnalyticsValueResultAborted;
 + (void)logNotificationOpened:(NSString *)notificationType;
 
 + (void)logPhotoDeletedWithResult:(NSString *)result;
+
++ (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
++ (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
 
 @end
