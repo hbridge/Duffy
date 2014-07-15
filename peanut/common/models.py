@@ -308,6 +308,8 @@ class PhotoAction(models.Model):
 	photo = models.ForeignKey(Photo, db_index=True)
 	user = models.ForeignKey(User)
 	action_type = models.CharField(max_length=50, db_index=True)
+	user_notified_time = models.DateTimeField(null=True, db_index=True)
+	added = models.DateTimeField(auto_now_add=True)
 
 	class Meta:
 		db_table = 'strand_photo_action'
