@@ -19,10 +19,11 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		url = 'http://%s/viz/summary' % (self.BASEURL)
 		print 'Testing: %s' % (url)
 		response = urllib2.urlopen(url)
+		result = str(response.read())
 
-		self.assertTrue("Clustered" in response)
-		self.assertTrue("Fulls" in response)
-		
+		self.assertTrue("Clustered" in result)
+		self.assertTrue("Fulls" in result)
+
 
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
