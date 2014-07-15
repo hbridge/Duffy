@@ -242,10 +242,14 @@
   if ([application applicationState] != UIApplicationStateActive) {
     if (!userInfo[@"view"]) return;
     int viewNumber = [(NSNumber *)userInfo[@"view"] intValue];
-    if (viewNumber == 0) {
-      [(RootViewController *)self.window.rootViewController showCamera];
-    } else if (viewNumber == 1) {
-      [(RootViewController *)self.window.rootViewController showGallery];
+    
+    UIViewController *rootViewController = self.window.rootViewController;
+    if ([rootViewController.class isSubclassOfClass:[RootViewController class]]) {
+      if (viewNumber == 0) {
+        [(RootViewController *)self.window.rootViewController showCamera];
+      } else if (viewNumber == 1) {
+        [(RootViewController *)self.window.rootViewController showGallery];
+      }
     }
     [DFAnalytics logNotificationOpened:[NSString stringWithFormat:@"%d", viewNumber]];
   } else {
