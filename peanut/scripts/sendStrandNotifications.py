@@ -37,8 +37,7 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 
 """
 	Look through all recent photos from last 30 minutes and see if any users have a 
-	  last_location_point near there...and haven't been notified recently
-
+	  last_location_point near there...and haven't been notified recently about that user
 
 	Check the photo we want to use to say if someone is nearby but we havent'
 	neighbored with them yet (basically, they shouldn't know I'm there)
@@ -47,11 +46,9 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
 	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_CAMERA}
 
-	lastNotificationTimes = notifications_util.getLastNotificationTimesForType(notificationLogs, msgType)
+	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
 
-	nonNotifiedUsers = filter(lambda x: x.id not in lastNotificationTimes, users)
-	
-	for user in nonNotifiedUsers:
+	for user in users:
 		nearbyPhotosData = geo_util.getNearbyPhotos(datetime.datetime.utcnow().replace(tzinfo=pytz.utc), user.last_location_point.x, user.last_location_point.y, photos, filterUserId=user.id)
 		names = list()
 
@@ -70,8 +67,18 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 		if len(names) > 0:
 			msg = " & ".join(names) + " took a photo near you! Take a photo to see it."
 
-			logger.debug("Sending %s to %s" % (msg, user.display_name))
-			notifications_util.sendNotification(user, msg, msgType, customPayload)
+			# We want to see if the user has gotten this message before.  Also, we want to support
+			#   new people showing up so if the message is longer than they got before, send.
+			sentMessageBefore = False
+			if user.id in notificationsById:
+				for notification in notificationsById[user.id]:
+					finalMsg = notifications_util.getMessageWithCustomPayload(msg, customPayload)
+					if notification.msg == finalMsg:
+						sentMessageBefore = True
+
+			if not sentMessageBefore:
+				logger.debug("Sending %s to %s" % (msg, user.id))
+				notifications_util.sendNotification(user, msg, msgType, customPayload)
 				
 def main(argv):
 	maxFilesAtTime = 100

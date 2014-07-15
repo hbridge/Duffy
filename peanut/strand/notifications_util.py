@@ -21,10 +21,17 @@ def sendNotification(user, msg, msgType, customPayload=None):
 			notification.sound = 'default'
 			apns = APNService.objects.get(id=device.service_id)
 			apns.push_notification_to_devices(notification, [device])
-			NotificationLog.objects.create(user=user, device_token=device.token, msg=(msg+' ' + json.dumps(customPayload)), apns=apns.id, msg_type=msgType)
+			NotificationLog.objects.create(user=user, device_token=device.token, msg=(getMessageWithCustomPayload(msg, customPayload)), apns=apns.id, msg_type=msgType)
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user)
 	
+def getMessageWithCustomPayload(msg, customPayload = None):
+	if customPayload:
+		return msg + ' ' + json.dumps(customPayload)
+	else:
+		return msg
+
+
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
 
@@ -36,17 +43,16 @@ def sendSMS(phoneNumber, msg):
 """
 	Create a dictionary per user_id on last notification time of NewPhoto notifications
 """
-def getLastNotificationTimesForType(notificationLogs, msgType):
-	lastNotificationTimes = dict()
+def getNotificationsForTypeById(notificationLogs, msgType):
+	notificationsById = dict()
 	
 	for notificationLog in notificationLogs:
 		if notificationLog.msg_type == msgType:
-			if notificationLog.user_id in lastNotificationTimes:
-				if (lastNotificationTimes[notificationLog.user_id] < notificationLog.added):
-					lastNotificationTimes[notificationLog.user_id] = notificationLog.added
-			else:
-				lastNotificationTimes[notificationLog.user_id] = notificationLog.added
-	return lastNotificationTimes
+			if notificationLog.user_id not in notificationsById:
+				notificationsById[notificationLog.user_id] = list()
+			notificationsById[notificationLog.user_id].append(notificationLog)
+
+	return notificationsById
 
 """
 	Return back notification logs within 30 seconds
