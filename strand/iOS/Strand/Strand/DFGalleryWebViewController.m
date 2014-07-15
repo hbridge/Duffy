@@ -129,7 +129,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     self.inviteController = [[DFInviteUserComposeController alloc] init];
     [self.inviteController loadMessageWithCompletion:^(NSError *error) {
       if (!error) {
-      [self presentViewController:self.inviteController animated:YES completion:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self presentViewController:self.inviteController animated:YES completion:nil];
+        });
       } else {
         [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
       }
