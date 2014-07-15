@@ -104,7 +104,7 @@ NSString *const FlashAutoTitle = @"Auto";
   
   if (text && ![text isEqualToString:@""]) {
     _nearbyFriendsHelpPopLabel = [MMPopLabel popLabelWithText:text];
-    [self.nearbyFriendsBar addSubview:_nearbyFriendsHelpPopLabel];
+    [self addSubview:_nearbyFriendsHelpPopLabel];
   }
 }
 
