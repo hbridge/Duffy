@@ -25,5 +25,6 @@ extern NSString *const FlashAutoTitle;
 - (void)hideHelpText;
 - (void)showJoinableHelpText;
 - (void)hideJoinableHelpText;
+- (void)setNearbyFriendsHelpText:(NSString *)text;
 
 @end

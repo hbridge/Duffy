@@ -13,12 +13,13 @@
 
 NSString *const DFNearbyFriendsMessageUpdatedNotificationName = @"DFNearbyFriendsMessageUpdatedNotificationName";
 NSString *const DFNearbyFriendsNotificationMessageKey = @"DFNearbyFriendsNotificationMessageKey";
+NSString *const DFNearbyFriendsNotificationExpandedMessageKey = @"DFNearbyFriendsNotificationExpandedMessageKey";
 NSTimeInterval const DFNearbyFriendsMinFetchInterval = 2.0;
 
 @interface DFNearbyFriendsManager ()
 
 @property (nonatomic, retain) DFNearbyFriendsAdapter *nearbyFriendsAdapter;
-@property (nonatomic, retain) NSString *lastMessage;
+@property (nonatomic, retain) DFPeanutMessageResponse *lastResponse;
 @property (nonatomic, retain) NSDate *lastFetchDate;
 @property (atomic) BOOL isUpdatingNearbyFriends;
 
@@ -56,14 +57,15 @@ static DFNearbyFriendsManager *defaultManager;
      self.isUpdatingNearbyFriends = NO;
      if (!error) {
        DDLogInfo(@"%@ updated nearby friends message. newMessage:%@ oldMessage:%@",
-                 [[self class] description], response.message, self.lastMessage);
-       if ([self.lastMessage isEqualToString:response.message]) return;
-       self.lastMessage = response.message;
+                 [[self class] description], response.message, self.lastResponse.message);
+       if ([self.lastResponse.message isEqualToString:response.message]) return;
+       self.lastResponse = response;
        [[NSNotificationCenter defaultCenter]
         postMainThreadNotificationName:DFNearbyFriendsMessageUpdatedNotificationName
         object:self
         userInfo:@{
-                   DFNearbyFriendsNotificationMessageKey: response.message
+                   DFNearbyFriendsNotificationMessageKey: response.message,
+                   DFNearbyFriendsNotificationExpandedMessageKey : response.expanded_message
                    }];
        
      } else {
@@ -78,7 +80,16 @@ static DFNearbyFriendsManager *defaultManager;
       [[NSDate date] timeIntervalSinceDate:self.lastFetchDate] > DFNearbyFriendsMinFetchInterval) {
     [self updateNearbyFriendsMessage];
   }
-  return self.lastMessage;
+  return self.lastResponse.message;
+}
+
+- (NSString *)expandedNearbyFriendsMessage
+{
+  if (!self.lastFetchDate) {
+    [self updateNearbyFriendsMessage];
+  }
+  
+  return self.lastResponse.expanded_message;
 }
 
 

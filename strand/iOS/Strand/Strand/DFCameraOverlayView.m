@@ -14,6 +14,7 @@
 
 @property (nonatomic, retain) MMPopLabel *cameraHelpPopLabel;
 @property (nonatomic, retain) MMPopLabel *cameraJoinableHelpPopLabel;
+@property (nonatomic, retain) MMPopLabel *nearbyFriendsHelpPopLabel;
 
 @end
 
@@ -28,6 +29,11 @@ NSString *const FlashAutoTitle = @"Auto";
   self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   [self configureHelpTextLabels];
   self.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+  
+  [self.nearbyFriendsLabel addGestureRecognizer:[[UITapGestureRecognizer alloc]
+                                                 initWithTarget:self
+                                                 action:@selector(nearbyFriendsLabelTapped:)]];
+  self.nearbyFriendsLabel.userInteractionEnabled = YES;
 }
 
 - (void)configureHelpTextLabels
@@ -53,7 +59,7 @@ NSString *const FlashAutoTitle = @"Auto";
 
 - (void)showHelpText
 {
-  [_cameraHelpPopLabel popAtView:self.takePhotoButton];
+  [_cameraHelpPopLabel popAtView:self.takePhotoButton animateView:NO];
 }
 
 - (void)hideHelpText
@@ -63,7 +69,7 @@ NSString *const FlashAutoTitle = @"Auto";
 
 - (void)showJoinableHelpText
 {
-  [_cameraJoinableHelpPopLabel popAtView:self.takePhotoButton];
+  [_cameraJoinableHelpPopLabel popAtView:self.takePhotoButton animateView:NO];
 }
 
 - (void)hideJoinableHelpText
@@ -90,10 +96,26 @@ NSString *const FlashAutoTitle = @"Auto";
   }
 }
 
-- (void)layoutSubviews
+- (void)setNearbyFriendsHelpText:(NSString *)text
 {
-  [super layoutSubviews];
+  if (_nearbyFriendsHelpPopLabel) {
+    [_nearbyFriendsHelpPopLabel removeFromSuperview];
+  }
+  
+  if (text && ![text isEqualToString:@""]) {
+    _nearbyFriendsHelpPopLabel = [MMPopLabel popLabelWithText:text];
+    [self.nearbyFriendsBar addSubview:_nearbyFriendsHelpPopLabel];
+  }
 }
 
+- (void)nearbyFriendsLabelTapped:(id)sender
+{
+  DDLogVerbose(@"Nearby friends tapped");
+  if (_nearbyFriendsHelpPopLabel && _nearbyFriendsHelpPopLabel.hidden) {
+    [_nearbyFriendsHelpPopLabel popAtView:self.nearbyFriendsLabel animateView:NO];
+  } else if (_nearbyFriendsHelpPopLabel && !(_nearbyFriendsHelpPopLabel.isHidden)) {
+    [_nearbyFriendsHelpPopLabel dismiss];
+  }
+}
 
 @end

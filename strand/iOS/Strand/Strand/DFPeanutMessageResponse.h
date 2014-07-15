@@ -13,6 +13,7 @@
 
 @property (nonatomic) BOOL result;
 @property (nonatomic, retain) NSString *message;
+@property (nonatomic, retain) NSString *expanded_message;
 @property (nonatomic, retain) NSArray *invalid_fields;
 
 @end

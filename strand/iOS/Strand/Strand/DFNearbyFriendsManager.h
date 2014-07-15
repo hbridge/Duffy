@@ -10,10 +10,12 @@
 
 extern NSString *const DFNearbyFriendsMessageUpdatedNotificationName;
 extern NSString *const DFNearbyFriendsNotificationMessageKey;
+extern NSString *const DFNearbyFriendsNotificationExpandedMessageKey;
 
 @interface DFNearbyFriendsManager : NSObject
 
 + (DFNearbyFriendsManager *)sharedManager;
 - (NSString *)nearbyFriendsMessage;
+- (NSString *)expandedNearbyFriendsMessage;
 
 @end

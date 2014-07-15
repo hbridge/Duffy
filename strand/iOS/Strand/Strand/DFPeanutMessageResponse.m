@@ -24,7 +24,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"result", @"message"];
+  return @[@"result", @"message", @"expanded_message"];
 }
 
 - (NSString *)firstInvalidFieldDescription

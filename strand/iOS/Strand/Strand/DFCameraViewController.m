@@ -292,10 +292,13 @@ const unsigned int RetryDelaySecs = 5;
 - (void)updateNearbyFriendsBar:(NSNotification *)note
 {
   NSString *message;
+  NSString *expandedMessage;
   if (note) {
     message = note.userInfo[DFNearbyFriendsNotificationMessageKey];
+    expandedMessage = note.userInfo[DFNearbyFriendsNotificationExpandedMessageKey];
   } else {
     message = [[DFNearbyFriendsManager sharedManager] nearbyFriendsMessage];
+    expandedMessage = [[DFNearbyFriendsManager sharedManager] expandedNearbyFriendsMessage];
   }
   
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -304,6 +307,8 @@ const unsigned int RetryDelaySecs = 5;
     } else {
       self.customCameraOverlayView.nearbyFriendsLabel.text = @"";
     }
+    
+    [self.customCameraOverlayView setNearbyFriendsHelpText:expandedMessage];
   });
 }
 
