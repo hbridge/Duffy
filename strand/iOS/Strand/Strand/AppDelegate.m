@@ -144,14 +144,10 @@
 
 - (void)requestPushNotifs
 {
-  if ([DFUserActionStore actionCountForAction:UserActionTakePhoto] > 0) {
-    [self checkForAndLogNotifsChange:[DFDefaultsStore lastRemoteNotificationsState]];
-    DDLogInfo(@"Requesting push notifications.");
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-     (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-  } else {
-    DDLogInfo(@"User has not taken a picture yet.  Not requesting push notifs.");
-  }
+  [self checkForAndLogNotifsChange:[DFDefaultsStore lastRemoteNotificationsState]];
+  DDLogInfo(@"Requesting push notifications.");
+  [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+   (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 }
 
 - (void)checkForAndLogNotifsChange:(DFDefaultsNotifsStateType)newNotifsState
