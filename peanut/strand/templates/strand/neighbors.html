@@ -132,7 +132,7 @@
 		}
 
 		function processData(data) {
-			$("#allImages").empty();
+			$("#allImages").children().remove();
 			
 			$.each( data.objects, function( i, objects ) {
 				if (objects.type == 'section') {
