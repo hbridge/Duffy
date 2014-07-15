@@ -78,7 +78,7 @@
 		<div class='ui-header'> Search/Photos/Arbus &mdash; {{ arbusList|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row-header' >
-				<td class='userid b-r'> UserId </td>
+				<td class='userid b-r'> ID </td>
 				<td class='name b-r'> Name </td>
 				<td class='phoneid b-r'> PhoneId </td>
 				<td class='created b-r'> Created </td>
@@ -88,7 +88,7 @@
 				<td class='clustered b-r'> Clustered <br> (%)  </td>
 				<td class='index-count b-r'> Indexed <br> Photos (%) </td>
 				<td class='faces b-r'> Face <br> Rec (%)  </td>
-				<td class='db-fullimage b-r'> Full <br>imgs (%) </td>
+				<td class='db-fullimage b-r'> Fulls (%) </td>
 				<td class='overfeat b-r'> Overfeat <br> (%)  </td>
 				<td class='classifications b-r'> Image <br> Rec (%)  </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
@@ -120,7 +120,7 @@
 		<div class='ui-header'> Strand &mdash; {{ strandList|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row-header' >
-				<td class='userid b-r'> UserId </td>
+				<td class='userid b-r'> ID </td>
 				<td class='name b-r'> Name </td>
 				<td class='phoneid b-r'> Phone # </td>
 				<td class='created b-r'> Created </td>
@@ -128,12 +128,13 @@
 				<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
 				<td class='twofish b-r'> TwoFish <br> (%) </td>
 				<td class='clustered b-r'> Clustered <br> (%)  </td>
-				<td class='db-fullimage b-r'> Full <br>imgs (%) </td>
+				<td class='db-fullimage b-r'> Fulls (%) </td>
 				<td class='neighbor b-r'> Neighbor <br> (%) </td>
 				<td class='notifications b-r'> Nots <br> sent </td>
 				<td class='last-not-timestamp b-r'> Last Not. <br> Timestamp </td>
 				<td class='location b-r'> Location </td>
 				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
+				<td class='invites b-r'> Rem. <br> invites </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 			</tr>
 		{% for entry in strandList %}
@@ -166,6 +167,7 @@
 					{% endif %}
 				</td>
 				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
+				<td class='invites b-r'> {{ entry.user.invites_remaining }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 			</tr>
 		{% endfor %}
