@@ -44,6 +44,8 @@
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
+  [DFAnalytics logInviteComposeFinishedWithResult:result
+                         presentingViewController:self.presentingViewController];
   [self dismissViewControllerAnimated:YES completion:^{
     DFPeanutInviteMessageAdapter *inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
     [inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
@@ -59,7 +61,7 @@
       }
     }];
   }];
-  [DFAnalytics logInviteComposeFinishedWithResult:result];
+  
 }
 
 

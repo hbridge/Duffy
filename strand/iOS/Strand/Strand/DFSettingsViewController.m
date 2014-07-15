@@ -16,6 +16,7 @@
 #import "DFMapViewController.h"
 #import "DFPeanutInviteMessageAdapter.h"
 #import "DFInviteUserComposeController.h"
+#import "DFAnalytics.h"
 
 @interface DFSettingsViewController ()
 
@@ -46,6 +47,19 @@
   
   [self configureForm];
 }
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
 
 - (void)configureForm
 {

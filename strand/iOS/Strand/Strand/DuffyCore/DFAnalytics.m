@@ -32,6 +32,7 @@ NSString* const ResultKey = @"result";
 NSString* const DFAnalyticsValueResultSuccess = @"success";
 NSString* const DFAnalyticsValueResultFailure = @"failure";
 NSString* const DFAnalyticsValueResultInvalidInput = @"invalidInput";
+NSString* const ParentViewControllerKey = @"parentView";
 
 
 NSString* const DFAnalyticsIsErrorKey = @"isError";
@@ -308,6 +309,8 @@ static DFAnalytics *defaultLogger;
 }
 
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
+                  presentingViewController:(UIViewController *)presentingViewController
+
 {
   NSString *resultString;
   if (result == MessageComposeResultCancelled) {
@@ -318,7 +321,10 @@ static DFAnalytics *defaultLogger;
     resultString = DFAnalyticsValueResultSuccess;
   }
   
-  [DFAnalytics logEvent:InviteUserFinshed withParameters:@{ResultKey: resultString}];
+  [DFAnalytics logEvent:InviteUserFinshed withParameters:@{
+                                                           ResultKey: resultString,
+                                                           ParentViewControllerKey: [DFAnalytics screenNameForControllerViewed:presentingViewController]
+                                                           }];
 }
 
 

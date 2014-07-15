@@ -48,6 +48,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
 
-+ (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result;
++ (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
+                  presentingViewController:(UIViewController *)presentingViewController;
 
 @end
