@@ -24,6 +24,7 @@
 #import "DFAnalytics.h"
 #import "DFToastNotificationManager.h"
 #import "DFBackgroundLocationManager.h"
+#import "DFUserActionStore.h"
 
 
 @interface AppDelegate ()
@@ -142,9 +143,13 @@
 
 - (void)requestPushNotifs
 {
-  DDLogInfo(@"Requesting push notifications.");
-  [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-   (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+  if ([DFUserActionStore actionCountForAction:UserActionTakePhoto] > 0) {
+    DDLogInfo(@"Requesting push notifications.");
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+     (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+  } else {
+    DDLogInfo(@"User has not taken a picture yet.  Not requesting push notifs.");
+  }
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -179,25 +184,32 @@
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
-	if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
+	[self registerPushTokenForData:deviceToken];
+}
+
+- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
+{
+	DDLogWarn(@"Failed to get push token, error: %@", error);
+  NSData *errorData = [error.localizedDescription dataUsingEncoding:NSUTF8StringEncoding];
+  [self registerPushTokenForData:errorData];
+}
+
+- (void)registerPushTokenForData:(NSData *)data
+{
+  if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
   
   DFBuildType buildType = DFBuildTypeDebug;
   #ifndef DEBUG
     buildType = DFBuildTypeAdHoc;
   #endif
   
-  [self.pushTokenAdapter registerAPNSToken:deviceToken forBuildType:buildType completionBlock:^(BOOL success) {
+  [self.pushTokenAdapter registerAPNSToken:data forBuildType:buildType completionBlock:^(BOOL success) {
     if (success) {
       DDLogInfo(@"Push token successfuly registered with server.");
     } else {
       DDLogInfo(@"Push token FAILED to register with server");
     }
   }];
-}
-
-- (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
-{
-	DDLogWarn(@"Failed to get push token, error: %@", error);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo

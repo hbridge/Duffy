@@ -420,7 +420,6 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
                                             cancelButtonTitle:@"OK"
                                             otherButtonTitles:nil];
       [alert show];
-      
     }
   };
   

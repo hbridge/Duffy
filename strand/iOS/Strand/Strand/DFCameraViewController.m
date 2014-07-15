@@ -27,6 +27,7 @@
 #import "DFCameraRollPhotoAsset.h"
 #import "DFStrandPhotoAsset.h"
 #import "DFNearbyFriendsManager.h"
+#import "DFUserActionStore.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -320,6 +321,7 @@ const unsigned int RetryDelaySecs = 5;
   [self takePicture];
   [self flashCameraView];
   [self hideNuxLabels];
+  [DFUserActionStore incrementCountForAction:UserActionTakePhoto];
 }
 
 - (void)hideNuxLabels
