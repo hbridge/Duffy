@@ -12,6 +12,8 @@
 
 @interface DFInviteUserComposeController ()
 
+@property (nonatomic, retain) DFPeanutInviteMessageResponse *loadedResponse;
+
 @end
 
 @implementation DFInviteUserComposeController
@@ -30,6 +32,7 @@
   DFPeanutInviteMessageAdapter *inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
   [inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
     if (!error) {
+      self.loadedResponse = response;
       [self setBody:response.invite_message];
       
       // Present message view controller on screen
@@ -47,19 +50,14 @@
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:self.presentingViewController];
   [self dismissViewControllerAnimated:YES completion:^{
-    DFPeanutInviteMessageAdapter *inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
-    [inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
-      if (!error) {
-        NSString *message = [NSString stringWithFormat:@"You have %d invites remaining.",
-                             response.invites_remaining];
+           NSString *message = [NSString stringWithFormat:@"You have %d invites remaining.",
+                             self.loadedResponse.invites_remaining];
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Remaining Invites"
                                                         message:message
                                                        delegate:nil
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles: nil];
         [alert show];
-      }
-    }];
   }];
   
 }
