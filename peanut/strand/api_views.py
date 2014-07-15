@@ -460,7 +460,7 @@ def get_nearby_friends_message(request):
 		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
 		
 		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
-		
+
 		photoUsers = list()
 		nonPhotoUsers = list()
 		for user in nearbyUsers:
@@ -477,11 +477,14 @@ def get_nearby_friends_message(request):
 
 		if len(nearbyUsers) == 0:
 			message = ""
+			expMessage = "No friends are near you."
 		elif len(photoUsers) == 0:
 			if len(nearbyUsers) == 1:
 				message = "1 friend will see this photo"
+				expMessage = "1 friend near you hasn't taken a photo yet. Take a photo to share with them."
 			else:
 				message = "%s friends will see this photo" % (len(nearbyUsers))
+				expMessage = "%s friends near you haven't taken a photo yet. Take a photo to share with them." % (len(nearbyUsers))
 		elif len(photoUsers) > 0:
 			names = list()
 			for user in photoUsers:
@@ -494,17 +497,22 @@ def get_nearby_friends_message(request):
 					numNames = len(names)
 					message = ", ".join(names[:numNames-2])
 					message += "& %s" % (names[numNames-1])
+				expMessage = message + " took a photo near you."
 			else:
 				message = ", ".join(names)
+				expMessage = message + " took a photo near you."
 
 				if len(nonPhotoUsers) == 1:
 					message += " & 1 friend"
+					expMessage += " 1 other friend near you hasn't taken a photo yet."
 				else:
 					message += " & %s friends" % len(nonPhotoUsers)
+					expMessage += " %s other friends near you haven't taken a photo yet." % len (nonPhotoUsers)
 
 			message += " will see this photo"
 
 		response['message'] = message
+		response['expanded_message'] = expMessage
 		response['result'] = True
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
