@@ -104,9 +104,8 @@ NSString* const InviteUserFinshed = @"InviteUserFinished";
 
 //Push notifs
 NSString* const RemoteNotifsChangedEvent = @"RemoteNotifsChanged";
-NSString* const OldStateKey = @"oldState";
-NSString* const NewStateKey = @"newState";
-NSString* const OldValueKey = @"oldValue";
+NSString* const StateChangeKey = @"stateChange";
+NSString* const ValueChangeKey = @"valueChange";
 
 static DFAnalytics *defaultLogger;
 
@@ -344,17 +343,18 @@ static DFAnalytics *defaultLogger;
                             oldNotificationType:(UIRemoteNotificationType)oldType
                                         newType:(UIRemoteNotificationType)newType
 {
-  oldState = oldState ? oldState : @"";
-  newState = newState ? newState : @"";
+  oldState = oldState ? oldState : @"None";
+  newState = newState ? newState : @"None";
   NSString *oldValue = [DFAnalytics stringForUIRemoteNotifType:oldType];
   NSString *newValue = [DFAnalytics stringForUIRemoteNotifType:newType];
   
+  NSString *stateString = [NSString stringWithFormat:@"%@ -> %@", oldState, newState];
+  NSString *valueString = [NSString stringWithFormat:@"%@ -> %@", oldValue, newValue];
+  
   [DFAnalytics logEvent:RemoteNotifsChangedEvent
          withParameters:@{
-                          OldStateKey:oldState,
-                          NewStateKey: newState,
-                          OldValueKey: oldValue,
-                          NewValueKey: newValue,
+                          StateChangeKey:stateString,
+                          ValueChangeKey:valueString
                             }];
 }
 
