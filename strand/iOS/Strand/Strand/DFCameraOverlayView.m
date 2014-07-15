@@ -59,7 +59,7 @@ NSString *const FlashAutoTitle = @"Auto";
 
 - (void)showHelpText
 {
-  [_cameraHelpPopLabel popAtView:self.takePhotoButton animateView:NO];
+  [_cameraHelpPopLabel popAtView:self.takePhotoButton animatePopLabel:YES animateTargetView:NO];
 }
 
 - (void)hideHelpText
@@ -69,7 +69,7 @@ NSString *const FlashAutoTitle = @"Auto";
 
 - (void)showJoinableHelpText
 {
-  [_cameraJoinableHelpPopLabel popAtView:self.takePhotoButton animateView:NO];
+  [_cameraJoinableHelpPopLabel popAtView:self.takePhotoButton animatePopLabel:YES animateTargetView:NO];
 }
 
 - (void)hideJoinableHelpText
@@ -112,7 +112,9 @@ NSString *const FlashAutoTitle = @"Auto";
 {
   DDLogVerbose(@"Nearby friends tapped");
   if (_nearbyFriendsHelpPopLabel && _nearbyFriendsHelpPopLabel.hidden) {
-    [_nearbyFriendsHelpPopLabel popAtView:self.nearbyFriendsLabel animateView:NO];
+    [_nearbyFriendsHelpPopLabel popAtView:self.nearbyFriendsLabel
+                          animatePopLabel:YES
+                        animateTargetView:NO];
   } else if (_nearbyFriendsHelpPopLabel && !(_nearbyFriendsHelpPopLabel.isHidden)) {
     [_nearbyFriendsHelpPopLabel dismiss];
   }
