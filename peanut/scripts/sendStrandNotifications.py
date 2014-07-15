@@ -12,7 +12,7 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import Neighbor, NotificationLog, Photo, User
+from common.models import Neighbor, NotificationLog, Photo, User, PhotoAction
 
 import strand.notifications_util as notifications_util
 import strand.geo_util as geo_util
@@ -80,6 +80,19 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 				logger.debug("Sending %s to %s" % (msg, user.id))
 				notifications_util.sendNotification(user, msg, msgType, customPayload)
 				
+def sendPhotoActionNotifications(photoActions):
+	for photoAction in photoActions:
+		if photoAction.action_type == "favorite":
+			msg = "%s just liked your photo!" % (photoAction.user.display_name)
+			msgType = constants.NOTIFICATIONS_PHOTO_FAVORITED_ID
+
+			logger.info("Sending %s to %s" % (msg, photoAction.photo.user))
+			notifications_util.sendNotification(photoAction.photo.user, msg, msgType)
+
+			photoAction.user_notified_time = datetime.datetime.utcnow()
+			photoAction.save()
+
+
 def main(argv):
 	maxFilesAtTime = 100
 
@@ -100,6 +113,12 @@ def main(argv):
 		users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdates)
 
 		sendJoinStrandNotification(photos, users, neighbors, notificationLogs)
+
+		likeNotificationWaitSeconds = datetime.datetime.utcnow()-datetime.timedelta(seconds=10)
+
+		photoActions = PhotoAction.objects.select_related().filter(added__lte=likeNotificationWaitSeconds).filter(user_notified_time=None)
+
+		sendPhotoActionNotifications(photoActions)
 
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)

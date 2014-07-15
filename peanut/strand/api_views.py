@@ -747,11 +747,3 @@ class CreatePhotoActionAPI(CreateAPIView):
 				return super(CreatePhotoActionAPI, self).post(request)
 		else:
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-	def post_save(self, obj, created):
-		if (created):
-			if obj.action_type == "favorite":
-				msg = "%s just liked your photo!" % (obj.user.display_name)
-				msgType = constants.NOTIFICATIONS_PHOTO_FAVORITED_ID
-
-				notifications_util.sendNotification(obj.photo.user, msg, msgType)
