@@ -711,7 +711,9 @@ def get_invite_message(request):
 				user.invites_remaining -= 1
 				user.save()
 
-				response['invite_message'] = "Strand makes it easy to share photos when you are with friends. Download and take a photo to start: bit.ly/1noDnx2." #115 chars
+				response['invite_message'] = "Try this app so we can share photos when we hang out: bit.ly/1noDnx2."
+
+				#response['invite_message'] = "Strand makes it easy to share photos when you are with friends. Download and take a photo to start: bit.ly/1noDnx2." #115 chars
 				response['invites_remaining'] = user.invites_remaining
 				return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
