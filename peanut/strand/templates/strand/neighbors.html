@@ -154,6 +154,7 @@
 					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");
 				}
 			});
+			showNoPhotoMessage(data);
 			$('div.image').each(function(){
 				imageClickHandler($(this));
 			});
@@ -181,7 +182,6 @@
 			$.get(url, function( data ) {
 				oldData = data;
 				processData(data);
-				showNoPhotoMessage(data);
 			});
 			
 			// Now set it up so that every 1 second, we see if we have different data.  If we do, then
