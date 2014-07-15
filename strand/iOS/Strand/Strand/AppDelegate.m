@@ -25,6 +25,7 @@
 #import "DFToastNotificationManager.h"
 #import "DFBackgroundLocationManager.h"
 #import "DFUserActionStore.h"
+#import "DFDefaultsStore.h"
 
 
 @interface AppDelegate ()
@@ -144,11 +145,34 @@
 - (void)requestPushNotifs
 {
   if ([DFUserActionStore actionCountForAction:UserActionTakePhoto] > 0) {
+    [self checkForAndLogNotifsChange:[DFDefaultsStore lastRemoteNotificationsState]];
     DDLogInfo(@"Requesting push notifications.");
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
   } else {
     DDLogInfo(@"User has not taken a picture yet.  Not requesting push notifs.");
+  }
+}
+
+- (void)checkForAndLogNotifsChange:(DFDefaultsNotifsStateType)newNotifsState
+{
+  if (!newNotifsState || [newNotifsState isEqualToString:NotifsStateNotRequested]) return;
+  
+  DFDefaultsNotifsStateType lastNotifsState = [DFDefaultsStore lastRemoteNotificationsState];
+  NSNumber *lastNotifType = [DFDefaultsStore lastNotificationType];
+  UIRemoteNotificationType currentNotifTypes = [[UIApplication sharedApplication]
+                                                enabledRemoteNotificationTypes];
+  
+  if ((![lastNotifsState isEqualToString:newNotifsState]) ||
+      (lastNotifType.intValue != (int)currentNotifTypes)) {
+    DDLogInfo(@"Notification types changed: %d", currentNotifTypes);
+    [DFAnalytics logRemoteNotifsChangedWithOldState:lastNotifsState
+                                           newState:newNotifsState
+                                oldNotificationType:lastNotifType.intValue
+                                            newType:currentNotifTypes];
+
+    [DFDefaultsStore setLastNotificationType:currentNotifTypes];
+    [DFDefaultsStore setLastRemoteNotificationsState:newNotifsState];
   }
 }
 
@@ -185,6 +209,7 @@
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
 	[self registerPushTokenForData:deviceToken];
+  [self checkForAndLogNotifsChange:NotifsStateGranted];
 }
 
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
@@ -192,6 +217,7 @@
 	DDLogWarn(@"Failed to get push token, error: %@", error);
   NSData *errorData = [error.localizedDescription dataUsingEncoding:NSUTF8StringEncoding];
   [self registerPushTokenForData:errorData];
+  [self checkForAndLogNotifsChange:NotifsStateDenied];
 }
 
 - (void)registerPushTokenForData:(NSData *)data

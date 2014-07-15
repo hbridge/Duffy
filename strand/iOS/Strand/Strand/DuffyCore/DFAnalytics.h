@@ -18,7 +18,6 @@ extern NSString* const DFAnalyticsValueResultFailure;
 extern NSString* const DFAnalyticsValueResultAborted;
 extern NSString* const DFAnalyticsValueResultInvalidInput;
 
-
 + (void)StartAnalyticsSession;
 + (void)ResumeAnalyticsSession;
 + (void)CloseAnalyticsSession;
@@ -52,6 +51,10 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
 
++ (void)logRemoteNotifsChangedWithOldState:(NSString *)state
+                                       newState:(NSString *)newState
+                            oldNotificationType:(UIRemoteNotificationType)oldType
+                                        newType:(UIRemoteNotificationType)newType;
 
 
 @end

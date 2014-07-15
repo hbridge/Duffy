@@ -102,6 +102,12 @@ NSString* const SetupSMSCodeEntered = @"SetupSMSCodeEntered";
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
 
+//Push notifs
+NSString* const RemoteNotifsChangedEvent = @"RemoteNotifsChanged";
+NSString* const OldStateKey = @"oldState";
+NSString* const NewStateKey = @"newState";
+NSString* const OldValueKey = @"oldValue";
+
 static DFAnalytics *defaultLogger;
 
 + (void)StartAnalyticsSession
@@ -333,6 +339,42 @@ static DFAnalytics *defaultLogger;
 }
 
 
++ (void)logRemoteNotifsChangedWithOldState:(NSString *)oldState
+                                       newState:(NSString *)newState
+                            oldNotificationType:(UIRemoteNotificationType)oldType
+                                        newType:(UIRemoteNotificationType)newType
+{
+  oldState = oldState ? oldState : @"";
+  newState = newState ? newState : @"";
+  NSString *oldValue = [DFAnalytics stringForUIRemoteNotifType:oldType];
+  NSString *newValue = [DFAnalytics stringForUIRemoteNotifType:newType];
+  
+  [DFAnalytics logEvent:RemoteNotifsChangedEvent
+         withParameters:@{
+                          OldStateKey:oldState,
+                          NewStateKey: newState,
+                          OldValueKey: oldValue,
+                          NewValueKey: newValue,
+                            }];
+}
 
+
++ (NSString *)stringForUIRemoteNotifType:(UIRemoteNotificationType)type;
+{
+  if (type == UIRemoteNotificationTypeNone) return @"None";
+
+  NSMutableString *valueString = [[NSMutableString alloc] init];
+  if (type | UIRemoteNotificationTypeBadge) {
+    [valueString appendString:@"Badge"];
+  }
+  if (type | UIRemoteNotificationTypeSound) {
+    [valueString appendString:@"Sound"];
+  }
+  if (type | UIRemoteNotificationTypeAlert) {
+    [valueString appendString:@"Alert"];
+  }
+  
+  return valueString;
+}
 
 @end
