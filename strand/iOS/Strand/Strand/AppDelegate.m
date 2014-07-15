@@ -165,7 +165,8 @@
   
   if ((![lastNotifsState isEqualToString:newNotifsState]) ||
       (lastNotifType.intValue != (int)currentNotifTypes)) {
-    DDLogInfo(@"Notification types changed: %d", currentNotifTypes);
+    DDLogInfo(@"Notification types changed. Old State:%@ New State: %@, Old Type:%d New Type:%d",
+              lastNotifsState, newNotifsState, lastNotifType.intValue, (int)currentNotifTypes);
     [DFAnalytics logRemoteNotifsChangedWithOldState:lastNotifsState
                                            newState:newNotifsState
                                 oldNotificationType:lastNotifType.intValue
