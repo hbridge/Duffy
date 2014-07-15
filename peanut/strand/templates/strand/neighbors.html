@@ -38,19 +38,18 @@
 		.ui-msg {
 			padding: 10px 10px 10px 10px;
 			text-align: center;
-			color: #000000;
-		}
-		.ui-msg-tag {
+			color: #606060;
 			font-size: 30px;
+		}
+		.ui-msg-invite {
+			padding-top: 40px;
+		}
+		.ui-msg-or {
 			padding-top: 30px;
 		}
 
 		.ui-msg-action {
-			padding: 150px 0px 10px 0px;
-			font-size: 30px;
-			text-align: center;
-			/*color: rgb(241, 126, 48);*/
-			color: #606060;
+			padding: 100px 0px 10px 0px;
 		}
 		.ui-locked {
 			-webkit-filter: blur(5px);
@@ -155,15 +154,17 @@
 					$("<div class='ui-section'>" + genHeader(objects, userList) + row + "</div>").appendTo("#allImages");
 				}
 			});
-			if (data.objects.length === 0){
-				$('div.ui-msg').removeClass('hidden');
-			}
 			$('div.image').each(function(){
 				imageClickHandler($(this));
 			});
 			$('span.timeago').timeago();
 		};
 
+		function showNoPhotoMessage(data){
+			if (data.objects && data.objects.length === 0){
+				$('div.ui-msg').removeClass('hidden');
+			}
+		}
 
 		/**
 			Main code here
@@ -175,14 +176,15 @@
 		$(document).ready(function(){
 
 			// Have to do the initial load, using an interval will actually wait the amount of time first
+			
 			console.log("Sending request to " + url);
 			$.get(url, function( data ) {
-				oldData = data
-				processData(data)
+				oldData = data;
+				processData(data);
+				showNoPhotoMessage(data);
 			});
 			
 			// Now set it up so that every 1 second, we see if we have different data.  If we do, then
-			// 
 			setInterval(function() {
 				console.log("Sending request to " + url);
 
@@ -195,6 +197,9 @@
 							processData(data)
 						}
 					}
+					else {
+						showNoPhotoMessage(data);
+					}
 					
 				});
 			}, 1000);
@@ -206,10 +211,11 @@
 
 <body>
 <div class="ui-content">
-	<div class="ui-gallery" id="allImages"/>
+	<div class="ui-gallery" id="allImages"></div>
 	<div class="ui-msg hidden"> 
-		<div class="ui-msg-tag hidden">Share photos automatically with nearby friends. </div>
 		<div class="ui-msg-action">Take a photo <img style='vertical-align:text-top' height='35px' width='35px' src='/static/camera.png'> to get started!</div>
+		<div class='ui-msg-or'>&mdash;</div>
+		<div class="ui-msg-invite">Invite friends <a href='/strand/viz/invite'><img class='ui-invite-icon' style='vertical-align:text-top' src='/static/invite_icon.jpg'></a>  </div>
 	</div>
 </div>
 
