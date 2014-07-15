@@ -700,8 +700,6 @@ def get_invite_message(request):
 	response = dict({'result': True})
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
-	timeWithinMinutes = 10
-
 	if (form.is_valid()):
 		userId = str(form.cleaned_data['user_id'])
 
@@ -713,7 +711,7 @@ def get_invite_message(request):
 				user.invites_remaining -= 1
 				user.save()
 
-				response['invite_message'] = "Try out this new app so we can automatically share photos while we are hanging out:  bit.ly/1noDnx2"
+				response['invite_message'] = "Strand makes it easy to share photos when you are with friends. Download and take a photo to start: bit.ly/1noDnx2." #115 chars
 				response['invites_remaining'] = user.invites_remaining
 				return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
