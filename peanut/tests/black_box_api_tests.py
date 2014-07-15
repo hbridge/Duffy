@@ -15,6 +15,15 @@ class BlackBoxUrlsTests(unittest.TestCase):
 
 		self.assertTrue("objects" in result)
 
+	def testSummary(self):
+		url = 'http://%s/viz/summary' % (self.BASEURL)
+		print 'Testing: %s' % (url)
+		response = urllib2.urlopen(url)
+
+		self.assertTrue("Clustered" in response)
+		self.assertTrue("Fulls" in response)
+		
+
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		# Backwards to forwards
