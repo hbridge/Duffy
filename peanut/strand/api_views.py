@@ -462,8 +462,9 @@ def get_nearby_friends_message(request):
 		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
 
 		photoUsers = list()
-		nonPhotoUsers = list()
-		for user in nearbyUsers:
+		nonPhotoUsers = nearbyUsers
+		
+		for user in users:
 			hasPhoto = False
 			for nearbyPhotoData in nearbyPhotosData:
 				photo, timeDistance, geoDistance = nearbyPhotoData
@@ -472,18 +473,19 @@ def get_nearby_friends_message(request):
 
 			if hasPhoto:
 				photoUsers.append(user)
-			else:
-				nonPhotoUsers.append(user)
 
-		if len(nearbyUsers) == 0:
+				# Remove this user from the nonPhotos list since we've found a photo
+				nonPhotoUsers = filter(lambda a: a.id != user.id, nonPhotoUsers)
+
+		if len(photoUsers) == 0 and len(nonPhotoUsers) == 0:
 			message = ""
 			expMessage = "No friends are near you."
 		elif len(photoUsers) == 0:
-			if len(nearbyUsers) == 1:
+			if len(nonPhotoUsers) == 1:
 				message = "1 friend will see this photo"
 				expMessage = "1 friend near you hasn't taken a photo yet. Take a photo to share with them."
 			else:
-				message = "%s friends will see this photo" % (len(nearbyUsers))
+				message = "%s friends will see this photo" % (len(nonPhotoUsers))
 				expMessage = "%s friends near you haven't taken a photo yet. Take a photo to share with them." % (len(nearbyUsers))
 		elif len(photoUsers) > 0:
 			names = list()
