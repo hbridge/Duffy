@@ -47,9 +47,9 @@ UInt16 const DFPhoneNumberLength = 10;
   [super viewDidLoad];
   // Do any additional setup after loading the view from its nib.
   self.phoneNumberField.delegate = self;
-  [self.phoneNumberField becomeFirstResponder];
   self.termsButton.titleLabel.numberOfLines = 0;
   self.termsButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+  self.nameTextField.placeholder = [DFUser deviceNameBasedUserName];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -133,6 +133,12 @@ replacementString:(NSString *)string
                          if (response.result) {
                            DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
                            codeEntryController.phoneNumberString = phoneNumberString;
+                           if (self.nameTextField.text
+                               && ![self.nameTextField.text isEqualToString:@""]) {
+                             codeEntryController.userName = self.nameTextField.text;
+                           } else {
+                             codeEntryController.userName = [DFUser deviceNameBasedUserName];
+                           }
                            [self.navigationController pushViewController:codeEntryController
                                                                 animated:NO];
                            [msvc dismissViewControllerAnimated:NO completion:nil];

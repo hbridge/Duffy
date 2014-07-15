@@ -29,5 +29,6 @@ typedef UInt64 DFUserIDType;
 + (void)setCurrentUser:(DFUser *)user;
 
 + (NSString *)deviceName;
++ (NSString *)deviceNameBasedUserName;
 
 @end

@@ -113,6 +113,21 @@ static DFUser *currentUser;
   return [[UIDevice currentDevice] name];
 }
 
++ (NSString *)deviceNameBasedUserName
+{
+  NSString *name = [[UIDevice currentDevice] name];
+  if (!name || [name isEqualToString:@""]) return @"";
+  
+  NSRange whitespaceRange = [name rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+  NSRange punctuationRange = [name rangeOfCharacterFromSet:[NSCharacterSet punctuationCharacterSet]];
+  NSUInteger firstLoc = MIN(whitespaceRange.location, punctuationRange.location);
+  if (firstLoc != NSNotFound) {
+    return [name substringToIndex:firstLoc];
+  }
+  
+  return name;
+}
+
 
 #pragma mark - Server URL and port
 

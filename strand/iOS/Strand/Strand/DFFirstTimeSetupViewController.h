@@ -16,5 +16,6 @@
 @property (weak, nonatomic) IBOutlet UIButton *termsButton;
 - (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender;
 - (IBAction)termsButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UITextField *nameTextField;
 
 @end

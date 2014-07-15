@@ -190,7 +190,7 @@ replacementString:(NSString *)string
   DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
   
   [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
-                          deviceName:[DFUser deviceName]
+                          deviceName:self.userName
                          phoneNumber:phoneNumberString
                        smsAuthString:authCodeString
                     withSuccessBlock:^(DFUser *user) {

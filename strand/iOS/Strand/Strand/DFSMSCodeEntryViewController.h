@@ -12,5 +12,6 @@
 
 @property (weak, nonatomic) IBOutlet UITextField *codeTextField;
 @property (nonatomic, retain) NSString *phoneNumberString;
+@property (nonatomic, retain) NSString *userName;
 
 @end
