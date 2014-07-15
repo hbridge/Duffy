@@ -47,6 +47,7 @@
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
+  DDLogInfo(@"%@ finishedw with result: %d", [self.class description], result);
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:self.presentingViewController];
   [self dismissViewControllerAnimated:YES completion:^{
