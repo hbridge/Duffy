@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 # Script to restart all Duffy services, should be called by a cron, probably nightly
 #
