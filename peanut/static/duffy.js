@@ -24,7 +24,7 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 	}
 
 	if (userList) {
-		if (getURLParameter("user_id") != photo.user_id) {
+		if (getURLParameter("user_id") != photo.user) {
 			userList.push(photo.display_name);
 		}
 	}
