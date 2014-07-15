@@ -87,6 +87,7 @@ NSString *const ActionIDPath = @"photo_actions/:id/";
        completionBlock(action, nil);
      } else if (method == RKRequestMethodDELETE && mappingResult == nil) {
        DDLogInfo(@"%@ deleted peanut action with id: %llu", [self.class description], action.id);
+       completionBlock(nil,nil);
      } else {
        DDLogError(@"%@ unexpected response: %@", [self.class description], mappingResult.firstObject);
      }

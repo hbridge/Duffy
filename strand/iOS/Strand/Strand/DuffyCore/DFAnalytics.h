@@ -44,11 +44,14 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)logNotificationOpened:(NSString *)notificationType;
 
 + (void)logPhotoDeletedWithResult:(NSString *)result;
++ (void)logPhotoLikePressedWithNewValue:(BOOL)isOn result:(NSString *)result;
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
 
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
+
+
 
 @end

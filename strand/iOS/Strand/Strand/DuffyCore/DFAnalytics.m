@@ -82,21 +82,18 @@ NSString* const PhotoTakenEvent = @"PhotoTaken";
 NSString* const FlashModeKey = @"flashMode";
 NSString* const CameraDeviceKey = @"cameraDevice";
 
-// Save pictire
+// Photo actions
 NSString* const PhotoSavedEvent = @"PhotoSaved";
+NSString* const PhotoDeletedEvent = @"PhotoDeleted";
+NSString* const PhotoLikedEvent = @"PhotoLiked";
 
 // App refresh
 NSString* const BackgroundRefreshEvent = @"BackgroundRefresh";
 NSString* const LocationUpdateEvent = @"LocationUpdated";
 NSString* const AppInBackgroundKey = @"appInBackground";
 
-
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
 NSString* const NotificationTypeKey = @"notificationType";
-
-// Delete
-NSString* const PhotoDeletedEvent = @"PhotoDeleted";
-
 
 // App SEtup
 NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
@@ -296,6 +293,14 @@ static DFAnalytics *defaultLogger;
 + (void)logPhotoDeletedWithResult:(NSString *)result
 {
   [DFAnalytics logEvent:PhotoDeletedEvent withParameters:@{ResultKey: result}];
+}
+
++ (void)logPhotoLikePressedWithNewValue:(BOOL)isOn result:(NSString *)result
+{
+  [DFAnalytics logEvent:PhotoLikedEvent withParameters:@{
+                                                         NewValueKey: @(isOn),
+                                                         ResultKey: result
+                                                         }];
 }
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result

@@ -393,43 +393,41 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
   
   DFPeanutAction *oldAction = self.userFavoritedAction;
+  DFPeanutAction *newAction;
   if (!self.isUserFavorited) {
-    DFPeanutAction *newAction = [[DFPeanutAction alloc] init];
+    newAction = [[DFPeanutAction alloc] init];
     newAction.user = [[DFUser currentUser] userID];
     newAction.action_type = DFActionFavorite;
     newAction.photo = self.photoID;
-
-    self.userFavoritedAction = newAction;
-    [self updateFavoriteButton];
-    [adapter postAction:newAction withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
-      if (!error) {
-        self.userFavoritedAction = action;
-      } else {
-        self.userFavoritedAction = oldAction;
-        [self updateFavoriteButton];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                        message:error.localizedDescription
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles:nil];
-        [alert show];
-      }
-    }];
   } else {
-    self.userFavoritedAction = nil;
-    [self updateFavoriteButton];
-    [adapter deleteAction:oldAction withCompletionBlock:^(DFPeanutAction *action, NSError *error) {
-      if (error) {
-        self.userFavoritedAction = oldAction;
-        [self updateFavoriteButton];
-      }
+    newAction = nil;
+  }
+  
+  self.userFavoritedAction = newAction;
+  [self updateFavoriteButton];
+  
+  DFPeanutActionResponseBlock responseBlock = ^(DFPeanutAction *action, NSError *error) {
+    if (!error) {
+      self.userFavoritedAction = action;
+      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited result:DFAnalyticsValueResultSuccess];
+    } else {
+      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited result:DFAnalyticsValueResultFailure];
+      self.userFavoritedAction = oldAction;
+      [self updateFavoriteButton];
       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                       message:error.localizedDescription
                                                      delegate:nil
                                             cancelButtonTitle:@"OK"
                                             otherButtonTitles:nil];
       [alert show];
-    }];
+      
+    }
+  };
+  
+  if (!oldAction) {
+    [adapter postAction:newAction withCompletionBlock:responseBlock];
+  } else {
+    [adapter deleteAction:oldAction withCompletionBlock:responseBlock];
   }
 }
 
