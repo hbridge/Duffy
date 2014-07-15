@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <MessageUI/MFMessageComposeViewController.h>
 
 
 @interface DFAnalytics : NSObject
@@ -46,5 +47,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
+
++ (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result;
 
 @end

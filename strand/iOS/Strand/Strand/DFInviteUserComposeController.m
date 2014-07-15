@@ -8,6 +8,7 @@
 
 #import "DFInviteUserComposeController.h"
 #import "DFPeanutInviteMessageAdapter.h"
+#import "DFAnalytics.h"
 
 @interface DFInviteUserComposeController ()
 
@@ -58,6 +59,7 @@
       }
     }];
   }];
+  [DFAnalytics logInviteComposeFinishedWithResult:result];
 }
 
 

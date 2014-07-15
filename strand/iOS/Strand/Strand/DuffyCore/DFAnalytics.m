@@ -101,6 +101,9 @@ NSString* const PhotoDeletedEvent = @"PhotoDeleted";
 NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
 NSString* const SetupSMSCodeEntered = @"SetupSMSCodeEntered";
 
+// Invites
+NSString* const InviteUserFinshed = @"InviteUserFinished";
+
 static DFAnalytics *defaultLogger;
 
 + (void)StartAnalyticsSession
@@ -303,6 +306,22 @@ static DFAnalytics *defaultLogger;
 {
   [DFAnalytics logEvent:SetupSMSCodeEntered withParameters:@{ResultKey: result}];
 }
+
++ (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
+{
+  NSString *resultString;
+  if (result == MessageComposeResultCancelled) {
+    resultString = DFAnalyticsValueResultAborted;
+  } else if (result == MessageComposeResultFailed) {
+    resultString = DFAnalyticsValueResultFailure;
+  } else if (result == MessageComposeResultSent) {
+    resultString = DFAnalyticsValueResultSuccess;
+  }
+  
+  [DFAnalytics logEvent:InviteUserFinshed withParameters:@{ResultKey: resultString}];
+}
+
+
 
 
 @end
