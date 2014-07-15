@@ -2,7 +2,8 @@
 
 ## Jul 14th, 2014
 
-- Easier to add new users.
+- Invite users to Strand by text from the shared photos view or from settings
+- Favorite photos in the individual photos view
 
 ## Jul 10th, 2014
 
