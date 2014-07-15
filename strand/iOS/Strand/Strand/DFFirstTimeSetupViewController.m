@@ -139,6 +139,7 @@ replacementString:(NSString *)string
                            [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultSuccess];
                          } else {
                            UIAlertView *failureAlert = [DFFirstTimeSetupViewController smsVerificationRequestFailed:error];
+                           [msvc dismissViewControllerAnimated:YES completion:nil];
                            [failureAlert show];
                            [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultFailure];
                          }
