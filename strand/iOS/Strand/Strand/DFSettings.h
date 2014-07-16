@@ -12,6 +12,7 @@
 
 @property (nonatomic, retain) NSString *displayName;
 @property (readonly, nonatomic, retain) NSString *version;
+@property (nonatomic, retain) NSString *phoneNumber;
 
 // dummy properties that are required to map the settings form
 @property (readonly, nonatomic, retain) NSDictionary *helpInfo;

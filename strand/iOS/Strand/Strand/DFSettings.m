@@ -29,4 +29,9 @@
   return [DFAppInfo appInfoString];
 }
 
+- (NSString *)phoneNumber
+{
+  return [[DFUser currentUser] phoneNumberString];
+}
+
 @end

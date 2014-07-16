@@ -86,7 +86,7 @@ static DFUser *currentUser;
   }
   if (self.displayName) [aCoder encodeObject:self.displayName forKey:displayNameCodeKey];
   if (self.authToken) [aCoder encodeObject:self.authToken forKey:authTokenCodeKey];
-  if (self.phoneNumberString) [aCoder encodeObject:self.authToken forKey:phoneNumberCodeKey];
+  if (self.phoneNumberString) [aCoder encodeObject:self.phoneNumberString forKey:phoneNumberCodeKey];
 }
 
 - (void)setDeviceID:(NSString *)deviceID
