@@ -475,10 +475,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     result = YES;
   }
   
-  if (location.horizontalAccuracy > MinLocationAccuracy) {
-      [self checkAndShowTurnOnWifiAlert];
-  }
-  
   return result;
 }
 
@@ -578,6 +574,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   CLLocation *location = locations.lastObject;
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
+  } else {
+    [self checkAndShowTurnOnWifiAlert];
   }
   
   DDLogInfo(@"DFCameraViewController updated location: <%f, %f> +/- %.02fm @ %@",
