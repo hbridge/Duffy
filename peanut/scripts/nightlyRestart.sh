@@ -5,39 +5,36 @@
 # Needed because long running python scripts have memory leaks.
 #
 
-echo $PATH
-whoami
-
-/usr/sbin/service duffy-faces stop
+/sbin/initctl stop duffy-faces
 sleep 1
-/usr/sbin/service duffy-faces start
+/sbin/initctl stop duffy-faces
 
 sleep 5
 
-/usr/sbin/service duffy-twofishes stop
+/sbin/initctl stop duffy-twofishes
 sleep 1
-/usr/sbin/service duffy-twofishes start
+/sbin/initctl start duffy-twofishes
 
 sleep 5
 
-/usr/sbin/service duffy-classifier stop
+/sbin/initctl stop duffy-classifier
 sleep 1
-/usr/sbin/service duffy-classifier start
+/sbin/initctl start duffy-classifier
 
 sleep 5
 
-/usr/sbin/service duffy-neighbor stop
+/sbin/initctl stop duffy-neighbor
 sleep 1
-/usr/sbin/service duffy-neighbor start
+/sbin/initctl start duffy-neighbor
 
 sleep 5
 
-/usr/sbin/service duffy-similarity stop
+/sbin/initctl stop duffy-similarity
 sleep 1
-/usr/sbin/service duffy-similarity start
+/sbin/initctl start duffy-similarity
 
 sleep 5
 
-/usr/sbin/service duffy-strand-notifications stop
+/sbin/initctl stop duffy-strand-notifications
 sleep 1
-/usr/sbin/service duffy-strand-notifications start
+/sbin/initctl start duffy-strand-notifications
