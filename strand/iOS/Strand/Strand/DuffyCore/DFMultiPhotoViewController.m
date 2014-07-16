@@ -63,15 +63,13 @@
 {
   [super viewDidAppear:animated];
   [self.navigationController setNavigationBarHidden:NO animated:YES];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-    [super viewDidDisappear:animated];
-  
-    [DFAnalytics logViewController:self disappearedWithParameters:nil];
+  [super viewDidDisappear:animated];
 }
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
