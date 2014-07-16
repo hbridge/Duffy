@@ -60,6 +60,7 @@ const NSTimeInterval WifiPromptInterval = 10 * 60;
   if (self) {
     [self configureLocationManager];
     [self observeNotifications];
+    self.lastWifiPromptDate = [NSDate dateWithTimeIntervalSince1970:0];
   }
   return self;
 }
@@ -468,16 +469,17 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (BOOL)isGoodLocation:(CLLocation *)location
 {
+  BOOL result = NO;
   if (location.horizontalAccuracy <= MinLocationAccuracy &&
       [[NSDate date] timeIntervalSinceDate:location.timestamp] <= MaxLocationAge) {
-    return YES;
+    result = YES;
   }
   
   if (location.horizontalAccuracy > MinLocationAccuracy) {
       [self checkAndShowTurnOnWifiAlert];
   }
   
-  return NO;
+  return result;
 }
 
 - (void)checkAndShowTurnOnWifiAlert
@@ -487,7 +489,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi
       && intervalSinceLastNag > WifiPromptInterval) {
     [UIAlertView showSimpleAlertWithTitle:@"Turn on WiFi"
-                                  message:@"Turn on WiFi to improve location accuracy."];
+                                  message:@"Could not get an accurate location. Turn on WiFi to improve location accuracy."];
     self.lastWifiPromptDate = [NSDate date];
   }
 }
