@@ -117,7 +117,8 @@
 
   }
   
-  if (self.favoritedOtherUserNames.count > 0 && self.favoritedOtherUserNames.count < 5) {
+  if ((self.favoritedOtherUserNames.count > 0 || self.isUserFavorited)
+      && self.favoritedOtherUserNames.count < 5) {
     NSMutableString *userNamesString = [[NSMutableString alloc] initWithString:@" "];
     if (self.isUserFavorited) {
       [userNamesString appendString:@"You"];
