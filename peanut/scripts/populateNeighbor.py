@@ -95,7 +95,7 @@ def sendNotifications(neighbors):
 		msg = " & ".join(names) + " added new photos!"
 
 		# If the user doesn't show up in the array then they haven't been notified in that time period
-		if user.id not in lastNotificationTimesById:
+		if user.id not in notificationsById:
 			logger.debug("Sending message '%s' to user %s" % (msg, user))
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
 		else:
