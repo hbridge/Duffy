@@ -12,6 +12,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		print "Testing: %s" % (url)
 		response = urllib2.urlopen(url)
 		result = json.loads(response.read())
+		print "/strand/api/neighbors stats: %s" % (result['stats'])
 
 		self.assertTrue("objects" in result)
 
