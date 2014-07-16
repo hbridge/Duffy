@@ -10,9 +10,12 @@
 
 @interface DFSettings : NSObject
 
++ (DFSettings *)sharedSettings;
+
 @property (nonatomic, retain) NSString *displayName;
 @property (readonly, nonatomic, retain) NSString *version;
 @property (nonatomic, retain) NSString *phoneNumber;
+@property (nonatomic) BOOL autosaveToCameraRoll;
 
 // dummy properties that are required to map the settings form
 @property (readonly, nonatomic, retain) NSDictionary *helpInfo;

@@ -39,5 +39,40 @@ NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
 }
 
 
+// Actions
+
+NSString *const UserActionPrefix = @"DFUserActionCount";
+DFUserActionType UserActionTakePhoto = @"TakePhoto";
+
++ (void)incrementCountForAction:(DFUserActionType)action
+{
+  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionPrefix, action];
+  NSNumber *count = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+  unsigned int newCount = [count unsignedIntValue] + 1;
+  [[NSUserDefaults standardUserDefaults] setObject:@(newCount) forKey:key];
+}
+
+
++ (unsigned int)actionCountForAction:(DFUserActionType)action
+{
+  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionPrefix, action];
+  NSNumber *count = [[NSUserDefaults standardUserDefaults] objectForKey:key];
+  return [count unsignedIntValue];
+}
+
+
+// whether setup steps have been passed
+DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll = @"DFSetupStepAskToAutoSaveToCameraRoll";
+
++ (void)setSetupStepPassed:(DFSetupStepType)step Passed:(BOOL)passed
+{
+  [[NSUserDefaults standardUserDefaults] setBool:passed forKey:step];
+}
+
++ (BOOL)isSetupStepPassed:(DFSetupStepType)step;
+{
+  return [[NSUserDefaults standardUserDefaults] boolForKey:step];
+}
+
 
 @end

@@ -21,5 +21,17 @@ extern DFDefaultsNotifsStateType NotifsStateUnavailable;
 + (void)setLastNotificationType:(UIRemoteNotificationType)type;
 + (NSNumber *)lastNotificationType;
 
+// whether setup steps have been passed
+typedef NSString *const DFSetupStepType;
+extern DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll;
++ (void)setSetupStepPassed:(DFSetupStepType)step Passed:(BOOL)passed;
++ (BOOL)isSetupStepPassed:(DFSetupStepType)step;
+
+// whether actions have happened
+typedef NSString *const DFUserActionType;
+extern DFUserActionType UserActionTakePhoto;
+
++ (void)incrementCountForAction:(DFUserActionType)action;
++ (unsigned int)actionCountForAction:(DFUserActionType)action;
 
 @end

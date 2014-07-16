@@ -11,7 +11,7 @@
 
 @class DFCameraOverlayView;
 
-@interface DFCameraViewController : UIImagePickerController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate>
+@interface DFCameraViewController : UIImagePickerController <UIImagePickerControllerDelegate, UINavigationControllerDelegate, CLLocationManagerDelegate, UIAlertViewDelegate>
 
 @property (nonatomic, readonly, retain) DFCameraOverlayView *customCameraOverlayView;
 

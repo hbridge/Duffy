@@ -93,6 +93,13 @@
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeLabel];
     
+    // Photos
+    [mapping sectionWithTitle:@"Photos"
+                       footer:@"Automatically save photos you take in Strand to your Camera Roll"
+                   identifier:@"photos"];
+    [mapping mapAttribute:@"autosaveToCameraRoll" title:@"Save to Camera Roll."
+                     type:FKFormAttributeMappingTypeBoolean];
+    
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
     [mapping button:@"Help"

@@ -20,7 +20,6 @@
 		5A0E122A1974839200B6FF04 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0E12291974839200B6FF04 /* MessageUI.framework */; };
 		5A0E122D197487CC00B6FF04 /* DFInviteUserComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122C197487CC00B6FF04 /* DFInviteUserComposeController.m */; };
 		5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */; };
-		5A0E12331975B55E00B6FF04 /* DFUserActionStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12321975B55E00B6FF04 /* DFUserActionStore.m */; };
 		5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */; };
 		5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */; };
 		5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */; };
@@ -162,8 +161,6 @@
 		5A0E122C197487CC00B6FF04 /* DFInviteUserComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFInviteUserComposeController.m; sourceTree = "<group>"; };
 		5A0E122E1974988700B6FF04 /* UIAlertView+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIAlertView+DFHelpers.h"; sourceTree = "<group>"; };
 		5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIAlertView+DFHelpers.m"; sourceTree = "<group>"; };
-		5A0E12311975B55E00B6FF04 /* DFUserActionStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUserActionStore.h; sourceTree = "<group>"; };
-		5A0E12321975B55E00B6FF04 /* DFUserActionStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserActionStore.m; sourceTree = "<group>"; };
 		5A0E12341975C1C600B6FF04 /* DFDefaultsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDefaultsStore.h; sourceTree = "<group>"; };
 		5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDefaultsStore.m; sourceTree = "<group>"; };
 		5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationController.h; sourceTree = "<group>"; };
@@ -746,8 +743,6 @@
 				5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */,
 				5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */,
 				5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */,
-				5A0E12311975B55E00B6FF04 /* DFUserActionStore.h */,
-				5A0E12321975B55E00B6FF04 /* DFUserActionStore.m */,
 			);
 			name = "First Time Setup";
 			sourceTree = "<group>";
@@ -1053,7 +1048,6 @@
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */,
-				5A0E12331975B55E00B6FF04 /* DFUserActionStore.m in Sources */,
 				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5AC4A93C1947C30800862D9C /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
 				5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */,

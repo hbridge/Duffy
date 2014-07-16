@@ -27,9 +27,10 @@
 #import "DFCameraRollPhotoAsset.h"
 #import "DFStrandPhotoAsset.h"
 #import "DFNearbyFriendsManager.h"
-#import "DFUserActionStore.h"
 #import "UIAlertView+DFHelpers.h"
 #import "RestKit/RestKit.h"
+#import "DFDefaultsStore.h"
+#import "DFSettings.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -39,6 +40,7 @@ const CLLocationAccuracy MinLocationAccuracy = 65.0;
 const NSTimeInterval MaxLocationAge = 15 * 60;
 const unsigned int RetryDelaySecs = 5;
 const NSTimeInterval WifiPromptInterval = 10 * 60;
+const unsigned int SavePromptMinPhotos = 1;
 
 @interface DFCameraViewController ()
 
@@ -323,13 +325,14 @@ const NSTimeInterval WifiPromptInterval = 10 * 60;
 
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
+  DDLogInfo(@"Take photo button pressed.");
   [self takePicture];
   [self flashCameraView];
-  [self hideNuxLabels];
-  [DFUserActionStore incrementCountForAction:UserActionTakePhoto];
+  [self handleNUXTasksForPhotoTaken];
+  [DFDefaultsStore incrementCountForAction:UserActionTakePhoto];
 }
 
-- (void)hideNuxLabels
+- (void)handleNUXTasksForPhotoTaken
 {
   BOOL cameraHelpWasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraHelpWasShown];
   BOOL joinableHelpWasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraJoinableHelpWasShown];
@@ -343,6 +346,33 @@ const NSTimeInterval WifiPromptInterval = 10 * 60;
       [[NSUserDefaults standardUserDefaults] setBool:YES forKey:DFStrandCameraJoinableHelpWasShown];
     }
   }
+  
+  unsigned int photoTakenCount = [DFDefaultsStore actionCountForAction:UserActionTakePhoto];
+  BOOL saveAsked = [DFDefaultsStore isSetupStepPassed:DFSetupStepAskToAutoSaveToCameraRoll];
+  if (photoTakenCount > SavePromptMinPhotos
+      && !saveAsked
+      && ![[DFSettings sharedSettings] autosaveToCameraRoll]) {
+    [self showAutoSavePrompt];
+  }
+}
+
+- (void)showAutoSavePrompt
+{
+  UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Auto-Save Photos?"
+                                                  message:@"Would you like photos you take in Strand to automatically be saved to your Camera Roll?"
+                                                 delegate:self
+                                        cancelButtonTitle:@"Not Now"
+                                        otherButtonTitles:@"Yes", nil];
+  [alert show];
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  if (buttonIndex > 0) {
+    [[DFSettings sharedSettings] setAutosaveToCameraRoll:YES];
+  }
+  
+  [DFDefaultsStore setSetupStepPassed:DFSetupStepAskToAutoSaveToCameraRoll Passed:YES];
 }
 
 - (void)galleryButtonPressed:(UIButton *)sender
@@ -462,6 +492,18 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   if (error) {
     [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
                 format:@"Error: %@", error.description];
+  }
+  
+  if ([[DFSettings sharedSettings] autosaveToCameraRoll]) {
+    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+    [library writeImageToSavedPhotosAlbum:image.CGImage
+                                 metadata:metadata
+    completionBlock:^(NSURL *assetURL, NSError *error) {
+      if (error) {
+        DDLogError(@"%@ couldn't save photo to Camera Roll:%@", [DFCameraViewController class],
+                   error.description);
+      }
+    }];
   }
   
   if (completionBlock) completionBlock();
