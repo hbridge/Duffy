@@ -127,23 +127,31 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self fullPhotoRequestedWithURL:requestURLString];
     return NO;
   } else if ([requestURLString rangeOfString:@"/strand/viz/invite"].location != NSNotFound) {
-    if (self.inviteController.isBeingPresented) return NO;
-    [self.inviteController loadMessageWithCompletion:^(NSError *error) {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        if (!error) {
-          [self presentViewController:self.inviteController animated:YES completion:^(void) {
-            self.inviteController = nil;
-          }];
-        } else {
-          [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
-        }
-      });
-    }];
+    [self inviteUserPressed];
+    return NO;
+  } else if ([requestURLString rangeOfString:@"/strand/viz/camera"].location != NSNotFound) {
+    [self cameraButtonPressed:nil];
     return NO;
   }
   return YES;
 }
 
+- (void)inviteUserPressed
+{
+  if (self.inviteController.isBeingPresented) return;
+  [self.inviteController loadMessageWithCompletion:^(NSError *error) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (!error) {
+        [self presentViewController:self.inviteController animated:YES completion:^(void) {
+          self.inviteController = nil;
+        }];
+      } else {
+        [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
+      }
+    });
+  }];
+
+}
 
 - (void)webViewDidFinishLoad:(UIWebView *)webView
 {
