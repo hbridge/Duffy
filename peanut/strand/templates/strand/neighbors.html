@@ -186,6 +186,14 @@
 				oldData = data;
 				processData(data);
 			});
+
+			$('div.ui-msg-invite').click(function() {
+				window.location.href = '/strand/viz/invite';
+			});
+
+			$('div.ui-msg-action').click(function() {
+				window.location.href = '/strand/viz/camera';
+			});
 			
 			// Now set it up so that every 1 second, we see if we have different data.  If we do, then
 			setInterval(function() {
@@ -201,15 +209,8 @@
 					}
 				});
 			}, 1000);
-		});
 
-		$('ui-msg-invite').click(function() {
-			window.location.href = '/strand/viz/invite';
 		});
-
-		$('ui-msg-action').click(function() {
-			window.location.href = '/strand/viz/camera';
-		})
 		
 	</script>
 </head>
@@ -225,6 +226,5 @@
 </div>
 
 </body>
-
 
 </html>
