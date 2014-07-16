@@ -4,6 +4,10 @@
 #
 # Needed because long running python scripts have memory leaks.
 #
+
+echo $PATH
+whoami
+
 /usr/sbin/service duffy-faces stop
 sleep 1
 /usr/sbin/service duffy-faces start
