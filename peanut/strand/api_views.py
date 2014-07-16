@@ -456,7 +456,10 @@ def get_nearby_friends_message(request):
 
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
-		
+
+		if (userId > 67):
+			users = users.filter(id__gt=67)
+				
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
 		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
 		
