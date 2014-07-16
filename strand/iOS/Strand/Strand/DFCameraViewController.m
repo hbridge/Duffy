@@ -40,7 +40,7 @@ const CLLocationAccuracy MinLocationAccuracy = 65.0;
 const NSTimeInterval MaxLocationAge = 15 * 60;
 const unsigned int RetryDelaySecs = 5;
 const NSTimeInterval WifiPromptInterval = 10 * 60;
-const unsigned int SavePromptMinPhotos = 1;
+const unsigned int SavePromptMinPhotos = 3;
 
 @interface DFCameraViewController ()
 
