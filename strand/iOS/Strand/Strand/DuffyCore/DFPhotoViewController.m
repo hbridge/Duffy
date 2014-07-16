@@ -21,6 +21,7 @@
 #import <ImageIO/ImageIO.h>
 #import "DFPeanutActionAdapter.h"
 #import "DFPeanutAction.h"
+#import "DFStrandConstants.h"
 
 @interface DFPhotoViewController ()
 
@@ -98,6 +99,7 @@
                                    action:@selector(confirmDeletePhoto)];
   
   [self.toolbar setItems:@[likeButton, flexibleSpace, self.trashButton] animated:NO];
+  self.toolbar.tintColor = [DFStrandConstants mainColor];
   
   [self updateFavoriteButton];
   if (![self isPhotoDeletableByUser]) {

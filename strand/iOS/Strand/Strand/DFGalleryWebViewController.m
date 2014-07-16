@@ -27,6 +27,7 @@
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *peanutGalleryAdapter;
 @property (nonatomic, retain) NSMutableDictionary *photoActions;
 @property (nonatomic, retain) DFInviteUserComposeController *inviteController;
+@property (nonatomic, retain) UIColor *barColor;
 
 @end
 
@@ -47,8 +48,13 @@
 {
   [super viewDidLoad];
   [self setNavigationButtons];
-  self.navigationController.navigationBar.tintColor =
-  [UIColor orangeColor];
+  self.navigationController.navigationBar.barTintColor = [DFStrandConstants mainColor];
+  self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
+  self.navigationController.navigationBar.titleTextAttributes = @{
+                                                                  NSForegroundColorAttributeName: [UIColor whiteColor]
+                                                                  };
+  self.navigationController.navigationBar.translucent = NO;
+  
 
   // setup webview
   self.webView.delegate = self;
@@ -63,6 +69,7 @@
     [self.webView loadRequest:[NSURLRequest requestWithURL:urlToLoad]];
   });
 }
+
 
 - (void)viewWillAppear:(BOOL)animated
 {

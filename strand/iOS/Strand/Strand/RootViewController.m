@@ -84,6 +84,10 @@
   return _subviewController;
 }
 
+-(UIStatusBarStyle)preferredStatusBarStyle{
+  return UIStatusBarStyleLightContent;
+}
+
 - (void)showGallery
 {
   UIViewController *galleryViewController = [self.subviewController

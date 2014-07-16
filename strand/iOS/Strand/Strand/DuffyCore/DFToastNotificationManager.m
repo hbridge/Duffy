@@ -9,6 +9,7 @@
 #import "DFToastNotificationManager.h"
 #import "CRToast.h"
 #import <AudioToolbox/AudioServices.h>
+#import "DFStrandConstants.h"
 
 @implementation DFToastNotificationManager
 
@@ -39,7 +40,7 @@ static DFToastNotificationManager *defaultManager;
 {
   NSDictionary *options = @{
                             kCRToastTextAlignmentKey : @(NSTextAlignmentCenter),
-                            kCRToastBackgroundColorKey : [UIColor orangeColor],
+                            kCRToastBackgroundColorKey : [DFStrandConstants mainColor],
                             kCRToastAnimationInTypeKey : @(CRToastAnimationTypeLinear),
                             kCRToastAnimationOutTypeKey : @(CRToastAnimationTypeLinear),
                             kCRToastAnimationInDirectionKey : @(CRToastAnimationDirectionTop),
