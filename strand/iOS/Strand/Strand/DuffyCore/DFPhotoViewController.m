@@ -40,7 +40,7 @@
     if (self) {
         UINavigationItem *n = [self navigationItem];
         [n setTitle:@"Photo"];
-      self.otherUsersFavoritedCount = 0;
+      self.favoritedOtherUserNames = [[NSMutableArray alloc] init];
       
         self.automaticallyAdjustsScrollViewInsets = NO;
         self.hidesBottomBarWhenPushed = YES;
@@ -73,23 +73,23 @@
 
 - (void)configureToolbar
 {
-  unsigned int otherFavoritesCount = 0;
+  self.favoritedOtherUserNames = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in self.photoActions) {
     if ([action.action_type isEqualToString:DFActionFavorite]) {
       if (action.user == [[DFUser currentUser] userID]) {
         self.userFavoritedAction = action;
       } else {
-        otherFavoritesCount++;
+        [self.favoritedOtherUserNames addObject:action.user_display_name];
       }
     }
   }
-  self.otherUsersFavoritedCount = otherFavoritesCount;
   
   self.favoriteButton = [UIButton buttonWithType:UIButtonTypeCustom];
   [self.favoriteButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
   [self.favoriteButton addTarget:self
                           action:@selector(favoriteButtonPressed:)
                 forControlEvents:UIControlEventTouchUpInside];
+  self.favoriteButton.titleLabel.font = [self.favoriteButton.titleLabel.font fontWithSize:14.0];
 
   UIBarButtonItem *likeButton = [[UIBarButtonItem alloc] initWithCustomView:self.favoriteButton];
   UIBarButtonItem *flexibleSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
@@ -117,9 +117,26 @@
 
   }
   
-  [self.favoriteButton setTitle:[NSString stringWithFormat:@" %d ",
-                                 self.otherUsersFavoritedCount + (self.isUserFavorited ? 1 : 0)]
-   forState:UIControlStateNormal];
+  if (self.favoritedOtherUserNames.count > 0 && self.favoritedOtherUserNames.count < 5) {
+    NSMutableString *userNamesString = [[NSMutableString alloc] initWithString:@" "];
+    if (self.isUserFavorited) {
+      [userNamesString appendString:@"You"];
+      if (self.favoritedOtherUserNames.count > 0) [userNamesString appendString:@", "];
+    }
+    for (NSUInteger i = 0; i < self.favoritedOtherUserNames.count; i++) {
+      [userNamesString appendString:self.favoritedOtherUserNames[i]];
+      if (i < self.favoritedOtherUserNames.count -1) {
+        [userNamesString appendString:@", "];
+      }
+    }
+    [self.favoriteButton setTitle:userNamesString
+                         forState:UIControlStateNormal];
+  } else {
+    [self.favoriteButton setTitle:[NSString stringWithFormat:@" %d ",
+                                   self.favoritedOtherUserNames.count + (self.isUserFavorited ? 1 : 0)]
+                         forState:UIControlStateNormal];
+  }
+  
   [self.favoriteButton setImage:newImage forState:UIControlStateNormal];
   [self.favoriteButton sizeToFit];
 }

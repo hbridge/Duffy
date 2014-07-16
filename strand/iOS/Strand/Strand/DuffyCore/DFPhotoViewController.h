@@ -20,7 +20,7 @@
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 @property (readonly, nonatomic) BOOL isUserFavorited;
-@property (nonatomic) unsigned int otherUsersFavoritedCount;
+@property (nonatomic, retain) NSMutableArray *favoritedOtherUserNames;
 @property (strong, nonatomic) UIButton *favoriteButton;
 @property (strong, nonatomic)  UIBarButtonItem *trashButton;
 
