@@ -203,6 +203,13 @@
 			}, 1000);
 		});
 
+		$('ui-msg-invite').click(function() {
+			window.location.href = '/strand/viz/invite';
+		});
+
+		$('ui-msg-action').click(function() {
+			window.location.href = '/strand/viz/camera';
+		})
 		
 	</script>
 </head>
@@ -213,7 +220,7 @@
 	<div class="ui-msg hidden"> 
 		<div class="ui-msg-action">Take a photo <img style='vertical-align:text-top' height='35px' width='35px' src='/static/camera.png'> to get started!</div>
 		<div class='ui-msg-or'>&mdash;</div>
-		<div class="ui-msg-invite">Invite friends <a href='/strand/viz/invite'><img class='ui-invite-icon' style='vertical-align:text-top' src='/static/invite_icon.jpg'></a>  </div>
+		<div class="ui-msg-invite">Invite friends <img class='ui-invite-icon' style='vertical-align:text-top' src='/static/invite_icon.jpg'> </div>
 	</div>
 </div>
 
