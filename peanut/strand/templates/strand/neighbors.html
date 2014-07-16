@@ -193,7 +193,7 @@
 
 				$.get(url, function( data ) {
 					if (data.objects) {
-						if (JSON.stringify(data) !== JSON.stringify(oldData)) {
+						if (JSON.stringify(data.objects) !== JSON.stringify(oldData.objects)) {
 							oldData = data
 							console.log("Refreshing data")
 							processData(data)
