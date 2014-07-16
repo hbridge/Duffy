@@ -133,15 +133,15 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self fullPhotoRequestedWithURL:requestURLString];
     return NO;
   } else if ([requestURLString rangeOfString:@"/strand/viz/invite"].location != NSNotFound) {
-    self.inviteController = [[DFInviteUserComposeController alloc] init];
+    if (self.inviteController.isBeingPresented) return NO;
     [self.inviteController loadMessageWithCompletion:^(NSError *error) {
-      if (!error) {
-        dispatch_async(dispatch_get_main_queue(), ^{
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if (!error) {
           [self presentViewController:self.inviteController animated:YES completion:nil];
-        });
-      } else {
-        [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
-      }
+        } else {
+          [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
+        }
+      });
     }];
     return NO;
   }
@@ -321,6 +321,15 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
   }
   
   return _peanutGalleryAdapter;
+}
+
+- (DFInviteUserComposeController *)inviteController
+{
+  if (!_inviteController) {
+    _inviteController = [[DFInviteUserComposeController alloc] init];
+  }
+  
+  return _inviteController;
 }
 
 
