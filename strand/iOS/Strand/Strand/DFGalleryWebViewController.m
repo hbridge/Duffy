@@ -137,7 +137,9 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
     [self.inviteController loadMessageWithCompletion:^(NSError *error) {
       dispatch_async(dispatch_get_main_queue(), ^{
         if (!error) {
-          [self presentViewController:self.inviteController animated:YES completion:nil];
+          [self presentViewController:self.inviteController animated:YES completion:^(void) {
+            self.inviteController = nil;
+          }];
         } else {
           [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
         }

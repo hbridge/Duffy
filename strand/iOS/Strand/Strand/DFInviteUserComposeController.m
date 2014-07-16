@@ -13,6 +13,8 @@
 @interface DFInviteUserComposeController ()
 
 @property (nonatomic, retain) DFPeanutInviteMessageResponse *loadedResponse;
+@property (nonatomic, retain) DFPeanutInviteMessageAdapter *inviteAdapter;
+@property (atomic) BOOL isLoadMessageInProgress;
 
 @end
 
@@ -29,8 +31,18 @@
 
 - (void)loadMessageWithCompletion:(void(^)(NSError *))messageLoadCompletion;
 {
-  DFPeanutInviteMessageAdapter *inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
-  [inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
+  if (self.isBeingPresented) {
+    messageLoadCompletion([NSError
+                           errorWithDomain:@"com.duffyapp.Strand"
+                           code:-11
+                           userInfo:@{
+                                      NSLocalizedDescriptionKey: @"Trying to load message when "
+                                      "invite controller already being presented."
+                                      }]);
+    return;
+  }
+  
+  [self.inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
     if (!error) {
       self.loadedResponse = response;
       [self setBody:response.invite_message];
@@ -70,5 +82,14 @@
   // Do any additional setup after loading the view.
 }
 
+
+- (DFPeanutInviteMessageAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) {
+    _inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
+  }
+  
+  return _inviteAdapter;
+}
 
 @end
