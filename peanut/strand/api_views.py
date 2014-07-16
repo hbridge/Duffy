@@ -252,6 +252,7 @@ def neighbors(request):
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
 	response['objects'] = objects
+	response['stats'] = '<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->'
 	response['next_start_date_time'] = lastDate
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
