@@ -59,10 +59,10 @@ class User(models.Model):
 		else:
 			productStr = "Strand"
 
-		if self.phone_id:
-			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)
+		if self.phone_number:
+			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_number)
 		else:
-			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_number)			
+			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)			
 
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
