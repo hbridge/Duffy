@@ -74,13 +74,12 @@ static DFSettings *defaultSettings;
       ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
       
       [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-        NSLog(@"%i",[group numberOfAssets]);
       } failureBlock:^(NSError *error) {
         if (error) {
           [UIAlertView showSimpleAlertWithTitle:@"Error"
                                         message:[NSString stringWithFormat:@"Cannot enable: %@",
                                                  error.localizedDescription]];
-          DDLogWarn(@"Couldn't access camera roll, code: %i", error.code);
+          DDLogWarn(@"Couldn't access camera roll, code: %ld", (long)error.code);
         }else{
           [[NSUserDefaults standardUserDefaults] setBool:autosaveToCameraRoll
                                                   forKey:AutosaveToCameraRollDefaultsKey];
