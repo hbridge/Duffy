@@ -7,7 +7,7 @@
 
 /sbin/initctl stop duffy-faces
 sleep 1
-/sbin/initctl stop duffy-faces
+/sbin/initctl start duffy-faces
 
 sleep 5
 
