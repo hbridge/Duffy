@@ -28,6 +28,8 @@
 #import "DFStrandPhotoAsset.h"
 #import "DFNearbyFriendsManager.h"
 #import "DFUserActionStore.h"
+#import "UIAlertView+DFHelpers.h"
+#import "RestKit/RestKit.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -36,12 +38,14 @@ const unsigned int MaxRetryCount = 3;
 const CLLocationAccuracy MinLocationAccuracy = 65.0;
 const NSTimeInterval MaxLocationAge = 15 * 60;
 const unsigned int RetryDelaySecs = 5;
+const NSTimeInterval WifiPromptInterval = 10 * 60;
 
 @interface DFCameraViewController ()
 
 @property (nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
 @property (nonatomic, retain) NSTimer *updateUITimer;
+@property (nonatomic, retain) NSDate *lastWifiPromptDate;
 
 @end
 
@@ -469,7 +473,23 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     return YES;
   }
   
+  if (location.horizontalAccuracy > MinLocationAccuracy) {
+      [self checkAndShowTurnOnWifiAlert];
+  }
+  
   return NO;
+}
+
+- (void)checkAndShowTurnOnWifiAlert
+{
+  AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
+  NSTimeInterval intervalSinceLastNag = [[NSDate date] timeIntervalSinceDate:self.lastWifiPromptDate];
+  if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi
+      && intervalSinceLastNag > WifiPromptInterval) {
+    [UIAlertView showSimpleAlertWithTitle:@"Turn on WiFi"
+                                  message:@"Turn on WiFi to improve location accuracy."];
+    self.lastWifiPromptDate = [NSDate date];
+  }
 }
 
 - (void)addLocation:(CLLocation *)location toMetadata:(NSMutableDictionary *)metadata
