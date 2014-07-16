@@ -103,6 +103,8 @@ def sendNotifications(neighbors):
 	
 def main(argv):
 	maxFilesAtTime = 100
+
+	timeWithinMinutes = 45
 	
 	logger.info("Starting... ")
 	while True:
@@ -112,8 +114,8 @@ def main(argv):
 			rowsToWrite = list()
 			photos = list(photos)
 
-			timeHigh = photos[0].time_taken + datetime.timedelta(hours=3)
-			timeLow = photos[-1].time_taken - datetime.timedelta(hours=3)
+			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutes)
+			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutes)
 
 			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None).filter(user__product_id=1)
 
