@@ -22,6 +22,7 @@
 		5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */; };
 		5A0E12331975B55E00B6FF04 /* DFUserActionStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12321975B55E00B6FF04 /* DFUserActionStore.m */; };
 		5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */; };
+		5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */; };
 		5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */; };
 		5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
@@ -165,6 +166,8 @@
 		5A0E12321975B55E00B6FF04 /* DFUserActionStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserActionStore.m; sourceTree = "<group>"; };
 		5A0E12341975C1C600B6FF04 /* DFDefaultsStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDefaultsStore.h; sourceTree = "<group>"; };
 		5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDefaultsStore.m; sourceTree = "<group>"; };
+		5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationController.h; sourceTree = "<group>"; };
+		5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNavigationController.m; sourceTree = "<group>"; };
 		5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFModalSpinnerViewController.h; sourceTree = "<group>"; };
 		5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFModalSpinnerViewController.m; sourceTree = "<group>"; };
 		5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFModalSpinnerViewController.xib; sourceTree = "<group>"; };
@@ -390,6 +393,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5A0E123A1976DCC300B6FF04 /* Common Views */ = {
+			isa = PBXGroup;
+			children = (
+				5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */,
+				5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */,
+			);
+			name = "Common Views";
+			sourceTree = "<group>";
+		};
 		5A3172CF196C7C6F00CA7693 /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -801,6 +813,7 @@
 				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
 				5ADD857219465C790037A6D5 /* Supporting Files */,
+				5A0E123A1976DCC300B6FF04 /* Common Views */,
 			);
 			path = Strand;
 			sourceTree = "<group>";
@@ -1120,6 +1133,7 @@
 				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
 				5AA4529D196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m in Sources */,
+				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */,
 				5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */,
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,

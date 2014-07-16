@@ -19,6 +19,7 @@
 #import "DFPeanutSearchObject.h"
 #import "DFInviteUserComposeController.h"
 #import "UIAlertView+DFHelpers.h"
+#import "DFNavigationController.h"
 
 @interface DFGalleryWebViewController ()
 
@@ -48,13 +49,6 @@
 {
   [super viewDidLoad];
   [self setNavigationButtons];
-  self.navigationController.navigationBar.barTintColor = [DFStrandConstants mainColor];
-  self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-  self.navigationController.navigationBar.titleTextAttributes = @{
-                                                                  NSForegroundColorAttributeName: [UIColor whiteColor]
-                                                                  };
-  self.navigationController.navigationBar.translucent = NO;
-  
 
   // setup webview
   self.webView.delegate = self;
@@ -308,7 +302,7 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 - (void)settingsButtonPressed:(UIButton *)sender
 {
   DFSettingsViewController *settingsViewController = [[DFSettingsViewController alloc] init];
-  [self presentViewController:[[UINavigationController alloc]
+  [self presentViewController:[[DFNavigationController alloc]
                                initWithRootViewController:settingsViewController]
                      animated:YES
                    completion:nil];
