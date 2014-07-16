@@ -104,7 +104,7 @@ def sendNotifications(neighbors):
 def main(argv):
 	maxFilesAtTime = 100
 
-	timeWithinMinutes = 45
+	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 	
 	logger.info("Starting... ")
 	while True:

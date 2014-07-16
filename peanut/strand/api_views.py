@@ -262,16 +262,15 @@ def neighbors(request):
 	Returns a list of photos
 """
 def getNonNeighboredPhotos(userId, lon, lat):
-	# TODO(Derek):  Probably want to pull this out to some other place, maybe a param
-	timeWithinHours = 3
+	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 
 	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 
-	timeLow = nowTime - datetime.timedelta(hours=timeWithinHours)
+	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
 
 	photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).filter(user__product_id=1)
 
-	nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinHours * 60 * 60)
+	nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinMinutes * 60)
 
 	nearbyPhotos = list()
 	for nearbyPhotoData in nearbyPhotosData:
@@ -328,8 +327,6 @@ def get_joinable_strands(request):
 """
 def get_new_photos(request):
 	response = dict({'result': True})
-
-	timeWithinHours = 3
 
 	form = GetNewPhotosForm(request.GET)
 	if form.is_valid():
