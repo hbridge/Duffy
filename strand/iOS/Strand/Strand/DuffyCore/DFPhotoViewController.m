@@ -133,7 +133,7 @@
                          forState:UIControlStateNormal];
   } else {
     [self.favoriteButton setTitle:[NSString stringWithFormat:@" %d ",
-                                   self.favoritedOtherUserNames.count + (self.isUserFavorited ? 1 : 0)]
+                                   (int)self.favoritedOtherUserNames.count + (self.isUserFavorited ? 1 : 0)]
                          forState:UIControlStateNormal];
   }
   

@@ -4,6 +4,7 @@
 
 - Tap on the nearby friends message to get a more thorough explanation of who's nearby to share with.
 - Set how your name will appear to others during app setup
+- See who favorited your photo.
 
 ## Jul 14th, 2014
 
