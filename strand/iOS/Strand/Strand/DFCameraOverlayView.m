@@ -9,6 +9,7 @@
 #import "DFCameraOverlayView.h"
 #import "MMPopLabel.h"
 #import "UIImage+Resize.h"
+#import "DFStrandConstants.h"
 
 @interface DFCameraOverlayView()
 
@@ -39,7 +40,7 @@ NSString *const FlashAutoTitle = @"Auto";
 - (void)configureHelpTextLabels
 {
   // set appearance style
-  [[MMPopLabel appearance] setLabelColor:[UIColor orangeColor]];
+  [[MMPopLabel appearance] setLabelColor:[DFStrandConstants mainColor]];
   [[MMPopLabel appearance] setLabelTextColor:[UIColor whiteColor]];
   [[MMPopLabel appearance] setLabelTextHighlightColor:[UIColor redColor]];
   [[MMPopLabel appearance] setLabelFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14.0f]];
