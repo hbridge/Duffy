@@ -21,6 +21,9 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		print 'Testing: %s' % (url)
 		response = urllib2.urlopen(url)
 		result = str(response.read())
+		statsStart = result.find('Total time')
+		statsEnd = result[statsStart:].find('<')
+		print "/viz/summary stats: %s" % (result[statsStart:][:statsEnd])
 
 		self.assertTrue("Clustered" in result)
 		self.assertTrue("Fulls" in result)
