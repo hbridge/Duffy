@@ -520,14 +520,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   return result;
 }
 
-- (void)checkAndShowTurnOnWifiAlert
+- (void)checkAndShowBadLocationAlert
 {
   AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
   NSTimeInterval intervalSinceLastNag = [[NSDate date] timeIntervalSinceDate:self.lastWifiPromptDate];
   if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi
       && intervalSinceLastNag > WifiPromptInterval) {
-    [UIAlertView showSimpleAlertWithTitle:@"Turn on WiFi"
-                                  message:@"Could not get an accurate location. Turn on WiFi to improve location accuracy."];
+    [UIAlertView showSimpleAlertWithTitle:@"Inaccurate Location"
+                                  message:@"Could not get an accurate location. Please turn on WiFi if it's off to improve location accuracy."];
     self.lastWifiPromptDate = [NSDate date];
   }
 }
@@ -617,7 +617,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
   } else {
-    [self checkAndShowTurnOnWifiAlert];
+    [self checkAndShowBadLocationAlert];
   }
   
   DDLogInfo(@"DFCameraViewController updated location: <%f, %f> +/- %.02fm @ %@",
