@@ -33,7 +33,9 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 		if (photo.id == neighbor.photo_1_id and user.id == neighbor.user_2_id):
 			return True
 		elif (photo.id == neighbor.photo_2_id and user.id == neighbor.user_1_id):
-			return True	
+			return True
+
+	return False
 
 """
 	Look through all recent photos from last 30 minutes and see if any users have a 
