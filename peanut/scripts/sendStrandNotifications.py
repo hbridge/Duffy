@@ -98,18 +98,18 @@ def sendPhotoActionNotifications(photoActions):
 def main(argv):
 	maxFilesAtTime = 100
 
-	notificationLogTimeWithSeconds = 30 * 60 # 30 minutes
+	timeWithSeconds = 30 * 60 # 30 minutes
 	
 	logger.info("Starting... ")
 	while True:
-		newPhotosStartTime = datetime.datetime.utcnow()-datetime.timedelta(seconds=30)
+		newPhotosStartTime = datetime.datetime.utcnow()-datetime.timedelta(seconds=timeWithSeconds)
 		neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTime) | Q(photo_2__time_taken__gt=newPhotosStartTime)).order_by('photo_1')
 		
 		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-		notificationLogs = notifications_util.getNotificationLogs(timeWithinSec=notificationLogTimeWithSeconds)
+		notificationLogs = notifications_util.getNotificationLogs(timeWithinSec=timeWithSeconds)
 
 		# 30 minute cut off for join strand messages
-		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(minutes=30)
+		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(seconds=timeWithSeconds)
 		frequencyOfGpsUpdates = datetime.datetime.utcnow()-datetime.timedelta(hours=8)
 		photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTime).filter(user__product_id=1)
 		users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdates)
