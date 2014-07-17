@@ -30,6 +30,10 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
+# TODO(Derek): move to a common loc, used in sendStrandNotifications
+def cleanName(str):
+	return str.split(' ')[0].split("'")[0]
+
 def getGroupForPhoto(photo, groupings):
 	for group in groupings:
 		if photo in group:
@@ -161,99 +165,102 @@ def getNeighboredPhotos(userId, startTime):
 
 def neighbors(request):
 	response = dict({'result': True})
-	data = api_util.getRequestData(request)
 
-	if data.has_key('user_id'):
-		userId = int(data['user_id'])
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		userId = int(form.cleaned_data['user_id'])
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
-			return api_util.returnFailure(response, "user_id not found")
-	else:
-		return api_util.returnFailure(response, "Need user_id")
+			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
+	
+		results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
 
-	results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
-
-	# Creates a list of lists of photos, each one called a "group", the list of lists is "groupings"
-	# We'll first get this list setup, de-duped and sorted
-	groupings = list()
-	for neighbor in results:
-		group = getGroupForPhoto(neighbor.photo_1, groupings)
-
-		if (group):
-			# If the first photo is in a group, see if the other photo is in there already
-			#   if it isn't, and this isn't a dup, then add photo_2 in
-			if neighbor.photo_2 not in group:
-				group.append(neighbor.photo_2)
-		else:
-			# If the first photo isn't in a group, see if the second one is
-			group = getGroupForPhoto(neighbor.photo_2, groupings)
+		# Creates a list of lists of photos, each one called a "group", the list of lists is "groupings"
+		# We'll first get this list setup, de-duped and sorted
+		groupings = list()
+		for neighbor in results:
+			group = getGroupForPhoto(neighbor.photo_1, groupings)
 
 			if (group):
-				# If the second photo is in a group and this isn't a dup then add in
-				group.append(neighbor.photo_1)
+				# If the first photo is in a group, see if the other photo is in there already
+				#   if it isn't, and this isn't a dup, then add photo_2 in
+				if neighbor.photo_2 not in group:
+					group.append(neighbor.photo_2)
 			else:
-				# If neither photo is in a group, we create a new one
-				group = [neighbor.photo_1, neighbor.photo_2]
+				# If the first photo isn't in a group, see if the second one is
+				group = getGroupForPhoto(neighbor.photo_2, groupings)
 
-				groupings.append(group)
+				if (group):
+					# If the second photo is in a group and this isn't a dup then add in
+					group.append(neighbor.photo_1)
+				else:
+					# If neither photo is in a group, we create a new one
+					group = [neighbor.photo_1, neighbor.photo_2]
 
-	sortedGroups = list()
-	for group in groupings:
-		group = sorted(group, key=lambda x: x.time_taken, reverse=True)
+					groupings.append(group)
 
-		# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
-		#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
-		#   So using location_city instead.  This means we might cut out some photos that were taken
-		#   at the exact same time in the same city
-		uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
-		sortedGroups.append(uniqueGroup)
+		sortedGroups = list()
+		for group in groupings:
+			group = sorted(group, key=lambda x: x.time_taken, reverse=True)
 
-	# now sort groups by the time_taken of the first photo in each group
-	sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
+			# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
+			#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
+			#   So using location_city instead.  This means we might cut out some photos that were taken
+			#   at the exact same time in the same city
+			uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
+			sortedGroups.append(uniqueGroup)
 
-	# Try to find recent photos
-	# If there are no previous groups, then fetch all photos and call them recent
-	# This query isn't executed raw, we add a filter for time_taken if there's any groups
-	# If there aren't any groups then the user probably doesn't have many photos
-	recentPhotos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
-	if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
-		lastPhotoTime = sortedGroups[0][0].time_taken
-		recentPhotos = recentPhotos.filter(time_taken__gt=lastPhotoTime)
+		# now sort groups by the time_taken of the first photo in each group
+		sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
 
-	haveRecentPhotos = len(recentPhotos) > 0
+		# Try to find recent photos
+		# If there are no previous groups, then fetch all photos and call them recent
+		# This query isn't executed raw, we add a filter for time_taken if there's any groups
+		# If there aren't any groups then the user probably doesn't have many photos
+		recentPhotos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
+		if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
+			lastPhotoTime = sortedGroups[0][0].time_taken
+			recentPhotos = recentPhotos.filter(time_taken__gt=lastPhotoTime)
 
-	if haveRecentPhotos:
-		sortedGroups.insert(0, recentPhotos)
+		haveRecentPhotos = len(recentPhotos) > 0
 
-	# Now see if there are any non-neighbored photos
-	# These are shown on the web view as Lock symbols
-	if user.last_location_point:
-		nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
-		haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
+		if haveRecentPhotos:
+			sortedGroups.insert(0, recentPhotos)
+
+		# Now see if there are any non-neighbored photos
+		# These are shown on the web view as Lock symbols
+		if user.last_location_point:
+			nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
+			haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
+		else:
+			haveNonNeighboredPhotos = False
+
+		if haveNonNeighboredPhotos:
+			sortedGroups.insert(0, nonNeighboredPhotos)
+
+		# Now we have to turn into our Duffy JSON, first, convert into the right format
+		groups = getGroups(sortedGroups)
+
+		# Now we need to update the titles for the groups before we turn it into sections
+		if haveRecentPhotos and haveNonNeighboredPhotos:
+			groups[0]['title'] = "Locked"
+			groups[1]['title'] = "Recent"
+		elif haveRecentPhotos:
+			groups[0]['title'] = "Recent"
+		elif haveNonNeighboredPhotos:
+			groups[0]['title'] = "Locked"
+
+		# Lastly, we turn our groups into sections which is the object we convert to json for the api
+		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+		response['objects'] = objects
+		response['stats'] = '<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->'
+		response['next_start_date_time'] = lastDate
+
 	else:
-		haveNonNeighboredPhotos = False
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
-	if haveNonNeighboredPhotos:
-		sortedGroups.insert(0, nonNeighboredPhotos)
-
-	# Now we have to turn into our Duffy JSON, first, convert into the right format
-	groups = getGroups(sortedGroups)
-
-	# Now we need to update the titles for the groups before we turn it into sections
-	if haveRecentPhotos and haveNonNeighboredPhotos:
-		groups[0]['title'] = "Locked"
-		groups[1]['title'] = "Recent"
-	elif haveRecentPhotos:
-		groups[0]['title'] = "Recent"
-	elif haveNonNeighboredPhotos:
-		groups[0]['title'] = "Locked"
-
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
-	response['objects'] = objects
-	response['stats'] = '<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->'
-	response['next_start_date_time'] = lastDate
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
@@ -301,7 +308,7 @@ def get_joinable_strands(request):
 
 	timeWithinHours = 3
 
-	form = GetJoinableStrandsForm(request.GET) 
+	form = GetJoinableStrandsForm(api_util.getRequestData(request)) 
 	if form.is_valid():
 		userId = form.cleaned_data['user_id']
 		lon = form.cleaned_data['lon']
@@ -328,7 +335,7 @@ def get_joinable_strands(request):
 def get_new_photos(request):
 	response = dict({'result': True})
 
-	form = GetNewPhotosForm(request.GET)
+	form = GetNewPhotosForm(api_util.getRequestData(request))
 	if form.is_valid():
 		userId = form.cleaned_data['user_id']
 		startTime = form.cleaned_data['start_date_time']
@@ -349,7 +356,7 @@ def get_new_photos(request):
 """
 def update_user_location(request):
 	response = dict({'result': True})
-	form = UpdateUserLocationForm(request.GET)
+	form = UpdateUserLocationForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
@@ -364,8 +371,8 @@ def update_user_location(request):
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
 			logger.error("Could not find user: %s " % (userId))
-			response['error'] = 'userId not found'
-			return HttpResponse(json.dumps(response), content_type="application/json")
+			response['user_id'] = 'userId not found'
+			return HttpResponse(json.dumps(response), content_type="application/json", status=400)
 
 		if ((not lon == 0) or (not lat == 0)):
 			if ((user.last_location_timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
@@ -389,12 +396,11 @@ def update_user_location(request):
 """
 def register_apns_token(request):
 	response = dict({'result': True})
-	form = RegisterAPNSTokenForm(request.GET)
+	form = RegisterAPNSTokenForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
 		deviceToken = form.cleaned_data['device_token'].replace(' ', '').replace('<', '').replace('>', '')
-		buildType = form.cleaned_data['build_type'] # not used but possible future use
 
 		try:
 			user = User.objects.get(id=userId)
@@ -439,7 +445,7 @@ def register_apns_token(request):
 """
 def get_nearby_friends_message(request):
 	response = dict({'result': True})
-	form = GetFriendsNearbyMessageForm(request.GET)
+	form = GetFriendsNearbyMessageForm(api_util.getRequestData(request))
 
 	timeWithinHours = 3
 	
@@ -513,7 +519,6 @@ def get_nearby_friends_message(request):
 
 		response['message'] = message
 		response['expanded_message'] = expMessage
-		response['result'] = True
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
@@ -521,7 +526,7 @@ def get_nearby_friends_message(request):
 
 
 """
-	Sends a notification to the device/build_type based on the user_id
+	Sends a notification to the device based on the user_id
 """
 
 def send_notifications_test(request):
@@ -536,11 +541,6 @@ def send_notifications_test(request):
 			return api_util.returnFailure(response, "user_id not found")
 	else:
 		return api_util.returnFailure(response, "Need user_id")
-
-	if data.has_key('build_type'):
-		buildType = int(data['build_type'])
-	else:
-		buildType = 0
 
 	if data.has_key('msg'):
 		msg = str(data['msg']) + ' ' + str(datetime.datetime.utcnow())
@@ -583,7 +583,7 @@ def send_sms_test(request):
 def send_sms_code(request):
 	response = dict({'result': True})
 
-	form = SendSmsCodeForm(request.GET)
+	form = SendSmsCodeForm(api_util.getRequestData(request))
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['phone_number'])
 
@@ -721,11 +721,6 @@ def get_invite_message(request):
 			return HttpResponse(json.dumps({'user_id': 'User does not exist'}), content_type="application/json", status=400)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
-
-# TODO(Derek): move to a common loc, used in sendStrandNotifications
-def cleanName(str):
-	return str.split(' ')[0].split("'")[0]
 
 """
 	REST interface for creating new PhotoActions.

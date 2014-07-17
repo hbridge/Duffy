@@ -9,8 +9,6 @@ from arbus import api_views as arbus_api_views
 from common.models import PhotoAction
 
 urlpatterns = patterns('',
-	url(r'^get_user', 'arbus.api_views.get_user', {'productId': '1'}),
-	url(r'^create_user', 'arbus.api_views.create_user', {'productId': '1'}),
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/(?P<photoId>[0-9]+)/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/bulk/$', arbus_api_views.PhotoBulkAPI.as_view()),
