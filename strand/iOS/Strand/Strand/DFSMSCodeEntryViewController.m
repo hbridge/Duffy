@@ -9,10 +9,10 @@
 #import "DFSMSCodeEntryViewController.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
-#import "AppDelegate.h"
 #import "NSString+DFHelpers.h"
 #import "DFModalSpinnerViewController.h"
 #import "DFAnalytics.h"
+#import "DFLocationPermissionViewController.h"
 
 const UInt16 DFCodeLength = 4;
 
@@ -195,10 +195,11 @@ replacementString:(NSString *)string
                        smsAuthString:authCodeString
                     withSuccessBlock:^(DFUser *user) {
                       [DFUser setCurrentUser:user];
-                      [msvc dismissViewControllerAnimated:YES completion:nil];
-                      AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
                       [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
-                      [delegate showMainView];
+                      DFLocationPermissionViewController *locationPermissionController =
+                      [[DFLocationPermissionViewController alloc] init];
+                      [self.navigationController setViewControllers:@[locationPermissionController] animated:YES];
+                       [msvc dismissViewControllerAnimated:YES completion:nil];
                     }
                         failureBlock:^(NSError *error) {
                           DDLogWarn(@"Create user failed: %@", error.localizedDescription);

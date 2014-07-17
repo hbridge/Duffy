@@ -40,7 +40,7 @@
      [[DFNavigationController alloc]
       initWithRootViewController:[[DFGalleryWebViewController alloc] init]],
      [[DFCameraViewController alloc] init]
-      ];
+     ];
   }
   return self;
 }

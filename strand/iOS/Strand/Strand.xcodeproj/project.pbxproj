@@ -125,6 +125,9 @@
 		5ADD859219465C790037A6D5 /* StrandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859119465C790037A6D5 /* StrandTests.m */; };
 		5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859C19465F520037A6D5 /* DFCameraViewController.m */; };
 		5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */; };
+		5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */; };
+		5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */; };
+		5AFDEBDE19782C8C005DDA7D /* DFLocationPermissionInstructions.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDD19782C8C005DDA7D /* DFLocationPermissionInstructions.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -359,6 +362,10 @@
 		5ADD859C19465F520037A6D5 /* DFCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraViewController.m; sourceTree = "<group>"; };
 		5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFGalleryWebViewController.h; sourceTree = "<group>"; };
 		5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFGalleryWebViewController.m; sourceTree = "<group>"; };
+		5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationPermissionViewController.h; sourceTree = "<group>"; };
+		5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPermissionViewController.m; sourceTree = "<group>"; };
+		5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionViewController.xib; sourceTree = "<group>"; };
+		5AFDEBDD19782C8C005DDA7D /* DFLocationPermissionInstructions.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionInstructions.xib; sourceTree = "<group>"; };
 		94542E8E141E41C19FC05FB9 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		9CFF5D7C92B449CB884517E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -743,6 +750,10 @@
 				5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */,
 				5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */,
 				5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */,
+				5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */,
+				5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */,
+				5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */,
+				5AFDEBDD19782C8C005DDA7D /* DFLocationPermissionInstructions.xib */,
 			);
 			name = "First Time Setup";
 			sourceTree = "<group>";
@@ -951,8 +962,10 @@
 				5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */,
 				5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */,
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
+				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5AA45296196708D00099CBD2 /* DFPhotosGridViewController.xib in Resources */,
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
+				5AFDEBDE19782C8C005DDA7D /* DFLocationPermissionInstructions.xib in Resources */,
 				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
 				5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */,
@@ -1045,6 +1058,7 @@
 				5AC4A9261947C30800862D9C /* DFNetworkingConstants.m in Sources */,
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
+				5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */,

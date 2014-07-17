@@ -613,6 +613,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
+  if (self.presentedViewController) [self.presentedViewController
+                                     dismissViewControllerAnimated:YES
+                                     completion:nil];
   CLLocation *location = locations.lastObject;
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
@@ -626,6 +629,15 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
             location.horizontalAccuracy,
             location.timestamp
             );
+}
+
+- (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
+{
+  //  UINib *locationInstructionsNib = [UINib nibWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
+  //UIView *locationInstructionsView = [[locationInstructionsNib instantiateWithOwner:self options:nil] firstObject];
+  UIViewController *vc = [[UIViewController alloc]
+                          initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
+  [self presentViewController:vc animated:YES completion:nil];
 }
 
 - (DFPeanutLocationAdapter *)locationAdapter

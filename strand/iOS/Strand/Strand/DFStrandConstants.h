@@ -25,6 +25,6 @@ extern NSString *const DFStrandJoinableStrandsCountKey;
 extern NSString *const DFStrandLastFetchAttemptDateDefaultsKey;
 
 + (UIColor *)mainColor;
-
++ (UIColor *)strandOrange;
 
 @end

@@ -1,5 +1,9 @@
 # Strand
 
+## Jul 16th, 2014
+
+- Added an option to auto-save your Strand photos to your camera roll
+
 ## Jul 15th, 2014
 
 - Tap on the nearby friends message to get a more thorough explanation of who's nearby to share with.

@@ -33,8 +33,13 @@ UIColor *DFStrandMainColor;
 #ifdef DEBUG
   return [UIColor darkGrayColor];
 #else
-  return [UIColor colorWithRed:236/255.f green:101/255.f blue:31/255.f alpha:1];
+  return [self strandOrange];
 #endif
+}
+
++ (UIColor *)strandOrange
+{
+  return [UIColor colorWithRed:236/255.f green:101/255.f blue:31/255.f alpha:1];
 }
 
 @end
