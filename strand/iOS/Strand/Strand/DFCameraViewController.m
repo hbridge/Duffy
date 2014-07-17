@@ -633,8 +633,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-  //  UINib *locationInstructionsNib = [UINib nibWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
-  //UIView *locationInstructionsView = [[locationInstructionsNib instantiateWithOwner:self options:nil] firstObject];
   UIViewController *vc = [[UIViewController alloc]
                           initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
   [self presentViewController:vc animated:YES completion:nil];
