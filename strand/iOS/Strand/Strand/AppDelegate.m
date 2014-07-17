@@ -25,6 +25,7 @@
 #import "DFToastNotificationManager.h"
 #import "DFBackgroundLocationManager.h"
 #import "DFDefaultsStore.h"
+#import "DFTypedefs.h"
 
 
 @interface AppDelegate ()
@@ -143,17 +144,17 @@
 
 - (void)requestPushNotifs
 {
-  [self checkForAndLogNotifsChange:[DFDefaultsStore lastRemoteNotificationsState]];
+  [self checkForAndLogNotifsChange:[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications]];
   DDLogInfo(@"Requesting push notifications.");
   [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
    (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
 }
 
-- (void)checkForAndLogNotifsChange:(DFDefaultsNotifsStateType)newNotifsState
+- (void)checkForAndLogNotifsChange:(DFPermissionStateType)newNotifsState
 {
-  if (!newNotifsState || [newNotifsState isEqualToString:NotifsStateNotRequested]) return;
+  if (!newNotifsState || [newNotifsState isEqualToString:DFPermissionStateNotRequested]) return;
   
-  DFDefaultsNotifsStateType lastNotifsState = [DFDefaultsStore lastRemoteNotificationsState];
+  DFPermissionStateType lastNotifsState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
   NSNumber *lastNotifType = [DFDefaultsStore lastNotificationType];
   UIRemoteNotificationType currentNotifTypes = [[UIApplication sharedApplication]
                                                 enabledRemoteNotificationTypes];
@@ -168,7 +169,7 @@
                                             newType:currentNotifTypes];
 
     [DFDefaultsStore setLastNotificationType:currentNotifTypes];
-    [DFDefaultsStore setLastRemoteNotificationsState:newNotifsState];
+    [DFDefaultsStore setState:newNotifsState forPermission:DFPermissionRemoteNotifications];
   }
 }
 
@@ -205,7 +206,7 @@
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
 	[self registerPushTokenForData:deviceToken];
-  [self checkForAndLogNotifsChange:NotifsStateGranted];
+  [self checkForAndLogNotifsChange:DFPermissionStateGranted];
 }
 
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
@@ -213,7 +214,7 @@
 	DDLogWarn(@"Failed to get push token, error: %@", error);
   NSData *errorData = [error.localizedDescription dataUsingEncoding:NSUTF8StringEncoding];
   [self registerPushTokenForData:errorData];
-  [self checkForAndLogNotifsChange:NotifsStateDenied];
+  [self checkForAndLogNotifsChange:DFPermissionStateDenied];
 }
 
 - (void)registerPushTokenForData:(NSData *)data

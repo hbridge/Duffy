@@ -7,19 +7,18 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFTypedefs.h"
 
 @interface DFDefaultsStore : NSObject
 
-typedef NSString *const DFDefaultsNotifsStateType;
-extern DFDefaultsNotifsStateType NotifsStateNotRequested;
-extern DFDefaultsNotifsStateType NotifsStateGranted;
-extern DFDefaultsNotifsStateType NotifsStateDenied;
-extern DFDefaultsNotifsStateType NotifsStateUnavailable;
 
-+ (void)setLastRemoteNotificationsState:(DFDefaultsNotifsStateType)state;
-+ (DFDefaultsNotifsStateType)lastRemoteNotificationsState;
 + (void)setLastNotificationType:(UIRemoteNotificationType)type;
 + (NSNumber *)lastNotificationType;
+
+
++ (void)setState:(DFPermissionStateType)state forPermission:(DFPermissionType)permission;
++ (DFPermissionStateType)stateForPermission:(DFPermissionType)permission;
+
 
 // whether setup steps have been passed
 typedef NSString *const DFSetupStepType;

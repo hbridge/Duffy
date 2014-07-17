@@ -95,15 +95,17 @@ NSString* const AppInBackgroundKey = @"appInBackground";
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
 NSString* const NotificationTypeKey = @"notificationType";
 
-// App SEtup
+// App Setup
 NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
 NSString* const SetupSMSCodeEntered = @"SetupSMSCodeEntered";
+NSString* const SetupLocationCompleted = @"SetupLocationCompleted";
 
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
 
 //Push notifs
-NSString* const RemoteNotifsChangedEvent = @"RemoteNotifsChanged";
+NSString* const PermissionChangedEvent = @"PermissionChanged";
+NSString* const PermissionTypeKey = @"permissionType";
 NSString* const StateChangeKey = @"stateChange";
 NSString* const ValueChangeKey = @"valueChange";
 
@@ -318,6 +320,23 @@ static DFAnalytics *defaultLogger;
   [DFAnalytics logEvent:SetupSMSCodeEntered withParameters:@{ResultKey: result}];
 }
 
++ (void)logSetupLocationCompletedWithResult:(NSString *)result
+                        userTappedLearnMore:(BOOL)didTapLearnMore
+{
+  [DFAnalytics logEvent:SetupLocationCompleted withParameters:@{ResultKey: result}];
+}
+
++ (void)logPermission:(DFPermissionType)permission
+  changedWithOldState:(DFPermissionStateType)oldState
+             newState:(DFPermissionStateType)newState
+{
+  [DFAnalytics logEvent:PermissionChangedEvent
+         withParameters:@{
+                          PermissionTypeKey: permission,
+                          StateChangeKey: [DFAnalytics stringForOldState:oldState toNewState:newState]
+                          }];
+}
+
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController
 
@@ -343,19 +362,26 @@ static DFAnalytics *defaultLogger;
                             oldNotificationType:(UIRemoteNotificationType)oldType
                                         newType:(UIRemoteNotificationType)newType
 {
-  oldState = oldState ? oldState : @"None";
-  newState = newState ? newState : @"None";
   NSString *oldValue = [DFAnalytics stringForUIRemoteNotifType:oldType];
   NSString *newValue = [DFAnalytics stringForUIRemoteNotifType:newType];
   
-  NSString *stateString = [NSString stringWithFormat:@"%@ -> %@", oldState, newState];
-  NSString *valueString = [NSString stringWithFormat:@"%@ -> %@", oldValue, newValue];
+  NSString *stateString = [DFAnalytics stringForOldState:oldState toNewState:newState];
+  NSString *valueString = [DFAnalytics stringForOldState:oldValue toNewState:newValue];
   
-  [DFAnalytics logEvent:RemoteNotifsChangedEvent
+  [DFAnalytics logEvent:PermissionChangedEvent
          withParameters:@{
+                          PermissionTypeKey: DFPermissionRemoteNotifications,
                           StateChangeKey:stateString,
                           ValueChangeKey:valueString
                             }];
+}
+
++ (NSString *)stringForOldState:(NSString *)oldState toNewState:(NSString *)newState
+{
+  return [NSString stringWithFormat:@"%@ -> %@",
+          oldState ? oldState : @"None",
+          newState ? newState : @"None"
+          ];
 }
 
 

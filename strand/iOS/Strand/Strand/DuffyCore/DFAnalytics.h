@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <MessageUI/MFMessageComposeViewController.h>
+#import "DFTypedefs.h"
 
 
 @interface DFAnalytics : NSObject
@@ -47,6 +48,8 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
++ (void)logSetupLocationCompletedWithResult:(NSString *)result
+                           userTappedLearnMore:(BOOL)didTapLearnMore;
 
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
@@ -55,6 +58,12 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
                                        newState:(NSString *)newState
                             oldNotificationType:(UIRemoteNotificationType)oldType
                                         newType:(UIRemoteNotificationType)newType;
++ (void)logPermission:(DFPermissionType)permission
+  changedWithOldState:(DFPermissionStateType)oldState
+             newState:(DFPermissionStateType)newState;
+
+
+
 
 
 @end

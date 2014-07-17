@@ -10,23 +10,7 @@
 
 @implementation DFDefaultsStore
 
-NSString *const DFDefaultsNotifsStateKey = @"DFDefaultsNotifsState";
-DFDefaultsNotifsStateType NotifsStateNotRequested = @"NotRequested";
-DFDefaultsNotifsStateType NotifsStateGranted = @"Granted";
-DFDefaultsNotifsStateType NotifsStateDenied = @"Denied";
-DFDefaultsNotifsStateType NotifsStateUnavailable = @"Unavailable";
-
 NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
-
-+ (void)setLastRemoteNotificationsState:(DFDefaultsNotifsStateType)state
-{
-  [[NSUserDefaults standardUserDefaults] setObject:state forKey:DFDefaultsNotifsStateKey];
-}
-
-+ (DFDefaultsNotifsStateType)lastRemoteNotificationsState
-{
-  return [[NSUserDefaults standardUserDefaults] objectForKey:DFDefaultsNotifsStateKey];
-}
 
 + (void)setLastNotificationType:(UIRemoteNotificationType)type
 {
@@ -38,6 +22,21 @@ NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
   return [[NSUserDefaults standardUserDefaults] objectForKey:DFDefaultsNotifsTypeKey];
 }
 
+// Permissions
++ (NSString *)keyForPermission:(DFPermissionType)permission
+{
+  return [NSString stringWithFormat:@"DFPermission%@", permission];
+}
+
++ (void)setState:(DFPermissionStateType)state forPermission:(DFPermissionType)permission
+{
+  [[NSUserDefaults standardUserDefaults] setObject:state forKey:[self keyForPermission:permission]];
+}
+
++ (DFPermissionStateType)stateForPermission:(DFPermissionType)permission
+{
+  return [[NSUserDefaults standardUserDefaults] objectForKey:[self keyForPermission:permission]];
+}
 
 // Actions
 
