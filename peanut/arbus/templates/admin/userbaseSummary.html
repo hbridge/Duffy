@@ -158,7 +158,7 @@
 				<td class='twofish right percent b-r' title='{{ entry.twofishCount }}'> {{ entry.twofish }} </td>
 				<td class='clustered right percent b-r' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
 				<td class='db-fullimage right b-r' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>
-				<td class='neighbor right b-r'> {{ entry.neighbor }} </td>
+				<td class='neighbor right b-r'> <a href='/strand/viz/neighbors?user_id={{ entry.user.id }}'>{{ entry.neighbor }}</a> </td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
 				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>				
 				<td class='location right b-r'> 
