@@ -22,6 +22,5 @@ typedef enum
 
 
 - (void)registerAPNSToken:(NSData *)apnsToken
-             forBuildType:(DFBuildType)buildType
           completionBlock:(DFPushTokenResponseBlock)completionBlock;
 @end

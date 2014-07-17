@@ -13,7 +13,6 @@
 
 static NSString *const RegisterTokenPath = @"register_apns_token";
 static NSString *const DeviceTokenKey = @"device_token";
-static NSString *const BuildTypeKey = @"build_type";
 
 @implementation DFPeanutPushTokenAdapter
 
@@ -41,7 +40,6 @@ static NSString *const BuildTypeKey = @"build_type";
 }
 
 - (void)registerAPNSToken:(NSData *)apnsToken
-             forBuildType:(DFBuildType)buildType
           completionBlock:(DFPushTokenResponseBlock)completionBlock
 {
   NSURLRequest *getRequest = [DFObjectManager
@@ -50,7 +48,6 @@ static NSString *const BuildTypeKey = @"build_type";
                               path:RegisterTokenPath
                               parameters:@{
                                            DeviceTokenKey : apnsToken,
-                                           BuildTypeKey : @(buildType)
                                            }];
   DDLogInfo(@"DFPeanutPushTokenAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   

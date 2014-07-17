@@ -35,4 +35,35 @@
   return appInfoString;
 }
 
+
++ (NSNumber *)buildNumber
+{
+  static NSNumber *buildNumber = nil;
+  if (!buildNumber) {
+    NSDictionary *infoDictionary = [[NSBundle mainBundle] infoDictionary];
+    buildNumber = @([[infoDictionary objectForKey:@"CFBundleVersion"] integerValue]);
+  }
+  return buildNumber;
+}
+
++ (NSString *)buildID
+{
+  static NSString *buildID = nil;
+  if (!buildID) {
+    buildID = [[NSBundle mainBundle] bundleIdentifier];
+  }
+  return buildID;
+}
+
++ (NSString *)deviceAndOSVersion
+{
+  static NSString *buildDeviceAndOS = nil;
+  if (!buildDeviceAndOS) {
+    buildDeviceAndOS = [NSString stringWithFormat:@"%@/%@",
+                        [[UIDevice currentDevice] model],
+                        [[UIDevice currentDevice] systemVersion]];
+  }
+  return buildDeviceAndOS;
+}
+
 @end

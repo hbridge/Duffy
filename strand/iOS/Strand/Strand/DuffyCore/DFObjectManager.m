@@ -11,11 +11,15 @@
 #import "DFNetworkingConstants.h"
 #import "DFPhotoStore.h"
 #import "DFUser.h"
+#import "DFAppInfo.h"
 
 static NSMutableSet *registeredAdapters;
 
 @implementation DFObjectManager
 
+NSString *const BuildOSKey = @"build_os";
+NSString *const BuildNumberKey = @"build_number";
+NSString *const BuildIDKey = @"build_id";
 
 + (void)initialize
 {
@@ -54,6 +58,12 @@ static NSMutableSet *registeredAdapters;
   if (([[DFUser currentUser] authToken])) {
     cumulativeParameters[DFAuthTokenParameterKey] = [[DFUser currentUser] authToken];
   }
+  
+  [cumulativeParameters addEntriesFromDictionary:@{
+                                                   BuildOSKey: [DFAppInfo deviceAndOSVersion],
+                                                   BuildNumberKey: [DFAppInfo buildNumber],
+                                                   BuildIDKey: [DFAppInfo buildID],
+                                                   }];
   
   [cumulativeParameters addEntriesFromDictionary:parameters];
   

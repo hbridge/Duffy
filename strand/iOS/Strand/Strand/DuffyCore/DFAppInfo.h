@@ -12,5 +12,8 @@
 
 
 + (NSString *)appInfoString;
++ (NSNumber *)buildNumber;
++ (NSString *)buildID;
++ (NSString *)deviceAndOSVersion;
 
 @end

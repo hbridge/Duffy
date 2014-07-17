@@ -220,12 +220,7 @@
 {
   if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
   
-  DFBuildType buildType = DFBuildTypeDebug;
-  #ifndef DEBUG
-    buildType = DFBuildTypeAdHoc;
-  #endif
-  
-  [self.pushTokenAdapter registerAPNSToken:data forBuildType:buildType completionBlock:^(BOOL success) {
+  [self.pushTokenAdapter registerAPNSToken:data  completionBlock:^(BOOL success) {
     if (success) {
       DDLogInfo(@"Push token successfuly registered with server.");
     } else {
