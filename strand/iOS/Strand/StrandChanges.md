@@ -1,5 +1,10 @@
 # Strand
 
+## Jul 17th, 2014
+
+- Explains why we need location permission
+- Roadblock if you don't give location permission
+
 ## Jul 16th, 2014
 
 - Added an option to auto-save your Strand photos to your camera roll
