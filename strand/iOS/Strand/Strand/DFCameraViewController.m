@@ -31,6 +31,7 @@
 #import "RestKit/RestKit.h"
 #import "DFDefaultsStore.h"
 #import "DFSettings.h"
+#import "DFLocationRoadblockViewController.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -48,7 +49,7 @@ const unsigned int SavePromptMinPhotos = 3;
 @property (nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
 @property (nonatomic, retain) NSTimer *updateUITimer;
 @property (nonatomic, retain) NSDate *lastWifiPromptDate;
-@property (readonly, nonatomic, retain) UIViewController *locationRoadblockViewController;
+@property (readonly, nonatomic, retain) DFLocationRoadblockViewController *locationRoadblockViewController;
 
 @end
 
@@ -618,13 +619,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-  if (self.presentedViewController == self.locationRoadblockViewController) {
-    [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
-    [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:DFPermissionStateDenied
-                      newState:DFPermissionStateGranted];
-    [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionLocation];
-  }
-  
   CLLocation *location = locations.lastObject;
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
@@ -641,7 +635,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
   DDLogInfo(@"%@ location update failed: %@", [self.class description], error.description);
-  if (error.code == kCLErrorDenied) {
+  if (error.code == kCLErrorDenied && !self.presentedViewController) {
     [self presentViewController:self.locationRoadblockViewController animated:YES completion:nil];
   }
 }
@@ -658,8 +652,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 - (UIViewController *)locationRoadblockViewController
 {
   if (!_locationRoadblockViewController) {
-    _locationRoadblockViewController = [[UIViewController alloc]
-                                        initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
+    _locationRoadblockViewController = [[DFLocationRoadblockViewController alloc] init];
   }
   
   return _locationRoadblockViewController;

@@ -118,6 +118,7 @@
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
 		5ACA39031947A71700834D86 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39021947A71700834D86 /* CFNetwork.framework */; };
 		5AD8589219785FCC00BFDC4E /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589119785FCC00BFDC4E /* DFTypedefs.m */; };
+		5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */; };
 		5ADD857519465C790037A6D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857419465C790037A6D5 /* main.m */; };
 		5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857719465C790037A6D5 /* AppDelegate.m */; };
 		5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857A19465C790037A6D5 /* RootViewController.m */; };
@@ -128,7 +129,7 @@
 		5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */; };
 		5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */; };
 		5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */; };
-		5AFDEBDE19782C8C005DDA7D /* DFLocationPermissionInstructions.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDD19782C8C005DDA7D /* DFLocationPermissionInstructions.xib */; };
+		5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -348,6 +349,8 @@
 		5ACA39021947A71700834D86 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		5AD8589019785F3600BFDC4E /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTypedefs.h; sourceTree = "<group>"; };
 		5AD8589119785FCC00BFDC4E /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTypedefs.m; sourceTree = "<group>"; };
+		5AD858931978700500BFDC4E /* DFLocationRoadblockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationRoadblockViewController.h; sourceTree = "<group>"; };
+		5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationRoadblockViewController.m; sourceTree = "<group>"; };
 		5ADD856F19465C790037A6D5 /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADD857319465C790037A6D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5ADD857419465C790037A6D5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -368,7 +371,7 @@
 		5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationPermissionViewController.h; sourceTree = "<group>"; };
 		5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPermissionViewController.m; sourceTree = "<group>"; };
 		5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionViewController.xib; sourceTree = "<group>"; };
-		5AFDEBDD19782C8C005DDA7D /* DFLocationPermissionInstructions.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionInstructions.xib; sourceTree = "<group>"; };
+		5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationRoadblockViewController.xib; sourceTree = "<group>"; };
 		94542E8E141E41C19FC05FB9 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		9CFF5D7C92B449CB884517E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -758,7 +761,9 @@
 				5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */,
 				5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */,
 				5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */,
-				5AFDEBDD19782C8C005DDA7D /* DFLocationPermissionInstructions.xib */,
+				5AD858931978700500BFDC4E /* DFLocationRoadblockViewController.h */,
+				5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */,
+				5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */,
 			);
 			name = "First Time Setup";
 			sourceTree = "<group>";
@@ -970,7 +975,7 @@
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5AA45296196708D00099CBD2 /* DFPhotosGridViewController.xib in Resources */,
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
-				5AFDEBDE19782C8C005DDA7D /* DFLocationPermissionInstructions.xib in Resources */,
+				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
 				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
 				5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */,
@@ -1090,6 +1095,7 @@
 				5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */,
 				5A0E122D197487CC00B6FF04 /* DFInviteUserComposeController.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
+				5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
