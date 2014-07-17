@@ -634,9 +634,12 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-  UIViewController *vc = [[UIViewController alloc]
-                          initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
-  [self presentViewController:vc animated:YES completion:nil];
+  DDLogInfo(@"%@ location update failed: %@", [self.class description], error.description);
+  if (error.code == kCLErrorDenied) {
+    UIViewController *vc = [[UIViewController alloc]
+                            initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
+    [self presentViewController:vc animated:YES completion:nil];
+  }
 }
 
 - (DFPeanutLocationAdapter *)locationAdapter
