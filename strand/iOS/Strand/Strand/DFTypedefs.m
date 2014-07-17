@@ -1,11 +1,11 @@
 #import "DFTypedefs.h"
 
 // Permission types
-DFPermissionType DFPermissionRemoteNotifications = @"RemoteNotifications";
-DFPermissionType DFPermissionLocation = @"Location";
+DFPermissionType const DFPermissionRemoteNotifications = @"RemoteNotifications";
+DFPermissionType const DFPermissionLocation = @"Location";
 
 // Permission states
-DFPermissionStateType DFPermissionStateNotRequested = @"NotRequested";
-DFPermissionStateType DFPermissionStateGranted = @"Granted";
-DFPermissionStateType DFPermissionStateDenied = @"Denied";
-DFPermissionStateType DFPermissionStateUnavailable = @"Unavailable";
+DFPermissionStateType const DFPermissionStateNotRequested = @"NotRequested";
+DFPermissionStateType const DFPermissionStateGranted = @"Granted";
+DFPermissionStateType const DFPermissionStateDenied = @"Denied";
+DFPermissionStateType const DFPermissionStateUnavailable = @"Unavailable";

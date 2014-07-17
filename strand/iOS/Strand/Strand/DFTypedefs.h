@@ -1,14 +1,14 @@
 
 
 
-typedef NSString *const DFPermissionType;
-extern DFPermissionType DFPermissionRemoteNotifications;
-extern DFPermissionType DFPermissionLocation;
+typedef NSString *DFPermissionType;
+extern DFPermissionType const DFPermissionRemoteNotifications;
+extern DFPermissionType const DFPermissionLocation;
 
 
-typedef NSString *const DFPermissionStateType;
+typedef NSString *DFPermissionStateType;
 
-extern DFPermissionStateType DFPermissionStateNotRequested;
-extern DFPermissionStateType DFPermissionStateGranted;
-extern DFPermissionStateType DFPermissionStateDenied;
-extern DFPermissionStateType DFPermissionStateUnavailable;
+extern DFPermissionStateType const DFPermissionStateNotRequested;
+extern DFPermissionStateType const DFPermissionStateGranted;
+extern DFPermissionStateType const DFPermissionStateDenied;
+extern DFPermissionStateType const DFPermissionStateUnavailable;

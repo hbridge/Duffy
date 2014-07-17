@@ -12,12 +12,15 @@
 #import "MMPopLabel.h"
 #import "UIAlertView+DFHelpers.h"
 #import "AppDelegate.h"
+#import "DFAnalytics.h"
+#import "DFDefaultsStore.h"
 
 @interface DFLocationPermissionViewController ()
 
 @property (nonatomic, readonly, retain) SAMGradientView *gradientView;
 @property (nonatomic, retain) MMPopLabel *learnMorePopLabel;
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
+@property (nonatomic) BOOL didShowLearnMore;
 
 @end
 
@@ -76,6 +79,7 @@
   } else {
     [self.learnMorePopLabel dismiss];
   }
+  self.didShowLearnMore = YES;
 }
 
 - (IBAction)grantLocationButtonPressed:(id)sender {
@@ -102,12 +106,27 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
+  [DFAnalytics logSetupLocationCompletedWithResult:DFAnalyticsValueResultFailure
+                               userTappedLearnMore:self.didShowLearnMore];
+  DFPermissionStateType newState;
+  if (error.code == kCLErrorDenied) {
+    newState = DFPermissionStateDenied;
+  } else {
+    newState = DFPermissionStateUnavailable;
+  }
+  [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:nil newState:newState];
+  [DFDefaultsStore setState:newState forPermission:DFPermissionLocation];
+  
   [self.locationManager stopUpdatingLocation];
   [self dismiss];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
+  [DFAnalytics logSetupLocationCompletedWithResult:DFAnalyticsValueResultSuccess
+                               userTappedLearnMore:self.didShowLearnMore];
+  [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:nil newState:DFPermissionStateGranted];
+  [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionLocation];
   [self.locationManager stopUpdatingLocation];
   [self dismiss];
 }

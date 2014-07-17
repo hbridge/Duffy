@@ -48,6 +48,7 @@ const unsigned int SavePromptMinPhotos = 3;
 @property (nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
 @property (nonatomic, retain) NSTimer *updateUITimer;
 @property (nonatomic, retain) NSDate *lastWifiPromptDate;
+@property (readonly, nonatomic, retain) UIViewController *locationRoadblockViewController;
 
 @end
 
@@ -55,6 +56,7 @@ const unsigned int SavePromptMinPhotos = 3;
 
 @synthesize customCameraOverlayView = _customCameraOverlayView;
 @synthesize locationAdapter = _locationAdapter;
+@synthesize locationRoadblockViewController = _locationRoadblockViewController;
 
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -616,9 +618,13 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-  if (self.presentedViewController) [self.presentedViewController
-                                     dismissViewControllerAnimated:YES
-                                     completion:nil];
+  if (self.presentedViewController == self.locationRoadblockViewController) {
+    [self.presentedViewController dismissViewControllerAnimated:YES completion:nil];
+    [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:DFPermissionStateDenied
+                      newState:DFPermissionStateGranted];
+    [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionLocation];
+  }
+  
   CLLocation *location = locations.lastObject;
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
@@ -636,9 +642,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 {
   DDLogInfo(@"%@ location update failed: %@", [self.class description], error.description);
   if (error.code == kCLErrorDenied) {
-    UIViewController *vc = [[UIViewController alloc]
-                            initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
-    [self presentViewController:vc animated:YES completion:nil];
+    [self presentViewController:self.locationRoadblockViewController animated:YES completion:nil];
   }
 }
 
@@ -651,6 +655,14 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   return _locationAdapter;
 }
 
-
+- (UIViewController *)locationRoadblockViewController
+{
+  if (!_locationRoadblockViewController) {
+    _locationRoadblockViewController = [[UIViewController alloc]
+                                        initWithNibName:@"DFLocationPermissionInstructions" bundle:nil];
+  }
+  
+  return _locationRoadblockViewController;
+}
 
 @end
