@@ -50,7 +50,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 				params[varName] = self.defaultParams[varName]
 
 		queryString = urllib.urlencode(params)
-		url = "http://%s/strand/api/%s?%s" % (self.BASEURL, name, queryString)
+		url = "http://%s/strand/api/v1/%s?%s" % (self.BASEURL, name, queryString)
 		self.urlLines.append("Testing: %s" % (url))
 		response = urllib2.urlopen(url)
 		result = json.loads(response.read())
