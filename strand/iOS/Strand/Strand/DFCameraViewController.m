@@ -307,6 +307,21 @@ const unsigned int SavePromptMinPhotos = 3;
   } else {
     message = [[DFNearbyFriendsManager sharedManager] nearbyFriendsMessage];
     expandedMessage = [[DFNearbyFriendsManager sharedManager] expandedNearbyFriendsMessage];
+    
+    if ((!message || [message isEqualToString:@""])
+        && ![self isGoodLocation:self.locationManager.location]) {
+      // add a message to the bar that the location fix is bad
+      message = @"Location inaccurate. Tap for more info.";
+      expandedMessage = @"Could not get an accurate location for your phone. ";
+      
+      if ([[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus] == AFNetworkReachabilityStatusReachableViaWiFi) {
+        expandedMessage = [expandedMessage
+                           stringByAppendingString:@"Nearby friends might be missing."];
+      } else {
+        expandedMessage = [expandedMessage
+                           stringByAppendingString:@"Please turn on WiFi if it's off to improve location accuracy."];
+      }
+    }
   }
   
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -520,18 +535,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   return result;
 }
 
-- (void)checkAndShowBadLocationAlert
-{
-  AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
-  NSTimeInterval intervalSinceLastNag = [[NSDate date] timeIntervalSinceDate:self.lastWifiPromptDate];
-  if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi
-      && intervalSinceLastNag > WifiPromptInterval) {
-    [UIAlertView showSimpleAlertWithTitle:@"Inaccurate Location"
-                                  message:@"Could not get an accurate location. Please turn on WiFi if it's off to improve location accuracy."];
-    self.lastWifiPromptDate = [NSDate date];
-  }
-}
-
 - (void)addLocation:(CLLocation *)location toMetadata:(NSMutableDictionary *)metadata
 {
   CLLocation *cachedLocation = [DFLocationStore LoadLastLocation];
@@ -619,8 +622,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   CLLocation *location = locations.lastObject;
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
-  } else {
-    [self checkAndShowBadLocationAlert];
   }
   
   DDLogInfo(@"DFCameraViewController updated location: <%f, %f> +/- %.02fm @ %@",
