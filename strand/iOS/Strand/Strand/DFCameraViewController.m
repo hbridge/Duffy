@@ -426,10 +426,10 @@ const unsigned int SavePromptMinPhotos = 3;
 
 - (void)flashCameraView
 {
-  [UIView animateWithDuration:0.1 animations:^{
-    self.cameraOverlayView.backgroundColor = [UIColor whiteColor];
+  [UIView animateWithDuration:0.3 animations:^{
+    self.cameraOverlayView.backgroundColor = [UIColor blackColor];
   } completion:^(BOOL finished) {
-    if (finished) [UIView animateWithDuration:0.1 animations:^{
+    if (finished) [UIView animateWithDuration:0.3 animations:^{
       self.cameraOverlayView.backgroundColor = [UIColor clearColor];
     }];
   }];
@@ -447,18 +447,40 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   // Handle a still image capture
   if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0)
       == kCFCompareEqualTo) {
-    
-    
     imageToSave = (UIImage *) [info objectForKey:
                                UIImagePickerControllerOriginalImage];
     NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
     [self saveImage:imageToSave withMetadata:metadata retryAttempt:0 completionBlock:^{
       [[DFUploadController sharedUploadController] uploadPhotos];
     }];
+    [self animateImageCaptured:imageToSave];
+    
     if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
       [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
     }
   }
+}
+
+- (void)animateImageCaptured:(UIImage *)image{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    CGRect imageViewFrame = CGRectMake(self.view.frame.origin.x,
+                                       self.view.frame.origin.y,
+                                       320,
+                                       348);
+    UIImageView *imageView = [[UIImageView alloc] initWithFrame:imageViewFrame];
+    imageView.image = image;
+    imageView.contentMode = UIViewContentModeScaleAspectFill;
+    
+    [self.customCameraOverlayView addSubview:imageView];
+    
+    [UIView animateWithDuration:0.5 animations:^{
+      // Change the position explicitly.
+      imageView.frame = self.customCameraOverlayView.galleryButton.frame;
+      imageView.alpha = 0.1;
+    } completion:^(BOOL finished) {
+      [imageView removeFromSuperview];
+    }];
+  });
 }
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
