@@ -187,6 +187,15 @@ class Photo(models.Model):
 	def getFullUrlImagePath(self):
 		return "/user_data/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
 
+	"""
+		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
+	"""
+	def getThumbUrlImagePath(self):
+		return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename) 
+
+	def getUserDisplayName(self):
+		return self.user.display_name
+
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		for obj in objs:
@@ -212,27 +221,48 @@ class Photo(models.Model):
 		except TypeError:
 			return self.id == other.id
 
+
+"""
+	Originally created to deal with SolrPhotos and DB photos which were different
+	Might want to move soon though, not gaining a lot
+"""
 class SimplePhoto:
 	id = None
 	time_taken = None
 	user = None
 	display_name = None
 
+	solrPhoto = None
+	dbPhoto = None
+
 	def serialize(self):
 		return {key:value for key, value in self.__dict__.items() if not key.startswith('__') and not callable(key)}
+		
+	def isDbPhoto(self):
+		if self.dbPhoto:
+			return True
+
+	def getDbPhoto(self):
+		return self.dbPhoto
 
 	def __init__(self, solrOrDbPhoto):
 		if hasattr(solrOrDbPhoto, 'photoId'):
 			# This is a solr photo
-			self.id = solrOrDbPhoto.photoId
-			self.time_taken = solrOrDbPhoto.timeTaken
-			self.user = solrOrDbPhoto.userId
+			self.solrPhoto = solrOrDbPhoto
+
+			self.id = self.solrPhoto.photoId
+			self.time_taken = self.solrPhoto.timeTaken
+			self.user = self.solrPhoto.userId
 		else:
 			# This is a database photo
-			self.id = solrOrDbPhoto.id
-			self.time_taken = solrOrDbPhoto.time_taken
-			self.user = solrOrDbPhoto.user_id
-			self.display_name = solrOrDbPhoto.user.display_name
+			self.dbPhoto = solrOrDbPhoto
+
+			self.id = self.dbPhoto.id
+			self.time_taken = self.dbPhoto.time_taken
+			self.user = self.dbPhoto.user_id
+			self.display_name = self.dbPhoto.user.display_name
+
+			
 
 class Classification(models.Model):
 	photo = models.ForeignKey(Photo)

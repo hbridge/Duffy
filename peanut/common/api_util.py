@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from phonenumber_field.phonenumber import PhoneNumber
 
 from common.models import Photo
-from common.serializers import PhotoActionWithUserNameSerializer
+from common.serializers import PhotoActionWithUserNameSerializer, PhotoForApiSerializer
 
 class DuffyJsonEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -48,7 +48,10 @@ def getPhotoObject(entry):
 	photoData = {'type': 'photo'}
 	photo = entry['photo']
 
-	photoData.update(photo.serialize())
+	if (photo.isDbPhoto()):
+		photoData.update(PhotoForApiSerializer(photo.getDbPhoto()).data)
+	else:
+		photoData.update(photo.serialize())
 
 	# Add in extra fields that aren't a part of the SimplePhoto model
 	if 'dist' in entry:

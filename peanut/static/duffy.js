@@ -14,8 +14,8 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 	// photoType = 0: regular photo
 	// photoType = 1: clusterBottom
 
-	thumbUrl = "/user_data/" + photo.user + "/" + photo.id + "-thumb-156.jpg";
-	fullUrl = "/user_data/" + photo.user + "/" + photo.id+ ".jpg";
+	thumbUrl = photo.thumb_image_path;
+	fullUrl = photo.full_image_path;
 	onErrorStr='this.onerror=null;this.src="' + thumbUrl +'";';
 	lockedStr = isLocked ? 'ui-locked' : 'ui-notlocked';
 
@@ -25,7 +25,7 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 
 	if (userList) {
 		if (getURLParameter("user_id") != photo.user) {
-			userList.push(photo.display_name);
+			userList.push(photo.user_display_name);
 		}
 	}
 	if (!photoType) {
@@ -37,8 +37,8 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 	else {
 		var thirdStr = 'is-third';
 	}	
-	if (photo.display_name) {
-		title = cleanName(photo.display_name);
+	if (photo.user_display_name) {
+		title = cleanName(photo.user_display_name);
 	}
 	else {
 		title = photo.dist;
