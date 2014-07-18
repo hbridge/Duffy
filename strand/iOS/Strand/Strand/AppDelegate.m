@@ -26,6 +26,8 @@
 #import "DFBackgroundLocationManager.h"
 #import "DFDefaultsStore.h"
 #import "DFTypedefs.h"
+#import "DFPeanutPushNotification.h"
+#import "NSString+DFHelpers.h"
 
 
 @interface AppDelegate ()
@@ -232,39 +234,44 @@
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
-  DDLogVerbose(@"App received background notification dict: %@",
-            userInfo.description);
-  if ([application applicationState] != UIApplicationStateActive) {
-    if (!userInfo[@"view"]) return;
-    int viewNumber = [(NSNumber *)userInfo[@"view"] intValue];
+  DDLogInfo(@"Foreground notification being forwarded to background notif handler.");
+  [self application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:nil];
+}
+
+- (void)application:(UIApplication *)application
+didReceiveRemoteNotification:(NSDictionary *)userInfo
+fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  DDLogVerbose(@"App received notification dict: %@",
+               userInfo.description);
+  DFPeanutPushNotification *pushNotif = [[DFPeanutPushNotification alloc] initWithUserInfo:userInfo];
+  if ([application applicationState] == UIApplicationStateBackground && pushNotif.isUpdateLocationRequest){
+    if (pushNotif.contentAvailable)
+    {
+      [[DFBackgroundLocationManager sharedBackgroundLocationManager]
+       backgroundUpdateWithCompletionHandler:completionHandler];
+    }
+  } else if ([application applicationState] == UIApplicationStateInactive) {
+    // This is the state that the note is received in if the user is swiping a notification
+    if (pushNotif.screenToShow == DFScreenNone) return;
     
     UIViewController *rootViewController = self.window.rootViewController;
     if ([rootViewController.class isSubclassOfClass:[RootViewController class]]) {
-      if (viewNumber == 0) {
+      if (pushNotif.screenToShow == DFScreenCamera) {
         [(RootViewController *)self.window.rootViewController showCamera];
-      } else if (viewNumber == 1) {
+      } else if (pushNotif.screenToShow == DFScreenGallery) {
         [(RootViewController *)self.window.rootViewController showGallery];
       }
     }
-    [DFAnalytics logNotificationOpened:[NSString stringWithFormat:@"%d", viewNumber]];
-  } else {
-    NSDictionary *apsDict = userInfo[@"aps"];
-    NSString *alertString;
-    id alert = apsDict[@"alert"];
-    if ([[alert class] isSubclassOfClass:[NSDictionary class]]) {
-      NSDictionary *alertDict = (NSDictionary *)alert;
-      alertString = alertDict[@"body"];
-    } else if ([[alert class] isSubclassOfClass:[NSString class]]) {
-      alertString = alert;
-    } else {
-      DDLogWarn(@"App received background notif of unknown format.  userInfo:%@", userInfo);
-    }
-    
-    if (alertString) {
-      [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:alertString];
+    [DFAnalytics logNotificationOpened:[NSString stringWithFormat:@"%d", pushNotif.screenToShow]];
+  } else if ([application applicationState] == UIApplicationStateActive) {
+    if ([pushNotif.message isNotEmpty]) {
+      [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:pushNotif.message];
     }
     [[DFStrandsManager sharedStrandsManager] performFetch];
   }
+  
+  if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
 }
 
 - (void)resetApplication

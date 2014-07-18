@@ -15,7 +15,7 @@
 
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
 @property (readonly, nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
-
+@property (atomic) BOOL isBackgroundLocationUpdateInProgress;
 
 @end
 
@@ -126,7 +126,9 @@ static DFBackgroundLocationManager *defaultManager;
             timeDifference,
             (int)[[UIApplication sharedApplication] applicationState]);
   
-  if (timeDifference > 0.0 && distance > 30.0) {
+  if ((timeDifference > 0.0 && distance > 30.0)
+      || (timeDifference > 0.0 && self.isBackgroundLocationUpdateInProgress))
+  {
     [self recordManagerLocation];
     [self.locationAdapter updateLocation:newLocation
                            withTimestamp:newLocation.timestamp
@@ -134,6 +136,12 @@ static DFBackgroundLocationManager *defaultManager;
                          completionBlock:^(BOOL success) {
                          }];
     [DFAnalytics logLocationUpdated];
+  } else if (self.isBackgroundLocationUpdateInProgress){
+    [self.locationAdapter updateLocation:lastLocation
+                           withTimestamp:lastLocation.timestamp
+                                accuracy:lastLocation.horizontalAccuracy completionBlock:^(BOOL success) {
+                                  
+                                }];
   }
 }
 
@@ -154,6 +162,25 @@ static DFBackgroundLocationManager *defaultManager;
   }
   
   return _locationAdapter;
+}
+
+
+- (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  DDLogInfo(@"%@ received background update request.", [self.class description]);
+  if (self.isBackgroundLocationUpdateInProgress) {
+    DDLogInfo(@"%@ background update request already in progres.  Ignoring.", [self.class description]);
+    return;
+  }
+  self.isBackgroundLocationUpdateInProgress = YES;
+  
+  [self.locationManager startUpdatingLocation];
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    DDLogInfo(@"%@ stopping background location updates and calling completion.", [self.class description]);
+    [self.locationManager stopUpdatingLocation];
+    self.isBackgroundLocationUpdateInProgress = NO;
+    completionHandler(UIBackgroundFetchResultNewData);
+  });
 }
 
 #pragma mark - Foreground/background handlers

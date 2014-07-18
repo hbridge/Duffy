@@ -14,5 +14,6 @@
 + (DFBackgroundLocationManager *)sharedBackgroundLocationManager;
 - (void)startUpdatingOnSignificantLocationChange;
 - (CLLocation *)lastLocation;
+- (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 
 @end

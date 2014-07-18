@@ -15,4 +15,9 @@
   return (NSRange){0, self.length};
 }
 
+- (BOOL)isNotEmpty
+{
+  return ![self isEqualToString:@""];
+}
+
 @end

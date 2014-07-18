@@ -11,5 +11,6 @@
 @interface NSString (DFHelpers)
 
 - (NSRange)fullRange;
+- (BOOL)isNotEmpty;
 
 @end

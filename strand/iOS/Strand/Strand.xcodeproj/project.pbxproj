@@ -120,6 +120,7 @@
 		5AD8589219785FCC00BFDC4E /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589119785FCC00BFDC4E /* DFTypedefs.m */; };
 		5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */; };
 		5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589719797E6000BFDC4E /* DFPermissionsHelpers.m */; };
+		5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589A1979A50200BFDC4E /* DFPeanutPushNotification.m */; };
 		5ADD857519465C790037A6D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857419465C790037A6D5 /* main.m */; };
 		5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857719465C790037A6D5 /* AppDelegate.m */; };
 		5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857A19465C790037A6D5 /* RootViewController.m */; };
@@ -354,6 +355,8 @@
 		5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationRoadblockViewController.m; sourceTree = "<group>"; };
 		5AD8589619797E6000BFDC4E /* DFPermissionsHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPermissionsHelpers.h; sourceTree = "<group>"; };
 		5AD8589719797E6000BFDC4E /* DFPermissionsHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPermissionsHelpers.m; sourceTree = "<group>"; };
+		5AD858991979A50200BFDC4E /* DFPeanutPushNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutPushNotification.h; sourceTree = "<group>"; };
+		5AD8589A1979A50200BFDC4E /* DFPeanutPushNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutPushNotification.m; sourceTree = "<group>"; };
 		5ADD856F19465C790037A6D5 /* Strand.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Strand.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADD857319465C790037A6D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5ADD857419465C790037A6D5 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
@@ -789,6 +792,8 @@
 			children = (
 				5A7B184A19707C3D00E5A1D1 /* Peanut Objects */,
 				5A7B184919707C1D00E5A1D1 /* Adapters */,
+				5AD858991979A50200BFDC4E /* DFPeanutPushNotification.h */,
+				5AD8589A1979A50200BFDC4E /* DFPeanutPushNotification.m */,
 			);
 			name = "Network Adapters";
 			sourceTree = "<group>";
@@ -1157,6 +1162,7 @@
 				5A7B185319707DE300E5A1D1 /* DFPeanutAction.m in Sources */,
 				5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */,
 				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
+				5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
 				5AA4529D196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m in Sources */,
 				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,

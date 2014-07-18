@@ -116,7 +116,7 @@ static DFAnalytics *defaultLogger;
 #ifdef DEBUG
   [[LocalyticsSession shared]
    LocalyticsSession:@"7790abca456e78bb24ebdbb-8e7455f6-fe36-11e3-9fb0-009c5fda0a25"];
-  [[LocalyticsSession shared] setLoggingEnabled:YES];
+  //  [[LocalyticsSession shared] setLoggingEnabled:YES];
 #else
   [[LocalyticsSession shared]
    LocalyticsSession:@"66b1e3dfca983d01af7f08d-e84211ee-fe31-11e3-4759-00a426b17dd8"];
