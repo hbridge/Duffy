@@ -13,9 +13,9 @@
 #ifdef DEBUG
 NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com";
 #else
-NSString const *DFServerBaseURL = @"http://prod.strand.duffyapp.com";
+NSString const *DFServerBaseURL = @"https://prod.strand.duffyapp.com";
 #endif
-NSString const *DFServerAPIPath = @"/strand/api/";
+NSString const *DFServerAPIPath = @"/strand/api/v1/";
 NSString const *DFServerPortDefault = @"";
 
 // common parameters

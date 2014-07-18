@@ -120,6 +120,7 @@ static DFAnalytics *defaultLogger;
 #else
   [[LocalyticsSession shared]
    LocalyticsSession:@"66b1e3dfca983d01af7f08d-e84211ee-fe31-11e3-4759-00a426b17dd8"];
+  [[LocalyticsSession shared] setEnableHTTPS:YES];
 #endif
   [[LocalyticsSession shared] enableHTTPS];
   [DFAnalytics ResumeAnalyticsSession];
