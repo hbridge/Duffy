@@ -9,6 +9,7 @@
 #import "DFLocationRoadblockViewController.h"
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
+#import "DFPermissionsHelpers.h"
 
 @interface DFLocationRoadblockViewController ()
 
@@ -40,15 +41,12 @@
 {
   DDLogInfo(@"%@ appeared.", [self.class description]);
   [super viewDidAppear:animated];
-  DFPermissionStateType lastKnownState = [DFDefaultsStore stateForPermission:DFPermissionLocation];
-  if (![lastKnownState isEqualToString:DFPermissionStateDenied]) {
-    [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:lastKnownState
-                      newState:DFPermissionStateDenied];
-    [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionLocation];
-    [self.locationManager startUpdatingLocation];
-  }
-  
-  self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(startLocationUpdates) userInfo:nil repeats:YES];
+  [self startLocationUpdates];
+  self.timer = [NSTimer scheduledTimerWithTimeInterval:1.0
+                                                target:self
+                                              selector:@selector(startLocationUpdates)
+                                              userInfo:nil
+                                               repeats:YES];
 }
 
 - (void)startLocationUpdates
@@ -84,9 +82,6 @@
   [self.locationManager stopUpdatingLocation];
   DDLogInfo(@"%@ location succeeded.  Dismissing.", [self.class description]);
   [self.timer invalidate];
-  [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:DFPermissionStateDenied
-                    newState:DFPermissionStateGranted];
-  [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionLocation];
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 

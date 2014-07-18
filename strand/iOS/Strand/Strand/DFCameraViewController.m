@@ -32,6 +32,7 @@
 #import "DFDefaultsStore.h"
 #import "DFSettings.h"
 #import "DFLocationRoadblockViewController.h"
+#import "DFPermissionsHelpers.h"
 
 static NSString *const DFStrandCameraHelpWasShown = @"DFStrandCameraHelpWasShown";
 static NSString *const DFStrandCameraJoinableHelpWasShown = @"DFStrandCameraJoinableHelpWasShown";
@@ -623,6 +624,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   if ([self isGoodLocation:location]) {
     [self updateServerUI];
   }
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [DFPermissionsHelpers recordAndLogPermission:DFPermissionLocation
+                                       changedTo:DFPermissionStateGranted];
+  });
   
   DDLogInfo(@"DFCameraViewController updated location: <%f, %f> +/- %.02fm @ %@",
             location.coordinate.latitude,
@@ -636,6 +641,10 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 {
   DDLogInfo(@"%@ location update failed: %@", [self.class description], error.description);
   if (error.code == kCLErrorDenied && !self.presentedViewController) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      [DFPermissionsHelpers recordAndLogPermission:DFPermissionLocation
+                                         changedTo:DFPermissionStateGranted];
+    });
     [self presentViewController:self.locationRoadblockViewController animated:YES completion:nil];
   }
 }

@@ -1,5 +1,9 @@
 # Strand
 
+## Jul 18th, 2014
+
+- HTTPS support
+
 ## Jul 17th, 2014
 
 - Explains why we need location permission
