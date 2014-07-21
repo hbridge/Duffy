@@ -162,11 +162,15 @@
        for (DFPhoto *photo in photos) {
          @autoreleasepool {
            NSData *thumbnailData = photo.asset.thumbnailJPEGData;
-           numBytes += thumbnailData.length;
-           [formData appendPartWithFileData:thumbnailData
-                                       name:photo.objectID.URIRepresentation.absoluteString
-                                   fileName:[NSString stringWithFormat:@"%@.jpg", photo.asset.hashString]
-                                   mimeType:@"image/jpg"];
+           if (thumbnailData) {
+             numBytes += thumbnailData.length;
+             [formData appendPartWithFileData:thumbnailData
+                                         name:photo.objectID.URIRepresentation.absoluteString
+                                     fileName:[NSString stringWithFormat:@"%@.jpg", photo.asset.hashString]
+                                     mimeType:@"image/jpg"];
+           } else {
+             DDLogError(@"Thumbnail data nil for upload");
+           }
          }
        }
      }
