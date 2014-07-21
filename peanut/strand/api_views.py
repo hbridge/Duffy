@@ -368,7 +368,7 @@ def get_joinable_strands(request):
 
 		nonNeighboredPhotos = getNonNeighboredPhotos(userId, lon, lat)
 
-		formattedGroups = getFormattedGroups([nonNeighboredPhotos])
+		formattedGroups = getFormattedGroups([nonNeighboredPhotos], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 
 		response['objects'] = objects
@@ -394,7 +394,7 @@ def get_new_photos(request):
 
 		photos = getNeighboredPhotos(userId, startTime)
 
-		formattedGroups = getFormattedGroups([photos])
+		formattedGroups = getFormattedGroups([photos], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(groups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
