@@ -130,17 +130,27 @@ def getGroups(groupings):
 			
 		# Grab title from the location_city of a photo...but find the first one that has
 		#   a valid location_city
-		title = None
+		bestLocation = None
 		i = 0
-		while (not title) and i < len(group):
-			title = getBestLocation(group[i])
+		while (not bestLocation) and i < len(group):
+			bestLocation = getBestLocation(group[i])
 			i += 1
+
+		names = list()
+		for photo in group:
+			names.append(photo.user.display_name)
+
+		names = set(names)
+
+		title = "With %s" % (", ".join(names))
+
+		subtitle = "%s in %s" % (api_util.prettyDate(group[0].time_taken), bestLocation)
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 		
-		output.append({'title': title, 'clusters': clusters})
+		output.append({'title': title, 'subtitle': subtitle, 'clusters': clusters})
 	return output
 	
 """

@@ -1,5 +1,6 @@
 import json
 import datetime
+import pytz
 import time
 
 from django.http import HttpResponse
@@ -96,7 +97,7 @@ def turnGroupsIntoSections(groupings, num):
 	lastDate = None
 	count = 0
 	for group in groupings:
-		section = {'type': 'section', 'title': group['title'], 'objects': list()}
+		section = {'type': 'section', 'title': group['title'], 'subtitle': group['subtitle'], 'objects': list()}
 		for cluster in group['clusters']:
 			if len(cluster) == 1:
 				photoData = getPhotoObject(cluster[0])
@@ -135,3 +136,51 @@ def returnFailure(response, msg):
 	response['result'] = False
 	response['debug'] = msg
 	return HttpResponse(json.dumps(response), content_type="application/json")
+
+"""
+	Get a datetime object or a int() Epoch timestamp and return a
+	pretty string like 'an hour ago', 'Yesterday', '3 months ago',
+	'just now', etc
+
+	From: http://stackoverflow.com/questions/1551382/user-friendly-time-format-in-python
+"""
+def prettyDate(time=False):
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	if type(time) is int:
+		diff = now - datetime.datetime.fromtimestamp(time)
+	elif isinstance(time, datetime.datetime):
+		diff = now - time
+	elif not time:
+		diff = now - now
+	second_diff = diff.seconds
+	day_diff = diff.days
+
+	if day_diff < 0:
+		return ''
+
+	if day_diff == 0:
+		if second_diff < 10:
+			return "just now"
+		if second_diff < 60:
+			return str(second_diff) + " seconds ago"
+		if second_diff < 120:
+			return "a minute ago"
+		if second_diff < 3600:
+			return str(second_diff / 60) + " minutes ago"
+		if second_diff < 7200:
+			return "an hour ago"
+		if second_diff < 86400:
+			return str(second_diff / 3600) + " hours ago"
+	if day_diff == 1:
+		return "Yesterday"
+	if day_diff < 7:
+		return str(day_diff) + " days ago"
+	if day_diff < 14:
+		return "1 week ago"
+	if day_diff < 31:
+		return str(day_diff / 7) + " weeks ago"
+	if day_diff < 60:
+		return "1 month ago"
+	if day_diff < 365:
+		return str(day_diff / 30) + " months ago"
+	return str(day_diff / 365) + " years ago"
