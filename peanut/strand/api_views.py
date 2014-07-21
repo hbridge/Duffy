@@ -441,6 +441,12 @@ def register_apns_token(request):
 				if (not device.is_active):
 					device.is_active = True
 				device.save()
+
+		# We're saving last build info here since we want to track it but only need it once per session
+		#   So this api call is good
+		if form.cleaned_data['build_id'] and form.cleaned_data['build_num']:
+			user.last_build_info = "%s-%s" % (form.cleaned_data['build_id'], form.cleaned_data['build_num'])
+		
 		user.save()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
