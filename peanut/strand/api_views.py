@@ -368,8 +368,8 @@ def get_joinable_strands(request):
 
 		nonNeighboredPhotos = getNonNeighboredPhotos(userId, lon, lat)
 
-		groups = getGroups([nonNeighboredPhotos])
-		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+		formattedGroups = getFormattedGroups([nonNeighboredPhotos])
+		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
@@ -394,8 +394,8 @@ def get_new_photos(request):
 
 		photos = getNeighboredPhotos(userId, startTime)
 
-		groups = getGroups([photos])
-		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+		formattedGroups = getFormattedGroups([photos])
+		lastDate, objects = api_util.turnFormattedGroupsIntoSections(groups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
 
@@ -415,7 +415,6 @@ def update_user_location(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 		timestamp = form.cleaned_data['timestamp']
-		accuracy = form.cleaned_data['accuracy']
 
 		if (not timestamp):
 			timestamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -432,7 +431,7 @@ def update_user_location(request):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
 				user.last_location_timestamp = timestamp
 				user.save()
-				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
+				logger.info("Location updated for user %s. %s: %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point))
 			else:
 				logger.info("Location NOT updated for user %s. Old Timestamp. %s: %s, %s" % (userId, timestamp, userId, str((lon, lat))))
 		else:
