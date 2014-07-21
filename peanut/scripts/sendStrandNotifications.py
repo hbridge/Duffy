@@ -85,13 +85,14 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 def sendPhotoActionNotifications(photoActions):
 	for photoAction in photoActions:
 		if photoAction.action_type == "favorite":
-			msg = "%s just liked your photo!" % (photoAction.user.display_name)
-			msgType = constants.NOTIFICATIONS_PHOTO_FAVORITED_ID
-			# Make name small since we only have 256 characters
-			customPayload = {'pid': photoAction.photo_id}
+			if photoAction.user_id != photoAction.photo.user_id:
+				msg = "%s just liked your photo!" % (photoAction.user.display_name)
+				msgType = constants.NOTIFICATIONS_PHOTO_FAVORITED_ID
+				# Make name small since we only have 256 characters
+				customPayload = {'pid': photoAction.photo_id}
 
-			logger.info("Sending %s to %s" % (msg, photoAction.photo.user))
-			notifications_util.sendNotification(photoAction.photo.user, msg, msgType, customPayload)
+				logger.info("Sending %s to %s" % (msg, photoAction.photo.user))
+				notifications_util.sendNotification(photoAction.photo.user, msg, msgType, customPayload)
 
 			photoAction.user_notified_time = datetime.datetime.utcnow()
 			photoAction.save()
