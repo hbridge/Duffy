@@ -128,6 +128,15 @@ static DFUser *currentUser;
   return name;
 }
 
+- (BOOL)isUserDeveloper
+{
+#ifdef DEBUG
+  return YES;
+#else
+  return NO;
+#endif
+}
+
 
 #pragma mark - Server URL and port
 

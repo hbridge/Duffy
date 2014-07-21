@@ -140,7 +140,6 @@ static DFImageStore *defaultStore;
 
 + (void)createCacheDirectories
 {
-  // thumbnails
   NSFileManager *fm = [NSFileManager defaultManager];
   
   NSArray *directoriesToCreate = @[[[self localThumbnailsDirectoryURL] path],
@@ -202,6 +201,26 @@ static DFImageStore *defaultStore;
   return [[self userLibraryURL] URLByAppendingPathComponent:@"thumbnails"];
 }
 
++ (NSError *)clearCache
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  
+  NSArray *directoriesToDeleteAndCreate = @[[[self localThumbnailsDirectoryURL] path],
+                                   [[self localFullImagesDirectoryURL] path]];
+  
+  for (NSString *path in directoriesToDeleteAndCreate) {
+    if ([fm fileExistsAtPath:path]) {
+      NSError *error;
+      [fm removeItemAtPath:path error:&error];
+      if (error) {
+        DDLogError(@"Error deleting cache directory: %@, error: %@", path, error.description);
+        return error;
+      }
+    }
+  }
+  [self createCacheDirectories];
+  return nil;
+}
 
 #pragma mark - Network Adapters
 

@@ -24,6 +24,8 @@ typedef void (^SetImageCompletion)(NSError *error);
            forID:(DFPhotoIDType)photoID
       completion:(SetImageCompletion)completion;
 
++ (NSError *)clearCache;
+
 + (NSURL *)applicationDocumentsDirectory;
 + (NSURL *)localFullImagesDirectoryURL;
 + (NSURL *)localThumbnailsDirectoryURL;

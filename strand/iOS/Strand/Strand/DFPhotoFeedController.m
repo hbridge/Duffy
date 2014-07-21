@@ -22,13 +22,13 @@
 #import "DFPeanutSearchObject.h"
 #import "NSString+DFHelpers.h"
 #import "DFPeanutActionAdapter.h"
+#import "DFSettingsViewController.h"
 
 const CGFloat DefaultRowHeight = 467;
 
 @interface DFPhotoFeedController ()
 
-@property (nonatomic, retain) NSArray *sectionNames;
-@property (nonatomic, retain) NSDictionary *objectsBySection;
+@property (nonatomic, retain) NSArray *sectionObjects;
 @property (nonatomic, retain) NSDictionary *indexPathsByID;
 @property (nonatomic, retain) NSDictionary *objectsByID;
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
@@ -46,16 +46,30 @@ const CGFloat DefaultRowHeight = 467;
   self = [super initWithStyle:style];
   if (self) {
     self.navigationItem.title = @"Shared";
+    [self setNavigationButtons];
+    self.imageCache = [[NSMutableDictionary alloc] init];
+    self.rowHeightCache = [[NSMutableDictionary alloc] init];
+  }
+  return self;
+}
+
+- (void)setNavigationButtons
+{
+  if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
+    UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc]
+                                       initWithImage:[[UIImage imageNamed:@"Assets/Icons/SettingsBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                                       style:UIBarButtonItemStylePlain
+                                       target:self
+                                       action:@selector(settingsButtonPressed:)];
     UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
                                      initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
                                      style:UIBarButtonItemStylePlain
                                      target:self
                                      action:@selector(cameraButtonPressed:)];
-    self.navigationItem.rightBarButtonItem = cameraButton;
-    self.imageCache = [[NSMutableDictionary alloc] init];
-    self.rowHeightCache = [[NSMutableDictionary alloc] init];
+    
+    self.navigationItem.leftBarButtonItems = @[settingsButton];
+    self.navigationItem.rightBarButtonItems = @[cameraButton];
   }
-  return self;
 }
 
 - (void)viewDidLoad
@@ -88,10 +102,7 @@ const CGFloat DefaultRowHeight = 467;
       // We need to do this work on the main thread because the DFPhoto objects that get created
       // have to be on the main thread so they can be accessed by colleciton view datasource methods
       dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *sectionNames = response.topLevelSectionNames;
-        NSDictionary *itemsBySection = response.objectsBySection;
-        
-        [self setSectionNames:sectionNames objectsBySection:itemsBySection];
+        [self setSectionObjects:response.topLevelSectionObjects];
       });
     }
     [self.refreshControl endRefreshing];
@@ -120,14 +131,15 @@ const CGFloat DefaultRowHeight = 467;
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  return self.sectionNames[section];
+  DFPeanutSearchObject *sectionObject = self.sectionObjects[section];
+  return sectionObject.title;
 }
 
 #pragma mark - Table view data source: rows
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return self.sectionNames.count;
+  return self.sectionObjects.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -138,9 +150,9 @@ const CGFloat DefaultRowHeight = 467;
 
 - (NSArray *)itemsForSectionIndex:(NSInteger)index
 {
-  if (index >= self.sectionNames.count) return nil;
-  NSString *sectionName = self.sectionNames[index];
-  NSArray *items = self.objectsBySection[sectionName];
+  if (index >= self.sectionObjects.count) return nil;
+  DFPeanutSearchObject *sectionObject = self.sectionObjects[index];
+  NSArray *items = sectionObject.objects;
   return items;
 }
 
@@ -230,17 +242,13 @@ const CGFloat DefaultRowHeight = 467;
   return DefaultRowHeight;
 }
 
-- (void)setSectionNames:(NSArray *)sectionNames objectsBySection:(NSDictionary *)objectsBySection
+- (void)setSectionObjects:(NSArray *)sectionObjects
 {
-  _sectionNames = sectionNames;
-  _objectsBySection = objectsBySection;
+  NSMutableDictionary *objectsByID = [NSMutableDictionary new];
+  NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
   
-  NSMutableDictionary *objectsByID = [[NSMutableDictionary alloc]
-                                      initWithCapacity:objectsBySection.allValues.count];
-  NSMutableDictionary *indexPathsByID = [[NSMutableDictionary alloc]
-                                         initWithCapacity:objectsBySection.allValues.count];
-  for (NSUInteger sectionIndex = 0; sectionIndex < sectionNames.count; sectionIndex++) {
-    NSArray *objectsForSection = objectsBySection[sectionNames[sectionIndex]];
+  for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
+    NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
     for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
       DFPeanutSearchObject *object = objectsForSection[objectIndex];
       NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
@@ -258,6 +266,7 @@ const CGFloat DefaultRowHeight = 467;
   
   _objectsByID = objectsByID;
   _indexPathsByID = indexPathsByID;
+  _sectionObjects = sectionObjects;
   
   [self.tableView reloadData];
 }
@@ -273,6 +282,14 @@ const CGFloat DefaultRowHeight = 467;
 - (void)cameraButtonPressed:(id)sender
 {
   [(RootViewController *)self.view.window.rootViewController showCamera];
+}
+
+- (void)settingsButtonPressed:(id)sender
+{
+  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
+  [self presentViewController:[[UINavigationController alloc] initWithRootViewController:svc]
+                     animated:YES
+                   completion:nil];
 }
 
 - (void)favoriteButtonPressed:(UIButton *)sender

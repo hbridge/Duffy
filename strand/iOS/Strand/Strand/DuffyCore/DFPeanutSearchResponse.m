@@ -32,30 +32,16 @@
 }
 
 
-- (NSArray *)topLevelSectionNames
+- (NSArray *)topLevelSectionObjects
 {
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutSearchObject *searchObject in self.objects) {
     if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
-      [result addObject:searchObject.title];
+      [result addObject:searchObject];
     }
   }
   return result;
 }
-
-- (NSDictionary *)objectsBySection
-{
-  NSMutableDictionary *itemsBySectionResult = [[NSMutableDictionary alloc] init];
-  for (DFPeanutSearchObject *sectionObject in self.objects) {
-    if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
-      itemsBySectionResult[sectionObject.title] = sectionObject.objects;
-    }
-  }
-  
-  [[DFPhotoStore sharedStore] saveContext];
-  return itemsBySectionResult;
-}
-
 
 
 @end

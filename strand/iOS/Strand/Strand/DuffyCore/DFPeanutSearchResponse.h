@@ -18,8 +18,6 @@
 @property (nonatomic, retain) NSString *thumb_image_path;
 @property (nonatomic, retain) NSString *full_image_path;
 
-- (NSArray *)topLevelSectionNames;
-- (NSDictionary *)objectsBySection;
-
+- (NSArray *)topLevelSectionObjects;
 
 @end

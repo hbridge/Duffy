@@ -25,5 +25,6 @@
 @property (readonly, nonatomic, retain) NSString *privacyPolicy;
 @property (readonly, nonatomic, retain) NSString *locationMap;
 @property (nonatomic, retain) NSString *inviteUser;
+@property (nonatomic, retain) NSString *clearImageCache;
 
 @end

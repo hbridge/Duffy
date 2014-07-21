@@ -10,7 +10,6 @@
 #import "DFCameraViewController.h"
 #import "DFPhotoNavigationControllerViewController.h"
 #import "DFPhotoFeedController.h"
-#import "DFGalleryViewController.h"
 #import "DFGalleryWebViewController.h"
 #import "DFNavigationController.h"
 

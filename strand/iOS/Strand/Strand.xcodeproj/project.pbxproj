@@ -66,7 +66,6 @@
 		5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */; };
 		5AA4529D196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4529C196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m */; };
 		5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */; };
-		5AA452A3196709750099CBD2 /* DFGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA452A2196709750099CBD2 /* DFGalleryViewController.m */; };
 		5AA452A6196739900099CBD2 /* DFPhotoFeedController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
@@ -253,8 +252,6 @@
 		5AA4529C196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoNavigationControllerViewController.m; path = DuffyCore/DFPhotoNavigationControllerViewController.m; sourceTree = "<group>"; };
 		5AA4529E1967092F0099CBD2 /* UICollectionView+DFExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UICollectionView+DFExtras.h"; path = "DuffyCore/UICollectionView+DFExtras.h"; sourceTree = "<group>"; };
 		5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UICollectionView+DFExtras.m"; path = "DuffyCore/UICollectionView+DFExtras.m"; sourceTree = "<group>"; };
-		5AA452A1196709750099CBD2 /* DFGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFGalleryViewController.h; sourceTree = "<group>"; };
-		5AA452A2196709750099CBD2 /* DFGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFGalleryViewController.m; sourceTree = "<group>"; };
 		5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoFeedController.h; sourceTree = "<group>"; };
 		5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoFeedController.m; sourceTree = "<group>"; };
 		5AB32B5A19537A610082F716 /* DFStrandStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandStore.h; sourceTree = "<group>"; };
@@ -703,8 +700,6 @@
 				5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */,
 				5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */,
 				5AC4A8D2194771F200862D9C /* DFGalleryWebViewController.xib */,
-				5AA452A1196709750099CBD2 /* DFGalleryViewController.h */,
-				5AA452A2196709750099CBD2 /* DFGalleryViewController.m */,
 				5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */,
 				5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */,
 				5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */,
@@ -1153,7 +1148,6 @@
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
-				5AA452A3196709750099CBD2 /* DFGalleryViewController.m in Sources */,
 				5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */,
 				5AC4A9291947C30800862D9C /* DFPeanutPhoto.m in Sources */,
 				5AC4A96D194A422300862D9C /* DFPeanutSearchObject.m in Sources */,

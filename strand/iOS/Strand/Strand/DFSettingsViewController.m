@@ -18,6 +18,9 @@
 #import "DFInviteUserComposeController.h"
 #import "DFAnalytics.h"
 #import "DFStrandConstants.h"
+#import "DFUser.h"
+#import "DFImageStore.h"
+#import "UIAlertView+DFHelpers.h"
 
 @interface DFSettingsViewController ()
 
@@ -137,6 +140,10 @@
                      webviewHandlerForURLString:DFPrivacyPageURLString navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     
+    if ([[DFUser currentUser] isUserDeveloper]) {
+      [DFSettingsViewController addDeveloperOptions:mapping];
+    }
+    
     [self.formModel registerMapping:mapping];
   }];
   
@@ -176,6 +183,27 @@
       [self presentViewController:self.inviteController animated:YES completion:nil];
     }];
   };
+}
+
+
+#pragma mark - Developer settings
+
++ (void)addDeveloperOptions:(FKFormMapping *)mapping
+{
+  // Support
+  [mapping sectionWithTitle:@"Developer" identifier:@"developer"];
+  [mapping button:@"Clear Image Cache"
+       identifier:@"clearImageCache"
+          handler:^(id object) {
+            NSError *error = [DFImageStore clearCache];
+            if (!error) {
+              [UIAlertView showSimpleAlertWithTitle:@"Cache cleared." message:@"The image cache has been cleared"];
+            } else {
+              [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
+            }
+            
+          }
+     accesoryType:UITableViewCellAccessoryDisclosureIndicator];
 }
 
 
