@@ -299,16 +299,17 @@ def neighbors(request):
 
 			if len(lockedPhotos) > 0:
 				groups.insert(0, lockedPhotos)
-			
-			haveLockedPhotos = True
+				hasLockedPhotos = True
+			else:
+				hasLockedPhotos = False
 		else:
-			haveLockedPhotos = False
+			hasLockedPhotos = False
 
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
 		formattedGroups = getFormattedGroups(groups, userId)
 
 		# Now we need to update the titles for the groups before we turn it into sections
-		if haveLockedPhotos:
+		if hasLockedPhotos:
 			formattedGroups[0]['title'] = "Locked"
 
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
