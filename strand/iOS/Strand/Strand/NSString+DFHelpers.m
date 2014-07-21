@@ -20,4 +20,16 @@
   return ![self isEqualToString:@""];
 }
 
++ (NSString *)stringWithCommaSeparatedStrings:(NSArray *)strings
+{
+  NSMutableString *result = [[NSMutableString alloc] init];
+  for (NSUInteger i = 0; i < strings.count; i++) {
+    [result appendString:strings[i]];
+    if (i < strings.count - 1) {
+      [result appendString:@", "];
+    }
+  }
+  return result;
+}
+
 @end

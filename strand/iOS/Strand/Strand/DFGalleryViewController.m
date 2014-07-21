@@ -36,10 +36,8 @@
       // We need to do this work on the main thread because the DFPhoto objects that get created
       // have to be on the main thread so they can be accessed by colleciton view datasource methods
       dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *peanutObjects = response.objects;
         NSArray *sectionNames = response.topLevelSectionNames;
-        NSDictionary *itemsBySection = [DFPeanutSearchResponse
-                                        photosBySectionForSearchObjects:peanutObjects];
+        NSDictionary *itemsBySection = response.objectsBySection;
         
         [self setSectionNames:sectionNames itemsBySection:itemsBySection];
       });

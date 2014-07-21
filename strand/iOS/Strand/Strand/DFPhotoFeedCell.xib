@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="466" id="KGk-i7-Jjw" customClass="DFPhotoFeedCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="467"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
+                <rect key="frame" x="0.0" y="0.0" width="320" height="466"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Mv-KR-hJz" userLabel="Imageview placeholder">
+                        <rect key="frame" x="0.0" y="44" width="320" height="320"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="320" id="tbV-2F-QTv"/>
+                            <constraint firstAttribute="height" constant="320" id="uP2-hT-cT3"/>
+                        </constraints>
+                    </view>
+                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="6Gw-h8-Can">
+                        <rect key="frame" x="150" y="199" width="20" height="20"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    </activityIndicatorView>
+                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="fST-z5-7nz" customClass="DFRoundedButton">
+                        <rect key="frame" x="20" y="397" width="111" height="29"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="0.84313732385635376" green="0.84313732385635376" blue="0.84313732385635376" alpha="1" colorSpace="deviceRGB"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="111" id="0d3-He-tQt"/>
+                            <constraint firstAttribute="height" constant="29" id="iay-6g-Vtp"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <state key="normal" title="Favorite" image="Assets/Icons/LikeOffButtonIcon">
+                            <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <state key="selected" title="Favorited" image="Assets/Icons/LikeOnButtonIcon">
+                            <color key="titleColor" red="0.98823535439999999" green="0.50196081400000003" blue="0.13725490870000001" alpha="1" colorSpace="deviceRGB"/>
+                        </state>
+                    </button>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HE2-Vf-wok">
+                        <rect key="frame" x="20" y="14" width="280" height="22"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="22" id="9ey-oa-zJ0"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                        <nil key="highlightedColor"/>
+                    </label>
+                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="B5M-0I-S31" customClass="DFRoundedButton">
+                        <rect key="frame" x="270" y="397" width="30" height="29"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <color key="backgroundColor" red="0.84313732389999996" green="0.84313732389999996" blue="0.84313732389999996" alpha="1" colorSpace="deviceRGB"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <state key="normal" title="...">
+                            <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <state key="selected">
+                            <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                    </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v5m-xw-TWf">
+                        <rect key="frame" x="20" y="372" width="280" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="17" id="ZlI-nY-Upr"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <state key="normal" title="Button" image="Assets/Icons/LikersListIcon">
+                            <color key="titleColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                    </button>
+                </subviews>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                <constraints>
+                    <constraint firstItem="v5m-xw-TWf" firstAttribute="top" secondItem="3Mv-KR-hJz" secondAttribute="bottom" constant="8" id="3C2-Hi-TSb"/>
+                    <constraint firstItem="3Mv-KR-hJz" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="GyX-5x-TLv"/>
+                    <constraint firstAttribute="trailing" secondItem="v5m-xw-TWf" secondAttribute="trailing" constant="20" id="H2q-dO-hgH"/>
+                    <constraint firstAttribute="trailing" secondItem="3Mv-KR-hJz" secondAttribute="trailing" id="Hyz-8x-qOI"/>
+                    <constraint firstItem="v5m-xw-TWf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="Qnf-Ia-CF5"/>
+                    <constraint firstAttribute="trailing" secondItem="B5M-0I-S31" secondAttribute="trailing" constant="20" id="TwD-2N-JGF"/>
+                    <constraint firstItem="B5M-0I-S31" firstAttribute="top" secondItem="fST-z5-7nz" secondAttribute="top" id="biw-5I-n44"/>
+                    <constraint firstItem="HE2-Vf-wok" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="14" id="cLN-2M-kpu"/>
+                    <constraint firstItem="HE2-Vf-wok" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="d31-cI-SfR"/>
+                    <constraint firstItem="fST-z5-7nz" firstAttribute="top" secondItem="v5m-xw-TWf" secondAttribute="bottom" constant="8" id="iPj-lA-dHo"/>
+                    <constraint firstItem="3Mv-KR-hJz" firstAttribute="top" secondItem="HE2-Vf-wok" secondAttribute="bottom" constant="8" id="mFe-Rg-ofh"/>
+                    <constraint firstItem="B5M-0I-S31" firstAttribute="bottom" secondItem="fST-z5-7nz" secondAttribute="bottom" id="qfk-aJ-DRZ"/>
+                    <constraint firstAttribute="trailing" secondItem="HE2-Vf-wok" secondAttribute="trailing" constant="20" id="sjQ-1q-hDq"/>
+                    <constraint firstItem="fST-z5-7nz" firstAttribute="top" secondItem="3Mv-KR-hJz" secondAttribute="bottom" priority="500" constant="8" id="trt-JD-FyJ"/>
+                    <constraint firstItem="fST-z5-7nz" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="wrv-dB-gFL"/>
+                </constraints>
+            </tableViewCellContentView>
+            <connections>
+                <outlet property="favoriteButton" destination="fST-z5-7nz" id="T7r-RU-IOa"/>
+                <outlet property="favoritersButton" destination="v5m-xw-TWf" id="F9j-ZI-47L"/>
+                <outlet property="imageViewPlaceholder" destination="3Mv-KR-hJz" id="gWz-ir-YDp"/>
+                <outlet property="loadingActivityIndicator" destination="6Gw-h8-Can" id="e70-WN-aaJ"/>
+                <outlet property="titleLabel" destination="HE2-Vf-wok" id="epE-vc-jiD"/>
+            </connections>
+        </tableViewCell>
+    </objects>
+    <resources>
+        <image name="Assets/Icons/LikeOffButtonIcon" width="16" height="16"/>
+        <image name="Assets/Icons/LikeOnButtonIcon" width="16" height="16"/>
+        <image name="Assets/Icons/LikersListIcon" width="16" height="16"/>
+    </resources>
+</document>

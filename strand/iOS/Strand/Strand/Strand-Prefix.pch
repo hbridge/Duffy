@@ -26,6 +26,7 @@
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <CocoaLumberjack/DDLog.h>
 #import "DFLogConfig.h"
+#import "DFTypedefs.h"
 #endif
 
 

@@ -153,10 +153,10 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
     [idsBeingCached addObject:@(self.photoID)];
     DFPhotoIDType photoID = self.photoID;
     DFPhotoMetadataAdapter *adapter = [[DFPhotoMetadataAdapter alloc] init];
-    [adapter getPhoto:photoID completionBlock:^(DFPeanutPhoto *peanutPhoto,
-                                                NSData *fullImageData,
+    [adapter getPhoto:photoID withImageDataTypes:DFImageFull completionBlock:^(DFPeanutPhoto *peanutPhoto,
+                                                NSDictionary *imageData,
                                                 NSError *error) {
-      [DFStrandPhotoAsset cacheImageData:fullImageData
+      [DFStrandPhotoAsset cacheImageData:imageData[@(DFImageFull)]
                                 metadata:[peanutPhoto metadataDictionary]
                                   userID:peanutPhoto.user.longLongValue
                           forAssetWithID:photoID];
@@ -290,7 +290,7 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
     filename = [NSString stringWithFormat:@"%@.jpg", newUniqueIDString];
   }
   
-  return [[DFPhotoStore localFullImagesDirectoryURL]
+  return [[DFImageStore localFullImagesDirectoryURL]
           URLByAppendingPathComponent:filename];
 }
 

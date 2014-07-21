@@ -1,5 +1,8 @@
 #import "DFTypedefs.h"
 
+
+
+
 // Permission types
 DFPermissionType const DFPermissionRemoteNotifications = @"RemoteNotifications";
 DFPermissionType const DFPermissionLocation = @"Location";

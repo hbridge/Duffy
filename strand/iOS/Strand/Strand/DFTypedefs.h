@@ -1,5 +1,14 @@
 
 
+// Photo types
+typedef UInt64 DFPhotoIDType;
+typedef NS_OPTIONS(unsigned int, DFImageType) {
+  DFImageNone,
+  DFImageFull,
+  DFImageThumbnail,
+};
+
+
 // Permissions
 typedef NSString *DFPermissionType;
 extern DFPermissionType const DFPermissionRemoteNotifications;

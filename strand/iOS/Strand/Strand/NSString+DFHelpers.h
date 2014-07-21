@@ -12,5 +12,6 @@
 
 - (NSRange)fullRange;
 - (BOOL)isNotEmpty;
++ (NSString *)stringWithCommaSeparatedStrings:(NSArray *)strings;
 
 @end

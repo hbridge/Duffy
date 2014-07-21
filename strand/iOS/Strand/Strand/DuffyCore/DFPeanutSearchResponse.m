@@ -11,6 +11,7 @@
 #import "DFPeanutSuggestion.h"
 #import "DFPeanutSearchObject.h"
 #import "DFPhotoStore.h"
+#import "DFPeanutPhoto.h"
 
 @implementation DFPeanutSearchResponse
 
@@ -27,7 +28,7 @@
 }
 
 + (NSArray *)simpleAttributeKeys {
-  return @[@"result", @"next_start_date_time"];
+  return @[@"result", @"next_start_date_time", @"thumb_image_path", @"full_image_path"];
 }
 
 
@@ -42,54 +43,17 @@
   return result;
 }
 
-
-+ (NSDictionary *)photosBySectionForSearchObjects:(NSArray *)peanutSearchObjects
+- (NSDictionary *)objectsBySection
 {
   NSMutableDictionary *itemsBySectionResult = [[NSMutableDictionary alloc] init];
-  for (DFPeanutSearchObject *sectionObject in peanutSearchObjects) {
+  for (DFPeanutSearchObject *sectionObject in self.objects) {
     if ([sectionObject.type isEqualToString:DFSearchObjectSection]) {
-      NSMutableArray *sectionItems = [[NSMutableArray alloc] init];
-      
-      for (DFPeanutSearchObject *searchObject in sectionObject.objects) {
-        if ([searchObject.type isEqualToString:DFSearchObjectPhoto]){
-          DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:searchObject.id];
-          if (!photo) {
-            photo = [DFPhoto createWithPhotoID:searchObject.id
-                                     inContext:[[DFPhotoStore sharedStore] managedObjectContext]];
-            photo.upload157Date = [NSDate date];
-            photo.upload569Date = [NSDate date];
-          }
-          [sectionItems addObject:photo];
-        } else if ([searchObject.type isEqualToString:DFSearchObjectCluster]
-                   || [searchObject.type isEqualToString:DFSearchObjectDocstack]) {
-          DFPhotoCollection *collection = [[DFPhotoCollection alloc]
-                                           initWithPhotos:[self photosForCluster:searchObject]];
-          [sectionItems addObject:collection];
-        }
-      }
-      
-      itemsBySectionResult[sectionObject.title] = sectionItems;
+      itemsBySectionResult[sectionObject.title] = sectionObject.objects;
     }
   }
   
   [[DFPhotoStore sharedStore] saveContext];
   return itemsBySectionResult;
-}
-
-+ (NSArray *)photosForCluster:(DFPeanutSearchObject *)cluster
-{
-  NSMutableArray *photos = [[NSMutableArray alloc] init];
-  for (DFPeanutSearchObject *subSearchObject in cluster.objects) {
-    if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
-      DFPhoto *photo = [DFPhoto createWithPhotoID:subSearchObject.id
-                               inContext:[[DFPhotoStore sharedStore] managedObjectContext]];
-      photo.upload157Date = [NSDate date];
-      photo.upload569Date = [NSDate date];
-      [photos addObject:photo];
-    }
-  }
-  
-  return  photos;
 }
 
 

@@ -60,10 +60,4 @@
 - (void)resetStore;
 
 
-+ (NSURL *)applicationDocumentsDirectory;
-+ (NSURL *)localFullImagesDirectoryURL;
-+ (NSURL *)localThumbnailsDirectoryURL;
-
-
-
 @end

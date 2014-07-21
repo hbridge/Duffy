@@ -36,5 +36,6 @@ extern DFActionType DFActionFavorite;
 
 + (NSArray *)simpleAttributeKeys;
 
++ (NSArray *)arrayOfLikerNamesFromActions:(NSArray *)actionArray;
 
 @end

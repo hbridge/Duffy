@@ -15,11 +15,22 @@
 #import "DFCGRectHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFAnalytics.h"
+#import "DFImageStore.h"
+#import "DFPeanutPhoto.h"
+#import "DFPhotoFeedCell.h"
+#import "DFPeanutSearchResponse.h"
+#import "DFPeanutSearchObject.h"
+#import "NSString+DFHelpers.h"
+#import "DFPeanutActionAdapter.h"
+
+const CGFloat DefaultRowHeight = 467;
 
 @interface DFPhotoFeedController ()
 
 @property (nonatomic, retain) NSArray *sectionNames;
-@property (nonatomic, retain) NSDictionary *itemsBySection;
+@property (nonatomic, retain) NSDictionary *objectsBySection;
+@property (nonatomic, retain) NSDictionary *indexPathsByID;
+@property (nonatomic, retain) NSDictionary *objectsByID;
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
 @property (atomic, retain) NSMutableDictionary *imageCache;
 @property (atomic, retain) NSMutableDictionary *rowHeightCache;
@@ -51,30 +62,40 @@
 {
   [super viewDidLoad];
   
-  [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil] forCellReuseIdentifier:@"cell"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
+  self.tableView.rowHeight = DefaultRowHeight;
+  
+  self.refreshControl = [[UIRefreshControl alloc] init];
+  [self.refreshControl addTarget:self action:@selector(reloadFeed) forControlEvents:UIControlEventValueChanged];
+  [self.tableView addSubview:self.refreshControl];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+  [self reloadFeed];
+  
+  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
+}
+
+- (void)reloadFeed
+{
+  [self.refreshControl beginRefreshing];
   [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response) {
     if (response.objects.count > 0) {
       // We need to do this work on the main thread because the DFPhoto objects that get created
       // have to be on the main thread so they can be accessed by colleciton view datasource methods
       dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *peanutObjects = response.objects;
         NSArray *sectionNames = response.topLevelSectionNames;
-        NSDictionary *itemsBySection = [DFPeanutSearchResponse
-                                        photosBySectionForSearchObjects:peanutObjects];
+        NSDictionary *itemsBySection = response.objectsBySection;
         
-        [self setSectionNames:sectionNames itemsBySection:itemsBySection];
+        [self setSectionNames:sectionNames objectsBySection:itemsBySection];
       });
     }
+    [self.refreshControl endRefreshing];
   }];
-  
-  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -119,53 +140,82 @@
 {
   if (index >= self.sectionNames.count) return nil;
   NSString *sectionName = self.sectionNames[index];
-  NSArray *items = self.itemsBySection[sectionName];
+  NSArray *items = self.objectsBySection[sectionName];
   return items;
 }
 
-- (DFPhoto *)representativePhotoForIndexPath:(NSIndexPath *)indexPath
+- (DFPeanutSearchObject *)representativePhotoForIndexPath:(NSIndexPath *)indexPath
 {
   NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
-  id item = itemsForSection[indexPath.row];
-  DFPhoto *representativePhoto;
-  if ([[item class] isSubclassOfClass:[DFPhoto class]]) {
-    representativePhoto = item;
-  } else if ([[item class] isSubclassOfClass:[DFPhotoCollection class]]) {
-    DFPhotoCollection *photoCollection = item;
-    representativePhoto = [[photoCollection photosByDateAscending:YES] firstObject];
+  DFPeanutSearchObject *object = itemsForSection[indexPath.row];
+  
+  if ([object.type isEqual:DFSearchObjectPhoto]) {
+    return object;
+  } else if ([object.type isEqual:DFSearchObjectCluster]) {
+    return [object.objects firstObject];
   }
   
-  return representativePhoto;
+  return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"
+  DFPhotoFeedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"
                                                           forIndexPath:indexPath];
   
-  cell.imageView.contentMode = UIViewContentModeScaleAspectFit;
   UIImage *image = self.imageCache[indexPath];
+  if (![cell.favoriteButton actionsForTarget:self forControlEvent:UIControlEventTouchUpInside]) {
+    [cell.favoriteButton addTarget:self action:@selector(favoriteButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+  }
+  
+  DFPeanutSearchObject *representativeObject = [self representativePhotoForIndexPath:indexPath];
   
   if (image) {
     cell.imageView.image = image;
   } else {
     cell.imageView.image = nil;
-    cell.imageView.backgroundColor = [UIColor grayColor];
+    [cell.loadingActivityIndicator startAnimating];
     
-    DFPhoto *representativePhoto = [self representativePhotoForIndexPath:indexPath];
-    if (representativePhoto) {
-      [representativePhoto.asset loadFullScreenImage:^(UIImage *image) {
-        self.imageCache[[self keyForIndexPath:indexPath]] = image;
-        dispatch_async(dispatch_get_main_queue(), ^{
-          [self.tableView reloadData];
-        });
-      } failureBlock:^(NSError *error) {
-      }];
+    if (representativeObject) {
+      [[DFImageStore sharedStore]
+       imageForID:representativeObject.id
+       type:DFImageFull
+       completion:^(UIImage *image) {
+         self.imageCache[indexPath] = image;
+         dispatch_async(dispatch_get_main_queue(), ^{
+           if (![tableView.visibleCells containsObject:cell]) return;
+           cell.imageView.image = image;
+           [cell.loadingActivityIndicator stopAnimating];
+           [cell setNeedsLayout];
+         });
+       }];
     }
   }
   
+  [DFPhotoFeedController configureNonImageAttributesForCell:cell
+                                               searchObject:representativeObject];
+  [cell setNeedsLayout];
   return cell;
 }
+
++ (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
+                              searchObject:(DFPeanutSearchObject *)searchObject
+{
+  cell.favoriteButton.tag = searchObject.id;
+  cell.titleLabel.text = searchObject.user_display_name;
+  
+  if (searchObject.actions.count > 0) {
+    [cell setFavoritersListHidden:NO];
+    NSArray *likerNames = [DFPeanutAction arrayOfLikerNamesFromActions:searchObject.actions];
+    NSString *likerNamesString = [NSString stringWithCommaSeparatedStrings:likerNames];
+    [cell.favoritersButton setTitle:likerNamesString forState:UIControlStateNormal];
+    cell.favoriteButton.selected = (searchObject.userFavoriteAction);
+  } else {
+    cell.favoriteButton.selected = NO;
+    [cell setFavoritersListHidden:YES];
+  }
+}
+
 
 - (id)keyForIndexPath:(NSIndexPath *)indexPath
 {
@@ -175,27 +225,39 @@
   return [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
 }
 
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  id key = [self keyForIndexPath:indexPath];
-  NSNumber *cachedHeight = self.rowHeightCache[key];
-  if (cachedHeight) return cachedHeight.floatValue;
-
-  UIImage *image = self.imageCache[key];
-  if (image) {
-    CGFloat height = [DFCGRectHelpers
-                      aspectFittedSize:image.size max:CGRectMake(0,0,290, 640)].size.height;
-    self.rowHeightCache[key] = @(height);
-    return height;
-  }
-  
-  return 200;
+  return DefaultRowHeight;
 }
 
-- (void)setSectionNames:(NSArray *)sectionNames itemsBySection:(NSDictionary *)photosBySection
+- (void)setSectionNames:(NSArray *)sectionNames objectsBySection:(NSDictionary *)objectsBySection
 {
   _sectionNames = sectionNames;
-  _itemsBySection = photosBySection;
+  _objectsBySection = objectsBySection;
+  
+  NSMutableDictionary *objectsByID = [[NSMutableDictionary alloc]
+                                      initWithCapacity:objectsBySection.allValues.count];
+  NSMutableDictionary *indexPathsByID = [[NSMutableDictionary alloc]
+                                         initWithCapacity:objectsBySection.allValues.count];
+  for (NSUInteger sectionIndex = 0; sectionIndex < sectionNames.count; sectionIndex++) {
+    NSArray *objectsForSection = objectsBySection[sectionNames[sectionIndex]];
+    for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
+      DFPeanutSearchObject *object = objectsForSection[objectIndex];
+      NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
+      if ([object.type isEqual:DFSearchObjectPhoto]) {
+        objectsByID[@(object.id)] = object;
+        indexPathsByID[@(object.id)] = indexPath;
+      } else if ([object.type isEqual:DFSearchObjectCluster]) {
+        for (DFPeanutSearchObject *subObject in object.objects) {
+          objectsByID[@(subObject.id)] = subObject;
+          indexPathsByID[@(subObject.id)] = indexPath;
+        }
+      }
+    }
+  }
+  
+  _objectsByID = objectsByID;
+  _indexPathsByID = indexPathsByID;
   
   [self.tableView reloadData];
 }
@@ -204,38 +266,73 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *items = [self itemsForSectionIndex:indexPath.section];
-  DDLogVerbose(@"item tapped at [%d, %d]", (int)indexPath.section, (int)indexPath.row);
-  id item = items[indexPath.row];
-  if ([[item class] isSubclassOfClass:[DFPhoto class]]) {
-    DFMultiPhotoViewController *mpvc = [[DFMultiPhotoViewController alloc] init];
-    [mpvc setActivePhoto:item inPhotos:items];
-    [self.navigationController pushViewController:mpvc animated:YES];
-  } else if ([[item class] isSubclassOfClass:[DFPhotoCollection class]]) {
-    [self expandCollection:item atIndexPath:indexPath];
-  }
-}
-
-- (void)expandCollection:(DFPhotoCollection *)collection atIndexPath:(NSIndexPath *)indexPath
-{
-  // get the photos to replace the collection with
-  NSArray *photos = [collection photosByDateAscending:YES];
-  
-  NSMutableArray *newItemsForSection = [self itemsForSectionIndex:indexPath.section].mutableCopy;
-  [newItemsForSection replaceObjectsInRange:(NSRange){indexPath.row, 1}
-                       withObjectsFromArray:photos];
-  NSMutableDictionary *newSections = self.itemsBySection.mutableCopy;
-  newSections[self.sectionNames[indexPath.section]] = newItemsForSection;
-  _itemsBySection = newSections;
-  [UIView animateWithDuration:0.3 animations:^{
-    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:indexPath.section]
-                  withRowAnimation:UITableViewRowAnimationTop];
-  }];
+  DDLogVerbose(@"Row tapped");
+  [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
 - (void)cameraButtonPressed:(id)sender
 {
   [(RootViewController *)self.view.window.rootViewController showCamera];
+}
+
+- (void)favoriteButtonPressed:(UIButton *)sender
+{
+  DDLogVerbose(@"Favorite button pressed");
+
+  DFPhotoIDType photoID = sender.tag;
+  DFPeanutSearchObject *object = self.objectsByID[@(photoID)];
+  DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFActionFavorite
+                                             forUser:[[DFUser currentUser] userID]]
+                               firstObject];
+  DFPeanutAction *newAction;
+  if (!oldFavoriteAction) {
+    newAction = [[DFPeanutAction alloc] init];
+    newAction.user = [[DFUser currentUser] userID];
+    newAction.action_type = DFActionFavorite;
+    newAction.photo = photoID;
+  } else {
+    newAction = nil;
+  }
+  
+  [object setUserFavoriteAction:newAction];
+  
+  [self reloadRowForPhotoID:photoID];
+  
+  DFPeanutActionResponseBlock responseBlock = ^(DFPeanutAction *action, NSError *error) {
+    if (!error) {
+      if (action) {
+        [object setUserFavoriteAction:action];
+      } // no need for the else case, it was already removed optimistically
+      
+      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil) result:DFAnalyticsValueResultSuccess];
+    } else {
+      [object setUserFavoriteAction:oldFavoriteAction];
+      [self reloadRowForPhotoID:photoID];
+      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                      message:error.localizedDescription
+                                                     delegate:nil
+                                            cancelButtonTitle:@"OK"
+                                            otherButtonTitles:nil];
+      [alert show];
+      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil) result:DFAnalyticsValueResultFailure];
+    }
+  };
+  
+  DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
+  if (!oldFavoriteAction) {
+    [adapter postAction:newAction withCompletionBlock:responseBlock];
+  } else {
+    [adapter deleteAction:oldFavoriteAction withCompletionBlock:responseBlock];
+  }
+}
+
+
+- (void)reloadRowForPhotoID:(DFPhotoIDType)photoID
+{
+  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
+  if (indexPath) {
+    [self.tableView reloadData];
+  }
 }
 
 #pragma mark - Adapters

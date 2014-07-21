@@ -44,7 +44,6 @@ static DFPhotoStore *defaultStore;
 {
   self = [super init];
   if (self) {
-    [self createCacheDirectories];
     // do an integrity check
     DFPhotoStoreIntegrityCheckResult integrityResult =
     [self checkForErrorsAndRepairWithContext:[self managedObjectContext]];
@@ -80,29 +79,6 @@ static DFPhotoStore *defaultStore;
   NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
   managedObjectContext.persistentStoreCoordinator = [DFPhotoStore persistentStoreCoordinator];
   return managedObjectContext;
-}
-
-- (void)createCacheDirectories
-{
-  // thumbnails
-  NSFileManager *fm = [NSFileManager defaultManager];
-  
-  NSArray *directoriesToCreate = @[[[DFPhotoStore localThumbnailsDirectoryURL] path],
-                                   [[DFPhotoStore localFullImagesDirectoryURL] path]];
-  
-  for (NSString *path in directoriesToCreate) {
-    if (![fm fileExistsAtPath:path]) {
-      NSError *error;
-      [fm createDirectoryAtPath:path withIntermediateDirectories:NO
-                     attributes:nil
-                          error:&error];
-      if (error) {
-        DDLogError(@"Error creating cache directory: %@, error: %@", path, error.description);
-        abort();
-      }
-    }
-    
-  }
 }
 
 - (void)loadCameraRollDB
@@ -386,16 +362,6 @@ static int const FetchStride = 500;
 }
 
 
-+ (NSURL *)userLibraryURL
-{
-  NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
-  
-  if ([paths count] > 0)
-  {
-    return [paths objectAtIndex:0];
-  }
-  return nil;
-}
 
 - (DFPhotoCollection *)cameraRoll
 {
@@ -593,7 +559,6 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 }
 
 
-
 #pragma mark - Application's Documents directory
 
 // Returns the URL to the application's Documents directory.
@@ -603,17 +568,6 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 }
 
 
-#pragma mark - File Paths
-
-+ (NSURL *)localFullImagesDirectoryURL
-{
-  return [[self userLibraryURL] URLByAppendingPathComponent:@"fullsize"];
-}
-
-+ (NSURL *)localThumbnailsDirectoryURL
-{
-  return [[self userLibraryURL] URLByAppendingPathComponent:@"thumbnails"];
-}
 
 @end
 

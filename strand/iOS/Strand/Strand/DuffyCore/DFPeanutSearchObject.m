@@ -48,7 +48,16 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"type", @"title", @"id"];
+  return @[@"id",
+           @"type",
+           @"title",
+           @"subtitle",
+           @"thumb_image_path",
+           @"full_image_path",
+           @"time_taken",
+           @"user",
+           @"user_display_name",
+           ];
 }
 
 - (NSDictionary *)JSONDictionary
@@ -74,6 +83,37 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   }
   
   return resultDict;
+}
+
+- (DFPeanutAction *)userFavoriteAction
+{
+  return [[self actionsOfType:DFActionFavorite
+                                           forUser:[[DFUser currentUser] userID]]
+                               firstObject];
+}
+
+- (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction
+{
+  NSMutableArray *mutableActions = [[NSMutableArray alloc] initWithArray:self.actions];
+  DFPeanutAction *oldFavoriteAction = [self userFavoriteAction];
+  [mutableActions removeObject:oldFavoriteAction];
+  if (favoriteAction) {
+    [mutableActions addObject:favoriteAction];
+  }
+  
+  self.actions = mutableActions;
+}
+
+- (NSArray *)actionsOfType:(DFActionType)type forUser:(DFUserIDType)user
+{
+  NSMutableArray *result = [[NSMutableArray alloc] init];
+  for (DFPeanutAction *action in self.actions) {
+    if ([action.action_type isEqual:type] && action.user == user) {
+      [result addObject:action];
+    }
+  }
+  
+  return result;
 }
 
 

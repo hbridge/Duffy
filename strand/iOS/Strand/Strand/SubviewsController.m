@@ -38,7 +38,7 @@
     _subviewControllers =
     @[
      [[DFNavigationController alloc]
-      initWithRootViewController:[[DFGalleryWebViewController alloc] init]],
+      initWithRootViewController:[[DFPhotoFeedController alloc] init]],
      [[DFCameraViewController alloc] init]
      ];
   }

@@ -11,8 +11,6 @@
 #import "DFPhotoAsset.h"
 #import "DFUser.h"
 
-typedef UInt64 DFPhotoIDType;
-
 @interface DFPhoto : NSManagedObject
 
 // stored properties

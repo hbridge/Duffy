@@ -27,5 +27,20 @@ DFActionType DFActionFavorite = @"favorite";
   return @[@"id", @"action_type", @"photo", @"user", @"user_display_name"];
 }
 
++ (NSArray *)arrayOfLikerNamesFromActions:(NSArray *)actionArray
+{
+  NSMutableArray *result = [[NSMutableArray alloc] init];
+  for (DFPeanutAction *action in actionArray) {
+    if ([action.action_type isEqualToString:DFActionFavorite]) {
+      if (action.user == [[DFUser currentUser] userID]) {
+        [result addObject:@"You"];
+      } else {
+        [result addObject:action.user_display_name];
+      }
+    }
+  }
+  return result;
+}
+
 
 @end

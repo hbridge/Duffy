@@ -15,7 +15,7 @@
 @class RKObjectManager;
 
 typedef void (^DFPhotoFetchCompletionBlock)(DFPeanutPhoto *peanutPhoto,
-                                            NSData *fullImageData,
+                                            NSDictionary *imageData,
                                             NSError *error);
 typedef void (^DFMetadataFetchCompletionBlock)(NSDictionary *metadata);
 typedef void (^DFPhotoDeleteCompletionBlock)(NSError *error);
@@ -31,7 +31,9 @@ typedef void (^DFPhotoDeleteCompletionBlock)(NSError *error);
       appendLargeImageData:(BOOL)uploadImage;
 - (void)getPhotoMetadata:(DFPhotoIDType)photoID
          completionBlock:(DFMetadataFetchCompletionBlock)completionBlock;
+
 - (void)getPhoto:(DFPhotoIDType)photoID
+withImageDataTypes:(DFImageType)imageTypes
  completionBlock:(DFPhotoFetchCompletionBlock)completionBlock;
 - (void)deletePhoto:(DFPhotoIDType)photoID
     completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock;

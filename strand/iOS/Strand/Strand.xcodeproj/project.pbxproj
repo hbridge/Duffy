@@ -83,7 +83,6 @@
 		5AC4A9291947C30800862D9C /* DFPeanutPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8F71947C30800862D9C /* DFPeanutPhoto.m */; };
 		5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8F91947C30800862D9C /* DFPhoto.m */; };
 		5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8FB1947C30800862D9C /* DFPhotoCollection.m */; };
-		5AC4A92C1947C30800862D9C /* DFPhotoImageCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8FD1947C30800862D9C /* DFPhotoImageCache.m */; };
 		5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8FF1947C30800862D9C /* DFPhotoMetadataAdapter.m */; };
 		5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9011947C30800862D9C /* DFPhotoStore.m */; };
 		5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */; };
@@ -129,6 +128,10 @@
 		5ADD859219465C790037A6D5 /* StrandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859119465C790037A6D5 /* StrandTests.m */; };
 		5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859C19465F520037A6D5 /* DFCameraViewController.m */; };
 		5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */; };
+		5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */; };
+		5AF32EC3197C6444004B5CC4 /* DFPhotoFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */; };
+		5AF32EC4197C6444004B5CC4 /* DFPhotoFeedCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */; };
+		5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */; };
 		5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */; };
 		5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */; };
 		5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */; };
@@ -286,8 +289,6 @@
 		5AC4A8F91947C30800862D9C /* DFPhoto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhoto.m; path = DuffyCore/DFPhoto.m; sourceTree = "<group>"; };
 		5AC4A8FA1947C30800862D9C /* DFPhotoCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoCollection.h; path = DuffyCore/DFPhotoCollection.h; sourceTree = "<group>"; };
 		5AC4A8FB1947C30800862D9C /* DFPhotoCollection.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoCollection.m; path = DuffyCore/DFPhotoCollection.m; sourceTree = "<group>"; };
-		5AC4A8FC1947C30800862D9C /* DFPhotoImageCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoImageCache.h; path = DuffyCore/DFPhotoImageCache.h; sourceTree = "<group>"; };
-		5AC4A8FD1947C30800862D9C /* DFPhotoImageCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoImageCache.m; path = DuffyCore/DFPhotoImageCache.m; sourceTree = "<group>"; };
 		5AC4A8FE1947C30800862D9C /* DFPhotoMetadataAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoMetadataAdapter.h; path = DuffyCore/DFPhotoMetadataAdapter.h; sourceTree = "<group>"; };
 		5AC4A8FF1947C30800862D9C /* DFPhotoMetadataAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoMetadataAdapter.m; path = DuffyCore/DFPhotoMetadataAdapter.m; sourceTree = "<group>"; };
 		5AC4A9001947C30800862D9C /* DFPhotoStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoStore.h; path = DuffyCore/DFPhotoStore.h; sourceTree = "<group>"; };
@@ -374,6 +375,13 @@
 		5ADD859C19465F520037A6D5 /* DFCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraViewController.m; sourceTree = "<group>"; };
 		5ADD85A019465F8E0037A6D5 /* DFGalleryWebViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFGalleryWebViewController.h; sourceTree = "<group>"; };
 		5ADD85A119465F8E0037A6D5 /* DFGalleryWebViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFGalleryWebViewController.m; sourceTree = "<group>"; };
+		5AF32EBD197C42CE004B5CC4 /* DFImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageStore.h; sourceTree = "<group>"; };
+		5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageStore.m; sourceTree = "<group>"; };
+		5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoFeedCell.h; sourceTree = "<group>"; };
+		5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoFeedCell.m; sourceTree = "<group>"; };
+		5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoFeedCell.xib; sourceTree = "<group>"; };
+		5AF32EC5197C9DCE004B5CC4 /* DFRoundedButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFRoundedButton.h; sourceTree = "<group>"; };
+		5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFRoundedButton.m; sourceTree = "<group>"; };
 		5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationPermissionViewController.h; sourceTree = "<group>"; };
 		5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPermissionViewController.m; sourceTree = "<group>"; };
 		5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionViewController.xib; sourceTree = "<group>"; };
@@ -414,6 +422,8 @@
 			children = (
 				5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */,
 				5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */,
+				5AF32EC5197C9DCE004B5CC4 /* DFRoundedButton.h */,
+				5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */,
 			);
 			name = "Common Views";
 			sourceTree = "<group>";
@@ -433,8 +443,6 @@
 				5A7B1844196F2C0800E5A1D1 /* DFMapViewController.xib */,
 				5A0E122B197487CC00B6FF04 /* DFInviteUserComposeController.h */,
 				5A0E122C197487CC00B6FF04 /* DFInviteUserComposeController.m */,
-				5A0E12341975C1C600B6FF04 /* DFDefaultsStore.h */,
-				5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */,
 			);
 			name = Settings;
 			sourceTree = "<group>";
@@ -566,13 +574,13 @@
 				5AC4A8F91947C30800862D9C /* DFPhoto.m */,
 				5AC4A8FA1947C30800862D9C /* DFPhotoCollection.h */,
 				5AC4A8FB1947C30800862D9C /* DFPhotoCollection.m */,
-				5AC4A8FC1947C30800862D9C /* DFPhotoImageCache.h */,
-				5AC4A8FD1947C30800862D9C /* DFPhotoImageCache.m */,
 				5AC4A9001947C30800862D9C /* DFPhotoStore.h */,
 				5AC4A9011947C30800862D9C /* DFPhotoStore.m */,
 				5AC4A9021947C30800862D9C /* DFPhotoStore+IntegrityCheck.h */,
 				5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */,
 				5A40343219607B92003D7546 /* PhotoAsset */,
+				5AF32EBD197C42CE004B5CC4 /* DFImageStore.h */,
+				5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */,
 			);
 			name = "Photo DB";
 			sourceTree = "<group>";
@@ -699,6 +707,9 @@
 				5AA452A2196709750099CBD2 /* DFGalleryViewController.m */,
 				5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */,
 				5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */,
+				5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */,
+				5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */,
+				5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */,
 			);
 			name = "Gallery View";
 			sourceTree = "<group>";
@@ -710,6 +721,8 @@
 				5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */,
 				5AB32B5A19537A610082F716 /* DFStrandStore.h */,
 				5AB32B5B19537A610082F716 /* DFStrandStore.m */,
+				5A0E12341975C1C600B6FF04 /* DFDefaultsStore.h */,
+				5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */,
 			);
 			name = Database;
 			sourceTree = "<group>";
@@ -984,6 +997,7 @@
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5AA45296196708D00099CBD2 /* DFPhotosGridViewController.xib in Resources */,
+				5AF32EC4197C6444004B5CC4 /* DFPhotoFeedCell.xib in Resources */,
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
 				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
@@ -1079,6 +1093,7 @@
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */,
+				5AF32EC3197C6444004B5CC4 /* DFPhotoFeedCell.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */,
@@ -1098,6 +1113,7 @@
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
+				5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */,
 				5A3172C4196B1C4200CA7693 /* DFSMSCodeEntryViewController.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
 				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
@@ -1105,6 +1121,7 @@
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */,
 				5A0E122D197487CC00B6FF04 /* DFInviteUserComposeController.m in Sources */,
+				5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
@@ -1153,7 +1170,6 @@
 				5AC4A94F1947C54C00862D9C /* Duffy.xcdatamodeld in Sources */,
 				5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */,
 				5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */,
-				5AC4A92C1947C30800862D9C /* DFPhotoImageCache.m in Sources */,
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
 				5AA45297196708D00099CBD2 /* DFPhotoStackCell.m in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,

@@ -145,4 +145,16 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
           (int)self.user, (int)self.id, self.time_taken, self.iphone_hash, self.file_key.absoluteString, self.metadata, self.thumb_filename, self.full_filename, self.iphone_faceboxes_topleft];
 }
 
+- (NSString *)thumbnail_image_path
+{
+  if (!_thumbnail_image_path) {
+    NSString *directory = [self.full_image_path stringByDeletingLastPathComponent];
+    return
+    [directory stringByAppendingPathComponent:[NSString
+                                               stringWithFormat:@"%@-thumb-156.jpg", self.id]];
+  }
+  
+  return _thumbnail_image_path;
+}
+
 @end

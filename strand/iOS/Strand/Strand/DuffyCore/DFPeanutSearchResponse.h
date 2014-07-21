@@ -15,9 +15,11 @@
 @property (nonatomic, retain) NSString *next_start_date_time;
 @property (nonatomic, retain) NSArray *objects;
 @property (nonatomic, retain) NSArray *retry_suggestions;
+@property (nonatomic, retain) NSString *thumb_image_path;
+@property (nonatomic, retain) NSString *full_image_path;
 
 - (NSArray *)topLevelSectionNames;
-+ (NSDictionary *)photosBySectionForSearchObjects:(NSArray *)peanutSearchObjects;
+- (NSDictionary *)objectsBySection;
 
 
 @end

@@ -293,7 +293,9 @@
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
 }
 
-- (void)getPhoto:(DFPhotoIDType)photoID completionBlock:(DFPhotoFetchCompletionBlock)completionBlock
+- (void)getPhoto:(DFPhotoIDType)photoID
+withImageDataTypes:(DFImageType)imageTypes
+ completionBlock:(DFPhotoFetchCompletionBlock)completionBlock
 {
   DFPeanutPhoto *requestPhoto = [[DFPeanutPhoto alloc] init];
   requestPhoto.id = @(photoID);
@@ -315,12 +317,21 @@
      if (resultPeanutPhoto.full_image_path) {
        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
          @autoreleasepool {
-           NSURL *fullImageURL = [[[DFUser currentUser] serverURL]
-                                  URLByAppendingPathComponent:resultPeanutPhoto.full_image_path];
-           NSData *data = [NSData dataWithContentsOfURL:fullImageURL];
-           [DFAnalytics logPhotoLoadWithResult:
-            data ? DFAnalyticsValueResultSuccess : DFAnalyticsValueResultFailure];
-           completionBlock(resultPeanutPhoto, data, nil);
+           NSMutableDictionary *dataDict = [[NSMutableDictionary alloc] init];
+           if (imageTypes & DFImageFull) {
+             NSURL *fullImageURL = [[[DFUser currentUser] serverURL]
+                                    URLByAppendingPathComponent:resultPeanutPhoto.full_image_path];
+             NSData *fullData = [NSData dataWithContentsOfURL:fullImageURL];
+             dataDict[@(DFImageFull)] = fullData;
+           }
+           if (imageTypes & DFImageThumbnail) {
+             NSURL *thumbImageURL = [[[DFUser currentUser] serverURL]
+                                    URLByAppendingPathComponent:resultPeanutPhoto.thumbnail_image_path];
+             NSData *fullData = [NSData dataWithContentsOfURL:thumbImageURL];
+             dataDict[@(DFImageThumbnail)] = fullData;
+           }
+           
+           completionBlock(resultPeanutPhoto, dataDict, nil);
          }
        });
      } else {
