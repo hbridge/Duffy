@@ -395,7 +395,7 @@ def get_new_photos(request):
 		photos = getNeighboredPhotos(userId, startTime)
 
 		formattedGroups = getFormattedGroups([photos], userId)
-		lastDate, objects = api_util.turnFormattedGroupsIntoSections(groups, 1000)
+		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
 
