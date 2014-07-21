@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
 
-def getGroupForPhoto(photo, groupings):
-	for group in groupings:
+def getGroupForPhoto(photo, groups):
+	for group in groups:
 		if photo in group:
 			return group
 	return None
@@ -90,6 +90,58 @@ def addActionsToClusters(clusters, actionsByPhotoIdCache):
 
 	return clusters
 
+def groupIsSolo(group, userId):
+	for photo in group:
+		if photo.user_id != userId:
+			return False
+	return True
+
+"""
+	This method adds in non-neighbored photos (photos taken solo) into the groups
+	It loops through all photos and if its not in a group, tries to find the best one to put it in.
+	Right now, it groups by photos within 3 hours of each other.
+
+	Returns back and updated list of lists of photos
+"""
+def addInSoloPhotos(groups, photos):
+	newGroup = list()
+	newGroupIndex = None
+
+	for photo in photos:
+		photoPlaced = False
+		group = getGroupForPhoto(photo, groups) 
+
+		# If the photo isn't in a group yet, loop backwards through the groups, finding the first
+		# one where the photo's time_taken is more recent than the first of the group's.
+		# if that's the same group that we've been forming, add to that, otherwise start new
+		if not group:
+			for i, group in enumerate(groups):
+				if not photoPlaced:
+					if photo.time_taken > group[0].time_taken:
+						# See if we should create a new group.
+						#  Do this if we found a new index or the photo is too far away from the current
+						#  newGroup (right now, same time as neighboring)
+						if ((i != newGroupIndex) or 
+						   (len(newGroup) > 0 and
+							newGroup[-1].time_taken - photo.time_taken > datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING))):
+							if (len(newGroup) > 0):
+								groups.insert(newGroupIndex, newGroup)
+								# Just inserted a group so new one has to be incremented
+								newGroupIndex = i + 1
+							else:
+								# Covers case of the first time we find a newGroup
+								newGroupIndex = i
+
+							newGroup = [photo]
+						else:
+							newGroup.append(photo)
+
+						photoPlaced = True
+
+	if (len(newGroup) > 0):
+		groups.insert(newGroupIndex, newGroup)
+	return groups
+	
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -107,14 +159,14 @@ def addActionsToClusters(clusters, actionsByPhotoIdCache):
 		},
 	]
 """
-def getGroups(groupings):
-	if len(groupings) == 0:
+def getFormattedGroups(groups, userId):
+	if len(groups) == 0:
 		return []
 
 	output = list()
 
 	photoIds = list()
-	for group in groupings:
+	for group in groups:
 		for photo in group:
 			photoIds.append(photo.id)
 
@@ -124,7 +176,7 @@ def getGroups(groupings):
 	# Do same with actions
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
 	
-	for group in groupings:
+	for group in groups:
 		if len(group) == 0:
 			continue
 			
@@ -142,7 +194,10 @@ def getGroups(groupings):
 
 		names = set(names)
 
-		title = "With %s" % (", ".join(names))
+		if (groupIsSolo(group, userId)):
+			title = "Just you"
+		else:
+			title = "With %s" % (", ".join(names))
 
 		subtitle = "%s in %s" % (api_util.prettyDate(group[0].time_taken), bestLocation)
 			
@@ -186,12 +241,12 @@ def neighbors(request):
 			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
 	
 		results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
-
-		# Creates a list of lists of photos, each one called a "group", the list of lists is "groupings"
+		
+		# Creates a list of lists of photos, each one called a "group", the list of lists is "groups"
 		# We'll first get this list setup, de-duped and sorted
-		groupings = list()
+		groups = list()
 		for neighbor in results:
-			group = getGroupForPhoto(neighbor.photo_1, groupings)
+			group = getGroupForPhoto(neighbor.photo_1, groups)
 
 			if (group):
 				# If the first photo is in a group, see if the other photo is in there already
@@ -200,7 +255,7 @@ def neighbors(request):
 					group.append(neighbor.photo_2)
 			else:
 				# If the first photo isn't in a group, see if the second one is
-				group = getGroupForPhoto(neighbor.photo_2, groupings)
+				group = getGroupForPhoto(neighbor.photo_2, groups)
 
 				if (group):
 					# If the second photo is in a group and this isn't a dup then add in
@@ -209,10 +264,10 @@ def neighbors(request):
 					# If neither photo is in a group, we create a new one
 					group = [neighbor.photo_1, neighbor.photo_2]
 
-					groupings.append(group)
+					groups.append(group)
 
 		sortedGroups = list()
-		for group in groupings:
+		for group in groups:
 			group = sorted(group, key=lambda x: x.time_taken, reverse=True)
 
 			# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
@@ -221,49 +276,36 @@ def neighbors(request):
 			#   at the exact same time in the same city
 			uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
 			sortedGroups.append(uniqueGroup)
+		groups = sortedGroups
 
 		# now sort groups by the time_taken of the first photo in each group
-		sortedGroups = sorted(sortedGroups, key=lambda x: x[0].time_taken, reverse=True)
+		groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
 
-		# Try to find recent photos
-		# If there are no previous groups, then fetch all photos and call them recent
-		# This query isn't executed raw, we add a filter for time_taken if there's any groups
-		# If there aren't any groups then the user probably doesn't have many photos
-		recentPhotos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
-		if len(sortedGroups) > 0 and len (sortedGroups[0]) > 0:
-			lastPhotoTime = sortedGroups[0][0].time_taken
-			recentPhotos = recentPhotos.filter(time_taken__gt=lastPhotoTime)
+		# Find all non-neighbored photos.  Look up all photos by user and see if they're already
+		#   in a group.  If not, then figure out where they belong in the timeline.
+		photos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
 
-		haveRecentPhotos = len(recentPhotos) > 0
-
-		if haveRecentPhotos:
-			sortedGroups.insert(0, recentPhotos)
-
+		groups = addInSoloPhotos(groups, photos)
+									
 		# Now see if there are any non-neighbored photos
 		# These are shown on the web view as Lock symbols
 		if user.last_location_point:
 			nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
+			groups.insert(0, nonNeighboredPhotos)
+			
 			haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
 		else:
 			haveNonNeighboredPhotos = False
 
-		if haveNonNeighboredPhotos:
-			sortedGroups.insert(0, nonNeighboredPhotos)
-
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
-		groups = getGroups(sortedGroups)
+		formattedGroups = getFormattedGroups(groups, userId)
 
 		# Now we need to update the titles for the groups before we turn it into sections
-		if haveRecentPhotos and haveNonNeighboredPhotos:
-			groups[0]['title'] = "Locked"
-			groups[1]['title'] = "Recent"
-		elif haveRecentPhotos:
-			groups[0]['title'] = "Recent"
-		elif haveNonNeighboredPhotos:
+		if haveNonNeighboredPhotos:
 			groups[0]['title'] = "Locked"
 
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		lastDate, objects = api_util.turnGroupsIntoSections(groups, 1000)
+		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 		response['stats'] = '<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->'
 		response['next_start_date_time'] = lastDate

@@ -92,11 +92,11 @@ def getPhotoObject(entry):
 				]
 
 """
-def turnGroupsIntoSections(groupings, num):
+def turnFormattedGroupsIntoSections(formattedGroups, num):
 	result = list()
 	lastDate = None
 	count = 0
-	for group in groupings:
+	for group in formattedGroups:
 		section = {'type': 'section', 'title': group['title'], 'subtitle': group['subtitle'], 'objects': list()}
 		for cluster in group['clusters']:
 			if len(cluster) == 1:

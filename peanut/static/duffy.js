@@ -23,11 +23,6 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 		photoType = 1;
 	}
 
-	if (userList) {
-		if (getURLParameter("user_id") != photo.user) {
-			userList.push(photo.user_display_name);
-		}
-	}
 	if (!photoType) {
 		var photoType = 0; // means regular photo
 	}
@@ -36,22 +31,16 @@ function addPhoto(photo, userList, photoType, isLocked, isThird){
 	}
 	else {
 		var thirdStr = 'is-third';
-	}	
-	if (photo.user_display_name) {
-		title = cleanName(photo.user_display_name);
-	}
-	else {
-		title = photo.dist;
 	}
 
 	switch (photoType) {
 		case 1:
 			img = "<img class='l " + lockedStr + "' width='78px' src='" + thumbUrl + "'/>";		
-			html = "<div class='image image-thumb " + thirdStr + "' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
+			html = "<div class='image image-thumb " + thirdStr + "' title='" + photo.title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 		default: // covers case 0
 			img = "<img class='l " + lockedStr + "' width='320px' onError='" + onErrorStr + "' src='" + fullUrl + "'/>";		
-			html = "<div class='image' title='" + title +"' r='" + fullUrl + "'>" + img + "</div>";
+			html = "<div class='image' title='" + photo.title +"' r='" + fullUrl + "'>" + img + "</div>";
 			break;
 	}
 	return html;

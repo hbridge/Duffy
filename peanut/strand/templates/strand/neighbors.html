@@ -84,33 +84,10 @@
 		*/
 		function genHeader(section, userList){
 			html = "";
-			$.each( section.objects, function(i, photos ) {
-				if (photos.type == 'photo') {
-					t = new Date(photos.time_taken * 1000).toISOString();
-					return false;
-				}
-				else if (photos.type == 'cluster') {
-					$.each(photos.objects, function(i, photos){
-						t = new Date(photos.time_taken * 1000).toISOString();
-						return false;
-					});
-					return false;
-				}
-			});
-			if (section.title == 'Recent') {
-				secTop = "<div class='ui-sec-head-top'>Recent photos</div>";
-				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span></div>";
-				
-			}
-			else if (section.title == 'Locked') {
-				secTop = "<div class='ui-sec-head-top'>Take a photo to unlock these photos </div>";
-				secBottom = "<div class='ui-sec-head-bottom'>" + "<span class='timeago' title='" + t + "'></span> with " + uniqueUser(userList) + "</div>";
-			}
-			else {
-				secTop = "<div class='ui-sec-head-top'>With " + uniqueUser(userList) + "</div>";
-				secBottom = "<div class='ui-sec-head-bottom'> <span class='timeago' title='" + t + "'></span> in " + section.title +"</div>";
-			}
 
+			secTop = "<div class='ui-sec-head-top'>" + section.title + "</div>";
+			secBottom = "<div class='ui-sec-head-bottom'>" + section.subtitle + "</div>";
+			
 			inviteLink = "<div class='ui-invite'><a href='/strand/viz/invite'><img class='ui-invite-icon' src='/static/invite_icon.jpg'></a></div>";
 			html = "<div class='ui-sec-header'>" + inviteLink + "<div class='ui-sec-header-lhs'>" + secTop + secBottom + "</div></div>";
 			return html;
