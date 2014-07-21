@@ -122,6 +122,7 @@ def userbaseSummary(request):
 			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added'))
 
 	notifsCounts = list(User.objects.filter(product_id=1).annotate(totalNotifs=Count('notificationlog'), lastSent=Max('notificationlog__added')))
+	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')))
 
 	for i, user in enumerate(userStats):
 		entry = dict()
@@ -160,6 +161,8 @@ def userbaseSummary(request):
 			entry['notifications'] = notifsCounts[i].totalNotifs
 			if (notifsCounts[i].totalNotifs):
 				entry['lastNotifSent'] = notifsCounts[i].lastSent.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+
+			entry['actions'] = actionsCount[i].totalActions
 
 		entry['internal'] = False
 
