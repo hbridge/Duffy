@@ -23,6 +23,7 @@
 #import "NSString+DFHelpers.h"
 #import "DFPeanutActionAdapter.h"
 #import "DFSettingsViewController.h"
+#import "DFFeedSectionHeaderView.h"
 
 const CGFloat DefaultRowHeight = 467;
 
@@ -76,7 +77,9 @@ const CGFloat DefaultRowHeight = 467;
 {
   [super viewDidLoad];
   
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil] forCellReuseIdentifier:@"cell"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
+       forCellReuseIdentifier:@"cell"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil] forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
   self.tableView.rowHeight = DefaultRowHeight;
@@ -129,10 +132,23 @@ const CGFloat DefaultRowHeight = 467;
 
 #pragma mark - Table view data source: sections
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+
+
+- (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+  DFFeedSectionHeaderView *headerView =
+  [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
+ 
   DFPeanutSearchObject *sectionObject = self.sectionObjects[section];
-  return sectionObject.title;
+  headerView.titleLabel.text = sectionObject.title;
+  headerView.subtitleLabel.text = sectionObject.subtitle;
+  
+  return headerView;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+  return 58.0;
 }
 
 #pragma mark - Table view data source: rows
