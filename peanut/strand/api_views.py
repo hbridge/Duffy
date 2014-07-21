@@ -109,7 +109,7 @@ def addInSoloPhotos(groups, photos):
 
 	# If there's no groups, then return all the photos since they're all solo
 	if len(groups) == 0:
-		return photos
+		return [photos]
 
 	# If there are groups, then figure out where all the possible solo photos go
 	for photo in photos:
