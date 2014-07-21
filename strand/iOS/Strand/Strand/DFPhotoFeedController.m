@@ -229,7 +229,7 @@ const CGFloat DefaultRowHeight = 467;
 + (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
                               searchObject:(DFPeanutSearchObject *)searchObject
 {
-  cell.favoriteButton.tag = searchObject.id;
+  cell.favoriteButton.tag = (NSInteger)searchObject.id;
   cell.titleLabel.text = searchObject.user_display_name;
   
   if (searchObject.actions.count > 0) {
@@ -237,7 +237,7 @@ const CGFloat DefaultRowHeight = 467;
     NSArray *likerNames = [DFPeanutAction arrayOfLikerNamesFromActions:searchObject.actions];
     NSString *likerNamesString = [NSString stringWithCommaSeparatedStrings:likerNames];
     [cell.favoritersButton setTitle:likerNamesString forState:UIControlStateNormal];
-    cell.favoriteButton.selected = (searchObject.userFavoriteAction);
+    cell.favoriteButton.selected = (searchObject.userFavoriteAction != nil);
   } else {
     cell.favoriteButton.selected = NO;
     [cell setFavoritersListHidden:YES];
