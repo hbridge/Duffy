@@ -107,9 +107,14 @@ def addInSoloPhotos(groups, photos):
 	newGroup = list()
 	newGroupIndex = None
 
+	# If there's no groups, then return all the photos since they're all solo
+	if len(groups) == 0:
+		return photos
+
+	# If there are groups, then figure out where all the possible solo photos go
 	for photo in photos:
 		photoPlaced = False
-		group = getGroupForPhoto(photo, groups) 
+		group = getGroupForPhoto(photo, groups)
 
 		# If the photo isn't in a group yet, loop backwards through the groups, finding the first
 		# one where the photo's time_taken is more recent than the first of the group's.
@@ -290,18 +295,20 @@ def neighbors(request):
 		# Now see if there are any non-neighbored photos
 		# These are shown on the web view as Lock symbols
 		if user.last_location_point:
-			nonNeighboredPhotos = getNonNeighboredPhotos(userId, user.last_location_point.x, user.last_location_point.y)
-			groups.insert(0, nonNeighboredPhotos)
+			lockedPhotos = getLockedPhotos(userId, user.last_location_point.x, user.last_location_point.y)
+
+			if len(lockedPhotos) > 0:
+				groups.insert(0, lockedPhotos)
 			
-			haveNonNeighboredPhotos = len(nonNeighboredPhotos) > 0
+			haveLockedPhotos = True
 		else:
-			haveNonNeighboredPhotos = False
+			haveLockedPhotos = False
 
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
 		formattedGroups = getFormattedGroups(groups, userId)
 
 		# Now we need to update the titles for the groups before we turn it into sections
-		if haveNonNeighboredPhotos:
+		if haveLockedPhotos:
 			groups[0]['title'] = "Locked"
 
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
@@ -320,7 +327,7 @@ def neighbors(request):
 
 	Returns a list of photos
 """
-def getNonNeighboredPhotos(userId, lon, lat):
+def getLockedPhotos(userId, lon, lat):
 	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 
 	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
