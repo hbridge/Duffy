@@ -116,10 +116,15 @@ def userbaseSummary(request):
 	# Strand-related code
 	strandList = list()
 
-	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
-			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
-			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
-			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added'))
+	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), 
+		thumbsCount=Count('photo__thumb_filename'), 
+		photosWithGPS=Count('photo__location_point'), 
+		twofishCount=Count('photo__twofishes_data'), 
+		fullImagesCount=Count('photo__full_filename'), 
+		clusteredCount=Count('photo__clustered_time'), 
+		neighborCount=Count('photo__neighbored_time'), 
+		lastAdded=Max('photo__added'), 
+		actions=Count('photoaction'))
 
 	notifsCounts = list(User.objects.filter(product_id=1).annotate(totalNotifs=Count('notificationlog'), lastSent=Max('notificationlog__added')))
 
