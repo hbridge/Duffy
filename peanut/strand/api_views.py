@@ -309,7 +309,7 @@ def neighbors(request):
 
 		# Now we need to update the titles for the groups before we turn it into sections
 		if haveLockedPhotos:
-			groups[0]['title'] = "Locked"
+			formattedGroups[0]['title'] = "Locked"
 
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
@@ -373,9 +373,9 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		nonNeighboredPhotos = getNonNeighboredPhotos(userId, lon, lat)
+		lockedPhotos = getLockedPhotos(userId, lon, lat)
 
-		formattedGroups = getFormattedGroups([nonNeighboredPhotos], userId)
+		formattedGroups = getFormattedGroups([lockedPhotos], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 
 		response['objects'] = objects
