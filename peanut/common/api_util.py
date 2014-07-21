@@ -159,10 +159,8 @@ def prettyDate(time=False):
 		return ''
 
 	if day_diff == 0:
-		if second_diff < 10:
-			return "just now"
 		if second_diff < 60:
-			return str(second_diff) + " secs ago"
+			return "just now"
 		if second_diff < 120:
 			return "a min ago"
 		if second_diff < 3600:
