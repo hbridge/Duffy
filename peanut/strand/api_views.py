@@ -440,7 +440,8 @@ def update_user_location(request):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
 				user.last_location_timestamp = timestamp
 				user.save()
-				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))			else:
+				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
+			else:
 				logger.info("Location NOT updated for user %s. Old Timestamp. %s: %s, %s" % (userId, timestamp, userId, str((lon, lat))))
 		else:
 			logger.info("Location NOT updated for user %s. Lat/Lon Zero. %s: %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, str((lon, lat))))
