@@ -47,16 +47,10 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 			apns.push_notification_to_devices(notification, [device])
 
 			# This is for logging
-			NotificationLog.objects.create(user=user, device_token=device.token, msg=(getMessageWithCustomPayload(msg, customPayload)), apns=apns.id, msg_type=msgTypeId)
+			NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId)
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user)
 	
-def getMessageWithCustomPayload(msg, customPayload = None):
-	if customPayload:
-		return "%s %s" % (msg, json.dumps(customPayload))
-	else:
-		return msg
-
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)

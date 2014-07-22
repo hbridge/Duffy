@@ -318,6 +318,7 @@ class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
 	device_token = models.TextField()
 	msg = models.TextField()
+	custom_payload = models.TextField()
 	apns = models.IntegerField()
 	added = models.DateTimeField(auto_now_add=True)
 	msg_type = models.IntegerField()

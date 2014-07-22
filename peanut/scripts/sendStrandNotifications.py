@@ -72,8 +72,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			sentMessageBefore = False
 			if user.id in notificationsById:
 				for notification in notificationsById[user.id]:
-					finalMsg = notifications_util.getMessageWithCustomPayload(msg, constants.NOTIFICATIONS_CUSTOM_DICT[msgType])
-					if notification.msg == finalMsg:
+					if notification.msg == msg:
 						sentMessageBefore = True
 
 			if not sentMessageBefore:
