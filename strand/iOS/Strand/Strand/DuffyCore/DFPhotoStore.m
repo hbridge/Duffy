@@ -11,6 +11,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhoto.h"
 #import "DFNotificationSharedConstants.h"
+#import "UIImage+DFHelpers.h"
 
 @interface DFPhotoStore(){
   NSManagedObjectContext *_managedObjectContext;
@@ -567,6 +568,25 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
 
+
+- (void)saveImageToCameraRoll:(UIImage *)image
+                 withMetadata:(NSDictionary *)metadata
+                   completion:(void(^)(NSError *error))completion
+{
+  NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
+  [self addOrientationToMetadata:mutableMetadata forImage:image];
+  
+  [self.assetsLibrary writeImageToSavedPhotosAlbum:image.CGImage
+                               metadata:mutableMetadata
+                        completionBlock:^(NSURL *assetURL, NSError *error) {
+                          completion(error);
+                        }];
+}
+
+- (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image
+{
+  metadata[@"Orientation"] = @([image CGImageOrientation]);
+}
 
 
 @end

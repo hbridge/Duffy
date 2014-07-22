@@ -25,6 +25,9 @@
 #import "DFSettingsViewController.h"
 #import "DFFeedSectionHeaderView.h"
 #import "DFNavigationController.h"
+#import "DFPhotoStore.h"
+#import "DFPhotoMetadataAdapter.h"
+#import "UIAlertView+DFHelpers.h"
 
 const CGFloat DefaultRowHeight = 467;
 
@@ -34,14 +37,17 @@ const CGFloat DefaultRowHeight = 467;
 @property (nonatomic, retain) NSDictionary *indexPathsByID;
 @property (nonatomic, retain) NSDictionary *objectsByID;
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
+@property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 @property (atomic, retain) NSMutableDictionary *imageCache;
 @property (atomic, retain) NSMutableDictionary *rowHeightCache;
+@property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 
 @end
 
 @implementation DFPhotoFeedController
 
 @synthesize galleryAdapter = _galleryAdapter;
+@synthesize photoAdapter = _photoAdapter;
 
 - (id)initWithStyle:(UITableViewStyle)style
 {
@@ -191,13 +197,14 @@ const CGFloat DefaultRowHeight = 467;
 {
   DFPhotoFeedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"
                                                           forIndexPath:indexPath];
-  
+
   UIImage *image = self.imageCache[indexPath];
-  if (![cell.favoriteButton actionsForTarget:self forControlEvent:UIControlEventTouchUpInside]) {
-    [cell.favoriteButton addTarget:self action:@selector(favoriteButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  }
+  
+  
   
   DFPeanutSearchObject *representativeObject = [self representativePhotoForIndexPath:indexPath];
+  DDLogVerbose(@"cellForRowAtIndexPath: [%d, %d] photoID: %llu", (int)indexPath.section, (int)indexPath.row, representativeObject.id);
+  [self addCellButtonActions:cell object:representativeObject];
   
   if (image) {
     cell.imageView.image = image;
@@ -208,7 +215,9 @@ const CGFloat DefaultRowHeight = 467;
     if (representativeObject) {
       [[DFImageStore sharedStore]
        imageForID:representativeObject.id
-       type:DFImageFull
+       preferredType:DFImageFull
+       thumbnailPath:representativeObject.thumb_image_path
+       fullPath:representativeObject.full_image_path
        completion:^(UIImage *image) {
          self.imageCache[indexPath] = image;
          dispatch_async(dispatch_get_main_queue(), ^{
@@ -227,10 +236,22 @@ const CGFloat DefaultRowHeight = 467;
   return cell;
 }
 
+- (void)addCellButtonActions:(DFPhotoFeedCell *)cell object:(DFPeanutSearchObject *)object
+{
+  if (![cell.favoriteButton actionsForTarget:self forControlEvent:UIControlEventTouchUpInside]) {
+    [cell.favoriteButton addTarget:self action:@selector(favoriteButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+  }
+  cell.favoriteButton.tag = (NSInteger)object.id;
+
+  if (![cell.moreOptionsButton actionsForTarget:self forControlEvent:UIControlEventTouchUpInside]) {
+    [cell.moreOptionsButton addTarget:self action:@selector(moreOptionsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+  }
+  cell.moreOptionsButton.tag = (NSInteger)object.id;
+}
+
 + (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
                               searchObject:(DFPeanutSearchObject *)searchObject
 {
-  cell.favoriteButton.tag = (NSInteger)searchObject.id;
   cell.titleLabel.text = searchObject.user_display_name;
   
   if (searchObject.actions.count > 0) {
@@ -284,6 +305,7 @@ const CGFloat DefaultRowHeight = 467;
   _objectsByID = objectsByID;
   _indexPathsByID = indexPathsByID;
   _sectionObjects = sectionObjects;
+  _imageCache = [NSMutableDictionary new];
   
   [self.tableView reloadData];
 }
@@ -360,6 +382,111 @@ const CGFloat DefaultRowHeight = 467;
   }
 }
 
+- (void)moreOptionsButtonPressed:(UIButton *)sender
+{
+  DDLogVerbose(@"More options button pressed");
+  DFPhotoIDType objectId = sender.tag;
+  self.actionSheetPhotoID = objectId;
+  
+  DFPeanutSearchObject *object = self.objectsByID[@(objectId)];
+  NSString *deleteTitle = [self isObjectDeletableByUser:object] ? @"Delete" : nil;
+
+  UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                           delegate:self
+                                                  cancelButtonTitle:@"Cancel"
+                                             destructiveButtonTitle:deleteTitle
+                                                  otherButtonTitles:@"Save", nil];
+  
+ 
+  [actionSheet showInView:sender.superview];
+}
+
+- (BOOL)isObjectDeletableByUser:(DFPeanutSearchObject *)object
+{
+  return object.user == [[DFUser currentUser] userID];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+  NSString *buttonTitle = [actionSheet buttonTitleAtIndex:buttonIndex];
+  DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
+  if ([buttonTitle isEqualToString:@"Delete"]) {
+    [self confirmDeletePhoto];
+  } else if ([buttonTitle isEqualToString:@"Save"]) {
+    [self savePhotoToCameraRoll];
+  }
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  if (buttonIndex == 1) {
+    [self deletePhoto];
+  }
+}
+
+- (void)confirmDeletePhoto
+{
+  UIAlertView *alertView = [[UIAlertView alloc]
+                            initWithTitle:@"Delete Photo?"
+                            message:@"You and other strand users will no longer be able to see it."
+                            delegate:self
+                            cancelButtonTitle:@"Cancel"
+                            otherButtonTitles:@"Delete", nil];
+  [alertView show];
+}
+
+- (void)deletePhoto
+{
+  [self.photoAdapter deletePhoto:self.actionSheetPhotoID completionBlock:^(NSError *error) {
+    if (!error) {
+      [self reloadFeed];
+      
+      // remove it from the db
+      [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.actionSheetPhotoID];
+      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess];
+    } else {
+      UIAlertView *alertView = [[UIAlertView alloc]
+                                initWithTitle:@"Error"
+                                message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
+                                          error.localizedRecoverySuggestion ?
+                                          error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]
+                                delegate:nil
+                                cancelButtonTitle:@"OK"
+                                otherButtonTitles:nil];
+      [alertView show];
+      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure];
+    }
+  }];
+}
+
+- (void)savePhotoToCameraRoll
+{
+  @autoreleasepool {
+    [self.photoAdapter getPhoto:self.actionSheetPhotoID withImageDataTypes:DFImageFull
+                completionBlock:^(DFPeanutPhoto *peanutPhoto, NSDictionary *imageData, NSError *error) {
+                  if (!error) {
+                    UIImage *image = [UIImage imageWithData:imageData[@(DFImageFull)]];
+                    [[DFPhotoStore sharedStore]
+                     saveImageToCameraRoll:image
+                     withMetadata:peanutPhoto.metadataDictionary
+                     completion:^(NSError *error) {
+                       if (error) {
+                         [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                                       message:error.localizedDescription];
+                         [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
+                       } else {
+                         DDLogInfo(@"Photo saved.");
+                         [UIAlertView showSimpleAlertWithTitle:nil
+                                                       message:@"Photo saved to your camera roll"];
+                         [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
+                       }
+                     }];
+                  } else {
+                    [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
+                  }
+                }];
+  }
+}
 
 - (void)reloadRowForPhotoID:(DFPhotoIDType)photoID
 {
@@ -380,5 +507,13 @@ const CGFloat DefaultRowHeight = 467;
   return _galleryAdapter;
 }
 
+- (DFPhotoMetadataAdapter *)photoAdapter
+{
+  if (!_photoAdapter) {
+    _photoAdapter = [[DFPhotoMetadataAdapter alloc] init];
+  }
+  
+  return _photoAdapter;
+}
 
 @end

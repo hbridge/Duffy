@@ -214,7 +214,7 @@
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
 {
 	DDLogWarn(@"Failed to get push token, error: %@", error);
-  NSData *errorData = [error.localizedDescription dataUsingEncoding:NSUTF8StringEncoding];
+  NSData *errorData = [[NSData alloc] init];
   [self registerPushTokenForData:errorData];
   [self checkForAndLogNotifsChange:DFPermissionStateDenied];
 }

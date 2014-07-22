@@ -103,6 +103,7 @@
                 <outlet property="favoritersButton" destination="v5m-xw-TWf" id="F9j-ZI-47L"/>
                 <outlet property="imageViewPlaceholder" destination="3Mv-KR-hJz" id="gWz-ir-YDp"/>
                 <outlet property="loadingActivityIndicator" destination="6Gw-h8-Can" id="e70-WN-aaJ"/>
+                <outlet property="moreOptionsButton" destination="B5M-0I-S31" id="vGA-wj-gj8"/>
                 <outlet property="titleLabel" destination="HE2-Vf-wok" id="epE-vc-jiD"/>
             </connections>
         </tableViewCell>

@@ -19,6 +19,12 @@ typedef void (^SetImageCompletion)(NSError *error);
               type:(DFImageType)type
         completion:(ImageLoadCompletionBlock)completionBlock;
 
+- (void)imageForID:(DFPhotoIDType)photoID
+              preferredType:(DFImageType)type
+     thumbnailPath:(NSString *)thumbnailPath
+          fullPath:(NSString *)fullPath
+        completion:(ImageLoadCompletionBlock)completionBlock;
+
 - (void)setImage:(UIImage *)image
             type:(DFImageType)type
            forID:(DFPhotoIDType)photoID

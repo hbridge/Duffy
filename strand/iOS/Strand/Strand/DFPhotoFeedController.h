@@ -8,6 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFPhotoFeedController : UITableViewController
+@interface DFPhotoFeedController : UITableViewController <UIActionSheetDelegate>
 
 @end

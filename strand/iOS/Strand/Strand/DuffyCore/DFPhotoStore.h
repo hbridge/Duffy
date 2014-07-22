@@ -59,5 +59,8 @@
 // wipe the store
 - (void)resetStore;
 
+- (void)saveImageToCameraRoll:(UIImage *)image
+                 withMetadata:(NSDictionary *)metadata
+                   completion:(void(^)(NSError *error))completion;
 
 @end

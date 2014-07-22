@@ -8,6 +8,7 @@
 
 #import "DFImageStore.h"
 #import "DFPhotoMetadataAdapter.h"
+#import "NSString+DFHelpers.h"
 
 @interface DFImageStore()
 
@@ -108,6 +109,47 @@ static DFImageStore *defaultStore;
   });
 }
 
+
+- (void)imageForID:(DFPhotoIDType)photoID
+     preferredType:(DFImageType)preferredType
+     thumbnailPath:(NSString *)thumbnailPath
+          fullPath:(NSString *)fullPath
+        completion:(ImageLoadCompletionBlock)completionBlock
+{
+  if (![thumbnailPath isNotEmpty] && ![fullPath isNotEmpty]) {
+    DDLogWarn(@"%@ imageForID withPaths requested but both paths are empty.", [self.class description]);
+    completionBlock(nil);
+  }
+  
+  NSURL *preferredLocalURL = [DFImageStore localURLForPhotoID:photoID type:preferredType];
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    @autoreleasepool {
+      NSData *imageData = [NSData dataWithContentsOfURL:preferredLocalURL];
+      if (imageData) {
+        UIImage *image = [UIImage imageWithData:imageData];
+        completionBlock(image);
+      } else {
+        NSDictionary *imageTypesToPaths;
+        if (preferredType & DFImageFull && [fullPath isNotEmpty]) {
+          imageTypesToPaths = @{@(DFImageFull) : fullPath};
+        } else if ([thumbnailPath isNotEmpty]) {
+          imageTypesToPaths = @{@(DFImageThumbnail) : thumbnailPath};
+        }
+        
+        [self.photoAdapter
+         getImageDataForTypesWithPaths:imageTypesToPaths
+         withCompletionBlock:^(NSDictionary *imageData, NSError *error) {
+           UIImage *resultImage;
+           if (imageData.allValues.firstObject) {
+             resultImage = [UIImage imageWithData:imageData.allValues.firstObject];
+           }
+           completionBlock(resultImage);
+         }];
+      }
+    }
+  });
+}
+
 - (void)scheduleDeferredCompletion:(ImageLoadCompletionBlock)completion forPhotoID:(DFPhotoIDType)photoID
 {
   NSMutableArray *deferredForID = self.deferredCompletionBlocks[@(photoID)];
@@ -136,8 +178,6 @@ static DFImageStore *defaultStore;
 {
   return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
-
-
 
 + (void)createCacheDirectories
 {

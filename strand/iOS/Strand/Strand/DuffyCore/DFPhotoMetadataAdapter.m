@@ -18,6 +18,7 @@
 #import "DFUser.h"
 #import "DFPhotoStore.h"
 #import "DFAnalytics.h"
+#import "NSString+DFHelpers.h"
 
 /* DFPeanutBulkPhotos Mapping Class */
 
@@ -301,6 +302,35 @@
 withImageDataTypes:(DFImageType)imageTypes
  completionBlock:(DFPhotoFetchCompletionBlock)completionBlock
 {
+  [self getPeanutPhoto:photoID completion:^(DFPeanutPhoto *peanutPhoto, NSError *error) {
+    if (!error){
+      if (imageTypes == DFImageNone) {
+        completionBlock(peanutPhoto, nil, nil);
+        return ;
+      }
+      
+      NSMutableDictionary *imageDataPaths = [NSMutableDictionary new];
+      if (imageTypes & DFImageThumbnail && [peanutPhoto.thumbnail_image_path isNotEmpty]) {
+        imageDataPaths[@(DFImageThumbnail)] = peanutPhoto.thumbnail_image_path;
+      }
+      if (imageTypes & DFImageFull && [peanutPhoto.full_image_path isNotEmpty]) {
+        imageDataPaths[@(DFImageFull)] = peanutPhoto.full_image_path;
+      }
+      
+      [self getImageDataForTypesWithPaths:imageDataPaths
+                      withCompletionBlock:^(NSDictionary *imageData, NSError *error) {
+                        completionBlock(peanutPhoto, imageData, error);
+                      }];
+      
+    } else {
+      completionBlock(nil, nil, error);
+    }
+  }];
+}
+
+- (void)getPeanutPhoto:(DFPhotoIDType)photoID
+      completion:(void(^)(DFPeanutPhoto *, NSError *error))completion
+{
   DFPeanutPhoto *requestPhoto = [[DFPeanutPhoto alloc] init];
   requestPhoto.id = @(photoID);
   
@@ -311,44 +341,42 @@ withImageDataTypes:(DFImageType)imageTypes
    path:[NSString stringWithFormat:@"photos/%llu", photoID]
    parameters:nil];
   
-  DDLogInfo(@"DFPhotoMetadataAdapter getting endpoint: %@", request.URL.absoluteString);
+  DDLogInfo(@"%@ getting endpoint: %@", [self.class description], request.URL.absoluteString);
   
   RKObjectRequestOperation *requestOperation =
   [self.objectManager
    objectRequestOperationWithRequest:request
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
      DFPeanutPhoto *resultPeanutPhoto = mappingResult.firstObject;
-     if (resultPeanutPhoto.full_image_path) {
-       dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-         @autoreleasepool {
-           NSMutableDictionary *dataDict = [[NSMutableDictionary alloc] init];
-           if (imageTypes & DFImageFull) {
-             NSURL *fullImageURL = [[[DFUser currentUser] serverURL]
-                                    URLByAppendingPathComponent:resultPeanutPhoto.full_image_path];
-             NSData *fullData = [NSData dataWithContentsOfURL:fullImageURL];
-             dataDict[@(DFImageFull)] = fullData;
-           }
-           if (imageTypes & DFImageThumbnail) {
-             NSURL *thumbImageURL = [[[DFUser currentUser] serverURL]
-                                    URLByAppendingPathComponent:resultPeanutPhoto.thumbnail_image_path];
-             NSData *fullData = [NSData dataWithContentsOfURL:thumbImageURL];
-             dataDict[@(DFImageThumbnail)] = fullData;
-           }
-           
-           completionBlock(resultPeanutPhoto, dataDict, nil);
-         }
-       });
-     } else {
-       DDLogWarn(@"DFPhotoMetadataAdapter: got peanut photo with no full_image_path. result peanut photo: %@",
-                 resultPeanutPhoto.description);
-       completionBlock(resultPeanutPhoto, nil, nil);
-     }
+     completion(resultPeanutPhoto, nil);
+     
    } failure:^(RKObjectRequestOperation *operation, NSError *error) {
-     DDLogWarn(@"DFPhotoMetadataAdapter photo fetch failed: %@", error.description);
-     completionBlock(nil, nil, error);
+     DDLogWarn(@"%@ photo fetch failed: %@", [self.class description], error.description);
+     completion(nil, error);
    }];
-  
-  [self.objectManager enqueueObjectRequestOperation:requestOperation];
+
+   [self.objectManager enqueueObjectRequestOperation:requestOperation];
+}
+
+- (void)getImageDataForTypesWithPaths:(NSDictionary *)pathsDict
+                  withCompletionBlock:(DFImageDataFetchCompletionBlock)completion
+{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    @autoreleasepool {
+      NSMutableDictionary *result = [NSMutableDictionary new];
+      for (NSNumber *imageType in pathsDict.allKeys) {
+        NSURL *url = [[[DFUser currentUser] serverURL]
+                      URLByAppendingPathComponent:pathsDict[imageType]];
+        DDLogVerbose(@"Getting image data at: %@", url);
+        NSData *data= [NSData dataWithContentsOfURL:url];
+        if (data) {
+          result[imageType] = data;
+        }
+      }
+      
+      completion(result, nil);
+    }
+  });
 }
 
 - (void)deletePhoto:(DFPhotoIDType)photoID

@@ -15,6 +15,7 @@
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingActivityIndicator;
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
 @property (weak, nonatomic) IBOutlet UIView *imageViewPlaceholder;
+@property (weak, nonatomic) IBOutlet UIButton *moreOptionsButton;
 
 @property (nonatomic) DFPhotoIDType photoID;
 
