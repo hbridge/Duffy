@@ -66,7 +66,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 
 		self.statsLines.append("/viz/summary stats: %s" % (result[statsStart:][:statsEnd])) 
 
-		self.assertTrue("Pipeline Status" in result)
+		self.assertTrue("Pipeline <br> Status" in result)
 		self.assertTrue("Last Upload" in result)
 
 	def testNeighbor(self):
