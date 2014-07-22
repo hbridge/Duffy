@@ -25,6 +25,7 @@ static DFImageStore *defaultStore;
 
 + (DFImageStore *)sharedStore {
   if (!defaultStore) {
+    [self createCacheDirectories];
     defaultStore = [[super allocWithZone:nil] init];
   }
   return defaultStore;

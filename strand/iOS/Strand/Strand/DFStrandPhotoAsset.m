@@ -32,7 +32,6 @@ static NSMutableArray *idsBeingCached;
 }
 
 + (DFStrandPhotoAsset *)createAssetForImageData:(NSData *)imageData
-                                    photoID:(DFPhotoIDType)photoID
                                    metadata:(NSDictionary *)metadata
                                    location:(CLLocation *)location
                                creationDate:(NSDate *)creationDate
@@ -41,12 +40,12 @@ static NSMutableArray *idsBeingCached;
   DFStrandPhotoAsset *newAsset = [NSEntityDescription
                                    insertNewObjectForEntityForName:[[self class] description]
                                    inManagedObjectContext:context];
-  newAsset.photoID = photoID;
   newAsset.storedMetadata = metadata;
   newAsset.storedLocation = location;
   newAsset.creationDate = creationDate;
   
-  NSURL *localFileURL = [DFStrandPhotoAsset localURLForPhotoID:photoID];
+  [self createCacheDirectories];
+  NSURL *localFileURL = [DFStrandPhotoAsset newLocalURLForPhoto];
   [imageData writeToURL:localFileURL atomically:YES];
   newAsset.localURLString = localFileURL.absoluteString;
   
@@ -89,6 +88,11 @@ static NSMutableArray *idsBeingCached;
   return _hashString;
 }
 
+- (NSURL *)localURL
+{
+  return [NSURL URLWithString:self.localURLString];
+}
+
 - (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone
 {
   // this DFStrand assets get their timezone set explicitly, so TZ correction should be unnecessary
@@ -118,18 +122,13 @@ static NSMutableArray *idsBeingCached;
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [self ensureLocalDataAndCallback:^(NSURL *localFileURL, NSError *error) {
-    if (!error) {
-      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        @autoreleasepool {
-          UIImage *loadedImage = [UIImage imageWithContentsOfFile:[localFileURL path]];
-          successBlock(loadedImage);
-        }
-      });
-    } else {
-      failureBlock(error);
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    @autoreleasepool {
+      UIImage *loadedImage = [UIImage imageWithContentsOfFile:[self.localURL path]];
+      successBlock(loadedImage);
     }
-  }];
+  });
+  
 }
 
 - (BOOL)isCacheOperationUnderwayForID:(DFPhotoIDType)photoID
@@ -138,159 +137,66 @@ static NSMutableArray *idsBeingCached;
 }
 
 
-typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
-
-- (void)ensureLocalDataAndCallback:(CacheCompleteBlock)completionBlock
-{
-  if (self.localURLString) {
-    NSURL *fileURL = [NSURL URLWithString:self.localURLString];
-    completionBlock(fileURL, nil);
-  } else if (self.photoID > 0) {
-    if ([self isCacheOperationUnderwayForID:self.photoID]) {
-      completionBlock(nil, nil);
-      return;
-    }
-    [idsBeingCached addObject:@(self.photoID)];
-    DFPhotoIDType photoID = self.photoID;
-    DFPhotoMetadataAdapter *adapter = [[DFPhotoMetadataAdapter alloc] init];
-    [adapter getPhoto:photoID withImageDataTypes:DFImageFull completionBlock:^(DFPeanutPhoto *peanutPhoto,
-                                                NSDictionary *imageData,
-                                                NSError *error) {
-      [DFStrandPhotoAsset cacheImageData:imageData[@(DFImageFull)]
-                                metadata:[peanutPhoto metadataDictionary]
-                                  userID:peanutPhoto.user.longLongValue
-                          forAssetWithID:photoID];
-      completionBlock([DFStrandPhotoAsset localURLForPhotoID:photoID], nil);
-      [idsBeingCached removeObject:@(self.photoID)];
-    }];
-  } else {
-    DDLogWarn(@"DFStrandPhotoAsset: attempting to load full image for asset without local URL or photoID.");
-    completionBlock(nil, [NSError errorWithDomain:@"com.duffyapp.Strand.DFStrandPhotoAsset" code:-4 userInfo:nil]);
-  }
-}
-
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [self ensureLocalDataAndCallback:^(NSURL *localFileURL, NSError *error) {
-    if (!error) {
-      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        @autoreleasepool {
-          DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:localFileURL];
-          UIImage *image = [resizer aspectImageWithMaxPixelSize:157];
-          successBlock([image thumbnailImage:157
-                           transparentBorder:0
-                                cornerRadius:0
-                        interpolationQuality:kCGInterpolationLow]);
-        }
-      });
-    } else {
-      failureBlock(error);
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    @autoreleasepool {
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:self.localURL];
+      UIImage *image = [resizer aspectImageWithMaxPixelSize:157];
+      successBlock([image thumbnailImage:157
+                       transparentBorder:0
+                            cornerRadius:0
+                    interpolationQuality:kCGInterpolationLow]);
     }
-  }];
+  });
 }
 
 - (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [self ensureLocalDataAndCallback:^(NSURL *localFileURL, NSError *error) {
-    if (!error) {
-      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        @autoreleasepool {
-          DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:localFileURL];
-          UIImage *image = [resizer aspectImageWithMaxPixelSize:2048];
-          successBlock(image);
-        }
-      });
-    } else {
-      failureBlock(error);
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    @autoreleasepool {
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:self.localURL];
+      UIImage *image = [resizer aspectImageWithMaxPixelSize:2048];
+      successBlock(image);
     }
-  }];
+  });
 }
 
 - (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [self ensureLocalDataAndCallback:^(NSURL *localFileURL, NSError *error) {
-    if (!error && localFileURL) {
-      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-        @autoreleasepool {
-          DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:localFileURL];
-          UIImage *image = [resizer aspectImageWithMaxPixelSize:1136];
-          if (image) {
-            successBlock(image);
-          } else {
-            failureBlock([NSError
-                          errorWithDomain:@"com.duffyapp.strand"
-                          code:-7
-                          userInfo:@{NSLocalizedDescriptionKey:
-                                       [NSString stringWithFormat:@"Could not create read image at URL: %@",
-                                        localFileURL]
-                                     }]);
-          }
-        }
-      });
-    } else {
-      failureBlock(error);
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    @autoreleasepool {
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:self.localURL];
+      UIImage *image = [resizer aspectImageWithMaxPixelSize:1136];
+      if (image) {
+        successBlock(image);
+      } else {
+        failureBlock([NSError
+                      errorWithDomain:@"com.duffyapp.strand"
+                      code:-7
+                      userInfo:@{NSLocalizedDescriptionKey:
+                                   [NSString stringWithFormat:@"Could not create read image at URL: %@",
+                                    self.localURL]
+                                 }]);
+      }
     }
-  }];
+  });
+  
 }
 
-+ (void)cacheImageData:(NSData *)imageData
-          metadata:(NSDictionary *)metadata
-                userID:(DFUserIDType)userID
-    forAssetWithID:(DFPhotoIDType)photoID
-{
-  DDLogInfo(@"Caching image data for photo id%llu", photoID);
-  NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-  NSFetchRequest *reqeust = [NSFetchRequest fetchRequestWithEntityName:@"DFStrandPhotoAsset"];
-  reqeust.predicate = [NSPredicate predicateWithFormat:@"photoID == %llu", photoID];
-  reqeust.fetchLimit = 1;
-  
-  NSError *error;
-  NSArray *result = [context executeFetchRequest:reqeust error:&error];
-  if (result.count == 0 || error) {
-    DDLogWarn(@"DFStrandPhotoAsset: attempted to cache data for asset with ID:%llu not found or error:%@",
-              photoID, error.description);
-    return;
-  }
-
-  // Set the assets data
-  DFStrandPhotoAsset *asset = result.firstObject;
-  asset.storedMetadata = metadata;
-  NSURL *localFileURL = [DFStrandPhotoAsset localURLForPhotoID:photoID];
-  [imageData writeToURL:localFileURL atomically:YES];
-  asset.localURLString = localFileURL.absoluteString;
-  
-  // Set the DFPhoto's data
-  asset.photo.creationDate = asset.creationDate;
-  asset.photo.userID = userID;
-  [context setMergePolicy:[[NSMergePolicy alloc]
-                           initWithMergeType:NSMergeByPropertyObjectTrumpMergePolicyType]];
-  [context save:&error];
-  if (error) {
-  #ifdef DEBUG
-    [NSException raise:@"Couldn't save store after caching photo" format:@"%@",error.description];
-  #else
-    DDLogError(@"DFStrandPhotoAsset: couldn't save store after caching photo: %@", error.description);
-  #endif
-  }
-}
-
-+ (NSURL *)localURLForPhotoID:(DFPhotoIDType)photoID
++ (NSURL *)newLocalURLForPhoto
 {
   // if we have an actual photo id, that's used in the path
-  NSString *filename;
-  if (photoID != 0) {
-    filename = [NSString stringWithFormat:@"%llu.jpg", photoID];
-  } else {
-    // otherwise, create a unique one
-    CFUUIDRef newUniqueID = CFUUIDCreate (kCFAllocatorDefault);
-    CFStringRef newUniqueIDString = CFUUIDCreateString (kCFAllocatorDefault, newUniqueID);
-    filename = [NSString stringWithFormat:@"%@.jpg", newUniqueIDString];
-  }
   
-  return [[DFImageStore localFullImagesDirectoryURL]
+  // otherwise, create a unique one
+  CFUUIDRef newUniqueID = CFUUIDCreate (kCFAllocatorDefault);
+  CFStringRef newUniqueIDString = CFUUIDCreateString (kCFAllocatorDefault, newUniqueID);
+  NSString *filename = [NSString stringWithFormat:@"%@.jpg", newUniqueIDString];
+  
+  return [[self localImagesDirectoryURL]
           URLByAppendingPathComponent:filename];
 }
 
@@ -305,6 +211,45 @@ typedef void (^CacheCompleteBlock)(NSURL *localFileURL, NSError *error);
                              initWithURL:[NSURL URLWithString:self.localURLString]];
   UIImage *image = [resizer aspectImageWithMaxPixelSize:length];
   return UIImageJPEGRepresentation(image, 0.8);
+}
+
++ (void)createCacheDirectories
+{
+  NSFileManager *fm = [NSFileManager defaultManager];
+  
+  NSArray *directoriesToCreate = @[[[
+                                     self localImagesDirectoryURL] path],
+                                   ];
+  
+  for (NSString *path in directoriesToCreate) {
+    if (![fm fileExistsAtPath:path]) {
+      NSError *error;
+      [fm createDirectoryAtPath:path withIntermediateDirectories:NO
+                     attributes:nil
+                          error:&error];
+      if (error) {
+        DDLogError(@"Error creating cache directory: %@, error: %@", path, error.description);
+        abort();
+      }
+    }
+    
+  }
+}
+
++ (NSURL *)localImagesDirectoryURL
+{
+  return [[self userLibraryURL] URLByAppendingPathComponent:@"CameraPhotos" isDirectory:YES];
+}
+
++ (NSURL *)userLibraryURL
+{
+  NSArray* paths = [[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask];
+  
+  if ([paths count] > 0)
+  {
+    return [paths objectAtIndex:0];
+  }
+  return nil;
 }
 
 

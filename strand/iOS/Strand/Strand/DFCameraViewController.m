@@ -513,7 +513,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
   NSData *data = UIImageJPEGRepresentation(image, 0.8);
   DFStrandPhotoAsset *asset = [DFStrandPhotoAsset createAssetForImageData:data
-                                      photoID:0
                                      metadata:mutableMetadata
                                      location:location
                                  creationDate:[NSDate date]
