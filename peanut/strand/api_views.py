@@ -197,7 +197,8 @@ def getFormattedGroups(groups, userId):
 
 		names = list()
 		for photo in group:
-			names.append(photo.user.display_name)
+			if photo.user_id != userId:
+				names.append(photo.user.display_name)
 
 		names = set(names)
 
