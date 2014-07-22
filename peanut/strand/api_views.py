@@ -58,18 +58,19 @@ def getBestLocation(photo):
 		twoFishesData = json.loads(photo.twofishes_data)
 		bestLocationName = None
 		bestWoeType = 100
-		for data in twoFishesData["interpretations"]:
-			if "woeType" in data["feature"]:
-				# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
-				if data["feature"]["woeType"] < bestWoeType:
-					bestLocationName = data["feature"]["displayName"]
-					bestWoeType = data["feature"]["woeType"]
-					if bestLocationName:
-						return bestLocationName
-					else:
-						return photo.location_city
-	else:
-		return "Earth"
+		if "interpretations" in twoFishesData:
+			for data in twoFishesData["interpretations"]:
+				if "woeType" in data["feature"]:
+					# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
+					if data["feature"]["woeType"] < bestWoeType:
+						bestLocationName = data["feature"]["displayName"]
+						bestWoeType = data["feature"]["woeType"]
+						if bestLocationName:
+							return bestLocationName
+						else:
+							return photo.location_city
+	
+	return None
 
 def getActionsByPhotoIdCache(photoIds):
 	actions = PhotoAction.objects.select_related().filter(photo_id__in=photoIds)
@@ -188,6 +189,7 @@ def getFormattedGroups(groups, userId):
 		# Grab title from the location_city of a photo...but find the first one that has
 		#   a valid location_city
 		bestLocation = None
+		subtitle = ""
 		i = 0
 		while (not bestLocation) and i < len(group):
 			bestLocation = getBestLocation(group[i])
@@ -204,7 +206,8 @@ def getFormattedGroups(groups, userId):
 		else:
 			title = "With %s" % (", ".join(names))
 
-		subtitle = "%s in %s" % (api_util.prettyDate(group[0].time_taken), bestLocation)
+		if bestLocation:
+			subtitle = "in %s" % (bestLocation)
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
@@ -288,7 +291,7 @@ def neighbors(request):
 
 		# Find all non-neighbored photos.  Look up all photos by user and see if they're already
 		#   in a group.  If not, then figure out where they belong in the timeline.
-		photos = Photo.objects.filter(user_id=userId).order_by("-time_taken")
+		photos = Photo.objects.filter(user_id=userId).exclude(thumb_filename=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by("-time_taken")
 
 		groups = addInSoloPhotos(groups, photos)
 									
