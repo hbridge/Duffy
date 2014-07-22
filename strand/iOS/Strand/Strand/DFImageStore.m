@@ -130,6 +130,7 @@ static DFImageStore *defaultStore;
       if (imageData) {
         UIImage *image = [UIImage imageWithData:imageData];
         completionBlock(image);
+        [self executeDefferredCompletionsWithImage:image forPhotoID:photoID];
       } else {
         [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
         if ([self.remoteLoadsInProgress containsObject:@(photoID)]) return;
@@ -194,6 +195,7 @@ static DFImageStore *defaultStore;
     completion(image);
   }
   [deferredForID removeAllObjects];
+  [self.remoteLoadsInProgress removeObject:@(photoID)];
 }
 
 
