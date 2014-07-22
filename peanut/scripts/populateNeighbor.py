@@ -62,7 +62,6 @@ def cleanName(str):
 
 def sendNotifications(neighbors):
 	msgType = constants.NOTIFICATIONS_NEW_PHOTO_ID
-	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_GALLERY}
 	
 	# Grab logs from last 30 seconds (default) then grab the last time they were notified
 	notificationLogs = notifications_util.getNotificationLogs()
@@ -70,6 +69,7 @@ def sendNotifications(neighbors):
 
 	# This is a dict with the user as the key and a list of other users w photos as the value
 	usersToNotify = dict()
+	photosToNotifyAbout = dict()
 
 	for neighbor in neighbors:
 		# If photo2 time is after photo1, we want to notify user1 since they have the older one
@@ -77,9 +77,11 @@ def sendNotifications(neighbors):
 		if neighbor.photo_1.time_taken < neighbor.photo_2.time_taken:
 			user = neighbor.user_1
 			otherUser = neighbor.user_2
+			photosToNotifyAbout[user] = neighbor.photo_2
 		else:
 			user = neighbor.user_2
 			otherUser = neighbor.user_1
+			photosToNotifyAbout[user] = neighbor.photo_1
 
 		if user not in usersToNotify:
 			usersToNotify[user] = list()
@@ -97,6 +99,8 @@ def sendNotifications(neighbors):
 		# If the user doesn't show up in the array then they haven't been notified in that time period
 		if user.id not in notificationsById:
 			logger.debug("Sending message '%s' to user %s" % (msg, user))
+			customPayload = {'pid': photosToNotifyAbout[user].id}
+			
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
 		else:
 			logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))

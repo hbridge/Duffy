@@ -3,31 +3,54 @@ import json
 import logging
 
 from peanut.settings import constants
-from common.models import NotificationLog
+from common.models import NotificationLog, DuffyNotification
 
-from ios_notifications.models import APNService, Device, Notification
+from ios_notifications.models import APNService, Device
 from twilio.rest import TwilioRestClient
 
 logger = logging.getLogger(__name__)
 
-def sendNotification(user, msg, msgType, customPayload=None):
+"""
+	Send a notification to the given user
+	msg is the string
+	msgType is from constants
+	withSound is boolean, if it vibrates
+	withVisual is if its silent (no visual)
+
+"""
+def sendNotification(user, msg, msgTypeId, customPayload):
 	if user.device_token:
 		devices = Device.objects.select_related().filter(token=user.device_token)	
 		for device in devices:
-			notification = Notification()
+			notification = DuffyNotification()
 			notification.message = msg
 			notification.service = device.service
-			notification.custom_payload = json.dumps(customPayload)
-			notification.sound = 'default'
+
+			payload = constants.NOTIFICATIONS_CUSTOM_DICT[msgTypeId]
+			payload.update(customPayload)
+			notification.custom_payload = json.dumps(payload)
+
+			if constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]:
+				notification.sound = constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]
+
+			# Its a visual notification if we don't put this in.  If we put it in, then its silent
+			if not constants.NOTIFICATIONS_VIZ_DICT[msgTypeId]:
+				notification.message = ""
+				notification.content_available = 1
+
 			apns = APNService.objects.get(id=device.service_id)
+
+			# This sends
 			apns.push_notification_to_devices(notification, [device])
-			NotificationLog.objects.create(user=user, device_token=device.token, msg=(getMessageWithCustomPayload(msg, customPayload)), apns=apns.id, msg_type=msgType)
+
+			# This is for logging
+			NotificationLog.objects.create(user=user, device_token=device.token, msg=(getMessageWithCustomPayload(msg, customPayload)), apns=apns.id, msg_type=msgTypeId)
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user)
 	
 def getMessageWithCustomPayload(msg, customPayload = None):
 	if customPayload:
-		return msg + ' ' + json.dumps(customPayload)
+		return "%s %s" % (msg, json.dumps(customPayload))
 	else:
 		return msg
 

@@ -357,3 +357,33 @@ class PhotoAction(models.Model):
 
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.id, self.photo_id, self.user_id, self.action_type)
+
+class DuffyNotification(Notification):
+	content_available = models.IntegerField(null=True)
+
+	"""
+		Override from main ios_notifications library
+	"""
+	@property
+	def payload(self):
+		aps = {}
+		if self.message:
+			aps['alert'] = self.message
+		else:
+			aps['alert'] = ''
+
+		if self.badge is not None:
+			aps['badge'] = self.badge
+
+		if self.sound:
+			aps['sound'] = self.sound
+				
+		if self.content_available:
+			aps['content-available'] = self.content_available
+			
+		message = {'aps': aps}
+		extra = self.extra
+		if extra is not None:
+			message.update(extra)
+		payload = json.dumps(message, separators=(',', ':'))
+		return payload

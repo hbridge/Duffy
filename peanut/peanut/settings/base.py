@@ -135,3 +135,5 @@ import warnings
 warnings.filterwarnings('ignore',
                         r".*received a naive datetime",
                         RuntimeWarning, r'.*')
+
+IOS_NOTIFICATIONS_PERSIST_NOTIFICATIONS = False

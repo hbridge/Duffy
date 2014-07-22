@@ -46,7 +46,6 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 """
 def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
-	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_CAMERA}
 
 	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
 
@@ -80,7 +79,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 
 			if not sentMessageBefore:
 				logger.debug("Sending %s to %s" % (msg, user.id))
-				notifications_util.sendNotification(user, msg, msgType, customPayload)
+				notifications_util.sendNotification(user, msg, msgType, None)
 				
 def sendPhotoActionNotifications(photoActions):
 	for photoAction in photoActions:

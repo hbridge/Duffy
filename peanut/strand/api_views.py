@@ -604,6 +604,9 @@ def send_notifications_test(request):
 	response = dict({'result': True})
 	data = api_util.getRequestData(request)
 
+	msg = None
+	customPayload = dict()
+
 	if data.has_key('user_id'):
 		userId = data['user_id']
 		try:
@@ -614,13 +617,17 @@ def send_notifications_test(request):
 		return api_util.returnFailure(response, "Need user_id")
 
 	if data.has_key('msg'):
-		msg = str(data['msg']) + ' ' + str(datetime.datetime.utcnow())
-	else:
-		msg = 'Strand test msg at ' + str(datetime.datetime.utcnow())
-	
-	customPayload = {'view': constants.NOTIFICATIONS_APP_VIEW_GALLERY}
+		msg = str(data['msg'])
 
-	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_NEW_PHOTO_ID, customPayload)
+	if data.has_key('msgTypeId'):
+		msgTypeId = int(data['msgTypeId'])
+	else:
+		return api_util.returnFailure(response, "Need msgTypeId")
+
+	if data.has_key('pid'):
+		customPayload['pid'] = int(data['pid'])
+
+	notifications_util.sendNotification(user, msg, msgTypeId, customPayload)
 
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
