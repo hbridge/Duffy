@@ -24,6 +24,7 @@
 #import "DFPeanutActionAdapter.h"
 #import "DFSettingsViewController.h"
 #import "DFFeedSectionHeaderView.h"
+#import "DFNavigationController.h"
 
 const CGFloat DefaultRowHeight = 467;
 
@@ -303,7 +304,7 @@ const CGFloat DefaultRowHeight = 467;
 - (void)settingsButtonPressed:(id)sender
 {
   DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
-  [self presentViewController:[[UINavigationController alloc] initWithRootViewController:svc]
+  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:svc]
                      animated:YES
                    completion:nil];
 }
