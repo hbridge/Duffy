@@ -1,6 +1,8 @@
 import math
 from math import radians, cos, sin, asin, sqrt
 
+from peanut.settings import constants
+
 def haversine(lon1, lat1, lon2, lat2):
 	"""
 	Calculate the great circle distance between two points 
@@ -21,7 +23,7 @@ def haversine(lon1, lat1, lon2, lat2):
 
 	Returns: (photo, timeDistance, geoDistance)
 """
-def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPhotoId=None, secondsWithin=3*60*60, distanceWithin=100):
+def getNearbyPhotos(baseTime, lon, lat, photosCache, filterUserId=None, filterPhotoId=None, secondsWithin=3*60*60, distanceWithin=constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
 	nearbyPhotos = list()
 
 	for photo in photosCache:
@@ -49,7 +51,7 @@ def getNearbyPhotosToPhoto(refPhoto, photosCache):
 """
 	Go through the user list and pick out any users that are within
 """
-def getNearbyUsers(lon, lat, users, filterUserId=None, distanceWithin=100):
+def getNearbyUsers(lon, lat, users, filterUserId=None, distanceWithin=constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
 	nearbyUsers = list()
 	for user in users:
 		if user.id != filterUserId and user.last_location_point:
