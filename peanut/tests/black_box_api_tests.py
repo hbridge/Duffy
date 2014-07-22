@@ -66,8 +66,8 @@ class BlackBoxUrlsTests(unittest.TestCase):
 
 		self.statsLines.append("/viz/summary stats: %s" % (result[statsStart:][:statsEnd])) 
 
-		self.assertTrue("Clustered" in result)
-		self.assertTrue("Fulls" in result)
+		self.assertTrue("Pipeline Status" in result)
+		self.assertTrue("Last Upload" in result)
 
 	def testNeighbor(self):
 		result = self.getResult('neighbors', forms.OnlyUserIdForm)
