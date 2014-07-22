@@ -21,10 +21,8 @@ typedef UInt64 DFUserIDType;
 
 @property (readonly, nonatomic, retain) NSURL *serverURL;
 @property (readonly, nonatomic, retain) NSURL *apiURL;
-@property (readonly, nonatomic, retain) NSURL *defaultServerURL;
-@property (readwrite, nonatomic, retain) NSString *userOverriddenServerURLString;
-@property (readwrite, nonatomic, retain) NSString *userOverriddenServerPortString;
-@property (readonly, nonatomic, retain) NSString *defaultServerPort;
+@property (readwrite, nonatomic, retain) NSString *userServerURLString;
+@property (readwrite, nonatomic, retain) NSString *userServerPortString;
 
 + (DFUser *)currentUser;
 + (void)setCurrentUser:(DFUser *)user;

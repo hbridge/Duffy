@@ -16,6 +16,8 @@
 @property (readonly, nonatomic, retain) NSString *version;
 @property (nonatomic, retain) NSString *phoneNumber;
 @property (nonatomic) BOOL autosaveToCameraRoll;
+@property (nonatomic, retain) NSString *serverURL;
+@property (nonatomic, retain) NSString *serverPort;
 
 // dummy properties that are required to map the settings form
 @property (readonly, nonatomic, retain) NSDictionary *helpInfo;

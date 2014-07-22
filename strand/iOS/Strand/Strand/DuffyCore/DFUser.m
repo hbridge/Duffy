@@ -14,18 +14,19 @@
 
 @synthesize userID = _userID;
 @synthesize deviceID = _deviceID;
+@synthesize userServerPortString = _userServerPortString;
+@synthesize userServerURLString = _userServerURLString;
 
 NSString *const userObjectDefaultsKey = @"com.duffysoft.User";
 
-static NSString *DFOverrideServerURLKey = @"com.duffysoft.DFOverrideServerURLKey";
-static NSString *DFOverrideServerPortKey = @"com.duffysoft.DFOverrideServerPortKey";
+NSString *const DFOverrideServerURLKey = @"DFOverrideServerURLKey";
+NSString *const DFOverrideServerPortKey = @"DFOverrideServerPortKey";
 
 NSString *const userIDCodeKey = @"userID";
 NSString *const deviceIDCodeKey = @"deviceID";
 NSString *const displayNameCodeKey = @"displayName";
 NSString *const authTokenCodeKey = @"authToken";
 NSString *const phoneNumberCodeKey = @"phoneNumber";
-
 
 
 NSString *DFEnabledYes = @"YES";
@@ -140,25 +141,40 @@ static DFUser *currentUser;
 
 #pragma mark - Server URL and port
 
-- (NSString *)userOverriddenServerURLKey
+- (NSString *)userServerURLString
 {
-  return [[NSUserDefaults standardUserDefaults] objectForKey:DFOverrideServerURLKey];
+  if (!_userServerURLString) {
+    _userServerURLString = [[NSUserDefaults standardUserDefaults] objectForKey:DFOverrideServerURLKey];
+  }
+  
+  return _userServerURLString;
 }
 
-- (void)setUserOverriddenServerURLString:(NSString *)userOverriddenServerURLString
+- (void)setUserServerURLString:(NSString *)userServerURLString
 {
-  [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerURLString forKey:DFOverrideServerURLKey];
-  [[NSUserDefaults standardUserDefaults] synchronize];
+  if (![userServerURLString isEqualToString:DFServerBaseURL]) {
+    _userServerURLString = userServerURLString;
+    DDLogInfo(@"Setting override server URL: %@", userServerURLString);
+    [[NSUserDefaults standardUserDefaults] setObject:userServerURLString forKey:DFOverrideServerURLKey];
+    BOOL result = [[NSUserDefaults standardUserDefaults] synchronize];
+    DDLogInfo(@"Settings override write: %d", result);
+    DDLogInfo(@"Object for key: %@", [[NSUserDefaults standardUserDefaults] objectForKey:DFOverrideServerURLKey]);
+  }
 }
 
-- (NSString *)userOverriddenServerPortString
+- (NSString *)userServerPortString
 {
-  return [[NSUserDefaults standardUserDefaults] stringForKey:DFOverrideServerPortKey];
+  if (!_userServerPortString) {
+    _userServerPortString = [[NSUserDefaults standardUserDefaults] stringForKey:DFOverrideServerPortKey];
+  }
+  return _userServerPortString;
 }
 
-- (void)setUserOverriddenServerPortString:(NSString *)userOverriddenServerPortString
+- (void)setUserServerPortString:(NSString *)userServerPortString
 {
-  [[NSUserDefaults standardUserDefaults] setObject:userOverriddenServerPortString
+  _userServerPortString = userServerPortString;
+  DDLogInfo(@"Setting override port: %@", userServerPortString);
+  [[NSUserDefaults standardUserDefaults] setObject:userServerPortString
                                             forKey:DFOverrideServerPortKey];
   [[NSUserDefaults standardUserDefaults] synchronize];
 }
@@ -167,14 +183,14 @@ static DFUser *currentUser;
 - (NSURL *)serverURL
 {
   NSMutableString *URLString;
-  if (self.userOverriddenServerURLString && ![self.userOverriddenServerURLString isEqualToString:@""]) {
-    URLString = [self.userOverriddenServerURLString mutableCopy];
+  if (self.userServerURLString && ![self.userServerURLString isEqualToString:@""]) {
+    URLString = [self.userServerURLString mutableCopy];
   } else {
     URLString = [DFServerBaseURL mutableCopy];
   }
   
-  if (self.userOverriddenServerPortString && ![self.userOverriddenServerPortString isEqualToString:@""]) {
-    [URLString appendString:[NSString stringWithFormat:@":%@", self.userOverriddenServerPortString]];
+  if (self.userServerPortString && ![self.userServerPortString isEqualToString:@""]) {
+    [URLString appendString:[NSString stringWithFormat:@":%@", self.userServerPortString]];
   }
   
   return [NSURL URLWithString:URLString];

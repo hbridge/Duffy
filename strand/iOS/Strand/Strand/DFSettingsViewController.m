@@ -21,6 +21,7 @@
 #import "DFUser.h"
 #import "DFImageStore.h"
 #import "UIAlertView+DFHelpers.h"
+#import "DFNetworkingConstants.h"
 
 @interface DFSettingsViewController ()
 
@@ -192,6 +193,17 @@
 {
   // Support
   [mapping sectionWithTitle:@"Developer" identifier:@"developer"];
+  [mapping mapAttribute:@"serverURL"
+                  title:@"Server"
+                   type:FKFormAttributeMappingTypeText
+           keyboardType:UIKeyboardTypeURL
+   ];
+  [mapping mapAttribute:@"serverPort"
+                  title:@"Port"
+                   type:FKFormAttributeMappingTypeText
+           keyboardType:UIKeyboardTypeNumberPad
+   ];
+  
   [mapping button:@"Clear Image Cache"
        identifier:@"clearImageCache"
           handler:^(id object) {
@@ -204,6 +216,7 @@
             
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+  
 }
 
 

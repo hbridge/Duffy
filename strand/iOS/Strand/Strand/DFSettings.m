@@ -92,4 +92,29 @@ static DFSettings *defaultSettings;
   }
 }
 
+
+- (NSString *)serverURL
+{
+  NSString *urlString = [[DFUser currentUser] userServerURLString];
+  return urlString;
+}
+
+- (void)setServerURL:(NSString *)newURL
+{
+  [[DFUser currentUser] setUserServerURLString:newURL];
+}
+
+- (NSString *)serverPort
+{
+  return [[DFUser currentUser] userServerPortString];
+}
+
+- (void)setServerPort:(NSString *)serverPort
+{
+  [[DFUser currentUser] setUserServerPortString:serverPort];
+}
+
+
+
+
 @end
