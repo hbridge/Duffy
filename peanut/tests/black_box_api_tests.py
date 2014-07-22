@@ -60,6 +60,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		url = 'http://%s/viz/summary' % (self.BASEURL)
 		self.urlLines.append('Testing: %s' % (url))
 		response = urllib2.urlopen(url)
+		result = str(response.read())
 
 		self.assertTrue("Pipeline <br> Status" in result)
 		self.assertTrue("Last Upload" in result)
@@ -67,7 +68,6 @@ class BlackBoxUrlsTests(unittest.TestCase):
 	def testNeighbor(self):
 		result = self.getResult('neighbors', forms.OnlyUserIdForm)
 
-		self.statsLines.append("/strand/api/neighbors stats: %s" % (result['stats']))
 		self.assertTrue("objects" in result)
 	
 	def testGetJoinableStrands(self):
