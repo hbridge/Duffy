@@ -169,7 +169,8 @@ shouldStartLoadWithRequest:(NSURLRequest *)request
 
 - (void)updateGalleryActions
 {
-  [self.peanutGalleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response) {
+  [self.peanutGalleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
+                                                               NSData *hashData) {
     if (response.result) {
       self.photoActions = [[NSMutableDictionary alloc] init];
       for (DFPeanutSearchObject *object in response.objects) {

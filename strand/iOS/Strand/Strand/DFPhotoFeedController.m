@@ -30,17 +30,22 @@
 #import "UIAlertView+DFHelpers.h"
 
 const CGFloat DefaultRowHeight = 467;
+const NSTimeInterval FeedChangePollFrequency = 1.0;
 
 @interface DFPhotoFeedController ()
 
 @property (nonatomic, retain) NSArray *sectionObjects;
 @property (nonatomic, retain) NSDictionary *indexPathsByID;
 @property (nonatomic, retain) NSDictionary *objectsByID;
-@property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
-@property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 @property (atomic, retain) NSMutableDictionary *imageCache;
 @property (atomic, retain) NSMutableDictionary *rowHeightCache;
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
+
+@property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
+@property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
+
+@property (nonatomic, retain) NSData *lastResponseHash;
+@property (nonatomic, retain) NSTimer *autoRefreshTimer;
 
 @end
 
@@ -57,6 +62,7 @@ const CGFloat DefaultRowHeight = 467;
     [self setNavigationButtons];
     self.imageCache = [[NSMutableDictionary alloc] init];
     self.rowHeightCache = [[NSMutableDictionary alloc] init];
+    [self observeNotifications];
   }
   return self;
 }
@@ -80,6 +86,18 @@ const CGFloat DefaultRowHeight = 467;
   }
 }
 
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(applicationDidBecomeActive:)
+                                               name:UIApplicationDidBecomeActiveNotification
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(applicationDidEnterBackground:)
+                                               name:UIApplicationDidEnterBackgroundNotification
+                                             object:nil];
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
@@ -99,24 +117,38 @@ const CGFloat DefaultRowHeight = 467;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self reloadFeed];
+  [self reloadFeedIsSilent:NO];
   
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
-- (void)reloadFeed
+- (void)reloadFeedIsSilent:(BOOL)isSilent
 {
-  [self.refreshControl beginRefreshing];
-  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response) {
-    if (response.objects.count > 0) {
-      // We need to do this work on the main thread because the DFPhoto objects that get created
-      // have to be on the main thread so they can be accessed by colleciton view datasource methods
+  if (!isSilent)
+    [self.refreshControl beginRefreshing];
+  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
+                                                         NSData *hashData) {
+    if (response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash]) {
+      DDLogInfo(@"New feed data detected. Re-rendering feed.");
       dispatch_async(dispatch_get_main_queue(), ^{
         [self setSectionObjects:response.topLevelSectionObjects];
       });
+      self.lastResponseHash = hashData;
     }
-    [self.refreshControl endRefreshing];
+    if (!isSilent) {
+      [self.refreshControl endRefreshing];
+    }
   }];
+}
+
+- (void)reloadFeed
+{
+  [self reloadFeedIsSilent:NO];
+}
+
+- (void)autoReloadFeed
+{
+  [self reloadFeedIsSilent:YES];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -127,7 +159,20 @@ const CGFloat DefaultRowHeight = 467;
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
                                                       object:self
                                                     userInfo:nil];
+  self.autoRefreshTimer = [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
+                                                           target:self
+                                                         selector:@selector(autoReloadFeed)
+                                                         userInfo:nil
+                                                          repeats:YES];
+  
   [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [self.autoRefreshTimer invalidate];
+  self.autoRefreshTimer = nil;
 }
 
 - (void)didReceiveMemoryWarning
@@ -514,6 +559,23 @@ const CGFloat DefaultRowHeight = 467;
   }
   
   return _photoAdapter;
+}
+
+
+#pragma mark - Notification handlers
+
+- (void)applicationDidBecomeActive:(NSNotification *)note
+{
+  if (self.isViewLoaded && self.view.window) {
+    [self viewDidAppear:YES];
+  }
+}
+
+- (void)applicationDidEnterBackground:(NSNotification *)note
+{
+  if (self.isViewLoaded && self.view.window) {
+    [self viewDidDisappear:YES];
+  }
 }
 
 @end

@@ -156,7 +156,8 @@ static DFImageStore *defaultStore;
                [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
              }];
            } else {
-             DDLogWarn(@"%@ image data for %@ nil", [self.class description], imageTypesToPaths.description);
+             DDLogWarn(@"%@ image data for %@ nil", [self.class description],
+                       imageTypesToPaths.description);
            }
            completionBlock(resultImage);
          }];
