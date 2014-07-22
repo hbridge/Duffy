@@ -60,11 +60,6 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		url = 'http://%s/viz/summary' % (self.BASEURL)
 		self.urlLines.append('Testing: %s' % (url))
 		response = urllib2.urlopen(url)
-		result = str(response.read())
-		statsStart = result.find('Total time')
-		statsEnd = result[statsStart:].find('<')
-
-		self.statsLines.append("/viz/summary stats: %s" % (result[statsStart:][:statsEnd])) 
 
 		self.assertTrue("Pipeline <br> Status" in result)
 		self.assertTrue("Last Upload" in result)
