@@ -15,6 +15,7 @@
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 @property (nonatomic, retain) NSMutableSet *remoteLoadsInProgress;
 @property (nonatomic, retain) NSMutableDictionary *deferredCompletionBlocks;
+@property (atomic, retain) NSMutableDictionary *fullImageCache;
 
 @end
 
@@ -42,6 +43,7 @@ static DFImageStore *defaultStore;
   self = [super init];
   if (self) {
     _deferredCompletionBlocks = [[NSMutableDictionary alloc] init];
+    _fullImageCache = [NSMutableDictionary new];
     self.remoteLoadsInProgress = [[NSMutableSet alloc] init];
   }
   return self;
@@ -99,7 +101,7 @@ static DFImageStore *defaultStore;
                                                                 NSError *error) {
                         // cache the photo locally
                         NSData *data = imageData[@(type)];
-                        [data writeToURL:localUrl atomically:YES];
+                        if (data) [data writeToURL:localUrl atomically:YES];
                         UIImage *image = [UIImage imageWithData:data];
                         [self executeDefferredCompletionsWithImage:image forPhotoID:photoID];
           }];
@@ -129,6 +131,10 @@ static DFImageStore *defaultStore;
         UIImage *image = [UIImage imageWithData:imageData];
         completionBlock(image);
       } else {
+        [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
+        if ([self.remoteLoadsInProgress containsObject:@(photoID)]) return;
+        
+        [self.remoteLoadsInProgress addObject:@(photoID)];
         NSDictionary *imageTypesToPaths;
         if (preferredType & DFImageFull && [fullPath isNotEmpty]) {
           imageTypesToPaths = @{@(DFImageFull) : fullPath};
@@ -138,16 +144,36 @@ static DFImageStore *defaultStore;
         
         [self.photoAdapter
          getImageDataForTypesWithPaths:imageTypesToPaths
-         withCompletionBlock:^(NSDictionary *imageData, NSError *error) {
+         withCompletionBlock:^(NSDictionary *imageDataDict, NSError *error) {
            UIImage *resultImage;
-           if (imageData.allValues.firstObject) {
-             resultImage = [UIImage imageWithData:imageData.allValues.firstObject];
+           DFImageType resultType = [(NSNumber *)imageDataDict.allKeys.firstObject intValue];
+           NSData *imageData = imageDataDict.allValues.firstObject;
+           if (imageData) {
+             resultImage = [UIImage imageWithData:imageData];
+             DFImageStore __weak *weakSelf = self;
+             [self setImageData:imageData type:resultType forID:photoID completion:^(NSError *error) {
+               [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
+             }];
            }
            completionBlock(resultImage);
          }];
       }
     }
   });
+}
+
+- (void)remoteLoadForPhotoID:(DFPhotoIDType)photoID
+               withLoadBlock:(void(^)(ImageLoadCompletionBlock))loadBlock
+             completionBlock:(ImageLoadCompletionBlock)completionBlock
+{
+  [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
+   if (![self.remoteLoadsInProgress containsObject:@(photoID)]) {
+     [self.remoteLoadsInProgress addObject:@(photoID)];
+     loadBlock(^(UIImage *image) {
+       completionBlock(image);
+       [self executeDefferredCompletionsWithImage:image forPhotoID:photoID];
+     });
+   }
 }
 
 - (void)scheduleDeferredCompletion:(ImageLoadCompletionBlock)completion forPhotoID:(DFPhotoIDType)photoID
