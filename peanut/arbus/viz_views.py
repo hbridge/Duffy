@@ -148,7 +148,7 @@ def userbaseSummary(request):
 			entry['status'] = 'OK'
 
 		if notifsCounts[i].totalNotifs > 0:
-			entry['notifications'] = notifsCounts[i].totalNotifs
+			entry['notifications'] = int(math.ceil(float(notifsCounts[i].totalNotifs)/float(5)))
 			entry['lastNotifSent'] = notifsCounts[i].lastSent.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 		else:
 			entry['notifications'] = '-'
