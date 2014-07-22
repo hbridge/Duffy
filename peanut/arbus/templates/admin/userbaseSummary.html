@@ -107,6 +107,9 @@
 					{% if entry.user.last_location_point %}
 					<a target=_new href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a>
 					{% endif %}
+					{% if entry.user.last_location_accuracy %}
+					(&plusmn;{{ entry.user.last_location_accuracy }}m)
+					{% endif %}
 				</td>
 				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
 				<td class='invites b-r'> {{ entry.user.invites_remaining }} </td>
