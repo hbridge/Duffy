@@ -443,6 +443,7 @@ def update_user_location(request):
 			if ((user.last_location_timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
 				user.last_location_timestamp = timestamp
+				user.last_location_accuracy = accuracy
 				user.save()
 				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
 			else:

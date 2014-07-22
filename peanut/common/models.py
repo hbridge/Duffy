@@ -23,6 +23,7 @@ class User(models.Model):
 	product_id = models.IntegerField(default=0)
 	device_token = models.TextField()
 	last_location_point = models.PointField(null=True)
+	last_location_accuracy = models.IntegerField(null=True)
 	last_location_timestamp = models.DateTimeField(null=True)
 	invites_remaining = models.IntegerField(default=10)
 	last_build_info = models.CharField(max_length=100, null=True)
