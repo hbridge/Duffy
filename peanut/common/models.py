@@ -187,13 +187,19 @@ class Photo(models.Model):
 		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
 	"""
 	def getFullUrlImagePath(self):
-		return "/user_data/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
+		if self.full_filename:
+			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.full_filename) 
+		else:
+			return ""
 
 	"""
 		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
 	"""
 	def getThumbUrlImagePath(self):
-		return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename) 
+		if self.thumb_filename:
+			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename)
+		else:
+			return ""
 
 	def getUserDisplayName(self):
 		return self.user.display_name
