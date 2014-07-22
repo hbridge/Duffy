@@ -292,7 +292,7 @@ def neighbors(request):
 
 		# Find all non-neighbored photos.  Look up all photos by user and see if they're already
 		#   in a group.  If not, then figure out where they belong in the timeline.
-		photos = Photo.objects.filter(user_id=userId).exclude(thumb_filename=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by("-time_taken")
+		photos = Photo.objects.filter(user_id=userId).exclude(thumb_filename=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).exclude(neighbored_time=None).order_by("-time_taken")
 
 		groups = addInSoloPhotos(groups, photos)
 									
@@ -339,7 +339,7 @@ def getLockedPhotos(userId, lon, lat):
 
 	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
 
-	photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).filter(user__product_id=1)
+	photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).exclude(neighbored_time=None).filter(user__product_id=1)
 
 	nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinMinutes * 60)
 
