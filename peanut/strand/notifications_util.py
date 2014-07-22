@@ -27,7 +27,10 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 			notification.service = device.service
 
 			payload = constants.NOTIFICATIONS_CUSTOM_DICT[msgTypeId]
-			payload.update(customPayload)
+
+			if customPayload:
+				payload.update(customPayload)
+				
 			notification.custom_payload = json.dumps(payload)
 
 			if constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]:
