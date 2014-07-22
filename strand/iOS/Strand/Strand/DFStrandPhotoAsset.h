@@ -19,7 +19,6 @@
 @property (nonatomic, retain) NSDate *creationDate;
 
 + (DFStrandPhotoAsset *)createAssetForImageData:(NSData *)imageData
-                                        photoID:(DFPhotoIDType)photoID
                                        metadata:(NSDictionary *)metadata
                                        location:(CLLocation *)location
                                    creationDate:(NSDate *)creationDate
