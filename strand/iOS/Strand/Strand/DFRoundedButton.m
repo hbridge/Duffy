@@ -33,14 +33,14 @@
   }
 }
 
-- (void)setSelected:(BOOL)selected
-{
-  [super setSelected:selected];
-  CGSize sizeThatFits = [self sizeThatFits:self.frame.size];
-  DDLogVerbose(@"PRE  size: %@ sizeThatFits:%@", NSStringFromCGSize(self.frame.size), NSStringFromCGSize([self sizeThatFits:self.frame.size]));
-  self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, sizeThatFits.width, sizeThatFits.height);
-  DDLogVerbose(@"POST size: %@ sizeThatFits:%@", NSStringFromCGSize(self.frame.size), NSStringFromCGSize([self sizeThatFits:self.frame.size]));
-}
+//- (void)setSelected:(BOOL)selected
+//{
+//  [super setSelected:selected];
+//  CGSize sizeThatFits = [self sizeThatFits:self.frame.size];
+//  DDLogVerbose(@"PRE  size: %@ sizeThatFits:%@", NSStringFromCGSize(self.frame.size), NSStringFromCGSize([self sizeThatFits:self.frame.size]));
+//  self.frame = CGRectMake(self.frame.origin.x, self.frame.origin.y, sizeThatFits.width, sizeThatFits.height);
+//  DDLogVerbose(@"POST size: %@ sizeThatFits:%@", NSStringFromCGSize(self.frame.size), NSStringFromCGSize([self sizeThatFits:self.frame.size]));
+//}
 
 - (CGSize)sizeThatFits:(CGSize)size
 {

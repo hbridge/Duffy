@@ -155,6 +155,8 @@ static DFImageStore *defaultStore;
              [self setImageData:imageData type:resultType forID:photoID completion:^(NSError *error) {
                [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
              }];
+           } else {
+             DDLogWarn(@"%@ image data for %@ nil", [self.class description], imageTypesToPaths.description);
            }
            completionBlock(resultImage);
          }];

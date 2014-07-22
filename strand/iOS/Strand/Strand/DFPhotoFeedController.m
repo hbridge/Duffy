@@ -200,10 +200,8 @@ const CGFloat DefaultRowHeight = 467;
 
   UIImage *image = self.imageCache[indexPath];
   
-  
-  
   DFPeanutSearchObject *representativeObject = [self representativePhotoForIndexPath:indexPath];
-  DDLogVerbose(@"cellForRowAtIndexPath: [%d, %d] photoID: %llu", (int)indexPath.section, (int)indexPath.row, representativeObject.id);
+  //DDLogVerbose(@"cellForRowAtIndexPath: [%d, %d] photoID: %llu", (int)indexPath.section, (int)indexPath.row, representativeObject.id);
   [self addCellButtonActions:cell object:representativeObject];
   
   if (image) {
@@ -219,7 +217,9 @@ const CGFloat DefaultRowHeight = 467;
        thumbnailPath:representativeObject.thumb_image_path
        fullPath:representativeObject.full_image_path
        completion:^(UIImage *image) {
-         self.imageCache[indexPath] = image;
+         if (image) {
+           self.imageCache[indexPath] = image;
+         }
          dispatch_async(dispatch_get_main_queue(), ^{
            if (![tableView.visibleCells containsObject:cell]) return;
            cell.imageView.image = image;
