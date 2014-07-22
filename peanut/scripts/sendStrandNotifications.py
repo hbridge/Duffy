@@ -46,7 +46,6 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 """
 def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
-
 	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
 
 	for user in users:
@@ -73,7 +72,7 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			sentMessageBefore = False
 			if user.id in notificationsById:
 				for notification in notificationsById[user.id]:
-					finalMsg = notifications_util.getMessageWithCustomPayload(msg, customPayload)
+					finalMsg = notifications_util.getMessageWithCustomPayload(msg, constants.NOTIFICATIONS_CUSTOM_DICT[msgType])
 					if notification.msg == finalMsg:
 						sentMessageBefore = True
 
