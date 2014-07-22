@@ -134,35 +134,29 @@ def userbaseSummary(request):
 
 
 		if (user.totalCount > 0):
-
-			entry['dbCount'] = user.totalCount
-			entry['thumbsCount'] = user.totalCount
-			entry['thumbs'] = int(math.floor(entry['thumbsCount']/user.totalCount*100))
-
-			if user.photosWithGPS > 0:
-				entry['twofishCount'] = user.photosWithGPS
-				entry['twofish'] = int(math.floor(float(user.twofishCount)/float(user.photosWithGPS)*100))
+			if (user.thumbsCount == user.totalCount and 
+				user.photosWithGPS == user.twofishCount and 
+				user.fullImagesCount == user.totalCount and 
+				user.clusteredCount == user.totalCount and
+				user.neighborCount == user.photosWithGPS):
+				entry['status'] = 'OK'
 			else:
-				entry['twofish'] = '-'
-			entry['fullimagesCount'] = user.fullImagesCount
-			entry['fullimages'] = entry['fullimagesCount']*100/user.totalCount
-
-			
-			entry['clusteredCount'] = user.clusteredCount
-			entry['clustered'] = entry['clusteredCount']*100/user.totalCount
-
-			if user.photosWithGPS > 0:
-				entry['neighbor'] = user.neighborCount*100/user.photosWithGPS
-			else:
-				entry['neighbor'] = '-'
+				entry['status'] = 'BAD'
 
 			entry['lastUploadTime'] = user.lastAdded.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+		else:
+			entry['status'] = 'OK'
 
+		if notifsCounts[i].totalNotifs > 0:
 			entry['notifications'] = notifsCounts[i].totalNotifs
-			if (notifsCounts[i].totalNotifs):
-				entry['lastNotifSent'] = notifsCounts[i].lastSent.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+			entry['lastNotifSent'] = notifsCounts[i].lastSent.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+		else:
+			entry['notifications'] = '-'
 
+		if (actionsCount[i].totalActions > 0):
 			entry['actions'] = actionsCount[i].totalActions
+		else:
+			entry['actions'] = '-'
 
 		entry['internal'] = False
 

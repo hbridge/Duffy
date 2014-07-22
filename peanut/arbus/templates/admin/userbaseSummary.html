@@ -74,6 +74,48 @@
 <div class="ui-content">
 	<div class='ui-server-id' id='ui-server-id'>
 	</div>
+
+	{% if strandList %}
+		<div class='ui-header'> Strand &mdash; {{ strandList|length }} accounts </div>
+		<table class='ui-table' cellpadding='3'>
+			<tr class='ui-row-header' >
+				<td class='userid b-r'> ID </td>
+				<td class='name b-r'> Name </td>
+				<td class='created b-r'> Created </td>
+				<td class='db-count b-r'> Photos </td>
+				<td class='status b-r' title='thumbs/twofish/clustered/fulls/neighbors'> Pipeline <br> Status </td>
+				<td class='actions b-r'> Actions </td>
+				<td class='notifications b-r'> Nots <br> sent </td>
+				<td class='last-not-timestamp b-r'> Last Not. <br> Timestamp </td>
+				<td class='location b-r'> Location </td>
+				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
+				<td class='invites b-r'> Rem. <br> invites </td>
+				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
+			</tr>
+		{% for entry in strandList %}
+			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
+				<td class='userid b-r'> {{ entry.user.id }} </td>
+				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_new href='/strand/viz/neighbors?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
+				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
+				<td class='db-count right b-r'> {{ entry.user.totalCount }} </td>
+				<td class='pipeline-status right b-r' 
+					title='{{ entry.user.thumbsCount }} | {{ entry.user.twofishCount }} | {{ entry.user.clusteredCount }} | {{ entry.user.fullImagesCount }} | {{ entry.user.neighborCount }}'> {{ entry.status }} </td>
+				<td class='actions right b-r'> {{ entry.actions}}</td>
+				<td class='notifications right b-r'> {{ entry.notifications }} </td>
+				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>				
+				<td class='location right b-r'> 
+					{% if entry.user.last_location_point %}
+					<a target=_new href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a>
+					{% endif %}
+				</td>
+				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
+				<td class='invites b-r'> {{ entry.user.invites_remaining }} </td>
+				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
+			</tr>
+		{% endfor %}
+		</table>
+	{% endif %}
+
 	{% if arbusList %}
 		<div class='ui-header'> Search/Photos/Arbus &mdash; {{ arbusList|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
@@ -115,66 +157,6 @@
 		{% endfor %}
 	</table>
 	{% endif %}
-
-	{% if strandList %}
-		<div class='ui-header'> Strand &mdash; {{ strandList|length }} accounts </div>
-		<table class='ui-table' cellpadding='3'>
-			<tr class='ui-row-header' >
-				<td class='userid b-r'> ID </td>
-				<td class='name b-r'> Name </td>
-				<td class='phoneid b-r'> Phone # </td>
-				<td class='created b-r'> Created </td>
-				<td class='db-count b-r'> Photos </td>
-				<td class='db-thumbnails b-r'> Thumbs <br> (%)</td>
-				<td class='twofish b-r'> TwoFish <br> (%) </td>
-				<td class='clustered b-r'> Clustered <br> (%)  </td>
-				<td class='db-fullimage b-r'> Fulls (%) </td>
-				<td class='neighbor b-r'> Neighbor <br> (%) </td>
-				<td class='actions b-r'> Actions </td>
-				<td class='notifications b-r'> Nots <br> sent </td>
-				<td class='last-not-timestamp b-r'> Last Not. <br> Timestamp </td>
-				<td class='location b-r'> Location </td>
-				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
-				<td class='invites b-r'> Rem. <br> invites </td>
-				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
-			</tr>
-		{% for entry in strandList %}
-			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
-				<td class='userid b-r'> {{ entry.user.id }} </td>
-				<td class='name b-r'> <a target=_new href='/strand/viz/neighbors?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
-				<td class='phoneid b-r' title='{{ entry.user.phone_number }}'> 
-
-					{% if entry.user.phone_number %}
-						{% if entry.user.phone_number|length > 12 %}
-							Archived
-						{% else %}
-							{{ entry.user.phone_number }}
-						{% endif %}
-					{% else %}
-						&mdash; 
-					{% endif %} </td>
-				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
-				<td class='db-count right b-r'> {{ entry.dbCount }} </td>
-				<td class='db-thumbnails right percent b-r' title='{{ entry.thumbsCount }}'> {{ entry.thumbs }} </td>
-				<td class='twofish right percent b-r' title='{{ entry.twofishCount }}'> {{ entry.twofish }} </td>
-				<td class='clustered right percent b-r' title='{{ entry.clusteredCount }}'> {{ entry.clustered }} </td>
-				<td class='db-fullimage right b-r' title='{{ entry.fullimagesCount }}'> {{ entry.fullimages }} </td>
-				<td class='neighbor right b-r'> {{ entry.neighbor }}</td>
-				<td class='actions right b-r'> {{ entry.actions}}</td>
-				<td class='notifications right b-r'> {{ entry.notifications }} </td>
-				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>				
-				<td class='location right b-r'> 
-					{% if entry.user.last_location_point %}
-					<a target=_new href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a>
-					{% endif %}
-				</td>
-				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
-				<td class='invites b-r'> {{ entry.user.invites_remaining }} </td>
-				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
-			</tr>
-		{% endfor %}
-		</table>
-	{% endif %}
 	<div class="ui-key">
 		Key: <span style='background-color: #C0C0C0;'> Shaded</span> rows are internal users.
 	</div>
@@ -193,6 +175,11 @@ $(document).ready(function() {
 	if ($.trim($(this).text()) != '100') {
 		$(this).addClass("red");
 	}
+  });
+  $("td.pipeline-status").each(function(){
+  	if ($.trim($(this).text()) != 'OK') {
+  		$(this).addClass("red");
+  	}
   });
   if (!(location.hostname.match('prod.strand.duffyapp.com'))){
   	$("#ui-server-id").append('DEV <span class="ui-server-switch">(<a target=_new href="http://prod.strand.duffyapp.com/viz/summary">Switch to Prod</a>)</span>');
