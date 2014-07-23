@@ -20,7 +20,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 	defaultParams['start_date_time'] = '2014-07-09 18:45:57'
 	defaultParams['lat'] = 40.0
 	defaultParams['lon'] = -70
-	defaultParams['device_token'] = ""
+	defaultParams['device_token'] = "TESTTOKEN"
 	defaultParams['phone_number'] = "+17815555559"
 	defaultParams['sms_access_code'] = "2345"
 	defaultParams['display_name'] = "Derek"

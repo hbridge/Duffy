@@ -20,6 +20,9 @@ logger = logging.getLogger(__name__)
 """
 def sendNotification(user, msg, msgTypeId, customPayload):
 	if user.device_token:
+		if user.device_token == "TESTTOKEN":
+			return None
+
 		devices = Device.objects.select_related().filter(token=user.device_token)
 
 		if len(devices) == 0:

@@ -87,7 +87,10 @@ def sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandLimitGpsUpda
 
 			if not sentMessageBefore:
 				logger.debug("Sending %s to %s" % (msg, user.id))
-				notificationLogsCache.append(notifications_util.sendNotification(user, msg, msgType, None))
+				logEntry = notifications_util.sendNotification(user, msg, msgType, None)
+				if logEntry:
+					notificationLogsCache.append(logEntry)
+
 	return notificationLogsCache
 			
 """
@@ -127,7 +130,10 @@ def sendGpsNotification(now, gpsRefreshTime, notificationLogsCache):
 	for user in usersWithOldGpsData:
 		if user.id not in notificationsById:
 			logger.debug("Pinging user %s to update their gps" % (user.id))
-			notificationLogsCache.append(notifications_util.sendNotification(user, "", msgType, dict()))
+			logEntry = notifications_util.sendNotification(user, "", msgType, dict())
+			if logEntry:
+				notificationLogsCache.append(logEntry)
+				
 	return notificationLogsCache
 
 """
@@ -154,7 +160,10 @@ def sendRawFirestarter(now, gpsUpdatedWithinHours, notifiedWithinDays, distanceW
 				msg = "You have %s friends on Strand nearby. Take a photo to share with them!" % (numNearbyUsers)
 				
 			logger.debug("Sending raw firestarter msg to user %s " % (user.id))
-			notificationLogsCache.append(notifications_util.sendNotification(user, msg, msgType, dict()))
+			logEntry = notifications_util.sendNotification(user, msg, msgType, dict())
+			if logEntry:
+				notificationLogsCache.append(logEntry)
+				
 	return notificationLogsCache
 """
 	Photo firestarter kicks off when a user has taken a photo recently
@@ -188,7 +197,10 @@ def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin
 				msg = "You have %s friends on Strand nearby. Take a photo to share with them!" % (numNearbyUsers)
 				
 			logger.debug("Sending photo firestarter msg to user %s " % (user.id))
-			notificationLogsCache.append(notifications_util.sendNotification(user, msg, msgType, dict()))
+			logEntry = notifications_util.sendNotification(user, msg, msgType, dict())
+			if logEntry:
+				notificationLogsCache.append(logEntry)
+			
 	return notificationLogsCache
 
 def main(argv):
