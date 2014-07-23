@@ -44,12 +44,21 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 	Check the photo we want to use to say if someone is nearby but we havent'
 	neighbored with them yet (basically, they shouldn't know I'm there)
 """
-def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
+def sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandLimitGpsCuttoff, notificationLogs):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
-	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
+
+	newPhotosStartTimeCutoff = now - datetime.timedelta(seconds=joinStrandWithinTime)
+	neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTimeCutoff) | Q(photo_2__time_taken__gt=newPhotosStartTimeCutoff)).order_by('photo_1')
+	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType, newPhotosStartTimeCutoff)
+
+	# 30 minute cut off for join strand messages
+	joinStrandStartTimeCutoff = now - datetime.timedelta(seconds=joinStrandWithinTime)
+	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=joinStrandLimitGpsCuttoff)
+	photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTimeCutoff).filter(user__product_id=1)
+	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
 	for user in users:
-		nearbyPhotosData = geo_util.getNearbyPhotos(datetime.datetime.utcnow().replace(tzinfo=pytz.utc), user.last_location_point.x, user.last_location_point.y, photos, filterUserId=user.id)
+		nearbyPhotosData = geo_util.getNearbyPhotos(now, user.last_location_point.x, user.last_location_point.y, photos, filterUserId=user.id)
 		names = list()
 
 		for nearbyPhotoData in nearbyPhotosData:
@@ -78,8 +87,17 @@ def sendJoinStrandNotification(photos, users, neighbors, notificationLogs):
 			if not sentMessageBefore:
 				logger.debug("Sending %s to %s" % (msg, user.id))
 				notifications_util.sendNotification(user, msg, msgType, None)
-				
-def sendPhotoActionNotifications(photoActions):
+			
+"""
+	Send notifications for actions on photos.
+	Right now, just for favoriting.  We grab all the actions where the user_notified_time isn't set,
+	  so we don't use the notification logs right now.
+"""	
+def sendPhotoActionNotifications(now, waitTime):
+	likeNotificationWaitSeconds = now - datetime.timedelta(seconds=waitTime)
+
+	photoActions = PhotoAction.objects.select_related().filter(added__lte=likeNotificationWaitSeconds).filter(user_notified_time=None)
+
 	for photoAction in photoActions:
 		if photoAction.action_type == "favorite":
 			if photoAction.user_id != photoAction.photo.user_id:
@@ -95,32 +113,41 @@ def sendPhotoActionNotifications(photoActions):
 			photoAction.save()
 
 
-def main(argv):
-	maxFilesAtTime = 100
-
-	timeWithSeconds = 30 * 60 # 30 minutes
+"""
+	If we haven't gotten a gps coordinate from them in the last hour, then send a ping
+"""
+def sendSendGpsNotification(now, gpsRefreshTime, notificationLogs):
+	msgType = constants.NOTIFICATIONS_FETCH_GPS_ID
+	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=gpsRefreshTime)
 	
+	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType, frequencyOfGpsUpdatesCutoff)
+	usersWithOldGpsData = User.objects.filter(product_id=1).filter(last_location_timestamp__lt=frequencyOfGpsUpdatesCutoff)
+
+	for user in usersWithOldGpsData:
+		if user.id not in notificationsById:
+			logger.debug("Pinging user %s to to update their gps" % (user.id))
+			notifications_util.sendNotification(user, "", msgType, dict())
+
+def main(argv):
+	joinStrandWithinTime = 30 * 60 # 30 minutes
+	joinStrandLimitGpsCuttoff = 8 # hours
+	waitTimeForPhotoAction = 10 # seconds
+	gpsRefreshTime = 3 # hours
+
+	notificationLogsCuttoffHours = 3 # hours, want it to be the longest time we could want to grab cache
+
 	logger.info("Starting... ")
 	while True:
-		newPhotosStartTime = datetime.datetime.utcnow()-datetime.timedelta(seconds=timeWithSeconds)
-		neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTime) | Q(photo_2__time_taken__gt=newPhotosStartTime)).order_by('photo_1')
-		
-		# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-		notificationLogs = notifications_util.getNotificationLogs(timeWithinSec=timeWithSeconds)
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		# Grap notification logs for use in other methods
+		notificationLogsCutoff = now - datetime.timedelta(hours=notificationLogsCuttoffHours)
+		notificationLogsCache = notifications_util.getNotificationLogs(notificationLogsCutoff)
 
-		# 30 minute cut off for join strand messages
-		joinStrandStartTime = datetime.datetime.utcnow()-datetime.timedelta(seconds=timeWithSeconds)
-		frequencyOfGpsUpdates = datetime.datetime.utcnow()-datetime.timedelta(hours=8)
-		photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTime).filter(user__product_id=1)
-		users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdates)
+		sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandLimitGpsCuttoff, notificationLogsCache)
 
-		sendJoinStrandNotification(photos, users, neighbors, notificationLogs)
+		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
 
-		likeNotificationWaitSeconds = datetime.datetime.utcnow()-datetime.timedelta(seconds=10)
-
-		photoActions = PhotoAction.objects.select_related().filter(added__lte=likeNotificationWaitSeconds).filter(user_notified_time=None)
-
-		sendPhotoActionNotifications(photoActions)
+		sendSendGpsNotification(now, gpsRefreshTime, notificationLogsCache)
 
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)

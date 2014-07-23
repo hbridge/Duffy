@@ -20,7 +20,13 @@ logger = logging.getLogger(__name__)
 """
 def sendNotification(user, msg, msgTypeId, customPayload):
 	if user.device_token:
-		devices = Device.objects.select_related().filter(token=user.device_token)	
+		devices = Device.objects.select_related().filter(token=user.device_token)
+
+		if len(devices) == 0:
+			logger.warning("Was told to send a notification to user %s who has a device token but nothing in the Device table")
+			NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-2, msg_type=msgTypeId)
+			return
+			
 		for device in devices:
 			notification = DuffyNotification()
 			notification.message = msg
@@ -50,7 +56,8 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 			NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId)
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user)
-	
+		NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-1, msg_type=msgTypeId)
+
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
@@ -63,21 +70,22 @@ def sendSMS(phoneNumber, msg):
 """
 	Create a dictionary per user_id on last notification time of NewPhoto notifications
 """
-def getNotificationsForTypeById(notificationLogs, msgType):
+def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff):
 	notificationsById = dict()
-	
 	for notificationLog in notificationLogs:
 		if notificationLog.msg_type == msgType:
-			if notificationLog.user_id not in notificationsById:
-				notificationsById[notificationLog.user_id] = list()
-			notificationsById[notificationLog.user_id].append(notificationLog)
-
+			if timeCutoff and notificationLog.added > timeCutoff:
+				if notificationLog.user_id not in notificationsById:
+					notificationsById[notificationLog.user_id] = list()
+				notificationsById[notificationLog.user_id].append(notificationLog)
+			else:
+				print "filtered"
 	return notificationsById
 
 """
 	Return back notification logs within 30 seconds
 """
-def getNotificationLogs(timeWithinSec=30):
+def getNotificationLogs(timeWithinCutoff):
 	# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-	notificationLogs = NotificationLog.objects.select_related().filter(added__gt=datetime.datetime.utcnow()-datetime.timedelta(seconds=timeWithinSec))
+	notificationLogs = NotificationLog.objects.select_related().filter(added__gt=timeWithinCutoff)
 	return notificationLogs

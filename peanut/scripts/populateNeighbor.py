@@ -60,11 +60,13 @@ def getUniqueRows(rows):
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
 
-def sendNotifications(neighbors):
+def sendNotifications(neighbors, timeWithinSecondsForNotification):
 	msgType = constants.NOTIFICATIONS_NEW_PHOTO_ID
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	notificationLogsCutoff = now - datetime.timedelta(seconds=timeWithinSecondsForNotification)
 	
 	# Grab logs from last 30 seconds (default) then grab the last time they were notified
-	notificationLogs = notifications_util.getNotificationLogs()
+	notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
 	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
 
 	# This is a dict with the user as the key and a list of other users w photos as the value
@@ -106,20 +108,21 @@ def sendNotifications(neighbors):
 			logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
 	
 def main(argv):
-	maxFilesAtTime = 100
+	maxPhotosAtTime = 100
+	timeWithinSecondsForNotification = 30 # seconds
 
-	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
+	timeWithinMinutesForNeighboring = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().exclude(user_id=1).exclude(thumb_filename=None).filter(neighbored_time=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by('-time_taken')[:maxFilesAtTime]
+		photos = Photo.objects.all().exclude(user_id=1).exclude(thumb_filename=None).filter(neighbored_time=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
 
 		if len(photos) > 0:
 			rowsToWrite = list()
 			photos = list(photos)
 
-			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutes)
-			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutes)
+			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
+			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
 			photosCache = Photo.objects.filter(time_taken__gte=timeLow).filter(time_taken__lte=timeHigh).exclude(location_point=None).filter(user__product_id=1)
 
@@ -158,7 +161,7 @@ def main(argv):
 			
 			logger.info("Wrote out %s new neighbor entries for %s photos" % (len(uniqueRows), len(photos)))
 
-			sendNotifications(rowsToCreate)
+			sendNotifications(rowsToCreate, timeWithinSecondsForNotification)
 		else:
 			time.sleep(1)	
 
