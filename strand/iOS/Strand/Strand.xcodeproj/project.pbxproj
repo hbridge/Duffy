@@ -25,6 +25,8 @@
 		5A188D6219802F87009D3244 /* FeedViewNuxPlaceholder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6119802F87009D3244 /* FeedViewNuxPlaceholder.xib */; };
 		5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6319803523009D3244 /* DFErrorScreen.xib */; };
 		5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A188D661980366C009D3244 /* DFErrorScreen.m */; };
+		5A188D6B19804A94009D3244 /* DFLockedStrandCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A188D6919804A94009D3244 /* DFLockedStrandCell.m */; };
+		5A188D6C19804A94009D3244 /* DFLockedStrandCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6A19804A94009D3244 /* DFLockedStrandCell.xib */; };
 		5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */; };
 		5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
@@ -183,6 +185,9 @@
 		5A188D6319803523009D3244 /* DFErrorScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFErrorScreen.xib; sourceTree = "<group>"; };
 		5A188D651980366C009D3244 /* DFErrorScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFErrorScreen.h; sourceTree = "<group>"; };
 		5A188D661980366C009D3244 /* DFErrorScreen.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFErrorScreen.m; sourceTree = "<group>"; };
+		5A188D6819804A94009D3244 /* DFLockedStrandCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLockedStrandCell.h; sourceTree = "<group>"; };
+		5A188D6919804A94009D3244 /* DFLockedStrandCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLockedStrandCell.m; sourceTree = "<group>"; };
+		5A188D6A19804A94009D3244 /* DFLockedStrandCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLockedStrandCell.xib; sourceTree = "<group>"; };
 		5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFModalSpinnerViewController.h; sourceTree = "<group>"; };
 		5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFModalSpinnerViewController.m; sourceTree = "<group>"; };
 		5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFModalSpinnerViewController.xib; sourceTree = "<group>"; };
@@ -435,6 +440,17 @@
 				5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */,
 			);
 			name = "Common Views";
+			sourceTree = "<group>";
+		};
+		5A188D6D19804AAB009D3244 /* Error and NUX */ = {
+			isa = PBXGroup;
+			children = (
+				5A188D6119802F87009D3244 /* FeedViewNuxPlaceholder.xib */,
+				5A188D6319803523009D3244 /* DFErrorScreen.xib */,
+				5A188D651980366C009D3244 /* DFErrorScreen.h */,
+				5A188D661980366C009D3244 /* DFErrorScreen.m */,
+			);
+			name = "Error and NUX";
 			sourceTree = "<group>";
 		};
 		5A3172CF196C7C6F00CA7693 /* Settings */ = {
@@ -720,10 +736,10 @@
 				5AA8FA4E197DD0CE00421513 /* DFFeedSectionHeaderView.xib */,
 				5AA8FA50197DD0E200421513 /* DFFeedSectionHeaderView.h */,
 				5AA8FA51197DD0E200421513 /* DFFeedSectionHeaderView.m */,
-				5A188D6119802F87009D3244 /* FeedViewNuxPlaceholder.xib */,
-				5A188D6319803523009D3244 /* DFErrorScreen.xib */,
-				5A188D651980366C009D3244 /* DFErrorScreen.h */,
-				5A188D661980366C009D3244 /* DFErrorScreen.m */,
+				5A188D6819804A94009D3244 /* DFLockedStrandCell.h */,
+				5A188D6919804A94009D3244 /* DFLockedStrandCell.m */,
+				5A188D6A19804A94009D3244 /* DFLockedStrandCell.xib */,
+				5A188D6D19804AAB009D3244 /* Error and NUX */,
 			);
 			name = "Gallery View";
 			sourceTree = "<group>";
@@ -1017,6 +1033,7 @@
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
 				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
+				5A188D6C19804A94009D3244 /* DFLockedStrandCell.xib in Resources */,
 				5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */,
 				5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */,
 				5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */,
@@ -1158,6 +1175,7 @@
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
 				5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */,
+				5A188D6B19804A94009D3244 /* DFLockedStrandCell.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
 				5AA45285196706A60099CBD2 /* DFPeanutGalleryAdapter.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,

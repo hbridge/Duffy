@@ -32,6 +32,7 @@
 #import "DFInviteUserComposeController.h"
 #import "DFErrorScreen.h"
 #import "DFDefaultsStore.h"
+#import "DFLockedStrandCell.h"
 
 const NSTimeInterval FeedChangePollFrequency = 1.0;
 
@@ -45,7 +46,7 @@ const CGFloat ActionBarHeight = 29 + 8; // height + spacing
 const CGFloat FooterPadding = 8;
 const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight + FavoritersListHeight + FooterPadding;
 
-
+const CGFloat LockedCellHeight = 157.0;
 
 @interface DFPhotoFeedController ()
 
@@ -136,7 +137,11 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
        forCellReuseIdentifier:@"photoCell"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
        forCellReuseIdentifier:@"clusterCell"];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil] forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFLockedStrandCell" bundle:nil]
+       forCellReuseIdentifier:@"lockedCell"];
+  
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil]
+forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
   self.tableView.rowHeight = MinRowHeight;
@@ -292,6 +297,10 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
+  if ([self isSectionLocked:self.sectionObjects[section]]) {
+    return 1;
+  }
+  
   NSArray *items = [self itemsForSectionIndex:section];
   return items.count;
 }
@@ -320,26 +329,47 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoFeedCell *cell;
+  UITableViewCell *cell;
 
-  UIImage *image = self.imageCache[indexPath];
-  
-  NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
+  DFPeanutSearchObject *section = self.sectionObjects[indexPath.section];
+  NSArray *itemsForSection = section.objects;
   DFPeanutSearchObject *object = itemsForSection[indexPath.row];
   //DDLogVerbose(@"cellForRowAtIndexPath: [%d, %d] photoID: %llu", (int)indexPath.section, (int)indexPath.row, representativeObject.id);
   
-  if ([object.type isEqual:DFSearchObjectPhoto]) {
-    cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell"
+  if ([self isSectionLocked:section]) {
+    DFLockedStrandCell *lockedCell = [tableView dequeueReusableCellWithIdentifier:@"lockedCell"
+                                                                     forIndexPath:indexPath];
+    cell = lockedCell;
+    [lockedCell setImages:@[]];
+    for (DFPeanutSearchObject *object in section.objects) {
+      [[DFImageStore sharedStore]
+       imageForID:object.id
+       preferredType:DFImageThumbnail
+       thumbnailPath:object.thumb_image_path
+       fullPath:object.full_image_path
+       completion:^(UIImage *image) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           if (![tableView.visibleCells containsObject:lockedCell]) return;
+           [lockedCell addImage:image];
+           [lockedCell setNeedsLayout];
+         });
+       }];
+    }
+  } else if ([object.type isEqual:DFSearchObjectPhoto]) {
+    DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"photoCell"
                                            forIndexPath:indexPath];
-    [cell setObjects:@[@(object.id)]];
-    [cell setClusterViewHidden:YES];
-    [DFPhotoFeedController configureNonImageAttributesForCell:cell
+    cell = photoFeedCell;
+    photoFeedCell.delegate = self;
+    [photoFeedCell setObjects:@[@(object.id)]];
+    [photoFeedCell setClusterViewHidden:YES];
+    [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
                                                  searchObject:object];
+    UIImage *image = self.imageCache[indexPath];
     if (image) {
-      [cell setImage:image forObject:@(object.id)];
+      [photoFeedCell setImage:image forObject:@(object.id)];
     } else {
-      cell.imageView.image = nil;
-      [cell.loadingActivityIndicator startAnimating];
+      photoFeedCell.imageView.image = nil;
+      [photoFeedCell.loadingActivityIndicator startAnimating];
       
       if (object) {
         [[DFImageStore sharedStore]
@@ -352,20 +382,22 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
              self.imageCache[indexPath] = image;
            }
            dispatch_async(dispatch_get_main_queue(), ^{
-             if (![tableView.visibleCells containsObject:cell]) return;
-             [cell setImage:image forObject:@(object.id)];
-             [cell.loadingActivityIndicator stopAnimating];
-             [cell setNeedsLayout];
+             if (![tableView.visibleCells containsObject:photoFeedCell]) return;
+             [photoFeedCell setImage:image forObject:@(object.id)];
+             [photoFeedCell.loadingActivityIndicator stopAnimating];
+             [photoFeedCell setNeedsLayout];
            });
          }];
       }
     }
   } else if ([object.type isEqual:DFSearchObjectCluster]) {
-    cell = [tableView dequeueReusableCellWithIdentifier:@"clusterCell"
+    DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"clusterCell"
                                     forIndexPath:indexPath];
-    [cell setClusterViewHidden:NO];
-    [cell setObjects:[DFPhotoFeedController objectIDNumbers:object.objects]];
-    [DFPhotoFeedController configureNonImageAttributesForCell:cell
+    cell = photoFeedCell;
+    photoFeedCell.delegate = self;
+    [photoFeedCell setClusterViewHidden:NO];
+    [photoFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:object.objects]];
+    [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
                                                  searchObject:[object.objects firstObject]];
     for (DFPeanutSearchObject *subObject in object.objects) {
       [[DFImageStore sharedStore]
@@ -375,16 +407,15 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
        fullPath:subObject.full_image_path
        completion:^(UIImage *image) {
          dispatch_async(dispatch_get_main_queue(), ^{
-           if (![tableView.visibleCells containsObject:cell]) return;
-           [cell setImage:image forObject:@(subObject.id)];
-           [cell setNeedsLayout];
+           if (![tableView.visibleCells containsObject:photoFeedCell]) return;
+           [photoFeedCell setImage:image forObject:@(subObject.id)];
+           [photoFeedCell setNeedsLayout];
          });
        }];
     }
   }
 
   
-  cell.delegate = self;
   [cell setNeedsLayout];
   return cell;
 }
@@ -434,8 +465,12 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
   CGFloat rowHeight = MinRowHeight;
   
   DFPeanutSearchObject *sectionObject = self.sectionObjects[indexPath.section];
-  DFPeanutSearchObject *rowObject = sectionObject.objects[indexPath.row];
+  if ([self isSectionLocked:sectionObject]) {
+    // If it's a section object, its height is fixed
+    return LockedCellHeight;
+  }
   
+  DFPeanutSearchObject *rowObject = sectionObject.objects[indexPath.row];
   if (rowObject.actions.count > 0) {
     rowHeight += FavoritersListHeight;
   }
@@ -444,6 +479,11 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
   }
   
   return rowHeight;
+}
+
+- (BOOL)isSectionLocked:(DFPeanutSearchObject *)sectionObject
+{
+  return [sectionObject.title isEqualToString:@"Locked"];
 }
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
