@@ -77,7 +77,7 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 {
   self = [super initWithStyle:style];
   if (self) {
-    self.navigationItem.title = @"Shared";
+    self.navigationItem.title = @"Strand";
     [self setNavigationButtons];
     self.imageCache = [[NSMutableDictionary alloc] init];
     self.rowHeightCache = [[NSMutableDictionary alloc] init];
@@ -89,19 +89,30 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 - (void)setNavigationButtons
 {
   if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
-    UIBarButtonItem *settingsButton = [[UIBarButtonItem alloc]
-                                       initWithImage:[[UIImage imageNamed:@"Assets/Icons/SettingsBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-                                       style:UIBarButtonItemStylePlain
-                                       target:self
-                                       action:@selector(settingsButtonPressed:)];
-    UIBarButtonItem *cameraButton = [[UIBarButtonItem alloc]
-                                     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton.png"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-                                     style:UIBarButtonItemStylePlain
-                                     target:self
-                                     action:@selector(cameraButtonPressed:)];
+    UIBarButtonItem *settingsButton =
+    [[UIBarButtonItem alloc]
+     initWithImage:[[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(settingsButtonPressed:)];
+    UIBarButtonItem *cameraButton =
+    [[UIBarButtonItem alloc]
+     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton"]
+                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(cameraButtonPressed:)];
+    UIBarButtonItem *inviteButton =
+    [[UIBarButtonItem alloc]
+     initWithImage:[[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(inviteButtonPressed:)];
     
     self.navigationItem.leftBarButtonItems = @[settingsButton];
-    self.navigationItem.rightBarButtonItems = @[cameraButton];
+    self.navigationItem.rightBarButtonItems = @[cameraButton, inviteButton];
   }
 }
 
