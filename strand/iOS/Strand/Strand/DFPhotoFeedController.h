@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFPhotoFeedCell.h"
 
-@interface DFPhotoFeedController : UITableViewController <UIActionSheetDelegate>
+@interface DFPhotoFeedController : UITableViewController <UIActionSheetDelegate, DFPhotoFeedCellDelegate>
 
 @end

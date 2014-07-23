@@ -29,7 +29,7 @@
 #import "DFPhotoMetadataAdapter.h"
 #import "UIAlertView+DFHelpers.h"
 
-const CGFloat DefaultRowHeight = 467;
+const CGFloat DefaultRowHeight = 420;
 const NSTimeInterval FeedChangePollFrequency = 1.0;
 
 @interface DFPhotoFeedController ()
@@ -103,7 +103,9 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
   [super viewDidLoad];
   
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:@"cell"];
+       forCellReuseIdentifier:@"photoCell"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
+       forCellReuseIdentifier:@"clusterCell"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil] forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
@@ -159,11 +161,13 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
                                                       object:self
                                                     userInfo:nil];
-  self.autoRefreshTimer = [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
-                                                           target:self
-                                                         selector:@selector(autoReloadFeed)
-                                                         userInfo:nil
-                                                          repeats:YES];
+  if (!self.autoRefreshTimer)
+    self.autoRefreshTimer =
+    [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
+                                     target:self
+                                   selector:@selector(autoReloadFeed)
+                                   userInfo:nil
+                                    repeats:YES];
   
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
@@ -240,58 +244,79 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoFeedCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"
-                                                          forIndexPath:indexPath];
+  DFPhotoFeedCell *cell;
 
   UIImage *image = self.imageCache[indexPath];
   
-  DFPeanutSearchObject *representativeObject = [self representativePhotoForIndexPath:indexPath];
+  NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
+  DFPeanutSearchObject *object = itemsForSection[indexPath.row];
   //DDLogVerbose(@"cellForRowAtIndexPath: [%d, %d] photoID: %llu", (int)indexPath.section, (int)indexPath.row, representativeObject.id);
-  [self addCellButtonActions:cell object:representativeObject];
   
-  if (image) {
-    cell.imageView.image = image;
-  } else {
-    cell.imageView.image = nil;
-    [cell.loadingActivityIndicator startAnimating];
-    
-    if (representativeObject) {
+  if ([object.type isEqual:DFSearchObjectPhoto]) {
+    cell = [tableView dequeueReusableCellWithIdentifier:@"photoCell"
+                                           forIndexPath:indexPath];
+    [cell setObjects:@[@(object.id)]];
+    [cell setClusterViewHidden:YES];
+    if (image) {
+      [cell setImage:image forObject:@(object.id)];
+    } else {
+      cell.imageView.image = nil;
+      [cell.loadingActivityIndicator startAnimating];
+      
+      if (object) {
+        [[DFImageStore sharedStore]
+         imageForID:object.id
+         preferredType:DFImageFull
+         thumbnailPath:object.thumb_image_path
+         fullPath:object.full_image_path
+         completion:^(UIImage *image) {
+           if (image) {
+             self.imageCache[indexPath] = image;
+           }
+           dispatch_async(dispatch_get_main_queue(), ^{
+             if (![tableView.visibleCells containsObject:cell]) return;
+             [cell setImage:image forObject:@(object.id)];
+             [cell.loadingActivityIndicator stopAnimating];
+             [cell setNeedsLayout];
+           });
+         }];
+      }
+    }
+  } else if ([object.type isEqual:DFSearchObjectCluster]) {
+    cell = [tableView dequeueReusableCellWithIdentifier:@"clusterCell"
+                                    forIndexPath:indexPath];
+    [cell setClusterViewHidden:NO];
+    [cell setObjects:[DFPhotoFeedController objectIDNumbers:object.objects]];
+    for (DFPeanutSearchObject *subObject in object.objects) {
       [[DFImageStore sharedStore]
-       imageForID:representativeObject.id
+       imageForID:subObject.id
        preferredType:DFImageFull
-       thumbnailPath:representativeObject.thumb_image_path
-       fullPath:representativeObject.full_image_path
+       thumbnailPath:subObject.thumb_image_path
+       fullPath:subObject.full_image_path
        completion:^(UIImage *image) {
-         if (image) {
-           self.imageCache[indexPath] = image;
-         }
          dispatch_async(dispatch_get_main_queue(), ^{
            if (![tableView.visibleCells containsObject:cell]) return;
-           cell.imageView.image = image;
-           [cell.loadingActivityIndicator stopAnimating];
+           [cell setImage:image forObject:@(subObject.id)];
            [cell setNeedsLayout];
          });
        }];
     }
   }
-  
+
   [DFPhotoFeedController configureNonImageAttributesForCell:cell
-                                               searchObject:representativeObject];
+                                               searchObject:object];
+  cell.delegate = self;
   [cell setNeedsLayout];
   return cell;
 }
 
-- (void)addCellButtonActions:(DFPhotoFeedCell *)cell object:(DFPeanutSearchObject *)object
++ (NSArray *)objectIDNumbers:(NSArray *)objects
 {
-  if (![cell.favoriteButton actionsForTarget:self forControlEvent:UIControlEventTouchUpInside]) {
-    [cell.favoriteButton addTarget:self action:@selector(favoriteButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutSearchObject *object in objects) {
+    [result addObject:@(object.id)];
   }
-  cell.favoriteButton.tag = (NSInteger)object.id;
-
-  if (![cell.moreOptionsButton actionsForTarget:self forControlEvent:UIControlEventTouchUpInside]) {
-    [cell.moreOptionsButton addTarget:self action:@selector(moreOptionsButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
-  }
-  cell.moreOptionsButton.tag = (NSInteger)object.id;
+  return result;
 }
 
 + (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
@@ -323,6 +348,23 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   return DefaultRowHeight;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  CGFloat rowHeight = DefaultRowHeight;
+  
+  DFPeanutSearchObject *sectionObject = self.sectionObjects[indexPath.section];
+  DFPeanutSearchObject *rowObject = sectionObject.objects[indexPath.row];
+  
+  if (rowObject.actions.count > 0) {
+    rowHeight += 19 + 8;
+  }
+  if ([rowObject.type isEqual:DFSearchObjectCluster]) {
+    rowHeight += 79 + 8;
+  }
+  
+  return rowHeight;
 }
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
@@ -376,12 +418,11 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
                    completion:nil];
 }
 
-- (void)favoriteButtonPressed:(UIButton *)sender
+- (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber
 {
   DDLogVerbose(@"Favorite button pressed");
-
-  DFPhotoIDType photoID = sender.tag;
-  DFPeanutSearchObject *object = self.objectsByID[@(photoID)];
+  DFPhotoIDType photoID = [objectIDNumber longLongValue];
+  DFPeanutSearchObject *object = self.objectsByID[objectIDNumber];
   DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
                                firstObject];
@@ -427,13 +468,13 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
   }
 }
 
-- (void)moreOptionsButtonPressed:(UIButton *)sender
+- (void)moreOptionsButtonPressedForObject:(NSNumber *)objectIDNumber
 {
   DDLogVerbose(@"More options button pressed");
-  DFPhotoIDType objectId = sender.tag;
+  DFPhotoIDType objectId = [objectIDNumber longLongValue];
+  DFPeanutSearchObject *object = self.objectsByID[objectIDNumber];
   self.actionSheetPhotoID = objectId;
   
-  DFPeanutSearchObject *object = self.objectsByID[@(objectId)];
   NSString *deleteTitle = [self isObjectDeletableByUser:object] ? @"Delete" : nil;
 
   UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
@@ -443,7 +484,7 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
                                                   otherButtonTitles:@"Save", nil];
   
  
-  [actionSheet showInView:sender.superview];
+  [actionSheet showInView:self.view.superview];
 }
 
 - (BOOL)isObjectDeletableByUser:(DFPeanutSearchObject *)object
