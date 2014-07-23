@@ -8,11 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+@class DFPhotoFeedCell;
+
 @protocol DFPhotoFeedCellDelegate <NSObject>
 @required
 
 - (void)favoriteButtonPressedForObject:(id)object;
 - (void)moreOptionsButtonPressedForObject:(id)object;
+- (void)feedCell:(DFPhotoFeedCell *)feedCell selectedObjectChanged:(id)newObject fromObject:(id)oldObject;
 
 @end
 

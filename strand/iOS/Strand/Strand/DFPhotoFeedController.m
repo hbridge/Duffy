@@ -29,8 +29,19 @@
 #import "DFPhotoMetadataAdapter.h"
 #import "UIAlertView+DFHelpers.h"
 
-const CGFloat DefaultRowHeight = 420;
 const NSTimeInterval FeedChangePollFrequency = 1.0;
+
+
+// constants used for row height calculations
+const CGFloat TitleAreaHeight = 22 + 14 + 14; // height plus spacing around
+const CGFloat ImageViewHeight = 320; // height plus spacing around
+const CGFloat CollectionViewHeight = 79;
+const CGFloat FavoritersListHeight = 17 + 8; //height + spacing to collection view or image view
+const CGFloat ActionBarHeight = 29 + 8; // height + spacing
+const CGFloat FooterPadding = 8;
+const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight + FavoritersListHeight + FooterPadding;
+
+
 
 @interface DFPhotoFeedController ()
 
@@ -109,7 +120,7 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil] forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
-  self.tableView.rowHeight = DefaultRowHeight;
+  self.tableView.rowHeight = MinRowHeight;
   
   self.refreshControl = [[UIRefreshControl alloc] init];
   [self.refreshControl addTarget:self action:@selector(reloadFeed) forControlEvents:UIControlEventValueChanged];
@@ -257,6 +268,8 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
                                            forIndexPath:indexPath];
     [cell setObjects:@[@(object.id)]];
     [cell setClusterViewHidden:YES];
+    [DFPhotoFeedController configureNonImageAttributesForCell:cell
+                                                 searchObject:object];
     if (image) {
       [cell setImage:image forObject:@(object.id)];
     } else {
@@ -287,6 +300,8 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
                                     forIndexPath:indexPath];
     [cell setClusterViewHidden:NO];
     [cell setObjects:[DFPhotoFeedController objectIDNumbers:object.objects]];
+    [DFPhotoFeedController configureNonImageAttributesForCell:cell
+                                                 searchObject:[object.objects firstObject]];
     for (DFPeanutSearchObject *subObject in object.objects) {
       [[DFImageStore sharedStore]
        imageForID:subObject.id
@@ -303,8 +318,7 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
     }
   }
 
-  [DFPhotoFeedController configureNonImageAttributesForCell:cell
-                                               searchObject:object];
+  
   cell.delegate = self;
   [cell setNeedsLayout];
   return cell;
@@ -347,21 +361,21 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  return DefaultRowHeight;
+  return MinRowHeight;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  CGFloat rowHeight = DefaultRowHeight;
+  CGFloat rowHeight = MinRowHeight;
   
   DFPeanutSearchObject *sectionObject = self.sectionObjects[indexPath.section];
   DFPeanutSearchObject *rowObject = sectionObject.objects[indexPath.row];
   
   if (rowObject.actions.count > 0) {
-    rowHeight += 19 + 8;
+    rowHeight += FavoritersListHeight;
   }
   if ([rowObject.type isEqual:DFSearchObjectCluster]) {
-    rowHeight += 79 + 8;
+    rowHeight += CollectionViewHeight;
   }
   
   return rowHeight;
@@ -417,6 +431,8 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
                      animated:YES
                    completion:nil];
 }
+
+#pragma mark - DFPhotoFeedCell Delegates
 
 - (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber
 {
@@ -487,10 +503,19 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
   [actionSheet showInView:self.view.superview];
 }
 
-- (BOOL)isObjectDeletableByUser:(DFPeanutSearchObject *)object
+
+- (void)feedCell:(DFPhotoFeedCell *)feedCell
+selectedObjectChanged:(id)newObject
+      fromObject:(id)oldObject
 {
-  return object.user == [[DFUser currentUser] userID];
+  DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
+  DFPeanutSearchObject *searchObject = self.objectsByID[newObject];
+  [DFPhotoFeedController configureNonImageAttributesForCell:feedCell searchObject:searchObject];
+  [feedCell setNeedsLayout];
 }
+
+
+#pragma mark - Action Handlers
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
@@ -502,6 +527,12 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
     [self savePhotoToCameraRoll];
   }
 }
+
+- (BOOL)isObjectDeletableByUser:(DFPeanutSearchObject *)object
+{
+  return object.user == [[DFUser currentUser] userID];
+}
+
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
 {

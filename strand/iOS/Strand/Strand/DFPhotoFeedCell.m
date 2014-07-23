@@ -161,9 +161,13 @@
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
+  id oldObject = self.selectedObject;
   id object = self.objects[indexPath.row];
   self.imageView.image = self.imagesForObjects[object];
   self.selectedObject = object;
+  if (self.delegate) {
+    [self.delegate feedCell:self selectedObjectChanged:object fromObject:oldObject];
+  }
 }
 
 #pragma mark - Action handlers
