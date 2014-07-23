@@ -14,9 +14,9 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000001192092896" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="13x-1i-Ub8">
-                        <rect key="frame" x="0.0" y="8" width="322" height="79"/>
+                        <rect key="frame" x="0.0" y="54" width="322" height="79"/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="79" id="yj2-gV-pRe"/>
+                            <constraint firstAttribute="height" constant="79" id="Gvu-ra-1qR"/>
                         </constraints>
                         <collectionViewFlowLayout key="collectionViewLayout" scrollDirection="horizontal" minimumLineSpacing="2" minimumInteritemSpacing="0.0" id="zpT-2D-yie">
                             <size key="itemSize" width="78.5" height="78.5"/>
@@ -26,23 +26,22 @@
                         </collectionViewFlowLayout>
                         <cells/>
                     </collectionView>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="282" translatesAutoresizingMaskIntoConstraints="NO" id="rLc-tW-oOk">
-                        <rect key="frame" x="20" y="105" width="282" height="36"/>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="These photos are locked. Take a photo to see them." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="282" translatesAutoresizingMaskIntoConstraints="NO" id="rLc-tW-oOk">
+                        <rect key="frame" x="20" y="10" width="282" height="36"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <string key="text">These photos are locked,
-take a photo to see them</string>
                         <fontDescription key="fontDescription" type="system" pointSize="15"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="rLc-tW-oOk" firstAttribute="top" secondItem="13x-1i-Ub8" secondAttribute="bottom" constant="18" id="9EB-u7-lDp"/>
-                    <constraint firstItem="rLc-tW-oOk" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="Fh5-78-dct"/>
-                    <constraint firstAttribute="trailing" secondItem="rLc-tW-oOk" secondAttribute="trailing" constant="20" id="GuF-7y-kaq"/>
-                    <constraint firstItem="13x-1i-Ub8" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="8" id="g1k-mO-FGb"/>
-                    <constraint firstAttribute="trailing" secondItem="13x-1i-Ub8" secondAttribute="trailing" id="gNL-KJ-foV"/>
-                    <constraint firstItem="13x-1i-Ub8" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="whd-yh-ZmQ"/>
+                    <constraint firstAttribute="trailing" secondItem="13x-1i-Ub8" secondAttribute="trailing" id="Fja-mB-uKa"/>
+                    <constraint firstItem="13x-1i-Ub8" firstAttribute="top" secondItem="rLc-tW-oOk" secondAttribute="bottom" constant="8" id="Ghk-p6-b0N"/>
+                    <constraint firstItem="rLc-tW-oOk" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="20" id="XVy-ml-EbT"/>
+                    <constraint firstItem="rLc-tW-oOk" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="10" id="fG6-bx-V1j"/>
+                    <constraint firstItem="13x-1i-Ub8" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="jha-Ka-ccV"/>
+                    <constraint firstAttribute="trailing" secondItem="rLc-tW-oOk" secondAttribute="trailing" constant="20" id="mf0-IR-tcG"/>
+                    <constraint firstItem="13x-1i-Ub8" firstAttribute="top" secondItem="rLc-tW-oOk" secondAttribute="bottom" constant="8" id="nN7-lE-uHC"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>

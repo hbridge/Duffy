@@ -13,6 +13,7 @@ PODS:
     - ActionSheetPicker2 (~> 0.1)
     - BWLongTextViewController (~> 1.0)
     - BWSelectViewController
+  - GPUImage (0.1.4)
   - HockeySDK (3.5.5)
   - JDStatusBarNotification (1.4.8)
   - Localytics-iOS-Client (2.23.0)
@@ -40,6 +41,7 @@ DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
   - CRToast (~> 0.0.7)
   - FormKit.m (~> 0.4.0)
+  - GPUImage (~> 0.1.4)
   - HockeySDK (~> 3.5.5)
   - JDStatusBarNotification (~> 1.4.7)
   - Localytics-iOS-Client (~> 2.23.0)
@@ -59,6 +61,7 @@ SPEC CHECKSUMS:
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   FormKit.m: 68e35d2e70558109fa9ce5935e0f16a65c8b2b51
+  GPUImage: ac2bde5f4dbea02a81ced6313964cec1f2043ca9
   HockeySDK: f9af97c2f5df4eb6ca6d2a9c408f2ff498edd608
   JDStatusBarNotification: c68611370dedc0ef865fb0fc1768dfbaf8fd961f
   Localytics-iOS-Client: 3f878379d40c67945ea5972c1e1bf9762b5e5b9f
