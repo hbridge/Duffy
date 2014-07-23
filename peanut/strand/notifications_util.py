@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 def sendNotification(user, msg, msgTypeId, customPayload):
 	if user.device_token:
 		if user.device_token == "TESTTOKEN":
-			return None
+			logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-1, msg_type=msgTypeId)
+			return logEntry
 
 		devices = Device.objects.select_related().filter(token=user.device_token)
 
