@@ -33,6 +33,7 @@
 #import "DFErrorScreen.h"
 #import "DFDefaultsStore.h"
 #import "DFLockedStrandCell.h"
+#import "DFUploadController.h"
 
 const NSTimeInterval FeedChangePollFrequency = 1.0;
 
@@ -162,6 +163,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 - (void)reloadFeed
 {
   [self reloadFeedIsSilent:NO];
+  [[DFUploadController sharedUploadController] uploadPhotos];
 }
 
 - (void)autoReloadFeed
@@ -226,6 +228,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
                                    userInfo:nil
                                     repeats:YES];
   
+  [[DFUploadController sharedUploadController] uploadPhotos];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
