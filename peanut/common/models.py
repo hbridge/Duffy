@@ -320,7 +320,7 @@ class NotificationLog(models.Model):
 	msg = models.TextField()
 	custom_payload = models.TextField()
 	apns = models.IntegerField()
-	added = models.DateTimeField(auto_now_add=True)
+	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	msg_type = models.IntegerField()
 
 	class Meta:

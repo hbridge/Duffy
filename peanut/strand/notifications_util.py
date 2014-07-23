@@ -78,8 +78,7 @@ def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff):
 				if notificationLog.user_id not in notificationsById:
 					notificationsById[notificationLog.user_id] = list()
 				notificationsById[notificationLog.user_id].append(notificationLog)
-			else:
-				print "filtered"
+
 	return notificationsById
 
 """
