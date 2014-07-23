@@ -427,10 +427,9 @@ def update_user_location(request):
 		lat = form.cleaned_data['lat']
 		timestamp = form.cleaned_data['timestamp']
 		accuracy = form.cleaned_data['accuracy']
-
-		if (not timestamp):
-			timestamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
+		last_photo_timestamp = form.cleaned_data['last_photo_timestamp']
+		
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		try:
 			user = User.objects.get(id=userId)
 		except User.DoesNotExist:
@@ -439,10 +438,19 @@ def update_user_location(request):
 			return HttpResponse(json.dumps(response), content_type="application/json", status=400)
 
 		if ((not lon == 0) or (not lat == 0)):
-			if ((user.last_location_timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
+			if ((user.last_location_timestamp and timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
-				user.last_location_timestamp = timestamp
+
+				if timestamp:
+					user.last_location_timestamp = timestamp
+				else:
+					user.last_location_timestamp = now
+
 				user.last_location_accuracy = accuracy
+
+				if last_photo_timestamp:
+					user.last_photo_timestamp = last_photo_timestamp
+					
 				user.save()
 				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
 			else:

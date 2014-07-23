@@ -48,6 +48,7 @@ class UpdateUserLocationForm(StrandApiForm):
 	lon = forms.FloatField(min_value=-180, max_value=180)
 	timestamp = forms.DateTimeField(required=False, input_formats=['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%d %H:%M:%S'])
 	accuracy = forms.FloatField(required=False)
+	last_photo_timestamp = forms.DateTimeField(required=False, input_formats=['%Y-%m-%dT%H:%M:%SZ', '%Y-%m-%d %H:%M:%S'])
 
 class GetFriendsNearbyMessageForm(StrandApiForm):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)

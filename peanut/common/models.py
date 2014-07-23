@@ -25,6 +25,7 @@ class User(models.Model):
 	last_location_point = models.PointField(null=True)
 	last_location_accuracy = models.IntegerField(null=True)
 	last_location_timestamp = models.DateTimeField(null=True)
+	last_photo_timestamp = models.DateTimeField(null=True)
 	invites_remaining = models.IntegerField(default=10)
 	last_build_info = models.CharField(max_length=100, null=True)
 	added = models.DateTimeField(auto_now_add=True)
@@ -317,7 +318,7 @@ class Neighbor(models.Model):
 class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
 	device_token = models.TextField()
-	msg = models.TextField()
+	msg = models.TextField(null=True)
 	custom_payload = models.TextField()
 	apns = models.IntegerField()
 	added = models.DateTimeField(auto_now_add=True, db_index=True)

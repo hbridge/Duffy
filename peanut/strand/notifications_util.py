@@ -24,8 +24,8 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 
 		if len(devices) == 0:
 			logger.warning("Was told to send a notification to user %s who has a device token but nothing in the Device table")
-			NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-2, msg_type=msgTypeId)
-			return
+			logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-2, msg_type=msgTypeId)
+			return logEntry
 			
 		for device in devices:
 			notification = DuffyNotification()
@@ -53,10 +53,12 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 			apns.push_notification_to_devices(notification, [device])
 
 			# This is for logging
-			NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId)
+			logEntry = NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId)
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user)
-		NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-1, msg_type=msgTypeId)
+		logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-1, msg_type=msgTypeId)
+
+		return logEntry
 
 
 def sendSMS(phoneNumber, msg):
@@ -78,6 +80,17 @@ def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff):
 				if notificationLog.user_id not in notificationsById:
 					notificationsById[notificationLog.user_id] = list()
 				notificationsById[notificationLog.user_id].append(notificationLog)
+
+	return notificationsById
+
+"""
+	Create a dictionary per user_id on last notification time of NewPhoto notifications
+"""
+def getNotificationsForTypeByIds(notificationLogs, msgTypes, timeCutoff):
+	notificationsById = dict()
+
+	for msgType in msgTypes:
+		notificationsById.update(getNotificationsForTypeById(notificationLogs, msgType, timeCutoff))
 
 	return notificationsById
 
