@@ -11,4 +11,7 @@
 
 @interface DFPhotoFeedController : UITableViewController <UIActionSheetDelegate, DFPhotoFeedCellDelegate>
 
+- (IBAction)cameraButtonPressed:(id)sender;
+- (IBAction)inviteButtonPressed:(id)sender;
+
 @end

@@ -51,7 +51,8 @@ static DFToastNotificationManager *defaultManager;
                             kCRToastSubtitleTextAlignmentKey : @(NSTextAlignmentLeft),
                             kCRToastNotificationTypeKey: @(CRToastTypeNavigationBar),
                             kCRToastInteractionRespondersKey: @[[DFToastNotificationManager
-                                                                 dismissInteractionHandler]]
+                                                                 dismissInteractionHandler]],
+                            kCRToastStatusBarStyleKey: @(UIStatusBarStyleLightContent),
                             };
   
   return options;
@@ -63,6 +64,9 @@ static DFToastNotificationManager *defaultManager;
     if (notificationType == DFStatusUploadError) {
       [self showErrorWithTitle:@"Couldn't Share Photos"
                       subTitle:@"An upload error occurred, please try again later."];
+    } else if (notificationType == DFFeedRefreshError) {
+      [self showErrorWithTitle:@"Couldn't Reload Feed"
+                      subTitle:@"Please try again later."];
     }
   });
 }
@@ -71,6 +75,7 @@ static DFToastNotificationManager *defaultManager;
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
 
+  options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
   options[kCRToastTimeIntervalKey] = @(5.0);
   options[kCRToastTextKey] = title;
   options[kCRToastSubtitleTextKey] = subtitle;

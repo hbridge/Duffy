@@ -28,6 +28,10 @@
 #import "DFPhotoStore.h"
 #import "DFPhotoMetadataAdapter.h"
 #import "UIAlertView+DFHelpers.h"
+#import "DFToastNotificationManager.h"
+#import "DFInviteUserComposeController.h"
+#import "DFErrorScreen.h"
+#import "DFDefaultsStore.h"
 
 const NSTimeInterval FeedChangePollFrequency = 1.0;
 
@@ -57,6 +61,10 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSTimer *autoRefreshTimer;
+
+@property (nonatomic, retain) DFInviteUserComposeController *inviteController;
+@property (nonatomic, retain) UIView *nuxPlaceholder;
+@property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
 @end
 
@@ -135,25 +143,6 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
-- (void)reloadFeedIsSilent:(BOOL)isSilent
-{
-  if (!isSilent)
-    [self.refreshControl beginRefreshing];
-  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
-                                                         NSData *hashData) {
-    if (response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash]) {
-      DDLogInfo(@"New feed data detected. Re-rendering feed.");
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [self setSectionObjects:response.topLevelSectionObjects];
-      });
-      self.lastResponseHash = hashData;
-    }
-    if (!isSilent) {
-      [self.refreshControl endRefreshing];
-    }
-  }];
-}
-
 - (void)reloadFeed
 {
   [self reloadFeedIsSilent:NO];
@@ -162,6 +151,46 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 - (void)autoReloadFeed
 {
   [self reloadFeedIsSilent:YES];
+}
+
+- (void)reloadFeedIsSilent:(BOOL)isSilent
+{
+  if (!isSilent)
+    [self.refreshControl beginRefreshing];
+  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
+                                                         NSData *hashData,
+                                                         NSError *error) {
+    [self.refreshControl endRefreshing];
+    if (!error) {
+      if (response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash]) {
+        DDLogInfo(@"New feed data detected. Re-rendering feed.");
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self setSectionObjects:response.topLevelSectionObjects];
+        });
+        self.lastResponseHash = hashData;
+      }
+    }
+    
+    // Evaluate whether and how to show error messages or NUX screens
+    if (self.sectionObjects.count == 0 && response.objects.count == 0) {
+      // Eligible to replace feed with placeholder
+      if (!error || [DFDefaultsStore actionCountForAction:UserActionTakePhoto] == 0) {
+        [self setShowNuxPlaceholder:YES];
+        [self showConnectionError:nil];
+      } else if (error) {
+        [self setShowNuxPlaceholder:NO];
+        [self showConnectionError:error];
+      }
+    } else {
+      // Not eligible to replace feed with placeholder
+      [self setShowNuxPlaceholder:NO];
+      [self showConnectionError:nil];
+      if (error && !isSilent) {
+        [[DFToastNotificationManager sharedInstance]
+         showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
+      }
+    }
+  }];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -197,9 +226,34 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
   self.imageCache = [[NSMutableDictionary alloc] init];
 }
 
+- (void)setShowNuxPlaceholder:(BOOL)isShown
+{
+  if (isShown) {
+    if (self.nuxPlaceholder) return;
+    self.nuxPlaceholder = [[[UINib nibWithNibName:@"FeedViewNuxPlaceholder" bundle:nil]
+                          instantiateWithOwner:self options:nil] firstObject];
+    [self.view addSubview:self.nuxPlaceholder];
+  } else {
+    [self.nuxPlaceholder removeFromSuperview];
+    self.nuxPlaceholder = nil;
+  }
+}
+
+- (void)showConnectionError:(NSError *)error
+{
+  [self.connectionErrorPlaceholder removeFromSuperview];
+  if (error) {
+    DFErrorScreen *errorScreen = [[[UINib nibWithNibName:@"DFErrorScreen" bundle:nil]
+                                   instantiateWithOwner:self options:nil] firstObject];
+    errorScreen.textView.text = error.localizedDescription;
+    self.connectionErrorPlaceholder = errorScreen;
+    [self.view addSubview:self.connectionErrorPlaceholder];
+  } else {
+    self.connectionErrorPlaceholder = nil;
+  }
+}
+
 #pragma mark - Table view data source: sections
-
-
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
@@ -432,6 +486,26 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
                    completion:nil];
 }
 
+
+- (void)inviteButtonPressed:(id)sender
+{
+  DDLogInfo(@"Invite button pressed");
+  if (self.inviteController.isBeingPresented) return;
+  self.inviteController = [[DFInviteUserComposeController alloc] init];
+  [self.inviteController loadMessageWithCompletion:^(NSError *error) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (!error) {
+        [self presentViewController:self.inviteController animated:YES completion:^(void) {
+          self.inviteController = nil;
+        }];
+      } else {
+        [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
+      }
+    });
+  }];
+}
+
+
 #pragma mark - DFPhotoFeedCell Delegates
 
 - (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber
@@ -515,7 +589,7 @@ selectedObjectChanged:(id)newObject
 }
 
 
-#pragma mark - Action Handlers
+#pragma mark - Action Handler Helpers
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {

@@ -10,7 +10,9 @@
 #import "DFNetworkAdapter.h"
 #import "DFPeanutSearchResponse.h"
 
-typedef void (^DFPeanutGalleryCompletionBlock)(DFPeanutSearchResponse *response, NSData *responseHash);
+typedef void (^DFPeanutGalleryCompletionBlock)(DFPeanutSearchResponse *response,
+                                               NSData *responseHash,
+                                               NSError *error);
 
 @interface DFPeanutGalleryAdapter : NSObject <DFNetworkAdapter>
 

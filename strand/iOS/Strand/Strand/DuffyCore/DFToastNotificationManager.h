@@ -12,6 +12,7 @@
 
 typedef enum {
   DFStatusUploadError,
+  DFFeedRefreshError,
 } DFToastNotificationType;
 
 
@@ -20,5 +21,6 @@ typedef enum {
 - (void)showNotificationWithType:(DFToastNotificationType)notificationType;
 - (void)showPhotoNotificationWithString:(NSString *)string;
 - (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout;
+- (void)showErrorWithTitle:(NSString *)title subTitle:(NSString *)subtitle;
 
 @end

@@ -59,17 +59,24 @@ NSString *const GalleryPath = @"neighbors";
                              hashDataForData:operation.HTTPRequestOperation.responseData];
      if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutSearchResponse class]]){
        DFPeanutSearchResponse *response = mappingResult.firstObject;
-       completionBlock(response, responseHash);
+       completionBlock(response, responseHash, nil);
      } else {
-       DDLogWarn(@"Search fetch resulted in a non-search response.  Mapping result: %@",
-                 mappingResult.description);
-       completionBlock(nil, nil);
+       NSError *error = [NSError
+                         errorWithDomain:@"com.duffyapp.strand"
+                         code:-12
+                         userInfo:@{
+                                    NSLocalizedDescriptionKey: @"Error. Please submit an error report to support.",
+                                    NSLocalizedFailureReasonErrorKey: @"Search fetch resulted in a non-search response.",
+                                    @"MappingResult": mappingResult.description,
+                                    }];
+       DDLogWarn(@"%@", error.description);
+       completionBlock(nil, nil, error);
      }
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
      DDLogWarn(@"Search fetch failed.  Error: %@", error.description);
-     completionBlock(nil,nil);
+     completionBlock(nil,nil, error);
    }];
   
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
