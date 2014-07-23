@@ -73,5 +73,17 @@ DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll = @"DFSetupStepAskToAutoSav
   return [[NSUserDefaults standardUserDefaults] boolForKey:step];
 }
 
+// Flash
++ (void)setFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode
+{
+  [[NSUserDefaults standardUserDefaults] setObject:@(flashMode) forKey:@"FlashMode"];
+}
+
++ (UIImagePickerControllerCameraFlashMode)flashMode
+{
+  NSNumber *flashMode = [[NSUserDefaults standardUserDefaults] objectForKey:@"FlashMode"];
+  return [flashMode intValue];
+}
+
 
 @end

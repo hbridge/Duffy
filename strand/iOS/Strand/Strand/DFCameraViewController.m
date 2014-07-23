@@ -102,12 +102,12 @@ const unsigned int SavePromptMinPhotos = 3;
   [super viewDidLoad];
   if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
     self.sourceType = UIImagePickerControllerSourceTypeCamera;
+    self.cameraOverlayView = self.customCameraOverlayView;
     self.view.backgroundColor = [UIColor blackColor];
     self.showsCameraControls = NO;
-    self.cameraFlashMode = UIImagePickerControllerCameraFlashModeAuto;
-    self.customCameraOverlayView.flashButton.tag = (NSInteger)UIImagePickerControllerCameraFlashModeAuto;
-    self.cameraOverlayView = self.customCameraOverlayView;
-    [self.customCameraOverlayView updateUIForFlashMode:UIImagePickerControllerCameraFlashModeAuto];
+    self.cameraFlashMode = [DFDefaultsStore flashMode];
+    self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
+    [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
   } else {
     self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
     //[self.view addSubview:self.customCameraOverlayView];
@@ -413,6 +413,7 @@ const unsigned int SavePromptMinPhotos = 3;
   flashButton.tag = newMode;
   self.cameraFlashMode = newMode;
   [self.customCameraOverlayView updateUIForFlashMode:newMode];
+  [DFDefaultsStore setFlashMode:newMode];
 }
 
 - (void)swapCameraButtonPressed:(UIButton *)sender

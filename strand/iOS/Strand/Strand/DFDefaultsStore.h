@@ -11,14 +11,11 @@
 
 @interface DFDefaultsStore : NSObject
 
-
 + (void)setLastNotificationType:(UIRemoteNotificationType)type;
 + (NSNumber *)lastNotificationType;
 
-
 + (void)setState:(DFPermissionStateType)state forPermission:(DFPermissionType)permission;
 + (DFPermissionStateType)stateForPermission:(DFPermissionType)permission;
-
 
 // whether setup steps have been passed
 typedef NSString *const DFSetupStepType;
@@ -32,5 +29,10 @@ extern DFUserActionType UserActionTakePhoto;
 
 + (void)incrementCountForAction:(DFUserActionType)action;
 + (unsigned int)actionCountForAction:(DFUserActionType)action;
+
+// Flash
++ (void)setFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
++ (UIImagePickerControllerCameraFlashMode)flashMode;
+
 
 @end
