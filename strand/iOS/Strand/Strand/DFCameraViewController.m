@@ -507,7 +507,8 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   
   NSMutableDictionary *mutableMetadata = [[NSMutableDictionary alloc] initWithDictionary:metadata];
   [self addLocation:location toMetadata:mutableMetadata];
-  [self addCachedLocationToMetadata:mutableMetadata];
+  NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
+  [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:mutableMetadata];
   
   // Save the assset locally
   NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
@@ -593,33 +594,13 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   metadata[@"{GPS}"] = latlongDict;
 }
 
-- (void)addCachedLocationToMetadata:(NSMutableDictionary *)metadata
+- (void)addExtraInfo:(NSString *)extraInfo toUserCommentsInMetadata:(NSMutableDictionary *)metadata
 {
-  CLLocation *lastCachedLocation = [DFLocationStore LoadLastLocation];
-  if (!lastCachedLocation) return;
-  
-  CLLocationCoordinate2D cachedCoords = lastCachedLocation.coordinate;
-  
-  NSMutableDictionary *exifDict = [[NSMutableDictionary alloc]
-                                   initWithDictionary:metadata[@"{Exif}"]];
-  
-  NSNumber *cachedLat = @(fabs(cachedCoords.latitude));
-  NSNumber *cachedLon = @(fabs(cachedCoords.longitude));
-  NSString *cachedDateRec = [[NSDateFormatter DjangoDateFormatter]
-                          stringFromDate:lastCachedLocation.timestamp];
-  NSString *GPSTagDateRec = [[NSDateFormatter DjangoDateFormatter] stringFromDate:self.locationManager.location.timestamp];
-  
-  NSDictionary *cachedLatlongDict = @{@"CachedLatitude": cachedLat,
-                                      @"CachedLatitudeRef" : cachedCoords.latitude >= 0.0 ? @"N" : @"S",
-                                      @"CachedLongitude" : cachedLon,
-                                      @"CachedLongitudeRef" : cachedCoords.longitude >= 0.0 ? @"E" : @"W",
-                                      @"CachedDateTimeRecorded" : cachedDateRec ? cachedDateRec : @"",
-                                      @"GPSTagDateTimeRecored" : GPSTagDateRec ? GPSTagDateRec : @""
-                                      };
-  exifDict[@"UserComment"] = cachedLatlongDict.description;
+  NSMutableDictionary *exifDict = [metadata[@"{Exif}"] mutableCopy];
+  NSString *oldData = exifDict[@"UserComment"];
+  exifDict[@"UserComment"] = [NSString stringWithFormat:@"%@, %@", oldData, extraInfo];
   metadata[@"{Exif}"] = exifDict;
 }
-
 
 - (void)joinableStrandsUpdated:(NSNotification *)note
 {
