@@ -176,7 +176,8 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
                                                          NSData *hashData,
                                                          NSError *error) {
-    [self.refreshControl endRefreshing];
+    if (!isSilent)
+      [self.refreshControl endRefreshing];
     if (!error) {
       if (response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash]) {
         DDLogInfo(@"New feed data detected. Re-rendering feed.");
