@@ -121,8 +121,16 @@ def userbaseSummary(request):
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
 			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added'))
 
-	notifsCounts = list(User.objects.filter(product_id=1).annotate(totalNotifs=Count('notificationlog'), lastSent=Max('notificationlog__added')))
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')))
+
+	# Exclude type GPS fetch since it happens so frequently
+	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
+	notificationCountById = dict()
+	notificationLastById = dict()
+	for notificationData in notificationDataRaw:
+		notificationCountById[notificationData['user']] = notificationData['totalNotifs']
+		notificationLastById[notificationData['user']] = notificationData['lastSent']
+
 
 	for i, user in enumerate(userStats):
 		entry = dict()
@@ -147,9 +155,9 @@ def userbaseSummary(request):
 		else:
 			entry['status'] = 'OK'
 
-		if notifsCounts[i].totalNotifs > 0:
-			entry['notifications'] = int(math.ceil(float(notifsCounts[i].totalNotifs)/float(5)))
-			entry['lastNotifSent'] = notifsCounts[i].lastSent.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+		if user.id in notificationCountById:
+			entry['notifications'] = int(math.ceil(float(notificationCountById[user.id])/float(5)))
+			entry['lastNotifSent'] = notificationLastById[user.id].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 		else:
 			entry['notifications'] = '-'
 
