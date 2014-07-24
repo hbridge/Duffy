@@ -27,6 +27,7 @@
   if (self) {
     _userInfo = userInfo;
     [self setMessageFromUserInfo:userInfo];
+    [self setTypeFromUserInfo:userInfo];
     [self setContentAvailableFromUserInfo:userInfo];
   }
   return self;
@@ -47,6 +48,11 @@
   }
 }
 
+- (void)setTypeFromUserInfo:(NSDictionary *)userInfo
+{
+  _type =  [(NSNumber *)self.userInfo[@"type"] intValue];
+}
+
 - (void)setContentAvailableFromUserInfo:(NSDictionary *)userInfo
 {
   NSDictionary *apsDict = userInfo[@"aps"];
@@ -56,16 +62,40 @@
 
 - (DFScreenType)screenToShow
 {
-  if (!self.userInfo[@"view"]) return DFScreenNone;
+  if (self.userInfo[@"view"]) {
+    return [(NSNumber *)self.userInfo[@"view"] intValue];
+  }
   
-  int viewNumber = [(NSNumber *)self.userInfo[@"view"] intValue];
-  return (DFScreenType)(viewNumber);
+  switch (self.type) {
+    case DFPushNotifUnknown:
+      return DFScreenCamera;
+    case DFPushNotifNewPhotos:
+      return DFScreenGallery;
+    case DFPushNotifJoinable:
+      return DFScreenCamera;
+    case DFPushNotifFavorited:
+      return DFScreenGallery;
+    case DFPushNotifFirestarter:
+      return DFScreenCamera;
+    default:
+      return DFScreenCamera;
+  }
 }
 
 - (BOOL)isUpdateLocationRequest
 {
   if (!self.userInfo[@"fgps"]) return NO;
   return [(NSNumber *)self.userInfo[@"fgps"] boolValue];
+}
+
+- (BOOL)isUpdateFeedRequest
+{
+  if (!self.userInfo[@"ff"]) return NO;
+  return [(NSNumber *)self.userInfo[@"ff"] boolValue];
+}
+
+- (NSString *)description{
+  return self.userInfo.description;
 }
 
 

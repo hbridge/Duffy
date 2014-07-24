@@ -28,3 +28,13 @@ typedef enum {
   DFScreenCamera,
   DFScreenGallery
 } DFScreenType;
+
+// Push notif types
+typedef enum {
+  DFPushNotifUnknown = 0,
+  DFPushNotifNewPhotos = 1,
+  DFPushNotifJoinable = 2,
+  DFPushNotifFavorited = 3,
+  DFPushNotifFetchGPS = 4,
+  DFPushNotifFirestarter = 5
+} DFPushNotifType;
