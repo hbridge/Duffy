@@ -13,6 +13,7 @@ typedef NS_OPTIONS(unsigned int, DFImageType) {
 typedef NSString *DFPermissionType;
 extern DFPermissionType const DFPermissionRemoteNotifications;
 extern DFPermissionType const DFPermissionLocation;
+extern DFPermissionType const DFPermissionPhotos;
 
 // Permission States
 typedef NSString *DFPermissionStateType;
@@ -21,6 +22,7 @@ extern DFPermissionStateType const DFPermissionStateNotRequested;
 extern DFPermissionStateType const DFPermissionStateGranted;
 extern DFPermissionStateType const DFPermissionStateDenied;
 extern DFPermissionStateType const DFPermissionStateUnavailable;
+extern DFPermissionStateType const DFPermissionStateRestricted;
 
 // Screens
 typedef enum {

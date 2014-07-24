@@ -9,6 +9,8 @@
 #import "DFAnalytics.h"
 #import "NSDictionary+DFJSON.h"
 #import "LocalyticsSession.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import "DFDefaultsStore.h"
 
 
 @interface DFAnalytics()
@@ -423,5 +425,43 @@ static DFAnalytics *defaultLogger;
   
   return valueString;
 }
+
+
++ (void)logPermissionsChanges
+{
+  [self logPhotoPermissionChanges];
+}
+
++ (void)logPhotoPermissionChanges
+{
+  // Photos
+  DFPermissionStateType oldPhotoState = [DFDefaultsStore stateForPermission:DFPermissionPhotos];
+  DFPermissionStateType currentState = [self.class stateFromAssetAuthStatus:[ALAssetsLibrary authorizationStatus]];
+  if ([oldPhotoState isEqual:currentState] ||
+      (oldPhotoState != nil &&
+       [ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusNotDetermined))
+  {
+    return;
+  }
+  
+  [self.class logPermission:DFPermissionPhotos
+        changedWithOldState:oldPhotoState
+                   newState:currentState];
+  [DFDefaultsStore setState:currentState forPermission:DFPermissionPhotos];
+}
+
++ (DFPermissionStateType)stateFromAssetAuthStatus:(ALAuthorizationStatus)status
+{
+  if (status == ALAuthorizationStatusAuthorized) {
+    return DFPermissionStateGranted;
+  } else if (status == ALAuthorizationStatusDenied) {
+    return DFPermissionStateDenied;
+  } else if (status == ALAuthorizationStatusRestricted) {
+    return DFPermissionStateRestricted;
+  } else { //if (status == ALAuthorizationStatusNotDetermined)
+    return DFPermissionStateNotRequested;
+  }
+}
+
 
 @end

@@ -58,6 +58,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
                                        newState:(NSString *)newState
                             oldNotificationType:(UIRemoteNotificationType)oldType
                                         newType:(UIRemoteNotificationType)newType;
++ (void)logPermissionsChanges;
 + (void)logPermission:(DFPermissionType)permission
   changedWithOldState:(DFPermissionStateType)oldState
              newState:(DFPermissionStateType)newState;
