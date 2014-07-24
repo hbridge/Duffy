@@ -41,7 +41,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 
 + (void)logBackgroundAppRefreshOccurred;
 + (void)logLocationUpdated;
-+ (void)logNotificationOpened:(NSString *)notificationType;
++ (void)logNotificationOpenedWithType:(DFPushNotifType)type;
 
 + (void)logPhotoDeletedWithResult:(NSString *)result;
 + (void)logPhotoLikePressedWithNewValue:(BOOL)isOn result:(NSString *)result;

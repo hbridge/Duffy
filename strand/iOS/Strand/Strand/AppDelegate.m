@@ -243,7 +243,7 @@
 didReceiveRemoteNotification:(NSDictionary *)userInfo
 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
-  DDLogVerbose(@"App received notification dict: %@",
+  DDLogVerbose(@"App received notification: %@",
                userInfo.description);
   DFPeanutPushNotification *pushNotif = [[DFPeanutPushNotification alloc] initWithUserInfo:userInfo];
   if ([application applicationState] == UIApplicationStateBackground && pushNotif.isUpdateLocationRequest){
@@ -266,7 +266,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
         [(RootViewController *)self.window.rootViewController showGallery];
       }
     }
-    [DFAnalytics logNotificationOpened:[NSString stringWithFormat:@"%d", pushNotif.screenToShow]];
+    [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
   } else if ([application applicationState] == UIApplicationStateActive) {
     if ([pushNotif.message isNotEmpty]) {
       [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:pushNotif.message];

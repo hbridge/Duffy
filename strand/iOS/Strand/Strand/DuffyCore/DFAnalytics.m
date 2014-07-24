@@ -291,11 +291,31 @@ static DFAnalytics *defaultLogger;
                                                         }];
 }
 
-+ (void)logNotificationOpened:(NSString *)notificationType
++ (void)logNotificationOpenedWithType:(DFPushNotifType)type
 {
-  [DFAnalytics logEvent:NotificationOpenedEvent withParameters:@{
-                                                            NotificationTypeKey: notificationType
-                                                            }];
+  [DFAnalytics logEvent:NotificationOpenedEvent
+         withParameters:@{
+                          NotificationTypeKey: [self.class pushNotifTypeToString:type],
+                          }];
+}
+
++ (NSString *)pushNotifTypeToString:(DFPushNotifType)type
+{
+  if (type == DFPushNotifUnknown) {
+    return @"unknown";
+  } else if (type == DFPushNotifFavorited) {
+    return @"favorite";
+  } else if (type == DFPushNotifFetchGPS) {
+    return @"fetchGPS";
+  } else if (type == DFPushNotifFirestarter) {
+    return @"firestarter";
+  } else if (type == DFPushNotifJoinable) {
+    return @"joinable";
+  } else if (type == DFPushNotifNewPhotos) {
+    return @"newPhotos";
+  }
+  
+  return @"unknown";
 }
 
 + (void)logPhotoDeletedWithResult:(NSString *)result
