@@ -30,6 +30,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *moreOptionsButton;
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UILabel *photoDateLabel;
 
 // Delegate
 @property (nonatomic, weak) NSObject <DFPhotoFeedCellDelegate> *delegate;

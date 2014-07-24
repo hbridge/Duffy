@@ -7,15 +7,15 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="538" id="KGk-i7-Jjw" customClass="DFPhotoFeedCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="539"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="482" id="KGk-i7-Jjw" customClass="DFPhotoFeedCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="483"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="320" height="538"/>
+                <rect key="frame" x="0.0" y="0.0" width="320" height="482"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HE2-Vf-wok">
-                        <rect key="frame" x="10" y="13" width="300" height="16"/>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HE2-Vf-wok">
+                        <rect key="frame" x="10" y="13" width="248" height="16"/>
                         <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
@@ -39,7 +39,7 @@
                         </constraints>
                     </imageView>
                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="6Gw-h8-Can">
-                        <rect key="frame" x="8" y="-99" width="20" height="20"/>
+                        <rect key="frame" x="8" y="-88" width="20" height="20"/>
                     </activityIndicatorView>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000000000000004" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h07-n4-DgV">
                         <rect key="frame" x="10" y="333" width="300" height="79"/>
@@ -99,10 +99,22 @@
                             <constraint firstAttribute="height" constant="29" id="kOJ-Yo-7ov"/>
                         </constraints>
                     </view>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="25m" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xhR-gV-Znx">
+                        <rect key="frame" x="258" y="13" width="52" height="16"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="16" id="kFk-Pv-TAS"/>
+                            <constraint firstAttribute="width" constant="52" id="xcm-DM-Dbm"/>
+                        </constraints>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="h07-n4-DgV" secondAttribute="trailing" constant="10" id="07M-SB-Mi0"/>
+                    <constraint firstItem="xhR-gV-Znx" firstAttribute="leading" secondItem="HE2-Vf-wok" secondAttribute="trailing" id="1YF-IO-PF8"/>
                     <constraint firstItem="U1S-w6-Jtc" firstAttribute="top" secondItem="h07-n4-DgV" secondAttribute="bottom" priority="900" constant="8" id="BMx-TO-HYc"/>
                     <constraint firstAttribute="trailing" secondItem="U1S-w6-Jtc" secondAttribute="trailing" id="EAA-NR-agd"/>
                     <constraint firstItem="h07-n4-DgV" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" constant="1" id="Q48-yN-yzu"/>
@@ -110,15 +122,16 @@
                     <constraint firstAttribute="trailing" secondItem="v5m-xw-TWf" secondAttribute="trailing" constant="10" id="U2a-H5-vDZ"/>
                     <constraint firstAttribute="centerX" secondItem="EPr-aP-pSV" secondAttribute="centerX" id="UMD-W8-k6d"/>
                     <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="W57-RD-aTX"/>
+                    <constraint firstItem="EPr-aP-pSV" firstAttribute="trailing" secondItem="xhR-gV-Znx" secondAttribute="trailing" id="XFh-2m-JaH"/>
                     <constraint firstItem="v5m-xw-TWf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="emp-ho-p4y"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="32" id="fDr-AQ-CiI"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="HE2-Vf-wok" secondAttribute="bottom" constant="3" id="flS-ZR-bpc"/>
                     <constraint firstItem="v5m-xw-TWf" firstAttribute="top" secondItem="h07-n4-DgV" secondAttribute="bottom" constant="8" id="kcq-eS-SKN"/>
+                    <constraint firstItem="HE2-Vf-wok" firstAttribute="centerY" secondItem="xhR-gV-Znx" secondAttribute="centerY" id="n4h-3S-fks"/>
                     <constraint firstItem="HE2-Vf-wok" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="o1z-cd-LaE"/>
                     <constraint firstItem="U1S-w6-Jtc" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="qjF-xY-N9B"/>
                     <constraint firstItem="v5m-xw-TWf" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="900" constant="8" id="u3r-jO-EWn"/>
                     <constraint firstItem="U1S-w6-Jtc" firstAttribute="top" secondItem="v5m-xw-TWf" secondAttribute="bottom" constant="8" id="v2A-sz-rMw"/>
-                    <constraint firstAttribute="trailing" secondItem="HE2-Vf-wok" secondAttribute="trailing" constant="10" id="yXj-YJ-bq2"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
@@ -127,6 +140,7 @@
                 <outlet property="favoritersButton" destination="v5m-xw-TWf" id="F9j-ZI-47L"/>
                 <outlet property="loadingActivityIndicator" destination="6Gw-h8-Can" id="e70-WN-aaJ"/>
                 <outlet property="moreOptionsButton" destination="B5M-0I-S31" id="vGA-wj-gj8"/>
+                <outlet property="photoDateLabel" destination="xhR-gV-Znx" id="Rm7-Ee-eba"/>
                 <outlet property="photoImageView" destination="EPr-aP-pSV" id="f4q-6k-aBD"/>
                 <outlet property="titleLabel" destination="HE2-Vf-wok" id="epE-vc-jiD"/>
             </connections>

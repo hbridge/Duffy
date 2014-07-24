@@ -48,4 +48,13 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
   return djangoDateFormatter;
 }
 
++ (NSString *)relativeTimeStringSinceDate:(NSDate *)date
+{
+  NSTimeInterval timeSinceDate = [[NSDate date] timeIntervalSinceDate:date];
+  if (timeSinceDate < 60.0) return @"1m";
+  if (timeSinceDate < 60.0 * 60) return [NSString stringWithFormat:@"%dm", (int)timeSinceDate/60];
+  if (timeSinceDate < 60.0 * 60 * 24) return [NSString stringWithFormat:@"%dh", (int)timeSinceDate/60/60];
+  return [NSString stringWithFormat:@"%dd", (int)timeSinceDate/60/60/24];
+}
+
 @end

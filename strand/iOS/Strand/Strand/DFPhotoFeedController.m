@@ -34,6 +34,7 @@
 #import "DFDefaultsStore.h"
 #import "DFLockedStrandCell.h"
 #import "DFUploadController.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 const NSTimeInterval FeedChangePollFrequency = 1.0;
 
@@ -436,6 +437,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
                               searchObject:(DFPeanutSearchObject *)searchObject
 {
   cell.titleLabel.text = searchObject.user_display_name;
+  cell.photoDateLabel.text = [NSDateFormatter relativeTimeStringSinceDate:searchObject.time_taken];
   
   if (searchObject.actions.count > 0) {
     [cell setFavoritersListHidden:NO];
