@@ -64,6 +64,10 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 
 		return logEntry
 
+def sendRefreshFeed(user):
+	msgType = constants.NOTIFICATIONS_REFRESH_FEED
+
+	sendNotification(user, "", msgType, dict())
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
@@ -76,7 +80,7 @@ def sendSMS(phoneNumber, msg):
 """
 	Create a dictionary per user_id on last notification time of NewPhoto notifications
 """
-def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff):
+def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff = None):
 	notificationsById = dict()
 	for notificationLog in notificationLogs:
 		if notificationLog.msg_type == msgType:
@@ -90,7 +94,7 @@ def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff):
 """
 	Create a dictionary per user_id on last notification time of NewPhoto notifications
 """
-def getNotificationsForTypeByIds(notificationLogs, msgTypes, timeCutoff):
+def getNotificationsForTypeByIds(notificationLogs, msgTypes, timeCutoff = None):
 	notificationsById = dict()
 
 	for msgType in msgTypes:

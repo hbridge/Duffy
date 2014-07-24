@@ -49,7 +49,7 @@ def sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandLimitGpsUpda
 
 	newPhotosStartTimeCutoff = now - datetime.timedelta(seconds=joinStrandWithinTime)
 	neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTimeCutoff) | Q(photo_2__time_taken__gt=newPhotosStartTimeCutoff)).order_by('photo_1')
-	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogsCache, msgType, newPhotosStartTimeCutoff)
+	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, [msgType, constants.NOTIFICATIONS_NEW_PHOTO_ID], newPhotosStartTimeCutoff)
 
 	# 30 minute cut off for join strand messages
 	joinStrandStartTimeCutoff = now - datetime.timedelta(seconds=joinStrandWithinTime)

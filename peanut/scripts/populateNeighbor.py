@@ -3,6 +3,7 @@ import sys, os
 import time, datetime
 import logging
 import math
+import pytz
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -67,12 +68,16 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 	
 	# Grab logs from last 30 seconds (default) then grab the last time they were notified
 	notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
-	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
+	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [msgType, constants.NOTIFICATIONS_JOIN_STRAND_ID])
 
 	# This is a dict with the user as the key and a list of other users w photos as the value
-	usersToNotify = dict()
+	usersToNotifyAboutById = dict()
+	usersToUpdateFeed = list()
 	photosToNotifyAbout = dict()
 
+	# Look through all of the new neighbor rows and pick out all the photos/users we need to notify
+	# a user about (if there's a new photo in their feed, we let them know)
+	# also, grab all users in general and tell them to update their feeds
 	for neighbor in neighbors:
 		# If photo2 time is after photo1, we want to notify user1 since they have the older one
 		# Else we want to notify user2
@@ -85,11 +90,14 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 			otherUser = neighbor.user_1
 			photosToNotifyAbout[user] = neighbor.photo_1
 
-		if user not in usersToNotify:
-			usersToNotify[user] = list()
-		usersToNotify[user].append(otherUser)
+		if user not in usersToNotifyAboutById:
+			usersToNotifyAboutById[user] = list()
+		usersToNotifyAboutById[user].append(otherUser)
 
-	for user, otherUsers in usersToNotify.iteritems():
+		usersToUpdateFeed.append(neighbor.photo_1.user)
+		usersToUpdateFeed.append(neighbor.photo_2.user)
+
+	for user, otherUsers in usersToNotifyAboutById.iteritems():
 		otherUsers = set(otherUsers)
 
 		names = list()
@@ -107,6 +115,12 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 		else:
 			logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
 	
+	usersToUpdateFeed = set(usersToUpdateFeed)
+
+	for user in usersToUpdateFeed:
+		logger.debug("Sending refreshFeed msg to user %s" % (user.id))
+		notifications_util.sendRefreshFeed(user)
+
 def main(argv):
 	maxPhotosAtTime = 100
 	timeWithinSecondsForNotification = 30 # seconds
