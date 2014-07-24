@@ -102,6 +102,7 @@ def sendPhotoActionNotifications(now, waitTime):
 	likeNotificationWaitSeconds = now - datetime.timedelta(seconds=waitTime)
 
 	photoActions = PhotoAction.objects.select_related().filter(added__lte=likeNotificationWaitSeconds).filter(user_notified_time=None)
+	usersToUpdateFeed = list()
 
 	for photoAction in photoActions:
 		if photoAction.action_type == "favorite":
@@ -116,6 +117,13 @@ def sendPhotoActionNotifications(now, waitTime):
 
 			photoAction.user_notified_time = datetime.datetime.utcnow()
 			photoAction.save()
+		usersToUpdateFeed.append(photoAction.photo.user)
+
+	# Tell all the users who just had photos liked to refresh their feeds
+	usersToUpdateFeed = set(usersToUpdateFeed)
+	for user in usersToUpdateFeed:
+		logger.debug("Sending refreshFeed msg to user %s" % (user.id))
+		notifications_util.sendRefreshFeed(user)
 
 """
 	If we haven't gotten a gps coordinate from them in the last hour, then send a ping
