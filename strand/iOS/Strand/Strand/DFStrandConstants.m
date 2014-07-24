@@ -26,6 +26,8 @@ NSString *const DFStrandUnseenPhotosUpdatedCountKey = @"DFStrandUnseenPhotosUpda
 NSString *const DFStrandJoinableStrandsNearbyNotificationName = @"DFStrandJoinableStrandsNearbyNotificationName";
 NSString *const DFStrandJoinableStrandsCountKey = @"DFStrandJoinableStrandsCountKey";
 
+NSString *const DFStrandRefreshRemoteUIRequestedNotificationName = @"com.duffyapp.Strand.DFStrandRefreshRemoteUIRequestedNotificationName";
+
 UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor

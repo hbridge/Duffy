@@ -24,6 +24,9 @@ extern NSString *const DFStrandJoinableStrandsNearbyNotificationName;
 extern NSString *const DFStrandJoinableStrandsCountKey;
 extern NSString *const DFStrandLastFetchAttemptDateDefaultsKey;
 
+extern NSString *const DFStrandRefreshRemoteUIRequestedNotificationName;
+
+
 + (UIColor *)defaultBackgroundColor;
 + (UIColor *)defaultBarForegroundColor;
 + (UIColor *)strongFeedForegroundTextColor;

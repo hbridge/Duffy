@@ -36,7 +36,7 @@
 #import "DFUploadController.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 
-const NSTimeInterval FeedChangePollFrequency = 1.0;
+const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 const CGFloat HeaderHeight = 48.0;
 // constants used for row height calculations
@@ -128,6 +128,10 @@ const CGFloat LockedCellHeight = 157.0;
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(applicationDidEnterBackground:)
                                                name:UIApplicationDidEnterBackgroundNotification
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadFeed)
+                                               name:DFStrandRefreshRemoteUIRequestedNotificationName
                                              object:nil];
 }
 

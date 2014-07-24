@@ -28,6 +28,7 @@
 #import "DFTypedefs.h"
 #import "DFPeanutPushNotification.h"
 #import "NSString+DFHelpers.h"
+#import "DFStrandConstants.h"
 
 
 @interface AppDelegate ()
@@ -267,8 +268,10 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   } else if ([application applicationState] == UIApplicationStateActive) {
     if ([pushNotif.message isNotEmpty]) {
       [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:pushNotif.message];
-    }
-    [[DFStrandsManager sharedStrandsManager] performFetch];
+    }    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:DFStrandRefreshRemoteUIRequestedNotificationName
+     object:self];
   }
   
   if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);

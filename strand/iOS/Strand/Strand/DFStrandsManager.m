@@ -57,7 +57,10 @@ static DFStrandsManager *defaultStrandsManager;
                                              selector:@selector(galleryAppeared:)
                                                  name:DFStrandGalleryAppearedNotificationName
                                                object:nil];
-
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(performFetch)
+                                                 name:DFStrandRefreshRemoteUIRequestedNotificationName
+                                               object:nil];
   }
   return self;
 }
