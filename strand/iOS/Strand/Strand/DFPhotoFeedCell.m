@@ -24,7 +24,11 @@
 {
   [self configureView];
   [self saveConstraints];
-  [self configureButtonActions];
+  UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
+                                                initWithTarget:self
+                                                action:@selector(favoriteButtonPressed:)];
+  doubleTapRecognizer.numberOfTapsRequired = 2;
+  [self.photoImageView addGestureRecognizer:doubleTapRecognizer];
 }
 
 - (void)configureView
@@ -40,16 +44,6 @@
         forCellWithReuseIdentifier:@"cell"];
   self.collectionView.backgroundColor = [UIColor clearColor];
 
-}
-
-- (void)configureButtonActions
-{
-  [self.favoriteButton addTarget:self
-                          action:@selector(favoriteButtonPressed:)
-                forControlEvents:UIControlEventTouchUpInside];
-  [self.moreOptionsButton addTarget:self
-                          action:@selector(moreOptionsButtonPressed:)
-                forControlEvents:UIControlEventTouchUpInside];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -180,17 +174,17 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 #pragma mark - Action handlers
 
-- (void)favoriteButtonPressed:(UIButton *)sender
+- (IBAction)favoriteButtonPressed:(id)sender
 {
   if (self.delegate) {
-    [self.delegate favoriteButtonPressedForObject:self.selectedObject];
+    [self.delegate favoriteButtonPressedForObject:self.selectedObject sender:sender];
   }
 }
 
-- (void)moreOptionsButtonPressed:(UIButton *)sender
+- (IBAction)moreOptionsButtonPressed:(id)sender
 {
   if (self.delegate) {
-    [self.delegate moreOptionsButtonPressedForObject:self.selectedObject];
+    [self.delegate moreOptionsButtonPressedForObject:self.selectedObject sender:sender];
   }
 }
 

@@ -87,9 +87,9 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
 
 - (DFPeanutAction *)userFavoriteAction
 {
-  return [[self actionsOfType:DFActionFavorite
-                                           forUser:[[DFUser currentUser] userID]]
-                               firstObject];
+  return [[self actionsOfType:DFPeanutActionFavorite
+                      forUser:[[DFUser currentUser] userID]]
+          firstObject];
 }
 
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction

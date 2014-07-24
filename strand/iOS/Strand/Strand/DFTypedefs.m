@@ -16,4 +16,5 @@ DFPermissionStateType const DFPermissionStateDenied = @"Denied";
 DFPermissionStateType const DFPermissionStateUnavailable = @"Unavailable";
 DFPermissionStateType const DFPermissionStateRestricted = @"Restricted";
 
-
+DFActionType DFActionButtonPress = @"ButtonPress";
+DFActionType DFActionDoubleTap = @"DoubleTap";

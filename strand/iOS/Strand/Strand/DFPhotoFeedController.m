@@ -438,7 +438,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
     }
   }
 
-  
+  cell.selectionStyle = UITableViewCellSelectionStyleNone;
   [cell setNeedsLayout];
   return cell;
 }
@@ -585,19 +585,20 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 
 #pragma mark - DFPhotoFeedCell Delegates
 
-- (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber
+- (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender
 {
   DDLogVerbose(@"Favorite button pressed");
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
   DFPeanutSearchObject *object = self.objectsByID[objectIDNumber];
-  DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFActionFavorite
+  DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFPeanutActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
                                firstObject];
+  BOOL wasGesture = [sender isKindOfClass:[UIGestureRecognizer class]];
   DFPeanutAction *newAction;
   if (!oldFavoriteAction) {
     newAction = [[DFPeanutAction alloc] init];
     newAction.user = [[DFUser currentUser] userID];
-    newAction.action_type = DFActionFavorite;
+    newAction.action_type = DFPeanutActionFavorite;
     newAction.photo = photoID;
   } else {
     newAction = nil;
@@ -613,7 +614,9 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
         [object setUserFavoriteAction:action];
       } // no need for the else case, it was already removed optimistically
       
-      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil) result:DFAnalyticsValueResultSuccess];
+      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
+                                            result:DFAnalyticsValueResultSuccess
+                                        actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress];
     } else {
       [object setUserFavoriteAction:oldFavoriteAction];
       [self reloadRowForPhotoID:photoID];
@@ -623,7 +626,9 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
                                             cancelButtonTitle:@"OK"
                                             otherButtonTitles:nil];
       [alert show];
-      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil) result:DFAnalyticsValueResultFailure];
+      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
+                                            result:DFAnalyticsValueResultFailure
+                                        actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress];
     }
   };
   
@@ -635,7 +640,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   }
 }
 
-- (void)moreOptionsButtonPressedForObject:(NSNumber *)objectIDNumber
+- (void)moreOptionsButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender
 {
   DDLogVerbose(@"More options button pressed");
   DFPhotoIDType objectId = [objectIDNumber longLongValue];

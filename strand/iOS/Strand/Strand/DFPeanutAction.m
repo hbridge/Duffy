@@ -12,7 +12,7 @@
 #import "DFPeanutError.h"
 
 
-DFActionType DFActionFavorite = @"favorite";
+DFPeanutActionType DFPeanutActionFavorite = @"favorite";
 
 @implementation DFPeanutAction
 
@@ -31,7 +31,7 @@ DFActionType DFActionFavorite = @"favorite";
 {
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in actionArray) {
-    if ([action.action_type isEqualToString:DFActionFavorite]) {
+    if ([action.action_type isEqualToString:DFPeanutActionFavorite]) {
       if (action.user == [[DFUser currentUser] userID]) {
         [result addObject:@"You"];
       } else {

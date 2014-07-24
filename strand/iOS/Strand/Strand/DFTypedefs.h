@@ -40,3 +40,7 @@ typedef enum {
   DFPushNotifFetchGPS = 4,
   DFPushNotifFirestarter = 5
 } DFPushNotifType;
+
+typedef NSString *DFActionType;
+extern DFActionType DFActionButtonPress;
+extern DFActionType DFActionDoubleTap;

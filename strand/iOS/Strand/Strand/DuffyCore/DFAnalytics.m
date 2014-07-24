@@ -326,10 +326,12 @@ static DFAnalytics *defaultLogger;
 }
 
 + (void)logPhotoLikePressedWithNewValue:(BOOL)isOn result:(NSString *)result
+                             actionType:(DFActionType)actionType
 {
   [DFAnalytics logEvent:PhotoLikedEvent withParameters:@{
                                                          NewValueKey: @(isOn),
-                                                         ResultKey: result
+                                                         ResultKey: result,
+                                                         @"ActionType" : actionType
                                                          }];
 }
 

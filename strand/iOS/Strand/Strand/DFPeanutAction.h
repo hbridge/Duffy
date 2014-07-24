@@ -22,9 +22,9 @@
  */
 
 typedef UInt64 DFActionID;
-typedef NSString *const DFActionType;
+typedef NSString *const DFPeanutActionType;
 
-extern DFActionType DFActionFavorite;
+extern DFPeanutActionType DFPeanutActionFavorite;
 
 @interface DFPeanutAction : NSObject <DFPeanutObject>
 

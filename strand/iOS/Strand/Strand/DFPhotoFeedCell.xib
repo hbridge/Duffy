@@ -31,16 +31,14 @@
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
                     </button>
-                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPr-aP-pSV">
+                    <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPr-aP-pSV">
                         <rect key="frame" x="10" y="32" width="300" height="300"/>
+                        <gestureRecognizers/>
                         <constraints>
                             <constraint firstAttribute="height" constant="300" id="ikG-p7-8RR"/>
                             <constraint firstAttribute="width" constant="300" id="t1L-J8-dky"/>
                         </constraints>
                     </imageView>
-                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="6Gw-h8-Can">
-                        <rect key="frame" x="8" y="-88" width="20" height="20"/>
-                    </activityIndicatorView>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000000000000004" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h07-n4-DgV">
                         <rect key="frame" x="10" y="333" width="300" height="79"/>
                         <constraints>
@@ -54,6 +52,9 @@
                         </collectionViewFlowLayout>
                         <cells/>
                     </collectionView>
+                    <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="6Gw-h8-Can">
+                        <rect key="frame" x="150" y="172" width="20" height="20"/>
+                    </activityIndicatorView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U1S-w6-Jtc" userLabel="Actions bar">
                         <rect key="frame" x="0.0" y="445" width="320" height="29"/>
                         <subviews>
@@ -71,6 +72,9 @@
                                 <state key="selected" title="Favorited" image="Assets/Icons/LikeOnButtonIcon">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="favoriteButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="oea-Ql-RiH"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="B5M-0I-S31" userLabel="moreOptionsButton" customClass="DFRoundedButton">
                                 <rect key="frame" x="282" y="0.0" width="30" height="29"/>
@@ -86,6 +90,9 @@
                                 <state key="selected">
                                     <color key="titleColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <connections>
+                                    <action selector="moreOptionsButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="Zzr-O1-SY2"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>

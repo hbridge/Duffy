@@ -13,8 +13,8 @@
 @protocol DFPhotoFeedCellDelegate <NSObject>
 @required
 
-- (void)favoriteButtonPressedForObject:(id)object;
-- (void)moreOptionsButtonPressedForObject:(id)object;
+- (void)favoriteButtonPressedForObject:(id)object sender:(id)sender;
+- (void)moreOptionsButtonPressedForObject:(id)object sender:(id)sender;
 - (void)feedCell:(DFPhotoFeedCell *)feedCell selectedObjectChanged:(id)newObject fromObject:(id)oldObject;
 
 @end
@@ -41,6 +41,10 @@
 
 - (void)setFavoritersListHidden:(BOOL)hidden;
 - (void)setClusterViewHidden:(BOOL)hidden;
+
+
+- (IBAction)favoriteButtonPressed:(id)sender;
+- (IBAction)moreOptionsButtonPressed:(id)sender;
 
 
 

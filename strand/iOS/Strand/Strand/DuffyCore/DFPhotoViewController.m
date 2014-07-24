@@ -75,7 +75,7 @@
 {
   self.favoritedOtherUserNames = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in self.photoActions) {
-    if ([action.action_type isEqualToString:DFActionFavorite]) {
+    if ([action.action_type isEqualToString:DFPeanutActionFavorite]) {
       if (action.user == [[DFUser currentUser] userID]) {
         self.userFavoritedAction = action;
       } else {
@@ -417,7 +417,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   if (!self.isUserFavorited) {
     newAction = [[DFPeanutAction alloc] init];
     newAction.user = [[DFUser currentUser] userID];
-    newAction.action_type = DFActionFavorite;
+    newAction.action_type = DFPeanutActionFavorite;
     newAction.photo = self.photoID;
   } else {
     newAction = nil;
@@ -429,9 +429,13 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   DFPeanutActionResponseBlock responseBlock = ^(DFPeanutAction *action, NSError *error) {
     if (!error) {
       self.userFavoritedAction = action;
-      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited result:DFAnalyticsValueResultSuccess];
+      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
+                                            result:DFAnalyticsValueResultSuccess
+                                        actionType:DFActionButtonPress];
     } else {
-      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited result:DFAnalyticsValueResultFailure];
+      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
+                                            result:DFAnalyticsValueResultFailure
+                                        actionType:DFActionButtonPress];
       self.userFavoritedAction = oldAction;
       [self updateFavoriteButton];
       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
