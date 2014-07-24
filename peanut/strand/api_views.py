@@ -208,7 +208,7 @@ def getFormattedGroups(groups, userId):
 			title = "With %s" % (", ".join(names))
 
 		if bestLocation:
-			subtitle = "in %s" % (bestLocation)
+			subtitle = "%s" % (bestLocation)
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
