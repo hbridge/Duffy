@@ -164,6 +164,13 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
 
+- (void)jumpToPhoto:(DFPhotoIDType)photoID
+{
+  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
+  [self.tableView scrollToRowAtIndexPath:indexPath
+                        atScrollPosition:UITableViewScrollPositionTop animated:YES];
+}
+
 - (void)reloadFeed
 {
   [self reloadFeedIsSilent:NO];
@@ -529,7 +536,9 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DDLogVerbose(@"Row tapped");
+  DFPeanutSearchObject *object = [[self.sectionObjects[indexPath.section] objects] objectAtIndex:indexPath.row];
+  DDLogVerbose(@"Row tapped for object: %@", object);
+               
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 

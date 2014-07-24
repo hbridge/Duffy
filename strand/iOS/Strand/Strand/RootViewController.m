@@ -7,23 +7,34 @@
 //
 
 #import "RootViewController.h"
-#import "SubviewsController.h"
+#import "DFNavigationController.h"
+#import "DFCameraViewController.h"
+#import "DFPhotoFeedController.h"
 
 @interface RootViewController ()
             
-@property (readonly, strong, nonatomic) SubviewsController *subviewController;
+@property (readonly, strong, nonatomic) NSArray *subviewControllers;
+@property (nonatomic, retain) DFCameraViewController *cameraViewController;
+@property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
 
 @end
 
 @implementation RootViewController
-            
-@synthesize subviewController = _subviewController;
 
 - (instancetype)init
 {
   self = [super init];
   if (self) {
     self.hideStatusBar = YES;
+    _cameraViewController = [[DFCameraViewController alloc] init];
+    _photoFeedController = [[DFPhotoFeedController alloc] init];
+    _subviewControllers =
+    @[
+      [[DFNavigationController alloc]
+       initWithRootViewController:_photoFeedController],
+      _cameraViewController,
+      ];
+
   }
   return self;
 }
@@ -39,16 +50,14 @@
   self.pageViewController.delegate = self;
   self.pageViewController.view.backgroundColor = [UIColor blackColor];
 
-  UIViewController *startingViewController = [self.subviewController
-                                                viewControllerAtIndex:1
-                                                storyboard:self.storyboard];
+  UIViewController *startingViewController = [self viewControllerAtIndex:1];
   NSArray *viewControllers = @[startingViewController];
   [self.pageViewController setViewControllers:viewControllers
                                     direction:UIPageViewControllerNavigationDirectionForward
                                      animated:NO
                                    completion:nil];
 
-  self.pageViewController.dataSource = self.subviewController;
+  self.pageViewController.dataSource = self;
 
   [self addChildViewController:self.pageViewController];
   [self.view addSubview:self.pageViewController.view];
@@ -68,20 +77,11 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  DDLogVerbose(@"VIEWDIDAPPEAR %@ viewDidAppear", [self class]);
-
 }
 
 - (void)didReceiveMemoryWarning {
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
-}
-
-- (SubviewsController *)subviewController {
-  if (!_subviewController) {
-      _subviewController = [[SubviewsController alloc] init];
-  }
-  return _subviewController;
 }
 
 -(UIStatusBarStyle)preferredStatusBarStyle{
@@ -90,9 +90,7 @@
 
 - (void)showGallery
 {
-  UIViewController *galleryViewController = [self.subviewController
-                                              viewControllerAtIndex:0
-                                              storyboard:self.storyboard];
+  UIViewController *galleryViewController = [self viewControllerAtIndex:0];
   NSArray *viewControllers = @[galleryViewController];
   [self.pageViewController setViewControllers:viewControllers
                                     direction:UIPageViewControllerNavigationDirectionReverse
@@ -103,9 +101,7 @@
 
 - (void)showCamera
 {
-  UIViewController *galleryViewController = [self.subviewController
-                                             viewControllerAtIndex:1
-                                             storyboard:self.storyboard];
+  UIViewController *galleryViewController = [self viewControllerAtIndex:1];
   NSArray *viewControllers = @[galleryViewController];
   [self.pageViewController setViewControllers:viewControllers
                                     direction:UIPageViewControllerNavigationDirectionForward
@@ -113,6 +109,55 @@
                                    completion:nil];
   self.hideStatusBar = YES;
 }
+
+- (void)showPhotoWithID:(DFPhotoIDType)photoID
+{
+  [self showGallery];
+  if ([self.photoFeedController respondsToSelector:@selector(jumpToPhoto:)]){
+    [self.photoFeedController jumpToPhoto:photoID];
+  }
+}
+
+#pragma mark - Page View Controller Data Source
+
+- (UIViewController *)viewControllerAtIndex:(NSUInteger)index {
+  // Return the data view controller for the given index.
+  if (index >= self.subviewControllers.count) return nil;
+  return self.subviewControllers[index];
+}
+
+- (NSUInteger)indexOfViewController:(UIViewController *)viewController {
+  return [self.subviewControllers indexOfObject:viewController];
+}
+
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+      viewControllerBeforeViewController:(UIViewController *)viewController
+{
+  NSUInteger index = [self indexOfViewController:viewController];
+  if ((index == 0) || (index == NSNotFound)) {
+    return nil;
+  }
+  
+  index--;
+  return [self viewControllerAtIndex:index];
+}
+
+- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
+       viewControllerAfterViewController:(UIViewController *)viewController
+{
+  NSUInteger index = [self indexOfViewController:viewController];
+  if (index == NSNotFound) {
+    return nil;
+  }
+  
+  index++;
+  if (index == [self.subviewControllers count]) {
+    return nil;
+  }
+  return [self viewControllerAtIndex:index];
+}
+
 
 #pragma mark - UIPageViewController delegate methods
 

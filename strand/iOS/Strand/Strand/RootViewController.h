@@ -8,13 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-@interface RootViewController : UIViewController <UIPageViewControllerDelegate>
+@interface RootViewController : UIViewController <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
 @property (nonatomic) BOOL hideStatusBar;
 
 - (void)showGallery;
 - (void)showCamera;
+- (void)showPhotoWithID:(DFPhotoIDType)photoID;
 
 - (void)setSwipingEnabled:(BOOL)isSwipingEnabled;
 

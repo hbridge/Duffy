@@ -258,7 +258,9 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
     
     UIViewController *rootViewController = self.window.rootViewController;
     if ([rootViewController.class isSubclassOfClass:[RootViewController class]]) {
-      if (pushNotif.screenToShow == DFScreenCamera) {
+      if (pushNotif.photoID) {
+        [(RootViewController *)self.window.rootViewController showPhotoWithID:pushNotif.photoID];
+      } else if (pushNotif.screenToShow == DFScreenCamera) {
         [(RootViewController *)self.window.rootViewController showCamera];
       } else if (pushNotif.screenToShow == DFScreenGallery) {
         [(RootViewController *)self.window.rootViewController showGallery];

@@ -60,6 +60,11 @@
   _contentAvailable = [contentAvailable boolValue];
 }
 
+- (DFPhotoIDType)photoID
+{
+  return [(NSNumber *)self.userInfo[@"pid"] longLongValue];
+}
+
 - (DFScreenType)screenToShow
 {
   if (self.userInfo[@"view"]) {

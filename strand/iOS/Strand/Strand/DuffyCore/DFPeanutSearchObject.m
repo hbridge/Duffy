@@ -116,5 +116,9 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   return result;
 }
 
+- (NSString *)description
+{
+  return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];
+}
 
 @end

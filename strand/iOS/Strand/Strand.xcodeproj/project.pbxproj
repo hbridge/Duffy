@@ -130,7 +130,6 @@
 		5ADD857519465C790037A6D5 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857419465C790037A6D5 /* main.m */; };
 		5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857719465C790037A6D5 /* AppDelegate.m */; };
 		5ADD857B19465C790037A6D5 /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD857A19465C790037A6D5 /* RootViewController.m */; };
-		5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD858019465C790037A6D5 /* SubviewsController.m */; };
 		5ADD858619465C790037A6D5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ADD858519465C790037A6D5 /* Images.xcassets */; };
 		5ADD859219465C790037A6D5 /* StrandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859119465C790037A6D5 /* StrandTests.m */; };
 		5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859C19465F520037A6D5 /* DFCameraViewController.m */; };
@@ -382,8 +381,6 @@
 		5ADD857719465C790037A6D5 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		5ADD857919465C790037A6D5 /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		5ADD857A19465C790037A6D5 /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
-		5ADD857F19465C790037A6D5 /* SubviewsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubviewsController.h; sourceTree = "<group>"; };
-		5ADD858019465C790037A6D5 /* SubviewsController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubviewsController.m; sourceTree = "<group>"; };
 		5ADD858519465C790037A6D5 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		5ADD858B19465C790037A6D5 /* StrandTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StrandTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5ADD859019465C790037A6D5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -712,8 +709,6 @@
 			children = (
 				5ADD857919465C790037A6D5 /* RootViewController.h */,
 				5ADD857A19465C790037A6D5 /* RootViewController.m */,
-				5ADD857F19465C790037A6D5 /* SubviewsController.h */,
-				5ADD858019465C790037A6D5 /* SubviewsController.m */,
 			);
 			name = "Main Page View controller";
 			sourceTree = "<group>";
@@ -1164,7 +1159,6 @@
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
-				5ADD858119465C790037A6D5 /* SubviewsController.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */,

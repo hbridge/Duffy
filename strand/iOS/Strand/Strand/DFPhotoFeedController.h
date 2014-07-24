@@ -13,5 +13,6 @@
 
 - (IBAction)cameraButtonPressed:(id)sender;
 - (IBAction)inviteButtonPressed:(id)sender;
+- (void)jumpToPhoto:(DFPhotoIDType)photoID;
 
 @end

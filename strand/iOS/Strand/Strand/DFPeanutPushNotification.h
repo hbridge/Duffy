@@ -13,8 +13,9 @@
 
 
 @property (readonly, nonatomic, retain) NSString *message;
-@property (nonatomic) DFPushNotifType type;
+@property (readonly, nonatomic) DFPushNotifType type;
 @property (readonly, nonatomic) DFScreenType screenToShow;
+@property (readonly, nonatomic) DFPhotoIDType photoID;
 @property (readonly, nonatomic) BOOL contentAvailable;
 @property (readonly, nonatomic) BOOL isUpdateLocationRequest;
 @property (readonly, nonatomic) BOOL isUpdateFeedRequest;
