@@ -205,10 +205,10 @@ def getFormattedGroups(groups, userId):
 		if (groupIsSolo(group, userId)):
 			title = "Just you"
 		else:
-			title = "With %s" % (", ".join(names))
+			title = ", ".join(names)
 
 		if bestLocation:
-			subtitle = "%s" % (bestLocation)
+			subtitle = bestLocation
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
