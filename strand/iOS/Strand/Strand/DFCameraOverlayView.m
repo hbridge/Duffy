@@ -30,6 +30,8 @@ NSString *const FlashAutoTitle = @"Auto";
   self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   [self configureHelpTextLabels];
   self.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
+  self.galleryButton.badgeColor = [DFStrandConstants strandGreen];
+  self.galleryButton.badgeTextColor = [UIColor blackColor];
   
   [self.nearbyFriendsLabel addGestureRecognizer:[[UITapGestureRecognizer alloc]
                                                  initWithTarget:self
@@ -118,6 +120,11 @@ NSString *const FlashAutoTitle = @"Auto";
   } else if (_nearbyFriendsHelpPopLabel && !(_nearbyFriendsHelpPopLabel.isHidden)) {
     [_nearbyFriendsHelpPopLabel dismiss];
   }
+}
+
+- (void)setGalleryButtonCount:(NSUInteger)count
+{
+  self.galleryButton.badgeCount = (int)count;
 }
 
 @end

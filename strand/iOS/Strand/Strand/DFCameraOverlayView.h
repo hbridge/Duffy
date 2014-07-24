@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFBadgeButton.h"
 
 extern NSString *const FlashOnTitle;
 extern NSString *const FlashOffTitle;
@@ -14,7 +15,7 @@ extern NSString *const FlashAutoTitle;
 
 @interface DFCameraOverlayView : UIView
 @property (weak, nonatomic) IBOutlet UIButton *takePhotoButton;
-@property (weak, nonatomic) IBOutlet UIButton *galleryButton;
+@property (weak, nonatomic) IBOutlet DFBadgeButton *galleryButton;
 @property (weak, nonatomic) IBOutlet UIButton *flashButton;
 @property (weak, nonatomic) IBOutlet UIButton *swapCameraButton;
 @property (weak, nonatomic) IBOutlet UILabel *nearbyFriendsLabel;
@@ -26,5 +27,8 @@ extern NSString *const FlashAutoTitle;
 - (void)showJoinableHelpText;
 - (void)hideJoinableHelpText;
 - (void)setNearbyFriendsHelpText:(NSString *)text;
+
+
+- (void)setGalleryButtonCount:(NSUInteger)count;
 
 @end
