@@ -40,12 +40,12 @@ const NSTimeInterval FeedChangePollFrequency = 1.0;
 
 const CGFloat HeaderHeight = 48.0;
 // constants used for row height calculations
-const CGFloat TitleAreaHeight = 22 + 14 + 14; // height plus spacing around
-const CGFloat ImageViewHeight = 320; // height plus spacing around
+const CGFloat TitleAreaHeight = 32; // height plus spacing around
+const CGFloat ImageViewHeight = 300; // height plus spacing around
 const CGFloat CollectionViewHeight = 79;
 const CGFloat FavoritersListHeight = 17 + 8; //height + spacing to collection view or image view
 const CGFloat ActionBarHeight = 29 + 8; // height + spacing
-const CGFloat FooterPadding = 8;
+const CGFloat FooterPadding = 2;
 const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight + FavoritersListHeight + FooterPadding;
 
 const CGFloat LockedCellHeight = 157.0;
