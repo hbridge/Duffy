@@ -44,18 +44,18 @@ def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
 	Check the photo we want to use to say if someone is nearby but we havent'
 	neighbored with them yet (basically, they shouldn't know I'm there)
 """
-def sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandLimitGpsUpdatedWithinHours, notificationLogsCache):
+def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedWithin, notificationLogsCache):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
 
-	newPhotosStartTimeCutoff = now - datetime.timedelta(seconds=joinStrandWithinTime)
+	newPhotosStartTimeCutoff = now - joinStrandWithin
 	neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTimeCutoff) | Q(photo_2__time_taken__gt=newPhotosStartTimeCutoff)).order_by('photo_1')
 	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, [msgType, constants.NOTIFICATIONS_NEW_PHOTO_ID], newPhotosStartTimeCutoff)
 
 	# 30 minute cut off for join strand messages
-	joinStrandStartTimeCutoff = now - datetime.timedelta(seconds=joinStrandWithinTime)
+	joinStrandStartTimeCutoff = now - joinStrandWithin
 	photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTimeCutoff).filter(user__product_id=1)
 
-	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=joinStrandLimitGpsUpdatedWithinHours)
+	frequencyOfGpsUpdatesCutoff = now - joinStrandLimitGpsUpdatedWithin
 	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
 	for user in users:
@@ -99,7 +99,7 @@ def sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandLimitGpsUpda
 	  so we don't use the notification logs right now.
 """	
 def sendPhotoActionNotifications(now, waitTime):
-	likeNotificationWaitSeconds = now - datetime.timedelta(seconds=waitTime)
+	likeNotificationWaitSeconds = now - waitTime
 
 	photoActions = PhotoAction.objects.select_related().filter(added__lte=likeNotificationWaitSeconds).filter(user_notified_time=None)
 	usersToUpdateFeed = list()
@@ -130,7 +130,7 @@ def sendPhotoActionNotifications(now, waitTime):
 """
 def sendGpsNotification(now, gpsRefreshTime, notificationLogsCache):
 	msgType = constants.NOTIFICATIONS_FETCH_GPS_ID
-	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=gpsRefreshTime)
+	frequencyOfGpsUpdatesCutoff = now - gpsRefreshTime
 	
 	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogsCache, msgType, frequencyOfGpsUpdatesCutoff)
 	usersWithOldGpsData = User.objects.filter(product_id=1).filter(last_location_timestamp__lt=frequencyOfGpsUpdatesCutoff)
@@ -148,13 +148,13 @@ def sendGpsNotification(now, gpsRefreshTime, notificationLogsCache):
 	Raw firestarter kicks off when a user is simply nearby other users (no photos taken.)
 	Very infrequent right now
 """
-def sendRawFirestarter(now, gpsUpdatedWithinHours, notifiedWithinDays, distanceWithinMeters, notificationLogsCache):
+def sendRawFirestarter(now, gpsUpdatedWithin, notifiedWithin, distanceWithinMeters, notificationLogsCache):
 	msgType = constants.NOTIFICATIONS_RAW_FIRESTARTER_ID
 	
-	gpsUpdatedCutoff = now - datetime.timedelta(hours=gpsUpdatedWithinHours)
+	gpsUpdatedCutoff = now - gpsUpdatedWithin
 	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=gpsUpdatedCutoff)
 
-	notifiedCutoff = now - datetime.timedelta(days=notifiedWithinDays)
+	notifiedCutoff = now - notifiedWithin
 	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, constants.NOTIFICATIONS_ANY, notifiedCutoff)
 
 	for user in users:
@@ -212,14 +212,13 @@ def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin
 	return notificationLogsCache
 
 def main(argv):
-	# TODO(Derek): move these over to timedeltas
-	joinStrandWithinTime = 30 * 60 # 30 minutes
-	joinStrandGpsUpdatedWithinHours = 8 # hours
-	waitTimeForPhotoAction = 10 # seconds
-	gpsRefreshTime = 3 # hours
+	joinStrandWithin = datetime.timedelta(minutes=30)
+	joinStrandGpsUpdatedWithin = datetime.timedelta(hours=8)
+	waitTimeForPhotoAction = datetime.timedelta(seconds=10)
+	gpsRefreshTime = datetime.timedelta(hours=3)
 
-	rawFirestarterGpsUpdatedWithinHours = 3 # hours
-	rawFirestarterNotifiedWithinDays = 7 # days
+	rawFirestarterGpsUpdatedWithin = datetime.timedelta(hours=3)
+	rawFirestarterNotifiedWithin = datetime.timedelta(days=7)
 	rawFirestarterDistanceWithinMeters = 100 # meters
 
 	photosFirestarterGpsUpdatedWithin = datetime.timedelta(hours=3)
@@ -228,16 +227,16 @@ def main(argv):
 	photosFirestarterPhotoTakenWithin = datetime.timedelta(minutes=30)
 
 	# Want it to be the longest time we could want to grab cache
-	notificationLogsCutoffDays = 7 # days
+	notificationLogsWithin = datetime.timedelta(days=7)
 	
 	logger.info("Starting... ")
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		# Grap notification logs for use in other methods
-		notificationLogsCutoff = now - datetime.timedelta(days=notificationLogsCutoffDays)
+		notificationLogsCutoff = now - notificationLogsWithin
 		notificationLogsCache = list(notifications_util.getNotificationLogs(notificationLogsCutoff))
 
-		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithinTime, joinStrandGpsUpdatedWithinHours, notificationLogsCache)
+		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
 
 		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
 
@@ -245,7 +244,7 @@ def main(argv):
 
 		notificationLogsCache = sendPhotoFirestarter(now, photosFirestarterPhotoTakenWithin, photosFirestarterGpsUpdatedWithin, photosFirestarterNotifiedWithin, photosFirestarterAccuracyWithinMeters, notificationLogsCache)
 
-		notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithinHours, rawFirestarterNotifiedWithinDays, rawFirestarterDistanceWithinMeters, notificationLogsCache)
+		notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
 				
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)

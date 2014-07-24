@@ -74,6 +74,7 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 	usersToNotifyAboutById = dict()
 	usersToUpdateFeed = list()
 	photosToNotifyAbout = dict()
+	newPhotos = list()
 
 	# Look through all of the new neighbor rows and pick out all the photos/users we need to notify
 	# a user about (if there's a new photo in their feed, we let them know)
@@ -85,10 +86,12 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 			user = neighbor.user_1
 			otherUser = neighbor.user_2
 			photosToNotifyAbout[user] = neighbor.photo_2
+			newPhotos.append(neighbor.photo_2)
 		else:
 			user = neighbor.user_2
 			otherUser = neighbor.user_1
 			photosToNotifyAbout[user] = neighbor.photo_1
+			newPhotos.append(neighbor.photo_1)
 
 		if user not in usersToNotifyAboutById:
 			usersToNotifyAboutById[user] = list()
@@ -97,6 +100,8 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 		usersToUpdateFeed.append(neighbor.photo_1.user)
 		usersToUpdateFeed.append(neighbor.photo_2.user)
 
+	# For each user, look at all the new photos taken around them and construct a message for them
+	#  With all the names in there
 	for user, otherUsers in usersToNotifyAboutById.iteritems():
 		otherUsers = set(otherUsers)
 
@@ -114,7 +119,20 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 			notifications_util.sendNotification(user, msg, msgType, customPayload)
 		else:
 			logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
-	
+
+	# Find folks who are not involved in these photos but are nearby instead
+	# Loop through all newer photos and look for users nearby 
+	#
+	# TODO(Derek): Swap out this 3 for a constants var once that is figured out
+	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=3)
+	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
+
+	for photo in newPhotos:
+		nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
+
+		usersToUpdateFeed.extend(nearbyUsers)
+		
+	# Send update feed msg to folks who are involved in these photos
 	usersToUpdateFeed = set(usersToUpdateFeed)
 
 	for user in usersToUpdateFeed:
