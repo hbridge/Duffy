@@ -8,5 +8,7 @@ sudo apachectl -k restart
 python /home/derek/prod/Duffy/peanut/tests/black_box_api_tests.py dev.duffyapp.com 297
 
 echo "Restarting scripts..."
-sudo restart duffy-strand-notifications
-sudo restart duffy-neighbor
+sudo stop duffy-strand-notifications
+sudo start duffy-strand-notifications
+sudo stop duffy-neighbor
+sudo start duffy-neighbor
