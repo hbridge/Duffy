@@ -24,7 +24,13 @@ extern NSString *const DFStrandJoinableStrandsNearbyNotificationName;
 extern NSString *const DFStrandJoinableStrandsCountKey;
 extern NSString *const DFStrandLastFetchAttemptDateDefaultsKey;
 
-+ (UIColor *)mainColor;
++ (UIColor *)defaultBackgroundColor;
++ (UIColor *)defaultBarForegroundColor;
++ (UIColor *)strongFeedForegroundTextColor;
++ (UIColor *)weakFeedForegroundTextColor;
 + (UIColor *)strandOrange;
++ (UIColor *)strandSalmon;
++ (UIColor *)strandGreen;
++ (UIColor *)strandYellow;
 
 @end

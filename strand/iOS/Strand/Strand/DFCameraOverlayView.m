@@ -40,9 +40,8 @@ NSString *const FlashAutoTitle = @"Auto";
 - (void)configureHelpTextLabels
 {
   // set appearance style
-  [[MMPopLabel appearance] setLabelColor:[DFStrandConstants mainColor]];
+  [[MMPopLabel appearance] setLabelColor:[DFStrandConstants defaultBackgroundColor]];
   [[MMPopLabel appearance] setLabelTextColor:[UIColor whiteColor]];
-  [[MMPopLabel appearance] setLabelTextHighlightColor:[UIColor redColor]];
   [[MMPopLabel appearance] setLabelFont:[UIFont fontWithName:@"HelveticaNeue-Light" size:14.0f]];
   [[MMPopLabel appearance] setButtonFont:[UIFont fontWithName:@"HelveticaNeue" size:14.0f]];
   

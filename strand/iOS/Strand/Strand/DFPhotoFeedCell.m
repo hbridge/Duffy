@@ -8,6 +8,7 @@
 
 #import "DFPhotoFeedCell.h"
 #import "DFPhotoViewCell.h"
+#import "DFStrandConstants.h"
 
 @interface DFPhotoFeedCell()
 
@@ -21,18 +22,24 @@
 
 - (void)awakeFromNib
 {
+  [self configureView];
+  [self saveConstraints];
+  [self configureButtonActions];
+}
+
+- (void)configureView
+{
   self.imageView.contentMode = UIViewContentModeScaleAspectFill;
   self.favoritersButton.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
-  self.savedConstraints = [NSMutableDictionary new];
-  [self saveConstraints];
+  [self.favoritersButton setTitleColor:[DFStrandConstants weakFeedForegroundTextColor]
+                              forState:UIControlStateNormal];
   
   self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
   self.collectionView.backgroundColor = [UIColor clearColor];
-  
-  [self configureButtonActions];
+
 }
 
 - (void)configureButtonActions
@@ -99,6 +106,7 @@
 
 - (void)saveConstraints
 {
+  self.savedConstraints = [NSMutableDictionary new];
   NSArray *viewsToSave = @[self.favoritersButton, self.collectionView];
   for (UIView *view in viewsToSave) {
     NSMutableArray *viewConstraints = [NSMutableArray new];

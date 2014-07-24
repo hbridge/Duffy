@@ -50,13 +50,6 @@
 {
   [super viewDidLoad];
   
-  self.navigationController.navigationBar.barTintColor = [DFStrandConstants mainColor];
-  self.navigationController.navigationBar.tintColor = [UIColor whiteColor];
-  self.navigationController.navigationBar.titleTextAttributes = @{
-                                                                  NSForegroundColorAttributeName: [UIColor whiteColor]
-                                                                  };
-  self.navigationController.navigationBar.translucent = NO;
-  
   [self configureForm];
 }
 

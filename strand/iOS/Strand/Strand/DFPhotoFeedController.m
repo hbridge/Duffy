@@ -37,7 +37,7 @@
 
 const NSTimeInterval FeedChangePollFrequency = 1.0;
 
-
+const CGFloat HeaderHeight = 48.0;
 // constants used for row height calculations
 const CGFloat TitleAreaHeight = 22 + 14 + 14; // height plus spacing around
 const CGFloat ImageViewHeight = 320; // height plus spacing around
@@ -144,7 +144,6 @@ const CGFloat LockedCellHeight = 157.0;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil]
 forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-  self.navigationController.navigationBar.tintColor = [UIColor orangeColor];
   self.tableView.rowHeight = MinRowHeight;
   
   self.refreshControl = [[UIRefreshControl alloc] init];
@@ -289,7 +288,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-  return 58.0;
+  return HeaderHeight;
 }
 
 #pragma mark - Table view data source: rows

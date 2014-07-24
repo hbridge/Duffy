@@ -21,7 +21,8 @@
 
 - (void)awakeFromNib
 {
-  //self.backgroundView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+  self.subtitleImageView.image = [UIImage imageNamed:@"Assets/Icons/LocationHeaderIcon"];
+  self.subtitleImageView.contentMode = UIViewContentModeCenter;
 }
 
 /*

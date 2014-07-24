@@ -99,7 +99,7 @@
                                    action:@selector(confirmDeletePhoto)];
   
   [self.toolbar setItems:@[likeButton, flexibleSpace, self.trashButton] animated:NO];
-  self.toolbar.tintColor = [DFStrandConstants mainColor];
+  self.toolbar.tintColor = [DFStrandConstants defaultBackgroundColor];
   
   [self updateFavoriteButton];
   if (![self isPhotoDeletableByUser]) {

@@ -28,18 +28,47 @@ NSString *const DFStrandJoinableStrandsCountKey = @"DFStrandJoinableStrandsCount
 
 UIColor *DFStrandMainColor;
 
-+(UIColor *)mainColor
++(UIColor *)defaultBackgroundColor
 {
-#ifdef DEBUG
-  return [UIColor darkGrayColor];
-#else
-  return [self strandOrange];
-#endif
+//#ifdef DEBUG
+//  return [UIColor darkGrayColor];
+//#else
+  return [self strandSalmon];
+  //#endif
+}
+
++ (UIColor *)defaultBarForegroundColor
+{
+  return [UIColor whiteColor];
+}
+
++ (UIColor *)strongFeedForegroundTextColor
+{
+  return [UIColor blackColor];
+}
+
++ (UIColor *)weakFeedForegroundTextColor
+{
+  return [UIColor colorWithRed:153/255.f green:153/255.f blue:153/255.f alpha:1];
 }
 
 + (UIColor *)strandOrange
 {
-  return [UIColor colorWithRed:236/255.f green:101/255.f blue:31/255.f alpha:1];
+  return [UIColor colorWithRed:236/255.f green:102/255.f blue:30/255.f alpha:1];
+}
+
++ (UIColor *)strandSalmon
+{
+  return [UIColor colorWithRed:255/255.f green:127/255.f blue:84/255.f alpha:1];
+}
+
++ (UIColor *)strandGreen
+{
+  return [UIColor colorWithRed:159/255.f green:255/255.f blue:198/255.f alpha:1];
+}
+
++ (UIColor *)strandYellow {
+  return [UIColor colorWithRed:255/255.f green:216/255.f blue:82/255.f alpha:1];
 }
 
 @end
