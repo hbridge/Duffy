@@ -400,3 +400,9 @@ class DuffyNotification(Notification):
 			message.update(extra)
 		payload = json.dumps(message, separators=(',', ':'))
 		return payload
+
+class ContactEntry(models.Model):
+	user = models.ForeignKey(User)
+	name = models.CharField(max_length=100)
+	phone_number = PhoneNumberField()
+	added = models.DateTimeField(auto_now_add=True)
