@@ -69,6 +69,8 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) UIView *nuxPlaceholder;
 @property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
+@property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
+
 @end
 
 @implementation DFPhotoFeedController
@@ -166,9 +168,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 
 - (void)jumpToPhoto:(DFPhotoIDType)photoID
 {
-  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
-  [self.tableView scrollToRowAtIndexPath:indexPath
-                        atScrollPosition:UITableViewScrollPositionTop animated:YES];
+  self.requestedPhotoIDToJumpTo = photoID;
 }
 
 - (void)reloadFeed
@@ -198,6 +198,14 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
           [self setSectionObjects:response.topLevelSectionObjects];
         });
         self.lastResponseHash = hashData;
+      }
+      if (self.requestedPhotoIDToJumpTo) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+          NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
+          [self.tableView scrollToRowAtIndexPath:indexPath
+                                atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+          self.requestedPhotoIDToJumpTo = 0;
+        });
       }
     }
     
