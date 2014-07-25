@@ -1,5 +1,11 @@
 # Strand
 
+## Jul 24th, 2014
+
+- Fresh coat of paint
+- Faster, fully native feed view
+- Flash mode is now saved between runs
+
 ## Jul 18th, 2014
 
 - HTTPS support
