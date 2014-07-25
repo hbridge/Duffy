@@ -8,6 +8,7 @@
 
 #import "DFPeanutUserObject.h"
 #import "RestKit/Restkit.h"
+#import <CoreLocation/CoreLocation.h>
 
 @implementation DFPeanutUserObject
 
@@ -43,6 +44,14 @@
 - (NSDictionary *)requestParameters
 {
   return [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
+}
+
+- (void)setLocation:(CLLocation *)location
+{
+  self.last_location_point = [NSString stringWithFormat:@"POINT (%f %f)",
+                              location.coordinate.latitude,
+                              location.coordinate.longitude];
+  self.last_location_accuracy = @(location.horizontalAccuracy);
 }
 
 @end

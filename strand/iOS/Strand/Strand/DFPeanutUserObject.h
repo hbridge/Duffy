@@ -10,6 +10,8 @@
 #import "DFPeanutObject.h"
 #import "DFUser.h"
 
+@class CLLocation;
+
 @interface DFPeanutUserObject : NSObject <DFPeanutObject>
 
 @property (nonatomic) DFUserIDType id;
@@ -25,5 +27,6 @@
 @property (nonatomic, retain) NSDate *added;
 
 - (NSDictionary *)requestParameters;
+- (void)setLocation:(CLLocation *)location;
 
 @end
