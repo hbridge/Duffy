@@ -507,8 +507,8 @@ def register_apns_token(request):
 
 		# We're saving last build info here since we want to track it but only need it once per session
 		#   So this api call is good
-		if form.cleaned_data['build_id'] and form.cleaned_data['build_num']:
-			user.last_build_info = "%s-%s" % (form.cleaned_data['build_id'], form.cleaned_data['build_num'])
+		if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
+			user.last_build_info = "%s-%s" % (form.cleaned_data['build_id'], form.cleaned_data['build_number'])
 		
 		user.save()
 	else:
