@@ -205,7 +205,7 @@ def getFormattedGroups(groups, userId):
 		if (groupIsSolo(group, userId)):
 			title = "Just you"
 		else:
-			title = ", ".join(names) + " and you"
+			title = ", ".join(names) + " and You"
 
 		if bestLocation:
 			subtitle = bestLocation
