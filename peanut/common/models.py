@@ -16,6 +16,7 @@ from ios_notifications.models import Notification
 # Create your models here.
 class User(models.Model):
 	uuid = UUIDField(auto=True)
+	use_uuid = models.BooleanField(default=False)
 	display_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100, null=True)
 	phone_number = PhoneNumberField(null=True)
@@ -46,7 +47,10 @@ class User(models.Model):
 		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, self.getUserDataId())
 
 	def getUserDataId(self):
-		return str(self.id)
+		if self.use_uuid:
+			return str(self.uuid)
+		else:
+			return str(self.id)
 
 	@classmethod
 	def getIds(cls, objs):
