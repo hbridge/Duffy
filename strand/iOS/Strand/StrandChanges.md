@@ -1,5 +1,11 @@
 # Strand
 
+## Jul 25th, 2014
+
+- Bigger images in feed
+- Show a loading screen when inviting users
+- Fixed crash in feed when images failed to load
+
 ## Jul 24th, 2014
 
 - Fresh coat of paint
