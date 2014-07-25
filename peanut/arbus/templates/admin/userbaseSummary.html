@@ -90,6 +90,7 @@
 				<td class='location b-r'> Location </td>
 				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
 				<td class='invites b-r'> Rem. <br> invites </td>
+				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 			</tr>
 		{% for entry in strandList %}
@@ -113,6 +114,7 @@
 				</td>
 				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
 				<td class='invites b-r'> {{ entry.user.invites_remaining }} </td>
+				<td class='invites b-r'> {{ entry.user.last_build_info }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 			</tr>
 		{% endfor %}
@@ -180,17 +182,17 @@ $(document).ready(function() {
 	}
   });
   $("td.pipeline-status").each(function(){
-  	if ($.trim($(this).text()) != 'OK') {
-  		$(this).addClass("red");
-  	}
+	if ($.trim($(this).text()) != 'OK') {
+		$(this).addClass("red");
+	}
   });
   if (!(location.hostname.match('prod.strand.duffyapp.com'))){
-  	$("#ui-server-id").append('DEV <span class="ui-server-switch">(<a target=_new href="http://prod.strand.duffyapp.com/viz/summary">Switch to Prod</a>)</span>');
-  	$("#ui-server-id").css('background-color', '#C0C0C0');
+	$("#ui-server-id").append('DEV <span class="ui-server-switch">(<a target=_new href="http://prod.strand.duffyapp.com/viz/summary">Switch to Prod</a>)</span>');
+	$("#ui-server-id").css('background-color', '#C0C0C0');
   }
   else {
-   	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_new href="http://dev.duffyapp.com/viz/summary">Switch to Dev</a>)</span>');
-   	$("#ui-server-id").css('background-color', 'orange');
+	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_new href="http://dev.duffyapp.com/viz/summary">Switch to Dev</a>)</span>');
+	$("#ui-server-id").css('background-color', 'orange');
   }
   $('td.timeago').each(function(){
 	if ($(this).html().search('min') > -1 || 
