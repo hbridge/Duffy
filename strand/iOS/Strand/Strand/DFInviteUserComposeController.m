@@ -62,17 +62,7 @@
   DDLogInfo(@"%@ finishedw with result: %d", [self.class description], result);
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:self.presentingViewController];
-  [self.presentingViewController dismissViewControllerAnimated:YES completion:^{
-           NSString *message = [NSString stringWithFormat:@"You have %d invites remaining.",
-                             self.loadedResponse.invites_remaining];
-        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Remaining Invites"
-                                                        message:message
-                                                       delegate:nil
-                                              cancelButtonTitle:@"OK"
-                                              otherButtonTitles: nil];
-        [alert show];
-  }];
-  
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 
