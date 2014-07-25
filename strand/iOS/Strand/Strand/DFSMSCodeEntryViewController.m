@@ -193,8 +193,15 @@ replacementString:(NSString *)string
                           deviceName:self.userName
                          phoneNumber:phoneNumberString
                        smsAuthString:authCodeString
-                    withSuccessBlock:^(DFUser *user) {
-                      [DFUser setCurrentUser:user];
+                    withSuccessBlock:^(DFPeanutUserObject *peanutUser) {
+                      DFUser *newUser = [[DFUser alloc] init];
+                      newUser.userID = peanutUser.id;
+                      newUser.phoneNumberString = peanutUser.phone_number;
+                      newUser.authToken = peanutUser.auth_token;
+                      newUser.displayName = peanutUser.display_name;
+                      newUser.deviceID = peanutUser.phone_id;
+                      
+                      [DFUser setCurrentUser:newUser];
                       [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
                       DFLocationPermissionViewController *locationPermissionController =
                       [[DFLocationPermissionViewController alloc] init];

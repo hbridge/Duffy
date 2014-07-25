@@ -21,7 +21,28 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"id", @"phone_number", @"display_name", @"auth_token"];
+  return @[@"id",
+           @"display_name",
+           @"phone_number",
+           @"phone_id",
+           @"auth_token",
+           @"device_token",
+           @"last_location_point",
+           @"last_location_accuracy",
+           @"last_photo_timestamp",
+           @"invites_remaining",
+           @"added",
+           ];
+}
+
+- (NSString *)description
+{
+  return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];
+}
+
+- (NSDictionary *)requestParameters
+{
+  return [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
 }
 
 @end

@@ -32,7 +32,6 @@
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
 		5A3172C4196B1C4200CA7693 /* DFSMSCodeEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C2196B1C4200CA7693 /* DFSMSCodeEntryViewController.m */; };
 		5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib */; };
-		5A3172C8196B616E00CA7693 /* DFUserPeanutResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C7196B616E00CA7693 /* DFUserPeanutResponse.m */; };
 		5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */; };
 		5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */; };
 		5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172D1196C84E400CA7693 /* DFSettingsViewController.m */; };
@@ -198,8 +197,6 @@
 		5A3172C1196B1C4200CA7693 /* DFSMSCodeEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSCodeEntryViewController.h; sourceTree = "<group>"; };
 		5A3172C2196B1C4200CA7693 /* DFSMSCodeEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSCodeEntryViewController.m; sourceTree = "<group>"; };
 		5A3172C3196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSMSCodeEntryViewController.xib; sourceTree = "<group>"; };
-		5A3172C6196B616E00CA7693 /* DFUserPeanutResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFUserPeanutResponse.h; path = DuffyCore/DFUserPeanutResponse.h; sourceTree = "<group>"; };
-		5A3172C7196B616E00CA7693 /* DFUserPeanutResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFUserPeanutResponse.m; path = DuffyCore/DFUserPeanutResponse.m; sourceTree = "<group>"; };
 		5A3172C9196B620100CA7693 /* DFPeanutUserObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutUserObject.h; sourceTree = "<group>"; };
 		5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutUserObject.m; sourceTree = "<group>"; };
 		5A3172CC196C442400CA7693 /* NSString+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+DFHelpers.h"; sourceTree = "<group>"; };
@@ -577,8 +574,6 @@
 				5AC4A90F1947C30800862D9C /* DFUploadSessionStats.m */,
 				5AC4A9141947C30800862D9C /* DFUserPeanutAdapter.h */,
 				5AC4A9151947C30800862D9C /* DFUserPeanutAdapter.m */,
-				5A3172C6196B616E00CA7693 /* DFUserPeanutResponse.h */,
-				5A3172C7196B616E00CA7693 /* DFUserPeanutResponse.m */,
 				5A3172C9196B620100CA7693 /* DFPeanutUserObject.h */,
 				5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */,
 			);
@@ -1209,7 +1204,6 @@
 				5AC4A9291947C30800862D9C /* DFPeanutPhoto.m in Sources */,
 				5AC4A96D194A422300862D9C /* DFPeanutSearchObject.m in Sources */,
 				5AC4A94A1947C3A700862D9C /* UIImage+RoundedCorner.m in Sources */,
-				5A3172C8196B616E00CA7693 /* DFUserPeanutResponse.m in Sources */,
 				5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */,
 				5AA45295196708D00099CBD2 /* DFPhotosGridViewController.m in Sources */,
 				5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */,

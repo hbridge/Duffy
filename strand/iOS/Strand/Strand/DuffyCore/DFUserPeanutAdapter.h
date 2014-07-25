@@ -8,17 +8,13 @@
 
 #import <Foundation/Foundation.h>
 #import "DFNetworkAdapter.h"
-
-@class DFUser;
+#import "DFPeanutUserObject.h"
+#import <RKHTTPUtilities.h>
 
 @interface DFUserPeanutAdapter : NSObject <DFNetworkAdapter>
 
-typedef void (^DFUserFetchSuccessBlock)(DFUser *user);
+typedef void (^DFUserFetchSuccessBlock)(DFPeanutUserObject *user);
 typedef void (^DFUserFetchFailureBlock)(NSError *error);
-
-- (void)fetchUserForDeviceID:(NSString *)deviceId
-            withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
-                failureBlock:(DFUserFetchFailureBlock)failureBlock;
 
 - (void)createUserForDeviceID:(NSString *)deviceId
                    deviceName:(NSString *)deviceName
@@ -27,5 +23,9 @@ typedef void (^DFUserFetchFailureBlock)(NSError *error);
              withSuccessBlock:(DFUserFetchSuccessBlock)successBlock
                  failureBlock:(DFUserFetchFailureBlock)failureBlock;
 
+- (void)performRequest:(RKRequestMethod)requestMethod
+        withPeanutUser:(DFPeanutUserObject *)peanutUser
+               success:(DFUserFetchSuccessBlock)success
+               failure:(DFUserFetchFailureBlock)failure;
 
 @end

@@ -10,8 +10,6 @@
 
 @interface DFUser : NSObject <NSCoding>
 
-typedef UInt64 DFUserIDType;
-
 @property (nonatomic) DFUserIDType userID;
 @property (nonatomic, retain) NSString *deviceID;
 @property (nonatomic, retain) NSString *displayName;

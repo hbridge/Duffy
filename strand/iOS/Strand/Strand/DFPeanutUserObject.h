@@ -13,8 +13,17 @@
 @interface DFPeanutUserObject : NSObject <DFPeanutObject>
 
 @property (nonatomic) DFUserIDType id;
-@property (nonatomic, retain) NSString *phone_number;
 @property (nonatomic, retain) NSString *display_name;
+@property (nonatomic, retain) NSString *phone_number;
+@property (nonatomic, retain) NSString *phone_id;
 @property (nonatomic, retain) NSString *auth_token;
+@property (nonatomic, retain) NSString *device_token;
+@property (nonatomic, retain) NSString *last_location_point;
+@property (nonatomic, retain) NSNumber *last_location_accuracy;
+@property (nonatomic, retain) NSDate *last_photo_timestamp;
+@property (nonatomic, retain) NSNumber *invites_remaining;
+@property (nonatomic, retain) NSDate *added;
+
+- (NSDictionary *)requestParameters;
 
 @end

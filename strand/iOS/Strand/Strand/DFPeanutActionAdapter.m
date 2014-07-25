@@ -94,33 +94,9 @@ NSString *const ActionIDPath = @"photo_actions/:id/";
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)
    {
-     NSMutableString *invalidFieldsString = [[NSMutableString alloc] init];
-     NSArray *invalidFields = error.userInfo[RKObjectMapperErrorObjectsKey];
-     if (invalidFields && invalidFields.count > 0) {
-       for (DFPeanutInvalidField *invalidField in invalidFields) {
-         [invalidFieldsString appendString:[NSString stringWithFormat:@"%@: %@. ",
-                                            invalidField.field_name,
-                                            invalidField.field_errors.firstObject]];
-       }
-     }
-     
-     NSError *betterError;
-     DDLogWarn(@"%@ get failed.  Error: %@ Invalid fields: %@",
-               [[self class] description],
-               error.description,
-               invalidFieldsString);
-     if (![invalidFieldsString isEqualToString:@""]) {
-       betterError = [NSError errorWithDomain:@"com.duffyapp.duffy"
-                                         code:-11 userInfo:@{
-                                                             NSLocalizedDescriptionKey: invalidFieldsString
-                                                             }];
-     }
-     
-     if (betterError) {
-       completionBlock(nil, betterError);
-     } else {
-       completionBlock(nil, error);
-     }
+     NSError *betterError = [DFPeanutInvalidField invalidFieldsErrorForError:error];
+     DDLogWarn(@"%@ got error: %@", [self.class description], betterError);
+     completionBlock(nil, betterError);
    }];
   
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
