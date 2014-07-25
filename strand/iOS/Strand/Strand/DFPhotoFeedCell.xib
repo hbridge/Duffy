@@ -15,13 +15,13 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="252" verticalHuggingPriority="251" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HE2-Vf-wok">
-                        <rect key="frame" x="10" y="13" width="248" height="16"/>
+                        <rect key="frame" x="10" y="13" width="258" height="16"/>
                         <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <button opaque="NO" contentMode="scaleToFill" restorationIdentifier="favoritersList" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="v5m-xw-TWf" userLabel="favoritersList">
-                        <rect key="frame" x="10" y="420" width="300" height="17"/>
+                        <rect key="frame" x="10" y="440" width="300" height="17"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="17" id="3VC-kh-nlc"/>
                         </constraints>
@@ -32,15 +32,15 @@
                         </state>
                     </button>
                     <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPr-aP-pSV">
-                        <rect key="frame" x="10" y="32" width="300" height="300"/>
+                        <rect key="frame" x="0.0" y="32" width="320" height="320"/>
                         <gestureRecognizers/>
                         <constraints>
-                            <constraint firstAttribute="height" constant="300" id="ikG-p7-8RR"/>
-                            <constraint firstAttribute="width" constant="300" id="t1L-J8-dky"/>
+                            <constraint firstAttribute="height" constant="320" id="ikG-p7-8RR"/>
+                            <constraint firstAttribute="width" constant="320" id="t1L-J8-dky"/>
                         </constraints>
                     </imageView>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000000000000004" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h07-n4-DgV">
-                        <rect key="frame" x="10" y="333" width="300" height="79"/>
+                        <rect key="frame" x="0.0" y="353" width="320" height="79"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="79" id="32E-5a-0uW"/>
                         </constraints>
@@ -56,7 +56,7 @@
                         <rect key="frame" x="150" y="172" width="20" height="20"/>
                     </activityIndicatorView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U1S-w6-Jtc" userLabel="Actions bar">
-                        <rect key="frame" x="0.0" y="445" width="320" height="29"/>
+                        <rect key="frame" x="0.0" y="465" width="320" height="29"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="fST-z5-7nz" userLabel="favoriteButton" customClass="DFRoundedButton">
                                 <rect key="frame" x="8" y="0.0" width="111" height="29"/>
@@ -107,7 +107,7 @@
                         </constraints>
                     </view>
                     <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="25m" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xhR-gV-Znx">
-                        <rect key="frame" x="258" y="13" width="52" height="16"/>
+                        <rect key="frame" x="268" y="13" width="52" height="16"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="16" id="kFk-Pv-TAS"/>
@@ -120,7 +120,7 @@
                 </subviews>
                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="h07-n4-DgV" secondAttribute="trailing" constant="10" id="07M-SB-Mi0"/>
+                    <constraint firstAttribute="trailing" secondItem="h07-n4-DgV" secondAttribute="trailing" id="07M-SB-Mi0"/>
                     <constraint firstItem="xhR-gV-Znx" firstAttribute="leading" secondItem="HE2-Vf-wok" secondAttribute="trailing" id="1YF-IO-PF8"/>
                     <constraint firstItem="U1S-w6-Jtc" firstAttribute="top" secondItem="h07-n4-DgV" secondAttribute="bottom" priority="900" constant="8" id="BMx-TO-HYc"/>
                     <constraint firstAttribute="trailing" secondItem="U1S-w6-Jtc" secondAttribute="trailing" id="EAA-NR-agd"/>
@@ -128,7 +128,7 @@
                     <constraint firstItem="U1S-w6-Jtc" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="800" constant="8" id="S0e-fU-RBu"/>
                     <constraint firstAttribute="trailing" secondItem="v5m-xw-TWf" secondAttribute="trailing" constant="10" id="U2a-H5-vDZ"/>
                     <constraint firstAttribute="centerX" secondItem="EPr-aP-pSV" secondAttribute="centerX" id="UMD-W8-k6d"/>
-                    <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="W57-RD-aTX"/>
+                    <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="W57-RD-aTX"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="trailing" secondItem="xhR-gV-Znx" secondAttribute="trailing" id="XFh-2m-JaH"/>
                     <constraint firstItem="v5m-xw-TWf" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="emp-ho-p4y"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="32" id="fDr-AQ-CiI"/>
