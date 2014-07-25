@@ -73,6 +73,7 @@ class User(models.Model):
 
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
+	use_uuid = BooleanField(default=False)
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
@@ -106,6 +107,12 @@ class Photo(models.Model):
 	def __unicode__(self):
 		return str(self.id)
 
+	def getUserDataId(self):
+		if self.use_uuid:
+			return str(self.uuid)
+		else:
+			return str(self.id)
+			
 	"""
 		Look to see from the iphone's location data if there's a city present
 		TODO(derek):  Should this be pulled out to its own table?
@@ -136,7 +143,7 @@ class Photo(models.Model):
 		This is used as a stopgap, the db also has this name
 	"""
 	def getDefaultThumbFilename(self):
-		return str(self.id) + "-thumb-" + str(constants.THUMBNAIL_SIZE) + '.jpg'
+		return self.getUserDataId() + "-thumb-" + str(constants.THUMBNAIL_SIZE) + '.jpg'
 
 	"""
 		Returns back the full localfile path of the thumb
@@ -165,7 +172,7 @@ class Photo(models.Model):
 	"""
 	def getDefaultFullFilename(self):
 		baseWithoutExtension, fileExtension = os.path.splitext(self.orig_filename)
-		fullFilename = str(self.id) + fileExtension
+		fullFilename = self.getUserDataId() + fileExtension
 
 		return fullFilename
 

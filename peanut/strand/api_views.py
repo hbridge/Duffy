@@ -718,7 +718,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	# TODO(Derek): Make this more interesting when we add auth to the APIs
 	authToken = random.randrange(10000, 10000000)
 
-	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 1, auth_token = str(authToken), use_uuid=True)
+	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 1, auth_token = str(authToken))
 
 	if smsAuth:
 		smsAuth.user_created = user
