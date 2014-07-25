@@ -784,29 +784,10 @@ def auth_phone(request):
 
 def get_invite_message(request):
 	response = dict({'result': True})
-	form = OnlyUserIdForm(api_util.getRequestData(request))
 
-	if (form.is_valid()):
-		userId = str(form.cleaned_data['user_id'])
+	response['invite_message'] = "Try this app so we can share photos when we hang out: bit.ly/1noDnx2."
 
-		try:
-			user = User.objects.get(id=userId)
-			if user.invites_remaining == 0:
-				return HttpResponse(json.dumps({'user_id': 'No more invites remaining'}), content_type="application/json", status=400)
-			else:
-				user.invites_remaining -= 1
-				user.save()
-
-				response['invite_message'] = "Try this app so we can share photos when we hang out: bit.ly/1noDnx2."
-
-				#response['invite_message'] = "Strand makes it easy to share photos when you are with friends. Download and take a photo to start: bit.ly/1noDnx2." #115 chars
-				response['invites_remaining'] = user.invites_remaining
-				return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'user_id': 'User does not exist'}), content_type="application/json", status=400)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 	REST interface for creating new PhotoActions.
