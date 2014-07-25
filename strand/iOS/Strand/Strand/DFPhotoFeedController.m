@@ -29,7 +29,7 @@
 #import "DFPhotoMetadataAdapter.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFToastNotificationManager.h"
-#import "DFInviteUserComposeController.h"
+#import "DFInviteUserViewController.h"
 #import "DFErrorScreen.h"
 #import "DFDefaultsStore.h"
 #import "DFLockedStrandCell.h"
@@ -65,7 +65,6 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSTimer *autoRefreshTimer;
 
-@property (nonatomic, retain) DFInviteUserComposeController *inviteController;
 @property (nonatomic, retain) UIView *nuxPlaceholder;
 @property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
@@ -567,19 +566,8 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 - (void)inviteButtonPressed:(id)sender
 {
   DDLogInfo(@"Invite button pressed");
-  if (self.inviteController.isBeingPresented) return;
-  self.inviteController = [[DFInviteUserComposeController alloc] init];
-  [self.inviteController loadMessageWithCompletion:^(NSError *error) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      if (!error) {
-        [self presentViewController:self.inviteController animated:YES completion:^(void) {
-          self.inviteController = nil;
-        }];
-      } else {
-        [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
-      }
-    });
-  }];
+  DFInviteUserViewController *inviteController = [[DFInviteUserViewController alloc] init];
+  [self presentViewController:inviteController animated:YES completion:nil];
 }
 
 
