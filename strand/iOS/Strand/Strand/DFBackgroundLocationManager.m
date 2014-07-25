@@ -26,7 +26,6 @@
 @synthesize locationAdapter = _locationAdapter;
 
 
-
 // We want the upload controller to be a singleton
 static DFBackgroundLocationManager *defaultManager;
 + (DFBackgroundLocationManager *)sharedBackgroundLocationManager {
@@ -40,7 +39,6 @@ static DFBackgroundLocationManager *defaultManager;
 {
   return [self sharedBackgroundLocationManager];
 }
-
 
 - (instancetype)init
 {
@@ -135,7 +133,6 @@ static DFBackgroundLocationManager *defaultManager;
                                 accuracy:newLocation.horizontalAccuracy
                          completionBlock:^(BOOL success) {
                          }];
-    [DFAnalytics logLocationUpdated];
   } else if (self.isBackgroundLocationUpdateInProgress){
     [self.locationAdapter updateLocation:lastLocation
                            withTimestamp:lastLocation.timestamp
@@ -163,7 +160,6 @@ static DFBackgroundLocationManager *defaultManager;
   
   return _locationAdapter;
 }
-
 
 - (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {

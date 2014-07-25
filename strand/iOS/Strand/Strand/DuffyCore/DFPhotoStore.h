@@ -63,4 +63,7 @@
                  withMetadata:(NSDictionary *)metadata
                    completion:(void(^)(NSError *error))completion;
 
+- (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
+                promptUserIfNecessary:(BOOL)promptUser;
+
 @end

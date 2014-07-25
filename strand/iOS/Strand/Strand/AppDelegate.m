@@ -29,6 +29,7 @@
 #import "DFPeanutPushNotification.h"
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
+#import "DFCameraRollChangeManager.h"
 
 
 @interface AppDelegate ()
@@ -142,6 +143,7 @@
   if ([self isAppSetupComplete]) {
     [[DFUploadController sharedUploadController] uploadPhotos];
     [[DFStrandsManager sharedStrandsManager] performFetch];
+    [[DFCameraRollChangeManager sharedManager] checkForNewCameraRollPhotosWithCompletion:nil];
   }
 }
 
@@ -278,6 +280,15 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   }
   
   if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
+}
+
+- (void)application:(UIApplication *)application
+performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  [[DFCameraRollChangeManager sharedManager]
+   checkForNewCameraRollPhotosWithCompletion:^(UIBackgroundFetchResult result) {
+    completionHandler(result);
+  }];
 }
 
 - (void)resetApplication

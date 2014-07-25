@@ -591,6 +591,37 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 }
 
 
+- (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
+                promptUserIfNecessary:(BOOL)promptUser
+{
+  if ([ALAssetsLibrary authorizationStatus] != ALAuthorizationStatusAuthorized
+      && !promptUser) {
+    DDLogVerbose(@"Not authorized to check for last photo date and promptUser false.");
+    return;
+  }
+  
+  [self.assetsLibrary
+   enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
+   usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+     if (group.numberOfAssets > 0) {
+       [group enumerateAssetsAtIndexes:[NSIndexSet indexSetWithIndex:group.numberOfAssets - 1]
+                               options:0
+                            usingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
+                              if (result) {
+                                NSDate *date = [result valueForProperty:ALAssetPropertyDate];
+                                completion(date);
+                                *stop = YES;
+                              }
+                            }];
+     } else if (group != nil) {
+       completion(nil);
+     }
+  } failureBlock:^(NSError *error) {
+    DDLogError(@"%@ couldn't enumerate photos: %@", [self.class description], error.description);
+  }];
+}
+
+
 @end
 
 

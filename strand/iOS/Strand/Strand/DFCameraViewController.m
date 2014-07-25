@@ -339,7 +339,7 @@ const unsigned int SavePromptMinPhotos = 3;
   [self takePicture];
   [self flashCameraView];
   [self handleNUXTasksForPhotoTaken];
-  [DFDefaultsStore incrementCountForAction:UserActionTakePhoto];
+  [DFDefaultsStore incrementCountForAction:DFUserActionTakePhoto];
 }
 
 - (void)handleNUXTasksForPhotoTaken
@@ -357,7 +357,7 @@ const unsigned int SavePromptMinPhotos = 3;
     }
   }
   
-  unsigned int photoTakenCount = [DFDefaultsStore actionCountForAction:UserActionTakePhoto];
+  unsigned int photoTakenCount = [DFDefaultsStore actionCountForAction:DFUserActionTakePhoto];
   BOOL saveAsked = [DFDefaultsStore isSetupStepPassed:DFSetupStepAskToAutoSaveToCameraRoll];
   if (photoTakenCount > SavePromptMinPhotos
       && !saveAsked

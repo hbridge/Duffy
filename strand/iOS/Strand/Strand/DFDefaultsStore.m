@@ -40,24 +40,39 @@ NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
 
 // Actions
 
-NSString *const UserActionPrefix = @"DFUserActionCount";
-DFUserActionType UserActionTakePhoto = @"TakePhoto";
+NSString *const UserActionCountPrefix = @"DFUserActionCount";
+NSString *const UserActionDatePrefix = @"DFLastUserActionDate";
+
+DFUserActionType DFUserActionTakePhoto = @"TakePhoto";
+DFUserActionType DFUserActionTakeExternalPhoto = @"TakeExternalPhoto";
 
 + (void)incrementCountForAction:(DFUserActionType)action
 {
-  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionPrefix, action];
+  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionCountPrefix, action];
   NSNumber *count = [[NSUserDefaults standardUserDefaults] objectForKey:key];
   unsigned int newCount = [count unsignedIntValue] + 1;
   [[NSUserDefaults standardUserDefaults] setObject:@(newCount) forKey:key];
 }
 
-
 + (unsigned int)actionCountForAction:(DFUserActionType)action
 {
-  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionPrefix, action];
+  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionCountPrefix, action];
   NSNumber *count = [[NSUserDefaults standardUserDefaults] objectForKey:key];
   return [count unsignedIntValue];
 }
+
++ (void)setLastDate:(NSDate *)date forAction:(DFUserActionType)action
+{
+  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionDatePrefix, action];
+  [[NSUserDefaults standardUserDefaults] setObject:date forKey:key];
+}
+
++ (NSDate *)lastDateForAction:(DFUserActionType)action
+{
+  NSString *key = [NSString stringWithFormat:@"%@%@", UserActionDatePrefix, action];
+  return [[NSUserDefaults standardUserDefaults] objectForKey:key];
+}
+
 
 
 // whether setup steps have been passed

@@ -22,7 +22,7 @@
 #import "DFImageStore.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFNetworkingConstants.h"
-#import "DFUserPeanutAdapter.h"
+#import "DFCameraRollChangeManager.h"
 
 @interface DFSettingsViewController ()
 
@@ -214,13 +214,8 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
-            peanutUser.id = [[DFUser currentUser] userID];
-            peanutUser.last_photo_timestamp = [NSDate date];
-            DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
-            [userAdapter performRequest:RKRequestMethodGET withPeanutUser:peanutUser success:^(DFPeanutUserObject *user) {
-              
-            } failure:^(NSError *error) {
+            [[DFCameraRollChangeManager sharedManager]
+             checkForNewCameraRollPhotosWithCompletion:^(UIBackgroundFetchResult result) {
               
             }];
 

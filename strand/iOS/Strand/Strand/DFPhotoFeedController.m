@@ -211,7 +211,7 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
     // Evaluate whether and how to show error messages or NUX screens
     if (self.sectionObjects.count == 0 && response.objects.count == 0) {
       // Eligible to replace feed with placeholder
-      if (!error || [DFDefaultsStore actionCountForAction:UserActionTakePhoto] == 0) {
+      if (!error || [DFDefaultsStore actionCountForAction:DFUserActionTakePhoto] == 0) {
         [self setShowNuxPlaceholder:YES];
         [self showConnectionError:nil];
       } else if (error) {

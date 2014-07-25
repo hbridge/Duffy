@@ -25,7 +25,9 @@ extern DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll;
 
 // whether actions have happened
 typedef NSString *const DFUserActionType;
-extern DFUserActionType UserActionTakePhoto;
+extern DFUserActionType DFUserActionTakePhoto;
+extern DFUserActionType DFUserActionTakeExternalPhoto;
+
 
 + (void)incrementCountForAction:(DFUserActionType)action;
 + (unsigned int)actionCountForAction:(DFUserActionType)action;
@@ -34,5 +36,9 @@ extern DFUserActionType UserActionTakePhoto;
 + (void)setFlashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 + (UIImagePickerControllerCameraFlashMode)flashMode;
 
+// Last date for action
+
++ (void)setLastDate:(NSDate *)date forAction:(DFUserActionType)action;
++ (NSDate *)lastDateForAction:(DFUserActionType)action;
 
 @end
