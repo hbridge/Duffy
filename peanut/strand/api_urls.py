@@ -1,12 +1,12 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
-from rest_framework.generics import RetrieveUpdateDestroyAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
 
 # If you're changing these, don't forget to change them below
 from strand import api_views as strand_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import PhotoAction
+from common.models import PhotoAction, User
 
 urlpatterns = patterns('',
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
@@ -28,6 +28,8 @@ urlpatterns = patterns('',
 
 	url(r'^photo_actions/$', strand_api_views.CreatePhotoActionAPI.as_view(model=PhotoAction, lookup_field='id')),
 	url(r'^photo_actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=PhotoAction, lookup_field='id')),
+
+	url(r'^users/(?P<id>[0-9]+)/$', RetrieveUpdateAPIView.as_view(model=User, lookup_field='id')),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
