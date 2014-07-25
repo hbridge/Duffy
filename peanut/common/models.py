@@ -17,7 +17,7 @@ from ios_notifications.models import Notification
 class User(models.Model):
 	uuid = UUIDField(auto=True)
 	use_uuid = models.BooleanField(default=True)
-	display_name = models.CharField(max_length=100, null=True)
+	display_name = models.CharField(max_length=100)
 	phone_id = models.CharField(max_length=100, null=True)
 	phone_number = PhoneNumberField(null=True)
 	auth_token = models.CharField(max_length=100, null=True)
