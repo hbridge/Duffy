@@ -53,6 +53,7 @@
 
 - (void)addImage:(UIImage *)image
 {
+  if (!image) image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
   [self.originalImages addObject:image];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];

@@ -147,17 +147,18 @@ static DFImageStore *defaultStore;
          getImageDataForTypesWithPaths:imageTypesToPaths
          withCompletionBlock:^(NSDictionary *imageDataDict, NSError *error) {
            UIImage *resultImage;
+           DFImageStore __weak *weakSelf = self;
            DFImageType resultType = [(NSNumber *)imageDataDict.allKeys.firstObject intValue];
            NSData *imageData = imageDataDict.allValues.firstObject;
            if (imageData) {
              resultImage = [UIImage imageWithData:imageData];
-             DFImageStore __weak *weakSelf = self;
              [self setImageData:imageData type:resultType forID:photoID completion:^(NSError *error) {
                [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
              }];
            } else {
              DDLogWarn(@"%@ image data for %@ nil", [self.class description],
                        imageTypesToPaths.description);
+             [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
            }
            completionBlock(resultImage);
          }];

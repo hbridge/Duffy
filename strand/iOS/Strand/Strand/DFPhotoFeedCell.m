@@ -93,6 +93,9 @@
 
 - (void)setImage:(UIImage *)image forObject:(id)object
 {
+  if (image == nil) {
+    image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
+  }
   self.imagesForObjects[object] = image;
   [self.collectionView reloadData];
   if ([object isEqual:self.selectedObject]) self.photoImageView.image = image;
@@ -152,7 +155,8 @@
                            forIndexPath:indexPath];
   
   id object = self.objects[indexPath.row];
-  cell.imageView.image = self.imagesForObjects[object];
+  UIImage *image = self.imagesForObjects[object];
+  cell.imageView.image = image;
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
   cell.imageView.backgroundColor = [UIColor grayColor];
