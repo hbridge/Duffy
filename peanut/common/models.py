@@ -16,7 +16,7 @@ from ios_notifications.models import Notification
 # Create your models here.
 class User(models.Model):
 	uuid = UUIDField(auto=True)
-	use_uuid = models.BooleanField(default=False)
+	use_uuid = models.BooleanField(default=True)
 	display_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100, null=True)
 	phone_number = PhoneNumberField(null=True)
@@ -73,7 +73,7 @@ class User(models.Model):
 
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
-	use_uuid = models.BooleanField(default=False)
+	use_uuid = models.BooleanField(default=True)
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
