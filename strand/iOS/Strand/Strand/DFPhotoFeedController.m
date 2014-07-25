@@ -454,7 +454,8 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 + (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
                               searchObject:(DFPeanutSearchObject *)searchObject
 {
-  cell.titleLabel.text = searchObject.user_display_name;
+  cell.titleLabel.text = searchObject.user == [[DFUser currentUser] userID] ?
+    @"You" : searchObject.user_display_name;
   cell.photoDateLabel.text = [NSDateFormatter relativeTimeStringSinceDate:searchObject.time_taken];
   
   if (searchObject.actions.count > 0) {
