@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from common.models import Photo, User, PhotoAction
 
+from rest_framework import renderers
+from rest_framework.parsers import BaseParser
+
 
 class PhotoSerializer(serializers.ModelSerializer):
 	full_image_path = serializers.Field(source='getFullUrlImagePath')
@@ -19,10 +22,10 @@ class PhotoForApiSerializer(serializers.ModelSerializer):
 		fields = ('id', 'user', 'time_taken','full_image_path', 'thumb_image_path', 'user_display_name',)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):	
 	class Meta:
 		model = User
-		fields = ('id', 'display_name', 'phone_number', 'auth_token', 'invites_remaining')
+		fields = ('id', 'display_name', 'phone_number', 'phone_id', 'auth_token', 'device_token', 'last_location_point', 'last_location_accuracy', 'last_photo_timestamp', 'invites_remaining', 'added')
 
 class PhotoActionWithUserNameSerializer(serializers.ModelSerializer):
 	user_display_name = serializers.Field('getUserDisplayName')

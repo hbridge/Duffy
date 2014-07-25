@@ -20,9 +20,9 @@ class User(models.Model):
 	display_name = models.CharField(max_length=100, null=True)
 	phone_id = models.CharField(max_length=100, null=True)
 	phone_number = PhoneNumberField(null=True)
-	auth_token = models.CharField(max_length=100)
+	auth_token = models.CharField(max_length=100, null=True)
 	product_id = models.IntegerField(default=0)
-	device_token = models.TextField()
+	device_token = models.TextField(null=True)
 	last_location_point = models.PointField(null=True)
 	last_location_accuracy = models.IntegerField(null=True)
 	last_location_timestamp = models.DateTimeField(null=True)
@@ -73,7 +73,7 @@ class User(models.Model):
 
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
-	use_uuid = BooleanField(default=False)
+	use_uuid = models.BooleanField(default=False)
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
