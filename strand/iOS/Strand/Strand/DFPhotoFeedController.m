@@ -55,8 +55,7 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) NSArray *sectionObjects;
 @property (nonatomic, retain) NSDictionary *indexPathsByID;
 @property (nonatomic, retain) NSDictionary *objectsByID;
-@property (atomic, retain) NSMutableDictionary *imageCache;
-@property (atomic, retain) NSMutableDictionary *rowHeightCache;
+
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 
 @property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
@@ -83,8 +82,6 @@ const CGFloat LockedCellHeight = 157.0;
   if (self) {
     self.navigationItem.title = @"Strand";
     [self setNavigationButtons];
-    self.imageCache = [[NSMutableDictionary alloc] init];
-    self.rowHeightCache = [[NSMutableDictionary alloc] init];
     [self observeNotifications];
     
   }
@@ -283,7 +280,6 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
-  self.imageCache = [[NSMutableDictionary alloc] init];
 }
 
 - (void)setShowNuxPlaceholder:(BOOL)isShown
@@ -400,44 +396,36 @@ const CGFloat LockedCellHeight = 157.0;
     }
   } else if ([object.type isEqual:DFSearchObjectPhoto]) {
     DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"photoCell"
-                                           forIndexPath:indexPath];
+                                                                     forIndexPath:indexPath];
     cell = photoFeedCell;
     photoFeedCell.delegate = self;
     [photoFeedCell setObjects:@[@(object.id)]];
     [photoFeedCell setClusterViewHidden:YES];
     [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
                                                  searchObject:object];
-    UIImage *image = self.imageCache[indexPath];
-    if (image) {
-      [photoFeedCell setImage:image forObject:@(object.id)];
-    } else {
-      photoFeedCell.imageView.image = nil;
-      [photoFeedCell.loadingActivityIndicator startAnimating];
-      
-      if (object) {
-        [[DFImageStore sharedStore]
-         imageForID:object.id
-         preferredType:DFImageFull
-         thumbnailPath:object.thumb_image_path
-         fullPath:object.full_image_path
-         completion:^(UIImage *image) {
-           if (image) {
-             self.imageCache[indexPath] = image;
-           }
-           dispatch_async(dispatch_get_main_queue(), ^{
-             if (![tableView.visibleCells containsObject:photoFeedCell]) return;
-             [photoFeedCell setImage:image forObject:@(object.id)];
-             [photoFeedCell.loadingActivityIndicator stopAnimating];
-             [photoFeedCell setNeedsLayout];
-           });
-         }];
-      }
+    photoFeedCell.imageView.image = nil;
+    [photoFeedCell.loadingActivityIndicator startAnimating];
+    
+    if (object) {
+      [[DFImageStore sharedStore]
+       imageForID:object.id
+       preferredType:DFImageFull
+       thumbnailPath:object.thumb_image_path
+       fullPath:object.full_image_path
+       completion:^(UIImage *image) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           if (![tableView.visibleCells containsObject:photoFeedCell]) return;
+           [photoFeedCell setImage:image forObject:@(object.id)];
+           [photoFeedCell.loadingActivityIndicator stopAnimating];
+           [photoFeedCell setNeedsLayout];
+         });
+       }];
     }
   } else if ([object.type isEqual:DFSearchObjectCluster]) {
-    DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"clusterCell"
-                                    forIndexPath:indexPath];
-    cell = photoFeedCell;
-    photoFeedCell.delegate = self;
+  DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"clusterCell"
+                                                                   forIndexPath:indexPath];
+  cell = photoFeedCell;
+  photoFeedCell.delegate = self;
     [photoFeedCell setClusterViewHidden:NO];
     [photoFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:object.objects]];
     [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
@@ -556,7 +544,6 @@ const CGFloat LockedCellHeight = 157.0;
   _objectsByID = objectsByID;
   _indexPathsByID = indexPathsByID;
   _sectionObjects = sectionObjects;
-  _imageCache = [NSMutableDictionary new];
   
   [self.tableView reloadData];
 }
