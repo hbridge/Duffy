@@ -16,6 +16,7 @@
 @property (readonly, strong, nonatomic) NSArray *subviewControllers;
 @property (nonatomic, retain) DFCameraViewController *cameraViewController;
 @property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
+@property (nonatomic, retain) DFNavigationController *feedNavController;
 
 @end
 
@@ -28,10 +29,11 @@
     self.hideStatusBar = YES;
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFPhotoFeedController alloc] init];
+    _feedNavController = [[DFNavigationController alloc] initWithRootViewController:_photoFeedController
+                                                                 animateInStatusBar:YES];
     _subviewControllers =
     @[
-      [[DFNavigationController alloc]
-       initWithRootViewController:_photoFeedController],
+      _feedNavController,
       _cameraViewController,
       ];
 
@@ -171,6 +173,28 @@
   self.pageViewController.doubleSided = NO;
   return UIPageViewControllerSpineLocationMin;
 }
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+        didFinishAnimating:(BOOL)finished
+   previousViewControllers:(NSArray *)previousViewControllers
+       transitionCompleted:(BOOL)completed
+{
+  if (self.pageViewController.viewControllers.firstObject == _feedNavController) {
+    [_feedNavController animateInStatusBar];
+    self.hideStatusBar = NO;
+  }
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+willTransitionToViewControllers:(NSArray *)pendingViewControllers
+{
+  if (pendingViewControllers.firstObject == _cameraViewController) {
+    self.hideStatusBar = YES;
+  }
+}
+
+
+#pragma mark - Other Helpers
 
 - (void)setHideStatusBar:(BOOL)hideStatusBar
 {

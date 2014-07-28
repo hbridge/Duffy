@@ -119,7 +119,6 @@ const unsigned int SavePromptMinPhotos = 3;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:YES];
   [self updateUnseenCount:nil];
 }
 

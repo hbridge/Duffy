@@ -86,6 +86,7 @@ const CGFloat LockedCellHeight = 157.0;
     self.imageCache = [[NSMutableDictionary alloc] init];
     self.rowHeightCache = [[NSMutableDictionary alloc] init];
     [self observeNotifications];
+    
   }
   return self;
 }
@@ -140,6 +141,11 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidLoad];
   
+  // we observe changes to the table view's frame to prevent it from moving when the status bar
+  // is hidden
+  [self.tableView addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionOld context:nil];
+  
+  self.automaticallyAdjustsScrollViewInsets = NO;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
        forCellReuseIdentifier:@"photoCell"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
@@ -147,13 +153,16 @@ const CGFloat LockedCellHeight = 157.0;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFLockedStrandCell" bundle:nil]
        forCellReuseIdentifier:@"lockedCell"];
   
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView" bundle:nil]
-forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
+  [self.tableView
+   registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView"
+                              bundle:nil]
+   forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.tableView.rowHeight = MinRowHeight;
   
   self.refreshControl = [[UIRefreshControl alloc] init];
-  [self.refreshControl addTarget:self action:@selector(reloadFeed) forControlEvents:UIControlEventValueChanged];
+  [self.refreshControl addTarget:self action:@selector(reloadFeed)
+                forControlEvents:UIControlEventValueChanged];
   [self.tableView addSubview:self.refreshControl];
 }
 
@@ -161,9 +170,8 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 {
   [super viewWillAppear:animated];
   [self reloadFeedIsSilent:NO];
-  
-  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
 }
+
 
 - (void)jumpToPhoto:(DFPhotoIDType)photoID
 {
@@ -233,8 +241,6 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
-  [(RootViewController *)self.view.window.rootViewController setHideStatusBar:NO];
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
                                                       object:self
                                                     userInfo:nil];
@@ -250,11 +256,27 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+  [super viewWillDisappear:animated];
+  // take a snapshot
+}
+
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
+
   [self.autoRefreshTimer invalidate];
   self.autoRefreshTimer = nil;
+}
+
+- (void)setTableViewFrame
+{
+  self.tableView.frame = CGRectMake(self.tableView.frame.origin.x,
+                                    self.navigationController.navigationBar.frame.size.height,
+                                    self.tableView.frame.size.width,
+                                    self.tableView.frame.size.height);
 }
 
 - (void)didReceiveMemoryWarning
@@ -356,7 +378,6 @@ forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   DFPeanutSearchObject *section = self.sectionObjects[indexPath.section];
   NSArray *itemsForSection = section.objects;
   DFPeanutSearchObject *object = itemsForSection[indexPath.row];
-  //DDLogVerbose(@"cellForRowAtIndexPath: [%d, %d] photoID: %llu", (int)indexPath.section, (int)indexPath.row, representativeObject.id);
   
   if ([self isSectionLocked:section]) {
     DFLockedStrandCell *lockedCell = [tableView dequeueReusableCellWithIdentifier:@"lockedCell"
@@ -792,6 +813,22 @@ selectedObjectChanged:(id)newObject
 {
   if (self.isViewLoaded && self.view.window) {
     [self viewDidDisappear:YES];
+  }
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath
+                      ofObject:(id)object
+                        change:(NSDictionary *)change
+                       context:(void *)context
+{
+  // This is a hack to prevent the table view from shifting when the Status bar is hidden and shown
+  if (object == self.tableView) {
+    if (self.tableView.frame.origin.y == 44.0) {
+      self.tableView.frame = CGRectMake(self.tableView.frame.origin.x,
+                                        64.0,
+                                        self.tableView.frame.size.width,
+                                        self.tableView.frame.size.height);
+    }
   }
 }
 

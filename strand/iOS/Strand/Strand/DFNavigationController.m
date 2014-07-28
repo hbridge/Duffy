@@ -8,20 +8,39 @@
 
 #import "DFNavigationController.h"
 #import "DFStrandConstants.h"
+#import "DFOverlayViewController.h"
+#import "DFNavigationBar.h"
 
 @interface DFNavigationController ()
+
+@property (nonatomic, retain) UIWindow *overlayWindow;
+@property (nonatomic, retain) DFOverlayViewController *overlayVC;
+@property (nonatomic) BOOL doesAnimateInStatusBar;
 
 @end
 
 @implementation DFNavigationController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (instancetype)initWithRootViewController:(UIViewController *)rootViewController
 {
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self) {
-    // Custom initialization
+  return [self initWithRootViewController:rootViewController animateInStatusBar:NO];
+}
+
+- (instancetype)initWithRootViewController:(UIViewController *)rootViewController
+                        animateInStatusBar:(BOOL)animateInStatusBar
+{
+  if (animateInStatusBar) {
+    self = [super initWithNavigationBarClass:[DFNavigationBar class] toolbarClass:[UIToolbar class]];
+  } else {
+    self = [super init];
   }
+  if (self) {
+    _doesAnimateInStatusBar = animateInStatusBar;
+    self.viewControllers = @[rootViewController];
+  }
+  
   return self;
+
 }
 
 - (void)viewDidLoad
@@ -37,6 +56,30 @@
   self.navigationBar.translucent = NO;
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+}
+
+- (void)animateInStatusBar
+{
+  if (!self.overlayWindow) {
+    self.overlayWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [self.overlayWindow setWindowLevel:UIWindowLevelStatusBar];
+    [self.overlayWindow setUserInteractionEnabled:NO];
+        
+    self.overlayVC = [[DFOverlayViewController alloc] init];
+    [self.overlayWindow setRootViewController:self.overlayVC];
+  }
+  
+  [self.overlayWindow setHidden:NO];
+  [self.overlayWindow makeKeyWindow];
+  
+  [self.overlayVC animateIn:^(BOOL finished) {
+    self.overlayWindow.hidden = YES;
+  }];
+}
+
 - (void)didReceiveMemoryWarning
 {
   [super didReceiveMemoryWarning];
@@ -46,5 +89,7 @@
 -(UIStatusBarStyle)preferredStatusBarStyle{
   return UIStatusBarStyleLightContent;
 }
+
+
 
 @end

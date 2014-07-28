@@ -45,6 +45,8 @@
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
 		5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344C196340A0003D7546 /* DFPhotoResizer.m */; };
 		5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A40344E19646BC6003D7546 /* AudioToolbox.framework */; };
+		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
+		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
 		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
 		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
 		5A7B1841196DFEB300E5A1D1 /* DFNearbyFriendsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */; };
@@ -223,6 +225,10 @@
 		5A40344B196340A0003D7546 /* DFPhotoResizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoResizer.h; sourceTree = "<group>"; };
 		5A40344C196340A0003D7546 /* DFPhotoResizer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoResizer.m; sourceTree = "<group>"; };
 		5A40344E19646BC6003D7546 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOverlayViewController.h; sourceTree = "<group>"; };
+		5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayViewController.m; sourceTree = "<group>"; };
+		5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationBar.h; sourceTree = "<group>"; };
+		5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNavigationBar.m; sourceTree = "<group>"; };
 		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
 		5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsAdapter.m; sourceTree = "<group>"; };
 		5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutMessageResponse.h; sourceTree = "<group>"; };
@@ -441,6 +447,10 @@
 			children = (
 				5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */,
 				5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */,
+				5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */,
+				5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */,
+				5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */,
+				5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */,
 				5AF32EC5197C9DCE004B5CC4 /* DFRoundedButton.h */,
 				5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */,
 				5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */,
@@ -1159,6 +1169,7 @@
 				5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */,
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
+				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
@@ -1171,6 +1182,7 @@
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */,
+				5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */,
 				5A0E122D197487CC00B6FF04 /* DFInviteUserComposeController.m in Sources */,
 				5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
