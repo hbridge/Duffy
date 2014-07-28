@@ -1,5 +1,11 @@
 # Strand
 
+## Jul 28th, 2014
+
+- Status bar no longer jumps when switching between camera and feed
+- Fixed unresponsiveness and crash after saving photo
+- Fixed other crashes
+
 ## Jul 25th, 2014
 
 - Bigger images in feed
