@@ -249,8 +249,8 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   DDLogVerbose(@"App received notification: %@",
                userInfo.description);
   DFPeanutPushNotification *pushNotif = [[DFPeanutPushNotification alloc] initWithUserInfo:userInfo];
-  if ([application applicationState] == UIApplicationStateBackground && pushNotif.isUpdateLocationRequest){
-    if (pushNotif.contentAvailable)
+  if ([application applicationState] == UIApplicationStateBackground){
+    if (pushNotif.contentAvailable && pushNotif.isUpdateLocationRequest)
     {
       [[DFBackgroundLocationManager sharedBackgroundLocationManager]
        backgroundUpdateWithCompletionHandler:completionHandler];

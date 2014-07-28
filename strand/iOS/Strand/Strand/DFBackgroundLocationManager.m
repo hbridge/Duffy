@@ -175,7 +175,12 @@ static DFBackgroundLocationManager *defaultManager;
     DDLogInfo(@"%@ stopping background location updates and calling completion.", [self.class description]);
     [self.locationManager stopUpdatingLocation];
     self.isBackgroundLocationUpdateInProgress = NO;
-    completionHandler(UIBackgroundFetchResultNewData);
+    if (completionHandler) {
+      completionHandler(UIBackgroundFetchResultNewData);
+    } else {
+      DDLogWarn(@"%@ backgorundUpdateWithCompletionHandler completion handler nil.",
+                [self.class description]);
+    }
   });
 }
 
