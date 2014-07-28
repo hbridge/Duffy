@@ -19,7 +19,7 @@ class User(models.Model):
 	use_uuid = models.BooleanField(default=True)
 	display_name = models.CharField(max_length=100)
 	phone_id = models.CharField(max_length=100, null=True)
-	phone_number = PhoneNumberField(null=True)
+	phone_number = PhoneNumberField(null=True, db_index=True)
 	auth_token = models.CharField(max_length=100, null=True)
 	product_id = models.IntegerField(default=0)
 	device_token = models.TextField(null=True)
@@ -402,7 +402,35 @@ class DuffyNotification(Notification):
 		return payload
 
 class ContactEntry(models.Model):
-	user = models.ForeignKey(User)
+	user = models.ForeignKey(User, db_index=True)
 	name = models.CharField(max_length=100)
-	phone_number = PhoneNumberField()
+	phone_number = PhoneNumberField(db_index=True)
+	evaluated = models.BooleanField(db_index=True, default=False)
+	bulk_batch_key = models.IntegerField(null=True, db_index=True)
+	added = models.DateTimeField(auto_now_add=True, db_index=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'strand_contacts'
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		for obj in objs:
+			obj.updated = datetime.datetime.now()
+
+		if isinstance(attributesList, list):
+			attributesList.append("updated")
+		else:
+			attributesList = [attributesList, "updated"]
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
+
+class FriendConnection(models.Model):
+	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
+	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		unique_together = ("user_1", "user_2")
+		db_table = 'strand_friends'

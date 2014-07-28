@@ -4,9 +4,10 @@ from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdate
 
 # If you're changing these, don't forget to change them below
 from strand import api_views as strand_api_views
+from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import PhotoAction, User
+from common.models import PhotoAction, User, ContactEntry
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
@@ -27,10 +28,12 @@ urlpatterns = patterns('',
 
 	url(r'^get_invite_message', 'strand.api_views.get_invite_message'),
 
-	url(r'^photo_actions/$', strand_api_views.CreatePhotoActionAPI.as_view(model=PhotoAction, lookup_field='id')),
+	url(r'^photo_actions/$', strand_rest_api_views.CreatePhotoActionAPI.as_view(model=PhotoAction, lookup_field='id')),
 	url(r'^photo_actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=PhotoAction, lookup_field='id')),
 
 	url(r'^users/(?P<id>[0-9]+)/$', RetrieveUpdateAPIView.as_view(model=User, lookup_field='id', serializer_class=UserSerializer)),
+
+	url(r'^contacts/$', strand_rest_api_views.BulkCreateAPIView.as_view(model=ContactEntry, lookup_field='id')),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
