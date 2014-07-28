@@ -20,6 +20,12 @@
 // Get a background context for use on background thread
 + (NSManagedObjectContext *)createBackgroundManagedObjectContext;
 
+typedef enum {
+  DFUploadStatusAny = 0,
+  DFUploadStatusNotUploaded = 1,
+  DFUploadStatusUploaded = 2,
+} DFUploadStatus;
+
 // Get the shared ALAssets library for other model files
 @property (readonly, strong, nonatomic) ALAssetsLibrary *assetsLibrary;
 
@@ -28,10 +34,10 @@
 - (DFPhotoCollection *)cameraRoll;
 - (DFPhotoCollection *)mostRecentPhotos:(NSUInteger)maxCount;
 - (DFPhoto *)mostRecentUploadedThumbnail;
-- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
-                                      fullUploadStatus:(BOOL)isFullPhotoUploaded;
-+ (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
-                                      fullUploadStatus:(BOOL)isFullPhotoUploaded
+- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
+                                      fullUploadStatus:(DFUploadStatus)fullStatus;
++ (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
+                                      fullUploadStatus:(DFUploadStatus)fullStatus
                                              inContext:(NSManagedObjectContext *)context;
 + (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;

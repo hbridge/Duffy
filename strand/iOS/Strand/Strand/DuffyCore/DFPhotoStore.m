@@ -291,16 +291,16 @@ static int const FetchStride = 500;
   return [result firstObject];
 }
 
-- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
-                                      fullUploadStatus:(BOOL)isFullPhotoUploaded
+- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
+                                      fullUploadStatus:(DFUploadStatus)fullStatus
 {
-  return [DFPhotoStore photosWithThumbnailUploadStatus:isThumbnailUploaded
-                                      fullUploadStatus:isFullPhotoUploaded
+  return [DFPhotoStore photosWithThumbnailUploadStatus:thumbnailStatus
+                                      fullUploadStatus:fullStatus
                                              inContext:[self managedObjectContext]];
 }
 
-+ (DFPhotoCollection *)photosWithThumbnailUploadStatus:(BOOL)isThumbnailUploaded
-                                      fullUploadStatus:(BOOL)isFullPhotoUploaded
++ (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
+                                      fullUploadStatus:(DFUploadStatus)fullStatus
                                              inContext:(NSManagedObjectContext *)context;
 {
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -308,21 +308,26 @@ static int const FetchStride = 500;
   request.entity = entity;
   
   NSPredicate *thumbnailPredicate;
-  if (isThumbnailUploaded) {
+  if (thumbnailStatus == DFUploadStatusUploaded) {
     thumbnailPredicate = [NSPredicate predicateWithFormat:@"upload157Date != nil"];
-  } else {
+  } else if (thumbnailStatus == DFUploadStatusNotUploaded){
     thumbnailPredicate = [NSPredicate predicateWithFormat:@"upload157Date = nil"];
   }
   
   NSPredicate *fullPredicate;
-  if (isFullPhotoUploaded) {
+  if (fullStatus == DFUploadStatusUploaded) {
     fullPredicate = [NSPredicate predicateWithFormat:@"upload569Date != nil"];
-  } else {
+  } else if (fullStatus == DFUploadStatusNotUploaded) {
     fullPredicate = [NSPredicate predicateWithFormat:@"upload569Date = nil"];
   }
   
+  assert(thumbnailPredicate || fullPredicate);
+  
+  NSMutableArray *subpredeicates = [NSMutableArray new];
+  if (thumbnailPredicate) [subpredeicates addObject:thumbnailPredicate];
+  if (fullPredicate) [subpredeicates addObject:fullPredicate];
   NSCompoundPredicate *compoundPredicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType
-                                                                       subpredicates:@[thumbnailPredicate, fullPredicate]];
+                                                                       subpredicates:subpredeicates];
   request.predicate = compoundPredicate;
   
   NSError *error;

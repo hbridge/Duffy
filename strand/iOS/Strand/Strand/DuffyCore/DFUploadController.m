@@ -131,9 +131,13 @@ static DFUploadController *defaultUploadController;
 {
     [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
         DFPhotoCollection *photosWithThumbsToUpload =
-            [DFPhotoStore photosWithThumbnailUploadStatus:NO fullUploadStatus:NO inContext:self.managedObjectContext];
+            [DFPhotoStore photosWithThumbnailUploadStatus:DFUploadStatusNotUploaded
+                                         fullUploadStatus:DFUploadStatusAny
+                                                inContext:self.managedObjectContext];
         DFPhotoCollection *eligibleFullImagesToUpload =
-            [DFPhotoStore photosWithThumbnailUploadStatus:YES fullUploadStatus:NO inContext:self.managedObjectContext];
+            [DFPhotoStore photosWithThumbnailUploadStatus:DFUploadStatusUploaded
+                                         fullUploadStatus:DFUploadStatusNotUploaded
+                                                inContext:self.managedObjectContext];
       
         [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
         [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];

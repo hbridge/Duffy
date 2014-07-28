@@ -35,9 +35,12 @@
 #import "DFLockedStrandCell.h"
 #import "DFUploadController.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFUploadingFeedCell.h"
+#import "DFNotificationSharedConstants.h"
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
+const CGFloat UploadingCellHeight = 50.0;
 const CGFloat HeaderHeight = 48.0;
 // constants used for row height calculations
 const CGFloat TitleAreaHeight = 32; // height plus spacing around
@@ -55,6 +58,8 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) NSArray *sectionObjects;
 @property (nonatomic, retain) NSDictionary *indexPathsByID;
 @property (nonatomic, retain) NSDictionary *objectsByID;
+@property (nonatomic, retain) NSArray *uploadingPhotos;
+@property (nonatomic, retain) NSError *uploadError;
 
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 
@@ -132,6 +137,10 @@ const CGFloat LockedCellHeight = 157.0;
                                            selector:@selector(reloadFeed)
                                                name:DFStrandRefreshRemoteUIRequestedNotificationName
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(uploadStatusChanged:)
+                                               name:DFUploadStatusNotificationName
+                                             object:nil];
 }
 
 - (void)viewDidLoad
@@ -149,6 +158,8 @@ const CGFloat LockedCellHeight = 157.0;
        forCellReuseIdentifier:@"clusterCell"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFLockedStrandCell" bundle:nil]
        forCellReuseIdentifier:@"lockedCell"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFUploadingFeedCell" bundle:nil]
+       forCellReuseIdentifier:@"uploadingCell"];
   
   [self.tableView
    registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView"
@@ -196,21 +207,27 @@ const CGFloat LockedCellHeight = 157.0;
     if (!isSilent)
       [self.refreshControl endRefreshing];
     if (!error) {
-      if (response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash]) {
-        DDLogInfo(@"New feed data detected. Re-rendering feed.");
-        dispatch_async(dispatch_get_main_queue(), ^{
-          [self setSectionObjects:response.topLevelSectionObjects];
-        });
-        self.lastResponseHash = hashData;
-      }
-      if (self.requestedPhotoIDToJumpTo) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-          NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
-          [self.tableView scrollToRowAtIndexPath:indexPath
-                                atScrollPosition:UITableViewScrollPositionBottom animated:NO];
-          self.requestedPhotoIDToJumpTo = 0;
-        });
-      }
+      dispatch_async(dispatch_get_main_queue(), ^{
+        NSArray *unUploadedPhotos = [[[DFPhotoStore sharedStore]
+                                      photosWithThumbnailUploadStatus:DFUploadStatusAny
+                                      fullUploadStatus:DFUploadStatusNotUploaded]
+                                     photosByDateAscending:NO];
+        if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])
+            || ![self.uploadingPhotos isEqualToArray:unUploadedPhotos]) {
+          DDLogInfo(@"New feed data detected. Re-rendering feed.");
+          [self setSectionObjects:response.topLevelSectionObjects
+                  uploadingPhotos:unUploadedPhotos];
+          
+          self.lastResponseHash = hashData;
+        }
+        if (self.requestedPhotoIDToJumpTo) {
+          dispatch_async(dispatch_get_main_queue(), ^{
+            NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
+            [self.tableView scrollToRowAtIndexPath:indexPath
+                                  atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+            self.requestedPhotoIDToJumpTo = 0;
+          });
+        }});
     }
     
     // Evaluate whether and how to show error messages or NUX screens
@@ -313,10 +330,14 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+  if (self.uploadingPhotos.count > 0 && section == 0) {
+    return nil;
+  }
+  
   DFFeedSectionHeaderView *headerView =
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
-  DFPeanutSearchObject *sectionObject = self.sectionObjects[section];
+  DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
   headerView.titleLabel.text = sectionObject.title;
   headerView.subtitleLabel.text = sectionObject.subtitle;
   
@@ -325,6 +346,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
+  if (self.uploadingPhotos.count > 0 && section == 0) return 0.0;
   return HeaderHeight;
 }
 
@@ -332,123 +354,170 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return self.sectionObjects.count;
+  return self.sectionObjects.count + (self.uploadingPhotos.count > 0 ? 1 : 0);
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  if ([self isSectionLocked:self.sectionObjects[section]]) {
+  if (self.uploadingPhotos.count > 0 && section == 0) {
+    return self.uploadingPhotos.count;
+  }
+  
+  DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
+  
+  if ([self isSectionLocked:sectionObject]) {
     return 1;
   }
   
-  NSArray *items = [self itemsForSectionIndex:section];
+  NSArray *items = sectionObject.objects;
   return items.count;
 }
 
-- (NSArray *)itemsForSectionIndex:(NSInteger)index
+- (DFPeanutSearchObject *)sectionObjectForTableSection:(NSUInteger)tableSection
 {
-  if (index >= self.sectionObjects.count) return nil;
-  DFPeanutSearchObject *sectionObject = self.sectionObjects[index];
-  NSArray *items = sectionObject.objects;
-  return items;
-}
-
-- (DFPeanutSearchObject *)representativePhotoForIndexPath:(NSIndexPath *)indexPath
-{
-  NSArray *itemsForSection = [self itemsForSectionIndex:indexPath.section];
-  DFPeanutSearchObject *object = itemsForSection[indexPath.row];
+  if (self.uploadingPhotos.count > 0) return self.sectionObjects[tableSection - 1];
   
-  if ([object.type isEqual:DFSearchObjectPhoto]) {
-    return object;
-  } else if ([object.type isEqual:DFSearchObjectCluster]) {
-    return [object.objects firstObject];
-  }
-  
-  return nil;
+  return self.sectionObjects[tableSection];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
-
-  DFPeanutSearchObject *section = self.sectionObjects[indexPath.section];
-  NSArray *itemsForSection = section.objects;
-  DFPeanutSearchObject *object = itemsForSection[indexPath.row];
   
-  if ([self isSectionLocked:section]) {
-    DFLockedStrandCell *lockedCell = [tableView dequeueReusableCellWithIdentifier:@"lockedCell"
-                                                                     forIndexPath:indexPath];
-    cell = lockedCell;
-    [lockedCell setImages:@[]];
-    for (DFPeanutSearchObject *object in section.objects) {
-      [[DFImageStore sharedStore]
-       imageForID:object.id
-       preferredType:DFImageThumbnail
-       thumbnailPath:object.thumb_image_path
-       fullPath:object.full_image_path
-       completion:^(UIImage *image) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-           if (![tableView.visibleCells containsObject:lockedCell]) return;
-           [lockedCell addImage:image];
-           [lockedCell setNeedsLayout];
-         });
-       }];
-    }
-  } else if ([object.type isEqual:DFSearchObjectPhoto]) {
-    DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"photoCell"
-                                                                     forIndexPath:indexPath];
-    cell = photoFeedCell;
-    photoFeedCell.delegate = self;
-    [photoFeedCell setObjects:@[@(object.id)]];
-    [photoFeedCell setClusterViewHidden:YES];
-    [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
-                                                 searchObject:object];
-    photoFeedCell.imageView.image = nil;
-    [photoFeedCell.loadingActivityIndicator startAnimating];
+  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
+    cell = [self cellForUploadAtIndexPath:indexPath];
+  } else {
+    DFPeanutSearchObject *section = [self sectionObjectForTableSection:indexPath.section];
+    NSArray *itemsForSection = section.objects;
+    DFPeanutSearchObject *object = itemsForSection[indexPath.row];
     
-    if (object) {
-      [[DFImageStore sharedStore]
-       imageForID:object.id
-       preferredType:DFImageFull
-       thumbnailPath:object.thumb_image_path
-       fullPath:object.full_image_path
-       completion:^(UIImage *image) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-           if (![tableView.visibleCells containsObject:photoFeedCell]) return;
-           [photoFeedCell setImage:image forObject:@(object.id)];
-           [photoFeedCell.loadingActivityIndicator stopAnimating];
-           [photoFeedCell setNeedsLayout];
-         });
-       }];
-    }
-  } else if ([object.type isEqual:DFSearchObjectCluster]) {
-  DFPhotoFeedCell *photoFeedCell = [tableView dequeueReusableCellWithIdentifier:@"clusterCell"
-                                                                   forIndexPath:indexPath];
-  cell = photoFeedCell;
-  photoFeedCell.delegate = self;
-    [photoFeedCell setClusterViewHidden:NO];
-    [photoFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:object.objects]];
-    [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
-                                                 searchObject:[object.objects firstObject]];
-    for (DFPeanutSearchObject *subObject in object.objects) {
-      [[DFImageStore sharedStore]
-       imageForID:subObject.id
-       preferredType:DFImageFull
-       thumbnailPath:subObject.thumb_image_path
-       fullPath:subObject.full_image_path
-       completion:^(UIImage *image) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-           if (![tableView.visibleCells containsObject:photoFeedCell]) return;
-           [photoFeedCell setImage:image forObject:@(subObject.id)];
-           [photoFeedCell setNeedsLayout];
-         });
-       }];
+    if ([self isSectionLocked:section]) {
+      cell = [self cellForLockedSection:section indexPath:indexPath];
+    } else if ([object.type isEqual:DFSearchObjectPhoto]) {
+      cell = [self cellForPhoto:object indexPath:indexPath];
+    } else if ([object.type isEqual:DFSearchObjectCluster]) {
+      cell = [self cellForCluster:object indexPath:indexPath];
     }
   }
 
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
   [cell setNeedsLayout];
   return cell;
+}
+
+- (DFUploadingFeedCell *)cellForUploadAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFUploadingFeedCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"uploadingCell"];
+  DFPhoto *uploadingPhoto = self.uploadingPhotos[indexPath.row];
+  
+  cell.imageView.image = nil;
+  if (indexPath.row == 0) {
+    if (!self.uploadError) {
+      cell.statusTextLabel.text = @"Uploading";
+      [cell.activityIndicator startAnimating];
+    } else {
+      cell.statusTextLabel.text = @"Retry Pending";
+      [cell.activityIndicator stopAnimating];
+    }
+  } else {
+    cell.statusTextLabel.text = @"Pending";
+    [cell.activityIndicator stopAnimating];
+  }
+  cell.retryButton.hidden = YES;
+  
+  [uploadingPhoto.asset loadUIImageForThumbnail:^(UIImage *image) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (![self.tableView.visibleCells containsObject:cell]) return;
+      cell.thumbnailImageView.image = image;
+    });
+  } failureBlock:^(NSError *error) {
+    DDLogError(@"Error loading thumbnail for uploading asset.");
+  }];
+  
+  return cell;
+}
+
+- (DFLockedStrandCell *)cellForLockedSection:(DFPeanutSearchObject *)section
+                                   indexPath:(NSIndexPath *)indexPath
+{
+  DFLockedStrandCell *lockedCell = [self.tableView dequeueReusableCellWithIdentifier:@"lockedCell"
+                                                                   forIndexPath:indexPath];
+  [lockedCell setImages:@[]];
+  for (DFPeanutSearchObject *object in section.objects) {
+    [[DFImageStore sharedStore]
+     imageForID:object.id
+     preferredType:DFImageThumbnail
+     thumbnailPath:object.thumb_image_path
+     fullPath:object.full_image_path
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         if (![self.tableView.visibleCells containsObject:lockedCell]) return;
+         [lockedCell addImage:image];
+         [lockedCell setNeedsLayout];
+       });
+     }];
+  }
+  return lockedCell;
+}
+
+- (DFPhotoFeedCell *)cellForPhoto:(DFPeanutSearchObject *)photoObject
+                           indexPath:(NSIndexPath *)indexPath
+{
+  DFPhotoFeedCell *photoFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"photoCell"
+                                                                   forIndexPath:indexPath];
+  photoFeedCell.delegate = self;
+  [photoFeedCell setObjects:@[@(photoObject.id)]];
+  [photoFeedCell setClusterViewHidden:YES];
+  [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
+                                               searchObject:photoObject];
+  photoFeedCell.imageView.image = nil;
+  [photoFeedCell.loadingActivityIndicator startAnimating];
+  
+  if (photoObject) {
+    [[DFImageStore sharedStore]
+     imageForID:photoObject.id
+     preferredType:DFImageFull
+     thumbnailPath:photoObject.thumb_image_path
+     fullPath:photoObject.full_image_path
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
+         [photoFeedCell setImage:image forObject:@(photoObject.id)];
+         [photoFeedCell.loadingActivityIndicator stopAnimating];
+         [photoFeedCell setNeedsLayout];
+       });
+     }];
+  }
+
+  return photoFeedCell;
+}
+
+- (DFPhotoFeedCell *)cellForCluster:(DFPeanutSearchObject *)cluster
+                        indexPath:(NSIndexPath *)indexPath
+{
+  DFPhotoFeedCell *photoFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"clusterCell"
+                                                                   forIndexPath:indexPath];
+  photoFeedCell.delegate = self;
+  [photoFeedCell setClusterViewHidden:NO];
+  [photoFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:cluster.objects]];
+  [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
+                                               searchObject:[cluster.objects firstObject]];
+  for (DFPeanutSearchObject *subObject in cluster.objects) {
+    [[DFImageStore sharedStore]
+     imageForID:subObject.id
+     preferredType:DFImageFull
+     thumbnailPath:subObject.thumb_image_path
+     fullPath:subObject.full_image_path
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
+         [photoFeedCell setImage:image forObject:@(subObject.id)];
+         [photoFeedCell setNeedsLayout];
+       });
+     }];
+  }
+
+  return photoFeedCell;
 }
 
 + (NSArray *)objectIDNumbers:(NSArray *)objects
@@ -495,9 +564,14 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
+    return UploadingCellHeight;
+  }
+  
   CGFloat rowHeight = MinRowHeight;
   
-  DFPeanutSearchObject *sectionObject = self.sectionObjects[indexPath.section];
+  
+  DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
   if ([self isSectionLocked:sectionObject]) {
     // If it's a section object, its height is fixed
     return LockedCellHeight;
@@ -520,6 +594,7 @@ const CGFloat LockedCellHeight = 157.0;
 }
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
+         uploadingPhotos:(NSArray *)uploadingPhotos
 {
   NSMutableDictionary *objectsByID = [NSMutableDictionary new];
   NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
@@ -544,6 +619,7 @@ const CGFloat LockedCellHeight = 157.0;
   _objectsByID = objectsByID;
   _indexPathsByID = indexPathsByID;
   _sectionObjects = sectionObjects;
+  _uploadingPhotos = uploadingPhotos;
   
   [self.tableView reloadData];
 }
@@ -552,7 +628,18 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutSearchObject *object = [[self.sectionObjects[indexPath.section] objects] objectAtIndex:indexPath.row];
+  id object;
+  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
+    object = self.uploadingPhotos[indexPath.row];
+  } else {
+    DFPeanutSearchObject *section = [self sectionObjectForTableSection:indexPath.section];
+    if ([self isSectionLocked:section]) {
+      object = section;
+    } else {
+      object = section.objects[indexPath.row];
+    }
+  }
+  
   DDLogVerbose(@"Row tapped for object: %@", object);
                
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
@@ -809,6 +896,21 @@ selectedObjectChanged:(id)newObject
 {
   if (self.isViewLoaded && self.view.window) {
     [self viewDidDisappear:YES];
+  }
+}
+
+- (void)uploadStatusChanged:(NSNotification *)note
+{
+  DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
+  if (uploadStats.fatalError) {
+    [self.tableView reloadData];
+    self.uploadError = uploadStats.fatalError;
+  } else {
+    self.uploadError = nil;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),
+                   dispatch_get_main_queue(), ^{
+      [self reloadFeedIsSilent:YES];
+    });
   }
 }
 

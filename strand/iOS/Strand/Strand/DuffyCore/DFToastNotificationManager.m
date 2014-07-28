@@ -62,11 +62,11 @@ static DFToastNotificationManager *defaultManager;
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     if (notificationType == DFStatusUploadError) {
-      [self showErrorWithTitle:@"Couldn't Share Photos"
-                      subTitle:@"An upload error occurred, please try again later."];
+      [self showErrorWithTitle:@"An upload error occurred. Your photo will be uploaded later."
+                      subTitle:nil];
     } else if (notificationType == DFFeedRefreshError) {
-      [self showErrorWithTitle:@"Couldn't Reload Feed"
-                      subTitle:@"Please try again later."];
+      [self showErrorWithTitle:@"Couldn't reload feed. Please try again later."
+                      subTitle:nil];
     }
   });
 }
@@ -78,7 +78,7 @@ static DFToastNotificationManager *defaultManager;
   options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
   options[kCRToastTimeIntervalKey] = @(5.0);
   options[kCRToastTextKey] = title;
-  options[kCRToastSubtitleTextKey] = subtitle;
+  if (subtitle) options[kCRToastSubtitleTextKey] = subtitle;
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/WarningIcon.png"];
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
