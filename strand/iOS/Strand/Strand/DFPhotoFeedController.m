@@ -728,16 +728,14 @@ selectedObjectChanged:(id)newObject
       [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.actionSheetPhotoID];
       [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess];
     } else {
-      UIAlertView *alertView = [[UIAlertView alloc]
-                                initWithTitle:@"Error"
-                                message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
-                                          error.localizedRecoverySuggestion ?
-                                          error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]
-                                delegate:nil
-                                cancelButtonTitle:@"OK"
-                                otherButtonTitles:nil];
-      [alertView show];
-      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [UIAlertView
+         showSimpleAlertWithTitle:@"Error"
+         message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
+                   error.localizedRecoverySuggestion ?
+                   error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]];
+        [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure];
+      });
     }
   }];
 }
