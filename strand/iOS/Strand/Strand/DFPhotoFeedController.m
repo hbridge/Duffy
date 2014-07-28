@@ -745,29 +745,40 @@ selectedObjectChanged:(id)newObject
 - (void)savePhotoToCameraRoll
 {
   @autoreleasepool {
-    [self.photoAdapter getPhoto:self.actionSheetPhotoID withImageDataTypes:DFImageFull
-                completionBlock:^(DFPeanutPhoto *peanutPhoto, NSDictionary *imageData, NSError *error) {
-                  if (!error) {
-                    UIImage *image = [UIImage imageWithData:imageData[@(DFImageFull)]];
-                    [[DFPhotoStore sharedStore]
-                     saveImageToCameraRoll:image
-                     withMetadata:peanutPhoto.metadataDictionary
-                     completion:^(NSError *error) {
-                       if (error) {
-                         [UIAlertView showSimpleAlertWithTitle:@"Error"
-                                                       message:error.localizedDescription];
-                         [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
-                       } else {
-                         DDLogInfo(@"Photo saved.");
-                         [UIAlertView showSimpleAlertWithTitle:nil
-                                                       message:@"Photo saved to your camera roll"];
-                         [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
-                       }
-                     }];
-                  } else {
-                    [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
-                  }
-                }];
+    [self.photoAdapter
+     getPhoto:self.actionSheetPhotoID
+     withImageDataTypes:DFImageFull
+     completionBlock:^(DFPeanutPhoto *peanutPhoto, NSDictionary *imageData, NSError *error) {
+       NSData *fullImageData = imageData[@(DFImageFull)];
+       if (!error && fullImageData) {
+         UIImage *image = [UIImage imageWithData:fullImageData];
+         [[DFPhotoStore sharedStore]
+          saveImageToCameraRoll:image
+          withMetadata:peanutPhoto.metadataDictionary
+          completion:^(NSError *error) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+              if (error) {
+                [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                              message:error.localizedDescription];
+                DDLogError(@"Saving photo to camera roll failed: %@", error.description);
+                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
+              } else {
+                DDLogInfo(@"Photo saved.");
+                
+                [UIAlertView showSimpleAlertWithTitle:nil
+                                              message:@"Photo saved to your camera roll"];
+                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
+              }});
+          }];
+       } else {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           NSString *errorMessage = error ? error.localizedDescription : @"Could not download photo.";
+           [UIAlertView showSimpleAlertWithTitle:@"Error" message:errorMessage];
+           DDLogError(@"Failed to save photo.  Error: %@ imageData.length:%lu",
+                      error.description, (unsigned long)fullImageData.length);
+         });
+       }
+     }];
   }
 }
 

@@ -578,11 +578,13 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
   [self addOrientationToMetadata:mutableMetadata forImage:image];
   
-  [self.assetsLibrary writeImageToSavedPhotosAlbum:image.CGImage
-                               metadata:mutableMetadata
-                        completionBlock:^(NSURL *assetURL, NSError *error) {
-                          completion(error);
-                        }];
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [self.assetsLibrary writeImageToSavedPhotosAlbum:image.CGImage
+                                            metadata:mutableMetadata
+                                     completionBlock:^(NSURL *assetURL, NSError *error) {
+                                       completion(error);
+                                     }];
+  });
 }
 
 - (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image
