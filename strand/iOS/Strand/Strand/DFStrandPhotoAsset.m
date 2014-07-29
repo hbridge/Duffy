@@ -113,9 +113,10 @@ static NSMutableArray *idsBeingCached;
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
+  NSURL *cachedLocalURL = self.localURL;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     @autoreleasepool {
-      UIImage *loadedImage = [UIImage imageWithContentsOfFile:[self.localURL path]];
+      UIImage *loadedImage = [UIImage imageWithContentsOfFile:[cachedLocalURL path]];
       successBlock(loadedImage);
     }
   });
@@ -131,9 +132,10 @@ static NSMutableArray *idsBeingCached;
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
+  NSURL *cachedLocalURL = self.localURL;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     @autoreleasepool {
-      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:self.localURL];
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:cachedLocalURL];
       UIImage *image = [resizer aspectImageWithMaxPixelSize:157];
       successBlock([image thumbnailImage:157
                        transparentBorder:0
@@ -146,9 +148,10 @@ static NSMutableArray *idsBeingCached;
 - (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
+  NSURL *cachedLocalURL = self.localURL;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     @autoreleasepool {
-      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:self.localURL];
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:cachedLocalURL];
       UIImage *image = [resizer aspectImageWithMaxPixelSize:2048];
       successBlock(image);
     }
@@ -158,9 +161,10 @@ static NSMutableArray *idsBeingCached;
 - (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
+  NSURL *cachedLocalURL = self.localURL;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     @autoreleasepool {
-      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:self.localURL];
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:cachedLocalURL];
       UIImage *image = [resizer aspectImageWithMaxPixelSize:1136];
       if (image) {
         successBlock(image);
@@ -204,10 +208,11 @@ static NSMutableArray *idsBeingCached;
                             success:(DFPhotoDataLoadSuccessBlock)success
                             failure:(DFPhotoAssetLoadFailureBlock)failure
 {
+  NSURL *cachedLocalURL = self.localURL;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     @autoreleasepool {
       DFPhotoResizer *resizer = [[DFPhotoResizer alloc]
-                                 initWithURL:[NSURL URLWithString:self.localURLString]];
+                                 initWithURL:cachedLocalURL];
       UIImage *image = [resizer aspectImageWithMaxPixelSize:length];
       success(UIImageJPEGRepresentation(image, 0.8));
     }

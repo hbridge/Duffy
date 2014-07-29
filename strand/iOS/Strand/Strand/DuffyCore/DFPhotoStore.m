@@ -293,8 +293,12 @@ static int const FetchStride = 500;
 
 - (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus
 {
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"isUploadProcessed = %@",
-                            [NSNumber numberWithBool:processedStatus]];
+  NSPredicate *predicate;
+  if (processedStatus) {
+    predicate = [NSPredicate predicateWithFormat:@"isUploadProcessed == YES"];
+  } else {
+    predicate = [NSPredicate predicateWithFormat:@"isUploadProcessed == NO || isUploadProcessed == nil"];
+  }
   return  [self.class photosWithPredicate:predicate inContext:[self managedObjectContext]];
 }
 

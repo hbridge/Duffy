@@ -24,9 +24,9 @@
   self.images = [NSMutableArray new];
   self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
+  self.collectionView.backgroundColor = [UIColor clearColor];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
-  self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated

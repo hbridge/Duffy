@@ -40,8 +40,14 @@
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
-const CGFloat UploadingCellHeight = 50.0;
-const CGFloat HeaderHeight = 48.0;
+// Uploading cell
+const CGFloat UploadingCellVerticalMargin = 10.0;
+const CGFloat UploadingCellTitleArea = 21 + 8;
+const CGFloat UploadingCellImageRowHeight = 45.0;
+const CGFloat UploadingCellImageRowSpacing = 6.0;
+const int UploadingCellImagesPerRow = 6;
+// Section Header
+const CGFloat SectionHeaderHeight = 48.0;
 // constants used for row height calculations
 const CGFloat TitleAreaHeight = 32; // height plus spacing around
 const CGFloat ImageViewHeight = 320; // height plus spacing around
@@ -256,8 +262,7 @@ const CGFloat LockedCellHeight = 157.0;
 - (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects
 {
   DFPhotoCollection *unprocessedCollection = [[DFPhotoStore sharedStore]
-                               photosWithThumbnailUploadStatus:DFUploadStatusAny
-                                              fullUploadStatus:DFUploadStatusNotUploaded];
+                               photosWithUploadProcessedStatus:NO];
   NSMutableArray *photosToMarkProcessed = [NSMutableArray new];
   
   DFPeanutSearchObject *firstSection = sectionObjects.firstObject;
@@ -381,7 +386,7 @@ const CGFloat LockedCellHeight = 157.0;
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
   if (self.uploadingPhotos.count > 0 && section == 0) return 0.0;
-  return HeaderHeight;
+  return SectionHeaderHeight;
 }
 
 #pragma mark - Table view data source: rows
@@ -394,7 +399,7 @@ const CGFloat LockedCellHeight = 157.0;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   if (self.uploadingPhotos.count > 0 && section == 0) {
-    return self.uploadingPhotos.count;
+    return 1;
   }
   
   DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
@@ -442,9 +447,8 @@ const CGFloat LockedCellHeight = 157.0;
 - (DFUploadingFeedCell *)cellForUploadAtIndexPath:(NSIndexPath *)indexPath
 {
   DFUploadingFeedCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"uploadingCell"];
-  DFPhoto *uploadingPhoto = self.uploadingPhotos[indexPath.row];
   
-  cell.imageView.image = nil;
+  cell.images = @[];
   if (indexPath.row == 0) {
     if (!self.uploadError) {
       cell.statusTextLabel.text = @"Uploading";
@@ -453,20 +457,18 @@ const CGFloat LockedCellHeight = 157.0;
       cell.statusTextLabel.text = @"Retry Pending";
       [cell.activityIndicator stopAnimating];
     }
-  } else {
-    cell.statusTextLabel.text = @"Pending";
-    [cell.activityIndicator stopAnimating];
   }
-  cell.retryButton.hidden = YES;
   
-  [uploadingPhoto.asset loadUIImageForThumbnail:^(UIImage *image) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      if (![self.tableView.visibleCells containsObject:cell]) return;
-      cell.thumbnailImageView.image = image;
-    });
-  } failureBlock:^(NSError *error) {
-    DDLogError(@"Error loading thumbnail for uploading asset.");
-  }];
+  for (DFPhoto *photo in self.uploadingPhotos) {
+    [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self.tableView.visibleCells containsObject:cell]) return;
+        [cell addImage:image];
+      });
+    } failureBlock:^(NSError *error) {
+      DDLogError(@"Error loading thumbnail for uploading asset.");
+    }];
+  }
   
   return cell;
 }
@@ -599,7 +601,10 @@ const CGFloat LockedCellHeight = 157.0;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    return UploadingCellHeight;
+    return UploadingCellVerticalMargin + UploadingCellTitleArea
+     + (self.uploadingPhotos.count / UploadingCellImagesPerRow + 1) * UploadingCellImageRowHeight
+     + (self.uploadingPhotos.count / UploadingCellImagesPerRow) * UploadingCellImageRowSpacing
+    + UploadingCellVerticalMargin;
   }
   
   CGFloat rowHeight = MinRowHeight;

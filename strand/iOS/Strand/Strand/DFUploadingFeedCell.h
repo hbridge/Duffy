@@ -8,11 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFUploadingFeedCell : UITableViewCell
-@property (weak, nonatomic) IBOutlet UIImageView *thumbnailImageView;
+@interface DFUploadingFeedCell : UITableViewCell <UICollectionViewDataSource, UICollectionViewDelegate>
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UILabel *statusTextLabel;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityIndicator;
-@property (weak, nonatomic) IBOutlet UIButton *retryButton;
-- (IBAction)retryButtonPressed:(UIButton *)sender;
+
+@property (nonatomic, retain) NSArray *images;
+- (void)addImage:(UIImage *)image;
 
 @end
