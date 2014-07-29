@@ -147,7 +147,8 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().exclude(user_id=1).exclude(thumb_filename=None).filter(neighbored_time=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
+		# TODO(Derek):  Temporarily adding in an exclude for full_filename
+		photos = Photo.objects.all().exclude(user_id=1).exclude(thumb_filename=None).exclude(full_filename=None).filter(neighbored_time=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
 
 		if len(photos) > 0:
 			rowsToWrite = list()
