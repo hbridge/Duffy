@@ -435,3 +435,14 @@ class FriendConnection(models.Model):
 	class Meta:
 		unique_together = ("user_1", "user_2")
 		db_table = 'strand_friends'
+
+class Strand(models.Model):
+	location_point = models.PointField()
+	time_started = models.DateTimeField()
+	photos = models.ManyToManyField(Photo)
+	users = models.ManyToManyField(User)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)	
+
+	class Meta:
+		db_table = 'strand_objects'
