@@ -40,7 +40,9 @@ typedef enum {
   DFPushNotifJoinable = 2,
   DFPushNotifFavorited = 3,
   DFPushNotifFetchGPS = 4,
-  DFPushNotifFirestarter = 5
+  DFPushNotifFirestarter = 5,
+  DFPushNotifFirestarterPhotoTaken = 6,
+  DFPushNotifRefreshFeed = 7
 } DFPushNotifType;
 
 typedef NSString *DFActionType;

@@ -82,6 +82,8 @@
       return DFScreenGallery;
     case DFPushNotifFirestarter:
       return DFScreenCamera;
+    case DFPushNotifFirestarterPhotoTaken:
+      return DFScreenCamera;
     default:
       return DFScreenCamera;
   }

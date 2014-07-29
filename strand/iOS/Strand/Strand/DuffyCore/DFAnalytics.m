@@ -311,6 +311,8 @@ static DFAnalytics *defaultLogger;
     return @"fetchGPS";
   } else if (type == DFPushNotifFirestarter) {
     return @"firestarter";
+  } else if (type == DFPushNotifFirestarterPhotoTaken) {
+    return @"firestarterPhoto";
   } else if (type == DFPushNotifJoinable) {
     return @"joinable";
   } else if (type == DFPushNotifNewPhotos) {
