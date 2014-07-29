@@ -83,13 +83,13 @@
 				<td class='name b-r'> Name </td>
 				<td class='created b-r'> Created </td>
 				<td class='db-count b-r'> Photos </td>
-				<td class='status b-r' title='thumbs/twofish/clustered/fulls/neighbors'> Pipeline <br> Status </td>
+				<td class='status b-r' title='All | Thumbs | Fulls | Clustered || withGPS | Twofish | Neighbors'> Pipeline <br> Status </td>
 				<td class='actions b-r'> Actions </td>
 				<td class='notifications b-r'> Nots <br> sent </td>
 				<td class='last-not-timestamp b-r'> Last Not. <br> Timestamp </td>
 				<td class='location b-r'> Location </td>
 				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
-				<td class='invites b-r'> Rem. <br> invites </td>
+				<td class='invites b-r center'> Invites <br> Sent | Rem. </td>
 				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 			</tr>
@@ -100,7 +100,7 @@
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 				<td class='db-count right b-r'> {{ entry.user.totalCount }} </td>
 				<td class='pipeline-status right b-r' 
-					title='{{ entry.user.thumbsCount }} | {{ entry.user.twofishCount }} | {{ entry.user.clusteredCount }} | {{ entry.user.fullImagesCount }} | {{ entry.user.neighborCount }}'> {{ entry.status }} </td>
+					title='{{entry.user.totalCount}} | {{ entry.user.thumbsCount }} | {{ entry.user.fullImagesCount }} | {{ entry.user.clusteredCount }} || {{entry.user.photosWithGPS}} | {{ entry.user.twofishCount }} | {{ entry.user.neighborCount }}'> {{ entry.status }} </td>
 				<td class='actions right b-r'> {{ entry.actions}}</td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
 				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>				
@@ -113,8 +113,8 @@
 					{% endif %}
 				</td>
 				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
-				<td class='invites b-r'> {{ entry.user.invites_remaining }} </td>
-				<td class='invites b-r'> {{ entry.user.last_build_info }} </td>
+				<td class='invites b-r center'> {{ entry.user.invites_sent}} | {{ entry.user.invites_remaining }} </td>
+				<td class='last-build b-r'> {{ entry.build }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 			</tr>
 		{% endfor %}

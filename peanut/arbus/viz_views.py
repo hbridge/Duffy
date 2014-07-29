@@ -142,12 +142,19 @@ def userbaseSummary(request):
 
 
 		if (user.totalCount > 0):
-			if (user.thumbsCount == user.totalCount and 
-				user.photosWithGPS == user.twofishCount and 
-				user.fullImagesCount == user.totalCount and 
-				user.clusteredCount == user.totalCount and
-				user.neighborCount == user.photosWithGPS):
+			if (user.totalCount == user.thumbsCount == user.fullImagesCount == user.clusteredCount and 
+				user.photosWithGPS == user.twofishCount == user.neighborCount):
 				entry['status'] = 'OK'
+			elif (user.thumbsCount != user.totalCount):
+				entry['status'] = '!thumbs'
+			elif (user.fullImagesCount != user.totalCount):
+				entry['status'] = '!fulls'
+			elif (user.clusteredCount != user.totalCount):
+				entry['status'] = '!cluster'
+			elif (user.twofishCount != user.photosWithGPS):
+				entry['status'] = '!twofish'
+			elif(user.neighborCount != user.photosWithGPS):
+				entry['status'] = '!neighbor'
 			else:
 				entry['status'] = 'BAD'
 
@@ -165,6 +172,16 @@ def userbaseSummary(request):
 			entry['actions'] = actionsCount[i].totalActions
 		else:
 			entry['actions'] = '-'
+
+		if user.last_build_info:
+			buildNum = user.last_build_info[user.last_build_info.find('-'):]
+			if ('enterprise' in user.last_build_info):
+				entry['build'] = 'e' + buildNum
+			elif ('dp' in user.last_build_info):
+				entry['build'] = 'd' + buildNum
+			else:
+				entry['build'] = 's' + buildNum
+
 
 		entry['internal'] = False
 
