@@ -291,6 +291,13 @@ static int const FetchStride = 500;
   return [result firstObject];
 }
 
+- (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"isUploadProcessed = %@",
+                            [NSNumber numberWithBool:processedStatus]];
+  return  [self.class photosWithPredicate:predicate inContext:[self managedObjectContext]];
+}
+
 - (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
 {

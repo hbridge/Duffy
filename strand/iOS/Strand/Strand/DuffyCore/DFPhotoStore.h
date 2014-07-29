@@ -39,6 +39,7 @@ typedef enum {
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
                                              inContext:(NSManagedObjectContext *)context;
+- (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus;
 + (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;

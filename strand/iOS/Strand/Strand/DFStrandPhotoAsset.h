@@ -13,7 +13,6 @@
 @interface DFStrandPhotoAsset : DFPhotoAsset
 
 @property (nonatomic, retain) NSString * localURLString;
-@property (nonatomic) UInt64 photoID;
 @property (nonatomic, retain) id storedMetadata;
 @property (nonatomic, retain) id storedLocation;
 @property (nonatomic, retain) NSDate *creationDate;
@@ -23,9 +22,6 @@
                                        location:(CLLocation *)location
                                    creationDate:(NSDate *)creationDate
                                       inContext:(NSManagedObjectContext *)context;
-
-+ (DFStrandPhotoAsset *)createAssetForPhotoID:(DFPhotoIDType)photoID
-                                    inContext:(NSManagedObjectContext *)context;
 
 
 

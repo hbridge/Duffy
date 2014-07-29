@@ -72,7 +72,6 @@
 		5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA4528F196708D00099CBD2 /* DFPhotoStackCell.xib */; };
 		5AA45299196708D00099CBD2 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA45291196708D00099CBD2 /* DFPhotoViewCell.m */; };
 		5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */; };
-		5AA4529D196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4529C196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m */; };
 		5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */; };
 		5AA452A6196739900099CBD2 /* DFPhotoFeedController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */; };
 		5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA8FA4E197DD0CE00421513 /* DFFeedSectionHeaderView.xib */; };
@@ -234,6 +233,7 @@
 		5A56EFB51986CC0E0032CA8A /* DFUploadingFeedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadingFeedCell.h; sourceTree = "<group>"; };
 		5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadingFeedCell.m; sourceTree = "<group>"; };
 		5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUploadingFeedCell.xib; sourceTree = "<group>"; };
+		5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 5.xcdatamodel"; sourceTree = "<group>"; };
 		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
 		5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsAdapter.m; sourceTree = "<group>"; };
 		5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutMessageResponse.h; sourceTree = "<group>"; };
@@ -273,8 +273,6 @@
 		5AA45290196708D00099CBD2 /* DFPhotoViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoViewCell.h; path = DuffyCore/DFPhotoViewCell.h; sourceTree = "<group>"; };
 		5AA45291196708D00099CBD2 /* DFPhotoViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoViewCell.m; path = DuffyCore/DFPhotoViewCell.m; sourceTree = "<group>"; };
 		5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = DFPhotoViewCell.xib; path = DuffyCore/DFPhotoViewCell.xib; sourceTree = "<group>"; };
-		5AA4529B196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoNavigationControllerViewController.h; path = DuffyCore/DFPhotoNavigationControllerViewController.h; sourceTree = "<group>"; };
-		5AA4529C196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPhotoNavigationControllerViewController.m; path = DuffyCore/DFPhotoNavigationControllerViewController.m; sourceTree = "<group>"; };
 		5AA4529E1967092F0099CBD2 /* UICollectionView+DFExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UICollectionView+DFExtras.h"; path = "DuffyCore/UICollectionView+DFExtras.h"; sourceTree = "<group>"; };
 		5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UICollectionView+DFExtras.m"; path = "DuffyCore/UICollectionView+DFExtras.m"; sourceTree = "<group>"; };
 		5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoFeedController.h; sourceTree = "<group>"; };
@@ -712,8 +710,6 @@
 			children = (
 				5AA4529E1967092F0099CBD2 /* UICollectionView+DFExtras.h */,
 				5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */,
-				5AA4529B196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.h */,
-				5AA4529C196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m */,
 				5AA45287196708D00099CBD2 /* DFPhotoSectionHeader.h */,
 				5AA45288196708D00099CBD2 /* DFPhotoSectionHeader.m */,
 				5AA45289196708D00099CBD2 /* DFPhotoSectionHeader.xib */,
@@ -1263,7 +1259,6 @@
 				5AB4CC001982AF7C00EFB3E3 /* DFInviteUserViewController.m in Sources */,
 				5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
-				5AA4529D196708FE0099CBD2 /* DFPhotoNavigationControllerViewController.m in Sources */,
 				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */,
 				5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */,
@@ -1558,12 +1553,13 @@
 		5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */,
 				5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */,
 				5AC4A94C1947C54C00862D9C /* Duffy 2.xcdatamodel */,
 				5AC4A94D1947C54C00862D9C /* Duffy 3.xcdatamodel */,
 				5AC4A94E1947C54C00862D9C /* Duffy.xcdatamodel */,
 			);
-			currentVersion = 5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */;
+			currentVersion = 5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */;
 			name = Duffy.xcdatamodeld;
 			path = DuffyCore/Duffy.xcdatamodeld;
 			sourceTree = "<group>";

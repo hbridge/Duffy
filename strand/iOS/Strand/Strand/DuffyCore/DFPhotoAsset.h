@@ -14,16 +14,11 @@
 
 @interface DFPhotoAsset : NSManagedObject
 
-// Access to the images
-// Will block if the image needs to be loaded from somewhere.  Avoid access on main thread
-@property (readonly, nonatomic, retain) UIImage *fullResolutionImage;
-@property (readonly, nonatomic, retain) UIImage *thumbnail; // 157x157 thumbnail
-@property (readonly, nonatomic, retain) UIImage *highResolutionImage; //max 2048x2048, aspect fit
-@property (readonly, nonatomic, retain) UIImage *fullScreenImage;
 @property (nonatomic, retain) DFPhoto *photo;
 
 // Use these to access image data asynchronously
 typedef void (^DFPhotoAssetLoadSuccessBlock)(UIImage *image);
+typedef void (^DFPhotoDataLoadSuccessBlock)(NSData *data);
 typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 
 // Metadata accessors
@@ -34,9 +29,6 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 /* The asset doesn't necessarily know what timezone it's in, so you have to give it one */
 - (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone;
 
-// Access the underlying image sized to a specific size.  Blocking call, avoid on main thread.
-- (UIImage *)imageResizedToLength:(CGFloat)length;
-
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
@@ -45,9 +37,16 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
 - (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
+- (void)loadImageResizedToLength:(CGFloat)length
+                         success:(DFPhotoAssetLoadSuccessBlock)success
+                         failure:(DFPhotoAssetLoadFailureBlock)failure;
 
 // Access image data.  Blocking call, avoid on main thread.
-- (NSData *)thumbnailJPEGData;
-- (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality;
+- (void)loadThubnailJPEGData:(DFPhotoDataLoadSuccessBlock)successBlock
+                     failure:(DFPhotoAssetLoadFailureBlock)failure;
+- (void)loadJPEGDataWithImageLength:(CGFloat)length
+                 compressionQuality:(float)quality
+                            success:(DFPhotoDataLoadSuccessBlock)success
+                            failure:(DFPhotoAssetLoadFailureBlock)failure;
 
 @end

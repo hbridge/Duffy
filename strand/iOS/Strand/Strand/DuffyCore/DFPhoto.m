@@ -24,6 +24,7 @@
 @dynamic photoID;
 @dynamic upload157Date;
 @dynamic upload569Date;
+@dynamic isUploadProcessed;
 @dynamic userID;
 
 // Create a new DFPhoto in a context
@@ -38,21 +39,6 @@
   newPhoto.asset = asset;
   newPhoto.creationDate = [asset creationDateForTimezone:timeZone];
   newPhoto.userID = userID;
-  
-  return newPhoto;
-}
-
-+ (DFPhoto *)createWithPhotoID:(DFPhotoIDType)photoID
-                     inContext:(NSManagedObjectContext *)context
-{
-  DFPhoto *newPhoto = [NSEntityDescription
-                       insertNewObjectForEntityForName:@"DFPhoto"
-                       inManagedObjectContext:context];
-  newPhoto.photoID = photoID;
-  
-  DFStrandPhotoAsset *newAsset = [DFStrandPhotoAsset createAssetForPhotoID:photoID
-                                                                 inContext:context];
-  newPhoto.asset = newAsset;
   
   return newPhoto;
 }

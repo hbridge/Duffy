@@ -149,7 +149,10 @@ const CGFloat LockedCellHeight = 157.0;
   
   // we observe changes to the table view's frame to prevent it from moving when the status bar
   // is hidden
-  [self.tableView addObserver:self forKeyPath:@"frame" options:NSKeyValueObservingOptionOld context:nil];
+  [self.tableView addObserver:self
+                   forKeyPath:@"frame"
+                      options:NSKeyValueObservingOptionOld
+                      context:nil];
   
   self.automaticallyAdjustsScrollViewInsets = NO;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
@@ -208,15 +211,13 @@ const CGFloat LockedCellHeight = 157.0;
       [self.refreshControl endRefreshing];
     if (!error) {
       dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *unUploadedPhotos = [[[DFPhotoStore sharedStore]
-                                      photosWithThumbnailUploadStatus:DFUploadStatusAny
-                                      fullUploadStatus:DFUploadStatusNotUploaded]
-                                     photosByDateAscending:NO];
+        NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:response.objects];
+        
         if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])
-            || ![self.uploadingPhotos isEqualToArray:unUploadedPhotos]) {
+            || ![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
           DDLogInfo(@"New feed data detected. Re-rendering feed.");
           [self setSectionObjects:response.topLevelSectionObjects
-                  uploadingPhotos:unUploadedPhotos];
+                  uploadingPhotos:unprocessedFeedPhotos];
           
           self.lastResponseHash = hashData;
         }
@@ -250,6 +251,39 @@ const CGFloat LockedCellHeight = 157.0;
       }
     }
   }];
+}
+
+- (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects
+{
+  DFPhotoCollection *unprocessedCollection = [[DFPhotoStore sharedStore]
+                               photosWithThumbnailUploadStatus:DFUploadStatusAny
+                                              fullUploadStatus:DFUploadStatusNotUploaded];
+  NSMutableArray *photosToMarkProcessed = [NSMutableArray new];
+  
+  DFPeanutSearchObject *firstSection = sectionObjects.firstObject;
+  for (DFPhoto *photo in unprocessedCollection.photoSet) {
+    for (DFPeanutSearchObject *object in firstSection.objects) {
+      if ([object.type isEqual:DFSearchObjectPhoto]) {
+        if (object.id == photo.photoID) {
+          [photosToMarkProcessed addObject:photo];
+        }
+      } else if ([object.type isEqual:DFSearchObjectCluster]) {
+        for (DFPeanutSearchObject *clusterPhoto in object.objects) {
+          if (clusterPhoto.id == photo.photoID) {
+            [photosToMarkProcessed addObject:photo];
+          }
+        }
+      }
+    }
+  }
+  
+  NSMutableArray *result = [[unprocessedCollection photosByDateAscending:NO] mutableCopy];
+  for (DFPhoto *photo in photosToMarkProcessed) {
+    [result removeObject:photo];
+    photo.isUploadProcessed = YES;
+  }
+  
+  return result;
 }
 
 - (void)viewDidAppear:(BOOL)animated

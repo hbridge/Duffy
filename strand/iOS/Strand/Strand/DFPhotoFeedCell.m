@@ -96,6 +96,7 @@
   if (image == nil) {
     image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
   }
+  
   self.imagesForObjects[object] = image;
   [self.collectionView reloadData];
   if ([object isEqual:self.selectedObject]) self.photoImageView.image = image;

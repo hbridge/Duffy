@@ -20,7 +20,6 @@ static NSMutableArray *idsBeingCached;
 @implementation DFStrandPhotoAsset
 
 @dynamic localURLString;
-@dynamic photoID;
 @dynamic storedMetadata;
 @dynamic storedLocation;
 @dynamic creationDate;
@@ -52,23 +51,6 @@ static NSMutableArray *idsBeingCached;
   return newAsset;
 }
 
-+ (DFStrandPhotoAsset *)createAssetForPhotoID:(DFPhotoIDType)photoID
-                                    inContext:(NSManagedObjectContext *)context
-{
-  DFStrandPhotoAsset *newAsset = [NSEntityDescription
-                                  insertNewObjectForEntityForName:[[self class] description]
-                                  inManagedObjectContext:context];
-  newAsset.photoID = photoID;
-  return newAsset;
-}
-
-- (NSURL *)canonicalURL
-{
-  if (self.photoID) return [DFPhotoMetadataAdapter urlForPhotoID:self.photoID];
-  if (self.localURLString) return [NSURL URLWithString:self.localURLString];
-  return nil;
-}
-
 - (NSDictionary *)metadata
 {
   return self.storedMetadata;
@@ -82,7 +64,16 @@ static NSMutableArray *idsBeingCached;
 - (NSString *)hashString
 {
   if (!_hashString) {
-    NSData *hashData = [DFDataHasher hashDataForData:[self thumbnailJPEGData]];
+    dispatch_semaphore_t thumbnailSemaphore = dispatch_semaphore_create(0);
+    NSData __block *thumbnailData;
+    [self loadThubnailJPEGData:^(NSData *data) {
+      thumbnailData = data;
+      dispatch_semaphore_signal(thumbnailSemaphore);
+    } failure:^(NSError *error) {
+      dispatch_semaphore_signal(thumbnailSemaphore);
+    }];
+    dispatch_semaphore_wait(thumbnailSemaphore, DISPATCH_TIME_FOREVER);
+    NSData *hashData = [DFDataHasher hashDataForData:thumbnailData];
     _hashString = [DFDataHasher hashStringForHashData:hashData];
   }
   return _hashString;
@@ -189,9 +180,6 @@ static NSMutableArray *idsBeingCached;
 
 + (NSURL *)newLocalURLForPhoto
 {
-  // if we have an actual photo id, that's used in the path
-  
-  // otherwise, create a unique one
   CFUUIDRef newUniqueID = CFUUIDCreate (kCFAllocatorDefault);
   CFStringRef newUniqueIDString = CFUUIDCreateString (kCFAllocatorDefault, newUniqueID);
   NSString *filename = [NSString stringWithFormat:@"%@.jpg", newUniqueIDString];
@@ -200,17 +188,30 @@ static NSMutableArray *idsBeingCached;
           URLByAppendingPathComponent:filename];
 }
 
-- (NSData *)thumbnailJPEGData
+- (void)loadThubnailJPEGData:(DFPhotoDataLoadSuccessBlock)successBlock failure:(DFPhotoAssetLoadFailureBlock)failure
 {
-  return UIImageJPEGRepresentation(self.thumbnail, 0.8);
+  [self loadUIImageForThumbnail:^(UIImage *image) {
+    @autoreleasepool {
+      successBlock(UIImageJPEGRepresentation(image, 0.8));
+    }
+  } failureBlock:^(NSError *error) {
+    failure(error);
+  }];
 }
 
-- (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality
+- (void)loadJPEGDataWithImageLength:(CGFloat)length
+                 compressionQuality:(float)quality
+                            success:(DFPhotoDataLoadSuccessBlock)success
+                            failure:(DFPhotoAssetLoadFailureBlock)failure
 {
-  DFPhotoResizer *resizer = [[DFPhotoResizer alloc]
-                             initWithURL:[NSURL URLWithString:self.localURLString]];
-  UIImage *image = [resizer aspectImageWithMaxPixelSize:length];
-  return UIImageJPEGRepresentation(image, 0.8);
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    @autoreleasepool {
+      DFPhotoResizer *resizer = [[DFPhotoResizer alloc]
+                                 initWithURL:[NSURL URLWithString:self.localURLString]];
+      UIImage *image = [resizer aspectImageWithMaxPixelSize:length];
+      success(UIImageJPEGRepresentation(image, 0.8));
+    }
+  });
 }
 
 + (void)createCacheDirectories

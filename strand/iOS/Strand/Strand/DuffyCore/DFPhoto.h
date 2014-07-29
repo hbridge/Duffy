@@ -21,6 +21,7 @@
 @property (nonatomic, retain) NSDate *creationDate;
 @property (nonatomic, retain) NSDate *upload157Date;
 @property (nonatomic, retain) NSDate *upload569Date;
+@property (nonatomic) BOOL isUploadProcessed;
 
 typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict);
 - (void)fetchReverseGeocodeDictionary:(DFPhotoReverseGeocodeCompletionBlock)completionBlock;
@@ -30,9 +31,6 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
                         userID:(DFUserIDType)userID
                     timeZone:(NSTimeZone *)timeZone
                    inContext:(NSManagedObjectContext *)context;
-
-+ (DFPhoto *)createWithPhotoID:(DFPhotoIDType)photoID
-                     inContext:(NSManagedObjectContext *)context;
 
 - (BOOL)isDeleteableByUser:(DFUserIDType)userID;
 

@@ -10,7 +10,6 @@
 #import "DFPhoto.h"
 #import "DFPhotoViewCell.h"
 #import "DFPhotoViewController.h"
-#import "DFPhotoNavigationControllerViewController.h"
 #import "DFMultiPhotoViewController.h"
 #import "DFPhotoSectionHeader.h"
 #import "DFPhotoStackCell.h"
@@ -261,11 +260,7 @@ static const CGFloat SectionHeaderHeight = 48;
                                 completion:^(BOOL finished) {
                                 }];
   
-  DFPhotoNavigationControllerViewController *photoNavController = (DFPhotoNavigationControllerViewController *)self.navigationController;
-  [photoNavController pushMultiPhotoViewController:multiPhotoController
-                      withFrontPhotoViewController:pvc
-                          fromPhotosGridController:self
-                                   itemAtIndexPath:indexPath];
+  [self.navigationController pushViewController:pvc animated:YES];
 }
 
 

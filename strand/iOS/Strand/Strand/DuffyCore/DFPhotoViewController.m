@@ -215,7 +215,7 @@
     _photo = photo;
     
     if (self.photoView) {
-        self.photoView.image = photo.asset.fullScreenImage;
+      //self.photoView.image = photo.asset.fullScreenImage;
     }
 }
 

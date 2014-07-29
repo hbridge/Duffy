@@ -14,6 +14,7 @@
 
 @property (readonly, nonatomic, retain) NSSet *photoSet;
 @property (readonly, nonatomic, retain) NSSet *photoURLSet;
+@property (readonly, nonatomic, retain) NSSet *photoIDSet;
 
 /* (UIImage *)thumbnail
  Returns a thumbnail representation of the photo collection.  If not set, returns a thumbnail of the

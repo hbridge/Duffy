@@ -162,7 +162,16 @@
      if (appendThumbnailData) {
        for (DFPhoto *photo in photos) {
          @autoreleasepool {
-           NSData *thumbnailData = photo.asset.thumbnailJPEGData;
+           dispatch_semaphore_t thumbnailSemaphore = dispatch_semaphore_create(0);
+           NSData __block *thumbnailData;
+           [photo.asset loadThubnailJPEGData:^(NSData *data) {
+             thumbnailData = data;
+             dispatch_semaphore_signal(thumbnailSemaphore);
+           } failure:^(NSError *error) {
+             dispatch_semaphore_signal(thumbnailSemaphore);
+           }];
+           dispatch_semaphore_wait(thumbnailSemaphore, DISPATCH_TIME_FOREVER);
+           
            if (thumbnailData) {
              numBytes += thumbnailData.length;
              [formData appendPartWithFileData:thumbnailData
@@ -218,7 +227,6 @@
     NSString *photoParamater =
      updateMetadata ? [peanutPhoto JSONString] : [peanutPhoto photoUploadJSONString];
     unsigned long __block imageDataBytes = 0;
-    DFPhoto __block *photoToUpload = photo;
     
     NSString *pathString = [NSString stringWithFormat:@"photos/%llu/", photo.photoID];
     NSMutableURLRequest *request =
@@ -230,9 +238,19 @@
      constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
        @autoreleasepool {
          if (uploadImage) {
-           NSData *imageData = //photo.thumbnailData;
-           [photoToUpload.asset JPEGDataWithImageLength:IMAGE_UPLOAD_MAX_LENGTH
-                                 compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY];
+           dispatch_semaphore_t loadSemaphore = dispatch_semaphore_create(0);
+           NSData __block *imageData;
+           [photo.asset
+            loadJPEGDataWithImageLength:IMAGE_UPLOAD_MAX_LENGTH
+            compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY
+            success:^(NSData *data) {
+              imageData = data;
+              dispatch_semaphore_signal(loadSemaphore);
+            } failure:^(NSError *error) {
+              dispatch_semaphore_signal(loadSemaphore);
+            }];
+           dispatch_semaphore_wait(loadSemaphore, DISPATCH_TIME_FOREVER);
+           
            imageDataBytes += imageData.length;
            [formData appendPartWithFileData:imageData
                                        name:peanutPhoto.file_key.absoluteString

@@ -13,90 +13,6 @@
 
 @dynamic photo;
 
-#pragma mark - Property wrappers
-
-
-- (UIImage *)thumbnail
-{
-  UIImage __block *loadedThumbnail;
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // Synchronously load the thunbnail
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [self loadUIImageForThumbnail:^(UIImage *thumbnailImage) {
-      loadedThumbnail = thumbnailImage;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  
-  return  loadedThumbnail;
-}
-
-- (UIImage *)fullResolutionImage
-{
-  UIImage __block *loadedFullImage;
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // Synchronously load the thunbnail
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [self loadUIImageForFullImage:^(UIImage *image) {
-      loadedFullImage = image;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  return loadedFullImage;
-}
-
-- (UIImage *)highResolutionImage
-{
-  UIImage __block *loadedImage;
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // Synchronously load the thunbnail
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [self loadHighResImage:^(UIImage *image) {
-      loadedImage = image;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  return loadedImage;
-}
-
-- (UIImage *)fullScreenImage
-{
-  UIImage __block *loadedImage;
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // Synchronously load the thunbnail
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [self loadFullScreenImage:^(UIImage *image) {
-      loadedImage = image;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  return loadedImage;
-}
-
 #pragma mark Methods to Override from here down
 
 - (NSURL *)canonicalURL
@@ -129,10 +45,9 @@
   return nil;
 }
 
-- (UIImage *)imageResizedToLength:(CGFloat)length
+- (void)loadImageResizedToLength:(CGFloat)length success:(DFPhotoAssetLoadSuccessBlock)success failure:(DFPhotoAssetLoadFailureBlock)failure
 {
   [DFPhotoAsset abstractClassException];
-  return nil;
 }
 
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
@@ -158,16 +73,14 @@
 #pragma mark
 
 
-- (NSData *)thumbnailJPEGData
+- (void)loadThubnailJPEGData:(DFPhotoDataLoadSuccessBlock)successBlock failure:(DFPhotoAssetLoadFailureBlock)failure
 {
   [DFPhotoAsset abstractClassException];
-  return nil;
 }
 
-- (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality
+- (void)loadJPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality success:(DFPhotoDataLoadSuccessBlock)success failure:(DFPhotoAssetLoadFailureBlock)failure
 {
   [DFPhotoAsset abstractClassException];
-  return nil;
 }
 
 

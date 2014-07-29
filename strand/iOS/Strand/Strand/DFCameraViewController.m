@@ -252,16 +252,6 @@ const unsigned int SavePromptMinPhotos = 3;
   return _customCameraOverlayView;
 }
 
-- (UIImage *)imageForLastPhoto
-{
-  NSArray *allPhotos = [[[DFPhotoStore sharedStore] mostRecentPhotos:1] photosByDateAscending:NO];
-  DDLogVerbose(@"imageForLastPhoto allPhotos count: %d", (int)allPhotos.count);
-  DFPhoto *photo =  [allPhotos firstObject];
-  if (photo) return photo.asset.thumbnail;
-  
-  return nil;
-}
-
 - (void)showHelpTextIfNeeded
 {
   BOOL wasShown = [[NSUserDefaults standardUserDefaults] boolForKey:DFStrandCameraHelpWasShown];

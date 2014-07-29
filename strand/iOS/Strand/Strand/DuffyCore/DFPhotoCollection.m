@@ -14,6 +14,7 @@
     NSMutableArray *photosByDate;
     NSMutableSet *photoAssetURLSet;
     NSMutableArray *objectIDsByDate;
+  NSMutableSet *photoIDs;
 }
 @end
 
@@ -28,6 +29,7 @@
         photosByDate = [[NSMutableArray alloc] init];
         photoAssetURLSet = [[NSMutableSet alloc] init];
         objectIDsByDate = [[NSMutableArray alloc] init];
+      photoIDs = [[NSMutableSet alloc] init];
     }
     return self;
 }
@@ -46,12 +48,6 @@
         if ([self.photoSet containsObject:newPhoto]) continue;
         
         [photosSet addObject:newPhoto];
-        if (![photoAssetURLSet containsObject:newPhoto.asset.canonicalURL]) {
-            [photoAssetURLSet addObject:newPhoto.asset.canonicalURL];
-        } else {
-            DDLogError(@"Error, adding another DFPhoto with the same universal ID as another in the set");
-        }
-
         NSUInteger insertIndex = [photosByDate indexOfObject:newPhoto
                       inSortedRange:(NSRange){0, photosByDate.count}
                             options:NSBinarySearchingInsertionIndex
@@ -60,6 +56,7 @@
                     }];
         [photosByDate insertObject:newPhoto atIndex:insertIndex];
         [objectIDsByDate insertObject:newPhoto.objectID atIndex:insertIndex];
+        [photoIDs addObject:@(newPhoto.photoID)];
     }
 }
 
@@ -94,6 +91,11 @@
 - (BOOL)containsPhotoWithAssetURL:(NSString *)assetURLString
 {
     return [photoAssetURLSet containsObject:assetURLString];
+}
+
+- (NSSet *)photoIDSet
+{
+  return photoIDs;
 }
 
 - (UIImage *)thumbnail
