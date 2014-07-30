@@ -727,9 +727,11 @@ const CGFloat LockedCellHeight = 157.0;
         [object setUserFavoriteAction:action];
       } // no need for the else case, it was already removed optimistically
       
-      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
-                                            result:DFAnalyticsValueResultSuccess
-                                        actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress];
+      [DFAnalytics
+       logPhotoLikePressedWithNewValue:(newAction != nil)
+       result:DFAnalyticsValueResultSuccess
+       actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress
+       timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
     } else {
       [object setUserFavoriteAction:oldFavoriteAction];
       [self reloadRowForPhotoID:photoID];
@@ -741,7 +743,8 @@ const CGFloat LockedCellHeight = 157.0;
       [alert show];
       [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
                                             result:DFAnalyticsValueResultFailure
-                                        actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress];
+                                        actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress
+                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
     }
   };
   
@@ -823,13 +826,15 @@ selectedObjectChanged:(id)newObject
 
 - (void)deletePhoto
 {
+  DFPeanutSearchObject *object = self.objectsByID[@(self.actionSheetPhotoID)];
   [self.photoAdapter deletePhoto:self.actionSheetPhotoID completionBlock:^(NSError *error) {
     if (!error) {
       [self reloadFeed];
       
       // remove it from the db
       [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.actionSheetPhotoID];
-      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess];
+      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess
+                      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
     } else {
       dispatch_async(dispatch_get_main_queue(), ^{
         [UIAlertView
@@ -837,7 +842,8 @@ selectedObjectChanged:(id)newObject
          message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
                    error.localizedRecoverySuggestion ?
                    error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]];
-        [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure];
+        [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure
+                        timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
       });
     }
   }];

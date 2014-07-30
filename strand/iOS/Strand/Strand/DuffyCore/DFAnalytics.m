@@ -111,6 +111,8 @@ NSString* const PermissionTypeKey = @"permissionType";
 NSString* const StateChangeKey = @"stateChange";
 NSString* const ValueChangeKey = @"valueChange";
 
+NSString* const PhotoAgeKey = @"photoAge";
+
 static DFAnalytics *defaultLogger;
 
 + (void)StartAnalyticsSession
@@ -323,18 +325,56 @@ static DFAnalytics *defaultLogger;
 }
 
 + (void)logPhotoDeletedWithResult:(NSString *)result
+           timeIntervalSinceTaken:(NSTimeInterval)timeInterval
 {
-  [DFAnalytics logEvent:PhotoDeletedEvent withParameters:@{ResultKey: result}];
+  [DFAnalytics logEvent:PhotoDeletedEvent withParameters:@{
+                                                           ResultKey: result,
+                                                           PhotoAgeKey: [self timeIntervalBucketString:timeInterval]
+                                                           }];
 }
 
-+ (void)logPhotoLikePressedWithNewValue:(BOOL)isOn result:(NSString *)result
++ (void)logPhotoLikePressedWithNewValue:(BOOL)isOn
+                                 result:(NSString *)result
                              actionType:(DFActionType)actionType
+                 timeIntervalSinceTaken:(NSTimeInterval)timeInterval
 {
   [DFAnalytics logEvent:PhotoLikedEvent withParameters:@{
                                                          NewValueKey: @(isOn),
                                                          ResultKey: result,
-                                                         @"ActionType" : actionType
+                                                         @"ActionType" : actionType,
+                                                         PhotoAgeKey : [self timeIntervalBucketString:timeInterval]
                                                          }];
+}
+
++ (NSString *)timeIntervalBucketString:(NSTimeInterval)timeInterval
+{
+  if (timeInterval < 60) {
+    return @"< 1m";
+  } else if (timeInterval < 60 * 5) {
+    return @"1-5m";
+  } else if (timeInterval < 60 * 10) {
+    return @"5-10m";
+  } else if (timeInterval < 60 * 30) {
+    return @"10-30m";
+  } else if (timeInterval < 60 * 60) {
+    return @"30m-1h";
+  } else if (timeInterval < 60 * 60 * 2) {
+    return @"1-2h";
+  } else if (timeInterval < 60 * 60 * 12) {
+    return @"2-12h";
+  } else if (timeInterval < 60 * 60 * 24) {
+    return @"12-24h";
+  } else if (timeInterval < 60 * 60 * 24 * 3) {
+    return @"1-3d";
+  } else if (timeInterval < 60 * 60 * 24 * 7) {
+    return @"3d-1w";
+  } else if (timeInterval < 60 * 60 * 24 * 30) {
+    return @"1w-1M";
+  } else if (timeInterval < 60 * 60 * 24 * 60) {
+    return @"1-2M";
+  }
+  
+  return @">2M";
 }
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result

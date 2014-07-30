@@ -43,9 +43,12 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)logLocationUpdated;
 + (void)logNotificationOpenedWithType:(DFPushNotifType)type;
 
-+ (void)logPhotoDeletedWithResult:(NSString *)result;
-+ (void)logPhotoLikePressedWithNewValue:(BOOL)isOn result:(NSString *)result
-                             actionType:(DFActionType)actionType;
++ (void)logPhotoDeletedWithResult:(NSString *)result
+           timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
++ (void)logPhotoLikePressedWithNewValue:(BOOL)isOn
+                                 result:(NSString *)result
+                             actionType:(DFActionType)actionType
+                 timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
