@@ -54,6 +54,11 @@ typedef enum {
 - (void)clearUploadInfo;
 
 - (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID;
++ (void)saveImage:(UIImage *)image
+     withMetadata:(NSDictionary *)metadata
+         location:(CLLocation *)location
+          context:(NSManagedObjectContext *)context
+  completionBlock:(void(^)(void))completion;
 
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;

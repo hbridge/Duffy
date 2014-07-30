@@ -12,6 +12,8 @@
 #import "DFPhoto.h"
 #import "DFNotificationSharedConstants.h"
 #import "UIImage+DFHelpers.h"
+#import "DFStrandPhotoAsset.h"
+#import "DFSettings.h"
 
 @interface DFPhotoStore(){
   NSManagedObjectContext *_managedObjectContext;
@@ -574,6 +576,49 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   DFPhoto *photo = [self photoWithPhotoID:photoID];
   if (photo) {
     [[self managedObjectContext] deleteObject:photo];
+  }
+}
+
++ (void)saveImage:(UIImage *)image
+     withMetadata:(NSDictionary *)metadata
+         location:(CLLocation *)location
+context:(NSManagedObjectContext *)context
+  completionBlock:(void (^)(void))completion
+{
+  @autoreleasepool {
+    NSData *data = UIImageJPEGRepresentation(image, 0.8);
+    DFStrandPhotoAsset *asset = [DFStrandPhotoAsset createAssetForImageData:data
+                                                                   metadata:metadata
+                                                                   location:location
+                                                               creationDate:[NSDate date]
+                                                                  inContext:context];
+    [DFPhoto createWithAsset:asset
+                      userID:[[DFUser currentUser] userID]
+                    timeZone:[NSTimeZone defaultTimeZone]
+                   inContext:context];
+    
+    // Save the database changes
+    NSError *error;
+    [context save:&error];
+    if (error) {
+      [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
+                  format:@"Error: %@", error.description];
+    }
+    
+    if ([[DFSettings sharedSettings] autosaveToCameraRoll]) {
+      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+      [library writeImageToSavedPhotosAlbum:image.CGImage
+                                   metadata:metadata
+                            completionBlock:^(NSURL *assetURL, NSError *error) {
+                              if (error) {
+                                DDLogError(@"%@ couldn't save photo to Camera Roll:%@",
+                                           [self.class description],
+                                           error.description);
+                              }
+                            }];
+    }
+    
+    if (completion) completion();
   }
 }
 

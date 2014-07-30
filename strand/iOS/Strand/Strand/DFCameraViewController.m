@@ -324,7 +324,7 @@ const unsigned int SavePromptMinPhotos = 3;
 
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
-  DDLogInfo(@"Take photo button pressed.");
+  DDLogInfo(@"%@ Take photo button pressed.", [self.class description]);
   [self takePicture];
   [self flashCameraView];
   [self handleNUXTasksForPhotoTaken];
@@ -431,9 +431,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     imageToSave = (UIImage *) [info objectForKey:
                                UIImagePickerControllerOriginalImage];
     NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
-    [self saveImage:imageToSave withMetadata:metadata retryAttempt:0 completionBlock:^{
-      [[DFUploadController sharedUploadController] uploadPhotos];
-    }];
+    [self waitForGoodLocationAndSaveImage:imageToSave withMetadata:metadata retryNumber:0];
     [self animateImageCaptured:imageToSave];
     
     if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
@@ -444,6 +442,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)animateImageCaptured:(UIImage *)image{
   dispatch_async(dispatch_get_main_queue(), ^{
+    DDLogInfo(@"%@ animating picture taken.", [self.class description]);
     CGRect imageViewFrame = CGRectMake(self.view.frame.origin.x,
                                        self.view.frame.origin.y,
                                        320,
@@ -460,6 +459,7 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
       imageView.alpha = 0.1;
     } completion:^(BOOL finished) {
       [imageView removeFromSuperview];
+      DDLogInfo(@"%@ animation complete.", [self.class description]);
     }];
   });
 }
@@ -469,66 +469,42 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
   [self galleryButtonPressed:nil];
 }
 
-- (void)saveImage:(UIImage *)image
-     withMetadata:(NSDictionary *)metadata
-     retryAttempt:(unsigned int)retryAttempt
-  completionBlock:(void (^)(void))completionBlock
+
+- (void)waitForGoodLocationAndSaveImage:(UIImage *)image
+                           withMetadata:(NSDictionary *)metadata
+                            retryNumber:(int)retryNumber
 {
   CLLocation *location = self.locationManager.location;
   
-  if (![self isGoodLocation:location] && retryAttempt <= MaxRetryCount) {
+  if (![self isGoodLocation:location] && retryNumber <= MaxRetryCount) {
     //wait for a better location fix
     DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self saveImage:image withMetadata:metadata retryAttempt:retryAttempt + 1 completionBlock:completionBlock];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:retryNumber + 1];
     });
     
     return;
   }
   
-  NSMutableDictionary *mutableMetadata = [[NSMutableDictionary alloc] initWithDictionary:metadata];
-  [self addLocation:location toMetadata:mutableMetadata];
-  NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
-  [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:mutableMetadata];
-  
-  // Save the assset locally
-  NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-  NSData *data = UIImageJPEGRepresentation(image, 0.8);
-  DFStrandPhotoAsset *asset = [DFStrandPhotoAsset createAssetForImageData:data
-                                     metadata:mutableMetadata
-                                     location:location
-                                 creationDate:[NSDate date]
-                                    inContext:context];
-  
-  DFPhoto *photo = [DFPhoto createWithAsset:asset
-                    userID:[[DFUser currentUser] userID]
-                  timeZone:[NSTimeZone defaultTimeZone]
-                 inContext:context];
-  
-  DDLogVerbose(@"New photo date:%@", [[NSDateFormatter DjangoDateFormatter]
-                                      stringFromDate:photo.creationDate]);
-  
-  // Save the database changes
-  NSError *error;
-  [context save:&error];
-  if (error) {
-    [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
-                format:@"Error: %@", error.description];
-  }
-  
-  if ([[DFSettings sharedSettings] autosaveToCameraRoll]) {
-    ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-    [library writeImageToSavedPhotosAlbum:image.CGImage
-                                 metadata:metadata
-    completionBlock:^(NSURL *assetURL, NSError *error) {
-      if (error) {
-        DDLogError(@"%@ couldn't save photo to Camera Roll:%@", [DFCameraViewController class],
-                   error.description);
-      }
-    }];
-  }
-  
-  if (completionBlock) completionBlock();
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    NSMutableDictionary *mutableMetadata = [[NSMutableDictionary alloc] initWithDictionary:metadata];
+    [self addLocation:location toMetadata:mutableMetadata];
+    NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
+    [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:mutableMetadata];
+    
+    // Save the assset locally
+    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+    [DFPhotoStore
+     saveImage:image
+     withMetadata:mutableMetadata
+     location:location
+     context:context
+     completionBlock:^{
+       DDLogInfo(@"%@ image saved.", [self.class description]);
+       [[DFUploadController sharedUploadController] uploadPhotos];
+     }];
+  });
 }
 
 - (BOOL)isGoodLocation:(CLLocation *)location
