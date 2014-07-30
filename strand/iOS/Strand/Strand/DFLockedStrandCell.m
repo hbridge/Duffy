@@ -12,7 +12,6 @@
 
 @interface DFLockedStrandCell()
 
-@property (nonatomic, retain) NSMutableArray *originalImages;
 @property (atomic, retain) NSMutableArray *blurredImages;
 
 @end
@@ -38,33 +37,35 @@
 
 - (void)setImages:(NSArray *)images
 {
-  self.originalImages = [images mutableCopy];
   self.blurredImages = [NSMutableArray new];
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    for (UIImage *image in self.originalImages) {
+  for (UIImage *image in images) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
-      [self.blurredImages addObject:blurredImage];
-    }
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self.collectionView reloadData];
+      if (blurredImage) {
+        [self.blurredImages addObject:blurredImage];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.collectionView reloadData];
+        });
+
+      }
     });
-  });
+  }
 }
 
 - (void)addImage:(UIImage *)image
 {
-  if (!image) image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
-  [self.originalImages addObject:image];
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
-    if (!blurredImage) return;
-    [self.blurredImages addObject:blurredImage];
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [self.collectionView reloadData];
+  if (image) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
+      if (blurredImage) {
+        [self.blurredImages addObject:blurredImage];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self.collectionView reloadData];
+        });
+      }
     });
-  });
+  }
 }
-
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
