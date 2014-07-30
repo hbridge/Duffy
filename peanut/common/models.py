@@ -93,6 +93,7 @@ class Photo(models.Model):
 	time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
 	neighbored_time = models.DateTimeField(null=True)
+	strand_evaluated = models.BooleanField(default=False, db_index=True)
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
@@ -437,7 +438,6 @@ class FriendConnection(models.Model):
 		db_table = 'strand_friends'
 
 class Strand(models.Model):
-	location_point = models.PointField()
 	time_started = models.DateTimeField()
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)

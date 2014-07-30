@@ -16,6 +16,7 @@ urlpatterns = patterns('',
 	url(r'^photos/bulk/$', arbus_api_views.PhotoBulkAPI.as_view()),
 	
 	url(r'^neighbors', 'strand.api_views.neighbors'),
+	url(r'^strand_feed', 'strand.api_views.strand_feed'),
 	url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands'),
 	url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
 

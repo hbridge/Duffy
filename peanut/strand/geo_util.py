@@ -18,7 +18,10 @@ def haversine(lon1, lat1, lon2, lat2):
 	km = 6367 * c
 	return km
 
-
+def getDistanceBetweenPhotos(photo1, photo2):
+	geoDistance = int(haversine(photo1.location_point.x, photo1.location_point.y, photo2.location_point.x, photo2.location_point.y) * 1000)
+	return geoDistance
+	
 """
 
 	Returns: (photo, timeDistance, geoDistance)

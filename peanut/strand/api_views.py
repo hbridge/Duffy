@@ -14,7 +14,7 @@ from django.http import Http404
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction
+from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction, Strand
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -323,6 +323,42 @@ def neighbors(request):
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
+	Return the Duffy JSON for the photo feed.
+
+	This uses the Strand objects instead of neighbors
+"""
+def strand_feed(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		userId = int(form.cleaned_data['user_id'])
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
+
+		strands = Strand.objects.select_related().filter(users__in=[user])
+
+		# list of list of photos
+		groups = list()
+		for strand in strands:
+			groups.append(strand.photos.all().order_by("-time_taken"))
+
+		# Now we have to turn into our Duffy JSON, first, convert into the right format
+		formattedGroups = getFormattedGroups(groups, userId)
+
+		# Lastly, we turn our groups into sections which is the object we convert to json for the api
+		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+		response['objects'] = objects
+		response['next_start_date_time'] = lastDate
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+"""
 	Utility method to find all nonNeighboredPhotos for the given user and location_point
 
 	Returns a list of photos
@@ -351,6 +387,9 @@ def getLockedPhotos(userId, lon, lat):
 	nonNeighboredPhotos = [item for item in nearbyPhotos if item.id not in neighboredPhotosIds]
 
 	return nonNeighboredPhotos
+
+def getLockedStrands(userId, lon, lat):
+	pass
 
 """
 	the user would join if they took a picture at the given startTime (defaults to now)
