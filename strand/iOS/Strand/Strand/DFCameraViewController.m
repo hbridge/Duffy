@@ -51,6 +51,7 @@ const unsigned int SavePromptMinPhotos = 3;
 @property (nonatomic, retain) NSTimer *updateUITimer;
 @property (nonatomic, retain) NSDate *lastWifiPromptDate;
 @property (readonly, nonatomic, retain) DFLocationRoadblockViewController *locationRoadblockViewController;
+@property (atomic) BOOL isTakePhotoInProgress;
 
 @end
 
@@ -324,11 +325,15 @@ const unsigned int SavePromptMinPhotos = 3;
 
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
-  DDLogInfo(@"%@ Take photo button pressed.", [self.class description]);
-  [self takePicture];
-  [self flashCameraView];
-  [self handleNUXTasksForPhotoTaken];
-  [DFDefaultsStore incrementCountForAction:DFUserActionTakePhoto];
+  DDLogInfo(@"%@ Take photo button pressed. isTakePhotoInProgress:%@",
+            [self.class description], [NSNumber numberWithBool:self.isTakePhotoInProgress]);
+  if (!self.isTakePhotoInProgress) {
+    self.isTakePhotoInProgress = YES;
+    [self takePicture];
+    [self flashCameraView];
+    [self handleNUXTasksForPhotoTaken];
+    [DFDefaultsStore incrementCountForAction:DFUserActionTakePhoto];
+  }
 }
 
 - (void)handleNUXTasksForPhotoTaken
@@ -421,6 +426,7 @@ const unsigned int SavePromptMinPhotos = 3;
 - (void)imagePickerController:(UIImagePickerController *)picker
 didFinishPickingMediaWithInfo:(NSDictionary *)info {
   DDLogInfo(@"%@ image picked", [self.class description]);
+  self.isTakePhotoInProgress = NO;
   
   NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
   UIImage *imageToSave;
