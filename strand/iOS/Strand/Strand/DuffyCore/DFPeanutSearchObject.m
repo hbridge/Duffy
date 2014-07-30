@@ -121,4 +121,23 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];
 }
 
+- (NSEnumerator *)enumeratorOfDescendents
+{
+  if (self.objects.count == 0) {
+    return [@[] objectEnumerator];
+  }
+  
+  NSMutableArray *allDescendendents = [NSMutableArray new];
+  for (DFPeanutSearchObject *object in self.objects) {
+    if (object.objects) {
+      [allDescendendents addObjectsFromArray:[[object enumeratorOfDescendents] allObjects]];
+    } else {
+      [allDescendendents addObject:object];
+    }
+  }
+  
+  return [allDescendendents objectEnumerator];
+}
+
+
 @end

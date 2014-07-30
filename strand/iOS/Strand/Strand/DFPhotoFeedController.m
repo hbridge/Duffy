@@ -263,29 +263,19 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DFPhotoCollection *unprocessedCollection = [[DFPhotoStore sharedStore]
                                photosWithUploadProcessedStatus:NO];
-  NSMutableArray *photosToMarkProcessed = [NSMutableArray new];
-  
-  DFPeanutSearchObject *firstSection = sectionObjects.firstObject;
-  for (DFPhoto *photo in unprocessedCollection.photoSet) {
-    for (DFPeanutSearchObject *object in firstSection.objects) {
-      if ([object.type isEqual:DFSearchObjectPhoto]) {
-        if (object.id == photo.photoID) {
-          [photosToMarkProcessed addObject:photo];
-        }
-      } else if ([object.type isEqual:DFSearchObjectCluster]) {
-        for (DFPeanutSearchObject *clusterPhoto in object.objects) {
-          if (clusterPhoto.id == photo.photoID) {
-            [photosToMarkProcessed addObject:photo];
-          }
-        }
-      }
+  NSMutableSet *allPhotoIDsInFeed = [NSMutableSet new];
+  for (DFPeanutSearchObject *section in sectionObjects) {
+    for (DFPeanutSearchObject *object in [[section enumeratorOfDescendents] allObjects]) {
+      if (object.id) [allPhotoIDsInFeed addObject:@(object.id)];
     }
   }
   
   NSMutableArray *result = [[unprocessedCollection photosByDateAscending:NO] mutableCopy];
-  for (DFPhoto *photo in photosToMarkProcessed) {
-    [result removeObject:photo];
-    photo.isUploadProcessed = YES;
+  for (DFPhoto *photo in unprocessedCollection.photoSet) {
+    if ([allPhotoIDsInFeed containsObject:@(photo.photoID)]) {
+      [result removeObject:photo];
+      photo.isUploadProcessed = YES;
+    }
   }
   
   return result;
