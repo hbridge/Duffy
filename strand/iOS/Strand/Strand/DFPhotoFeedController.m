@@ -497,7 +497,7 @@ const CGFloat LockedCellHeight = 157.0;
   [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
                                                searchObject:photoObject];
   photoFeedCell.imageView.image = nil;
-  [photoFeedCell.loadingActivityIndicator startAnimating];
+  //[photoFeedCell.loadingActivityIndicator startAnimating];
   
   if (photoObject) {
     [[DFImageStore sharedStore]
@@ -509,7 +509,6 @@ const CGFloat LockedCellHeight = 157.0;
        dispatch_async(dispatch_get_main_queue(), ^{
          if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
          [photoFeedCell setImage:image forObject:@(photoObject.id)];
-         [photoFeedCell.loadingActivityIndicator stopAnimating];
          [photoFeedCell setNeedsLayout];
        });
      }];
@@ -521,12 +520,12 @@ const CGFloat LockedCellHeight = 157.0;
 - (DFPhotoFeedCell *)cellForCluster:(DFPeanutSearchObject *)cluster
                         indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoFeedCell *photoFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"clusterCell"
+  DFPhotoFeedCell *clusterFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"clusterCell"
                                                                    forIndexPath:indexPath];
-  photoFeedCell.delegate = self;
-  [photoFeedCell setClusterViewHidden:NO];
-  [photoFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:cluster.objects]];
-  [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
+  clusterFeedCell.delegate = self;
+  [clusterFeedCell setClusterViewHidden:NO];
+  [clusterFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:cluster.objects]];
+  [DFPhotoFeedController configureNonImageAttributesForCell:clusterFeedCell
                                                searchObject:[cluster.objects firstObject]];
   for (DFPeanutSearchObject *subObject in cluster.objects) {
     [[DFImageStore sharedStore]
@@ -536,14 +535,14 @@ const CGFloat LockedCellHeight = 157.0;
      fullPath:subObject.full_image_path
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
-         if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
-         [photoFeedCell setImage:image forObject:@(subObject.id)];
-         [photoFeedCell setNeedsLayout];
+         if (![self.tableView.visibleCells containsObject:clusterFeedCell]) return;
+         [clusterFeedCell setImage:image forObject:@(subObject.id)];
+         [clusterFeedCell setNeedsLayout];
        });
      }];
   }
 
-  return photoFeedCell;
+  return clusterFeedCell;
 }
 
 + (NSArray *)objectIDNumbers:(NSArray *)objects

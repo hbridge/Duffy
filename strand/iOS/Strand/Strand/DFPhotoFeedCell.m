@@ -43,7 +43,6 @@
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
   self.collectionView.backgroundColor = [UIColor clearColor];
-
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -56,7 +55,6 @@
 - (void)layoutSubviews
 {
   [super layoutSubviews];
-  //self.imageView.frame = self.imageViewPlaceholder.frame;
   self.imageView.clipsToBounds = YES;
 }
 
@@ -91,6 +89,12 @@
   [self.collectionView reloadData];
 }
 
+- (void)setSelectedObject:(id)selectedObject
+{
+  _selectedObject = selectedObject;
+  [self setLargeImage:self.imagesForObjects[selectedObject]];
+}
+
 - (void)setImage:(UIImage *)image forObject:(id)object
 {
   if (image == nil) {
@@ -99,7 +103,20 @@
   
   self.imagesForObjects[object] = image;
   [self.collectionView reloadData];
-  if ([object isEqual:self.selectedObject]) self.photoImageView.image = image;
+  if ([object isEqual:self.selectedObject]) [self setLargeImage:image];
+}
+
+- (void)setLargeImage:(UIImage *)image
+{
+  self.photoImageView.image = image;
+  if (image.size.height < self.photoImageView.frame.size.height * .75) {
+    [self.loadingActivityIndicator startAnimating];
+    self.photoImageView.alpha = 0.5;
+  } else {
+    [self.loadingActivityIndicator stopAnimating];
+    self.photoImageView.alpha = 1.0;
+  }
+
 }
 
 - (void)saveConstraints
@@ -170,7 +187,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   id oldObject = self.selectedObject;
   id object = self.objects[indexPath.row];
-  self.imageView.image = self.imagesForObjects[object];
+  [self setLargeImage:self.imagesForObjects[object]];
   self.selectedObject = object;
   if (self.delegate) {
     [self.delegate feedCell:self selectedObjectChanged:object fromObject:oldObject];
@@ -192,6 +209,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     [self.delegate moreOptionsButtonPressedForObject:self.selectedObject sender:sender];
   }
 }
+
 
 
 @end
