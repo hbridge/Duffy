@@ -11,7 +11,12 @@
 #import "DFPeanutSearchResponse.h"
 #import "DFDataHasher.h"
 
+#ifdef DEBUG
+NSString *const GalleryPath = @"strand_feed";
+#else
 NSString *const GalleryPath = @"neighbors";
+#endif
+
 
 @implementation DFPeanutGalleryAdapter 
 
