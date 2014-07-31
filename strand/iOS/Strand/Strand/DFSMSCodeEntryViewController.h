@@ -8,10 +8,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFSMSCodeEntryViewController : UIViewController <UITextFieldDelegate>
+@interface DFSMSCodeEntryViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextField *codeTextField;
 @property (nonatomic, retain) NSString *phoneNumberString;
 @property (nonatomic, retain) NSString *userName;
+@property (weak, nonatomic) IBOutlet UIButton *doneButton;
+- (IBAction)doneButtonPressed:(id)sender;
 
 @end

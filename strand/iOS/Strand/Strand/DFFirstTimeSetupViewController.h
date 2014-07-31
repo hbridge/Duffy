@@ -17,5 +17,6 @@
 - (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender;
 - (IBAction)termsButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UITextField *nameTextField;
+- (IBAction)nameTextFieldChanged:(UITextField *)sender;
 
 @end

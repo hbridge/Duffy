@@ -36,12 +36,6 @@ const UInt16 DFCodeLength = 4;
     // Do any additional setup after loading the view from its nib.
   self.codeTextField.delegate = self;
   [self.codeTextField becomeFirstResponder];
-  
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                            target:self
-                                            action:@selector(doneButtonPressed:)];
-  
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -91,7 +85,8 @@ replacementString:(NSString *)string
   if (![string isEqualToString:@""] && [textField.text rangeOfString:@"-"].location == NSNotFound) {
     return NO;
   }
-  
+ 
+  self.doneButton.enabled = NO;
   // if the user typed a char, remove the first '-' or " -"
   if (![string isEqualToString:@""]) {
     textField.text = [textField.text
@@ -106,6 +101,7 @@ replacementString:(NSString *)string
       [self setCodeTextFieldCursorOffset:firstDashRange.location];
     } else {
       [self setCodeTextFieldCursorOffset:self.codeTextField.text.length];
+      self.doneButton.enabled = YES;
     }
     
     return NO;
@@ -129,7 +125,9 @@ replacementString:(NSString *)string
   return YES;
 }
 
-- (void)doneButtonPressed:(id)sender
+
+
+- (IBAction)doneButtonPressed:(id)sender
 {
   if (![self isEnteredCodeValid]) {
     [self showInvalidCodeAlert:[self enteredCode]];
@@ -206,17 +204,15 @@ replacementString:(NSString *)string
                       DFLocationPermissionViewController *locationPermissionController =
                       [[DFLocationPermissionViewController alloc] init];
                       [self.navigationController setViewControllers:@[locationPermissionController] animated:YES];
-                       [msvc dismissViewControllerAnimated:YES completion:nil];
+                      [msvc dismissViewControllerAnimated:YES completion:nil];
                     }
                         failureBlock:^(NSError *error) {
                           DDLogWarn(@"Create user failed: %@", error.localizedDescription);
-                          [msvc dismissViewControllerAnimated:YES completion:^{
-                            UIAlertView *failureAlert = [DFSMSCodeEntryViewController accountFailedAlert:error];
-                            [failureAlert show];
-                            [self resetCodeField];
-                            [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultFailure];
-                            [self.codeTextField becomeFirstResponder];
-                          }];
+                          
+                          UIAlertView *failureAlert = [self accountFailedAlert:error];
+                          [failureAlert show];
+                          [self resetCodeField];
+                          [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultFailure];
                         }];
   
 }
@@ -227,15 +223,20 @@ replacementString:(NSString *)string
 }
 
 
-+ (UIAlertView *)accountFailedAlert:(NSError *)error
+- (UIAlertView *)accountFailedAlert:(NSError *)error
 {
   return [[UIAlertView alloc] initWithTitle:@"Account Creation Failed"
                                     message:error.localizedDescription
-                                   delegate:nil
+                                   delegate:self
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];
 }
 
-
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  [self.presentedViewController dismissViewControllerAnimated:YES completion:^{
+    [self.codeTextField becomeFirstResponder];
+  }];
+}
 
 @end

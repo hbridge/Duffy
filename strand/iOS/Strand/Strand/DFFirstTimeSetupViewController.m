@@ -30,7 +30,7 @@ UInt16 const DFPhoneNumberLength = 10;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-      self.navigationItem.title = @"Phone Number";
+      self.navigationItem.title = @"Create Account";
       self.doneBarButtonItem = [[UIBarButtonItem alloc]
                                 initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                 target:self
@@ -49,7 +49,7 @@ UInt16 const DFPhoneNumberLength = 10;
   self.phoneNumberField.delegate = self;
   self.termsButton.titleLabel.numberOfLines = 0;
   self.termsButton.titleLabel.textAlignment = NSTextAlignmentCenter;
-  self.nameTextField.placeholder = [DFUser deviceNameBasedUserName];
+  self.nameTextField.text = [DFUser deviceNameBasedUserName];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -76,6 +76,7 @@ UInt16 const DFPhoneNumberLength = 10;
 shouldChangeCharactersInRange:(NSRange)range
 replacementString:(NSString *)string
 {
+  if (textField != self.phoneNumberField) return YES;
   // dash after 3 numbers
   if (range.location == 2 && ![string isEqualToString:@""]) {
     textField.text = [textField.text stringByAppendingString:[NSString stringWithFormat:@"%@-", string]];
@@ -104,13 +105,21 @@ replacementString:(NSString *)string
 
 
 - (IBAction)phoneNumberFieldValueChanged:(UITextField *)sender {
-  if (sender.text.length > 0) {
+  [self textFieldChanged];
+}
+
+- (IBAction)nameTextFieldChanged:(UITextField *)sender {
+  [self textFieldChanged];
+}
+
+- (void)textFieldChanged
+{
+  if (self.phoneNumberField.text.length && self.nameTextField.text.length > 0) {
     self.doneBarButtonItem.enabled = YES;
   } else {
     self.doneBarButtonItem.enabled = NO;
   }
 }
-
 
 
 - (void)phoneNumberDoneButtonPressed:(id)sender
