@@ -208,7 +208,6 @@ replacementString:(NSString *)string
                     }
                         failureBlock:^(NSError *error) {
                           DDLogWarn(@"Create user failed: %@", error.localizedDescription);
-                          
                           UIAlertView *failureAlert = [self accountFailedAlert:error];
                           [failureAlert show];
                           [self resetCodeField];

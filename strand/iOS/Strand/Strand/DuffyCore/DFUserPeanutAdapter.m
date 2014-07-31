@@ -52,7 +52,7 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
   [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:CreateUserPath
-                                              keyPath:@"user"
+                                              keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
   
   return @[restSuccessResponse, restErrorResponse, createSuccessResponse, createErrorResponse];
