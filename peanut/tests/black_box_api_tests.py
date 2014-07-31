@@ -23,7 +23,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 	defaultParams['device_token'] = "TESTTOKEN"
 	defaultParams['phone_number'] = "+17815555559"
 	defaultParams['sms_access_code'] = "2345"
-	defaultParams['display_name'] = "Derek"
+	defaultParams['display_name'] = "Unittest Account"
 	defaultParams['phone_id'] = "ldkfjaldkjf"
 
 	statsLines = list()
@@ -67,6 +67,11 @@ class BlackBoxUrlsTests(unittest.TestCase):
 
 	def testNeighbor(self):
 		result = self.getResult('neighbors', forms.OnlyUserIdForm)
+
+		self.assertTrue("objects" in result)
+
+	def testStrandFeed(self):
+		result = self.getResult('strand_feed', forms.OnlyUserIdForm)
 
 		self.assertTrue("objects" in result)
 	
