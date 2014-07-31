@@ -122,6 +122,7 @@ def userbaseSummary(request):
 			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added'))
 
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')))
+	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')))
 
 	# Exclude type GPS fetch since it happens so frequently
 	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
@@ -151,7 +152,7 @@ def userbaseSummary(request):
 				entry['status'] = '!fulls'
 			elif (user.clusteredCount != user.totalCount):
 				entry['status'] = '!cluster'
-			elif (user.twofishCount != user.photosWithGPS):
+			elif (user.twofishCount < user.photosWithGPS):
 				entry['status'] = '!twofish'
 			elif(user.neighborCount != user.photosWithGPS):
 				entry['status'] = '!neighbor'
@@ -172,6 +173,8 @@ def userbaseSummary(request):
 			entry['actions'] = actionsCount[i].totalActions
 		else:
 			entry['actions'] = '-'
+
+		entry['strandCount'] = strandCount[i].totalStrands
 
 		if user.last_build_info:
 			buildNum = user.last_build_info[user.last_build_info.find('-'):]
