@@ -14,6 +14,7 @@
 #import "AppDelegate.h"
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
+#import "RootViewController.h"
 
 @interface DFLocationPermissionViewController ()
 
@@ -135,6 +136,9 @@
 {
   AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
   [delegate showMainView];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [(RootViewController *)delegate.window.rootViewController showGallery];
+  });
 }
 
 - (BOOL)prefersStatusBarHidden
