@@ -381,12 +381,12 @@ def strand_feed(request):
 
 """
 def getNearbyStrands(userId, lon, lat):
-	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 5
+	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 
 	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
 
-	strands = Strand.objects.select_related().filter(time_started__gt=timeLow).exclude(users__id=userId)
+	strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow).exclude(users__id=userId)
 
 	joinableStrands = list()
 

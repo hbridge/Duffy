@@ -20,30 +20,53 @@ import strand.notifications_util as notifications_util
 logger = logging.getLogger(__name__)
 
 def photoBelongsInStrand(targetPhoto, strand, photosByStrandId):
-	if not targetPhoto.location_point:
-		return False
-
 	for photo in photosByStrandId[strand.id]:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
-		if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
-			geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
-			return True
+		if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
+			if not photo.location_point and not photo.location_point:
+				return True
+
+			if (photo.location_point and targetPhoto.location_point and 
+				geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+				return True
 
 	return False
 
+def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
+	if photo.time_taken > strand.last_photo_time:
+		strand.last_photo_time = photo.time_taken
+
+	if photo.time_taken < strand.time_started:
+		strand.time_started = photo.time_taken
+	
+	if strand.id not in photosByStrandId:
+		# Handle case that this is a new strand
+		strand.photos.add(photo)
+		photosByStrandId[strand.id] = [photo]
+	elif photo not in photosByStrandId[strand.id]:
+		strand.photos.add(photo)
+		photosByStrandId[strand.id].append(photo)
+
+	if strand.id not in usersByStrandId:
+		# Handle case that this is a new strand
+		strand.users.add(photo.user)
+		usersByStrandId[strand.id]= [photo.user]
+	elif photo.user not in usersByStrandId[strand.id]:
+		strand.users.add(photo.user)
+		usersByStrandId[strand.id].append(photo.user)
+		
+		
 def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
 	photoList = photosByStrandId[strand2.id]
 	for photo in photoList:
 		if photo not in photosByStrandId[strand1.id]:
-			strand1.photos.add(photo)
-			photosByStrandId[strand1.id].append(photo)
+			addPhotoToStrand(strand1, photo, photosByStrandId, usersByStrandId)
 
 	userList = usersByStrandId[strand2.id]
 	for user in userList:
-		if user not in strand1.users.all():
+		if user not in usersByStrandId[strand1.id]:
 			strand1.users.add(user)
 			usersByStrandId[strand1.id].append(user)
-
 
 """
 	Grab all photos that are not strandEvaluated and grab all strands from the last 24 hours
@@ -74,10 +97,10 @@ def main(argv):
 			usersByStrandId = dict()
 			photos = list(photos)
 
-			timeHigh = photos[0].time_taken + datetime.timedelta(days=1)
+			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-			strandsCache = list(Strand.objects.select_related().filter(time_started__gt=timeLow).filter(time_started__lt=timeHigh))
+			strandsCache = list(Strand.objects.select_related().filter(time_started__gt=timeLow).filter(last_photo_time__lt=timeHigh))
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
@@ -92,24 +115,21 @@ def main(argv):
 				
 				if len(matchingStrands) == 1:
 					strand = matchingStrands[0]
-					strand.photos.add(photo)
-					photosByStrandId[strand.id].append(photo)
-
-					if photo.user not in matchingStrands[0].users.all():
-						strand.users.add(photo.user)
-						usersByStrandId[strand.id].append(photo.user)
-
+					addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId)
 					strandsAddedTo.append(strand)
+					
 					logger.debug("Just added photo %s to strand %s" % (photo.id, strand.id))
 				elif len(matchingStrands) > 1:
 					logger.debug("Found %s matching strands for photo %s, merging" % (len(matchingStrands), photo.id))
 					targetStrand = matchingStrands[0]
+					
 					# Merge strands
 					for i, strand in enumerate(matchingStrands):
 						if i > 0:
 							mergeStrands(targetStrand, strand, photosByStrandId, usersByStrandId)
 							logger.debug("Merged strand %s into %s" % (strand.id, targetStrand.id))
 
+					# Delete unneeded Srands
 					for i, strand in enumerate(matchingStrands):
 						if i > 0:
 							# remove from our cache and db
@@ -117,15 +137,13 @@ def main(argv):
 							logger.debug("Deleted strand %s" % strand.id)
 							strand.delete()
 							strandsDeleted += 1
-					strandsAddedTo.append(matchingStrands[0])
+							
+					strandsAddedTo.append(targetStrand)
 				else:
-					newStrand = Strand.objects.create(time_started = photo.time_taken)
-					newStrand.photos.add(photo)
-					newStrand.users.add(photo.user)
+					newStrand = Strand.objects.create(time_started = photo.time_taken, last_photo_time = photo.time_taken)
+					addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId)
 					strandsCreated.append(newStrand)
 					strandsCache.append(newStrand)
-					photosByStrandId[newStrand.id] = [photo]
-					usersByStrandId[newStrand.id] = [photo.user]
 					logger.debug("Created new Strand %s for photo %s" % (newStrand.id, photo.id))
 
 				photo.strand_evaluated = True

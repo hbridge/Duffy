@@ -439,6 +439,7 @@ class FriendConnection(models.Model):
 
 class Strand(models.Model):
 	time_started = models.DateTimeField()
+	last_photo_time = models.DateTimeField()
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
 	added = models.DateTimeField(auto_now_add=True)
