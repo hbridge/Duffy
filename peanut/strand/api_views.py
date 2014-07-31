@@ -351,9 +351,21 @@ def strand_feed(request):
 		# now sort groups by the time_taken of the first photo in each group
 		groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
 
+		joinableStrands = getNearbyStrands(userId, user.last_location_point.x, user.last_location_point.y)
+
+		# Lastly, grab all our locked strands and add in those photos
+		lockedGroup = list()
+		for strand in joinableStrands:
+			lockedGroup.extend(strand.photos.all())
+
+		if len(lockedGroup) > 0:
+			groups.insert(0, lockedGroup)
+
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
 		formattedGroups = getFormattedGroups(groups, userId)
 
+		if len(lockedGroup) > 0:
+			formattedGroups[0]['title'] = "Locked"
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
@@ -363,6 +375,33 @@ def strand_feed(request):
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+
+"""
+	Utility method to grab all active strands near the given lat and lon.  Filter out any the given userId is currently in
+
+"""
+def getNearbyStrands(userId, lon, lat):
+	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING * 5
+
+	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
+
+	strands = Strand.objects.select_related().filter(time_started__gt=timeLow).exclude(users__id=userId)
+
+	joinableStrands = list()
+
+	for strand in strands:
+		for photo in strand.photos.all():
+			# See if a photo was taken now and in the location, would it belong in this strand
+			# TODO(Derek):  This could probably be pulled out and shared with populateStrands
+			timeDiff = nowTime - photo.time_taken
+			if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
+				geo_util.getDistanceToPhoto(lon, lat, photo) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+				joinableStrands.append(strand)
+
+	joinableStrands = set(joinableStrands)
+
+	return joinableStrands
 """
 	Utility method to find all nonNeighboredPhotos for the given user and location_point
 
