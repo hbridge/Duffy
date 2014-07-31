@@ -52,7 +52,7 @@ def userbaseSummary(request):
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
 			overfeatCount=Count('photo__overfeat_data'), classCount=Count('photo__classification_data'), 
-			faceCount=Count('photo__faces_data'), lastAdded=Max('photo__added'), lastUpdated=Max('photo__updated')).order_by('-id')
+			faceCount=Count('photo__faces_data'), lastAdded=Max('photo__added'), lastUpdated=Max('photo__updated'))
 
 	for user in userStats:
 		entry = dict()
@@ -119,10 +119,10 @@ def userbaseSummary(request):
 	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
-			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added'))
+			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added')).order_by('-id')
 
-	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')))
-	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')))
+	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
+	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
 
 	# Exclude type GPS fetch since it happens so frequently
 	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
