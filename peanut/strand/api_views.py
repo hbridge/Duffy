@@ -205,6 +205,8 @@ def getFormattedGroups(groups, userId):
 
 		if bestLocation:
 			subtitle = bestLocation
+		else:
+			subtitle = "Location Unknown"
 			
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
@@ -345,6 +347,9 @@ def strand_feed(request):
 		groups = list()
 		for strand in strands:
 			groups.append(strand.photos.all().order_by("-time_taken"))
+
+		# now sort groups by the time_taken of the first photo in each group
+		groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
 
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
 		formattedGroups = getFormattedGroups(groups, userId)

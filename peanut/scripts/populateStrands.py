@@ -20,6 +20,9 @@ import strand.notifications_util as notifications_util
 logger = logging.getLogger(__name__)
 
 def photoBelongsInStrand(targetPhoto, strand, photosByStrandId):
+	if not targetPhoto.location_point:
+		return False
+
 	for photo in photosByStrandId[strand.id]:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
 		if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
@@ -60,7 +63,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().exclude(thumb_filename=None).filter(strand_evaluated=False).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
+		photos = Photo.objects.all().exclude(thumb_filename=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
 
 		if len(photos) > 0:
 			strandsCreated = list()
@@ -82,6 +85,7 @@ def main(argv):
 
 			for photo in photos:
 				matchingStrands = list()
+
 				for strand in strandsCache:
 					if photoBelongsInStrand(photo, strand, photosByStrandId):
 						matchingStrands.append(strand)
