@@ -91,6 +91,7 @@
 				<td class='location b-r'> Location </td>
 				<td class='location-timestamp b-r'> Location <br> Timestamp </td>
 				<td class='invites b-r center'> Invites <br> Sent | Rem. </td>
+				<td class='contacts b-r'> Contacts </td> 
 				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 			</tr>
@@ -116,6 +117,7 @@
 				</td>
 				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
 				<td class='invites b-r center'> {{ entry.user.invites_sent}} | {{ entry.user.invites_remaining }} </td>
+				<td class='contacts b-r'> {{ entry.contactCount }} </td>
 				<td class='last-build b-r'> {{ entry.build }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 			</tr>

@@ -123,6 +123,7 @@ def userbaseSummary(request):
 
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
 	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
+	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 
 	# Exclude type GPS fetch since it happens so frequently
 	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
@@ -175,6 +176,7 @@ def userbaseSummary(request):
 			entry['actions'] = '-'
 
 		entry['strandCount'] = strandCount[i].totalStrands
+		entry['contactCount'] = contactCount[i].totalContacts
 
 		if user.last_build_info:
 			buildNum = user.last_build_info[user.last_build_info.find('-'):]
