@@ -52,7 +52,7 @@ def userbaseSummary(request):
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
 			overfeatCount=Count('photo__overfeat_data'), classCount=Count('photo__classification_data'), 
-			faceCount=Count('photo__faces_data'), lastAdded=Max('photo__added'), lastUpdated=Max('photo__updated'))
+			faceCount=Count('photo__faces_data'), lastAdded=Max('photo__added'), lastUpdated=Max('photo__updated')).order_by('-id')
 
 	for user in userStats:
 		entry = dict()
