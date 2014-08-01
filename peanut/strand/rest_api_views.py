@@ -1,5 +1,6 @@
 from random import randint
 import datetime
+import phonenumbers
 
 from rest_framework.generics import CreateAPIView, GenericAPIView
 from rest_framework.response import Response
@@ -7,9 +8,17 @@ from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
 
 from common.models import PhotoAction, ContactEntry
-
+from common.serializers import BulkContactEntrySerializer
 
 class BulkCreateModelMixin(CreateModelMixin):
+    def chunks(self, l, n):
+        """ Yield successive n-sized chunks from l.
+        """
+        for i in xrange(0, len(l), n):
+            yield l[i:i+n]
+
+    batchSize = 1000
+
     """
     Either create a single or many model instances in bulk by using the
     Serializer's ``many=True`` ability from Django REST >= 2.2.5.
@@ -31,16 +40,19 @@ class BulkCreateModelMixin(CreateModelMixin):
             
             [self.pre_save(obj) for obj in objects]
 
-            batchKey = randint(1,10000)
-            for obj in objects:
-                obj.bulk_batch_key = batchKey
+            results = list()
+            for chunk in self.chunks(objects, self.batchSize):
+                batchKey = randint(1,10000)
+                for obj in objects:
+                    obj.bulk_batch_key = batchKey
 
-            model.objects.bulk_create(objects)
+                model.objects.bulk_create(objects)
 
-            # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
-            dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
-            serializer.object[serializer.bulk_key] = model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt)
+                # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
+                dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
+                results.extend(model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt))
 
+            serializer.object[serializer.bulk_key] = results
             [self.post_save(obj, created=True) for obj in serializer.object]
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -54,6 +66,18 @@ class BulkCreateAPIView(BulkCreateModelMixin,
                         GenericAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+class ContactEntryBulkAPI(BulkCreateAPIView):
+    model = ContactEntry
+    lookup_field = 'id'
+    serializer_class = BulkContactEntrySerializer
+
+    """
+        Clean up the phone number and set it.  Should only be one number per entry
+    """
+    def pre_save(self, obj):
+        for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, "US"):
+            obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
 """
     REST interface for creating new PhotoActions.
