@@ -8,7 +8,7 @@ from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
 from common.models import PhotoAction, User, ContactEntry
-from common.serializers import UserSerializer
+from common.serializers import UserSerializer, BulkContactEntrySerializer
 
 urlpatterns = patterns('',
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
@@ -34,7 +34,7 @@ urlpatterns = patterns('',
 
 	url(r'^users/(?P<id>[0-9]+)/$', RetrieveUpdateAPIView.as_view(model=User, lookup_field='id', serializer_class=UserSerializer)),
 
-	url(r'^contacts/$', strand_rest_api_views.BulkCreateAPIView.as_view(model=ContactEntry, lookup_field='id')),
+	url(r'^contacts/$', strand_rest_api_views.BulkCreateAPIView.as_view(model=ContactEntry, lookup_field='id', serializer_class=BulkContactEntrySerializer)),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from common.models import Photo, User, PhotoAction
+from common.models import Photo, User, PhotoAction, ContactEntry
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -36,5 +36,18 @@ class PhotoActionWithUserNameSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = PhotoAction
 		fields = ('id', 'photo', 'user', 'user_display_name', 'action_type')
+
+	
+class ContactEntrySerializer(serializers.ModelSerializer):
+	phone_number = serializers.CharField()
+
+	class Meta:
+		model = ContactEntry
+
+class BulkContactEntrySerializer(serializers.Serializer):
+	contacts = ContactEntrySerializer(many=True)
+
+	bulk_model = ContactEntry
+	bulk_key = 'contacts'
 
 	

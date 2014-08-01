@@ -23,29 +23,27 @@ class BulkCreateModelMixin(CreateModelMixin):
     """
 
     def create(self, request, *args, **kwargs):
-        bulk = isinstance(request.DATA, list)
+        serializer = self.get_serializer(data=request.DATA)
 
-        if not bulk:
-            return super(BulkCreateModelMixin, self).create(request, *args, **kwargs)
+        model = serializer.bulk_model
+        if serializer.is_valid():
+            objects = serializer.object[serializer.bulk_key]
+            
+            [self.pre_save(obj) for obj in objects]
 
-        else:
-            serializer = self.get_serializer(data=request.DATA, many=True)
-            model = serializer.opts.model
-            if serializer.is_valid():
-                [self.pre_save(obj) for obj in serializer.object]
+            batchKey = randint(1,10000)
+            for obj in objects:
+                obj.bulk_batch_key = batchKey
 
-                batchKey = randint(1,10000)
-                for obj in serializer.object:
-                    obj.bulk_batch_key = batchKey
+            model.objects.bulk_create(objects)
 
-                self.object = model.objects.bulk_create(serializer.object)
+            # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
+            dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
+            serializer.object[serializer.bulk_key] = model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt)
 
-                # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
-                dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
-                serializer.object = model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt)
-
-                [self.post_save(obj, created=True) for obj in serializer.object]
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            [self.post_save(obj, created=True) for obj in serializer.object]
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
