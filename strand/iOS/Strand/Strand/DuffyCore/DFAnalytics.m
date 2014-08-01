@@ -284,22 +284,6 @@ static DFAnalytics *defaultLogger;
   [DFAnalytics logEvent:PhotoSavedEvent withParameters:@{ResultKey: result}];
 }
 
-
-+ (void)logBackgroundAppRefreshOccurred
-{
-  [DFAnalytics logEvent:BackgroundRefreshEvent];
-}
-
-+ (void)logLocationUpdated
-{
-  NSString *backgroundString = [[UIApplication sharedApplication] applicationState]
-  == UIApplicationStateBackground ? @"true" : @"false";
-  
-  [DFAnalytics logEvent:LocationUpdateEvent withParameters:@{
-                                                        AppInBackgroundKey: backgroundString
-                                                        }];
-}
-
 + (void)logNotificationOpenedWithType:(DFPushNotifType)type
 {
   [DFAnalytics logEvent:NotificationOpenedEvent

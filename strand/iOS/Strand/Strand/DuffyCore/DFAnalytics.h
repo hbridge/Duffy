@@ -24,10 +24,6 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)ResumeAnalyticsSession;
 + (void)CloseAnalyticsSession;
 
-/* Background Processes */
-+ (void)logBackgroundAppRefreshOccurred;
-+ (void)logLocationUpdated;
-
 /* App Setup and Permissions */
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
