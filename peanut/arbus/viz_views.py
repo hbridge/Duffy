@@ -1,7 +1,7 @@
 import os, datetime
 import json
 from collections import OrderedDict
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil import tz
 import time, math, urllib
@@ -127,7 +127,7 @@ def userbaseSummary(request):
 	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1'), totalFriends2=Count('friend_user_2')).order_by('-id'))
 
 	# Exclude type GPS fetch since it happens so frequently
-	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
+	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
 	notificationCountById = dict()
 	notificationLastById = dict()
 	for notificationData in notificationDataRaw:
