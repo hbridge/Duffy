@@ -53,7 +53,7 @@ static DFContactSyncManager *defaultManager;
       DDLogInfo(@"Posting %d contacts succeeded.", (int)peanutContacts.count);
       [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionSyncContacts];
     } failure:^(NSError *error) {
-      DDLogError(error.description);
+      DDLogError(@"%@ posting contacts failed: %@", [self.class description], error.description);
     }];
   }];
 }

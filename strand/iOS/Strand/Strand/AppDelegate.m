@@ -81,7 +81,7 @@
 
 #ifdef DEBUG
   //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-  RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
 #else
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
@@ -90,14 +90,15 @@
 
 - (void)configureHockey
 {
+#ifdef DEBUG
+  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"f4cd14764b2b5695063cdfc82e5097f6"];
+#else
   [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"81845532ce7ca873cdfce8e43f8abce9"];
+#endif
+  
   [[BITHockeyManager sharedHockeyManager] startManager];
   [[BITHockeyManager sharedHockeyManager].authenticator
    authenticateInstallation];
-  
-  #ifdef DEBUG
-  [[BITHockeyManager sharedHockeyManager] setDisableUpdateManager:YES];
-  #endif
 }
 
 - (BOOL)isAppSetupComplete

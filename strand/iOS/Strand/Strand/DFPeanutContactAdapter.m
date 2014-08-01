@@ -74,6 +74,9 @@ NSString *const RestPostPath = @"contacts/";
             [[self class] description],
             request.URL.absoluteString,
             (unsigned long)request.HTTPBody.length);
+  DDLogVerbose(@"%@ request body: %@",
+               [self.class description],
+               [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
   
   RKObjectRequestOperation *operation =
   [[DFObjectManager sharedManager]
