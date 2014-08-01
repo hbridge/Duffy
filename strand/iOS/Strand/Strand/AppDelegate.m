@@ -30,6 +30,8 @@
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFCameraRollChangeManager.h"
+#import "DFNavigationController.h"
+#import "DFContactSyncManager.h"
 
 
 @interface AppDelegate ()
@@ -79,7 +81,7 @@
 
 #ifdef DEBUG
   //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
 #else
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
@@ -101,13 +103,19 @@
 - (BOOL)isAppSetupComplete
 {
   return  ([[DFUser currentUser] userID]
-           && ![[DFUser currentUser] userID] == 0);
+           && ![[DFUser currentUser] userID] == 0
+           && [DFDefaultsStore  stateForPermission:DFPermissionLocation]
+           && [DFDefaultsStore  stateForPermission:DFPermissionContacts]
+           && ![[DFDefaultsStore stateForPermission:DFPermissionLocation]
+                isEqual:DFPermissionStateNotRequested]
+           && ![[DFDefaultsStore stateForPermission:DFPermissionContacts]
+                isEqual:DFPermissionStateNotRequested]);
 }
 
 - (void)showFirstTimeSetup
 {
   DFFirstTimeSetupViewController *setupViewController = [[DFFirstTimeSetupViewController alloc] init];
-  self.window.rootViewController = [[UINavigationController alloc]
+  self.window.rootViewController = [[DFNavigationController alloc]
                                     initWithRootViewController:setupViewController];
 }
 
@@ -157,31 +165,17 @@
 
 - (void)checkForAndLogNotifsChange:(DFPermissionStateType)newNotifsState
 {
-  if (!newNotifsState || [newNotifsState isEqualToString:DFPermissionStateNotRequested]) return;
-  
-  DFPermissionStateType lastNotifsState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
+  [DFDefaultsStore setState:newNotifsState forPermission:DFPermissionRemoteNotifications];
   NSNumber *lastNotifType = [DFDefaultsStore lastNotificationType];
   UIRemoteNotificationType currentNotifTypes = [[UIApplication sharedApplication]
                                                 enabledRemoteNotificationTypes];
-  
-  if ((![lastNotifsState isEqualToString:newNotifsState]) ||
-      (lastNotifType.intValue != (int)currentNotifTypes)) {
-    DDLogInfo(@"Notification types changed. Old State:%@ New State: %@, Old Type:%d New Type:%d",
-              lastNotifsState, newNotifsState, lastNotifType.intValue, (int)currentNotifTypes);
-    [DFAnalytics logRemoteNotifsChangedWithOldState:lastNotifsState
-                                           newState:newNotifsState
-                                oldNotificationType:lastNotifType.intValue
-                                            newType:currentNotifTypes];
-
-    [DFDefaultsStore setLastNotificationType:currentNotifTypes];
-    [DFDefaultsStore setState:newNotifsState forPermission:DFPermissionRemoteNotifications];
-  }
+  [DFAnalytics logRemoteNotifsChangedFromOldNotificationType:lastNotifType.intValue
+                                                     newType:currentNotifTypes];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
   // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
   // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
-  [DFAnalytics logPermissionsChanges];
   [DFAnalytics CloseAnalyticsSession];
 }
 
@@ -189,8 +183,11 @@
   [[NSUserDefaults standardUserDefaults] synchronize];
   [[DFPhotoStore sharedStore] saveContext];
   [DFAnalytics CloseAnalyticsSession];
-  // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-  // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+  
+  if ([self isAppSetupComplete]) {
+    [DFAnalytics logPermissionsChanges];
+    [[DFContactSyncManager sharedManager] sync];
+  }
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
@@ -218,9 +215,12 @@
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
 {
 	DDLogWarn(@"Failed to get push token, error: %@", error);
-  NSData *errorData = [[NSData alloc] init];
-  [self registerPushTokenForData:errorData];
-  [self checkForAndLogNotifsChange:DFPermissionStateDenied];
+  [self registerPushTokenForData:[NSData new]];
+  if (error.code == 3010) {
+    [self checkForAndLogNotifsChange:DFPermissionStateUnavailable];
+  } else {
+    [self checkForAndLogNotifsChange:DFPermissionStateDenied];
+  }
 }
 
 - (void)registerPushTokenForData:(NSData *)data

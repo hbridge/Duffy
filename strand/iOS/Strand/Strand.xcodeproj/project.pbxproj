@@ -49,6 +49,11 @@
 		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
 		5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */; };
 		5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */; };
+		5A56EFC0198ACF1E0032CA8A /* DFContactsNUXViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFBE198ACF1E0032CA8A /* DFContactsNUXViewController.m */; };
+		5A56EFC1198ACF1E0032CA8A /* DFContactsNUXViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A56EFBF198ACF1E0032CA8A /* DFContactsNUXViewController.xib */; };
+		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
+		5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */; };
+		5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */; };
 		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
 		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
 		5A7B1841196DFEB300E5A1D1 /* DFNearbyFriendsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */; };
@@ -234,6 +239,15 @@
 		5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadingFeedCell.m; sourceTree = "<group>"; };
 		5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUploadingFeedCell.xib; sourceTree = "<group>"; };
 		5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 5.xcdatamodel"; sourceTree = "<group>"; };
+		5A56EFBD198ACF1E0032CA8A /* DFContactsNUXViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactsNUXViewController.h; sourceTree = "<group>"; };
+		5A56EFBE198ACF1E0032CA8A /* DFContactsNUXViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactsNUXViewController.m; sourceTree = "<group>"; };
+		5A56EFBF198ACF1E0032CA8A /* DFContactsNUXViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFContactsNUXViewController.xib; sourceTree = "<group>"; };
+		5A56EFC2198AD42C0032CA8A /* DFPeanutContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutContact.h; sourceTree = "<group>"; };
+		5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContact.m; sourceTree = "<group>"; };
+		5A56EFC5198AD5870032CA8A /* DFPeanutContactAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutContactAdapter.h; sourceTree = "<group>"; };
+		5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContactAdapter.m; sourceTree = "<group>"; };
+		5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactSyncManager.h; sourceTree = "<group>"; };
+		5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactSyncManager.m; sourceTree = "<group>"; };
 		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
 		5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsAdapter.m; sourceTree = "<group>"; };
 		5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutMessageResponse.h; sourceTree = "<group>"; };
@@ -680,6 +694,8 @@
 				5A7B184C19707C7200E5A1D1 /* DFPeanutActionAdapter.m */,
 				5A0E122619747C6200B6FF04 /* DFPeanutInviteMessageAdapter.h */,
 				5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */,
+				5A56EFC5198AD5870032CA8A /* DFPeanutContactAdapter.h */,
+				5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -701,6 +717,8 @@
 				5A7B185219707DE300E5A1D1 /* DFPeanutAction.m */,
 				5A0E122319747BD800B6FF04 /* DFPeanutInviteMessageResponse.h */,
 				5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */,
+				5A56EFC2198AD42C0032CA8A /* DFPeanutContact.h */,
+				5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -841,6 +859,9 @@
 				5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */,
 				5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */,
 				5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */,
+				5A56EFBD198ACF1E0032CA8A /* DFContactsNUXViewController.h */,
+				5A56EFBE198ACF1E0032CA8A /* DFContactsNUXViewController.m */,
+				5A56EFBF198ACF1E0032CA8A /* DFContactsNUXViewController.xib */,
 				5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */,
 				5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */,
 				5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */,
@@ -862,6 +883,8 @@
 				5AC4A962194A295700862D9C /* DFStrandConstants.m */,
 				5AB4CC02198306C800EFB3E3 /* DFCameraRollChangeManager.h */,
 				5AB4CC03198306C800EFB3E3 /* DFCameraRollChangeManager.m */,
+				5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */,
+				5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */,
 			);
 			name = "Background manager";
 			sourceTree = "<group>";
@@ -1063,6 +1086,7 @@
 				5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */,
 				5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */,
 				5AB4CC011982AF7C00EFB3E3 /* DFInviteUserViewController.xib in Resources */,
+				5A56EFC1198ACF1E0032CA8A /* DFContactsNUXViewController.xib in Resources */,
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5AA45296196708D00099CBD2 /* DFPhotosGridViewController.xib in Resources */,
@@ -1181,6 +1205,7 @@
 				5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */,
 				5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */,
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
+				5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
@@ -1221,9 +1246,11 @@
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
 				5AA45285196706A60099CBD2 /* DFPeanutGalleryAdapter.m in Sources */,
 				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
+				5A56EFC0198ACF1E0032CA8A /* DFContactsNUXViewController.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */,
+				5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */,
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */,
@@ -1265,6 +1292,7 @@
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
 				5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */,
+				5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -7,6 +7,7 @@
 DFPermissionType const DFPermissionRemoteNotifications = @"RemoteNotifications";
 DFPermissionType const DFPermissionLocation = @"Location";
 DFPermissionType const DFPermissionPhotos = @"Photos";
+DFPermissionType const DFPermissionContacts = @"Contacts";
 
 
 // Permission states

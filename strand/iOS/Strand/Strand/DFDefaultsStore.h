@@ -27,6 +27,7 @@ extern DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll;
 typedef NSString *const DFUserActionType;
 extern DFUserActionType DFUserActionTakePhoto;
 extern DFUserActionType DFUserActionTakeExternalPhoto;
+extern DFUserActionType DFUserActionSyncContacts;
 
 
 + (void)incrementCountForAction:(DFUserActionType)action;

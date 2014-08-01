@@ -7,10 +7,13 @@
 //
 
 #import "DFAnalytics.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import <AddressBook/AddressBook.h>
 #import "NSDictionary+DFJSON.h"
 #import "LocalyticsSession.h"
-#import <AssetsLibrary/AssetsLibrary.h>
+
 #import "DFDefaultsStore.h"
+
 
 
 @interface DFAnalytics()
@@ -101,12 +104,14 @@ NSString* const NotificationTypeKey = @"notificationType";
 NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
 NSString* const SetupSMSCodeEntered = @"SetupSMSCodeEntered";
 NSString* const SetupLocationCompleted = @"SetupLocationCompleted";
+NSString* const SetupContactsCompleted = @"SetupContactsCompleted";
 
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
 
 //Push notifs
 NSString* const PermissionChangedEvent = @"PermissionChanged";
+NSString* const NotificationsChangedEvent = @"NotificationsChanged";
 NSString* const PermissionTypeKey = @"permissionType";
 NSString* const StateChangeKey = @"stateChange";
 NSString* const ValueChangeKey = @"valueChange";
@@ -390,13 +395,29 @@ static DFAnalytics *defaultLogger;
 + (void)logSetupLocationCompletedWithResult:(NSString *)result
                         userTappedLearnMore:(BOOL)didTapLearnMore
 {
-  [DFAnalytics logEvent:SetupLocationCompleted withParameters:@{ResultKey: result}];
+  [DFAnalytics logEvent:SetupLocationCompleted
+         withParameters:@{
+                          ResultKey: result,
+                          @"didPressLearnMore" : [NSNumber numberWithBool:didTapLearnMore]
+                          }];
+}
+
++ (void)logSetupContactsCompletedWithResult:(NSString *)result
+                        userTappedLearnMore:(BOOL)didTapLearnMore
+{
+  [DFAnalytics logEvent:SetupContactsCompleted
+         withParameters:@{
+                          ResultKey: result,
+                          @"didPressLearnMore" : [NSNumber numberWithBool:didTapLearnMore]
+                          }];
 }
 
 + (void)logPermission:(DFPermissionType)permission
   changedWithOldState:(DFPermissionStateType)oldState
              newState:(DFPermissionStateType)newState
 {
+  if (oldState == nil) oldState = DFPermissionStateNotRequested;
+  if ([oldState isEqual:newState]) return;
   [DFAnalytics logEvent:PermissionChangedEvent
          withParameters:@{
                           PermissionTypeKey: permission,
@@ -424,22 +445,17 @@ static DFAnalytics *defaultLogger;
 }
 
 
-+ (void)logRemoteNotifsChangedWithOldState:(NSString *)oldState
-                                       newState:(NSString *)newState
-                            oldNotificationType:(UIRemoteNotificationType)oldType
-                                        newType:(UIRemoteNotificationType)newType
++ (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
+                                                  newType:(UIRemoteNotificationType)newType
 {
   NSString *oldValue = [DFAnalytics stringForUIRemoteNotifType:oldType];
   NSString *newValue = [DFAnalytics stringForUIRemoteNotifType:newType];
+  if ([oldValue isEqual:newValue]) return;
   
-  NSString *stateString = [DFAnalytics stringForOldState:oldState toNewState:newState];
-  NSString *valueString = [DFAnalytics stringForOldState:oldValue toNewState:newValue];
-  
-  [DFAnalytics logEvent:PermissionChangedEvent
+  [DFAnalytics logEvent:NotificationsChangedEvent
          withParameters:@{
                           PermissionTypeKey: DFPermissionRemoteNotifications,
-                          StateChangeKey:stateString,
-                          ValueChangeKey:valueString
+                          ValueChangeKey:[self stringForOldState:oldValue toNewState:newValue]
                             }];
 }
 
@@ -473,25 +489,37 @@ static DFAnalytics *defaultLogger;
 
 + (void)logPermissionsChanges
 {
-  [self logPhotoPermissionChanges];
-}
-
-+ (void)logPhotoPermissionChanges
-{
   // Photos
   DFPermissionStateType oldPhotoState = [DFDefaultsStore stateForPermission:DFPermissionPhotos];
-  DFPermissionStateType currentState = [self.class stateFromAssetAuthStatus:[ALAssetsLibrary authorizationStatus]];
-  if ([oldPhotoState isEqual:currentState] ||
-      (oldPhotoState != nil &&
-       [ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusNotDetermined))
-  {
+  DFPermissionStateType currentPhotoState =
+  [self.class stateFromAssetAuthStatus:[ALAssetsLibrary authorizationStatus]];
+  [self lookForAndRecordPermissionChangeForType:DFPermissionPhotos
+                                   oldState:oldPhotoState currentState:currentPhotoState];
+  
+  // Contacts
+  DFPermissionStateType oldContactsState = [DFDefaultsStore stateForPermission:DFPermissionContacts];
+  DFPermissionStateType currentContactsState =
+  [self.class stateFromABAuthStatus:ABAddressBookGetAuthorizationStatus()];
+  [self lookForAndRecordPermissionChangeForType:DFPermissionContacts
+                                   oldState:oldContactsState
+                               currentState:currentContactsState];
+}
+
++ (void)lookForAndRecordPermissionChangeForType:(DFPermissionType)permissionType
+                                   oldState:(DFPermissionStateType)oldState
+                                   currentState:(DFPermissionStateType)newState
+{
+  if (oldState == nil) oldState = DFPermissionStateNotRequested;
+  if ([oldState isEqual:newState]) {
     return;
   }
   
-  [self.class logPermission:DFPermissionPhotos
-        changedWithOldState:oldPhotoState
-                   newState:currentState];
-  [DFDefaultsStore setState:currentState forPermission:DFPermissionPhotos];
+  DDLogInfo(@"%@ permission change for %@ found: %@",
+            [self.class description],
+            permissionType,
+            [self stringForOldState:oldState toNewState:newState]);
+  // The defaults store will automatically call back to DFAnalytics to log the state change
+  [DFDefaultsStore setState:newState forPermission:permissionType];
 }
 
 + (DFPermissionStateType)stateFromAssetAuthStatus:(ALAuthorizationStatus)status
@@ -503,6 +531,19 @@ static DFAnalytics *defaultLogger;
   } else if (status == ALAuthorizationStatusRestricted) {
     return DFPermissionStateRestricted;
   } else { //if (status == ALAuthorizationStatusNotDetermined)
+    return DFPermissionStateNotRequested;
+  }
+}
+
++ (DFPermissionStateType)stateFromABAuthStatus:(ABAuthorizationStatus)status
+{
+  if (status == kABAuthorizationStatusAuthorized) {
+    return DFPermissionStateGranted;
+  } else if (status == kABAuthorizationStatusDenied) {
+    return DFPermissionStateDenied;
+  } else if (status == kABAuthorizationStatusRestricted) {
+    return DFPermissionStateRestricted;
+  } else { //if (status == kABAuthorizationStatusNotDetermined)
     return DFPermissionStateNotRequested;
   }
 }

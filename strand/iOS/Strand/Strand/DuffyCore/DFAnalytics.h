@@ -19,30 +19,50 @@ extern NSString* const DFAnalyticsValueResultFailure;
 extern NSString* const DFAnalyticsValueResultAborted;
 extern NSString* const DFAnalyticsValueResultInvalidInput;
 
+/* Stop and Start Session Helpers */
 + (void)StartAnalyticsSession;
 + (void)ResumeAnalyticsSession;
 + (void)CloseAnalyticsSession;
 
+/* Background Processes */
++ (void)logBackgroundAppRefreshOccurred;
++ (void)logLocationUpdated;
+
+/* App Setup and Permissions */
+
++ (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
++ (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
++ (void)logSetupLocationCompletedWithResult:(NSString *)result
+                        userTappedLearnMore:(BOOL)didTapLearnMore;
++ (void)logSetupContactsCompletedWithResult:(NSString *)result
+                        userTappedLearnMore:(BOOL)didTapLearnMore;
+
+
+
++ (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
+                                              newType:(UIRemoteNotificationType)newType;
++ (void)logPermissionsChanges;
++ (void)logPermission:(DFPermissionType)permission
+  changedWithOldState:(DFPermissionStateType)oldState
+             newState:(DFPermissionStateType)newState;
+
+/* Generic logging for view controllers */
 + (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
-+ (void)logSwitchBetweenPhotos:(NSString *)actionType;
 
+/* Uploads */
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
 + (void)logUploadEndedWithResult:(NSString *)resultValue numPhotos:(unsigned long)numPhotos sessionAvgThroughputKBPS:(double)KBPS;
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
 + (void)logUploadCancelledWithIsError:(BOOL)isError;
 + (void)logUploadRetryCountExceededWithCount:(unsigned int)count;
 
-+ (void)logPhotoLoadWithResult:(NSString *)result;
-
+/* Log camera and photo actions */
 + (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
                       flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 + (void)logPhotoSavedWithResult:(NSString *)result;
-
-+ (void)logBackgroundAppRefreshOccurred;
-+ (void)logLocationUpdated;
-+ (void)logNotificationOpenedWithType:(DFPushNotifType)type;
-
++ (void)logSwitchBetweenPhotos:(NSString *)actionType;
++ (void)logPhotoLoadWithResult:(NSString *)result;
 + (void)logPhotoDeletedWithResult:(NSString *)result
            timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
 + (void)logPhotoLikePressedWithNewValue:(BOOL)isOn
@@ -50,22 +70,14 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
                              actionType:(DFActionType)actionType
                  timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
 
-+ (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result;
-+ (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
-+ (void)logSetupLocationCompletedWithResult:(NSString *)result
-                           userTappedLearnMore:(BOOL)didTapLearnMore;
+/* Notification response */
++ (void)logNotificationOpenedWithType:(DFPushNotifType)type;
+
+/* Inviting */
 
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
 
-+ (void)logRemoteNotifsChangedWithOldState:(NSString *)state
-                                       newState:(NSString *)newState
-                            oldNotificationType:(UIRemoteNotificationType)oldType
-                                        newType:(UIRemoteNotificationType)newType;
-+ (void)logPermissionsChanges;
-+ (void)logPermission:(DFPermissionType)permission
-  changedWithOldState:(DFPermissionStateType)oldState
-             newState:(DFPermissionStateType)newState;
 
 
 

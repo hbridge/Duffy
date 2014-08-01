@@ -7,6 +7,7 @@
 //
 
 #import "DFDefaultsStore.h"
+#import "DFAnalytics.h"
 
 @implementation DFDefaultsStore
 
@@ -30,7 +31,12 @@ NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
 
 + (void)setState:(DFPermissionStateType)state forPermission:(DFPermissionType)permission
 {
-  [[NSUserDefaults standardUserDefaults] setObject:state forKey:[self keyForPermission:permission]];
+  DFPermissionStateType oldState = [self stateForPermission:permission];
+  if (![state isEqual:oldState]) {
+    [DFAnalytics logPermission:permission
+           changedWithOldState:oldState newState:state];
+    [[NSUserDefaults standardUserDefaults] setObject:state forKey:[self keyForPermission:permission]];
+  }
 }
 
 + (DFPermissionStateType)stateForPermission:(DFPermissionType)permission
@@ -45,6 +51,7 @@ NSString *const UserActionDatePrefix = @"DFLastUserActionDate";
 
 DFUserActionType DFUserActionTakePhoto = @"TakePhoto";
 DFUserActionType DFUserActionTakeExternalPhoto = @"TakeExternalPhoto";
+DFUserActionType DFUserActionSyncContacts = @"SyncContacts";
 
 + (void)incrementCountForAction:(DFUserActionType)action
 {

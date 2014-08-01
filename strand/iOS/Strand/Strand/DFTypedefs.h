@@ -16,6 +16,7 @@ typedef NSString *DFPermissionType;
 extern DFPermissionType const DFPermissionRemoteNotifications;
 extern DFPermissionType const DFPermissionLocation;
 extern DFPermissionType const DFPermissionPhotos;
+extern DFPermissionType const DFPermissionContacts;
 
 // Permission States
 typedef NSString *DFPermissionStateType;

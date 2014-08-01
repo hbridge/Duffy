@@ -130,11 +130,13 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
                                };
   NSURLRequest *createRequest = [DFObjectManager
                                  requestWithObject:[[DFPeanutUserObject alloc] init]
-                                 method:RKRequestMethodPOST
+                                 method:RKRequestMethodGET
                                  path:CreateUserPath
                                  parameters:parameters];
-  DDLogInfo(@"%@ getting endpoint: %@, parameters:%@", [[self class] description],
+  DDLogInfo(@"%@ getting endpoint: %@, body:%@ parameters:%@",
+            [[self class] description],
             createRequest.URL.absoluteString,
+            [[NSString alloc] initWithData:createRequest.HTTPBody encoding:NSUTF8StringEncoding],
             parameters);
   
   RKObjectRequestOperation *operation =

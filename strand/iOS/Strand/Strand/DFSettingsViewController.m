@@ -22,7 +22,7 @@
 #import "DFImageStore.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFNetworkingConstants.h"
-#import "DFCameraRollChangeManager.h"
+#import "DFContactSyncManager.h"
 
 @interface DFSettingsViewController ()
 
@@ -214,10 +214,7 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            [[DFCameraRollChangeManager sharedManager]
-             checkForNewCameraRollPhotosWithCompletion:^(UIBackgroundFetchResult result) {
-              
-            }];
+            [[DFContactSyncManager sharedManager] forceSync];
 
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];

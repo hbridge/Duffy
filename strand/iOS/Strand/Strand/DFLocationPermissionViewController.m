@@ -15,10 +15,10 @@
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
 #import "RootViewController.h"
+#import "DFContactsNUXViewController.h"
 
 @interface DFLocationPermissionViewController ()
 
-@property (nonatomic, readonly, retain) SAMGradientView *gradientView;
 @property (nonatomic, retain) MMPopLabel *learnMorePopLabel;
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
 @property (nonatomic) BOOL didShowLearnMore;
@@ -42,8 +42,8 @@
 {
   [super viewDidLoad];
   // Do any additional setup after loading the view from its nib.
-  
-  self.gradientView.gradientColors = @[[UIColor orangeColor], [DFStrandConstants strandOrange]];
+  SAMGradientView *gradientView = (SAMGradientView *)self.view;
+  gradientView.gradientColors = @[[DFStrandConstants defaultBackgroundColor], [DFStrandConstants strandOrange]];
   [self configurePopLabel];
   [self.navigationController setNavigationBarHidden:YES];
   [self setNeedsStatusBarAppearanceUpdate];
@@ -134,11 +134,8 @@
 
 - (void)dismiss
 {
-  AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-  [delegate showMainView];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [(RootViewController *)delegate.window.rootViewController showGallery];
-  });
+  DFContactsNUXViewController *contactsNux = [DFContactsNUXViewController new];
+  [self.navigationController setViewControllers:@[contactsNux] animated:YES];
 }
 
 - (BOOL)prefersStatusBarHidden

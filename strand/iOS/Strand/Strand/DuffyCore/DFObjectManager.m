@@ -23,11 +23,12 @@ NSString *const BuildIDKey = @"build_id";
 
 + (void)initialize
 {
-    RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:[[DFUser currentUser] apiURL]];
-    [RKObjectManager setSharedManager:objectManager];
+  RKObjectManager* objectManager = [RKObjectManager managerWithBaseURL:[[DFUser currentUser] apiURL]];
+  [RKObjectManager setSharedManager:objectManager];
   [[objectManager HTTPClient] setDefaultHeader:@"Accept-Encoding" value:@"gzip, deflate"];
-    
-    registeredAdapters = [[NSMutableSet alloc] init];
+  [[RKObjectManager sharedManager] setRequestSerializationMIMEType:RKMIMETypeJSON];
+  
+  registeredAdapters = [[NSMutableSet alloc] init];
 }
 
 
@@ -71,6 +72,7 @@ NSString *const BuildIDKey = @"build_id";
                                                      method:method
                                                        path:path
                                                  parameters:cumulativeParameters];
+  
 }
 
 
