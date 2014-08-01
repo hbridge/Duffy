@@ -81,18 +81,19 @@ def main(argv):
 					#   The possible friend won't be in the possibleFriendEntriesByUser dict
 					#   if we don't have any contacts from them
 					if (possibleFriend in possibleFriendEntriesByUser and 
-					  str(contactEntry.user.phone_number) in opposingContactEntriesByUser[opposingUser]):
+					  str(contactEntry.user.phone_number) in possibleFriendEntriesByUser[possibleFriend] and
+					  contactEntry.user.id != possibleFriend.id):
 						try:
 							# Yay!  lets make a Friend entry
 							# Lower id will go first
-							if contactEntry.user.id < opposingUser.id:
-								FriendConnection.objects.create(user_1=contactEntry.user, user_2=opposingUser)
+							if contactEntry.user.id < possibleFriend.id:
+								FriendConnection.objects.create(user_1=contactEntry.user, user_2=possibleFriend)
 							else:
-								FriendConnection.objects.create(user_1=opposingUser, user_2=contactEntry.user)
+								FriendConnection.objects.create(user_1=possibleFriend, user_2=contactEntry.user)
 
 							newConnectionCount += 1
 						except IntegrityError:
-							logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, opposingUser.id))
+							logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, possibleFriend.id))
 
 				contactEntry.evaluated = True
 
