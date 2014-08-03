@@ -40,8 +40,12 @@ static DFUser *currentUser;
     NSData *userData = [[NSUserDefaults standardUserDefaults] valueForKey:userObjectDefaultsKey];
     if (userData) {
       currentUser = [NSKeyedUnarchiver unarchiveObjectWithData:userData];
+      DDLogInfo(@"%@ unarchiving user data: %@",
+                [self.class description],
+                currentUser.description);
     } else {
       currentUser = [[DFUser alloc] init];
+      DDLogInfo(@"%@ no user data found.", [self.class description]);
     }
     
     [self checkUserDefaults];
