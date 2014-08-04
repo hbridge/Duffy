@@ -22,6 +22,7 @@
 		5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */; };
 		5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */; };
 		5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */; };
+		5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */; };
 		5A188D6219802F87009D3244 /* FeedViewNuxPlaceholder.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6119802F87009D3244 /* FeedViewNuxPlaceholder.xib */; };
 		5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6319803523009D3244 /* DFErrorScreen.xib */; };
 		5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A188D661980366C009D3244 /* DFErrorScreen.m */; };
@@ -191,6 +192,8 @@
 		5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDefaultsStore.m; sourceTree = "<group>"; };
 		5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationController.h; sourceTree = "<group>"; };
 		5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNavigationController.m; sourceTree = "<group>"; };
+		5A14A3A7198C2B4600A4F032 /* DFUserInfoManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUserInfoManager.h; sourceTree = "<group>"; };
+		5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUserInfoManager.m; sourceTree = "<group>"; };
 		5A188D6119802F87009D3244 /* FeedViewNuxPlaceholder.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = FeedViewNuxPlaceholder.xib; sourceTree = "<group>"; };
 		5A188D6319803523009D3244 /* DFErrorScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFErrorScreen.xib; sourceTree = "<group>"; };
 		5A188D651980366C009D3244 /* DFErrorScreen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFErrorScreen.h; sourceTree = "<group>"; };
@@ -885,6 +888,8 @@
 				5AB4CC03198306C800EFB3E3 /* DFCameraRollChangeManager.m */,
 				5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */,
 				5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */,
+				5A14A3A7198C2B4600A4F032 /* DFUserInfoManager.h */,
+				5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */,
 			);
 			name = "Background manager";
 			sourceTree = "<group>";
@@ -1259,6 +1264,7 @@
 				5AB4CC04198306C800EFB3E3 /* DFCameraRollChangeManager.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
+				5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */,
 				5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */,
 				5AC4A9291947C30800862D9C /* DFPeanutPhoto.m in Sources */,
 				5AC4A96D194A422300862D9C /* DFPeanutSearchObject.m in Sources */,
