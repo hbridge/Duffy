@@ -351,11 +351,11 @@ def strand_feed(request):
 		# now sort groups by the time_taken of the first photo in each group
 		groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
 
+		# Lastly, grab all our locked strands and add in those photos
+		lockedGroup = list()
 		if user.last_location_point:
 			joinableStrands = getNearbyStrands(userId, user.last_location_point.x, user.last_location_point.y)
 
-			# Lastly, grab all our locked strands and add in those photos
-			lockedGroup = list()
 			for strand in joinableStrands:
 				lockedGroup.extend(strand.photos.all())
 
