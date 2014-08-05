@@ -30,12 +30,6 @@ logger = logging.getLogger(__name__)
 def cleanName(str):
 	return str.split(' ')[0].split("'")[0]
 
-def getGroupForPhoto(photo, groups):
-	for group in groups:
-		if photo in group:
-			return group
-	return None
-
 def removeDups(seq, idFunction=None): 
    # order preserving
    if idFunction is None:
@@ -93,57 +87,6 @@ def groupIsSolo(group, userId):
 			return False
 	return True
 
-"""
-	This method adds in non-neighbored photos (photos taken solo) into the groups
-	It loops through all photos and if its not in a group, tries to find the best one to put it in.
-	Right now, it groups by photos within 3 hours of each other.
-
-	Returns back and updated list of lists of photos
-"""
-def addInSoloPhotos(groups, photos):
-	newGroup = list()
-	newGroupIndex = None
-
-	# If there's no groups, then return all the photos since they're all solo
-	if len(groups) == 0:
-		return [photos]
-
-	# If there are groups, then figure out where all the possible solo photos go
-	for photo in photos:
-		photoPlaced = False
-		group = getGroupForPhoto(photo, groups)
-
-		# If the photo isn't in a group yet, loop backwards through the groups, finding the first
-		# one where the photo's time_taken is more recent than the first of the group's.
-		# if that's the same group that we've been forming, add to that, otherwise start new
-		if not group:
-			for i, group in enumerate(groups):
-				if not photoPlaced:
-					if photo.time_taken > group[0].time_taken:
-						# See if we should create a new group.
-						#  Do this if we found a new index or the photo is too far away from the current
-						#  newGroup (right now, same time as neighboring)
-						if ((i != newGroupIndex) or 
-						   (len(newGroup) > 0 and
-							newGroup[-1].time_taken - photo.time_taken > datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING))):
-							if (len(newGroup) > 0):
-								groups.insert(newGroupIndex, newGroup)
-								# Just inserted a group so new one has to be incremented
-								newGroupIndex = i + 1
-							else:
-								# Covers case of the first time we find a newGroup
-								newGroupIndex = i
-
-							newGroup = [photo]
-						else:
-							newGroup.append(photo)
-
-						photoPlaced = True
-
-	if (len(newGroup) > 0):
-		groups.insert(newGroupIndex, newGroup)
-	return groups
-	
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -214,115 +157,131 @@ def getFormattedGroups(groups, userId):
 		
 		output.append({'title': title, 'subtitle': subtitle, 'clusters': clusters})
 	return output
-	
+
 """
-	Get photos that have neighbor entries for this user and are after the given startTime
+	Utility method to grab all active strands near the given lat and lon.  Filter out any the given userId is currently in
+
 """
-def getNeighboredPhotos(userId, startTime):
-	# Get all neighbors for this user's photos
-	neighbors = Neighbor.objects.select_related().filter(Q(user_1_id=userId) | Q(user_2_id=userId)).filter(Q(photo_1__time_taken__gt=startTime) | Q(photo_2__time_taken__gt=startTime)).order_by('photo_1')
+def getNearbyStrands(userId, lon, lat):
+	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 
-	latestPhotos = list()
+	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
 
-	# For each neighbor, find the other people's photos that were taken after the given start time
-	for neighbor in neighbors:
-		if neighbor.user_1_id == userId and neighbor.photo_2.time_taken > startTime:
-			latestPhotos.append(neighbor.photo_2)
-		elif neighbor.user_2_id == userId and neighbor.photo_1.time_taken > startTime:
-			latestPhotos.append(neighbor.photo_1)
-			
-	uniquePhotos = removeDups(latestPhotos, lambda x: x.id)
+	strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow).exclude(users__id=userId)
 
-	return uniquePhotos
+	joinableStrands = list()
 
-def neighbors(request):
-	response = dict({'result': True})
+	for strand in strands:
+		for photo in strand.photos.all():
+			# See if a photo was taken now and in the location, would it belong in this strand
+			# TODO(Derek):  This could probably be pulled out and shared with populateStrands
+			timeDiff = nowTime - photo.time_taken
+			if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
+				geo_util.getDistanceToPhoto(lon, lat, photo) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+				joinableStrands.append(strand)
 
-	form = OnlyUserIdForm(api_util.getRequestData(request))
+	joinableStrands = set(joinableStrands)
 
-	if (form.is_valid()):
-		userId = int(form.cleaned_data['user_id'])
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
-	
-		results = Neighbor.objects.select_related().filter(Q(user_1=user) | Q(user_2=user)).order_by('photo_1')
-		
-		# Creates a list of lists of photos, each one called a "group", the list of lists is "groups"
-		# We'll first get this list setup, de-duped and sorted
-		groups = list()
-		for neighbor in results:
-			group = getGroupForPhoto(neighbor.photo_1, groups)
+	return joinableStrands
 
-			if (group):
-				# If the first photo is in a group, see if the other photo is in there already
-				#   if it isn't, and this isn't a dup, then add photo_2 in
-				if neighbor.photo_2 not in group:
-					group.append(neighbor.photo_2)
-			else:
-				# If the first photo isn't in a group, see if the second one is
-				group = getGroupForPhoto(neighbor.photo_2, groups)
+"""
+	Return friends and friends of friends ids for the given user
+"""
+def getFriendsIds(userId):
+	friendConnections = FriendConnection.objects.select_related().filter(Q(user_1=userId) | Q(user_2=userId))
 
-				if (group):
-					# If the second photo is in a group and this isn't a dup then add in
-					group.append(neighbor.photo_1)
-				else:
-					# If neither photo is in a group, we create a new one
-					group = [neighbor.photo_1, neighbor.photo_2]
-
-					groups.append(group)
-
-		sortedGroups = list()
-		for group in groups:
-			group = sorted(group, key=lambda x: x.time_taken, reverse=True)
-
-			# This is a crappy hack.  What we'd like to do is define a dup as same time_taken and same
-			#   location_point.  But a bug in mysql looks to be corrupting the lat/lon we fetch here.
-			#   So using location_city instead.  This means we might cut out some photos that were taken
-			#   at the exact same time in the same city
-			uniqueGroup = removeDups(group, lambda x: (x.time_taken, x.location_city))
-			sortedGroups.append(uniqueGroup)
-		groups = sortedGroups
-
-		# now sort groups by the time_taken of the first photo in each group
-		groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
-
-		# Find all non-neighbored photos.  Look up all photos by user and see if they're already
-		#   in a group.  If not, then figure out where they belong in the timeline.
-		photos = Photo.objects.filter(user_id=userId).exclude(thumb_filename=None).exclude(time_taken=None).exclude(location_point=None).filter(user__product_id=1).exclude(neighbored_time=None).order_by("-time_taken")
-
-		groups = addInSoloPhotos(groups, photos)
-									
-		# Now see if there are any non-neighbored photos
-		# These are shown on the web view as Lock symbols
-		if user.last_location_point:
-			lockedPhotos = getLockedPhotos(userId, user.last_location_point.x, user.last_location_point.y)
-
-			if len(lockedPhotos) > 0:
-				groups.insert(0, lockedPhotos)
-				hasLockedPhotos = True
-			else:
-				hasLockedPhotos = False
+	friendsIds = list()
+	for friendConnection in friendConnections:
+		if (friendConnection.user_1.id != userId):
+			friendsIds.append(friendConnection.user_1.id)
 		else:
-			hasLockedPhotos = False
+			friendsIds.append(friendConnection.user_2.id)
 
-		# Now we have to turn into our Duffy JSON, first, convert into the right format
-		formattedGroups = getFormattedGroups(groups, userId)
+	friendsOfFriendConnections = FriendConnection.objects.select_related().filter(Q(user_1__in=friendsIds) | Q(user_2__in=friendsIds))
+	for friendsOfFriendConnection in friendsOfFriendConnections:
+		if (friendsOfFriendConnection.user_1.id != userId):
+			friendsIds.append(friendsOfFriendConnection.user_1.id)
+		if (friendsOfFriendConnection.user_2.id != userId):
+			friendsIds.append(friendsOfFriendConnection.user_2.id)
 
-		# Now we need to update the titles for the groups before we turn it into sections
-		if hasLockedPhotos:
-			formattedGroups[0]['title'] = "Locked"
+	friendsIds = set(friendsIds)
+	return friendsIds
 
-		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
-		response['objects'] = objects
-		response['next_start_date_time'] = lastDate
+"""
+	Return back a list of photos that either belong to a friend or the given user
+"""
+def filterPhotosByFriends(userId, friendIds, photos):
+	resultPhotos = list()
+	for photo in photos:
+		if photo.user_id in friendIds or photo.user_id == userId:
+			resultPhotos.append(photo)
 
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return resultPhotos
 
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+"""
+	Return back a list of users that are in the friends list
+"""
+def filterUsersByFriends(userId, friendIds, users):
+	resultUsers = list()
+	for user in users:
+		if user.id in friendIds:
+			resultUsers.append(user)
+
+	return resultUsers
+
+
+"""
+	Helper Method for auth_phone
+
+	Strand specific code for creating a user.  If a user already exists, this will
+	archive the old one by changing the phone number to an archive format (2352+15555555555)
+
+	This also updates the SmsAuth object to point to this user
+
+	Lastly, this creates the local directory
+
+	TODO(Derek):  If we create users in more places, might want to move this
+"""
+def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
+	try:
+		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
+		
+		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
+			return user
+		else:
+			# User exists, so need to archive
+			# To do that, re-do the phone number, adding in an archive code
+			archiveCode = random.randrange(1000, 10000)
+			
+			user.phone_number = "%s%s" %(archiveCode, phoneNumber)
+			user.save()
+	except User.DoesNotExist:
+		pass
+
+	# TODO(Derek): Make this more interesting when we add auth to the APIs
+	authToken = random.randrange(10000, 10000000)
+
+	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 1, auth_token = str(authToken))
+
+	if smsAuth:
+		smsAuth.user_created = user
+		smsAuth.save()
+
+	# Create directory for photos
+	# TODO(Derek): Might want to move to a more common location if more places that we create users
+	try:
+		userBasePath = user.getUserDataPath()
+		os.stat(userBasePath)
+	except:
+		os.mkdir(userBasePath)
+		os.chmod(userBasePath, 0775)
+
+	return user
+
+#####################################################################################
+#################################  EXTERNAL METHODS  ################################
+#####################################################################################
 
 """
 	Return the Duffy JSON for the photo feed.
@@ -383,110 +342,6 @@ def strand_feed(request):
 
 
 """
-	Utility method to grab all active strands near the given lat and lon.  Filter out any the given userId is currently in
-
-"""
-def getNearbyStrands(userId, lon, lat):
-	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
-
-	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
-
-	strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow).exclude(users__id=userId)
-
-	joinableStrands = list()
-
-	for strand in strands:
-		for photo in strand.photos.all():
-			# See if a photo was taken now and in the location, would it belong in this strand
-			# TODO(Derek):  This could probably be pulled out and shared with populateStrands
-			timeDiff = nowTime - photo.time_taken
-			if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
-				geo_util.getDistanceToPhoto(lon, lat, photo) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
-				joinableStrands.append(strand)
-
-	joinableStrands = set(joinableStrands)
-
-	return joinableStrands
-"""
-	Utility method to find all nonNeighboredPhotos for the given user and location_point
-
-	Returns a list of photos
-"""
-def getLockedPhotos(userId, lon, lat):
-	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
-
-	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
-
-	photosCache = Photo.objects.filter(time_taken__gt=timeLow).exclude(user_id=userId).exclude(location_point=None).exclude(neighbored_time=None).filter(user__product_id=1)
-
-	nearbyPhotosData = geo_util.getNearbyPhotos(nowTime, lon, lat, photosCache, secondsWithin = timeWithinMinutes * 60)
-
-	nearbyPhotos = list()
-	for nearbyPhotoData in nearbyPhotosData:
-		photo, timeDistance, geoDistance = nearbyPhotoData
-		nearbyPhotos.append(photo)
-
-	neighboredPhotos = getNeighboredPhotos(userId, timeLow)
-
-	# We want to remove any photos that are already neighbored
-	neighboredPhotosIds = Photo.getPhotosIds(neighboredPhotos)
-
-	nonNeighboredPhotos = [item for item in nearbyPhotos if item.id not in neighboredPhotosIds]
-
-	return nonNeighboredPhotos
-
-def getLockedStrands(userId, lon, lat):
-	pass
-
-"""
-	Return friends and friends of friends ids for the given user
-"""
-def getFriendsIds(userId):
-	friendConnections = FriendConnection.objects.select_related().filter(Q(user_1=userId) | Q(user_2=userId))
-
-	friendsIds = list()
-	for friendConnection in friendConnections:
-		if (friendConnection.user_1.id != userId):
-			friendsIds.append(friendConnection.user_1.id)
-		else:
-			friendsIds.append(friendConnection.user_2.id)
-
-	friendsOfFriendConnections = FriendConnection.objects.select_related().filter(Q(user_1__in=friendsIds) | Q(user_2__in=friendsIds))
-	for friendsOfFriendConnection in friendsOfFriendConnections:
-		if (friendsOfFriendConnection.user_1.id != userId):
-			friendsIds.append(friendsOfFriendConnection.user_1.id)
-		if (friendsOfFriendConnection.user_2.id != userId):
-			friendsIds.append(friendsOfFriendConnection.user_2.id)
-
-	friendsIds = set(friendsIds)
-	return friendsIds
-
-"""
-	Return back a list of photos that either belong to a friend or the given user
-"""
-def filterPhotosByFriends(userId, friendIds, photos):
-	resultPhotos = list()
-	for photo in photos:
-		if photo.user_id in friendIds or photo.user_id == userId:
-			resultPhotos.append(photo)
-
-	return resultPhotos
-
-"""
-	Return back a list of users that are in the friends list
-"""
-def filterUsersByFriends(userId, friendIds, users):
-	resultUsers = list()
-	for user in users:
-		if user.id in friendIds:
-			resultUsers.append(user)
-
-	return resultUsers
-
-"""
 	the user would join if they took a picture at the given startTime (defaults to now)
 
 	Searches for all photos of their friends within the time range and geo range but that don't have a
@@ -517,7 +372,6 @@ def get_joinable_strands(request):
 
 		formattedGroups = getFormattedGroups([lockedGroup], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
-
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
 
@@ -527,9 +381,6 @@ def get_joinable_strands(request):
 
 """
 	Returns back any new photos in the user's strands after the given date and time
-
-	This looks at all the neighbor rows and see's if there's any ones with other people's photos
-	taken after the startTime
 """
 def get_new_photos(request):
 	response = dict({'result': True})
@@ -538,10 +389,18 @@ def get_new_photos(request):
 	if form.is_valid():
 		userId = form.cleaned_data['user_id']
 		startTime = form.cleaned_data['start_date_time']
+		photoList = list()
 
-		photos = getNeighboredPhotos(userId, startTime)
+		strands = Strand.objects.filter(last_photo_time__gt=startTime)
+		
+		for strand in strands:
+			for photo in strand.photos.filter(time_taken__gt=startTime):
+				if photo.user_id != userId:
+					photoList.append(photo)
 
-		formattedGroups = getFormattedGroups([photos], userId)
+		photoList = removeDups(photoList, lambda x: x.id)
+
+		formattedGroups = getFormattedGroups([photoList], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate
@@ -826,54 +685,6 @@ def send_sms_code(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
-
-"""
-	Helper Method for auth_phone
-
-	Strand specific code for creating a user.  If a user already exists, this will
-	archive the old one by changing the phone number to an archive format (2352+15555555555)
-
-	This also updates the SmsAuth object to point to this user
-
-	Lastly, this creates the local directory
-
-	TODO(Derek):  If we create users in more places, might want to move this
-"""
-def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
-	try:
-		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
-		
-		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
-			return user
-		else:
-			# User exists, so need to archive
-			# To do that, re-do the phone number, adding in an archive code
-			archiveCode = random.randrange(1000, 10000)
-			
-			user.phone_number = "%s%s" %(archiveCode, phoneNumber)
-			user.save()
-	except User.DoesNotExist:
-		pass
-
-	# TODO(Derek): Make this more interesting when we add auth to the APIs
-	authToken = random.randrange(10000, 10000000)
-
-	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 1, auth_token = str(authToken))
-
-	if smsAuth:
-		smsAuth.user_created = user
-		smsAuth.save()
-
-	# Create directory for photos
-	# TODO(Derek): Might want to move to a more common location if more places that we create users
-	try:
-		userBasePath = user.getUserDataPath()
-		os.stat(userBasePath)
-	except:
-		os.mkdir(userBasePath)
-		os.chmod(userBasePath, 0775)
-
-	return user
 
 """
 	Call to authorize a phone with an sms code.  The SMS code should have been sent with send_sms_code

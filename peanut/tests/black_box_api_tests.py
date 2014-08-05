@@ -65,11 +65,6 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		self.assertTrue("Pipeline <br> Status" in result)
 		self.assertTrue("Last Upload" in result)
 
-	def testNeighbor(self):
-		result = self.getResult('neighbors', forms.OnlyUserIdForm)
-
-		self.assertTrue("objects" in result)
-
 	def testStrandFeed(self):
 		result = self.getResult('strand_feed', forms.OnlyUserIdForm)
 
