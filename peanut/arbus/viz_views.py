@@ -127,9 +127,10 @@ def userbaseSummary(request):
 	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1'), totalFriends2=Count('friend_user_2')).order_by('-id'))
 
 	# Exclude type GPS fetch since it happens so frequently
-	notificationDataRaw = NotificationLog.objects.exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
+	notificationDataRaw = NotificationLog.objects.filter(apns=constants.IOS_NOTIFICATIONS_PROD_APNS_ID).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
 	notificationCountById = dict()
 	notificationLastById = dict()
+
 	for notificationData in notificationDataRaw:
 		notificationCountById[notificationData['user']] = notificationData['totalNotifs']
 		notificationLastById[notificationData['user']] = notificationData['lastSent']
@@ -166,7 +167,7 @@ def userbaseSummary(request):
 			entry['status'] = 'OK'
 
 		if user.id in notificationCountById:
-			entry['notifications'] = int(math.ceil(float(notificationCountById[user.id])/float(5)))
+			entry['notifications'] = notificationCountById[user.id]
 			entry['lastNotifSent'] = notificationLastById[user.id].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 		else:
 			entry['notifications'] = '-'
@@ -178,6 +179,7 @@ def userbaseSummary(request):
 
 		entry['strandCount'] = strandCount[i].totalStrands
 		entry['contactCount'] = contactCount[i].totalContacts
+		print "user: %s || f1: %s | f2: %s" % (user.id, friendCount[i].totalFriends1, friendCount[i].totalFriends2)
 		entry['friendCount'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
 
 		if user.last_build_info:
