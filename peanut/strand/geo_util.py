@@ -58,7 +58,7 @@ def getNearbyPhotosToPhoto(refPhoto, photosCache):
 """
 	Go through the user list and pick out any users that are within
 """
-def getNearbyUsers(lon, lat, users, filterUserId=None, distanceWithin=constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING, accuracyWithin = 100):
+def getNearbyUsers(lon, lat, users, filterUserId=None, distanceWithin=constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING, accuracyWithin = 200):
 	nearbyUsers = list()
 	for user in users:
 		if user.id != filterUserId and user.last_location_point:
