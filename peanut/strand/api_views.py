@@ -348,8 +348,9 @@ def strand_feed(request):
 		for strand in strands:
 			groups.append(strand.photos.all().order_by("-time_taken"))
 
-		# now sort groups by the time_taken of the first photo in each group
-		groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
+		if len(groups) > 0:
+			# now sort groups by the time_taken of the first photo in each group
+			groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
 
 		# Lastly, grab all our locked strands and add in those photos
 		lockedGroup = list()
