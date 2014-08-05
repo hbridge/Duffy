@@ -23,12 +23,6 @@ sleep 1
 
 sleep 5
 
-/sbin/initctl stop duffy-neighbor
-sleep 1
-/sbin/initctl start duffy-neighbor
-
-sleep 5
-
 /sbin/initctl stop duffy-similarity
 sleep 1
 /sbin/initctl start duffy-similarity

@@ -14,12 +14,12 @@ from django.http import Http404
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction, Strand
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
 
-from strand import geo_util, notifications_util, friends_util
+from strand import geo_util, notifications_util, friends_util, strands_util
 from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
 
 from ios_notifications.models import APNService, Device, Notification
@@ -159,33 +159,6 @@ def getFormattedGroups(groups, userId):
 	return output
 
 """
-	Utility method to grab all active strands near the given lat and lon.  Filter out any the given userId is currently in
-
-"""
-def getNearbyStrands(userId, lon, lat):
-	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
-
-	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	timeLow = nowTime - datetime.timedelta(minutes=timeWithinMinutes)
-
-	strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow).exclude(users__id=userId)
-
-	joinableStrands = list()
-
-	for strand in strands:
-		for photo in strand.photos.all():
-			# See if a photo was taken now and in the location, would it belong in this strand
-			# TODO(Derek):  This could probably be pulled out and shared with populateStrands
-			timeDiff = nowTime - photo.time_taken
-			if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
-				geo_util.getDistanceToPhoto(lon, lat, photo) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
-				joinableStrands.append(strand)
-
-	joinableStrands = set(joinableStrands)
-
-	return joinableStrands
-
-"""
 	Helper Method for auth_phone
 
 	Strand specific code for creating a user.  If a user already exists, this will
@@ -316,15 +289,12 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		friendIds = friends_util.getFriendsIds(userId)
+		friendsIds = friends_util.getFriendsIds(userId)
+		strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 
-		lockedGroup = list()
-		joinableStrands = getNearbyStrands(userId, lon, lat)
+		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds)
 
-		for strand in joinableStrands:
-			lockedGroup.extend(friends_util.filterPhotosByFriends(userId, friendIds, strand.photos.all()))
-
-		formattedGroups = getFormattedGroups([lockedGroup], userId)
+		formattedGroups = getFormattedGroups([joinableStrandPhotos], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 		response['next_start_date_time'] = lastDate

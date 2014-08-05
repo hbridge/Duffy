@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction, Strand, FriendConnection
+from common.models import FriendConnection
 
 """
 	Return friends and friends of friends ids for the given user

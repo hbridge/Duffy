@@ -98,7 +98,11 @@ def getNotificationsForTypeByIds(notificationLogs, msgTypes, timeCutoff = None):
 	notificationsById = dict()
 
 	for msgType in msgTypes:
-		notificationsById.update(getNotificationsForTypeById(notificationLogs, msgType, timeCutoff))
+		notifications = getNotificationsForTypeById(notificationLogs, msgType, timeCutoff)
+		for id, notes in notifications.iteritems():
+			if id not in notificationsById:
+				notificationsById[id] = list()
+			notificationsById[id].extend(notes)
 
 	return notificationsById
 

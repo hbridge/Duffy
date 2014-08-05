@@ -12,10 +12,9 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import Neighbor, NotificationLog, Photo, User, PhotoAction
+from common.models import Neighbor, NotificationLog, Photo, User, PhotoAction, Strand
 
-import strand.notifications_util as notifications_util
-import strand.geo_util as geo_util
+from strand import notifications_util, geo_util, strands_util, friends_util
 
 logger = logging.getLogger(__name__)
 
@@ -48,28 +47,22 @@ def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedW
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
 
 	newPhotosStartTimeCutoff = now - joinStrandWithin
-	neighbors = Neighbor.objects.select_related().filter(Q(photo_1__time_taken__gt=newPhotosStartTimeCutoff) | Q(photo_2__time_taken__gt=newPhotosStartTimeCutoff)).order_by('photo_1')
 	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, [msgType, constants.NOTIFICATIONS_NEW_PHOTO_ID], newPhotosStartTimeCutoff)
 
 	# 30 minute cut off for join strand messages
 	joinStrandStartTimeCutoff = now - joinStrandWithin
-	photos = Photo.objects.select_related().filter(time_taken__gt=joinStrandStartTimeCutoff).filter(user__product_id=1)
-
+	strands = Strand.objects.select_related().filter(last_photo_time__gt=joinStrandStartTimeCutoff)
+	
 	frequencyOfGpsUpdatesCutoff = now - joinStrandLimitGpsUpdatedWithin
 	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
 	for user in users:
-		nearbyPhotosData = geo_util.getNearbyPhotos(now, user.last_location_point.x, user.last_location_point.y, photos, filterUserId=user.id)
+		friendsIds = friends_util.getFriendsIds(user.id)
+		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
+
 		names = list()
-
-		for nearbyPhotoData in nearbyPhotosData:
-			(photo, timeDistance, geoDistance) = nearbyPhotoData
-
-			# If we found a photo that has been neighbored and it isn't neighbored with
-			#   the current user, then lets tell them to join up!
-			# Otherwise, we want to skip it since we want to sent the new photo notification
-			if photo.neighbored_time and not hasNeighboredPhotoWithPhoto(user, photo, neighbors):
-				names.append(cleanName(photo.user.display_name))
+		for photo in joinableStrandPhotos:
+			names.append(photo.user.display_name)
 
 		# Grab unique names
 		names = set(names)
@@ -79,13 +72,19 @@ def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedW
 
 			# We want to see if the user has gotten this message before.  Also, we want to support
 			#   new people showing up so if the message is longer than they got before, send.
-			sentMessageBefore = False
+			skipNotification = False
 			if user.id in notificationsById:
 				for notification in notificationsById[user.id]:
-					if notification.msg == msg:
-						sentMessageBefore = True
 
-			if not sentMessageBefore:
+					if notification.msg_type == msgType:
+						if (len(notification.msg) == len(msg) or 
+							notification.msg == ""):
+						
+							skipNotification = True
+					if notification.msg_type == constants.NOTIFICATIONS_NEW_PHOTO_ID:
+						skipNotification = True
+
+			if not skipNotification:
 				logger.debug("Sending %s to %s" % (msg, user.id))
 				logEntry = notifications_util.sendNotification(user, msg, msgType, None)
 				if logEntry:
