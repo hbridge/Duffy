@@ -245,10 +245,9 @@ def strand_feed(request):
 		# Lastly, grab all our locked strands and add in those photos
 		lockedGroup = list()
 		if user.last_location_point:
-			joinableStrands = getNearbyStrands(userId, user.last_location_point.x, user.last_location_point.y)
+			joinableStrandPhotos = getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y)
 
-			for strand in joinableStrands:
-				lockedGroup.extend(friends_util.filterPhotosByFriends(userId, friendIds, strand.photos.all()))
+			lockedGroup.extend(joinableStrandPhotos)
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, lockedGroup)
