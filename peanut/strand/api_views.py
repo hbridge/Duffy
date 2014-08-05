@@ -14,12 +14,12 @@ from django.http import Http404
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction, Strand, FriendConnection
+from common.models import Photo, User, Neighbor, SmsAuth, PhotoAction, Strand
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
 
-from strand import geo_util, notifications_util
+from strand import geo_util, notifications_util, friends_util
 from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
 
 from ios_notifications.models import APNService, Device, Notification
@@ -186,52 +186,6 @@ def getNearbyStrands(userId, lon, lat):
 	return joinableStrands
 
 """
-	Return friends and friends of friends ids for the given user
-"""
-def getFriendsIds(userId):
-	friendConnections = FriendConnection.objects.select_related().filter(Q(user_1=userId) | Q(user_2=userId))
-
-	friendsIds = list()
-	for friendConnection in friendConnections:
-		if (friendConnection.user_1.id != userId):
-			friendsIds.append(friendConnection.user_1.id)
-		else:
-			friendsIds.append(friendConnection.user_2.id)
-
-	friendsOfFriendConnections = FriendConnection.objects.select_related().filter(Q(user_1__in=friendsIds) | Q(user_2__in=friendsIds))
-	for friendsOfFriendConnection in friendsOfFriendConnections:
-		if (friendsOfFriendConnection.user_1.id != userId):
-			friendsIds.append(friendsOfFriendConnection.user_1.id)
-		if (friendsOfFriendConnection.user_2.id != userId):
-			friendsIds.append(friendsOfFriendConnection.user_2.id)
-
-	friendsIds = set(friendsIds)
-	return friendsIds
-
-"""
-	Return back a list of photos that either belong to a friend or the given user
-"""
-def filterPhotosByFriends(userId, friendIds, photos):
-	resultPhotos = list()
-	for photo in photos:
-		if photo.user_id in friendIds or photo.user_id == userId:
-			resultPhotos.append(photo)
-
-	return resultPhotos
-
-"""
-	Return back a list of users that are in the friends list
-"""
-def filterUsersByFriends(userId, friendIds, users):
-	resultUsers = list()
-	for user in users:
-		if user.id in friendIds:
-			resultUsers.append(user)
-
-	return resultUsers
-
-
-"""
 	Helper Method for auth_phone
 
 	Strand specific code for creating a user.  If a user already exists, this will
@@ -300,14 +254,14 @@ def strand_feed(request):
 		except User.DoesNotExist:
 			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
 
-		friendIds = getFriendsIds(userId)
+		friendIds = friends_util.getFriendsIds(userId)
 
 		strands = Strand.objects.select_related().filter(users__in=[user])
 
 		# list of list of photos
 		groups = list()
 		for strand in strands:
-			photos = filterPhotosByFriends(userId, friendIds, strand.photos.all().order_by("-time_taken"))
+			photos = friends_util.filterPhotosByFriends(userId, friendIds, strand.photos.all().order_by("-time_taken"))
 			if len(photos) > 0:
 				groups.append(photos)
 
@@ -321,7 +275,7 @@ def strand_feed(request):
 			joinableStrands = getNearbyStrands(userId, user.last_location_point.x, user.last_location_point.y)
 
 			for strand in joinableStrands:
-				lockedGroup.extend(filterPhotosByFriends(userId, friendIds, strand.photos.all()))
+				lockedGroup.extend(friends_util.filterPhotosByFriends(userId, friendIds, strand.photos.all()))
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, lockedGroup)
@@ -362,13 +316,13 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		friendIds = getFriendsIds(userId)
+		friendIds = friends_util.getFriendsIds(userId)
 
 		lockedGroup = list()
 		joinableStrands = getNearbyStrands(userId, lon, lat)
 
 		for strand in joinableStrands:
-			lockedGroup.extend(filterPhotosByFriends(userId, friendIds, strand.photos.all()))
+			lockedGroup.extend(friends_util.filterPhotosByFriends(userId, friendIds, strand.photos.all()))
 
 		formattedGroups = getFormattedGroups([lockedGroup], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
@@ -531,11 +485,11 @@ def get_nearby_friends_message(request):
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
 
-		friendIds = getFriendsIds(userId)
+		friendIds = friends_util.getFriendsIds(userId)
 		
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
-		users = filterUsersByFriends(userId, friendIds, users)
+		users = friends_util.filterUsersByFriends(userId, friendIds, users)
 
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
 

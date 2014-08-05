@@ -193,7 +193,7 @@ def main(argv):
 			
 			logger.info("Wrote out %s new neighbor entries for %s photos" % (len(uniqueRows), len(photos)))
 
-			sendNotifications(rowsToCreate, timeWithinSecondsForNotification)
+			#sendNotifications(rowsToCreate, timeWithinSecondsForNotification)
 		else:
 			time.sleep(1)	
 
