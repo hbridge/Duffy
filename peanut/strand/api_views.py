@@ -348,7 +348,7 @@ def strand_feed(request):
 		# list of list of photos
 		groups = list()
 		for strand in strands:
-			photos = filterByFriends(userId, friendIds, strand.photos.all().order_by("-time_taken"))
+			photos = filterPhotosByFriends(userId, friendIds, strand.photos.all().order_by("-time_taken"))
 			if len(photos) > 0:
 				groups.append(photos)
 
@@ -362,7 +362,7 @@ def strand_feed(request):
 			joinableStrands = getNearbyStrands(userId, user.last_location_point.x, user.last_location_point.y)
 
 			for strand in joinableStrands:
-				lockedGroup.extend(filterByFriends(userId, friendIds, strand.photos.all()))
+				lockedGroup.extend(filterPhotosByFriends(userId, friendIds, strand.photos.all()))
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, lockedGroup)
@@ -467,13 +467,24 @@ def getFriendsIds(userId):
 """
 	Return back a list of photos that either belong to a friend or the given user
 """
-def filterByFriends(userId, friendIds, photos):
+def filterPhotosByFriends(userId, friendIds, photos):
 	resultPhotos = list()
 	for photo in photos:
 		if photo.user_id in friendIds or photo.user_id == userId:
 			resultPhotos.append(photo)
 
 	return resultPhotos
+
+"""
+	Return back a list of users that are in the friends list
+"""
+def filterUsersByFriends(userId, friendIds, users):
+	resultUsers = list()
+	for user in users:
+		if user.id in friendIds:
+			resultUsers.append(user)
+
+	return resultUsers
 
 """
 	the user would join if they took a picture at the given startTime (defaults to now)
@@ -496,9 +507,15 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		lockedPhotos = getLockedPhotos(userId, lon, lat)
+		friendIds = getFriendsIds(userId)
 
-		formattedGroups = getFormattedGroups([lockedPhotos], userId)
+		lockedGroup = list()
+		joinableStrands = getNearbyStrands(userId, lon, lat)
+
+		for strand in joinableStrands:
+			lockedGroup.extend(filterPhotosByFriends(userId, friendIds, strand.photos.all()))
+
+		formattedGroups = getFormattedGroups([lockedGroup], userId)
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 
 		response['objects'] = objects
@@ -655,10 +672,14 @@ def get_nearby_friends_message(request):
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
 
+		friendIds = getFriendsIds(userId)
+		
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
+		users = filterUsersByFriends(userId, friendIds, users)
 
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
+
 		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
 		
 		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
