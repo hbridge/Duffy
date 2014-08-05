@@ -196,7 +196,7 @@ def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin
 		# Also make sure we haven't sent them either a raw firestarter or a photo one recently
 		if (numNearbyUsers > 0 and
 		  user.last_photo_timestamp and 
-		  user.last_photo_timestamp > photoTakenCutoff and 
+		  user.last_photo_timestamp.replace(tzinfo=pytz.utc) > photoTakenCutoff and 
 		  user.id not in notificationsById):
 			print "here"
 			if numNearbyUsers == 1:
