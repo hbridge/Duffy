@@ -35,9 +35,11 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId):
 def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	if photo.time_taken > strand.last_photo_time:
 		strand.last_photo_time = photo.time_taken
+		strand.save()
 
 	if photo.time_taken < strand.time_started:
 		strand.time_started = photo.time_taken
+		strand.save()
 	
 	if strand.id not in photosByStrandId:
 		# Handle case that this is a new strand
