@@ -5,6 +5,7 @@ from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil import tz
 import time, math, urllib
+import logging
 
 from django.shortcuts import render
 from django.http import HttpResponse
@@ -22,6 +23,7 @@ from common.models import Photo, User, Classification, NotificationLog
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
 
+logger = logging.getLogger(__name__)
 	
 def manualAddPhoto(request):
 	form = ManualAddPhoto()
@@ -179,7 +181,7 @@ def userbaseSummary(request):
 
 		entry['strandCount'] = strandCount[i].totalStrands
 		entry['contactCount'] = contactCount[i].totalContacts
-		print "user: %s || f1: %s | f2: %s" % (user.id, friendCount[i].totalFriends1, friendCount[i].totalFriends2)
+		logger.error("user: %s || f1: %s | f2: %s" % (user.id, friendCount[i].totalFriends1, friendCount[i].totalFriends2))
 		entry['friendCount'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
 
 		if user.last_build_info:
