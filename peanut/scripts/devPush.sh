@@ -10,8 +10,6 @@ python /home/derek/prod/Duffy/peanut/tests/black_box_api_tests.py dev.duffyapp.c
 echo "Restarting scripts..."
 sudo stop duffy-strand-notifications
 sudo start duffy-strand-notifications
-sudo stop duffy-neighbor
-sudo start duffy-neighbor
 sudo stop duffy-friends
 sudo start duffy-friends
 sudo stop duffy-stranding
