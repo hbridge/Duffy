@@ -12,36 +12,15 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import Neighbor, NotificationLog, Photo, User, PhotoAction, Strand
+from common.models import NotificationLog, Photo, User, PhotoAction, Strand
 
 from strand import notifications_util, geo_util, strands_util, friends_util
 
 logger = logging.getLogger(__name__)
 
-def cleanName(str):
-	return str.split(' ')[0].split("'")[0]
-
-"""
-	See if the given user has a photo neighbored with the given photo
-"""
-def hasNeighboredPhotoWithPhoto(user, photo, neighbors):
-	if (user.id == photo.user_id):
-		return False
-
-	for neighbor in neighbors:
-		if (photo.id == neighbor.photo_1_id and user.id == neighbor.user_2_id):
-			return True
-		elif (photo.id == neighbor.photo_2_id and user.id == neighbor.user_1_id):
-			return True
-
-	return False
-
 """
 	Look through all recent photos from last 30 minutes and see if any users have a 
 	  last_location_point near there...and haven't been notified recently about that user
-
-	Check the photo we want to use to say if someone is nearby but we havent'
-	neighbored with them yet (basically, they shouldn't know I'm there)
 """
 def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedWithin, notificationLogsCache):
 	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
