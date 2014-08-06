@@ -214,8 +214,16 @@ def main(argv):
 
 		notificationLogsCache = list()
 		logger.debug("doing queries")
-		notificationLogsCache.extend(notifications_util.getNotificationLogs(notificationLogsCutoff))
+		# Join Strand
+		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - joinStrandWithin, constants.NOTIFICATIONS_JOIN_STRAND_ID))
+		# Gps
+		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - gpsRefreshTime, constants.NOTIFICATIONS_FETCH_GPS_ID))
+		# Photo firestarter
+		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - photosFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_PHOTO_FIRESTARTER_ID))
+		# Raw firestarter
+		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - rawFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_RAW_FIRESTARTER_ID))
 
+		logger.debug("About to do joinable strands")
 		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
 
 		logger.debug("About to do photo actions...")
