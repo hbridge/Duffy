@@ -29,20 +29,30 @@ def getFriendsIds(userId):
 	Return back a list of photos that either belong to a friend or the given user
 """
 def filterPhotosByFriends(userId, friendIds, photos):
+	return photos
+
+	# TODO(Derek): Put this back once we're in the app store
+	"""
 	resultPhotos = list()
 	for photo in photos:
 		if photo.user_id in friendIds or photo.user_id == userId:
 			resultPhotos.append(photo)
 
 	return resultPhotos
+	"""
 
 """
 	Return back a list of users that are in the friends list
 """
 def filterUsersByFriends(userId, friendIds, users):
+	return users
+	
+	# TODO(Derek): Put this back once we're in the app store
+	"""
 	resultUsers = list()
 	for user in users:
 		if user.id in friendIds:
 			resultUsers.append(user)
 
 	return resultUsers
+	"""

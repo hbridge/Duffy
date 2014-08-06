@@ -138,8 +138,6 @@ def sendRawFirestarter(now, gpsUpdatedWithin, notifiedWithin, distanceWithinMete
 
 		numNearbyUsers = len(nearbyUsers)
 		if numNearbyUsers > 0 and user.id not in notificationsById:
-			print "here2"
-			print notificationLogsCache[-1]
 			if numNearbyUsers == 1:
 				msg = "You have a friend on Strand nearby. Take a photo to share with them!"
 			else:
