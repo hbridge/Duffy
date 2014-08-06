@@ -213,7 +213,6 @@ def main(argv):
 		notificationLogsCutoff = now - notificationLogsWithin
 
 		notificationLogsCache = list()
-		logger.debug("doing queries")
 		# Join Strand
 		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - joinStrandWithin, constants.NOTIFICATIONS_JOIN_STRAND_ID))
 		# Gps
@@ -233,7 +232,6 @@ def main(argv):
 
 		notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
 				
-		logger.debug("Sleeping...")
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)
 
