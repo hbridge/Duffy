@@ -223,19 +223,14 @@ def main(argv):
 		# Raw firestarter
 		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - rawFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_RAW_FIRESTARTER_ID))
 
-		logger.debug("About to do joinable strands")
 		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
 
-		logger.debug("About to do photo actions...")
 		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
 
-		logger.debug("About to do gps...")
 		notificationLogsCache = sendGpsNotification(now, gpsRefreshTime, notificationLogsCache)
 
-		logger.debug("About to do photo fire starter...")
 		notificationLogsCache = sendPhotoFirestarter(now, photosFirestarterPhotoTakenWithin, photosFirestarterGpsUpdatedWithin, photosFirestarterNotifiedWithin, photosFirestarterAccuracyWithinMeters, notificationLogsCache)
 
-		logger.debug("About to do raw fire starter...")
 		notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
 				
 		logger.debug("Sleeping...")
