@@ -34,12 +34,13 @@ def getContactsByUser(contactEntries):
 	for contactEntry in contactEntries:
 		if contactEntry.user not in contactsByUser:
 			contactsByUser[contactEntry.user] = dict()
-			try:
-				contactsByUser[contactEntry.user][str(contactEntry.phone_number)] = True
-			except UnicodeEncodeError:
-				logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
-				contactEntry.skip = True
-				contactEntry.save()
+			
+		try:
+			contactsByUser[contactEntry.user][str(contactEntry.phone_number)] = True
+		except UnicodeEncodeError:
+			logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+			contactEntry.skip = True
+			contactEntry.save()
 
 
 	return contactsByUser
@@ -70,7 +71,7 @@ def main(argv):
 			usersToFetchContactsFor = list()
 			for contactEntry in contactEntries:
 				try:
-					if str(contactEntry.phone_number) in usersByPhoneNumber:
+					if contactEntry.phone_number in usersByPhoneNumber:
 						usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
 				except UnicodeEncodeError:
 					logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
@@ -84,8 +85,8 @@ def main(argv):
 			
 			for contactEntry in contactEntries:
 				# If we have a user associated with a given phone number
-				if str(contactEntry.phone_number) in usersByPhoneNumber:
-					possibleFriend = usersByPhoneNumber[str(contactEntry.phone_number)]
+				if contactEntry.phone_number in usersByPhoneNumber:
+					possibleFriend = usersByPhoneNumber[contactEntry.phone_number]
 
 					# And the possible Friend also has the reverse mapping for this contact
 					#   The possible friend won't be in the possibleFriendEntriesByUser dict
