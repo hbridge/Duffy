@@ -121,7 +121,7 @@ def userbaseSummary(request):
 	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
-			neighborCount=Count('photo__neighbored_time'), lastAdded=Max('photo__added')).order_by('-id')
+			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-id')
 
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
 	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
@@ -149,7 +149,7 @@ def userbaseSummary(request):
 
 		if (user.totalCount > 0):
 			if (user.totalCount == user.thumbsCount == user.fullImagesCount == user.clusteredCount and 
-				user.photosWithGPS == user.twofishCount == user.neighborCount):
+				user.photosWithGPS == user.twofishCount == user.strandedCount):
 				entry['status'] = 'OK'
 			elif (user.thumbsCount != user.totalCount):
 				entry['status'] = '!thumbs'
@@ -159,8 +159,8 @@ def userbaseSummary(request):
 				entry['status'] = '!cluster'
 			elif (user.twofishCount < user.photosWithGPS):
 				entry['status'] = '!twofish'
-			elif(user.neighborCount != user.photosWithGPS):
-				entry['status'] = '!neighbor'
+			elif(user.strandedCount != user.photosWithGPS):
+				entry['status'] = '!strand'
 			else:
 				entry['status'] = 'BAD'
 
