@@ -211,18 +211,25 @@ def main(argv):
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		# Grap notification logs for use in other methods
 		notificationLogsCutoff = now - notificationLogsWithin
+
+		logger.dubug("doing query")
 		notificationLogsCache = list(notifications_util.getNotificationLogs(notificationLogsCutoff))
 
 		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
 
+		logger.debug("About to do photo actions...")
 		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
 
+		logger.debug("About to do gps...")
 		notificationLogsCache = sendGpsNotification(now, gpsRefreshTime, notificationLogsCache)
 
+		logger.debug("About to do photo fire starter...")
 		notificationLogsCache = sendPhotoFirestarter(now, photosFirestarterPhotoTakenWithin, photosFirestarterGpsUpdatedWithin, photosFirestarterNotifiedWithin, photosFirestarterAccuracyWithinMeters, notificationLogsCache)
 
+		logger.debug("About to do raw fire starter...")
 		notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
 				
+		logger.debug("Sleeping...")
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)
 
