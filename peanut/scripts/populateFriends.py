@@ -78,7 +78,7 @@ def main(argv):
 					contactEntry.save()
 			usersToFetchContactsFor = set(usersToFetchContactsFor)
 
-			possibleFriendEntries = ContactEntry.objects.filter(user_id__in=usersToFetchContactsFor)
+			possibleFriendEntries = ContactEntry.objects.filter(user_id__in=usersToFetchContactsFor).filter(skip=False)
 
 			possibleFriendEntriesByUser = getContactsByUser(possibleFriendEntries)
 			
