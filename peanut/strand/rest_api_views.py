@@ -1,5 +1,7 @@
 from random import randint
 import datetime
+import logging
+import re
 import phonenumbers
 
 from rest_framework.generics import CreateAPIView, GenericAPIView
@@ -9,6 +11,9 @@ from rest_framework import status
 
 from common.models import PhotoAction, ContactEntry
 from common.serializers import BulkContactEntrySerializer
+
+logger = logging.getLogger(__name__)
+
 
 class BulkCreateModelMixin(CreateModelMixin):
     def chunks(self, l, n):
@@ -42,6 +47,7 @@ class BulkCreateModelMixin(CreateModelMixin):
 
             results = list()
             for chunk in self.chunks(objects, self.batchSize):
+
                 batchKey = randint(1,10000)
                 for obj in objects:
                     obj.bulk_batch_key = batchKey
@@ -76,8 +82,16 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         Clean up the phone number and set it.  Should only be one number per entry
     """
     def pre_save(self, obj):
+        logger.info("Doing a ContactEntry bulk update for user %s of number %s" % (obj.user, obj.phone_number))
+        foundMatch = False      
         for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, "US"):
+            foundMatch = True
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+
+        if not foundMatch:
+            print("Parse error for contact entry user %s  %s  with number %s" % (obj.user, obj.name, obj.phone_number))
+            obj.skip = True
+
 
 """
     REST interface for creating new PhotoActions.

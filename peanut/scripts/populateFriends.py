@@ -50,7 +50,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False)[:100]
+		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False)[:100]
 		newConnectionCount = 0
 
 		if len(contactEntries) > 0:
@@ -63,11 +63,8 @@ def main(argv):
 			# Now, look through each of those user's contacts to see if there's a corrisponding entry
 			usersToFetchContactsFor = list()
 			for contactEntry in contactEntries:
-				try:
-					if str(contactEntry.phone_number) in usersByPhoneNumber:
-						usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
-				except UnicodeEncodeError:
-					logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+				if str(contactEntry.phone_number) in usersByPhoneNumber:
+					usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
 					
 			usersToFetchContactsFor = set(usersToFetchContactsFor)
 

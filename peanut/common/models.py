@@ -408,6 +408,7 @@ class ContactEntry(models.Model):
 	name = models.CharField(max_length=100)
 	phone_number = models.CharField(max_length=128, db_index=True)
 	evaluated = models.BooleanField(db_index=True, default=False)
+	skip = models.BooleanField(db_index=True, default=False)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True)
