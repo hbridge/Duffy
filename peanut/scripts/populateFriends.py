@@ -59,59 +59,58 @@ def main(argv):
 		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False)[:100]
 		newConnectionCount = 0
 
-		
-			if len(contactEntries) > 0:
-				# Grab users who these new contact entries point to
-				phoneNumbers = [contactEntry.phone_number for contactEntry in contactEntries]
-				users = User.objects.filter(phone_number__in=phoneNumbers)
+		if len(contactEntries) > 0:
+			# Grab users who these new contact entries point to
+			phoneNumbers = [contactEntry.phone_number for contactEntry in contactEntries]
+			users = User.objects.filter(phone_number__in=phoneNumbers)
 
-				usersByPhoneNumber = getUsersByPhoneNumber(users)
+			usersByPhoneNumber = getUsersByPhoneNumber(users)
 
-				# Now, look through each of those user's contacts to see if there's a corrisponding entry
-				usersToFetchContactsFor = list()
-				for contactEntry in contactEntries:
-					try:
-						if str(contactEntry.phone_number) in usersByPhoneNumber:
-							usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
-					except UnicodeEncodeError:
-						logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
-						contactEntry.skip = True
-						contactEntry.save()
-				usersToFetchContactsFor = set(usersToFetchContactsFor)
-
-				possibleFriendEntries = ContactEntry.objects.filter(user_id__in=usersToFetchContactsFor)
-
-				possibleFriendEntriesByUser = getContactsByUser(possibleFriendEntries)
-				
-				for contactEntry in contactEntries:
-					# If we have a user associated with a given phone number
+			# Now, look through each of those user's contacts to see if there's a corrisponding entry
+			usersToFetchContactsFor = list()
+			for contactEntry in contactEntries:
+				try:
 					if str(contactEntry.phone_number) in usersByPhoneNumber:
-						possibleFriend = usersByPhoneNumber[str(contactEntry.phone_number)]
+						usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
+				except UnicodeEncodeError:
+					logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+					contactEntry.skip = True
+					contactEntry.save()
+			usersToFetchContactsFor = set(usersToFetchContactsFor)
 
-						# And the possible Friend also has the reverse mapping for this contact
-						#   The possible friend won't be in the possibleFriendEntriesByUser dict
-						#   if we don't have any contacts from them
-						if (possibleFriend in possibleFriendEntriesByUser and 
-						  str(contactEntry.user.phone_number) in possibleFriendEntriesByUser[possibleFriend] and
-						  contactEntry.user.id != possibleFriend.id):
-							try:
-								# Yay!  lets make a Friend entry
-								# Lower id will go first
-								if contactEntry.user.id < possibleFriend.id:
-									FriendConnection.objects.create(user_1=contactEntry.user, user_2=possibleFriend)
-								else:
-									FriendConnection.objects.create(user_1=possibleFriend, user_2=contactEntry.user)
+			possibleFriendEntries = ContactEntry.objects.filter(user_id__in=usersToFetchContactsFor)
 
-								newConnectionCount += 1
-							except IntegrityError:
-								logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, possibleFriend.id))
+			possibleFriendEntriesByUser = getContactsByUser(possibleFriendEntries)
+			
+			for contactEntry in contactEntries:
+				# If we have a user associated with a given phone number
+				if str(contactEntry.phone_number) in usersByPhoneNumber:
+					possibleFriend = usersByPhoneNumber[str(contactEntry.phone_number)]
 
-					contactEntry.evaluated = True
+					# And the possible Friend also has the reverse mapping for this contact
+					#   The possible friend won't be in the possibleFriendEntriesByUser dict
+					#   if we don't have any contacts from them
+					if (possibleFriend in possibleFriendEntriesByUser and 
+					  str(contactEntry.user.phone_number) in possibleFriendEntriesByUser[possibleFriend] and
+					  contactEntry.user.id != possibleFriend.id):
+						try:
+							# Yay!  lets make a Friend entry
+							# Lower id will go first
+							if contactEntry.user.id < possibleFriend.id:
+								FriendConnection.objects.create(user_1=contactEntry.user, user_2=possibleFriend)
+							else:
+								FriendConnection.objects.create(user_1=possibleFriend, user_2=contactEntry.user)
 
-				logger.info("Wrote out %s friend entries after evaluating %s contact entries" % (newConnectionCount, len(contactEntries)))
-				ContactEntry.bulkUpdate(contactEntries, ["evaluated"])
-			else:
-				time.sleep(1)
+							newConnectionCount += 1
+						except IntegrityError:
+							logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, possibleFriend.id))
+
+				contactEntry.evaluated = True
+
+			logger.info("Wrote out %s friend entries after evaluating %s contact entries" % (newConnectionCount, len(contactEntries)))
+			ContactEntry.bulkUpdate(contactEntries, ["evaluated"])
+		else:
+			time.sleep(1)
 		
 
 
