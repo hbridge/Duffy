@@ -249,9 +249,7 @@ def strand_feed(request):
 		lockedGroup = list()
 		if user.last_location_point:
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-			joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
-
-			lockedGroup.extend(joinableStrandPhotos)
+			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, lockedGroup)
@@ -261,6 +259,7 @@ def strand_feed(request):
 
 		if len(lockedGroup) > 0:
 			formattedGroups[0]['title'] = "Locked"
+			
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
 		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects

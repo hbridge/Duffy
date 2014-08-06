@@ -20,13 +20,14 @@ def getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds):
 
 	joinableStrands = list()
 	for strand in strands:
-		for photo in strand.photos.all():
-			# See if a photo was taken now and in the location, would it belong in this strand
-			# TODO(Derek):  This could probably be pulled out and shared with populateStrands
-			timeDiff = nowTime - photo.time_taken
-			if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
-				geo_util.getDistanceToPhoto(lon, lat, photo) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
-				joinableStrands.append(strand)
+		if userId not in [x.id for x in strand.users.all()]:
+			for photo in strand.photos.all():
+				# See if a photo was taken now and in the location, would it belong in this strand
+				# TODO(Derek):  This could probably be pulled out and shared with populateStrands
+				timeDiff = nowTime - photo.time_taken
+				if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING and
+					geo_util.getDistanceToPhoto(lon, lat, photo) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+					joinableStrands.append(strand)
 
 	joinableStrands = set(joinableStrands)
 
