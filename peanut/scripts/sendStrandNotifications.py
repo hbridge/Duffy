@@ -212,7 +212,7 @@ def main(argv):
 		# Grap notification logs for use in other methods
 		notificationLogsCutoff = now - notificationLogsWithin
 
-		logger.dubug("doing query")
+		logger.debug("doing query")
 		notificationLogsCache = list(notifications_util.getNotificationLogs(notificationLogsCutoff))
 
 		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
