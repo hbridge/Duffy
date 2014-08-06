@@ -220,6 +220,9 @@ def strand_feed(request):
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
+	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
 	if (form.is_valid()):
 		userId = int(form.cleaned_data['user_id'])
 		try:
@@ -227,14 +230,14 @@ def strand_feed(request):
 		except User.DoesNotExist:
 			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
 
-		friendIds = friends_util.getFriendsIds(userId)
+		friendsIds = friends_util.getFriendsIds(userId)
 
 		strands = Strand.objects.select_related().filter(users__in=[user])
 
 		# list of list of photos
 		groups = list()
 		for strand in strands:
-			photos = friends_util.filterPhotosByFriends(userId, friendIds, strand.photos.all().order_by("-time_taken"))
+			photos = friends_util.filterPhotosByFriends(userId, friendsIds, strand.photos.all().order_by("-time_taken"))
 			if len(photos) > 0:
 				groups.append(photos)
 
@@ -245,7 +248,8 @@ def strand_feed(request):
 		# Lastly, grab all our locked strands and add in those photos
 		lockedGroup = list()
 		if user.last_location_point:
-			joinableStrandPhotos = getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y)
+			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
+			joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
 
 			lockedGroup.extend(joinableStrandPhotos)
 
@@ -280,7 +284,8 @@ def strand_feed(request):
 def get_joinable_strands(request):
 	response = dict({'result': True})
 
-	timeWithinHours = 3
+	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
 	form = GetJoinableStrandsForm(api_util.getRequestData(request)) 
 	if form.is_valid():
