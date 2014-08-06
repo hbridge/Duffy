@@ -119,5 +119,5 @@ def getNotificationLogs(timeWithinCutoff):
 """
 def getNotificationLogsForType(timeWithinCutoff, msgType):
 	# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-	notificationLogs = NotificationLog.objects.filter(msg_type=msgType, filter(added__gt=timeWithinCutoff)
+	notificationLogs = NotificationLog.objects.filter(msg_type=msgType).filter(added__gt=timeWithinCutoff).filter(apns=1)
 	return notificationLogs
