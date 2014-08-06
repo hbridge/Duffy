@@ -197,7 +197,6 @@ def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin
 		  user.last_photo_timestamp and 
 		  user.last_photo_timestamp.replace(tzinfo=pytz.utc) > photoTakenCutoff and 
 		  user.id not in notificationsById):
-			print "here"
 			if numNearbyUsers == 1:
 				msg = "You have a friend on Strand nearby. Take a photo to share with them!"
 			else:
