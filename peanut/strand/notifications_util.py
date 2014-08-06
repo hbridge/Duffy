@@ -17,20 +17,22 @@ logger = logging.getLogger(__name__)
 	withSound is boolean, if it vibrates
 	withVisual is if its silent (no visual)
 
+	Returns a list of logEntries (NotificationLog)
 """
 def sendNotification(user, msg, msgTypeId, customPayload):
 	if user.device_token:
 		if user.device_token == "TESTTOKEN":
 			logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-1, msg_type=msgTypeId)
-			return logEntry
+			return [logEntry]
 
 		devices = Device.objects.select_related().filter(token=user.device_token)
 
 		if len(devices) == 0:
 			logger.warning("Was told to send a notification to user %s who has a device token but nothing in the Device table" % user.id)
 			logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, apns=-2, msg_type=msgTypeId)
-			return logEntry
-			
+			return [logEntry]
+		
+		logEntries = list()	
 		for device in devices:
 			notification = DuffyNotification()
 			notification.message = msg
@@ -57,12 +59,13 @@ def sendNotification(user, msg, msgTypeId, customPayload):
 			apns.push_notification_to_devices(notification, [device])
 
 			# This is for logging
-			logEntry = NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId)
+			logEntries.append(NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId))
+		return logEntries
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user.id)
 		logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, apns=-1, msg_type=msgTypeId)
 
-		return logEntry
+		return [logEntry]
 
 def sendRefreshFeed(user):
 	msgType = constants.NOTIFICATIONS_REFRESH_FEED

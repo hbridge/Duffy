@@ -65,9 +65,8 @@ def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedW
 
 			if not skipNotification:
 				logger.debug("Sending %s to %s" % (msg, user.id))
-				logEntry = notifications_util.sendNotification(user, msg, msgType, None)
-				if logEntry:
-					notificationLogsCache.append(logEntry)
+				logEntries = notifications_util.sendNotification(user, msg, msgType, None)
+				notificationLogsCache.extend(logEntries)
 
 	return notificationLogsCache
 			
@@ -116,9 +115,8 @@ def sendGpsNotification(now, gpsRefreshTime, notificationLogsCache):
 	for user in usersWithOldGpsData:
 		if user.id not in notificationsById:
 			logger.debug("Pinging user %s to update their gps" % (user.id))
-			logEntry = notifications_util.sendNotification(user, "", msgType, dict())
-			if logEntry:
-				notificationLogsCache.append(logEntry)
+			logEntries = notifications_util.sendNotification(user, "", msgType, dict())
+			notificationLogsCache.extend(logEntries)
 				
 	return notificationLogsCache
 
@@ -140,15 +138,17 @@ def sendRawFirestarter(now, gpsUpdatedWithin, notifiedWithin, distanceWithinMete
 
 		numNearbyUsers = len(nearbyUsers)
 		if numNearbyUsers > 0 and user.id not in notificationsById:
+			print "here2"
+			print notificationLogsCache[-1]
 			if numNearbyUsers == 1:
 				msg = "You have a friend on Strand nearby. Take a photo to share with them!"
 			else:
 				msg = "You have %s friends on Strand nearby. Take a photo to share with them!" % (numNearbyUsers)
 				
 			logger.debug("Sending raw firestarter msg to user %s " % (user.id))
-			logEntry = notifications_util.sendNotification(user, msg, msgType, dict())
-			if logEntry:
-				notificationLogsCache.append(logEntry)
+			
+			logEntries = notifications_util.sendNotification(user, msg, msgType, dict())
+			notificationLogsCache.extend(logEntries)
 				
 	return notificationLogsCache
 """
@@ -182,9 +182,8 @@ def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin
 				msg = "You have %s friends on Strand nearby. Take a photo to share with them!" % (numNearbyUsers)
 				
 			logger.debug("Sending photo firestarter msg to user %s " % (user.id))
-			logEntry = notifications_util.sendNotification(user, msg, msgType, dict())
-			if logEntry:
-				notificationLogsCache.append(logEntry)
+			logEntries = notifications_util.sendNotification(user, msg, msgType, dict())
+			notificationLogsCache.extend(logEntries)
 			
 	return notificationLogsCache
 
