@@ -63,9 +63,12 @@ def main(argv):
 			# Now, look through each of those user's contacts to see if there's a corrisponding entry
 			usersToFetchContactsFor = list()
 			for contactEntry in contactEntries:
-				if str(contactEntry.phone_number) in usersByPhoneNumber:
-					usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
-
+				try:
+					if str(contactEntry.phone_number) in usersByPhoneNumber:
+						usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
+				except UnicodeEncodeError:
+					logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+					
 			usersToFetchContactsFor = set(usersToFetchContactsFor)
 
 			possibleFriendEntries = ContactEntry.objects.filter(user_id__in=usersToFetchContactsFor)
