@@ -34,7 +34,13 @@ def getContactsByUser(contactEntries):
 	for contactEntry in contactEntries:
 		if contactEntry.user not in contactsByUser:
 			contactsByUser[contactEntry.user] = dict()
-		contactsByUser[contactEntry.user][str(contactEntry.phone_number)] = True
+			try:
+				contactsByUser[contactEntry.user][str(contactEntry.phone_number)] = True
+			except UnicodeEncodeError:
+				logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+				contactEntry.skip = True
+				contactEntry.save()
+
 
 	return contactsByUser
 	
@@ -53,7 +59,7 @@ def main(argv):
 		contactEntries = ContactEntry.objects.select_related().filter(evaluated=False).filter(skip=False)[:100]
 		newConnectionCount = 0
 
-		try:
+		
 			if len(contactEntries) > 0:
 				# Grab users who these new contact entries point to
 				phoneNumbers = [contactEntry.phone_number for contactEntry in contactEntries]
@@ -64,9 +70,13 @@ def main(argv):
 				# Now, look through each of those user's contacts to see if there's a corrisponding entry
 				usersToFetchContactsFor = list()
 				for contactEntry in contactEntries:
-					if str(contactEntry.phone_number) in usersByPhoneNumber:
-						usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
-									
+					try:
+						if str(contactEntry.phone_number) in usersByPhoneNumber:
+							usersToFetchContactsFor.append(usersByPhoneNumber[str(contactEntry.phone_number)].id)
+					except UnicodeEncodeError:
+						logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+						contactEntry.skip = True
+						contactEntry.save()
 				usersToFetchContactsFor = set(usersToFetchContactsFor)
 
 				possibleFriendEntries = ContactEntry.objects.filter(user_id__in=usersToFetchContactsFor)
@@ -102,8 +112,7 @@ def main(argv):
 				ContactEntry.bulkUpdate(contactEntries, ["evaluated"])
 			else:
 				time.sleep(1)
-		except UnicodeEncodeError:
-			logging.error("Unicode Encode Error for contact entry %s" % contactEntry.id)
+		
 
 
 if __name__ == "__main__":
