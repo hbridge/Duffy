@@ -286,8 +286,12 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 - (void)application:(UIApplication *)application
 performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
+  NSDate *startDate = [NSDate date];
+  DDLogInfo(@"Strand background app refresh called at %@", startDate);
   [[DFCameraRollChangeManager sharedManager]
    checkForNewCameraRollPhotosWithCompletion:^(UIBackgroundFetchResult result) {
+     DDLogInfo(@"Strand background app refresh finishing after %.02f seconds.",
+               [[NSDate date] timeIntervalSinceDate:startDate]);
     completionHandler(result);
   }];
 }
