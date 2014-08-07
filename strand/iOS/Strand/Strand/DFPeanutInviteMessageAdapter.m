@@ -52,7 +52,7 @@ NSString *const InviteMessagePath = @"get_invite_message";
                               path:InviteMessagePath
                               parameters:nil
                               ];
-  DDLogInfo(@"%@ getting endpoint: %@", [[self class] description],
+  DDLogVerbose(@"%@ getting endpoint: %@", [[self class] description],
             getRequest.URL.absoluteString);
   
   RKObjectRequestOperation *requestOp =

@@ -61,7 +61,7 @@ static NSString *const AccuracyKey = @"accuracy";
                                            TimestampKey: timestampString,
                                            AccuracyKey: @(location.horizontalAccuracy),
                                            }];
-  DDLogInfo(@"DFPeanutLocationAdapter getting endpoint: %@", getRequest.URL.absoluteString);
+  DDLogVerbose(@"DFPeanutLocationAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]

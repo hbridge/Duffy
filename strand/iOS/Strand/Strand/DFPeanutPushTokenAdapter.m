@@ -49,7 +49,7 @@ static NSString *const DeviceTokenKey = @"device_token";
                               parameters:@{
                                            DeviceTokenKey : apnsToken,
                                            }];
-  DDLogInfo(@"DFPeanutPushTokenAdapter getting endpoint: %@", getRequest.URL.absoluteString);
+  DDLogVerbose(@"DFPeanutPushTokenAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]

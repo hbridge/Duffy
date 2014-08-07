@@ -69,7 +69,6 @@ NSString *const RestPostPath = @"contacts/";
                            path:requestPath
                            parameters:nil];
   
-  //NSString *bodyString = [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding];
   DDLogInfo(@"%@ getting endpoint: %@ \n  bodySize:%lu \n",
             [[self class] description],
             request.URL.absoluteString,

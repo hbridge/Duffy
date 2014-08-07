@@ -91,7 +91,7 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
                               parameters:nil];
   
   
-  DDLogInfo(@"%@ getting endpoint: %@ \n  body:%@ \n",
+  DDLogVerbose(@"%@ getting endpoint: %@ \n  body:%@ \n",
             [[self class] description],
             request.URL.absoluteString,
             [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
