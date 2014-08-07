@@ -157,7 +157,7 @@
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
               @"AppDelegate",
-              [[UIApplication sharedApplication] applicationState]);
+              (int)[[UIApplication sharedApplication] applicationState]);
   }
 }
 
