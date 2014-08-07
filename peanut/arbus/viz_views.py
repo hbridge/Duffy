@@ -126,8 +126,7 @@ def userbaseSummary(request):
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
 	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
-	friendCount = User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id')
-	print friendCount.query
+	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
 	# Exclude type GPS fetch since it happens so frequently
 	notificationDataRaw = NotificationLog.objects.filter(apns=constants.IOS_NOTIFICATIONS_PROD_APNS_ID).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
