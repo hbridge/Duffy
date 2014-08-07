@@ -15,7 +15,7 @@
 #import "DFBackgroundLocationManager.h"
 #import "DFMapViewController.h"
 #import "DFPeanutInviteMessageAdapter.h"
-#import "DFInviteUserComposeController.h"
+#import "DFInviteUserViewController.h"
 #import "DFAnalytics.h"
 #import "DFStrandConstants.h"
 #import "DFUser.h"
@@ -28,7 +28,7 @@
 
 @property (nonatomic, retain) FKFormModel *formModel;
 @property (nonatomic, retain) DFSettings *settings;
-@property (nonatomic, retain) DFInviteUserComposeController *inviteController;
+@property (nonatomic, retain) DFInviteUserViewController *inviteController;
 
 @end
 
@@ -173,10 +173,8 @@
 - (FKFormMappingButtonHandlerBlock)inviteUserHandler
 {
   return ^(id object){
-    self.inviteController = [[DFInviteUserComposeController alloc] init];
-    [self.inviteController loadMessageWithCompletion:^(NSError *error) {
-      [self presentViewController:self.inviteController animated:YES completion:nil];
-    }];
+    self.inviteController = [[DFInviteUserViewController alloc] init];
+    [self presentViewController:self.inviteController animated:YES completion:nil];
   };
 }
 

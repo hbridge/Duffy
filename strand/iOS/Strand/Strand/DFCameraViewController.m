@@ -120,27 +120,6 @@ const unsigned int SavePromptMinPhotos = 3;
   self.delegate = self;
 }
 
-- (void)viewWillAppear:(BOOL)animated
-{
-  [super viewWillAppear:animated];
-  [self updateUnseenCount:nil];
-}
-
-- (void)updateUnseenCount:(NSNotification *)note
-{
-  int unseenCount;
-  if (note) {
-    NSNumber *unseenNumber = note.userInfo[DFStrandUnseenPhotosUpdatedCountKey];
-    unseenCount = unseenNumber.intValue;
-  } else {
-    unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
-  }
-  
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self.customCameraOverlayView setGalleryButtonCount:unseenCount];
-  });
-}
-
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
@@ -184,6 +163,21 @@ const unsigned int SavePromptMinPhotos = 3;
 {
   [self updateUnseenCount:nil];
   [self updateNearbyFriendsBar:nil];
+}
+
+- (void)updateUnseenCount:(NSNotification *)note
+{
+  int unseenCount;
+  if (note) {
+    NSNumber *unseenNumber = note.userInfo[DFStrandUnseenPhotosUpdatedCountKey];
+    unseenCount = unseenNumber.intValue;
+  } else {
+    unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
+  }
+  
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.customCameraOverlayView setGalleryButtonCount:unseenCount];
+  });
 }
 
 - (void)viewDidResignActive
