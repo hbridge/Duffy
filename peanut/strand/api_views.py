@@ -372,7 +372,16 @@ def update_user_location(request):
 
 				if last_photo_timestamp:
 					user.last_photo_timestamp = last_photo_timestamp
-					
+				
+				# We're saving last build info here since we are already writing to the user row in the database
+				if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
+					# if last_build_info is empty or if either build_id or build_number is not in last_build_info
+					#    update last_build_info
+					if ((not user.last_build_info) or 
+						form.cleaned_data['build_id'] not in user.last_build_info or 
+						str(form.cleaned_data['build_number']) not in user.last_build_info):
+						user.last_build_info = "%s-%s" % (form.cleaned_data['build_id'], form.cleaned_data['build_number'])
+			
 				user.save()
 				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
 			else:
@@ -427,11 +436,6 @@ def register_apns_token(request):
 					device.is_active = True
 				device.save()
 
-		# We're saving last build info here since we want to track it but only need it once per session
-		#   So this api call is good
-		if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
-			user.last_build_info = "%s-%s" % (form.cleaned_data['build_id'], form.cleaned_data['build_number'])
-		
 		user.save()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
