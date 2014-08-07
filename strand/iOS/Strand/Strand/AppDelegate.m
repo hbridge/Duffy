@@ -152,7 +152,6 @@
   if ([self isAppSetupComplete]) {
     [[DFUploadController sharedUploadController] uploadPhotos];
     [[DFStrandsManager sharedStrandsManager] performFetch];
-    [[DFCameraRollChangeManager sharedManager] checkForNewCameraRollPhotosWithCompletion:nil];
   }
 }
 
@@ -288,12 +287,11 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 {
   NSDate *startDate = [NSDate date];
   DDLogInfo(@"Strand background app refresh called at %@", startDate);
-  [[DFCameraRollChangeManager sharedManager]
-   checkForNewCameraRollPhotosWithCompletion:^(UIBackgroundFetchResult result) {
-     DDLogInfo(@"Strand background app refresh finishing after %.02f seconds.",
-               [[NSDate date] timeIntervalSinceDate:startDate]);
-    completionHandler(result);
-  }];
+  UIBackgroundFetchResult result = [[DFCameraRollChangeManager sharedManager] backgroundChangeScan];
+  DDLogInfo(@"Strand background app refresh finishing after %.02f seconds with result: %d",
+            [[NSDate date] timeIntervalSinceDate:startDate],
+            (int)result);
+  completionHandler(result);
 }
 
 - (void)resetApplication

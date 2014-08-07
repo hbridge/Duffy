@@ -660,6 +660,7 @@ context:(NSManagedObjectContext *)context
   if ([ALAssetsLibrary authorizationStatus] != ALAuthorizationStatusAuthorized
       && !promptUser) {
     DDLogVerbose(@"Not authorized to check for last photo date and promptUser false.");
+    completion(nil);
     return;
   }
   

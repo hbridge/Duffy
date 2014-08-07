@@ -11,7 +11,7 @@
 @interface DFCameraRollChangeManager : NSObject
 
 + (DFCameraRollChangeManager *)sharedManager;
-- (void)checkForNewCameraRollPhotosWithCompletion:(void (^)(UIBackgroundFetchResult result))completion;
+- (UIBackgroundFetchResult)backgroundChangeScan;
 
 
 @end

@@ -33,33 +33,40 @@ static DFCameraRollChangeManager *defaultManager;
   return [self sharedManager];
 }
 
-- (void)checkForNewCameraRollPhotosWithCompletion:(void (^)(UIBackgroundFetchResult result))completion
+- (UIBackgroundFetchResult)backgroundChangeScan
 {
   NSDate *lastDateRecorded = [DFDefaultsStore lastDateForAction:DFUserActionTakeExternalPhoto];
-  [[DFPhotoStore sharedStore] fetchMostRecentSavedPhotoDate:^(NSDate *lastPhotoDate) {
-    if (lastPhotoDate && ![lastDateRecorded isEqualToDate:lastPhotoDate]) {
-      DDLogInfo(@"%@ new camera roll photo detected. old most recent:%@ new most recent:%@",
-                [self.class description], lastDateRecorded, lastPhotoDate);
-      DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
-      peanutUser.id = [[DFUser currentUser] userID];
-      peanutUser.last_photo_timestamp = lastPhotoDate;
-      [self.userAdapter
-       performRequest:RKRequestMethodPUT
-       withPeanutUser:peanutUser
-       success:^(DFPeanutUserObject *user) {
-         [DFDefaultsStore setLastDate:lastPhotoDate forAction:DFUserActionTakeExternalPhoto];
-         if (completion)
-           completion(UIBackgroundFetchResultNewData);
-       } failure:^(NSError *error) {
-         if (completion)
-           completion(UIBackgroundFetchResultNewData);
-       }];
-    } else {
-      DDLogInfo(@"%@ no new camera roll photos detected.", [self.class description]);
-      if (completion)
-        completion(UIBackgroundFetchResultNoData);
-    }
-  } promptUserIfNecessary:NO];
+  UIBackgroundFetchResult __block result;
+  dispatch_semaphore_t completion_semaphore = dispatch_semaphore_create(0);
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    [[DFPhotoStore sharedStore] fetchMostRecentSavedPhotoDate:^(NSDate *lastPhotoDate) {
+      if (lastPhotoDate && ![lastDateRecorded isEqualToDate:lastPhotoDate]) {
+        DDLogInfo(@"%@ new camera roll photo detected. old most recent:%@ new most recent:%@",
+                  [self.class description], lastDateRecorded, lastPhotoDate);
+        DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
+        peanutUser.id = [[DFUser currentUser] userID];
+        peanutUser.last_photo_timestamp = lastPhotoDate;
+        [self.userAdapter
+         performRequest:RKRequestMethodPUT
+         withPeanutUser:peanutUser
+         success:^(DFPeanutUserObject *user) {
+           [DFDefaultsStore setLastDate:lastPhotoDate forAction:DFUserActionTakeExternalPhoto];
+           result = UIBackgroundFetchResultNewData;
+           dispatch_semaphore_signal(completion_semaphore);
+         } failure:^(NSError *error) {
+           result = UIBackgroundFetchResultFailed;
+           dispatch_semaphore_signal(completion_semaphore);
+         }];
+      } else {
+        DDLogInfo(@"%@ no new camera roll photos detected.", [self.class description]);
+        result = UIBackgroundFetchResultNoData;
+        dispatch_semaphore_signal(completion_semaphore);
+      }
+    } promptUserIfNecessary:NO];
+  });
+  
+  dispatch_semaphore_wait(completion_semaphore, dispatch_time(DISPATCH_TIME_NOW, 28 * NSEC_PER_SEC));
+  return result;
 }
 
 - (DFUserPeanutAdapter *)userAdapter
