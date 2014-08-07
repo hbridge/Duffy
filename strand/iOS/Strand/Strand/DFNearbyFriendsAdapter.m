@@ -13,6 +13,7 @@
 NSString *const NearbyFriendsPath = @"get_nearby_friends_message";
 NSString *const LatitudeKey = @"lat";
 NSString *const LongitudeKey = @"lon";
+NSString *const AccuracyKey = @"accuracy";
 
 @implementation DFNearbyFriendsAdapter
 
@@ -49,6 +50,7 @@ NSString *const LongitudeKey = @"lon";
                               parameters:@{
                                            LatitudeKey : @(location.coordinate.latitude),
                                            LongitudeKey: @(location.coordinate.longitude),
+                                           AccuracyKey: @(location.horizontalAccuracy),
                                            }];
   DDLogInfo(@"%@ getting endpoint: %@", [[self class] description], getRequest.URL.absoluteString);
   
