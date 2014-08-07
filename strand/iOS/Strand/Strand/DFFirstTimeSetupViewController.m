@@ -50,6 +50,9 @@ UInt16 const DFPhoneNumberLength = 10;
   self.termsButton.titleLabel.numberOfLines = 0;
   self.termsButton.titleLabel.textAlignment = NSTextAlignmentCenter;
   self.nameTextField.text = [DFUser deviceNameBasedUserName];
+  if ([self.nameTextField.text isEqualToString:@"iPhone"]) {
+    self.nameTextField.text = @"";
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated

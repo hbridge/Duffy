@@ -1,5 +1,11 @@
 # Strand
 
+## Aug 4th, 2014
+
+- Adds one more step to setup that asks for you contacts permission so we can figure out who you're friends with based on your address book.
+- Show photos that are uploading in the feed
+- Bug fixes
+
 ## Jul 28th, 2014
 
 - Status bar no longer jumps when switching between camera and feed
