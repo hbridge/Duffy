@@ -472,7 +472,9 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
 
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
+  DDLogInfo(@"%@ imagePickerControllerDidCancel.", [self.class description]);
   [self galleryButtonPressed:nil];
+  self.isTakePhotoInProgress = NO;
 }
 
 
