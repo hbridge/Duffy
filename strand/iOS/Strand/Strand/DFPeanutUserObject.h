@@ -24,6 +24,7 @@
 @property (nonatomic, retain) NSNumber *last_location_accuracy;
 @property (nonatomic, retain) NSDate *last_photo_timestamp;
 @property (nonatomic, retain) NSNumber *invites_remaining;
+@property (nonatomic, retain) NSNumber *invites_sent;
 @property (nonatomic, retain) NSDate *added;
 
 - (NSDictionary *)requestParameters;

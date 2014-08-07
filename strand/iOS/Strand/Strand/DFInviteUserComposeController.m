@@ -62,6 +62,7 @@
   DDLogInfo(@"%@ finishedw with result: %d", [self.class description], result);
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:self.presentingViewController];
+  self.result = result;
   [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 

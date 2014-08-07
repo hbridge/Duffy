@@ -10,7 +10,7 @@
 
 @interface DFInviteUserComposeController : MFMessageComposeViewController <MFMessageComposeViewControllerDelegate>
 
-
+@property (nonatomic) MessageComposeResult result;
 - (void)loadMessageWithCompletion:(void(^)(NSError *))messageLoadCompletion;
 
 @end

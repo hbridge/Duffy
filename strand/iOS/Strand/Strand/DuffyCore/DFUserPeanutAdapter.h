@@ -28,4 +28,7 @@ typedef void (^DFUserFetchFailureBlock)(NSError *error);
                success:(DFUserFetchSuccessBlock)success
                failure:(DFUserFetchFailureBlock)failure;
 
+- (void)getCurrentUserWithSuccess:(DFUserFetchSuccessBlock)succcess
+                          failure:(DFUserFetchFailureBlock)failure;
+
 @end

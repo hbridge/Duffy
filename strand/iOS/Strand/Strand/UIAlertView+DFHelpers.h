@@ -11,5 +11,7 @@
 @interface UIAlertView (DFHelpers)
 
 + (void)showSimpleAlertWithTitle:(NSString *)title message:(NSString *)message;
++ (void)showSimpleAlertWithTitle:(NSString *)title
+                   formatMessage:(NSString *)format, ... NS_FORMAT_FUNCTION(2,3);
 
 @end

@@ -20,4 +20,12 @@
   [alertView show];
 }
 
++ (void)showSimpleAlertWithTitle:(NSString *)title formatMessage:(NSString *)format, ...
+{
+  va_list args;
+  va_start(args, format);
+  NSString *message = [[NSString alloc] initWithFormat:format arguments:args];
+  [self showSimpleAlertWithTitle:title message:message];
+}
+
 @end

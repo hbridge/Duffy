@@ -32,6 +32,7 @@
            @"last_location_accuracy",
            @"last_photo_timestamp",
            @"invites_remaining",
+           @"invites_sent",
            @"added",
            ];
 }

@@ -159,7 +159,13 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
 }
 
-
+- (void)getCurrentUserWithSuccess:(DFUserFetchSuccessBlock)succcess
+                          failure:(DFUserFetchFailureBlock)failure
+{
+  DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
+  user.id = [[DFUser currentUser] userID];
+  [self performRequest:RKRequestMethodGET withPeanutUser:user success:succcess failure:failure];
+}
 
 
 @end
