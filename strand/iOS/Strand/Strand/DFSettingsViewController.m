@@ -95,7 +95,7 @@
     [mapping sectionWithTitle:@"Photos"
                        footer:@"Automatically save photos you take in Strand to your Camera Roll"
                    identifier:@"photos"];
-    [mapping mapAttribute:@"autosaveToCameraRoll" title:@"Save to Camera Roll."
+    [mapping mapAttribute:@"autosaveToCameraRoll" title:@"Save to Camera Roll"
                      type:FKFormAttributeMappingTypeBoolean];
     
     // Support

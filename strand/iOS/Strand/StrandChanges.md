@@ -1,5 +1,10 @@
 # Strand
 
+## Aug 7th, 2015
+
+- Improved battery drain
+- Other minor bug fixes
+
 ## Aug 4th, 2014
 
 - Adds one more step to setup that asks for you contacts permission so we can figure out who you're friends with based on your address book.
