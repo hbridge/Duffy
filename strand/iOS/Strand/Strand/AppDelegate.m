@@ -148,10 +148,16 @@
 
 - (void)performForegroundOperations
 {
-  DDLogInfo(@"Strand app %@ became active.", [DFAppInfo appInfoString]);
-  if ([self isAppSetupComplete]) {
-    [[DFUploadController sharedUploadController] uploadPhotos];
-    [[DFStrandsManager sharedStrandsManager] performFetch];
+  if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+    DDLogInfo(@"Strand app %@ became active.", [DFAppInfo appInfoString]);
+    if ([self isAppSetupComplete]) {
+      [[DFUploadController sharedUploadController] uploadPhotos];
+      [[DFStrandsManager sharedStrandsManager] performFetch:nil];
+    }
+  } else {
+    DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
+              @"AppDelegate",
+              [[UIApplication sharedApplication] applicationState]);
   }
 }
 
@@ -174,8 +180,6 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-  // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-  // Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
   [DFAnalytics CloseAnalyticsSession];
 }
 
@@ -246,7 +250,7 @@
 didReceiveRemoteNotification:(NSDictionary *)userInfo
 fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
-  DDLogVerbose(@"App received notification: %@",
+  DDLogInfo(@"App received notification: %@",
                userInfo.description);
   DFPeanutPushNotification *pushNotif = [[DFPeanutPushNotification alloc] initWithUserInfo:userInfo];
   if ([application applicationState] == UIApplicationStateBackground){

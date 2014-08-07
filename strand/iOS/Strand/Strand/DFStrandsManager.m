@@ -58,14 +58,14 @@ static DFStrandsManager *defaultStrandsManager;
                                                  name:DFStrandGalleryAppearedNotificationName
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(performFetch)
+                                             selector:@selector(performFetch:)
                                                  name:DFStrandRefreshRemoteUIRequestedNotificationName
                                                object:nil];
   }
   return self;
 }
 
-- (UIBackgroundFetchResult)performFetch
+- (UIBackgroundFetchResult)performFetch:(NSNotification *)note
 {
   DDLogInfo(@"DFStrandsManager performing fetch.");
   
@@ -197,7 +197,7 @@ static DFStrandsManager *defaultStrandsManager;
 - (int)numUnseenPhotos
 {
   if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] > MinSecondsBetweenFetch) {
-    [self performFetch];
+    [self performFetch:nil];
   }
   
   return [DFStrandStore UnseenPhotosCount];

@@ -15,7 +15,7 @@
 
 + (DFStrandsManager *)sharedStrandsManager;
 
-- (UIBackgroundFetchResult)performFetch;
+- (UIBackgroundFetchResult)performFetch:(NSNotification *)note;
 
 - (void)updateJoinableStrands;
 - (void)updateNewPhotos;
