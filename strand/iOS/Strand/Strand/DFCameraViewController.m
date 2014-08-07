@@ -82,7 +82,10 @@ const unsigned int SavePromptMinPhotos = 3;
                                            selector:@selector(applicationDidEnterBackground:)
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
-  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(applicationDidResignActive:)
+                                               name:UIApplicationWillResignActiveNotification
+                                             object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(updateUnseenCount:)
                                                name:DFStrandUnseenPhotosUpdatedNotificationName
@@ -141,14 +144,14 @@ const unsigned int SavePromptMinPhotos = 3;
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self viewDidAppearFromBackground:NO];
+  [self viewDidBecomeActive];
 }
 
 
 - (void)viewDidDisappear:(BOOL)animated
 {
   [super viewDidDisappear:animated];
-  [self viewDidDisappearToBackground:NO];
+  [self viewDidResignActive];
 }
 
 - (void)configureLocationManager
@@ -159,7 +162,7 @@ const unsigned int SavePromptMinPhotos = 3;
   self.locationManager.delegate = self;
 }
 
-- (void)viewDidAppearFromBackground:(BOOL)fromBackground
+- (void)viewDidBecomeActive
 {
   [self updateServerUI];
   if (!self.updateUITimer) {
@@ -183,7 +186,7 @@ const unsigned int SavePromptMinPhotos = 3;
   [self updateNearbyFriendsBar:nil];
 }
 
-- (void)viewDidDisappearToBackground:(BOOL)toBackground
+- (void)viewDidResignActive
 {
   [self stopLocationUpdates];
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
@@ -194,14 +197,21 @@ const unsigned int SavePromptMinPhotos = 3;
 - (void)applicationDidBecomeActive:(NSNotification *)note
 {
   if (self.isViewLoaded && self.view.window) {
-    [self viewDidAppearFromBackground:YES];
+    [self viewDidBecomeActive];
   }
 }
 
 - (void)applicationDidEnterBackground:(NSNotification *)note
 {
   if (self.isViewLoaded && self.view.window) {
-    [self viewDidDisappearToBackground:YES];
+    [self viewDidResignActive];
+  }
+}
+
+- (void)applicationDidResignActive:(NSNotification *)note
+{
+  if (self.isViewLoaded && self.view.window) {
+    [self viewDidResignActive];
   }
 }
 

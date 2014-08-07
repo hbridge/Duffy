@@ -52,6 +52,10 @@ static DFBackgroundLocationManager *defaultManager;
                                              selector:@selector(appEnteredBackground)
                                                  name:UIApplicationDidEnterBackgroundNotification
                                                object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appResignedActive)
+                                                 name:UIApplicationWillResignActiveNotification
+                                               object:nil];
     if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
       [self.locationManager startUpdatingLocation];
     }
@@ -193,6 +197,12 @@ static DFBackgroundLocationManager *defaultManager;
 }
 
 - (void)appEnteredBackground
+{
+  DDLogVerbose(@"DFBackgroundLocationManager stopping continuous updates.");
+  [self.locationManager stopUpdatingLocation];
+}
+
+- (void)appResignedActive
 {
   DDLogVerbose(@"DFBackgroundLocationManager stopping continuous updates.");
   [self.locationManager stopUpdatingLocation];

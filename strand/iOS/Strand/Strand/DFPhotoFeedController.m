@@ -136,6 +136,10 @@ const CGFloat LockedCellHeight = 157.0;
                                                name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(viewDidBecomeInactive)
+                                               name:UIApplicationWillResignActiveNotification
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(applicationDidEnterBackground:)
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
@@ -310,6 +314,11 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidDisappear:animated];
 
+  [self viewDidBecomeInactive];
+}
+
+- (void)viewDidBecomeInactive
+{
   [self.autoRefreshTimer invalidate];
   self.autoRefreshTimer = nil;
 }
