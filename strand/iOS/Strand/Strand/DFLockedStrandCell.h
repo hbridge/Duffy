@@ -12,7 +12,8 @@
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 
-- (void)setImages:(NSArray *)images;
-- (void)addImage:(UIImage *)image;
+// Objects that the locked cell represents
+@property (nonatomic, retain) NSArray *objects;
+- (void)setImage:(UIImage *)image forObject:(id)object;
                   
 @end

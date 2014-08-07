@@ -468,7 +468,13 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DFLockedStrandCell *lockedCell = [self.tableView dequeueReusableCellWithIdentifier:@"lockedCell"
                                                                    forIndexPath:indexPath];
-  [lockedCell setImages:@[]];
+  
+  NSMutableArray *objectIDs = [NSMutableArray new];
+  for (DFPeanutSearchObject *object in section.objects) {
+    [objectIDs addObject:@(object.id)];
+  }
+  lockedCell.objects = objectIDs;
+  
   for (DFPeanutSearchObject *object in section.objects) {
     [[DFImageStore sharedStore]
      imageForID:object.id
@@ -478,7 +484,7 @@ const CGFloat LockedCellHeight = 157.0;
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
          if (![self.tableView.visibleCells containsObject:lockedCell]) return;
-         [lockedCell addImage:image];
+         [lockedCell setImage:image forObject:@(object.id)];
          [lockedCell setNeedsLayout];
        });
      }];

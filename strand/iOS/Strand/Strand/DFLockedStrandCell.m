@@ -12,7 +12,7 @@
 
 @interface DFLockedStrandCell()
 
-@property (atomic, retain) NSMutableArray *blurredImages;
+@property (atomic, retain) NSMutableDictionary *blurredImagesForObjects;
 
 @end
 
@@ -20,7 +20,7 @@
 
 - (void)awakeFromNib
 {
-  self.images = [NSMutableArray new];
+  self.blurredImagesForObjects = [NSMutableDictionary new];
   self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
   self.collectionView.backgroundColor = [UIColor clearColor];
@@ -35,30 +35,19 @@
   // Configure the view for the selected state
 }
 
-- (void)setImages:(NSArray *)images
+- (void)setObjects:(NSArray *)objects
 {
-  self.blurredImages = [NSMutableArray new];
-  for (UIImage *image in images) {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
-      if (blurredImage) {
-        [self.blurredImages addObject:blurredImage];
-        dispatch_async(dispatch_get_main_queue(), ^{
-          [self.collectionView reloadData];
-        });
-
-      }
-    });
-  }
+  _objects = objects;
+  self.blurredImagesForObjects = [NSMutableDictionary new];
 }
 
-- (void)addImage:(UIImage *)image
+- (void)setImage:(UIImage *)image forObject:(id)object
 {
   if (image) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
       if (blurredImage) {
-        [self.blurredImages addObject:blurredImage];
+        self.blurredImagesForObjects[object] = blurredImage;
         dispatch_async(dispatch_get_main_queue(), ^{
           [self.collectionView reloadData];
         });
@@ -74,7 +63,7 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  return self.blurredImages.count;
+  return self.blurredImagesForObjects.allValues.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -84,7 +73,8 @@
                            dequeueReusableCellWithReuseIdentifier:@"cell"
                            forIndexPath:indexPath];
   
-  cell.imageView.image = self.blurredImages[indexPath.row];
+  id object = self.objects[indexPath.row];
+  cell.imageView.image = self.blurredImagesForObjects[object];
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
   cell.imageView.backgroundColor = [UIColor grayColor];
