@@ -1371,7 +1371,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "7CE5382B-2DB6-4805-87BA-7B6EABFE231C";
+				PROVISIONING_PROFILE = "CEEBEA49-9D65-4D7C-BBBE-3BB9B4FE19EA";
 				SDKROOT = iphoneos;
 			};
 			name = "App store";
@@ -1486,7 +1486,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "68570027-24F0-4258-BAD9-390D9837DFED";
+				PROVISIONING_PROFILE = "9B7E583D-319A-4A68-92B3-D786BFD25302";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
