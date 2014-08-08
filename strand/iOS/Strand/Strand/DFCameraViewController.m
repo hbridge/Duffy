@@ -51,7 +51,6 @@ const unsigned int SavePromptMinPhotos = 3;
 @property (nonatomic, retain) NSTimer *updateUITimer;
 @property (nonatomic, retain) NSDate *lastWifiPromptDate;
 @property (readonly, nonatomic, retain) DFLocationRoadblockViewController *locationRoadblockViewController;
-@property (atomic) BOOL isTakePhotoInProgress;
 
 @end
 
@@ -105,16 +104,16 @@ const unsigned int SavePromptMinPhotos = 3;
 {
   [super viewDidLoad];
   if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-    self.sourceType = UIImagePickerControllerSourceTypeCamera;
+//    self.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.cameraOverlayView = self.customCameraOverlayView;
-    self.view.backgroundColor = [UIColor blackColor];
-    self.showsCameraControls = NO;
-    self.cameraFlashMode = [DFDefaultsStore flashMode];
-    self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
-    [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
+//    self.view.backgroundColor = [UIColor blackColor];
+//    self.showsCameraControls = NO;
+//    self.cameraFlashMode = [DFDefaultsStore flashMode];
+//    self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
+//    [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
   } else {
-    self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
-    //[self.view addSubview:self.customCameraOverlayView];
+//    self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
+//    //[self.view addSubview:self.customCameraOverlayView];
   }
   
   self.delegate = self;
@@ -329,15 +328,13 @@ const unsigned int SavePromptMinPhotos = 3;
 
 - (void)takePhotoButtonPressed:(UIButton *)sender
 {
-  DDLogInfo(@"%@ Take photo button pressed. isTakePhotoInProgress:%@",
-            [self.class description], [NSNumber numberWithBool:self.isTakePhotoInProgress]);
-  if (!self.isTakePhotoInProgress) {
-    self.isTakePhotoInProgress = YES;
-    [self takePicture];
-    [self flashCameraView];
-    [self handleNUXTasksForPhotoTaken];
-    [DFDefaultsStore incrementCountForAction:DFUserActionTakePhoto];
-  }
+  DDLogInfo(@"%@ Take photo button pressed.",
+            [self.class description]);
+  [self takePicture];
+  [self flashCameraView];
+  [self handleNUXTasksForPhotoTaken];
+  [DFDefaultsStore incrementCountForAction:DFUserActionTakePhoto];
+
 }
 
 - (void)handleNUXTasksForPhotoTaken
@@ -427,26 +424,19 @@ const unsigned int SavePromptMinPhotos = 3;
 
 #pragma mark - Image Picker Controller delegate methods
 
-- (void)imagePickerController:(UIImagePickerController *)picker
-didFinishPickingMediaWithInfo:(NSDictionary *)info {
-  DDLogInfo(@"%@ image picked", [self.class description]);
-  self.isTakePhotoInProgress = NO;
+- (void)cameraView:(DFAVCameraViewController *)cameraView
+   didCaptureImage:(UIImage *)image
+          metadata:(NSDictionary *)metadata
+{
+  DDLogInfo(@"%@ image captured", [self.class description]);
   
-  NSString *mediaType = [info objectForKey: UIImagePickerControllerMediaType];
-  UIImage *imageToSave;
   
-  // Handle a still image capture
-  if (CFStringCompare ((CFStringRef) mediaType, kUTTypeImage, 0)
-      == kCFCompareEqualTo) {
-    imageToSave = (UIImage *) [info objectForKey:
-                               UIImagePickerControllerOriginalImage];
-    NSDictionary *metadata = (NSDictionary *)info[UIImagePickerControllerMediaMetadata];
-    [self waitForGoodLocationAndSaveImage:imageToSave withMetadata:metadata retryNumber:0];
-    [self animateImageCaptured:imageToSave];
+  [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:0];
+  [self animateImageCaptured:image];
+  
+  if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
+    [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
     
-    if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
-      [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
-    }
   }
 }
 
@@ -473,14 +463,6 @@ didFinishPickingMediaWithInfo:(NSDictionary *)info {
     }];
   });
 }
-
-- (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
-{
-  DDLogInfo(@"%@ imagePickerControllerDidCancel.", [self.class description]);
-  [self galleryButtonPressed:nil];
-  self.isTakePhotoInProgress = NO;
-}
-
 
 - (void)waitForGoodLocationAndSaveImage:(UIImage *)image
                            withMetadata:(NSDictionary *)metadata
