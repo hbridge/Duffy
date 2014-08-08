@@ -18,6 +18,8 @@
 @property (nonatomic, retain) AVCaptureVideoPreviewLayer *capturePreviewLayer;
 @property (nonatomic, retain) UIView *capturePreviewView;
 
+@property (nonatomic, readonly) AVCaptureDevice *currentCaptureDevice;
+
 @end
 
 @implementation DFAVCameraViewController
@@ -160,24 +162,58 @@
 
 - (void)previewTapped:(UITapGestureRecognizer *)tapRecognizer
 {
-  CGPoint location = [tapRecognizer locationInView:self.capturePreviewView];
-  CGPoint focusLocation = [self.capturePreviewLayer captureDevicePointOfInterestForPoint:location];
+  CGPoint viewLocation = [tapRecognizer locationInView:self.capturePreviewView];
+  CGPoint deviceLocation = [self.capturePreviewLayer captureDevicePointOfInterestForPoint:viewLocation];
   DDLogVerbose(@"Focus tapped. Location in view: %@ focusLocation: %@",
-               NSStringFromCGPoint(location),
-               NSStringFromCGPoint(focusLocation));
+               NSStringFromCGPoint(viewLocation),
+               NSStringFromCGPoint(deviceLocation));
   
-  NSError *error;
-  [[self currentCameraDevice] lockForConfiguration:&error];
-  [[self currentCameraDevice] setFocusMode:AVCaptureFocusModeAutoFocus];
-  [[self currentCameraDevice] setFocusPointOfInterest:focusLocation];
-  [[self currentCameraDevice] unlockForConfiguration];
-  if (error) {
-    DDLogError(@"%@ couldn't set focus POI: %@", [self.class description], error.description);
+  if ([self.currentCaptureDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
+    NSError *error;
+    [self.currentCaptureDevice lockForConfiguration:&error];
+    [self.currentCaptureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+    [self.currentCaptureDevice setFocusPointOfInterest:deviceLocation];
+    [self.currentCaptureDevice unlockForConfiguration];
+    if (error) {
+      DDLogError(@"%@ couldn't set focus POI: %@", [self.class description], error.description);
+    }
+  } else {
+    DDLogWarn(@"%@ autofocus mode not supported.", [self.class description]);
   }
 }
 
+- (void)setCameraFlashMode:(UIImagePickerControllerCameraFlashMode)cameraFlashMode
+{
+  AVCaptureFlashMode newMode;
+  if (cameraFlashMode == UIImagePickerControllerCameraFlashModeOn) {
+    newMode = AVCaptureFlashModeOn;
+  } else if (cameraFlashMode == UIImagePickerControllerCameraFlashModeOff) {
+    newMode = AVCaptureFlashModeOff;
+  } else {
+    newMode = AVCaptureFlashModeAuto;
+  }
+  
+  NSError *error;
+  [self.currentCaptureDevice lockForConfiguration:&error];
+  self.currentCaptureDevice.flashMode = newMode;
+  [self.currentCaptureDevice unlockForConfiguration];
+}
 
-- (AVCaptureDevice *)currentCameraDevice {
+- (UIImagePickerControllerCameraFlashMode)cameraFlashMode
+{
+  if (self.currentCaptureDevice.flashMode == AVCaptureFlashModeOn) {
+    return UIImagePickerControllerCameraFlashModeOn;
+  } else if (self.currentCaptureDevice.flashMode == AVCaptureFlashModeOff) {
+    return UIImagePickerControllerCameraFlashModeOff;
+  } else if (self.currentCaptureDevice.flashMode == AVCaptureFlashModeAuto) {
+    return UIImagePickerControllerCameraFlashModeAuto;
+  }
+  
+  return UIImagePickerControllerCameraFlashModeAuto;
+}
+
+
+- (AVCaptureDevice *)currentCaptureDevice {
   return [(AVCaptureDeviceInput *)self.session.inputs.firstObject device];
 }
 
