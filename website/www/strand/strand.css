@@ -14,7 +14,14 @@ body {
 }
 .ui-footer {
 	padding: 10px 0px 10px 0px;
+	font-size: 12px;
 }
 .ui-indent {
 	padding-left: 40px;
+}
+.hidden {
+	display: none;
+}
+.center {
+	text-align: center;
 }
