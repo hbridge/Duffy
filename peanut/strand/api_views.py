@@ -372,6 +372,7 @@ def update_user_location(request):
 
 				if last_photo_timestamp:
 					user.last_photo_timestamp = last_photo_timestamp
+					logger.info("Last Photo: %s, %s" % (user.id, last_photo_timestamp))
 				
 				# We're saving last build info here since we are already writing to the user row in the database
 				if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
@@ -381,6 +382,7 @@ def update_user_location(request):
 						form.cleaned_data['build_id'] not in user.last_build_info or 
 						str(form.cleaned_data['build_number']) not in user.last_build_info):
 						user.last_build_info = "%s-%s" % (form.cleaned_data['build_id'], form.cleaned_data['build_number'])
+						logger.info("Build info updated to %s" % (user.last_build_info))
 			
 				user.save()
 				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
