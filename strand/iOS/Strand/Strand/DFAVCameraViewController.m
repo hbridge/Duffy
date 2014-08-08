@@ -212,6 +212,57 @@
   return UIImagePickerControllerCameraFlashModeAuto;
 }
 
+- (void)setCameraDevice:(UIImagePickerControllerCameraDevice)cameraDevice
+{
+  DDLogVerbose(@"%@ setting new camera device to %@",
+               [self.class description],
+               @(cameraDevice));
+  AVCaptureDeviceInput *oldInput = self.session.inputs.firstObject;
+  [self.session removeInput:oldInput];
+  
+  NSError *error = nil;
+  AVCaptureDeviceInput *newInput;
+  if (cameraDevice == UIImagePickerControllerCameraDeviceRear) {
+    newInput = [AVCaptureDeviceInput deviceInputWithDevice:[self rearCamera] error:&error];
+  } else {
+    newInput = [AVCaptureDeviceInput deviceInputWithDevice:[self frontCamera] error:&error];
+  }
+  
+  if (!newInput || error) {
+    DDLogError(@"%@ couldn't set new camera device to %@.  Error:%@",
+               [self.class description],
+               @(cameraDevice),
+               error);
+    return;
+  }
+
+  [self.session addInput:newInput];
+}
+
+- (UIImagePickerControllerCameraDevice)cameraDevice
+{
+  if (self.currentCaptureDevice == [self frontCamera]) {
+    return UIImagePickerControllerCameraDeviceFront;
+  }
+  
+  return UIImagePickerControllerCameraDeviceRear;
+}
+
+
+- (AVCaptureDevice *)frontCamera {
+  NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
+  for (AVCaptureDevice *device in devices) {
+    if (device.position == AVCaptureDevicePositionFront) {
+      return device;
+    }
+  }
+  return nil;
+}
+
+- (AVCaptureDevice *)rearCamera {
+  return [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
+}
+
 
 - (AVCaptureDevice *)currentCaptureDevice {
   return [(AVCaptureDeviceInput *)self.session.inputs.firstObject device];
