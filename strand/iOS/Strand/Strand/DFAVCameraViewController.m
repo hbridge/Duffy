@@ -10,6 +10,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import <ImageIO/ImageIO.h>
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "UIImage+DFHelpers.h"
 
 
 @interface DFAVCameraViewController ()
@@ -112,7 +113,10 @@
                                                                NULL)];
        exifDict[@"DateTimeOriginal"] = [[NSDateFormatter EXIFDateFormatter]
                                         stringFromDate:[NSDate date]];
-       NSDictionary *metadata = @{@"{Exif}": exifDict};
+       NSDictionary *metadata = @{
+                                  @"Orientation": @([image CGImageOrientation]),
+                                  @"{Exif}": exifDict,
+                                  };
        
        if ([self.delegate respondsToSelector:@selector(cameraView:didCaptureImage:metadata:)]) {
          [self.delegate cameraView:self didCaptureImage:image metadata:metadata];
