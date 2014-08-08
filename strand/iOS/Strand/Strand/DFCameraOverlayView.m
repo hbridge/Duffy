@@ -27,7 +27,6 @@ NSString *const FlashAutoTitle = @"Auto";
 
 - (void)awakeFromNib
 {
-  self.flashButton.imageView.image = [self.flashButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   [self configureHelpTextLabels];
   self.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
   self.galleryButton.badgeColor = [DFStrandConstants strandGreen];
