@@ -185,9 +185,9 @@ def userbaseSummary(request):
 
 		if user.last_build_info:
 			buildNum = user.last_build_info[user.last_build_info.find('-'):]
-			if ('enterprise' in user.last_build_info):
+			if ('enterprise' in user.last_build_info.lower()):
 				entry['build'] = 'e' + buildNum
-			elif ('dp' in user.last_build_info):
+			elif ('dp' in user.last_build_info.lower()):
 				entry['build'] = 'd' + buildNum
 			else:
 				entry['build'] = 's' + buildNum
