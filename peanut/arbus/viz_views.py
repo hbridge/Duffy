@@ -121,12 +121,21 @@ def userbaseSummary(request):
 	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
-			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-id')
+			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-lastAdded')
 
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
 	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
+
+	extras = dict()
+	for i in range(len(userStats)):
+		entry = dict()
+		entry['actions'] = actionsCount[i].totalActions
+		entry['strands'] = strandCount[i].totalStrands
+		entry['contacts'] = contactCount[i].totalContacts
+		entry['friends'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
+		extras[actionsCount[i].id] = entry
 
 	# Exclude type GPS fetch since it happens so frequently
 	notificationDataRaw = NotificationLog.objects.filter(apns=constants.IOS_NOTIFICATIONS_PROD_APNS_ID).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
@@ -135,7 +144,7 @@ def userbaseSummary(request):
 
 	for notificationData in notificationDataRaw:
 		notificationCountById[notificationData['user']] = notificationData['totalNotifs']
-		notificationLastById[notificationData['user']] = notificationData['lastSent']
+		notificationLastById[notificationData['user']] = notificationData['lastSent']	
 
 
 	for i, user in enumerate(userStats):
@@ -174,14 +183,14 @@ def userbaseSummary(request):
 		else:
 			entry['notifications'] = '-'
 
-		if (actionsCount[i].totalActions > 0):
-			entry['actions'] = actionsCount[i].totalActions
+		if (extras[user.id]['actions'] > 0):
+			entry['actions'] = extras[user.id]['actions']
 		else:
 			entry['actions'] = '-'
 
-		entry['strandCount'] = strandCount[i].totalStrands
-		entry['contactCount'] = contactCount[i].totalContacts
-		entry['friendCount'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
+		entry['strandCount'] = extras[user.id]['strands']
+		entry['contactCount'] = extras[user.id]['contacts']
+		entry['friendCount'] = extras[user.id]['friends']
 
 		if user.last_build_info:
 			buildNum = user.last_build_info[user.last_build_info.find('-'):]
