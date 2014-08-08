@@ -104,13 +104,10 @@ const unsigned int SavePromptMinPhotos = 3;
 {
   [super viewDidLoad];
   if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-//    self.sourceType = UIImagePickerControllerSourceTypeCamera;
     self.cameraOverlayView = self.customCameraOverlayView;
-//    self.view.backgroundColor = [UIColor blackColor];
-//    self.showsCameraControls = NO;
-//    self.cameraFlashMode = [DFDefaultsStore flashMode];
-//    self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
-//    [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
+    self.cameraFlashMode = [DFDefaultsStore flashMode];
+    self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
+    [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
   } else {
 //    self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
 //    //[self.view addSubview:self.customCameraOverlayView];
@@ -434,10 +431,7 @@ const unsigned int SavePromptMinPhotos = 3;
   [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:0];
   [self animateImageCaptured:image];
   
-  if (self.sourceType == UIImagePickerControllerSourceTypeCamera) {
-    [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
-    
-  }
+  [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
 }
 
 - (void)animateImageCaptured:(UIImage *)image{

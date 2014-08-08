@@ -27,7 +27,6 @@
 @property (nonatomic, retain) NSObject<DFAVCameraViewControllerDelegate> *delegate;
 @property (nonatomic) UIImagePickerControllerCameraDevice cameraDevice;
 @property (nonatomic) UIImagePickerControllerCameraFlashMode cameraFlashMode;
-@property (nonatomic) UIImagePickerControllerSourceType sourceType;
 
 
 
