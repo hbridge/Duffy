@@ -4,9 +4,18 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 	<link rel="stylesheet" type="text/css" href="/strand/strand.css" media="screen" />
 	<script src='/resources/jquery-1.10.2.min.js'> </script>
+	<script type="text/javascript" src="//web.localytics.com/latest/localytics.min.js"></script>
+	<script type="text/javascript">
+		var localytics = LocalyticsSession("a592cd77469784a29d9bb69-f41b5cee-2171-11e4-4a11-00a426b17dd8", {logger:true, namespace:"websdk"});
+		localytics.open();
+	</script>
+
+	
+
 	<style>
 	body {
 		/*background-color: rgba(241,125,82,0.5);*/
+		width: 310px;
 	}
 	.ui-screenshots {
 		margin-right: auto;
@@ -20,6 +29,7 @@
 		margin-left: auto;
 		height: 363px;
 		width: 200px;
+
 	}
 	.ui-strand-text {
 		padding-top: 5px;
@@ -29,10 +39,7 @@
 	}
 	.ui-top-summary {
 		float: left;
-		padding-top: 10px;
-		padding-bottom: 10px;
-		font-size: 18px;
-		text-align: center;
+		padding-top: 20px;
 	}
 	.ui-header {
 		overflow: auto;
@@ -40,9 +47,6 @@
 	.ui-dl-text {
 		float:left;
 		width:100%;
-	}
-	.ui-dl {
-		font-size: 18px;
 	}
 	.ui-footer {
 		float:left;
@@ -59,7 +63,7 @@
 </div>
 
 <div class="ui-top-summary"> 
-	Instantly share photos with nearby friends!
+	Instantly share photos with friends near you!
 </div>
 
 <div class='ui-screenshots'>
@@ -68,7 +72,7 @@
 
 <div class='ui-dl-text'>
 <div class='ui-dl center'>
-	<a href='itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F30%3F%26avtoken%3Dbc066bce6c500e52fe721bc6894a4f9b8689d4df'>Try Strand now!</a>
+	<a href='javascript:dlClicked();'>Try Strand now!</a>
 </div>
 <div class='ui-dl-noiPhone hidden'>
 	Please open this page in Safari on an iPhone (iOS 7+) to try the app.
@@ -79,7 +83,12 @@
 <div class="ui-footer"> &copy; 2014 Duffy, Inc.</div>  
 </body>
 <script>
-	function detectiPhone(){
+	function dlClicked(){
+		localytics.tagEvent("DL_Clicked");
+		window.location.href = 'itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F30%3F%26avtoken%3Dbc066bce6c500e52fe721bc6894a4f9b8689d4df';
+	}
+	
+	/*function detectiPhone(){
 		var ua = navigator.userAgent;
 		if (ua.match(/(iPhone);.*CPU.*OS 7_\d/i) && (ua.indexOf('Safari') != -1) && (ua.indexOf('Chrome') < 0)) {
 			return true;
@@ -93,6 +102,6 @@
 			$('div.ui-dl-noiPhone').removeClass('hidden');
 		}
 	});
-
+	*/
 </script>
 </html>
