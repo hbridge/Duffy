@@ -178,8 +178,10 @@
 - (FKFormMappingButtonHandlerBlock)inviteUserHandler
 {
   return ^(id object){
-    self.inviteController = [[DFInviteUserViewController alloc] init];
-    [self presentViewController:self.inviteController animated:YES completion:nil];
+    if (!self.inviteController.isBeingPresented) {
+      self.inviteController = [[DFInviteUserViewController alloc] init];
+      [self presentViewController:self.inviteController animated:YES completion:nil];
+    }
   };
 }
 
