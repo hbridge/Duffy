@@ -44,13 +44,11 @@
 - (void)setImage:(UIImage *)image forObject:(id)object
 {
   if (image) {
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
       UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
       if (blurredImage) {
         self.blurredImagesForObjects[object] = blurredImage;
-        dispatch_async(dispatch_get_main_queue(), ^{
-          [self.collectionView reloadData];
-        });
+        [self.collectionView reloadData];
       }
     });
   }
