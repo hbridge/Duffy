@@ -210,6 +210,11 @@ def userbaseSummary(request):
 		else:
 			entry['weeklyStrands'] = '-'
 
+		if user.id in weeklyActionsById:
+			entry['weeklyActions'] = weeklyActionsById[user.id]
+		else:
+			entry['weeklyActions'] = '-'
+
 		if (extras[user.id]['actions'] > 0):
 			entry['actions'] = extras[user.id]['actions']
 		else:
