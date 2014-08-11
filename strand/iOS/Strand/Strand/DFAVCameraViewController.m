@@ -13,6 +13,7 @@
 #import "UIImage+DFHelpers.h"
 #import "SAMGradientView.h"
 #import "UIView+DFExtensions.h"
+#import "DBMotionManager.h"
 
 
 @interface DFAVCameraViewController ()
@@ -22,6 +23,8 @@
 @property (nonatomic, retain) UIView *capturePreviewView;
 
 @property (readonly, nonatomic, retain) AVCaptureDevice *currentCaptureDevice;
+@property (nonatomic, retain) DBMotionManager *motionManager;
+@property (nonatomic) UIDeviceOrientation deviceOrientation;
 
 @end
 
@@ -57,6 +60,12 @@
     [self showRandomGradientView];
   }
 
+  __weak typeof(self) weakSelf = self;
+  [[DBMotionManager sharedManager] startMotionHandler];
+  [[DBMotionManager sharedManager] setMotionRotationHandler:^(UIDeviceOrientation orientation){
+    NSLog(@"last orientation %d", orientation);
+    [weakSelf rotationChanged:orientation];
+  }];
 }
 
 - (void)appDidBecomeActive:(NSNotification *)note
@@ -237,8 +246,10 @@
        NSData *imageData = [AVCaptureStillImageOutput jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
        UIImage *image = [UIImage imageWithCGImage:[[[UIImage alloc] initWithData:imageData] CGImage]
                                             scale:1.0f
-                                      orientation:[self.class currentImageOrientation]];
+                                      orientation:[self currentImageOrientation]];
        
+       NSNumber *number = (__bridge  NSNumber *)CMGetAttachment(imageDataSampleBuffer, kCGImagePropertyOrientation, NULL);
+       DDLogInfo(@"orientation %@", number);
        NSMutableDictionary *exifDict = [NSMutableDictionary dictionaryWithDictionary:(__bridge NSDictionary *)CMGetAttachment(imageDataSampleBuffer,
                                                                kCGImagePropertyExifDictionary,
                                                                NULL)];
@@ -256,8 +267,8 @@
    }];
 }
 
-+ (UIImageOrientation)currentImageOrientation {
-  UIDeviceOrientation deviceOrientation = [[UIDevice currentDevice] orientation];
+- (UIImageOrientation)currentImageOrientation {
+  UIDeviceOrientation deviceOrientation = self.deviceOrientation;
   UIImageOrientation imageOrientation = UIImageOrientationRight;
   
   switch (deviceOrientation) {
@@ -276,7 +287,7 @@
     default:
       break;
   }
-  
+
   return imageOrientation;
 }
 
@@ -435,5 +446,15 @@
 {
   DDLogInfo(@"%@ %@", [self.class description], note.name);
 }
+
+- (void) rotationChanged:(UIDeviceOrientation) orientation
+{
+  if ( orientation != UIDeviceOrientationUnknown ||
+      orientation != UIDeviceOrientationFaceUp ||
+      orientation != UIDeviceOrientationFaceDown ) {
+    _deviceOrientation = orientation;
+  }
+}
+
 
 @end
