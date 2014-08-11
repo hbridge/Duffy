@@ -38,5 +38,6 @@ extern NSString const *DFUploadResultOperationType;
 extern NSString *const DFSupportPageURLString;
 extern NSString *const DFTermsPageURLString;
 extern NSString *const DFPrivacyPageURLString;
+extern NSString *const DFAcknowledgementsPageURLString;
 
 @end

@@ -122,8 +122,13 @@
       [self.navigationController pushViewController:mapViewController animated:YES];
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     
-    // Legal
+    // Acknowledgements & Legal
     [mapping sectionWithTitle:@"Legal" footer:nil identifier:@"legal"];
+    [mapping button:@"Acknowledgements"
+         identifier:@"acknowledgements"
+            handler:[DFSettingsViewController
+                     webviewHandlerForURLString:DFAcknowledgementsPageURLString navigationController:self.navigationController]
+       accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Terms"
          identifier:@"terms"
             handler:[DFSettingsViewController

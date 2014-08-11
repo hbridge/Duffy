@@ -25,9 +25,11 @@
 @property (readonly, nonatomic, retain) NSData *sendFeedback;
 @property (readonly, nonatomic, retain) NSString *terms;
 @property (readonly, nonatomic, retain) NSString *privacyPolicy;
+@property (nonatomic, retain) NSString *acknowledgements;
 @property (readonly, nonatomic, retain) NSString *locationMap;
 @property (nonatomic, retain) NSString *inviteUser;
 @property (nonatomic, retain) NSString *clearImageCache;
 @property (nonatomic, retain) NSString *testSomething;
+
 
 @end
