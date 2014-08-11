@@ -103,15 +103,10 @@ const unsigned int SavePromptMinPhotos = 3;
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-    self.cameraOverlayView = self.customCameraOverlayView;
-    self.cameraFlashMode = [DFDefaultsStore flashMode];
-    self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
-    [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
-  } else {
-//    self.sourceType = UIImagePickerControllerSourceTypeSavedPhotosAlbum;
-//    //[self.view addSubview:self.customCameraOverlayView];
-  }
+  self.cameraOverlayView = self.customCameraOverlayView;
+  self.cameraFlashMode = [DFDefaultsStore flashMode];
+  self.customCameraOverlayView.flashButton.tag = (NSInteger)self.cameraFlashMode;
+  [self.customCameraOverlayView updateUIForFlashMode:self.cameraFlashMode];
   
   self.delegate = self;
 }
@@ -230,26 +225,25 @@ const unsigned int SavePromptMinPhotos = 3;
 {
   if (!_customCameraOverlayView) {
     _customCameraOverlayView = [[[UINib nibWithNibName:@"DFCameraOverlayView" bundle:nil]
-                           instantiateWithOwner:self options:nil]
-                          firstObject];
+                                 instantiateWithOwner:self options:nil]
+                                firstObject];
     _customCameraOverlayView.frame = self.view.frame;
-    if ([UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypeCamera]) {
-      // only wire up buttons if we're not in the simulator
-      [_customCameraOverlayView.takePhotoButton addTarget:self
-                                                   action:@selector(takePhotoButtonPressed:)
-                                         forControlEvents:UIControlEventTouchUpInside];
-      [_customCameraOverlayView.galleryButton addTarget:self
-                                                 action:@selector(galleryButtonPressed:)
+    // only wire up buttons if we're not in the simulator
+    [_customCameraOverlayView.takePhotoButton addTarget:self
+                                                 action:@selector(takePhotoButtonPressed:)
                                        forControlEvents:UIControlEventTouchUpInside];
-      [_customCameraOverlayView.flashButton addTarget:self
-                                               action:@selector(flashButtonPressed:)
+    [_customCameraOverlayView.galleryButton addTarget:self
+                                               action:@selector(galleryButtonPressed:)
                                      forControlEvents:UIControlEventTouchUpInside];
-      [_customCameraOverlayView.swapCameraButton addTarget:self
-                                                    action:@selector(swapCameraButtonPressed:)
-                                          forControlEvents:UIControlEventTouchUpInside];
-    }
+    [_customCameraOverlayView.flashButton addTarget:self
+                                             action:@selector(flashButtonPressed:)
+                                   forControlEvents:UIControlEventTouchUpInside];
+    [_customCameraOverlayView.swapCameraButton addTarget:self
+                                                  action:@selector(swapCameraButtonPressed:)
+                                        forControlEvents:UIControlEventTouchUpInside];
   }
-
+  
+  
   return _customCameraOverlayView;
 }
 
@@ -464,7 +458,7 @@ const unsigned int SavePromptMinPhotos = 3;
 {
   CLLocation *location = self.locationManager.location;
   
-  if (![self isGoodLocation:location] && retryNumber <= MaxRetryCount) {
+  if (![self isGoodLocation:location] && retryNumber <= MaxRetryCount && !TARGET_IPHONE_SIMULATOR) {
     //wait for a better location fix
     DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)),
@@ -473,6 +467,11 @@ const unsigned int SavePromptMinPhotos = 3;
     });
     
     return;
+  }
+  
+  if (![self isGoodLocation:location] && TARGET_IPHONE_SIMULATOR) {
+    // default simulator to puck building
+    location = [[CLLocation alloc] initWithLatitude:40.7246846 longitude:-73.9953671];
   }
   
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -541,7 +540,8 @@ const unsigned int SavePromptMinPhotos = 3;
 
 - (void)addExtraInfo:(NSString *)extraInfo toUserCommentsInMetadata:(NSMutableDictionary *)metadata
 {
-  NSMutableDictionary *exifDict = [metadata[@"{Exif}"] mutableCopy];
+  NSMutableDictionary *exifDict = [[NSMutableDictionary alloc]
+                                   initWithDictionary:metadata[@"{Exif}"]];
   NSString *oldData = exifDict[@"UserComment"];
   exifDict[@"UserComment"] = [NSString stringWithFormat:@"%@, %@", oldData, extraInfo];
   metadata[@"{Exif}"] = exifDict;

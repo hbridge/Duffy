@@ -42,6 +42,7 @@
 		5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172D8196C8C6300CA7693 /* DFWebViewController.xib */; };
 		5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */; };
 		5A3172E0196C9EC100CA7693 /* DFPeanutError.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172DF196C9EC100CA7693 /* DFPeanutError.m */; };
+		5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */; };
 		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
 		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
@@ -227,6 +228,8 @@
 		5A3172DC196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDiagnosticInfoMailComposeController.m; sourceTree = "<group>"; };
 		5A3172DE196C9EC100CA7693 /* DFPeanutError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutError.h; sourceTree = "<group>"; };
 		5A3172DF196C9EC100CA7693 /* DFPeanutError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutError.m; sourceTree = "<group>"; };
+		5A3F6A971999498900C2F7D4 /* UIView+DFExtensions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+DFExtensions.h"; sourceTree = "<group>"; };
+		5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+DFExtensions.m"; sourceTree = "<group>"; };
 		5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 4.xcdatamodel"; sourceTree = "<group>"; };
 		5A40343B196083A9003D7546 /* DFPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoAsset.h; path = DuffyCore/DFPhotoAsset.h; sourceTree = "<group>"; };
 		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
@@ -478,6 +481,8 @@
 				5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */,
 				5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */,
 				5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */,
+				5A3F6A971999498900C2F7D4 /* UIView+DFExtensions.h */,
+				5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */,
 			);
 			name = "Common Views";
 			sourceTree = "<group>";
@@ -1219,6 +1224,7 @@
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
+				5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,

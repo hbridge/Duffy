@@ -1,5 +1,9 @@
 # Strand
 
+## Aug 11th, 2015
+
+- Totally new camera with improved speed and reliability
+
 ## Aug 7th, 2015
 
 - Improved battery drain

@@ -11,6 +11,8 @@
 #import <ImageIO/ImageIO.h>
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UIImage+DFHelpers.h"
+#import "SAMGradientView.h"
+#import "UIView+DFExtensions.h"
 
 
 @interface DFAVCameraViewController ()
@@ -48,6 +50,13 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
+  
+  // TODO possibly guard against black screen by checking for a video connection like in takePicture
+  
+  if (TARGET_IPHONE_SIMULATOR) {
+    [self showRandomGradientView];
+  }
+
 }
 
 - (void)appDidBecomeActive:(NSNotification *)note
@@ -81,15 +90,41 @@
   // Dispose of any resources that can be recreated.
 }
 
+- (void)showRandomGradientView
+{
+  if (self.capturePreviewView) {
+    [self.capturePreviewView removeFromSuperview];
+  }
+
+  SAMGradientView *gradientView = [[SAMGradientView alloc] initWithFrame:self.view.frame];
+  srand48(time(0));
+
+  gradientView.gradientColors = @[
+                                  [UIColor colorWithRed:drand48()
+                                                  green:drand48()
+                                                   blue:drand48()
+                                                  alpha:1.0],
+                                  [UIColor colorWithRed:drand48()
+                                                  green:drand48()
+                                                   blue:drand48()
+                                                  alpha:1.0]
+                                  ];
+
+  [self.view insertSubview:gradientView atIndex:0];
+  self.capturePreviewView = gradientView;
+}
 
 - (void)createCaptureSession
 {
+  if (TARGET_IPHONE_SIMULATOR) {
+    return;
+    [self showRandomGradientView];
+  }
+  
   DDLogInfo(@"%@ creating new capture session.", [self.class description]);
   
   // remove old session and views if necessary
-  if (self.session) {
-    
-  }[self.session stopRunning];
+  if (self.session) [self.session stopRunning];
   if (self.capturePreviewLayer) [self.capturePreviewLayer removeFromSuperlayer];
   if (self.capturePreviewView) [self.capturePreviewView removeFromSuperview];
   
@@ -145,6 +180,9 @@
     if ([device isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance]) {
       [device setWhiteBalanceMode:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance];
     }
+    if ([device isLowLightBoostSupported]) {
+      [device setAutomaticallyEnablesLowLightBoostWhenAvailable:YES];
+    }
   }
   [device unlockForConfiguration];
 }
@@ -172,9 +210,22 @@
 
 
 - (void)takePicture {
+  if (TARGET_IPHONE_SIMULATOR) {
+    if ([self.delegate respondsToSelector:@selector(cameraView:didCaptureImage:metadata:)]) {
+      [self.delegate cameraView:self
+                didCaptureImage:[self.capturePreviewView imageRepresentation]
+                       metadata:nil];
+      [self showRandomGradientView];
+    }
+    return;
+  }
+  
   AVCaptureStillImageOutput *output = self.session.outputs.lastObject;
   AVCaptureConnection *videoConnection = output.connections.lastObject;
-  if (!videoConnection) return;
+  if (!videoConnection) {
+    DDLogError(@"%@ takePicture: error no video connection.", [self.class description]);
+    return;
+  }
   
   [output
    captureStillImageAsynchronouslyFromConnection:videoConnection
@@ -235,11 +286,13 @@
   if (self.cameraOverlayView) [self.cameraOverlayView removeFromSuperview];
   _cameraOverlayView = cameraOverlayView;
   
+  if (!TARGET_IPHONE_SIMULATOR) {
   //Focus gesture
-  UITapGestureRecognizer *focusTapRecognizer = [[UITapGestureRecognizer alloc]
-                                                initWithTarget:self
-                                                action:@selector(previewTapped:)];
-  [_cameraOverlayView addGestureRecognizer:focusTapRecognizer];
+    UITapGestureRecognizer *focusTapRecognizer = [[UITapGestureRecognizer alloc]
+                                                  initWithTarget:self
+                                                  action:@selector(previewTapped:)];
+    [_cameraOverlayView addGestureRecognizer:focusTapRecognizer];
+  }
   
   [self.view addSubview:_cameraOverlayView];
 }
