@@ -194,6 +194,8 @@ def userbaseSummary(request):
 
 		if user.id in weeklyPhotosById:
 			entry['weeklyPhotos'] = weeklyPhotosById[user.id]
+		else:
+			entry['weeklyPhotos'] = '-'
 
 		if (extras[user.id]['actions'] > 0):
 			entry['actions'] = extras[user.id]['actions']
