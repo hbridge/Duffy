@@ -18,7 +18,7 @@ from haystack.query import SearchQuerySet
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, NotificationLog, Strand
+from common.models import Photo, User, Classification, NotificationLog, Strand, PhotoAction
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -125,7 +125,7 @@ def userbaseSummary(request):
 
 	photoDataRaw = Photo.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
 	strandDataRaw = Strand.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').order_by().annotate(weeklyStrands=Count('users'))	
-	#photoactionDataRaw = PhotoAction.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalActions=Count('user'))
+	actionDataRaw = PhotoAction.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyActions=Count('user'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
@@ -159,6 +159,10 @@ def userbaseSummary(request):
 	weeklyStrandsById = dict()
 	for strandData in strandDataRaw:
 		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
+
+	weeklyActionsById = dict()
+	for actionData in actionDataRaw:
+		weeklyActionsById[actionData['user']] = actionData['weeklyActions']
 
 	for i, user in enumerate(userStats):
 		entry = dict()
