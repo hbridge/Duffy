@@ -82,8 +82,8 @@
 				<td class='userid b-r'> ID </td>
 				<td class='name b-r'> Name </td>
 				<td class='created b-r'> Created </td>
-				<td class='db-count b-r'> Photos <br> 7-day | all </td>
-				<td class='strands b-r'> Strands </td>
+				<td class='db-count center b-r'> Photos <br> 7-day | all </td>
+				<td class='strands center b-r'> Strands <br> 7-day | all </td>
 				<td class='status b-r' title='All | Thumbs | Fulls | Clustered || withGPS | Twofish | Strand'> Pipeline <br> Status </td>
 				<td class='actions b-r'> Actions </td>
 				<td class='notifications b-r'> Nots sent <br> (7 days)</td>
@@ -101,7 +101,7 @@
 				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_new href='/strand/viz/neighbors?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 				<td class='db-count right b-r'> {{ entry.weeklyPhotos }} | {{ entry.user.totalCount }} </td>
-				<td class='strand right b-r'> {{ entry.strandCount }} </td>
+				<td class='strand right b-r'> {{entry.weeklyStrands }} | {{ entry.strandCount }} </td>
 				<td class='pipeline-status right b-r' 
 					title='{{entry.user.totalCount}} | {{ entry.user.thumbsCount }} | {{ entry.user.fullImagesCount }} | {{ entry.user.clusteredCount }} || {{entry.user.photosWithGPS}} | {{ entry.user.twofishCount }} | {{ entry.user.neighborCount }}'> {{ entry.status }} </td>
 				<td class='actions right b-r'> {{ entry.actions}}</td>

@@ -18,7 +18,7 @@ from haystack.query import SearchQuerySet
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, NotificationLog
+from common.models import Photo, User, Classification, NotificationLog, Strand
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -124,8 +124,8 @@ def userbaseSummary(request):
 			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-lastAdded')
 
 	photoDataRaw = Photo.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
+	strandDataRaw = Strand.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').order_by().annotate(weeklyStrands=Count('users'))	
 	#photoactionDataRaw = PhotoAction.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalActions=Count('user'))
-	#strandsDataRaw = Strand.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalStrands=Count('user'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
@@ -155,6 +155,10 @@ def userbaseSummary(request):
 	weeklyPhotosById = dict()
 	for photoData in photoDataRaw:
 		weeklyPhotosById[photoData['user']] = photoData['weeklyPhotos']
+
+	weeklyStrandsById = dict()
+	for strandData in strandDataRaw:
+		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
 
 	for i, user in enumerate(userStats):
 		entry = dict()
@@ -196,6 +200,11 @@ def userbaseSummary(request):
 			entry['weeklyPhotos'] = weeklyPhotosById[user.id]
 		else:
 			entry['weeklyPhotos'] = '-'
+
+		if user.id in weeklyStrandsById:
+			entry['weeklyStrands'] = weeklyStrandsById[user.id]
+		else:
+			entry['weeklyStrands'] = '-'
 
 		if (extras[user.id]['actions'] > 0):
 			entry['actions'] = extras[user.id]['actions']
