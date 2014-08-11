@@ -123,6 +123,12 @@ def userbaseSummary(request):
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
 			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-lastAdded')
 
+	photoDataRaw = Photo.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
+	#photoactionDataRaw = PhotoAction.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalActions=Count('user'))
+	#strandsDataRaw = Strand.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalStrands=Count('user'))
+	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
+	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
+
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
 	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
@@ -146,6 +152,9 @@ def userbaseSummary(request):
 		notificationCountById[notificationData['user']] = notificationData['totalNotifs']
 		notificationLastById[notificationData['user']] = notificationData['lastSent']	
 
+	weeklyPhotosById = dict()
+	for photoData in photoDataRaw:
+		weeklyPhotosById[photoData['user']] = photoData['weeklyPhotos']
 
 	for i, user in enumerate(userStats):
 		entry = dict()
@@ -183,6 +192,9 @@ def userbaseSummary(request):
 		else:
 			entry['notifications'] = '-'
 
+		if user.id in weeklyPhotosById:
+			entry['weeklyPhotos'] = weeklyPhotosById[user.id]
+
 		if (extras[user.id]['actions'] > 0):
 			entry['actions'] = extras[user.id]['actions']
 		else:
@@ -191,6 +203,7 @@ def userbaseSummary(request):
 		entry['strandCount'] = extras[user.id]['strands']
 		entry['contactCount'] = extras[user.id]['contacts']
 		entry['friendCount'] = extras[user.id]['friends']
+
 
 		if user.last_build_info:
 			buildNum = user.last_build_info[user.last_build_info.find('-'):]
