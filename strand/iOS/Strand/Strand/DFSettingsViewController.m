@@ -22,7 +22,7 @@
 #import "DFImageStore.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFNetworkingConstants.h"
-#import "DFContactSyncManager.h"
+#import "AppDelegate.h"
 
 @interface DFSettingsViewController ()
 
@@ -212,7 +212,7 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            [[DFContactSyncManager sharedManager] forceSync];
+            [(id)[UIApplication sharedApplication] suspend];
 
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];

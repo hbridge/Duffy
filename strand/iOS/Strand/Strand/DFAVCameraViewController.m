@@ -15,26 +15,64 @@
 
 @interface DFAVCameraViewController ()
 
-@property (readonly, retain) AVCaptureSession *session;
+@property (atomic, retain) AVCaptureSession *session;
 @property (nonatomic, retain) AVCaptureVideoPreviewLayer *capturePreviewLayer;
 @property (nonatomic, retain) UIView *capturePreviewView;
 
-@property (nonatomic, readonly) AVCaptureDevice *currentCaptureDevice;
+@property (readonly, nonatomic, retain) AVCaptureDevice *currentCaptureDevice;
 
 @end
 
 @implementation DFAVCameraViewController
 
-@synthesize session = _session;
-
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(appDidBecomeActive:)
+                                                 name:UIApplicationDidBecomeActiveNotification
+                                               object:nil];
+  }
+  return self;
+}
 
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   
-  
+  [self createCaptureSession];
   [self.session startRunning];
+}
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+}
+
+- (void)appDidBecomeActive:(NSNotification *)note
+{
+  DDLogInfo(@"%@ app became active. Cature session nil:%@ running:%@ interrupted:%@",
+            [self.class description],
+            @(self.session == nil),
+            @(self.session.isRunning),
+            @(self.session.isInterrupted));
+  if (!self.session) [self createCaptureSession];
+  if (!self.session.isRunning) [self.session startRunning];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  
+  if (self.session && !self.session.isRunning) {
+    [self.session startRunning];
+  }
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning
@@ -43,53 +81,95 @@
   // Dispose of any resources that can be recreated.
 }
 
-- (AVCaptureSession *)session
+
+- (void)createCaptureSession
 {
-  if (!_session) {
-    _session = [[AVCaptureSession alloc] init];
-    if ([_session canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
-      NSLog(@"Setting session preset");
-      _session.sessionPreset = AVCaptureSessionPresetPhoto;
-      AVCaptureDevice *device = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-      
-      NSError *error;
-      AVCaptureDeviceInput *input = [AVCaptureDeviceInput deviceInputWithDevice:device error:&error];
-      assert(input);
-      [_session addInput:input];
-      
-      //turn on point autofocus for center
-      [device lockForConfiguration:&error];
-      if (!error) {
-        if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
-          //device.focusPointOfInterest = CGPointMake(0.5, 0.5);
-          device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
-        }
-        if ([device isFlashModeSupported:AVCaptureFlashModeAuto]) {
-          device.flashMode = AVCaptureFlashModeAuto;
-        }
-      }
-      [device unlockForConfiguration];
-      
-      //preview layer
-      self.capturePreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_session];
-      self.capturePreviewLayer.frame = self.view.frame;
-      self.capturePreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-      
-      //preview view
-      self.capturePreviewView = [[UIView alloc] initWithFrame:self.view.frame];
-      [self.view insertSubview:self.capturePreviewView atIndex:0];
-      [self.capturePreviewView.layer addSublayer:self.capturePreviewLayer];
-      
-      // still image output
-      AVCaptureStillImageOutput *stillOutput = [[AVCaptureStillImageOutput alloc] init];
-      stillOutput.outputSettings = @{AVVideoCodecKey : AVVideoCodecJPEG};
-      [_session addOutput:stillOutput];
-      
-      
+  DDLogInfo(@"%@ creating new capture session.", [self.class description]);
+  
+  // remove old session and views if necessary
+  if (self.session) {
+    
+  }[self.session stopRunning];
+  if (self.capturePreviewLayer) [self.capturePreviewLayer removeFromSuperlayer];
+  if (self.capturePreviewView) [self.capturePreviewView removeFromSuperview];
+  
+  AVCaptureSession *oldSession = self.session;
+  // create a new session
+  self.session = [[AVCaptureSession alloc] init];
+  if ([self.session canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
+    self.session.sessionPreset = AVCaptureSessionPresetPhoto;
+    NSError *error;
+    AVCaptureDeviceInput *input = [AVCaptureDeviceInput
+                                   deviceInputWithDevice:[self rearCamera]
+                                   error:&error];
+    assert(input);
+    [self.session addInput:input];
+    
+    [self configureRearCamera];
+    
+    //preview layer
+    self.capturePreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:self.session];
+    self.capturePreviewLayer.frame = self.view.frame;
+    self.capturePreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+    
+    //preview view
+    self.capturePreviewView = [[UIView alloc] initWithFrame:self.view.frame];
+    [self.view insertSubview:self.capturePreviewView atIndex:0];
+    [self.capturePreviewView.layer addSublayer:self.capturePreviewLayer];
+    
+    // still image output
+    AVCaptureStillImageOutput *stillOutput = [[AVCaptureStillImageOutput alloc] init];
+    stillOutput.outputSettings = @{AVVideoCodecKey : AVVideoCodecJPEG};
+    [self.session addOutput:stillOutput];
+    
+    [self observeNotificationsForSession:self.session oldSession:oldSession];
+  }
+}
+
+
+
+- (void)configureRearCamera
+{
+  AVCaptureDevice *device = [self rearCamera];
+  
+  NSError *error;
+  [device lockForConfiguration:&error];
+  if (!error) {
+    //turn on point autofocus for center
+    if ([device isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
+      device.focusMode = AVCaptureFocusModeContinuousAutoFocus;
+    }
+    if ([device isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
+      [device setExposureMode:AVCaptureExposureModeContinuousAutoExposure];
+    }
+    if ([device isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance]) {
+      [device setWhiteBalanceMode:AVCaptureWhiteBalanceModeContinuousAutoWhiteBalance];
     }
   }
-  return _session;
+  [device unlockForConfiguration];
 }
+
+- (void)observeNotificationsForSession:(AVCaptureSession *)session oldSession:(AVCaptureSession *)oldSession
+{
+  [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                  name:AVCaptureSessionRuntimeErrorNotification
+                                                object:oldSession];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(didReceiveCaptureError:)
+                                               name:AVCaptureSessionRuntimeErrorNotification
+                                             object:session];
+  for (NSString *notificationType in @[AVCaptureSessionDidStartRunningNotification,
+                                       AVCaptureSessionDidStopRunningNotification,
+                                       AVCaptureSessionWasInterruptedNotification,
+                                       AVCaptureSessionInterruptionEndedNotification]) {
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:notificationType object:oldSession];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(didReceiveCaptureNotification:)
+                                                 name:notificationType
+                                               object:session];
+  }
+}
+
 
 - (void)takePicture {
   AVCaptureStillImageOutput *output = self.session.outputs.lastObject;
@@ -175,14 +255,33 @@
   if ([self.currentCaptureDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus]) {
     NSError *error;
     [self.currentCaptureDevice lockForConfiguration:&error];
-    [self.currentCaptureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
-    [self.currentCaptureDevice setFocusPointOfInterest:deviceLocation];
-    [self.currentCaptureDevice unlockForConfiguration];
-    if (error) {
-      DDLogError(@"%@ couldn't set focus POI: %@", [self.class description], error.description);
+    if (!error) {
+      if ([self.currentCaptureDevice isFocusModeSupported:AVCaptureFocusModeAutoFocus])
+        [self.currentCaptureDevice setFocusMode:AVCaptureFocusModeAutoFocus];
+      if ([self.currentCaptureDevice isFocusPointOfInterestSupported])
+        [self.currentCaptureDevice setFocusPointOfInterest:deviceLocation];
+      [self.currentCaptureDevice unlockForConfiguration];
+    } else {
+      DDLogError(@"%@ couldn't get lock to set focus POI: %@", [self.class description], error.description);
     }
   } else {
     DDLogWarn(@"%@ autofocus mode not supported.", [self.class description]);
+  }
+  
+  if ([self.currentCaptureDevice isExposurePointOfInterestSupported]) {
+    NSError *error;
+    [self.currentCaptureDevice lockForConfiguration:&error];
+    if (!error) {
+      if ([self.currentCaptureDevice  isExposureModeSupported:AVCaptureExposureModeAutoExpose])
+        [self.currentCaptureDevice setExposureMode:AVCaptureExposureModeAutoExpose];
+      if ([self.currentCaptureDevice isExposurePointOfInterestSupported])
+        [self.currentCaptureDevice setExposurePointOfInterest:deviceLocation];
+      [self.currentCaptureDevice unlockForConfiguration];
+    } else {
+      DDLogError(@"%@ couldn't get lock to set exposure POI: %@", [self.class description], error.description);
+    }
+  } else {
+    DDLogInfo(@"%@ exposure POI not supported.", [self.class description]);
   }
 }
 
@@ -272,5 +371,16 @@
   return [(AVCaptureDeviceInput *)self.session.inputs.firstObject device];
 }
 
+
+- (void)didReceiveCaptureError:(NSNotification *)note
+{
+  DDLogError(@"%@ capture error: %@", [self.class description],
+             [(NSError *)note.userInfo[AVCaptureSessionErrorKey] description]);
+}
+
+- (void)didReceiveCaptureNotification:(NSNotification *)note
+{
+  DDLogInfo(@"%@ %@", [self.class description], note.name);
+}
 
 @end
