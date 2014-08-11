@@ -60,12 +60,13 @@
     [self showRandomGradientView];
   }
 
+  if (!TARGET_IPHONE_SIMULATOR) {
   __weak typeof(self) weakSelf = self;
-  [[DBMotionManager sharedManager] startMotionHandler];
-  [[DBMotionManager sharedManager] setMotionRotationHandler:^(UIDeviceOrientation orientation){
-    NSLog(@"last orientation %d", orientation);
-    [weakSelf rotationChanged:orientation];
-  }];
+    [[DBMotionManager sharedManager] startMotionHandler];
+    [[DBMotionManager sharedManager] setMotionRotationHandler:^(UIDeviceOrientation orientation){
+      [weakSelf rotationChanged:orientation];
+    }];
+  }
 }
 
 - (void)appDidBecomeActive:(NSNotification *)note
