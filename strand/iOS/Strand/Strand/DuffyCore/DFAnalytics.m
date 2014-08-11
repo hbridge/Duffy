@@ -186,7 +186,7 @@ static DFAnalytics *defaultLogger;
                                   range:(NSRange) {0, className.length}];
   
   
-  return className;
+  return className ? className : @"";
 }
 
 + (void)logSwitchBetweenPhotos:(NSString *)actionType
@@ -420,6 +420,8 @@ static DFAnalytics *defaultLogger;
     resultString = DFAnalyticsValueResultFailure;
   } else if (result == MessageComposeResultSent) {
     resultString = DFAnalyticsValueResultSuccess;
+  } else {
+    resultString = @"Unknown";
   }
   
   [DFAnalytics logEvent:InviteUserFinshed withParameters:@{
