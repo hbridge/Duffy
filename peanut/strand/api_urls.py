@@ -28,6 +28,7 @@ urlpatterns = patterns('',
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
 	url(r'^get_invite_message', 'strand.api_views.get_invite_message'),
+	url(r'^get_notifications', 'strand.api_views.get_notifications'),
 
 	url(r'^photo_actions/$', strand_rest_api_views.CreatePhotoActionAPI.as_view(model=PhotoAction, lookup_field='id')),
 	url(r'^photo_actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=PhotoAction, lookup_field='id')),

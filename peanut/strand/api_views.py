@@ -14,7 +14,7 @@ from django.http import Http404
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -672,4 +672,24 @@ def get_invite_message(request):
 	response['invite_message'] = "Try this app so we can share photos when we hang out: bit.ly/1noDnx2."
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+def get_notifications(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		userId = form.cleaned_data['user_id']
+
+		notifications = NotificationLog.objects.filter(user_id=userId).filter(msg_type=constants.NOTIFICATIONS_PHOTO_FAVORITED_ID).exclude(metadata=None).filter(apns=1).order_by("-added")[:20]
+
+		response['notifications'] = list()
+
+		for notification in notifications:
+			response['notifications'].append(json.loads(notification.metadata))		
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
 
