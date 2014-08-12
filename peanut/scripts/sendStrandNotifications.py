@@ -93,9 +93,9 @@ def sendPhotoActionNotifications(now, waitTime):
 
 				metadata = {'photo': photoAction.photo_id,
 							'action_text': metadataMsg,
-							'actor_user': photoAction.user,
+							'actor_user': photoAction.user_id,
 							'actor_name': photoAction.user.display_name,
-							'user': photoAction.photo.user,
+							'user': photoAction.photo.user_id,
 							'time': photoAction.added}
 
 				logger.info("Sending %s to %s" % (visibleMsg, photoAction.photo.user))
