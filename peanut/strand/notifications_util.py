@@ -4,6 +4,7 @@ import logging
 
 from peanut.settings import constants
 from common.models import NotificationLog, DuffyNotification
+from common.api_util import DuffyJsonEncoder
 
 from ios_notifications.models import APNService, Device
 from twilio.rest import TwilioRestClient
@@ -46,7 +47,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			if customPayload:
 				payload.update(customPayload)
 				
-			notification.custom_payload = json.dumps(payload)
+			notification.custom_payload = json.dumps(payload, cls=DuffyJsonEncoder)
 
 			if constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]:
 				notification.sound = constants.NOTIFICATIONS_SOUND_DICT[msgTypeId]
