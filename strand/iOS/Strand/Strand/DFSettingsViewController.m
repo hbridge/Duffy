@@ -89,7 +89,7 @@
             handler:[self inviteUserHandler]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
-    [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeLabel];
+    [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
     
     // Photos
     [mapping sectionWithTitle:@"Photos"

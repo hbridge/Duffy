@@ -9,14 +9,24 @@
 #import "DFSettings.h"
 #import "DFAppInfo.h"
 #import "DFUser.h"
+#import "DFUserPeanutAdapter.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIAlertView+DFHelpers.h"
 
 NSString *const AutosaveToCameraRollDefaultsKey = @"DFSettingsAutosaveToCameraRoll";
 
+@interface DFSettings ()
+
+@property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
+
+@end
+
 @implementation DFSettings
 
 static DFSettings *defaultSettings;
+
+@synthesize userAdapter = _userAdapter;
+
 + (DFSettings *)sharedSettings
 {
   if (!defaultSettings) {
@@ -30,11 +40,44 @@ static DFSettings *defaultSettings;
   return [self sharedSettings];
 }
 
+/*
+  Called when the display name is changed, want to save new name locally and on server.
+  */
 - (void)setDisplayName:(NSString *)displayName
 {
   DFUser *currentUser = [DFUser currentUser];
+  // Save copy of string incase there's a failure
+  NSString *oldDisplayName = currentUser.displayName;
+  
+  // This updates the local user data so the UI is correct
   currentUser.displayName = displayName;
-  [DFUser setCurrentUser:currentUser];
+  
+  // Create a PeanutUser to use for sending to the server, set only the display name
+  DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
+  peanutUser.id = currentUser.userID;
+  peanutUser.display_name = displayName;
+  
+  // Do the HTTP PUT to the server
+  [self.userAdapter
+   performRequest:RKRequestMethodPUT
+   withPeanutUser:peanutUser
+   success:^(DFPeanutUserObject *user) {
+     // This writes the settings to local disk since the server returned success
+     [DFUser setCurrentUser:currentUser];
+     DDLogInfo(@"Successfully updated user object on server after display name change");
+   }
+   failure:^(NSError *error) {
+     // Revert local user copy back to old data
+     currentUser.displayName = oldDisplayName;
+     DDLogError(@"%@ put of user object %@ failed with error: %@",
+                [self.class description],
+                peanutUser,
+                error.description);
+     [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                   message:[NSString stringWithFormat:
+                                            @"Could not update display name. %@",
+                                            error.localizedDescription]];
+   }];
 }
 
 - (NSString *)displayName
@@ -114,6 +157,11 @@ static DFSettings *defaultSettings;
   [[DFUser currentUser] setUserServerPortString:serverPort];
 }
 
+- (DFUserPeanutAdapter *)userAdapter
+{
+  if (!_userAdapter) _userAdapter = [[DFUserPeanutAdapter alloc] init];
+  return _userAdapter;
+}
 
 
 
