@@ -73,6 +73,10 @@ static DFSettings *defaultSettings;
                 [self.class description],
                 peanutUser,
                 error.description);
+     [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                   message:[NSString stringWithFormat:
+                                            @"Could not update display name. %@",
+                                            error.localizedDescription]];
    }];
 }
 
