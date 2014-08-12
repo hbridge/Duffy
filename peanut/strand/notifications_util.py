@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 """
 def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 	if metadata:
-		metadata = json.dumps(metadata)
+		metadata = json.dumps(metadata, cls=DuffyJsonEncoder)
 		
 	if user.device_token:
 		if user.device_token == "TESTTOKEN":
