@@ -333,6 +333,7 @@ class NotificationLog(models.Model):
 	device_token = models.TextField()
 	msg = models.TextField(null=True)
 	custom_payload = models.TextField()
+	metadata = models.TextField()
 	apns = models.IntegerField()
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	msg_type = models.IntegerField()

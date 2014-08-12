@@ -84,13 +84,22 @@ def sendPhotoActionNotifications(now, waitTime):
 	for photoAction in photoActions:
 		if photoAction.action_type == "favorite":
 			if photoAction.user_id != photoAction.photo.user_id:
-				msg = "%s just liked your photo!" % (photoAction.user.display_name)
+				visibleMsg = "%s just liked your photo!" % (photoAction.user.display_name)
+				noteMsg = "%s liked your photo" % (photoAction.user.display_name)
+				
 				msgType = constants.NOTIFICATIONS_PHOTO_FAVORITED_ID
 				# Make name small since we only have 256 characters
 				customPayload = {'pid': photoAction.photo_id}
 
+				metadata = {'photo': photoAction.photo_id,
+							'action_text': noteMsg,
+							'actor_user': photoAction.user,
+							'actor_name': photoAction.user.display_name,
+							'user': photoAction.photo.user,
+							'time': photoAction.added}
+
 				logger.info("Sending %s to %s" % (msg, photoAction.photo.user))
-				notifications_util.sendNotification(photoAction.photo.user, msg, msgType, customPayload)
+				notifications_util.sendNotification(photoAction.photo.user, msg, msgType, customPayload, metadata)
 
 			photoAction.user_notified_time = datetime.datetime.utcnow()
 			photoAction.save()
