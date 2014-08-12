@@ -1020,12 +1020,12 @@
 			buildConfigurationList = 5ADD859519465C790037A6D5 /* Build configuration list for PBXNativeTarget "Strand" */;
 			buildPhases = (
 				17B498A5204A4365B98EE109 /* Check Pods Manifest.lock */,
+				5AC4A959194A10B000862D9C /* ShellScript */,
 				5ADD856B19465C790037A6D5 /* Sources */,
 				5ADD856C19465C790037A6D5 /* Frameworks */,
 				5ADD856D19465C790037A6D5 /* Resources */,
 				6108859460044427A3B5218E /* Copy Pods Resources */,
 				5AC4A958194A0F3300862D9C /* ShellScript */,
-				5AC4A959194A10B000862D9C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -1179,7 +1179,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "#!/bin/bash\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$INFOPLIST_FILE\"";
+			shellScript = "#!/bin/bash\nif [ \"${CONFIGURATION}\" = \"Release\" ]; then\nbuildNumber=$(/usr/libexec/PlistBuddy -c \"Print CFBundleVersion\" \"$INFOPLIST_FILE\")\nbuildNumber=$(($buildNumber + 1))\n/usr/libexec/PlistBuddy -c \"Set :CFBundleVersion $buildNumber\" \"$INFOPLIST_FILE\"\nfi";
 		};
 		6108859460044427A3B5218E /* Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -1381,8 +1381,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Henry Bridge (Y83XBMV536)";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Old Fashioned Software, LLC (Y83XBMV536)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Old Fashioned Software, LLC (Y83XBMV536)";
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -1515,7 +1515,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Old Fashioned Software, LLC";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Old Fashioned Software, LLC";
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
