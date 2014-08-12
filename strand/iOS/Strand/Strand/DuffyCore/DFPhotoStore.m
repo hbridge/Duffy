@@ -582,7 +582,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 + (void)saveImage:(UIImage *)image
      withMetadata:(NSDictionary *)metadata
          location:(CLLocation *)location
-context:(NSManagedObjectContext *)context
+          context:(NSManagedObjectContext *)context
   completionBlock:(void (^)(void))completion
 {
   @autoreleasepool {
@@ -606,16 +606,9 @@ context:(NSManagedObjectContext *)context
     }
     
     if ([[DFSettings sharedSettings] autosaveToCameraRoll]) {
-      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-      [library writeImageToSavedPhotosAlbum:image.CGImage
-                                   metadata:metadata
-                            completionBlock:^(NSURL *assetURL, NSError *error) {
-                              if (error) {
-                                DDLogError(@"%@ couldn't save photo to Camera Roll:%@",
-                                           [self.class description],
-                                           error.description);
-                              }
-                            }];
+      DFPhotoStore *photoStore = [DFPhotoStore sharedStore];
+      [photoStore saveImageToCameraRoll:image withMetadata:metadata completion:^(NSError *error) {
+      }];
     }
     
     if (completion) completion();
@@ -631,6 +624,60 @@ context:(NSManagedObjectContext *)context
   return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
 
+/*
+ * Add image to a custom photo album
+ * Copied from http://praveenmatanam.wordpress.com/2013/02/14/add-image-to-custom-photo-album/
+ */
+- (void) addPhotoToPhotoAlbum:(NSURL *) assetURL toPhotoAlbum:(NSString *) album
+{
+  [self.assetsLibrary assetForURL:assetURL
+           resultBlock:^(ALAsset *asset)
+   {
+     NSString *groupName = [[NSUserDefaults standardUserDefaults] objectForKey:@"groupURL"];
+     NSURL *groupURL = [[NSURL alloc] initWithString:groupName?groupName:@""];
+     
+     [self.assetsLibrary groupForURL:groupURL
+              resultBlock:^(ALAssetsGroup *group)
+      {
+        NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
+        
+        if ([album isEqualToString:groupName])
+        {
+          [group addAsset:asset];
+        }
+        else
+        {
+          __weak ALAssetsLibrary *lib = self.assetsLibrary;
+          
+          [self.assetsLibrary addAssetsGroupAlbumWithName:album resultBlock:^(ALAssetsGroup *group)
+           {
+             NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
+             NSURL *groupURL = [group valueForProperty:ALAssetsGroupPropertyURL];
+             [[NSUserDefaults standardUserDefaults] setObject:groupURL.absoluteString forKey:@"groupURL"];
+             
+             [lib enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:^(ALAssetsGroup *group, BOOL *stop)
+              {
+                if ([album isEqualToString:groupName])
+                {
+                  [group addAsset:asset];
+                }
+                
+              } failureBlock:^(NSError *error)
+              {
+              }];
+             
+           } failureBlock:^(NSError *error)
+           {
+           }];
+        }
+      } failureBlock:^(NSError *error)
+      {
+      }];
+     
+   } failureBlock:^(NSError *error)
+   {
+   }];
+}
 
 - (void)saveImageToCameraRoll:(UIImage *)image
                  withMetadata:(NSDictionary *)metadata
@@ -643,6 +690,13 @@ context:(NSManagedObjectContext *)context
     [self.assetsLibrary writeImageToSavedPhotosAlbum:image.CGImage
                                             metadata:mutableMetadata
                                      completionBlock:^(NSURL *assetURL, NSError *error) {
+                                       if (error) {
+                                         DDLogError(@"%@ couldn't save photo to Camera Roll:%@",
+                                                    [self.class description],
+                                                    error.description);
+                                       } else {
+                                         [self addPhotoToPhotoAlbum:assetURL toPhotoAlbum:@"Strand"];
+                                       }
                                        completion(error);
                                      }];
   });
