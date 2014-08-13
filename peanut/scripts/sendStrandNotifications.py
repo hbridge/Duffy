@@ -91,11 +91,7 @@ def sendPhotoActionNotifications(now, waitTime):
 				# Make name small since we only have 256 characters
 				customPayload = {'pid': photoAction.photo_id}
 
-				metadata = {'photo': photoAction.photo_id,
-							'action_text': metadataMsg,
-							'actor_user': photoAction.user_id,
-							'user': photoAction.photo.user_id,
-							'time': photoAction.added}
+				metadata = {'photo_action': photoAction.id}
 
 				logger.info("Sending %s to %s" % (visibleMsg, photoAction.photo.user))
 				notifications_util.sendNotification(photoAction.photo.user, visibleMsg, msgType, customPayload, metadata)
