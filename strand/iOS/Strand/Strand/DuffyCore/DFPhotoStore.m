@@ -642,17 +642,17 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
           [group addAsset:asset];
           found = YES;
         }
-        
       } failureBlock:^(NSError *error)
       {
+        DDLogError(@"Error looping over albums: %@, %@", error, error.userInfo);
       }];
      
      if (!found) {
        [self.assetsLibrary addAssetsGroupAlbumWithName:album resultBlock:^(ALAssetsGroup *group){
          [group addAsset:asset];
-       } failureBlock:^(NSError *error)
-        {
-        }];
+       } failureBlock:^(NSError *error) {
+        DDLogError(@"Error creating custom Strand album: %@, %@", error, error.userInfo);
+       }];
      }
      
    } failureBlock:^(NSError *error)
