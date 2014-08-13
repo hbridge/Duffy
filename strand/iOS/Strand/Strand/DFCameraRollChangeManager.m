@@ -39,7 +39,7 @@ static DFCameraRollChangeManager *defaultManager;
   UIBackgroundFetchResult __block result;
   dispatch_semaphore_t completion_semaphore = dispatch_semaphore_create(0);
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-    [[DFPhotoStore sharedStore] fetchMostRecentSavedPhotoDate:^(NSDate *lastPhotoDate) {
+    [DFPhotoStore fetchMostRecentSavedPhotoDate:^(NSDate *lastPhotoDate) {
       if (lastPhotoDate && ![lastDateRecorded isEqualToDate:lastPhotoDate]) {
         DDLogInfo(@"%@ new camera roll photo detected. old most recent:%@ new most recent:%@",
                   [self.class description], lastDateRecorded, lastPhotoDate);

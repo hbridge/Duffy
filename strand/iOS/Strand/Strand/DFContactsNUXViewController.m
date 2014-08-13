@@ -106,7 +106,7 @@
 - (void)dismiss
 {
   AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-  [delegate showMainView];
+  [delegate firstTimeSetupComplete];
   dispatch_async(dispatch_get_main_queue(), ^{
     RootViewController *rootViewController = (RootViewController *)delegate.window.rootViewController;
     if ([rootViewController respondsToSelector:@selector(showGallery)]) {

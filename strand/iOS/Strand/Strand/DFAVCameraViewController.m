@@ -35,8 +35,8 @@
   self = [super init];
   if (self) {
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(appDidBecomeActive:)
-                                                 name:UIApplicationDidBecomeActiveNotification
+                                             selector:@selector(appWillEnterForeground:)
+                                                 name:UIApplicationWillEnterForegroundNotification
                                                object:nil];
   }
   return self;
@@ -69,13 +69,19 @@
   }
 }
 
-- (void)appDidBecomeActive:(NSNotification *)note
+- (void)appWillEnterForeground:(NSNotification *)note
 {
-  DDLogInfo(@"%@ app became active. Cature session nil:%@ running:%@ interrupted:%@",
+  AVCaptureStillImageOutput *output = self.session.outputs.lastObject;
+  AVCaptureConnection *videoConnection = output.connections.lastObject;
+  
+  DDLogInfo(@"%@ appWillEnterForeground. CaptureSessionNil:%@ VideoConnectionNil:%@ running:%@ interrupted:%@ appState:%@",
             [self.class description],
             @(self.session == nil),
+            @(videoConnection == nil),
             @(self.session.isRunning),
-            @(self.session.isInterrupted));
+            @(self.session.isInterrupted),
+            @([[UIApplication sharedApplication] applicationState]));
+  
   if (!self.session) [self createCaptureSession];
   if (!self.session.isRunning) [self.session startRunning];
 }

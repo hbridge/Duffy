@@ -689,7 +689,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 }
 
 
-- (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
++ (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
                 promptUserIfNecessary:(BOOL)promptUser
 {
   if ([ALAssetsLibrary authorizationStatus] != ALAuthorizationStatusAuthorized
@@ -698,8 +698,9 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
     completion(nil);
     return;
   }
-  
-  [self.assetsLibrary
+ 
+  ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+  [library
    enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos
    usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
      if (group.numberOfAssets > 0) {

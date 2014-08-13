@@ -46,24 +46,20 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [self configureLogs];
   [self configureHockey];
-  
-  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 
-   if (![self isAppSetupComplete]) {
-    [self showFirstTimeSetup];
-  } else if (![self isAuthTokenValid]) {
-    [self resetApplication];
-  } else {
-    [self showMainView];
-   }
-  
+  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
   [self.window makeKeyAndVisible];
+  
+  if ([application applicationState] != UIApplicationStateBackground) {
+    // only create views etc if we're not being launched in the background
+    [self createRootViewController];
+  }
   
   if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
     [self application:application didReceiveRemoteNotification:
      launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]];
   }
-
+  
   return YES;
 }
 
@@ -120,6 +116,24 @@
                                     initWithRootViewController:setupViewController];
 }
 
+- (void)firstTimeSetupComplete
+{
+  [self showMainView];
+  [self performForegroundOperations];
+}
+
+- (void)createRootViewController
+{
+  if (![self isAppSetupComplete]) {
+    [self showFirstTimeSetup];
+  } else if (![self isAuthTokenValid]) {
+    [self resetApplication];
+  } else {
+    [self showMainView];
+  }
+
+}
+
 - (void)showMainView
 {
   if (![NSThread isMainThread]) {
@@ -131,7 +145,6 @@
   
   [DFPhotoStore sharedStore];
   [self requestPushNotifs];
-  [self performForegroundOperations];
   self.window.rootViewController = [[RootViewController alloc] init];
   [[DFBackgroundLocationManager sharedBackgroundLocationManager]
    startUpdatingOnSignificantLocationChange];
@@ -148,8 +161,8 @@
 
 - (void)performForegroundOperations
 {
+  DDLogInfo(@"AppDelegate performForegroundOperation");
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-    DDLogInfo(@"Strand app %@ became active.", [DFAppInfo appInfoString]);
     if ([self isAppSetupComplete]) {
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
@@ -180,10 +193,12 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
+  DDLogInfo(@"AppDelegate appWillResignActive");
   [DFAnalytics CloseAnalyticsSession];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
+  DDLogInfo(@"AppDelegate appDidenterBackground");
   [[NSUserDefaults standardUserDefaults] synchronize];
   [[DFPhotoStore sharedStore] saveContext];
   [DFAnalytics CloseAnalyticsSession];
@@ -196,10 +211,13 @@
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
+  DDLogInfo(@"AppDelegate for %@ appWillEnterForeground.", [DFAppInfo appInfoString]);
+  if (!self.window.rootViewController) [self createRootViewController];
   [DFAnalytics ResumeAnalyticsSession];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
+  DDLogInfo(@"AppDelegate for %@ appDidBecomeActive.", [DFAppInfo appInfoString]);
   [DFAnalytics StartAnalyticsSession];
   [self performForegroundOperations];
 }
