@@ -23,6 +23,7 @@
   self.imagesForObjects = [NSMutableDictionary new];
   self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
+  self.collectionView.scrollsToTop = NO;
   self.collectionView.backgroundColor = [UIColor clearColor];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"cell"];

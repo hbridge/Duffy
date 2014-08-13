@@ -38,6 +38,7 @@
   [self.favoritersButton setTitleColor:[DFStrandConstants weakFeedForegroundTextColor]
                               forState:UIControlStateNormal];
   
+  self.collectionView.scrollsToTop = NO;
   self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]

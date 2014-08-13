@@ -168,6 +168,7 @@ const CGFloat LockedCellHeight = 157.0;
   self.contentView = self.tableView;
   self.tableView.dataSource = self;
   self.tableView.delegate = self;
+  self.tableView.scrollsToTop = YES;
   
   self.automaticallyAdjustsScrollViewInsets = NO;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
@@ -240,7 +241,8 @@ const CGFloat LockedCellHeight = 157.0;
           dispatch_async(dispatch_get_main_queue(), ^{
             NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
             [self.tableView scrollToRowAtIndexPath:indexPath
-                                  atScrollPosition:UITableViewScrollPositionBottom animated:NO];
+                                  atScrollPosition:UITableViewScrollPositionBottom
+                                          animated:NO];
             self.requestedPhotoIDToJumpTo = 0;
           });
         }});
