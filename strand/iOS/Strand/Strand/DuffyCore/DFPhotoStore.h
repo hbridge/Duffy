@@ -71,7 +71,7 @@ typedef enum {
 // wipe the store
 - (void)resetStore;
 
-- (void)addPhotoToPhotoAlbum:(NSURL *) assetURL toPhotoAlbum:(NSString *) album;
+- (void)addAssetWithURL:(NSURL *) assetURL toPhotoAlbum:(NSString *) album;
 
 - (void)saveImageToCameraRoll:(UIImage *)image
                  withMetadata:(NSDictionary *)metadata

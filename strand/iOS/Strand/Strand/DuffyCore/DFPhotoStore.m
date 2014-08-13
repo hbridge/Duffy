@@ -626,53 +626,34 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 
 /*
  * Add image to a custom photo album
- * Copied from http://praveenmatanam.wordpress.com/2013/02/14/add-image-to-custom-photo-album/
+ * Iterates through all the users's groups looking for the correct album, if it doesn't exist, it gets created.
  */
-- (void) addPhotoToPhotoAlbum:(NSURL *) assetURL toPhotoAlbum:(NSString *) album
+- (void) addAssetWithURL:(NSURL *) assetURL toPhotoAlbum:(NSString *) album
 {
   [self.assetsLibrary assetForURL:assetURL
-           resultBlock:^(ALAsset *asset)
+                      resultBlock:^(ALAsset *asset)
    {
-     NSString *groupName = [[NSUserDefaults standardUserDefaults] objectForKey:@"groupURL"];
-     NSURL *groupURL = [[NSURL alloc] initWithString:groupName?groupName:@""];
-     
-     [self.assetsLibrary groupForURL:groupURL
-              resultBlock:^(ALAssetsGroup *group)
+     __block BOOL found = NO;
+     [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:^(ALAssetsGroup *group, BOOL *stop)
       {
         NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-        
         if ([album isEqualToString:groupName])
         {
           [group addAsset:asset];
+          found = YES;
         }
-        else
-        {
-          __weak ALAssetsLibrary *lib = self.assetsLibrary;
-          
-          [self.assetsLibrary addAssetsGroupAlbumWithName:album resultBlock:^(ALAssetsGroup *group)
-           {
-             NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-             NSURL *groupURL = [group valueForProperty:ALAssetsGroupPropertyURL];
-             [[NSUserDefaults standardUserDefaults] setObject:groupURL.absoluteString forKey:@"groupURL"];
-             
-             [lib enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:^(ALAssetsGroup *group, BOOL *stop)
-              {
-                if ([album isEqualToString:groupName])
-                {
-                  [group addAsset:asset];
-                }
-                
-              } failureBlock:^(NSError *error)
-              {
-              }];
-             
-           } failureBlock:^(NSError *error)
-           {
-           }];
-        }
+        
       } failureBlock:^(NSError *error)
       {
       }];
+     
+     if (!found) {
+       [self.assetsLibrary addAssetsGroupAlbumWithName:album resultBlock:^(ALAssetsGroup *group){
+         [group addAsset:asset];
+       } failureBlock:^(NSError *error)
+        {
+        }];
+     }
      
    } failureBlock:^(NSError *error)
    {
@@ -695,7 +676,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                                                     [self.class description],
                                                     error.description);
                                        } else {
-                                         [self addPhotoToPhotoAlbum:assetURL toPhotoAlbum:@"Strand"];
+                                         [self addAssetWithURL:assetURL toPhotoAlbum:@"Strand"];
                                        }
                                        completion(error);
                                      }];
