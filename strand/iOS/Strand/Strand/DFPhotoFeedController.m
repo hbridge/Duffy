@@ -196,7 +196,8 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self reloadFeedIsSilent:NO];
+  BOOL silent = self.sectionObjects.count > 0;
+  [self reloadFeedIsSilent:silent];
 }
 
 
