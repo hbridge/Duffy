@@ -164,7 +164,7 @@ const CGFloat LockedCellHeight = 157.0;
   [super viewDidLoad];
   
   self.tableView = [[UITableView alloc] initWithFrame:self.contentView.frame
-                                                style:UITableViewStyleGrouped];
+                                                style:UITableViewStylePlain];
   self.contentView = self.tableView;
   self.tableView.dataSource = self;
   self.tableView.delegate = self;
