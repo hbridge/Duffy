@@ -78,7 +78,28 @@ def splitPhotosFromIndexbyMonth(userId, solrPhotoSet, threshold=constants.DEFAUL
 	
 	return groupings
 
+"""
+	Returns back a simple cluster structure for the list of photoSet
 
+	input:  list of photos
+	returns: cluster (list)
+			--> entry (dict)
+				--> photo (SimplePhoto)
+				--> dist (shortest distance to any photo in set)
+			--> entry
+				--> photo (SimplePhoto)
+				--> dist (shortest distance to any photo in set)
+				--> simrow (only for 2nd and later elements)
+			--> ...
+"""
+def getSimpleCluster(photos):
+	cluster = list()
+
+	for photo in photos:
+		photo = SimplePhoto(photo)
+		cluster.append({'photo': photo})
+
+	return cluster
 
 """
 	Returns clusters for a set of photos based on the threshold
