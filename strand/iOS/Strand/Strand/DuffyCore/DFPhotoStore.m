@@ -628,7 +628,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
  * Add image to a custom photo album
  * Iterates through all the users's groups looking for the correct album, if it doesn't exist, it gets created.
  */
-- (void) addAssetWithURL:(NSURL *) assetURL toPhotoAlbum:(NSString *) album
+- (void) addAssetWithURL:(NSURL *) assetURL toPhotoAlbum:(NSString *) albumName
 {
   [self.assetsLibrary assetForURL:assetURL
                       resultBlock:^(ALAsset *asset)
@@ -637,7 +637,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
      [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:^(ALAssetsGroup *group, BOOL *stop)
       {
         NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-        if ([album isEqualToString:groupName])
+        if ([albumName isEqualToString:groupName])
         {
           [group addAsset:asset];
           found = YES;
@@ -648,7 +648,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
       }];
      
      if (!found) {
-       [self.assetsLibrary addAssetsGroupAlbumWithName:album resultBlock:^(ALAssetsGroup *group){
+       [self.assetsLibrary addAssetsGroupAlbumWithName:albumName resultBlock:^(ALAssetsGroup *group){
          [group addAsset:asset];
        } failureBlock:^(NSError *error) {
         DDLogError(@"Error creating custom Strand album: %@, %@", error, error.userInfo);
