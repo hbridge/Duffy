@@ -144,7 +144,7 @@ def userbaseSummary(request):
 		extras[actionsCount[i].id] = entry
 
 	# Exclude type GPS fetch since it happens so frequently
-	notificationDataRaw = NotificationLog.objects.filter(apns=constants.IOS_NOTIFICATIONS_PROD_APNS_ID).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
+	notificationDataRaw = NotificationLog.objects.filter(Q(apns=constants.IOS_NOTIFICATIONS_PROD_APNS_ID) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_SENT)).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
 	notificationCountById = dict()
 	notificationLastById = dict()
 

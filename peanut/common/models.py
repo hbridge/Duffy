@@ -334,7 +334,9 @@ class NotificationLog(models.Model):
 	msg = models.TextField(null=True)
 	custom_payload = models.TextField()
 	metadata = models.TextField()
-	apns = models.IntegerField()
+	# Not used, probably can remove at some point
+	apns = models.IntegerField(null=True)
+	result = models.IntegerField(db_index=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	msg_type = models.IntegerField()
 

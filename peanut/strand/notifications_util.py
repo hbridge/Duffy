@@ -26,14 +26,14 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 		
 	if user.device_token:
 		if user.device_token == "TESTTOKEN":
-			logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", apns=-1, msg_type=msgTypeId, metadata=metadata)
+			logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
 			return [logEntry]
 
 		devices = Device.objects.select_related().filter(token=user.device_token)
 
 		if len(devices) == 0:
 			logger.warning("Was told to send a notification to user %s who has a device token but nothing in the Device table" % user.id)
-			logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, apns=-2, msg_type=msgTypeId, metadata=metadata)
+			logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
 			return [logEntry]
 		
 		logEntries = list()	
@@ -63,11 +63,11 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			apns.push_notification_to_devices(notification, [device])
 
 			# This is for logging
-			logEntries.append(NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, apns=apns.id, msg_type=msgTypeId, metadata=metadata))
+		logEntries.append(NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_SENT, msg_type=msgTypeId, metadata=metadata))
 		return logEntries
 	else:
 		logger.warning("Was told to send a notification to user %s who doesn't have a device token" % user.id)
-		logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, apns=-1, msg_type=msgTypeId, metadata=metadata)
+		logEntry = NotificationLog.objects.create(user=user, device_token="", msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
 
 		return [logEntry]
 
