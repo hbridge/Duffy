@@ -582,7 +582,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 + (void)saveImage:(UIImage *)image
      withMetadata:(NSDictionary *)metadata
          location:(CLLocation *)location
-context:(NSManagedObjectContext *)context
+          context:(NSManagedObjectContext *)context
   completionBlock:(void (^)(void))completion
 {
   @autoreleasepool {
@@ -606,16 +606,9 @@ context:(NSManagedObjectContext *)context
     }
     
     if ([[DFSettings sharedSettings] autosaveToCameraRoll]) {
-      ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
-      [library writeImageToSavedPhotosAlbum:image.CGImage
-                                   metadata:metadata
-                            completionBlock:^(NSURL *assetURL, NSError *error) {
-                              if (error) {
-                                DDLogError(@"%@ couldn't save photo to Camera Roll:%@",
-                                           [self.class description],
-                                           error.description);
-                              }
-                            }];
+      DFPhotoStore *photoStore = [DFPhotoStore sharedStore];
+      [photoStore saveImageToCameraRoll:image withMetadata:metadata completion:^(NSError *error) {
+      }];
     }
     
     if (completion) completion();
@@ -631,6 +624,41 @@ context:(NSManagedObjectContext *)context
   return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
 }
 
+/*
+ * Add image to a custom photo album
+ * Iterates through all the users's groups looking for the correct album, if it doesn't exist, it gets created.
+ */
+- (void) addAssetWithURL:(NSURL *) assetURL toPhotoAlbum:(NSString *) albumName
+{
+  [self.assetsLibrary assetForURL:assetURL
+                      resultBlock:^(ALAsset *asset)
+   {
+     __block BOOL found = NO;
+     [self.assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAlbum usingBlock:^(ALAssetsGroup *group, BOOL *stop)
+      {
+        NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
+        if ([albumName isEqualToString:groupName])
+        {
+          [group addAsset:asset];
+          found = YES;
+        }
+      } failureBlock:^(NSError *error)
+      {
+        DDLogError(@"Error looping over albums: %@, %@", error, error.userInfo);
+      }];
+     
+     if (!found) {
+       [self.assetsLibrary addAssetsGroupAlbumWithName:albumName resultBlock:^(ALAssetsGroup *group){
+         [group addAsset:asset];
+       } failureBlock:^(NSError *error) {
+        DDLogError(@"Error creating custom Strand album: %@, %@", error, error.userInfo);
+       }];
+     }
+     
+   } failureBlock:^(NSError *error)
+   {
+   }];
+}
 
 - (void)saveImageToCameraRoll:(UIImage *)image
                  withMetadata:(NSDictionary *)metadata
@@ -643,6 +671,13 @@ context:(NSManagedObjectContext *)context
     [self.assetsLibrary writeImageToSavedPhotosAlbum:image.CGImage
                                             metadata:mutableMetadata
                                      completionBlock:^(NSURL *assetURL, NSError *error) {
+                                       if (error) {
+                                         DDLogError(@"%@ couldn't save photo to Camera Roll:%@",
+                                                    [self.class description],
+                                                    error.description);
+                                       } else {
+                                         [self addAssetWithURL:assetURL toPhotoAlbum:@"Strand"];
+                                       }
                                        completion(error);
                                      }];
   });
