@@ -54,12 +54,6 @@
   self.translucent = NO;
 }
 
-- (void)layoutSubviews
-{
-  [super setFrame:CGRectMake(self.frame.origin.x, 0, self.frame.size.width, 64)];
-  [super layoutSubviews];
-}
-
 - (void)setItemAlpha:(CGFloat)alpha
 {
   for (UINavigationItem *item in self.items) {
