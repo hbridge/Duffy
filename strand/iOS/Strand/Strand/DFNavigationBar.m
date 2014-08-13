@@ -48,9 +48,9 @@
   self.barTintColor = [DFStrandConstants defaultBackgroundColor];
   self.tintColor = [DFStrandConstants defaultBarForegroundColor];
   self.titleTextAttributes = @{
-                                             NSForegroundColorAttributeName:
-                                               [DFStrandConstants defaultBarForegroundColor]
-                                             };
+                               NSForegroundColorAttributeName:
+                                 [DFStrandConstants defaultBarForegroundColor]
+                               };
   self.translucent = NO;
 }
 
