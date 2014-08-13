@@ -8,11 +8,11 @@
 
 #import "DFLockedStrandCell.h"
 #import "DFPhotoViewCell.h"
-#import <GPUImage/GPUImage.h>
+#import <LiveFrost/LiveFrost.h>
 
 @interface DFLockedStrandCell()
 
-@property (atomic, retain) NSMutableDictionary *blurredImagesForObjects;
+@property (atomic, retain) NSMutableDictionary *imagesForObjects;
 
 @end
 
@@ -20,7 +20,7 @@
 
 - (void)awakeFromNib
 {
-  self.blurredImagesForObjects = [NSMutableDictionary new];
+  self.imagesForObjects = [NSMutableDictionary new];
   self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
   self.collectionView.backgroundColor = [UIColor clearColor];
@@ -38,18 +38,17 @@
 - (void)setObjects:(NSArray *)objects
 {
   _objects = objects;
-  self.blurredImagesForObjects = [NSMutableDictionary new];
+  self.imagesForObjects = [NSMutableDictionary new];
 }
 
 - (void)setImage:(UIImage *)image forObject:(id)object
 {
   if (image) {
     dispatch_async(dispatch_get_main_queue(), ^{
-      UIImage *blurredImage = [DFLockedStrandCell blurryGPUImage:image];
-      if (blurredImage) {
-        self.blurredImagesForObjects[object] = blurredImage;
+
+        self.imagesForObjects[object] = image;
         [self.collectionView reloadData];
-      }
+
     });
   }
 }
@@ -61,7 +60,7 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  return self.blurredImagesForObjects.allValues.count;
+  return self.imagesForObjects.allValues.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -70,23 +69,28 @@
   DFPhotoViewCell *cell = [self.collectionView
                            dequeueReusableCellWithReuseIdentifier:@"cell"
                            forIndexPath:indexPath];
+  BOOL hasBlurView = NO;
+  for (UIView *view in cell.subviews) {
+    if ([view.class isSubclassOfClass:[LFGlassView class]]) {
+      hasBlurView = YES;
+      break;
+    }
+  }
+  
+  if (!hasBlurView) {
+    LFGlassView *glassView = [[LFGlassView alloc] initWithFrame:cell.bounds];
+    glassView.blurRadius = 1;
+    [cell addSubview:glassView];
+  }
   
   id object = self.objects[indexPath.row];
-  cell.imageView.image = self.blurredImagesForObjects[object];
+  cell.imageView.image = self.imagesForObjects[object];
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
   cell.imageView.backgroundColor = [UIColor grayColor];
   
   return cell;
 }
-
-+ (UIImage *)blurryGPUImage:(UIImage *)image {
-  GPUImageGaussianBlurFilter *blurFilter = [GPUImageGaussianBlurFilter new];
-  blurFilter.blurRadiusInPixels = 10.0;
-  UIImage *result = [blurFilter imageByFilteringImage:image];
-  return result;
-}
-
 
 
 @end

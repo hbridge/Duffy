@@ -13,9 +13,9 @@ PODS:
     - ActionSheetPicker2 (~> 0.1)
     - BWLongTextViewController (~> 1.0)
     - BWSelectViewController
-  - GPUImage (0.1.4)
   - HockeySDK (3.5.5)
   - JDStatusBarNotification (1.4.8)
+  - LiveFrost (1.1.2)
   - LKbadgeView (1.1.0)
   - Localytics-iOS-Client (2.23.0)
   - MMPopLabel (0.1.1)
@@ -42,9 +42,9 @@ DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
   - CRToast (~> 0.0.7)
   - FormKit.m (~> 0.4.0)
-  - GPUImage (~> 0.1.4)
   - HockeySDK (~> 3.5.5)
   - JDStatusBarNotification (~> 1.4.7)
+  - LiveFrost (~> 1.1.2)
   - LKbadgeView (~> 1.1.0)
   - Localytics-iOS-Client (~> 2.23.0)
   - MMPopLabel (from `https://github.com/hbridge/MMPopLabel.git`)
@@ -63,9 +63,9 @@ SPEC CHECKSUMS:
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   FormKit.m: 68e35d2e70558109fa9ce5935e0f16a65c8b2b51
-  GPUImage: ac2bde5f4dbea02a81ced6313964cec1f2043ca9
   HockeySDK: f9af97c2f5df4eb6ca6d2a9c408f2ff498edd608
   JDStatusBarNotification: c68611370dedc0ef865fb0fc1768dfbaf8fd961f
+  LiveFrost: 8c7e447e6833902ddc2a639faa27e71e091b5062
   LKbadgeView: 8e14044ee22c6d570c07e69e1ce73a3f91061730
   Localytics-iOS-Client: 3f878379d40c67945ea5972c1e1bf9762b5e5b9f
   MMPopLabel: e094a5b49eeff1d80a72cb4508219cb10e4c7e65
