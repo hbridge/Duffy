@@ -1,5 +1,10 @@
 # Strand
 
+## Aug 13th, 2015 (4717)
+
+- Status bar hides in feed to give you more space to see photos
+- More work on fixing the blank camera and battery life
+
 ## Aug 11th, 2015
 
 - Totally new camera with improved speed and reliability
