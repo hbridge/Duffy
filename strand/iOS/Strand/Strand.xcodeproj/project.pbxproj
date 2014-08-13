@@ -44,6 +44,7 @@
 		5A3172E0196C9EC100CA7693 /* DFPeanutError.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172DF196C9EC100CA7693 /* DFPeanutError.m */; };
 		5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */; };
 		5A3F6A9F1999573A00C2F7D4 /* DBMotionManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3F6A9E1999573A00C2F7D4 /* DBMotionManager.m */; };
+		5A3F6AA4199AB64B00C2F7D4 /* DFTopBarController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3F6AA3199AB64B00C2F7D4 /* DFTopBarController.m */; };
 		5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40343F196083A9003D7546 /* DFCameraRollPhotoAsset.m */; };
 		5A40344219609163003D7546 /* DFPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344119609163003D7546 /* DFPhotoAsset.m */; };
 		5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4034491961F721003D7546 /* DFStrandPhotoAsset.m */; };
@@ -233,6 +234,8 @@
 		5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+DFExtensions.m"; sourceTree = "<group>"; };
 		5A3F6A9D1999573A00C2F7D4 /* DBMotionManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DBMotionManager.h; path = ThirdParty/DBCamera/DBMotionManager.h; sourceTree = "<group>"; };
 		5A3F6A9E1999573A00C2F7D4 /* DBMotionManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DBMotionManager.m; path = ThirdParty/DBCamera/DBMotionManager.m; sourceTree = "<group>"; };
+		5A3F6AA2199AB64B00C2F7D4 /* DFTopBarController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTopBarController.h; sourceTree = "<group>"; };
+		5A3F6AA3199AB64B00C2F7D4 /* DFTopBarController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTopBarController.m; sourceTree = "<group>"; };
 		5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 4.xcdatamodel"; sourceTree = "<group>"; };
 		5A40343B196083A9003D7546 /* DFPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoAsset.h; path = DuffyCore/DFPhotoAsset.h; sourceTree = "<group>"; };
 		5A40343E196083A9003D7546 /* DFCameraRollPhotoAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFCameraRollPhotoAsset.h; path = DuffyCore/DFCameraRollPhotoAsset.h; sourceTree = "<group>"; };
@@ -476,6 +479,8 @@
 			children = (
 				5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */,
 				5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */,
+				5A3F6AA2199AB64B00C2F7D4 /* DFTopBarController.h */,
+				5A3F6AA3199AB64B00C2F7D4 /* DFTopBarController.m */,
 				5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */,
 				5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */,
 				5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */,
@@ -1251,6 +1256,7 @@
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
+				5A3F6AA4199AB64B00C2F7D4 /* DFTopBarController.m in Sources */,
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
 				5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */,
 				5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */,

@@ -10,13 +10,16 @@
 #import "DFNavigationController.h"
 #import "DFCameraViewController.h"
 #import "DFPhotoFeedController.h"
+#import "DFOverlayViewController.h"
 
 @interface RootViewController ()
             
 @property (readonly, strong, nonatomic) NSArray *subviewControllers;
 @property (nonatomic, retain) DFCameraViewController *cameraViewController;
 @property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
-@property (nonatomic, retain) DFNavigationController *feedNavController;
+
+@property (nonatomic, retain) UIWindow *overlayWindow;
+@property (nonatomic, retain) DFOverlayViewController *overlayVC;
 
 @end
 
@@ -29,11 +32,9 @@
     self.hideStatusBar = YES;
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFPhotoFeedController alloc] init];
-    _feedNavController = [[DFNavigationController alloc] initWithRootViewController:_photoFeedController
-                                                                 animateInStatusBar:YES];
     _subviewControllers =
     @[
-      _feedNavController,
+      _photoFeedController,
       _cameraViewController,
       ];
 
@@ -179,18 +180,37 @@
    previousViewControllers:(NSArray *)previousViewControllers
        transitionCompleted:(BOOL)completed
 {
-  if (self.pageViewController.viewControllers.firstObject == _feedNavController) {
-    [_feedNavController animateInStatusBar];
+  if (self.pageViewController.viewControllers.firstObject == _photoFeedController && finished) {
     self.hideStatusBar = NO;
+  } else {
+    self.hideStatusBar = YES;
   }
 }
 
 - (void)pageViewController:(UIPageViewController *)pageViewController
 willTransitionToViewControllers:(NSArray *)pendingViewControllers
 {
-  if (pendingViewControllers.firstObject == _cameraViewController) {
-    self.hideStatusBar = YES;
+  self.hideStatusBar = YES;
+}
+
+
+- (void)animateInStatusBar
+{
+  if (!self.overlayWindow) {
+    self.overlayWindow = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    [self.overlayWindow setWindowLevel:UIWindowLevelStatusBar];
+    [self.overlayWindow setUserInteractionEnabled:NO];
+    
+    self.overlayVC = [[DFOverlayViewController alloc] init];
+    [self.overlayWindow setRootViewController:self.overlayVC];
   }
+  
+  [self.overlayWindow setHidden:NO];
+  [self.overlayWindow makeKeyWindow];
+  
+  [self.overlayVC animateIn:^(BOOL finished) {
+    self.overlayWindow.hidden = YES;
+  }];
 }
 
 
@@ -198,8 +218,12 @@ willTransitionToViewControllers:(NSArray *)pendingViewControllers
 
 - (void)setHideStatusBar:(BOOL)hideStatusBar
 {
+  if (_hideStatusBar == hideStatusBar) return;
   _hideStatusBar = hideStatusBar;
   [self setNeedsStatusBarAppearanceUpdate];
+  if (!hideStatusBar) {
+    [self animateInStatusBar];
+  }
 }
 
 - (BOOL)prefersStatusBarHidden

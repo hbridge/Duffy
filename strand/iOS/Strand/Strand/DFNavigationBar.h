@@ -10,4 +10,6 @@
 
 @interface DFNavigationBar : UINavigationBar
 
+- (void)setItemAlpha:(CGFloat)alpha;
+
 @end

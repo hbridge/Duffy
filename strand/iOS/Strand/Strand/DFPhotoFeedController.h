@@ -8,8 +8,13 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPhotoFeedCell.h"
+#import "DFNavigationBar.h"
+#import "DFTopBarController.h"
 
-@interface DFPhotoFeedController : UITableViewController <UIActionSheetDelegate, DFPhotoFeedCellDelegate>
+@interface DFPhotoFeedController : DFTopBarController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate, DFPhotoFeedCellDelegate>
+
+@property (nonatomic, retain) UITableView *tableView;
+@property (nonatomic, retain) UIRefreshControl *refreshControl;
 
 - (IBAction)cameraButtonPressed:(id)sender;
 - (IBAction)inviteButtonPressed:(id)sender;

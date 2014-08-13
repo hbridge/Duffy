@@ -10,7 +10,4 @@
 
 @interface DFNavigationController : UINavigationController
 
-- (instancetype)initWithRootViewController:(UIViewController *)rootViewController
-                        animateInStatusBar:(BOOL)animateInStatusBar;
-- (void)animateInStatusBar;
 @end

@@ -87,11 +87,17 @@ const CGFloat LockedCellHeight = 157.0;
 @synthesize galleryAdapter = _galleryAdapter;
 @synthesize photoAdapter = _photoAdapter;
 
-- (id)initWithStyle:(UITableViewStyle)style
+- (id)init
 {
-  self = [super initWithStyle:style];
+  self = [super init];
   if (self) {
-    self.navigationItem.title = @"Strand";
+    UILabel *titleLabel = [[UILabel alloc] init];
+    titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
+    titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
+    titleLabel.text = @"Strand";
+    self.navigationItem.titleView = titleLabel;
+    [titleLabel sizeToFit];
+    
     [self setNavigationButtons];
     [self observeNotifications];
     
@@ -157,12 +163,11 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidLoad];
   
-  // we observe changes to the table view's frame to prevent it from moving when the status bar
-  // is hidden
-  [self.tableView addObserver:self
-                   forKeyPath:@"frame"
-                      options:NSKeyValueObservingOptionOld
-                      context:nil];
+  self.tableView = [[UITableView alloc] initWithFrame:self.contentView.frame
+                                                style:UITableViewStyleGrouped];
+  self.contentView = self.tableView;
+  self.tableView.dataSource = self;
+  self.tableView.delegate = self;
   
   self.automaticallyAdjustsScrollViewInsets = NO;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
@@ -326,7 +331,7 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)setTableViewFrame
 {
   self.tableView.frame = CGRectMake(self.tableView.frame.origin.x,
-                                    self.navigationController.navigationBar.frame.size.height,
+                                    self.navigationBar.frame.size.height,
                                     self.tableView.frame.size.width,
                                     self.tableView.frame.size.height);
 }
@@ -416,6 +421,15 @@ const CGFloat LockedCellHeight = 157.0;
   if (self.uploadingPhotos.count > 0) return self.sectionObjects[tableSection - 1];
   
   return self.sectionObjects[tableSection];
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return NO;
+}
+
+-(UIStatusBarStyle)preferredStatusBarStyle{
+  return UIStatusBarStyleLightContent;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -963,20 +977,5 @@ selectedObjectChanged:(id)newObject
   }
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath
-                      ofObject:(id)object
-                        change:(NSDictionary *)change
-                       context:(void *)context
-{
-  // This is a hack to prevent the table view from shifting when the Status bar is hidden and shown
-  if (object == self.tableView) {
-    if (self.tableView.frame.origin.y == 44.0) {
-      self.tableView.frame = CGRectMake(self.tableView.frame.origin.x,
-                                        64.0,
-                                        self.tableView.frame.size.width,
-                                        self.tableView.frame.size.height);
-    }
-  }
-}
 
 @end
