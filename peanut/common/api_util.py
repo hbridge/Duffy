@@ -6,6 +6,8 @@ import time
 from django.http import HttpResponse
 from phonenumber_field.phonenumber import PhoneNumber
 
+from peanut.settings import constants
+
 from common.models import Photo
 from common.serializers import PhotoActionWithUserNameSerializer, PhotoForApiSerializer
 
@@ -98,31 +100,43 @@ def turnFormattedGroupsIntoSections(formattedGroups, num):
 	count = 0
 	for group in formattedGroups:
 		section = {'type': 'section', 'title': group['title'], 'subtitle': group['subtitle'], 'objects': list()}
+		mostRecentPhotoDate = None
 		for cluster in group['clusters']:
 			if len(cluster) == 1:
 				photoData = getPhotoObject(cluster[0])
 				section['objects'].append(photoData)
-				lastDate = photoData['time_taken']
+
+				if not mostRecentPhotoDate or photoData['time_taken'] > mostRecentPhotoDate:
+					mostRecentPhotoDate = photoData['time_taken']
 			else:
 				clusterObj = {'type': 'cluster', 'objects': list()}
 				for entry in cluster:
 					photoData = getPhotoObject(entry)
 					clusterObj['objects'].append(photoData)
-					lastDate = photoData['time_taken']
+					
+					if not mostRecentPhotoDate or photoData['time_taken'] > mostRecentPhotoDate:
+						mostRecentPhotoDate = photoData['time_taken']
 				section['objects'].append(clusterObj)
 
 			count += 1
 			if count == num:
+				if mostRecentPhotoDate:
+					section['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
 				result.append(section)
-				return lastDate, result
+				return result
 		if ('docs' in group and len(group['docs']) > 0):
 			docObj = {'type': 'docstack', 'title': 'Your docs', 'objects': list()}
 			for entry in group['docs']:
 				photoData = getPhotoObject(entry)
 				docObj['objects'].append(photoData)
 			section['objects'].append(docObj)
+
+		if mostRecentPhotoDate:
+			section['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
 		result.append(section)
-	return lastDate, result
+	return result
 
 def getRequestData(request):
 	if request.method == 'GET':

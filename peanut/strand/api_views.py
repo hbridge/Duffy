@@ -261,9 +261,8 @@ def strand_feed(request):
 			formattedGroups[0]['title'] = "Locked"
 			
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
-		response['next_start_date_time'] = lastDate
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
@@ -298,9 +297,8 @@ def get_joinable_strands(request):
 		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds)
 
 		formattedGroups = getFormattedGroups([joinableStrandPhotos], userId)
-		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
-		response['next_start_date_time'] = lastDate
 
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
@@ -328,9 +326,8 @@ def get_new_photos(request):
 		photoList = removeDups(photoList, lambda x: x.id)
 
 		formattedGroups = getFormattedGroups([photoList], userId)
-		lastDate, objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
-		response['next_start_date_time'] = lastDate
 
 		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 	else:
