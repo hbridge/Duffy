@@ -681,12 +681,13 @@ def get_notifications(request):
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
 
-		notifications = NotificationLog.objects.filter(user_id=userId).filter(msg_type=constants.NOTIFICATIONS_PHOTO_FAVORITED_ID).exclude(metadata=None).filter(apns=1).order_by("-added")[:20]
+		# Grab all logs (don't filter on error) because we want this to show things that they might not have gotten notifications for
+		notifications = NotificationLog.objects.filter(user_id=userId).filter(msg_type=constants.NOTIFICATIONS_PHOTO_FAVORITED_ID).exclude(metadata=None).exclude(result=None).order_by("-added")[:20]
 
 		response['notifications'] = list()
 
 		for notification in notifications:
-			response['notifications'].append(json.loads(notification.metadata))		
+			response['notifications'].append(json.loads(notification.metadata))
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 

@@ -2,6 +2,8 @@ import datetime
 import json
 import logging
 
+from django.db.models import Q
+
 from peanut.settings import constants
 from common.models import NotificationLog, DuffyNotification
 from common.api_util import DuffyJsonEncoder
@@ -126,5 +128,6 @@ def getNotificationLogs(timeWithinCutoff):
 """
 def getNotificationLogsForType(timeWithinCutoff, msgType):
 	# Grap notification logs from last hour.  If a user isn't in here, then they weren't notified
-	notificationLogs = NotificationLog.objects.filter(msg_type=msgType).filter(added__gt=timeWithinCutoff).filter(apns__in=[-2,-1,1])
+	notificationLogs = NotificationLog.objects.filter(msg_type=msgType).filter(added__gt=timeWithinCutoff).filter(Q(apns__in=[-2,-1,1]) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_SENT) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_ERROR))
 	return notificationLogs
+
