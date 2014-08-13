@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title> Download Strand </title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+	<link rel="stylesheet" type="text/css" href="/strand/strand.css" media="screen" />
+	<script src='/resources/jquery-1.10.2.min.js'> </script>
+	<script type="text/javascript" src="//web.localytics.com/latest/localytics.min.js"></script>
+	<script type="text/javascript">
+		var localytics = LocalyticsSession("a592cd77469784a29d9bb69-f41b5cee-2171-11e4-4a11-00a426b17dd8", {logger:true, namespace:"websdk"});
+		localytics.open();
+	</script>
+
+	
+
+	<style>
+	body {
+		/*width: 310px;*/
+		margin: 0px;
+		font-family: HelveticaNeue;		
+	}
+	.ui-content {
+
+	}
+	.ui-header {
+		overflow: auto;
+		height: 60px;
+		padding: 0px;
+		background-color: rgba(242,138,95,1);
+	}
+	.ui-top-summary {
+		float: left;
+		height: 38px;
+		margin-top: 10px;
+		padding: 0px 75px 0px 75px;
+		text-align: center;
+		font-size: 16px;
+		line-height: 19px;
+	}
+	img.ui-icon {
+		float:left;
+		height: 40px;
+		width: 40px;
+		margin: 10px;
+		border: 1px solid #000000;
+		border-radius: 6px;
+	}
+	.ui-screenshots {
+		float:left;
+		width:100%;
+	}
+	img.ui-image {
+		display:block;
+		margin-right: auto;
+		margin-left: auto;
+		height: 290px;
+	}
+	.ui-strand-text {
+		padding-top: 16px;
+		padding-left: 2px;
+		float: left;
+		text-align: left;
+		font-size: 24px;
+		color: #202020;
+	}
+	.ui-strand-text-beta {
+		font-weight: normal;
+	}
+	.ui-dl {
+		float: left;
+		width: 100%;
+		height: 33px;
+		text-align: center;
+	}
+	.ui-dl-text {
+		background: #FF8D58;
+		box-shadow: 0px 4px 0px 0px #D1581F;
+		font-size: 28px;
+		color: #FFFFFF;
+		line-height: 24px;
+		border-radius: 6px;
+		border: 1px solid white;
+		padding: 2px 8px;		
+	}
+	.ui-dl-appstore {
+		float:left;
+		width: 100%;
+	}
+	img.ui-appstore {
+		display: block;
+		margin-right: auto;
+		margin-left: auto;
+	}
+	.ui-footer {
+		float:left;
+		width:100%;
+		text-align: center;
+	}
+	</style>
+</head>
+<body>
+
+<div class='ui-content'>
+
+<div class='ui-header'> 
+	<img class='ui-icon' src='/resources/strand_icon.png'> <div class='ui-strand-text'> Strand <span class='ui-strand-text-beta'>Beta </span> </div>
+</div>
+
+<div class="ui-top-summary"> 
+	Instantly share photos with friends near you!
+</div>
+
+<div class='ui-screenshots'>
+	<img class='ui-image' src='/resources/sample_mock.png'>
+</div>
+
+<div class='ui-dl'>
+	<span class='ui-dl-text'>Try Strand now!</span>
+</div>
+
+<div class='ui-dl-appstore hidden'>
+	<img class='ui-appstore' src='/resources/appstore.svg'>
+</div>
+<p>
+<p>
+<p>
+<p>
+</div> 
+</body>
+<script>
+	function dlClicked(){
+		localytics.tagEvent("DL_Clicked_fb2");
+		window.location.href = 'itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F30%3F%26avtoken%3Dbc066bce6c500e52fe721bc6894a4f9b8689d4df';
+	}
+	
+
+	function detectiPhone(){
+		var ua = navigator.userAgent;
+		if (ua.match(/(iPhone);.*CPU.*OS 7_\d/i) && (ua.indexOf('Safari') != -1) && (ua.indexOf('Chrome') < 0)) {
+			return true;
+		}
+		return false;
+	}
+
+	$(document).ready(function(){
+		/*if (!detectiPhone()){
+			$('div.ui-dl').addClass('hidden');
+			$('div.ui-dl-noiPhone').removeClass('hidden');
+		}*/
+		$('div.ui-dl').click(function() {
+			dlClicked();
+		});
+		$('img.ui-appstore').click(function() {
+			dlClicked();
+		});
+	});
+	
+</script>
+</html>
