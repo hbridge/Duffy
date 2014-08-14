@@ -87,46 +87,6 @@ def groupIsSolo(group, userId):
 			return False
 	return True
 
-def getGroupFromPhotoList(photos, userId, simCaches, actionsByPhotoIdCache, expired):
-	# Grab title from the location_city of a photo...but find the first one that has
-	#   a valid location_city
-	subtitle = None
-	i = 0
-	while (not subtitle) and i < len(photos):
-		subtitle = getBestLocation(photos[i])
-		i += 1
-
-	if not subtitle:
-		subtitle = "Location Unknown"
-
-	names = list()
-	mainPhotos = list()
-	hiddenPhotos = list()
-	for photo in photos:
-		if photo.user_id != userId:
-			names.append(photo.user.display_name)
-
-		if photo.id in actionsByPhotoIdCache or not expired:
-			mainPhotos.append(photo)
-		else:
-			hiddenPhotos.append(photo)
-			
-	names = set(names)
-
-	if (groupIsSolo(photos, userId)):
-		title = "Just you"
-	else:
-		title = ", ".join(names) + " and You"
-		
-	clusters = cluster_util.getClustersFromPhotos(mainPhotos, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
-
-	clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
-
-	if len(hiddenPhotos) > 0:
-		clusters.append(cluster_util.getSimpleCluster(hiddenPhotos))
-
-	return {'title': title, 'subtitle': subtitle, 'clusters': clusters}
-
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -194,7 +154,7 @@ def getFormattedGroups(groups, userId):
 		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
-
+		
 		output.append({'title': title, 'subtitle': subtitle, 'clusters': clusters})
 	return output
 
@@ -274,49 +234,34 @@ def strand_feed(request):
 
 		strands = Strand.objects.select_related().filter(users__in=[user])
 
-		photoIds = list()
-		for strand in strands:
-			for photo in strand.photos.all():
-				photoIds.append(photo.id)
-
-		# Fetch all the similarities at once so we can process in memory
-		simCaches = cluster_util.getSimCaches(photoIds)
-
-		# Do same with actions
-		actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
-
-		# list of groups
+		# list of list of photos
 		groups = list()
 		for strand in strands:
 			photos = friends_util.filterPhotosByFriends(userId, friendsIds, strand.photos.all().order_by("-time_taken"))
 			if len(photos) > 0:
-				expired = False
-				if nowTime > strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING):
-					expired = True
-
-				groups.append(getGroupFromPhotoList(photos, userId, simCaches, actionsByPhotoIdCache, expired))
+				groups.append(photos)
 
 		if len(groups) > 0:
 			# now sort groups by the time_taken of the first photo in each group
-			groups = sorted(groups, key=lambda x: x['clusters'][0][0]['photo'].time_taken, reverse=True)
+			groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
 
 		# Lastly, grab all our locked strands and add in those photos
 		lockedGroup = list()
 		if user.last_location_point:
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-			lockedPhotos = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
+			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
 
-			if len(lockedPhotos) > 0:
-				groups.insert(0, getGroupFromPhotoList(lockedPhotos, userId, simCaches, actionsByPhotoIdCache, False))
+			if len(lockedGroup) > 0:
+				groups.insert(0, lockedGroup)
 
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
-		#formattedGroups = getFormattedGroups(groups, userId)
+		formattedGroups = getFormattedGroups(groups, userId)
 
 		if len(lockedGroup) > 0:
-			groups[0]['title'] = "Locked"
+			formattedGroups[0]['title'] = "Locked"
 			
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		objects = api_util.turnFormattedGroupsIntoSections(groups, 1000)
+		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
