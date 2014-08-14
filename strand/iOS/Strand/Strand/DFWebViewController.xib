@@ -18,14 +18,17 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <webView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="WWh-WI-6fo">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WWh-WI-6fo">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="524"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                 </webView>
                 <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aYg-3M-q4W">
                     <rect key="frame" x="0.0" y="524" width="320" height="44"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="iyi-ox-vIi"/>
+                    </constraints>
                     <items>
                         <barButtonItem style="plain" systemItem="flexibleSpace" id="veO-Hn-S2P"/>
                         <barButtonItem image="Assets/Icons/BackBarButtonIcon.png" id="dCI-Pz-x56" userLabel="Back Button">
@@ -52,9 +55,16 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="trailing" secondItem="aYg-3M-q4W" secondAttribute="trailing" id="23U-3c-7ml"/>
                 <constraint firstItem="aYg-3M-q4W" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="4S2-46-WEA"/>
                 <constraint firstAttribute="trailing" secondItem="aYg-3M-q4W" secondAttribute="trailing" id="8Qa-Kg-yTO"/>
+                <constraint firstAttribute="trailing" secondItem="WWh-WI-6fo" secondAttribute="trailing" id="Bs1-AL-iit"/>
+                <constraint firstItem="aYg-3M-q4W" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="D9F-AS-CIF"/>
+                <constraint firstAttribute="bottom" secondItem="aYg-3M-q4W" secondAttribute="bottom" id="JOp-iK-tw7"/>
+                <constraint firstItem="WWh-WI-6fo" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="axy-cT-MtX"/>
+                <constraint firstItem="aYg-3M-q4W" firstAttribute="top" secondItem="WWh-WI-6fo" secondAttribute="bottom" id="jdX-Uf-4ul"/>
                 <constraint firstAttribute="bottom" secondItem="aYg-3M-q4W" secondAttribute="bottom" id="mwY-Ki-BaC"/>
+                <constraint firstItem="WWh-WI-6fo" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="taW-oT-XLw"/>
             </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
