@@ -12,5 +12,7 @@
 
 + (DFPeanutNotificationsManager *)sharedManager;
 - (NSArray *)notifications;
+- (NSArray *)unreadNotifications;
+- (NSArray *)readNotifications;
 
 @end

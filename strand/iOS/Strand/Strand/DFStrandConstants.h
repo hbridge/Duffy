@@ -19,6 +19,8 @@ extern NSString *const DFStrandGalleryAppearedNotificationName;
 
 extern NSString *const DFStrandUnseenPhotosUpdatedNotificationName;
 extern NSString *const DFStrandUnseenPhotosUpdatedCountKey;
+extern NSString *const DFStrandNotificationsUpdatedNotification;
+extern NSString *const DFStrandNotificationsUnseenCountKey;
 
 extern NSString *const DFStrandJoinableStrandsNearbyNotificationName;
 extern NSString *const DFStrandJoinableStrandsCountKey;

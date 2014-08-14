@@ -22,6 +22,8 @@ NSString *const DFStrandGalleryAppearedNotificationName = @"DFStrandGalleryAppea
 
 NSString *const DFStrandUnseenPhotosUpdatedNotificationName = @"DFStrandUnseenPhotosUpdatedNotification";
 NSString *const DFStrandUnseenPhotosUpdatedCountKey = @"DFStrandUnseenPhotosUpdatedCountKey";
+NSString *const DFStrandNotificationsUpdatedNotification = @"DFStrandNotificationsUpdatedNotification";
+NSString *const DFStrandNotificationsUnseenCountKey = @"DFStrandNotificationsUnseenCount";
 
 NSString *const DFStrandJoinableStrandsNearbyNotificationName = @"DFStrandJoinableStrandsNearbyNotificationName";
 NSString *const DFStrandJoinableStrandsCountKey = @"DFStrandJoinableStrandsCountKey";

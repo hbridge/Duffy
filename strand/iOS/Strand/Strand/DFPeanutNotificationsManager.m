@@ -8,6 +8,7 @@
 
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutNotificationsAdapter.h"
+#import "DFStrandConstants.h"
 
 NSTimeInterval const DFNotificationsMinFetchInterval = 2.0;
 
@@ -51,6 +52,12 @@ static DFPeanutNotificationsManager *defaultManager;
     DDLogInfo(@"Fetching %d notifications succeeded.", (int)peanutNotifications.count);
     self.isUpdatingNotifications = NO;
     self.lastFetchDate = [NSDate date];
+    
+    
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:DFStrandNotificationsUpdatedNotification
+     object:self
+     userInfo:@{DFStrandNotificationsUnseenCountKey: @(self.unreadNotifications.count)}];
   } failure:^(NSError *error) {
     DDLogError(@"%@ fetching contacts failed: %@", [self.class description], error.description);
     self.isUpdatingNotifications = NO;
@@ -74,5 +81,19 @@ static DFPeanutNotificationsManager *defaultManager;
   
   return _notificationsAdapter;
 }
+
+- (NSArray *)unreadNotifications
+{
+  // TODO (dparham) make this return
+  return self.notifications;
+}
+
+- (NSArray *)readNotifications
+{
+  // TODO (dparham) make this return the right set of notifications
+  
+  return self.notifications;
+}
+
 
 @end

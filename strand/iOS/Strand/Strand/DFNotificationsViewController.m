@@ -15,7 +15,8 @@
 
 @interface DFNotificationsViewController ()
 
-@property (nonatomic, retain) NSArray *peanutNotifications;
+@property (nonatomic, retain) NSArray *unreadNotifications;
+@property (nonatomic, retain) NSArray *readNotifications;
 
 @end
 
@@ -41,7 +42,8 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  self.peanutNotifications = [[DFPeanutNotificationsManager sharedManager] notifications];
+  self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+  self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
   [self.tableView reloadData];
 }
 
@@ -60,7 +62,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return self.peanutNotifications.count;
+  return self.unreadNotifications.count + self.readNotifications.count;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
@@ -68,14 +70,30 @@
   return @"Notifications";
 }
 
+- (DFPeanutNotification *)peanutNotificationForIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutNotification *peanutNotification;
+  if (indexPath.row < self.unreadNotifications.count) {
+    peanutNotification = self.unreadNotifications[indexPath.row];
+  } else {
+    peanutNotification = self.readNotifications[indexPath.row - self.unreadNotifications.count];
+  }
+
+  return peanutNotification;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFNotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
   
-  DFPeanutNotification *peanutNotification = self.peanutNotifications[indexPath.row];
+  DFPeanutNotification *peanutNotification = [self peanutNotificationForIndexPath:indexPath];
+  
+  // set cell basic data
   cell.nameLabel.text = peanutNotification.actor_display_name;
   cell.descriptionLabel.text = peanutNotification.action_text;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:peanutNotification.time];
+  
+  //set the preview image
   cell.previewImageView.image = nil;
   [[DFImageStore sharedStore]
    imageForID:peanutNotification.photo_id.longLongValue
@@ -89,12 +107,17 @@
      });
    }];
   
+  //decide whether to highlight
+  if (indexPath.row < self.unreadNotifications.count) {
+    cell.backgroundColor = [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
+  }
+  
   return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutNotification *notification = self.peanutNotifications[indexPath.row];
+  DFPeanutNotification *notification = [self peanutNotificationForIndexPath:indexPath];
   DDLogVerbose(@"%@ notif tapped for notif:%@", [self.class description], notification);
   
   if (self.delegate) {

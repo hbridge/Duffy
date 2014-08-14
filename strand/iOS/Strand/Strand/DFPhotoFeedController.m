@@ -81,6 +81,8 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
+
+@property (nonatomic, retain) DFBadgeButton *titleBadgeButton;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 
 @end
@@ -94,19 +96,20 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self = [super init];
   if (self) {
-    DFBadgeButton *titleBadgeButton = [[DFBadgeButton alloc] init];
-    titleBadgeButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
-    titleBadgeButton.titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
-    [titleBadgeButton setTitle:@"Strand" forState:UIControlStateNormal];
-    titleBadgeButton.badgeColor = [DFStrandConstants strandGreen];
-    titleBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
-    titleBadgeButton.badgeCount = 5;
-    [titleBadgeButton addTarget:self
+    self.titleBadgeButton = [[DFBadgeButton alloc] init];
+    self.titleBadgeButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
+    self.titleBadgeButton.titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
+    [self.titleBadgeButton setTitle:@"Strand" forState:UIControlStateNormal];
+    self.titleBadgeButton.badgeColor = [DFStrandConstants strandGreen];
+    self.titleBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
+    self.titleBadgeButton.badgeCount = (int)[[[DFPeanutNotificationsManager sharedManager]
+                                    unreadNotifications] count];
+    [self.titleBadgeButton addTarget:self
                          action:@selector(titleButtonPressed:)
                forControlEvents:UIControlEventTouchUpInside];
     
-    self.navigationItem.titleView = titleBadgeButton;
-    [titleBadgeButton sizeToFit];
+    self.navigationItem.titleView = self.titleBadgeButton;
+    [self.titleBadgeButton sizeToFit];
     
     [self setNavigationButtons];
     [self observeNotifications];
@@ -166,6 +169,10 @@ const CGFloat LockedCellHeight = 157.0;
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(uploadStatusChanged:)
                                                name:DFUploadStatusNotificationName
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(notificationsChanged:)
+                                               name:DFStrandNotificationsUpdatedNotification
                                              object:nil];
 }
 
@@ -1040,6 +1047,12 @@ selectedObjectChanged:(id)newObject
       [self reloadFeedIsSilent:YES];
     });
   }
+}
+
+- (void)notificationsChanged:(NSNotification *)note
+{
+  NSNumber *unreadCount = note.userInfo[DFStrandNotificationsUnseenCountKey];
+  self.titleBadgeButton.badgeCount = unreadCount.intValue;
 }
 
 
