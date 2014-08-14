@@ -22,6 +22,7 @@
 
 @property (nonatomic, retain) NSNumber *photo_id;
 @property (nonatomic, retain) NSString *action_text;
+@property (nonatomic, retain) NSString *photo_thumb_path;
 @property (nonatomic, retain) NSNumber *actor_user;
 @property (nonatomic, retain) NSNumber *actor_display_name;
 @property (nonatomic, retain) NSDate *time;
