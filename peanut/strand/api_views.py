@@ -679,7 +679,7 @@ def get_notifications(request):
 		userId = form.cleaned_data['user_id']
 		response['notifications'] = list()
 
-		photoActions = PhotoAction.objects.filter(photo__user_id=userId)
+		photoActions = PhotoAction.objects.filter(photo__user_id=userId).order_by("-added")[:20]
 
 		for photoAction in photoActions:
 			if photoAction.user_id != userId:
