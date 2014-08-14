@@ -82,7 +82,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
 
-@property (nonatomic, retain) DFBadgeButton *titleBadgeButton;
+@property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 
 @end
@@ -96,20 +96,22 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self = [super init];
   if (self) {
-    self.titleBadgeButton = [[DFBadgeButton alloc] init];
-    self.titleBadgeButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
-    self.titleBadgeButton.titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
-    [self.titleBadgeButton setTitle:@"Strand" forState:UIControlStateNormal];
-    self.titleBadgeButton.badgeColor = [DFStrandConstants strandGreen];
-    self.titleBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
-    self.titleBadgeButton.badgeCount = (int)[[[DFPeanutNotificationsManager sharedManager]
-                                    unreadNotifications] count];
-    [self.titleBadgeButton addTarget:self
-                         action:@selector(titleButtonPressed:)
-               forControlEvents:UIControlEventTouchUpInside];
-    
-    self.navigationItem.titleView = self.titleBadgeButton;
-    [self.titleBadgeButton sizeToFit];
+    self.notificationsBadgeButton = [[DFBadgeButton alloc] init];
+    UIImage *image = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
+                      imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    [self.notificationsBadgeButton setImage:image
+                                   forState:UIControlStateNormal];
+    self.notificationsBadgeButton.badgeEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 6);
+    self.notificationsBadgeButton.badgeColor = [UIColor colorWithRed:74/255.0 green:144/255.0 blue:226/255.0 alpha:1.0];
+    self.notificationsBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
+    self.notificationsBadgeButton.badgeCount = (int)[[[DFPeanutNotificationsManager sharedManager]
+                                                      unreadNotifications] count];
+    [self.notificationsBadgeButton addTarget:self
+                                      action:@selector(titleButtonPressed:)
+                            forControlEvents:UIControlEventTouchUpInside];
+
+    self.navigationItem.titleView = self.notificationsBadgeButton;
+    [self.notificationsBadgeButton sizeToFit];
     
     [self setNavigationButtons];
     [self observeNotifications];
@@ -1052,7 +1054,7 @@ selectedObjectChanged:(id)newObject
 - (void)notificationsChanged:(NSNotification *)note
 {
   NSNumber *unreadCount = note.userInfo[DFStrandNotificationsUnseenCountKey];
-  self.titleBadgeButton.badgeCount = unreadCount.intValue;
+  self.notificationsBadgeButton.badgeCount = unreadCount.intValue;
 }
 
 
