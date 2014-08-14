@@ -186,11 +186,15 @@ const CGFloat LockedCellHeight = 157.0;
    forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.tableView.rowHeight = MinRowHeight;
+
   
   self.refreshControl = [[UIRefreshControl alloc] init];
   [self.refreshControl addTarget:self action:@selector(reloadFeed)
                 forControlEvents:UIControlEventValueChanged];
-  [self.tableView addSubview:self.refreshControl];
+
+  UITableViewController *tableViewController = [[UITableViewController alloc] init];
+  tableViewController.tableView = self.tableView;
+  tableViewController.refreshControl = self.refreshControl;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -198,6 +202,18 @@ const CGFloat LockedCellHeight = 157.0;
   [super viewWillAppear:animated];
   BOOL silent = self.sectionObjects.count > 0;
   [self reloadFeedIsSilent:silent];
+}
+
+- (void)setIsRefreshing:(BOOL)isRefreshing
+{
+  if (isRefreshing) {
+    self.tableView.tableHeaderView = self.refreshControl;
+    [self.refreshControl beginRefreshing];
+  } else {
+    [self.refreshControl endRefreshing];
+    self.tableView.tableHeaderView = nil;
+    
+  }
 }
 
 
