@@ -683,10 +683,11 @@ def get_notifications(request):
 
 		for photoAction in photoActions:
 			if photoAction.user_id != userId:
-				metadataMsg = '%s liked your photo' % (photoAction.user.display_name)
+				metadataMsg = 'liked your photo'
 				metadata = {'photo_id': photoAction.photo_id,
 							'action_text': metadataMsg,
 							'actor_user': photoAction.user_id,
+							'actor_display_name':  photoAction.user.display_name,
 							'time': photoAction.added}
 				response['notifications'].append(metadata)
 		
