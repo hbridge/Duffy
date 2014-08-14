@@ -73,14 +73,14 @@
   DFNotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
   
   DFPeanutNotification *peanutNotification = self.peanutNotifications[indexPath.row];
-  cell.nameLabel.text = peanutNotification.actor_user.description;
+  cell.nameLabel.text = peanutNotification.actor_display_name;
   cell.descriptionLabel.text = peanutNotification.action_text;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:peanutNotification.time];
   cell.previewImageView.image = nil;
   [[DFImageStore sharedStore]
    imageForID:peanutNotification.photo_id.longLongValue
    preferredType:DFImageThumbnail
-   thumbnailPath:@""
+   thumbnailPath:peanutNotification.photo_thumb_path
    fullPath:nil
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
