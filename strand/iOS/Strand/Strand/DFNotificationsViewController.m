@@ -7,8 +7,15 @@
 //
 
 #import "DFNotificationsViewController.h"
+#import "DFPeanutNotificationsManager.h"
+#import "DFPeanutNotification.h"
+#import "DFNotificationTableViewCell.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFImageStore.h"
 
 @interface DFNotificationsViewController ()
+
+@property (nonatomic, retain) NSArray *peanutNotifications;
 
 @end
 
@@ -29,6 +36,13 @@
   
   [self.tableView registerNib:[UINib nibWithNibName:@"DFNotificationTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"cell"];
+  self.tableView.separatorInset = UIEdgeInsetsMake(0, 50, 0, 0);
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  self.peanutNotifications = [[DFPeanutNotificationsManager sharedManager] notifications];
+  [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning
@@ -46,16 +60,37 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return 5;
+  return self.peanutNotifications.count;
 }
 
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+  return @"Notifications";
+}
 
- - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
- {
- UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
-   
- return cell;
- }
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFNotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
+  
+  DFPeanutNotification *peanutNotification = self.peanutNotifications[indexPath.row];
+  cell.nameLabel.text = peanutNotification.actor_user.description;
+  cell.descriptionLabel.text = peanutNotification.action_text;
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:peanutNotification.time];
+  cell.previewImageView.image = nil;
+  [[DFImageStore sharedStore]
+   imageForID:peanutNotification.photo_id.longLongValue
+   preferredType:DFImageThumbnail
+   thumbnailPath:@""
+   fullPath:nil
+   completion:^(UIImage *image) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if (![tableView.visibleCells containsObject:cell]) return;
+       cell.previewImageView.image = image;
+     });
+   }];
+  
+  return cell;
+}
 
 
 

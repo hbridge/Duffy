@@ -50,6 +50,7 @@ static DFPeanutNotificationsManager *defaultManager;
     self.peanutNotifications = peanutNotifications;
     DDLogInfo(@"Fetching %d notifications succeeded.", (int)peanutNotifications.count);
     self.isUpdatingNotifications = NO;
+    self.lastFetchDate = [NSDate date];
   } failure:^(NSError *error) {
     DDLogError(@"%@ fetching contacts failed: %@", [self.class description], error.description);
     self.isUpdatingNotifications = NO;

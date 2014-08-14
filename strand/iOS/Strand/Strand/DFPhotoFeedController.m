@@ -39,6 +39,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFBadgeButton.h"
 #import "DFNotificationsViewController.h"
+#import "DFPeanutNotificationsManager.h"
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
@@ -98,7 +99,7 @@ const CGFloat LockedCellHeight = 157.0;
     titleBadgeButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
     titleBadgeButton.titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
     [titleBadgeButton setTitle:@"Strand" forState:UIControlStateNormal];
-    titleBadgeButton.badgeColor = [DFStrandConstants strandYellow];
+    titleBadgeButton.badgeColor = [DFStrandConstants strandGreen];
     titleBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
     titleBadgeButton.badgeCount = 5;
     [titleBadgeButton addTarget:self
