@@ -688,7 +688,7 @@ def get_notifications(request):
 							'action_text': metadataMsg,
 							'actor_user': photoAction.user_id,
 							'actor_display_name':  photoAction.user.display_name,
-							'photo_thumb_url': photoAction.photo.getThumbUrlImagePath(),
+							'photo_thumb_path': photoAction.photo.getThumbUrlImagePath(),
 							'time': photoAction.added}
 				response['notifications'].append(metadata)
 		
