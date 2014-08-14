@@ -37,6 +37,8 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFUploadingFeedCell.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFBadgeButton.h"
+#import "DFNotificationsViewController.h"
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
@@ -79,6 +81,7 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
+@property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 
 @end
 
@@ -91,12 +94,19 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self = [super init];
   if (self) {
-    UILabel *titleLabel = [[UILabel alloc] init];
-    titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
-    titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
-    titleLabel.text = @"Strand";
-    self.navigationItem.titleView = titleLabel;
-    [titleLabel sizeToFit];
+    DFBadgeButton *titleBadgeButton = [[DFBadgeButton alloc] init];
+    titleBadgeButton.titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
+    titleBadgeButton.titleLabel.textColor = [DFStrandConstants defaultBarForegroundColor];
+    [titleBadgeButton setTitle:@"Strand" forState:UIControlStateNormal];
+    titleBadgeButton.badgeColor = [DFStrandConstants strandYellow];
+    titleBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
+    titleBadgeButton.badgeCount = 5;
+    [titleBadgeButton addTarget:self
+                         action:@selector(titleButtonPressed:)
+               forControlEvents:UIControlEventTouchUpInside];
+    
+    self.navigationItem.titleView = titleBadgeButton;
+    [titleBadgeButton sizeToFit];
     
     [self setNavigationButtons];
     [self observeNotifications];
@@ -740,6 +750,31 @@ const CGFloat LockedCellHeight = 157.0;
   DDLogInfo(@"Invite button pressed");
   DFInviteUserViewController *inviteController = [[DFInviteUserViewController alloc] init];
   [self presentViewController:inviteController animated:YES completion:nil];
+}
+
+- (void)titleButtonPressed:(UIButton *)button
+{
+  DDLogVerbose(@"Title button pressed");
+  DFNotificationsViewController *notifsViewController = [DFNotificationsViewController new];
+  
+  self.notificationsPopupController = [[WYPopoverController alloc] initWithContentViewController:notifsViewController];
+  self.notificationsPopupController.delegate = self;
+  [self.notificationsPopupController presentPopoverFromRect:button.bounds
+                                                     inView:button
+                                   permittedArrowDirections:WYPopoverArrowDirectionAny
+                                                   animated:YES];
+}
+
+
+- (BOOL)popoverControllerShouldDismissPopover:(WYPopoverController *)controller
+{
+  return YES;
+}
+
+- (void)popoverControllerDidDismissPopover:(WYPopoverController *)controller
+{
+  self.notificationsPopupController.delegate = nil;
+  self.notificationsPopupController = nil;
 }
 
 

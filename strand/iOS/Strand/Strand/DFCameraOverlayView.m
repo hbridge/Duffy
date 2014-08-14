@@ -31,6 +31,8 @@ NSString *const FlashAutoTitle = @"Auto";
   self.galleryButton.titleLabel.textAlignment = NSTextAlignmentCenter;
   self.galleryButton.badgeColor = [DFStrandConstants strandGreen];
   self.galleryButton.badgeTextColor = [UIColor blackColor];
+  // because the button is larger than the image, we have to add insets to make it line up
+  self.galleryButton.badgeEdgeInsets = UIEdgeInsetsMake(10, 0, 0, 18);
   
   [self.nearbyFriendsLabel addGestureRecognizer:[[UITapGestureRecognizer alloc]
                                                  initWithTarget:self

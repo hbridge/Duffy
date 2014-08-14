@@ -13,5 +13,6 @@
 @property (nonatomic, retain) UIColor *badgeColor;
 @property (nonatomic, retain) UIColor *badgeTextColor;
 @property (nonatomic) int badgeCount;
+@property (nonatomic) UIEdgeInsets badgeEdgeInsets;
 
 @end

@@ -72,6 +72,9 @@
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
+		5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */; };
+		5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */; };
+		5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */; };
 		5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */; };
 		5AA45285196706A60099CBD2 /* DFPeanutGalleryAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA45284196706A60099CBD2 /* DFPeanutGalleryAdapter.m */; };
 		5AA45293196708D00099CBD2 /* DFPhotoSectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA45288196708D00099CBD2 /* DFPhotoSectionHeader.m */; };
@@ -286,6 +289,11 @@
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
 		5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutLocationAdapter.h; sourceTree = "<group>"; };
 		5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutLocationAdapter.m; sourceTree = "<group>"; };
+		5AA38DF3199D1A1800AD1805 /* DFNotificationsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationsViewController.h; sourceTree = "<group>"; };
+		5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationsViewController.m; sourceTree = "<group>"; };
+		5AA38DF6199D1A4700AD1805 /* DFNotificationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationTableViewCell.h; sourceTree = "<group>"; };
+		5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationTableViewCell.m; sourceTree = "<group>"; };
+		5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNotificationTableViewCell.xib; sourceTree = "<group>"; };
 		5AA4527E19648A120099CBD2 /* DFBackgroundLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBackgroundLocationManager.h; sourceTree = "<group>"; };
 		5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBackgroundLocationManager.m; sourceTree = "<group>"; };
 		5AA45283196706A60099CBD2 /* DFPeanutGalleryAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutGalleryAdapter.h; sourceTree = "<group>"; };
@@ -671,6 +679,7 @@
 		5A56EFB41986CBC10032CA8A /* Feed View */ = {
 			isa = PBXGroup;
 			children = (
+				5AA38DF2199D19CA00AD1805 /* Notifs Popover */,
 				5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */,
 				5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */,
 				5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */,
@@ -740,6 +749,18 @@
 				5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */,
 			);
 			name = "Peanut Objects";
+			sourceTree = "<group>";
+		};
+		5AA38DF2199D19CA00AD1805 /* Notifs Popover */ = {
+			isa = PBXGroup;
+			children = (
+				5AA38DF3199D1A1800AD1805 /* DFNotificationsViewController.h */,
+				5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */,
+				5AA38DF6199D1A4700AD1805 /* DFNotificationTableViewCell.h */,
+				5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */,
+				5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */,
+			);
+			name = "Notifs Popover";
 			sourceTree = "<group>";
 		};
 		5AA45286196708B10099CBD2 /* Gallery */ = {
@@ -1127,6 +1148,7 @@
 				5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */,
 				5AC4A8D3194771F200862D9C /* DFGalleryWebViewController.xib in Resources */,
 				5A188D6219802F87009D3244 /* FeedViewNuxPlaceholder.xib in Resources */,
+				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
@@ -1235,6 +1257,7 @@
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
 				5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */,
+				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
@@ -1305,6 +1328,7 @@
 				5ADD85A219465F8E0037A6D5 /* DFGalleryWebViewController.m in Sources */,
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
 				5A1E402519955570009A9FB2 /* DFAVCameraViewController.m in Sources */,
+				5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */,
 				5AA45297196708D00099CBD2 /* DFPhotoStackCell.m in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,
 				5A3172D5196C85F800CA7693 /* DFSettings.m in Sources */,

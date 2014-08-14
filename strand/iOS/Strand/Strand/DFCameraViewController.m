@@ -163,7 +163,7 @@ const unsigned int SavePromptMinPhotos = 3;
     NSNumber *unseenNumber = note.userInfo[DFStrandUnseenPhotosUpdatedCountKey];
     unseenCount = unseenNumber.intValue;
   } else {
-    unseenCount =  [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
+    unseenCount = [[DFStrandsManager sharedStrandsManager] numUnseenPhotos];
   }
   
   dispatch_async(dispatch_get_main_queue(), ^{

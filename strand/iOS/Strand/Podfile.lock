@@ -37,6 +37,7 @@ PODS:
   - SAMGradientView (0.2.1)
   - SOCKit (1.1)
   - TransitionKit (1.1.1)
+  - WYPopoverController (0.2.2)
 
 DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
@@ -50,6 +51,7 @@ DEPENDENCIES:
   - MMPopLabel (from `https://github.com/hbridge/MMPopLabel.git`)
   - RestKit (~> 0.20.0)
   - SAMGradientView (~> 0.2.1)
+  - WYPopoverController (~> 0.2.2)
 
 EXTERNAL SOURCES:
   MMPopLabel:
@@ -73,5 +75,6 @@ SPEC CHECKSUMS:
   SAMGradientView: 37ef027b0da8b5fd85bfdfef49801b5262160998
   SOCKit: d8d0dd3688ae1026c12367570da8fa8e1a6980fb
   TransitionKit: b573f93c422f6aedf7d40e93e7c2f202d1295063
+  WYPopoverController: c233d69fdfd5c7e316b481df1060624d7a9e629d
 
 COCOAPODS: 0.33.1
