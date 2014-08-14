@@ -38,7 +38,6 @@
 #import "DFUploadingFeedCell.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFBadgeButton.h"
-#import "DFNotificationsViewController.h"
 #import "DFPeanutNotificationsManager.h"
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
@@ -757,6 +756,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"Title button pressed");
   DFNotificationsViewController *notifsViewController = [DFNotificationsViewController new];
+  notifsViewController.delegate = self;
   
   self.notificationsPopupController = [[WYPopoverController alloc] initWithContentViewController:notifsViewController];
   self.notificationsPopupController.delegate = self;
@@ -776,6 +776,16 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.notificationsPopupController.delegate = nil;
   self.notificationsPopupController = nil;
+}
+
+- (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
+  didSelectNotificationWithPhotoID:(DFPhotoIDType)photoID
+{
+  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
+  [self.tableView scrollToRowAtIndexPath:indexPath
+                        atScrollPosition:UITableViewScrollPositionTop
+                                animated:YES];
+  [self.notificationsPopupController dismissPopoverAnimated:YES];
 }
 
 

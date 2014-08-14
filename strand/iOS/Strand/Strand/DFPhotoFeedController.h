@@ -11,9 +11,11 @@
 #import "DFNavigationBar.h"
 #import "DFTopBarController.h"
 #import "WYPopoverController.h"
+#import "DFNotificationsViewController.h"
 
-
-@interface DFPhotoFeedController : DFTopBarController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate, DFPhotoFeedCellDelegate, WYPopoverControllerDelegate>
+@interface DFPhotoFeedController : DFTopBarController
+<UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
+DFPhotoFeedCellDelegate, WYPopoverControllerDelegate, DFNotificationsViewControllerDelegate>
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;

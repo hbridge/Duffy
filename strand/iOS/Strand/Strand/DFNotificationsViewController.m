@@ -92,6 +92,17 @@
   return cell;
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutNotification *notification = self.peanutNotifications[indexPath.row];
+  DDLogVerbose(@"%@ notif tapped for notif:%@", [self.class description], notification);
+  
+  if (self.delegate) {
+    [self.delegate notificationViewController:self
+             didSelectNotificationWithPhotoID:notification.photo_id.longLongValue];
+  }
+}
+
 
 
 @end

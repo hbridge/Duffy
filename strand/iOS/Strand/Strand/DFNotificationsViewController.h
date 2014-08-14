@@ -8,6 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+@class DFNotificationsViewController;
+
+@protocol DFNotificationsViewControllerDelegate <NSObject>
+
+@required
+- (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
+  didSelectNotificationWithPhotoID:(DFPhotoIDType)photoID;
+
+@end
+
 @interface DFNotificationsViewController : UITableViewController
+
+@property (nonatomic, retain) id<DFNotificationsViewControllerDelegate> delegate;
 
 @end
