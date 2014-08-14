@@ -20,7 +20,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"photo_id", @"action_text", @"actor_user", @"time"];
+  return @[@"photo_id", @"action_text", @"actor_user", @"actor_display_name", @"time"];
 }
 
 - (NSString *)description

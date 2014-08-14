@@ -20,9 +20,10 @@
 
 @interface DFPeanutNotification : NSObject <DFPeanutObject>
 
-@property (nonatomic) NSNumber *photo_id;
+@property (nonatomic, retain) NSNumber *photo_id;
 @property (nonatomic, retain) NSString *action_text;
-@property (nonatomic) NSNumber *actor_user;
+@property (nonatomic, retain) NSNumber *actor_user;
+@property (nonatomic, retain) NSNumber *actor_display_name;
 @property (nonatomic, retain) NSDate *time;
 
 @end
