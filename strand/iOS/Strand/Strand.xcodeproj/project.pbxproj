@@ -159,6 +159,9 @@
 		5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */; };
 		5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */; };
 		5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */; };
+		651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A85199D170800678D16 /* DFPeanutNotification.m */; };
+		651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */; };
+		651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -451,6 +454,12 @@
 		5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationPermissionViewController.m; sourceTree = "<group>"; };
 		5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationPermissionViewController.xib; sourceTree = "<group>"; };
 		5AFDEBDD19782C8C005DDA7D /* DFLocationRoadblockViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLocationRoadblockViewController.xib; sourceTree = "<group>"; };
+		651E9A84199D170800678D16 /* DFPeanutNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNotification.h; sourceTree = "<group>"; };
+		651E9A85199D170800678D16 /* DFPeanutNotification.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotification.m; sourceTree = "<group>"; };
+		651E9A87199D190F00678D16 /* DFPeanutNotificationsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNotificationsAdapter.h; sourceTree = "<group>"; };
+		651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsAdapter.m; sourceTree = "<group>"; };
+		651E9A8A199D2B1400678D16 /* DFPeanutNotificationsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNotificationsManager.h; sourceTree = "<group>"; };
+		651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsManager.m; sourceTree = "<group>"; };
 		94542E8E141E41C19FC05FB9 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		9CFF5D7C92B449CB884517E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -724,6 +733,10 @@
 				5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */,
 				5A56EFC5198AD5870032CA8A /* DFPeanutContactAdapter.h */,
 				5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */,
+				651E9A87199D190F00678D16 /* DFPeanutNotificationsAdapter.h */,
+				651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */,
+				651E9A8A199D2B1400678D16 /* DFPeanutNotificationsManager.h */,
+				651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -747,6 +760,8 @@
 				5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */,
 				5A56EFC2198AD42C0032CA8A /* DFPeanutContact.h */,
 				5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */,
+				651E9A84199D170800678D16 /* DFPeanutNotification.h */,
+				651E9A85199D170800678D16 /* DFPeanutNotification.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -1092,7 +1107,7 @@
 				TargetAttributes = {
 					5ADD856E19465C790037A6D5 = {
 						CreatedOnToolsVersion = 6.0;
-						DevelopmentTeam = KTS292CQN5;
+						DevelopmentTeam = M2VN27FN7Z;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -1264,6 +1279,7 @@
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */,
 				5A3172C4196B1C4200CA7693 /* DFSMSCodeEntryViewController.m in Sources */,
+				651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
 				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
@@ -1299,6 +1315,7 @@
 				5A56EFC0198ACF1E0032CA8A /* DFContactsNUXViewController.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
+				651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */,
 				5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */,
 				5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */,
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
@@ -1306,6 +1323,7 @@
 				5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */,
 				5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */,
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
+				651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */,
 				5AB4CC04198306C800EFB3E3 /* DFCameraRollChangeManager.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
