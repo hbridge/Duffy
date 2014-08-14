@@ -80,8 +80,12 @@
   
   if (!hasBlurView) {
     LFGlassView *glassView = [[LFGlassView alloc] initWithFrame:cell.bounds];
+    glassView.liveBlurring = NO;
     glassView.blurRadius = 1;
     [cell addSubview:glassView];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [glassView blurOnceIfPossible];
+    });
   }
   
   id object = self.objects[indexPath.row];
