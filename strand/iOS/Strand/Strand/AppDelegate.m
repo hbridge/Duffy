@@ -32,6 +32,7 @@
 #import "DFCameraRollChangeManager.h"
 #import "DFNavigationController.h"
 #import "DFContactSyncManager.h"
+#import "DFSocketsManager.h"
 
 
 @interface AppDelegate ()
@@ -166,6 +167,7 @@
     if ([self isAppSetupComplete]) {
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
+      [[DFSocketsManager sharedManager] initNetworkCommunication];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
