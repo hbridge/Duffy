@@ -10,23 +10,20 @@
 		var localytics = LocalyticsSession("a592cd77469784a29d9bb69-f41b5cee-2171-11e4-4a11-00a426b17dd8", {logger:true, namespace:"websdk"});
 		localytics.open();
 	</script>
-
-	
-
 	<style>
 	body {
-		/*width: 310px;*/
 		margin: 0px;
-		font-family: HelveticaNeue;		
+		font-family: HelveticaNeue;	
+		overflow: auto;
 	}
 	.ui-content {
-
+		overflow: auto;
 	}
 	.ui-header {
 		overflow: auto;
 		height: 60px;
 		padding: 0px;
-		background-color: rgba(242,138,95,1);
+		/*background-color: rgba(242,138,95,1);*/
 	}
 	.ui-top-summary {
 		float: left;
@@ -74,7 +71,7 @@
 	}
 	.ui-dl-text {
 		background: #FF8D58;
-		box-shadow: 0px 4px 0px 0px #D1581F;
+		/*box-shadow: 0px 4px 0px 0px #D1581F;*/
 		font-size: 28px;
 		color: #FFFFFF;
 		line-height: 24px;
@@ -96,6 +93,12 @@
 		width:100%;
 		text-align: center;
 	}
+	.ui-disclaimer {
+		font-size: 14px;
+		text-align: center;
+		margin: 10px 30px;
+		float:left;
+	}
 	</style>
 </head>
 <body>
@@ -114,25 +117,25 @@
 	<img class='ui-image' src='/resources/sample_mock.png'>
 </div>
 
-<div class='ui-dl hidden'>
+<div class='ui-dl'>
 	<span class='ui-dl-text'>Try Strand now!</span>
 </div>
 
-<div class='ui-dl-appstore'>
+<div class='ui-dl-appstore hidden'>
 	<img class='ui-appstore' src='/resources/appstore.svg'>
 </div>
-<p>
-<p>
-<p>
-<p>
-</div> 
+<div class='ui-disclaimer'>
+	(PS: Strand is confidential. We haven't released publicly to the App Store yet. You may see some additional warnings when you install the Beta version using Hockey.)
+</div>
+<div class="ui-footer"> &copy; 2014 Duffy, Inc.</div>
+</div>
 </body>
 <script>
 	function dlClicked(){
 		localytics.tagEvent("DL_Clicked_fb2");
 		window.location.href = 'itms-services://?action=download-manifest&url=https%3A%2F%2Frink.hockeyapp.net%2Fapi%2F2%2Fapps%2F81845532ce7ca873cdfce8e43f8abce9%2Fapp_versions%2F30%3F%26avtoken%3Dbc066bce6c500e52fe721bc6894a4f9b8689d4df';
+
 	}
-	
 
 	function detectiPhone(){
 		var ua = navigator.userAgent;
@@ -147,6 +150,15 @@
 			$('div.ui-dl').addClass('hidden');
 			$('div.ui-dl-noiPhone').removeClass('hidden');
 		}*/
+
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+		(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+		m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	  	ga('create', 'UA-53853203-1', 'auto');
+	  	ga('send', 'pageview');
+
 		$('div.ui-dl').click(function() {
 			dlClicked();
 		});
