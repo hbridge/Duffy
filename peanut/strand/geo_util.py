@@ -65,7 +65,7 @@ def getNearbyUsers(lon, lat, users, filterUserId=None, distanceWithin=constants.
 			geoDistance = int(haversine(lon, lat, user.last_location_point.x, user.last_location_point.y) * 1000)
 			if geoDistance < distanceWithin:
 				if accuracyWithin:
-					if user.last_location_accuracy and user.last_location_accuracy < accuracyWithin:
+					if user.last_location_accuracy and user.last_location_accuracy <= accuracyWithin:
 						nearbyUsers.append(user)
 				else:
 					nearbyUsers.append(user)
