@@ -13,12 +13,13 @@
 #import "WYPopoverController.h"
 #import "DFNotificationsViewController.h"
 
-@interface DFPhotoFeedController : DFTopBarController
+@interface DFPhotoFeedController : UIViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
 DFPhotoFeedCellDelegate, WYPopoverControllerDelegate, DFNotificationsViewControllerDelegate>
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
+@property (readonly, nonatomic, retain) DFTopBarController *topBarController;
 
 - (IBAction)cameraButtonPressed:(id)sender;
 - (IBAction)inviteButtonPressed:(id)sender;

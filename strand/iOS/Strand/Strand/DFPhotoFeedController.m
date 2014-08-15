@@ -84,6 +84,9 @@ const CGFloat LockedCellHeight = 157.0;
 
 @property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
+@property (nonatomic) CGFloat previousScrollViewYOffset;
+@property (nonatomic) BOOL isViewTransitioning;
+
 
 @end
 
@@ -182,9 +185,9 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidLoad];
   
-  self.tableView = [[UITableView alloc] initWithFrame:self.contentView.frame
+  self.tableView = [[UITableView alloc] initWithFrame:self.view.frame
                                                 style:UITableViewStylePlain];
-  self.contentView = self.tableView;
+  [self.view addSubview:self.tableView];
   self.tableView.dataSource = self;
   self.tableView.delegate = self;
   self.tableView.scrollsToTop = YES;
@@ -218,6 +221,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)viewWillAppear:(BOOL)animated
 {
+  self.isViewTransitioning = YES;
   [super viewWillAppear:animated];
   BOOL silent = self.sectionObjects.count > 0;
   [self reloadFeedIsSilent:silent];
@@ -330,6 +334,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  self.isViewTransitioning = YES;
   [super viewDidAppear:animated];
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
                                                       object:self
@@ -349,14 +354,14 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)viewWillDisappear:(BOOL)animated
 {
+  self.isViewTransitioning = YES;
   [super viewWillDisappear:animated];
-  // take a snapshot
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
+  self.isViewTransitioning = NO;
   [super viewDidDisappear:animated];
-
   [self viewDidBecomeInactive];
 }
 
@@ -364,14 +369,6 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [self.autoRefreshTimer invalidate];
   self.autoRefreshTimer = nil;
-}
-
-- (void)setTableViewFrame
-{
-  self.tableView.frame = CGRectMake(self.tableView.frame.origin.x,
-                                    self.navigationBar.frame.size.height,
-                                    self.tableView.frame.size.width,
-                                    self.tableView.frame.size.height);
 }
 
 - (void)didReceiveMemoryWarning
@@ -1055,6 +1052,52 @@ selectedObjectChanged:(id)newObject
 {
   NSNumber *unreadCount = note.userInfo[DFStrandNotificationsUnseenCountKey];
   self.notificationsBadgeButton.badgeCount = unreadCount.intValue;
+}
+
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+{
+  if (![self shouldHandleScrollChange]) return;
+  CGFloat scrollOffset = scrollView.contentOffset.y;
+  CGFloat dy = scrollOffset - self.previousScrollViewYOffset;
+  
+  if (scrollOffset <= -scrollView.contentInset.top) {
+    [self.topBarController mainScrollViewScrolledToTop:YES dy:dy];
+  } else {
+    [self.topBarController mainScrollViewScrolledToTop:NO dy:dy];
+  }
+  
+  // store the scrollOffset for calculations next time around
+  self.previousScrollViewYOffset = scrollOffset;
+}
+
+- (BOOL)shouldHandleScrollChange
+{
+  if (self.isViewTransitioning || !self.view.window) return NO;
+  
+  return YES;
+}
+
+- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
+{
+  [self.topBarController mainScrollViewStoppedScrolling];
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView
+                  willDecelerate:(BOOL)decelerate
+{
+  if (!decelerate) {
+    [self.topBarController mainScrollViewStoppedScrolling];
+  }
+}
+
+- (DFTopBarController *)topBarController
+{
+  if ([[self.parentViewController class] isSubclassOfClass:[DFTopBarController class]]) {
+    return (DFTopBarController *)self.parentViewController;
+  }
+  
+  return nil;
 }
 
 

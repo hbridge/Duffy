@@ -11,8 +11,7 @@
 
 @interface DFTopBarController ()
 
-@property (nonatomic) CGFloat previousScrollViewYOffset;
-@property (atomic) BOOL isViewTransitioning;
+@property (nonatomic, retain) UIView *contentView;
 
 @end
 
@@ -22,6 +21,15 @@ CGFloat const MinNavbarOriginY = -NavBarHeight + StatusBarHeight; // we want a b
 CGFloat const MaxNavbarOriginY = 0;
 
 @implementation DFTopBarController
+
+- (instancetype)initWithRootViewController:(UIViewController *)viewController
+{
+  self = [super init];
+  if (self) {
+    self.viewControllers = @[viewController];
+  }
+  return self;
+}
 
 - (void)viewDidLoad
 {
@@ -33,31 +41,20 @@ CGFloat const MaxNavbarOriginY = 0;
                                              self.view.frame.size.width,
                                              NavBarHeight)];
   [self.view addSubview:self.navigationBar];
-  self.navigationBar.items = @[self.navigationItem];
+  
+  if (self.viewControllers.lastObject) {
+    UIViewController *vc = self.viewControllers.lastObject;
+    [self setContentView:vc.view];
+    self.navigationBar.items = @[vc.navigationItem];
+  }
 }
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)setViewControllers:(NSArray *)viewControllers
 {
-  [super viewWillAppear:animated];
-  self.isViewTransitioning = YES;
-}
-
-- (void)viewDidAppear:(BOOL)animated
-{
-  [super viewDidAppear:animated];
-  self.isViewTransitioning = NO;
-}
-
-- (void)viewWillDisappear:(BOOL)animated
-{
-  [super viewWillDisappear:animated];
-  self.isViewTransitioning = YES;
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-  [super viewWillDisappear:animated];
-  self.isViewTransitioning = NO;
+  _viewControllers = viewControllers;
+  for (UIViewController *vc in viewControllers) {
+    [self addChildViewController:vc];
+  }
 }
 
 - (void)setContentView:(UIView *)newContentView
@@ -74,27 +71,20 @@ CGFloat const MaxNavbarOriginY = 0;
 
 #pragma mark - UIScrollViewDelegate
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+- (void)mainScrollViewScrolledToTop:(BOOL)isTop dy:(CGFloat)dy
 {
-  if (![self shouldHandleScrollChange]) return;
   CGRect navbarFrame = self.navigationBar.frame;
   
-  CGFloat scrollOffset = scrollView.contentOffset.y;
-  CGFloat scrollDiff = scrollOffset - self.previousScrollViewYOffset;
-  
-  if (scrollOffset <= -scrollView.contentInset.top) {
+  if (isTop) {
     // we're at the top of the scrollview, show the nav bar
     navbarFrame.origin.y = 0;
   } else {
     // the user has scrolled, set the origin of the navbar based on how much the user just scrolled
     // but keeping it to within MinNavbarOriginY and MaxNavbarOriginY
-    navbarFrame.origin.y = MIN(MaxNavbarOriginY, MAX(MinNavbarOriginY, navbarFrame.origin.y - scrollDiff));
+    navbarFrame.origin.y = MIN(MaxNavbarOriginY, MAX(MinNavbarOriginY, navbarFrame.origin.y - dy));
   }
   
   [self setNavbarFrame:navbarFrame];
-
-  // store the scrollOffset for calculations next time around
-  self.previousScrollViewYOffset = scrollOffset;
 }
 
 /* 
@@ -118,31 +108,9 @@ CGFloat const MaxNavbarOriginY = 0;
   self.contentView.frame = contentViewFrame;
 }
 
-- (BOOL)shouldHandleScrollChange
+- (void)mainScrollViewStoppedScrolling
 {
-  if (self.isViewTransitioning || !self.view.window) return NO;
-
-  return YES;
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-  [self stoppedScrolling];
-}
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView
-                  willDecelerate:(BOOL)decelerate
-{
-  if (!decelerate) {
-    [self stoppedScrolling];
-  }
-}
-- (void)stoppedScrolling
-{
-  if (![self shouldHandleScrollChange]) return;
-  
-  CGRect frame = self.navigationBar.frame;
-  if (frame.origin.y < 0) {
+  if (self.navigationBar.frame.origin.y < 0) {
     [self animateNavBarTo:MinNavbarOriginY];
   }
 }

@@ -9,9 +9,15 @@
 #import <UIKit/UIKit.h>
 #import "DFNavigationBar.h"
 
-@interface DFTopBarController : UIViewController <UIScrollViewDelegate>
+@interface DFTopBarController : UIViewController
 
 @property (readonly, nonatomic, retain) DFNavigationBar *navigationBar;
-@property (nonatomic, retain) UIView *contentView;
+@property (nonatomic, retain) NSArray *viewControllers;
+
+- (instancetype)initWithRootViewController:(UIViewController *)viewController;
+
+- (void)mainScrollViewScrolledToTop:(BOOL)isTop dy:(CGFloat)dy;
+- (void)mainScrollViewStoppedScrolling;
+- (void)showNavBar;
 
 @end

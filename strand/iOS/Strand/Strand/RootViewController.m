@@ -11,12 +11,14 @@
 #import "DFCameraViewController.h"
 #import "DFPhotoFeedController.h"
 #import "DFOverlayViewController.h"
+#import "DFTopBarController.h"
 
 @interface RootViewController ()
             
 @property (readonly, strong, nonatomic) NSArray *subviewControllers;
 @property (nonatomic, retain) DFCameraViewController *cameraViewController;
 @property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
+@property (nonatomic, retain) DFTopBarController *strandsNavController;
 
 @property (nonatomic, retain) UIWindow *overlayWindow;
 @property (nonatomic, retain) DFOverlayViewController *overlayVC;
@@ -32,9 +34,11 @@
     self.hideStatusBar = YES;
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFPhotoFeedController alloc] init];
+    _strandsNavController = [[DFTopBarController alloc]
+                             initWithRootViewController:_photoFeedController];
     _subviewControllers =
     @[
-      _photoFeedController,
+      _strandsNavController,
       _cameraViewController,
       ];
 
@@ -180,7 +184,7 @@
    previousViewControllers:(NSArray *)previousViewControllers
        transitionCompleted:(BOOL)completed
 {
-  if (self.pageViewController.viewControllers.firstObject == _photoFeedController && finished) {
+  if (self.pageViewController.viewControllers.firstObject == _strandsNavController && finished) {
     self.hideStatusBar = NO;
   } else {
     self.hideStatusBar = YES;
