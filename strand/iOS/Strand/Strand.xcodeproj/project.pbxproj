@@ -163,6 +163,7 @@
 		651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A85199D170800678D16 /* DFPeanutNotification.m */; };
 		651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */; };
 		651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */; };
+		6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -463,6 +464,8 @@
 		651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsAdapter.m; sourceTree = "<group>"; };
 		651E9A8A199D2B1400678D16 /* DFPeanutNotificationsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNotificationsManager.h; sourceTree = "<group>"; };
 		651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsManager.m; sourceTree = "<group>"; };
+		6523FF3E199E67BE00FA8C59 /* DFSocketsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSocketsManager.h; sourceTree = "<group>"; };
+		6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSocketsManager.m; sourceTree = "<group>"; };
 		94542E8E141E41C19FC05FB9 /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = "<group>"; };
 		9CFF5D7C92B449CB884517E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -951,6 +954,8 @@
 				5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */,
 				5A14A3A7198C2B4600A4F032 /* DFUserInfoManager.h */,
 				5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */,
+				6523FF3E199E67BE00FA8C59 /* DFSocketsManager.h */,
+				6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */,
 			);
 			name = "Background manager";
 			sourceTree = "<group>";
@@ -1319,6 +1324,7 @@
 				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
 				5A56EFC0198ACF1E0032CA8A /* DFContactsNUXViewController.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
+				6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */,
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */,
 				5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */,
