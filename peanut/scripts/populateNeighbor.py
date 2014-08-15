@@ -132,12 +132,9 @@ def sendNotifications(neighbors, timeWithinSecondsForNotification):
 
 		usersToUpdateFeed.extend(nearbyUsers)
 		
-	# Send update feed msg to folks who are involved in these photos
-	usersToUpdateFeed = set(usersToUpdateFeed)
 
-	for user in usersToUpdateFeed:
-		logger.debug("Sending refreshFeed msg to user %s" % (user.id))
-		notifications_util.sendRefreshFeed(user)
+	# Tell all the users who just had photos liked to refresh their feeds
+	notifications_util.sendRefreshFeedToUsers(set(usersToUpdateFeed))
 
 def main(argv):
 	maxPhotosAtTime = 100

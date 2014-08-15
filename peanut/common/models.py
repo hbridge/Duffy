@@ -330,20 +330,32 @@ class Neighbor(models.Model):
 
 class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
-	device_token = models.TextField()
+	device_token = models.TextField(null=True)
 	msg = models.TextField(null=True)
-	custom_payload = models.TextField()
-	metadata = models.TextField()
+	msg_type = models.IntegerField()
+	custom_payload = models.TextField(null=True)
+	metadata = models.TextField(null=True)
 	# Not used, probably can remove at some point
 	apns = models.IntegerField(null=True)
-	result = models.IntegerField(db_index=True)
+	result = models.IntegerField(db_index=True, null=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
-	msg_type = models.IntegerField()
+	updated = models.DateTimeField(auto_now=True, db_index=True)
+	
 
 	class Meta:
 		db_table = 'strand_notification_log'
 
 
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		now = datetime.datetime.utcnow()
+		for obj in objs:
+			obj.updated = now
+
+		attributesList.append("updated")
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.user_id, self.id, self.device_token, self.apns)
 

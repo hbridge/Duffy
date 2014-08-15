@@ -101,10 +101,8 @@ def sendPhotoActionNotifications(now, waitTime):
 		usersToUpdateFeed.append(photoAction.photo.user)
 
 	# Tell all the users who just had photos liked to refresh their feeds
-	usersToUpdateFeed = set(usersToUpdateFeed)
-	for user in usersToUpdateFeed:
-		logger.debug("Sending refreshFeed msg to user %s" % (user.id))
-		notifications_util.sendRefreshFeed(user)
+	notifications_util.sendRefreshFeedToUsers(set(usersToUpdateFeed))
+
 
 """
 	If we haven't gotten a gps coordinate from them in the last hour, then send a ping

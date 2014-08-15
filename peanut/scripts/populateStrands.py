@@ -109,6 +109,25 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 		# New photos are used to look at their location and update feeds of nearby users
 		newPhotos.append(photo)
 
+	# Find folks who are not involved in these photos but are nearby instead
+	# Loop through all newer photos and look for users nearby 
+	#
+	# TODO(Derek): Swap out this 3 for a constants var once that is figured out
+	# TODO(Derek): Filter by friends who are actually in the feed (right now everyone in a strand)
+	#    get a refreshFeed, even if they can't see the new photos
+	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=3)
+	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
+
+	for photo in newPhotos:
+		nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
+
+		usersToUpdateFeed.extend(nearbyUsers)
+		
+	# Send update feed msg to folks who are involved in these photos
+	notifications_util.sendRefreshFeedToUsers(set(usersToUpdateFeed))
+
+	
+
 	# For each user, look at all the new photos taken around them and construct a message for them
 	#  With all the names in there
 	for user, otherUsers in usersToNotifyAboutById.iteritems():
@@ -136,26 +155,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 			else:
 				logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
 
-	# Find folks who are not involved in these photos but are nearby instead
-	# Loop through all newer photos and look for users nearby 
-	#
-	# TODO(Derek): Swap out this 3 for a constants var once that is figured out
-	# TODO(Derek): Filter by friends who are actually in the feed (right now everyone in a strand)
-	#    get a refreshFeed, even if they can't see the new photos
-	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=3)
-	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
-	for photo in newPhotos:
-		nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
-
-		usersToUpdateFeed.extend(nearbyUsers)
-		
-	# Send update feed msg to folks who are involved in these photos
-	usersToUpdateFeed = set(usersToUpdateFeed)
-
-	for user in usersToUpdateFeed:
-		logger.debug("Sending refreshFeed msg to user %s" % (user.id))
-		notifications_util.sendRefreshFeed(user)
 
 
 
@@ -252,7 +252,7 @@ def main(argv):
 
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 		else:
-			time.sleep(1)	
+			time.sleep(.1)	
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/stranding.log',

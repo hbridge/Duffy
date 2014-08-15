@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 	if metadata:
 		metadata = json.dumps(metadata, cls=DuffyJsonEncoder)
-		
+
 	if user.device_token:
 		if user.device_token == "TESTTOKEN":
 			logEntry = NotificationLog.objects.create(user=user, device_token="", msg="", custom_payload="", result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=msgTypeId, metadata=metadata)
@@ -64,7 +64,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 			# This sends
 			apns.push_notification_to_devices(notification, [device])
 
-			# This is for logging
+		# This is for logging
 		logEntries.append(NotificationLog.objects.create(user=user, device_token=device.token, msg=msg, custom_payload=customPayload, result=constants.IOS_NOTIFICATIONS_RESULT_SENT, msg_type=msgTypeId, metadata=metadata))
 		return logEntries
 	else:
@@ -73,10 +73,15 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 
 		return [logEntry]
 
-def sendRefreshFeed(user):
-	msgType = constants.NOTIFICATIONS_REFRESH_FEED
+def sendRefreshFeedToUsers(users):
+	# First send to sockets
+	for user in users:
+		logger.debug("Sending refresh feed to user %s" % (user.id))
+		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
 
-	sendNotification(user, "", msgType, dict())
+	# Next send through push notifications
+	for user in users:
+		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, dict())
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
