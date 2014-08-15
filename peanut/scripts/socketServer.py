@@ -113,7 +113,7 @@ def main(argv):
 	reactor.run()
 
 if __name__ == "__main__":
-	logging.basicConfig(filename='/var/log/duffy/socket-notifications.log',
+	logging.basicConfig(filename='/var/log/duffy/socket-server.log',
 						level=logging.DEBUG,
 						format='%(asctime)s %(levelname)s %(message)s')
 	logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
