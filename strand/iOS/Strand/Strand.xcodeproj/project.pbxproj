@@ -75,6 +75,7 @@
 		5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */; };
 		5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */; };
 		5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */; };
+		5AA38DFD199E87CD00AD1805 /* DFStrandsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DFC199E87CD00AD1805 /* DFStrandsViewController.m */; };
 		5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */; };
 		5AA45285196706A60099CBD2 /* DFPeanutGalleryAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA45284196706A60099CBD2 /* DFPeanutGalleryAdapter.m */; };
 		5AA45293196708D00099CBD2 /* DFPhotoSectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA45288196708D00099CBD2 /* DFPhotoSectionHeader.m */; };
@@ -297,6 +298,8 @@
 		5AA38DF6199D1A4700AD1805 /* DFNotificationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationTableViewCell.h; sourceTree = "<group>"; };
 		5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationTableViewCell.m; sourceTree = "<group>"; };
 		5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNotificationTableViewCell.xib; sourceTree = "<group>"; };
+		5AA38DFB199E87CD00AD1805 /* DFStrandsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandsViewController.h; sourceTree = "<group>"; };
+		5AA38DFC199E87CD00AD1805 /* DFStrandsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandsViewController.m; sourceTree = "<group>"; };
 		5AA4527E19648A120099CBD2 /* DFBackgroundLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBackgroundLocationManager.h; sourceTree = "<group>"; };
 		5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBackgroundLocationManager.m; sourceTree = "<group>"; };
 		5AA45283196706A60099CBD2 /* DFPeanutGalleryAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutGalleryAdapter.h; sourceTree = "<group>"; };
@@ -691,6 +694,8 @@
 				5AA38DF2199D19CA00AD1805 /* Notifs Popover */,
 				5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */,
 				5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */,
+				5AA38DFB199E87CD00AD1805 /* DFStrandsViewController.h */,
+				5AA38DFC199E87CD00AD1805 /* DFStrandsViewController.m */,
 				5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */,
 				5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */,
 				5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */,
@@ -1332,6 +1337,7 @@
 				5AC4A9291947C30800862D9C /* DFPeanutPhoto.m in Sources */,
 				5AC4A96D194A422300862D9C /* DFPeanutSearchObject.m in Sources */,
 				5AC4A94A1947C3A700862D9C /* UIImage+RoundedCorner.m in Sources */,
+				5AA38DFD199E87CD00AD1805 /* DFStrandsViewController.m in Sources */,
 				5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */,
 				5AA45295196708D00099CBD2 /* DFPhotosGridViewController.m in Sources */,
 				5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */,

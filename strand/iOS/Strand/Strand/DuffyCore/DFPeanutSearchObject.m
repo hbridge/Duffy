@@ -139,5 +139,10 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   return [allDescendendents objectEnumerator];
 }
 
+- (BOOL)isLockedSection
+{
+  return ([self.type isEqual:DFSearchObjectSection] && [self.title isEqual:@"Locked"]);
+}
+
 
 @end

@@ -41,4 +41,7 @@ extern DFSearchObjectType DFSearchObjectDocstack;
 - (NSArray *)actionsOfType:(DFActionType)type forUser:(DFUserIDType)user;
 - (NSEnumerator *)enumeratorOfDescendents;
 
+- (BOOL)isLockedSection;
+
+
 @end

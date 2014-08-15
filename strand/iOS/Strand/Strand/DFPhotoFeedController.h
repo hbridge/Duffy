@@ -7,22 +7,21 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFStrandsViewController.h"
 #import "DFPhotoFeedCell.h"
 #import "DFNavigationBar.h"
 #import "DFTopBarController.h"
 #import "WYPopoverController.h"
 #import "DFNotificationsViewController.h"
 
-@interface DFPhotoFeedController : UIViewController
+@interface DFPhotoFeedController : DFStrandsViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
-DFPhotoFeedCellDelegate, WYPopoverControllerDelegate, DFNotificationsViewControllerDelegate>
+DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate>
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 @property (readonly, nonatomic, retain) DFTopBarController *topBarController;
 
-- (IBAction)cameraButtonPressed:(id)sender;
-- (IBAction)inviteButtonPressed:(id)sender;
 - (void)jumpToPhoto:(DFPhotoIDType)photoID;
 
 @end

@@ -7,40 +7,28 @@
 //
 
 #import "DFPhotoFeedController.h"
-#import "DFPeanutGalleryAdapter.h"
-#import "DFPhoto.h"
-#import "DFPhotoCollection.h"
-#import "DFMultiPhotoViewController.h"
-#import "RootViewController.h"
-#import "DFCGRectHelpers.h"
-#import "DFStrandConstants.h"
 #import "DFAnalytics.h"
-#import "DFImageStore.h"
-#import "DFPeanutPhoto.h"
-#import "DFPhotoFeedCell.h"
-#import "DFPeanutSearchResponse.h"
-#import "DFPeanutSearchObject.h"
-#import "NSString+DFHelpers.h"
-#import "DFPeanutActionAdapter.h"
-#import "DFSettingsViewController.h"
-#import "DFFeedSectionHeaderView.h"
-#import "DFNavigationController.h"
-#import "DFPhotoStore.h"
-#import "DFPhotoMetadataAdapter.h"
-#import "UIAlertView+DFHelpers.h"
-#import "DFToastNotificationManager.h"
-#import "DFInviteUserViewController.h"
-#import "DFErrorScreen.h"
 #import "DFDefaultsStore.h"
+#import "DFErrorScreen.h"
+#import "DFFeedSectionHeaderView.h"
+#import "DFImageStore.h"
 #import "DFLockedStrandCell.h"
-#import "DFUploadController.h"
-#import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "DFUploadingFeedCell.h"
+#import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
-#import "DFBadgeButton.h"
-#import "DFPeanutNotificationsManager.h"
-
-const NSTimeInterval FeedChangePollFrequency = 60.0;
+#import "DFPeanutActionAdapter.h"
+#import "DFPeanutPhoto.h"
+#import "DFPeanutSearchObject.h"
+#import "DFPhotoFeedCell.h"
+#import "DFPhotoMetadataAdapter.h"
+#import "DFPhotoStore.h"
+#import "DFStrandConstants.h"
+#import "DFToastNotificationManager.h"
+#import "DFUploadController.h"
+#import "DFUploadingFeedCell.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "NSString+DFHelpers.h"
+#import "RootViewController.h"
+#import "UIAlertView+DFHelpers.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -63,122 +51,30 @@ const CGFloat LockedCellHeight = 157.0;
 
 @interface DFPhotoFeedController ()
 
-@property (nonatomic, retain) NSArray *sectionObjects;
-@property (nonatomic, retain) NSDictionary *indexPathsByID;
-@property (nonatomic, retain) NSDictionary *objectsByID;
-@property (nonatomic, retain) NSArray *uploadingPhotos;
-@property (nonatomic, retain) NSError *uploadError;
-
-@property (nonatomic) DFPhotoIDType actionSheetPhotoID;
-
-@property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
-
-@property (nonatomic, retain) NSData *lastResponseHash;
-@property (nonatomic, retain) NSTimer *autoRefreshTimer;
 
 @property (nonatomic, retain) UIView *nuxPlaceholder;
 @property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
+@property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
 
-@property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
-@property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 @property (nonatomic) CGFloat previousScrollViewYOffset;
 @property (nonatomic) BOOL isViewTransitioning;
-
 
 @end
 
 @implementation DFPhotoFeedController
 
-@synthesize galleryAdapter = _galleryAdapter;
 @synthesize photoAdapter = _photoAdapter;
 
-- (id)init
+- (instancetype)init
 {
   self = [super init];
   if (self) {
-    self.notificationsBadgeButton = [[DFBadgeButton alloc] init];
-    UIImage *image = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
-                      imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    [self.notificationsBadgeButton setImage:image
-                                   forState:UIControlStateNormal];
-    self.notificationsBadgeButton.badgeEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 6);
-    self.notificationsBadgeButton.badgeColor = [UIColor colorWithRed:74/255.0 green:144/255.0 blue:226/255.0 alpha:1.0];
-    self.notificationsBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
-    self.notificationsBadgeButton.badgeCount = (int)[[[DFPeanutNotificationsManager sharedManager]
-                                                      unreadNotifications] count];
-    [self.notificationsBadgeButton addTarget:self
-                                      action:@selector(titleButtonPressed:)
-                            forControlEvents:UIControlEventTouchUpInside];
-
-    self.navigationItem.titleView = self.notificationsBadgeButton;
-    [self.notificationsBadgeButton sizeToFit];
-    
-    [self setNavigationButtons];
-    [self observeNotifications];
-    
+    self.delegate = self;
   }
   return self;
-}
-
-- (void)setNavigationButtons
-{
-  if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
-    UIBarButtonItem *settingsButton =
-    [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(settingsButtonPressed:)];
-    UIBarButtonItem *cameraButton =
-    [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(cameraButtonPressed:)];
-    UIBarButtonItem *inviteButton =
-    [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(inviteButtonPressed:)];
-    
-    self.navigationItem.leftBarButtonItems = @[settingsButton];
-    self.navigationItem.rightBarButtonItems = @[cameraButton, inviteButton];
-  }
-}
-
-- (void)observeNotifications
-{
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(applicationDidBecomeActive:)
-                                               name:UIApplicationDidBecomeActiveNotification
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(viewDidBecomeInactive)
-                                               name:UIApplicationWillResignActiveNotification
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(applicationDidEnterBackground:)
-                                               name:UIApplicationDidEnterBackgroundNotification
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(reloadFeed)
-                                               name:DFStrandRefreshRemoteUIRequestedNotificationName
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(uploadStatusChanged:)
-                                               name:DFUploadStatusNotificationName
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(notificationsChanged:)
-                                               name:DFStrandNotificationsUpdatedNotification
-                                             object:nil];
 }
 
 - (void)viewDidLoad
@@ -223,134 +119,19 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.isViewTransitioning = YES;
   [super viewWillAppear:animated];
-  BOOL silent = self.sectionObjects.count > 0;
-  [self reloadFeedIsSilent:silent];
-}
-
-- (void)setIsRefreshing:(BOOL)isRefreshing
-{
-  if (isRefreshing) {
-    self.tableView.tableHeaderView = self.refreshControl;
-    [self.refreshControl beginRefreshing];
-  } else {
-    [self.refreshControl endRefreshing];
-    self.tableView.tableHeaderView = nil;
-    
-  }
-}
-
-
-- (void)jumpToPhoto:(DFPhotoIDType)photoID
-{
-  self.requestedPhotoIDToJumpTo = photoID;
-}
-
-- (void)reloadFeed
-{
-  [self reloadFeedIsSilent:NO];
-  [[DFUploadController sharedUploadController] uploadPhotos];
-}
-
-- (void)autoReloadFeed
-{
-  [self reloadFeedIsSilent:YES];
-}
-
-- (void)reloadFeedIsSilent:(BOOL)isSilent
-{
-  if (!isSilent)
-    [self.refreshControl beginRefreshing];
-  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
-                                                         NSData *hashData,
-                                                         NSError *error) {
-    if (!isSilent)
-      [self.refreshControl endRefreshing];
-    if (!error) {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:response.objects];
-        
-        if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])
-            || ![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
-          DDLogInfo(@"New feed data detected. Re-rendering feed.");
-          [self setSectionObjects:response.topLevelSectionObjects
-                  uploadingPhotos:unprocessedFeedPhotos];
-          
-          self.lastResponseHash = hashData;
-        }
-        if (self.requestedPhotoIDToJumpTo) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-            NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
-            [self.tableView scrollToRowAtIndexPath:indexPath
-                                  atScrollPosition:UITableViewScrollPositionBottom
-                                          animated:NO];
-            self.requestedPhotoIDToJumpTo = 0;
-          });
-        }});
-    }
-    
-    // Evaluate whether and how to show error messages or NUX screens
-    if (self.sectionObjects.count == 0 && response.objects.count == 0) {
-      // Eligible to replace feed with placeholder
-      if (!error || [DFDefaultsStore actionCountForAction:DFUserActionTakePhoto] == 0) {
-        [self setShowNuxPlaceholder:YES];
-        [self showConnectionError:nil];
-      } else if (error) {
-        [self setShowNuxPlaceholder:NO];
-        [self showConnectionError:error];
-      }
-    } else {
-      // Not eligible to replace feed with placeholder
-      [self setShowNuxPlaceholder:NO];
-      [self showConnectionError:nil];
-      if (error && !isSilent) {
-        [[DFToastNotificationManager sharedInstance]
-         showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
-      }
-    }
-  }];
-}
-
-- (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects
-{
-  DFPhotoCollection *unprocessedCollection = [[DFPhotoStore sharedStore]
-                               photosWithUploadProcessedStatus:NO];
-  NSMutableSet *allPhotoIDsInFeed = [NSMutableSet new];
-  for (DFPeanutSearchObject *section in sectionObjects) {
-    for (DFPeanutSearchObject *object in [[section enumeratorOfDescendents] allObjects]) {
-      if (object.id) [allPhotoIDsInFeed addObject:@(object.id)];
-    }
-  }
-  
-  NSMutableArray *result = [[unprocessedCollection photosByDateAscending:NO] mutableCopy];
-  for (DFPhoto *photo in unprocessedCollection.photoSet) {
-    if ([allPhotoIDsInFeed containsObject:@(photo.photoID)]) {
-      [result removeObject:photo];
-      photo.isUploadProcessed = YES;
-    }
-  }
-  
-  return result;
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  self.isViewTransitioning = YES;
+  if (self.sectionObjects.count == 0) [self.refreshControl beginRefreshing];
+  self.isViewTransitioning = NO;
   [super viewDidAppear:animated];
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
                                                       object:self
                                                     userInfo:nil];
-  if (!self.autoRefreshTimer)
-    self.autoRefreshTimer =
-    [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
-                                     target:self
-                                   selector:@selector(autoReloadFeed)
-                                   userInfo:nil
-                                    repeats:YES];
   
-  [[DFUploadController sharedUploadController] uploadPhotos];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
-
 
 - (void)viewWillDisappear:(BOOL)animated
 {
@@ -362,19 +143,69 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.isViewTransitioning = NO;
   [super viewDidDisappear:animated];
-  [self viewDidBecomeInactive];
 }
 
-- (void)viewDidBecomeInactive
+#pragma mark - Jump to a specific photo
+
+- (void)showPhoto:(DFPhotoIDType)photoId
 {
-  [self.autoRefreshTimer invalidate];
-  self.autoRefreshTimer = nil;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
+    if (indexPath) {
+      [self.tableView scrollToRowAtIndexPath:indexPath
+                            atScrollPosition:UITableViewScrollPositionBottom
+                                    animated:NO];
+      self.requestedPhotoIDToJumpTo = 0;
+    } else {
+      DDLogWarn(@"%@ showPhoto:%llu no indexPath for photoId found.",
+                [self.class description],
+                self.requestedPhotoIDToJumpTo);
+    }
+  });
 }
 
-- (void)didReceiveMemoryWarning
+- (void)jumpToPhoto:(DFPhotoIDType)photoID
 {
-  [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
+  self.requestedPhotoIDToJumpTo = photoID;
+  [self reloadFeed];
+}
+
+#pragma mark - DFStrandsViewControllerDelegate
+
+- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
+  didFinishRefreshWithNewData:(BOOL)newData
+                     isSilent:(BOOL)isSilent
+                        error:(NSError *)error
+
+{
+  [self.refreshControl endRefreshing];
+  
+  if (self.sectionObjects.count > 0 && newData) {
+    // Normal case, reload the table view
+    [self.tableView reloadData];
+  } else if (self.sectionObjects.count == 0 && newData) {
+    // Eligible to replace feed with placeholder
+    if (!error || [DFDefaultsStore actionCountForAction:DFUserActionTakePhoto] == 0) {
+      [self setShowNuxPlaceholder:YES];
+      [self showConnectionError:nil];
+    } else if (error) {
+      [self setShowNuxPlaceholder:NO];
+      [self showConnectionError:error];
+    }
+  } else {
+    // Error but there are objects in the feed we shouldn't wipe
+    [self setShowNuxPlaceholder:NO];
+    [self showConnectionError:nil];
+    if (error && !isSilent) {
+      [[DFToastNotificationManager sharedInstance]
+       showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
+    }
+  }
+  
+  if (self.requestedPhotoIDToJumpTo != 0) {
+    [self showPhoto:self.requestedPhotoIDToJumpTo];
+    self.requestedPhotoIDToJumpTo = 0;
+  }
 }
 
 - (void)setShowNuxPlaceholder:(BOOL)isShown
@@ -428,7 +259,7 @@ const CGFloat LockedCellHeight = 157.0;
   return SectionHeaderHeight;
 }
 
-#pragma mark - Table view data source: rows
+#pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -443,7 +274,7 @@ const CGFloat LockedCellHeight = 157.0;
   
   DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
   
-  if ([self isSectionLocked:sectionObject]) {
+  if ([sectionObject isLockedSection]) {
     return 1;
   }
   
@@ -458,15 +289,6 @@ const CGFloat LockedCellHeight = 157.0;
   return self.sectionObjects[tableSection];
 }
 
-- (BOOL)prefersStatusBarHidden
-{
-  return NO;
-}
-
--(UIStatusBarStyle)preferredStatusBarStyle{
-  return UIStatusBarStyleLightContent;
-}
-
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
@@ -478,7 +300,7 @@ const CGFloat LockedCellHeight = 157.0;
     NSArray *itemsForSection = section.objects;
     DFPeanutSearchObject *object = itemsForSection[indexPath.row];
     
-    if ([self isSectionLocked:section]) {
+    if ([section isLockedSection]) {
       cell = [self cellForLockedSection:section indexPath:indexPath];
     } else if ([object.type isEqual:DFSearchObjectPhoto]) {
       cell = [self cellForPhoto:object indexPath:indexPath];
@@ -664,7 +486,7 @@ const CGFloat LockedCellHeight = 157.0;
   
   
   DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
-  if ([self isSectionLocked:sectionObject]) {
+  if ([sectionObject isLockedSection]) {
     // If it's a section object, its height is fixed
     return LockedCellHeight;
   }
@@ -680,42 +502,6 @@ const CGFloat LockedCellHeight = 157.0;
   return rowHeight;
 }
 
-- (BOOL)isSectionLocked:(DFPeanutSearchObject *)sectionObject
-{
-  return [sectionObject.title isEqualToString:@"Locked"];
-}
-
-- (void)setSectionObjects:(NSArray *)sectionObjects
-         uploadingPhotos:(NSArray *)uploadingPhotos
-{
-  NSMutableDictionary *objectsByID = [NSMutableDictionary new];
-  NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
-  
-  for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
-    NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
-    for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
-      DFPeanutSearchObject *object = objectsForSection[objectIndex];
-      NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
-      if ([object.type isEqual:DFSearchObjectPhoto]) {
-        objectsByID[@(object.id)] = object;
-        indexPathsByID[@(object.id)] = indexPath;
-      } else if ([object.type isEqual:DFSearchObjectCluster]) {
-        for (DFPeanutSearchObject *subObject in object.objects) {
-          objectsByID[@(subObject.id)] = subObject;
-          indexPathsByID[@(subObject.id)] = indexPath;
-        }
-      }
-    }
-  }
-  
-  _objectsByID = objectsByID;
-  _indexPathsByID = indexPathsByID;
-  _sectionObjects = sectionObjects;
-  _uploadingPhotos = uploadingPhotos;
-  
-  [self.tableView reloadData];
-}
-
 #pragma mark - Actions
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -725,7 +511,7 @@ const CGFloat LockedCellHeight = 157.0;
     object = self.uploadingPhotos[indexPath.row];
   } else {
     DFPeanutSearchObject *section = [self sectionObjectForTableSection:indexPath.section];
-    if ([self isSectionLocked:section]) {
+    if ([section isLockedSection]) {
       object = section;
     } else {
       object = section.objects[indexPath.row];
@@ -736,64 +522,6 @@ const CGFloat LockedCellHeight = 157.0;
                
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
-
-- (void)cameraButtonPressed:(id)sender
-{
-  [(RootViewController *)self.view.window.rootViewController showCamera];
-}
-
-- (void)settingsButtonPressed:(id)sender
-{
-  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
-  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:svc]
-                     animated:YES
-                   completion:nil];
-}
-
-
-- (void)inviteButtonPressed:(id)sender
-{
-  DDLogInfo(@"Invite button pressed");
-  DFInviteUserViewController *inviteController = [[DFInviteUserViewController alloc] init];
-  [self presentViewController:inviteController animated:YES completion:nil];
-}
-
-- (void)titleButtonPressed:(UIButton *)button
-{
-  DDLogVerbose(@"Title button pressed");
-  DFNotificationsViewController *notifsViewController = [DFNotificationsViewController new];
-  notifsViewController.delegate = self;
-  
-  self.notificationsPopupController = [[WYPopoverController alloc] initWithContentViewController:notifsViewController];
-  self.notificationsPopupController.delegate = self;
-  [self.notificationsPopupController presentPopoverFromRect:button.bounds
-                                                     inView:button
-                                   permittedArrowDirections:WYPopoverArrowDirectionAny
-                                                   animated:YES];
-}
-
-
-- (BOOL)popoverControllerShouldDismissPopover:(WYPopoverController *)controller
-{
-  return YES;
-}
-
-- (void)popoverControllerDidDismissPopover:(WYPopoverController *)controller
-{
-  self.notificationsPopupController.delegate = nil;
-  self.notificationsPopupController = nil;
-}
-
-- (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
-  didSelectNotificationWithPhotoID:(DFPhotoIDType)photoID
-{
-  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
-  [self.tableView scrollToRowAtIndexPath:indexPath
-                        atScrollPosition:UITableViewScrollPositionTop
-                                animated:YES];
-  [self.notificationsPopupController dismissPopoverAnimated:YES];
-}
-
 
 #pragma mark - DFPhotoFeedCell Delegates
 
@@ -998,15 +726,6 @@ selectedObjectChanged:(id)newObject
 
 #pragma mark - Adapters
 
-- (DFPeanutGalleryAdapter *)galleryAdapter
-{
-  if (!_galleryAdapter) {
-    _galleryAdapter = [[DFPeanutGalleryAdapter alloc] init];
-  }
-  
-  return _galleryAdapter;
-}
-
 - (DFPhotoMetadataAdapter *)photoAdapter
 {
   if (!_photoAdapter) {
@@ -1017,43 +736,7 @@ selectedObjectChanged:(id)newObject
 }
 
 
-#pragma mark - Notification handlers
-
-- (void)applicationDidBecomeActive:(NSNotification *)note
-{
-  if (self.isViewLoaded && self.view.window) {
-    [self viewDidAppear:YES];
-  }
-}
-
-- (void)applicationDidEnterBackground:(NSNotification *)note
-{
-  if (self.isViewLoaded && self.view.window) {
-    [self viewDidDisappear:YES];
-  }
-}
-
-- (void)uploadStatusChanged:(NSNotification *)note
-{
-  DFUploadSessionStats *uploadStats = note.userInfo[DFUploadStatusUpdateSessionUserInfoKey];
-  if (uploadStats.fatalError) {
-    [self.tableView reloadData];
-    self.uploadError = uploadStats.fatalError;
-  } else {
-    self.uploadError = nil;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),
-                   dispatch_get_main_queue(), ^{
-      [self reloadFeedIsSilent:YES];
-    });
-  }
-}
-
-- (void)notificationsChanged:(NSNotification *)note
-{
-  NSNumber *unreadCount = note.userInfo[DFStrandNotificationsUnseenCountKey];
-  self.notificationsBadgeButton.badgeCount = unreadCount.intValue;
-}
-
+#pragma mark - UIScrollViewDelegate methods
 
 - (void)scrollViewDidScroll:(UIScrollView *)scrollView
 {
