@@ -20,4 +20,7 @@
 - (void)mainScrollViewStoppedScrolling;
 - (void)showNavBar;
 
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)popViewControllerAnimated:(BOOL)animated;
+
 @end

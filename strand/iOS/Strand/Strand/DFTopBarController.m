@@ -57,6 +57,29 @@ CGFloat const MaxNavbarOriginY = 0;
   }
 }
 
+- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
+{
+  if (!self.viewControllers) self.viewControllers = @[];
+  self.viewControllers = [self.viewControllers arrayByAddingObject:viewController];
+  self.contentView = viewController.view;
+  [self.navigationBar pushNavigationItem:viewController.navigationItem animated:animated];
+}
+
+- (void)popViewControllerAnimated:(BOOL)animated
+{
+  if (self.viewControllers.count == 1) {
+    [NSException raise:@"Cannot pop root view controller"
+                format:@"%@ trying to pop root view controller.", [self.class description]];
+  }
+  
+  self.viewControllers = [self.viewControllers
+                          subarrayWithRange:(NSRange){0, self.viewControllers.count - 1}];
+  UIViewController *newTopViewController = self.viewControllers.lastObject;
+  self.contentView = newTopViewController.view;
+  [self.navigationBar popNavigationItemAnimated:animated];
+}
+
+
 - (void)setContentView:(UIView *)newContentView
 {
   CGRect frame = self.view.frame;
