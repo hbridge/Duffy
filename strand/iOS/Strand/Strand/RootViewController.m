@@ -33,8 +33,7 @@
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFPhotoFeedController alloc] init];
     _strandsNavController = [[DFTopBarController alloc]
-                             initWithRootViewController:[[DFGalleryViewController alloc] init]];
-    [_strandsNavController pushViewController:_photoFeedController animated:NO];
+                             initWithRootViewController:_photoFeedController];
     _subviewControllers =
     @[
       _strandsNavController,
