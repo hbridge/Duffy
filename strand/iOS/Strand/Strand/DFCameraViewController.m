@@ -167,7 +167,7 @@ const unsigned int SavePromptMinPhotos = 3;
   }
   
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self.customCameraOverlayView setGalleryButtonCount:5];
+    [self.customCameraOverlayView setGalleryButtonCount:unseenCount];
   });
 }
 
