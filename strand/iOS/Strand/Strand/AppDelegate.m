@@ -168,6 +168,9 @@
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandRefreshRemoteUIRequestedNotificationName
+       object:self];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
