@@ -102,7 +102,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                                name:UIApplicationDidBecomeActiveNotification
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(applicationDidEnterBackground:)
+                                           selector:@selector(viewDidBecomeInactive)
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
