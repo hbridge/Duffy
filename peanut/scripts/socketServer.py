@@ -94,12 +94,16 @@ def processMessages():
 	running = False
 
 def main(argv):
-	
+	if (len(sys.argv) > 1):
+		port = int(sys.argv[1])
+	else:
+		port = 8001
+
 	mobileClient = MobileClient
 	
 	factory = Factory()
 	factory.protocol = mobileClient
-	reactor.listenTCP(8000, factory)
+	reactor.listenTCP(port, factory)
 	logger.info("Starting... ")
 	
 	processMessages()
