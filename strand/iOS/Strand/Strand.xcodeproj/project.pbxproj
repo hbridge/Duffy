@@ -1501,15 +1501,15 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Old Fashioned Software, LLC (Y83XBMV536)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Old Fashioned Software, LLC (Y83XBMV536)";
+				CODE_SIGN_IDENTITY = "";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "CEEBEA49-9D65-4D7C-BBBE-3BB9B4FE19EA";
+				PROVISIONING_PROFILE = "79694aac-9d1e-40b4-b45b-369ea24d3566";
 				SDKROOT = iphoneos;
 			};
 			name = "App store";
@@ -1624,7 +1624,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "28d4d359-8146-473b-a411-25827c18aa2a";
+				PROVISIONING_PROFILE = "8100fff3-7e6e-4a3f-b9bb-dabcbe4f7690";
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
