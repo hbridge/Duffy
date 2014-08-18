@@ -367,10 +367,12 @@
     newMode = AVCaptureFlashModeAuto;
   }
   
-  NSError *error;
-  [self.currentCaptureDevice lockForConfiguration:&error];
-  self.currentCaptureDevice.flashMode = newMode;
-  [self.currentCaptureDevice unlockForConfiguration];
+  if ([self.currentCaptureDevice isFlashModeSupported:newMode]) {
+    NSError *error;
+    [self.currentCaptureDevice lockForConfiguration:&error];
+    self.currentCaptureDevice.flashMode = newMode;
+    [self.currentCaptureDevice unlockForConfiguration];
+  }
 }
 
 - (UIImagePickerControllerCameraFlashMode)cameraFlashMode
