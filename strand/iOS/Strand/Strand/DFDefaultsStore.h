@@ -28,6 +28,7 @@ typedef NSString *const DFUserActionType;
 extern DFUserActionType DFUserActionTakePhoto;
 extern DFUserActionType DFUserActionTakeExternalPhoto;
 extern DFUserActionType DFUserActionSyncContacts;
+extern DFUserActionType DFUserActionViewNotifications;
 
 
 + (void)incrementCountForAction:(DFUserActionType)action;

@@ -45,6 +45,8 @@
   self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
   self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
   [self.tableView reloadData];
+  
+  [[DFPeanutNotificationsManager sharedManager] markNotificationsAsRead];
 }
 
 - (void)didReceiveMemoryWarning

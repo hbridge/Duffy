@@ -9,6 +9,7 @@
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutNotificationsAdapter.h"
 #import "DFStrandConstants.h"
+#import "DFDefaultsStore.h"
 
 NSTimeInterval const DFNotificationsMinFetchInterval = 2.0;
 
@@ -64,12 +65,16 @@ static DFPeanutNotificationsManager *defaultManager;
   }];
 }
 
+/*
+ * Returns the current set of notifications
+ */
 - (NSArray *)notifications
 {
   if (!self.peanutNotifications ||
       [[NSDate date] timeIntervalSinceDate:self.lastFetchDate] > DFNotificationsMinFetchInterval) {
     [self updateNotifications];
   }
+
   return self.peanutNotifications;
 }
 
@@ -82,18 +87,57 @@ static DFPeanutNotificationsManager *defaultManager;
   return _notificationsAdapter;
 }
 
+/*
+ * Compare all the current notifications to the last time the user viewed the page, return back ones
+ *   that are after that date.
+ */
 - (NSArray *)unreadNotifications
 {
-  // TODO (dparham) make this return
-  return self.notifications;
+  NSMutableArray *unreadNotifications = [NSMutableArray new];
+  
+  for (int x=0; x < self.notifications.count; x++) {
+    if ([self.lastViewDate compare: ((DFPeanutNotification *)self.notifications[x]).time] == NSOrderedAscending) {
+      [unreadNotifications addObject:self.notifications[x]];
+    }
+  }
+  return unreadNotifications;
 }
 
+/*
+ * Compare all the current notifications to the last time the user viewed the page, return back ones
+ *   that are before that date.
+ */
 - (NSArray *)readNotifications
 {
-  // TODO (dparham) make this return the right set of notifications
+  NSMutableArray *readNotifications = [NSMutableArray new];
   
-  return self.notifications;
+  for (int x=0; x < self.notifications.count; x++) {
+    if ([self.lastViewDate compare: ((DFPeanutNotification *)self.notifications[x]).time] == NSOrderedDescending) {
+      [readNotifications addObject:self.notifications[x]];
+    }
+  }
+  return readNotifications;
 }
 
+/*
+ * Last date that notifications were viewed, this is set by using the markNotificationsAsRead method
+ */
+- (NSDate *)lastViewDate
+{
+  NSDate *lastViewDate = [DFDefaultsStore lastDateForAction:DFUserActionViewNotifications];
+  if (lastViewDate == nil) {
+    return [NSDate date];
+  } else {
+    return lastViewDate;
+  }
+}
+
+/*
+ * This should be called when the notifications view is shown to the user.
+ */
+- (void)markNotificationsAsRead
+{
+  [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionViewNotifications];
+}
 
 @end
