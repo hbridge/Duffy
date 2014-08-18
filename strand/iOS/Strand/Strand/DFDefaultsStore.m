@@ -53,6 +53,7 @@ DFUserActionType DFUserActionTakePhoto = @"TakePhoto";
 DFUserActionType DFUserActionTakeExternalPhoto = @"TakeExternalPhoto";
 DFUserActionType DFUserActionSyncContacts = @"SyncContacts";
 DFUserActionType DFUserActionSyncManualContacts = @"SyncManualContacts";
+DFUserActionType DFUserActionViewNotifications = @"ViewNotifications";
 
 + (void)incrementCountForAction:(DFUserActionType)action
 {

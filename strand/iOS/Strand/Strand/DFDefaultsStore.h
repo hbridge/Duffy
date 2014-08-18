@@ -29,7 +29,7 @@ extern DFUserActionType DFUserActionTakePhoto;
 extern DFUserActionType DFUserActionTakeExternalPhoto;
 extern DFUserActionType DFUserActionSyncContacts;
 extern DFUserActionType DFUserActionSyncManualContacts;
-
+extern DFUserActionType DFUserActionViewNotifications;
 
 + (void)incrementCountForAction:(DFUserActionType)action;
 + (unsigned int)actionCountForAction:(DFUserActionType)action;
