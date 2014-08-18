@@ -126,7 +126,7 @@ static DFPeanutNotificationsManager *defaultManager;
 {
   NSDate *lastViewDate = [DFDefaultsStore lastDateForAction:DFUserActionViewNotifications];
   if (lastViewDate == nil) {
-    return [NSDate date];
+    return [[NSDate alloc] initWithTimeIntervalSince1970:0];
   } else {
     return lastViewDate;
   }
