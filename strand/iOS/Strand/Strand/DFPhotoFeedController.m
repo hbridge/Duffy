@@ -611,7 +611,7 @@ const CGFloat LockedCellHeight = 157.0;
                                                   otherButtonTitles:@"Save", nil];
   
  
-  [actionSheet showInView:self.view.superview];
+  [actionSheet showInView:self.tableView];
 }
 
 
