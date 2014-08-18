@@ -20,7 +20,6 @@ DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate>
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
-@property (readonly, nonatomic, retain) DFTopBarController *topBarController;
 
 - (void)jumpToPhoto:(DFPhotoIDType)photoID;
 

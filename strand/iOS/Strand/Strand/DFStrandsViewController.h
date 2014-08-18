@@ -10,6 +10,7 @@
 #import "DFNotificationsViewController.h"
 #import "WYPopoverController.h"
 
+@class DFTopBarController;
 @class DFStrandsViewController;
 @protocol DFStrandViewControllerDelegate <NSObject>
 
@@ -21,6 +22,8 @@
 @end
 
 @interface DFStrandsViewController : UIViewController <DFNotificationsViewControllerDelegate, WYPopoverControllerDelegate>
+
+@property (nonatomic, weak) DFTopBarController *topBarController;
 
 // Strand data
 @property (nonatomic, retain) NSArray *sectionObjects;
@@ -37,6 +40,8 @@
 
 
 - (void)reloadFeed;
+
+- (void)settingsButtonPressed:(id)sender;
 
 // asbtract method, subclasses should implement
 - (void)showPhoto:(DFPhotoIDType)photoId;

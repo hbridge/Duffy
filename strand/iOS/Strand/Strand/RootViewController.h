@@ -8,10 +8,18 @@
 
 #import <UIKit/UIKit.h>
 
+@class DFCameraViewController;
+@class DFPhotoFeedController;
+@class DFTopBarController;
+
 @interface RootViewController : UIViewController <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
 
 @property (strong, nonatomic) UIPageViewController *pageViewController;
 @property (nonatomic) BOOL hideStatusBar;
+
+@property (nonatomic, retain) DFCameraViewController *cameraViewController;
+@property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
+@property (nonatomic, retain) DFTopBarController *strandsNavController;
 
 - (void)showGallery;
 - (void)showCamera;

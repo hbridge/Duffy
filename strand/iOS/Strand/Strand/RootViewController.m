@@ -12,13 +12,11 @@
 #import "DFPhotoFeedController.h"
 #import "DFOverlayViewController.h"
 #import "DFTopBarController.h"
+#import "DFGalleryViewController.h"
 
 @interface RootViewController ()
             
 @property (readonly, strong, nonatomic) NSArray *subviewControllers;
-@property (nonatomic, retain) DFCameraViewController *cameraViewController;
-@property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
-@property (nonatomic, retain) DFTopBarController *strandsNavController;
 
 @property (nonatomic, retain) UIWindow *overlayWindow;
 @property (nonatomic, retain) DFOverlayViewController *overlayVC;
@@ -35,7 +33,8 @@
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFPhotoFeedController alloc] init];
     _strandsNavController = [[DFTopBarController alloc]
-                             initWithRootViewController:_photoFeedController];
+                             initWithRootViewController:[[DFGalleryViewController alloc] init]];
+    [_strandsNavController pushViewController:_photoFeedController animated:NO];
     _subviewControllers =
     @[
       _strandsNavController,

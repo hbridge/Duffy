@@ -73,6 +73,13 @@ const CGFloat LockedCellHeight = 157.0;
   self = [super init];
   if (self) {
     self.delegate = self;
+
+    UIBarButtonItem *backToGalleryItem = [[UIBarButtonItem alloc]
+                                          initWithImage:[UIImage imageNamed:@"Assets/Icons/GridBarButton"]
+                                          style:UIBarButtonItemStylePlain
+                                          target:self
+                                          action:@selector(backPressed:)];
+    self.navigationItem.backBarButtonItem = backToGalleryItem;
   }
   return self;
 }
@@ -153,7 +160,7 @@ const CGFloat LockedCellHeight = 157.0;
     NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
     if (indexPath) {
       [self.tableView scrollToRowAtIndexPath:indexPath
-                            atScrollPosition:UITableViewScrollPositionBottom
+                            atScrollPosition:UITableViewScrollPositionTop
                                     animated:NO];
       self.requestedPhotoIDToJumpTo = 0;
     } else {
@@ -204,7 +211,6 @@ const CGFloat LockedCellHeight = 157.0;
   
   if (self.requestedPhotoIDToJumpTo != 0) {
     [self showPhoto:self.requestedPhotoIDToJumpTo];
-    self.requestedPhotoIDToJumpTo = 0;
   }
 }
 
@@ -723,6 +729,15 @@ selectedObjectChanged:(id)newObject
     [self.tableView reloadData];
   }
 }
+
+
+#pragma mark - Bar Actions
+
+- (void)backPressed:(id)sender
+{
+  [self.topBarController popViewControllerAnimated:YES];
+}
+
 
 #pragma mark - Adapters
 

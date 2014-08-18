@@ -8,6 +8,7 @@
 
 #import "DFTopBarController.h"
 #import "DFOverlayViewController.h"
+#import "DFStrandsViewController.h"
 
 @interface DFTopBarController ()
 
@@ -40,6 +41,7 @@ CGFloat const MaxNavbarOriginY = 0;
                                              0,
                                              self.view.frame.size.width,
                                              NavBarHeight)];
+  _navigationBar.delegate = self;
   [self.view addSubview:self.navigationBar];
   
   if (self.viewControllers.lastObject) {
@@ -52,20 +54,33 @@ CGFloat const MaxNavbarOriginY = 0;
 - (void)setViewControllers:(NSArray *)viewControllers
 {
   _viewControllers = viewControllers;
-  for (UIViewController *vc in viewControllers) {
+  NSMutableArray *navigationItems = [NSMutableArray new];
+  for (DFStrandsViewController *vc in viewControllers) {
     [self addChildViewController:vc];
+    [navigationItems  addObject:vc.navigationItem];
+    vc.topBarController = self;
   }
+  
+  self.navigationBar.items = navigationItems;
 }
 
-- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated
+- (void)pushViewController:(DFStrandsViewController *)viewController animated:(BOOL)animated
 {
   if (!self.viewControllers) self.viewControllers = @[];
   self.viewControllers = [self.viewControllers arrayByAddingObject:viewController];
   self.contentView = viewController.view;
-  [self.navigationBar pushNavigationItem:viewController.navigationItem animated:animated];
+  self.navigationBar.items = [self.navigationBar.items arrayByAddingObject:viewController.navigationItem];
+  //[self.navigationBar pushNavigationItem:viewController.navigationItem animated:animated];
+  //self.navigationBar.topItem.titleView = viewController.navigationItem.titleView;
+  viewController.topBarController = self;
+  DDLogInfo(@"pushViewController backItem:%@ leftItems:%@ titleView:%@ rightItems:%@",
+            viewController.navigationItem.backBarButtonItem,
+            viewController.navigationItem.leftBarButtonItems,
+            viewController.navigationItem.titleView,
+            viewController.navigationItem.rightBarButtonItems);
 }
 
-- (void)popViewControllerAnimated:(BOOL)animated
+- (void)popViewControllerAnimated:(BOOL)animated popNavBar:(BOOL)popNavBar
 {
   if (self.viewControllers.count == 1) {
     [NSException raise:@"Cannot pop root view controller"
@@ -76,9 +91,12 @@ CGFloat const MaxNavbarOriginY = 0;
                           subarrayWithRange:(NSRange){0, self.viewControllers.count - 1}];
   UIViewController *newTopViewController = self.viewControllers.lastObject;
   self.contentView = newTopViewController.view;
-  [self.navigationBar popNavigationItemAnimated:animated];
 }
 
+- (void)popViewControllerAnimated:(BOOL)animated
+{
+  [self popViewControllerAnimated:animated popNavBar:YES];
+}
 
 - (void)setContentView:(UIView *)newContentView
 {
@@ -153,6 +171,16 @@ CGFloat const MaxNavbarOriginY = 0;
   if (self.navigationBar.frame.origin.y < 0) {
     [self animateNavBarTo:0];
   }
+}
+
+- (void)navigationBar:(UINavigationBar *)navigationBar didPopItem:(UINavigationItem *)item
+{
+  [self popViewControllerAnimated:YES popNavBar:NO];
+}
+
+- (void)navigationBar:(UINavigationBar *)navigationBar didPushItem:(UINavigationItem *)item
+{
+  
 }
 
 

@@ -9,7 +9,9 @@
 #import <UIKit/UIKit.h>
 #import "DFNavigationBar.h"
 
-@interface DFTopBarController : UIViewController
+@class DFStrandsViewController;
+
+@interface DFTopBarController : UIViewController <UINavigationBarDelegate>
 
 @property (readonly, nonatomic, retain) DFNavigationBar *navigationBar;
 @property (nonatomic, retain) NSArray *viewControllers;
@@ -20,7 +22,7 @@
 - (void)mainScrollViewStoppedScrolling;
 - (void)showNavBar;
 
-- (void)pushViewController:(UIViewController *)viewController animated:(BOOL)animated;
+- (void)pushViewController:(DFStrandsViewController *)viewController animated:(BOOL)animated;
 - (void)popViewControllerAnimated:(BOOL)animated;
 
 @end

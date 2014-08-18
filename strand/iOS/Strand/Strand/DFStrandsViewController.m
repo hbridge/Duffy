@@ -20,6 +20,7 @@
 #import "DFPeanutSearchObject.h"
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFStrandsViewController.h"
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
@@ -75,13 +76,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   
   // other buttons
   if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
-    UIBarButtonItem *settingsButton =
-    [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(settingsButtonPressed:)];
     UIBarButtonItem *cameraButton =
     [[UIBarButtonItem alloc]
      initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton"]
@@ -97,7 +91,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
      target:self
      action:@selector(inviteButtonPressed:)];
     
-    self.navigationItem.leftBarButtonItems = @[settingsButton];
     self.navigationItem.rightBarButtonItems = @[cameraButton, inviteButton];
   }
 }
@@ -276,15 +269,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   [(RootViewController *)self.view.window.rootViewController showCamera];
 }
 
-- (void)settingsButtonPressed:(id)sender
-{
-  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
-  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:svc]
-                     animated:YES
-                   completion:nil];
-}
-
-
 - (void)inviteButtonPressed:(id)sender
 {
   DDLogInfo(@"Invite button pressed");
@@ -363,5 +347,14 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   
   return _galleryAdapter;
 }
+
+- (void)settingsButtonPressed:(id)sender
+{
+  DFSettingsViewController *svc = [[DFSettingsViewController alloc] init];
+  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:svc]
+                     animated:YES
+                   completion:nil];
+}
+
 
 @end
