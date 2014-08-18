@@ -23,6 +23,7 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFNetworkingConstants.h"
 #import "AppDelegate.h"
+#import "DFContactsViewController.h"
 
 @interface DFSettingsViewController ()
 
@@ -87,6 +88,13 @@
     [mapping button:@"Invite Friend"
          identifier:@"inviteUser"
             handler:[self inviteUserHandler]
+       accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+    [mapping button:@"Add Friends"
+         identifier:@"addFriends"
+            handler:^(id object) {
+              [self.navigationController pushViewController:[[DFContactsViewController alloc] init]
+                                                   animated:YES];
+            }
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];

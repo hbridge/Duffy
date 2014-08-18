@@ -12,6 +12,7 @@
 #import "DFPeanutContactAdapter.h"
 #import "DFPeanutContact.h"
 #import "DFUser.h"
+#import "DFContactsStore.h"
 
 @implementation DFContactSyncManager
 
@@ -31,37 +32,69 @@ static DFContactSyncManager *defaultManager;
 
 - (void)sync
 {
-  NSDate *lastSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncContacts];
-  if (!lastSync) lastSync = [NSDate dateWithTimeIntervalSince1970:0];
-  [self syncWithLastSyncDate:lastSync];
+  NSDate *lastABSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncContacts];
+  if (!lastABSync) lastABSync = [NSDate dateWithTimeIntervalSince1970:0];
+  [self syncABContactsWithLastSyncDate:lastABSync];
+  
+  NSDate *lastDFContactSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncManualContacts];
+  if (!lastDFContactSync) lastDFContactSync = [NSDate dateWithTimeIntervalSince1970:0];
+  [self syncDFContactsWithLastSyncDate:lastDFContactSync];
 }
 
 - (void)forceSync
 {
-  [self syncWithLastSyncDate:[NSDate dateWithTimeIntervalSince1970:0]];
+  [self syncABContactsWithLastSyncDate:[NSDate dateWithTimeIntervalSince1970:0]];
+  [self syncDFContactsWithLastSyncDate:[NSDate dateWithTimeIntervalSince1970:0]];
 }
 
-- (void)syncWithLastSyncDate:(NSDate *)lastSync
+- (void)syncABContactsWithLastSyncDate:(NSDate *)lastSync
 {
+  DFPeanutContactAdapter *contactAdapter = [DFPeanutContactAdapter new];
+  
+  //sync AB contacts
   [self peanutContactsFromABModifiedAfterDate:lastSync withCompletion:^(NSArray *peanutContacts) {
     if (peanutContacts.count == 0) {
-      DDLogInfo(@"%@ no new contacts found.", [self.class description]);
+      DDLogInfo(@"%@ no new AB contacts found.", [self.class description]);
       return;
     }
-    DFPeanutContactAdapter *contactAdapter = [DFPeanutContactAdapter new];
     [contactAdapter postPeanutContacts:peanutContacts success:^(NSArray *peanutContacts) {
-      DDLogInfo(@"Posting %d contacts succeeded.", (int)peanutContacts.count);
+      DDLogInfo(@"%@ posting %d AB contacts succeeded.", [self.class description], (int)peanutContacts.count);
       [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionSyncContacts];
     } failure:^(NSError *error) {
-      DDLogError(@"%@ posting contacts failed: %@", [self.class description], error.description);
+      DDLogError(@"%@ posting AB contacts failed: %@", [self.class description], error.description);
     }];
   }];
+}
+
+- (void)syncDFContactsWithLastSyncDate:(NSDate *)lastSync
+{
+  DFPeanutContactAdapter *contactAdapter = [DFPeanutContactAdapter new];
+  //sync manual contacts
+  NSArray *manualContacts = [[DFContactsStore sharedStore] contactsModifiedAfterDate:lastSync];
+  if (manualContacts.count == 0) {
+    DDLogInfo(@"%@ no new manual contacts found.", [self.class description]);
+  } else {
+    NSMutableArray *manualPeanutContacts = [NSMutableArray new];
+    for (DFContact *contact in manualContacts) {
+      DFPeanutContact *peanutContact = [[DFPeanutContact alloc] init];
+      peanutContact.name = contact.name;
+      peanutContact.phone_number = contact.phoneNumber;
+      peanutContact.user = @([[DFUser currentUser] userID]);
+      [manualPeanutContacts addObject:peanutContact];
+    }
+    [contactAdapter postPeanutContacts:manualPeanutContacts success:^(NSArray *peanutContacts) {
+      DDLogInfo(@"%@ posting %d manual contacts succeeded.", [self.class description], (int)manualPeanutContacts.count);
+      [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionSyncManualContacts];
+    } failure:^(NSError *error) {
+      DDLogError(@"%@ posting manual contacts failed: %@", [self.class description], error.description);
+    }];
+  }
 }
 
 - (void)peanutContactsFromABModifiedAfterDate:(NSDate *)minimumDate
                                withCompletion:(void(^)(NSArray *peanutContacts))completion
 {
-  DDLogInfo(@"%@ looking for contacts modified after %@...", [self.class description], minimumDate);
+  DDLogInfo(@"%@ looking for AB contacts modified after %@...", [self.class description], minimumDate);
   NSMutableArray *peanutContacts = [NSMutableArray new];
   
   CFErrorRef error;

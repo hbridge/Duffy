@@ -49,6 +49,7 @@ NSString *const RestPostPath = @"contacts/";
 + (NSArray *)requestDescriptors
 {
   RKObjectMapping *mapping = [[DFPeanutContact objectMapping] inverseMapping];
+  mapping.forceCollectionMapping = YES;
   RKRequestDescriptor *restRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:[DFPeanutContact class]

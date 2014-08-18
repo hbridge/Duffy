@@ -33,6 +33,7 @@
 #import "DFNavigationController.h"
 #import "DFContactSyncManager.h"
 #import "DFSocketsManager.h"
+#import "DFContactsStore.h"
 
 
 @interface AppDelegate ()
@@ -203,6 +204,7 @@
   DDLogInfo(@"AppDelegate appDidenterBackground");
   [[NSUserDefaults standardUserDefaults] synchronize];
   [[DFPhotoStore sharedStore] saveContext];
+  [[DFContactsStore sharedStore] saveContext];
   [DFAnalytics CloseAnalyticsSession];
   
   if ([self isAppSetupComplete]) {
@@ -227,6 +229,7 @@
 - (void)applicationWillTerminate:(UIApplication *)application {
   [[NSUserDefaults standardUserDefaults] synchronize];
   [[DFPhotoStore sharedStore] saveContext];
+  [[DFContactsStore sharedStore] saveContext];
   [DFAnalytics CloseAnalyticsSession];
 }
 
