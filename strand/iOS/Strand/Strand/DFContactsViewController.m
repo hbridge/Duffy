@@ -14,6 +14,8 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFAddContactViewController.h"
 #import "DFContactsStore.h"
+#import "SVProgressHUD.h"
+#import "DFLocationPermissionViewController.h"
 
 
 
@@ -51,7 +53,7 @@
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                               initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                               target:self
-                                              action:@selector(dismiss)];
+                                              action:@selector(showNextStep)];
   }
   [self.tableView reloadData];
 }
@@ -65,7 +67,10 @@
 
 - (BOOL)canUserProceed
 {
-  return (self.manualContacts.count > 0 && self.navigationController.viewControllers.firstObject == self);
+  return (self.showAsNUXStep &&
+          (self.manualContacts.count > 0
+           || ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized)
+          );
 }
 
 #pragma mark - Table View Delegate/Datasource
@@ -152,7 +157,15 @@
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
       //        [DFAnalytics logSetupContactsCompletedWithResult:DFAnalyticsValueResultSuccess
       //                                     userTappedLearnMore:self.learnMoreWasPressed];
-      [self dismiss];
+      [[DFContactSyncManager sharedManager] sync];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [SVProgressHUD showSuccessWithStatus:@"Success!"];
+      });
+      if (self.canUserProceed) {
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+          [self showNextStep];
+        });
+      }
     } else {
       [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionContacts];
       //        [DFAnalytics logSetupContactsCompletedWithResult:DFAnalyticsValueResultFailure
@@ -171,10 +184,10 @@
 }
 
 
-- (void)dismiss
+- (void)showNextStep
 {
-  [[DFContactSyncManager sharedManager] sync];
-  
+  DFLocationPermissionViewController *lvc = [[DFLocationPermissionViewController alloc] init];
+  [self.navigationController setViewControllers:@[lvc] animated:YES];
 }
 
 @end

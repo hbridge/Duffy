@@ -10,4 +10,6 @@
 
 @interface DFContactsViewController : UITableViewController
 
+@property (nonatomic) BOOL showAsNUXStep;
+
 @end

@@ -10,13 +10,13 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "AppDelegate.h"
-#import "DFModalSpinnerViewController.h"
 #import "DFSMSCodeEntryViewController.h"
 #import "NSString+DFHelpers.h"
 #import "DFSMSVerificationAdapter.h"
 #import "DFWebViewController.h"
 #import "DFNetworkingConstants.h"
 #import "DFAnalytics.h"
+#import "SVProgressHUD.h"
 
 UInt16 const DFPhoneNumberLength = 10;
 
@@ -132,36 +132,24 @@ replacementString:(NSString *)string
     [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultInvalidInput];
     return;
   }
-    NSString __block *phoneNumberString = [self enteredPhoneNumber];
-  DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
-                                        initWithMessage:[NSString stringWithFormat:@"Sending SMS to %@",
-                                                         phoneNumberString]];
-  [self presentViewController:msvc animated:YES completion:nil];
-
+  NSString __block *phoneNumberString = [self enteredPhoneNumber];
+  [SVProgressHUD show];
   
   DFSMSVerificationAdapter *smsAdapter = [[DFSMSVerificationAdapter alloc] init];
-  [smsAdapter requestSMSCodeForPhoneNumber:phoneNumberString
-                       withCompletionBlock:^(DFPeanutTrueFalseResponse *response, NSError *error) {
-                         if (response.result) {
-                           DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
-                           codeEntryController.phoneNumberString = phoneNumberString;
-                           if (self.nameTextField.text
-                               && ![self.nameTextField.text isEqualToString:@""]) {
-                             codeEntryController.userName = self.nameTextField.text;
-                           } else {
-                             codeEntryController.userName = [DFUser deviceNameBasedUserName];
-                           }
-                           [self.navigationController pushViewController:codeEntryController
-                                                                animated:NO];
-                           [msvc dismissViewControllerAnimated:NO completion:nil];
-                           [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultSuccess];
-                         } else {
-                           UIAlertView *failureAlert = [DFFirstTimeSetupViewController smsVerificationRequestFailed:error];
-                           [msvc dismissViewControllerAnimated:YES completion:nil];
-                           [failureAlert show];
-                           [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultFailure];
-                         }
-  }];
+  [smsAdapter
+   requestSMSCodeForPhoneNumber:phoneNumberString
+   withCompletionBlock:^(DFPeanutTrueFalseResponse *response, NSError *error) {
+     if (response.result) {
+       [SVProgressHUD dismiss];
+       [self showNextStepWithPhoneNumber:phoneNumberString];
+       [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultSuccess];
+     } else {
+       [SVProgressHUD dismiss];
+       UIAlertView *failureAlert = [DFFirstTimeSetupViewController smsVerificationRequestFailed:error];
+       [failureAlert show];
+       [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultFailure];
+     }
+   }];
   
   
 }
@@ -248,6 +236,18 @@ replacementString:(NSString *)string
   }
 }
 
-
+- (void)showNextStepWithPhoneNumber:(NSString *)phoneNumberString
+{
+  DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
+  codeEntryController.phoneNumberString = phoneNumberString;
+  if (self.nameTextField.text
+      && ![self.nameTextField.text isEqualToString:@""]) {
+    codeEntryController.userName = self.nameTextField.text;
+  } else {
+    codeEntryController.userName = [DFUser deviceNameBasedUserName];
+  }
+  [self.navigationController pushViewController:codeEntryController
+                                       animated:YES];
+}
 
 @end

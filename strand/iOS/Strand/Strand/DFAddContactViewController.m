@@ -63,9 +63,9 @@
     [mapping
      validationForAttribute:@"name"
      validBlock:^BOOL(NSString *value, id object) {
-       return value.length < 20;
+       return (value.length > 0 && value.length < 20);
      } errorMessageBlock:^NSString *(id value, id object) {
-       return @"Text is too long.";
+       return @"Please enter a 1 to 20 character name";
      }];
     [mapping
      validationForAttribute:@"phone_number"
@@ -77,7 +77,7 @@
        
        return true;
      } errorMessageBlock:^NSString *(id value, id object) {
-       return @"Invalid. Please enter a 10-digit phone number.";
+       return @"Please enter a 10-digit phone number";
      }];
     
     [self.formModel registerMapping:mapping];

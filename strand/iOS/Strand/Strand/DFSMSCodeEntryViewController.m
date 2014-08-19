@@ -10,9 +10,9 @@
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "NSString+DFHelpers.h"
-#import "DFModalSpinnerViewController.h"
 #import "DFAnalytics.h"
-#import "DFLocationPermissionViewController.h"
+#import "SVProgressHUD.h"
+#import "DFContactsViewController.h"
 
 const UInt16 DFCodeLength = 4;
 
@@ -181,38 +181,36 @@ replacementString:(NSString *)string
 - (void)getUserIDWithPhoneNumber:(NSString *)phoneNumberString
                         authCode:(NSString *)authCodeString
 {
-  DFModalSpinnerViewController *msvc = [[DFModalSpinnerViewController alloc]
-                                        initWithMessage:@"Verifying..."];
-  [self presentViewController:msvc animated:YES completion:nil];
+  [SVProgressHUD show];
   
   DFUserPeanutAdapter *userAdapter = [[DFUserPeanutAdapter alloc] init];
   
-  [userAdapter createUserForDeviceID:[[DFUser currentUser] deviceID]
-                          deviceName:self.userName
-                         phoneNumber:phoneNumberString
-                       smsAuthString:authCodeString
-                    withSuccessBlock:^(DFPeanutUserObject *peanutUser) {
-                      DFUser *newUser = [[DFUser alloc] init];
-                      newUser.userID = peanutUser.id;
-                      newUser.phoneNumberString = peanutUser.phone_number;
-                      newUser.authToken = peanutUser.auth_token;
-                      newUser.displayName = peanutUser.display_name;
-                      newUser.deviceID = peanutUser.phone_id;
-                      
-                      [DFUser setCurrentUser:newUser];
-                      [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
-                      DFLocationPermissionViewController *locationPermissionController =
-                      [[DFLocationPermissionViewController alloc] init];
-                      [self.navigationController setViewControllers:@[locationPermissionController] animated:YES];
-                      [msvc dismissViewControllerAnimated:YES completion:nil];
-                    }
-                        failureBlock:^(NSError *error) {
-                          DDLogWarn(@"Create user failed: %@", error.localizedDescription);
-                          UIAlertView *failureAlert = [self accountFailedAlert:error];
-                          [failureAlert show];
-                          [self resetCodeField];
-                          [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultFailure];
-                        }];
+  [userAdapter
+   createUserForDeviceID:[[DFUser currentUser] deviceID]
+   deviceName:self.userName
+   phoneNumber:phoneNumberString
+   smsAuthString:authCodeString
+   withSuccessBlock:^(DFPeanutUserObject *peanutUser) {
+     DFUser *newUser = [[DFUser alloc] init];
+     newUser.userID = peanutUser.id;
+     newUser.phoneNumberString = peanutUser.phone_number;
+     newUser.authToken = peanutUser.auth_token;
+     newUser.displayName = peanutUser.display_name;
+     newUser.deviceID = peanutUser.phone_id;
+     
+     [DFUser setCurrentUser:newUser];
+     [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
+     [SVProgressHUD dismiss];
+     [self showNextStep];
+   }
+   failureBlock:^(NSError *error) {
+     DDLogWarn(@"Create user failed: %@", error.localizedDescription);
+     UIAlertView *failureAlert = [self accountFailedAlert:error];
+     [failureAlert show];
+     [self resetCodeField];
+     [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultFailure];
+     [SVProgressHUD dismiss];
+   }];
   
 }
 
@@ -236,6 +234,13 @@ replacementString:(NSString *)string
   [self.presentedViewController dismissViewControllerAnimated:YES completion:^{
     [self.codeTextField becomeFirstResponder];
   }];
+}
+
+- (void)showNextStep
+{
+  DFContactsViewController *cvc = [[DFContactsViewController alloc] init];
+  cvc.showAsNUXStep = YES;
+  [self.navigationController setViewControllers:@[cvc] animated:YES];
 }
 
 @end

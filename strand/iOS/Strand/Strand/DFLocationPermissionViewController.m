@@ -15,7 +15,6 @@
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
 #import "RootViewController.h"
-#import "DFContactsNUXViewController.h"
 
 @interface DFLocationPermissionViewController ()
 
@@ -134,8 +133,14 @@
 
 - (void)dismiss
 {
-  DFContactsNUXViewController *contactsNux = [DFContactsNUXViewController new];
-  [self.navigationController setViewControllers:@[contactsNux] animated:YES];
+  AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+  [delegate firstTimeSetupComplete];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    RootViewController *rootViewController = (RootViewController *)delegate.window.rootViewController;
+    if ([rootViewController respondsToSelector:@selector(showGallery)]) {
+      [rootViewController showGallery];
+    }
+  });
 }
 
 - (BOOL)prefersStatusBarHidden

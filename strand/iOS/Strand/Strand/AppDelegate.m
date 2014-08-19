@@ -104,7 +104,6 @@
   return  ([[DFUser currentUser] userID]
            && ![[DFUser currentUser] userID] == 0
            && [DFDefaultsStore  stateForPermission:DFPermissionLocation]
-           && [DFDefaultsStore  stateForPermission:DFPermissionContacts]
            && ![[DFDefaultsStore stateForPermission:DFPermissionLocation]
                 isEqual:DFPermissionStateNotRequested]
            && ![[DFDefaultsStore stateForPermission:DFPermissionContacts]
