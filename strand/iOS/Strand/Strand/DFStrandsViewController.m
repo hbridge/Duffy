@@ -70,7 +70,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   [self.notificationsBadgeButton setImage:image
                                  forState:UIControlStateNormal];
   self.notificationsBadgeButton.badgeEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 6);
-  self.notificationsBadgeButton.badgeColor = [UIColor colorWithRed:74/255.0 green:144/255.0 blue:226/255.0 alpha:1.0];
+  self.notificationsBadgeButton.badgeColor = [DFStrandConstants strandBlue];
   self.notificationsBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
   self.notificationsBadgeButton.badgeCount = (int)[[[DFPeanutNotificationsManager sharedManager]
                                                     unreadNotifications] count];
@@ -379,8 +379,14 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   DDLogVerbose(@"Title button pressed");
   DFNotificationsViewController *notifsViewController = [DFNotificationsViewController new];
   notifsViewController.delegate = self;
+  UINavigationController *navController = [[UINavigationController alloc]
+                                           initWithRootViewController:notifsViewController];
   
-  self.notificationsPopupController = [[WYPopoverController alloc] initWithContentViewController:notifsViewController];
+  self.notificationsPopupController = [[WYPopoverController alloc]
+                                       initWithContentViewController:navController];
+  [self.notificationsPopupController beginThemeUpdates];
+  self.notificationsPopupController.theme.viewContentInsets = UIEdgeInsetsMake(0, 2, 0, 2);
+  [self.notificationsPopupController endThemeUpdates];
   self.notificationsPopupController.delegate = self;
   [self.notificationsPopupController presentPopoverFromRect:button.bounds
                                                      inView:button

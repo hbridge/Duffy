@@ -27,7 +27,7 @@
 {
   self = [super initWithStyle:style];
   if (self) {
-    // Custom initialization
+    self.navigationItem.title = @"Notifications";
   }
   return self;
 }
@@ -67,11 +67,6 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return self.unreadNotifications.count + self.readNotifications.count;
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-  return @"Notifications";
 }
 
 - (DFPeanutNotification *)peanutNotificationForIndexPath:(NSIndexPath *)indexPath
