@@ -62,7 +62,7 @@ static DFSocketsManager *defaultManager;
 		case NSStreamEventHasBytesAvailable:
 			if (theStream == self.inputStream) {
 				uint8_t buffer[1024];
-				int len;
+				NSInteger len;
 				
 				while ([self.inputStream hasBytesAvailable]) {
 					len = [self.inputStream read:buffer maxLength:sizeof(buffer)];
