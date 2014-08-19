@@ -12,6 +12,7 @@
 #import "DFNotificationTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFImageStore.h"
+#import "DFAnalytics.h"
 
 @interface DFNotificationsViewController ()
 
@@ -47,6 +48,7 @@
   [self.tableView reloadData];
   
   [[DFPeanutNotificationsManager sharedManager] markNotificationsAsRead];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -121,6 +123,7 @@
 {
   DFPeanutNotification *notification = [self peanutNotificationForIndexPath:indexPath];
   DDLogVerbose(@"%@ notif tapped for notif:%@", [self.class description], notification);
+  [DFAnalytics logNotificationViewItemOpened:notification.action_text notifDate:notification.time];
   
   if (self.delegate) {
     [self.delegate notificationViewController:self

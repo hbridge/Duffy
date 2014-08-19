@@ -99,6 +99,7 @@ NSString* const AppInBackgroundKey = @"appInBackground";
 
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
 NSString* const NotificationTypeKey = @"notificationType";
+NSString* const NotificationsViewItemOpened = @"NotificationsViewItemOpened";
 
 // App Setup
 NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
@@ -292,6 +293,17 @@ static DFAnalytics *defaultLogger;
                           }];
 }
 
++ (void)logNotificationViewItemOpened:(NSString *)type notifDate:(NSDate *)notifDate
+{
+  [DFAnalytics logEvent:NotificationsViewItemOpened
+         withParameters:@{
+                          @"type": type,
+                          @"age" : [self bucketStringForTimeInternval:[[NSDate date]
+                                                                       timeIntervalSinceDate:notifDate]]
+                          }];
+}
+
+
 + (NSString *)pushNotifTypeToString:(DFPushNotifType)type
 {
   if (type == DFPushNotifUnknown) {
@@ -318,7 +330,7 @@ static DFAnalytics *defaultLogger;
 {
   [DFAnalytics logEvent:PhotoDeletedEvent withParameters:@{
                                                            ResultKey: result,
-                                                           PhotoAgeKey: [self timeIntervalBucketString:timeInterval]
+                                                           PhotoAgeKey: [self bucketStringForTimeInternval:timeInterval]
                                                            }];
 }
 
@@ -331,11 +343,11 @@ static DFAnalytics *defaultLogger;
                                                          NewValueKey: @(isOn),
                                                          ResultKey: result,
                                                          @"ActionType" : actionType,
-                                                         PhotoAgeKey : [self timeIntervalBucketString:timeInterval]
+                                                         PhotoAgeKey : [self bucketStringForTimeInternval:timeInterval]
                                                          }];
 }
 
-+ (NSString *)timeIntervalBucketString:(NSTimeInterval)timeInterval
++ (NSString *)bucketStringForTimeInternval:(NSTimeInterval)timeInterval
 {
   if (timeInterval < 60) {
     return @"< 1m";

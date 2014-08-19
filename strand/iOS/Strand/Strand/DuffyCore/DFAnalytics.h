@@ -65,6 +65,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 
 /* Notification response */
 + (void)logNotificationOpenedWithType:(DFPushNotifType)type;
++ (void)logNotificationViewItemOpened:(NSString *)type notifDate:(NSDate *)notifDate;
 
 /* Inviting */
 
