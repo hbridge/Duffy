@@ -32,7 +32,7 @@ class MobileClient(Protocol):
 		for userId, client in clients.iteritems():
 			if client == self:
 				del clients[userId]
-				logger.debug("Removing client %s" % (userId))
+				logger.info("Removing client %s" % (userId))
 				break
 
 	def dataReceived(self, data):
