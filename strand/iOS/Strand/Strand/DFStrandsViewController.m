@@ -346,11 +346,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   didSelectNotificationWithPhotoID:(DFPhotoIDType)photoID
 {
   [self showPhoto:photoID];
-//  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
-//  [self.tableView scrollToRowAtIndexPath:indexPath
-//                        atScrollPosition:UITableViewScrollPositionTop
-//                                animated:YES];
-//  [self.notificationsPopupController dismissPopoverAnimated:YES];
+  [self.notificationsPopupController dismissPopoverAnimated:YES];
 }
 
 - (void)showPhoto:(DFPhotoIDType)photoId

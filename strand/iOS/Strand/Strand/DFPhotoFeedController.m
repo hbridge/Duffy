@@ -163,16 +163,15 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)showPhoto:(DFPhotoIDType)photoId
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSIndexPath *indexPath = self.indexPathsByID[@(self.requestedPhotoIDToJumpTo)];
+    NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
     if (indexPath) {
       [self.tableView scrollToRowAtIndexPath:indexPath
                             atScrollPosition:UITableViewScrollPositionTop
                                     animated:NO];
-      self.requestedPhotoIDToJumpTo = 0;
     } else {
       DDLogWarn(@"%@ showPhoto:%llu no indexPath for photoId found.",
                 [self.class description],
-                self.requestedPhotoIDToJumpTo);
+                photoId);
     }
   });
 }
@@ -217,6 +216,7 @@ const CGFloat LockedCellHeight = 157.0;
   
   if (self.requestedPhotoIDToJumpTo != 0) {
     [self showPhoto:self.requestedPhotoIDToJumpTo];
+    self.requestedPhotoIDToJumpTo = 0;
   }
 }
 
