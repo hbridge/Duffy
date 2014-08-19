@@ -67,8 +67,6 @@ static DFStrandsManager *defaultStrandsManager;
 
 - (UIBackgroundFetchResult)performFetch:(NSNotification *)note
 {
-  DDLogInfo(@"DFStrandsManager performing fetch.");
-  
   if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] < MinSecondsBetweenFetch)
     return UIBackgroundFetchResultNoData;
   
@@ -91,9 +89,6 @@ static DFStrandsManager *defaultStrandsManager;
     return;
   }
   
-  DDLogInfo(@"Updating joinable strands with location: [%f, %f]",
-            lastLocation.coordinate.latitude,
-            lastLocation.coordinate.longitude);
   [self.joinableStrandsAdapter fetchJoinableStrandsNearLatitude:lastLocation.coordinate.latitude
                                                       longitude:lastLocation.coordinate.longitude
                                                 completionBlock:^(DFPeanutSearchResponse *response)
@@ -105,7 +100,7 @@ static DFStrandsManager *defaultStrandsManager;
     }
     
     unsigned int joinableStrandsCount = (unsigned int)response.objects.count;
-    DDLogInfo(@"%d joinable strands nearby.", joinableStrandsCount);
+    DDLogVerbose(@"%d joinable strands nearby.", joinableStrandsCount);
     
     [[NSNotificationCenter defaultCenter]
      postNotificationName:DFStrandJoinableStrandsNearbyNotificationName
@@ -118,8 +113,6 @@ static DFStrandsManager *defaultStrandsManager;
 {
   if (self.isNewPhotoCountFetchInProgress) return;
   self.isNewPhotoCountFetchInProgress = YES;
-
-  DDLogInfo(@"Updating new photo counts.");
   
   NSDate *galleryLastSeenDate = [DFStrandStore galleryLastSeenDate];
   if (!galleryLastSeenDate) galleryLastSeenDate = [NSDate dateWithTimeIntervalSince1970:0];
@@ -144,11 +137,10 @@ static DFStrandsManager *defaultStrandsManager;
         }
       }
     }
-    
-    DDLogInfo(@"%d unseen photos in joined strands since %@", newCount, galleryLastSeenDate);
+
     [DFStrandStore SaveUnseenPhotosCount:newCount];
-    
     if (newCount != oldCount) {
+      DDLogVerbose(@"%d unseen photos in joined strands since %@", newCount, galleryLastSeenDate);
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandUnseenPhotosUpdatedNotificationName
        object:self

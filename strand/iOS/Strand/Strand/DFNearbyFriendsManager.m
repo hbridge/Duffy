@@ -56,9 +56,9 @@ static DFNearbyFriendsManager *defaultManager;
    completionBlock:^(DFPeanutMessageResponse *response, NSError *error) {
      self.isUpdatingNearbyFriends = NO;
      if (!error) {
+       if ([self.lastResponse.message isEqualToString:response.message]) return;
        DDLogInfo(@"%@ updated nearby friends message. newMessage:%@ oldMessage:%@",
                  [[self class] description], response.message, self.lastResponse.message);
-       if ([self.lastResponse.message isEqualToString:response.message]) return;
        self.lastResponse = response;
        [[NSNotificationCenter defaultCenter]
         postMainThreadNotificationName:DFNearbyFriendsMessageUpdatedNotificationName

@@ -52,9 +52,7 @@ NSString *const GalleryPath = @"neighbors";
                               method:RKRequestMethodGET
                               path:GalleryPath
                               parameters:nil
-                              ];
-  DDLogVerbose(@"%@ getting endpoint: %@", [self class], getRequest.URL.absoluteString);
-  
+                              ];  
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]
    objectRequestOperationWithRequest:getRequest

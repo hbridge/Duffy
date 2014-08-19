@@ -52,8 +52,6 @@ NSString *const AccuracyKey = @"accuracy";
                                            LongitudeKey: @(location.coordinate.longitude),
                                            AccuracyKey: @(location.horizontalAccuracy),
                                            }];
-  DDLogVerbose(@"%@ getting endpoint: %@", [[self class] description], getRequest.URL.absoluteString);
-  
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]
    objectRequestOperationWithRequest:getRequest

@@ -59,7 +59,6 @@ static DFBackgroundLocationManager *defaultManager;
     if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
       [self.locationManager startUpdatingLocation];
     }
-    [self startUpdatingOnSignificantLocationChange];
   }
   return self;
 }

@@ -46,7 +46,7 @@ static DFSocketsManager *defaultManager;
 }
 
 - (void) sendMessage:(NSString *)message {
-  DDLogInfo(@"Socket sending message: %@", message);
+  DDLogInfo(@"%@ sending message: %@", self.class, message);
 	NSData *data = [[NSData alloc] initWithData:[message dataUsingEncoding:NSASCIIStringEncoding]];
 	[self.outputStream write:[data bytes] maxLength:[data length]];
 }
@@ -55,7 +55,7 @@ static DFSocketsManager *defaultManager;
   switch (streamEvent) {
       
 		case NSStreamEventOpenCompleted:
-			DDLogInfo(@"Successfully opened stream to server");
+			DDLogInfo(@"%@ successfully opened %@ to server", self.class, theStream.class);
       self.sentUserId = NO;
 			break;
       

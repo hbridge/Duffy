@@ -65,7 +65,6 @@ NSString *const LongitudeParameter = @"lon";
                                            LatitudeParameter : @(latitude),
                                            LongitudeParameter : @(longitude)
                                            }];
-  DDLogVerbose(@"DFPeanutJoinableStrandsAdapter getting endpoint: %@", getRequest.URL.absoluteString);
   
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]

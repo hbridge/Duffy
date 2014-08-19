@@ -162,7 +162,6 @@
 
 - (void)performForegroundOperations
 {
-  DDLogInfo(@"AppDelegate performForegroundOperation");
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
     if ([self isAppSetupComplete]) {
       [[DFUploadController sharedUploadController] uploadPhotos];
@@ -180,12 +179,10 @@
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
-  DDLogInfo(@"AppDelegate appWillResignActive");
   [DFAnalytics CloseAnalyticsSession];
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
-  DDLogInfo(@"AppDelegate appDidenterBackground");
   [[NSUserDefaults standardUserDefaults] synchronize];
   [[DFPhotoStore sharedStore] saveContext];
   [[DFContactsStore sharedStore] saveContext];
@@ -199,13 +196,11 @@
 
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
-  DDLogInfo(@"AppDelegate for %@ appWillEnterForeground.", [DFAppInfo appInfoString]);
   if (!self.window.rootViewController) [self createRootViewController];
   [DFAnalytics ResumeAnalyticsSession];
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
-  DDLogInfo(@"AppDelegate for %@ appDidBecomeActive.", [DFAppInfo appInfoString]);
   [DFAnalytics StartAnalyticsSession];
   [self performForegroundOperations];
   [DFPushNotificationsManager refreshPushToken];

@@ -55,8 +55,6 @@ NSString *const StartDateTimeParameter = @"start_date_time";
                               parameters:@{
                                            StartDateTimeParameter : dateString,
                                            }];
-  DDLogVerbose(@"DFPeanutNewPhotosAdapter getting endpoint: %@", getRequest.URL.absoluteString);
-  
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]
    objectRequestOperationWithRequest:getRequest
