@@ -135,6 +135,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+  [self reloadFeed];
 }
 
 - (void)viewDidAppear:(BOOL)animated

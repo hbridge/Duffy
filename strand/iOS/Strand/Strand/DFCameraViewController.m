@@ -492,7 +492,7 @@ const unsigned int SavePromptMinPhotos = 3;
        
        // Tell the feeds to refresh
        [[NSNotificationCenter defaultCenter]
-        postNotificationName:DFStrandPhotoSavedNotificationName
+        postNotificationName:DFStrandCameraPhotoSavedNotificationName
         object:self];
        
        [[DFUploadController sharedUploadController] uploadPhotos];
