@@ -213,10 +213,9 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
     newData = YES;
   }
   
-  if (self.delegate) {
+  if (self.delegate && newData) {
     DDLogInfo(@"Refreshing the view.");
-    [self.delegate strandsViewController:self
-             didUpdateData:newData];
+    [self.delegate strandsViewControllerUpdatedData:self];
   }
 }
 
@@ -234,8 +233,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)reloadFeedIsSilent:(BOOL)isSilent
 {
-  NSLog(@"Calling reload with %lu photos", (unsigned long)self.sectionObjects.count);
-  
   [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
                                                          NSData *hashData,
                                                          NSError *error) {

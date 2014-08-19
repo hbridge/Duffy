@@ -14,8 +14,7 @@
 @class DFStrandsViewController;
 @protocol DFStrandViewControllerDelegate <NSObject>
 
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-           didUpdateData:(BOOL)newData;
+- (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController;
 - (void)strandsViewController:(DFStrandsViewController *)strandsViewController
 didFinishServerFetchWithError:(NSError *)error;
 

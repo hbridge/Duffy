@@ -179,23 +179,20 @@ const CGFloat LockedCellHeight = 157.0;
 
 #pragma mark - DFStrandsViewControllerDelegate
 
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-           didUpdateData:(BOOL)newData
+- (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
 {
-  if (newData) {
-    // Reload the table view
-    [self.tableView reloadData];
-  }
+  [self.tableView reloadData];
+}
+
+- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:(NSError *)error
+{
+  // Turn off spinner since we successfully did a server fetch
+  [self.refreshControl endRefreshing];
   
   if (self.requestedPhotoIDToJumpTo != 0) {
     [self showPhoto:self.requestedPhotoIDToJumpTo];
     self.requestedPhotoIDToJumpTo = 0;
   }
-}
-
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:(NSError *)error
-{
-  [self.refreshControl endRefreshing];
 }
 
 #pragma mark - Table view data source: sections
