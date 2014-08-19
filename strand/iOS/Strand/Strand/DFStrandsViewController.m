@@ -119,7 +119,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(refreshView)
-                                               name:DFStrandPhotoSavedNotificationName
+                                               name:DFStrandCameraPhotoSavedNotificationName
                                              object:nil];
 }
 
