@@ -27,18 +27,23 @@
 
 - (void)promptForPushNotifsIfNecessary
 {
-  DFPermissionStateType notifsState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
-  if (!notifsState || [notifsState isEqual:DFPermissionStateNotRequested]) {
-    DDLogInfo(@"%@ prompting for push notifs.", self.class);
-    UIAlertView *alertView = [[UIAlertView alloc]
-                              initWithTitle:@"Receive Updates"
-                              message:@"Would you like to get notifications when friends add photos?"
-                              delegate:self
-                              cancelButtonTitle:@"Not Now"
-                              otherButtonTitles:@"Yes", nil];
-    alertView.delegate = self;
-    [alertView show];
-  }
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    DFPermissionStateType notifsState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
+    if (!notifsState || [notifsState isEqual:DFPermissionStateNotRequested]) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        DDLogInfo(@"%@ prompting for push notifs.", self.class);
+        UIAlertView *alertView = [[UIAlertView alloc]
+                                  initWithTitle:@"Receive Updates"
+                                  message:@"Would you like to get notifications when friends add photos?"
+                                  delegate:self
+                                  cancelButtonTitle:@"Not Now"
+                                  otherButtonTitles:@"Yes", nil];
+        alertView.delegate = self;
+        [alertView show];
+        
+      });
+    }
+  });
 }
 
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
