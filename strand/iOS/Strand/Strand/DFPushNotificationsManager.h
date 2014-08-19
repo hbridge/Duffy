@@ -8,9 +8,12 @@
 
 #import <Foundation/Foundation.h>
 
-@interface DFPushNotificationsManager : NSObject
+@interface DFPushNotificationsManager : NSObject <UIAlertViewDelegate>
 
-+ (void)requestPushNotifs;
++ (DFPushNotificationsManager *)sharedManager;
+
+- (void)promptForPushNotifsIfNecessary;
++ (void)requestPushNotifsPermission;
 + (void)refreshPushToken;
 + (void)registerDeviceToken:(NSData *)data;
 + (void)registerFailedWithError:(NSError *)error;

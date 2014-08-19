@@ -13,8 +13,47 @@
 
 @implementation DFPushNotificationsManager
 
++ (DFPushNotificationsManager *)sharedManager
+{
+  static DFPushNotificationsManager *defaultManager = nil;
+  if (!defaultManager) defaultManager = [[super allocWithZone:nil] init];
+  return defaultManager;
+}
 
-+ (void)requestPushNotifs
++ (id)allocWithZone:(struct _NSZone *)zone
+{
+  return [self sharedManager];
+}
+
+- (void)promptForPushNotifsIfNecessary
+{
+  DFPermissionStateType notifsState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
+  if (!notifsState || [notifsState isEqual:DFPermissionStateNotRequested]) {
+    DDLogInfo(@"%@ prompting for push notifs.", self.class);
+    UIAlertView *alertView = [[UIAlertView alloc]
+                              initWithTitle:@"Receive Updates"
+                              message:@"Would you like to get notifications when friends add photos?"
+                              delegate:self
+                              cancelButtonTitle:@"Not Now"
+                              otherButtonTitles:@"Yes", nil];
+    alertView.delegate = self;
+    [alertView show];
+  }
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex
+{
+  if (buttonIndex == 0) {
+    DDLogInfo(@"%@ user said Not Now to push prompt.", self.class);
+    [DFDefaultsStore setState:DFPermissionStatePreRequestedNotNow forPermission:DFPermissionRemoteNotifications];
+  } else {
+    DDLogInfo(@"%@ user said Yes to push prompt.", self.class);
+    [DFDefaultsStore setState:DFPermissionStatePreRequestedYes forPermission:DFPermissionRemoteNotifications];
+    [self.class requestPushNotifsPermission];
+  }
+}
+
++ (void)requestPushNotifsPermission
 {
   DDLogInfo(@"%@ requesting push notifications.", self);
   [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
@@ -24,7 +63,8 @@
 + (void)refreshPushToken
 {
   [DFDefaultsStore setLastNotificationType:[[UIApplication sharedApplication] enabledRemoteNotificationTypes]];
-  if ([[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStateGranted]) {
+  if ([[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStateGranted]
+      || [[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStatePreRequestedYes]) {
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
   }

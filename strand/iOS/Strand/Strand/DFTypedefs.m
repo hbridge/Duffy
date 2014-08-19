@@ -12,7 +12,8 @@ DFPermissionType const DFPermissionContacts = @"Contacts";
 
 // Permission states
 DFPermissionStateType const DFPermissionStateNotRequested = @"NotRequested";
-DFPermissionStateType const DFPermissionStatePreRequested = @"PreRequested";
+DFPermissionStateType const DFPermissionStatePreRequestedNotNow = @"PreRequestedNotNow";
+DFPermissionStateType const DFPermissionStatePreRequestedYes = @"PreRequestedYes";
 DFPermissionStateType const DFPermissionStateGranted = @"Granted";
 DFPermissionStateType const DFPermissionStateDenied = @"Denied";
 DFPermissionStateType const DFPermissionStateUnavailable = @"Unavailable";

@@ -21,6 +21,7 @@
 #import "DFUploadController.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFStrandsViewController.h"
+#import "DFPushNotificationsManager.h"
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
@@ -155,6 +156,13 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                      selector:@selector(autoReloadFeed)
                                      userInfo:nil
                                       repeats:YES];
+  }
+  
+  // if the user has real content in their feed, prompt for push notifications
+  NSString *firstSectionTitle = [(DFPeanutSearchObject *)self.sectionObjects.firstObject title];
+  if (self.sectionObjects.count > 1 ||
+      (self.sectionObjects.count == 1 && ![firstSectionTitle isEqualToString:@"Locked"])) {
+    [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
 }
 
