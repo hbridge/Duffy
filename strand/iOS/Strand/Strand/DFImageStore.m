@@ -14,7 +14,7 @@
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 @property (nonatomic, retain) NSMutableSet *remoteLoadsInProgress;
-@property (nonatomic, retain) NSMutableDictionary *deferredCompletionBlocks;
+@property (atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (atomic, retain) NSMutableDictionary *fullImageCache;
 
 @end
