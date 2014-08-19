@@ -6,22 +6,25 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFStrandsViewController.h"
-#import "DFStrandConstants.h"
-#import "DFBadgeButton.h"
-#import "DFPeanutNotificationsManager.h"
 #import "WYPopoverController.h"
 #import "RootViewController.h"
-#import "DFSettingsViewController.h"
-#import "DFNavigationController.h"
+
+#import "DFBadgeButton.h"
+#import "DFErrorScreen.h"
 #import "DFInviteUserViewController.h"
-#import "DFPeanutGalleryAdapter.h"
-#import "DFPhotoStore.h"
-#import "DFPeanutSearchObject.h"
-#import "DFUploadController.h"
+#import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFPeanutGalleryAdapter.h"
+#import "DFPeanutNotificationsManager.h"
+#import "DFPeanutSearchObject.h"
+#import "DFPhotoStore.h"
+#import "DFSettingsViewController.h"
 #import "DFStrandsViewController.h"
 #import "DFPushNotificationsManager.h"
+#import "DFStrandConstants.h"
+#import "DFToastNotificationManager.h"
+#import "DFUploadController.h"
+
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
@@ -153,7 +156,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
       self.autoRefreshTimer =
       [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
                                        target:self
-                                     selector:@selector(autoReloadFeed)
+                                     selector:@selector(reloadFeed)
                                      userInfo:nil
                                       repeats:YES];
   }
@@ -187,33 +190,30 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)refreshView
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self refreshView:YES isSlient:YES error:nil];
+    [self refreshView:NO];
   });
 }
 
 /*
  * Refresh the current view.  Very cheap and fast.
- * Only calls the child view to re-render
+ * Figures out if there's any photos currently being processed, to be shown in the uploading bar
+ * Then calls the child view to re-render
  */
-- (void)refreshView:(BOOL)withNewData
-           isSlient:(BOOL)isSilent
-              error:(NSError *)error
+- (void)refreshView:(BOOL)withNewServerData
 {
-  BOOL newData = withNewData;
+  BOOL newData = withNewServerData;
   NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
   
   if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
     self.uploadingPhotos = unprocessedFeedPhotos;
-    NSLog(@"Setting uploaded photos to count %d", self.uploadingPhotos.count);
+    DDLogDebug(@"Setting uploaded photos to count %lu", (unsigned long)self.uploadingPhotos.count);
     newData = YES;
   }
   
   if (self.delegate) {
     DDLogInfo(@"Refreshing the view.");
     [self.delegate strandsViewController:self
-             didFinishRefreshWithNewData:newData
-                                isSilent:isSilent
-                                   error:error];
+             refreshWithNewData:newData];
   }
 }
 
@@ -230,27 +230,34 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                                          NSData *hashData,
                                                          NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-      BOOL newData = NO;
+      [self.delegate didFinishServerFetch:self];
+    
+      BOOL newServerData = NO;
       if (!error) {
         if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])) {
           DDLogInfo(@"New feed data detected.");
           [self setSectionObjects:response.topLevelSectionObjects];
           self.lastResponseHash = hashData;
-          newData = YES;
+          newServerData = YES;
         }
       }
-      [self refreshView:newData isSlient:isSilent error:error];
+      // We know there's been an error
+      // If there's no data, show a nice message on the screen instead of a dropdown
+      else if (self.sectionObjects.count == 0) {
+        [self showConnectionError:error];
+      }
+      // If there is data, then show a dropdown only if it wasn't a silent reload
+      else if (!isSilent) {
+        [[DFToastNotificationManager sharedInstance]
+         showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
+      }
+      
+      [self refreshView:newServerData];
     });
   }];
   
   [[DFUploadController sharedUploadController] uploadPhotos];
 }
-
-- (void)autoReloadFeed
-{
-  [self reloadFeedIsSilent:YES];
-}
-
 
 - (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects
 {
@@ -301,6 +308,20 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   _sectionObjects = sectionObjects;
 }
 
+
+- (void)showConnectionError:(NSError *)error
+{
+  [self.connectionErrorPlaceholder removeFromSuperview];
+  if (error) {
+    DFErrorScreen *errorScreen = [[[UINib nibWithNibName:@"DFErrorScreen" bundle:nil]
+                                   instantiateWithOwner:self options:nil] firstObject];
+    errorScreen.textView.text = error.localizedDescription;
+    self.connectionErrorPlaceholder = errorScreen;
+    [self.view addSubview:self.connectionErrorPlaceholder];
+  } else {
+    self.connectionErrorPlaceholder = nil;
+  }
+}
 
 #pragma mark - Navbar Action Handlers
 
