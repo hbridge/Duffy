@@ -117,6 +117,10 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                            selector:@selector(notificationsChanged:)
                                                name:DFStrandNotificationsUpdatedNotification
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(refreshView)
+                                               name:DFStrandPhotoSavedNotificationName
+                                             object:nil];
 }
 
 #pragma mark - View Controller lifetime methods
@@ -166,6 +170,45 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   self.autoRefreshTimer = nil;
 }
 
+/*
+ * Refresh the view without a network call.  Cheap and fast but this always redraws the view
+ * This should be called after a photo is taken for instance since we don't need to refresh the feed
+ *
+ * For methods that fetch the feed from the server, call reloadFeed
+ */
+- (void)refreshView
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self refreshView:YES isSlient:YES error:nil];
+  });
+}
+
+/*
+ * Refresh the current view.  Very cheap and fast.
+ * Only calls the child view to re-render
+ */
+- (void)refreshView:(BOOL)withNewData
+           isSlient:(BOOL)isSilent
+              error:(NSError *)error
+{
+  BOOL newData = withNewData;
+  NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
+  
+  if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
+    self.uploadingPhotos = unprocessedFeedPhotos;
+    NSLog(@"Setting uploaded photos to count %d", self.uploadingPhotos.count);
+    newData = YES;
+  }
+  
+  if (self.delegate) {
+    DDLogInfo(@"Refreshing the view.");
+    [self.delegate strandsViewController:self
+             didFinishRefreshWithNewData:newData
+                                isSilent:isSilent
+                                   error:error];
+  }
+}
+
 #pragma mark - Strand data fetching
 
 - (void)reloadFeed
@@ -181,26 +224,17 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
     dispatch_async(dispatch_get_main_queue(), ^{
       BOOL newData = NO;
       if (!error) {
-        NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:response.objects];
-        
-        if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])
-            || ![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
-          DDLogInfo(@"New feed data detected. Re-rendering feed.");
-          [self setSectionObjects:response.topLevelSectionObjects
-                  uploadingPhotos:unprocessedFeedPhotos];
-          
+        if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])) {
+          DDLogInfo(@"New feed data detected.");
+          [self setSectionObjects:response.topLevelSectionObjects];
           self.lastResponseHash = hashData;
           newData = YES;
         }
       }
-      
-      if (self.delegate) [self.delegate strandsViewController:self
-                                  didFinishRefreshWithNewData:newData
-                                                     isSilent:isSilent
-                                                        error:error];
+      [self refreshView:newData isSlient:isSilent error:error];
     });
   }];
-
+  
   [[DFUploadController sharedUploadController] uploadPhotos];
 }
 
@@ -233,7 +267,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 }
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
-          uploadingPhotos:(NSArray *)uploadingPhotos
 {
   NSMutableDictionary *objectsByID = [NSMutableDictionary new];
   NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
@@ -258,7 +291,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   _objectsByID = objectsByID;
   _indexPathsByID = indexPathsByID;
   _sectionObjects = sectionObjects;
-  _uploadingPhotos = uploadingPhotos;
 }
 
 
