@@ -463,8 +463,8 @@ const unsigned int SavePromptMinPhotos = 3;
     DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)),
                    dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:retryNumber + 1];
-    });
+                     [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:retryNumber + 1];
+                   });
     
     return;
   }
@@ -489,6 +489,12 @@ const unsigned int SavePromptMinPhotos = 3;
      context:context
      completionBlock:^{
        DDLogInfo(@"%@ image saved.", [self.class description]);
+       
+       // Tell the feeds to refresh
+       [[NSNotificationCenter defaultCenter]
+        postNotificationName:DFStrandPhotoSavedNotificationName
+        object:self];
+       
        [[DFUploadController sharedUploadController] uploadPhotos];
      }];
   });

@@ -30,6 +30,8 @@ NSString *const DFStrandJoinableStrandsCountKey = @"DFStrandJoinableStrandsCount
 
 NSString *const DFStrandRefreshRemoteUIRequestedNotificationName = @"com.duffyapp.Strand.DFStrandRefreshRemoteUIRequestedNotificationName";
 
+NSString *const DFStrandPhotoSavedNotificationName = @"com.duffyapp.Strand.DFStrandPhotoSavedNotificationName";
+
 UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor
