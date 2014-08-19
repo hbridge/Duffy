@@ -15,8 +15,9 @@
 @protocol DFStrandViewControllerDelegate <NSObject>
 
 - (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-           refreshWithNewData:(BOOL)newData;
-- (void)didFinishServerFetch:(DFStrandsViewController *)strandsViewController;
+           didUpdateData:(BOOL)newData;
+- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
+didFinishServerFetchWithError:(NSError *)error;
 
 @end
 
@@ -30,8 +31,6 @@
 @property (nonatomic, retain) NSDictionary *objectsByID;
 @property (nonatomic, retain) NSArray *uploadingPhotos;
 @property (nonatomic, retain) NSError *uploadError;
-
-@property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
 // Delegate
 @property (nonatomic, weak) id<DFStrandViewControllerDelegate> delegate;

@@ -26,7 +26,7 @@ extern NSString *const DFStrandJoinableStrandsNearbyNotificationName;
 extern NSString *const DFStrandJoinableStrandsCountKey;
 extern NSString *const DFStrandLastFetchAttemptDateDefaultsKey;
 
-extern NSString *const DFStrandRefreshRemoteUIRequestedNotificationName;
+extern NSString *const DFStrandReloadRemoteUIRequestedNotificationName;
 extern NSString *const DFStrandCameraPhotoSavedNotificationName;
 
 

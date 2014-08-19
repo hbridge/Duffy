@@ -113,7 +113,7 @@ static DFSocketsManager *defaultManager;
   if ([command isEqualToString:@"refresh"]) {
     DDLogInfo(@"Was told to refresh my feed, with id %@", value);
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:DFStrandRefreshRemoteUIRequestedNotificationName
+     postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
      object:self];
     
     [self sendMessage:[NSString stringWithFormat:@"ack:%@",value]];

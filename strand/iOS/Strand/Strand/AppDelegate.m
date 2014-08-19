@@ -168,7 +168,7 @@
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
       [[NSNotificationCenter defaultCenter]
-       postNotificationName:DFStrandRefreshRemoteUIRequestedNotificationName
+       postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];
     }
   } else {
@@ -261,7 +261,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
       [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:pushNotif.message];
     }    
     [[NSNotificationCenter defaultCenter]
-     postNotificationName:DFStrandRefreshRemoteUIRequestedNotificationName
+     postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
      object:self];
   }
   

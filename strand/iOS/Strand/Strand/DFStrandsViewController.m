@@ -37,6 +37,9 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 @property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
 
+@property (nonatomic, retain) UIView *connectionErrorPlaceholder;
+@property (nonatomic, retain) UIView *nuxPlaceholder;
+
 @end
 
 @implementation DFStrandsViewController
@@ -110,8 +113,8 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(reloadFeed)
-                                               name:DFStrandRefreshRemoteUIRequestedNotificationName
+                                           selector:@selector(reloadFeedSilently)
+                                               name:DFStrandReloadRemoteUIRequestedNotificationName
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(uploadStatusChanged:)
@@ -139,7 +142,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self reloadFeed];
+  [self reloadFeedSilently];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -156,7 +159,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
       self.autoRefreshTimer =
       [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
                                        target:self
-                                     selector:@selector(reloadFeed)
+                                     selector:@selector(reloadFeedSilently)
                                      userInfo:nil
                                       repeats:YES];
   }
@@ -213,7 +216,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   if (self.delegate) {
     DDLogInfo(@"Refreshing the view.");
     [self.delegate strandsViewController:self
-             refreshWithNewData:newData];
+             didUpdateData:newData];
   }
 }
 
@@ -224,35 +227,59 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   [self reloadFeedIsSilent:NO];
 }
 
+- (void)reloadFeedSilently
+{
+  [self reloadFeedIsSilent:YES];
+}
+
 - (void)reloadFeedIsSilent:(BOOL)isSilent
 {
+  NSLog(@"Calling reload with %lu photos", (unsigned long)self.sectionObjects.count);
+  
   [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
                                                          NSData *hashData,
                                                          NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-      [self.delegate didFinishServerFetch:self];
-    
       BOOL newServerData = NO;
+      
       if (!error) {
+        DDLogInfo(@"New feed data received from server");
+        // Remove error screen incase it was showing
+        [self setShowConnectionError:NO withError:nil];
+        
+        // See if we have have existing data, if not, show the NUX screen
+        if (response.objects.count == 0 && self.uploadingPhotos.count == 0) {
+          [self setShowNuxPlaceholder:YES];
+        } else {
+          [self setShowNuxPlaceholder:NO];
+        }
+        
         if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])) {
-          DDLogInfo(@"New feed data detected.");
+          // We have data, so remove the NUX screen
+          [self setShowNuxPlaceholder:NO];
+          
+          // Update the objects, the child views use this
           [self setSectionObjects:response.topLevelSectionObjects];
           self.lastResponseHash = hashData;
           newServerData = YES;
         }
-      }
-      // We know there's been an error
-      // If there's no data, show a nice message on the screen instead of a dropdown
-      else if (self.sectionObjects.count == 0) {
-        [self showConnectionError:error];
-      }
-      // If there is data, then show a dropdown only if it wasn't a silent reload
-      else if (!isSilent) {
-        [[DFToastNotificationManager sharedInstance]
-         showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
+      } else {
+        DDLogInfo(@"Error when trying to get feed from server");
+        // Upon any error, we want to hide the NUX page
+        [self setShowNuxPlaceholder:NO];
+        
+        // If there's no data, show a nice message on the screen instead of a dropdown
+        if (self.sectionObjects.count == 0) {
+          [self setShowConnectionError:YES withError:error];
+        } else if (!isSilent) {
+          // If there is data, then show a dropdown if it wasn't a silent reload
+          [[DFToastNotificationManager sharedInstance]
+           showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
+        }
       }
       
       [self refreshView:newServerData];
+      [self.delegate strandsViewController:self didFinishServerFetchWithError:error];
     });
   }];
   
@@ -309,10 +336,10 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 }
 
 
-- (void)showConnectionError:(NSError *)error
+- (void)setShowConnectionError:(BOOL)isShown withError:(NSError *)error
 {
   [self.connectionErrorPlaceholder removeFromSuperview];
-  if (error) {
+  if (isShown) {
     DFErrorScreen *errorScreen = [[[UINib nibWithNibName:@"DFErrorScreen" bundle:nil]
                                    instantiateWithOwner:self options:nil] firstObject];
     errorScreen.textView.text = error.localizedDescription;
@@ -320,6 +347,19 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
     [self.view addSubview:self.connectionErrorPlaceholder];
   } else {
     self.connectionErrorPlaceholder = nil;
+  }
+}
+
+- (void)setShowNuxPlaceholder:(BOOL)isShown
+{
+  if (isShown) {
+    if (self.nuxPlaceholder) return;
+    self.nuxPlaceholder = [[[UINib nibWithNibName:@"FeedViewNuxPlaceholder" bundle:nil]
+                            instantiateWithOwner:self options:nil] firstObject];
+    [self.view addSubview:self.nuxPlaceholder];
+  } else {
+    [self.nuxPlaceholder removeFromSuperview];
+    self.nuxPlaceholder = nil;
   }
 }
 
@@ -383,7 +423,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   if (!uploadStats.fatalError) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),
                    dispatch_get_main_queue(), ^{
-                     [self reloadFeed];
+                     [self reloadFeedSilently];
                    });
   }
 }

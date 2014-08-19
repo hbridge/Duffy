@@ -51,8 +51,6 @@ const CGFloat LockedCellHeight = 157.0;
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 
-@property (nonatomic, retain) UIView *nuxPlaceholder;
-
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
 
@@ -182,16 +180,11 @@ const CGFloat LockedCellHeight = 157.0;
 #pragma mark - DFStrandsViewControllerDelegate
 
 - (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-           refreshWithNewData:(BOOL)newData
+           didUpdateData:(BOOL)newData
 {
   if (newData) {
-    // If we don't have any data and we aren't uploading any photos, show NUX page
-    if (self.sectionObjects.count == 0 && self.uploadingPhotos.count == 0) {
-      [self setShowNuxPlaceholder:YES];
-    } else {
-      // Normal case, reload the table view
-      [self.tableView reloadData];
-    }
+    // Reload the table view
+    [self.tableView reloadData];
   }
   
   if (self.requestedPhotoIDToJumpTo != 0) {
@@ -200,22 +193,9 @@ const CGFloat LockedCellHeight = 157.0;
   }
 }
 
-- (void)didFinishServerFetch:(DFStrandsViewController *)strandsViewController
+- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:(NSError *)error
 {
   [self.refreshControl endRefreshing];
-}
-
-- (void)setShowNuxPlaceholder:(BOOL)isShown
-{
-  if (isShown) {
-    if (self.nuxPlaceholder) return;
-    self.nuxPlaceholder = [[[UINib nibWithNibName:@"FeedViewNuxPlaceholder" bundle:nil]
-                          instantiateWithOwner:self options:nil] firstObject];
-    [self.view addSubview:self.nuxPlaceholder];
-  } else {
-    [self.nuxPlaceholder removeFromSuperview];
-    self.nuxPlaceholder = nil;
-  }
 }
 
 #pragma mark - Table view data source: sections
