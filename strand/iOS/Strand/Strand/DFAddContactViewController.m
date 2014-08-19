@@ -10,6 +10,7 @@
 #import "Formkit.h"
 #import "DFContactsStore.h"
 #import "UIAlertView+DFHelpers.h"
+#import "DFAnalytics.h"
 
 @interface DFAddContactViewController ()
 
@@ -39,6 +40,12 @@
   [super viewDidLoad];
   
   [self configureForm];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)configureForm
@@ -92,9 +99,11 @@
   if (self.formModel.invalidAttributes.count > 0) {
     [UIAlertView showSimpleAlertWithTitle:@"Invalid Entry"
                             formatMessage:@"You have entered invalid information.  Please try again."];
+    [DFAnalytics logAddContactCompletedWithResult:@"ValidationFailure"];
     return;
   }
-  
+
+  [DFAnalytics logAddContactCompletedWithResult:@"Success"];
   [self.formModel save];
   [[DFContactsStore sharedStore]
    createContactWithName:self.contact.name

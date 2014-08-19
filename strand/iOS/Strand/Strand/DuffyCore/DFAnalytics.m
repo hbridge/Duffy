@@ -386,13 +386,13 @@ static DFAnalytics *defaultLogger;
                           }];
 }
 
-+ (void)logSetupContactsCompletedWithResult:(NSString *)result
-                        userTappedLearnMore:(BOOL)didTapLearnMore
++ (void)logSetupContactsCompletedWithABPermission:(int)status
+                                 numAddedManually:(NSUInteger)numAddedManually
 {
   [DFAnalytics logEvent:SetupContactsCompleted
          withParameters:@{
-                          ResultKey: result,
-                          @"didPressLearnMore" : [NSNumber numberWithBool:didTapLearnMore]
+                          DFPermissionContacts: [self.class stateFromABAuthStatus:status],
+                          @"numAddedManually": @(numAddedManually),
                           }];
 }
 
@@ -534,5 +534,10 @@ static DFAnalytics *defaultLogger;
   }
 }
 
+
++ (void)logAddContactCompletedWithResult:(NSString *)result
+{
+  [self logEvent:@"AddManualContact" withParameters:@{ResultKey: result}];
+}
 
 @end

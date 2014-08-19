@@ -10,7 +10,6 @@
 #import <MessageUI/MFMessageComposeViewController.h>
 #import "DFTypedefs.h"
 
-
 @interface DFAnalytics : NSObject
 
 extern NSString * const DFAnalyticsActionTypeSwipe;
@@ -30,10 +29,8 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result;
 + (void)logSetupLocationCompletedWithResult:(NSString *)result
                         userTappedLearnMore:(BOOL)didTapLearnMore;
-+ (void)logSetupContactsCompletedWithResult:(NSString *)result
-                        userTappedLearnMore:(BOOL)didTapLearnMore;
-
-
++ (void)logSetupContactsCompletedWithABPermission:(int)status
+                                 numAddedManually:(NSUInteger)numAddedManually;
 
 + (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
                                               newType:(UIRemoteNotificationType)newType;
@@ -75,8 +72,8 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
                   presentingViewController:(UIViewController *)presentingViewController;
 
 
-
-
+/* Contacts */
++ (void)logAddContactCompletedWithResult:(NSString *)result;
 
 
 @end

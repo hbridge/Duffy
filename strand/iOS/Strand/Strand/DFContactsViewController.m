@@ -17,8 +17,6 @@
 #import "SVProgressHUD.h"
 #import "DFLocationPermissionViewController.h"
 
-
-
 @interface DFContactsViewController ()
 
 @property (nonatomic, retain) DFAddContactViewController *addContactController;
@@ -36,7 +34,6 @@
   }
   return self;
 }
-
 
 - (void)viewDidLoad
 {
@@ -56,6 +53,13 @@
                                               action:@selector(showNextStep)];
   }
   [self.tableView reloadData];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self
+          appearedWithParameters:@{@"showAsNUXStep": @(self.showAsNUXStep)}];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -155,8 +159,6 @@
     if (granted) {
       [[DFContactSyncManager sharedManager] sync];
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
-      //        [DFAnalytics logSetupContactsCompletedWithResult:DFAnalyticsValueResultSuccess
-      //                                     userTappedLearnMore:self.learnMoreWasPressed];
       [[DFContactSyncManager sharedManager] sync];
       dispatch_async(dispatch_get_main_queue(), ^{
         [SVProgressHUD showSuccessWithStatus:@"Success!"];
@@ -168,8 +170,6 @@
       }
     } else {
       [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionContacts];
-      //        [DFAnalytics logSetupContactsCompletedWithResult:DFAnalyticsValueResultFailure
-      //                                     userTappedLearnMore:self.learnMoreWasPressed];
       dispatch_async(dispatch_get_main_queue(), ^{
         [self.tableView reloadData];
       });
@@ -186,6 +186,8 @@
 
 - (void)showNextStep
 {
+  [DFAnalytics logSetupContactsCompletedWithABPermission:ABAddressBookGetAuthorizationStatus()
+                                        numAddedManually:self.manualContacts.count];
   DFLocationPermissionViewController *lvc = [[DFLocationPermissionViewController alloc] init];
   [self.navigationController setViewControllers:@[lvc] animated:YES];
 }
