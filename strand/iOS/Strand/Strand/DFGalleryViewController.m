@@ -82,14 +82,17 @@ static const CGFloat SectionHeaderHeight = 54;
 
 }
 
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-  didFinishRefreshWithNewData:(BOOL)newData
-                     isSilent:(BOOL)isSilent
-                        error:(NSError *)error
+- (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
 {
-  if (newData)
-    [self.collectionView reloadData];
+[self.collectionView reloadData];
 }
+
+- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:error
+{
+  // Don't need to do anything for server refreshes
+}
+
+
 
 # pragma mark - Collection View Datasource
 

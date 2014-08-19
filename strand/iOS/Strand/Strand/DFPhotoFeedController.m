@@ -9,7 +9,6 @@
 #import "DFPhotoFeedController.h"
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
-#import "DFErrorScreen.h"
 #import "DFFeedSectionHeaderView.h"
 #import "DFImageStore.h"
 #import "DFLockedStrandCell.h"
@@ -22,7 +21,6 @@
 #import "DFPhotoMetadataAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFStrandConstants.h"
-#import "DFToastNotificationManager.h"
 #import "DFUploadController.h"
 #import "DFUploadingFeedCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
@@ -52,9 +50,6 @@ const CGFloat LockedCellHeight = 157.0;
 @interface DFPhotoFeedController ()
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
-
-@property (nonatomic, retain) UIView *nuxPlaceholder;
-@property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
@@ -184,66 +179,19 @@ const CGFloat LockedCellHeight = 157.0;
 
 #pragma mark - DFStrandsViewControllerDelegate
 
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-  didFinishRefreshWithNewData:(BOOL)newData
-                     isSilent:(BOOL)isSilent
-                        error:(NSError *)error
-
+- (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
 {
+  [self.tableView reloadData];
+}
+
+- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:(NSError *)error
+{
+  // Turn off spinner since we successfully did a server fetch
   [self.refreshControl endRefreshing];
-  
-  if (self.sectionObjects.count > 0 && newData) {
-    // Normal case, reload the table view
-    [self.tableView reloadData];
-  } else if (self.sectionObjects.count == 0 && newData) {
-    // Eligible to replace feed with placeholder
-    if (!error || [DFDefaultsStore actionCountForAction:DFUserActionTakePhoto] == 0) {
-      [self setShowNuxPlaceholder:YES];
-      [self showConnectionError:nil];
-    } else if (error) {
-      [self setShowNuxPlaceholder:NO];
-      [self showConnectionError:error];
-    }
-  } else {
-    // Error but there are objects in the feed we shouldn't wipe
-    [self setShowNuxPlaceholder:NO];
-    [self showConnectionError:nil];
-    if (error && !isSilent) {
-      [[DFToastNotificationManager sharedInstance]
-       showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
-    }
-  }
   
   if (self.requestedPhotoIDToJumpTo != 0) {
     [self showPhoto:self.requestedPhotoIDToJumpTo];
     self.requestedPhotoIDToJumpTo = 0;
-  }
-}
-
-- (void)setShowNuxPlaceholder:(BOOL)isShown
-{
-  if (isShown) {
-    if (self.nuxPlaceholder) return;
-    self.nuxPlaceholder = [[[UINib nibWithNibName:@"FeedViewNuxPlaceholder" bundle:nil]
-                          instantiateWithOwner:self options:nil] firstObject];
-    [self.view addSubview:self.nuxPlaceholder];
-  } else {
-    [self.nuxPlaceholder removeFromSuperview];
-    self.nuxPlaceholder = nil;
-  }
-}
-
-- (void)showConnectionError:(NSError *)error
-{
-  [self.connectionErrorPlaceholder removeFromSuperview];
-  if (error) {
-    DFErrorScreen *errorScreen = [[[UINib nibWithNibName:@"DFErrorScreen" bundle:nil]
-                                   instantiateWithOwner:self options:nil] firstObject];
-    errorScreen.textView.text = error.localizedDescription;
-    self.connectionErrorPlaceholder = errorScreen;
-    [self.view addSubview:self.connectionErrorPlaceholder];
-  } else {
-    self.connectionErrorPlaceholder = nil;
   }
 }
 

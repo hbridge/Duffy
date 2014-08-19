@@ -59,7 +59,7 @@ static DFStrandsManager *defaultStrandsManager;
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(performFetch:)
-                                                 name:DFStrandRefreshRemoteUIRequestedNotificationName
+                                                 name:DFStrandReloadRemoteUIRequestedNotificationName
                                                object:nil];
   }
   return self;

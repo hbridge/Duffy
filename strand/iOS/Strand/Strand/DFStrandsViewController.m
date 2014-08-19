@@ -6,22 +6,25 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFStrandsViewController.h"
-#import "DFStrandConstants.h"
-#import "DFBadgeButton.h"
-#import "DFPeanutNotificationsManager.h"
 #import "WYPopoverController.h"
 #import "RootViewController.h"
-#import "DFSettingsViewController.h"
-#import "DFNavigationController.h"
+
+#import "DFBadgeButton.h"
+#import "DFErrorScreen.h"
 #import "DFInviteUserViewController.h"
-#import "DFPeanutGalleryAdapter.h"
-#import "DFPhotoStore.h"
-#import "DFPeanutSearchObject.h"
-#import "DFUploadController.h"
+#import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
+#import "DFPeanutGalleryAdapter.h"
+#import "DFPeanutNotificationsManager.h"
+#import "DFPeanutSearchObject.h"
+#import "DFPhotoStore.h"
+#import "DFSettingsViewController.h"
 #import "DFStrandsViewController.h"
 #import "DFPushNotificationsManager.h"
+#import "DFStrandConstants.h"
+#import "DFToastNotificationManager.h"
+#import "DFUploadController.h"
+
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
 
@@ -33,6 +36,9 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 @property (nonatomic, retain) DFBadgeButton *notificationsBadgeButton;
 @property (nonatomic, retain) WYPopoverController *notificationsPopupController;
+
+@property (nonatomic, retain) UIView *connectionErrorPlaceholder;
+@property (nonatomic, retain) UIView *nuxPlaceholder;
 
 @end
 
@@ -107,8 +113,8 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                                name:UIApplicationDidEnterBackgroundNotification
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(reloadFeed)
-                                               name:DFStrandRefreshRemoteUIRequestedNotificationName
+                                           selector:@selector(reloadFeedSilently)
+                                               name:DFStrandReloadRemoteUIRequestedNotificationName
                                              object:nil];
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(uploadStatusChanged:)
@@ -136,7 +142,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self reloadFeed];
+  [self reloadFeedSilently];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -153,7 +159,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
       self.autoRefreshTimer =
       [NSTimer scheduledTimerWithTimeInterval:FeedChangePollFrequency
                                        target:self
-                                     selector:@selector(autoReloadFeed)
+                                     selector:@selector(reloadFeedSilently)
                                      userInfo:nil
                                       repeats:YES];
   }
@@ -187,33 +193,29 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)refreshView
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self refreshView:YES isSlient:YES error:nil];
+    [self refreshView:NO];
   });
 }
 
 /*
  * Refresh the current view.  Very cheap and fast.
- * Only calls the child view to re-render
+ * Figures out if there's any photos currently being processed, to be shown in the uploading bar
+ * Then calls the child view to re-render
  */
-- (void)refreshView:(BOOL)withNewData
-           isSlient:(BOOL)isSilent
-              error:(NSError *)error
+- (void)refreshView:(BOOL)withNewServerData
 {
-  BOOL newData = withNewData;
+  BOOL newData = withNewServerData;
   NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
   
   if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
     self.uploadingPhotos = unprocessedFeedPhotos;
-    NSLog(@"Setting uploaded photos to count %d", self.uploadingPhotos.count);
+    DDLogDebug(@"Setting uploaded photos to count %lu", (unsigned long)self.uploadingPhotos.count);
     newData = YES;
   }
   
-  if (self.delegate) {
+  if (self.delegate && newData) {
     DDLogInfo(@"Refreshing the view.");
-    [self.delegate strandsViewController:self
-             didFinishRefreshWithNewData:newData
-                                isSilent:isSilent
-                                   error:error];
+    [self.delegate strandsViewControllerUpdatedData:self];
   }
 }
 
@@ -224,33 +226,62 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   [self reloadFeedIsSilent:NO];
 }
 
+- (void)reloadFeedSilently
+{
+  [self reloadFeedIsSilent:YES];
+}
+
 - (void)reloadFeedIsSilent:(BOOL)isSilent
 {
   [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
                                                          NSData *hashData,
                                                          NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{
-      BOOL newData = NO;
+      BOOL newServerData = NO;
+      
       if (!error) {
+        DDLogInfo(@"New feed data received from server");
+        // Remove error screen incase it was showing
+        [self setShowConnectionError:NO withError:nil];
+        
+        // See if we have have existing data, if not, show the NUX screen
+        if (response.objects.count == 0 && self.uploadingPhotos.count == 0) {
+          [self setShowNuxPlaceholder:YES];
+        } else {
+          [self setShowNuxPlaceholder:NO];
+        }
+        
         if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])) {
-          DDLogInfo(@"New feed data detected.");
+          // We have data, so remove the NUX screen
+          [self setShowNuxPlaceholder:NO];
+          
+          // Update the objects, the child views use this
           [self setSectionObjects:response.topLevelSectionObjects];
           self.lastResponseHash = hashData;
-          newData = YES;
+          newServerData = YES;
+        }
+      } else {
+        DDLogInfo(@"Error when trying to get feed from server");
+        // Upon any error, we want to hide the NUX page
+        [self setShowNuxPlaceholder:NO];
+        
+        // If there's no data, show a nice message on the screen instead of a dropdown
+        if (self.sectionObjects.count == 0) {
+          [self setShowConnectionError:YES withError:error];
+        } else if (!isSilent) {
+          // If there is data, then show a dropdown if it wasn't a silent reload
+          [[DFToastNotificationManager sharedInstance]
+           showErrorWithTitle:@"Couldn't Reload Feed" subTitle:error.localizedDescription];
         }
       }
-      [self refreshView:newData isSlient:isSilent error:error];
+      
+      [self refreshView:newServerData];
+      [self.delegate strandsViewController:self didFinishServerFetchWithError:error];
     });
   }];
   
   [[DFUploadController sharedUploadController] uploadPhotos];
 }
-
-- (void)autoReloadFeed
-{
-  [self reloadFeedIsSilent:YES];
-}
-
 
 - (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects
 {
@@ -301,6 +332,33 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   _sectionObjects = sectionObjects;
 }
 
+
+- (void)setShowConnectionError:(BOOL)isShown withError:(NSError *)error
+{
+  [self.connectionErrorPlaceholder removeFromSuperview];
+  if (isShown) {
+    DFErrorScreen *errorScreen = [[[UINib nibWithNibName:@"DFErrorScreen" bundle:nil]
+                                   instantiateWithOwner:self options:nil] firstObject];
+    errorScreen.textView.text = error.localizedDescription;
+    self.connectionErrorPlaceholder = errorScreen;
+    [self.view addSubview:self.connectionErrorPlaceholder];
+  } else {
+    self.connectionErrorPlaceholder = nil;
+  }
+}
+
+- (void)setShowNuxPlaceholder:(BOOL)isShown
+{
+  if (isShown) {
+    if (self.nuxPlaceholder) return;
+    self.nuxPlaceholder = [[[UINib nibWithNibName:@"FeedViewNuxPlaceholder" bundle:nil]
+                            instantiateWithOwner:self options:nil] firstObject];
+    [self.view addSubview:self.nuxPlaceholder];
+  } else {
+    [self.nuxPlaceholder removeFromSuperview];
+    self.nuxPlaceholder = nil;
+  }
+}
 
 #pragma mark - Navbar Action Handlers
 
@@ -362,7 +420,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   if (!uploadStats.fatalError) {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.0 * NSEC_PER_SEC)),
                    dispatch_get_main_queue(), ^{
-                     [self reloadFeed];
+                     [self reloadFeedSilently];
                    });
   }
 }

@@ -49,7 +49,7 @@ static DFUserInfoManager *defaultManager;
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(update)
-                                                 name:DFStrandRefreshRemoteUIRequestedNotificationName
+                                                 name:DFStrandReloadRemoteUIRequestedNotificationName
                                                object:nil];
   }
   return self;
