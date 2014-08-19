@@ -34,6 +34,7 @@
 #import "DFContactSyncManager.h"
 #import "DFSocketsManager.h"
 #import "DFContactsStore.h"
+#import "DFPushNotificationsManager.h"
 
 
 @interface AppDelegate ()
@@ -145,7 +146,6 @@
   }
   
   [DFPhotoStore sharedStore];
-  [self requestPushNotifs];
   self.window.rootViewController = [[RootViewController alloc] init];
   [[DFBackgroundLocationManager sharedBackgroundLocationManager]
    startUpdatingOnSignificantLocationChange];
@@ -179,24 +179,6 @@
   }
 }
 
-- (void)requestPushNotifs
-{
-  [self checkForAndLogNotifsChange:[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications]];
-  DDLogInfo(@"Requesting push notifications.");
-  [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-   (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
-}
-
-- (void)checkForAndLogNotifsChange:(DFPermissionStateType)newNotifsState
-{
-  [DFDefaultsStore setState:newNotifsState forPermission:DFPermissionRemoteNotifications];
-  NSNumber *lastNotifType = [DFDefaultsStore lastNotificationType];
-  UIRemoteNotificationType currentNotifTypes = [[UIApplication sharedApplication]
-                                                enabledRemoteNotificationTypes];
-  [DFAnalytics logRemoteNotifsChangedFromOldNotificationType:lastNotifType.intValue
-                                                     newType:currentNotifTypes];
-}
-
 - (void)applicationWillResignActive:(UIApplication *)application {
   DDLogInfo(@"AppDelegate appWillResignActive");
   [DFAnalytics CloseAnalyticsSession];
@@ -226,6 +208,7 @@
   DDLogInfo(@"AppDelegate for %@ appDidBecomeActive.", [DFAppInfo appInfoString]);
   [DFAnalytics StartAnalyticsSession];
   [self performForegroundOperations];
+  [DFPushNotificationsManager refreshPushToken];
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -237,37 +220,16 @@
 
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
-	[self registerPushTokenForData:deviceToken];
-  [self checkForAndLogNotifsChange:DFPermissionStateGranted];
+	[DFPushNotificationsManager registerDeviceToken:deviceToken];
 }
 
 - (void)application:(UIApplication*)application didFailToRegisterForRemoteNotificationsWithError:(NSError*)error
 {
-	DDLogWarn(@"Failed to get push token, error: %@", error);
-  [self registerPushTokenForData:[NSData new]];
-  if (error.code == 3010) {
-    [self checkForAndLogNotifsChange:DFPermissionStateUnavailable];
-  } else {
-    [self checkForAndLogNotifsChange:DFPermissionStateDenied];
-  }
-}
-
-- (void)registerPushTokenForData:(NSData *)data
-{
-  if (!self.pushTokenAdapter) self.pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
-  
-  [self.pushTokenAdapter registerAPNSToken:data  completionBlock:^(BOOL success) {
-    if (success) {
-      DDLogInfo(@"Push token successfuly registered with server.");
-    } else {
-      DDLogInfo(@"Push token FAILED to register with server");
-    }
-  }];
+  [DFPushNotificationsManager registerFailedWithError:error];
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
-  DDLogInfo(@"Foreground notification being forwarded to background notif handler.");
   [self application:application didReceiveRemoteNotification:userInfo fetchCompletionHandler:nil];
 }
 

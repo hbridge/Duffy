@@ -15,7 +15,11 @@ NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
 
 + (void)setLastNotificationType:(UIRemoteNotificationType)type
 {
-  [[NSUserDefaults standardUserDefaults] setObject:@(type) forKey:DFDefaultsNotifsTypeKey];
+  NSNumber *lastNotifType = [DFDefaultsStore lastNotificationType];
+  if (![lastNotifType isEqual:@(type)]) {
+    [DFAnalytics logRemoteNotifsChangedFromOldNotificationType:lastNotifType.intValue newType:type];
+    [[NSUserDefaults standardUserDefaults] setObject:@(type) forKey:DFDefaultsNotifsTypeKey];
+  }
 }
 
 + (NSNumber *)lastNotificationType
