@@ -78,11 +78,15 @@ class BasePhotoAPI(APIView):
 				photo.time_taken = datetime.date(2007, 9, 1)
 
 			if not photo.location_point:
-				lat, lon = location_util.getLatLonFromExtraData(photo, True)
+				lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
 
 				if lat and lon:
 					photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
 					logger.debug("looked for lat lon and got %s" % (photo.location_point))
+
+					photo.location_accuracy_meters = accuracy
+					logger.debug("with accuracy %s" % (photo.location_accuracy_meters))
+
 		return photos
 
 
@@ -113,6 +117,9 @@ class PhotoAPI(BasePhotoAPI):
 
 		serializer = PhotoSerializer(photo, data=photoData)
 		if serializer.is_valid():
+			if (serializer.data['strand_evaluated']):
+				serializer.data['strand_needs_reeval'] = True
+				
 			serializer.save()
 
 			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
@@ -131,7 +138,7 @@ class PhotoAPI(BasePhotoAPI):
 
 				# This will look at the uploaded metadata or exif data in the file to populate more fields
 				photosToUpdate = self.populateExtraData([serializer.object])
-
+				Photo.bulkUpdate(photosToUpdate, ["location_point", "location_accuracy_meters", "full_filename", "thumb_filename", "time_taken"])
 			except IntegrityError:
 				logger.error("IntegrityError")
 				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -233,7 +240,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 				# These are all the fields that we might want to update.  List of the extra fields from above
 				# TODO(Derek):  Probably should do this more intelligently
-				Photo.bulkUpdate(photosToUpdate, ["location_point", "full_filename", "thumb_filename", "time_taken"])
+				Photo.bulkUpdate(photosToUpdate, ["location_point", "location_accuracy_meters", "full_filename", "thumb_filename", "time_taken"])
 			else:
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			

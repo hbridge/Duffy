@@ -97,29 +97,31 @@ def getLatLonFromExif(exif_data):
 	Returns back the lat, lon as a tuple
 	If not found, returns (None, None)
 """
-def getLatLonFromExtraData(photo, tryFile=False):
+def getLatLonAccuracyFromExtraData(photo, tryFile=False):
 	if photo.metadata:
 		metadata = json.loads(photo.metadata)
 		if "{GPS}" in metadata:
 			gpsData = metadata["{GPS}"]
-			lat = lon = None
+			lat = lon = accuracy = None
 
 			if "Latitude" in gpsData and gpsData['Latitude'] > 0:
 				lat = gpsData["Latitude"]
 				if gpsData["LatitudeRef"] == "S":
 					lat = lat * -1
-				print lat
 			if "Longitude" in gpsData and gpsData['Longitude'] > 0:
 				lon = gpsData["Longitude"]
 				if gpsData["LongitudeRef"] == "W":
 					lon = lon * -1
-				print lon
+			if "{Exif}" in metadata and "UserComment" in metadata["{Exif}"]:
+				userComment = metadata["{Exif}"]["UserComment"]
+				if "accuracy" in userComment:
+					accuracy = int(float(userComment.split("=")[1]))
 
 			if lat and lon:
-				return (lat, lon)
+				return (lat, lon, accuracy)
 			else:
 				logger.error("Thought I should have found GPS data but didn't in photo %s and metadata: %s" % (photo.id, metadata))
-				return (None, None)
+				return (None, None, None)
 		
 	if (tryFile):
 		exif = image_util.getExifData(photo)
