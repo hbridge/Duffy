@@ -38,6 +38,11 @@ static DFPeanutNotificationsManager *defaultManager;
   self = [super init];
   if (self) {
     [self updateNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateNotifications)
+                                                 name:DFStrandReloadRemoteUIRequestedNotificationName
+                                               object:nil];
+
   }
   return self;
 }
