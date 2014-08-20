@@ -190,7 +190,7 @@ def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin
 def main(argv):
 	joinStrandWithin = datetime.timedelta(minutes=30)
 	joinStrandGpsUpdatedWithin = datetime.timedelta(hours=8)
-	waitTimeForPhotoAction = datetime.timedelta(seconds=10)
+	waitTimeForPhotoAction = datetime.timedelta(seconds=5)
 	gpsRefreshTime = datetime.timedelta(hours=3)
 
 	rawFirestarterGpsUpdatedWithin = datetime.timedelta(hours=3)
