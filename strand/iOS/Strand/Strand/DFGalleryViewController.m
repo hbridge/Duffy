@@ -15,7 +15,7 @@
 #import "DFNavigationController.h"
 #import "DFSettingsViewController.h"
 #import "DFGallerySectionHeader.h"
-#import "DFPhotoFeedController.h"
+#import "DFFeedViewController.h"
 #import "RootViewController.h"
 
 
@@ -284,7 +284,7 @@ static const CGFloat SectionHeaderHeight = 54;
       photoID = ((DFPeanutSearchObject *)object.objects.firstObject).id;
     }
     
-    DFPhotoFeedController *photoFeedController =
+    DFFeedViewController *photoFeedController =
     [(RootViewController *)self.view.window.rootViewController photoFeedController];
     [self.topBarController pushViewController:photoFeedController animated:YES];
     [photoFeedController jumpToPhoto:photoID];

@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 @class DFCameraViewController;
-@class DFPhotoFeedController;
+@class DFFeedViewController;
 @class DFTopBarController;
 
 @interface RootViewController : UIViewController <UIPageViewControllerDelegate, UIPageViewControllerDataSource>
@@ -18,7 +18,7 @@
 @property (nonatomic) BOOL hideStatusBar;
 
 @property (nonatomic, retain) DFCameraViewController *cameraViewController;
-@property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
+@property (nonatomic, retain) DFFeedViewController *photoFeedController;
 @property (nonatomic, retain) DFTopBarController *strandsNavController;
 
 + (RootViewController *)rootViewController;

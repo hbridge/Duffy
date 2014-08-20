@@ -9,7 +9,7 @@
 #import "RootViewController.h"
 #import "DFNavigationController.h"
 #import "DFCameraViewController.h"
-#import "DFPhotoFeedController.h"
+#import "DFFeedViewController.h"
 #import "DFOverlayViewController.h"
 #import "DFTopBarController.h"
 #import "DFGalleryViewController.h"
@@ -42,7 +42,7 @@ static RootViewController *mainRootViewController;
     }
     self.hideStatusBar = YES;
     _cameraViewController = [[DFCameraViewController alloc] init];
-    _photoFeedController = [[DFPhotoFeedController alloc] init];
+    _photoFeedController = [[DFFeedViewController alloc] init];
     _strandsNavController = [[DFTopBarController alloc]
                              initWithRootViewController:_photoFeedController];
     _subviewControllers =

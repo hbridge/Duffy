@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPhotoFeedController.h"
+#import "DFFeedViewController.h"
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
 #import "DFFeedSectionHeaderView.h"
@@ -47,7 +47,7 @@ const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight
 
 const CGFloat LockedCellHeight = 157.0;
 
-@interface DFPhotoFeedController ()
+@interface DFFeedViewController ()
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 
@@ -59,7 +59,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 @end
 
-@implementation DFPhotoFeedController
+@implementation DFFeedViewController
 
 @synthesize photoAdapter = _photoAdapter;
 
@@ -350,7 +350,7 @@ const CGFloat LockedCellHeight = 157.0;
   photoFeedCell.delegate = self;
   [photoFeedCell setObjects:@[@(photoObject.id)]];
   [photoFeedCell setClusterViewHidden:YES];
-  [DFPhotoFeedController configureNonImageAttributesForCell:photoFeedCell
+  [DFFeedViewController configureNonImageAttributesForCell:photoFeedCell
                                                searchObject:photoObject];
   photoFeedCell.imageView.image = nil;
   //[photoFeedCell.loadingActivityIndicator startAnimating];
@@ -380,8 +380,8 @@ const CGFloat LockedCellHeight = 157.0;
                                                                    forIndexPath:indexPath];
   clusterFeedCell.delegate = self;
   [clusterFeedCell setClusterViewHidden:NO];
-  [clusterFeedCell setObjects:[DFPhotoFeedController objectIDNumbers:cluster.objects]];
-  [DFPhotoFeedController configureNonImageAttributesForCell:clusterFeedCell
+  [clusterFeedCell setObjects:[DFFeedViewController objectIDNumbers:cluster.objects]];
+  [DFFeedViewController configureNonImageAttributesForCell:clusterFeedCell
                                                searchObject:[cluster.objects firstObject]];
   for (DFPeanutSearchObject *subObject in cluster.objects) {
     [[DFImageStore sharedStore]
@@ -574,7 +574,7 @@ selectedObjectChanged:(id)newObject
 {
   DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
   DFPeanutSearchObject *searchObject = self.objectsByID[newObject];
-  [DFPhotoFeedController configureNonImageAttributesForCell:feedCell searchObject:searchObject];
+  [DFFeedViewController configureNonImageAttributesForCell:feedCell searchObject:searchObject];
   [feedCell setNeedsLayout];
 }
 

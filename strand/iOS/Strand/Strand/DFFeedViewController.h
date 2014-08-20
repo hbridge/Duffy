@@ -14,7 +14,7 @@
 #import "WYPopoverController.h"
 #import "DFNotificationsViewController.h"
 
-@interface DFPhotoFeedController : DFStrandsViewController
+@interface DFFeedViewController : DFStrandsViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
 DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate>
 

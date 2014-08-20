@@ -94,7 +94,7 @@
 		5AA45299196708D00099CBD2 /* DFPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA45291196708D00099CBD2 /* DFPhotoViewCell.m */; };
 		5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */; };
 		5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */; };
-		5AA452A6196739900099CBD2 /* DFPhotoFeedController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */; };
+		5AA452A6196739900099CBD2 /* DFFeedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA452A5196739900099CBD2 /* DFFeedViewController.m */; };
 		5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA8FA4E197DD0CE00421513 /* DFFeedSectionHeaderView.xib */; };
 		5AA8FA52197DD0E200421513 /* DFFeedSectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA8FA51197DD0E200421513 /* DFFeedSectionHeaderView.m */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
@@ -339,8 +339,8 @@
 		5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = DFPhotoViewCell.xib; path = DuffyCore/DFPhotoViewCell.xib; sourceTree = "<group>"; };
 		5AA4529E1967092F0099CBD2 /* UICollectionView+DFExtras.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UICollectionView+DFExtras.h"; path = "DuffyCore/UICollectionView+DFExtras.h"; sourceTree = "<group>"; };
 		5AA4529F1967092F0099CBD2 /* UICollectionView+DFExtras.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "UICollectionView+DFExtras.m"; path = "DuffyCore/UICollectionView+DFExtras.m"; sourceTree = "<group>"; };
-		5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoFeedController.h; sourceTree = "<group>"; };
-		5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoFeedController.m; sourceTree = "<group>"; };
+		5AA452A4196739900099CBD2 /* DFFeedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFeedViewController.h; sourceTree = "<group>"; };
+		5AA452A5196739900099CBD2 /* DFFeedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFeedViewController.m; sourceTree = "<group>"; };
 		5AA8FA4E197DD0CE00421513 /* DFFeedSectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFeedSectionHeaderView.xib; sourceTree = "<group>"; };
 		5AA8FA50197DD0E200421513 /* DFFeedSectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFeedSectionHeaderView.h; sourceTree = "<group>"; };
 		5AA8FA51197DD0E200421513 /* DFFeedSectionHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFeedSectionHeaderView.m; sourceTree = "<group>"; };
@@ -817,8 +817,8 @@
 		5AA38DFE199EB2D000AD1805 /* Feed */ = {
 			isa = PBXGroup;
 			children = (
-				5AA452A4196739900099CBD2 /* DFPhotoFeedController.h */,
-				5AA452A5196739900099CBD2 /* DFPhotoFeedController.m */,
+				5AA452A4196739900099CBD2 /* DFFeedViewController.h */,
+				5AA452A5196739900099CBD2 /* DFFeedViewController.m */,
 				5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */,
 				5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */,
 				5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */,
@@ -1399,7 +1399,7 @@
 				5AA45295196708D00099CBD2 /* DFPhotosGridViewController.m in Sources */,
 				5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */,
 				5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */,
-				5AA452A6196739900099CBD2 /* DFPhotoFeedController.m in Sources */,
+				5AA452A6196739900099CBD2 /* DFFeedViewController.m in Sources */,
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
 				5A9BC31019A26A22002D1CD7 /* DFGallerySectionHeader.m in Sources */,
