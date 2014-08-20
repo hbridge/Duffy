@@ -77,15 +77,22 @@ class BasePhotoAPI(APIView):
 				logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
 				photo.time_taken = datetime.date(2007, 9, 1)
 
-			if not photo.location_point:
-				lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
+			lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
 
-				if lat and lon:
-					photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-					logger.debug("looked for lat lon and got %s" % (photo.location_point))
+			if not photo.location_point and (lat and lon):
+				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+				photo.location_accuracy_meters = accuracy
 
-					photo.location_accuracy_meters = accuracy
-					logger.debug("with accuracy %s" % (photo.location_accuracy_meters))
+				logger.debug("For photo %s, Looked for lat lon and got %s" % (photo.id, photo.location_point))
+				logger.debug("With accuracy %s" % (photo.location_accuracy_meters))
+			elif accuracy and accuracy < photo.location_accuracy_meters:
+				logger.debug("For photo %s, Updated location from %s  to  %s " % (photo.id, photo.location_point, fromstr("POINT(%s %s)" % (lon, lat))))
+				logger.debug("And accuracy from %s to %s", photo.location_accuracy_meters, accuracy)
+
+				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+				photo.location_accuracy_meters = accuracy
+			elif accuracy and accuracy >= photo.location_accuracy_meters:
+				logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
 
 		return photos
 
@@ -119,8 +126,10 @@ class PhotoAPI(BasePhotoAPI):
 		if serializer.is_valid():
 			if (serializer.data['strand_evaluated']):
 				serializer.data['strand_needs_reeval'] = True
-				
-			serializer.save()
+			
+			# This will look at the uploaded metadata or exif data in the file to populate more fields
+			photosToUpdate = self.populateExtraData([serializer.object])
+			Photo.bulkUpdate(photosToUpdate, ["location_point", "location_accuracy_meters", "metadata", "time_taken"])
 
 			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 			return Response(serializer.data)
@@ -133,6 +142,7 @@ class PhotoAPI(BasePhotoAPI):
 		serializer = PhotoSerializer(data=request.DATA)
 		if serializer.is_valid():
 			try:
+				# TODO(Derek):  Not sure this is working, it has two saves in it
 				serializer.save()
 				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 
