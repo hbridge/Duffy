@@ -471,7 +471,7 @@ const unsigned int SavePromptMinPhotos = 3;
     [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:mutableMetadata];
     
     // Save the asset locally
-    NSManagedObjectContext *context = [DFUploadController sharedUploadController].managedObjectContext;
+    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
     [DFPhotoStore
      saveImage:image
      withMetadata:mutableMetadata
@@ -502,6 +502,8 @@ const unsigned int SavePromptMinPhotos = 3;
       retryNumber:(int)retryNumber
 {
   CLLocation *location = self.locationManager.location;
+  
+  [context refreshObject:photo mergeChanges:NO];
   
   if ((![self isGoodLocation:location] && retryNumber <= MaxRetryCount && !TARGET_IPHONE_SIMULATOR) || photo.photoID == 0) {
     // Wait for a better location fix or for the photo to finish uploading
