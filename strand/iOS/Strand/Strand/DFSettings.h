@@ -31,6 +31,7 @@
 @property (nonatomic, retain) NSString *clearImageCache;
 @property (nonatomic, retain) NSString *testSomething;
 @property (readonly, nonatomic, retain) NSString *addFriends;
+@property (readonly, nonatomic, retain) NSString *printAllFonts;
 
 
 

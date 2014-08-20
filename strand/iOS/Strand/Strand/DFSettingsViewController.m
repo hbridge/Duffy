@@ -223,6 +223,19 @@
             
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+  [mapping button:@"Print All Fonts"
+       identifier:@"printAllFonts"
+          handler:^(id object) {
+            NSArray *fontFamilies = [UIFont familyNames];
+            
+            for (int i = 0; i < [fontFamilies count]; i++)
+            {
+              NSString *fontFamily = [fontFamilies objectAtIndex:i];
+              NSArray *fontNames = [UIFont fontNamesForFamilyName:[fontFamilies objectAtIndex:i]];
+              NSLog (@"%@: %@", fontFamily, fontNames);
+            }
+          }
+accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
