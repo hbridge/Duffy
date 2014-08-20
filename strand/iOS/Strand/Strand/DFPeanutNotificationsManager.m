@@ -138,6 +138,7 @@ static DFPeanutNotificationsManager *defaultManager;
 - (void)markNotificationsAsRead
 {
   [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionViewNotifications];
+  [[UIApplication sharedApplication] setApplicationIconBadgeNumber:0];
 }
 
 @end
