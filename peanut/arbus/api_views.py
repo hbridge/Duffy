@@ -100,11 +100,7 @@ class BasePhotoAPI(APIView):
 			logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
 			if photo.strand_evaluated:
 				photo.strand_needs_reeval = True
-
-			logger.debug("strand_evaluated:  %s" % (photo.strand_evaluated))
-			if photo.strand_evaluated:
-				photo.strand_needs_reeval = True
-			logger.debug("strand_needs_reeval:  %s" % (photo.strand_needs_reeval))
+				
 		return photo
 
 	def populateExtraDataForPhotos(self, photos):
