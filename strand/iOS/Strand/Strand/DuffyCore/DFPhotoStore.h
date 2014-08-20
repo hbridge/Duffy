@@ -58,7 +58,7 @@ typedef enum {
      withMetadata:(NSDictionary *)metadata
          location:(CLLocation *)location
           context:(NSManagedObjectContext *)context
-  completionBlock:(void(^)(void))completion;
+  completionBlock:(void(^)(DFPhoto *))completion;
 
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;

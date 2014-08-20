@@ -23,8 +23,8 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 
 // Metadata accessors
 @property (readonly, nonatomic, retain) NSURL *canonicalURL;
-@property (readonly, nonatomic, retain) NSDictionary *metadata;
-@property (readonly, nonatomic, retain) CLLocation *location;
+@property (nonatomic, retain) NSMutableDictionary *metadata;
+@property (nonatomic, retain) CLLocation *location;
 @property (readonly, nonatomic, retain) NSString *hashString;
 /* The asset doesn't necessarily know what timezone it's in, so you have to give it one */
 - (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone;

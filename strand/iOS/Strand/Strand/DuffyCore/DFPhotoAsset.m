@@ -11,6 +11,9 @@
 
 @implementation DFPhotoAsset
 
+@synthesize metadata;
+@synthesize location;
+
 @dynamic photo;
 
 #pragma mark Methods to Override from here down
@@ -21,7 +24,7 @@
   return nil;
 }
 
-- (NSDictionary *)metadata
+- (NSMutableDictionary *)metadata
 {
   [DFPhotoAsset abstractClassException];
   return nil;
