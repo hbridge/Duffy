@@ -89,7 +89,7 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
             obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
         if not foundMatch:
-            print("Parse error for contact entry user %s  %s  with number %s" % (obj.user, obj.name, obj.phone_number))
+            logger.info("Parse error for contact entry")
             obj.skip = True
 
 
