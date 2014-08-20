@@ -94,6 +94,7 @@ const CGFloat LockedCellHeight = 157.0;
   [self.view addSubview:self.tableView];
   self.tableView.dataSource = self;
   self.tableView.delegate = self;
+  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, 70, 0);
   self.tableView.scrollsToTop = YES;
   
   self.automaticallyAdjustsScrollViewInsets = NO;
