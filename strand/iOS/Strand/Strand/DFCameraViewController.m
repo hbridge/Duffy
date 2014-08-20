@@ -520,7 +520,7 @@ const unsigned int SavePromptMinPhotos = 3;
     NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
     [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:photo.asset.metadata];
     
-    DDLogDebug(@"Sending update to server for photo %llu with new metadata %@", photo.photoID, photo.asset.metadata);
+    DDLogDebug(@"%@ Sending update to server for photo %llu with new metadata %@", [self.class description], photo.photoID, photo.asset.metadata);
 
     DFPhotoMetadataAdapter *photoAdapter = [DFPhotoMetadataAdapter new];
     [photoAdapter putPhoto:photo updateMetadata:YES appendLargeImageData:NO];

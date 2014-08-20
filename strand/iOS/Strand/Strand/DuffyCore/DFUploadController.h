@@ -18,6 +18,4 @@
 - (void)cancelUploads;
 - (BOOL)isUploadInProgress;
 
-@property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
-
 @end
