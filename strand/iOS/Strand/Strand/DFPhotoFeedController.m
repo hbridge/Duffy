@@ -159,16 +159,20 @@ const CGFloat LockedCellHeight = 157.0;
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
+   
     if (indexPath) {
       // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
       self.isViewTransitioning = YES;
       [self.tableView scrollToRowAtIndexPath:indexPath
                             atScrollPosition:UITableViewScrollPositionTop
-                                    animated:NO];
+                                    animated:YES];
+      
       // this tweak is gross but makes for less text from the last section overlapped under the header
       self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
                                                  self.tableView.contentOffset.y + 10);
-      self.isViewTransitioning = NO;
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        self.isViewTransitioning = NO;
+      });
     } else {
       DDLogWarn(@"%@ showPhoto:%llu no indexPath for photoId found.",
                 [self.class description],
