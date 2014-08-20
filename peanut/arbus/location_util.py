@@ -119,7 +119,7 @@ def getLatLonAccuracyFromExtraData(photo, tryFile=False):
 				if "accuracy" in userComment:
 					accuracyArray = userComment.split("accuracy=")
 					if len(accuracyArray) > 1:
-						accuracy = int(float(accuracyArray[1]))
+						accuracy = int(float(accuracyArray[-1]))
 
 			if lat and lon:
 				return (lat, lon, accuracy)
