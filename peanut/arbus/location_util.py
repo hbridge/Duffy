@@ -114,10 +114,14 @@ def getLatLonAccuracyFromExtraData(photo, tryFile=False):
 					lon = lon * -1
 			if "{Exif}" in metadata and "UserComment" in metadata["{Exif}"]:
 				userComment = metadata["{Exif}"]["UserComment"]
+
+				# userComment should be of the form  "(old Data)=|=accuracy=40.0000"
 				if "accuracy" in userComment:
 					commentsArray = userComment.split("=|=")
 					if len(commentsArray) > 1:
-						accuracy = int(float(commentsArray[1]))
+						accuracyArray = commentsArray.split("=")
+						if len(accuracyArray) > 1:
+							accuracy = int(float(commentsArray.split("=")[1]))
 
 			if lat and lon:
 				return (lat, lon, accuracy)
