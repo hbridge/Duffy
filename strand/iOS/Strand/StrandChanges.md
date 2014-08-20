@@ -1,5 +1,10 @@
 # Strand
 
+## Aug 20th 2015 (1.0.2 4719)
+
+- New app icon!
+- Tapping an in app notification takes you to the photo in feed
+
 ## Aug 19th, 2015 (4718)
 
 - Access your recent notifications from the top of the feed
