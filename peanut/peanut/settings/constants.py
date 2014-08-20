@@ -87,5 +87,5 @@ TIME_WITHIN_MINUTES_FOR_NEIGHBORING = 3 * 60
 DISTANCE_WITHIN_METERS_FOR_NEIGHBORING = 175
 
 # links for inviting
-INVITE_LINK_ENTERPRISE = 'bit.ly/1noDnx2'
-INVITE_LINK_APP_STORE = 'bit.ly/1w9cNCW'
+INVITE_LINK_ENTERPRISE = 'bit.ly/1noDnx2' # bit.ly/strand-beta also works
+INVITE_LINK_APP_STORE = 'bit.ly/strand-appstore'
