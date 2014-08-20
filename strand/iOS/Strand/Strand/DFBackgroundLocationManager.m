@@ -127,8 +127,14 @@ static DFBackgroundLocationManager *defaultManager;
             timeDifference,
             (int)[[UIApplication sharedApplication] applicationState]);
   
-  if ((timeDifference > 0.0 && distance > 30.0)
-      || (timeDifference > 0.0 && self.isBackgroundLocationUpdateInProgress))
+  // If we've moved more than 30 m
+  //   or we're supposed to update location in the background
+  //   or our accuracy is better than what it was before
+  // Then update with new location
+  if (timeDifference > 0.0 &&
+      (distance > 30.0
+      || self.isBackgroundLocationUpdateInProgress
+      || newLocation.horizontalAccuracy < lastLocation.horizontalAccuracy))
   {
     [self recordManagerLocation];
     [self.locationAdapter updateLocation:newLocation
