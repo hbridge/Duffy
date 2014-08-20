@@ -60,40 +60,56 @@ class BasePhotoAPI(APIView):
 
 		return ret
 
+
 	"""
 		Fill in extra data that needs a bit more processing.
 		Right now time_taken and location_point.  Both will look at the file exif data if
 		  we don't have iphone metadata
 	"""
-	def populateExtraData(self, photos):
+	def populateExtraData(self, photo):
+		if not photo.time_taken:
+			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
+			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
+
+		# Bug fix for bad data in photo where date was before 1900
+		# Initial bug was from a photo in iPhone 1, guessing at the date
+		if (photo.time_taken.date() < datetime.date(1900, 1, 1)):
+			logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
+			photo.time_taken = datetime.date(2007, 9, 1)
+
+		lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
+
+		if not photo.location_point and (lat and lon):
+			photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+			photo.location_accuracy_meters = accuracy
+
+			logger.debug("For photo %s, Looked for lat lon and got %s" % (photo.id, photo.location_point))
+			logger.debug("With accuracy %s" % (photo.location_accuracy_meters))
+		elif accuracy and accuracy < photo.location_accuracy_meters:
+			logger.debug("For photo %s, Updated location from %s  to  %s " % (photo.id, photo.location_point, fromstr("POINT(%s %s)" % (lon, lat))))
+			logger.debug("And accuracy from %s to %s", photo.location_accuracy_meters, accuracy)
+
+			photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+			photo.location_accuracy_meters = accuracy
+
+			logger.debug("strand_evaluated:  %s" % (photo.strand_evaluated))
+			if photo.strand_evaluated:
+				photo.strand_needs_reeval = True
+			logger.debug("strand_needs_reeval:  %s" % (photo.strand_needs_reeval))
+		elif accuracy and accuracy >= photo.location_accuracy_meters:
+			logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
+			if photo.strand_evaluated:
+				photo.strand_needs_reeval = True
+
+			logger.debug("strand_evaluated:  %s" % (photo.strand_evaluated))
+			if photo.strand_evaluated:
+				photo.strand_needs_reeval = True
+			logger.debug("strand_needs_reeval:  %s" % (photo.strand_needs_reeval))
+		return photo
+
+	def populateExtraDataForPhotos(self, photos):
 		for photo in photos:
-			if not photo.time_taken:
-				photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
-				logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
-
-			# Bug fix for bad data in photo where date was before 1900
-			# Initial bug was from a photo in iPhone 1, guessing at the date
-			if (photo.time_taken.date() < datetime.date(1900, 1, 1)):
-				logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
-				photo.time_taken = datetime.date(2007, 9, 1)
-
-			lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
-
-			if not photo.location_point and (lat and lon):
-				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-				photo.location_accuracy_meters = accuracy
-
-				logger.debug("For photo %s, Looked for lat lon and got %s" % (photo.id, photo.location_point))
-				logger.debug("With accuracy %s" % (photo.location_accuracy_meters))
-			elif accuracy and accuracy < photo.location_accuracy_meters:
-				logger.debug("For photo %s, Updated location from %s  to  %s " % (photo.id, photo.location_point, fromstr("POINT(%s %s)" % (lon, lat))))
-				logger.debug("And accuracy from %s to %s", photo.location_accuracy_meters, accuracy)
-
-				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-				photo.location_accuracy_meters = accuracy
-			elif accuracy and accuracy >= photo.location_accuracy_meters:
-				logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
-
+			self.populateExtraData(photo)
 		return photos
 
 
@@ -122,33 +138,32 @@ class PhotoAPI(BasePhotoAPI):
 		else:
 			photoData = request.DATA
 
-		serializer = PhotoSerializer(photo, data=photoData)
-		if serializer.is_valid():
-			if (serializer.data['strand_evaluated']):
-				serializer.data['strand_needs_reeval'] = True
-			
-			# This will look at the uploaded metadata or exif data in the file to populate more fields
-			photosToUpdate = self.populateExtraData([serializer.object])
-			Photo.bulkUpdate(photosToUpdate, ["location_point", "location_accuracy_meters", "metadata", "time_taken"])
+		serializer = PhotoSerializer(photo, data=photoData, partial=True)
 
+		if serializer.is_valid():
+			# This will look at the uploaded metadata or exif data in the file to populate more fields
+			photo = self.populateExtraData(serializer.object)
+						
 			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
-			return Response(serializer.data)
+			Photo.bulkUpdate(photo, ["location_point", "strand_needs_reeval", "location_accuracy_meters", "full_filename", "thumb_filename", "metadata", "time_taken"])
+
+			return Response(PhotoSerializer(photo).data)
 		else:
 			logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
 			return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 	def post(self, request, format=None):
-		serializer = PhotoSerializer(data=request.DATA)
+		serializer = PhotoSerializer(data=request.DATA, partial=True)
 		if serializer.is_valid():
 			try:
-				# TODO(Derek):  Not sure this is working, it has two saves in it
 				serializer.save()
 				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 
 				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				photosToUpdate = self.populateExtraData([serializer.object])
-				Photo.bulkUpdate(photosToUpdate, ["location_point", "location_accuracy_meters", "full_filename", "thumb_filename", "time_taken"])
+				photos = self.populateExtraData(serializer.object)
+				Photo.bulkUpdate(photo, ["location_point", "strand_needs_reeval", "location_accuracy_meters", "full_filename", "thumb_filename", "metadata", "time_taken"])
+				return Response(PhotoSerializer(photo).data)
 			except IntegrityError:
 				logger.error("IntegrityError")
 				Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -186,7 +201,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 				dup = Photo.objects.filter(iphone_hash=photo.iphone_hash).filter(user=photo.user)
 				if len(dup) > 0:
 					logger.warning("Found dup photo in upload: " + str(dup[0].id))
-					serializer = PhotoSerializer(dup[0], data=dupPhotoData[i])
+					serializer = PhotoSerializer(dup[0], data=dupPhotoData[i], partial=True)
 					if serializer.is_valid():
 						serializer.save()
 						photoDups.append(serializer.object)
@@ -212,7 +227,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
 				photoData["bulk_batch_key"] = batchKey
-				serializer = PhotoSerializer(data=photoData)
+				serializer = PhotoSerializer(data=photoData, partial=True)
 				if serializer.is_valid():
 					objsToCreate.append(serializer.object)
 					dupPhotoData.append(photoData)
@@ -246,7 +261,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 				photosToUpdate = image_util.handleUploadedImagesBulk(request, createdPhotos)
 
 				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				photosToUpdate = self.populateExtraData(photosToUpdate)
+				photosToUpdate = self.populateExtraDataForPhotos(photosToUpdate)
 
 				# These are all the fields that we might want to update.  List of the extra fields from above
 				# TODO(Derek):  Probably should do this more intelligently

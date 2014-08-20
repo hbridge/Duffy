@@ -10,7 +10,6 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Photo
-		fields = ('id', 'user', 'time_taken', 'metadata', 'iphone_hash', 'full_filename', 'thumb_filename', 'file_key', 'bulk_batch_key', 'is_local', 'full_image_path', 'strand_evaluated', 'strand_needs_reeval')
 
 class PhotoForApiSerializer(serializers.ModelSerializer):
 	full_image_path = serializers.Field(source='getFullUrlImagePath')

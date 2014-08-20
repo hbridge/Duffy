@@ -222,6 +222,9 @@ class Photo(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
+		if not isinstance(objs, list):
+			objs = [objs]
+
 		for obj in objs:
 			obj.updated = datetime.datetime.now()
 
