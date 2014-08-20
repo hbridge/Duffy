@@ -10,7 +10,7 @@ class StrandApiForm(forms.Form):
 	# Build num is the version of the build, like 1285
 	build_number = forms.IntegerField(required=False)
 
-	# Build id is the idenitfier for type of build like com.Duffy.Strand
+	# Build id is the idenitfier for type of build like com.Duffyapp.Strand
 	build_id = forms.CharField(required=False)
 
 

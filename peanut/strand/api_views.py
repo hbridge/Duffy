@@ -20,7 +20,7 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util
 
 from strand import geo_util, notifications_util, friends_util, strands_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -666,7 +666,15 @@ def auth_phone(request):
 def get_invite_message(request):
 	response = dict({'result': True})
 
-	response['invite_message'] = "Try this app so we can share photos when we hang out: bit.ly/1noDnx2."
+	form = StrandApiForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		if ('enterprise' in form.cleaned_data['build_id'].lower()):
+			inviteLink = constants.INVITE_LINK_ENTERPRISE
+		else:
+			inviteLink = constants.INVITE_LINK_APP_STORE
+
+	response['invite_message'] = "Try this app so we can share photos when we hang out: "  + inviteLink + "."
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
