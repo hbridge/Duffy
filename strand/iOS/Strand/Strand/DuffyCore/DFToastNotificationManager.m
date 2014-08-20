@@ -10,6 +10,8 @@
 #import "CRToast.h"
 #import <AudioToolbox/AudioServices.h>
 #import "DFStrandConstants.h"
+#import "DFPeanutAction.h"
+#import "RootViewController.h"
 
 @implementation DFToastNotificationManager
 
@@ -99,13 +101,15 @@ static DFToastNotificationManager *defaultManager;
   AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
-- (void)showPhotoNotificationWithString:(NSString *)string
+- (void)showNotificationForPush:(DFPeanutPushNotification *)pushNotif
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
   options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
   options[kCRToastTimeIntervalKey] = @(10);
-  options[kCRToastTextKey] = string;
+  options[kCRToastTextKey] = pushNotif.message ? pushNotif.message : @"";
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/PhotoNotificationIcon.png"];
+  
+  options[kCRToastInteractionRespondersKey] = @[[self.class gotoPhotoInteractionHandler:pushNotif.photoID]];
   
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
@@ -113,6 +117,16 @@ static DFToastNotificationManager *defaultManager;
   AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
 }
 
+
++ (id)gotoPhotoInteractionHandler:(DFPhotoIDType)photoID
+{
+  return [CRToastInteractionResponder
+          interactionResponderWithInteractionType:CRToastInteractionTypeAll
+          automaticallyDismiss:YES
+          block:^(CRToastInteractionType interactionType) {
+            [[RootViewController rootViewController] showPhotoWithID:photoID];
+          }];
+}
 
 + (id)dismissInteractionHandler
 {

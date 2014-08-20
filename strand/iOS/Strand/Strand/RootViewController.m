@@ -25,10 +25,21 @@
 
 @implementation RootViewController
 
+static RootViewController *mainRootViewController;
++ (RootViewController *)rootViewController
+{
+  return mainRootViewController;
+}
+
 - (instancetype)init
 {
   self = [super init];
   if (self) {
+    if (mainRootViewController) {
+      [NSException raise:@"Multiple Root View Controllers" format:@"There shoudl only be one rootViewController!"];
+    } else {
+      mainRootViewController = self;
+    }
     self.hideStatusBar = YES;
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFPhotoFeedController alloc] init];

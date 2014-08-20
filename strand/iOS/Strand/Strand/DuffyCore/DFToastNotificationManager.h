@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPeanutPushNotification.h"
 
 @interface DFToastNotificationManager : NSObject
 
@@ -15,11 +16,11 @@ typedef enum {
   DFFeedRefreshError,
 } DFToastNotificationType;
 
-
 + (DFToastNotificationManager *)sharedInstance;
 
 - (void)showNotificationWithType:(DFToastNotificationType)notificationType;
-- (void)showPhotoNotificationWithString:(NSString *)string;
+- (void)showNotificationForPush:(DFPeanutPushNotification *)pushNotif;
+
 - (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout;
 - (void)showErrorWithTitle:(NSString *)title subTitle:(NSString *)subtitle;
 

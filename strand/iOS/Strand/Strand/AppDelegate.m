@@ -258,7 +258,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
     [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
   } else if ([application applicationState] == UIApplicationStateActive) {
     if ([pushNotif.message isNotEmpty]) {
-      [[DFToastNotificationManager sharedInstance] showPhotoNotificationWithString:pushNotif.message];
+      [[DFToastNotificationManager sharedInstance] showNotificationForPush:pushNotif];
     }    
     [[NSNotificationCenter defaultCenter]
      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName

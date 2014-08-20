@@ -21,6 +21,7 @@
 @property (nonatomic, retain) DFPhotoFeedController *photoFeedController;
 @property (nonatomic, retain) DFTopBarController *strandsNavController;
 
++ (RootViewController *)rootViewController;
 - (void)showGallery;
 - (void)showCamera;
 - (void)showPhotoWithID:(DFPhotoIDType)photoID;
