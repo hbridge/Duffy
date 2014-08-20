@@ -1,5 +1,11 @@
 # Strand
 
+## Aug 19th, 2015 (4718)
+
+- Access your recent notifications from the top of the feed
+- Add contacts manually in settings if you don't give the app permission to access your contacts
+- Performance improvements: new photos appear faster, feed loads faster
+
 ## Aug 13th, 2015 (4717)
 
 - Status bar hides in feed to give you more space to see photos
