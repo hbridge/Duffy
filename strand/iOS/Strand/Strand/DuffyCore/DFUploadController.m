@@ -25,7 +25,6 @@
 
 @property (atomic, retain) DFUploadQueue *thumbnailsObjectIDQueue;
 @property (atomic, retain) DFUploadQueue *fullImageObjectIDQueue;
-@property (readonly, nonatomic, retain) NSManagedObjectContext *managedObjectContext;
 
 @property (atomic, retain) NSOperationQueue *syncOperationQueue;
 @property (atomic, retain) NSOperationQueue *uploadOperationQueue;

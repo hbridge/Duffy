@@ -583,7 +583,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
      withMetadata:(NSDictionary *)metadata
          location:(CLLocation *)location
           context:(NSManagedObjectContext *)context
-  completionBlock:(void (^)(void))completion
+  completionBlock:(void (^)(DFPhoto *newPhoto))completion
 {
   @autoreleasepool {
     NSData *data = UIImageJPEGRepresentation(image, 0.8);
@@ -592,10 +592,10 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                                                                    location:location
                                                                creationDate:[NSDate date]
                                                                   inContext:context];
-    [DFPhoto createWithAsset:asset
-                      userID:[[DFUser currentUser] userID]
-                    timeZone:[NSTimeZone defaultTimeZone]
-                   inContext:context];
+    DFPhoto *newPhoto = [DFPhoto createWithAsset:asset
+                                          userID:[[DFUser currentUser] userID]
+                                        timeZone:[NSTimeZone defaultTimeZone]
+                                       inContext:context];
     
     // Save the database changes
     NSError *error;
@@ -611,7 +611,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
       }];
     }
     
-    if (completion) completion();
+    if (completion) completion(newPhoto);
   }
 }
 

@@ -15,6 +15,7 @@
 #import "DFMultiPhotoViewController.h"
 #import "DFPeanutLocationAdapter.h"
 #import "DFPhoto.h"
+#import "DFPhotoMetadataAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFPhotoViewController.h"
 #import "DFStrandConstants.h"
@@ -422,7 +423,7 @@ const unsigned int SavePromptMinPhotos = 3;
   DDLogInfo(@"%@ image captured", [self.class description]);
   
   
-  [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:0];
+  [self saveImage:image withMetadata:metadata retryNumber:0];
   [self animateImageCaptured:image];
   
   [DFAnalytics logPhotoTakenWithCamera:self.cameraDevice flashMode:self.cameraFlashMode];
@@ -452,22 +453,11 @@ const unsigned int SavePromptMinPhotos = 3;
   });
 }
 
-- (void)waitForGoodLocationAndSaveImage:(UIImage *)image
-                           withMetadata:(NSDictionary *)metadata
-                            retryNumber:(int)retryNumber
+- (void)saveImage:(UIImage *)image
+     withMetadata:(NSDictionary *)metadata
+      retryNumber:(int)retryNumber
 {
   CLLocation *location = self.locationManager.location;
-  
-  if (![self isGoodLocation:location] && retryNumber <= MaxRetryCount && !TARGET_IPHONE_SIMULATOR) {
-    //wait for a better location fix
-    DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)),
-                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-                     [self waitForGoodLocationAndSaveImage:image withMetadata:metadata retryNumber:retryNumber + 1];
-                   });
-    
-    return;
-  }
   
   if (![self isGoodLocation:location] && TARGET_IPHONE_SIMULATOR) {
     // default simulator to puck building
@@ -480,15 +470,15 @@ const unsigned int SavePromptMinPhotos = 3;
     NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
     [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:mutableMetadata];
     
-    // Save the assset locally
-    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+    // Save the asset locally
+    NSManagedObjectContext *context = [DFUploadController sharedUploadController].managedObjectContext;
     [DFPhotoStore
      saveImage:image
      withMetadata:mutableMetadata
      location:location
      context:context
-     completionBlock:^{
-       DDLogInfo(@"%@ image saved.", [self.class description]);
+     completionBlock:^(DFPhoto *newPhoto){
+       DDLogInfo(@"%@ image saved with metadata %@", [self.class description], newPhoto.asset.metadata);
        
        // Tell the feeds to refresh
        [[NSNotificationCenter defaultCenter]
@@ -496,8 +486,43 @@ const unsigned int SavePromptMinPhotos = 3;
         object:self];
        
        [[DFUploadController sharedUploadController] uploadPhotos];
+       
+       if (![self isGoodLocation:location]) {
+         [self waitForGoodLocationAndUpdatePhoto:newPhoto withContext:context retryNumber:0];
+       }
      }];
   });
+}
+
+/*
+ * Loops a few times, checking on the latest location.  If it has a good location then it adds that to the photo
+ *   metadata and
+ */
+- (void)waitForGoodLocationAndUpdatePhoto:(DFPhoto *)photo withContext:context
+      retryNumber:(int)retryNumber
+{
+  CLLocation *location = self.locationManager.location;
+  
+  if ((![self isGoodLocation:location] && retryNumber <= MaxRetryCount && !TARGET_IPHONE_SIMULATOR) || photo.photoID == 0) {
+    // Wait for a better location fix or for the photo to finish uploading
+    DDLogWarn(@"DFCameraViewController got bad location fix.  Retrying in %ds", RetryDelaySecs);
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(RetryDelaySecs * NSEC_PER_SEC)),
+                   dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                     [self waitForGoodLocationAndUpdatePhoto:photo withContext:context retryNumber:retryNumber + 1];
+                   });
+    return;
+  }
+  
+  if (photo.photoID != 0) {
+    [self addLocation:location toMetadata:photo.asset.metadata];
+    NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
+    [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:photo.asset.metadata];
+    
+    DDLogDebug(@"Sending update to server for photo %llu with new metadata %@", photo.photoID, photo.asset.metadata);
+
+    DFPhotoMetadataAdapter *photoAdapter = [DFPhotoMetadataAdapter new];
+    [photoAdapter putPhoto:photo updateMetadata:YES appendLargeImageData:NO];
+  }
 }
 
 - (BOOL)isGoodLocation:(CLLocation *)location
@@ -549,6 +574,7 @@ const unsigned int SavePromptMinPhotos = 3;
   NSMutableDictionary *exifDict = [[NSMutableDictionary alloc]
                                    initWithDictionary:metadata[@"{Exif}"]];
   NSString *oldData = exifDict[@"UserComment"];
+  
   exifDict[@"UserComment"] = [NSString stringWithFormat:@"%@, %@", oldData, extraInfo];
   metadata[@"{Exif}"] = exifDict;
 }
