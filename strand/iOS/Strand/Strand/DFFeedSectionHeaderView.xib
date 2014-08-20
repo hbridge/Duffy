@@ -52,7 +52,6 @@
                     </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="dMB-6d-4Qm" secondAttribute="bottom" id="55m-EF-Jk5"/>
                 <constraint firstItem="dMB-6d-4Qm" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="nVk-8U-i0e"/>
