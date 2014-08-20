@@ -14,7 +14,8 @@
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 @property (nonatomic, retain) NSMutableSet *remoteLoadsInProgress;
-@property (atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
+@property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
+@property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
 @property (atomic, retain) NSMutableDictionary *fullImageCache;
 
 @end
@@ -22,6 +23,7 @@
 @implementation DFImageStore
 
 @synthesize photoAdapter = _photoAdapter;
+@synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
 
 static DFImageStore *defaultStore;
 
@@ -42,7 +44,8 @@ static DFImageStore *defaultStore;
 {
   self = [super init];
   if (self) {
-    _deferredCompletionBlocks = [[NSMutableDictionary alloc] init];
+    _deferredCompletionBlocks = [NSMutableDictionary new];
+    self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     _fullImageCache = [NSMutableDictionary new];
     self.remoteLoadsInProgress = [[NSMutableSet alloc] init];
   }
@@ -183,6 +186,7 @@ static DFImageStore *defaultStore;
 
 - (void)scheduleDeferredCompletion:(ImageLoadCompletionBlock)completion forPhotoID:(DFPhotoIDType)photoID
 {
+  dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
   NSMutableArray *deferredForID = self.deferredCompletionBlocks[@(photoID)];
   if (!deferredForID) {
     deferredForID = [[NSMutableArray alloc] init];
@@ -190,16 +194,19 @@ static DFImageStore *defaultStore;
   }
   
   [deferredForID addObject:[completion copy]];
+  dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
 - (void)executeDefferredCompletionsWithImage:(UIImage *)image forPhotoID:(DFPhotoIDType)photoID
 {
+  dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
   NSMutableArray *deferredForID = self.deferredCompletionBlocks[@(photoID)];
   for (ImageLoadCompletionBlock completion in deferredForID) {
     completion(image);
   }
   [deferredForID removeAllObjects];
   [self.remoteLoadsInProgress removeObject:@(photoID)];
+  dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
 
