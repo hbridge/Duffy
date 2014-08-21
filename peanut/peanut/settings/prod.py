@@ -1,7 +1,7 @@
 from peanut.settings.base import *
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 DATABASES = {
 	'default': {
@@ -95,4 +95,4 @@ ADMINS = (
 	('Derek', 'derek@duffytech.co'),
 )
 
-ALLOWED_HOSTS = ["prod.strand.duffyapp.com"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com"]
