@@ -399,7 +399,7 @@ def update_user_location(request):
 """
 def register_apns_token(request):
 	response = dict({'result': True})
-	form = RegisterAPNSTokenForm(api_util.getRequestData(request))
+	form = RegisterPNSTokenForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		userId = form.cleaned_data['user_id']
