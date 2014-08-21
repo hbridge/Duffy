@@ -1,5 +1,9 @@
 # Strand
 
+## Aug 21st 2015 (1.0.2 4721)
+
+- New invite user flow
+
 ## Aug 20th 2015 (1.0.2 4719)
 
 - New app icon!
