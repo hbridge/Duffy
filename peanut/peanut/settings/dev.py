@@ -1,5 +1,10 @@
 from peanut.settings.base import *
 
+# Used to support utf8 4 byte encoding in mysql.  Don't ask
+# http://stackoverflow.com/questions/21517358/django-mysql-unknown-encoding-utf8mb4
+import codecs
+codecs.register(lambda name: codecs.lookup('utf8') if name == 'utf8mb4' else None)
+
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.contrib.gis.db.backends.mysql', 
@@ -8,6 +13,7 @@ DATABASES = {
 		'PASSWORD': 'duffy',
 		'HOST': 'localhost',   # Or an IP Address that your DB is hosted on
 		'PORT': '3306',
+		'OPTIONS': {'charset': 'utf8mb4'},
 	}
 }
 
