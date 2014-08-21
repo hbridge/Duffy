@@ -71,7 +71,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
-
++ (void)logInviteAskContactsWithParameters:(NSDictionary *)parameters;
 
 /* Contacts */
 + (void)logAddContactCompletedWithResult:(NSString *)result;

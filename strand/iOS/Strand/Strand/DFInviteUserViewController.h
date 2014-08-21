@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MessageUI.h>
 
-@interface DFInviteUserViewController : UIViewController
+@interface DFInviteUserViewController : UITableViewController <UITextFieldDelegate, UISearchDisplayDelegate, MFMessageComposeViewControllerDelegate>
 
 @end

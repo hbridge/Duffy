@@ -10,7 +10,6 @@
 #import "DFAnalytics.h"
 #import "DFPhoto.h"
 #import "DFPhotoViewController.h"
-#import "DFGalleryWebViewController.h"
 
 @interface DFMultiPhotoViewController ()
 
@@ -202,12 +201,8 @@
 - (void)activePhotoDeleted
 {
   // If the root view contorller is the gallery, pop back to the gallery
-  UIViewController *rootViewController = self.navigationController.viewControllers.firstObject;
+  //UIViewController *rootViewController = self.navigationController.viewControllers.firstObject;
   
-  if ([[rootViewController class] isSubclassOfClass:[DFGalleryWebViewController class]]) {
-    [self.navigationController popViewControllerAnimated:YES];
-    return;
-  }
   
   // Otherwise, if the root view controller is the multi photo view controller, this is
   // The last photo view, so move the the most recent other photo taken or pop back to camera.

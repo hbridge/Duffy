@@ -109,6 +109,7 @@ NSString* const SetupContactsCompleted = @"SetupContactsCompleted";
 
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
+NSString* const InviteContactsPrompt = @"InviteContactsPrompt";
 
 //Push notifs
 NSString* const PermissionChangedEvent = @"PermissionChanged";
@@ -440,6 +441,11 @@ static DFAnalytics *defaultLogger;
                                                            ResultKey: resultString,
                                                            ParentViewControllerKey: [DFAnalytics screenNameForControllerViewed:presentingViewController]
                                                            }];
+}
+
++ (void)logInviteAskContactsWithParameters:(NSDictionary *)parameters
+{
+  [DFAnalytics logEvent:InviteContactsPrompt withParameters:parameters];
 }
 
 

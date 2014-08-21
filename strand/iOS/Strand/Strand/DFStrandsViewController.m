@@ -371,7 +371,10 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 {
   DDLogInfo(@"Invite button pressed");
   DFInviteUserViewController *inviteController = [[DFInviteUserViewController alloc] init];
-  [self presentViewController:inviteController animated:YES completion:nil];
+  DFNavigationController *navController = [[DFNavigationController
+                                            alloc] initWithRootViewController:inviteController];
+
+  [self presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)titleButtonPressed:(UIButton *)button

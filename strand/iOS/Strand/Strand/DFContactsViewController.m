@@ -139,7 +139,7 @@
 {
   if (indexPath.section == 0) {
     if (indexPath.row == 0) [self importContactsPressed];
-    if (indexPath.row == 1) [self enterManuallyPressed];
+    else if (indexPath.row == 1) [self enterManuallyPressed];
   }
   
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

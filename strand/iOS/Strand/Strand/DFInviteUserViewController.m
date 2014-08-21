@@ -7,117 +7,372 @@
 //
 
 #import "DFInviteUserViewController.h"
-#import "DFInviteUserComposeController.h"
+#import <AddressBook/AddressBook.h>
+#import <RHAddressBook/AddressBook.h>
 #import "UIAlertView+DFHelpers.h"
 #import "DFUserPeanutAdapter.h"
+#import "DFPeanutInviteMessageAdapter.h"
+#import "NSString+DFHelpers.h"
+#import "DFAnalytics.h"
+#import "SVProgressHUD.h"
+#import "DFDefaultsStore.h"
 
 @interface DFInviteUserViewController ()
 
-@property (nonatomic, retain) DFInviteUserComposeController *composeController;
+@property (nonatomic, retain) MFMessageComposeViewController *composeController;
 @property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
-@property (nonatomic, retain) DFPeanutUserObject *peanutUser;
+@property (nonatomic, retain) DFPeanutInviteMessageAdapter *inviteAdapter;
+@property (atomic, retain) DFPeanutInviteMessageResponse *inviteResponse;
+@property (nonatomic, retain) NSError *loadInviteMessageError;
+@property (nonatomic, retain) UITextField *toTextField;
+@property (nonatomic, retain) NSArray *abSearchResults;
+@property (nonatomic, retain) NSString *textNumberString;
+@property (readonly, nonatomic, retain) RHAddressBook *addressBook;
 
 @end
 
 @implementation DFInviteUserViewController
 
 @synthesize userAdapter = _userAdapter;
+@synthesize addressBook = _addressBook;
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-      self.composeController = [[DFInviteUserComposeController alloc] init];
-    }
-    return self;
+  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+  if (self) {
+    self.navigationItem.title = @"Invite Friend";
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                             target:self
+                                             action:@selector(cancel)];
+  }
+  return self;
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+  [super viewDidLoad];
+  
+  [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFABResultTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"abResult"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFNoContactsTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"noContacts"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFNoResultsTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"noResults"];
+
+  [self configureToField];
+  
+  [self.inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
+    self.inviteResponse = response;
+    self.loadInviteMessageError = error;
+    if (error) DDLogError(@"%@ fetching invite response yielded error: %@", self.class, error);
+  }];
 }
 
-- (void)viewWillAppear:(BOOL)animated
+- (void)configureToField
 {
-  [super viewWillAppear:animated];
-  if (self.composeController.isBeingDismissed) {
-    // we're coming back form the child compose controller
-    [self dismissViewControllerAnimated:YES completion:nil];
-  }
+  self.toTextField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+  self.toTextField.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, 44)];
+  self.toTextField.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, 44)];
+  self.toTextField.leftViewMode = self.toTextField.rightViewMode = UITextFieldViewModeAlways;
+  self.toTextField.delegate = self;
+  self.toTextField.placeholder = @"Enter a name or phone number";
+  self.toTextField.backgroundColor = [UIColor whiteColor];
+  self.toTextField.keyboardType = UIKeyboardTypeNamePhonePad;
+  self.toTextField.autocorrectionType = UITextAutocorrectionTypeNo;
+  self.tableView.tableHeaderView = self.toTextField;
+  [self.toTextField addTarget:self
+                       action:@selector(textFieldChanged:)
+             forControlEvents:UIControlEventEditingChanged];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (!self.composeController || self.composeController.isBeingDismissed) {
-    // the the view controller failed to load
-    [self dismissViewControllerAnimated:YES completion:nil];
-  } else {
-    [self.userAdapter getCurrentUserWithSuccess:^(DFPeanutUserObject *user) {
-      self.peanutUser = user;
-      if (user.invites_remaining.intValue > 0) {
-        [self showComposer];
-      } else {
-        [self dismissViewControllerAnimated:YES completion:^{
-          [UIAlertView showSimpleAlertWithTitle:@"No Invites Remaining"
-                                        message:@"You have no invites remaining."];
-          
-        }];
-      }
-    } failure:^(NSError *error) {
-      [self dismissViewControllerAnimated:YES completion:^{
-        [UIAlertView showSimpleAlertWithTitle:@"Error"
-                                      message:[NSString stringWithFormat:
-                                               @"Could determine how many remaining invites you have. %@",
-                                               error.localizedDescription]];
-        
-      }];
-    }];
+  
+  // only handle this logic if this view is appearing for the first time
+  if (!self.isMovingToParentViewController) return;
+
+  [self.toTextField becomeFirstResponder];
+  [DFAnalytics logViewController:self appearedWithParameters:@{@"result": @"Success"}];
+}
+
+
+#pragma mark - Text Field Changes and Filtering
+
+- (void)textFieldChanged:(id)sender
+{
+  [self updateSearchResults];
+  [self.tableView reloadData];
+}
+
+- (void)updateSearchResults
+{
+  self.abSearchResults = nil;
+  self.textNumberString = nil;
+  
+  if ([self.toTextField.text isNotEmpty]) {
+    self.abSearchResults = @[];
+    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+      self.abSearchResults = [self abSearchResultsForString:self.toTextField.text];
+    }
+    self.textNumberString = [self textNumberStringForString:self.toTextField.text];
   }
 }
 
-- (void)showComposer
+- (NSArray *)abSearchResultsForString:(NSString *)string
 {
-  [self.composeController loadMessageWithCompletion:^(NSError *error) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-      if (!error) {
-        [self presentViewController:self.composeController animated:YES completion:nil];
-      } else {
-        [UIAlertView showSimpleAlertWithTitle:@"Error" message:error.localizedDescription];
-        [self dismissViewControllerAnimated:YES completion:nil];
-      }
-    });
-  }];
-}
-
-- (void)dismissViewControllerAnimated:(BOOL)flag completion:(void (^)(void))completion
-{
-  if (self.composeController.result == MessageComposeResultSent) {
-    self.peanutUser.invites_remaining = @(self.peanutUser.invites_remaining.intValue - 1);
-    self.peanutUser.invites_sent = @(self.peanutUser.invites_sent.intValue + 1);
-    [self.userAdapter
-     performRequest:RKRequestMethodPUT
-     withPeanutUser:self.peanutUser
-     success:^(DFPeanutUserObject *user) {
-       [UIAlertView showSimpleAlertWithTitle:@"Invite Sent"
-                               formatMessage:@"You have %d invites remaining.",
-        self.peanutUser.invites_remaining.intValue];
-     } failure:^(NSError *error) {
-       DDLogError(@"%@ put of user object %@ failed with error: %@",
-                  [self.class description],
-                  self.peanutUser,
-                  error.description);
-     }];
+  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) return @[];
+  
+  NSMutableArray *results = [NSMutableArray new];
+  NSArray *people = [self.addressBook peopleWithName:string];
+  for (RHPerson *person in people) {
+    for (int i = 0; i < person.phoneNumbers.values.count; i++) {
+      NSDictionary *resultDict = @{
+                                   @"person": person,
+                                   @"index": @(i),
+                                   };
+      [results addObject:resultDict];
+    }
   }
   
-  [self.presentingViewController dismissViewControllerAnimated:flag completion:completion];
+  return results;
 }
+
+- (NSString *)textNumberStringForString:(NSString *)string
+{
+  static NSRegularExpression *phoneNumberRegex = nil;
+  if (!phoneNumberRegex) {
+    NSError *error;
+    phoneNumberRegex = [NSRegularExpression regularExpressionWithPattern:@"^[2-9][0-9]{9}$" options:0 error:&error];
+    if (error) {
+      [NSException raise:@"Bad regex" format:@"Error: %@", error];
+    }
+  }
+  
+  if ([[phoneNumberRegex matchesInString:string options:0 range:[string fullRange]] count] > 0) {
+    return string;
+  }
+
+  return nil;
+}
+
+#pragma mark - Table View Datasource and Delegate
+
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+  NSInteger result = 0;
+  if (self.abSearchResults) result += 1;
+  if (self.textNumberString) result += 1;
+  
+  return result;
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+  if (section == 0) return @"Contacts";
+  if (section == 1) return @"Text Phone Number";
+  return nil;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
+{
+  return 30.0;
+}
+
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+  if (section == 0) {
+    return MAX(self.abSearchResults.count, 1);
+  } else if (section == 1) {
+    return self.textNumberString ? 1 : 0;
+  }
+  
+  return 0;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  UITableViewCell *cell;
+  
+  if (indexPath.section == 0) {
+    if (self.abSearchResults.count > 0) {
+      cell = [self.tableView dequeueReusableCellWithIdentifier:@"abResult"];
+      [self configureABCell:cell forIndexPath:indexPath];
+      cell.imageView.image = nil;
+    } else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined) {
+      cell = [self.tableView dequeueReusableCellWithIdentifier:@"noContacts"];
+    } else {
+      cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
+    }
+  } else if (indexPath.section == 1) {
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
+    cell.textLabel.text = [NSString stringWithFormat:@"Text %@", self.textNumberString];
+    cell.imageView.image = [UIImage imageNamed:@"SMSTableCellIcon"];
+  }
+    
+  return cell;
+}
+
+- (void)configureABCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath
+{
+  NSDictionary *resultDict = self.abSearchResults[indexPath.row];
+  RHPerson *person = resultDict[@"person"];
+  int phoneIndex = [resultDict[@"index"] intValue];
+  
+  cell.textLabel.text = person.name;
+  cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ %@",
+                               [person.phoneNumbers localizedLabelAtIndex:phoneIndex],
+                               [person.phoneNumbers valueAtIndex:phoneIndex]
+                               ];
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if (indexPath.section == 0) {
+    if (self.abSearchResults.count > 0) return 44.0;
+    return 91.0;
+  }
+  
+  return 44.0;
+}
+
+#pragma mark - Action Responses
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if (indexPath.section == 0 && self.abSearchResults.count > 0) {
+    NSDictionary *resultDict = self.abSearchResults[indexPath.row];
+    RHPerson *person = resultDict[@"person"];
+    int phoneIndex = [resultDict[@"index"] intValue];
+    
+    [self showComposerWithName:person.name phoneNumber:[person.phoneNumbers valueAtIndex:phoneIndex]];
+  } else if (indexPath.section == 1 && self.textNumberString) {
+    [self showComposerWithName:self.textNumberString phoneNumber:self.textNumberString];
+  } else if (indexPath.section == 0 && ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
+    ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
+    if (status == kABAuthorizationStatusNotDetermined) {
+      [self askForContactsPermission];
+    } else {
+      [self showContactsDeniedAlert];
+    }
+  }
+  
+  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)showComposerWithName:(NSString *)name phoneNumber:(NSString *)phoneNumber
+{
+  [SVProgressHUD show];
+  if (!self.inviteResponse) {
+    // retry getting the invite response, if it fails, show an alert
+    DDLogError(@"%@ invite response not set.  Trying to fetch again", self.class);
+    [self.inviteAdapter fetchInviteMessageResponse:^(DFPeanutInviteMessageResponse *response, NSError *error) {
+      if (!error) {
+        self.inviteResponse = response;
+        [self showComposerWithName:name phoneNumber:phoneNumber];
+      } else {
+        DDLogError(@"%@ could not fetch invite text on retry.", self.class);
+        [UIAlertView showSimpleAlertWithTitle:@"Error" formatMessage:@"Could not invite at this time. %@",
+         error.localizedDescription];
+      }
+    }];
+    return;
+  }
+  self.composeController = [[MFMessageComposeViewController alloc] init];
+  self.composeController.messageComposeDelegate = self;
+  self.composeController.recipients = @[phoneNumber];
+  self.composeController.body = self.inviteResponse.invite_message;
+
+  if (self.composeController) {
+    [self presentViewController:self.composeController animated:YES completion:^{
+      [SVProgressHUD dismiss];
+    }];
+  } else {
+    DDLogError(@"%@ compose controller null", self.class);
+    [SVProgressHUD dismiss];
+  }
+}
+
+#pragma mark - MFMessageComposeViewControllerDelegate
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+                 didFinishWithResult:(MessageComposeResult)result
+{
+  DDLogInfo(@"%@ messageCompose finished with result: %d", [self.class description], result);
+  [DFAnalytics logInviteComposeFinishedWithResult:result
+                         presentingViewController:self.presentingViewController];
+  if (result == MessageComposeResultSent) {
+    [self.presentingViewController
+     dismissViewControllerAnimated:YES
+     completion:^{
+       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+     }];
+    
+  } else {
+    [self dismissViewControllerAnimated:YES completion:nil];
+  }
+}
+
+- (void)askForContactsPermission
+{
+  DDLogInfo(@"%@ asking for contacts permission", self.class);
+  CFErrorRef error;
+  ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
+  
+  ABAuthorizationStatus oldStatus = ABAddressBookGetAuthorizationStatus();
+  DFInviteUserViewController __weak *weakSelf;
+  ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
+    if (granted) {
+      [weakSelf updateSearchResults];
+      [weakSelf.tableView reloadData];
+      [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
+    } else {
+      [weakSelf showContactsDeniedAlert];
+    }
+    
+    [DFAnalytics logInviteAskContactsWithParameters:@{
+                                                      @"oldValue": @(oldStatus),
+                                                      @"newValue": @(ABAddressBookGetAuthorizationStatus())
+                                                      }];
+
+  });
+}
+
+- (void)showContactsDeniedAlert
+{
+  [UIAlertView showSimpleAlertWithTitle:@"Contacts Denied"
+                          formatMessage:@"Please go to Settings > Privacy > Contacts and change Strand to on."];
+}
+
+- (void)cancel
+{
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+#pragma mark - Adapters and AB getters
 
 - (DFUserPeanutAdapter *)userAdapter
 {
   if (!_userAdapter) _userAdapter = [[DFUserPeanutAdapter alloc] init];
   return _userAdapter;
+}
+
+- (DFPeanutInviteMessageAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) {
+    _inviteAdapter = [[DFPeanutInviteMessageAdapter alloc] init];
+  }
+  
+  return _inviteAdapter;
+}
+
+- (RHAddressBook *)addressBook
+{
+  if (!_addressBook) _addressBook = [[RHAddressBook alloc] init];
+  return _addressBook;
 }
 
 @end

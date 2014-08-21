@@ -98,6 +98,7 @@
    </AnalyzeAction>
    <ArchiveAction
       buildConfiguration = "Release"
+      customArchiveName = "Strand Enterprise"
       revealArchiveInOrganizer = "YES">
    </ArchiveAction>
 </Scheme>
