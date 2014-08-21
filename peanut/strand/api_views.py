@@ -666,17 +666,23 @@ def auth_phone(request):
 def get_invite_message(request):
 	response = dict({'result': True})
 
-	form = StrandApiForm(api_util.getRequestData(request))
+	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
+		userId = int(form.cleaned_data['user_id'])
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)	
 		if ('enterprise' in form.cleaned_data['build_id'].lower()):
 			inviteLink = constants.INVITE_LINK_ENTERPRISE
 		else:
 			inviteLink = constants.INVITE_LINK_APP_STORE
-	else:
-		inviteLink = constants.INVITE_LINK_APP_STORE
 
-	response['invite_message'] = "Try this app so we can share photos when we hang out: "  + inviteLink + "."
+		response['invite_message'] = "Try this app so we can share photos when we hang out: "  + inviteLink + "."
+		response['invites_remaining'] = user.invites_remaining
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
