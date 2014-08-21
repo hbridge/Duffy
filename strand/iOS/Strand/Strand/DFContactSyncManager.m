@@ -32,9 +32,11 @@ static DFContactSyncManager *defaultManager;
 
 - (void)sync
 {
-  NSDate *lastABSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncContacts];
-  if (!lastABSync) lastABSync = [NSDate dateWithTimeIntervalSince1970:0];
-  [self syncABContactsWithLastSyncDate:lastABSync];
+  if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+    NSDate *lastABSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncContacts];
+    if (!lastABSync) lastABSync = [NSDate dateWithTimeIntervalSince1970:0];
+    [self syncABContactsWithLastSyncDate:lastABSync];
+  }
   
   NSDate *lastDFContactSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncManualContacts];
   if (!lastDFContactSync) lastDFContactSync = [NSDate dateWithTimeIntervalSince1970:0];
