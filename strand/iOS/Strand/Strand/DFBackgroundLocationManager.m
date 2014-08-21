@@ -15,7 +15,7 @@
 
 @property (readonly, nonatomic, retain) CLLocationManager *locationManager;
 @property (readonly, nonatomic, retain) DFPeanutLocationAdapter *locationAdapter;
-@property (atomic) BOOL isBackgroundLocationUpdateInProgress;
+@property (atomic) BOOL isProcessingServerUpdateLocationRequest;
 
 @end
 
@@ -118,7 +118,7 @@ static DFBackgroundLocationManager *defaultManager;
     timeDifference = [newLocation.timestamp timeIntervalSinceDate:lastLocation.timestamp];
   }
   
-  DDLogInfo(@"DFBackgroundLocationManager updated location: <%f, %f> +/- %.02fm @ %@ distance from last:%.6efkm time from last:%.6efs AppState: %d",
+  DDLogInfo(@"DFBackgroundLocationManager didUpdateLocation: <%f, %f> +/- %.02fm @ %@ distance from last:%.6efkm time from last:%.6efs AppState: %d",
             newLocation.coordinate.latitude,
             newLocation.coordinate.longitude,
             newLocation.horizontalAccuracy,
@@ -128,12 +128,12 @@ static DFBackgroundLocationManager *defaultManager;
             (int)[[UIApplication sharedApplication] applicationState]);
   
   // If we've moved more than 30 m
-  //   or we're supposed to update location in the background
+  //   or we're processing an explicit request to update our location from the server
   //   or our accuracy is better than what it was before
   // Then update with new location
   if (timeDifference > 0.0 &&
       (distance > 30.0
-      || self.isBackgroundLocationUpdateInProgress
+      || self.isProcessingServerUpdateLocationRequest
       || newLocation.horizontalAccuracy < lastLocation.horizontalAccuracy))
   {
     [self recordManagerLocation];
@@ -141,13 +141,12 @@ static DFBackgroundLocationManager *defaultManager;
                            withTimestamp:newLocation.timestamp
                                 accuracy:newLocation.horizontalAccuracy
                          completionBlock:^(BOOL success) {
+                           DDLogInfo(@"%@ recorded location <%f, %f> and posted to server with success:%@",
+                                     self.class,
+                                     newLocation.coordinate.latitude,
+                                     newLocation.coordinate.longitude,
+                                     success ? @"true" : @"false");
                          }];
-  } else if (self.isBackgroundLocationUpdateInProgress){
-    [self.locationAdapter updateLocation:lastLocation
-                           withTimestamp:lastLocation.timestamp
-                                accuracy:lastLocation.horizontalAccuracy completionBlock:^(BOOL success) {
-                                  
-                                }];
   }
 }
 
@@ -173,17 +172,17 @@ static DFBackgroundLocationManager *defaultManager;
 - (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   DDLogInfo(@"%@ received background update request.", [self.class description]);
-  if (self.isBackgroundLocationUpdateInProgress) {
+  if (self.isProcessingServerUpdateLocationRequest) {
     DDLogInfo(@"%@ background update request already in progres.  Ignoring.", [self.class description]);
     return;
   }
-  self.isBackgroundLocationUpdateInProgress = YES;
+  self.isProcessingServerUpdateLocationRequest = YES;
   
   [self.locationManager startUpdatingLocation];
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(25 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
     DDLogInfo(@"%@ stopping background location updates and calling completion.", [self.class description]);
     [self.locationManager stopUpdatingLocation];
-    self.isBackgroundLocationUpdateInProgress = NO;
+    self.isProcessingServerUpdateLocationRequest = NO;
     if (completionHandler) {
       completionHandler(UIBackgroundFetchResultNewData);
     } else {
