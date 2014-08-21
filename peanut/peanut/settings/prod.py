@@ -1,5 +1,8 @@
 from peanut.settings.base import *
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.contrib.gis.db.backends.mysql', 
@@ -47,10 +50,15 @@ LOGGING = {
 			'filename': '/home/ubuntu/logs/duffy-photos.log',
 			'formatter': 'verbose'
 		},
+		'mail_admins': {
+			'level': 'ERROR',
+			'class': 'django.utils.log.AdminEmailHandler',
+			'filters': ['special']
+		}
 	},
 	'loggers': {
 		'django': {
-			'handlers':['djangofile', 'djangoerror'],
+			'handlers':['djangofile', 'djangoerror', 'mail_admins'],
 			'propagate': True,
 			'level':'DEBUG',
 		},
@@ -72,3 +80,17 @@ LOGGING = {
 
 	}
 }
+
+DEFAULT_FROM_EMAIL = 'duffyserver@gmail.com'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'duffyserver@gmail.com'
+EMAIL_HOST_PASSWORD = 'duffyserver!'
+EMAIL_USE_TLS = True
+
+SERVER_EMAIL = 'duffyserver@gmail.com'
+
+ADMINS = (
+	('Derek', 'derek@duffytech.co'),
+)
