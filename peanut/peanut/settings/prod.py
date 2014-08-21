@@ -94,3 +94,5 @@ SERVER_EMAIL = 'duffyserver@gmail.com'
 ADMINS = (
 	('Derek', 'derek@duffytech.co'),
 )
+
+ALLOWED_HOSTS = ["prod.strand.duffyapp.com"]
