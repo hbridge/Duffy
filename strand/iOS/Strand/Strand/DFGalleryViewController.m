@@ -229,7 +229,7 @@ static const CGFloat SectionHeaderHeight = 54;
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
-  cell.likeOnImageView.hidden = [[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] == 0;
+  cell.likeIconImageView.hidden = [[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] == 0;
   
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
@@ -243,7 +243,6 @@ static const CGFloat SectionHeaderHeight = 54;
        [cell setNeedsLayout];
      });
    }];
-
   
   return cell;
 }
@@ -251,9 +250,9 @@ static const CGFloat SectionHeaderHeight = 54;
 - (UICollectionViewCell *)cellForCluster:(DFPeanutSearchObject *)clusterObject
                                indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoStackCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"clusterCell"
+  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
                                                                          forIndexPath:indexPath];
-  cell.photoImageView.image = nil;
+  cell.imageView.image = nil;
   cell.likeIconImageView.hidden = YES;
   for (DFPeanutSearchObject *object in clusterObject.objects) {
     if ([[object actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
@@ -272,7 +271,7 @@ static const CGFloat SectionHeaderHeight = 54;
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:cell]) return;
-       cell.photoImageView.image = image;
+       cell.imageView.image = image;
        [cell setNeedsLayout];
      });
    }];

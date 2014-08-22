@@ -34,7 +34,7 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="imageView" destination="2gT-dn-UU6" id="nAC-fk-qaT"/>
-                <outlet property="likeOnImageView" destination="TUZ-FC-zJG" id="5Lq-sq-LOG"/>
+                <outlet property="likeIconImageView" destination="TUZ-FC-zJG" id="Yrm-ue-9Ax"/>
             </connections>
         </view>
     </objects>
