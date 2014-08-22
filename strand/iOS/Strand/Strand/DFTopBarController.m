@@ -72,6 +72,8 @@ CGFloat const MaxNavbarOriginY = 0;
   viewController.topBarController = self;
   
   if (animated && self.contentView) {
+    // Disable interaction on the disappearing view
+    self.contentView.userInteractionEnabled = NO;
     // Set the new view's frame to be off screen
     UIView *newView = viewController.view;
     [self.view addSubview:newView];
@@ -88,6 +90,7 @@ CGFloat const MaxNavbarOriginY = 0;
      animations:^{
        newView.frame = frame;
      } completion:^(BOOL finished) {
+       self.contentView.userInteractionEnabled = YES;
        self.contentView = newView;
      }];
   }
