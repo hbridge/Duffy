@@ -84,6 +84,11 @@ static const CGFloat SectionHeaderHeight = 54;
   self.flowLayout.minimumInteritemSpacing = ItemSpacing;
   self.flowLayout.minimumLineSpacing = ItemSpacing;
 
+  
+  self.refreshControl = [[UIRefreshControl alloc] init];
+  [self.refreshControl addTarget:self action:@selector(reloadFeed)
+                forControlEvents:UIControlEventValueChanged];
+  [self.collectionView addSubview:self.refreshControl];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -99,7 +104,7 @@ static const CGFloat SectionHeaderHeight = 54;
 
 - (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:error
 {
-  // Don't need to do anything for server refreshes
+  [self.refreshControl endRefreshing];
 }
 
 
@@ -335,7 +340,9 @@ static const CGFloat SectionHeaderHeight = 54;
            perspectiveTransform = CATransform3DTranslate(perspectiveTransform, 0, 0, 10.0);
            cell.likeIconImageView.layer.transform = perspectiveTransform;
          } completion:^(BOOL finished) {
-           cell.likeIconImageView.layer.transform = CATransform3DIdentity;
+           if (finished) {
+             cell.likeIconImageView.layer.transform = CATransform3DIdentity;
+           }
          }];
         
       });

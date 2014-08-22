@@ -12,6 +12,7 @@
 @interface DFGalleryViewController : DFStrandsViewController <DFStrandViewControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate>
 
 @property (nonatomic, retain) UICollectionView *collectionView;
+@property (nonatomic, retain) UIRefreshControl *refreshControl;
 
 
 @end
