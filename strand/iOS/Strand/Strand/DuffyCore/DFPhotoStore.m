@@ -428,8 +428,12 @@ static int const FetchStride = 500;
     return;
   }
   
-  /* merge in the changes to the main context */
-  [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+  // merge in the changes to the main context
+  // but only if the persistent stores are the same
+  NSManagedObjectContext *otherContext = notification.object;
+  if (otherContext.persistentStoreCoordinator == self.managedObjectContext.persistentStoreCoordinator) {
+    [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+  }
 }
 
 - (void)photosChanged:(NSNotification *)note
@@ -443,9 +447,6 @@ static int const FetchStride = 500;
     }
   }];
 }
-
-
-
 
 - (void)clearUploadInfo
 {

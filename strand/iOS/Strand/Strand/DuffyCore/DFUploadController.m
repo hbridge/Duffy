@@ -463,10 +463,13 @@ static DFUploadController *defaultUploadController;
 
 /* Save notification handler for the background context */
 - (void)backgroundContextDidSave:(NSNotification *)notification {
-    /* merge in the changes to the main context */
+  /* merge in the changes to our context, but only if the PSC is the same */
+  NSManagedObjectContext *otherContext = notification.object;
+  if (otherContext.persistentStoreCoordinator == self.managedObjectContext.persistentStoreCoordinator) {
     [self scheduleWithDispatchUploads:NO operation:[NSBlockOperation blockOperationWithBlock:^{
-        [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
+      [self.managedObjectContext mergeChangesFromContextDidSaveNotification:notification];
     }]];
+  }
 }
 
 - (void)cameraRollSyncCompleted:(NSNotification *)notification {
