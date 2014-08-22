@@ -13,13 +13,19 @@
                 <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qdj-Fe-Ocw">
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Qdj-Fe-Ocw">
                         <rect key="frame" x="0.0" y="0.0" width="100" height="100"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     </imageView>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="Qdj-Fe-Ocw" secondAttribute="trailing" id="P8B-Uk-kva"/>
+                <constraint firstItem="Qdj-Fe-Ocw" firstAttribute="top" secondItem="paW-Lb-LPS" secondAttribute="top" id="ipP-oE-Z2T"/>
+                <constraint firstAttribute="bottom" secondItem="Qdj-Fe-Ocw" secondAttribute="bottom" id="l4b-0l-MRg"/>
+                <constraint firstItem="Qdj-Fe-Ocw" firstAttribute="leading" secondItem="paW-Lb-LPS" secondAttribute="leading" id="pRh-vz-cLp"/>
+            </constraints>
             <connections>
                 <outlet property="imageView" destination="Qdj-Fe-Ocw" id="g7H-YV-Tmx"/>
             </connections>
