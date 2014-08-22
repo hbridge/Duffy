@@ -1,5 +1,9 @@
 # Strand
 
+## Aug 22nd 2015 (1.0.2 4722)
+
+- Minor bug fixes
+
 ## Aug 21st 2015 (1.0.2 4721)
 
 - New invite user flow
