@@ -56,8 +56,8 @@ static const CGFloat SectionHeaderHeight = 54;
   self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
   self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame
                                            collectionViewLayout:self.flowLayout];
-
   [self.view addSubview:self.collectionView];
+  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, 75, 0);
   [self configureCollectionView];
   
 }
