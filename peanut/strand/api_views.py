@@ -199,9 +199,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	logger.info("Created new user %s" % user)
 
 	# Now pre-populate friends who this user was invited by
-	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invite").exclude(skip=True)
-
-	logger.info("Contact entry query: %s" % (invitedBy.query))
+	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invited").exclude(skip=True)
 	
 	for invite in invitedBy:
 		try:
