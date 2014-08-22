@@ -43,6 +43,6 @@ didFinishServerFetchWithError:(NSError *)error;
 - (void)settingsButtonPressed:(id)sender;
 
 // asbtract method, subclasses should implement
-- (void)showPhoto:(DFPhotoIDType)photoId;
+- (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;
 
 @end

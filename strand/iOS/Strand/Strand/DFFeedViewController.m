@@ -69,18 +69,18 @@ const CGFloat LockedCellHeight = 157.0;
   if (self) {
     self.delegate = self;
     /* uncommment to show gallery */
-    //    UIBarButtonItem *backToGalleryItem = [[UIBarButtonItem alloc]
-    //                                          initWithImage:[UIImage imageNamed:@"Assets/Icons/GridBarButton"]
-    //                                          style:UIBarButtonItemStylePlain
-    //                                          target:self
-    //                                          action:@selector(backPressed:)];
-    //self.navigationItem.backBarButtonItem = backToGalleryItem;
-    UIBarButtonItem *settingsButtonIcon = [[UIBarButtonItem alloc]
-                                           initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                                           style:UIBarButtonItemStylePlain
-                                           target:self
-                                           action:@selector(settingsButtonPressed:)];
-    self.navigationItem.leftBarButtonItem = settingsButtonIcon;
+    UIBarButtonItem *backToGalleryItem = [[UIBarButtonItem alloc]
+                                          initWithImage:[UIImage imageNamed:@"Assets/Icons/GridBarButton"]
+                                          style:UIBarButtonItemStylePlain
+                                          target:self
+                                          action:@selector(backPressed:)];
+    self.navigationItem.leftBarButtonItem = backToGalleryItem;
+//    UIBarButtonItem *settingsButtonIcon = [[UIBarButtonItem alloc]
+//                                           initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+//                                           style:UIBarButtonItemStylePlain
+//                                           target:self
+//                                           action:@selector(settingsButtonPressed:)];
+//    self.navigationItem.leftBarButtonItem = settingsButtonIcon;
   }
   return self;
 }
@@ -156,7 +156,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 #pragma mark - Jump to a specific photo
 
-- (void)showPhoto:(DFPhotoIDType)photoId
+- (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
@@ -166,7 +166,7 @@ const CGFloat LockedCellHeight = 157.0;
       self.isViewTransitioning = YES;
       [self.tableView scrollToRowAtIndexPath:indexPath
                             atScrollPosition:UITableViewScrollPositionTop
-                                    animated:YES];
+                                    animated:animated];
       
       // this tweak is gross but makes for less text from the last section overlapped under the header
       self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
@@ -201,7 +201,7 @@ const CGFloat LockedCellHeight = 157.0;
   [self.refreshControl endRefreshing];
   
   if (self.requestedPhotoIDToJumpTo != 0) {
-    [self showPhoto:self.requestedPhotoIDToJumpTo];
+    [self showPhoto:self.requestedPhotoIDToJumpTo animated:NO];
     self.requestedPhotoIDToJumpTo = 0;
   }
 }

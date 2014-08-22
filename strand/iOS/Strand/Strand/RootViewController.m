@@ -44,7 +44,8 @@ static RootViewController *mainRootViewController;
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFFeedViewController alloc] init];
     _strandsNavController = [[DFTopBarController alloc]
-                             initWithRootViewController:_photoFeedController];
+                             initWithRootViewController:[[DFGalleryViewController alloc] init]];
+    [_strandsNavController pushViewController:_photoFeedController animated:NO];
     _subviewControllers =
     @[
       _strandsNavController,

@@ -287,7 +287,7 @@ static const CGFloat SectionHeaderHeight = 54;
     DFFeedViewController *photoFeedController =
     [(RootViewController *)self.view.window.rootViewController photoFeedController];
     [self.topBarController pushViewController:photoFeedController animated:YES];
-    [photoFeedController jumpToPhoto:photoID];
+    [photoFeedController showPhoto:photoID animated:NO];
   }
 }
 
