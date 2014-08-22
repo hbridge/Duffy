@@ -36,6 +36,7 @@
 - (void)layoutSubviews
 {
   [super layoutSubviews];
+  self.glassView.frame = self.imageView.frame;
   [self.glassView blurOnceIfPossible];
 }
 

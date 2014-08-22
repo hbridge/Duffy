@@ -303,5 +303,51 @@ static const CGFloat SectionHeaderHeight = 54;
 }
 
 
+- (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
+    
+    if (indexPath) {
+      if ([[self sectionObjectForUploadedSection:indexPath.section] isLockedSection]) {
+        indexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
+      }
+      
+      // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
+      [self.collectionView scrollToItemAtIndexPath:indexPath
+                                  atScrollPosition:UICollectionViewScrollPositionCenteredVertically
+                                          animated:animated
+       ];
+      
+      // this tweak is gross but makes for less text from the last section overlapped under the header
+      self.collectionView.contentOffset = CGPointMake(self.collectionView.contentOffset.x,
+                                                 self.collectionView.contentOffset.y + 10);
+
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+        [UIView
+         animateWithDuration:0.4
+         delay:0.0
+         options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAutoreverse
+         animations:^{
+           CATransform3D perspectiveTransform = CATransform3DIdentity;
+           perspectiveTransform = CATransform3DScale(perspectiveTransform, 1.6, 1.6, 1.6);
+           perspectiveTransform = CATransform3DTranslate(perspectiveTransform, 0, 0, 10.0);
+           cell.likeIconImageView.layer.transform = perspectiveTransform;
+         } completion:^(BOOL finished) {
+           cell.likeIconImageView.layer.transform = CATransform3DIdentity;
+         }];
+        
+      });
+      
+    } else; {
+      DDLogWarn(@"%@ showPhoto:%llu no indexPath for photoId found.",
+                [self.class description],
+                photoId);
+    }
+  });
+}
+
+
 
 @end
