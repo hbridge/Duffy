@@ -18,5 +18,11 @@
 @property (nonatomic, retain) NSString *name;
 @property (nonatomic, retain) NSString *phone_number;
 
+typedef NSString *const DFPeanutContactType;
+extern DFPeanutContactType DFPeanutContactAddressBook;
+extern DFPeanutContactType DFPeanutContactManual;
+extern DFPeanutContactType DFPeanutContactInvited;
+
+@property (nonatomic, retain) NSString *contact_type;
 
 @end

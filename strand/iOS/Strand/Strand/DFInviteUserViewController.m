@@ -16,6 +16,7 @@
 #import "DFAnalytics.h"
 #import "SVProgressHUD.h"
 #import "DFDefaultsStore.h"
+#import "DFPeanutContactAdapter.h"
 
 @interface DFInviteUserViewController ()
 
@@ -28,6 +29,7 @@
 @property (nonatomic, retain) NSArray *abSearchResults;
 @property (nonatomic, retain) NSString *textNumberString;
 @property (readonly, nonatomic, retain) RHAddressBook *addressBook;
+@property (nonatomic, retain) DFPeanutContact *selectedContact;
 
 @end
 
@@ -247,6 +249,11 @@
     NSDictionary *resultDict = self.abSearchResults[indexPath.row];
     RHPerson *person = resultDict[@"person"];
     int phoneIndex = [resultDict[@"index"] intValue];
+    self.selectedContact = [[DFPeanutContact alloc] init];
+    self.selectedContact.name = person.name;
+    self.selectedContact.phone_number = [person.phoneNumbers valueAtIndex:phoneIndex];
+    self.selectedContact.contact_type = DFPeanutContactInvited;
+    self.selectedContact.user = @([[DFUser currentUser] userID]);
     
     [self showComposerWithName:person.name phoneNumber:[person.phoneNumbers valueAtIndex:phoneIndex]];
   } else if (indexPath.section == 1 && self.textNumberString) {
@@ -305,6 +312,14 @@
   [DFAnalytics logInviteComposeFinishedWithResult:result
                          presentingViewController:self.presentingViewController];
   if (result == MessageComposeResultSent) {
+    DFPeanutContactAdapter *contactAdapter = [[DFPeanutContactAdapter alloc] init];
+    [contactAdapter
+     postPeanutContacts:@[self.selectedContact]
+     success:^(NSArray *peanutContacts) {
+       DDLogInfo(@"%@ successfully posted contact: %@", self.class, self.selectedContact);
+     } failure:^(NSError *error) {
+       DDLogInfo(@"%@ failed to post contact: %@", self.class, self.selectedContact);
+     }];
     [self.presentingViewController
      dismissViewControllerAnimated:YES
      completion:^{

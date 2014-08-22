@@ -9,6 +9,11 @@
 #import "DFPeanutContact.h"
 #import "NSDictionary+DFJSON.h"
 
+DFPeanutContactType DFPeanutContactAddressBook = @"ab";
+DFPeanutContactType DFPeanutContactManual = @"manual";
+DFPeanutContactType DFPeanutContactInvited = @"invited";
+
+
 @implementation DFPeanutContact
 
 + (RKObjectMapping *)objectMapping {
@@ -20,7 +25,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"id", @"user", @"name", @"phone_number"];
+  return @[@"id", @"user", @"name", @"phone_number", @"contact_type"];
 }
 
 - (NSString *)description
