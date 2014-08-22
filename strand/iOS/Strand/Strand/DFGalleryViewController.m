@@ -17,6 +17,8 @@
 #import "DFGallerySectionHeader.h"
 #import "DFFeedViewController.h"
 #import "RootViewController.h"
+#import "DFLockedPhotoViewCell.h"
+#import "DFAnalytics.h"
 
 
 static const CGFloat ItemSize = 105;
@@ -70,6 +72,8 @@ static const CGFloat SectionHeaderHeight = 54;
         forCellWithReuseIdentifier:@"photoCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoStackCell" bundle:nil]
         forCellWithReuseIdentifier:@"clusterCell"];
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFLockedPhotoViewCell" bundle:nil]
+       forCellWithReuseIdentifier:@"lockedCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionHeader" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
@@ -80,6 +84,12 @@ static const CGFloat SectionHeaderHeight = 54;
   self.flowLayout.minimumInteritemSpacing = ItemSpacing;
   self.flowLayout.minimumLineSpacing = ItemSpacing;
 
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
@@ -125,8 +135,6 @@ static const CGFloat SectionHeaderHeight = 54;
 }
 
 
-
-
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
   if (self.uploadingPhotos.count > 0 && section == 0) {
@@ -134,10 +142,6 @@ static const CGFloat SectionHeaderHeight = 54;
   }
   
   DFPeanutSearchObject *sectionObject = [self sectionObjectForUploadedSection:section];
-  
-  if ([sectionObject isLockedSection]) {
-    return 1;
-  }
   
   NSArray *items = sectionObject.objects;
   return items.count;
@@ -198,12 +202,12 @@ static const CGFloat SectionHeaderHeight = 54;
 - (UICollectionViewCell *)cellForLockedSection:(DFPeanutSearchObject *)section
                                      indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoViewCell *lockedCell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
+  DFPhotoViewCell *lockedCell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"lockedCell"
                                                                                forIndexPath:indexPath];
   lockedCell.imageView.image = nil;
 
   //TODO complete
-  DFPeanutSearchObject *object = section.objects.firstObject;
+  DFPeanutSearchObject *object = section.objects[indexPath.row];
   [[DFImageStore sharedStore]
    imageForID:object.id
    preferredType:DFImageThumbnail

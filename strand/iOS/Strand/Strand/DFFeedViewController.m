@@ -162,6 +162,10 @@ const CGFloat LockedCellHeight = 157.0;
     NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
    
     if (indexPath) {
+      if ([[self sectionObjectForTableSection:indexPath.section] isLockedSection]) {
+        indexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
+      }
+      
       // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
       self.isViewTransitioning = YES;
       [self.tableView scrollToRowAtIndexPath:indexPath
