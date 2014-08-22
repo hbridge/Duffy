@@ -323,12 +323,14 @@
   ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
   
   ABAuthorizationStatus oldStatus = ABAddressBookGetAuthorizationStatus();
-  DFInviteUserViewController __weak *weakSelf;
+  DFInviteUserViewController __weak *weakSelf = self;
   ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
     if (granted) {
-      [weakSelf updateSearchResults];
-      [weakSelf.tableView reloadData];
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [weakSelf updateSearchResults];
+        [weakSelf.tableView reloadData];
+      });
     } else {
       [weakSelf showContactsDeniedAlert];
     }
