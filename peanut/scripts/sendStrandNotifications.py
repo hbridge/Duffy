@@ -36,8 +36,8 @@ def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedW
 	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
 	for user in users:
-		friendsIds = friends_util.getFriendsIds(user.id)
-		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
+		friendsData = friends_util.getFriendsData(user.id)
+		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
 
 		names = list()
 		for photo in joinableStrandPhotos:

@@ -11,10 +11,11 @@ from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import Http404
+from django.db import IntegrityError
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -195,6 +196,22 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		smsAuth.user_created = user
 		smsAuth.save()
 
+	logger.info("Created new user %s" % user)
+
+	# Now pre-populate friends who this user was invited by
+	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invite").exclude(skip=True)
+
+	for invite in invitedBy:
+		try:
+			if user.id < invite.user.id:
+				FriendConnection.objects.create(user_1=user, user_2=invite.user)
+			else:
+				FriendConnection.objects.create(user_1=invite.user, user_2=user)
+			logger.debug("Created invite friend entry for user %s with user %s" % (user.id, invite.user.id))
+		except IntegrityError:
+			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
+
+		
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
@@ -230,14 +247,14 @@ def strand_feed(request):
 		except User.DoesNotExist:
 			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
 
-		friendsIds = friends_util.getFriendsIds(userId)
+		friendsData = friends_util.getFriendsData(userId)
 
 		strands = Strand.objects.select_related().filter(users__in=[user])
 
 		# list of list of photos
 		groups = list()
 		for strand in strands:
-			photos = friends_util.filterPhotosByFriends(userId, friendsIds, strand.photos.all().order_by("-time_taken"))
+			photos = friends_util.filterStrandPhotosByFriends(userId, friendsData, strand)
 			if len(photos) > 0:
 				groups.append(photos)
 
@@ -249,7 +266,7 @@ def strand_feed(request):
 		lockedGroup = list()
 		if user.last_location_point:
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
+			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, lockedGroup)
@@ -291,10 +308,10 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		friendsIds = friends_util.getFriendsIds(userId)
+		friendsData = friends_util.getFriendsData(userId)
 		strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 
-		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds)
+		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsData)
 
 		formattedGroups = getFormattedGroups([joinableStrandPhotos], userId)
 		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
@@ -461,11 +478,11 @@ def get_nearby_friends_message(request):
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
 
-		friendIds = friends_util.getFriendsIds(userId)
+		friendsData = friends_util.getFriendsData(userId)
 		
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
-		users = friends_util.filterUsersByFriends(userId, friendIds, users)
+		users = friends_util.filterUsersByFriends(userId, friendsData, users)
 
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
 
@@ -510,7 +527,7 @@ def get_nearby_friends_message(request):
 				else:
 					numNames = len(names)
 					message = ", ".join(names[:numNames-2])
-					message += "& %s" % (names[numNames-1])
+					message += " & %s" % (names[numNames-1])
 				expMessage = message + " took a photo near you."
 			else:
 				message = ", ".join(names)
