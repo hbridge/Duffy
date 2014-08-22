@@ -15,7 +15,7 @@ from django.db import IntegrityError
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -201,6 +201,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	# Now pre-populate friends who this user was invited by
 	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invite").exclude(skip=True)
 
+	logger.info("Contact entry query: %s" % (invitedBy.query))
+	logger.info("%s invites" % (len(invitedBy)))
 	for invite in invitedBy:
 		try:
 			if user.id < invite.user.id:
