@@ -157,7 +157,6 @@
   ABAddressBookRef addressBookRef = ABAddressBookCreateWithOptions(NULL, &error);
   ABAddressBookRequestAccessWithCompletion(addressBookRef, ^(bool granted, CFErrorRef error) {
     if (granted) {
-      [[DFContactSyncManager sharedManager] sync];
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
       [[DFContactSyncManager sharedManager] sync];
       dispatch_async(dispatch_get_main_queue(), ^{
@@ -182,7 +181,6 @@
   DFAddContactViewController *addContactViewController = [[DFAddContactViewController alloc] init];
   [self.navigationController pushViewController:addContactViewController animated:YES];
 }
-
 
 - (void)showNextStep
 {
