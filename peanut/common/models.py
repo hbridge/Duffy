@@ -429,6 +429,7 @@ class ContactEntry(models.Model):
 	phone_number = models.CharField(max_length=128, db_index=True)
 	evaluated = models.BooleanField(db_index=True, default=False)
 	skip = models.BooleanField(db_index=True, default=False)
+	contact_type = models.CharField(max_length=30, null=True)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True)

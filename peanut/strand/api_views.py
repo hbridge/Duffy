@@ -14,7 +14,7 @@ from django.http import Http404
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -195,6 +195,22 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		smsAuth.user_created = user
 		smsAuth.save()
 
+	logger.info("Created new user %s" % user)
+
+	# Now pre-populate friends who this user was invited by
+	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invite").exclude(skip=True)
+
+	for invite in invitedBy:
+		try:
+			if user.id < invite.user.id:
+				FriendConnection.objects.create(user_1=user, user_2=invite.user)
+			else:
+				FriendConnection.objects.create(user_1=invite.user, user_2=user)
+			logger.debug("Created invite friend entry for user %s with user %s" % (user.id, invite.user.id))
+		except IntegrityError:
+			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
+
+		
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
