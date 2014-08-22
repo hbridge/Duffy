@@ -30,13 +30,22 @@
                         <constraint firstAttribute="width" constant="25" id="kS5-lC-hg0"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
-                    <color key="textColor" red="0.93333339691162109" green="0.40000003576278687" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/LikeOnGalleryIcon" translatesAutoresizingMaskIntoConstraints="NO" id="pZq-TN-Rbk">
+                    <rect key="frame" x="4" y="58" width="15" height="15"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="15" id="4eo-zO-GLw"/>
+                        <constraint firstAttribute="width" constant="15" id="ypo-h9-l6m"/>
+                    </constraints>
+                </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="VJ5-MG-akj" secondAttribute="bottom" constant="1" id="2QT-Eh-boW"/>
+                <constraint firstAttribute="bottom" secondItem="pZq-TN-Rbk" secondAttribute="bottom" constant="4" id="Bij-31-zhh"/>
                 <constraint firstAttribute="trailing" secondItem="VJ5-MG-akj" secondAttribute="trailing" constant="-2" id="CUu-3f-Act"/>
                 <constraint firstAttribute="trailing" secondItem="1dA-2O-3kS" secondAttribute="trailing" id="YcT-47-NrT"/>
                 <constraint firstAttribute="bottom" secondItem="cPL-tb-lqo" secondAttribute="bottom" id="YkS-AY-8Ob"/>
@@ -44,16 +53,19 @@
                 <constraint firstAttribute="trailing" secondItem="cPL-tb-lqo" secondAttribute="trailing" id="r1B-GG-lFa"/>
                 <constraint firstAttribute="bottom" secondItem="1dA-2O-3kS" secondAttribute="bottom" id="sCi-SM-qI7"/>
                 <constraint firstItem="cPL-tb-lqo" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="vk4-Fe-crr"/>
+                <constraint firstItem="pZq-TN-Rbk" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="4" id="zZI-Gl-25w"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
                 <outlet property="countLabel" destination="VJ5-MG-akj" id="RRl-aZ-neN"/>
+                <outlet property="likeIconImageView" destination="pZq-TN-Rbk" id="oIJ-ux-C4D"/>
                 <outlet property="overlayImageView" destination="1dA-2O-3kS" id="WLk-Su-a3I"/>
                 <outlet property="photoImageView" destination="cPL-tb-lqo" id="JuO-sy-QwP"/>
             </connections>
         </view>
     </objects>
     <resources>
+        <image name="Assets/Icons/LikeOnGalleryIcon" width="16" height="16"/>
         <image name="Assets/Icons/PhotoStackOverlay.png" width="16" height="16"/>
     </resources>
 </document>

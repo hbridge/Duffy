@@ -225,6 +225,7 @@ static const CGFloat SectionHeaderHeight = 54;
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
+  cell.likeOnImageView.hidden = [[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] == 0;
   
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
@@ -249,6 +250,13 @@ static const CGFloat SectionHeaderHeight = 54;
   DFPhotoStackCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"clusterCell"
                                                                          forIndexPath:indexPath];
   cell.photoImageView.image = nil;
+  cell.likeIconImageView.hidden = YES;
+  for (DFPeanutSearchObject *object in clusterObject.objects) {
+    if ([[object actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
+      cell.likeIconImageView.hidden = NO;
+      break;
+    }
+  }
   
   DFPeanutSearchObject *firstObject = (DFPeanutSearchObject *)clusterObject.objects.firstObject;
   
