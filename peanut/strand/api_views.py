@@ -201,6 +201,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	# Now pre-populate friends who this user was invited by
 	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invite").exclude(skip=True)
 
+	logger.info("Contact entry query: %s" % (invitedBy.query))
+	
 	for invite in invitedBy:
 		try:
 			if user.id < invite.user.id:
@@ -211,7 +213,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		except IntegrityError:
 			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
 
-		
+	logger.info("%s invites" % (len(invitedBy)))
+	
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
