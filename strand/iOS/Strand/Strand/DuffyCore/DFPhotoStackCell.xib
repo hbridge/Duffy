@@ -34,11 +34,11 @@
                     <nil key="highlightedColor"/>
                 </label>
                 <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/LikeOnGalleryIcon" translatesAutoresizingMaskIntoConstraints="NO" id="pZq-TN-Rbk">
-                    <rect key="frame" x="4" y="58" width="15" height="15"/>
+                    <rect key="frame" x="4" y="53" width="20" height="20"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="15" id="4eo-zO-GLw"/>
-                        <constraint firstAttribute="width" constant="15" id="ypo-h9-l6m"/>
+                        <constraint firstAttribute="height" constant="20" id="4eo-zO-GLw"/>
+                        <constraint firstAttribute="width" constant="20" id="ypo-h9-l6m"/>
                     </constraints>
                 </imageView>
             </subviews>
