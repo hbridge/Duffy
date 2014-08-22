@@ -135,9 +135,9 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 
 		# This does two database lookups
 		# TODO(Derek): If we need speed, build this into a cache
-		friendIds = friends_util.getFriendsIds(user.id)
+		friendsData = friends_util.getFriendsData(user.id)
 
-		otherUsers = friends_util.filterUsersByFriends(user.id, friendIds, otherUsers)
+		otherUsers = friends_util.filterUsersByFriends(user.id, friendsData, otherUsers)
 
 		names = list()
 		for otherUser in otherUsers:

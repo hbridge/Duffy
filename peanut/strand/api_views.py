@@ -230,14 +230,14 @@ def strand_feed(request):
 		except User.DoesNotExist:
 			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
 
-		friendsIds = friends_util.getFriendsIds(userId)
+		friendsData = friends_util.getFriendsData(userId)
 
 		strands = Strand.objects.select_related().filter(users__in=[user])
 
 		# list of list of photos
 		groups = list()
 		for strand in strands:
-			photos = friends_util.filterPhotosByFriends(userId, friendsIds, strand.photos.all().order_by("-time_taken"))
+			photos = friends_util.filterStrandPhotosByFriends(userId, friendsData, strand)
 			if len(photos) > 0:
 				groups.append(photos)
 
@@ -249,7 +249,7 @@ def strand_feed(request):
 		lockedGroup = list()
 		if user.last_location_point:
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsIds)
+			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, lockedGroup)
@@ -291,10 +291,10 @@ def get_joinable_strands(request):
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		friendsIds = friends_util.getFriendsIds(userId)
+		friendsData = friends_util.getFriendsData(userId)
 		strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 
-		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds)
+		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsData)
 
 		formattedGroups = getFormattedGroups([joinableStrandPhotos], userId)
 		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
@@ -461,11 +461,11 @@ def get_nearby_friends_message(request):
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
 
-		friendIds = friends_util.getFriendsIds(userId)
+		friendsData = friends_util.getFriendsData(userId)
 		
 		# For now, search through all Users, when we have more, do something more efficent
 		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
-		users = friends_util.filterUsersByFriends(userId, friendIds, users)
+		users = friends_util.filterUsersByFriends(userId, friendsData, users)
 
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
 
@@ -510,7 +510,7 @@ def get_nearby_friends_message(request):
 				else:
 					numNames = len(names)
 					message = ", ".join(names[:numNames-2])
-					message += "& %s" % (names[numNames-1])
+					message += " & %s" % (names[numNames-1])
 				expMessage = message + " took a photo near you."
 			else:
 				message = ", ".join(names)

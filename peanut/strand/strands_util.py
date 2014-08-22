@@ -13,7 +13,7 @@ from strand import geo_util, friends_util
 	Utility method to grab all photos that are in a joinable strand near the given lat, lon
 	Also, filters by friends of the userId
 """
-def getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds):
+def getJoinableStrandPhotos(userId, lon, lat, strands, friendsData):
 	timeWithinMinutes = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 
 	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -33,6 +33,6 @@ def getJoinableStrandPhotos(userId, lon, lat, strands, friendsIds):
 
 	photos = list()
 	for strand in joinableStrands:
-		photos.extend(friends_util.filterPhotosByFriends(userId, friendsIds, strand.photos.all()))
+		photos.extend(friends_util.filterStrandPhotosByFriends(userId, friendsData, strand))
 
 	return photos
