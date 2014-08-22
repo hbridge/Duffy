@@ -412,11 +412,11 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)notificationViewController:(DFNotificationsViewController *)notificationViewController
   didSelectNotificationWithPhotoID:(DFPhotoIDType)photoID
 {
-  [self showPhoto:photoID];
+  [self showPhoto:photoID animated:YES];
   [self.notificationsPopupController dismissPopoverAnimated:YES];
 }
 
-- (void)showPhoto:(DFPhotoIDType)photoId
+- (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated
 {
   // abstract method
 }

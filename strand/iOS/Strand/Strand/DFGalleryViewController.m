@@ -17,6 +17,8 @@
 #import "DFGallerySectionHeader.h"
 #import "DFFeedViewController.h"
 #import "RootViewController.h"
+#import "DFLockedPhotoViewCell.h"
+#import "DFAnalytics.h"
 
 
 static const CGFloat ItemSize = 105;
@@ -54,8 +56,8 @@ static const CGFloat SectionHeaderHeight = 54;
   self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
   self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame
                                            collectionViewLayout:self.flowLayout];
-
   [self.view addSubview:self.collectionView];
+  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, 75, 0);
   [self configureCollectionView];
   
 }
@@ -70,6 +72,8 @@ static const CGFloat SectionHeaderHeight = 54;
         forCellWithReuseIdentifier:@"photoCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoStackCell" bundle:nil]
         forCellWithReuseIdentifier:@"clusterCell"];
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFLockedPhotoViewCell" bundle:nil]
+       forCellWithReuseIdentifier:@"lockedCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionHeader" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
@@ -80,6 +84,12 @@ static const CGFloat SectionHeaderHeight = 54;
   self.flowLayout.minimumInteritemSpacing = ItemSpacing;
   self.flowLayout.minimumLineSpacing = ItemSpacing;
 
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
@@ -125,8 +135,6 @@ static const CGFloat SectionHeaderHeight = 54;
 }
 
 
-
-
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
   if (self.uploadingPhotos.count > 0 && section == 0) {
@@ -134,10 +142,6 @@ static const CGFloat SectionHeaderHeight = 54;
   }
   
   DFPeanutSearchObject *sectionObject = [self sectionObjectForUploadedSection:section];
-  
-  if ([sectionObject isLockedSection]) {
-    return 1;
-  }
   
   NSArray *items = sectionObject.objects;
   return items.count;
@@ -198,12 +202,12 @@ static const CGFloat SectionHeaderHeight = 54;
 - (UICollectionViewCell *)cellForLockedSection:(DFPeanutSearchObject *)section
                                      indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoViewCell *lockedCell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
+  DFPhotoViewCell *lockedCell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"lockedCell"
                                                                                forIndexPath:indexPath];
   lockedCell.imageView.image = nil;
 
   //TODO complete
-  DFPeanutSearchObject *object = section.objects.firstObject;
+  DFPeanutSearchObject *object = section.objects[indexPath.row];
   [[DFImageStore sharedStore]
    imageForID:object.id
    preferredType:DFImageThumbnail
@@ -225,6 +229,7 @@ static const CGFloat SectionHeaderHeight = 54;
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
+  cell.likeIconImageView.hidden = [[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] == 0;
   
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
@@ -238,7 +243,6 @@ static const CGFloat SectionHeaderHeight = 54;
        [cell setNeedsLayout];
      });
    }];
-
   
   return cell;
 }
@@ -246,9 +250,16 @@ static const CGFloat SectionHeaderHeight = 54;
 - (UICollectionViewCell *)cellForCluster:(DFPeanutSearchObject *)clusterObject
                                indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoStackCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"clusterCell"
+  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
                                                                          forIndexPath:indexPath];
-  cell.photoImageView.image = nil;
+  cell.imageView.image = nil;
+  cell.likeIconImageView.hidden = YES;
+  for (DFPeanutSearchObject *object in clusterObject.objects) {
+    if ([[object actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
+      cell.likeIconImageView.hidden = NO;
+      break;
+    }
+  }
   
   DFPeanutSearchObject *firstObject = (DFPeanutSearchObject *)clusterObject.objects.firstObject;
   
@@ -260,7 +271,7 @@ static const CGFloat SectionHeaderHeight = 54;
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:cell]) return;
-       cell.photoImageView.image = image;
+       cell.imageView.image = image;
        [cell setNeedsLayout];
      });
    }];
@@ -287,8 +298,54 @@ static const CGFloat SectionHeaderHeight = 54;
     DFFeedViewController *photoFeedController =
     [(RootViewController *)self.view.window.rootViewController photoFeedController];
     [self.topBarController pushViewController:photoFeedController animated:YES];
-    [photoFeedController jumpToPhoto:photoID];
+    [photoFeedController showPhoto:photoID animated:NO];
   }
+}
+
+
+- (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
+    
+    if (indexPath) {
+      if ([[self sectionObjectForUploadedSection:indexPath.section] isLockedSection]) {
+        indexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
+      }
+      
+      // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
+      [self.collectionView scrollToItemAtIndexPath:indexPath
+                                  atScrollPosition:UICollectionViewScrollPositionCenteredVertically
+                                          animated:animated
+       ];
+      
+      // this tweak is gross but makes for less text from the last section overlapped under the header
+      self.collectionView.contentOffset = CGPointMake(self.collectionView.contentOffset.x,
+                                                 self.collectionView.contentOffset.y + 10);
+
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
+        [UIView
+         animateWithDuration:0.4
+         delay:0.0
+         options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAutoreverse
+         animations:^{
+           CATransform3D perspectiveTransform = CATransform3DIdentity;
+           perspectiveTransform = CATransform3DScale(perspectiveTransform, 1.6, 1.6, 1.6);
+           perspectiveTransform = CATransform3DTranslate(perspectiveTransform, 0, 0, 10.0);
+           cell.likeIconImageView.layer.transform = perspectiveTransform;
+         } completion:^(BOOL finished) {
+           cell.likeIconImageView.layer.transform = CATransform3DIdentity;
+         }];
+        
+      });
+      
+    } else; {
+      DDLogWarn(@"%@ showPhoto:%llu no indexPath for photoId found.",
+                [self.class description],
+                photoId);
+    }
+  });
 }
 
 

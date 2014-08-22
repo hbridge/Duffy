@@ -433,12 +433,12 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
       self.userFavoritedAction = action;
       [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
                                             result:DFAnalyticsValueResultSuccess
-                                        actionType:DFActionButtonPress
+                                        actionType:DFUIActionButtonPress
                             timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.creationDate]];
     } else {
       [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
                                             result:DFAnalyticsValueResultFailure
-                                        actionType:DFActionButtonPress
+                                        actionType:DFUIActionButtonPress
                             timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.creationDate]];
       self.userFavoritedAction = oldAction;
       [self updateFavoriteButton];

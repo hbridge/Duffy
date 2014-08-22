@@ -12,5 +12,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
 @property (weak, nonatomic) IBOutlet UILabel *countLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *likeIconImageView;
 
 @end

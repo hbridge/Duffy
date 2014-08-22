@@ -68,16 +68,29 @@ CGFloat const MaxNavbarOriginY = 0;
 {
   if (!self.viewControllers) self.viewControllers = @[];
   self.viewControllers = [self.viewControllers arrayByAddingObject:viewController];
-  self.contentView = viewController.view;
   self.navigationBar.items = [self.navigationBar.items arrayByAddingObject:viewController.navigationItem];
-  //[self.navigationBar pushNavigationItem:viewController.navigationItem animated:animated];
-  //self.navigationBar.topItem.titleView = viewController.navigationItem.titleView;
   viewController.topBarController = self;
-  DDLogInfo(@"pushViewController backItem:%@ leftItems:%@ titleView:%@ rightItems:%@",
-            viewController.navigationItem.backBarButtonItem,
-            viewController.navigationItem.leftBarButtonItems,
-            viewController.navigationItem.titleView,
-            viewController.navigationItem.rightBarButtonItems);
+  
+  if (animated && self.contentView) {
+    // Set the new view's frame to be off screen
+    UIView *newView = viewController.view;
+    [self.view addSubview:newView];
+    CGRect frame = self.contentView.frame;
+    frame.origin.x = self.contentView.frame.size.width;
+    newView.frame = frame;
+    
+    // Setup a transition to move it on screen and finally swap it
+    frame.origin.x = 0;
+    [UIView
+     animateWithDuration:0.3
+     delay:0
+     options:UIViewAnimationOptionCurveEaseInOut
+     animations:^{
+       newView.frame = frame;
+     } completion:^(BOOL finished) {
+       self.contentView = newView;
+     }];
+  }
 }
 
 - (void)popViewControllerAnimated:(BOOL)animated popNavBar:(BOOL)popNavBar
@@ -90,7 +103,25 @@ CGFloat const MaxNavbarOriginY = 0;
   self.viewControllers = [self.viewControllers
                           subarrayWithRange:(NSRange){0, self.viewControllers.count - 1}];
   UIViewController *newTopViewController = self.viewControllers.lastObject;
+  
+  UIView *oldView = self.contentView;
+  CGRect oldFrame = self.contentView.frame;
+  oldFrame.origin.x = self.view.frame.size.width;
+  
   self.contentView = newTopViewController.view;
+  
+  if (animated) {
+    [self.view addSubview:oldView];
+    [UIView
+     animateWithDuration:0.3
+     delay:0
+     options:UIViewAnimationOptionCurveEaseInOut
+     animations:^{
+       oldView.frame = oldFrame;
+     } completion:^(BOOL finished) {
+       [oldView removeFromSuperview];
+     }];
+  }
 }
 
 - (void)popViewControllerAnimated:(BOOL)animated
@@ -105,9 +136,11 @@ CGFloat const MaxNavbarOriginY = 0;
   frame.size.height = self.view.frame.size.height - frame.origin.y;
   newContentView.frame = frame;
   
-  [self.contentView removeFromSuperview];
-  [self.view addSubview:newContentView];
+  if (self.contentView == newContentView) return;
+  
+  [_contentView removeFromSuperview];
   _contentView = newContentView;
+  [self.view addSubview:newContentView];
 }
 
 #pragma mark - UIScrollViewDelegate

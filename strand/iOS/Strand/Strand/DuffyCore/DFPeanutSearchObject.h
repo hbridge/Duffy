@@ -38,7 +38,7 @@ extern DFSearchObjectType DFSearchObjectDocstack;
 
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
-- (NSArray *)actionsOfType:(DFActionType)type forUser:(DFUserIDType)user;
+- (NSArray *)actionsOfType:(DFPeanutActionType)type forUser:(DFUserIDType)user;
 - (NSEnumerator *)enumeratorOfDescendents;
 
 - (BOOL)isLockedSection;

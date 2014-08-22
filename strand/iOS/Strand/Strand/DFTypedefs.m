@@ -19,5 +19,7 @@ DFPermissionStateType const DFPermissionStateDenied = @"Denied";
 DFPermissionStateType const DFPermissionStateUnavailable = @"Unavailable";
 DFPermissionStateType const DFPermissionStateRestricted = @"Restricted";
 
-DFActionType DFActionButtonPress = @"ButtonPress";
-DFActionType DFActionDoubleTap = @"DoubleTap";
+DFUIActionType DFUIActionButtonPress = @"ButtonPress";
+DFUIActionType DFUIActionDoubleTap = @"DoubleTap";
+
+DFPeanutActionType DFPeanutActionFavorite = @"favorite";
