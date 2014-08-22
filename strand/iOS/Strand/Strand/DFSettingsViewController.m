@@ -188,7 +188,7 @@
   return ^(id object){
     if (!self.inviteController.isBeingPresented) {
       self.inviteController = [[DFInviteUserViewController alloc] init];
-      [self presentViewController:self.inviteController animated:YES completion:nil];
+      [self.navigationController pushViewController:self.inviteController animated:YES];
     }
   };
 }
