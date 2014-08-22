@@ -157,7 +157,6 @@ static DFUploadController *defaultUploadController;
 - (NSOperation *)dispatchUploadsOperation
 {
     return [NSBlockOperation blockOperationWithBlock:^{
-        DDLogVerbose(@"Dispatching uploads if required...");
         if (self.uploadOperationQueue.operationCount >= self.uploadOperationQueue.maxConcurrentOperationCount) {
             DDLogVerbose(@"Already maxed out on operations.");
             return;

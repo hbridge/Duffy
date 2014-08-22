@@ -240,7 +240,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
       BOOL newServerData = NO;
       
       if (!error) {
-        DDLogInfo(@"New feed data received from server");
         // Remove error screen incase it was showing
         [self setShowConnectionError:NO withError:nil];
         
@@ -252,6 +251,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
         }
         
         if ((response.objects.count > 0 && ![hashData isEqual:self.lastResponseHash])) {
+          DDLogInfo(@"%@ new feed data received from server", self.class);
           // We have data, so remove the NUX screen
           [self setShowNuxPlaceholder:NO];
           
