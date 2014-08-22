@@ -721,6 +721,7 @@
 				5A9BC30E19A26A22002D1CD7 /* DFGallerySectionHeader.h */,
 				5A9BC30F19A26A22002D1CD7 /* DFGallerySectionHeader.m */,
 				5A9BC31119A26A34002D1CD7 /* DFGallerySectionHeader.xib */,
+				5A7F8FF819A7D09700EF0119 /* Cells */,
 				5A188D6D19804AAB009D3244 /* Error and NUX */,
 			);
 			name = "Feed And Gallery";
@@ -784,6 +785,19 @@
 			name = "Peanut Objects";
 			sourceTree = "<group>";
 		};
+		5A7F8FF819A7D09700EF0119 /* Cells */ = {
+			isa = PBXGroup;
+			children = (
+				5AA4528D196708D00099CBD2 /* DFPhotoStackCell.h */,
+				5AA4528E196708D00099CBD2 /* DFPhotoStackCell.m */,
+				5AA4528F196708D00099CBD2 /* DFPhotoStackCell.xib */,
+				5AA45290196708D00099CBD2 /* DFPhotoViewCell.h */,
+				5AA45291196708D00099CBD2 /* DFPhotoViewCell.m */,
+				5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */,
+			);
+			name = Cells;
+			sourceTree = "<group>";
+		};
 		5A9BC31319A297E8002D1CD7 /* Contacts */ = {
 			isa = PBXGroup;
 			children = (
@@ -844,12 +858,6 @@
 				5AA4528A196708D00099CBD2 /* DFPhotosGridViewController.h */,
 				5AA4528B196708D00099CBD2 /* DFPhotosGridViewController.m */,
 				5AA4528C196708D00099CBD2 /* DFPhotosGridViewController.xib */,
-				5AA4528D196708D00099CBD2 /* DFPhotoStackCell.h */,
-				5AA4528E196708D00099CBD2 /* DFPhotoStackCell.m */,
-				5AA4528F196708D00099CBD2 /* DFPhotoStackCell.xib */,
-				5AA45290196708D00099CBD2 /* DFPhotoViewCell.h */,
-				5AA45291196708D00099CBD2 /* DFPhotoViewCell.m */,
-				5AA45292196708D00099CBD2 /* DFPhotoViewCell.xib */,
 			);
 			name = Gallery;
 			sourceTree = "<group>";
