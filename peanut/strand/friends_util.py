@@ -55,6 +55,9 @@ def shouldUserBeIncluded(userId, evalUserId, friendsData, presentUsers):
 	Return back a list of photos that either belong to a friend or the given user
 """
 def filterStrandPhotosByFriends(userId, friendsData, strand):
+	return strand.photos.all()
+
+	"""
 	presentUsers = strand.users.all()
 
 	resultPhotos = list()
@@ -63,14 +66,19 @@ def filterStrandPhotosByFriends(userId, friendsData, strand):
 			resultPhotos.append(photo)
 
 	return resultPhotos
+	"""
 
 """
 	Return back a list of users that are in the friends list
 """
 def filterUsersByFriends(userId, friendsData, presentUsers):
+	return presentUsers
+
+	"""
 	resultUsers = list()
 	for user in presentUsers:
 		if shouldUserBeIncluded(userId, user.id, friendsData, presentUsers):
 			resultUsers.append(user)
 
 	return resultUsers
+	"""
