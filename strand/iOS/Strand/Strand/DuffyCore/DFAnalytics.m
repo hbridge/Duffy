@@ -337,7 +337,7 @@ static DFAnalytics *defaultLogger;
 
 + (void)logPhotoLikePressedWithNewValue:(BOOL)isOn
                                  result:(NSString *)result
-                             actionType:(DFActionType)actionType
+                             actionType:(DFUIActionType)actionType
                  timeIntervalSinceTaken:(NSTimeInterval)timeInterval
 {
   [DFAnalytics logEvent:PhotoLikedEvent withParameters:@{

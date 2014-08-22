@@ -22,14 +22,11 @@
  */
 
 typedef UInt64 DFActionID;
-typedef NSString *const DFPeanutActionType;
-
-extern DFPeanutActionType DFPeanutActionFavorite;
 
 @interface DFPeanutAction : NSObject <DFPeanutObject>
 
 @property (nonatomic) DFActionID id;
-@property (nonatomic, retain) DFActionType action_type;
+@property (nonatomic, retain) DFPeanutActionType action_type;
 @property (nonatomic) DFPhotoIDType photo;
 @property (nonatomic) DFUserIDType user;
 @property (nonatomic, retain) NSString *user_display_name;

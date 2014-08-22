@@ -523,7 +523,7 @@ const CGFloat LockedCellHeight = 157.0;
       [DFAnalytics
        logPhotoLikePressedWithNewValue:(newAction != nil)
        result:DFAnalyticsValueResultSuccess
-       actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress
+       actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
        timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
     } else {
       [object setUserFavoriteAction:oldFavoriteAction];
@@ -536,7 +536,7 @@ const CGFloat LockedCellHeight = 157.0;
       [alert show];
       [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
                                             result:DFAnalyticsValueResultFailure
-                                        actionType:wasGesture ? DFActionDoubleTap : DFActionButtonPress
+                                        actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
                             timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
     }
   };

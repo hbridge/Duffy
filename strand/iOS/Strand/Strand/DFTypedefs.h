@@ -48,6 +48,9 @@ typedef enum {
   DFPushNotifRefreshFeed = 7
 } DFPushNotifType;
 
-typedef NSString *DFActionType;
-extern DFActionType DFActionButtonPress;
-extern DFActionType DFActionDoubleTap;
+typedef NSString *DFUIActionType;
+extern DFUIActionType DFUIActionButtonPress;
+extern DFUIActionType DFUIActionDoubleTap;
+
+typedef NSString *const DFPeanutActionType;
+extern DFPeanutActionType DFPeanutActionFavorite;

@@ -60,7 +60,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
            timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
 + (void)logPhotoLikePressedWithNewValue:(BOOL)isOn
                                  result:(NSString *)result
-                             actionType:(DFActionType)actionType
+                             actionType:(DFUIActionType)actionType
                  timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
 
 /* Notification response */

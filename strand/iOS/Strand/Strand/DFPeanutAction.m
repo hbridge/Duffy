@@ -12,8 +12,6 @@
 #import "DFPeanutError.h"
 
 
-DFPeanutActionType DFPeanutActionFavorite = @"favorite";
-
 @implementation DFPeanutAction
 
 + (RKObjectMapping *)objectMapping {

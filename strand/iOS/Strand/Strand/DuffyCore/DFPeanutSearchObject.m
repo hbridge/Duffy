@@ -104,11 +104,11 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   self.actions = mutableActions;
 }
 
-- (NSArray *)actionsOfType:(DFActionType)type forUser:(DFUserIDType)user
+- (NSArray *)actionsOfType:(DFPeanutActionType)type forUser:(DFUserIDType)user
 {
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in self.actions) {
-    if ([action.action_type isEqual:type] && action.user == user) {
+    if ([action.action_type isEqual:type] && (action.user == user || user == 0)) {
       [result addObject:action];
     }
   }
