@@ -11,6 +11,7 @@ from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import Http404
+from django.db import IntegrityError
 
 from peanut.settings import constants
 
