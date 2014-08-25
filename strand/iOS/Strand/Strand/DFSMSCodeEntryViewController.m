@@ -125,8 +125,6 @@ replacementString:(NSString *)string
   return YES;
 }
 
-
-
 - (IBAction)doneButtonPressed:(id)sender
 {
   if (![self isEnteredCodeValid]) {
@@ -137,6 +135,10 @@ replacementString:(NSString *)string
   NSString *authCode = [self enteredCode];
   [self getUserIDWithPhoneNumber:self.phoneNumberString authCode:authCode];
   DDLogInfo(@"User entered auth code: %@", authCode);
+}
+
+- (IBAction)codeTextFieldOverlayPressed:(id)sender {
+  [self.codeTextField becomeFirstResponder];
 }
 
 - (NSString *)enteredCode
@@ -217,6 +219,9 @@ replacementString:(NSString *)string
 - (void)resetCodeField
 {
   self.codeTextField.text = @"- - - -";
+  UITextPosition *beginning = [self.codeTextField beginningOfDocument];
+  [self.codeTextField setSelectedTextRange:[self.codeTextField textRangeFromPosition:beginning
+                                                        toPosition:beginning]];
 }
 
 

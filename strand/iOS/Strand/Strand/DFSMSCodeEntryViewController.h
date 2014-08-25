@@ -11,9 +11,11 @@
 @interface DFSMSCodeEntryViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextField *codeTextField;
+@property (weak, nonatomic) IBOutlet UIView *codeTextFieldOverlay;
 @property (nonatomic, retain) NSString *phoneNumberString;
 @property (nonatomic, retain) NSString *userName;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 - (IBAction)doneButtonPressed:(id)sender;
+- (IBAction)codeTextFieldOverlayPressed:(id)sender;
 
 @end

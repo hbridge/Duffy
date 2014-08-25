@@ -7,6 +7,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSMSCodeEntryViewController">
             <connections>
                 <outlet property="codeTextField" destination="hlQ-D4-OFh" id="Geq-Ii-sNc"/>
+                <outlet property="codeTextFieldOverlay" destination="o9Q-6S-ler" id="Zvf-7u-blO"/>
                 <outlet property="doneButton" destination="NgE-B8-hxj" id="8FU-vK-zaT"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -39,9 +40,20 @@
                         <action selector="doneButtonPressed:" destination="-1" eventType="touchUpInside" id="lO6-wC-ngs"/>
                     </connections>
                 </button>
+                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-6S-ler">
+                    <rect key="frame" x="20" y="103" width="280" height="35"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <gestureRecognizers/>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
         </view>
+        <tapGestureRecognizer id="Zhq-tZ-pml">
+            <connections>
+                <action selector="codeTextFieldOverlayPressed:" destination="-1" id="8S4-wF-bcP"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
 </document>
