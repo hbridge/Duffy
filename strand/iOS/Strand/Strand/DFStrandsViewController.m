@@ -307,29 +307,31 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
 {
-  NSMutableDictionary *objectsByID = [NSMutableDictionary new];
-  NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
-  
-  for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
-    NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
-    for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
-      DFPeanutSearchObject *object = objectsForSection[objectIndex];
-      NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
-      if ([object.type isEqual:DFSearchObjectPhoto]) {
-        objectsByID[@(object.id)] = object;
-        indexPathsByID[@(object.id)] = indexPath;
-      } else if ([object.type isEqual:DFSearchObjectCluster]) {
-        for (DFPeanutSearchObject *subObject in object.objects) {
-          objectsByID[@(subObject.id)] = subObject;
-          indexPathsByID[@(subObject.id)] = indexPath;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSMutableDictionary *objectsByID = [NSMutableDictionary new];
+    NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
+    
+    for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
+      NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
+      for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
+        DFPeanutSearchObject *object = objectsForSection[objectIndex];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
+        if ([object.type isEqual:DFSearchObjectPhoto]) {
+          objectsByID[@(object.id)] = object;
+          indexPathsByID[@(object.id)] = indexPath;
+        } else if ([object.type isEqual:DFSearchObjectCluster]) {
+          for (DFPeanutSearchObject *subObject in object.objects) {
+            objectsByID[@(subObject.id)] = subObject;
+            indexPathsByID[@(subObject.id)] = indexPath;
+          }
         }
       }
     }
-  }
-  
-  _objectsByID = objectsByID;
-  _indexPathsByID = indexPathsByID;
-  _sectionObjects = sectionObjects;
+    
+    _objectsByID = objectsByID;
+    _indexPathsByID = indexPathsByID;
+    _sectionObjects = sectionObjects;
+  });
 }
 
 
