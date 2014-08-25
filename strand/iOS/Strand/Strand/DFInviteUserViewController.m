@@ -249,12 +249,6 @@
     NSDictionary *resultDict = self.abSearchResults[indexPath.row];
     RHPerson *person = resultDict[@"person"];
     int phoneIndex = [resultDict[@"index"] intValue];
-    self.selectedContact = [[DFPeanutContact alloc] init];
-    self.selectedContact.name = person.name;
-    self.selectedContact.phone_number = [person.phoneNumbers valueAtIndex:phoneIndex];
-    self.selectedContact.contact_type = DFPeanutContactInvited;
-    self.selectedContact.user = @([[DFUser currentUser] userID]);
-    
     [self showComposerWithName:person.name phoneNumber:[person.phoneNumbers valueAtIndex:phoneIndex]];
   } else if (indexPath.section == 1 && self.textNumberString) {
     [self showComposerWithName:self.textNumberString phoneNumber:self.textNumberString];
@@ -273,6 +267,15 @@
 - (void)showComposerWithName:(NSString *)name phoneNumber:(NSString *)phoneNumber
 {
   [SVProgressHUD show];
+
+  // setup selected contact for use in messageComposeViewController:didFinishWithResult
+  self.selectedContact = [[DFPeanutContact alloc] init];
+  self.selectedContact.name = name;
+  self.selectedContact.phone_number = phoneNumber;
+  self.selectedContact.contact_type = DFPeanutContactInvited;
+  self.selectedContact.user = @([[DFUser currentUser] userID]);
+  
+  // handle the case where we failed to get the invite text at controller init
   if (!self.inviteResponse) {
     // retry getting the invite response, if it fails, show an alert
     DDLogError(@"%@ invite response not set.  Trying to fetch again", self.class);
@@ -288,6 +291,8 @@
     }];
     return;
   }
+  
+  // setup the compose controller and show
   self.composeController = [[MFMessageComposeViewController alloc] init];
   self.composeController.messageComposeDelegate = self;
   self.composeController.recipients = @[phoneNumber];
