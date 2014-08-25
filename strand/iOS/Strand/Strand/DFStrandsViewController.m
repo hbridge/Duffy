@@ -307,6 +307,8 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
 {
+  // we dispatch this on the main thread so that it can't happen mid-tableview update
+  // or have a race between multiple responses from the server
   dispatch_async(dispatch_get_main_queue(), ^{
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
