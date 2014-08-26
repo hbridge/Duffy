@@ -1,5 +1,9 @@
 # Strand
 
+## Aug 26th 2015 (1.0.2 4725)
+
+- Minor bug fixes
+
 ## Aug 22nd 2015 (1.0.2 4722/4724)
 
 - New Gallery View!  See all your strand photos in a gallery.  Just press the button at the top left corner of the feed.
