@@ -201,25 +201,22 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
  * Refresh the current view.  Very cheap and fast.
  * Figures out if there's any photos currently being processed, to be shown in the uploading bar
  * Then calls the child view to re-render
- * Needs to happen async on main thread because setSectionObjects happens async on main thread
  */
 - (void)refreshView:(BOOL)withNewServerData
 {
-  dispatch_async(dispatch_get_main_queue(), ^{
-    BOOL newData = withNewServerData;
-    NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
-    
-    if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
-      self.uploadingPhotos = unprocessedFeedPhotos;
-      DDLogDebug(@"Setting uploaded photos to count %lu", (unsigned long)self.uploadingPhotos.count);
-      newData = YES;
-    }
-    
-    if (self.delegate && newData) {
-      DDLogInfo(@"Refreshing the view.");
-      [self.delegate strandsViewControllerUpdatedData:self];
-    }
-  });
+  BOOL newData = withNewServerData;
+  NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
+  
+  if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
+    self.uploadingPhotos = unprocessedFeedPhotos;
+    DDLogDebug(@"Setting uploaded photos to count %lu", (unsigned long)self.uploadingPhotos.count);
+    newData = YES;
+  }
+  
+  if (self.delegate && newData) {
+    DDLogInfo(@"Refreshing the view.");
+    [self.delegate strandsViewControllerUpdatedData:self];
+  }
 }
 
 #pragma mark - Strand data fetching
@@ -310,33 +307,29 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)setSectionObjects:(NSArray *)sectionObjects
 {
-  // we dispatch this on the main thread so that it can't happen mid-tableview update
-  // or have a race between multiple responses from the server
-  dispatch_async(dispatch_get_main_queue(), ^{
-    NSMutableDictionary *objectsByID = [NSMutableDictionary new];
-    NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
-    
-    for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
-      NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
-      for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
-        DFPeanutSearchObject *object = objectsForSection[objectIndex];
-        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
-        if ([object.type isEqual:DFSearchObjectPhoto]) {
-          objectsByID[@(object.id)] = object;
-          indexPathsByID[@(object.id)] = indexPath;
-        } else if ([object.type isEqual:DFSearchObjectCluster]) {
-          for (DFPeanutSearchObject *subObject in object.objects) {
-            objectsByID[@(subObject.id)] = subObject;
-            indexPathsByID[@(subObject.id)] = indexPath;
-          }
+  NSMutableDictionary *objectsByID = [NSMutableDictionary new];
+  NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
+  
+  for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
+    NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
+    for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
+      DFPeanutSearchObject *object = objectsForSection[objectIndex];
+      NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
+      if ([object.type isEqual:DFSearchObjectPhoto]) {
+        objectsByID[@(object.id)] = object;
+        indexPathsByID[@(object.id)] = indexPath;
+      } else if ([object.type isEqual:DFSearchObjectCluster]) {
+        for (DFPeanutSearchObject *subObject in object.objects) {
+          objectsByID[@(subObject.id)] = subObject;
+          indexPathsByID[@(subObject.id)] = indexPath;
         }
       }
     }
-    
-    _objectsByID = objectsByID;
-    _indexPathsByID = indexPathsByID;
-    _sectionObjects = sectionObjects;
-  });
+  }
+  
+  _objectsByID = objectsByID;
+  _indexPathsByID = indexPathsByID;
+  _sectionObjects = sectionObjects;
 }
 
 
