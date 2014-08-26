@@ -186,8 +186,6 @@ static const CGFloat SectionHeaderHeight = 54;
 
 - (UICollectionViewCell *)cellForUploadAtIndexPath:(NSIndexPath *)indexPath
 {
-  //TODO complete
-  
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
   
@@ -211,7 +209,6 @@ static const CGFloat SectionHeaderHeight = 54;
                                                                                forIndexPath:indexPath];
   lockedCell.imageView.image = nil;
 
-  //TODO complete
   DFPeanutSearchObject *object = section.objects[indexPath.row];
   [[DFImageStore sharedStore]
    imageForID:object.id
