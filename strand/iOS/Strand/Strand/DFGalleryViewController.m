@@ -330,21 +330,17 @@ static const CGFloat SectionHeaderHeight = 54;
 
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         DFPhotoViewCell *cell = (DFPhotoViewCell *)[self.collectionView cellForItemAtIndexPath:indexPath];
-        [UIView
-         animateWithDuration:0.4
-         delay:0.0
-         options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAutoreverse
-         animations:^{
-           CATransform3D perspectiveTransform = CATransform3DIdentity;
-           perspectiveTransform = CATransform3DScale(perspectiveTransform, 1.6, 1.6, 1.6);
-           perspectiveTransform = CATransform3DTranslate(perspectiveTransform, 0, 0, 10.0);
-           cell.likeIconImageView.layer.transform = perspectiveTransform;
-         } completion:^(BOOL finished) {
-           if (finished) {
-             cell.likeIconImageView.layer.transform = CATransform3DIdentity;
-           }
-         }];
-        
+       
+        CABasicAnimation *animation = [CABasicAnimation animation];
+        animation.keyPath = @"transform";
+        animation.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
+        animation.autoreverses = YES;
+        animation.fromValue = [NSValue valueWithCATransform3D:CATransform3DIdentity];
+        CATransform3D tranform = CATransform3DIdentity;
+        tranform = CATransform3DScale(tranform, 1.6, 1.6, 1.6);
+        tranform = CATransform3DTranslate(tranform, 0, 0, 10.0);
+        animation.toValue = [NSValue valueWithCATransform3D:tranform];
+        [cell.likeIconImageView.layer addAnimation:animation forKey:@"bulge"];
       });
       
     } else; {
