@@ -36,10 +36,10 @@ static RootViewController *mainRootViewController;
   self = [super init];
   if (self) {
     if (mainRootViewController) {
-      [NSException raise:@"Multiple Root View Controllers" format:@"There shoudl only be one rootViewController!"];
-    } else {
-      mainRootViewController = self;
+      DDLogWarn(@"Creating second mainRootViewController.  mainRootViewController.view.window: %@", mainRootViewController.view.window);
     }
+    
+    mainRootViewController = self;
     self.hideStatusBar = YES;
     _cameraViewController = [[DFCameraViewController alloc] init];
     _photoFeedController = [[DFFeedViewController alloc] init];
