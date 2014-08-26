@@ -201,22 +201,25 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
  * Refresh the current view.  Very cheap and fast.
  * Figures out if there's any photos currently being processed, to be shown in the uploading bar
  * Then calls the child view to re-render
+ * Needs to happen async on main thread because setSectionObjects happens async on main thread
  */
 - (void)refreshView:(BOOL)withNewServerData
 {
-  BOOL newData = withNewServerData;
-  NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
-  
-  if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
-    self.uploadingPhotos = unprocessedFeedPhotos;
-    DDLogDebug(@"Setting uploaded photos to count %lu", (unsigned long)self.uploadingPhotos.count);
-    newData = YES;
-  }
-  
-  if (self.delegate && newData) {
-    DDLogInfo(@"Refreshing the view.");
-    [self.delegate strandsViewControllerUpdatedData:self];
-  }
+  dispatch_async(dispatch_get_main_queue(), ^{
+    BOOL newData = withNewServerData;
+    NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
+    
+    if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
+      self.uploadingPhotos = unprocessedFeedPhotos;
+      DDLogDebug(@"Setting uploaded photos to count %lu", (unsigned long)self.uploadingPhotos.count);
+      newData = YES;
+    }
+    
+    if (self.delegate && newData) {
+      DDLogInfo(@"Refreshing the view.");
+      [self.delegate strandsViewControllerUpdatedData:self];
+    }
+  });
 }
 
 #pragma mark - Strand data fetching
