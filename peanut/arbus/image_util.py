@@ -194,23 +194,20 @@ def handleUploadedImage(request, fileKey, photo):
 
 
 def handleUploadedImagesBulk(request, photos):
-	photosToUpdate = list()
 	for photo in photos:
-		tempFilepath = tempfile.mktemp()
-
-		if photo.file_key in request.FILES:
-			writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
-			updatedPhoto = processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
-			
-			logger.debug("Processed photo, now called %s %s" % (updatedPhoto.thumb_filename, updatedPhoto.full_filename))
-			photosToUpdate.append(updatedPhoto)
-		else:
-			logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
+		if photo.file_key:
+			tempFilepath = tempfile.mktemp()
+			if photo.file_key in request.FILES:
+				writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
+				processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
+				
+				logger.debug("Processed photo, now called %s %s" % (updatedPhoto.thumb_filename, updatedPhoto.full_filename))
+				photosToUpdate.append(updatedPhoto)
+			else:
+				logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
 
 	if (len(request.FILES) != len(photosToUpdate)):
 		logger.error("Have request with %s files and only %s photos updated" % (len(request.FILES), len(photosToUpdate)))
-		
-	return photosToUpdate
 
 """
 	Moves an uploaded file to a new destination

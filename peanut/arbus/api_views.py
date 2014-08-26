@@ -246,22 +246,21 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			# Now that we've created the images in the db, we need to deal with any uploaded images
 			#   and fill in any EXIF data (time_taken, gps, etc)
-			photosToUpdate = list()
 			if len(createdPhotos) > 0:
 				logger.debug("Successfully created %s entries in db, now processing photos" % (len(createdPhotos)))
 				# This will move the uploaded image over to the filesystem, and create needed thumbs
-				photosToUpdate = image_util.handleUploadedImagesBulk(request, createdPhotos)
+				image_util.handleUploadedImagesBulk(request, createdPhotos)
 
 				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				photosToUpdate = self.populateExtraDataForPhotos(photosToUpdate)
+				self.populateExtraDataForPhotos(createdPhotos)
 
 				# These are all the fields that we might want to update.  List of the extra fields from above
 				# TODO(Derek):  Probably should do this more intelligently
-				Photo.bulkUpdate(photosToUpdate, ["location_point", "location_accuracy_meters", "full_filename", "thumb_filename", "time_taken"])
+				Photo.bulkUpdate(createdPhotos, ["location_point", "location_accuracy_meters", "full_filename", "thumb_filename", "time_taken"])
 			else:
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
-			for photo in photosToUpdate:
+			for photo in createdPhotos:
 				serializer = PhotoSerializer(photo)
 				response.append(serializer.data)
 
@@ -526,7 +525,7 @@ Helper functions
 	This could be located else where
 """
 def createUser(phoneId, firstName, productId):
-	user = User(display_name = firstName, last_name = "", phone_id = phoneId, product_id = productId)
+	user = User(display_name = firstName, phone_id = phoneId, product_id = productId)
 	user.save()
 
 	userBasePath = user.getUserDataPath()
