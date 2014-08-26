@@ -242,7 +242,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			# This grabs all photos created in bulk_create and dups, since we're updating the batch_key
 			# with dups
-			createdPhotos = Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt)
+			createdPhotos = list(Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt))
 
 			# Now that we've created the images in the db, we need to deal with any uploaded images
 			#   and fill in any EXIF data (time_taken, gps, etc)
