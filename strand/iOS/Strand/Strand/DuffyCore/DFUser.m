@@ -37,6 +37,7 @@ static DFUser *currentUser;
 + (DFUser *)currentUser
 {
   if (!currentUser) {
+    [[NSUserDefaults standardUserDefaults] synchronize]; // ensure we get what's on disk
     NSData *userData = [[NSUserDefaults standardUserDefaults] valueForKey:userObjectDefaultsKey];
     if (userData) {
       currentUser = [NSKeyedUnarchiver unarchiveObjectWithData:userData];
