@@ -1,6 +1,6 @@
 # Strand
 
-## Aug 26th 2015 (1.0.2 4725)
+## Aug 26th 2015 (1.0.2 4725/4726)
 
 - Minor bug fixes
 
