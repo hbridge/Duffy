@@ -201,14 +201,10 @@ def handleUploadedImagesBulk(request, photos):
 				writeOutUploadedFile(request.FILES[photo.file_key], tempFilepath)
 				processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
 				
-				logger.debug("Processed photo, now called %s %s" % (updatedPhoto.thumb_filename, updatedPhoto.full_filename))
-				photosToUpdate.append(updatedPhoto)
+				logger.debug("Processed photo, now called %s %s" % (photo.thumb_filename, photo.full_filename))
 			else:
 				logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
-
-	if (len(request.FILES) != len(photosToUpdate)):
-		logger.error("Have request with %s files and only %s photos updated" % (len(request.FILES), len(photosToUpdate)))
-
+				
 """
 	Moves an uploaded file to a new destination
 """
