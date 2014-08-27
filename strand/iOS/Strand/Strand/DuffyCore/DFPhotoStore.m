@@ -278,7 +278,7 @@ static int const FetchStride = 500;
   request.entity = entity;
   
   request.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO]];
-  request.predicate = [NSPredicate predicateWithFormat:@"upload157Date != nil"];
+  request.predicate = [NSPredicate predicateWithFormat:@"uploadThumbDate != nil"];
   request.fetchLimit = 1;
   
   NSError *error;
@@ -306,14 +306,17 @@ static int const FetchStride = 500;
 
 - (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
+                                     shouldUploadPhoto:(BOOL)shouldUploadPhoto
 {
   return [DFPhotoStore photosWithThumbnailUploadStatus:thumbnailStatus
                                       fullUploadStatus:fullStatus
+                                     shouldUploadPhoto:shouldUploadPhoto
                                              inContext:[self managedObjectContext]];
 }
 
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
+                                     shouldUploadPhoto:(BOOL)shouldUploadPhoto
                                              inContext:(NSManagedObjectContext *)context;
 {
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -322,25 +325,33 @@ static int const FetchStride = 500;
   
   NSPredicate *thumbnailPredicate;
   if (thumbnailStatus == DFUploadStatusUploaded) {
-    thumbnailPredicate = [NSPredicate predicateWithFormat:@"upload157Date != nil"];
+    thumbnailPredicate = [NSPredicate predicateWithFormat:@"uploadThumbDate != nil"];
   } else if (thumbnailStatus == DFUploadStatusNotUploaded){
-    thumbnailPredicate = [NSPredicate predicateWithFormat:@"upload157Date = nil"];
+    thumbnailPredicate = [NSPredicate predicateWithFormat:@"uploadThumbDate = nil"];
   }
   
   NSPredicate *fullPredicate;
   if (fullStatus == DFUploadStatusUploaded) {
-    fullPredicate = [NSPredicate predicateWithFormat:@"upload569Date != nil"];
+    fullPredicate = [NSPredicate predicateWithFormat:@"uploadLargeDate != nil"];
   } else if (fullStatus == DFUploadStatusNotUploaded) {
-    fullPredicate = [NSPredicate predicateWithFormat:@"upload569Date = nil"];
+    fullPredicate = [NSPredicate predicateWithFormat:@"uploadLargeDate = nil"];
+  }
+  
+  NSPredicate *shouldUploadPredicate;
+  if (shouldUploadPhoto) {
+    shouldUploadPredicate = [NSPredicate predicateWithFormat:@"shouldUploadImage == YES"];
+  } else {
+    shouldUploadPredicate = [NSPredicate predicateWithFormat:@"shouldUploadImage == NO || shouldUploadPhoto == nil"];
   }
   
   assert(thumbnailPredicate || fullPredicate);
   
-  NSMutableArray *subpredeicates = [NSMutableArray new];
-  if (thumbnailPredicate) [subpredeicates addObject:thumbnailPredicate];
-  if (fullPredicate) [subpredeicates addObject:fullPredicate];
+  NSMutableArray *subpredicates = [NSMutableArray new];
+  if (thumbnailPredicate) [subpredicates addObject:thumbnailPredicate];
+  if (fullPredicate) [subpredicates addObject:fullPredicate];
+  if (shouldUploadPredicate) [subpredicates addObject:shouldUploadPredicate];
   NSCompoundPredicate *compoundPredicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType
-                                                                       subpredicates:subpredeicates];
+                                                                       subpredicates:subpredicates];
   request.predicate = compoundPredicate;
   
   NSError *error;
@@ -362,9 +373,9 @@ static int const FetchStride = 500;
   
   NSPredicate *predicate;
   if (isUploaded) {
-    predicate = [NSPredicate predicateWithFormat:@"upload569Date != nil"];
+    predicate = [NSPredicate predicateWithFormat:@"uploadLargeDate != nil"];
   } else {
-    predicate = [NSPredicate predicateWithFormat:@"upload569Date = nil"];
+    predicate = [NSPredicate predicateWithFormat:@"uploadLargeDate = nil"];
   }
   
   request.predicate = predicate;
@@ -452,8 +463,8 @@ static int const FetchStride = 500;
 {
   DFPhotoCollection *allPhotosCollection = [DFPhotoStore allPhotosCollectionUsingContext:[self managedObjectContext]];
   for (DFPhoto *photo in allPhotosCollection.photoSet) {
-    photo.upload157Date = nil;
-    photo.upload569Date = nil;
+    photo.uploadThumbDate = nil;
+    photo.uploadLargeDate = nil;
     photo.photoID = 0;
   }
   

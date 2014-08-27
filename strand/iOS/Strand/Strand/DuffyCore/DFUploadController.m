@@ -130,17 +130,20 @@ static DFUploadController *defaultUploadController;
 - (void)addPhotosIDsToQueue
 {
     [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
-        DFPhotoCollection *photosWithThumbsToUpload =
-            [DFPhotoStore photosWithThumbnailUploadStatus:DFUploadStatusNotUploaded
-                                         fullUploadStatus:DFUploadStatusAny
-                                                inContext:self.managedObjectContext];
-        DFPhotoCollection *eligibleFullImagesToUpload =
-            [DFPhotoStore photosWithThumbnailUploadStatus:DFUploadStatusUploaded
-                                         fullUploadStatus:DFUploadStatusNotUploaded
-                                                inContext:self.managedObjectContext];
       
-        [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
-        [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
+      DFPhotoCollection *photosWithThumbsToUpload =
+      [DFPhotoStore photosWithThumbnailUploadStatus:DFUploadStatusNotUploaded
+                                   fullUploadStatus:DFUploadStatusAny
+                                  shouldUploadPhoto:YES
+                                          inContext:self.managedObjectContext];
+      DFPhotoCollection *eligibleFullImagesToUpload =
+      [DFPhotoStore photosWithThumbnailUploadStatus:DFUploadStatusUploaded
+                                   fullUploadStatus:DFUploadStatusNotUploaded
+                                  shouldUploadPhoto:YES
+                                          inContext:self.managedObjectContext];
+      
+      [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
+      [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
     }]];
 }
 
@@ -250,14 +253,14 @@ static DFUploadController *defaultUploadController;
         metadataChanges[photo.objectID] = DFPhotoChangeTypeMetadata;
         
         if (uploadType == DFPhotoUploadOperationThumbnailData) {
-            photo.upload157Date = [NSDate date];
+            photo.uploadThumbDate = [NSDate date];
             if (peanutPhoto.full_filename && ![peanutPhoto.full_filename isEqualToString:@""])
                 DDLogWarn(@"Interesting: got non null full filename (%@) for photo we're just uploading thumbnail for.", peanutPhoto.full_filename);
             // Manage out upload queues
             [self.thumbnailsObjectIDQueue markObjectCompleted:photo.objectID];
             [self.fullImageObjectIDQueue addObjectsFromArray:@[photo.objectID]];
         } else if (uploadType == DFPhotoUploadOperationFullImageData) {
-            photo.upload569Date = [NSDate date];
+            photo.uploadLargeDate = [NSDate date];
             [self.fullImageObjectIDQueue markObjectCompleted:photo.objectID];
         } else {
           [NSException raise:@"No DFPhotoUploadOperationImageDataType"

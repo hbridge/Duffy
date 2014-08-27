@@ -35,9 +35,11 @@ typedef enum {
 - (DFPhotoCollection *)mostRecentPhotos:(NSUInteger)maxCount;
 - (DFPhoto *)mostRecentUploadedThumbnail;
 - (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
-                                      fullUploadStatus:(DFUploadStatus)fullStatus;
+                                      fullUploadStatus:(DFUploadStatus)fullStatus
+                                     shouldUploadPhoto:(BOOL)shouldUploadPhoto;
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
+                                     shouldUploadPhoto:(BOOL)shouldUploadPhoto
                                              inContext:(NSManagedObjectContext *)context;
 - (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus;
 + (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context;

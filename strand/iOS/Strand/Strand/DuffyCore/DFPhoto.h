@@ -19,9 +19,11 @@
 @property (nonatomic, retain) DFPhotoAsset *asset;
 
 @property (nonatomic, retain) NSDate *creationDate;
-@property (nonatomic, retain) NSDate *upload157Date;
-@property (nonatomic, retain) NSDate *upload569Date;
+@property (nonatomic, retain) NSDate *uploadThumbDate;
+@property (nonatomic, retain) NSDate *uploadLargeDate;
 @property (nonatomic) BOOL isUploadProcessed;
+@property (nonatomic) BOOL shouldUploadImage;
+@property (nonatomic, retain) NSString *sourceString;
 
 typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict);
 - (void)fetchReverseGeocodeDictionary:(DFPhotoReverseGeocodeCompletionBlock)completionBlock;

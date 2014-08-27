@@ -479,6 +479,10 @@ const unsigned int SavePromptMinPhotos = 3;
      context:context
      completionBlock:^(DFPhoto *newPhoto){
        DDLogInfo(@"%@ image saved with metadata %@", [self.class description], newPhoto.asset.metadata);
+       newPhoto.shouldUploadImage = YES;
+       newPhoto.sourceString = @"strand";
+       NSError *error;
+       [context save:&error];
        
        // Tell the feeds to refresh
        [[NSNotificationCenter defaultCenter]

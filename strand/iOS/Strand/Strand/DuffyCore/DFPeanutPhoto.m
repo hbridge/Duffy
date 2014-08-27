@@ -36,6 +36,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
       self.metadata = [[self trimmedMetadataDict:photo.asset.metadata] JSONString];
       self.iphone_hash = photo.asset.hashString;
       self.file_key = photo.objectID.URIRepresentation;
+      self.taken_with_strand = @((int)[photo.sourceString isEqualToString:@"strand"]);
     }
   }
   return self;
@@ -62,7 +63,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 + (NSArray *)attributes
 {
   return @[@"user", @"id", @"time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
-           @"full_filename", @"full_image_path"];
+           @"full_filename", @"full_image_path", @"taken_with_strand"];
 }
 
 - (NSDictionary *)dictionaryForAttributes:(NSArray *)attributes

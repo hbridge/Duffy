@@ -22,10 +22,12 @@
 @dynamic asset;
 @dynamic creationDate;
 @dynamic photoID;
-@dynamic upload157Date;
-@dynamic upload569Date;
+@dynamic uploadThumbDate;
+@dynamic uploadLargeDate;
 @dynamic isUploadProcessed;
+@dynamic shouldUploadImage;
 @dynamic userID;
+@dynamic sourceString;
 
 // Create a new DFPhoto in a context
 + (DFPhoto *)createWithAsset:(DFPhotoAsset *)asset

@@ -7,8 +7,10 @@
         <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="isUploadProcessed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="photoID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
-        <attribute name="upload157Date" optional="YES" attributeType="Date" syncable="YES"/>
-        <attribute name="upload569Date" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="shouldUploadImage" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="sourceString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uploadLargeDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="uploadThumbDate" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="userID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
         <relationship name="asset" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DFPhotoAsset" inverseName="photo" inverseEntity="DFPhotoAsset" syncable="YES"/>
     </entity>
@@ -23,7 +25,7 @@
     </entity>
     <elements>
         <element name="DFCameraRollPhotoAsset" positionX="45" positionY="117" width="128" height="58"/>
-        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="148"/>
+        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="180"/>
         <element name="DFPhotoAsset" positionX="63" positionY="126" width="128" height="58"/>
         <element name="DFStrandPhotoAsset" positionX="81" positionY="126" width="128" height="105"/>
     </elements>
