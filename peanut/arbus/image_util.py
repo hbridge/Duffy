@@ -194,6 +194,7 @@ def handleUploadedImage(request, fileKey, photo):
 
 
 def handleUploadedImagesBulk(request, photos):
+	count = 0
 	for photo in photos:
 		if photo.file_key:
 			tempFilepath = tempfile.mktemp()
@@ -202,9 +203,10 @@ def handleUploadedImagesBulk(request, photos):
 				processUploadedPhoto(photo, request.FILES[photo.file_key].name, tempFilepath, bulk=True)
 				
 				logger.debug("Processed photo, now called %s %s" % (photo.thumb_filename, photo.full_filename))
+				count += 1
 			else:
 				logger.error("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
-				
+	return count
 """
 	Moves an uploaded file to a new destination
 """

@@ -11,6 +11,7 @@ class PhotoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Photo
 
+
 class PhotoForApiSerializer(serializers.ModelSerializer):
 	full_image_path = serializers.Field(source='getFullUrlImagePath')
 	thumb_image_path = serializers.Field(source='getThumbUrlImagePath')

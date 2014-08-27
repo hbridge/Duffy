@@ -98,7 +98,7 @@ class Photo(models.Model):
 	strand_needs_reeval = models.BooleanField(default=False, db_index=True)
 	taken_with_strand = models.BooleanField(default=True)
 	file_key = models.CharField(max_length=100, null=True)
-	bulk_batch_key = models.IntegerField(null=True)
+	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
 

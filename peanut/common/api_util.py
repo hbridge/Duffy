@@ -3,8 +3,10 @@ import datetime
 import pytz
 import time
 
-from django.http import HttpResponse
 from phonenumber_field.phonenumber import PhoneNumber
+
+from django.http import HttpResponse
+from django.contrib.gis.geos import Point
 
 from peanut.settings import constants
 
@@ -18,6 +20,10 @@ class DuffyJsonEncoder(json.JSONEncoder):
 
 		if isinstance(obj, PhoneNumber):
 			return str(obj)
+
+		if isinstance(obj, Point):
+			return str(obj)
+
 			
 		return json.JSONEncoder.default(self, obj)
 

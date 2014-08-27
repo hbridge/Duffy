@@ -104,6 +104,14 @@ class BasePhotoAPI(APIView):
 			self.populateExtraData(photo)
 		return photos
 
+	def simplePhotoSerializer(self, photoDict):
+		photoDict["user_id"] = photoDict["user"]
+		del photoDict["user"]
+
+		photo = Photo(**photoDict)
+
+		return photo
+
 
 class PhotoAPI(BasePhotoAPI):
 	def getObject(self, photoId):
@@ -206,6 +214,8 @@ class PhotoBulkAPI(BasePhotoAPI):
 	def post(self, request, format=None):
 		response = list()
 
+		startTime = datetime.datetime.now()
+
 		if "bulk_photos" in request.DATA:
 			logger.info("Got request for bulk photo update with %s files" % len(request.FILES))
 			photosData = json.loads(request.DATA["bulk_photos"])
@@ -219,13 +229,13 @@ class PhotoBulkAPI(BasePhotoAPI):
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
 				photoData["bulk_batch_key"] = batchKey
-				serializer = PhotoSerializer(data=photoData, partial=True)
-				if serializer.is_valid():
-					objsToCreate.append(serializer.object)
-					dupPhotoData.append(photoData)
-				else:
-					logger.error("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
-					return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+				
+				photo = self.simplePhotoSerializer(photoData)
+
+				self.populateExtraData(photo)
+				objsToCreate.append(photo)
+
+				dupPhotoData.append(photoData)
 
 			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
 			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
@@ -248,32 +258,29 @@ class PhotoBulkAPI(BasePhotoAPI):
 			#   and fill in any EXIF data (time_taken, gps, etc)
 			if len(createdPhotos) > 0:
 				logger.debug("Successfully created %s entries in db, now processing photos" % (len(createdPhotos)))
+
 				# This will move the uploaded image over to the filesystem, and create needed thumbs
-				image_util.handleUploadedImagesBulk(request, createdPhotos)
+				numImagesProcessed = image_util.handleUploadedImagesBulk(request, createdPhotos)
 
-				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				self.populateExtraDataForPhotos(createdPhotos)
-
-				# These are all the fields that we might want to update.  List of the extra fields from above
-				# TODO(Derek):  Probably should do this more intelligently
-				Photo.bulkUpdate(createdPhotos, ["location_point", "location_accuracy_meters", "full_filename", "thumb_filename", "time_taken"])
+				if numImagesProcessed > 0:
+					# These are all the fields that we might want to update.  List of the extra fields from above
+					# TODO(Derek):  Probably should do this more intelligently
+					Photo.bulkUpdate(createdPhotos, ["full_filename", "thumb_filename"])
 			else:
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
 			for photo in createdPhotos:
-				serializer = PhotoSerializer(photo)
-				response.append(serializer.data)
+				response.append(model_to_dict(photo))
 
 			# We don't need to update/save the dups since other code does that, but we still
 			#   want to add it to the response
 			for photo in dups:
-				serializer = PhotoSerializer(photo)
-				response.append(serializer.data)
+				response.append(model_to_dict(photo))
 
-			return Response(response, status=status.HTTP_201_CREATED)
+			return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json", status=201)
 		else:
 			logger.error("Got request with no bulk_photos, returning 400")
-			return Response(response, status=status.HTTP_400_BAD_REQUEST)
+			return HttpResponse(json.dumps({"bulk_photos": "Missing key"}), content_type="application/json", status=400)
 """
 	Autocomplete which takes in user_id and q and returns back matches and counts
 """
