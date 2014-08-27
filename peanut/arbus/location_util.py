@@ -5,6 +5,9 @@ import sys
 import os
 import logging
 
+from django.contrib.gis.geos import fromstr
+
+
 from common.models import Photo
 
 from arbus import image_util
@@ -165,7 +168,12 @@ def populateLocationInfo(photos):
 		if photo.location_point:
 			lat, lon = (photo.location_point.y, photo.location_point.x)
 		else:
-			lat, lon = getLatLonFromExtraData(photo)
+			lat, lon, accuracy = getLatLonAccuracyFromExtraData(photo)
+			if lat and lon:
+				# Something must have gone wrong at intake, lets fix it up
+				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+				photo.location_accuracy_meters = accuracy
+				logger.warning("Fixed up photo %s which didn't have location point, now %s %s" % (photo.id, lon, lat))
 
 		if lat and lon:
 			latLonList.append((lat, lon))
@@ -191,7 +199,7 @@ def populateLocationInfo(photos):
 
 	logger.info("Updating %s photos" % len(photosToUpdate))
 
-	Photo.bulkUpdate(photosToUpdate, ["twofishes_data", "location_city"])
+	Photo.bulkUpdate(photosToUpdate, ["twofishes_data", "location_city", "location_point", "location_accuracy_meters"])
 
 	return len(photosToUpdate)
 
