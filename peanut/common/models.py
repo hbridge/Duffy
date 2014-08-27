@@ -465,6 +465,7 @@ class Strand(models.Model):
 	last_photo_time = models.DateTimeField()
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
+	shared = models.BooleanField(default=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 

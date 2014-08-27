@@ -226,6 +226,52 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
 
+
+
+"""
+	Return the Duffy JSON for the strands a user has that are unshared
+
+	This uses the Strand objects instead of neighbors
+"""
+def unshared_strands(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
+	if (form.is_valid()):
+		userId = int(form.cleaned_data['user_id'])
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
+
+
+		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False)
+
+		# list of list of photos
+		groups = list()
+		for strand in strands:
+			photos = strand.photos.all().order_by("-time_taken")
+			if len(photos) > 0:
+				groups.append(photos)
+
+		if len(groups) > 0:
+			# now sort groups by the time_taken of the first photo in each group
+			groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
+
+		formattedGroups = getFormattedGroups(groups, userId)
+			
+		# Lastly, we turn our groups into sections which is the object we convert to json for the api
+		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+		response['objects'] = objects
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+	
 """
 	Return the Duffy JSON for the photo feed.
 
@@ -547,7 +593,6 @@ def get_nearby_friends_message(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
-
 
 """
 	Sends a notification to the device based on the user_id

@@ -20,6 +20,18 @@ import strand.notifications_util as notifications_util
 logger = logging.getLogger(__name__)
 
 def photoBelongsInStrand(targetPhoto, strand, photosByStrandId):
+	users = strand.users.all()
+	if len(users) == 0:
+		logger.error("photoBelongsInStrand has strand with zero users")
+		return False
+
+	# If this is a non-shared strand (solo) and the photo doesn't belong to the strand's user, don't put it in
+	if not strand.shared and targetPhoto.user_id != users[0].id:
+		return False
+
+	if not targetPhoto.taken_with_strand and strand.shared:
+		return False
+
 	for photo in photosByStrandId[strand.id]:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
 		if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
@@ -236,15 +248,18 @@ def main(argv):
 					strandsAddedTo.append(targetStrand)
 					photoToStrandIdDict[photo] = targetStrand.id
 				else:
-					newStrand = Strand.objects.create(time_started = photo.time_taken, last_photo_time = photo.time_taken)
+					# If we're creating a strand with a photo that wasn't taken with strand, then turn off sharing
+					shared = photo.taken_with_strand
+					
+					newStrand = Strand.objects.create(time_started = photo.time_taken, last_photo_time = photo.time_taken, shared = shared)
 					addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId)
 					strandsCreated.append(newStrand)
 					strandsCache.append(newStrand)
 
 					photoToStrandIdDict[photo] = newStrand.id
 
-					logger.debug("Created new Strand %s for photo %s" % (newStrand.id, photo.id))
-
+					logger.debug("Created new Strand %s for photo %s.  shared = %s" % (newStrand.id, photo.id, shared))
+	
 				photo.strand_evaluated = True
 				
 			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted))
