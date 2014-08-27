@@ -108,7 +108,8 @@ class BasePhotoAPI(APIView):
 		photoDict["user_id"] = photoDict["user"]
 		del photoDict["user"]
 
-		photoDict["taken_with_strand"] = int(photoDict["taken_with_strand"])
+		if "taken_with_strand" in photoDict:
+			photoDict["taken_with_strand"] = int(photoDict["taken_with_strand"])
 
 		photo = Photo(**photoDict)
 
