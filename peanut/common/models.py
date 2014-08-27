@@ -96,7 +96,7 @@ class Photo(models.Model):
 	neighbored_time = models.DateTimeField(null=True)
 	strand_evaluated = models.BooleanField(default=False, db_index=True)
 	strand_needs_reeval = models.BooleanField(default=False, db_index=True)
-	taken_with_strand = models.BooleanField(null=True)
+	taken_with_strand = models.BooleanField(default=True)
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
