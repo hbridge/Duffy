@@ -104,15 +104,21 @@ class BasePhotoAPI(APIView):
 			self.populateExtraData(photo)
 		return photos
 
-	def simplePhotoSerializer(self, photoDict):
-		photoDict["user_id"] = photoDict["user"]
-		del photoDict["user"]
+	def simplePhotoSerializer(self, photoData):
+		photoData["user_id"] = photoData["user"]
+		del photoData["user"]
 
-		if "taken_with_strand" in photoDict:
-			photoDict["taken_with_strand"] = int(photoDict["taken_with_strand"])
+		if "taken_with_strand" in photoData:
+			photoData["taken_with_strand"] = int(photoData["taken_with_strand"])
 
-		photo = Photo(**photoDict)
+		if "time_taken" in photoData:
+			photoData["time_taken"] = datetime.datetime.strptime(photoData["time_taken"], "%Y-%m-%dT%H:%M:%SZ")
+			print photoData["time_taken"]
 
+		if "id" in photoData and int(photoData["id"]) == 0:
+			del photoData["id"]
+
+		photo = Photo(**photoData)
 		return photo
 
 
@@ -232,7 +238,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
 				photoData["bulk_batch_key"] = batchKey
-
+					
 				photo = self.simplePhotoSerializer(photoData)
 
 				self.populateExtraData(photo)
