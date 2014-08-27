@@ -34,12 +34,10 @@ typedef enum {
 - (DFPhotoCollection *)cameraRoll;
 - (DFPhotoCollection *)mostRecentPhotos:(NSUInteger)maxCount;
 - (DFPhoto *)mostRecentUploadedThumbnail;
-- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
-                                      fullUploadStatus:(DFUploadStatus)fullStatus
-                                     shouldUploadPhoto:(BOOL)shouldUploadPhoto;
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
                                      shouldUploadPhoto:(BOOL)shouldUploadPhoto
+                                       photoIDRequired:(BOOL)photoIDRequired
                                              inContext:(NSManagedObjectContext *)context;
 - (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus;
 + (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context;

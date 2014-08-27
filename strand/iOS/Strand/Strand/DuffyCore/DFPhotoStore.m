@@ -304,19 +304,10 @@ static int const FetchStride = 500;
   return  [self.class photosWithPredicate:predicate inContext:[self managedObjectContext]];
 }
 
-- (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
-                                      fullUploadStatus:(DFUploadStatus)fullStatus
-                                     shouldUploadPhoto:(BOOL)shouldUploadPhoto
-{
-  return [DFPhotoStore photosWithThumbnailUploadStatus:thumbnailStatus
-                                      fullUploadStatus:fullStatus
-                                     shouldUploadPhoto:shouldUploadPhoto
-                                             inContext:[self managedObjectContext]];
-}
-
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
                                       fullUploadStatus:(DFUploadStatus)fullStatus
                                      shouldUploadPhoto:(BOOL)shouldUploadPhoto
+                                       photoIDRequired:(BOOL)photoIDRequired
                                              inContext:(NSManagedObjectContext *)context;
 {
   NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -344,12 +335,18 @@ static int const FetchStride = 500;
     shouldUploadPredicate = [NSPredicate predicateWithFormat:@"shouldUploadImage == NO || shouldUploadPhoto == nil"];
   }
   
+  NSPredicate *photoIDRequiredPredicate;
+  if (photoIDRequired) {
+    photoIDRequiredPredicate = [NSPredicate predicateWithFormat:@"photoID != 0 && photoID != nil"];
+  }
+  
   assert(thumbnailPredicate || fullPredicate);
   
   NSMutableArray *subpredicates = [NSMutableArray new];
   if (thumbnailPredicate) [subpredicates addObject:thumbnailPredicate];
   if (fullPredicate) [subpredicates addObject:fullPredicate];
   if (shouldUploadPredicate) [subpredicates addObject:shouldUploadPredicate];
+  if (photoIDRequiredPredicate) [subpredicates addObject:photoIDRequiredPredicate];
   NSCompoundPredicate *compoundPredicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType
                                                                        subpredicates:subpredicates];
   request.predicate = compoundPredicate;

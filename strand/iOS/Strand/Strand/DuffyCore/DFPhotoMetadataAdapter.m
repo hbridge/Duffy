@@ -212,7 +212,11 @@
   }
   
   result[DFUploadResultNumBytes] = @(numBytes);
-  result[DFUploadResultOperationType] = DFPhotoUploadOperationThumbnailData;
+  if (appendThumbnailData) {
+    result[DFUploadResultOperationType] = DFPhotoUploadOperationThumbnailData;
+  } else {
+    result[DFUploadResultOperationType] = DFPhotoUploadOperationMetadata;
+  }
   
   return result;
 }

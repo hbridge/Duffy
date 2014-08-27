@@ -188,8 +188,11 @@
 
 - (NSString *)description
 {
-    return [NSString stringWithFormat:@"DFPhotoUploadQueue notStarted:%@ inProgress:%@ completed:%@ cancelled:%@",
-            self.notStartedUploads.description, self.inProgressUploads.description, self.completedObjects.description, self.cancelledUploads.description];
+    return [NSString stringWithFormat:@"DFPhotoUploadQueue {notStarted:%@ inProgress:%@ completed:%@ cancelled:%@}",
+            @(self.notStartedUploads.count),
+            @(self.inProgressUploads.count),
+            @(self.completedObjects.count),
+            @(self.cancelledUploads.count)];
 }
 
 @end

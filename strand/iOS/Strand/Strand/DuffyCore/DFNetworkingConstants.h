@@ -27,6 +27,7 @@ extern const float IMAGE_UPLOAD_JPEG_QUALITY;
 extern CGFloat const IMAGE_UPLOAD_MAX_LENGTH;
 
 typedef NSString* const DFPhotoUploadOperationImageDataType;
+extern DFPhotoUploadOperationImageDataType DFPhotoUploadOperationMetadata;
 extern DFPhotoUploadOperationImageDataType DFPhotoUploadOperationThumbnailData;
 extern DFPhotoUploadOperationImageDataType DFPhotoUploadOperationFullImageData;
 
