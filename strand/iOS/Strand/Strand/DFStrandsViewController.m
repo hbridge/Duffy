@@ -287,7 +287,8 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects
 {
   DFPhotoCollection *unprocessedCollection = [[DFPhotoStore sharedStore]
-                                              photosWithUploadProcessedStatus:NO];
+                                              photosWithUploadProcessedStatus:NO
+                                              shouldUploadImage:YES];
   NSMutableSet *allPhotoIDsInFeed = [NSMutableSet new];
   for (DFPeanutSearchObject *section in sectionObjects) {
     for (DFPeanutSearchObject *object in [[section enumeratorOfDescendents] allObjects]) {

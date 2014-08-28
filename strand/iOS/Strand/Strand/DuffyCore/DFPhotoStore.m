@@ -295,14 +295,27 @@ static int const FetchStride = 500;
 }
 
 - (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus
+                                     shouldUploadImage:(BOOL)shouldUploadImage
 {
-  NSPredicate *predicate;
+  NSPredicate *processedPredicate;
   if (processedStatus) {
-    predicate = [NSPredicate predicateWithFormat:@"isUploadProcessed == YES"];
+    processedPredicate = [NSPredicate predicateWithFormat:@"isUploadProcessed == YES"];
   } else {
-    predicate = [NSPredicate predicateWithFormat:@"isUploadProcessed == NO || isUploadProcessed == nil"];
+    processedPredicate = [NSPredicate predicateWithFormat:@"isUploadProcessed == NO || isUploadProcessed == nil"];
   }
-  return  [self.class photosWithPredicate:predicate inContext:[self managedObjectContext]];
+  
+  NSPredicate *shouldUploadPredicate;
+  if (shouldUploadImage) {
+    shouldUploadPredicate = [NSPredicate predicateWithFormat:@"shouldUploadImage == YES"];
+  } else {
+    shouldUploadPredicate = [NSPredicate predicateWithFormat:@"shouldUploadImage == NO || shouldUploadImage = nil"];
+  }
+
+  NSCompoundPredicate *compoundPredicate = [[NSCompoundPredicate alloc]
+                                            initWithType:NSAndPredicateType
+                                            subpredicates:@[processedPredicate, shouldUploadPredicate]];
+  
+  return  [self.class photosWithPredicate:compoundPredicate inContext:[self managedObjectContext]];
 }
 
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus

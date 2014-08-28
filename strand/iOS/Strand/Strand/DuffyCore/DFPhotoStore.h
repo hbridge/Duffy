@@ -39,7 +39,8 @@ typedef enum {
                                      shouldUploadPhoto:(BOOL)shouldUploadPhoto
                                        photoIDRequired:(BOOL)photoIDRequired
                                              inContext:(NSManagedObjectContext *)context;
-- (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus;
+- (DFPhotoCollection *)photosWithUploadProcessedStatus:(BOOL)processedStatus
+                                     shouldUploadImage:(BOOL)shouldUploadImage;
 + (DFPhotoCollection *)photosWithFullPhotoUploadStatus:(BOOL)isUploaded inContext:(NSManagedObjectContext *)context;
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
