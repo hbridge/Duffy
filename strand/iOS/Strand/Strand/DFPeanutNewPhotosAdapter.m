@@ -9,7 +9,7 @@
 #import "DFPeanutNewPhotosAdapter.h"
 #import <Restkit/RestKit.h>
 #import "DFObjectManager.h"
-#import "DFPeanutSearchResponse.h"
+#import "DFPeanutObjectsResponse.h"
 #import "DFStrandConstants.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 
@@ -27,7 +27,7 @@ NSString *const StartDateTimeParameter = @"start_date_time";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *searchResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutSearchResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:NewPhotosPath
                                               keyPath:nil
@@ -49,7 +49,7 @@ NSString *const StartDateTimeParameter = @"start_date_time";
 {
   NSString *dateString = [[NSDateFormatter DjangoDateFormatter] stringFromDate:date];
   NSURLRequest *getRequest = [DFObjectManager
-                              requestWithObject:[[DFPeanutSearchResponse alloc] init]
+                              requestWithObject:[[DFPeanutObjectsResponse alloc] init]
                               method:RKRequestMethodGET
                               path:NewPhotosPath
                               parameters:@{
@@ -60,8 +60,8 @@ NSString *const StartDateTimeParameter = @"start_date_time";
    objectRequestOperationWithRequest:getRequest
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
-     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutSearchResponse class]]){
-       DFPeanutSearchResponse *response = mappingResult.firstObject;
+     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutObjectsResponse class]]){
+       DFPeanutObjectsResponse *response = mappingResult.firstObject;
        completionBlock(response);
      } else {
        DDLogWarn(@"Search fetch resulted in a non-search response.  Mapping result: %@",

@@ -6,14 +6,14 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFPeanutSearchResponse.h"
+#import "DFPeanutObjectsResponse.h"
 #import <RestKit/RestKit.h>
 #import "DFPeanutSuggestion.h"
 #import "DFPeanutSearchObject.h"
 #import "DFPhotoStore.h"
 #import "DFPeanutPhoto.h"
 
-@implementation DFPeanutSearchResponse
+@implementation DFPeanutObjectsResponse
 
 + (RKObjectMapping *)objectMapping
 {

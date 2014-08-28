@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "DFNetworkAdapter.h"
-#import "DFPeanutSearchResponse.h"
+#import "DFPeanutObjectsResponse.h"
 
-typedef void (^DFPeanutNewPhotosCompletionBlock)(DFPeanutSearchResponse *response);
+typedef void (^DFPeanutNewPhotosCompletionBlock)(DFPeanutObjectsResponse *response);
 
 
 @interface DFPeanutNewPhotosAdapter : NSObject <DFNetworkAdapter>

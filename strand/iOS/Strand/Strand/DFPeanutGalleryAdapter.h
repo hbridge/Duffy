@@ -6,16 +6,10 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-#import "DFNetworkAdapter.h"
-#import "DFPeanutSearchResponse.h"
+#import "DFPeanutObjectsAdapter.h"
 
-typedef void (^DFPeanutGalleryCompletionBlock)(DFPeanutSearchResponse *response,
-                                               NSData *responseHash,
-                                               NSError *error);
+@interface DFPeanutGalleryAdapter : DFPeanutObjectsAdapter <DFNetworkAdapter>
 
-@interface DFPeanutGalleryAdapter : NSObject <DFNetworkAdapter>
-
-- (void)fetchGalleryWithCompletionBlock:(DFPeanutGalleryCompletionBlock)completionBlock;
+- (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;
 
 @end

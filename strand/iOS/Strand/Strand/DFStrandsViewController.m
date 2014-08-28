@@ -234,7 +234,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)reloadFeedIsSilent:(BOOL)isSilent
 {
-  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutSearchResponse *response,
+  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutObjectsResponse *response,
                                                          NSData *hashData,
                                                          NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{

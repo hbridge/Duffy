@@ -91,7 +91,7 @@ static DFStrandsManager *defaultStrandsManager;
   
   [self.joinableStrandsAdapter fetchJoinableStrandsNearLatitude:lastLocation.coordinate.latitude
                                                       longitude:lastLocation.coordinate.longitude
-                                                completionBlock:^(DFPeanutSearchResponse *response)
+                                                completionBlock:^(DFPeanutObjectsResponse *response)
   {
     self.isJoinableStrandsFetchInProgress = NO;
     if (!response || !response.result) {
@@ -118,7 +118,7 @@ static DFStrandsManager *defaultStrandsManager;
   if (!galleryLastSeenDate) galleryLastSeenDate = [NSDate dateWithTimeIntervalSince1970:0];
 
   [self.newPhotosAdapter fetchNewPhotosAfterDate:galleryLastSeenDate
-                                 completionBlock:^(DFPeanutSearchResponse *response)
+                                 completionBlock:^(DFPeanutObjectsResponse *response)
   {
     self.isNewPhotoCountFetchInProgress = NO;
     if (!response || response.result == NO) {

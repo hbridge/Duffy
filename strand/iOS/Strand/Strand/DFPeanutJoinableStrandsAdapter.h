@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 #import "DFNetworkAdapter.h"
-#import "DFPeanutSearchResponse.h"
+#import "DFPeanutObjectsResponse.h"
 
-typedef void (^DFPeanutNearbyClustersCompletionBlock)(DFPeanutSearchResponse *response);
+typedef void (^DFPeanutNearbyClustersCompletionBlock)(DFPeanutObjectsResponse *response);
 
 @interface DFPeanutJoinableStrandsAdapter : NSObject <DFNetworkAdapter>
 

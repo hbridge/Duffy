@@ -1,17 +1,17 @@
 //
-//  DFPeanutGalleryAdapter.m
+//  DFPeanutSuggestedStrandsAdapter.m
 //  Strand
 //
-//  Created by Henry Bridge on 7/4/14.
+//  Created by Henry Bridge on 8/28/14.
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPeanutGalleryAdapter.h"
+#import "DFPeanutSuggestedStrandsAdapter.h"
 #import "DFObjectManager.h"
 
-NSString *const GalleryPath = @"strand_feed";
+NSString *const UnsharedPath = @"unshared_strands";
 
-@implementation DFPeanutGalleryAdapter 
+@implementation DFPeanutSuggestedStrandsAdapter
 
 
 + (void)initialize
@@ -24,7 +24,7 @@ NSString *const GalleryPath = @"strand_feed";
   RKResponseDescriptor *galleryResponseDescriptor =
   [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
                                                method:RKRequestMethodAny
-                                          pathPattern:GalleryPath
+                                          pathPattern:UnsharedPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   
@@ -38,11 +38,10 @@ NSString *const GalleryPath = @"strand_feed";
 }
 
 
-- (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+- (void)fetchSuggestedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
-  [super fetchObjectsAtPath:GalleryPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:UnsharedPath withCompletionBlock:completionBlock];
 }
-
 
 
 @end

@@ -9,7 +9,7 @@
 #import "DFPeanutJoinableStrandsAdapter.h"
 #import <Restkit/RestKit.h>
 #import "DFObjectManager.h"
-#import "DFPeanutSearchResponse.h"
+#import "DFPeanutObjectsResponse.h"
 #import "DFStrandConstants.h"
 
 NSString *const NearbyClustersPath = @"get_joinable_strands";
@@ -30,7 +30,7 @@ NSString *const LongitudeParameter = @"lon";
 + (NSArray *)responseDescriptors
 {
   RKResponseDescriptor *searchResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutSearchResponse objectMapping]
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
                                                method:RKRequestMethodAny
                                           pathPattern:NearbyClustersPath
                                               keyPath:nil
@@ -58,7 +58,7 @@ NSString *const LongitudeParameter = @"lon";
   }
   
   NSURLRequest *getRequest = [DFObjectManager
-                              requestWithObject:[[DFPeanutSearchResponse alloc] init]
+                              requestWithObject:[[DFPeanutObjectsResponse alloc] init]
                               method:RKRequestMethodGET
                               path:NearbyClustersPath
                               parameters:@{
@@ -71,8 +71,8 @@ NSString *const LongitudeParameter = @"lon";
    objectRequestOperationWithRequest:getRequest
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
-     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutSearchResponse class]]){
-       DFPeanutSearchResponse *response = mappingResult.firstObject;
+     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutObjectsResponse class]]){
+       DFPeanutObjectsResponse *response = mappingResult.firstObject;
        completionBlock(response);
      } else {
        DDLogWarn(@"Search fetch resulted in a non-search response.  Mapping result: %@",
