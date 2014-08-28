@@ -464,37 +464,49 @@ const unsigned int SavePromptMinPhotos = 3;
     location = [[CLLocation alloc] initWithLatitude:40.7246846 longitude:-73.9953671];
   }
   
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     NSMutableDictionary *mutableMetadata = [[NSMutableDictionary alloc] initWithDictionary:metadata];
     [self addLocation:location toMetadata:mutableMetadata];
     NSString *accuracyInfo = [NSString stringWithFormat:@"accuracy=%f", location.horizontalAccuracy];
     [self addExtraInfo:accuracyInfo toUserCommentsInMetadata:mutableMetadata];
     
     // Save the asset locally
-    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-    [DFPhotoStore
-     saveImage:image
-     withMetadata:mutableMetadata
-     location:location
-     context:context
-     completionBlock:^(DFPhoto *newPhoto){
-       DDLogInfo(@"%@ image saved with metadata %@", [self.class description], newPhoto.asset.metadata);
-       newPhoto.shouldUploadImage = YES;
-       newPhoto.sourceString = @"strand";
-       NSError *error;
-       [context save:&error];
-       
-       // Tell the feeds to refresh
-       [[NSNotificationCenter defaultCenter]
-        postNotificationName:DFStrandCameraPhotoSavedNotificationName
-        object:self];
-       
-       [[DFUploadController sharedUploadController] uploadPhotos];
-       
-       if (![self isGoodLocation:location]) {
-         [self waitForGoodLocationAndUpdatePhoto:newPhoto withContext:context retryNumber:0];
-       }
-     }];
+    [[DFPhotoStore sharedStore] saveImageToCameraRoll:image withMetadata:mutableMetadata completion:^(NSURL *assetURL, NSError *error) {
+      if (assetURL) {
+        ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
+        [library assetForURL:assetURL resultBlock:^(ALAsset *asset) {
+          NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+          DFCameraRollPhotoAsset *dfAsset = [DFCameraRollPhotoAsset createWithALAsset:asset inContext:context];
+          DFPhoto *photo = [DFPhoto createWithAsset:dfAsset userID:[[DFUser currentUser] userID]
+                                           timeZone:[NSTimeZone defaultTimeZone]
+                                          inContext:context];
+          photo.sourceString = @"strand";
+          photo.shouldUploadImage = YES;
+          
+          NSError *error;
+          [context save:&error];
+          if (error) {
+            
+          } else {
+            DDLogInfo(@"%@ image saved with metadata %@", [self.class description], photo.asset.metadata);
+          }
+          
+          // Tell the feeds to refresh
+          [[NSNotificationCenter defaultCenter]
+           postNotificationName:DFStrandCameraPhotoSavedNotificationName
+           object:self];
+          
+          [[DFUploadController sharedUploadController] uploadPhotos];
+          
+          if (![self isGoodLocation:location]) {
+            [self waitForGoodLocationAndUpdatePhoto:photo withContext:context retryNumber:0];
+          }
+        } failureBlock:^(NSError *error) {
+          // failed to get asset for URL we just saved
+          
+        }];
+      };
+    }];
   });
 }
 

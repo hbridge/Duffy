@@ -659,7 +659,7 @@ selectedObjectChanged:(id)newObject
          [[DFPhotoStore sharedStore]
           saveImageToCameraRoll:image
           withMetadata:peanutPhoto.metadataDictionary
-          completion:^(NSError *error) {
+          completion:^(NSURL *assetURL, NSError *error) {
             dispatch_async(dispatch_get_main_queue(), ^{
               if (error) {
                 [UIAlertView showSimpleAlertWithTitle:@"Error"

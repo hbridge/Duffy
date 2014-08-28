@@ -251,6 +251,7 @@
               imageData = data;
               dispatch_semaphore_signal(loadSemaphore);
             } failure:^(NSError *error) {
+              DDLogError(@"Error: nil data for asset! %@", error);
               dispatch_semaphore_signal(loadSemaphore);
             }];
            dispatch_semaphore_wait(loadSemaphore, DISPATCH_TIME_FOREVER);

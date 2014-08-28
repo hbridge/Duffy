@@ -44,20 +44,21 @@
 
 - (void)addPhotos:(NSArray *)newPhotos
 {
-    for (DFPhoto *newPhoto in newPhotos) {
-        if ([self.photoSet containsObject:newPhoto]) continue;
-        
-        [photosSet addObject:newPhoto];
-        NSUInteger insertIndex = [photosByDate indexOfObject:newPhoto
-                      inSortedRange:(NSRange){0, photosByDate.count}
-                            options:NSBinarySearchingInsertionIndex
-                    usingComparator:^NSComparisonResult(DFPhoto *photo1, DFPhoto *photo2) {
-                        return [photo1.creationDate compare:photo2.creationDate];
-                    }];
-        [photosByDate insertObject:newPhoto atIndex:insertIndex];
-        [objectIDsByDate insertObject:newPhoto.objectID atIndex:insertIndex];
-        [photoIDs addObject:@(newPhoto.photoID)];
-    }
+  for (DFPhoto *newPhoto in newPhotos) {
+    if ([self.photoSet containsObject:newPhoto]) continue;
+    
+    [photosSet addObject:newPhoto];
+    NSUInteger insertIndex = [photosByDate indexOfObject:newPhoto
+                                           inSortedRange:(NSRange){0, photosByDate.count}
+                                                 options:NSBinarySearchingInsertionIndex
+                                         usingComparator:^NSComparisonResult(DFPhoto *photo1, DFPhoto *photo2) {
+                                           return [photo1.creationDate compare:photo2.creationDate];
+                                         }];
+    [photosByDate insertObject:newPhoto atIndex:insertIndex];
+    [objectIDsByDate insertObject:newPhoto.objectID atIndex:insertIndex];
+    [photoIDs addObject:@(newPhoto.photoID)];
+    [photoAssetURLSet addObject:newPhoto.asset.canonicalURL];
+  }
 }
 
 

@@ -13,6 +13,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "UIImage+DFHelpers.h"
 #import "DFStrandPhotoAsset.h"
+#import "DFCameraRollPhotoAsset.h"
 #import "DFSettings.h"
 
 @interface DFPhotoStore(){
@@ -588,39 +589,40 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   }
 }
 
-+ (void)saveImage:(UIImage *)image
+- (void)saveImage:(UIImage *)image
      withMetadata:(NSDictionary *)metadata
-         location:(CLLocation *)location
-          context:(NSManagedObjectContext *)context
   completionBlock:(void (^)(DFPhoto *newPhoto))completion
 {
   @autoreleasepool {
-    NSData *data = UIImageJPEGRepresentation(image, 0.8);
-    DFStrandPhotoAsset *asset = [DFStrandPhotoAsset createAssetForImageData:data
-                                                                   metadata:metadata
-                                                                   location:location
-                                                               creationDate:[NSDate date]
-                                                                  inContext:context];
-    DFPhoto *newPhoto = [DFPhoto createWithAsset:asset
-                                          userID:[[DFUser currentUser] userID]
-                                        timeZone:[NSTimeZone defaultTimeZone]
-                                       inContext:context];
+    DFPhotoStore *photoStore = [DFPhotoStore sharedStore];
     
-    // Save the database changes
-    NSError *error;
-    [context save:&error];
-    if (error) {
-      [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
-                  format:@"Error: %@", error.description];
-    }
-    
-    if ([[DFSettings sharedSettings] autosaveToCameraRoll]) {
-      DFPhotoStore *photoStore = [DFPhotoStore sharedStore];
-      [photoStore saveImageToCameraRoll:image withMetadata:metadata completion:^(NSError *error) {
-      }];
-    }
-    
-    if (completion) completion(newPhoto);
+    [photoStore
+     saveImageToCameraRoll:image
+     withMetadata:metadata
+     completion:^(NSURL *assetURL, NSError *error) {
+       [self.assetsLibrary assetForURL:assetURL resultBlock:^(ALAsset *asset) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           DFCameraRollPhotoAsset *dfAsset = [DFCameraRollPhotoAsset createWithALAsset:asset
+                                                                           inContext:self.managedObjectContext];
+           
+           DFPhoto *newPhoto = [DFPhoto createWithAsset:dfAsset
+                                                 userID:[[DFUser currentUser] userID]
+                                               timeZone:[NSTimeZone defaultTimeZone]
+                                              inContext:self.managedObjectContext];
+           NSError *error;
+           [self.managedObjectContext save:&error];
+           if (error) {
+             [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
+                         format:@"Error: %@", error.description];
+           }
+           
+           if (completion) completion(newPhoto);
+           
+         });
+       } failureBlock:^(NSError *error) {
+         if (completion) completion(nil);
+       }];
+    }];
   }
 }
 
@@ -671,7 +673,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 
 - (void)saveImageToCameraRoll:(UIImage *)image
                  withMetadata:(NSDictionary *)metadata
-                   completion:(void(^)(NSError *error))completion
+                   completion:(void(^)(NSURL *assetURL, NSError *error))completion
 {
   NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
   [self addOrientationToMetadata:mutableMetadata forImage:image];
@@ -687,7 +689,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                                        } else {
                                          [self addAssetWithURL:assetURL toPhotoAlbum:@"Strand"];
                                        }
-                                       completion(error);
+                                       completion(assetURL, error);
                                      }];
   });
 }

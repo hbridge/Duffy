@@ -139,7 +139,9 @@ static DFUploadController *defaultUploadController;
     [DFPhotoStore photosWithPhotoIDs:@[@(0)] retainOrder:NO inContext:self.managedObjectContext];
     NSMutableArray *photosWithMetadataToUpload = [NSMutableArray new];
     for (DFPhoto *photo in photosWithoutIDs) {
-      [photosWithMetadataToUpload addObject:photo.objectID];
+      if (photo.asset.location) {
+        [photosWithMetadataToUpload addObject:photo.objectID];
+      }
     }
     
     DFPhotoCollection *photosWithThumbsToUpload =
@@ -207,8 +209,13 @@ static DFUploadController *defaultUploadController;
       }
     } else {
       //there's nothing else to upload, check to see if everything's complete
-      if (self.thumbnailsObjectIDQueue.numObjectsIncomplete == 0 && self.fullImageObjectIDQueue.numObjectsIncomplete == 0
-          && (self.thumbnailsObjectIDQueue.numObjectsComplete > 0 || self.fullImageObjectIDQueue.numObjectsComplete > 0)) {
+      if (self.metadataQueue.numObjectsIncomplete == 0
+          && self.thumbnailsObjectIDQueue.numObjectsIncomplete == 0
+          && self.fullImageObjectIDQueue.numObjectsIncomplete == 0
+          && (self.metadataQueue.numObjectsComplete
+              || self.thumbnailsObjectIDQueue.numObjectsComplete > 0
+              || self.fullImageObjectIDQueue.numObjectsComplete > 0))
+      {
         [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
       }
     }
@@ -261,7 +268,8 @@ static DFUploadController *defaultUploadController;
   return successBlock;
 }
 
-- (void)saveUploadedPhotosWithPeanutPhotos:(NSArray *)peanutPhotos uploadOperationType:(DFPhotoUploadOperationImageDataType)uploadType
+- (void)saveUploadedPhotosWithPeanutPhotos:(NSArray *)peanutPhotos
+                       uploadOperationType:(DFPhotoUploadOperationImageDataType)uploadType
 {
   NSMutableDictionary *metadataChanges = [[NSMutableDictionary alloc] initWithCapacity:peanutPhotos.count];
   for (DFPeanutPhoto *peanutPhoto in peanutPhotos) {
@@ -274,7 +282,9 @@ static DFUploadController *defaultUploadController;
     
     if (uploadType == DFPhotoUploadOperationMetadata) {
       [self.metadataQueue markObjectCompleted:photo.objectID];
-      [self.thumbnailsObjectIDQueue addObjectsFromArray:@[photo.objectID]];
+      if (photo.shouldUploadImage) {
+        [self.thumbnailsObjectIDQueue addObjectsFromArray:@[photo.objectID]];
+      }
     } else if (uploadType == DFPhotoUploadOperationThumbnailData) {
       photo.uploadThumbDate = [NSDate date];
       if (peanutPhoto.full_filename && ![peanutPhoto.full_filename isEqualToString:@""])
@@ -383,6 +393,7 @@ static DFUploadController *defaultUploadController;
     DDLogInfo(@"Cancelling all operations with isError:%@ isSilent%@",
               isError ? @"true" : @"false",
               isSilent ? @"true" : @"false");
+    [self.metadataQueue removeAllObjects];
     [self.thumbnailsObjectIDQueue removeAllObjects];
     [self.fullImageObjectIDQueue removeAllObjects];
     [self.uploadOperationQueue cancelAllOperations];
@@ -410,6 +421,7 @@ static DFUploadController *defaultUploadController;
     _currentSessionStats = nil;
     
     [self endBackgroundUpdateTask];
+    [self.metadataQueue clearCompleted];
     [self.thumbnailsObjectIDQueue clearCompleted];
     [self.fullImageObjectIDQueue clearCompleted];
   }];

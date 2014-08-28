@@ -24,6 +24,7 @@
 #import "DFStrandConstants.h"
 #import "DFToastNotificationManager.h"
 #import "DFUploadController.h"
+#import "DFCreateStrandViewController.h"
 
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
@@ -92,11 +93,11 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
      action:@selector(cameraButtonPressed:)];
     UIBarButtonItem *inviteButton =
     [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
                     imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
      style:UIBarButtonItemStylePlain
      target:self
-     action:@selector(inviteButtonPressed:)];
+     action:@selector(createButtonPressed:)];
     
     self.navigationItem.rightBarButtonItems = @[cameraButton, inviteButton];
   }
@@ -374,6 +375,16 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:inviteController];
 
+  [self presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)createButtonPressed:(id)sender
+{
+  DDLogInfo(@"Create button pressed");
+  DFCreateStrandViewController *createController = [[DFCreateStrandViewController alloc] init];
+  DFNavigationController *navController = [[DFNavigationController
+                                            alloc] initWithRootViewController:createController];
+  
   [self presentViewController:navController animated:YES completion:nil];
 }
 

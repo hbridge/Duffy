@@ -102,6 +102,10 @@
 		5AA9293219A6598600032A3F /* DFNoContactsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA9293119A6598600032A3F /* DFNoContactsTableViewCell.xib */; };
 		5AA9293419A66AB700032A3F /* DFNoResultsTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA9293319A66AB700032A3F /* DFNoResultsTableViewCell.xib */; };
 		5AA9293819A67CC500032A3F /* DFABResultTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA9293719A67CC500032A3F /* DFABResultTableViewCell.xib */; };
+		5AAF037619AE888500EF021C /* DFCameraRollSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF037319AE888500EF021C /* DFCameraRollSyncManager.m */; };
+		5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF037519AE888500EF021C /* DFCameraRollSyncOperation.m */; };
+		5AAF037C19AF86BF00EF021C /* DFCreateStrandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF037A19AF86BF00EF021C /* DFCreateStrandViewController.m */; };
+		5AAF037D19AF86BF00EF021C /* DFCreateStrandViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF037B19AF86BF00EF021C /* DFCreateStrandViewController.xib */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */; };
 		5AB4CC001982AF7C00EFB3E3 /* DFInviteUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */; };
@@ -351,6 +355,13 @@
 		5AA9293119A6598600032A3F /* DFNoContactsTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNoContactsTableViewCell.xib; sourceTree = "<group>"; };
 		5AA9293319A66AB700032A3F /* DFNoResultsTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNoResultsTableViewCell.xib; sourceTree = "<group>"; };
 		5AA9293719A67CC500032A3F /* DFABResultTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFABResultTableViewCell.xib; sourceTree = "<group>"; };
+		5AAF037219AE888500EF021C /* DFCameraRollSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollSyncManager.h; sourceTree = "<group>"; };
+		5AAF037319AE888500EF021C /* DFCameraRollSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncManager.m; sourceTree = "<group>"; };
+		5AAF037419AE888500EF021C /* DFCameraRollSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollSyncOperation.h; sourceTree = "<group>"; };
+		5AAF037519AE888500EF021C /* DFCameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollSyncOperation.m; sourceTree = "<group>"; };
+		5AAF037919AF86BF00EF021C /* DFCreateStrandViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCreateStrandViewController.h; sourceTree = "<group>"; };
+		5AAF037A19AF86BF00EF021C /* DFCreateStrandViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCreateStrandViewController.m; sourceTree = "<group>"; };
+		5AAF037B19AF86BF00EF021C /* DFCreateStrandViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCreateStrandViewController.xib; sourceTree = "<group>"; };
 		5AB32B5A19537A610082F716 /* DFStrandStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandStore.h; sourceTree = "<group>"; };
 		5AB32B5B19537A610082F716 /* DFStrandStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandStore.m; sourceTree = "<group>"; };
 		5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgeButton.h; sourceTree = "<group>"; };
@@ -701,6 +712,10 @@
 				5A40343219607B92003D7546 /* PhotoAsset */,
 				5AF32EBD197C42CE004B5CC4 /* DFImageStore.h */,
 				5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */,
+				5AAF037219AE888500EF021C /* DFCameraRollSyncManager.h */,
+				5AAF037319AE888500EF021C /* DFCameraRollSyncManager.m */,
+				5AAF037419AE888500EF021C /* DFCameraRollSyncOperation.h */,
+				5AAF037519AE888500EF021C /* DFCameraRollSyncOperation.m */,
 			);
 			name = "Photo DB";
 			sourceTree = "<group>";
@@ -876,6 +891,16 @@
 				5AA4528C196708D00099CBD2 /* DFPhotosGridViewController.xib */,
 			);
 			name = Gallery;
+			sourceTree = "<group>";
+		};
+		5AAF037819AF865E00EF021C /* Create Strand */ = {
+			isa = PBXGroup;
+			children = (
+				5AAF037919AF86BF00EF021C /* DFCreateStrandViewController.h */,
+				5AAF037A19AF86BF00EF021C /* DFCreateStrandViewController.m */,
+				5AAF037B19AF86BF00EF021C /* DFCreateStrandViewController.xib */,
+			);
+			name = "Create Strand";
 			sourceTree = "<group>";
 		};
 		5AB4CBFC1982AF2500EFB3E3 /* Inviting */ = {
@@ -1068,6 +1093,7 @@
 				5AC4A8DA1947B01D00862D9C /* Logging and Analytics */,
 				5AC4A8DC1947B61900862D9C /* Database */,
 				5A3172CF196C7C6F00CA7693 /* Settings */,
+				5AAF037819AF865E00EF021C /* Create Strand */,
 				5AB4CBFC1982AF2500EFB3E3 /* Inviting */,
 				5AC4A964194A3FBF00862D9C /* Network Adapters */,
 				5AC4A8D019476F9000862D9C /* Assets */,
@@ -1239,6 +1265,7 @@
 				5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
+				5AAF037D19AF86BF00EF021C /* DFCreateStrandViewController.xib in Resources */,
 				5AA9293419A66AB700032A3F /* DFNoResultsTableViewCell.xib in Resources */,
 				5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */,
 				5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */,
@@ -1332,6 +1359,8 @@
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5AC4A93A1947C30800862D9C /* NSDateFormatter+DFPhotoDateFormatters.m in Sources */,
 				5A3172D9196C8C6300CA7693 /* DFWebViewController.m in Sources */,
+				5AAF037C19AF86BF00EF021C /* DFCreateStrandViewController.m in Sources */,
+				5AAF037619AE888500EF021C /* DFCameraRollSyncManager.m in Sources */,
 				5AD8589219785FCC00BFDC4E /* DFTypedefs.m in Sources */,
 				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5A9BC31619A2985D002D1CD7 /* DFContactsViewController.m in Sources */,
@@ -1368,6 +1397,7 @@
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
+				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,
 				5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
 				5A7F8FFC19A7DA1D00EF0119 /* DFLockedPhotoViewCell.m in Sources */,

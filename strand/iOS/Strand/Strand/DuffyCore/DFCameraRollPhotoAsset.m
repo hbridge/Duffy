@@ -228,23 +228,51 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 #pragma mark - JPEGData Access
 
 
-- (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality
+- (void)loadThubnailJPEGData:(DFPhotoDataLoadSuccessBlock)successBlock
+                     failure:(DFPhotoAssetLoadFailureBlock)failure
 {
-  DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
+  [[DFCameraRollPhotoAsset sharedAssetsLibrary]
+   assetForURL:[NSURL URLWithString:self.alAssetURLString]
+   resultBlock:^(ALAsset *asset) {
+     @autoreleasepool {
+       NSData *data = [self.class JPEGDataForCGImage:asset.thumbnail withQuality:0.7];
+       if (data) successBlock(data);
+       else failure (nil);
+     }
+   } failureBlock:^(NSError *error) {
+     failure(error);
+   }];
+}
+
+- (void)loadJPEGDataWithImageLength:(CGFloat)length
+                 compressionQuality:(float)quality
+                            success:(DFPhotoDataLoadSuccessBlock)success
+                            failure:(DFPhotoAssetLoadFailureBlock)failure
+{
+  [[DFCameraRollPhotoAsset sharedAssetsLibrary]
+   assetForURL:[NSURL URLWithString:self.alAssetURLString]
+   resultBlock:^(ALAsset *asset) {
+     @autoreleasepool {
+       NSData *data = [self.class JPEGDataWithImageLength:length compressionQuality:quality asset:asset];
+       if (data) success(data);
+       else failure(nil);
+     }
+   } failureBlock:^(NSError *error) {
+     failure(error);
+   }];
+}
+
++ (NSData *)JPEGDataWithImageLength:(CGFloat)length compressionQuality:(float)quality asset:(ALAsset *)asset
+{
+  DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:asset];
   CGImageRef imageRef = [[resizer aspectImageWithMaxPixelSize:length] CGImage];
   NSData *outputData = [self JPEGDataForCGImage:imageRef withQuality:quality];
-  CGImageRelease(imageRef);
   
   return outputData;
 }
 
-- (NSData *)thumbnailJPEGData
-{
-  CGImageRef thumbnail = [self.asset thumbnail];
-  return [self JPEGDataForCGImage:thumbnail withQuality:0.7];
-}
 
-- (NSData *)JPEGDataForCGImage:(CGImageRef)imageRef withQuality:(float)quality
++ (NSData *)JPEGDataForCGImage:(CGImageRef)imageRef withQuality:(float)quality
 {
   NSMutableData *outputData = [[NSMutableData alloc] init];
   CGImageDestinationRef destRef = CGImageDestinationCreateWithData((__bridge CFMutableDataRef)outputData,
