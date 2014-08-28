@@ -294,7 +294,7 @@ def strand_feed(request):
 
 		friendsData = friends_util.getFriendsData(userId)
 
-		strands = Strand.objects.select_related().filter(users__in=[user])
+		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
 
 		# list of list of photos
 		groups = list()
