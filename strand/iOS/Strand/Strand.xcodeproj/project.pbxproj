@@ -114,6 +114,8 @@
 		5AAF038D19B0D99200EF021C /* DFCreateStrandTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF038B19B0D99200EF021C /* DFCreateStrandTableViewCell.xib */; };
 		5AAF039119B0DBAE00EF021C /* DFCollectionViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF038F19B0DBAE00EF021C /* DFCollectionViewTableViewCell.m */; };
 		5AAF039219B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF039019B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib */; };
+		5AAF039519B10A7200EF021C /* DFSelectablePhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF039419B10A7200EF021C /* DFSelectablePhotoViewCell.m */; };
+		5AAF039719B10A8600EF021C /* DFSelectablePhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF039619B10A8600EF021C /* DFSelectablePhotoViewCell.xib */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */; };
 		5AB4CC001982AF7C00EFB3E3 /* DFInviteUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */; };
@@ -383,6 +385,9 @@
 		5AAF038E19B0DBAE00EF021C /* DFCollectionViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCollectionViewTableViewCell.h; sourceTree = "<group>"; };
 		5AAF038F19B0DBAE00EF021C /* DFCollectionViewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCollectionViewTableViewCell.m; sourceTree = "<group>"; };
 		5AAF039019B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCollectionViewTableViewCell.xib; sourceTree = "<group>"; };
+		5AAF039319B10A7200EF021C /* DFSelectablePhotoViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSelectablePhotoViewCell.h; sourceTree = "<group>"; };
+		5AAF039419B10A7200EF021C /* DFSelectablePhotoViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSelectablePhotoViewCell.m; sourceTree = "<group>"; };
+		5AAF039619B10A8600EF021C /* DFSelectablePhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSelectablePhotoViewCell.xib; sourceTree = "<group>"; };
 		5AB32B5A19537A610082F716 /* DFStrandStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandStore.h; sourceTree = "<group>"; };
 		5AB32B5B19537A610082F716 /* DFStrandStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandStore.m; sourceTree = "<group>"; };
 		5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgeButton.h; sourceTree = "<group>"; };
@@ -569,6 +574,9 @@
 				5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */,
 				5A3F6A971999498900C2F7D4 /* UIView+DFExtensions.h */,
 				5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */,
+				5AAF039319B10A7200EF021C /* DFSelectablePhotoViewCell.h */,
+				5AAF039419B10A7200EF021C /* DFSelectablePhotoViewCell.m */,
+				5AAF039619B10A8600EF021C /* DFSelectablePhotoViewCell.xib */,
 			);
 			name = "Common Views";
 			sourceTree = "<group>";
@@ -1298,6 +1306,7 @@
 				5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */,
 				5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */,
 				5A188D6219802F87009D3244 /* FeedViewNuxPlaceholder.xib in Resources */,
+				5AAF039719B10A8600EF021C /* DFSelectablePhotoViewCell.xib in Resources */,
 				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
@@ -1464,6 +1473,7 @@
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */,
 				5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */,
+				5AAF039519B10A7200EF021C /* DFSelectablePhotoViewCell.m in Sources */,
 				5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */,
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,

@@ -8,10 +8,13 @@
 
 #import "DFSelectPhotosViewController.h"
 #import "DFGallerySectionHeader.h"
-#import "DFPhotoViewCell.h"
 #import "DFPhotoStore.h"
+#import "DFSelectablePhotoViewCell.h"
 
 @interface DFSelectPhotosViewController ()
+
+@property (nonatomic, retain) NSArray *photoObjects;
+@property (nonatomic, retain) NSMutableArray *selectedPhotoIDs;
 
 @end
 
@@ -47,8 +50,24 @@
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
   self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
-  [self.collectionView registerNib:[UINib nibWithNibName:[DFPhotoViewCell description] bundle:nil]
+  [self.collectionView registerNib:[UINib nibWithNibName:[DFSelectablePhotoViewCell description] bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
+  
+}
+
+- (void)setSectionObject:(DFPeanutSearchObject *)sectionObject
+{
+  _sectionObject = sectionObject;
+  NSMutableArray *photos = [NSMutableArray new];
+  self.selectedPhotoIDs = [NSMutableArray new];
+  for (DFPeanutSearchObject *object in sectionObject.enumeratorOfDescendents.allObjects) {
+    if ([object.type isEqual:DFSearchObjectPhoto]) {
+      [photos addObject:object];
+      // select all by default
+      [self.selectedPhotoIDs addObject:@(object.id)];
+    }
+  }
+  self.photoObjects = photos;
 }
 
 #pragma mark - UICollectionView Data/Delegate
@@ -78,17 +97,22 @@
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  return self.sectionObject.objects.count;
+  return self.photoObjects.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
+  DFSelectablePhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
                                                                          forIndexPath:indexPath];
-  DFPeanutSearchObject *object = self.sectionObject.objects[indexPath.row];
-  if ([object.type isEqual:DFSearchObjectCluster]) object = object.objects.firstObject;
+  
+  
+  DFPeanutSearchObject *object = self.photoObjects[indexPath.row];
   DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:object.id];
   
+  // show the selected status
+  cell.showTickMark = [self.selectedPhotoIDs containsObject:@(object.id)];
+
+  // set the image
   cell.imageView.image = nil;
   [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
     //if ([self.collectionView.visibleCells containsObject:cell]) {
@@ -102,6 +126,27 @@
   return cell;
 }
 
+
+
+- (void)collectionView:(UICollectionView *)collectionView
+didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutSearchObject *photoObject = self.photoObjects[indexPath.row];
+  NSUInteger index = [self.selectedPhotoIDs indexOfObject:@(photoObject.id)];
+  if (index != NSNotFound) {
+    [self.selectedPhotoIDs removeObjectAtIndex:index];
+  } else {
+    [self.selectedPhotoIDs addObject:@(photoObject.id)];
+  }
+  
+  DDLogVerbose(@"selectedIndex:%@ photoID:%@ selectedPhotoIDs:%@",
+               indexPath.description,
+               @(photoObject.id),
+               self.selectedPhotoIDs);
+  
+  [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
+  [self.collectionView deselectItemAtIndexPath:indexPath animated:YES];
+}
 
 
 #pragma mark - Actions
