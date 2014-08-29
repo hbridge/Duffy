@@ -10,6 +10,9 @@
 #import "DFGallerySectionHeader.h"
 #import "DFPhotoStore.h"
 #import "DFSelectablePhotoViewCell.h"
+#import "DFPeanutStrandAdapter.h"
+#import "SVProgressHUD.h"
+#import "DFUploadController.h"
 
 @interface DFSelectPhotosViewController ()
 
@@ -153,9 +156,57 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)donePressed:(id)sender
 {
+  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
+  requestStrand.users = @[@([[DFUser currentUser] userID])];
+  requestStrand.photos = self.selectedPhotoIDs;
+  requestStrand.shared = YES;
+  [self setTimesForStrand:requestStrand fromPhotoObjects:self.photoObjects];
   
+  
+  DFPeanutStrandAdapter *strandAdapter = [[DFPeanutStrandAdapter alloc] init];
+  [strandAdapter performRequest:RKRequestMethodPOST
+               withPeanutStrand:requestStrand success:^(DFPeanutStrand *peanutStrand) {
+                 DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
+                 [self dismissViewControllerAnimated:YES completion:^{
+                   [SVProgressHUD showSuccessWithStatus:@"Success!"];
+                 }];
+                 [self markPhotosForUpload:peanutStrand.photos];
+               } failure:^(NSError *error) {
+                 [SVProgressHUD showErrorWithStatus:@"Failed."];
+                 DDLogError(@"%@ failed to create strand: %@, error: %@",
+                            self.class, requestStrand, error);
+               }];
 }
 
+- (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
+{
+  NSDate *minDateFound;
+  NSDate *maxDateFound;
+  
+  for (DFPeanutSearchObject *object in objects) {
+    if (!minDateFound || [object.time_taken compare:minDateFound] == NSOrderedAscending) {
+      minDateFound = object.time_taken;
+    }
+    if (!maxDateFound || [object.time_taken compare:maxDateFound] == NSOrderedDescending) {
+      maxDateFound = object.time_taken;
+    }
+  }
+  
+  strand.time_started = minDateFound;
+  strand.last_photo_time = maxDateFound;
+}
+
+- (void)markPhotosForUpload:(NSArray *)photoIDs
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:photoIDs retainOrder:NO];
+    for (DFPhoto *photo in photos) {
+      photo.shouldUploadImage = YES;
+    }
+    [[DFPhotoStore sharedStore] saveContext];
+    [[DFUploadController sharedUploadController] uploadPhotos];
+  });
+}
 
 
 @end

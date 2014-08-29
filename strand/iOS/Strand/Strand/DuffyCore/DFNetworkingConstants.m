@@ -12,7 +12,7 @@
 
 #ifdef DEBUG
 NSString const *DFServerBaseHost = @"dev.strand.duffyapp.com";
-NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com";
+NSString const *DFServerBaseURL = @"http://dev.strand.duffyapp.com:7000";
 int DFSocketPort = 8005;
 #else
 NSString const *DFServerBaseHost = @"prod.strand.duffyapp.com";

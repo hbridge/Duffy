@@ -12,6 +12,7 @@
 #import "DFPhotoStore.h"
 #import "DFUser.h"
 #import "DFAppInfo.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 static NSMutableSet *registeredAdapters;
 
@@ -27,6 +28,7 @@ NSString *const BuildIDKey = @"build_id";
   [RKObjectManager setSharedManager:objectManager];
   [[objectManager HTTPClient] setDefaultHeader:@"Accept-Encoding" value:@"gzip, deflate"];
   [[RKObjectManager sharedManager] setRequestSerializationMIMEType:RKMIMETypeJSON];
+  //  [RKObjectMapping setPreferredDateFormatter:[NSDateFormatter DjangoDateFormatter]];
   
   registeredAdapters = [[NSMutableSet alloc] init];
 }

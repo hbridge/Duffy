@@ -1,0 +1,32 @@
+//
+//  DFPeanutStrand.m
+//  Strand
+//
+//  Created by Henry Bridge on 8/29/14.
+//  Copyright (c) 2014 Duffy Inc. All rights reserved.
+//
+
+#import "DFPeanutStrand.h"
+#import "RestKit/RestKit.h"
+
+@implementation DFPeanutStrand
+
++ (RKObjectMapping *)objectMapping {
+  RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
+  [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
+  
+  return objectMapping;
+}
+
++ (NSArray *)simpleAttributeKeys
+{
+  return @[@"id", @"time_started", @"last_photo_time", @"shared", @"added", @"updated", @"photos", @"users"];
+}
+
+- (NSString *)description
+{
+  NSDictionary *dictRep = [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
+  return dictRep.description;
+}
+
+@end
