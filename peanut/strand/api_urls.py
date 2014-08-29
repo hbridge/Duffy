@@ -1,13 +1,13 @@
 from django.conf.urls import patterns, url
 from rest_framework.urlpatterns import format_suffix_patterns
-from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
+from rest_framework.generics import RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView, CreateAPIView
 
 # If you're changing these, don't forget to change them below
 from strand import api_views as strand_api_views
 from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import PhotoAction, User, ContactEntry
+from common.models import PhotoAction, User, ContactEntry, Strand
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
@@ -37,6 +37,9 @@ urlpatterns = patterns('',
 	url(r'^users/(?P<id>[0-9]+)/$', RetrieveUpdateAPIView.as_view(model=User, lookup_field='id', serializer_class=UserSerializer)),
 
 	url(r'^contacts/$', strand_rest_api_views.ContactEntryBulkAPI.as_view()),
+
+	url(r'^strands/$', CreateAPIView.as_view(model=Strand, lookup_field='id')),	
+	url(r'^strands/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Strand, lookup_field='id')),	
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
