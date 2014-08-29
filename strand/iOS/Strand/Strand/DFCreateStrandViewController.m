@@ -109,7 +109,7 @@
   cell.locationLabel.text = section.subtitle;
   cell.countLabel.text = [@(section.objects.count) stringValue];
   DFPeanutSearchObject *firstObject = section.objects.firstObject;
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:firstObject.time_taken];
+  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:firstObject.time_taken];
   
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];

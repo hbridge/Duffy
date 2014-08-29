@@ -32,8 +32,6 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
   return exifFormatter;
 }
 
-
-
 + (NSDateFormatter *)DjangoDateFormatter
 {
   dispatch_semaphore_wait(DateFormmaterCreateSemaphore, DISPATCH_TIME_FOREVER);
@@ -46,6 +44,21 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
   dispatch_semaphore_signal(DateFormmaterCreateSemaphore);
   
   return djangoDateFormatter;
+}
+
++ (NSDateFormatter *)HumanDateFormatter
+{
+  dispatch_semaphore_wait(DateFormmaterCreateSemaphore, DISPATCH_TIME_FOREVER);
+  static NSDateFormatter *humanDateFormatter = nil;
+  if (!humanDateFormatter) {
+    humanDateFormatter = [[NSDateFormatter alloc] init];
+    [humanDateFormatter setDateStyle:NSDateFormatterMediumStyle];
+    [humanDateFormatter setTimeStyle:NSDateFormatterNoStyle];
+  }
+  dispatch_semaphore_signal(DateFormmaterCreateSemaphore);
+  
+  return humanDateFormatter;
+
 }
 
 + (NSString *)relativeTimeStringSinceDate:(NSDate *)date

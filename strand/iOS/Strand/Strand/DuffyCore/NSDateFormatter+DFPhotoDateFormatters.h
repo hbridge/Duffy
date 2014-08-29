@@ -14,6 +14,7 @@
 
 + (NSDateFormatter *)DjangoDateFormatter;
 + (NSString *)relativeTimeStringSinceDate:(NSDate *)date;
++ (NSDateFormatter *)HumanDateFormatter;
 
 
 @end
