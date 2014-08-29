@@ -20,13 +20,7 @@
 
 - (void)awakeFromNib
 {
-  self.imagesForObjects = [NSMutableDictionary new];
-  self.collectionView.delegate = self;
-  self.collectionView.dataSource = self;
-  self.collectionView.scrollsToTop = NO;
   self.collectionView.backgroundColor = [UIColor clearColor];
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
-        forCellWithReuseIdentifier:@"cell"];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
@@ -36,40 +30,12 @@
   // Configure the view for the selected state
 }
 
-- (void)setObjects:(NSArray *)objects
-{
-  _objects = objects;
-  self.imagesForObjects = [NSMutableDictionary new];
-}
-
-- (void)setImage:(UIImage *)image forObject:(id)object
-{
-  if (image) {
-    dispatch_async(dispatch_get_main_queue(), ^{
-
-        self.imagesForObjects[object] = image;
-        [self.collectionView reloadData];
-
-    });
-  }
-}
-
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
-  return 1;
-}
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-  return self.imagesForObjects.allValues.count;
-}
-
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoViewCell *cell = [self.collectionView
-                           dequeueReusableCellWithReuseIdentifier:@"cell"
-                           forIndexPath:indexPath];
+
+  DFPhotoViewCell *cell = (DFPhotoViewCell *)[super collectionView:collectionView
+                                            cellForItemAtIndexPath:indexPath];
   BOOL hasBlurView = NO;
   for (UIView *view in cell.subviews) {
     if ([view.class isSubclassOfClass:[LFGlassView class]]) {
@@ -87,12 +53,6 @@
       [glassView blurOnceIfPossible];
     });
   }
-  
-  id object = self.objects[indexPath.row];
-  cell.imageView.image = self.imagesForObjects[object];
-  cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
-  cell.imageView.clipsToBounds = YES;
-  cell.imageView.backgroundColor = [UIColor grayColor];
   
   return cell;
 }

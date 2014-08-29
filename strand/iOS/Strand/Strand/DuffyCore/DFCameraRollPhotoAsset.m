@@ -166,14 +166,15 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  if (self.asset) {
-    CGImageRef imageRef = [self.asset thumbnail];
-    UIImage *image = [UIImage imageWithCGImage:imageRef];
-    successBlock(image);
-  } else {
-    failureBlock([NSError errorWithDomain:@"" code:-1
-                                 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
-  }
+  [[DFCameraRollPhotoAsset sharedAssetsLibrary]
+   assetForURL:[NSURL URLWithString:self.alAssetURLString]
+   resultBlock:^(ALAsset *asset) {
+     @autoreleasepool {
+       successBlock([UIImage imageWithCGImage:asset.thumbnail]);
+     }
+   } failureBlock:^(NSError *error) {
+     failureBlock(error);
+   }];
 }
 
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock

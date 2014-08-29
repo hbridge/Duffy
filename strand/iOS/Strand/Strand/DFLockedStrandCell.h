@@ -7,13 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFCollectionViewTableViewCell.h"
 
-@interface DFLockedStrandCell : UITableViewCell <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface DFLockedStrandCell : DFCollectionViewTableViewCell
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
-
-// Objects that the locked cell represents
-@property (nonatomic, retain) NSArray *objects;
-- (void)setImage:(UIImage *)image forObject:(id)object;
                   
 @end

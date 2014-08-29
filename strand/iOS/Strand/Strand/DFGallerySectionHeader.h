@@ -8,6 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+static const CGFloat SectionHeaderWidth = 320;
+static const CGFloat SectionHeaderHeight = 54;
+
 @interface DFGallerySectionHeader : UICollectionReusableView
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;

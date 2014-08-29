@@ -23,9 +23,6 @@
 
 static const CGFloat ItemSize = 105;
 static const CGFloat ItemSpacing = 2.5;
-static const CGFloat SectionHeaderWidth = 320;
-static const CGFloat SectionHeaderHeight = 54;
-
 
 @interface DFGalleryViewController ()
 

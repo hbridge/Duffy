@@ -12,7 +12,7 @@
 #import "DFPhoto.h"
 #import "DFPeanutAction.h"
 
-@interface DFPeanutSearchObject : NSObject<DFPeanutObject, DFJSONConvertible>
+@interface DFPeanutSearchObject : NSObject<DFPeanutObject, DFJSONConvertible, NSCopying>
 
 typedef NSString *const DFSearchObjectType;
 

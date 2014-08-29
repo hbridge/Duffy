@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFCreateStrandViewController : UICollectionViewController <UICollectionViewDataSource, UICollectionViewDelegate>
-@property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
+@interface DFCreateStrandViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>
 
 @end

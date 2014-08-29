@@ -144,5 +144,29 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   return ([self.type isEqual:DFSearchObjectSection] && [self.title isEqual:@"Locked"]);
 }
 
+/* Creates a shallow copy of the SearchObject */
+- (id)copyWithZone:(NSZone *)zone
+{
+  DFPeanutSearchObject *newObject = [[DFPeanutSearchObject allocWithZone:zone] init];
+  newObject.id = self.id;
+  newObject.title = [self.title copyWithZone:zone];
+  newObject.subtitle = [self.title copyWithZone:zone];
+  newObject.thumb_image_path = [self.thumb_image_path copyWithZone:zone];
+  newObject.full_image_path = [self.full_image_path copyWithZone:zone];
+  newObject.time_taken = [self.time_taken copyWithZone:zone];
+  newObject.user = self.user;
+  newObject.user_display_name = [self.user_display_name copy];
+  
+  return newObject;
+}
+
+/* Compares equality by looking at the object IDs */
+- (BOOL)isEqual:(id)object
+{
+  DFPeanutSearchObject *otherObject = object;
+  if (otherObject.id == self.id) return YES;
+  return NO;
+}
+
 
 @end

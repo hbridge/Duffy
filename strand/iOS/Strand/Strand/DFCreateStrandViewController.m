@@ -13,9 +13,10 @@
 #import "DFPeanutSearchObject.h"
 #import "DFPhotoStore.h"
 #import "DFGallerySectionHeader.h"
-
-static const CGFloat SectionHeaderWidth = 320;
-static const CGFloat SectionHeaderHeight = 54;
+#import "DFCreateStrandTableViewCell.h"
+#import "DFPeanutSearchObject.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFSelectPhotosViewController.h"
 
 @interface DFCreateStrandViewController ()
 
@@ -33,12 +34,14 @@ static const CGFloat SectionHeaderHeight = 54;
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
     [self configureNav];
+    [self configureTableView];
   }
   return self;
 }
 
 - (void)configureNav
 {
+  self.navigationItem.title = @"Create Strand";
   self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                            initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                            target:self
@@ -57,18 +60,25 @@ static const CGFloat SectionHeaderHeight = 54;
      target:self
      action:@selector(updateSuggestions:)],
     ];
+  
+  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithTitle:@"Back"
+                                           style:UIBarButtonItemStylePlain
+                                           target:self
+                                           action:nil];
+}
+
+- (void)configureTableView
+{
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"cell"];
 }
 
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionHeader" bundle:nil]
-        forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-               withReuseIdentifier:@"headerView"];
-  self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
-  [self.collectionView registerNib:[UINib nibWithNibName:[DFPhotoViewCell description] bundle:nil]
-        forCellWithReuseIdentifier:@"cell"];
+  [self updateSuggestions:self];
 }
 
 - (void)didReceiveMemoryWarning
@@ -78,59 +88,64 @@ static const CGFloat SectionHeaderHeight = 54;
 }
 
 
-#pragma mark - UICollectionView Data/Delegate
+#pragma mark - UITableView Data/Delegate
 
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+  return 1;
+}
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return self.response.topLevelSectionObjects.count;
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UICollectionReusableView *view;
-  if (kind == UICollectionElementKindSectionHeader) {
-    DFGallerySectionHeader *headerView = [self.collectionView
-                                          dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                          withReuseIdentifier:@"headerView"
-                                          forIndexPath:indexPath];
-    DFPeanutSearchObject *sectionObject = self.response.topLevelSectionObjects[indexPath.section];
-    headerView.titleLabel.text = sectionObject.title;
-    headerView.subtitleLabel.text = sectionObject.subtitle;
-    
-    
-    view = headerView;
+  DFPeanutSearchObject *section = self.response.topLevelSectionObjects[indexPath.row];
+  DFCreateStrandTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
+  
+  // Set the header attributes
+  cell.locationLabel.text = section.subtitle;
+  cell.countLabel.text = [@(section.objects.count) stringValue];
+  DFPeanutSearchObject *firstObject = section.objects.firstObject;
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:firstObject.time_taken];
+  
+  // Get the IDs of all the photos we want to show
+  NSMutableArray *idsToShow = [NSMutableArray new];
+  for (DFPeanutSearchObject *object in section.objects) {
+    if ([object.type isEqual:DFSearchObjectPhoto]) {
+      [idsToShow addObject:@(object.id)];
+
+    } else if ([object.type isEqual:DFSearchObjectCluster]) {
+      DFPeanutSearchObject *repObject = object.objects.firstObject;
+      [idsToShow addObject:@(repObject.id)];
+    }
   }
-  return view;
-}
 
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-  NSArray *objects = [self.response.topLevelSectionObjects[section] objects];
-  return objects.count;
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
-                                                                         forIndexPath:indexPath];
-  
-  NSArray *sectionObjects = [self.response.topLevelSectionObjects[indexPath.section] objects];
-  DFPeanutSearchObject *object = sectionObjects[indexPath.row];
-  if ([object.type isEqual:DFSearchObjectCluster]) object = object.objects.firstObject;
-  DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:object.id];
-  
-  cell.imageView.image = nil;
-  [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
-    //if ([self.collectionView.visibleCells containsObject:cell]) {
-      cell.imageView.image = image;
-      [cell setNeedsLayout];
-    //}
-  } failureBlock:^(NSError *error) {
-    DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
-  }];
+  // Set the images for the collection view
+  cell.objects = idsToShow;
+  for (NSNumber *photoID in idsToShow) {
+    DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
+    
+    if (photo) {
+      [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
+        [cell setImage:image forObject:photoID];
+      } failureBlock:^(NSError *error) {
+        DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
+      }];
+    }
+  }
   
   return cell;
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutSearchObject *section = self.response.topLevelSectionObjects[indexPath.row];
+  DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc] init];
+  selectController.sectionObject = section;
+  [self.navigationController pushViewController:selectController animated:YES];
 }
 
 
@@ -148,7 +163,7 @@ static const CGFloat SectionHeaderHeight = 54;
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
       self.response = response;
-      [self.collectionView reloadData];
+      [self.tableView reloadData];
     }
   }];
 }
