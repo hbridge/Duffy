@@ -9,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin
 from rest_framework import status
 
-from common.models import PhotoAction, ContactEntry
-from common.serializers import BulkContactEntrySerializer
+from common.models import PhotoAction, ContactEntry, StrandInvite
+from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +90,26 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
 
         if not foundMatch:
             logger.info("Parse error for contact entry")
+            obj.skip = True
+
+
+class StrandInviteBulkAPI(BulkCreateAPIView):
+    model = StrandInvite
+    lookup_field = 'id'
+    serializer_class = BulkStrandInviteSerializer
+
+    """
+        Clean up the phone number and set it.  Should only be one number per entry
+    """
+    def pre_save(self, obj):
+        logger.info("Doing a StrandInvite bulk update for user %s of strand %s and number %s" % (obj.user, obj.strand, obj.phone_number))
+        foundMatch = False      
+        for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, "US"):
+            foundMatch = True
+            obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+
+        if not foundMatch:
+            logger.info("Parse error for Strand Invite")
             obj.skip = True
 
 
