@@ -13,11 +13,15 @@
 #import "DFPeanutStrandAdapter.h"
 #import "SVProgressHUD.h"
 #import "DFUploadController.h"
+#import "DFPeoplePickerViewController.h"
+#import "NSString+DFHelpers.h"
 
 @interface DFSelectPhotosViewController ()
 
 @property (nonatomic, retain) NSArray *photoObjects;
 @property (nonatomic, retain) NSMutableArray *selectedPhotoIDs;
+@property (nonatomic, retain) NSArray *selectedContacts;
+@property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
 
 @end
 
@@ -37,6 +41,7 @@
   [super viewDidLoad];
   
   [self configureCollectionView];
+  [self configurePeoplePicker];
 }
 
 - (void)configureNavBar
@@ -45,6 +50,17 @@
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                             target:self action:@selector(donePressed:)];
+}
+
+- (void)configurePeoplePicker
+{
+  self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+  self.peoplePicker = [[DFPeoplePickerViewController alloc]
+                       initWithTokenField:self.tokenField
+                       tableView:self.tableView];
+  self.peoplePicker.allowsMultipleSelection = YES;
+  self.peoplePicker.delegate = self;
+  [self.view addSubview:self.tokenField];
 }
 
 - (void)configureCollectionView
@@ -152,6 +168,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 }
 
 
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+  [self.tokenField collapse];
+}
+
 #pragma mark - Actions
 
 - (void)donePressed:(id)sender
@@ -206,6 +227,20 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     [[DFPhotoStore sharedStore] saveContext];
     [[DFUploadController sharedUploadController] uploadPhotos];
   });
+}
+
+#pragma mark - DFPeoplePicker delegate
+
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+         didPickContacts:(NSArray *)peanutContacts
+{
+  self.selectedContacts = peanutContacts;
+}
+
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+           textDidChange:(NSString *)text
+{
+  self.tableView.hidden = ![text isNotEmpty];
 }
 
 

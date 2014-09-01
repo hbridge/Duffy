@@ -68,7 +68,7 @@
   // only handle this logic if this view is appearing for the first time
   if (!self.isMovingToParentViewController) return;
 
-  [self.toTextField becomeFirstResponder];
+  [self.tokenField becomeFirstResponder];
   [DFAnalytics logViewController:self appearedWithParameters:@{@"result": @"Success"}];
 }
 
@@ -77,9 +77,10 @@
 
 #pragma mark - Action Responses
 
-- (void)pickerController:(DFPeoplePickerViewController *)pickerController didPickContact:(DFPeanutContact *)contact
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+         didPickContacts:(NSArray *)peanutContacts
 {
-  [self showComposerWithPickedContact:contact];
+  [self showComposerWithPickedContact:peanutContacts.firstObject];
 }
 
 

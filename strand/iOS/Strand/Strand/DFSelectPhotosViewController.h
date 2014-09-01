@@ -8,10 +8,15 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutSearchObject.h"
+#import "VENTokenField.h"
+#import "DFPeoplePickerViewController.h"
 
-@interface DFSelectPhotosViewController : UICollectionViewController
+@interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, DFPeoplePickerDelegate>
 
 @property (nonatomic, retain) DFPeanutSearchObject *sectionObject;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
+@property (nonatomic, retain) VENTokenField *tokenField;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 @end

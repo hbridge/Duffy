@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutContact.h"
+#import "VENTokenField.h"
 
 @class DFPeoplePickerViewController;
 
@@ -15,17 +16,23 @@
 
 @required
 
-- (void)pickerController:(DFPeoplePickerViewController *)pickerController didPickContact:(DFPeanutContact *)contact;
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+         didPickContacts:(NSArray *)peanutContacts;
+
+@optional
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController textDidChange:(NSString *)text;
 
 @end
 
 
-@interface DFPeoplePickerViewController : UITableViewController <UITextFieldDelegate>
+@interface DFPeoplePickerViewController : UITableViewController <VENTokenFieldDelegate, VENTokenFieldDataSource>
 
 @property (nonatomic, weak) NSObject<DFPeoplePickerDelegate>* delegate;
-
-@property (nonatomic, retain) UITextField *toTextField;
+@property (nonatomic, retain) VENTokenField *tokenField;
 @property (nonatomic, retain) NSArray *abSearchResults;
 @property (nonatomic, retain) NSString *textNumberString;
+@property (nonatomic) BOOL allowsMultipleSelection;
+
+- (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView;
 
 @end
