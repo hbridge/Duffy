@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import <MessageUI/MessageUI.h>
+#import "DFPeoplePickerViewController.h"
 
-@interface DFInviteUserViewController : UITableViewController <UITextFieldDelegate, UISearchDisplayDelegate, MFMessageComposeViewControllerDelegate>
+@interface DFInviteUserViewController : DFPeoplePickerViewController <MFMessageComposeViewControllerDelegate, DFPeoplePickerDelegate>
 
 @end

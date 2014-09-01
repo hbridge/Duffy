@@ -4,7 +4,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFInviteUserComposeController">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPeoplePickerViewController">
             <connections>
                 <outlet property="view" destination="pkn-BI-Fod" id="PGJ-ZK-J1R"/>
             </connections>
@@ -16,8 +16,8 @@
             <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <connections>
-                <outlet property="dataSource" destination="-1" id="qat-Qz-5Y2"/>
-                <outlet property="delegate" destination="-1" id="WSM-79-Ndb"/>
+                <outlet property="dataSource" destination="-1" id="hWn-LO-5pu"/>
+                <outlet property="delegate" destination="-1" id="aWp-HR-ORU"/>
             </connections>
         </tableView>
     </objects>
