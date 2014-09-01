@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from common.models import Photo, User, PhotoAction, ContactEntry
+from common.models import Photo, User, PhotoAction, ContactEntry, StrandInvite
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -50,4 +50,14 @@ class BulkContactEntrySerializer(serializers.Serializer):
 	bulk_model = ContactEntry
 	bulk_key = 'contacts'
 
-	
+class StrandInviteSerializer(serializers.ModelSerializer):
+	phone_number = serializers.CharField()
+
+	class Meta:
+		model = StrandInvite
+
+class BulkStrandInviteSerializer(serializers.Serializer):
+	strandInvites = StrandInviteSerializer(many=True)
+
+	bulk_model = StrandInvite
+	bulk_key = 'strand_invite'

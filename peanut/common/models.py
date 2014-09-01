@@ -471,3 +471,17 @@ class Strand(models.Model):
 
 	class Meta:
 		db_table = 'strand_objects'
+
+class StrandInvite(models.Model):
+	strand = models.ForeignKey(Strand, db_index=True)
+	user = models.ForeignKey(User, db_index=True)
+	phone_number = models.CharField(max_length=128, db_index=True) 
+	evaluated = models.BooleanField(db_index=True, default=False)
+	accepted  = models.BooleanField(db_index=True, default=False)
+	ignored  = models.BooleanField(db_index=True, default=False)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)	
+
+
+	class Meta:
+		db_table = 'strand_invites'

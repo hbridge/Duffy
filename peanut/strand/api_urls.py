@@ -41,6 +41,8 @@ urlpatterns = patterns('',
 	url(r'^strands/$', CreateAPIView.as_view(model=Strand, lookup_field='id')),	
 	url(r'^strands/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Strand, lookup_field='id')),	
 
+	url(r'^strand_invite/$', strand_rest_api_views.StrandInviteBulkAPI.as_view()),
+
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
 	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),	
