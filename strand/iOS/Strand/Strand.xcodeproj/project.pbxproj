@@ -119,6 +119,10 @@
 		5AAF039A19B112F700EF021C /* DFPeanutStrand.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF039919B112F700EF021C /* DFPeanutStrand.m */; };
 		5AAF039D19B1168500EF021C /* DFPeanutStrandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF039C19B1168500EF021C /* DFPeanutStrandAdapter.m */; };
 		5AAF03A319B4D5B200EF021C /* DFPeoplePickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03A219B4D5B200EF021C /* DFPeoplePickerViewController.m */; };
+		5AAF03A619B509B400EF021C /* DFInviteStrandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03A519B509B400EF021C /* DFInviteStrandViewController.m */; };
+		5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03A819B50F2D00EF021C /* DFPeanutStrandInvite.m */; };
+		5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03AB19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m */; };
+		5AAF03AF19B5145200EF021C /* DFPeanutStrandInviteAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */; };
 		5AB4CC001982AF7C00EFB3E3 /* DFInviteUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */; };
@@ -397,6 +401,14 @@
 		5AAF039C19B1168500EF021C /* DFPeanutStrandAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutStrandAdapter.m; sourceTree = "<group>"; };
 		5AAF03A119B4D5B200EF021C /* DFPeoplePickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeoplePickerViewController.h; sourceTree = "<group>"; };
 		5AAF03A219B4D5B200EF021C /* DFPeoplePickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeoplePickerViewController.m; sourceTree = "<group>"; };
+		5AAF03A419B509B400EF021C /* DFInviteStrandViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFInviteStrandViewController.h; sourceTree = "<group>"; };
+		5AAF03A519B509B400EF021C /* DFInviteStrandViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFInviteStrandViewController.m; sourceTree = "<group>"; };
+		5AAF03A719B50F2D00EF021C /* DFPeanutStrandInvite.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutStrandInvite.h; sourceTree = "<group>"; };
+		5AAF03A819B50F2D00EF021C /* DFPeanutStrandInvite.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutStrandInvite.m; sourceTree = "<group>"; };
+		5AAF03AA19B5105D00EF021C /* DFPeanutRestEndpointAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutRestEndpointAdapter.h; sourceTree = "<group>"; };
+		5AAF03AB19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutRestEndpointAdapter.m; sourceTree = "<group>"; };
+		5AAF03AD19B5145200EF021C /* DFPeanutStrandInviteAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutStrandInviteAdapter.h; sourceTree = "<group>"; };
+		5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutStrandInviteAdapter.m; sourceTree = "<group>"; };
 		5AB32B5A19537A610082F716 /* DFStrandStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandStore.h; sourceTree = "<group>"; };
 		5AB32B5B19537A610082F716 /* DFStrandStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandStore.m; sourceTree = "<group>"; };
 		5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgeButton.h; sourceTree = "<group>"; };
@@ -815,6 +827,10 @@
 				651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */,
 				5AAF039B19B1168500EF021C /* DFPeanutStrandAdapter.h */,
 				5AAF039C19B1168500EF021C /* DFPeanutStrandAdapter.m */,
+				5AAF03AA19B5105D00EF021C /* DFPeanutRestEndpointAdapter.h */,
+				5AAF03AB19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m */,
+				5AAF03AD19B5145200EF021C /* DFPeanutStrandInviteAdapter.h */,
+				5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -842,6 +858,8 @@
 				651E9A85199D170800678D16 /* DFPeanutNotification.m */,
 				5AAF039819B112F700EF021C /* DFPeanutStrand.h */,
 				5AAF039919B112F700EF021C /* DFPeanutStrand.m */,
+				5AAF03A719B50F2D00EF021C /* DFPeanutStrandInvite.h */,
+				5AAF03A819B50F2D00EF021C /* DFPeanutStrandInvite.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -954,6 +972,8 @@
 				5AAF038919B0D99200EF021C /* DFCreateStrandTableViewCell.h */,
 				5AAF038A19B0D99200EF021C /* DFCreateStrandTableViewCell.m */,
 				5AAF038B19B0D99200EF021C /* DFCreateStrandTableViewCell.xib */,
+				5AAF03A419B509B400EF021C /* DFInviteStrandViewController.h */,
+				5AAF03A519B509B400EF021C /* DFInviteStrandViewController.m */,
 			);
 			name = "Create Strand";
 			sourceTree = "<group>";
@@ -1414,6 +1434,7 @@
 				5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */,
 				5AA45299196708D00099CBD2 /* DFPhotoViewCell.m in Sources */,
 				5AC4A9261947C30800862D9C /* DFNetworkingConstants.m in Sources */,
+				5AAF03A619B509B400EF021C /* DFInviteStrandViewController.m in Sources */,
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */,
@@ -1433,6 +1454,7 @@
 				5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */,
 				5AAF038319AFCED000EF021C /* DFPeanutSuggestedStrandsAdapter.m in Sources */,
 				5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */,
+				5AAF03AF19B5145200EF021C /* DFPeanutStrandInviteAdapter.m in Sources */,
 				5A7B1845196F2C0800E5A1D1 /* DFMapViewController.m in Sources */,
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
 				5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */,
@@ -1443,6 +1465,7 @@
 				5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */,
 				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
+				5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
@@ -1542,6 +1565,7 @@
 				5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */,
 				5AAF038C19B0D99200EF021C /* DFCreateStrandTableViewCell.m in Sources */,
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,
+				5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
 				5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */,
 				5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */,

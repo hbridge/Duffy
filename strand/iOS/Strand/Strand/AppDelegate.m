@@ -80,7 +80,7 @@
 
 #ifdef DEBUG
   //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
-  //RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
+  RKLogConfigureByName("RestKit/ObjectMapping", RKLogLevelTrace);
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);
 #else
   RKLogConfigureByName("RestKit/Network", RKLogLevelError);

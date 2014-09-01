@@ -34,4 +34,9 @@
 }
 */
 
+- (IBAction)inviteButtonPressed:(id)sender {
+  if ([self.delegate respondsToSelector:@selector(inviteButtonPressedForHeaderView:)]) {
+    [self.delegate inviteButtonPressedForHeaderView:self];
+  }
+}
 @end

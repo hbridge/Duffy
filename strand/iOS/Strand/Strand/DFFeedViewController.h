@@ -13,10 +13,11 @@
 #import "DFTopBarController.h"
 #import "WYPopoverController.h"
 #import "DFNotificationsViewController.h"
+#import "DFFeedSectionHeaderView.h"
 
 @interface DFFeedViewController : DFStrandsViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
-DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate>
+DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderViewDelegate>
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;

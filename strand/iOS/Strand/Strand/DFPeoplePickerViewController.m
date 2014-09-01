@@ -34,7 +34,6 @@
     self.tokenField = tokenField;
     [self configureTableView];
     [self configureTokenField];
-    self.selectedContacts = [NSMutableArray new];
   }
   return self;
 }
@@ -90,6 +89,7 @@
 
 - (void)configureTokenField
 {
+  self.selectedContacts = [NSMutableArray new];
   if (!self.tokenField) {
     self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
     self.tokenField.backgroundColor = [UIColor whiteColor];
@@ -264,15 +264,12 @@
   }
   
   if (selectedContact) {
-    if (!self.allowsMultipleSelection) {
-      [self.delegate pickerController:self didPickContacts:@[selectedContact]];
-    } else {
-      [self.selectedContacts addObject:selectedContact];
-      [self.tokenField reloadData];
-      [self updateSearchResults];
-      [self.tableView reloadData];
-      [self tokenField:self.tokenField didChangeText:self.tokenField.inputText];
-    }
+    [self.selectedContacts addObject:selectedContact];
+    [self.tokenField reloadData];
+    [self updateSearchResults];
+    [self.tableView reloadData];
+    [self tokenField:self.tokenField didChangeText:self.tokenField.inputText];
+    [self.delegate pickerController:self didPickContacts:self.selectedContacts];
   }
   
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

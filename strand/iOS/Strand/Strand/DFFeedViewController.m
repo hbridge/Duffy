@@ -27,6 +27,7 @@
 #import "NSString+DFHelpers.h"
 #import "RootViewController.h"
 #import "UIAlertView+DFHelpers.h"
+#import "DFInviteStrandViewController.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -224,6 +225,8 @@ const CGFloat LockedCellHeight = 157.0;
   DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
   headerView.titleLabel.text = sectionObject.title;
   headerView.subtitleLabel.text = sectionObject.subtitle;
+  headerView.representativeObject = sectionObject;
+  headerView.delegate = self;
   
   return headerView;
 }
@@ -491,6 +494,18 @@ const CGFloat LockedCellHeight = 157.0;
   DDLogVerbose(@"Row tapped for object: %@", object);
                
   [tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+#pragma mark - DFFeedSectionHeaderView Delegate
+
+- (void)inviteButtonPressedForHeaderView:(DFFeedSectionHeaderView *)headerView
+{
+  DFPeanutSearchObject *section = (DFPeanutSearchObject *)headerView.representativeObject;
+  DFInviteStrandViewController *vc = [[DFInviteStrandViewController alloc] init];
+  vc.sectionObject = section;
+  [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc]
+                     animated:YES
+                   completion:nil];
 }
 
 #pragma mark - DFPhotoFeedCell Delegates

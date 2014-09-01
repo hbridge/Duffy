@@ -36,6 +36,16 @@
                                 <constraint firstAttribute="width" constant="15" id="HHs-TM-He0"/>
                             </constraints>
                         </imageView>
+                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L8d-Rs-vGG">
+                            <rect key="frame" x="281" y="6" width="35" height="35"/>
+                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <state key="normal" image="Assets/Icons/InviteBarButton.png">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="inviteButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="2VV-Z5-txE"/>
+                            </connections>
+                        </button>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     <constraints>
@@ -66,4 +76,7 @@
             </connections>
         </view>
     </objects>
+    <resources>
+        <image name="Assets/Icons/InviteBarButton.png" width="24" height="24"/>
+    </resources>
 </document>
