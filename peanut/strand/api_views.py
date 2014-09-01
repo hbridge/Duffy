@@ -113,7 +113,7 @@ def getFormattedGroups(groups, userId):
 
 	photoIds = list()
 	for group in groups:
-		for photo in group:
+		for photo in group['photos']:
 			photoIds.append(photo.id)
 
 	# Fetch all the similarities at once so we can process in memory
@@ -123,7 +123,7 @@ def getFormattedGroups(groups, userId):
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
 	
 	for group in groups:
-		if len(group) == 0:
+		if len(group['photos']) == 0:
 			continue
 			
 		# Grab title from the location_city of a photo...but find the first one that has
@@ -131,18 +131,19 @@ def getFormattedGroups(groups, userId):
 		bestLocation = None
 		subtitle = ""
 		i = 0
-		while (not bestLocation) and i < len(group):
-			bestLocation = getBestLocation(group[i])
+		while (not bestLocation) and i < len(group['photos']):
+			bestLocation = getBestLocation(group['photos'][i])
 			i += 1
 
 		names = list()
-		for photo in group:
+		for photo in group['photos']:
 			if photo.user_id != userId:
 				names.append(photo.user.display_name)
 
 		names = set(names)
 
-		if (groupIsSolo(group, userId)):
+
+		if (groupIsSolo(group['photos'], userId)):
 			title = "Just you"
 		else:
 			title = ", ".join(names) + " and You"
@@ -152,11 +153,11 @@ def getFormattedGroups(groups, userId):
 		else:
 			subtitle = "Location Unknown"
 			
-		clusters = cluster_util.getClustersFromPhotos(group, constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
+		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 		
-		output.append({'title': title, 'subtitle': subtitle, 'clusters': clusters})
+		output.append({'title': title, 'subtitle': subtitle, 'clusters': clusters, 'id': group['id']})
 	return output
 
 """
@@ -299,22 +300,27 @@ def strand_feed(request):
 		# list of list of photos
 		groups = list()
 		for strand in strands:
+			strandId = strand.id
 			photos = friends_util.filterStrandPhotosByFriends(userId, friendsData, strand)
+			entry = {'photos': photos, 'id': strandId}
+
 			if len(photos) > 0:
-				groups.append(photos)
+				groups.append(entry)
 
 		if len(groups) > 0:
 			# now sort groups by the time_taken of the first photo in each group
-			groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
+			groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 		# Lastly, grab all our locked strands and add in those photos
 		lockedGroup = list()
 		if user.last_location_point:
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
+			# TODO: get a real id for locked group
+			entry = {'photos': lockedGroup, 'id': 0}
 
 			if len(lockedGroup) > 0:
-				groups.insert(0, lockedGroup)
+				groups.insert(0, entry)
 
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
 		formattedGroups = getFormattedGroups(groups, userId)

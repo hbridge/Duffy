@@ -105,7 +105,7 @@ def turnFormattedGroupsIntoSections(formattedGroups, num):
 	lastDate = None
 	count = 0
 	for group in formattedGroups:
-		section = {'type': 'section', 'title': group['title'], 'subtitle': group['subtitle'], 'objects': list()}
+		section = {'type': 'section', 'title': group['title'], 'subtitle': group['subtitle'], 'id': group['id'], 'objects': list()}
 		mostRecentPhotoDate = None
 		for cluster in group['clusters']:
 			if len(cluster) == 1:
