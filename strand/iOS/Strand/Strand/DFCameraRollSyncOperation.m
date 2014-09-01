@@ -84,6 +84,7 @@ static int NumChangesFlushThreshold = 100;
 
 - (NSDictionary *)findChanges
 {
+  // setup lists of objects
   self.enumerationCompleteSemaphore = dispatch_semaphore_create(0);
   self.foundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
   self.knownNotFoundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
@@ -120,6 +121,14 @@ static int NumChangesFlushThreshold = 100;
   DDLogInfo(@"Scan complete.  Change summary for all groups: \n%@", [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
   
   return self.allObjectIDsToChanges;
+}
+
+
+- (void)findRemoteChanges
+{
+  // TODO download a list of what the server thinks it has
+  
+  // TODO compare server list to whether we have photos with those ids or not, whether hashes match etc
 }
 
 
