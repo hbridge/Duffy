@@ -364,7 +364,7 @@ def get_joinable_strands(request):
 
 		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsData)
 
-		formattedGroups = getFormattedGroups({'photos': [joinableStrandPhotos]}, userId)
+		formattedGroups = getFormattedGroups([{'photos': [joinableStrandPhotos]}], userId)
 		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 
@@ -393,7 +393,7 @@ def get_new_photos(request):
 
 		photoList = removeDups(photoList, lambda x: x.id)
 
-		formattedGroups = getFormattedGroups({'photos':[photoList]}, userId)
+		formattedGroups = getFormattedGroups([{'photos':[photoList]}], userId)
 		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 
