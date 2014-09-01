@@ -190,9 +190,12 @@ static const CGFloat ItemSpacing = 2.5;
   [firstPhoto.asset loadUIImageForThumbnail:^(UIImage *image) {
     if ([self.collectionView.visibleCells containsObject:cell]) {
       cell.imageView.image = image;
+
       [cell setNeedsLayout];
     }
   } failureBlock:^(NSError *error) {
+    cell.imageView.image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
+    [cell setNeedsLayout];
     DDLogError(@"Error loading thumbnail for uploading asset.");
   }];
   
@@ -238,7 +241,10 @@ static const CGFloat ItemSpacing = 2.5;
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:cell]) return;
-       cell.imageView.image = image;
+       if
+         (image) cell.imageView.image = image;
+       else
+         cell.imageView.image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
        [cell setNeedsLayout];
      });
    }];

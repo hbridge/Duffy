@@ -170,7 +170,11 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
    assetForURL:[NSURL URLWithString:self.alAssetURLString]
    resultBlock:^(ALAsset *asset) {
      @autoreleasepool {
-       successBlock([UIImage imageWithCGImage:asset.thumbnail]);
+       if (asset.thumbnail) {
+         successBlock([UIImage imageWithCGImage:asset.thumbnail]);
+       } else {
+         failureBlock(nil);
+       }
      }
    } failureBlock:^(NSError *error) {
      failureBlock(error);
