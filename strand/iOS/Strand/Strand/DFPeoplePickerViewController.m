@@ -73,8 +73,9 @@
 {
   self.selectedContacts = [NSMutableArray new];
   if (!self.tokenField) {
-    self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
-    self.tokenField.maxHeight = 44.0;
+    self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 50)];
+    self.tokenField.maxHeight = 50.0;
+    self.tokenField.verticalInset = 3.0;
     self.tokenField.backgroundColor = [UIColor whiteColor];
     self.tableView.tableHeaderView = self.tokenField;
   }
