@@ -60,4 +60,4 @@ class BulkStrandInviteSerializer(serializers.Serializer):
 	strandInvites = StrandInviteSerializer(many=True)
 
 	bulk_model = StrandInvite
-	bulk_key = 'strand_invite'
+	bulk_key = 'strandInvites'

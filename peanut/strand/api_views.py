@@ -255,13 +255,16 @@ def unshared_strands(request):
 		# list of list of photos
 		groups = list()
 		for strand in strands:
+			strandId = strand.id			
 			photos = strand.photos.all().order_by("-time_taken")
+			entry = {'photos': photos, 'id': strandId}
+
 			if len(photos) > 0:
-				groups.append(photos)
+				groups.append(entry)
 
 		if len(groups) > 0:
 			# now sort groups by the time_taken of the first photo in each group
-			groups = sorted(groups, key=lambda x: x[0].time_taken, reverse=True)
+			groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 		formattedGroups = getFormattedGroups(groups, userId)
 			
