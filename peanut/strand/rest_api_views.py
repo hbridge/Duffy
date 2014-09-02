@@ -4,13 +4,15 @@ import logging
 import re
 import phonenumbers
 
-from rest_framework.generics import CreateAPIView, GenericAPIView
+from django.shortcuts import get_list_or_404
+
+from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView, ListAPIView
 from rest_framework.response import Response
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
 
 from common.models import PhotoAction, ContactEntry, StrandInvite
-from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
+from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer, StrandInviteSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -64,6 +66,19 @@ class BulkCreateModelMixin(CreateModelMixin):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+"""
+    Used to return only unused invites in the Strand Invites table for a user
+"""
+
+class OpenStrandInviteView(ListAPIView):
+    serializer_class = StrandInviteSerializer
+    lookup_field='phone_number'
+
+    def get_queryset(self):
+        phone_number = self.kwargs['phone_number']
+        return StrandInvite.objects.filter(evaluated=0).filter(phone_number=phone_number)
+
 
 """
     Used to do a fast bulk update with one write to the database

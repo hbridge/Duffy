@@ -387,7 +387,7 @@ def get_new_photos(request):
 		startTime = form.cleaned_data['start_date_time']
 		photoList = list()
 
-		strands = Strand.objects.filter(last_photo_time__gt=startTime)
+		strands = Strand.objects.filter(last_photo_time__gt=startTime).filter(shared=True)
 		
 		for strand in strands:
 			for photo in strand.photos.filter(time_taken__gt=startTime):

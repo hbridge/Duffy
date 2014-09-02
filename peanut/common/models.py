@@ -465,7 +465,7 @@ class Strand(models.Model):
 	last_photo_time = models.DateTimeField()
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
-	shared = models.BooleanField(default=True)
+	shared = models.BooleanField(default=True)	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
@@ -479,9 +479,22 @@ class StrandInvite(models.Model):
 	evaluated = models.BooleanField(db_index=True, default=False)
 	accepted  = models.BooleanField(db_index=True, default=False)
 	ignored  = models.BooleanField(db_index=True, default=False)
+	bulk_batch_key = models.IntegerField(null=True, db_index=True)	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
 
 	class Meta:
 		db_table = 'strand_invites'
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		for obj in objs:
+			obj.updated = datetime.datetime.now()
+
+		if isinstance(attributesList, list):
+			attributesList.append("updated")
+		else:
+			attributesList = [attributesList, "updated"]
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
