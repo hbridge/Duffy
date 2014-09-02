@@ -18,23 +18,39 @@
 
 @implementation DFInviteStrandViewController
 
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    [self configure];
+  }
+  return self;
+}
+
+
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-      self.delegate = self;
-      self.allowsMultipleSelection = YES;
-      
-      self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                               initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                               target:self
-                                               action:@selector(cancelButtonPressed:)];
-      self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                                initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                                target:self
-                                                action:@selector(doneButtonPressed:)];
+      [self configure];
     }
     return self;
+}
+
+
+- (void)configure
+{
+  self.delegate = self;
+  self.allowsMultipleSelection = YES;
+  
+  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                           target:self
+                                           action:@selector(cancelButtonPressed:)];
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                            target:self
+                                            action:@selector(doneButtonPressed:)];
 }
 
 - (void)viewDidLoad

@@ -503,7 +503,7 @@ const CGFloat LockedCellHeight = 157.0;
   DFPeanutSearchObject *section = (DFPeanutSearchObject *)headerView.representativeObject;
   DFInviteStrandViewController *vc = [[DFInviteStrandViewController alloc] init];
   vc.sectionObject = section;
-  [self presentViewController:[[UINavigationController alloc] initWithRootViewController:vc]
+  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
                      animated:YES
                    completion:nil];
 }

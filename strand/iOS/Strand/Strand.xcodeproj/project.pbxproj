@@ -70,6 +70,7 @@
 		5A7F8FFE19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A7F8FFD19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
+		5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
 		5A9BC31019A26A22002D1CD7 /* DFGallerySectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9BC30F19A26A22002D1CD7 /* DFGallerySectionHeader.m */; };
 		5A9BC31219A26A34002D1CD7 /* DFGallerySectionHeader.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9BC31119A26A34002D1CD7 /* DFGallerySectionHeader.xib */; };
@@ -320,6 +321,8 @@
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
+		5A93B59E19B6290F00A3DBA7 /* DFABResultTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFABResultTableViewCell.h; sourceTree = "<group>"; };
+		5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFABResultTableViewCell.m; sourceTree = "<group>"; };
 		5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutLocationAdapter.h; sourceTree = "<group>"; };
 		5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutLocationAdapter.m; sourceTree = "<group>"; };
 		5A9BC30E19A26A22002D1CD7 /* DFGallerySectionHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFGallerySectionHeader.h; sourceTree = "<group>"; };
@@ -963,6 +966,8 @@
 		5AAF037819AF865E00EF021C /* Create Strand */ = {
 			isa = PBXGroup;
 			children = (
+				5AB4CBFD1982AF7C00EFB3E3 /* DFInviteUserViewController.h */,
+				5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */,
 				5AAF037919AF86BF00EF021C /* DFCreateStrandViewController.h */,
 				5AAF037A19AF86BF00EF021C /* DFCreateStrandViewController.m */,
 				5AAF037B19AF86BF00EF021C /* DFCreateStrandViewController.xib */,
@@ -978,19 +983,19 @@
 			name = "Create Strand";
 			sourceTree = "<group>";
 		};
-		5AB4CBFC1982AF2500EFB3E3 /* Inviting */ = {
+		5AB4CBFC1982AF2500EFB3E3 /* People Picker */ = {
 			isa = PBXGroup;
 			children = (
 				5AAF03A119B4D5B200EF021C /* DFPeoplePickerViewController.h */,
 				5AAF03A219B4D5B200EF021C /* DFPeoplePickerViewController.m */,
 				5AA9292A19A6502200032A3F /* DFPeoplePickerViewController.xib */,
-				5AB4CBFD1982AF7C00EFB3E3 /* DFInviteUserViewController.h */,
-				5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */,
+				5A93B59E19B6290F00A3DBA7 /* DFABResultTableViewCell.h */,
+				5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */,
 				5AA9293719A67CC500032A3F /* DFABResultTableViewCell.xib */,
 				5AA9293119A6598600032A3F /* DFNoContactsTableViewCell.xib */,
 				5AA9293319A66AB700032A3F /* DFNoResultsTableViewCell.xib */,
 			);
-			name = Inviting;
+			name = "People Picker";
 			sourceTree = "<group>";
 		};
 		5AC4A8D61947AF8E00862D9C /* Camera View */ = {
@@ -1171,7 +1176,7 @@
 				5AC4A8DC1947B61900862D9C /* Database */,
 				5A3172CF196C7C6F00CA7693 /* Settings */,
 				5AAF037819AF865E00EF021C /* Create Strand */,
-				5AB4CBFC1982AF2500EFB3E3 /* Inviting */,
+				5AB4CBFC1982AF2500EFB3E3 /* People Picker */,
 				5AC4A964194A3FBF00862D9C /* Network Adapters */,
 				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
@@ -1476,6 +1481,7 @@
 				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
+				5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */,
 				5AAF038719B0D5AE00EF021C /* DFSelectPhotosViewController.m in Sources */,
 				5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */,
 				5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */,

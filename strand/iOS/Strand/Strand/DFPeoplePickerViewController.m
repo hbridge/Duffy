@@ -14,6 +14,7 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFAnalytics.h"
 #import "DFUser.h"
+#import "DFABResultTableViewCell.h"
 
 
 @interface DFPeoplePickerViewController ()
@@ -26,6 +27,16 @@
 @implementation DFPeoplePickerViewController
 @synthesize addressBook = _addressBook;
 
+
+- (instancetype)init
+{
+  self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
+  if (self) {
+    
+  }
+  return self;
+}
+
 - (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView
 {
   self = [super init];
@@ -34,15 +45,6 @@
     self.tokenField = tokenField;
     [self configureTableView];
     [self configureTokenField];
-  }
-  return self;
-}
-
-- (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-  self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-  if (self) {
-    
   }
   return self;
 }
@@ -67,31 +69,12 @@
 
 }
 
-//- (void)configureToField
-//{
-//  if (!self.toTextField) {
-//    self.toTextField = [[UITextField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-//    self.tableView.tableHeaderView = self.toTextField;
-//    self.toTextField.leftView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, 44)];
-//    self.toTextField.rightView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 8, 44)];
-//    self.toTextField.leftViewMode = self.toTextField.rightViewMode = UITextFieldViewModeAlways;
-//    self.toTextField.delegate = self;
-//  }
-//
-//  self.toTextField.placeholder = @"Enter a name or phone number";
-//  self.toTextField.backgroundColor = [UIColor whiteColor];
-//  self.toTextField.keyboardType = UIKeyboardTypeNamePhonePad;
-//  self.toTextField.autocorrectionType = UITextAutocorrectionTypeNo;
-//  [self.toTextField addTarget:self
-//                       action:@selector(textFieldChanged:)
-//             forControlEvents:UIControlEventEditingChanged];
-//}
-
 - (void)configureTokenField
 {
   self.selectedContacts = [NSMutableArray new];
   if (!self.tokenField) {
-    self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+    self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 44)];
+    self.tokenField.maxHeight = 44.0;
     self.tokenField.backgroundColor = [UIColor whiteColor];
     self.tableView.tableHeaderView = self.tokenField;
   }
@@ -204,7 +187,7 @@
   if (indexPath.section == 0) {
     if (self.abSearchResults.count > 0) {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"abResult"];
-      [self configureABCell:cell forIndexPath:indexPath];
+      [self configureABCell:(DFABResultTableViewCell *)cell forIndexPath:indexPath];
       cell.imageView.image = nil;
     } else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined) {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noContacts"];
@@ -220,14 +203,14 @@
   return cell;
 }
 
-- (void)configureABCell:(UITableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath
+- (void)configureABCell:(DFABResultTableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath
 {
   NSDictionary *resultDict = self.abSearchResults[indexPath.row];
   RHPerson *person = resultDict[@"person"];
   int phoneIndex = [resultDict[@"index"] intValue];
   
-  cell.textLabel.text = person.name;
-  cell.detailTextLabel.text = [NSString stringWithFormat:@"%@ %@",
+  cell.titleLabel.text = person.name;
+  cell.subtitleLabel.text = [NSString stringWithFormat:@"%@ %@",
                                [person.phoneNumbers localizedLabelAtIndex:phoneIndex],
                                [person.phoneNumbers valueAtIndex:phoneIndex]
                                ];
@@ -264,12 +247,16 @@
   }
   
   if (selectedContact) {
-    [self.selectedContacts addObject:selectedContact];
-    [self.tokenField reloadData];
-    [self updateSearchResults];
-    [self.tableView reloadData];
-    [self tokenField:self.tokenField didChangeText:self.tokenField.inputText];
-    [self.delegate pickerController:self didPickContacts:self.selectedContacts];
+    if (self.allowsMultipleSelection) {
+      [self.selectedContacts addObject:selectedContact];
+      [self.tokenField reloadData];
+      [self updateSearchResults];
+      [self.tableView reloadData];
+      [self tokenField:self.tokenField didChangeText:self.tokenField.inputText];
+      [self.delegate pickerController:self didPickContacts:self.selectedContacts];
+    } else {
+      [self.delegate pickerController:self didPickContacts:@[selectedContact]];
+    }
   }
   
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];

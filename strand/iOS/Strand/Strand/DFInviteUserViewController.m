@@ -35,18 +35,32 @@
 
 @synthesize userAdapter = _userAdapter;
 
+- (instancetype)init
+{
+  self = [super init];
+  if (self) {
+    [self configure];
+  }
+  return self;
+}
+
 - (instancetype)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
   self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
   if (self) {
-    self.navigationItem.title = @"Invite Friend";
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                             initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                             target:self
-                                             action:@selector(cancel)];
-    self.delegate = self;
+    [self configure];
   }
   return self;
+}
+
+- (void)configure
+{
+  self.navigationItem.title = @"Invite Friend";
+  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                           target:self
+                                           action:@selector(cancel)];
+  self.delegate = self;
 }
 
 - (void)viewDidLoad
@@ -102,6 +116,7 @@
         [self showComposerWithPickedContact:pickedContact];
       } else {
         DDLogError(@"%@ could not fetch invite text on retry.", self.class);
+        [SVProgressHUD dismiss];
         [UIAlertView showSimpleAlertWithTitle:@"Error" formatMessage:@"Could not invite at this time. %@",
          error.localizedDescription];
       }
