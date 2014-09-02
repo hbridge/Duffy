@@ -17,13 +17,15 @@ typedef void (^DFPeanutRestFetchFailure)(NSError *error);
 @interface DFPeanutRestEndpointAdapter : NSObject
 
 + (NSArray *)responseDescriptorsForPeanutObjectClass:(Class<DFPeanutObject>)peanutObjectClass
-                                            basePath:(NSString *)pathString;
+                                            basePath:(NSString *)pathString
+                                         bulkKeyPath:(NSString *)bulkKeyPath;
 + (NSArray *)requestDescriptorsForPeanutObjectClass:(Class<DFPeanutObject>)peanutObjectClass
                                         rootKeyPath:(NSString *)rootKeyPath;
 
 - (void)performRequest:(RKRequestMethod)requestMethod
               withPath:(NSString *)path
                objects:(NSArray *)objects
+            parameters:(NSDictionary *)parameters
        forceCollection:(BOOL)forceCollection
                success:(DFPeanutRestFetchSuccess)success
                failure:(DFPeanutRestFetchFailure)failure;

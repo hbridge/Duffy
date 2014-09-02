@@ -15,6 +15,7 @@
 
 + (NSArray *)responseDescriptorsForPeanutObjectClass:(Class<DFPeanutObject>)peanutObjectClass
                                                 basePath:(NSString *)pathString
+                                         bulkKeyPath:(NSString *)bulkKeyPath
 {
   NSString *pathWithID = [pathString stringByAppendingPathComponent:@":id/"];
   
@@ -30,12 +31,23 @@
                                           pathPattern:pathWithID
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
-  RKResponseDescriptor *createSuccessResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:pathString
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+  RKResponseDescriptor *createSuccessResponse;
+  if (bulkKeyPath) {
+    createSuccessResponse =
+    [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
+                                                 method:RKRequestMethodAny
+                                            pathPattern:pathString
+                                                keyPath:bulkKeyPath
+                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+  } else {
+    createSuccessResponse =
+    [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
+                                                 method:RKRequestMethodAny
+                                            pathPattern:pathString
+                                                keyPath:nil
+                                            statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+  }
+  
   RKResponseDescriptor *createErrorResponse =
   [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
                                                method:RKRequestMethodAny
@@ -62,6 +74,7 @@
 - (void)performRequest:(RKRequestMethod)requestMethod
               withPath:(NSString *)path
                objects:(NSArray *)objects
+            parameters:(NSDictionary *)parameters
        forceCollection:(BOOL)forceCollection
                success:(DFPeanutRestFetchSuccess)success
                failure:(DFPeanutRestFetchFailure)failure
@@ -72,13 +85,13 @@
                requestWithObject:objects.firstObject
                method:requestMethod
                path:path
-               parameters:nil];
+               parameters:parameters];
   } else {
     request = [DFObjectManager
                requestWithObject:objects
                method:requestMethod
                path:path
-               parameters:nil];
+               parameters:parameters];
   }
 
   DDLogVerbose(@"%@ getting endpoint: %@ \n  body:%@ \n",

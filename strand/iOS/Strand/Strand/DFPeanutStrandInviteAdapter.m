@@ -21,7 +21,8 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
 + (NSArray *)responseDescriptors
 {
   return [super responseDescriptorsForPeanutObjectClass:[DFPeanutStrandInvite class]
-                                               basePath:StrandInviteBasePath];
+                                               basePath:StrandInviteBasePath
+                                            bulkKeyPath:@"strandInvites"];
 }
 
 + (NSArray *)requestDescriptors
@@ -38,6 +39,7 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
    performRequest:RKRequestMethodPOST
    withPath:StrandInviteBasePath
    objects:peanutStrandInvites
+   parameters:nil
    forceCollection:YES
    success:^(NSArray *resultObjects) {
      success(success);
