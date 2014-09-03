@@ -8,7 +8,7 @@
 
 #import "DFCreateStrandViewController.h"
 #import "DFCameraRollSyncManager.h"
-#import "DFPeanutSuggestedStrandsAdapter.h"
+#import "DFPeanutStrandFeedAdapter.h"
 #import "DFPhotoViewCell.h"
 #import "DFPeanutSearchObject.h"
 #import "DFPhotoStore.h"
@@ -17,17 +17,34 @@
 #import "DFPeanutSearchObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosViewController.h"
+#import "DFPeanutStrandInviteAdapter.h"
+#import "DFPeanutStrandAdapter.h"
+#import "DFImageStore.h"
 
 @interface DFCreateStrandViewController ()
 
-@property (readonly, nonatomic, retain) DFPeanutSuggestedStrandsAdapter *suggestionsAdapter;
-@property (nonatomic, retain) DFPeanutObjectsResponse *response;
+@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
+
+@property (nonatomic, retain) DFPeanutObjectsResponse *suggestedResponse;
+@property (nonatomic, retain) DFPeanutObjectsResponse *invitedResponse;
 
 @end
 
 @implementation DFCreateStrandViewController
-@synthesize suggestionsAdapter = _suggestionsAdapter;
+@synthesize feedAdapter = _feedAdapter;
+@synthesize inviteAdapter = _inviteAdapter;
+@synthesize strandAdapter = _strandAdapter;
 
+- (instancetype)initWithShowInvites:(BOOL)showInvites
+{
+  self = [self init];
+  if (self) {
+    _showInvites = showInvites;
+  }
+  return self;
+}
 
 - (instancetype)init
 {
@@ -77,7 +94,6 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  
   [self updateSuggestions:self];
 }
 
@@ -87,47 +103,135 @@
   // Dispose of any resources that can be recreated.
 }
 
+- (void)setShowInvites:(BOOL)showInvites
+{
+  [self updateSuggestions:self];
+}
+
 
 #pragma mark - UITableView Data/Delegate
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return 1;
+  return 1 + (self.invitedResponse.topLevelSectionObjects.count > 0 && self.showInvites);
+}
+
+- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
+{
+  if (self.showInvites && self.invitedResponse.topLevelSectionObjects.count > 0 && section == 0) {
+    return @"Invitations";
+  }
+ 
+  return @"Start a Strand";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return self.response.topLevelSectionObjects.count;
+  return [[self sectionObjectsForSection:section] count];
+}
+
+- (NSArray *)sectionObjectsForSection:(NSUInteger)section
+{
+  if ([self shouldShowInvites] && section == 0) {
+    return self.invitedResponse.topLevelSectionObjects;
+  }
+  
+  return self.suggestedResponse.topLevelSectionObjects;
+}
+
+- (BOOL)shouldShowInvites
+{
+  if (self.showInvites && self.invitedResponse.topLevelSectionObjects.count > 0) {
+    return YES;
+  }
+  
+  return NO;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutSearchObject *section = self.response.topLevelSectionObjects[indexPath.row];
+  UITableViewCell *cell;
+  NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
+  if ([self shouldShowInvites] && indexPath.section == 0) {
+    cell = [self cellWithObject:sectionObjects[indexPath.row] areImagesRemote:YES];
+  } else {
+    cell = [self cellWithObject:sectionObjects[indexPath.row] areImagesRemote:NO];
+  }
+  
+  return cell;
+}
+
+- (UITableViewCell *)cellWithObject:(DFPeanutSearchObject *)suggestion
+                             areImagesRemote:(BOOL)areImagesRemote
+{
   DFCreateStrandTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
   
   // Set the header attributes
-  cell.locationLabel.text = section.subtitle;
-  cell.countLabel.text = [@(section.objects.count) stringValue];
-  DFPeanutSearchObject *firstObject = section.objects.firstObject;
+  cell.locationLabel.text = suggestion.subtitle;
+  cell.countLabel.text = [@(suggestion.objects.count) stringValue];
+  DFPeanutSearchObject *firstObject = suggestion.objects.firstObject;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:firstObject.time_taken];
   
+  if (areImagesRemote) {
+    [self setRemotePhotosForCell:cell withSection:suggestion];
+  } else {
+    [self setLocalPhotosForCell:cell section:suggestion];
+  }
+  
+  
+  return cell;
+}
+
+- (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
+                   withSection:(DFPeanutSearchObject *)section
+{
+  NSMutableArray *photoIDs = [NSMutableArray new];
+  NSMutableArray *photos = [NSMutableArray new];
+  
+  for (DFPeanutSearchObject *object in section.objects) {
+    DFPeanutSearchObject *photoObject;
+    if ([object.type isEqual:DFSearchObjectCluster]) {
+      photoObject = object.objects.firstObject;
+    } else if ([object.type isEqual:DFSearchObjectPhoto]) {
+      photoObject = object;
+    }
+    [photoIDs addObject:@(photoObject.id)];
+    [photos addObject:photoObject];
+  }
+  
+  cell.objects = photoIDs;
+  for (DFPeanutSearchObject *photoObject in photos) {
+    [[DFImageStore sharedStore]
+     imageForID:photoObject.id
+     preferredType:DFImageThumbnail
+     thumbnailPath:photoObject.thumb_image_path
+     fullPath:photoObject.full_image_path
+     completion:^(UIImage *image) {
+       [cell setImage:image forObject:@(photoObject.id)];
+     }];
+  }
+}
+
+
+- (void)setLocalPhotosForCell:(DFCreateStrandTableViewCell *)cell
+                      section:(DFPeanutSearchObject *)section
+{
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];
   for (DFPeanutSearchObject *object in section.objects) {
     if ([object.type isEqual:DFSearchObjectPhoto]) {
       [idsToShow addObject:@(object.id)];
-
+      
     } else if ([object.type isEqual:DFSearchObjectCluster]) {
       DFPeanutSearchObject *repObject = object.objects.firstObject;
       [idsToShow addObject:@(repObject.id)];
     }
   }
-
+  
   // Set the images for the collection view
   cell.objects = idsToShow;
   for (NSNumber *photoID in idsToShow) {
     DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
-    
     if (photo) {
       [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
         [cell setImage:image forObject:photoID];
@@ -136,13 +240,12 @@
       }];
     }
   }
-  
-  return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutSearchObject *section = self.response.topLevelSectionObjects[indexPath.row];
+  NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
+  DFPeanutSearchObject *section = sectionObjects[indexPath.row];
   DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc] init];
   selectController.sectionObject = section;
   [self.navigationController pushViewController:selectController animated:YES];
@@ -158,14 +261,21 @@
 
 - (void)updateSuggestions:(id)sender
 {
-  [self.suggestionsAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
+  [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
     if (error) {
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
-      self.response = response;
+      self.suggestedResponse = response;
       [self.tableView reloadData];
     }
   }];
+  
+  if (self.showInvites) {
+    [self.feedAdapter fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
+      self.invitedResponse = response;
+      [self.tableView reloadData];
+    }];
+  }
 }
 
 - (void)cancelPressed:(id)sender
@@ -173,14 +283,30 @@
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (DFPeanutSuggestedStrandsAdapter *)suggestionsAdapter
+- (DFPeanutStrandFeedAdapter *)feedAdapter
 {
-  if (!_suggestionsAdapter) {
-    _suggestionsAdapter = [[DFPeanutSuggestedStrandsAdapter alloc] init];
+  if (!_feedAdapter) {
+    _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
   }
   
-  return _suggestionsAdapter;
+  return _feedAdapter;
+}
+- (DFPeanutStrandInviteAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) {
+    _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+  }
+  
+  return _inviteAdapter;
 }
 
+- (DFPeanutStrandAdapter *)strandAdapter
+{
+  if (!_strandAdapter) {
+    _strandAdapter = [[DFPeanutStrandAdapter alloc] init];
+  }
+  
+  return _strandAdapter;
+}
 
 @end

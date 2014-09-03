@@ -20,15 +20,18 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
 
 + (NSArray *)responseDescriptors
 {
-  return [super responseDescriptorsForPeanutObjectClass:[DFPeanutStrandInvite class]
-                                               basePath:StrandInviteBasePath
-                                            bulkKeyPath:@"strandInvites"];
+  NSArray *inviteRestDescriptors =
+  [super responseDescriptorsForPeanutObjectClass:[DFPeanutStrandInvite class]
+                                        basePath:StrandInviteBasePath
+                                     bulkKeyPath:@"invites"];
+  
+  return inviteRestDescriptors;
 }
 
 + (NSArray *)requestDescriptors
 {
   return [super requestDescriptorsForPeanutObjectClass:[DFPeanutStrandInvite class]
-                                           rootKeyPath:@"strandInvites"];
+                                           rootKeyPath:@"invites"];
 }
 
 - (void)postInvites:(NSArray *)peanutStrandInvites

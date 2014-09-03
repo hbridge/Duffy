@@ -10,4 +10,8 @@
 
 @interface DFCreateStrandViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>
 
+@property (nonatomic) BOOL showInvites;
+
+- (instancetype)initWithShowInvites:(BOOL)showInvites;
+
 @end

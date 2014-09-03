@@ -14,7 +14,7 @@
 #import "DFInviteUserViewController.h"
 #import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
-#import "DFPeanutGalleryAdapter.h"
+#import "DFPeanutStrandFeedAdapter.h"
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutSearchObject.h"
 #import "DFPhotoStore.h"
@@ -31,7 +31,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 @interface DFStrandsViewController ()
 
-@property (readonly, nonatomic, retain) DFPeanutGalleryAdapter *galleryAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSTimer *autoRefreshTimer;
 
@@ -45,7 +45,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 @implementation DFStrandsViewController
 
-@synthesize galleryAdapter = _galleryAdapter;
+@synthesize feedAdapter = _feedAdapter;
 
 - (instancetype)init
 {
@@ -234,7 +234,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)reloadFeedIsSilent:(BOOL)isSilent
 {
-  [self.galleryAdapter fetchGalleryWithCompletionBlock:^(DFPeanutObjectsResponse *response,
+  [self.feedAdapter fetchGalleryWithCompletionBlock:^(DFPeanutObjectsResponse *response,
                                                          NSData *hashData,
                                                          NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -382,7 +382,9 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)createButtonPressed:(id)sender
 {
   DDLogInfo(@"Create button pressed");
-  DFCreateStrandViewController *createController = [[DFCreateStrandViewController alloc] init];
+  DFCreateStrandViewController *createController = [[DFCreateStrandViewController alloc]
+                                                    initWithShowInvites:YES];
+  createController.showInvites = YES;
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
   
@@ -454,13 +456,13 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 #pragma mark - Network controllers
 
-- (DFPeanutGalleryAdapter *)galleryAdapter
+- (DFPeanutStrandFeedAdapter *)feedAdapter
 {
-  if (!_galleryAdapter) {
-    _galleryAdapter = [[DFPeanutGalleryAdapter alloc] init];
+  if (!_feedAdapter) {
+    _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
   }
   
-  return _galleryAdapter;
+  return _feedAdapter;
 }
 
 - (void)settingsButtonPressed:(id)sender

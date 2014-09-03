@@ -55,6 +55,7 @@
 - (void)configurePeoplePicker
 {
   self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
+  self.tokenField.maxHeight = 44.0;
   self.peoplePicker = [[DFPeoplePickerViewController alloc]
                        initWithTokenField:self.tokenField
                        tableView:self.tableView];
@@ -167,12 +168,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   [self.collectionView deselectItemAtIndexPath:indexPath animated:YES];
 }
 
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
-  [self.tokenField collapse];
-}
-
 #pragma mark - Actions
 
 - (void)donePressed:(id)sender
@@ -241,6 +236,15 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
            textDidChange:(NSString *)text
 {
   self.tableView.hidden = ![text isNotEmpty];
+}
+
+- (IBAction)collectionViewTapped:(id)sender {
+  [self.tokenField resignFirstResponder];
+}
+
+- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+  [self.tokenField resignFirstResponder];
 }
 
 

@@ -11,7 +11,7 @@
 #import "VENTokenField.h"
 #import "DFPeoplePickerViewController.h"
 
-@interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate, DFPeoplePickerDelegate>
+@interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate,UIScrollViewDelegate, DFPeoplePickerDelegate>
 
 @property (nonatomic, retain) DFPeanutSearchObject *sectionObject;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
@@ -19,4 +19,5 @@
 @property (nonatomic, retain) VENTokenField *tokenField;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
+- (IBAction)collectionViewTapped:(id)sender;
 @end
