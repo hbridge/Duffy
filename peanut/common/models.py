@@ -264,7 +264,9 @@ class SimplePhoto:
 	dbPhoto = None
 
 	def serialize(self):
-		return {key:value for key, value in self.__dict__.items() if not key.startswith('__') and not callable(key)}
+		return {'id' : self.id,
+				'time_taken' : self.time_taken,
+				'user' : self.user}
 		
 	def isDbPhoto(self):
 		if self.dbPhoto:

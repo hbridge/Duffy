@@ -135,9 +135,9 @@ def getLatLonAccuracyFromExtraData(photo, tryFile=False):
 		
 		lat, lon = getLatLonFromExif(exif)
 		if lat and lon:
-			return (lat, lon)
+			return (lat, lon, None)
 
-	return (None, None)
+	return (None, None, None)
 
 def getCity(twoFishesResult):
 	for entry in twoFishesResult:

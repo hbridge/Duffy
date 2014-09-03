@@ -406,10 +406,9 @@ def search(request):
 
 			# Grap the objects to turn into json, called sections.  Also limit by num and get the lastDate
 			#   which is the key for the next call
-			lastDate, sections = api_util.turnGroupsIntoSections(monthGroupings, num)
+			sections = api_util.turnFormattedGroupsIntoSections(monthGroupings, num)
 
 			response['objects'] = sections
-			response['next_start_date_time'] = datetime.datetime.strftime(lastDate, '%Y-%m-%d %H:%M:%S')
 		else:
 			response['retry_suggestions'] = suggestions_util.getTopCombos(user_id)
 		response['result'] = True
@@ -491,7 +490,7 @@ def get_user(request, productId = 0):
 			user = User.objects.get(Q(phone_id=phoneId) & Q(product_id=productId))
 		except User.DoesNotExist:
 			logger.error("Could not find user: %s %s" % (phoneId, productId))
-			return HttpResponse(json.dumps(response), content_type="application/json")
+			return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 	#if user is None:
 	#	return returnFailure(response, "User not found.  Need valid user_id or phone_id")
@@ -499,7 +498,7 @@ def get_user(request, productId = 0):
 	if (user):
 		serializer = UserSerializer(user)
 		response['user'] = serializer.data
-	return HttpResponse(json.dumps(response), content_type="application/json")
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 	Creates a new user, if it doesn't exist
@@ -528,7 +527,7 @@ def create_user(request, productId = 0):
 
 	serializer = UserSerializer(user)
 	response['user'] = serializer.data
-	return HttpResponse(json.dumps(response), content_type="application/json")
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 Helper functions
