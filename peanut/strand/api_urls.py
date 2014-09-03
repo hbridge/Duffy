@@ -18,6 +18,7 @@ urlpatterns = patterns('',
 	url(r'^neighbors', 'strand.api_views.strand_feed'),
 	url(r'^strand_feed', 'strand.api_views.strand_feed'),
 	url(r'^unshared_strands', 'strand.api_views.unshared_strands'),
+	url(r'^invited_strands', 'strand.api_views.invited_strands'),
 	url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands'),
 	url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
 
@@ -42,9 +43,7 @@ urlpatterns = patterns('',
 	url(r'^strands/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Strand, lookup_field='id')),
 
 	url(r'^strand_invite/$', strand_rest_api_views.StrandInviteBulkAPI.as_view()),
-	#url(r'^strand_invite/(?P<phone_number>[+][0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=StrandInvite, lookup_field='phone_number')),
-	url(r'^strand_invite/(?P<phone_number>[+][0-9]+)/$', strand_rest_api_views.OpenStrandInviteView.as_view(lookup_field='phone_number')),
-
+	url(r'^strand_invite/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=StrandInvite, lookup_field='id')),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),

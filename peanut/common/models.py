@@ -476,18 +476,17 @@ class Strand(models.Model):
 
 class StrandInvite(models.Model):
 	strand = models.ForeignKey(Strand, db_index=True)
-	user = models.ForeignKey(User, db_index=True)
+	user = models.ForeignKey(User, db_index=True, related_name="inviting_user")
 	phone_number = models.CharField(max_length=128, db_index=True) 
-	evaluated = models.BooleanField(db_index=True, default=False)
-	accepted  = models.BooleanField(db_index=True, default=False)
-	ignored  = models.BooleanField(db_index=True, default=False)
-	bulk_batch_key = models.IntegerField(null=True, db_index=True)	
+	accepted_user = models.ForeignKey(User, null=True, db_index=True, related_name="accepted_user")
+	bulk_batch_key = models.IntegerField(null=True, db_index=True)
+	skip = models.BooleanField(default=False, db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
 
 	class Meta:
-		db_table = 'strand_invites'
+		db_table = 'strand_invite'
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
@@ -500,3 +499,4 @@ class StrandInvite(models.Model):
 			attributesList = [attributesList, "updated"]
 
 		bulk_updater.bulk_update(objs, update_fields=attributesList)
+

@@ -15,7 +15,7 @@ from django.db import IntegrityError
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -88,6 +88,12 @@ def groupIsSolo(group, userId):
 			return False
 	return True
 
+def groupDoesNotHaveUser(group, userId):
+	for photo in group:
+		if photo.user_id == userId:
+			return False
+	return True
+
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -145,6 +151,8 @@ def getFormattedGroups(groups, userId):
 
 		if (groupIsSolo(group['photos'], userId)):
 			title = "Just you"
+		elif (groupDoesNotHaveUser(group['photos'], userId)):
+			title = "From " + "& ".join(names) + " near " + bestLocation
 		else:
 			title = ", ".join(names) + " and You"
 
@@ -212,6 +220,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		except IntegrityError:
 			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
 
+
+
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
@@ -228,6 +238,47 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 #####################################################################################
 
 
+def getObjectsDataForStrands(userId, strands):
+	# list of list of photos
+	groups = list()
+	for strand in strands:
+		strandId = strand.id			
+		photos = strand.photos.all().order_by("-time_taken")
+		entry = {'photos': photos, 'id': strandId}
+
+		if len(photos) > 0:
+			groups.append(entry)
+
+	if len(groups) > 0:
+		# now sort groups by the time_taken of the first photo in each group
+		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
+
+	formattedGroups = getFormattedGroups(groups, userId)
+		
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+	return objects
+	
+def invited_strands(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		userId = int(form.cleaned_data['user_id'])
+		try:
+			user = User.objects.get(id=userId)
+		except User.DoesNotExist:
+			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
+
+		strandInvites = StrandInvite.objects.select_related().filter(phone_number=user.phone_number).exclude(skip=True).filter(accepted_user__isnull=True)
+
+		strands = set([x.strand for x in strandInvites])
+		response['objects'] = getObjectsDataForStrands(userId, strands)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 	Return the Duffy JSON for the strands a user has that are unshared
@@ -239,9 +290,6 @@ def unshared_strands(request):
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
-	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
-
 	if (form.is_valid()):
 		userId = int(form.cleaned_data['user_id'])
 		try:
@@ -249,28 +297,9 @@ def unshared_strands(request):
 		except User.DoesNotExist:
 			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
 
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
-		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False)
-
-		# list of list of photos
-		groups = list()
-		for strand in strands:
-			strandId = strand.id			
-			photos = strand.photos.all().order_by("-time_taken")
-			entry = {'photos': photos, 'id': strandId}
-
-			if len(photos) > 0:
-				groups.append(entry)
-
-		if len(groups) > 0:
-			# now sort groups by the time_taken of the first photo in each group
-			groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
-
-		formattedGroups = getFormattedGroups(groups, userId)
-			
-		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
-		response['objects'] = objects
+		response['objects'] = getObjectsDataForStrands(userId, strands)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 

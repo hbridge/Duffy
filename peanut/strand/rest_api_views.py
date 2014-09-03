@@ -12,7 +12,7 @@ from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
 
 from common.models import PhotoAction, ContactEntry, StrandInvite
-from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer, StrandInviteSerializer
+from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 logger = logging.getLogger(__name__)
 
@@ -68,25 +68,14 @@ class BulkCreateModelMixin(CreateModelMixin):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 """
-    Used to return only unused invites in the Strand Invites table for a user
-"""
-
-class OpenStrandInviteView(ListAPIView):
-    serializer_class = StrandInviteSerializer
-    lookup_field='phone_number'
-
-    def get_queryset(self):
-        phone_number = self.kwargs['phone_number']
-        return StrandInvite.objects.filter(evaluated=0).filter(phone_number=phone_number)
-
-
-"""
     Used to do a fast bulk update with one write to the database
 """
 class BulkCreateAPIView(BulkCreateModelMixin,
                         GenericAPIView):
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
+
+
 
 class ContactEntryBulkAPI(BulkCreateAPIView):
     model = ContactEntry
@@ -95,6 +84,8 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
 
     """
         Clean up the phone number and set it.  Should only be one number per entry
+
+        TODO(Derek): Can this be combined with StrandInviteBulkAPI?
     """
     def pre_save(self, obj):
         logger.info("Doing a ContactEntry bulk update for user %s of number %s" % (obj.user, obj.phone_number))
@@ -115,6 +106,8 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
 
     """
         Clean up the phone number and set it.  Should only be one number per entry
+
+        TODO(Derek): Can this be combined with ContactEntryBulkAPI?
     """
     def pre_save(self, obj):
         logger.info("Doing a StrandInvite bulk update for user %s of strand %s and number %s" % (obj.user, obj.strand, obj.phone_number))
@@ -126,8 +119,7 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
         if not foundMatch:
             logger.info("Parse error for Strand Invite")
             obj.skip = True
-
-
+            
 """
     REST interface for creating new PhotoActions.
 
