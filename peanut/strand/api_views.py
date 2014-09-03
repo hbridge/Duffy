@@ -265,16 +265,12 @@ def invited_strands(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = int(form.cleaned_data['user_id'])
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
-
+		user = form.cleaned_data['user']
+		
 		strandInvites = StrandInvite.objects.select_related().filter(phone_number=user.phone_number).exclude(skip=True).filter(accepted_user__isnull=True)
 
 		strands = set([x.strand for x in strandInvites])
-		response['objects'] = getObjectsDataForStrands(userId, strands)
+		response['objects'] = getObjectsDataForStrands(user.id, strands)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
@@ -291,20 +287,16 @@ def unshared_strands(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = int(form.cleaned_data['user_id'])
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
-
+		user = form.cleaned_data['user']
+		
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
-		response['objects'] = getObjectsDataForStrands(userId, strands)
+		response['objects'] = getObjectsDataForStrands(user.id, strands)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-	
+
 """
 	Return the Duffy JSON for the photo feed.
 
@@ -319,13 +311,9 @@ def strand_feed(request):
 	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
 	if (form.is_valid()):
-		userId = int(form.cleaned_data['user_id'])
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)
-
-		friendsData = friends_util.getFriendsData(userId)
+		user = form.cleaned_data['user']
+		
+		friendsData = friends_util.getFriendsData(user.id)
 
 		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
 
@@ -333,7 +321,7 @@ def strand_feed(request):
 		groups = list()
 		for strand in strands:
 			strandId = strand.id
-			photos = friends_util.filterStrandPhotosByFriends(userId, friendsData, strand)
+			photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
 			entry = {'photos': photos, 'id': strandId}
 
 			if len(photos) > 0:
@@ -347,7 +335,7 @@ def strand_feed(request):
 		lockedGroup = list()
 		if user.last_location_point:
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-			lockedGroup = strands_util.getJoinableStrandPhotos(userId, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
+			lockedGroup = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
 			# TODO: get a real id for locked group
 			entry = {'photos': lockedGroup, 'id': 0}
 
@@ -355,7 +343,7 @@ def strand_feed(request):
 				groups.insert(0, entry)
 
 		# Now we have to turn into our Duffy JSON, first, convert into the right format
-		formattedGroups = getFormattedGroups(groups, userId)
+		formattedGroups = getFormattedGroups(groups, user.id)
 
 		if len(lockedGroup) > 0:
 			formattedGroups[0]['title'] = "Locked"
@@ -387,16 +375,16 @@ def get_joinable_strands(request):
 
 	form = GetJoinableStrandsForm(api_util.getRequestData(request)) 
 	if form.is_valid():
-		userId = form.cleaned_data['user_id']
+		user = form.cleaned_data['user']
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 
-		friendsData = friends_util.getFriendsData(userId)
+		friendsData = friends_util.getFriendsData(user.id)
 		strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 
-		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(userId, lon, lat, strands, friendsData)
+		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, lon, lat, strands, friendsData)
 
-		formattedGroups = getFormattedGroups([{'photos': joinableStrandPhotos, 'id': 0}], userId)
+		formattedGroups = getFormattedGroups([{'photos': joinableStrandPhotos, 'id': 0}], user.id)
 		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 
@@ -412,20 +400,20 @@ def get_new_photos(request):
 
 	form = GetNewPhotosForm(api_util.getRequestData(request))
 	if form.is_valid():
-		userId = form.cleaned_data['user_id']
+		user = form.cleaned_data['user']
 		startTime = form.cleaned_data['start_date_time']
 		photoList = list()
 
-		strands = Strand.objects.filter(last_photo_time__gt=startTime).filter(users=userId).filter(shared=True)
+		strands = Strand.objects.filter(last_photo_time__gt=startTime).filter(users=user.id).filter(shared=True)
 		
 		for strand in strands:
 			for photo in strand.photos.filter(time_taken__gt=startTime):
-				if photo.user_id != userId:
+				if photo.user_id != user.id:
 					photoList.append(photo)
 
 		photoList = removeDups(photoList, lambda x: x.id)
 
-		formattedGroups = getFormattedGroups([{'photos':photoList, 'id': 0}], userId)
+		formattedGroups = getFormattedGroups([{'photos':photoList, 'id': 0}], user.id)
 		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
 		response['objects'] = objects
 
@@ -441,7 +429,7 @@ def update_user_location(request):
 	form = UpdateUserLocationForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = form.cleaned_data['user_id']
+		user = form.cleaned_data['user']
 		lon = form.cleaned_data['lon']
 		lat = form.cleaned_data['lat']
 		timestamp = form.cleaned_data['timestamp']
@@ -449,13 +437,7 @@ def update_user_location(request):
 		last_photo_timestamp = form.cleaned_data['last_photo_timestamp']
 		
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			logger.error("Could not find user: %s " % (userId))
-			response['user_id'] = 'userId not found'
-			return HttpResponse(json.dumps(response), content_type="application/json", status=400)
-
+		
 		if ((not lon == 0) or (not lat == 0)):
 			if ((user.last_location_timestamp and timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
@@ -482,11 +464,11 @@ def update_user_location(request):
 						logger.info("Build info updated to %s" % (user.last_build_info))
 			
 				user.save()
-				logger.info("Location updated for user %s. %s: %s, %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, user.last_location_point, accuracy))
+				logger.info("Location updated for user %s. %s: %s, %s, %s" % (user.id, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), user.id, user.last_location_point, accuracy))
 			else:
-				logger.info("Location NOT updated for user %s. Old Timestamp. %s: %s, %s" % (userId, timestamp, userId, str((lon, lat))))
+				logger.info("Location NOT updated for user %s. Old Timestamp. %s: %s, %s" % (user.id, timestamp, user.id, str((lon, lat))))
 		else:
-			logger.info("Location NOT updated for user %s. Lat/Lon Zero. %s: %s, %s" % (userId, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), userId, str((lon, lat))))
+			logger.info("Location NOT updated for user %s. Lat/Lon Zero. %s: %s, %s" % (user.id, datetime.datetime.utcnow().replace(tzinfo=pytz.utc), user.id, str((lon, lat))))
 
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
@@ -502,14 +484,8 @@ def register_apns_token(request):
 	form = RegisterAPNSTokenForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = form.cleaned_data['user_id']
+		user = form.cleaned_data['user']
 		deviceToken = form.cleaned_data['device_token'].replace(' ', '').replace('<', '').replace('>', '')
-
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			logger.error("Could not find user: %s " % (userId))
-			return HttpResponse(json.dumps(response), content_type="application/json")
 
 		# TODO (Aseem): Make this more efficient. Assume nothing!
 		user.device_token = deviceToken
@@ -554,24 +530,24 @@ def get_nearby_friends_message(request):
 	timeWithinHours = 3
 	
 	if (form.is_valid()):
-		userId = form.cleaned_data['user_id']
+		user = form.cleaned_data['user']
 		lat = form.cleaned_data['lat']
 		lon = form.cleaned_data['lon']
 
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
 
-		friendsData = friends_util.getFriendsData(userId)
+		friendsData = friends_util.getFriendsData(user.id)
 		
 		# For now, search through all Users, when we have more, do something more efficent
-		users = User.objects.exclude(id=userId).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
-		users = friends_util.filterUsersByFriends(userId, friendsData, users)
+		users = User.objects.exclude(id=user.id).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
+		users = friends_util.filterUsersByFriends(user.id, friendsData, users)
 
-		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=userId)
+		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=user.id)
 
 		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
 		
-		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=userId)
+		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=user.id)
 
 		photoUsers = list()
 		nonPhotoUsers = nearbyUsers
@@ -768,11 +744,8 @@ def get_invite_message(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = int(form.cleaned_data['user_id'])
-		try:
-			user = User.objects.get(id=userId)
-		except User.DoesNotExist:
-			return HttpResponse(json.dumps({'user_id': 'User not found'}), content_type="application/json", status=400)	
+		user = form.cleaned_data['user']
+	
 		if ('enterprise' in form.cleaned_data['build_id'].lower()):
 			inviteLink = constants.INVITE_LINK_ENTERPRISE
 		else:
@@ -791,13 +764,13 @@ def get_notifications(request):
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
-		userId = form.cleaned_data['user_id']
+		user = form.cleaned_data['user']
 		response['notifications'] = list()
 
-		photoActions = PhotoAction.objects.filter(photo__user_id=userId).order_by("-added")[:20]
+		photoActions = PhotoAction.objects.filter(photo__user_id=user.id).order_by("-added")[:20]
 
 		for photoAction in photoActions:
-			if photoAction.user_id != userId:
+			if photoAction.user_id != user.id:
 				metadataMsg = 'liked your photo'
 				metadata = {'photo_id': photoAction.photo_id,
 							'action_text': metadataMsg,
