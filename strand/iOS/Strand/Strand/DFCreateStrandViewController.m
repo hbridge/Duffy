@@ -264,13 +264,23 @@
 {
   NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
   DFPeanutSearchObject *section = sectionObjects[indexPath.row];
-  DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc] init];
+  DFSelectPhotosViewController *selectController;
   if ([self shouldShowInvites] && indexPath.section == 0) {
     // this is an invite, the object that user selected represenets the shared photos
-    selectController.sharedSectionObject = section;
+    // don't show the to field
+    selectController = [[DFSelectPhotosViewController alloc]
+                        initWithTitle:@"Accept Invite"
+                        showsToField:NO suggestedSectionObject:nil
+                        sharedSectionObject:section];
   } else {
     // this is creating a new strand, the object they selected is a suggestion
+    // we also want to show a to field to invite others
     selectController.suggestedSectionObject = section;
+    selectController = [[DFSelectPhotosViewController alloc]
+                        initWithTitle:@"Create Strand"
+                        showsToField:YES
+                        suggestedSectionObject:section
+                        sharedSectionObject:nil];
   }
   
   [self.navigationController pushViewController:selectController animated:YES];

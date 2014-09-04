@@ -18,6 +18,8 @@
 #import "DFPhotoViewCell.h"
 #import "DFImageStore.h"
 
+CGFloat const ToFieldHeight = 44.0;
+
 @interface DFSelectPhotosViewController ()
 
 @property (nonatomic, retain) NSArray *suggestedPhotoObjects;
@@ -30,11 +32,23 @@
 
 @implementation DFSelectPhotosViewController
 
+
 - (instancetype)init
+{
+  return [self initWithTitle:nil showsToField:NO suggestedSectionObject:nil sharedSectionObject:nil];
+}
+
+- (instancetype)initWithTitle:(NSString *)title
+                 showsToField:(BOOL)showsToField
+       suggestedSectionObject:(DFPeanutSearchObject *)suggestedSectionObject
+          sharedSectionObject:(DFPeanutSearchObject *)sharedSectionObject
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
-    [self configureNavBar];
+    _showsToField = showsToField;
+    [self configureNavBarWithTitle:title];
+    self.suggestedSectionObject = suggestedSectionObject;
+    self.sharedSectionObject = sharedSectionObject;
   }
   return self;
 }
@@ -44,12 +58,16 @@
   [super viewDidLoad];
   
   [self configureCollectionView];
-  [self configurePeoplePicker];
+  if (self.showsToField) {
+    [self configurePeoplePicker];
+  } else {
+    [self.searchBarWrapperView removeFromSuperview];
+  }
 }
 
-- (void)configureNavBar
+- (void)configureNavBarWithTitle:(NSString *)title
 {
-  self.navigationItem.title = @"Select Photos";
+  self.navigationItem.title = title ? title : @"Select Photos";
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                             target:self action:@selector(donePressed:)];
@@ -57,14 +75,15 @@
 
 - (void)configurePeoplePicker
 {
-  self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, 320, 44)];
-  self.tokenField.maxHeight = 44.0;
+  // configure the token field
+  self.tokenField = [[VENTokenField alloc] initWithFrame:self.searchBarWrapperView.bounds];
+  self.tokenField.maxHeight = ToFieldHeight;
   self.peoplePicker = [[DFPeoplePickerViewController alloc]
                        initWithTokenField:self.tokenField
                        tableView:self.tableView];
   self.peoplePicker.allowsMultipleSelection = YES;
   self.peoplePicker.delegate = self;
-  [self.view addSubview:self.tokenField];
+  [self.searchBarWrapperView addSubview:self.tokenField];
 }
 
 - (void)configureCollectionView
@@ -112,7 +131,7 @@
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return 1 + (self.sharedPhotoObjects.count > 0);
+  return (self.suggestedPhotoObjects.count > 0) + (self.sharedPhotoObjects.count > 0);
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
@@ -135,23 +154,20 @@
 
 - (DFPeanutSearchObject *)objectForSection:(NSUInteger)section
 {
-  if (section == 0) return self.suggestedSectionObject;
-  if (section == 1) return self.sharedSectionObject;
-  
-  return nil;
+  if (section == 0 && self.suggestedPhotoObjects.count > 0) return self.suggestedSectionObject;
+ return self.sharedSectionObject;
 }
 
 - (NSArray *)photosForSection:(NSUInteger)section
 {
-  if (section == 0) return self.suggestedPhotoObjects;
-  if (section == 1) return self.sharedPhotoObjects;
+  if (section == 0 && self.suggestedPhotoObjects.count > 0) return self.suggestedPhotoObjects;
   
-  return nil;
+  return self.sharedPhotoObjects;
 }
 
 - (BOOL)areImagesForSectionRemote:(NSUInteger)section
 {
-  return section > 0;
+  return ([self photosForSection:section] == self.sharedPhotoObjects);
 }
 
 
