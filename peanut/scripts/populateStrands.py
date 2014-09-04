@@ -160,7 +160,7 @@ def main(argv):
 						continue
 					
 					# If the photo wasn't taken with strand (is private) and the strand is shared, don't match
-					if not targetPhoto.taken_with_strand and strand.shared:
+					if not photo.taken_with_strand and strand.shared:
 						continue
 						
 					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
