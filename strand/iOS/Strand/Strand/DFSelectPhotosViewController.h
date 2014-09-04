@@ -13,7 +13,9 @@
 
 @interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate,UIScrollViewDelegate, DFPeoplePickerDelegate>
 
-@property (nonatomic, retain) DFPeanutSearchObject *sectionObject;
+@property (nonatomic, retain) DFPeanutSearchObject *suggestedSectionObject;
+@property (nonatomic, retain) DFPeanutSearchObject *sharedSectionObject;
+
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic, retain) VENTokenField *tokenField;

@@ -15,10 +15,13 @@
 #import "DFUploadController.h"
 #import "DFPeoplePickerViewController.h"
 #import "NSString+DFHelpers.h"
+#import "DFPhotoViewCell.h"
+#import "DFImageStore.h"
 
 @interface DFSelectPhotosViewController ()
 
-@property (nonatomic, retain) NSArray *photoObjects;
+@property (nonatomic, retain) NSArray *suggestedPhotoObjects;
+@property (nonatomic, retain) NSArray *sharedPhotoObjects;
 @property (nonatomic, retain) NSMutableArray *selectedPhotoIDs;
 @property (nonatomic, retain) NSArray *selectedContacts;
 @property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
@@ -71,13 +74,16 @@
                withReuseIdentifier:@"headerView"];
   self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
   [self.collectionView registerNib:[UINib nibWithNibName:[DFSelectablePhotoViewCell description] bundle:nil]
+        forCellWithReuseIdentifier:@"selectableCell"];
+  [self.collectionView registerNib:[UINib nibWithNibName:[DFPhotoViewCell description] bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
   
 }
 
-- (void)setSectionObject:(DFPeanutSearchObject *)sectionObject
+- (void)setSuggestedSectionObject:(DFPeanutSearchObject *)sectionObject
 {
-  _sectionObject = sectionObject;
+  _suggestedSectionObject = sectionObject;
+  sectionObject.title = @"Your Photos (Not Shared)";
   NSMutableArray *photos = [NSMutableArray new];
   self.selectedPhotoIDs = [NSMutableArray new];
   for (DFPeanutSearchObject *object in sectionObject.enumeratorOfDescendents.allObjects) {
@@ -87,26 +93,39 @@
       [self.selectedPhotoIDs addObject:@(object.id)];
     }
   }
-  self.photoObjects = photos;
+  self.suggestedPhotoObjects = photos;
+}
+
+- (void)setSharedSectionObject:(DFPeanutSearchObject *)sharedSectionObject
+{
+  _sharedSectionObject = sharedSectionObject;
+  NSMutableArray *photos = [NSMutableArray new];
+  for (DFPeanutSearchObject *object in sharedSectionObject.enumeratorOfDescendents.allObjects) {
+    if ([object.type isEqual:DFSearchObjectPhoto]) {
+      [photos addObject:object];
+    }
+  }
+  self.sharedPhotoObjects = photos;
 }
 
 #pragma mark - UICollectionView Data/Delegate
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return 1;
+  return 1 + (self.sharedPhotoObjects.count > 0);
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
 {
   UICollectionReusableView *view;
   if (kind == UICollectionElementKindSectionHeader) {
+    DFPeanutSearchObject *sectionObject = [self objectForSection:indexPath.section];
     DFGallerySectionHeader *headerView = [self.collectionView
                                           dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                                           withReuseIdentifier:@"headerView"
                                           forIndexPath:indexPath];
-    headerView.titleLabel.text = self.sectionObject.title;
-    headerView.subtitleLabel.text = self.sectionObject.subtitle;
+    headerView.titleLabel.text = sectionObject.title;
+    headerView.subtitleLabel.text = sectionObject.subtitle;
     
     
     view = headerView;
@@ -114,34 +133,94 @@
   return view;
 }
 
+- (DFPeanutSearchObject *)objectForSection:(NSUInteger)section
+{
+  if (section == 0) return self.suggestedSectionObject;
+  if (section == 1) return self.sharedSectionObject;
+  
+  return nil;
+}
+
+- (NSArray *)photosForSection:(NSUInteger)section
+{
+  if (section == 0) return self.suggestedPhotoObjects;
+  if (section == 1) return self.sharedPhotoObjects;
+  
+  return nil;
+}
+
+- (BOOL)areImagesForSectionRemote:(NSUInteger)section
+{
+  return section > 0;
+}
+
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  return self.photoObjects.count;
+  return [[self photosForSection:section] count];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFSelectablePhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
-                                                                         forIndexPath:indexPath];
+  UICollectionViewCell *cell;
   
+  DFPeanutSearchObject *object = [self photosForSection:indexPath.section][indexPath.row];
+  if (![self areImagesForSectionRemote:indexPath.section]) {
+    cell = [self cellForLocalPhoto:object atIndexPath:indexPath];
+  } else {
+    cell = [self cellForRemotePhoto:object atIndexPath:indexPath];
+  }
   
-  DFPeanutSearchObject *object = self.photoObjects[indexPath.row];
+  return cell;
+}
+
+- (UICollectionViewCell *)cellForLocalPhoto:(DFPeanutSearchObject *)object
+                                atIndexPath:(NSIndexPath *)indexPath
+{
+  DFSelectablePhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"selectableCell"
+                                                                                   forIndexPath:indexPath];
+  
   DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:object.id];
   
   // show the selected status
   cell.showTickMark = [self.selectedPhotoIDs containsObject:@(object.id)];
-
+  
   // set the image
   cell.imageView.image = nil;
   [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
     //if ([self.collectionView.visibleCells containsObject:cell]) {
-    cell.imageView.image = image;
-    [cell setNeedsLayout];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      cell.imageView.image = image;
+      [cell setNeedsLayout];
+    });
     //}
   } failureBlock:^(NSError *error) {
     DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
   }];
+
+  return cell;
+}
+
+- (UICollectionViewCell *)cellForRemotePhoto:(DFPeanutSearchObject *)object
+                                 atIndexPath:(NSIndexPath *)indexPath
+{
+  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
+                                                                         forIndexPath:indexPath];
+  // set the image
+  cell.imageView.image = nil;
+  
+  [[DFImageStore sharedStore]
+   imageForID:object.id
+   preferredType:DFImageThumbnail
+   thumbnailPath:object.thumb_image_path
+   fullPath:object.full_image_path
+   completion:^(UIImage *image) {
+     //if (![self.collectionView.visibleCells containsObject:cell]) return ;
+     dispatch_async(dispatch_get_main_queue(), ^{
+       cell.imageView.image = image;
+       [cell setNeedsLayout];
+     });
+   }];
   
   return cell;
 }
@@ -151,7 +230,7 @@
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutSearchObject *photoObject = self.photoObjects[indexPath.row];
+  DFPeanutSearchObject *photoObject = self.suggestedPhotoObjects[indexPath.row];
   NSUInteger index = [self.selectedPhotoIDs indexOfObject:@(photoObject.id)];
   if (index != NSNotFound) {
     [self.selectedPhotoIDs removeObjectAtIndex:index];
@@ -176,7 +255,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectedPhotoIDs;
   requestStrand.shared = YES;
-  [self setTimesForStrand:requestStrand fromPhotoObjects:self.photoObjects];
+  [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedPhotoObjects];
   
   
   DFPeanutStrandAdapter *strandAdapter = [[DFPeanutStrandAdapter alloc] init];

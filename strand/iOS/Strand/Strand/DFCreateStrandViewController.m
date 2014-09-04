@@ -247,7 +247,14 @@
   NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
   DFPeanutSearchObject *section = sectionObjects[indexPath.row];
   DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc] init];
-  selectController.sectionObject = section;
+  if ([self shouldShowInvites] && indexPath.section == 0) {
+    // this is an invite, the object that user selected represenets the shared photos
+    selectController.sharedSectionObject = section;
+  } else {
+    // this is creating a new strand, the object they selected is a suggestion
+    selectController.suggestedSectionObject = section;
+  }
+  
   [self.navigationController pushViewController:selectController animated:YES];
 }
 
