@@ -3,6 +3,9 @@ import json
 import datetime
 
 from django.contrib.gis.db import models
+from django.template.defaultfilters import escape
+from django.core.urlresolvers import reverse
+
 from phonenumber_field.modelfields import PhoneNumberField
 from uuidfield import UUIDField
 
@@ -214,12 +217,32 @@ class Photo(models.Model):
 	"""
 	def getThumbUrlImagePath(self):
 		if self.thumb_filename:
+			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename) 
+		else:
+			return ""
+
+	def photo_html(self):
+		if self.thumb_filename:
+			return "<img src='%s'></img>" % (self.getThumbUrlImagePath())
+		if self.full_filename:
+			return "<img src='%s'></img>" % (self.getFullUrlImagePath())
+		else:
+			return "No image"
+	photo_html.allow_tags = True
+	photo_html.short_description = "Photo"
+
+	"""
+		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
+	"""
+	def getThumbUrlImagePath(self):
+		if self.thumb_filename:
 			return "/user_data/%s/%s" % (self.user.getUserDataId(), self.thumb_filename)
 		else:
 			return ""
 
 	def getUserDisplayName(self):
 		return self.user.display_name
+
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
@@ -470,6 +493,49 @@ class Strand(models.Model):
 	shared = models.BooleanField(default=True)	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
+
+	def __unicode__(self):
+		return str(self.id)
+		
+	def user_info(self):
+		names = [str(user) for user in self.users.all()]
+		return " & ".join(names)
+
+	def photo_info(self):
+		photoCount = self.photos.count()
+
+		if photoCount == 1:
+			return "1 photo"
+		else:
+			return "%s photos" % (photoCount)
+		
+	def sharing_info(self):
+		if self.shared:
+			return "Shared"
+		else:
+			return "Private"
+
+	def photos_link(self):
+		photos = self.photos.all()
+
+		links = list()
+		for photo in photos:
+			links.append('<a href="%s">%s</a>' % (reverse("admin:common_photo_change", args=(photo.id,)) , escape(photo)))
+		return ', '.join(links)		
+	photos_link.allow_tags = True
+	photos_link.short_description = "Photos"
+
+	def users_link(self):
+		users = self.users.all()
+
+		links = list()
+		for user in users:
+			links.append('<a href="%s">%s</a>' % (reverse("admin:common_user_change", args=(user.id,)) , escape(user)))
+		return ', '.join(links)
+
+	users_link.allow_tags = True
+	users_link.short_description = "Users"
+	
 
 	class Meta:
 		db_table = 'strand_objects'
