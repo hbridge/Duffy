@@ -21,7 +21,7 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util
 
 from strand import geo_util, notifications_util, friends_util, strands_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm, SuggestedUnsharedPhotosForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -237,6 +237,14 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
 
+def getObjectsDataForPhotos(userId, photos):
+	groups = [{'photos': photos, 'id': None}]
+
+	formattedGroups = getFormattedGroups(groups, userId)
+		
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+	return objects
 
 def getObjectsDataForStrands(userId, strands):
 	# list of list of photos
@@ -296,6 +304,47 @@ def unshared_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+"""
+	Return the Duffy JSON for "unshared" photos for a user that are a good match for the given strand
+"""
+def suggested_unshared_photos(request):
+	response = dict({'result': True})
+
+	form = SuggestedUnsharedPhotosForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+
+		# This is the strand we're looking in the users's private photos to see if there's any good matches
+		strand = form.cleaned_data['strand']
+
+		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+		timeLow = strand.time_started - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
+		# Get all the unshared strands for the given user that are close to the given strand
+		unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(time_started__gt=timeLow)
+		
+		unsharedPhotos = list()
+		for unsharedStrand in unsharedStrands:
+			unsharedPhotos.extend(unsharedStrand.photos.all())
+		unsharedPhotos = set(unsharedPhotos)
+
+		matchingPhotos = list()
+		if len(unsharedPhotos) > 0:
+			# For each photo, see if it would do well in a strand from the cache
+			for photo in unsharedPhotos:
+				if strands_util.photoBelongsInStrand(photo, strand):
+					matchingPhotos.append(photo)
+
+			matchingPhotos = sorted(matchingPhotos, key=lambda x: x.time_taken, reverse=True)
+	
+		response['objects'] = getObjectsDataForPhotos(user.id, matchingPhotos)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
 
 """
 	Return the Duffy JSON for the photo feed.

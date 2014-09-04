@@ -19,6 +19,8 @@ urlpatterns = patterns('',
 	url(r'^strand_feed', 'strand.api_views.strand_feed'),
 	url(r'^unshared_strands', 'strand.api_views.unshared_strands'),
 	url(r'^invited_strands', 'strand.api_views.invited_strands'),
+	url(r'^suggested_unshared_photos', 'strand.api_views.suggested_unshared_photos'),
+
 	url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands'),
 	url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
 

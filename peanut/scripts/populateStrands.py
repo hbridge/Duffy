@@ -19,69 +19,6 @@ import strand.notifications_util as notifications_util
 
 logger = logging.getLogger(__name__)
 
-def photoBelongsInStrand(targetPhoto, strand, photosByStrandId):
-	users = strand.users.all()
-	if len(users) == 0:
-		logger.error("photoBelongsInStrand has strand with zero users")
-		return False
-
-	# If this is a non-shared strand (solo) and the photo doesn't belong to the strand's user, don't put it in
-	if not strand.shared and targetPhoto.user_id != users[0].id:
-		return False
-
-	if not targetPhoto.taken_with_strand and strand.shared:
-		return False
-
-	for photo in photosByStrandId[strand.id]:
-		timeDiff = photo.time_taken - targetPhoto.time_taken
-		if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
-			if not photo.location_point and not photo.location_point:
-				return True
-
-			if (photo.location_point and targetPhoto.location_point and 
-				geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
-				return True
-
-	return False
-
-def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
-	if photo.time_taken > strand.last_photo_time:
-		strand.last_photo_time = photo.time_taken
-		strand.save()
-
-	if photo.time_taken < strand.time_started:
-		strand.time_started = photo.time_taken
-		strand.save()
-	
-	if strand.id not in photosByStrandId:
-		# Handle case that this is a new strand
-		strand.photos.add(photo)
-		photosByStrandId[strand.id] = [photo]
-	elif photo not in photosByStrandId[strand.id]:
-		strand.photos.add(photo)
-		photosByStrandId[strand.id].append(photo)
-
-	if strand.id not in usersByStrandId:
-		# Handle case that this is a new strand
-		strand.users.add(photo.user)
-		usersByStrandId[strand.id]= [photo.user]
-	elif photo.user not in usersByStrandId[strand.id]:
-		strand.users.add(photo.user)
-		usersByStrandId[strand.id].append(photo.user)
-		
-		
-def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
-	photoList = photosByStrandId[strand2.id]
-	for photo in photoList:
-		if photo not in photosByStrandId[strand1.id]:
-			addPhotoToStrand(strand1, photo, photosByStrandId, usersByStrandId)
-
-	userList = usersByStrandId[strand2.id]
-	for user in userList:
-		if user not in usersByStrandId[strand1.id]:
-			strand1.users.add(user)
-			usersByStrandId[strand1.id].append(user)
-
 """
 	Takes in:
 	photosAndStrandDict - Dictionary key being a photo and value the strandId
@@ -216,12 +153,22 @@ def main(argv):
 				matchingStrands = list()
 
 				for strand in strandsCache:
-					if photoBelongsInStrand(photo, strand, photosByStrandId):
+					users = strand.users.all()
+					
+					# If this is a non-shared strand (solo) and the photo doesn't belong to the strand's user, don't match
+					if not strand.shared and photo.user_id != users[0].id:
+						continue
+					
+					# If the photo wasn't taken with strand (is private) and the strand is shared, don't match
+					if not targetPhoto.taken_with_strand and strand.shared:
+						continue
+						
+					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
 						matchingStrands.append(strand)
 				
 				if len(matchingStrands) == 1:
 					strand = matchingStrands[0]
-					addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId)
+					strands_util.addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId)
 					strandsAddedTo.append(strand)
 					photoToStrandIdDict[photo] = strand.id
 					
@@ -233,7 +180,7 @@ def main(argv):
 					# Merge strands
 					for i, strand in enumerate(matchingStrands):
 						if i > 0:
-							mergeStrands(targetStrand, strand, photosByStrandId, usersByStrandId)
+							strands_util.mergeStrands(targetStrand, strand, photosByStrandId, usersByStrandId)
 							logger.debug("Merged strand %s into %s" % (strand.id, targetStrand.id))
 
 					# Delete unneeded Srands
@@ -252,7 +199,7 @@ def main(argv):
 					shared = photo.taken_with_strand
 					
 					newStrand = Strand.objects.create(time_started = photo.time_taken, last_photo_time = photo.time_taken, shared = shared)
-					addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId)
+					strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId)
 					strandsCreated.append(newStrand)
 					strandsCache.append(newStrand)
 
