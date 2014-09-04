@@ -154,6 +154,10 @@ def main(argv):
 
 				for strand in strandsCache:
 					users = strand.users.all()
+
+					if len(users) == 0:
+						logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
+						continue
 					
 					# If this is a non-shared strand (solo) and the photo doesn't belong to the strand's user, don't match
 					if not strand.shared and photo.user_id != users[0].id:
