@@ -20,6 +20,7 @@
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFPeanutStrandAdapter.h"
 #import "DFImageStore.h"
+#import "DFStrandInviteTableViewCell.h"
 
 @interface DFCreateStrandViewController ()
 
@@ -88,7 +89,10 @@
 - (void)configureTableView
 {
   [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"cell"];
+       forCellReuseIdentifier:@"suggestion"];
+
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFStrandInviteTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"invite"];
 }
 
 - (void)viewDidLoad
@@ -153,18 +157,23 @@
   UITableViewCell *cell;
   NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
   if ([self shouldShowInvites] && indexPath.section == 0) {
-    cell = [self cellWithObject:sectionObjects[indexPath.row] areImagesRemote:YES];
+    cell = [self cellWithObject:sectionObjects[indexPath.row] isInviteCell:YES];
   } else {
-    cell = [self cellWithObject:sectionObjects[indexPath.row] areImagesRemote:NO];
+    cell = [self cellWithObject:sectionObjects[indexPath.row] isInviteCell:NO];
   }
   
   return cell;
 }
 
 - (UITableViewCell *)cellWithObject:(DFPeanutSearchObject *)suggestion
-                             areImagesRemote:(BOOL)areImagesRemote
+                             isInviteCell:(BOOL)isInviteCell
 {
-  DFCreateStrandTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
+  DFCreateStrandTableViewCell *cell;
+  if (isInviteCell) {
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"invite"];
+  } else {
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
+  }
   
   // Set the header attributes
   cell.locationLabel.text = suggestion.subtitle;
@@ -172,12 +181,12 @@
   DFPeanutSearchObject *firstObject = suggestion.objects.firstObject;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:firstObject.time_taken];
   
-  if (areImagesRemote) {
+  if (isInviteCell) {
     [self setRemotePhotosForCell:cell withSection:suggestion];
+    [(DFStrandInviteTableViewCell *)cell titleLabel].text = suggestion.title;
   } else {
     [self setLocalPhotosForCell:cell section:suggestion];
   }
-  
   
   return cell;
 }
@@ -240,6 +249,15 @@
       }];
     }
   }
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if ([self shouldShowInvites] && indexPath.section == 0) {
+    return 189.0;
+  }
+  
+  return 170.0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
