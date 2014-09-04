@@ -19,4 +19,8 @@ typedef void (^DFPeanutObjectsCompletion)(DFPeanutObjectsResponse *response,
 - (void)fetchObjectsAtPath:(NSString *)path
        withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;
 
+- (void)fetchObjectsAtPath:(NSString *)path
+       withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+                parameters:(NSDictionary *)parameters;
+
 @end

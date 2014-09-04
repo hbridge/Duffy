@@ -17,6 +17,7 @@
 #import "NSString+DFHelpers.h"
 #import "DFPhotoViewCell.h"
 #import "DFImageStore.h"
+#import "DFPeanutStrand.h"
 
 CGFloat const ToFieldHeight = 44.0;
 
@@ -112,7 +113,11 @@ CGFloat const ToFieldHeight = 44.0;
       [self.selectedPhotoIDs addObject:@(object.id)];
     }
   }
+  
   self.suggestedPhotoObjects = photos;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.tableView reloadData];
+  });
 }
 
 - (void)setSharedSectionObject:(DFPeanutSearchObject *)sharedSectionObject
@@ -124,7 +129,12 @@ CGFloat const ToFieldHeight = 44.0;
       [photos addObject:object];
     }
   }
+  
   self.sharedPhotoObjects = photos;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    
+    [self.tableView reloadData];
+  });
 }
 
 #pragma mark - UICollectionView Data/Delegate
@@ -267,13 +277,68 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)donePressed:(id)sender
 {
+  if (self.sharedSectionObject.id) {
+    [self updateStrandWithID:@(self.sharedSectionObject.id)];
+  } else {
+    [self createNewStrandWithSelection];
+  }
+}
+
+- (void)updateStrandWithID:(NSNumber *)strandID
+{
+  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
+  requestStrand.id = strandID;
+  
+  [SVProgressHUD show];
+  DFPeanutStrandAdapter *strandAdapter = [[DFPeanutStrandAdapter alloc] init];
+  [strandAdapter
+   performRequest:RKRequestMethodGET
+   withPeanutStrand:requestStrand
+   success:^(DFPeanutStrand *peanutStrand) {
+     // add current user to list of users if not there
+     NSNumber *userID = @([[DFUser currentUser] userID]);
+     if (![peanutStrand.users containsObject:userID]) {
+       peanutStrand.users = [peanutStrand.users arrayByAddingObject:userID];
+     }
+     
+     // add any selected photos to the list of shared photos
+     if (self.selectedPhotoIDs.count > 0) {
+       NSMutableSet *newPhotoIDs = [[NSMutableSet alloc] initWithArray:peanutStrand.photos];
+       [newPhotoIDs addObjectsFromArray:self.selectedPhotoIDs];
+       peanutStrand.photos = [newPhotoIDs allObjects];
+     }
+     
+     // Put the new peanut strand
+     [strandAdapter
+      performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+      success:^(DFPeanutStrand *peanutStrand) {
+        DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
+        [self dismissViewControllerAnimated:YES completion:^{
+          [SVProgressHUD showSuccessWithStatus:@"Success!"];
+        }];
+        // mark the selected photos for upload
+        [self markPhotosForUpload:self.selectedPhotoIDs];
+      } failure:^(NSError *error) {
+        [SVProgressHUD showErrorWithStatus:@"Failed."];
+        DDLogError(@"%@ failed to put strand: %@, error: %@",
+                   self.class, peanutStrand, error);
+      }];
+   } failure:^(NSError *error) {
+     [SVProgressHUD showErrorWithStatus:@"Failed."];
+     DDLogError(@"%@ failed to get strand: %@, error: %@",
+                self.class, requestStrand, error);
+   }];
+}
+
+- (void)createNewStrandWithSelection
+{
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectedPhotoIDs;
   requestStrand.shared = YES;
   [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedPhotoObjects];
   
-  
+  [SVProgressHUD show];
   DFPeanutStrandAdapter *strandAdapter = [[DFPeanutStrandAdapter alloc] init];
   [strandAdapter performRequest:RKRequestMethodPOST
                withPeanutStrand:requestStrand success:^(DFPeanutStrand *peanutStrand) {
@@ -287,6 +352,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                  DDLogError(@"%@ failed to create strand: %@, error: %@",
                             self.class, requestStrand, error);
                }];
+
 }
 
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects

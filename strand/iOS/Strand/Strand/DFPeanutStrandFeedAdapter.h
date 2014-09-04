@@ -13,6 +13,8 @@
 - (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchSuggestedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchInvitedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchSuggestedPhotosForStrand:(NSNumber *)strandID
+                           completion:(DFPeanutObjectsCompletion)completionBlock;
 
 
 @end

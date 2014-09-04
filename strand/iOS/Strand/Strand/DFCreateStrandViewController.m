@@ -266,24 +266,40 @@
   DFPeanutSearchObject *section = sectionObjects[indexPath.row];
   DFSelectPhotosViewController *selectController;
   if ([self shouldShowInvites] && indexPath.section == 0) {
-    // this is an invite, the object that user selected represenets the shared photos
-    // don't show the to field
-    selectController = [[DFSelectPhotosViewController alloc]
-                        initWithTitle:@"Accept Invite"
-                        showsToField:NO suggestedSectionObject:nil
-                        sharedSectionObject:section];
+    
+    [self.feedAdapter
+     fetchSuggestedPhotosForStrand:@(section.id)
+     completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
+       
+       dispatch_async(dispatch_get_main_queue(), ^{
+         DFPeanutSearchObject *suggestionObject;
+         if (!error) {
+           suggestionObject = response.objects.firstObject;
+         }
+         
+         // this is an invite, the object that user selected represenets the shared photos
+         // don't show the to field
+         DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc]
+                             initWithTitle:@"Accept Invite"
+                             showsToField:NO
+                             suggestedSectionObject:suggestionObject
+                             sharedSectionObject:section];
+         [self.navigationController pushViewController:selectController animated:YES];
+       });
+       
+       
+     }];
+    
   } else {
     // this is creating a new strand, the object they selected is a suggestion
     // we also want to show a to field to invite others
-    selectController.suggestedSectionObject = section;
     selectController = [[DFSelectPhotosViewController alloc]
                         initWithTitle:@"Create Strand"
                         showsToField:YES
                         suggestedSectionObject:section
                         sharedSectionObject:nil];
+    [self.navigationController pushViewController:selectController animated:YES];
   }
-  
-  [self.navigationController pushViewController:selectController animated:YES];
 }
 
 
@@ -306,7 +322,10 @@
   }];
   
   if (self.showInvites) {
-    [self.feedAdapter fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
+    [self.feedAdapter
+     fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
+                                         NSData *responseHash,
+                                         NSError *error) {
       self.invitedResponse = response;
       [self.tableView reloadData];
     }];

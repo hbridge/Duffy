@@ -15,12 +15,13 @@
 
 - (void)fetchObjectsAtPath:(NSString *)path
        withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+                parameters:(NSDictionary *)parameters
 {
   NSURLRequest *getRequest = [DFObjectManager
                               requestWithObject:[[DFPeanutObjectsResponse alloc] init]
                               method:RKRequestMethodGET
                               path:path
-                              parameters:nil
+                              parameters:parameters
                               ];
   RKObjectRequestOperation *requestOp =
   [[DFObjectManager sharedManager]
@@ -52,6 +53,12 @@
    }];
   
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
+}
+
+- (void)fetchObjectsAtPath:(NSString *)path
+       withCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+{
+  [self fetchObjectsAtPath:path withCompletionBlock:completionBlock parameters:nil];
 }
 
 @end
