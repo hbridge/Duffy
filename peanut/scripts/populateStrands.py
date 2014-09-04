@@ -14,7 +14,7 @@ from django.db.models import Count
 from peanut.settings import constants
 from common.models import Photo, Strand, User
 
-from strand import geo_util, friends_util
+from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
 
 logger = logging.getLogger(__name__)
