@@ -46,7 +46,7 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None):
 
 	for photo in photosInStrand:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
-		if ( (timeDiff.total_seconds() / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
+		if ( (abs(timeDiff.total_seconds()) / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
 			if not photo.location_point and not photo.location_point:
 				return True
 
