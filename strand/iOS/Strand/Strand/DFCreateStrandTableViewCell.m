@@ -12,7 +12,6 @@
 
 - (void)awakeFromNib
 {
-  self.collectionView = self.myCollecitonView;
   [super awakeFromNib];
 }
 

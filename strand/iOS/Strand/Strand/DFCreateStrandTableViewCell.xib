@@ -101,9 +101,9 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <connections>
+                <outlet property="collectionView" destination="xfa-oV-Myh" id="AEp-bE-K8O"/>
                 <outlet property="countLabel" destination="tIH-IE-G7P" id="2l5-v0-JhD"/>
                 <outlet property="locationLabel" destination="nXm-PB-5eG" id="r6Q-nO-Dbf"/>
-                <outlet property="myCollecitonView" destination="xfa-oV-Myh" id="UrK-TM-GJW"/>
                 <outlet property="timeLabel" destination="iF9-cP-ShN" id="jkd-oc-TTu"/>
             </connections>
         </tableViewCell>
