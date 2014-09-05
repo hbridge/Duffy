@@ -34,14 +34,18 @@
 
 - (NSArray *)topLevelSectionObjects
 {
+  return [self topLevelObjectsOfType:DFFeedObjectSection];
+}
+
+- (NSArray *)topLevelObjectsOfType:(DFFeedObjectType)type
+{
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutFeedObject *searchObject in self.objects) {
-    if ([searchObject.type isEqualToString:DFFeedObjectSection]) {
+    if ([searchObject.type isEqualToString:type]) {
       [result addObject:searchObject];
     }
   }
   return result;
 }
-
 
 @end

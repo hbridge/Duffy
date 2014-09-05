@@ -11,6 +11,7 @@
 
 @interface DFPeanutStrandInvite : NSObject <DFPeanutObject>
 
+@property (nonatomic, retain) NSNumber *id;
 @property (nonatomic) NSNumber *strand;
 @property (nonatomic) NSNumber *user;
 @property (nonatomic, retain) NSString *phone_number;

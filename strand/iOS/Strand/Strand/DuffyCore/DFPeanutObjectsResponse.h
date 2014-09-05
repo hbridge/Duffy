@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFPeanutObject.h"
+#import "DFPeanutFeedObject.h"
 
 @interface DFPeanutObjectsResponse : NSObject <DFPeanutObject>
 
@@ -19,5 +20,6 @@
 @property (nonatomic, retain) NSString *full_image_path;
 
 - (NSArray *)topLevelSectionObjects;
+- (NSArray *)topLevelObjectsOfType:(DFFeedObjectType)type;
 
 @end

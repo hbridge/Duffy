@@ -32,7 +32,7 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
 + (NSArray *)requestDescriptors
 {
   return [super requestDescriptorsForPeanutObjectClass:[DFPeanutStrandInvite class]
-                                           rootKeyPath:@"invites"];
+                                           bulkPostKeyPath:@"invites"];
 }
 
 - (void)postInvites:(NSArray *)peanutStrandInvites
@@ -58,12 +58,15 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
                      success:(DFPeanutRestFetchSuccess)success
                      failure:(DFPeanutRestFetchFailure)failure
 {
-  NSString *invitePath = [StrandInviteBasePath stringByAppendingPathComponent:[inviteID stringValue]];
+  NSString *invitePath = [[StrandInviteBasePath stringByAppendingPathComponent:[inviteID stringValue]]
+                          stringByAppendingString:@"/"];
+  DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
+  invite.id = inviteID;
   // get the invite object
   [super
    performRequest:RKRequestMethodGET
    withPath:invitePath
-   objects:nil
+   objects:@[invite]
    parameters:nil
    forceCollection:NO
    success:^(NSArray *resultObjects) {

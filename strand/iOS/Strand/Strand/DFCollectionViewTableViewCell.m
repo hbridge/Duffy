@@ -49,6 +49,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       self.imagesForObjects[object] = image;
       [self.collectionView reloadData];
+      [self setNeedsLayout];
     });
   }
 }

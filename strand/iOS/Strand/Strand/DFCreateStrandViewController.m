@@ -29,7 +29,7 @@
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 
 @property (nonatomic, retain) DFPeanutObjectsResponse *suggestedResponse;
-@property (nonatomic, retain) DFPeanutObjectsResponse *invitedResponse;
+@property (nonatomic, retain) NSArray *inviteObjects;
 
 @end
 
@@ -117,12 +117,12 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return 1 + (self.invitedResponse.topLevelSectionObjects.count > 0 && self.showInvites);
+  return 1 + (self.inviteObjects.count > 0 && self.showInvites);
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  if (self.showInvites && self.invitedResponse.topLevelSectionObjects.count > 0 && section == 0) {
+  if (self.showInvites && self.inviteObjects.count > 0 && section == 0) {
     return @"Invitations";
   }
  
@@ -137,7 +137,7 @@
 - (NSArray *)sectionObjectsForSection:(NSUInteger)section
 {
   if ([self shouldShowInvites] && section == 0) {
-    return self.invitedResponse.topLevelSectionObjects;
+    return self.inviteObjects;
   }
   
   return self.suggestedResponse.topLevelSectionObjects;
@@ -145,7 +145,7 @@
 
 - (BOOL)shouldShowInvites
 {
-  if (self.showInvites && self.invitedResponse.topLevelSectionObjects.count > 0) {
+  if (self.showInvites && self.inviteObjects.count > 0) {
     return YES;
   }
   
@@ -155,11 +155,12 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
-  NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
-  if ([self shouldShowInvites] && indexPath.section == 0) {
-    cell = [self cellWithObject:sectionObjects[indexPath.row] isInviteCell:YES];
+  DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
+    cell = [self cellWithObject:strandObject isInviteCell:YES];
   } else {
-    cell = [self cellWithObject:sectionObjects[indexPath.row] isInviteCell:NO];
+    cell = [self cellWithObject:feedObject isInviteCell:NO];
   }
   
   return cell;
@@ -262,13 +263,12 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
-  DFPeanutFeedObject *section = sectionObjects[indexPath.row];
+  NSArray *feedObjectsForSection = [self sectionObjectsForSection:indexPath.section];
+  DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
   DFSelectPhotosViewController *selectController;
-  if ([self shouldShowInvites] && indexPath.section == 0) {
-    
+  if ([feedObject.type isEqualToString:DFFeedObjectInviteStrand]) {
     [self.feedAdapter
-     fetchSuggestedPhotosForStrand:@(section.id)
+     fetchSuggestedPhotosForStrand:@(feedObject.id)
      completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
        
        dispatch_async(dispatch_get_main_queue(), ^{
@@ -283,7 +283,8 @@
                              initWithTitle:@"Accept Invite"
                              showsToField:NO
                              suggestedSectionObject:suggestionObject
-                             sharedSectionObject:section];
+                             sharedSectionObject:feedObject.objects.firstObject];
+         selectController.inviteObject = feedObject;
          [self.navigationController pushViewController:selectController animated:YES];
        });
        
@@ -296,7 +297,7 @@
     selectController = [[DFSelectPhotosViewController alloc]
                         initWithTitle:@"Create Strand"
                         showsToField:YES
-                        suggestedSectionObject:section
+                        suggestedSectionObject:feedObject
                         sharedSectionObject:nil];
     [self.navigationController pushViewController:selectController animated:YES];
   }
@@ -326,7 +327,7 @@
      fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
                                          NSData *responseHash,
                                          NSError *error) {
-      self.invitedResponse = response;
+      self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
       [self.tableView reloadData];
     }];
   }

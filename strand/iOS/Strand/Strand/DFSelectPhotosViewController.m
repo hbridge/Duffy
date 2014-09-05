@@ -321,14 +321,16 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
         [self markPhotosForUpload:self.selectedPhotoIDs];
         
         // mark the invite as used
-        DFPeanutStrandInviteAdapter *strandInviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
-        [strandInviteAdapter
-         markInviteWithIDUsed:@(0)
-         success:^(NSArray *resultObjects) {
-           DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
-        } failure:^(NSError *error) {
-          DDLogWarn(@"Failed to mark invite used: %@", error);
-        }];
+        if (self.inviteObject) {
+          DFPeanutStrandInviteAdapter *strandInviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+          [strandInviteAdapter
+           markInviteWithIDUsed:@(self.inviteObject.id)
+           success:^(NSArray *resultObjects) {
+             DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
+           } failure:^(NSError *error) {
+             DDLogWarn(@"Failed to mark invite used: %@", error);
+           }];
+        }
         
       } failure:^(NSError *error) {
         [SVProgressHUD showErrorWithStatus:@"Failed."];

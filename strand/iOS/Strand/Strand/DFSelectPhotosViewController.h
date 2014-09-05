@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestedSectionObject;
 @property (nonatomic, retain) DFPeanutFeedObject *sharedSectionObject;
+@property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
 
 @property (weak, nonatomic) IBOutlet UIView *searchBarWrapperView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;

@@ -20,7 +20,7 @@ typedef void (^DFPeanutRestFetchFailure)(NSError *error);
                                             basePath:(NSString *)pathString
                                          bulkKeyPath:(NSString *)bulkKeyPath;
 + (NSArray *)requestDescriptorsForPeanutObjectClass:(Class<DFPeanutObject>)peanutObjectClass
-                                        rootKeyPath:(NSString *)rootKeyPath;
+                                        bulkPostKeyPath:(NSString *)bulkPostKeyPath;
 
 - (void)performRequest:(RKRequestMethod)requestMethod
               withPath:(NSString *)path

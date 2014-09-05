@@ -17,7 +17,7 @@
                                                 basePath:(NSString *)pathString
                                          bulkKeyPath:(NSString *)bulkKeyPath
 {
-  NSString *pathWithID = [pathString stringByAppendingPathComponent:@":id/"];
+  NSString *pathWithID = [pathString stringByAppendingString:@":id/"];
   
   RKResponseDescriptor *restSuccessResponse =
   [RKResponseDescriptor responseDescriptorWithMapping:[peanutObjectClass objectMapping]
@@ -59,15 +59,22 @@
 }
 
 + (NSArray *)requestDescriptorsForPeanutObjectClass:(Class<DFPeanutObject>)peanutObjectClass
-                                        rootKeyPath:(NSString *)rootKeyPath
+                                        bulkPostKeyPath:(NSString *)bulkPostKeyPath
 {
   RKObjectMapping *mapping = [[peanutObjectClass objectMapping] inverseMapping];
-  RKRequestDescriptor *restRequestDescriptor =
+  RKRequestDescriptor *bulkPostRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:peanutObjectClass
-                                        rootKeyPath:rootKeyPath
-                                             method:RKRequestMethodAny];
-  return @[restRequestDescriptor];
+                                        rootKeyPath:bulkPostKeyPath
+                                             method:RKRequestMethodPOST];
+  RKRequestDescriptor *putRequestDescriptor =
+  [RKRequestDescriptor requestDescriptorWithMapping:mapping
+                                        objectClass:peanutObjectClass
+                                        rootKeyPath:nil
+                                             method:RKRequestMethodPUT];
+  
+  
+  return @[bulkPostRequestDescriptor, putRequestDescriptor];
 }
 
 
