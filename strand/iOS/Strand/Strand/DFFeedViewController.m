@@ -16,7 +16,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFPeanutActionAdapter.h"
 #import "DFPeanutPhoto.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "DFPhotoFeedCell.h"
 #import "DFPhotoMetadataAdapter.h"
 #import "DFPhotoStore.h"
@@ -222,7 +222,7 @@ const CGFloat LockedCellHeight = 157.0;
   DFFeedSectionHeaderView *headerView =
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
-  DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
+  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:section];
   headerView.titleLabel.text = sectionObject.title;
   headerView.subtitleLabel.text = sectionObject.subtitle;
   headerView.representativeObject = sectionObject;
@@ -250,7 +250,7 @@ const CGFloat LockedCellHeight = 157.0;
     return 1;
   }
   
-  DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:section];
+  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:section];
   
   if ([sectionObject isLockedSection]) {
     return 1;
@@ -260,7 +260,7 @@ const CGFloat LockedCellHeight = 157.0;
   return items.count;
 }
 
-- (DFPeanutSearchObject *)sectionObjectForTableSection:(NSUInteger)tableSection
+- (DFPeanutFeedObject *)sectionObjectForTableSection:(NSUInteger)tableSection
 {
   if (self.uploadingPhotos.count > 0) return self.sectionObjects[tableSection - 1];
   
@@ -274,15 +274,15 @@ const CGFloat LockedCellHeight = 157.0;
   if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
     cell = [self cellForUploadAtIndexPath:indexPath];
   } else {
-    DFPeanutSearchObject *section = [self sectionObjectForTableSection:indexPath.section];
+    DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
     NSArray *itemsForSection = section.objects;
-    DFPeanutSearchObject *object = itemsForSection[indexPath.row];
+    DFPeanutFeedObject *object = itemsForSection[indexPath.row];
     
     if ([section isLockedSection]) {
       cell = [self cellForLockedSection:section indexPath:indexPath];
-    } else if ([object.type isEqual:DFSearchObjectPhoto]) {
+    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
       cell = [self cellForPhoto:object indexPath:indexPath];
-    } else if ([object.type isEqual:DFSearchObjectCluster]) {
+    } else if ([object.type isEqual:DFFeedObjectCluster]) {
       cell = [self cellForCluster:object indexPath:indexPath];
     }
   }
@@ -321,19 +321,19 @@ const CGFloat LockedCellHeight = 157.0;
   return cell;
 }
 
-- (DFLockedStrandCell *)cellForLockedSection:(DFPeanutSearchObject *)section
+- (DFLockedStrandCell *)cellForLockedSection:(DFPeanutFeedObject *)section
                                    indexPath:(NSIndexPath *)indexPath
 {
   DFLockedStrandCell *lockedCell = [self.tableView dequeueReusableCellWithIdentifier:@"lockedCell"
                                                                    forIndexPath:indexPath];
   
   NSMutableArray *objectIDs = [NSMutableArray new];
-  for (DFPeanutSearchObject *object in section.objects) {
+  for (DFPeanutFeedObject *object in section.objects) {
     [objectIDs addObject:@(object.id)];
   }
   lockedCell.objects = objectIDs;
   
-  for (DFPeanutSearchObject *object in section.objects) {
+  for (DFPeanutFeedObject *object in section.objects) {
     [[DFImageStore sharedStore]
      imageForID:object.id
      preferredType:DFImageThumbnail
@@ -350,7 +350,7 @@ const CGFloat LockedCellHeight = 157.0;
   return lockedCell;
 }
 
-- (DFPhotoFeedCell *)cellForPhoto:(DFPeanutSearchObject *)photoObject
+- (DFPhotoFeedCell *)cellForPhoto:(DFPeanutFeedObject *)photoObject
                            indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoFeedCell *photoFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"photoCell"
@@ -381,7 +381,7 @@ const CGFloat LockedCellHeight = 157.0;
   return photoFeedCell;
 }
 
-- (DFPhotoFeedCell *)cellForCluster:(DFPeanutSearchObject *)cluster
+- (DFPhotoFeedCell *)cellForCluster:(DFPeanutFeedObject *)cluster
                         indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoFeedCell *clusterFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"clusterCell"
@@ -391,7 +391,7 @@ const CGFloat LockedCellHeight = 157.0;
   [clusterFeedCell setObjects:[DFFeedViewController objectIDNumbers:cluster.objects]];
   [DFFeedViewController configureNonImageAttributesForCell:clusterFeedCell
                                                searchObject:[cluster.objects firstObject]];
-  for (DFPeanutSearchObject *subObject in cluster.objects) {
+  for (DFPeanutFeedObject *subObject in cluster.objects) {
     [[DFImageStore sharedStore]
      imageForID:subObject.id
      preferredType:DFImageFull
@@ -412,14 +412,14 @@ const CGFloat LockedCellHeight = 157.0;
 + (NSArray *)objectIDNumbers:(NSArray *)objects
 {
   NSMutableArray *result = [NSMutableArray new];
-  for (DFPeanutSearchObject *object in objects) {
+  for (DFPeanutFeedObject *object in objects) {
     [result addObject:@(object.id)];
   }
   return result;
 }
 
 + (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
-                              searchObject:(DFPeanutSearchObject *)searchObject
+                              searchObject:(DFPeanutFeedObject *)searchObject
 {
   cell.titleLabel.text = searchObject.user == [[DFUser currentUser] userID] ?
     @"You" : searchObject.user_display_name;
@@ -458,17 +458,17 @@ const CGFloat LockedCellHeight = 157.0;
   CGFloat rowHeight = MinRowHeight;
   
   
-  DFPeanutSearchObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
+  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
   if ([sectionObject isLockedSection]) {
     // If it's a section object, its height is fixed
     return LockedCellHeight;
   }
   
-  DFPeanutSearchObject *rowObject = sectionObject.objects[indexPath.row];
+  DFPeanutFeedObject *rowObject = sectionObject.objects[indexPath.row];
   if (rowObject.actions.count > 0) {
     rowHeight += FavoritersListHeight;
   }
-  if ([rowObject.type isEqual:DFSearchObjectCluster]) {
+  if ([rowObject.type isEqual:DFFeedObjectCluster]) {
     rowHeight += CollectionViewHeight;
   }
   
@@ -483,7 +483,7 @@ const CGFloat LockedCellHeight = 157.0;
   if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
     object = self.uploadingPhotos[indexPath.row];
   } else {
-    DFPeanutSearchObject *section = [self sectionObjectForTableSection:indexPath.section];
+    DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
     if ([section isLockedSection]) {
       object = section;
     } else {
@@ -500,7 +500,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)inviteButtonPressedForHeaderView:(DFFeedSectionHeaderView *)headerView
 {
-  DFPeanutSearchObject *section = (DFPeanutSearchObject *)headerView.representativeObject;
+  DFPeanutFeedObject *section = (DFPeanutFeedObject *)headerView.representativeObject;
   DFInviteStrandViewController *vc = [[DFInviteStrandViewController alloc] init];
   vc.sectionObject = section;
   [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
@@ -514,7 +514,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"Favorite button pressed");
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
-  DFPeanutSearchObject *object = self.objectsByID[objectIDNumber];
+  DFPeanutFeedObject *object = self.objectsByID[objectIDNumber];
   DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFPeanutActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
                                firstObject];
@@ -572,7 +572,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"More options button pressed");
   DFPhotoIDType objectId = [objectIDNumber longLongValue];
-  DFPeanutSearchObject *object = self.objectsByID[objectIDNumber];
+  DFPeanutFeedObject *object = self.objectsByID[objectIDNumber];
   self.actionSheetPhotoID = objectId;
   
   NSString *deleteTitle = [self isObjectDeletableByUser:object] ? @"Delete" : nil;
@@ -593,7 +593,7 @@ selectedObjectChanged:(id)newObject
       fromObject:(id)oldObject
 {
   DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
-  DFPeanutSearchObject *searchObject = self.objectsByID[newObject];
+  DFPeanutFeedObject *searchObject = self.objectsByID[newObject];
   [DFFeedViewController configureNonImageAttributesForCell:feedCell searchObject:searchObject];
   [feedCell setNeedsLayout];
 }
@@ -612,7 +612,7 @@ selectedObjectChanged:(id)newObject
   }
 }
 
-- (BOOL)isObjectDeletableByUser:(DFPeanutSearchObject *)object
+- (BOOL)isObjectDeletableByUser:(DFPeanutFeedObject *)object
 {
   return object.user == [[DFUser currentUser] userID];
 }
@@ -638,7 +638,7 @@ selectedObjectChanged:(id)newObject
 
 - (void)deletePhoto
 {
-  DFPeanutSearchObject *object = self.objectsByID[@(self.actionSheetPhotoID)];
+  DFPeanutFeedObject *object = self.objectsByID[@(self.actionSheetPhotoID)];
   [self.photoAdapter deletePhoto:self.actionSheetPhotoID completionBlock:^(NSError *error) {
     if (!error) {
       [self reloadFeed];

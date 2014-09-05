@@ -6,17 +6,24 @@
 //  Copyright (c) 2014 Duffy Productions. All rights reserved.
 //
 
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import <Restkit/RestKit.h>
 
-@implementation DFPeanutSearchObject
+@implementation DFPeanutFeedObject
 
-DFSearchObjectType DFSearchObjectSection = @"section";
-DFSearchObjectType DFSearchObjectPhoto = @"photo";
-DFSearchObjectType DFSearchObjectCluster = @"cluster";
-DFSearchObjectType DFSearchObjectDocstack = @"docstack";
+DFFeedObjectType DFFeedObjectSection = @"section";
+DFFeedObjectType DFFeedObjectPhoto = @"photo";
+DFFeedObjectType DFFeedObjectCluster = @"cluster";
+DFFeedObjectType DFFeedObjectDocstack = @"docstack";
+DFFeedObjectType DFFeedObjectInviteStrand = @"invite_strand";
+DFFeedObjectType DFFeedObjectStrand = @"strand";
 
+static NSArray *FeedObjectTypes;
 
++ (void)initialize
+{
+  FeedObjectTypes = @[DFFeedObjectSection, DFFeedObjectPhoto, DFFeedObjectCluster, DFFeedObjectDocstack, DFFeedObjectInviteStrand, DFFeedObjectStrand];
+}
 
 - (id)initWithJSONDict:(NSDictionary *)jsonDict
 {
@@ -26,7 +33,7 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
     
     NSMutableArray *convertedObjects = [[NSMutableArray alloc] init];
     for (NSDictionary *subJSONDict in _objects) {
-      DFPeanutSearchObject *convertedObject = [[DFPeanutSearchObject alloc] initWithJSONDict:subJSONDict];
+      DFPeanutFeedObject *convertedObject = [[DFPeanutFeedObject alloc] initWithJSONDict:subJSONDict];
       [convertedObjects addObject:convertedObject];
     }
     _objects = convertedObjects;
@@ -46,6 +53,7 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   return objectMapping;
 }
 
+
 + (NSArray *)simpleAttributeKeys
 {
   return @[@"id",
@@ -62,11 +70,11 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
 
 - (NSDictionary *)JSONDictionary
 {
-  NSMutableDictionary *resultDict = [[self dictionaryWithValuesForKeys:[DFPeanutSearchObject
+  NSMutableDictionary *resultDict = [[self dictionaryWithValuesForKeys:[DFPeanutFeedObject
                                                                 simpleAttributeKeys]] mutableCopy];
   if (self.objects.count > 0) {
     NSMutableArray *objectsJSONDicts = [[NSMutableArray alloc] initWithCapacity:self.objects.count];
-    for (DFPeanutSearchObject *object in self.objects) {
+    for (DFPeanutFeedObject *object in self.objects) {
       [objectsJSONDicts addObject:object.JSONDictionary];
     }
     
@@ -128,7 +136,7 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
   }
   
   NSMutableArray *allDescendendents = [NSMutableArray new];
-  for (DFPeanutSearchObject *object in self.objects) {
+  for (DFPeanutFeedObject *object in self.objects) {
     if (object.objects) {
       [allDescendendents addObjectsFromArray:[[object enumeratorOfDescendents] allObjects]];
     } else {
@@ -141,13 +149,13 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
 
 - (BOOL)isLockedSection
 {
-  return ([self.type isEqual:DFSearchObjectSection] && [self.title isEqual:@"Locked"]);
+  return ([self.type isEqual:DFFeedObjectSection] && [self.title isEqual:@"Locked"]);
 }
 
 /* Creates a shallow copy of the SearchObject */
 - (id)copyWithZone:(NSZone *)zone
 {
-  DFPeanutSearchObject *newObject = [[DFPeanutSearchObject allocWithZone:zone] init];
+  DFPeanutFeedObject *newObject = [[DFPeanutFeedObject allocWithZone:zone] init];
   newObject.id = self.id;
   newObject.title = [self.title copyWithZone:zone];
   newObject.subtitle = [self.title copyWithZone:zone];
@@ -163,7 +171,7 @@ DFSearchObjectType DFSearchObjectDocstack = @"docstack";
 /* Compares equality by looking at the object IDs */
 - (BOOL)isEqual:(id)object
 {
-  DFPeanutSearchObject *otherObject = object;
+  DFPeanutFeedObject *otherObject = object;
   if (otherObject.id == self.id) return YES;
   return NO;
 }

@@ -12,18 +12,21 @@
 #import "DFPhoto.h"
 #import "DFPeanutAction.h"
 
-@interface DFPeanutSearchObject : NSObject<DFPeanutObject, DFJSONConvertible, NSCopying>
+@interface DFPeanutFeedObject : NSObject<DFPeanutObject, DFJSONConvertible, NSCopying>
 
-typedef NSString *const DFSearchObjectType;
+typedef NSString *const DFFeedObjectType;
 
-extern DFSearchObjectType DFSearchObjectSection;
-extern DFSearchObjectType DFSearchObjectPhoto;
-extern DFSearchObjectType DFSearchObjectCluster;
-extern DFSearchObjectType DFSearchObjectDocstack;
+extern DFFeedObjectType DFFeedObjectSection;
+extern DFFeedObjectType DFFeedObjectPhoto;
+extern DFFeedObjectType DFFeedObjectCluster;
+extern DFFeedObjectType DFFeedObjectDocstack;
+extern DFFeedObjectType DFFeedObjectInviteStrand;
+extern DFFeedObjectType DFFeedObjectStrand;
+
 
 // Simple attribures
 @property (nonatomic) DFPhotoIDType id;
-@property (nonatomic, retain) DFSearchObjectType type;
+@property (nonatomic, retain) DFFeedObjectType type;
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) NSString *subtitle;
 @property (nonatomic, retain) NSString *thumb_image_path;

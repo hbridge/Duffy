@@ -8,7 +8,7 @@
 
 #import "DFGalleryViewController.h"
 #import "DFPhotoViewCell.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "DFPhotoStackCell.h"
 #import "DFPhoto.h"
 #import "DFImageStore.h"
@@ -126,7 +126,7 @@ static const CGFloat ItemSpacing = 2.5;
       headerView.titleLabel.text = @"Uploading Photos";
       headerView.subtitleLabel.text = @"These photos are currently uploading";
     } else {
-      DFPeanutSearchObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
+      DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
       headerView.titleLabel.text = sectionObject.title;
       headerView.subtitleLabel.text = sectionObject.subtitle;
     }
@@ -143,13 +143,13 @@ static const CGFloat ItemSpacing = 2.5;
     return self.uploadingPhotos.count;
   }
   
-  DFPeanutSearchObject *sectionObject = [self sectionObjectForUploadedSection:section];
+  DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:section];
   
   NSArray *items = sectionObject.objects;
   return items.count;
 }
 
-- (DFPeanutSearchObject *)sectionObjectForUploadedSection:(NSUInteger)tableSection
+- (DFPeanutFeedObject *)sectionObjectForUploadedSection:(NSUInteger)tableSection
 {
   if (self.uploadingPhotos.count > 0) return self.sectionObjects[tableSection - 1];
   
@@ -164,15 +164,15 @@ static const CGFloat ItemSpacing = 2.5;
   if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
     cell = [self cellForUploadAtIndexPath:indexPath];
   } else {
-    DFPeanutSearchObject *section = [self sectionObjectForUploadedSection:indexPath.section];
+    DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
     NSArray *itemsForSection = section.objects;
-    DFPeanutSearchObject *object = itemsForSection[indexPath.row];
+    DFPeanutFeedObject *object = itemsForSection[indexPath.row];
     
     if ([section isLockedSection]) {
       cell = [self cellForLockedSection:section indexPath:indexPath];
-    } else if ([object.type isEqual:DFSearchObjectPhoto]) {
+    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
       cell = [self cellForPhoto:object indexPath:indexPath];
-    } else if ([object.type isEqual:DFSearchObjectCluster]) {
+    } else if ([object.type isEqual:DFFeedObjectCluster]) {
       cell = [self cellForCluster:object indexPath:indexPath];
     }
   }
@@ -202,14 +202,14 @@ static const CGFloat ItemSpacing = 2.5;
   return cell;
 }
 
-- (UICollectionViewCell *)cellForLockedSection:(DFPeanutSearchObject *)section
+- (UICollectionViewCell *)cellForLockedSection:(DFPeanutFeedObject *)section
                                      indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoViewCell *lockedCell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"lockedCell"
                                                                                forIndexPath:indexPath];
   lockedCell.imageView.image = nil;
 
-  DFPeanutSearchObject *object = section.objects[indexPath.row];
+  DFPeanutFeedObject *object = section.objects[indexPath.row];
   [[DFImageStore sharedStore]
    imageForID:object.id
    preferredType:DFImageThumbnail
@@ -226,7 +226,7 @@ static const CGFloat ItemSpacing = 2.5;
   return lockedCell;
 }
 
-- (UICollectionViewCell *)cellForPhoto:(DFPeanutSearchObject *)photoObject
+- (UICollectionViewCell *)cellForPhoto:(DFPeanutFeedObject *)photoObject
                              indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
@@ -252,21 +252,21 @@ static const CGFloat ItemSpacing = 2.5;
   return cell;
 }
 
-- (UICollectionViewCell *)cellForCluster:(DFPeanutSearchObject *)clusterObject
+- (UICollectionViewCell *)cellForCluster:(DFPeanutFeedObject *)clusterObject
                                indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
                                                                          forIndexPath:indexPath];
   cell.imageView.image = nil;
   cell.likeIconImageView.hidden = YES;
-  for (DFPeanutSearchObject *object in clusterObject.objects) {
+  for (DFPeanutFeedObject *object in clusterObject.objects) {
     if ([[object actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
       cell.likeIconImageView.hidden = NO;
       break;
     }
   }
   
-  DFPeanutSearchObject *firstObject = (DFPeanutSearchObject *)clusterObject.objects.firstObject;
+  DFPeanutFeedObject *firstObject = (DFPeanutFeedObject *)clusterObject.objects.firstObject;
   
   [[DFImageStore sharedStore]
    imageForID:firstObject.id
@@ -292,12 +292,12 @@ static const CGFloat ItemSpacing = 2.5;
     // don't do anything for uploading rows right now
   } else {
     DFPhotoIDType photoID;
-    DFPeanutSearchObject *section = [self sectionObjectForUploadedSection:indexPath.section];
-    DFPeanutSearchObject *object = section.objects[indexPath.row];
-    if ([object.type isEqualToString:DFSearchObjectPhoto]) {
+    DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
+    DFPeanutFeedObject *object = section.objects[indexPath.row];
+    if ([object.type isEqualToString:DFFeedObjectPhoto]) {
       photoID = object.id;
-    } else if ([object.type isEqualToString:DFSearchObjectCluster]) {
-      photoID = ((DFPeanutSearchObject *)object.objects.firstObject).id;
+    } else if ([object.type isEqualToString:DFFeedObjectCluster]) {
+      photoID = ((DFPeanutFeedObject *)object.objects.firstObject).id;
     }
     
     DFFeedViewController *photoFeedController =

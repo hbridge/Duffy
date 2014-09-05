@@ -11,7 +11,7 @@
 #import "DFStrandConstants.h"
 #import "DFPeanutJoinableStrandsAdapter.h"
 #import "DFPeanutNewPhotosAdapter.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFLocationStore.h"
 #import "DFStrandStore.h"
@@ -128,10 +128,10 @@ static DFStrandsManager *defaultStrandsManager;
     
     unsigned int oldCount = [DFStrandStore UnseenPhotosCount];
     unsigned int newCount = 0;
-    for (DFPeanutSearchObject *searchObject in response.objects) {
-      if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
-        for (DFPeanutSearchObject *subSearchObject in searchObject.objects) {
-          if ([subSearchObject.type isEqualToString:DFSearchObjectPhoto]) {
+    for (DFPeanutFeedObject *searchObject in response.objects) {
+      if ([searchObject.type isEqualToString:DFFeedObjectSection]) {
+        for (DFPeanutFeedObject *subSearchObject in searchObject.objects) {
+          if ([subSearchObject.type isEqualToString:DFFeedObjectPhoto]) {
             newCount++;
           }
         }

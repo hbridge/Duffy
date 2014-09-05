@@ -7,10 +7,10 @@
 //
 
 #import "DFPeoplePickerViewController.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 
 @interface DFInviteStrandViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate>
 
-@property (nonatomic, retain) DFPeanutSearchObject *sectionObject;
+@property (nonatomic, retain) DFPeanutFeedObject *sectionObject;
 
 @end

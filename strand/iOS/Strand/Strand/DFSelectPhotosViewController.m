@@ -42,8 +42,8 @@ CGFloat const ToFieldHeight = 44.0;
 
 - (instancetype)initWithTitle:(NSString *)title
                  showsToField:(BOOL)showsToField
-       suggestedSectionObject:(DFPeanutSearchObject *)suggestedSectionObject
-          sharedSectionObject:(DFPeanutSearchObject *)sharedSectionObject
+       suggestedSectionObject:(DFPeanutFeedObject *)suggestedSectionObject
+          sharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
@@ -101,14 +101,14 @@ CGFloat const ToFieldHeight = 44.0;
   
 }
 
-- (void)setSuggestedSectionObject:(DFPeanutSearchObject *)sectionObject
+- (void)setSuggestedSectionObject:(DFPeanutFeedObject *)sectionObject
 {
   _suggestedSectionObject = sectionObject;
   sectionObject.title = @"Your Photos (Not Shared)";
   NSMutableArray *photos = [NSMutableArray new];
   self.selectedPhotoIDs = [NSMutableArray new];
-  for (DFPeanutSearchObject *object in sectionObject.enumeratorOfDescendents.allObjects) {
-    if ([object.type isEqual:DFSearchObjectPhoto]) {
+  for (DFPeanutFeedObject *object in sectionObject.enumeratorOfDescendents.allObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
       [photos addObject:object];
       // select all by default
       [self.selectedPhotoIDs addObject:@(object.id)];
@@ -121,12 +121,12 @@ CGFloat const ToFieldHeight = 44.0;
   });
 }
 
-- (void)setSharedSectionObject:(DFPeanutSearchObject *)sharedSectionObject
+- (void)setSharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject
 {
   _sharedSectionObject = sharedSectionObject;
   NSMutableArray *photos = [NSMutableArray new];
-  for (DFPeanutSearchObject *object in sharedSectionObject.enumeratorOfDescendents.allObjects) {
-    if ([object.type isEqual:DFSearchObjectPhoto]) {
+  for (DFPeanutFeedObject *object in sharedSectionObject.enumeratorOfDescendents.allObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
       [photos addObject:object];
     }
   }
@@ -149,7 +149,7 @@ CGFloat const ToFieldHeight = 44.0;
 {
   UICollectionReusableView *view;
   if (kind == UICollectionElementKindSectionHeader) {
-    DFPeanutSearchObject *sectionObject = [self objectForSection:indexPath.section];
+    DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
     DFGallerySectionHeader *headerView = [self.collectionView
                                           dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                                           withReuseIdentifier:@"headerView"
@@ -163,7 +163,7 @@ CGFloat const ToFieldHeight = 44.0;
   return view;
 }
 
-- (DFPeanutSearchObject *)objectForSection:(NSUInteger)section
+- (DFPeanutFeedObject *)objectForSection:(NSUInteger)section
 {
   if (section == 0 && self.suggestedPhotoObjects.count > 0) return self.suggestedSectionObject;
  return self.sharedSectionObject;
@@ -191,7 +191,7 @@ CGFloat const ToFieldHeight = 44.0;
 {
   UICollectionViewCell *cell;
   
-  DFPeanutSearchObject *object = [self photosForSection:indexPath.section][indexPath.row];
+  DFPeanutFeedObject *object = [self photosForSection:indexPath.section][indexPath.row];
   if (![self areImagesForSectionRemote:indexPath.section]) {
     cell = [self cellForLocalPhoto:object atIndexPath:indexPath];
   } else {
@@ -201,7 +201,7 @@ CGFloat const ToFieldHeight = 44.0;
   return cell;
 }
 
-- (UICollectionViewCell *)cellForLocalPhoto:(DFPeanutSearchObject *)object
+- (UICollectionViewCell *)cellForLocalPhoto:(DFPeanutFeedObject *)object
                                 atIndexPath:(NSIndexPath *)indexPath
 {
   DFSelectablePhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"selectableCell"
@@ -228,7 +228,7 @@ CGFloat const ToFieldHeight = 44.0;
   return cell;
 }
 
-- (UICollectionViewCell *)cellForRemotePhoto:(DFPeanutSearchObject *)object
+- (UICollectionViewCell *)cellForRemotePhoto:(DFPeanutFeedObject *)object
                                  atIndexPath:(NSIndexPath *)indexPath
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"cell"
@@ -257,7 +257,7 @@ CGFloat const ToFieldHeight = 44.0;
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutSearchObject *photoObject = self.suggestedPhotoObjects[indexPath.row];
+  DFPeanutFeedObject *photoObject = self.suggestedPhotoObjects[indexPath.row];
   NSUInteger index = [self.selectedPhotoIDs indexOfObject:@(photoObject.id)];
   if (index != NSNotFound) {
     [self.selectedPhotoIDs removeObjectAtIndex:index];
@@ -390,7 +390,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   NSDate *minDateFound;
   NSDate *maxDateFound;
   
-  for (DFPeanutSearchObject *object in objects) {
+  for (DFPeanutFeedObject *object in objects) {
     if (!minDateFound || [object.time_taken compare:minDateFound] == NSOrderedAscending) {
       minDateFound = object.time_taken;
     }

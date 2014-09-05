@@ -7,14 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "VENTokenField.h"
 #import "DFPeoplePickerViewController.h"
 
 @interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate,UIScrollViewDelegate, DFPeoplePickerDelegate>
 
-@property (nonatomic, retain) DFPeanutSearchObject *suggestedSectionObject;
-@property (nonatomic, retain) DFPeanutSearchObject *sharedSectionObject;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestedSectionObject;
+@property (nonatomic, retain) DFPeanutFeedObject *sharedSectionObject;
 
 @property (weak, nonatomic) IBOutlet UIView *searchBarWrapperView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
@@ -26,8 +26,8 @@
 
 - (instancetype)initWithTitle:(NSString *)title
                  showsToField:(BOOL)showsToField
-       suggestedSectionObject:(DFPeanutSearchObject *)suggestedSectionObject
-          sharedSectionObject:(DFPeanutSearchObject *)sharedSectionObject;
+       suggestedSectionObject:(DFPeanutFeedObject *)suggestedSectionObject
+          sharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject;
 - (IBAction)collectionViewTapped:(id)sender;
 
 @end

@@ -9,7 +9,7 @@
 #import "DFPeanutObjectsResponse.h"
 #import <RestKit/RestKit.h>
 #import "DFPeanutSuggestion.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFPeanutPhoto.h"
 
@@ -20,7 +20,7 @@
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects"
-                                                 mapping:[DFPeanutSearchObject objectMapping]];
+                                                 mapping:[DFPeanutFeedObject objectMapping]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"retry_suggestions"
                                                  mapping:[DFPeanutSuggestion objectMapping]];
   
@@ -35,8 +35,8 @@
 - (NSArray *)topLevelSectionObjects
 {
   NSMutableArray *result = [[NSMutableArray alloc] init];
-  for (DFPeanutSearchObject *searchObject in self.objects) {
-    if ([searchObject.type isEqualToString:DFSearchObjectSection]) {
+  for (DFPeanutFeedObject *searchObject in self.objects) {
+    if ([searchObject.type isEqualToString:DFFeedObjectSection]) {
       [result addObject:searchObject];
     }
   }

@@ -16,7 +16,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFPeanutNotificationsManager.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFSettingsViewController.h"
 #import "DFStrandsViewController.h"
@@ -166,7 +166,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   }
   
   // if the user has real content in their feed, prompt for push notifications
-  NSString *firstSectionTitle = [(DFPeanutSearchObject *)self.sectionObjects.firstObject title];
+  NSString *firstSectionTitle = [(DFPeanutFeedObject *)self.sectionObjects.firstObject title];
   if (self.sectionObjects.count > 1 ||
       (self.sectionObjects.count == 1 && ![firstSectionTitle isEqualToString:@"Locked"])) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
@@ -290,8 +290,8 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
                                               photosWithUploadProcessedStatus:NO
                                               shouldUploadImage:YES];
   NSMutableSet *allPhotoIDsInFeed = [NSMutableSet new];
-  for (DFPeanutSearchObject *section in sectionObjects) {
-    for (DFPeanutSearchObject *object in [[section enumeratorOfDescendents] allObjects]) {
+  for (DFPeanutFeedObject *section in sectionObjects) {
+    for (DFPeanutFeedObject *object in [[section enumeratorOfDescendents] allObjects]) {
       if (object.id) [allPhotoIDsInFeed addObject:@(object.id)];
     }
   }
@@ -315,13 +315,13 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   for (NSUInteger sectionIndex = 0; sectionIndex < sectionObjects.count; sectionIndex++) {
     NSArray *objectsForSection = [sectionObjects[sectionIndex] objects];
     for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
-      DFPeanutSearchObject *object = objectsForSection[objectIndex];
+      DFPeanutFeedObject *object = objectsForSection[objectIndex];
       NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
-      if ([object.type isEqual:DFSearchObjectPhoto]) {
+      if ([object.type isEqual:DFFeedObjectPhoto]) {
         objectsByID[@(object.id)] = object;
         indexPathsByID[@(object.id)] = indexPath;
-      } else if ([object.type isEqual:DFSearchObjectCluster]) {
-        for (DFPeanutSearchObject *subObject in object.objects) {
+      } else if ([object.type isEqual:DFFeedObjectCluster]) {
+        for (DFPeanutFeedObject *subObject in object.objects) {
           objectsByID[@(subObject.id)] = subObject;
           indexPathsByID[@(subObject.id)] = indexPath;
         }

@@ -10,11 +10,11 @@
 #import "DFCameraRollSyncManager.h"
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFPhotoViewCell.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFGallerySectionHeader.h"
 #import "DFCreateStrandTableViewCell.h"
-#import "DFPeanutSearchObject.h"
+#import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosViewController.h"
 #import "DFPeanutStrandInviteAdapter.h"
@@ -165,7 +165,7 @@
   return cell;
 }
 
-- (UITableViewCell *)cellWithObject:(DFPeanutSearchObject *)suggestion
+- (UITableViewCell *)cellWithObject:(DFPeanutFeedObject *)suggestion
                              isInviteCell:(BOOL)isInviteCell
 {
   DFCreateStrandTableViewCell *cell;
@@ -178,7 +178,7 @@
   // Set the header attributes
   cell.locationLabel.text = suggestion.subtitle;
   cell.countLabel.text = [@(suggestion.objects.count) stringValue];
-  DFPeanutSearchObject *firstObject = suggestion.objects.firstObject;
+  DFPeanutFeedObject *firstObject = suggestion.objects.firstObject;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:firstObject.time_taken];
   
   if (isInviteCell) {
@@ -192,16 +192,16 @@
 }
 
 - (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
-                   withSection:(DFPeanutSearchObject *)section
+                   withSection:(DFPeanutFeedObject *)section
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
   NSMutableArray *photos = [NSMutableArray new];
   
-  for (DFPeanutSearchObject *object in section.objects) {
-    DFPeanutSearchObject *photoObject;
-    if ([object.type isEqual:DFSearchObjectCluster]) {
+  for (DFPeanutFeedObject *object in section.objects) {
+    DFPeanutFeedObject *photoObject;
+    if ([object.type isEqual:DFFeedObjectCluster]) {
       photoObject = object.objects.firstObject;
-    } else if ([object.type isEqual:DFSearchObjectPhoto]) {
+    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
       photoObject = object;
     }
     [photoIDs addObject:@(photoObject.id)];
@@ -209,7 +209,7 @@
   }
   
   cell.objects = photoIDs;
-  for (DFPeanutSearchObject *photoObject in photos) {
+  for (DFPeanutFeedObject *photoObject in photos) {
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
      preferredType:DFImageThumbnail
@@ -223,16 +223,16 @@
 
 
 - (void)setLocalPhotosForCell:(DFCreateStrandTableViewCell *)cell
-                      section:(DFPeanutSearchObject *)section
+                      section:(DFPeanutFeedObject *)section
 {
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];
-  for (DFPeanutSearchObject *object in section.objects) {
-    if ([object.type isEqual:DFSearchObjectPhoto]) {
+  for (DFPeanutFeedObject *object in section.objects) {
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
       [idsToShow addObject:@(object.id)];
       
-    } else if ([object.type isEqual:DFSearchObjectCluster]) {
-      DFPeanutSearchObject *repObject = object.objects.firstObject;
+    } else if ([object.type isEqual:DFFeedObjectCluster]) {
+      DFPeanutFeedObject *repObject = object.objects.firstObject;
       [idsToShow addObject:@(repObject.id)];
     }
   }
@@ -263,7 +263,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   NSArray *sectionObjects = [self sectionObjectsForSection:indexPath.section];
-  DFPeanutSearchObject *section = sectionObjects[indexPath.row];
+  DFPeanutFeedObject *section = sectionObjects[indexPath.row];
   DFSelectPhotosViewController *selectController;
   if ([self shouldShowInvites] && indexPath.section == 0) {
     
@@ -272,7 +272,7 @@
      completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
        
        dispatch_async(dispatch_get_main_queue(), ^{
-         DFPeanutSearchObject *suggestionObject;
+         DFPeanutFeedObject *suggestionObject;
          if (!error) {
            suggestionObject = response.objects.firstObject;
          }
