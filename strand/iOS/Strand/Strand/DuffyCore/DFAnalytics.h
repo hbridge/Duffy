@@ -31,6 +31,7 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
                         userTappedLearnMore:(BOOL)didTapLearnMore;
 + (void)logSetupContactsCompletedWithABPermission:(int)status
                                  numAddedManually:(NSUInteger)numAddedManually;
++ (void)logSetupPhotosCompletedWithResult:(NSString *)result;
 
 + (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
                                               newType:(UIRemoteNotificationType)newType;
@@ -40,12 +41,16 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
              newState:(DFPermissionStateType)newState;
 
 /* Generic logging for view controllers */
-+ (void)logViewController:(UIViewController *)viewController appearedWithParameters:(NSDictionary *)params;
-+ (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params;
++ (void)logViewController:(UIViewController *)viewController
+   appearedWithParameters:(NSDictionary *)params;
++ (void)logViewController:(UIViewController *)viewController
+disappearedWithParameters:(NSDictionary *)params;
 
 /* Uploads */
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
-+ (void)logUploadEndedWithResult:(NSString *)resultValue numPhotos:(unsigned long)numPhotos sessionAvgThroughputKBPS:(double)KBPS;
++ (void)logUploadEndedWithResult:(NSString *)resultValue
+                       numPhotos:(unsigned long)numPhotos
+        sessionAvgThroughputKBPS:(double)KBPS;
 + (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
 + (void)logUploadCancelledWithIsError:(BOOL)isError;
 + (void)logUploadRetryCountExceededWithCount:(unsigned int)count;

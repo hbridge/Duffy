@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFFirstTimeSetupViewController.h"
+#import "DFCreateAccountViewController.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "AppDelegate.h"
-#import "DFSMSCodeEntryViewController.h"
+#import "DFSMSAuthViewController.h"
 #import "NSString+DFHelpers.h"
 #import "DFSMSVerificationAdapter.h"
 #import "DFWebViewController.h"
@@ -20,11 +20,11 @@
 
 UInt16 const DFPhoneNumberLength = 10;
 
-@interface DFFirstTimeSetupViewController ()
+@interface DFCreateAccountViewController ()
 
 @end
 
-@implementation DFFirstTimeSetupViewController
+@implementation DFCreateAccountViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -37,7 +37,6 @@ UInt16 const DFPhoneNumberLength = 10;
                                 action:@selector(phoneNumberDoneButtonPressed:)];
       self.doneBarButtonItem.enabled = NO;
       self.navigationItem.rightBarButtonItem = self.doneBarButtonItem;
-      
     }
     return self;
 }
@@ -145,7 +144,7 @@ replacementString:(NSString *)string
        [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultSuccess];
      } else {
        [SVProgressHUD dismiss];
-       UIAlertView *failureAlert = [DFFirstTimeSetupViewController smsVerificationRequestFailed:error];
+       UIAlertView *failureAlert = [DFCreateAccountViewController smsVerificationRequestFailed:error];
        [failureAlert show];
        [DFAnalytics logSetupPhoneNumberEnteredWithResult:DFAnalyticsValueResultFailure];
      }
@@ -238,7 +237,7 @@ replacementString:(NSString *)string
 
 - (void)showNextStepWithPhoneNumber:(NSString *)phoneNumberString
 {
-  DFSMSCodeEntryViewController *codeEntryController = [[DFSMSCodeEntryViewController alloc] init];
+  DFSMSAuthViewController *codeEntryController = [[DFSMSAuthViewController alloc] init];
   codeEntryController.phoneNumberString = phoneNumberString;
   if (self.nameTextField.text
       && ![self.nameTextField.text isEqualToString:@""]) {

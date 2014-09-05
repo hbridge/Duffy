@@ -15,6 +15,8 @@
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
 #import "RootViewController.h"
+#import "DFCreateStrandViewController.h"
+#import "DFNavigationController.h"
 
 @interface DFLocationPermissionViewController ()
 
@@ -136,10 +138,11 @@
   AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
   [delegate firstTimeSetupComplete];
   dispatch_async(dispatch_get_main_queue(), ^{
+    DFCreateStrandViewController *vc = [[DFCreateStrandViewController alloc] init];
     RootViewController *rootViewController = (RootViewController *)delegate.window.rootViewController;
-    if ([rootViewController respondsToSelector:@selector(showGallery)]) {
-      [rootViewController showGallery];
-    }
+    [rootViewController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
+                                     animated:NO
+                                   completion:nil];
   });
 }
 

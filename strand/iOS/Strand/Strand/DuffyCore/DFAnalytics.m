@@ -106,6 +106,8 @@ NSString* const SetupPhoneNumberEntered = @"SetupPhoneNumberEntered";
 NSString* const SetupSMSCodeEntered = @"SetupSMSCodeEntered";
 NSString* const SetupLocationCompleted = @"SetupLocationCompleted";
 NSString* const SetupContactsCompleted = @"SetupContactsCompleted";
+NSString* const SetupPhotosCompleted = @"SetupPhotosCompleted";
+
 
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
@@ -387,6 +389,11 @@ static DFAnalytics *defaultLogger;
 + (void)logSetupSMSCodeEnteredWithResult:(NSString *)result
 {
   [DFAnalytics logEvent:SetupSMSCodeEntered withParameters:@{ResultKey: result}];
+}
+
++ (void)logSetupPhotosCompletedWithResult:(NSString *)result
+{
+  [DFAnalytics logEvent:SetupPhotosCompleted withParameters:@{ResultKey: result}];
 }
 
 + (void)logSetupLocationCompletedWithResult:(NSString *)result

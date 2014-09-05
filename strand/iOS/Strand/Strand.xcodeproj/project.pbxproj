@@ -28,11 +28,9 @@
 		5A188D6B19804A94009D3244 /* DFLockedStrandCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A188D6919804A94009D3244 /* DFLockedStrandCell.m */; };
 		5A188D6C19804A94009D3244 /* DFLockedStrandCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A188D6A19804A94009D3244 /* DFLockedStrandCell.xib */; };
 		5A1E402519955570009A9FB2 /* DFAVCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A1E402319955570009A9FB2 /* DFAVCameraViewController.m */; };
-		5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */; };
-		5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
-		5A3172C4196B1C4200CA7693 /* DFSMSCodeEntryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C2196B1C4200CA7693 /* DFSMSCodeEntryViewController.m */; };
-		5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib */; };
+		5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */; };
+		5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */; };
 		5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */; };
 		5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */; };
 		5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172D1196C84E400CA7693 /* DFSettingsViewController.m */; };
@@ -52,6 +50,8 @@
 		5A4BBD2B19B7D55500359299 /* DFPeanutStrandFeedAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2A19B7D55500359299 /* DFPeanutStrandFeedAdapter.m */; };
 		5A4BBD2E19B8BA0100359299 /* DFStrandInviteTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2D19B8BA0100359299 /* DFStrandInviteTableViewCell.m */; };
 		5A4BBD3019B8BA8500359299 /* DFStrandInviteTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2F19B8BA8500359299 /* DFStrandInviteTableViewCell.xib */; };
+		5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */; };
+		5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */; };
 		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
 		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
 		5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */; };
@@ -161,8 +161,8 @@
 		5AC4A9491947C3A700862D9C /* UIImage+Resize.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9451947C3A700862D9C /* UIImage+Resize.m */; };
 		5AC4A94A1947C3A700862D9C /* UIImage+RoundedCorner.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9471947C3A700862D9C /* UIImage+RoundedCorner.m */; };
 		5AC4A94F1947C54C00862D9C /* Duffy.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */; };
-		5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */; };
-		5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */; };
+		5AC4A9541947C77300862D9C /* DFCreateAccountViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A9521947C77300862D9C /* DFCreateAccountViewController.m */; };
+		5AC4A9551947C77300862D9C /* DFCreateAccountViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A9531947C77300862D9C /* DFCreateAccountViewController.xib */; };
 		5AC4A9571948A59200862D9C /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5AC4A9561948A59200862D9C /* CoreLocation.framework */; };
 		5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A95F194A25A300862D9C /* DFStrandsManager.m */; };
 		5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A962194A295700862D9C /* DFStrandConstants.m */; };
@@ -245,14 +245,11 @@
 		5A188D6A19804A94009D3244 /* DFLockedStrandCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLockedStrandCell.xib; sourceTree = "<group>"; };
 		5A1E402219955570009A9FB2 /* DFAVCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAVCameraViewController.h; sourceTree = "<group>"; };
 		5A1E402319955570009A9FB2 /* DFAVCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAVCameraViewController.m; sourceTree = "<group>"; };
-		5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFModalSpinnerViewController.h; sourceTree = "<group>"; };
-		5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFModalSpinnerViewController.m; sourceTree = "<group>"; };
-		5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFModalSpinnerViewController.xib; sourceTree = "<group>"; };
 		5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSVerificationAdapter.h; sourceTree = "<group>"; };
 		5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSVerificationAdapter.m; sourceTree = "<group>"; };
-		5A3172C1196B1C4200CA7693 /* DFSMSCodeEntryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSCodeEntryViewController.h; sourceTree = "<group>"; };
-		5A3172C2196B1C4200CA7693 /* DFSMSCodeEntryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSCodeEntryViewController.m; sourceTree = "<group>"; };
-		5A3172C3196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSMSCodeEntryViewController.xib; sourceTree = "<group>"; };
+		5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSAuthViewController.h; sourceTree = "<group>"; };
+		5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSAuthViewController.m; sourceTree = "<group>"; };
+		5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSMSAuthViewController.xib; sourceTree = "<group>"; };
 		5A3172C9196B620100CA7693 /* DFPeanutUserObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutUserObject.h; sourceTree = "<group>"; };
 		5A3172CA196B620100CA7693 /* DFPeanutUserObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutUserObject.m; sourceTree = "<group>"; };
 		5A3172CC196C442400CA7693 /* NSString+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+DFHelpers.h"; sourceTree = "<group>"; };
@@ -289,6 +286,9 @@
 		5A4BBD2C19B8BA0100359299 /* DFStrandInviteTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandInviteTableViewCell.h; sourceTree = "<group>"; };
 		5A4BBD2D19B8BA0100359299 /* DFStrandInviteTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandInviteTableViewCell.m; sourceTree = "<group>"; };
 		5A4BBD2F19B8BA8500359299 /* DFStrandInviteTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandInviteTableViewCell.xib; sourceTree = "<group>"; };
+		5A4BBD3C19BA4F9600359299 /* DFPhotosPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotosPermissionViewController.h; sourceTree = "<group>"; };
+		5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotosPermissionViewController.m; sourceTree = "<group>"; };
+		5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotosPermissionViewController.xib; sourceTree = "<group>"; };
 		5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOverlayViewController.h; sourceTree = "<group>"; };
 		5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayViewController.m; sourceTree = "<group>"; };
 		5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationBar.h; sourceTree = "<group>"; };
@@ -490,9 +490,9 @@
 		5AC4A94C1947C54C00862D9C /* Duffy 2.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 2.xcdatamodel"; sourceTree = "<group>"; };
 		5AC4A94D1947C54C00862D9C /* Duffy 3.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 3.xcdatamodel"; sourceTree = "<group>"; };
 		5AC4A94E1947C54C00862D9C /* Duffy.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Duffy.xcdatamodel; sourceTree = "<group>"; };
-		5AC4A9511947C77300862D9C /* DFFirstTimeSetupViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFirstTimeSetupViewController.h; sourceTree = "<group>"; };
-		5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFirstTimeSetupViewController.m; sourceTree = "<group>"; };
-		5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFirstTimeSetupViewController.xib; sourceTree = "<group>"; };
+		5AC4A9511947C77300862D9C /* DFCreateAccountViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCreateAccountViewController.h; sourceTree = "<group>"; };
+		5AC4A9521947C77300862D9C /* DFCreateAccountViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCreateAccountViewController.m; sourceTree = "<group>"; };
+		5AC4A9531947C77300862D9C /* DFCreateAccountViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCreateAccountViewController.xib; sourceTree = "<group>"; };
 		5AC4A9561948A59200862D9C /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		5AC4A95E194A25A300862D9C /* DFStrandsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandsManager.h; sourceTree = "<group>"; };
 		5AC4A95F194A25A300862D9C /* DFStrandsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandsManager.m; sourceTree = "<group>"; };
@@ -1091,15 +1091,15 @@
 		5AC4A9501947C75700862D9C /* First Time Setup */ = {
 			isa = PBXGroup;
 			children = (
-				5AC4A9511947C77300862D9C /* DFFirstTimeSetupViewController.h */,
-				5AC4A9521947C77300862D9C /* DFFirstTimeSetupViewController.m */,
-				5AC4A9531947C77300862D9C /* DFFirstTimeSetupViewController.xib */,
-				5A3172C1196B1C4200CA7693 /* DFSMSCodeEntryViewController.h */,
-				5A3172C2196B1C4200CA7693 /* DFSMSCodeEntryViewController.m */,
-				5A3172C3196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib */,
-				5A3172B9196B0D5300CA7693 /* DFModalSpinnerViewController.h */,
-				5A3172BA196B0D5300CA7693 /* DFModalSpinnerViewController.m */,
-				5A3172BB196B0D5300CA7693 /* DFModalSpinnerViewController.xib */,
+				5AC4A9511947C77300862D9C /* DFCreateAccountViewController.h */,
+				5AC4A9521947C77300862D9C /* DFCreateAccountViewController.m */,
+				5AC4A9531947C77300862D9C /* DFCreateAccountViewController.xib */,
+				5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */,
+				5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */,
+				5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */,
+				5A4BBD3C19BA4F9600359299 /* DFPhotosPermissionViewController.h */,
+				5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */,
+				5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */,
 				5AFDEBD8197748A7005DDA7D /* DFLocationPermissionViewController.h */,
 				5AFDEBD9197748A7005DDA7D /* DFLocationPermissionViewController.m */,
 				5AFDEBDA197748A7005DDA7D /* DFLocationPermissionViewController.xib */,
@@ -1327,7 +1327,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AA9293219A6598600032A3F /* DFNoContactsTableViewCell.xib in Resources */,
-				5AC4A9551947C77300862D9C /* DFFirstTimeSetupViewController.xib in Resources */,
+				5AC4A9551947C77300862D9C /* DFCreateAccountViewController.xib in Resources */,
 				5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */,
 				5A9BC31219A26A34002D1CD7 /* DFGallerySectionHeader.xib in Resources */,
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
@@ -1342,8 +1342,8 @@
 				5AA9292B19A6502200032A3F /* DFPeoplePickerViewController.xib in Resources */,
 				5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */,
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
+				5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
-				5A3172BD196B0D5300CA7693 /* DFModalSpinnerViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
 				5AAF039219B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib in Resources */,
 				5A188D6C19804A94009D3244 /* DFLockedStrandCell.xib in Resources */,
@@ -1352,7 +1352,7 @@
 				5A188D6219802F87009D3244 /* FeedViewNuxPlaceholder.xib in Resources */,
 				5AAF039719B10A8600EF021C /* DFSelectablePhotoViewCell.xib in Resources */,
 				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
-				5A3172C5196B1C4200CA7693 /* DFSMSCodeEntryViewController.xib in Resources */,
+				5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFCreateStrandViewController.xib in Resources */,
@@ -1470,6 +1470,7 @@
 				5AAF03A319B4D5B200EF021C /* DFPeoplePickerViewController.m in Sources */,
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
 				5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */,
+				5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */,
 				5A3F6A991999498900C2F7D4 /* UIView+DFExtensions.m in Sources */,
 				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
@@ -1478,7 +1479,7 @@
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */,
-				5A3172C4196B1C4200CA7693 /* DFSMSCodeEntryViewController.m in Sources */,
+				5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */,
 				651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */,
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
 				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
@@ -1486,7 +1487,6 @@
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */,
 				5AAF038719B0D5AE00EF021C /* DFSelectPhotosViewController.m in Sources */,
-				5A3172BC196B0D5300CA7693 /* DFModalSpinnerViewController.m in Sources */,
 				5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */,
 				5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
@@ -1570,7 +1570,7 @@
 				5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
 				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,
-				5AC4A9541947C77300862D9C /* DFFirstTimeSetupViewController.m in Sources */,
+				5AC4A9541947C77300862D9C /* DFCreateAccountViewController.m in Sources */,
 				5A3F6A9F1999573A00C2F7D4 /* DBMotionManager.m in Sources */,
 				5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */,
 				5AAF038C19B0D99200EF021C /* DFCreateStrandTableViewCell.m in Sources */,

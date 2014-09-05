@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFFirstTimeSetupViewController : UIViewController <UITextFieldDelegate, UIActionSheetDelegate>
+@interface DFCreateAccountViewController : UIViewController <UITextFieldDelegate, UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UILabel *statusLabel;
 @property (weak, nonatomic) IBOutlet UITextField *phoneNumberField;

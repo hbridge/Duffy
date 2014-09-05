@@ -4,7 +4,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSMSCodeEntryViewController">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSMSAuthViewController">
             <connections>
                 <outlet property="codeTextField" destination="hlQ-D4-OFh" id="Geq-Ii-sNc"/>
                 <outlet property="codeTextFieldOverlay" destination="o9Q-6S-ler" id="Zvf-7u-blO"/>

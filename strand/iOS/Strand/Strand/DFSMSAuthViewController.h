@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFSMSCodeEntryViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate>
+@interface DFSMSAuthViewController : UIViewController <UITextFieldDelegate, UIAlertViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITextField *codeTextField;
 @property (weak, nonatomic) IBOutlet UIView *codeTextFieldOverlay;

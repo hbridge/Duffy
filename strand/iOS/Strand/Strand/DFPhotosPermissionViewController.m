@@ -1,0 +1,100 @@
+//
+//  DFPhotosPermissionViewController.m
+//  Strand
+//
+//  Created by Henry Bridge on 9/5/14.
+//  Copyright (c) 2014 Duffy Inc. All rights reserved.
+//
+
+#import "DFPhotosPermissionViewController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
+#import "UIAlertView+DFHelpers.h"
+#import "DFLocationPermissionViewController.h"
+#import "DFAnalytics.h"
+#import "SAMGradientView.h"
+#import "DFStrandConstants.h"
+#import "DFCameraRollSyncManager.h"
+#import "DFUploadController.h"
+#import "DFPhotoStore.h"
+
+@interface DFPhotosPermissionViewController ()
+
+@end
+
+@implementation DFPhotosPermissionViewController
+
+- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+{
+    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
+    if (self) {
+        // Custom initialization
+    }
+    return self;
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+  
+  SAMGradientView *gradientView = (SAMGradientView *)self.view;
+  gradientView.gradientColors = @[[DFStrandConstants defaultBackgroundColor], [DFStrandConstants strandOrange]];
+  [self.navigationController setNavigationBarHidden:YES];
+  [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (IBAction)grantPhotosAccessPressed:(id)sender {
+  ALAuthorizationStatus status = [ALAssetsLibrary authorizationStatus];
+  if (status == ALAuthorizationStatusAuthorized) {
+    [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyGranted"];
+    [self showNextStep];
+  } else if (status == ALAuthorizationStatusDenied) {
+    [DFAnalytics logSetupPhotosCompletedWithResult:@"alreadyDenied"];
+    [UIAlertView showSimpleAlertWithTitle:@"Enable Access"
+                                  message:@"Please give this app permission to access your photo library in Settings."];
+  } else if (status == ALAuthorizationStatusRestricted) {
+    [DFAnalytics logSetupPhotosCompletedWithResult:@"restricted"];
+    [UIAlertView showSimpleAlertWithTitle:@"Restricted"
+                                  message:@"Access to the photo library is restricted on this phone."];
+  } else if (status == ALAuthorizationStatusNotDetermined) {
+    ALAssetsLibrary *lib = [[ALAssetsLibrary alloc] init];
+    [lib enumerateGroupsWithTypes:ALAssetsGroupSavedPhotos usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+      [DFAnalytics logSetupPhotosCompletedWithResult:@"askedGranted"];
+      [self showNextStep];
+      *stop = YES;
+    } failureBlock:^(NSError *error) {
+      if (error) {
+        [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                      message:[NSString stringWithFormat:@"%@",
+                                               error.localizedDescription]];
+        DDLogWarn(@"Couldn't access camera roll, code: %ld", (long)error.code);
+        [DFAnalytics logSetupPhotosCompletedWithResult:@"error"];
+      }else{
+        [DFAnalytics logSetupPhotosCompletedWithResult:@"askedDenied"];
+      }
+    }];
+  }
+}
+
+- (void)showNextStep
+{
+  [[DFPhotoStore sharedStore] resetStore]; // this is a bit of a hack, need to put this in to initialize the DB and it's clear
+  [[DFCameraRollSyncManager sharedManager] sync];
+  [[DFUploadController sharedUploadController] uploadPhotos];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    DFLocationPermissionViewController *vc = [[DFLocationPermissionViewController alloc] init];
+    [self.navigationController setViewControllers:@[vc] animated:YES];
+  });
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return YES;
+}
+
+@end

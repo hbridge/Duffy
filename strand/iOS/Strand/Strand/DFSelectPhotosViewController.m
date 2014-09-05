@@ -399,7 +399,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     }
   }
   
-  strand.time_started = minDateFound;
+  strand.first_photo_time = minDateFound;
   strand.last_photo_time = maxDateFound;
 }
 

@@ -15,7 +15,7 @@
 #import "DFPhotoStore.h"
 #import "DFUser.h"
 #import "DFUserPeanutAdapter.h"
-#import "DFFirstTimeSetupViewController.h"
+#import "DFCreateAccountViewController.h"
 #import "HockeySDK.h"
 #import "DFStrandsManager.h"
 #import <RestKit/RestKit.h>
@@ -113,7 +113,7 @@
 
 - (void)showFirstTimeSetup
 {
-  DFFirstTimeSetupViewController *setupViewController = [[DFFirstTimeSetupViewController alloc] init];
+  DFCreateAccountViewController *setupViewController = [[DFCreateAccountViewController alloc] init];
   self.window.rootViewController = [[DFNavigationController alloc]
                                     initWithRootViewController:setupViewController];
 }

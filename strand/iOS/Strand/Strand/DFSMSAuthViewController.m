@@ -6,21 +6,22 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFSMSCodeEntryViewController.h"
+#import "DFSMSAuthViewController.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFUser.h"
 #import "NSString+DFHelpers.h"
 #import "DFAnalytics.h"
 #import "SVProgressHUD.h"
 #import "DFContactsViewController.h"
+#import "DFPhotosPermissionViewController.h"
 
 const UInt16 DFCodeLength = 4;
 
-@interface DFSMSCodeEntryViewController ()
+@interface DFSMSAuthViewController ()
 
 @end
 
-@implementation DFSMSCodeEntryViewController
+@implementation DFSMSAuthViewController
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -243,9 +244,8 @@ replacementString:(NSString *)string
 
 - (void)showNextStep
 {
-  DFContactsViewController *cvc = [[DFContactsViewController alloc] init];
-  cvc.showAsNUXStep = YES;
-  [self.navigationController setViewControllers:@[cvc] animated:YES];
+  DFPhotosPermissionViewController *vc = [[DFPhotosPermissionViewController alloc] init];
+  [self.navigationController setViewControllers:@[vc] animated:YES];
 }
 
 @end
