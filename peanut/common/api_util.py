@@ -73,7 +73,7 @@ def getPhotoObject(entry):
 
 
 """
-	Called from api_views, turns groups (by month or something else) into sections
+	Called from api_views, turns groups (by month or something else) into feedObjects
 	  that is converted to json and returned to the user
 
 	Limit the number of objects we add in by 'num'
@@ -81,7 +81,10 @@ def getPhotoObject(entry):
 	Takes as input:
 	groupings = [
 					{
-						'title': string,
+						'metadata': {
+							'title' : blah
+							'id' : 12
+							}
 						'clusters': 
 							[
 								[
@@ -100,24 +103,20 @@ def getPhotoObject(entry):
 				]
 
 """
-def turnFormattedGroupsIntoSections(formattedGroups, num):
+def turnFormattedGroupsIntoFeedObjects(formattedGroups, num):
 	result = list()
 	lastDate = None
 	count = 0
 	for group in formattedGroups:
-		section = {'type': 'section', 'title': group['title'], 'objects': list()}
+		feedObject = {'objects': list()}
 
-		if 'subtitle' in group:
-			section['subtitle'] = group['subtitle']
-
-		if 'id' in group:
-			section['id'] = group['id']
+		feedObject.update(group['metadata'])
 			
 		mostRecentPhotoDate = None
 		for cluster in group['clusters']:
 			if len(cluster) == 1:
 				photoData = getPhotoObject(cluster[0])
-				section['objects'].append(photoData)
+				feedObject['objects'].append(photoData)
 
 				if not mostRecentPhotoDate or photoData['time_taken'] > mostRecentPhotoDate:
 					mostRecentPhotoDate = photoData['time_taken']
@@ -129,26 +128,26 @@ def turnFormattedGroupsIntoSections(formattedGroups, num):
 					
 					if not mostRecentPhotoDate or photoData['time_taken'] > mostRecentPhotoDate:
 						mostRecentPhotoDate = photoData['time_taken']
-				section['objects'].append(clusterObj)
+				feedObject['objects'].append(clusterObj)
 
 			count += 1
 			if count == num:
 				if mostRecentPhotoDate:
-					section['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+					feedObject['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
-				result.append(section)
+				result.append(feedObject)
 				return result
 		if ('docs' in group and len(group['docs']) > 0):
 			docObj = {'type': 'docstack', 'title': 'Your docs', 'objects': list()}
 			for entry in group['docs']:
 				photoData = getPhotoObject(entry)
 				docObj['objects'].append(photoData)
-			section['objects'].append(docObj)
+			feedObject['objects'].append(docObj)
 
 		if mostRecentPhotoDate:
-			section['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+			feedObject['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
-		result.append(section)
+		result.append(feedObject)
 	return result
 
 def getRequestData(request):

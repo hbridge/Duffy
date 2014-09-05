@@ -89,3 +89,8 @@ DISTANCE_WITHIN_METERS_FOR_NEIGHBORING = 175
 # links for inviting
 INVITE_LINK_ENTERPRISE = 'bit.ly/1noDnx2' # bit.ly/strand-beta also works
 INVITE_LINK_APP_STORE = 'bit.ly/strand-appstore'
+
+FEED_OBJECT_TYPE_STRAND = 'section' # will be strand
+FEED_OBJECT_TYPE_INVITE_STRAND = 'invite_strand'
+FEED_OBJECT_TYPE_SUGGESTED_PHOTOS = 'suggested_photos'
+

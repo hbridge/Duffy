@@ -99,15 +99,33 @@ def groupDoesNotHaveUser(group, userId):
 
 	We do all the photos at once so we can load up the sims cache once
 
+	Takes in list of dicts::
+	[
+		{
+			'photos': [photo1, photo2]
+			'metadata' : {'strand_id': 12}
+		},
+		{
+			'photos': [photo1, photo2]
+			'metadata' : {'strand_id': 17}
+		}
+	]
+
 	Returns format of:
 	[
 		{
-			'title': blah
 			'clusters': clusters
+			'metadata': {'title': blah,
+						 'subtitle': blah2,
+						 'strand_id': 12
+						}
 		},
 		{
-			'title': blah2
 			'clusters': clusters
+			'metadata': {'title': blah3,
+						 'subtitle': blah4,
+						 'strand_id': 17
+						}
 		},
 	]
 """
@@ -135,7 +153,6 @@ def getFormattedGroups(groups, userId):
 		# Grab title from the location_city of a photo...but find the first one that has
 		#   a valid location_city
 		bestLocation = None
-		subtitle = ""
 		i = 0
 		while (not bestLocation) and i < len(group['photos']):
 			bestLocation = getBestLocation(group['photos'][i])
@@ -157,15 +174,18 @@ def getFormattedGroups(groups, userId):
 			title = ", ".join(names) + " and You"
 
 		if bestLocation:
-			subtitle = bestLocation
+			location = bestLocation
 		else:
-			subtitle = "Location Unknown"
+			location = "Location Unknown"
 			
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
-		
-		output.append({'title': title, 'subtitle': subtitle, 'clusters': clusters, 'id': group['id']})
+
+		metadata = group['metadata']
+		metadata.update({'title': title, 'subtitle': location, 'location': location})
+
+		output.append({'clusters': clusters, 'metadata': metadata})
 	return output
 
 """
@@ -233,29 +253,28 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 	return user
 
-#####################################################################################
-#################################  EXTERNAL METHODS  ################################
-#####################################################################################
-
-def getObjectsDataForPhotos(userId, photos):
-	groups = [{'photos': photos, 'id': None}]
+def getObjectsDataForPhotos(userId, photos, feedObjectType):
+	metadata = {'type': feedObjectType}
+	groups = [{'photos': photos, 'metadata': metadata}]
 
 	formattedGroups = getFormattedGroups(groups, userId)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
 
-def getObjectsDataForStrands(userId, strands):
+def getObjectsDataForStrands(userId, strands, feedObjectType):
 	# list of list of photos
 	groups = list()
 	for strand in strands:
 		strandId = strand.id			
 		photos = strand.photos.all().order_by("-time_taken")
-		entry = {'photos': photos, 'id': strandId}
+		
+		metadata = {'type': feedObjectType, 'id': strandId}
+		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
-			groups.append(entry)
+			groups.append(groupEntry)
 
 	if len(groups) > 0:
 		# now sort groups by the time_taken of the first photo in each group
@@ -264,9 +283,16 @@ def getObjectsDataForStrands(userId, strands):
 	formattedGroups = getFormattedGroups(groups, userId)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
-	
+
+#####################################################################################
+#################################  EXTERNAL METHODS  ################################
+#####################################################################################
+
+
+# ----------------------- FEED ENDPOINTS --------------------
+
 def invited_strands(request):
 	response = dict({'result': True})
 
@@ -277,8 +303,14 @@ def invited_strands(request):
 		
 		strandInvites = StrandInvite.objects.select_related().filter(phone_number=user.phone_number).exclude(skip=True).filter(accepted_user__isnull=True)
 
-		strands = set([x.strand for x in strandInvites])
-		response['objects'] = getObjectsDataForStrands(user.id, strands)
+		responseObjects = list()
+
+		for strandInvite in strandInvites:
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id}
+			entry['objects'] = getObjectsDataForStrands(user.id, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			responseObjects.append(entry)
+			
+		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
@@ -299,10 +331,9 @@ def unshared_strands(request):
 		
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
-		response['objects'] = getObjectsDataForStrands(user.id, strands)
+		response['objects'] = getObjectsDataForStrands(user.id, strands, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
@@ -325,6 +356,7 @@ def suggested_unshared_photos(request):
 		# Get all the unshared strands for the given user that are close to the given strand
 		unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 		
+		print unsharedStrands
 		unsharedPhotos = list()
 		for unsharedStrand in unsharedStrands:
 			unsharedPhotos.extend(unsharedStrand.photos.all())
@@ -339,10 +371,9 @@ def suggested_unshared_photos(request):
 
 			matchingPhotos = sorted(matchingPhotos, key=lambda x: x.time_taken, reverse=True)
 	
-		response['objects'] = getObjectsDataForPhotos(user.id, matchingPhotos)
+		response['objects'] = getObjectsDataForPhotos(user.id, matchingPhotos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
@@ -371,13 +402,14 @@ def strand_feed(request):
 		for strand in strands:
 			strandId = strand.id
 			photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
-			entry = {'photos': photos, 'id': strandId}
+			metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strandId}
+			entry = {'photos': photos, 'metadata': metadata}
 
 			if len(photos) > 0:
 				groups.append(entry)
 
+		# now sort groups by the time_taken of the first photo in each group
 		if len(groups) > 0:
-			# now sort groups by the time_taken of the first photo in each group
 			groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 		# Lastly, grab all our locked strands and add in those photos
@@ -386,7 +418,8 @@ def strand_feed(request):
 			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 			lockedGroup = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
 			# TODO: get a real id for locked group
-			entry = {'photos': lockedGroup, 'id': 0}
+			metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': 0}
+			entry = {'photos': lockedGroup, 'metadata': metadata}
 
 			if len(lockedGroup) > 0:
 				groups.insert(0, entry)
@@ -398,11 +431,10 @@ def strand_feed(request):
 			formattedGroups[0]['title'] = "Locked"
 			
 		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
+		objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 		response['objects'] = objects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
@@ -432,14 +464,11 @@ def get_joinable_strands(request):
 		strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
 
 		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, lon, lat, strands, friendsData)
-
-		formattedGroups = getFormattedGroups([{'photos': joinableStrandPhotos, 'id': 0}], user.id)
-		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
-		response['objects'] = objects
-
-		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+		
+		response['objects'] = getObjectsDataForPhotos(user.id, joinableStrandPhotos, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
 	Returns back any new photos in the user's strands after the given date and time
@@ -462,13 +491,15 @@ def get_new_photos(request):
 
 		photoList = removeDups(photoList, lambda x: x.id)
 
-		formattedGroups = getFormattedGroups([{'photos':photoList, 'id': 0}], user.id)
-		objects = api_util.turnFormattedGroupsIntoSections(formattedGroups, 1000)
-		response['objects'] = objects
-
-		return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+		response['objects'] = getObjectsDataForPhotos(user.id, photoList, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
+#   -------------------------  OTHER ENDPOINTS ---------------------
+
+
 
 """
 	Registers a user's current location (and only stores the last location)
