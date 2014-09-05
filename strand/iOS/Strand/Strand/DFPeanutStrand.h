@@ -27,7 +27,7 @@
 @interface DFPeanutStrand : NSObject <DFPeanutObject>
 
 @property (nonatomic, retain) NSNumber  *id;
-@property (nonatomic, retain) NSDate *time_started;
+@property (nonatomic, retain) NSDate *first_photo_time;
 @property (nonatomic, retain) NSDate *last_photo_time;
 @property (nonatomic) BOOL shared;
 @property (nonatomic, retain) NSDate *added;
