@@ -16,4 +16,9 @@
             success:(DFPeanutRestFetchSuccess)success
             failure:(DFPeanutRestFetchFailure)failure;
 
+
+- (void)markInviteWithIDUsed:(NSNumber *)inviteID
+            success:(DFPeanutRestFetchSuccess)success
+            failure:(DFPeanutRestFetchFailure)failure;
+
 @end

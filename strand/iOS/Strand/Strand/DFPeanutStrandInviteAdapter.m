@@ -8,6 +8,7 @@
 
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFPeanutStrandInvite.h"
+#import "DFUser.h"
 
 NSString *const StrandInviteBasePath = @"strand_invite/";
 
@@ -46,6 +47,39 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
    forceCollection:YES
    success:^(NSArray *resultObjects) {
      success(success);
+   } failure:^(NSError *error) {
+     failure(failure);
+   }];
+}
+
+
+
+- (void)markInviteWithIDUsed:(NSNumber *)inviteID
+                     success:(DFPeanutRestFetchSuccess)success
+                     failure:(DFPeanutRestFetchFailure)failure
+{
+  NSString *invitePath = [StrandInviteBasePath stringByAppendingPathComponent:[inviteID stringValue]];
+  // get the invite object
+  [super
+   performRequest:RKRequestMethodGET
+   withPath:invitePath
+   objects:nil
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     DFPeanutStrandInvite *fetchedInvite = resultObjects.firstObject;
+     fetchedInvite.accepted_user_id = @([[DFUser currentUser] userID]);
+     [super
+      performRequest:RKRequestMethodPUT
+      withPath:invitePath
+      objects:@[fetchedInvite]
+      parameters:nil
+      forceCollection:NO
+      success:^(NSArray *resultObjects) {
+        success(resultObjects);
+      } failure:^(NSError *error) {
+        failure(error);
+      }];
    } failure:^(NSError *error) {
      failure(failure);
    }];

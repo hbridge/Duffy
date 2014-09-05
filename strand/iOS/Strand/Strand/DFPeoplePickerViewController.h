@@ -32,6 +32,7 @@
 @property (nonatomic, retain) NSArray *abSearchResults;
 @property (nonatomic, retain) NSString *textNumberString;
 @property (nonatomic) BOOL allowsMultipleSelection;
+@property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
 
 - (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView;
 

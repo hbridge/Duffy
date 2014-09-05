@@ -84,6 +84,11 @@
   self.tokenField.placeholderText = @"Enter a name or phone number";
 }
 
+- (NSArray *)selectedPeanutContacts
+{
+  return self.selectedContacts;
+}
+
 #pragma mark - Text Field Changes and Filtering
 
 - (void)tokenField:(VENTokenField *)tokenField didChangeText:(NSString *)text

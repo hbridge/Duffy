@@ -18,6 +18,7 @@
 #import "DFPhotoViewCell.h"
 #import "DFImageStore.h"
 #import "DFPeanutStrand.h"
+#import "DFPeanutStrandInviteAdapter.h"
 
 CGFloat const ToFieldHeight = 44.0;
 
@@ -318,6 +319,17 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
         }];
         // mark the selected photos for upload
         [self markPhotosForUpload:self.selectedPhotoIDs];
+        
+        // mark the invite as used
+        DFPeanutStrandInviteAdapter *strandInviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+        [strandInviteAdapter
+         markInviteWithIDUsed:@(0)
+         success:^(NSArray *resultObjects) {
+           DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
+        } failure:^(NSError *error) {
+          DDLogWarn(@"Failed to mark invite used: %@", error);
+        }];
+        
       } failure:^(NSError *error) {
         [SVProgressHUD showErrorWithStatus:@"Failed."];
         DDLogError(@"%@ failed to put strand: %@, error: %@",
@@ -332,6 +344,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)createNewStrandWithSelection
 {
+  // Create the strand
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectedPhotoIDs;
@@ -340,19 +353,36 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   
   [SVProgressHUD show];
   DFPeanutStrandAdapter *strandAdapter = [[DFPeanutStrandAdapter alloc] init];
-  [strandAdapter performRequest:RKRequestMethodPOST
-               withPeanutStrand:requestStrand success:^(DFPeanutStrand *peanutStrand) {
-                 DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
-                 [self dismissViewControllerAnimated:YES completion:^{
-                   [SVProgressHUD showSuccessWithStatus:@"Success!"];
-                 }];
-                 [self markPhotosForUpload:peanutStrand.photos];
-               } failure:^(NSError *error) {
-                 [SVProgressHUD showErrorWithStatus:@"Failed."];
-                 DDLogError(@"%@ failed to create strand: %@, error: %@",
-                            self.class, requestStrand, error);
-               }];
-
+  [strandAdapter
+   performRequest:RKRequestMethodPOST
+   withPeanutStrand:requestStrand success:^(DFPeanutStrand *peanutStrand) {
+     DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
+     // invite selected users
+     DFPeanutStrandInviteAdapter *inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+     NSMutableArray *invites = [NSMutableArray new];
+     for (DFPeanutContact *contact in self.peoplePicker.selectedPeanutContacts) {
+       DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
+       invite.user = @([[DFUser currentUser] userID]);
+       invite.strand = peanutStrand.id;
+       invite.phone_number = contact.phone_number;
+       [invites addObject:invite];
+     }
+     [inviteAdapter postInvites:invites success:^(NSArray *resultObjects) {
+       [self dismissViewControllerAnimated:YES completion:^{
+         [SVProgressHUD showSuccessWithStatus:@"Success!"];
+       }];
+     } failure:^(NSError *error) {
+       [self dismissViewControllerAnimated:YES completion:^{
+         [SVProgressHUD showErrorWithStatus:@"Inviting friends failed."];
+       }];
+     }];
+     
+     [self markPhotosForUpload:peanutStrand.photos];
+   } failure:^(NSError *error) {
+     [SVProgressHUD showErrorWithStatus:@"Failed."];
+     DDLogError(@"%@ failed to create strand: %@, error: %@",
+                self.class, requestStrand, error);
+   }];
 }
 
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects

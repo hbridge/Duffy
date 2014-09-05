@@ -21,7 +21,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"user", @"strand", @"phone_number"];
+  return @[@"user", @"strand", @"phone_number", @"accepted_user_id"];
 }
 
 - (NSString *)description
