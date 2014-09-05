@@ -143,7 +143,7 @@ def main(argv):
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-			strandsCache = list(Strand.objects.select_related().filter(time_started__gt=timeLow).filter(last_photo_time__lt=timeHigh))
+			strandsCache = list(Strand.objects.select_related().filter(first_photo_time__gt=timeLow).filter(last_photo_time__lt=timeHigh))
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
@@ -202,7 +202,7 @@ def main(argv):
 					# If we're creating a strand with a photo that wasn't taken with strand, then turn off sharing
 					shared = photo.taken_with_strand
 					
-					newStrand = Strand.objects.create(time_started = photo.time_taken, last_photo_time = photo.time_taken, shared = shared)
+					newStrand = Strand.objects.create(first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, shared = shared)
 					strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId)
 					strandsCreated.append(newStrand)
 					strandsCache.append(newStrand)

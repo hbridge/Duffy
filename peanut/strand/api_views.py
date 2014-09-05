@@ -320,10 +320,10 @@ def suggested_unshared_photos(request):
 		strand = form.cleaned_data['strand']
 
 		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
-		timeLow = strand.time_started - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+		timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
 		# Get all the unshared strands for the given user that are close to the given strand
-		unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(time_started__gt=timeLow)
+		unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 		
 		unsharedPhotos = list()
 		for unsharedStrand in unsharedStrands:

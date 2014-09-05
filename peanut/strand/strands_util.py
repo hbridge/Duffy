@@ -61,8 +61,8 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 		strand.last_photo_time = photo.time_taken
 		strand.save()
 
-	if photo.time_taken < strand.time_started:
-		strand.time_started = photo.time_taken
+	if photo.time_taken < strand.first_photo_time:
+		strand.first_photo_time = photo.time_taken
 		strand.save()
 	
 	if strand.id not in photosByStrandId:
