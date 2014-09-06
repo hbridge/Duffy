@@ -41,8 +41,8 @@ urlpatterns = patterns('',
 
 	url(r'^contacts/$', strand_rest_api_views.ContactEntryBulkAPI.as_view()),
 
-	url(r'^strands/$', CreateAPIView.as_view(model=Strand, lookup_field='id')),	
-	url(r'^strands/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Strand, lookup_field='id')),
+	url(r'^strands/$', strand_rest_api_views.CreateStrandAPI.as_view(model=Strand, lookup_field='id')),	
+	url(r'^strands/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyStrandAPI.as_view(model=Strand, lookup_field='id')),
 
 	url(r'^strand_invite/$', strand_rest_api_views.StrandInviteBulkAPI.as_view()),
 	url(r'^strand_invite/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=StrandInvite, lookup_field='id')),

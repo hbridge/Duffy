@@ -6,7 +6,7 @@ import phonenumbers
 
 from django.shortcuts import get_list_or_404
 
-from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
@@ -140,4 +140,28 @@ class CreatePhotoActionAPI(CreateAPIView):
                 return super(CreatePhotoActionAPI, self).post(request)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+def updateStrandWithCorrectPhotoTimes(strand):
+    for photo in strand.photos.all():
+        if photo.time_taken > strand.last_photo_time:
+            strand.last_photo_time = photo.time_taken
+
+        if photo.time_taken < strand.first_photo_time:
+            strand.first_photo_time = photo.time_taken
+
+"""
+    REST interface for creating new PhotoActions.
+
+    Use a custom overload of the create method so we don't double create likes
+"""
+class CreateStrandAPI(CreateAPIView):
+    def post_save(self, obj, created):
+        updateStrandWithCorrectPhotoTimes(obj)
+        obj.save()
+        
+class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
+    def pre_save(self, obj):
+        updateStrandWithCorrectPhotoTimes(obj)
 
