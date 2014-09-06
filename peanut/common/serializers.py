@@ -51,8 +51,6 @@ class BulkContactEntrySerializer(serializers.Serializer):
 	bulk_key = 'contacts'
 
 class StrandInviteSerializer(serializers.ModelSerializer):
-	phone_number = serializers.CharField()
-
 	class Meta:
 		model = StrandInvite
 

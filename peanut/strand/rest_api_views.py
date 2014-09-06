@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
 
-from common.models import PhotoAction, ContactEntry, StrandInvite
+from common.models import PhotoAction, ContactEntry, StrandInvite, User
 from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 logger = logging.getLogger(__name__)
@@ -109,16 +109,23 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
 
         TODO(Derek): Can this be combined with ContactEntryBulkAPI?
     """
-    def pre_save(self, obj):
-        logger.info("Doing a StrandInvite bulk update for user %s of strand %s and number %s" % (obj.user, obj.strand, obj.phone_number))
+    def pre_save(self, strandInvite):
+        logger.info("Doing a StrandInvite bulk update for user %s of strand %s and number %s" % (strandInvite.user, strandInvite.strand, strandInvite.phone_number))
         foundMatch = False      
-        for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, "US"):
+        for match in phonenumbers.PhoneNumberMatcher(strandInvite.phone_number, "US"):
             foundMatch = True
-            obj.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
+            strandInvite.phone_number = phonenumbers.format_number(match.number, phonenumbers.PhoneNumberFormat.E164)
 
         if not foundMatch:
             logger.info("Parse error for Strand Invite")
-            obj.skip = True
+            strandInvite.skip = True
+        else:
+            # Found a valid phone number, now lets see if we can find a valid user for that
+            try:
+                user = User.objects.get(phone_number=strandInvite.phone_number)
+                strandInvite.invited_user = user
+            except User.DoesNotExist:
+                logger.debug("Looked for %s but didn't find matching user" % (strandInvite.phone_number))
             
 """
     REST interface for creating new PhotoActions.
@@ -142,14 +149,17 @@ class CreatePhotoActionAPI(CreateAPIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 def updateStrandWithCorrectPhotoTimes(strand):
+    changed = False
     for photo in strand.photos.all():
         if photo.time_taken > strand.last_photo_time:
             strand.last_photo_time = photo.time_taken
+            changed = True
 
         if photo.time_taken < strand.first_photo_time:
             strand.first_photo_time = photo.time_taken
+            changed = True
+    return changed
 
 """
     REST interface for creating new PhotoActions.
@@ -157,11 +167,17 @@ def updateStrandWithCorrectPhotoTimes(strand):
     Use a custom overload of the create method so we don't double create likes
 """
 class CreateStrandAPI(CreateAPIView):
-    def post_save(self, obj, created):
-        updateStrandWithCorrectPhotoTimes(obj)
-        obj.save()
+    def post_save(self, strand, created):
+        changed = updateStrandWithCorrectPhotoTimes(strand)
+        if changed:
+            logger.debug("Updated strand %d with new times" % (strand.id))
+            strand.save()
+
+        logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
         
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
-    def pre_save(self, obj):
-        updateStrandWithCorrectPhotoTimes(obj)
+    def pre_save(self, strand):
+        updateStrandWithCorrectPhotoTimes(strand)
+
+        logger.info("Updated strand %s", (obj.id))
 

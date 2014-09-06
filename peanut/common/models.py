@@ -544,6 +544,7 @@ class StrandInvite(models.Model):
 	strand = models.ForeignKey(Strand, db_index=True)
 	user = models.ForeignKey(User, db_index=True, related_name="inviting_user")
 	phone_number = models.CharField(max_length=128, db_index=True) 
+	invited_user = models.ForeignKey(User, null=True, db_index=True, related_name="invited_user")
 	accepted_user = models.ForeignKey(User, null=True, db_index=True, related_name="accepted_user")
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	skip = models.BooleanField(default=False, db_index=True)
