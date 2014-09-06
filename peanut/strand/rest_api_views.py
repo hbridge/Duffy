@@ -3,6 +3,7 @@ import datetime
 import logging
 import re
 import phonenumbers
+from threading import Thread
 
 from django.shortcuts import get_list_or_404
 
@@ -11,8 +12,12 @@ from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
 
+from peanut.settings import constants
+
 from common.models import PhotoAction, ContactEntry, StrandInvite, User
 from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
+
+from strand import notifications_util
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +66,7 @@ class BulkCreateModelMixin(CreateModelMixin):
                 results.extend(model.objects.filter(bulk_batch_key = batchKey).filter(added__gt=dt))
 
             serializer.object[serializer.bulk_key] = results
-            [self.post_save(obj, created=True) for obj in serializer.object]
+            [self.post_save(obj, created=True) for obj in serializer.object[serializer.bulk_key]]
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -104,6 +109,13 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
     lookup_field = 'id'
     serializer_class = BulkStrandInviteSerializer
 
+    def sendNotification(self, strandInviteId):
+        strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
+        msg = "%s just invited you to look at their Strand in %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
+        
+        if strandInvite.invited_user:
+            notifications_util.sendNotification(strandInvite.invited_user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, None)
+
     """
         Clean up the phone number and set it.  Should only be one number per entry
 
@@ -126,7 +138,13 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
                 strandInvite.invited_user = user
             except User.DoesNotExist:
                 logger.debug("Looked for %s but didn't find matching user" % (strandInvite.phone_number))
-            
+
+    def post_save(self, strandInvite, created):
+        if created:
+            print strandInvite
+            thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
+            thread.start()
+            logger.debug("Just started thread to send notification about strand invite")            
 """
     REST interface for creating new PhotoActions.
 
