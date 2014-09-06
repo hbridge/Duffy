@@ -71,7 +71,7 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
    forceCollection:NO
    success:^(NSArray *resultObjects) {
      DFPeanutStrandInvite *fetchedInvite = resultObjects.firstObject;
-     fetchedInvite.accepted_user_id = @([[DFUser currentUser] userID]);
+     fetchedInvite.accepted_user = @([[DFUser currentUser] userID]);
      [super
       performRequest:RKRequestMethodPUT
       withPath:invitePath
