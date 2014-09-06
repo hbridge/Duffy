@@ -33,7 +33,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from common.models import Photo, User, Neighbor, Similarity
+from common.models import Photo, User, Similarity
 from common.serializers import PhotoSerializer, UserSerializer
 from common import api_util, cluster_util
 

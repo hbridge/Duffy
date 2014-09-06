@@ -342,23 +342,6 @@ class Similarity(models.Model):
 	def __unicode__(self):
 		return '{0}, {1}, {2}'.format(self.photo_1.id, self.photo_2.id, self.similarity)
 
-
-class Neighbor(models.Model):
-	user_1 = models.ForeignKey(User, related_name="neighbor_user_1")
-	user_2 = models.ForeignKey(User, related_name="neighbor_user_2")
-	photo_1 = models.ForeignKey(Photo, related_name="neighbor_photo_1")
-	photo_2 = models.ForeignKey(Photo, related_name="neighbor_photo_2")
-	time_distance_sec = models.IntegerField()
-	geo_distance_m = models.IntegerField()
-	added = models.DateTimeField(auto_now_add=True)
-
-	class Meta:
-		unique_together = ("photo_1", "photo_2")
-		db_table = 'strand_neighbor'
-
-	def __unicode__(self):
-		return '{0}, {1}, {2}, {3}'.format(self.photo_1.id, self.photo_2.id, self.time_distance_sec, self.geo_distance_m)
-
 class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
 	device_token = models.TextField(null=True)
@@ -536,6 +519,13 @@ class Strand(models.Model):
 	users_link.allow_tags = True
 	users_link.short_description = "Users"
 	
+	@classmethod
+	def getIds(cls, objs):
+		ids = list()
+		for obj in objs:
+			ids.append(obj.id)
+
+		return ids
 
 	class Meta:
 		db_table = 'strand_objects'
@@ -567,3 +557,15 @@ class StrandInvite(models.Model):
 
 		bulk_updater.bulk_update(objs, update_fields=attributesList)
 
+
+class StrandNeighbor(models.Model):
+	strand_1 = models.ForeignKey(Strand, db_index=True, related_name = "strand_1")
+	strand_2 = models.ForeignKey(Strand, db_index=True, related_name = "strand_2")
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)	
+
+	def __unicode__(self):
+		return str(self.id)
+		
+	class Meta:
+		db_table = 'strand_neighbor'
