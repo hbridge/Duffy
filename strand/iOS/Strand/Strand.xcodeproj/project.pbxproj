@@ -48,8 +48,7 @@
 		5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344C196340A0003D7546 /* DFPhotoResizer.m */; };
 		5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A40344E19646BC6003D7546 /* AudioToolbox.framework */; };
 		5A4BBD2B19B7D55500359299 /* DFPeanutStrandFeedAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2A19B7D55500359299 /* DFPeanutStrandFeedAdapter.m */; };
-		5A4BBD2E19B8BA0100359299 /* DFStrandInviteTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2D19B8BA0100359299 /* DFStrandInviteTableViewCell.m */; };
-		5A4BBD3019B8BA8500359299 /* DFStrandInviteTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2F19B8BA8500359299 /* DFStrandInviteTableViewCell.xib */; };
+		5A4BBD3019B8BA8500359299 /* DFCreateStrandTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2F19B8BA8500359299 /* DFCreateStrandTableViewCell.xib */; };
 		5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */; };
 		5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */; };
 		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
@@ -113,7 +112,6 @@
 		5AAF038719B0D5AE00EF021C /* DFSelectPhotosViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF038519B0D5AE00EF021C /* DFSelectPhotosViewController.m */; };
 		5AAF038819B0D5AE00EF021C /* DFSelectPhotosViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF038619B0D5AE00EF021C /* DFSelectPhotosViewController.xib */; };
 		5AAF038C19B0D99200EF021C /* DFCreateStrandTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF038A19B0D99200EF021C /* DFCreateStrandTableViewCell.m */; };
-		5AAF038D19B0D99200EF021C /* DFCreateStrandTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF038B19B0D99200EF021C /* DFCreateStrandTableViewCell.xib */; };
 		5AAF039119B0DBAE00EF021C /* DFCollectionViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF038F19B0DBAE00EF021C /* DFCollectionViewTableViewCell.m */; };
 		5AAF039219B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AAF039019B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib */; };
 		5AAF039519B10A7200EF021C /* DFSelectablePhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF039419B10A7200EF021C /* DFSelectablePhotoViewCell.m */; };
@@ -283,9 +281,7 @@
 		5A40344E19646BC6003D7546 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		5A4BBD2919B7D55500359299 /* DFPeanutStrandFeedAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutStrandFeedAdapter.h; sourceTree = "<group>"; };
 		5A4BBD2A19B7D55500359299 /* DFPeanutStrandFeedAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutStrandFeedAdapter.m; sourceTree = "<group>"; };
-		5A4BBD2C19B8BA0100359299 /* DFStrandInviteTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandInviteTableViewCell.h; sourceTree = "<group>"; };
-		5A4BBD2D19B8BA0100359299 /* DFStrandInviteTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandInviteTableViewCell.m; sourceTree = "<group>"; };
-		5A4BBD2F19B8BA8500359299 /* DFStrandInviteTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandInviteTableViewCell.xib; sourceTree = "<group>"; };
+		5A4BBD2F19B8BA8500359299 /* DFCreateStrandTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCreateStrandTableViewCell.xib; sourceTree = "<group>"; };
 		5A4BBD3C19BA4F9600359299 /* DFPhotosPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotosPermissionViewController.h; sourceTree = "<group>"; };
 		5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotosPermissionViewController.m; sourceTree = "<group>"; };
 		5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotosPermissionViewController.xib; sourceTree = "<group>"; };
@@ -393,7 +389,6 @@
 		5AAF038619B0D5AE00EF021C /* DFSelectPhotosViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSelectPhotosViewController.xib; sourceTree = "<group>"; };
 		5AAF038919B0D99200EF021C /* DFCreateStrandTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCreateStrandTableViewCell.h; sourceTree = "<group>"; };
 		5AAF038A19B0D99200EF021C /* DFCreateStrandTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCreateStrandTableViewCell.m; sourceTree = "<group>"; };
-		5AAF038B19B0D99200EF021C /* DFCreateStrandTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCreateStrandTableViewCell.xib; sourceTree = "<group>"; };
 		5AAF038E19B0DBAE00EF021C /* DFCollectionViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCollectionViewTableViewCell.h; sourceTree = "<group>"; };
 		5AAF038F19B0DBAE00EF021C /* DFCollectionViewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCollectionViewTableViewCell.m; sourceTree = "<group>"; };
 		5AAF039019B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCollectionViewTableViewCell.xib; sourceTree = "<group>"; };
@@ -973,10 +968,7 @@
 				5AAF037B19AF86BF00EF021C /* DFCreateStrandViewController.xib */,
 				5AAF038919B0D99200EF021C /* DFCreateStrandTableViewCell.h */,
 				5AAF038A19B0D99200EF021C /* DFCreateStrandTableViewCell.m */,
-				5AAF038B19B0D99200EF021C /* DFCreateStrandTableViewCell.xib */,
-				5A4BBD2C19B8BA0100359299 /* DFStrandInviteTableViewCell.h */,
-				5A4BBD2D19B8BA0100359299 /* DFStrandInviteTableViewCell.m */,
-				5A4BBD2F19B8BA8500359299 /* DFStrandInviteTableViewCell.xib */,
+				5A4BBD2F19B8BA8500359299 /* DFCreateStrandTableViewCell.xib */,
 				5AAF038419B0D5AE00EF021C /* DFSelectPhotosViewController.h */,
 				5AAF038519B0D5AE00EF021C /* DFSelectPhotosViewController.m */,
 				5AAF038619B0D5AE00EF021C /* DFSelectPhotosViewController.xib */,
@@ -1332,11 +1324,10 @@
 				5A9BC31219A26A34002D1CD7 /* DFGallerySectionHeader.xib in Resources */,
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
-				5A4BBD3019B8BA8500359299 /* DFStrandInviteTableViewCell.xib in Resources */,
+				5A4BBD3019B8BA8500359299 /* DFCreateStrandTableViewCell.xib in Resources */,
 				5AA45296196708D00099CBD2 /* DFPhotosGridViewController.xib in Resources */,
 				5A7F8FFE19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib in Resources */,
 				5AF32EC4197C6444004B5CC4 /* DFPhotoFeedCell.xib in Resources */,
-				5AAF038D19B0D99200EF021C /* DFCreateStrandTableViewCell.xib in Resources */,
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
 				5AAF038819B0D5AE00EF021C /* DFSelectPhotosViewController.xib in Resources */,
 				5AA9292B19A6502200032A3F /* DFPeoplePickerViewController.xib in Resources */,
@@ -1517,7 +1508,6 @@
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
 				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
-				5A4BBD2E19B8BA0100359299 /* DFStrandInviteTableViewCell.m in Sources */,
 				6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */,
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */,

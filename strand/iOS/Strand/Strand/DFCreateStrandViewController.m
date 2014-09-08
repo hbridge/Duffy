@@ -20,7 +20,12 @@
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFPeanutStrandAdapter.h"
 #import "DFImageStore.h"
-#import "DFStrandInviteTableViewCell.h"
+#import "NSString+DFHelpers.h"
+
+const CGFloat CreateCellWithTitleHeight = 192;
+const CGFloat CreateCellTitleHeight = 20;
+const CGFloat CreateCellTitleSpacing = 8;
+
 
 @interface DFCreateStrandViewController ()
 
@@ -89,10 +94,10 @@
 - (void)configureTableView
 {
   [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"suggestion"];
-
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFStrandInviteTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"invite"];
+       forCellReuseIdentifier:@"cellWithTitle"];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+       forCellReuseIdentifier:@"cellNoTitle"];
+  
 }
 
 - (void)viewDidLoad
@@ -158,35 +163,38 @@
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
-    cell = [self cellWithObject:strandObject isInviteCell:YES];
+    cell = [self cellWithStrandObject:strandObject isInviteCell:YES];
   } else {
-    cell = [self cellWithObject:feedObject isInviteCell:NO];
+    cell = [self cellWithStrandObject:feedObject isInviteCell:NO];
   }
   
   return cell;
 }
 
-- (UITableViewCell *)cellWithObject:(DFPeanutFeedObject *)suggestion
+- (UITableViewCell *)cellWithStrandObject:(DFPeanutFeedObject *)strandObject
                              isInviteCell:(BOOL)isInviteCell
 {
   DFCreateStrandTableViewCell *cell;
-  if (isInviteCell) {
-    cell = [self.tableView dequeueReusableCellWithIdentifier:@"invite"];
+  if ([strandObject.title isNotEmpty]) {
+   cell = [self.tableView dequeueReusableCellWithIdentifier:@"cellWithTitle"];
   } else {
-    cell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"cellNoTitle"];
+    if (cell.titleLabel.superview) [cell.titleLabel removeFromSuperview];
   }
   
+  DFPeanutFeedObject *photoObject = strandObject.objects.firstObject;
+  if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
+  
   // Set the header attributes
-  cell.locationLabel.text = suggestion.subtitle;
-  cell.countLabel.text = [@(suggestion.objects.count) stringValue];
-  DFPeanutFeedObject *firstObject = suggestion.objects.firstObject;
-  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:firstObject.time_taken];
+  cell.titleLabel.text = strandObject.title;
+  cell.locationLabel.text = strandObject.subtitle;
+  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
+                         stringFromDate:photoObject.time_taken];
   
   if (isInviteCell) {
-    [self setRemotePhotosForCell:cell withSection:suggestion];
-    [(DFStrandInviteTableViewCell *)cell titleLabel].text = suggestion.title;
+    [self setRemotePhotosForCell:cell withSection:strandObject];
   } else {
-    [self setLocalPhotosForCell:cell section:suggestion];
+    [self setLocalPhotosForCell:cell section:strandObject];
   }
   
   return cell;
@@ -254,11 +262,10 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if ([self shouldShowInvites] && indexPath.section == 0) {
-    return 189.0;
-  }
-  
-  return 170.0;
+  DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]
+      || [feedObject.title isNotEmpty]) return CreateCellWithTitleHeight;
+  else return CreateCellWithTitleHeight - CreateCellTitleHeight - CreateCellTitleSpacing;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
