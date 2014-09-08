@@ -15,6 +15,7 @@
 @property (nonatomic) NSNumber *strand;
 @property (nonatomic) NSNumber *user;
 @property (nonatomic, retain) NSString *phone_number;
-@property (nonatomic, retain) NSNumber *accepted_user_id;
+@property (nonatomic, retain) NSNumber *accepted_user;
+@property (nonatomic, retain) NSNumber *invited_user;
 
 @end
