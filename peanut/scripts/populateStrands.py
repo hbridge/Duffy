@@ -12,12 +12,43 @@ if parentPath not in sys.path:
 from django.db.models import Count
 
 from peanut.settings import constants
-from common.models import Photo, Strand, User
+from common.models import Photo, Strand, User, StrandNeighbor
 
 from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
 
 logger = logging.getLogger(__name__)
+
+def processWithExisting(existingNeighborRows, newNeighborRows):
+	existing = dict()
+	rowsToCreate = list()
+
+	for row in existingNeighborRows:
+		id1 = row.strand_1_id
+		id2 = row.strand_2_id
+
+		if id1 not in existing:
+			existing[id1] = dict()
+		existing[id1][id2] = True
+
+	for newRow in newNeighborRows:
+		id1 = newRow.strand_1_id
+		id2 = newRow.strand_2_id
+
+		if id1 in existing and id2 in existing[id1]:
+			pass
+		else:
+			rowsToCreate.append(newRow)
+	return rowsToCreate
+
+
+def getAllStrandIds(neighborRows):
+	strandIds = list()
+	for row in neighborRows:
+		strandIds.append(row.strand_1_id)
+		strandIds.append(row.strand_2_id)
+
+	return set(strandIds)
 
 """
 	Takes in:
@@ -139,6 +170,7 @@ def main(argv):
 			# Used for notifications
 			photoToStrandIdDict = dict()
 			photos = list(photos)
+			strandNeighborsToCreate = list()
 
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
@@ -151,24 +183,30 @@ def main(argv):
 
 			for photo in photos:
 				matchingStrands = list()
+				strandNeighbors = list()
 
 				for strand in strandsCache:
 					users = strand.users.all()
 
 					if len(users) == 0:
 						logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
+						# remove from our cache and db
+						strandsCache = filter(lambda a: a.id != strand.id, strandsCache)
+						logger.debug("Deleted strand %s" % strand.id)
+						strand.delete()
 						continue
 					
-					# If this is a non-shared strand (solo) and the photo doesn't belong to the strand's user, don't match
-					if not strand.shared and photo.user_id != users[0].id:
-						continue
-					
-					# If the photo wasn't taken with strand (is private) and the strand is shared, don't match
-					if not photo.taken_with_strand and strand.shared:
-						continue
-						
 					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
-						matchingStrands.append(strand)
+						# If this is a private strand and the photo doesn't belong to the strand's user
+						#   then create strand neighbor entry
+						if not strand.shared and photo.user_id != users[0].id:
+							strandNeighbors.append(strand)
+						# If the photo wasn't taken with strand (is private) and the strand is shared
+						#    then create a strand neighbor entry
+						elif not photo.taken_with_strand and strand.shared:
+							strandNeighbors.append(strand)
+						else:
+							matchingStrands.append(strand)
 				
 				if len(matchingStrands) == 1:
 					strand = matchingStrands[0]
@@ -211,11 +249,35 @@ def main(argv):
 
 					logger.debug("Created new Strand %s for photo %s.  shared = %s" % (newStrand.id, photo.id, shared))
 	
+				strandNeighbors = set(strandNeighbors)
+				# Now create the StrandNeighbor rows
+				for strand in strandNeighbors:
+					finalStrandId = photoToStrandIdDict[photo]
+					if strand.id < finalStrandId:
+						# Add in a tuple because we're going do dedup later
+						strandNeighborsToCreate.append((strand.id, finalStrandId))
+					else:
+						strandNeighborsToCreate.append((finalStrandId, strand.id))
+
 				photo.strand_evaluated = True
-				
-			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted))
+			
 			Photo.bulkUpdate(photos, ["strand_evaluated"])
 
+			# Now deal with strand neighbor rows
+			# Dedup our new neighbor rows and process with existing ones in the database
+			strandNeighborsToCreate = set(strandNeighborsToCreate)
+			strandNeighbors = list()
+			for t in strandNeighborsToCreate:
+				id1, id2 = t
+				strandNeighbors.append(StrandNeighbor(strand_1_id=id1, strand_2_id=id2))
+			
+			allIds = getAllStrandIds(strandNeighbors)
+			existingRows = StrandNeighbor.objects.filter(strand_1__in=allIds).filter(strand_2_id__in=allIds)
+			neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
+			StrandNeighbor.objects.bulk_create(neighborRowsToCreate)	
+
+			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(strandNeighborsToCreate)))
+			
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 		else:
 			time.sleep(.1)	

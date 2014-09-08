@@ -568,4 +568,5 @@ class StrandNeighbor(models.Model):
 		return str(self.id)
 		
 	class Meta:
+		unique_together = ("strand_1", "strand_2")
 		db_table = 'strand_neighbor'

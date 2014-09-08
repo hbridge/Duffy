@@ -15,7 +15,7 @@ from django.db import IntegrityError
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite
+from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util
@@ -267,7 +267,7 @@ def getObjectsDataForStrands(userId, strands, feedObjectType):
 	# list of list of photos
 	groups = list()
 	for strand in strands:
-		strandId = strand.id			
+		strandId = strand.id
 		photos = strand.photos.all().order_by("-time_taken")
 		
 		metadata = {'type': feedObjectType, 'id': strandId}
@@ -285,6 +285,70 @@ def getObjectsDataForStrands(userId, strands, feedObjectType):
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
+
+
+"""
+	Creates a cache which is a dictionary with the key being the strandId and the value
+	a list of neighbor strands
+"""
+def getStrandNeighborsCache(strands):
+	strandIds = Strand.getIds(strands)
+
+	strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+
+	strandNeighborsCache = dict()
+	for strand in strands:
+		for strandNeighbor in strandNeighbors:
+			added = False
+			if strand.id == strandNeighbor.strand_1_id:
+				if strand.id not in strandNeighborsCache:
+					strandNeighborsCache[strand.id] = list()
+				if strandNeighbor.strand_2 not in strandNeighborsCache[strand.id]:
+					strandNeighborsCache[strand.id].append(strandNeighbor.strand_2)
+			elif strand.id == strandNeighbor.strand_2_id:
+				if strand.id not in strandNeighborsCache:
+					strandNeighborsCache[strand.id] = list()
+				if strandNeighbor.strand_1 not in strandNeighborsCache[strand.id]:
+					strandNeighborsCache[strand.id].append(strandNeighbor.strand_1)
+					
+	return strandNeighborsCache
+
+"""
+	Returns back the objects data for private strands which includes neighbor_users.
+	This gets the Neh
+"""
+def getObjectsDataForPrivateStrands(userId, strands, feedObjectType):
+	groups = list()
+	
+	strandNeighborsCache = getStrandNeighborsCache(strands)
+	for strand in strands:
+		strandId = strand.id
+		photos = strand.photos.all().order_by("-time_taken")
+		
+		neighborUsers = list()
+		if strand.id in strandNeighborsCache:
+			for neighborStrand in strandNeighborsCache[strand.id]:
+				users = neighborStrand.users.all()
+				neighborUsers.extend([user.display_name for user in users])
+
+		neighborUsers = set(neighborUsers)
+
+		metadata = {'type': feedObjectType, 'id': strandId, 'neighbor_users': ', '.join(neighborUsers)}
+		groupEntry = {'photos': photos, 'metadata': metadata}
+
+		if len(photos) > 0:
+			groups.append(groupEntry)
+
+	if len(groups) > 0:
+		# now sort groups by the time_taken of the first photo in each group
+		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
+
+	formattedGroups = getFormattedGroups(groups, userId)
+		
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	return objects
+
 
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
@@ -317,7 +381,7 @@ def invited_strands(request):
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
-	Return the Duffy JSON for the strands a user has that are unshared
+	Return the Duffy JSON for the strands a user has that are private and unshared
 
 	This uses the Strand objects instead of neighbors
 """
@@ -331,13 +395,13 @@ def unshared_strands(request):
 		
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
-		response['objects'] = getObjectsDataForStrands(user.id, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		response['objects'] = getObjectsDataForPrivateStrands(user.id, strands, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 """
-	Return the Duffy JSON for "unshared" photos for a user that are a good match for the given strand
+	Return the Duffy JSON for "private" photos for a user that are a good match for the given strand
 """
 def suggested_unshared_photos(request):
 	response = dict({'result': True})
@@ -356,7 +420,6 @@ def suggested_unshared_photos(request):
 		# Get all the unshared strands for the given user that are close to the given strand
 		unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 		
-		print unsharedStrands
 		unsharedPhotos = list()
 		for unsharedStrand in unsharedStrands:
 			unsharedPhotos.extend(unsharedStrand.photos.all())
