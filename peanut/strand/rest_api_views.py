@@ -103,7 +103,9 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
             logger.info("Parse error for contact entry")
             obj.skip = True
 
-
+"""
+   Strand invite API
+"""
 class StrandInviteBulkAPI(BulkCreateAPIView):
     model = StrandInvite
     lookup_field = 'id'
@@ -143,10 +145,28 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
 
     def post_save(self, strandInvite, created):
         if created:
-            print strandInvite
             thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
             thread.start()
             logger.debug("Just started thread to send notification about strand invite %s" % (strandInvite.id))            
+
+
+class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
+    def sendNotification(self, strandInviteId):
+        strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
+        msg = "%s just looked at the photos you shared from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
+        
+        logger.debug("going to send %s to user id %s" % (msg, strandInvite.user.id))
+        notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, None)
+
+
+    def post_save(self, strandInvite, created):
+        if strandInvite.accepted_user_id:
+            sendNotification(strandInvite)
+
+        thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
+        thread.start()
+        logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
+
 """
     REST interface for creating new PhotoActions.
 
@@ -182,7 +202,7 @@ def updateStrandWithCorrectPhotoTimes(strand):
     return changed
 
 """
-    REST interface for creating new PhotoActions.
+    REST interface for creating and editing strands
 
     Use a custom overload of the create method so we don't double create likes
 """

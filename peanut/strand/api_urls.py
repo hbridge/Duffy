@@ -45,7 +45,7 @@ urlpatterns = patterns('',
 	url(r'^strands/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyStrandAPI.as_view(model=Strand, lookup_field='id')),
 
 	url(r'^strand_invite/$', strand_rest_api_views.StrandInviteBulkAPI.as_view()),
-	url(r'^strand_invite/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=StrandInvite, lookup_field='id')),
+	url(r'^strand_invite/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyStrandInviteAPI.as_view(model=StrandInvite, lookup_field='id')),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
