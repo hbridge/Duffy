@@ -165,8 +165,9 @@ def getFormattedGroups(groups, userId):
 
 		names = set(names)
 
-
-		if (groupIsSolo(group['photos'], userId)):
+		if "title" in group['metadata']:
+			title = group['metadata']['title']
+		elif (groupIsSolo(group['photos'], userId)):
 			title = "Just you"
 		elif (groupDoesNotHaveUser(group['photos'], userId)):
 			title = "From " + "& ".join(names) + " near " + bestLocation
@@ -315,7 +316,7 @@ def getStrandNeighborsCache(strands):
 
 """
 	Returns back the objects data for private strands which includes neighbor_users.
-	This gets the Neh
+	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
 def getObjectsDataForPrivateStrands(userId, strands, feedObjectType):
 	groups = list()
@@ -333,7 +334,10 @@ def getObjectsDataForPrivateStrands(userId, strands, feedObjectType):
 
 		neighborUsers = set(neighborUsers)
 
-		metadata = {'type': feedObjectType, 'id': strandId, 'neighbor_users': ', '.join(neighborUsers)}
+		title = ', '.join(neighborUsers)
+		if len(neighborUsers) > 0:
+			title += " might like these photos"
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
