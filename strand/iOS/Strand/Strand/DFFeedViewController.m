@@ -69,19 +69,10 @@ const CGFloat LockedCellHeight = 157.0;
   self = [super init];
   if (self) {
     self.delegate = self;
-    /* uncommment to show gallery */
-    UIBarButtonItem *backToGalleryItem = [[UIBarButtonItem alloc]
-                                          initWithImage:[UIImage imageNamed:@"Assets/Icons/GridBarButton"]
-                                          style:UIBarButtonItemStylePlain
-                                          target:self
-                                          action:@selector(backPressed:)];
-    self.navigationItem.leftBarButtonItem = backToGalleryItem;
-//    UIBarButtonItem *settingsButtonIcon = [[UIBarButtonItem alloc]
-//                                           initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-//                                           style:UIBarButtonItemStylePlain
-//                                           target:self
-//                                           action:@selector(settingsButtonPressed:)];
-//    self.navigationItem.leftBarButtonItem = settingsButtonIcon;
+    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
+                                     imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
+                             imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
   }
   return self;
 }

@@ -40,10 +40,11 @@
   self = [super initWithStyle:UITableViewStyleGrouped];
   if (self) {
     self.settings = [[DFSettings alloc] init];
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                             target:self
-                                             action:@selector(closeButtonPressed:)];
+    self.navigationItem.title = @"Settings";
+    self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+                             imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+                             imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   }
   return self;
 }
@@ -51,6 +52,13 @@
 - (void)viewDidLoad
 {
   [super viewDidLoad];
+  
+  if (self.isBeingPresented) {
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                             target:self
+                                             action:@selector(closeButtonPressed:)];
+  }
   
   [self configureForm];
 }

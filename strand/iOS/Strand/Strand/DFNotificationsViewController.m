@@ -28,6 +28,11 @@
   self = [super initWithStyle:style];
   if (self) {
     self.navigationItem.title = @"Notifications";
+    self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
+                             imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
+                             imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+
   }
   return self;
 }

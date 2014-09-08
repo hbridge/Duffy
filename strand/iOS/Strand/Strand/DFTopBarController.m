@@ -28,6 +28,7 @@ CGFloat const MaxNavbarOriginY = 0;
   self = [super init];
   if (self) {
     self.viewControllers = @[viewController];
+    self.tabBarItem = viewController.tabBarItem;
   }
   return self;
 }
@@ -219,5 +220,10 @@ CGFloat const MaxNavbarOriginY = 0;
   
 }
 
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+  return UIStatusBarStyleLightContent;
+}
 
 @end

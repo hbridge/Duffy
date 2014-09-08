@@ -64,43 +64,12 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)configureNavigationItem
 {
-  // notification button
-  self.notificationsBadgeButton = [[DFBadgeButton alloc] init];
-  UIImage *image = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-  [self.notificationsBadgeButton setImage:image
-                                 forState:UIControlStateNormal];
-  self.notificationsBadgeButton.badgeEdgeInsets = UIEdgeInsetsMake(2, 0, 0, 6);
-  self.notificationsBadgeButton.badgeColor = [DFStrandConstants strandBlue];
-  self.notificationsBadgeButton.badgeTextColor = [DFStrandConstants defaultBarForegroundColor];
-  self.notificationsBadgeButton.badgeCount = (int)[[[DFPeanutNotificationsManager sharedManager]
-                                                    unreadNotifications] count];
-  [self.notificationsBadgeButton addTarget:self
-                                    action:@selector(titleButtonPressed:)
-                          forControlEvents:UIControlEventTouchUpInside];
-  
-  self.navigationItem.titleView = self.notificationsBadgeButton;
-  [self.notificationsBadgeButton sizeToFit];
-  
-  // other buttons
-  if (!(self.navigationItem.rightBarButtonItems.count > 0)) {
-    UIBarButtonItem *cameraButton =
-    [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CameraBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(cameraButtonPressed:)];
-    UIBarButtonItem *inviteButton =
-    [[UIBarButtonItem alloc]
-     initWithImage:[[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
-                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(createButtonPressed:)];
-    
-    self.navigationItem.rightBarButtonItems = @[cameraButton, inviteButton];
-  }
+  UILabel *titleLabel = [[UILabel alloc] init];
+  titleLabel.text = @"Strand";
+  titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
+  titleLabel.textColor = [UIColor whiteColor];
+  [titleLabel sizeToFit];
+  self.navigationItem.titleView = titleLabel;
 }
 
 - (void)observeNotifications
@@ -364,10 +333,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 #pragma mark - Navbar Action Handlers
 
-- (void)cameraButtonPressed:(id)sender
-{
-  [(RootViewController *)self.view.window.rootViewController showCamera];
-}
 
 - (void)inviteButtonPressed:(id)sender
 {

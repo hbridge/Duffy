@@ -48,6 +48,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   self = [self init];
   if (self) {
     _showInvites = showInvites;
+    
   }
   return self;
 }
@@ -58,6 +59,8 @@ const CGFloat CreateCellTitleSpacing = 8;
   if (self) {
     [self configureNav];
     [self configureTableView];
+    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
   }
   return self;
 }

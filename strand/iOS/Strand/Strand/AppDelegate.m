@@ -7,7 +7,6 @@
 //
 
 #import "AppDelegate.h"
-#import "RootViewController.h"
 #import <CocoaLumberjack/DDTTYLogger.h>
 #import <CocoaLumberjack/DDASLLogger.h>
 #import <CocoaLumberjack/DDFileLogger.h>
@@ -35,11 +34,16 @@
 #import "DFSocketsManager.h"
 #import "DFContactsStore.h"
 #import "DFPushNotificationsManager.h"
+#import "DFFeedViewController.h"
+#import "DFSettingsViewController.h"
+#import "DFCreateStrandViewController.h"
+#import "DFTopBarController.h"
 
 
 @interface AppDelegate ()
 
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
+@property (nonatomic, retain) DFFeedViewController *feedViewController;
             
 @end
 
@@ -146,7 +150,30 @@
   }
   
   [DFPhotoStore sharedStore];
-  self.window.rootViewController = [[RootViewController alloc] init];
+  
+  self.feedViewController = [[DFFeedViewController alloc] init];
+  DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
+  DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
+  DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
+
+  UITabBarController *tabBarController = [[UITabBarController alloc] init];
+  tabBarController.viewControllers =
+  @[[[DFTopBarController alloc] initWithRootViewController:self.feedViewController],
+    [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
+    [[DFNavigationController alloc] initWithRootViewController:createViewController],
+    [[DFNavigationController alloc] initWithRootViewController:settingsController]
+    ];
+  
+  for (UINavigationController *vc in tabBarController.viewControllers) {
+    vc.tabBarItem.imageInsets = vc.tabBarItem.imageInsets = UIEdgeInsetsMake(5.5, 0, -5.5, 0);
+  }
+  tabBarController.tabBar.barTintColor = [DFStrandConstants strandSalmon];
+  tabBarController.tabBar.tintColor = [UIColor whiteColor];
+  tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
+  tabBarController.tabBar.translucent = NO;
+  
+  self.window.rootViewController = tabBarController;
+  
   [[DFBackgroundLocationManager sharedBackgroundLocationManager]
    startUpdatingOnSignificantLocationChange];
 }
@@ -245,16 +272,15 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
     // This is the state that the note is received in if the user is swiping a notification
     if (pushNotif.screenToShow == DFScreenNone) return;
     
-    UIViewController *rootViewController = self.window.rootViewController;
-    if ([rootViewController.class isSubclassOfClass:[RootViewController class]]) {
-      if (pushNotif.photoID) {
-        [(RootViewController *)self.window.rootViewController showPhotoWithID:pushNotif.photoID];
-      } else if (pushNotif.screenToShow == DFScreenCamera) {
-        [(RootViewController *)self.window.rootViewController showCamera];
-      } else if (pushNotif.screenToShow == DFScreenGallery) {
-        [(RootViewController *)self.window.rootViewController showGallery];
-      }
+    if (pushNotif.photoID) {
+      [self.feedViewController showPhoto:pushNotif.photoID animated:NO];
+    } else if (pushNotif.screenToShow == DFScreenCamera) {
+      //[(RootViewController *)self.window.rootViewController showCamera];
+      // disabled for now
+    } else if (pushNotif.screenToShow == DFScreenGallery) {
+      // disabled for now
     }
+    
     [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
   } else if ([application applicationState] == UIApplicationStateActive) {
     if ([pushNotif.message isNotEmpty]) {
