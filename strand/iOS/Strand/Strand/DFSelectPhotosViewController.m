@@ -314,9 +314,10 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
       performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
       success:^(DFPeanutStrand *peanutStrand) {
         DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
-        [self dismissViewControllerAnimated:YES completion:^{
-          [SVProgressHUD showSuccessWithStatus:@"Success!"];
-        }];
+        [SVProgressHUD showSuccessWithStatus:@"Success!"];
+        [self.tabBarController setSelectedIndex:0];
+        [self.navigationController popViewControllerAnimated:NO];
+        
         // mark the selected photos for upload
         [self markPhotosForUpload:self.selectedPhotoIDs];
         
@@ -370,13 +371,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
        [invites addObject:invite];
      }
      [inviteAdapter postInvites:invites success:^(NSArray *resultObjects) {
-       [self dismissViewControllerAnimated:YES completion:^{
-         [SVProgressHUD showSuccessWithStatus:@"Success!"];
-       }];
+       [SVProgressHUD showSuccessWithStatus:@"Success!"];
+       [self.tabBarController setSelectedIndex:0];
+       [self.navigationController popViewControllerAnimated:NO];
      } failure:^(NSError *error) {
-       [self dismissViewControllerAnimated:YES completion:^{
-         [SVProgressHUD showErrorWithStatus:@"Inviting friends failed."];
-       }];
+       [SVProgressHUD showErrorWithStatus:@"Inviting friends failed."];
      }];
      
      [self markPhotosForUpload:peanutStrand.photos];

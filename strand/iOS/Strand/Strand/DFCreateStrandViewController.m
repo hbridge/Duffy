@@ -48,7 +48,6 @@ const CGFloat CreateCellTitleSpacing = 8;
   self = [self init];
   if (self) {
     _showInvites = showInvites;
-    
   }
   return self;
 }
@@ -57,6 +56,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
+    _showInvites = YES;
     [self configureNav];
     [self configureTableView];
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
@@ -69,31 +69,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)configureNav
 {
-  self.navigationItem.title = @"Create Strand";
-  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                           target:self
-                                           action:@selector(cancelPressed:)];
-  
-  
-  
-  self.navigationItem.rightBarButtonItems =
-  @[[[UIBarButtonItem alloc]
-     initWithTitle:@"Sync"
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(sync:)],
-    [[UIBarButtonItem alloc]
-     initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-     target:self
-     action:@selector(updateSuggestions:)],
-    ];
-  
-  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithTitle:@"Back"
-                                           style:UIBarButtonItemStylePlain
-                                           target:self
-                                           action:nil];
+  self.navigationItem.title = @"Start Strand";
 }
 
 - (void)configureTableView
@@ -279,8 +255,9 @@ const CGFloat CreateCellTitleSpacing = 8;
   DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
   DFSelectPhotosViewController *selectController;
   if ([feedObject.type isEqualToString:DFFeedObjectInviteStrand]) {
+    DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
     [self.feedAdapter
-     fetchSuggestedPhotosForStrand:@(feedObject.id)
+     fetchSuggestedPhotosForStrand:@(strandObject.id)
      completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
        
        dispatch_async(dispatch_get_main_queue(), ^{
