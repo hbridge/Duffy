@@ -156,7 +156,7 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
         msg = "%s just looked at the photos you shared from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
         
         logger.debug("going to send %s to user id %s" % (msg, strandInvite.user.id))
-        notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, None)
+        notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
 
 
     def post_save(self, strandInvite, created):
