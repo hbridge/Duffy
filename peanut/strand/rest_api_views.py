@@ -110,10 +110,12 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
     serializer_class = BulkStrandInviteSerializer
 
     def sendNotification(self, strandInviteId):
+        logger.debug("in sendNotification for id %s" % strandInviteId)
         strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
         msg = "%s just invited you to look at their Strand in %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
         
         if strandInvite.invited_user:
+            logger.debug("going to send %s to user id %s" % (msg, strandInvite.invited_user.id))
             notifications_util.sendNotification(strandInvite.invited_user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, None)
 
     """
@@ -144,7 +146,7 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
             print strandInvite
             thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
             thread.start()
-            logger.debug("Just started thread to send notification about strand invite")            
+            logger.debug("Just started thread to send notification about strand invite %s" % (strandInvite.id))            
 """
     REST interface for creating new PhotoActions.
 
