@@ -170,7 +170,9 @@ def getFormattedGroups(groups, userId):
 		elif (groupIsSolo(group['photos'], userId)):
 			title = "Just you"
 		elif (groupDoesNotHaveUser(group['photos'], userId)):
-			title = "From " + "& ".join(names) + " near " + bestLocation
+			title = "From " + "& ".join(names)
+			if bestLocation:
+				title += " near " + bestLocation
 		else:
 			title = ", ".join(names) + " and You"
 

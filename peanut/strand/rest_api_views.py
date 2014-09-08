@@ -197,5 +197,5 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
     def pre_save(self, strand):
         updateStrandWithCorrectPhotoTimes(strand)
 
-        logger.info("Updated strand %s", (obj.id))
+        logger.info("Updated strand %s", (strand.id))
 
