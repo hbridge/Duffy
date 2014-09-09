@@ -247,7 +247,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user__isnull=True).filter(accepted_user__isnull=True)
 	for strandInvite in strandInvites:
 		strandInvite.invited_user = user
-	StrandInvite.bulkUpdate(strandInvites, "invited_user")
+	if len(strandInvites) > 0:
+		StrandInvite.bulkUpdate(strandInvites, "invited_user")
 	logger.debug("Updated %s invites with user id %s" % (len(strandInvites), user.id))
 	
 	# Create directory for photos
