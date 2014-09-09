@@ -377,7 +377,7 @@ def invited_strands(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		
-		strandInvites = StrandInvite.objects.select_related().filter(user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+		strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 
 		responseObjects = list()
 
