@@ -161,11 +161,9 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
 
     def post_save(self, strandInvite, created):
         if strandInvite.accepted_user_id:
-            self.sendNotification(strandInvite)
-
-        thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
-        thread.start()
-        logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
+            thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
+            thread.start()
+            logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
 
 """
     REST interface for creating new PhotoActions.
