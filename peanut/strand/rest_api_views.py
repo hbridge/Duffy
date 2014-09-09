@@ -161,7 +161,7 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
 
     def post_save(self, strandInvite, created):
         if strandInvite.accepted_user_id:
-            sendNotification(strandInvite)
+            self.sendNotification(strandInvite)
 
         thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
         thread.start()
