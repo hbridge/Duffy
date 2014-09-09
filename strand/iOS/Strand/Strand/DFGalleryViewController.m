@@ -110,7 +110,7 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return self.sectionObjects.count + (self.uploadingPhotos.count > 0 ? 1 : 0);
+  return self.strandObjects.count + (self.uploadingPhotos.count > 0 ? 1 : 0);
 }
 
 
@@ -151,9 +151,9 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (DFPeanutFeedObject *)sectionObjectForUploadedSection:(NSUInteger)tableSection
 {
-  if (self.uploadingPhotos.count > 0) return self.sectionObjects[tableSection - 1];
+  if (self.uploadingPhotos.count > 0) return self.strandObjects[tableSection - 1];
   
-  return self.sectionObjects[tableSection];
+  return self.strandObjects[tableSection];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView

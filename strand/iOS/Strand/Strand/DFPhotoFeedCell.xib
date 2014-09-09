@@ -40,7 +40,7 @@
                         </constraints>
                     </imageView>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000000000000004" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h07-n4-DgV">
-                        <rect key="frame" x="0.0" y="352" width="320" height="79"/>
+                        <rect key="frame" x="0.0" y="353" width="320" height="79"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="79" id="32E-5a-0uW"/>
                         </constraints>
@@ -56,7 +56,7 @@
                         <rect key="frame" x="150" y="188" width="20" height="20"/>
                     </activityIndicatorView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="U1S-w6-Jtc" userLabel="Actions bar">
-                        <rect key="frame" x="10" y="464" width="300" height="29"/>
+                        <rect key="frame" x="10" y="465" width="300" height="29"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="fST-z5-7nz" userLabel="favoriteButton" customClass="DFRoundedButton">
                                 <rect key="frame" x="0.0" y="0.0" width="111" height="29"/>

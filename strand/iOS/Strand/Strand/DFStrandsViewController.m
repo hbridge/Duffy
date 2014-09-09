@@ -136,9 +136,9 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   }
   
   // if the user has real content in their feed, prompt for push notifications
-  NSString *firstSectionTitle = [(DFPeanutFeedObject *)self.sectionObjects.firstObject title];
-  if (self.sectionObjects.count > 1 ||
-      (self.sectionObjects.count == 1 && ![firstSectionTitle isEqualToString:@"Locked"])) {
+  NSString *firstSectionTitle = [(DFPeanutFeedObject *)self.strandObjects.firstObject title];
+  if (self.strandObjects.count > 1 ||
+      (self.strandObjects.count == 1 && ![firstSectionTitle isEqualToString:@"Locked"])) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
 }
@@ -176,7 +176,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)refreshView:(BOOL)withNewServerData
 {
   BOOL newData = withNewServerData;
-  NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.sectionObjects];
+  NSArray *unprocessedFeedPhotos = [self unprocessedFeedPhotos:self.strandObjects];
   
   if (![self.uploadingPhotos isEqualToArray:unprocessedFeedPhotos]) {
     self.uploadingPhotos = unprocessedFeedPhotos;
@@ -227,7 +227,8 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
           [self setShowNuxPlaceholder:NO];
           
           // Update the objects, the child views use this
-          [self setSectionObjects:response.topLevelSectionObjects];
+          [self setStrandObjects:response.topLevelSectionObjects];
+          self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
           self.lastResponseHash = hashData;
           newServerData = YES;
         }
@@ -237,7 +238,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
         [self setShowNuxPlaceholder:NO];
         
         // If there's no data, show a nice message on the screen instead of a dropdown
-        if (self.sectionObjects.count == 0) {
+        if (self.strandObjects.count == 0) {
           [self setShowConnectionError:YES withError:error];
         } else if (!isSilent) {
           // If there is data, then show a dropdown if it wasn't a silent reload
@@ -277,7 +278,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   return result;
 }
 
-- (void)setSectionObjects:(NSArray *)sectionObjects
+- (void)setStrandObjects:(NSArray *)sectionObjects
 {
   NSMutableDictionary *objectsByID = [NSMutableDictionary new];
   NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
@@ -301,7 +302,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   
   _objectsByID = objectsByID;
   _indexPathsByID = indexPathsByID;
-  _sectionObjects = sectionObjects;
+  _strandObjects = sectionObjects;
 }
 
 

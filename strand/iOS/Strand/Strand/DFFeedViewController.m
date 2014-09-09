@@ -69,12 +69,17 @@ const CGFloat LockedCellHeight = 157.0;
   self = [super init];
   if (self) {
     self.delegate = self;
-    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
-                                     imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
-                             imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+    [self initTabBarItem];
   }
   return self;
+}
+
+- (void)initTabBarItem
+{
+  self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
+                                   imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
+                           imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
 - (void)viewDidLoad
@@ -124,7 +129,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  if (self.sectionObjects.count == 0) [self.refreshControl beginRefreshing];
+  if (self.strandObjects.count == 0) [self.refreshControl beginRefreshing];
   self.isViewTransitioning = NO;
   [super viewDidAppear:animated];
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
@@ -204,6 +209,17 @@ const CGFloat LockedCellHeight = 157.0;
 
 #pragma mark - Table view data source: sections
 
+- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
+{
+  NSInteger sections = 0;
+  sections += (self.uploadingPhotos.count > 0 ? 1 : 0);
+  
+  if (self.strandToShow) sections += 1;
+  else sections += self.strandObjects.count;
+
+  return sections;
+}
+
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
   if (self.uploadingPhotos.count > 0 && section == 0) {
@@ -230,10 +246,6 @@ const CGFloat LockedCellHeight = 157.0;
 
 #pragma mark - Table view data source
 
-- (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
-{
-  return self.sectionObjects.count + (self.uploadingPhotos.count > 0 ? 1 : 0);
-}
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
@@ -253,9 +265,10 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (DFPeanutFeedObject *)sectionObjectForTableSection:(NSUInteger)tableSection
 {
-  if (self.uploadingPhotos.count > 0) return self.sectionObjects[tableSection - 1];
+  if (self.strandToShow) return self.strandToShow;
+  if (self.uploadingPhotos.count > 0) return self.strandObjects[tableSection - 1];
   
-  return self.sectionObjects[tableSection];
+  return self.strandObjects[tableSection];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath

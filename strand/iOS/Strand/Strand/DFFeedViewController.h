@@ -14,6 +14,7 @@
 #import "WYPopoverController.h"
 #import "DFNotificationsViewController.h"
 #import "DFFeedSectionHeaderView.h"
+#import "DFPeanutFeedObject.h"
 
 @interface DFFeedViewController : DFStrandsViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
@@ -21,6 +22,7 @@ DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderView
 
 @property (nonatomic, retain) UITableView *tableView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
+@property (nonatomic, retain) DFPeanutFeedObject *strandToShow;
 
 - (void)jumpToPhoto:(DFPhotoIDType)photoID;
 

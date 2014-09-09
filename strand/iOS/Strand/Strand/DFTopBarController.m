@@ -220,7 +220,6 @@ CGFloat const MaxNavbarOriginY = 0;
   
 }
 
-
 - (UIStatusBarStyle)preferredStatusBarStyle
 {
   return UIStatusBarStyleLightContent;

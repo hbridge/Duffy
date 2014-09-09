@@ -38,13 +38,13 @@
 #import "DFSettingsViewController.h"
 #import "DFCreateStrandViewController.h"
 #import "DFTopBarController.h"
+#import "DFStrandsFeedViewController.h"
 
 
 @interface AppDelegate ()
 
 @property (nonatomic, retain) UITabBarController *tabBarController;
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
-@property (nonatomic, retain) DFFeedViewController *feedViewController;
 
 @end
 
@@ -153,14 +153,14 @@
   
   [DFPhotoStore sharedStore];
   
-  self.feedViewController = [[DFFeedViewController alloc] init];
+  DFStrandsFeedViewController *strandsFeedViewCotnroller = [[DFStrandsFeedViewController alloc] init];
   DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
   DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
-  @[[[DFTopBarController alloc] initWithRootViewController:self.feedViewController],
+  @[[[DFNavigationController alloc] initWithRootViewController:strandsFeedViewCotnroller],
     [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
     [[DFNavigationController alloc] initWithRootViewController:createViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
@@ -275,12 +275,12 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
     if (pushNotif.screenToShow == DFScreenNone) return;
     
     if (pushNotif.photoID) {
-      [self.feedViewController showPhoto:pushNotif.photoID animated:NO];
+      //TODO disabled for now
     } else if (pushNotif.screenToShow == DFScreenCamera) {
       //[(RootViewController *)self.window.rootViewController showCamera];
-      // disabled for now
+      // TODO disabled for now
     } else if (pushNotif.screenToShow == DFScreenGallery) {
-      // disabled for now
+      // TODO disabled for now
     }
     
     [DFAnalytics logNotificationOpenedWithType:pushNotif.type];

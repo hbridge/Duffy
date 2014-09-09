@@ -24,8 +24,12 @@ didFinishServerFetchWithError:(NSError *)error;
 
 @property (nonatomic, weak) DFTopBarController *topBarController;
 
+
+// Invite objects
+@property (nonatomic, retain) NSArray *inviteObjects;
+
 // Strand data
-@property (nonatomic, retain) NSArray *sectionObjects;
+@property (nonatomic, retain) NSArray *strandObjects;
 @property (nonatomic, retain) NSDictionary *indexPathsByID;
 @property (nonatomic, retain) NSDictionary *objectsByID;
 @property (nonatomic, retain) NSArray *uploadingPhotos;
