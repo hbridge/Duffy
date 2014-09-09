@@ -70,6 +70,11 @@ const CGFloat CreateCellTitleSpacing = 8;
 - (void)configureNav
 {
   self.navigationItem.title = @"Start Strand";
+  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithTitle:@"Back"
+                                           style:UIBarButtonItemStylePlain
+                                           target:nil
+                                           action:nil];
 }
 
 - (void)configureTableView

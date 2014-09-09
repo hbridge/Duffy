@@ -25,6 +25,7 @@
 #import "DFToastNotificationManager.h"
 #import "DFUploadController.h"
 #import "DFCreateStrandViewController.h"
+#import "AppDelegate.h"
 
 
 const NSTimeInterval FeedChangePollFrequency = 60.0;
@@ -436,6 +437,10 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:svc]
                      animated:YES
                    completion:nil];
+}
+
+- (IBAction)createStrandButtonPressed:(id)sender {
+  [(AppDelegate *)[[UIApplication sharedApplication] delegate] showCreateStrandTab];
 }
 
 

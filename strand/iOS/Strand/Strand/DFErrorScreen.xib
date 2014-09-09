@@ -10,14 +10,17 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Error" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mQ6-z9-dfO">
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Error" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="mQ6-z9-dfO">
                     <rect key="frame" x="20" y="113" width="280" height="21"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="huk-0J-Y9v"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="system" pointSize="23"/>
                     <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" bounces="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TsR-L6-3Ik">
+                <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" bounces="NO" editable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="TsR-L6-3Ik">
                     <rect key="frame" x="20" y="142" width="280" height="406"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                     <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -28,6 +31,15 @@
                 </textView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="TsR-L6-3Ik" firstAttribute="top" secondItem="mQ6-z9-dfO" secondAttribute="bottom" constant="8" id="7Gq-7U-etg"/>
+                <constraint firstItem="mQ6-z9-dfO" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="Jbv-b0-bX8"/>
+                <constraint firstItem="mQ6-z9-dfO" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="113" id="V4j-75-SGA"/>
+                <constraint firstAttribute="trailing" secondItem="mQ6-z9-dfO" secondAttribute="trailing" constant="20" id="aEy-fN-LSX"/>
+                <constraint firstItem="TsR-L6-3Ik" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="ht7-Q9-lM5"/>
+                <constraint firstAttribute="bottom" secondItem="TsR-L6-3Ik" secondAttribute="bottom" constant="20" id="rFD-Ht-cIi"/>
+                <constraint firstAttribute="trailing" secondItem="TsR-L6-3Ik" secondAttribute="trailing" constant="20" id="vEu-hK-7BR"/>
+            </constraints>
             <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
             <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
             <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>

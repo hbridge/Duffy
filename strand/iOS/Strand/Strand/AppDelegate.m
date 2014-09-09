@@ -42,9 +42,10 @@
 
 @interface AppDelegate ()
 
+@property (nonatomic, retain) UITabBarController *tabBarController;
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
 @property (nonatomic, retain) DFFeedViewController *feedViewController;
-            
+
 @end
 
 @implementation AppDelegate
@@ -126,6 +127,7 @@
 {
   [self showMainView];
   [self performForegroundOperations];
+  [self showCreateStrandTab];
 }
 
 - (void)createRootViewController
@@ -156,23 +158,23 @@
   DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
-  UITabBarController *tabBarController = [[UITabBarController alloc] init];
-  tabBarController.viewControllers =
+  self.tabBarController = [[UITabBarController alloc] init];
+  self.tabBarController.viewControllers =
   @[[[DFTopBarController alloc] initWithRootViewController:self.feedViewController],
     [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
     [[DFNavigationController alloc] initWithRootViewController:createViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   
-  for (UINavigationController *vc in tabBarController.viewControllers) {
+  for (UINavigationController *vc in self.tabBarController.viewControllers) {
     vc.tabBarItem.imageInsets = vc.tabBarItem.imageInsets = UIEdgeInsetsMake(5.5, 0, -5.5, 0);
   }
-  tabBarController.tabBar.barTintColor = [DFStrandConstants strandSalmon];
-  tabBarController.tabBar.tintColor = [UIColor whiteColor];
-  tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
-  tabBarController.tabBar.translucent = NO;
+  self.tabBarController.tabBar.barTintColor = [DFStrandConstants strandSalmon];
+  self.tabBarController.tabBar.tintColor = [UIColor whiteColor];
+  self.tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
+  self.tabBarController.tabBar.translucent = NO;
   
-  self.window.rootViewController = tabBarController;
+  self.window.rootViewController = self.tabBarController;
   
   [[DFBackgroundLocationManager sharedBackgroundLocationManager]
    startUpdatingOnSignificantLocationChange];
@@ -327,7 +329,13 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     DDLogInfo(@"App reset complete.  Showing first time setup.");
     [self showFirstTimeSetup];
   });
-
 }
+
+- (void)showCreateStrandTab
+{
+  [self.tabBarController setSelectedIndex:2];
+}
+
+
 
 @end

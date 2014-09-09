@@ -137,13 +137,6 @@
 {
   AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
   [delegate firstTimeSetupComplete];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    DFCreateStrandViewController *vc = [[DFCreateStrandViewController alloc] init];
-    RootViewController *rootViewController = (RootViewController *)delegate.window.rootViewController;
-    [rootViewController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
-                                     animated:NO
-                                   completion:nil];
-  });
 }
 
 - (BOOL)prefersStatusBarHidden
