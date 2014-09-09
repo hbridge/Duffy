@@ -273,11 +273,13 @@ def getObjectsDataForPhotos(userId, photos, feedObjectType):
 	return objects
 
 def getObjectsDataForStrands(userId, strands, feedObjectType):
+	friendsData = friends_util.getFriendsData(userId)
+
 	# list of list of photos
 	groups = list()
 	for strand in strands:
 		strandId = strand.id
-		photos = strand.photos.all().order_by("-time_taken")
+		photos = friends_util.filterStrandPhotosByFriends(userId, friendsData, strand)
 		
 		metadata = {'type': feedObjectType, 'id': strandId}
 		groupEntry = {'photos': photos, 'metadata': metadata}
@@ -467,47 +469,25 @@ def strand_feed(request):
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		
-		friendsData = friends_util.getFriendsData(user.id)
+		responseObjects = list()
 
+		# Grab invites
+		strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+
+		inviteObjects = list()
+		for strandInvite in strandInvites:
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id}
+			entry['objects'] = getObjectsDataForStrands(user.id, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			inviteObjects.append(entry)
+
+		responseObjects.extend(inviteObjects)
+
+		# Grab regular feed objects
 		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
+		feedObjects = getObjectsDataForStrands(user.id, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		responseObjects.extend(feedObjects)
 
-		# list of list of photos
-		groups = list()
-		for strand in strands:
-			strandId = strand.id
-			photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
-			metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strandId}
-			entry = {'photos': photos, 'metadata': metadata}
-
-			if len(photos) > 0:
-				groups.append(entry)
-
-		# now sort groups by the time_taken of the first photo in each group
-		if len(groups) > 0:
-			groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
-
-		# Lastly, grab all our locked strands and add in those photos
-		lockedGroup = list()
-		if user.last_location_point:
-			strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-			lockedGroup = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
-			# TODO: get a real id for locked group
-			metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': 0}
-			entry = {'photos': lockedGroup, 'metadata': metadata}
-
-			if len(lockedGroup) > 0:
-				groups.insert(0, entry)
-
-		# Now we have to turn into our Duffy JSON, first, convert into the right format
-		formattedGroups = getFormattedGroups(groups, user.id)
-
-		if len(lockedGroup) > 0:
-			formattedGroups[0]['title'] = "Locked"
-			
-		# Lastly, we turn our groups into sections which is the object we convert to json for the api
-		objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
-		response['objects'] = objects
+		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
