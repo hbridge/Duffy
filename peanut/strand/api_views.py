@@ -243,8 +243,12 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		except IntegrityError:
 			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
 
-
-
+	# Now fill in strand invites for this phone number
+	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user_id__isnull=True).filter(accepted_user__isnull=True)
+	for strandInvite in strandInvites:
+		strandInvite.invited_user = user
+	StrandInvite.bulkUpdate(strandInvites, "invited_user")
+	
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
