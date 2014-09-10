@@ -11,11 +11,12 @@
 
 @implementation DFPhotoAsset
 
-@synthesize storedMetadata;
+
 @synthesize metadata;
 @synthesize location;
 
 @dynamic photo;
+@dynamic storedMetadata;
 
 #pragma mark Methods to Override from here down
 

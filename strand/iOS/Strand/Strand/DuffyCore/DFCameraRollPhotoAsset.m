@@ -31,7 +31,6 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 @dynamic alAssetURLString;
 @synthesize asset = _asset;
 @synthesize hashString = _hashString;
-@synthesize metadata;
 
 + (ALAssetsLibrary *)sharedAssetsLibrary
 {
