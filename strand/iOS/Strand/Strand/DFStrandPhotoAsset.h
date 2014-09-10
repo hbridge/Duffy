@@ -13,7 +13,6 @@
 @interface DFStrandPhotoAsset : DFPhotoAsset
 
 @property (nonatomic, retain) NSString * localURLString;
-@property (nonatomic, retain) id storedMetadata;
 @property (nonatomic, retain) id storedLocation;
 @property (nonatomic, retain) NSDate *creationDate;
 

@@ -23,11 +23,14 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 
 // Metadata accessors
 @property (readonly, nonatomic, retain) NSURL *canonicalURL;
-@property (nonatomic, retain) NSMutableDictionary *metadata;
+// This gets pulled from the storedMetadata if it exists, if not pulls from asset
+@property (nonatomic, retain, readonly) NSDictionary *metadata;
+// This is a cached version of the metadata set upon creation of this class
+@property (nonatomic, retain) id storedMetadata;
 @property (nonatomic, retain) CLLocation *location;
 @property (readonly, nonatomic, retain) NSString *hashString;
 /* The asset doesn't necessarily know what timezone it's in, so you have to give it one */
-- (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone;
+- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone;
 
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
