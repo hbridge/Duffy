@@ -11,8 +11,13 @@
 
 @interface DFDefaultsStore : NSObject
 
+//ios 7 notifs
 + (void)setLastNotificationType:(UIRemoteNotificationType)type;
 + (NSNumber *)lastNotificationType;
+
+//ios 8 notifs
++ (void)setLastUserNotificationType:(UIUserNotificationType)type;
++ (NSNumber *)lastUserNotificationType;
 
 + (void)setState:(DFPermissionStateType)state forPermission:(DFPermissionType)permission;
 + (DFPermissionStateType)stateForPermission:(DFPermissionType)permission;

@@ -33,8 +33,13 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
                                  numAddedManually:(NSUInteger)numAddedManually;
 + (void)logSetupPhotosCompletedWithResult:(NSString *)result;
 
+// ios 7 notifs
 + (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
                                               newType:(UIRemoteNotificationType)newType;
+
+//ios 8 notifs
++ (void)logUserNotifsChangedFromOldNotificationType:(UIUserNotificationType)oldType
+                                            newType:(UIUserNotificationType)newType;
 + (void)logPermissionsChanges;
 + (void)logPermission:(DFPermissionType)permission
   changedWithOldState:(DFPermissionStateType)oldState

@@ -87,7 +87,14 @@
   }
   self.invitedStrands = inviteStrands;
   
-  [self.tableView reloadData];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (inviteStrands.count > 0) {
+      self.tabBarItem.badgeValue = [@(inviteStrands.count) stringValue];
+    } else {
+      self.tabBarItem.badgeValue = nil;
+    }
+    [self.tableView reloadData];
+  });
 }
 
 - (void)strandsViewController:(DFStrandsViewController *)strandsViewController

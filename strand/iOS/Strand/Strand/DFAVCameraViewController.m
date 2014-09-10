@@ -131,12 +131,7 @@
 }
 
 - (void)createCaptureSession
-{
-  if (TARGET_IPHONE_SIMULATOR) {
-    return;
-    [self showRandomGradientView];
-  }
-  
+{  
   DDLogInfo(@"%@ creating new capture session.", [self.class description]);
   
   // remove old session and views if necessary

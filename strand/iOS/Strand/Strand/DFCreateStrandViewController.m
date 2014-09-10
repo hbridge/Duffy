@@ -56,7 +56,6 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
-    _showInvites = YES;
     [self configureNav];
     [self configureTableView];
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
@@ -307,12 +306,16 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)updateSuggestions:(id)sender
 {
-  [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
+  [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
+                                                          NSData *responseHash,
+                                                          NSError *error) {
     if (error) {
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
       self.suggestedResponse = response;
-      [self.tableView reloadData];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self.tableView reloadData];
+      });
     }
   }];
   

@@ -470,6 +470,20 @@ static DFAnalytics *defaultLogger;
                             }];
 }
 
++ (void)logUserNotifsChangedFromOldNotificationType:(UIUserNotificationType)oldType
+                                              newType:(UIUserNotificationType)newType
+{
+  NSString *oldValue = [DFAnalytics stringForUIUserNotifType:oldType];
+  NSString *newValue = [DFAnalytics stringForUIUserNotifType:newType];
+  if ([oldValue isEqual:newValue]) return;
+  
+  [DFAnalytics logEvent:NotificationsChangedEvent
+         withParameters:@{
+                          PermissionTypeKey: DFPermissionRemoteNotifications,
+                          ValueChangeKey:[self stringForOldState:oldValue toNewState:newValue]
+                          }];
+}
+
 + (NSString *)stringForOldState:(NSString *)oldState toNewState:(NSString *)newState
 {
   return [NSString stringWithFormat:@"%@ -> %@",
@@ -491,6 +505,24 @@ static DFAnalytics *defaultLogger;
     [valueString appendString:@"Sound"];
   }
   if (type | UIRemoteNotificationTypeAlert) {
+    [valueString appendString:@"Alert"];
+  }
+  
+  return valueString;
+}
+
++ (NSString *)stringForUIUserNotifType:(UIUserNotificationType)type
+{
+  if (type == UIUserNotificationTypeNone) return @"None";
+  
+  NSMutableString *valueString = [[NSMutableString alloc] init];
+  if (type | UIUserNotificationTypeBadge) {
+    [valueString appendString:@"Badge"];
+  }
+  if (type | UIUserNotificationTypeSound) {
+    [valueString appendString:@"Sound"];
+  }
+  if (type | UIUserNotificationTypeAlert) {
     [valueString appendString:@"Alert"];
   }
   

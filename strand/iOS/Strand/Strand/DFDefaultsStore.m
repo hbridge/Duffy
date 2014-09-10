@@ -12,6 +12,7 @@
 @implementation DFDefaultsStore
 
 NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
+NSString *const DFDefaultsUserNotifsTypeKey = @"DFStrandLastUserNotifTypes";
 
 + (void)setLastNotificationType:(UIRemoteNotificationType)type
 {
@@ -22,10 +23,25 @@ NSString *const DFDefaultsNotifsTypeKey = @"DFStrandLastNotifTypes";
   }
 }
 
++ (void)setLastUserNotificationType:(UIUserNotificationType)type
+{
+  NSNumber *lastUserNotifType = [DFDefaultsStore lastUserNotificationType];
+  if (![lastUserNotifType isEqual:@(type)]) {
+    
+    [[NSUserDefaults standardUserDefaults] setObject:@(type) forKey:DFDefaultsUserNotifsTypeKey];
+  }
+}
+
 + (NSNumber *)lastNotificationType
 {
   return [[NSUserDefaults standardUserDefaults] objectForKey:DFDefaultsNotifsTypeKey];
 }
+
++ (NSNumber *)lastUserNotificationType
+{
+  return [[NSUserDefaults standardUserDefaults] objectForKey:DFDefaultsUserNotifsTypeKey];
+}
+
 
 // Permissions
 + (NSString *)keyForPermission:(DFPermissionType)permission

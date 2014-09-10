@@ -61,18 +61,36 @@
 + (void)requestPushNotifsPermission
 {
   DDLogInfo(@"%@ requesting push notifications.", self);
-  [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-   (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+  if ([[UIApplication sharedApplication]
+       respondsToSelector:@selector(registerUserNotificationSettings:)]) {
+    // iOS 8
+    UIUserNotificationSettings *settings = [UIUserNotificationSettings
+                                            settingsForTypes:UIUserNotificationTypeAlert
+                                            | UIUserNotificationTypeBadge
+                                            | UIUserNotificationTypeSound
+                                            categories:nil];
+    [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
+  } else {
+    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
+     (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+  }
 }
 
 + (void)refreshPushToken
 {
-  [DFDefaultsStore setLastNotificationType:[[UIApplication sharedApplication] enabledRemoteNotificationTypes]];
+  if ([[UIApplication sharedApplication]
+       respondsToSelector:@selector(currentUserNotificationSettings)]) {
+    // iOS 8
+    UIUserNotificationSettings *settings = [[UIApplication sharedApplication]
+                                            currentUserNotificationSettings];
+    [DFDefaultsStore setLastUserNotificationType:settings.types];
+  } else {
+    [DFDefaultsStore setLastNotificationType:[[UIApplication sharedApplication] enabledRemoteNotificationTypes]];
+  }
+  
   if ([[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStateGranted]
       || [[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStatePreRequestedYes]) {
-    DDLogInfo(@"%@ registeringForRemoteNotifications", self);
-    [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
-     (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
+    [self requestPushNotifsPermission];
   }
 }
 

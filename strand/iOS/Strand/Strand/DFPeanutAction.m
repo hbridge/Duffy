@@ -9,8 +9,6 @@
 #import "DFPeanutAction.h"
 #import "RestKit/RestKit.h"
 #import "DFPeanutUserObject.h"
-#import "DFPeanutError.h"
-
 
 @implementation DFPeanutAction
 
