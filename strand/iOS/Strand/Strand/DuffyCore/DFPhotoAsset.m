@@ -11,6 +11,7 @@
 
 @implementation DFPhotoAsset
 
+@synthesize storedMetadata;
 @synthesize metadata;
 @synthesize location;
 
@@ -18,13 +19,12 @@
 
 #pragma mark Methods to Override from here down
 
-- (NSURL *)canonicalURL
+- (NSDictionary *)metadata
 {
-  [DFPhotoAsset abstractClassException];
-  return nil;
+  return self.storedMetadata;
 }
 
-- (NSMutableDictionary *)metadata
+- (NSURL *)canonicalURL
 {
   [DFPhotoAsset abstractClassException];
   return nil;
@@ -42,7 +42,7 @@
   return nil;
 }
 
-- (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone
+- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone
 {
   [DFPhotoAsset abstractClassException];
   return nil;

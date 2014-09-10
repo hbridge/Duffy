@@ -92,7 +92,8 @@ static int NumChangesFlushThreshold = 100;
   
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
-  
+  DDLogDebug(@"Starting camera roll in findChanges");
+  NSDate *startDate = [NSDate date];
   // scan camera roll
   ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
   [library
@@ -118,7 +119,7 @@ static int NumChangesFlushThreshold = 100;
   [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   [self flushChanges];
-  DDLogInfo(@"Scan complete.  Change summary for all groups: \n%@", [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
+  DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@", [[NSDate date] timeIntervalSinceDate:startDate], [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
   
   return self.allObjectIDsToChanges;
 }
@@ -167,6 +168,7 @@ static int NumChangesFlushThreshold = 100;
 {
   NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   return ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
+    //DDLogDebug(@"In enumeration block, index %lu", (unsigned long)index);
     if(photoAsset != NULL) {
       if (self.isCancelled) {
         *stop = YES;
@@ -177,7 +179,11 @@ static int NumChangesFlushThreshold = 100;
         [self flushChanges];
       }
       NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
-      NSDate *assetDate = [photoAsset creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+      DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
+                                       createWithALAsset:photoAsset
+                                       inContext:self.managedObjectContext];
+      
+      NSDate *assetDate = [asset creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
       [self.knownNotFoundURLs removeObject:assetURL];
       
       // We have this asset in our DB, see if it matches what we expect
@@ -189,11 +195,11 @@ static int NumChangesFlushThreshold = 100;
           [self.unsavedObjectIDsToChanges addEntriesFromDictionary:changes];
           // set to the new known date
           self.knownAndFoundURLsToDates[assetURL] = assetDate;
+        } {
+          // If we found what we expected, then delete the one we just created since its a dup
+          [self.managedObjectContext deleteObject:asset];
         }
       } else {//(![knownAndFoundURLs containsObject:assetURLString])
-        DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
-                                         createWithALAsset:photoAsset
-                                         inContext:self.managedObjectContext];
         DFPhoto *newPhoto = [DFPhoto createWithAsset:asset
                                               userID:[[DFUser currentUser] userID]
                                             timeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]
@@ -202,7 +208,6 @@ static int NumChangesFlushThreshold = 100;
         // store information about the new photo to notify
         self.unsavedObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
         // add to list of knownURLs so we don't duplicate add it
-        
         // in either case, add mappings
         [self.foundURLs addObject:assetURL];
         self.knownAndFoundURLsToDates[assetURL] = assetDate;
@@ -213,6 +218,7 @@ static int NumChangesFlushThreshold = 100;
       [self.allObjectIDsToChanges addEntriesFromDictionary:groupObjectIDsToChanges];
       [groupObjectIDsToChanges removeAllObjects];
     }
+    //DDLogDebug(@"In enumeration block, index %lu, done", (unsigned long)index);
   };
 }
 

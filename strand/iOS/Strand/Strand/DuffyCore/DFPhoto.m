@@ -39,7 +39,7 @@
                        insertNewObjectForEntityForName:@"DFPhoto"
                        inManagedObjectContext:context];
   newPhoto.asset = asset;
-  newPhoto.creationDate = [asset creationDateForTimezone:timeZone];
+  newPhoto.creationDate = [asset creationDateForTimeZone:timeZone];
   newPhoto.userID = userID;
   
   return newPhoto;

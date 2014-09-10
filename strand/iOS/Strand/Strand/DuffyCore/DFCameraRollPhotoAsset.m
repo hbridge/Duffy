@@ -31,6 +31,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 @dynamic alAssetURLString;
 @synthesize asset = _asset;
 @synthesize hashString = _hashString;
+@synthesize metadata;
 
 + (ALAssetsLibrary *)sharedAssetsLibrary
 {
@@ -48,6 +49,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
                        insertNewObjectForEntityForName:@"DFCameraRollPhotoAsset"
                        inManagedObjectContext:managedObjectContext];
   newAsset.alAssetURLString = [[asset.defaultRepresentation url] absoluteString];
+  newAsset.storedMetadata = [[asset defaultRepresentation] metadata];
   
   return newAsset;
 }
@@ -81,16 +83,6 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 - (NSURL *)canonicalURL
 {
   return [NSURL URLWithString:self.alAssetURLString];
-}
-
-- (NSDictionary *)metadata
-{
-  return self.asset.defaultRepresentation.metadata;
-}
-
-- (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone;
-{
-  return [self.asset creationDateForTimeZone:timezone];
 }
 
 - (NSString *)formatCreationDate:(NSDate *)date
@@ -304,6 +296,28 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   ALAssetRepresentation *rep = [self.asset defaultRepresentation];
   NSString *fileName = [rep filename];
   return fileName;
+}
+
+- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone
+{
+  if (self.storedMetadata) {
+    NSDictionary *exifDict = self.storedMetadata[@"{Exif}"];
+    if (exifDict) {
+      if (exifDict[@"DateTimeOriginal"]){
+        NSDateFormatter *exifFormatter = [NSDateFormatter EXIFDateFormatter];
+        exifFormatter.timeZone = timezone;
+        NSDate *date = [exifFormatter dateFromString:exifDict[@"DateTimeOriginal"]];
+        return date;
+      }
+    }
+  }
+  
+  return [self.asset valueForProperty:ALAssetPropertyDate];
+}
+
+- (NSDate *)creationDate
+{
+  return [self creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 }
 
 

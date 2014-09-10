@@ -20,7 +20,6 @@ static NSMutableArray *idsBeingCached;
 @implementation DFStrandPhotoAsset
 
 @dynamic localURLString;
-@dynamic storedMetadata;
 @dynamic storedLocation;
 @dynamic creationDate;
 @synthesize hashString = _hashString;
@@ -49,11 +48,6 @@ static NSMutableArray *idsBeingCached;
   newAsset.localURLString = localFileURL.absoluteString;
   
   return newAsset;
-}
-
-- (NSDictionary *)metadata
-{
-  return self.storedMetadata;
 }
 
 - (CLLocation *)location
