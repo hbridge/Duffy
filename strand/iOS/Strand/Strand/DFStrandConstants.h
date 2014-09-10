@@ -39,5 +39,6 @@ extern NSString *const DFStrandCameraPhotoSavedNotificationName;
 + (UIColor *)strandGreen;
 + (UIColor *)strandYellow;
 + (UIColor *)strandBlue;
++ (UIColor *)strandRed;
 
 @end
