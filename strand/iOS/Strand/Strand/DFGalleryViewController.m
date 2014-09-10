@@ -37,13 +37,18 @@ static const CGFloat ItemSpacing = 2.5;
   self = [super init];
   if (self) {
     self.delegate = self;
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                             initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
-                                             style:UIBarButtonItemStylePlain
-                                             target:self
-                                             action:@selector(settingsButtonPressed:)];
+    [self initNavigationAndTab];
   }
   return self;
+}
+
+- (void)initNavigationAndTab
+{
+  self.navigationItem.title = @"Strands";
+  self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/GalleryBarButton"]
+                                   imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/GalleryBarButton"]
+                           imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
 - (void)viewDidLoad
@@ -300,9 +305,9 @@ static const CGFloat ItemSpacing = 2.5;
       photoID = ((DFPeanutFeedObject *)object.objects.firstObject).id;
     }
     
-    DFFeedViewController *photoFeedController =
-    [(RootViewController *)self.view.window.rootViewController photoFeedController];
-    [self.topBarController pushViewController:photoFeedController animated:YES];
+    DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
+    photoFeedController.strandToShow = section;
+    [self.navigationController pushViewController:photoFeedController animated:YES];
     [photoFeedController showPhoto:photoID animated:NO];
   }
 }

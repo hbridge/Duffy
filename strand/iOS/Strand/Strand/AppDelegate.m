@@ -39,6 +39,7 @@
 #import "DFCreateStrandViewController.h"
 #import "DFTopBarController.h"
 #import "DFStrandsFeedViewController.h"
+#import "DFGalleryViewController.h"
 
 
 @interface AppDelegate ()
@@ -154,14 +155,14 @@
   [DFPhotoStore sharedStore];
   
   DFStrandsFeedViewController *strandsFeedViewCotnroller = [[DFStrandsFeedViewController alloc] init];
-  DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
+  DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:strandsFeedViewCotnroller],
-    [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
+    [[DFNavigationController alloc] initWithRootViewController:galleryviewController],
     [[DFNavigationController alloc] initWithRootViewController:createViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
