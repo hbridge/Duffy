@@ -62,7 +62,7 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		response = urllib2.urlopen(url)
 		result = str(response.read())
 
-		self.assertTrue("Pipeline <br> Status" in result)
+		self.assertTrue("last-build" in result)
 		self.assertTrue("Last Upload" in result)
 
 	def testStrandFeed(self):
