@@ -2,7 +2,7 @@
 # Runs a server listening to requests to convert a lat lon to a timezone
 
 import json
-import subprocess, os, signal
+import subprocess, os, signal, sys
 import logging
 import datetime
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
