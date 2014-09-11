@@ -70,12 +70,6 @@ class BasePhotoAPI(APIView):
 		  we don't have iphone metadata
 	"""
 	def populateExtraData(self, photo):
-		# Bug fix for bad data in photo where date was before 1900
-		# Initial bug was from a photo in iPhone 1, guessing at the date
-		if (photo.time_taken.date() < datetime.date(1900, 1, 1)):
-			logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
-			photo.time_taken = datetime.date(2007, 9, 1)
-
 		lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
 
 		if not photo.location_point and (lat and lon):
@@ -100,6 +94,11 @@ class BasePhotoAPI(APIView):
 			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
 			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
 		
+		# Bug fix for bad data in photo where date was before 1900
+		# Initial bug was from a photo in iPhone 1, guessing at the date
+		if (photo.time_taken and photo.time_taken.date() < datetime.date(1900, 1, 1)):
+			logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
+			photo.time_taken = datetime.date(2007, 9, 1)
 		"""
 		if not photo.time_taken and photo.location_point:
 			timezoneName = timezoneFetcher.tzNameAt(photo.location_point.y, photo.location_point.x)
