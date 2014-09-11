@@ -225,6 +225,8 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 
 	def populateTimezonesForPhotos(self, photos):
+		timezonerBaseUrl = "http://localhost:8234/timezone?"
+		
 		params = list()
 		photosNeedingTimezone = list()
 		for photo in photos:
@@ -234,7 +236,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 		timezonerParams = '&'.join(params)
 
 		if len(photosNeedingTimezone) > 0:
-			timezonerUrl = "http://localhost:12345/timezone?%s" % (timezonerParams)
+			timezonerUrl = "%s%s" % (timezonerBaseUrl, timezonerParams)
 
 			logger.debug("Requesting URL:  %s" % timezonerUrl)
 			timezonerResultJson = urllib2.urlopen(timezonerUrl).read()

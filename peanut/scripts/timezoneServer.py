@@ -53,8 +53,13 @@ def main():
 						level=logging.DEBUG,
 						format='%(asctime)s %(levelname)s %(message)s')
 
+	if (len(sys.argv) > 1):
+		port = int(sys.argv[1])
+	else:
+		port = 8234
+		
 	try:
-		server = HTTPServer(('', 12345), HttpHandler)
+		server = HTTPServer(('', port), HttpHandler)
 		logging.info('started timezone server...')
 		server.serve_forever()
 	except KeyboardInterrupt:
