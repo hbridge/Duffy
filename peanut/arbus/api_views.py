@@ -229,7 +229,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			params.append("ll=%s,%s" % (photo.location_point.y, photo.location_point.x))
 		timezonerParams = '&'.join(params)
 
-		timezonerUrl = "http://localhost:12345/?%s" % (timezonerParams)
+		timezonerUrl = "http://localhost:12345/timezone?%s" % (timezonerParams)
 
 		logger.debug("Requesting URL:  %s" % timezonerUrl)
 		timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
