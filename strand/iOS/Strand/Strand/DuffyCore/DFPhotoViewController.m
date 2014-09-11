@@ -370,7 +370,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
       // remove it from the db
       [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.photoID];
       [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess
-                      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.creationDate]];
+                      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
     } else {
       UIAlertView *alertView = [[UIAlertView alloc]
                                 initWithTitle:@"Error"
@@ -382,7 +382,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
                                 otherButtonTitles:nil];
       [alertView show];
       [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure
-       timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.creationDate]];
+       timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
     }
   }];
 }
@@ -434,12 +434,12 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
       [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
                                             result:DFAnalyticsValueResultSuccess
                                         actionType:DFUIActionButtonPress
-                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.creationDate]];
+                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
     } else {
       [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
                                             result:DFAnalyticsValueResultFailure
                                         actionType:DFUIActionButtonPress
-                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.creationDate]];
+                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
       self.userFavoritedAction = oldAction;
       [self updateFavoriteButton];
       UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"

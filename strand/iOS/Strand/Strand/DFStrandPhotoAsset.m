@@ -84,6 +84,14 @@ static NSMutableArray *idsBeingCached;
   return self.creationDate;
 }
 
+- (NSDate *)creationDateInAssetTimeZone
+{
+  // We're tracking the timezone for Strand Photos right now so this shouldn't return anything
+  // TODO(Derek): We really shouldn't do this, this should be corrected based on timezone
+  return self.creationDate;
+}
+
+
 - (UIImage *)imageResizedToLength:(CGFloat)length
 {
   dispatch_semaphore_t loadSemaphore = dispatch_semaphore_create(0);

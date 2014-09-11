@@ -29,8 +29,11 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 @property (nonatomic, retain) id storedMetadata;
 @property (nonatomic, retain) CLLocation *location;
 @property (readonly, nonatomic, retain) NSString *hashString;
-/* The asset doesn't necessarily know what timezone it's in, so you have to give it one */
+/* Returns the asset's  creation date for the given timezone.  Usually UTC will be specified */
 - (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone;
+
+/* Returns the asset's creation date for the local timezone it was taken in */
+- (NSDate *)creationDateInAssetTimeZone;
 
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
