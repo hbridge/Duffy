@@ -6,6 +6,7 @@ from PIL import Image
 import time
 import logging
 import thread
+import urllib2
 import pprint
 import datetime
 import HTMLParser
@@ -223,7 +224,8 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 
 	def populateTimezonesForPhotos(self, photos):
-		for photo in timezoneNeedingPhotos:
+		params = list()
+		for photo in photos:
 			params.append("ll=%s,%s" % (photo.location_point.latitude, photo.location_point.longitude))
 		timezonerParams = '&'.join(params)
 
