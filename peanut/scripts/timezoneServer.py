@@ -4,6 +4,7 @@
 import json
 import subprocess, os, signal
 import logging
+import datetime
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 from tzwhere import tzwhere
@@ -24,6 +25,7 @@ class HttpHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
 		try:
 			response = dict({'result': True})
+			start = datetime.datetime.now()
 
 			if self.path.startswith("/timezone"):
 				if '?' in self.path:
@@ -35,9 +37,12 @@ class HttpHandler(BaseHTTPRequestHandler):
 						latlon = latlon.replace('&', '')
 						if latlon != "":
 							lat, lon = latlon.split(',')
+							a = datetime.datetime.now()
 							timezoneName = timezoneFetcher.tzNameAt(float(lat), float(lon))
+							b = datetime.datetime.now()
 							responses.append(timezoneName)
 						
+					print "Total request time: %s" % (datetime.datetime.now() - start)
 					return self.respondSuccess(responses)
 			return
 				

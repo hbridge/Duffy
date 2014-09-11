@@ -248,6 +248,8 @@ class PhotoBulkAPI(BasePhotoAPI):
 				photo.local_time_taken = photo.local_time_taken.replace(tzinfo=tzinfo)
 				photo.time_taken = photo.local_time_taken.astimezone(pytz.timezone("UTC"))
 
+				logger.debug("Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
+
 	def post(self, request, format=None):
 		response = list()
 
