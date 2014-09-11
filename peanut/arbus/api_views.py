@@ -225,7 +225,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 
 	def populateTimezonesForPhotos(self, photos):
-
 		params = list()
 		photosNeedingTimezone = list()
 		for photo in photos:
@@ -234,25 +233,26 @@ class PhotoBulkAPI(BasePhotoAPI):
 				params.append("ll=%s,%s" % (photo.location_point.y, photo.location_point.x))
 		timezonerParams = '&'.join(params)
 
-		timezonerUrl = "http://localhost:12345/timezone?%s" % (timezonerParams)
+		if len(photosNeedingTimezone) > 0:
+			timezonerUrl = "http://localhost:12345/timezone?%s" % (timezonerParams)
 
-		logger.debug("Requesting URL:  %s" % timezonerUrl)
-		timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
-		
-		if (timezonerResultJson):
-			timezonerResult = json.loads(timezonerResultJson)
-			for i, photo in enumerate(photosNeedingTimezone):
-				timezoneName = timezonerResult[i]
-				if not timezoneName:
-					logger.error("got no timezone with lat:%s lon:%s, setting to Eastern" % (photo.location_point.y, photo.location_point.x))
-					tzinfo = pytz.timezone('US/Eastern')
-				else:	
-					tzinfo = pytz.timezone(timezoneName)
-						
-				photo.local_time_taken = photo.local_time_taken.replace(tzinfo=tzinfo)
-				photo.time_taken = photo.local_time_taken.astimezone(pytz.timezone("UTC"))
-
-				logger.debug("Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
+			logger.debug("Requesting URL:  %s" % timezonerUrl)
+			timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
+			
+			if (timezonerResultJson):
+				timezonerResult = json.loads(timezonerResultJson)
+				for i, photo in enumerate(photosNeedingTimezone):
+					timezoneName = timezonerResult[i]
+					if not timezoneName:
+						logger.error("got no timezone with lat:%s lon:%s, setting to Eastern" % (photo.location_point.y, photo.location_point.x))
+						tzinfo = pytz.timezone('US/Eastern')
+					else:	
+						tzinfo = pytz.timezone(timezoneName)
+							
+					localTimeTaken = photo.local_time_taken.replace(tzinfo=tzinfo)
+					photo.time_taken = localTimeTaken.astimezone(pytz.timezone("UTC"))
+					
+					logger.debug("Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
 
 	def post(self, request, format=None):
 		response = list()
@@ -268,6 +268,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			# Keep this around incase we find dups, then we can update the photo with new data
 			dupPhotoData = list()
 			batchKey = randint(1,10000)
+			seenHashCodes = list()
 
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
@@ -275,15 +276,16 @@ class PhotoBulkAPI(BasePhotoAPI):
 					
 				photo = self.simplePhotoSerializer(photoData)
 
-				self.populateExtraData(photo)
-				objsToCreate.append(photo)
+				if (photo.iphone_hash and photo.iphone_hash not in seenHashCodes) or not photo.iphone_hash:
+					self.populateExtraData(photo)
+					objsToCreate.append(photo)
 
-				dupPhotoData.append(photoData)
+					dupPhotoData.append(photoData)
+					seenHashCodes.append(photo.iphone_hash)
+				else:
+					logger.debug("Saw a repeat hash in the same request, so ignoring.  Hash was %s" % (photo.iphone_hash))
 
 			self.populateTimezonesForPhotos(objsToCreate)
-
-			for photo in objsToCreate:
-				logger.debug("2Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
 
 			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
 			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
@@ -314,11 +316,13 @@ class PhotoBulkAPI(BasePhotoAPI):
 					# These are all the fields that we might want to update.  List of the extra fields from above
 					# TODO(Derek):  Probably should do this more intelligently
 					Photo.bulkUpdate(createdPhotos, ["full_filename", "thumb_filename"])
+					logger.debug("Doing another update for created photos because %s photos had images" % (numImagesProcessed))
 			else:
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
 			for photo in createdPhotos:
 				response.append(model_to_dict(photo))
+				logger.debug("2Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
 
 			# We don't need to update/save the dups since other code does that, but we still
 			#   want to add it to the response
