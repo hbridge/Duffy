@@ -9,7 +9,7 @@
 #import "DFStrandsViewController.h"
 #import "DFTopBarController.h"
 
-@interface DFGalleryViewController : DFStrandsViewController <DFStrandViewControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate>
+@interface DFGalleryViewController : DFStrandsViewController <DFStrandViewControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 
 @property (nonatomic, retain) UICollectionView *collectionView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;

@@ -19,6 +19,7 @@
 #import "RootViewController.h"
 #import "DFLockedPhotoViewCell.h"
 #import "DFAnalytics.h"
+#import "DFGalleryCollectionViewFlowLayout.h"
 
 
 static const CGFloat ItemSize = 105;
@@ -26,7 +27,7 @@ static const CGFloat ItemSpacing = 2.5;
 
 @interface DFGalleryViewController ()
 
-@property (nonatomic, retain) UICollectionViewFlowLayout *flowLayout;
+@property (nonatomic, retain) DFGalleryCollectionViewFlowLayout *flowLayout;
 
 @end
 
@@ -55,7 +56,7 @@ static const CGFloat ItemSpacing = 2.5;
 {
   [super viewDidLoad];
   
-  self.flowLayout = [[UICollectionViewFlowLayout alloc] init];
+  self.flowLayout = [[DFGalleryCollectionViewFlowLayout alloc] init];
   self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame
                                            collectionViewLayout:self.flowLayout];
   [self.view addSubview:self.collectionView];
@@ -199,6 +200,26 @@ static const CGFloat ItemSpacing = 2.5;
   [cell setNeedsLayout];
   return cell;
 }
+
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
+    return CGSizeMake(ItemSize, ItemSize);
+  }
+  
+  DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
+  NSArray *itemsForSection = section.objects;
+  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
+  
+  if (object.actions.count > 0) {
+    return CGSizeMake(ItemSize * 3.0/2.0, ItemSize * 3.0/2.0);
+  }
+  
+  return CGSizeMake(ItemSize, ItemSize);
+}
+
 
 - (UICollectionViewCell *)cellForUploadAtIndexPath:(NSIndexPath *)indexPath
 {
