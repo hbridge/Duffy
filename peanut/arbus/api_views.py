@@ -115,7 +115,7 @@ class BasePhotoAPI(APIView):
 			photoData["time_taken"] = datetime.datetime.strptime(photoData["time_taken"], "%Y-%m-%dT%H:%M:%SZ")
 
 		if "local_time_taken" in photoData:
-			photoData["local_time_taken"] = datetime.datetime.strptime(photoData["time_taken"], "%Y-%m-%dT%H:%M:%SZ")
+			photoData["local_time_taken"] = datetime.datetime.strptime(photoData["local_time_taken"], "%Y-%m-%dT%H:%M:%SZ")
 
 		if "id" in photoData and int(photoData["id"]) == 0:
 			del photoData["id"]
