@@ -118,19 +118,21 @@ def userbaseSummary(request):
 	# Strand-related code
 	strandList = list()
 
+
 	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
 			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-lastAdded')
 
-	photoDataRaw = Photo.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
-	strandDataRaw = Strand.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').order_by().annotate(weeklyStrands=Count('users'))	
+	# This photo call is taking over a second on the dev database right now.
+	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
+	strandDataRaw = Strand.objects.filter(shared=True).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').order_by().annotate(weeklyStrands=Count('users'))	
 	actionDataRaw = PhotoAction.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyActions=Count('user'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
 	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
-	strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand')).order_by('-id'))
+	#strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand__shared')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
@@ -138,7 +140,7 @@ def userbaseSummary(request):
 	for i in range(len(userStats)):
 		entry = dict()
 		entry['actions'] = actionsCount[i].totalActions
-		entry['strands'] = strandCount[i].totalStrands
+		#entry['strands'] = strandCount[i].totalStrands
 		entry['contacts'] = contactCount[i].totalContacts
 		entry['friends'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
 		extras[actionsCount[i].id] = entry
@@ -174,25 +176,8 @@ def userbaseSummary(request):
 
 
 		if (user.totalCount > 0):
-			if (user.totalCount == user.thumbsCount == user.fullImagesCount == user.clusteredCount and 
-				user.photosWithGPS == user.twofishCount == user.strandedCount):
-				entry['status'] = 'OK'
-			elif (user.thumbsCount != user.totalCount):
-				entry['status'] = '!thumbs'
-			elif (user.fullImagesCount != user.totalCount):
-				entry['status'] = '!fulls'
-			elif (user.clusteredCount != user.totalCount):
-				entry['status'] = '!cluster'
-			elif (user.twofishCount < user.photosWithGPS):
-				entry['status'] = '!twofish'
-			elif(user.strandedCount != user.photosWithGPS):
-				entry['status'] = '!strand'
-			else:
-				entry['status'] = 'BAD'
-
 			entry['lastUploadTime'] = user.lastAdded.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-		else:
-			entry['status'] = 'OK'
+			entry['metadataCount'] = user.totalCount - user.thumbsCount
 
 		if user.id in notificationCountById:
 			entry['notifications'] = notificationCountById[user.id]
@@ -220,7 +205,6 @@ def userbaseSummary(request):
 		else:
 			entry['actions'] = '-'
 
-		entry['strandCount'] = extras[user.id]['strands']
 		entry['contactCount'] = extras[user.id]['contacts']
 		entry['friendCount'] = extras[user.id]['friends']
 

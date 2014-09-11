@@ -82,9 +82,9 @@
 				<td class='userid b-r'> ID </td>
 				<td class='name b-r'> Name </td>
 				<td class='created b-r'> Created </td>
-				<td class='status b-r' title='All | Thumbs | Fulls | Clustered || withGPS | Twofish | Strand'> Pipeline <br> Status </td>
-				<td class='db-count center b-r'> Photos <br> (7d | all) </td>
-				<td class='strands center b-r'> Strands <br> (7d | all) </td>
+				<td class='db-count center b-r'> Metadata <br> Only </td>
+				<td class='thumbs center b-r'> Photos <br> (7d | all) </td>
+				<td class='strands center b-r'> Strands <br> (7d) </td>
 				<td class='actions center b-r'> Actions <br> (7d | all) </td>
 				<td class='notifications center b-r'> Nots sent <br> (7d)</td>
 				<td class='last-not-timestamp b-r'> Last Not. <br> Timestamp </td>
@@ -99,10 +99,9 @@
 				<td class='userid b-r'> {{ entry.user.id }} </td>
 				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_new href='/strand/viz/neighbors?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
-				<td class='pipeline-status right b-r' 
-					title='{{entry.user.totalCount}} | {{ entry.user.thumbsCount }} | {{ entry.user.fullImagesCount }} | {{ entry.user.clusteredCount }} || {{entry.user.photosWithGPS}} | {{ entry.user.twofishCount }} | {{ entry.user.neighborCount }}'> {{ entry.status }} </td>				
-				<td class='db-count right b-r'> {{ entry.weeklyPhotos }} | {{ entry.user.totalCount }} </td>
-				<td class='strand right b-r'> {{entry.weeklyStrands }} | {{ entry.strandCount }} </td>
+				<td class='db-count right b-r'>	{{ entry.metadataCount }} </td>		
+				<td class='thumbs right b-r'> {{ entry.weeklyPhotos }} | {{ entry.user.thumbsCount }} </td>
+				<td class='strand right b-r'> {{entry.weeklyStrands }} </td>
 				<td class='actions right b-r'> {{entry.weeklyActions }} | {{ entry.actions}}</td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
 				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>				
