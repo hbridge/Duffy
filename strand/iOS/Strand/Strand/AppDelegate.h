@@ -14,7 +14,7 @@
 
 - (void)resetApplication;
 - (void)firstTimeSetupComplete;
-- (void)showCreateStrandTab;
+- (void)showCreateStrand;
 
 @end
 

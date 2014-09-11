@@ -91,6 +91,18 @@ const CGFloat CreateCellTitleSpacing = 8;
   [self updateSuggestions:self];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  
+  if (self.navigationController.isBeingPresented) {
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                             target:self
+                                             action:@selector(cancelPressed:)];
+  }
+}
+
 - (void)didReceiveMemoryWarning
 {
   [super didReceiveMemoryWarning];

@@ -71,6 +71,11 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
   titleLabel.textColor = [UIColor whiteColor];
   [titleLabel sizeToFit];
   self.navigationItem.titleView = titleLabel;
+  
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                            target:self
+                                            action:@selector(createStrandButtonPressed:)];
 }
 
 - (void)observeNotifications
@@ -441,7 +446,9 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 }
 
 - (IBAction)createStrandButtonPressed:(id)sender {
-  [(AppDelegate *)[[UIApplication sharedApplication] delegate] showCreateStrandTab];
+  DFCreateStrandViewController *vc = [[DFCreateStrandViewController alloc] initWithShowInvites:NO];
+  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
+                     animated:YES completion:nil];
 }
 
 

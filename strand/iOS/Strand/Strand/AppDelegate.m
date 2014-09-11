@@ -128,7 +128,7 @@
 {
   [self showMainView];
   [self performForegroundOperations];
-  [self showCreateStrandTab];
+  [self showCreateStrand];
 }
 
 - (void)createRootViewController
@@ -156,14 +156,12 @@
   
   DFStrandsFeedViewController *strandsFeedViewCotnroller = [[DFStrandsFeedViewController alloc] init];
   DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
-  DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:strandsFeedViewCotnroller],
     [[DFNavigationController alloc] initWithRootViewController:galleryviewController],
-    [[DFNavigationController alloc] initWithRootViewController:createViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   
@@ -331,9 +329,12 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   });
 }
 
-- (void)showCreateStrandTab
+- (void)showCreateStrand
 {
-  [self.tabBarController setSelectedIndex:2];
+  DFCreateStrandViewController *vc = [[DFCreateStrandViewController alloc] initWithShowInvites:YES];
+  [self.tabBarController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
+                                      animated:YES
+                                    completion:nil];
 }
 
 
