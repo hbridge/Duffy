@@ -13,8 +13,6 @@ import operator
 from random import randint
 from collections import Counter
 
-from tzwhere import tzwhere
-
 from django.shortcuts import render
 from django.template.loader import render_to_string
 from django.http import HttpResponse
@@ -48,8 +46,6 @@ import urllib
 from dateutil.relativedelta import relativedelta
 
 logger = logging.getLogger(__name__)
-
-#timezoneFetcher = tzwhere.tzwhere()
 
 class BasePhotoAPI(APIView):
 
@@ -93,13 +89,6 @@ class BasePhotoAPI(APIView):
 		if not photo.time_taken:
 			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
 			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
-		
-		"""
-		if not photo.time_taken and photo.location_point and photo.local_time_taken:
-			timezoneName = timezoneFetcher.tzNameAt(photo.location_point.y, photo.location_point.x)
-			photo.time_taken = pytz.timezone(timezoneName).localize(photo.local_time_taken)
-			logger.debug("Set time_taken based on local.  From %s  to  %s" % (photo.local_time_taken, photo.time_taken))
-		"""
 		
 		# Bug fix for bad data in photo where date was before 1900
 		# Initial bug was from a photo in iPhone 1, guessing at the date
