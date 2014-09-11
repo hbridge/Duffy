@@ -37,9 +37,7 @@ class HttpHandler(BaseHTTPRequestHandler):
 						latlon = latlon.replace('&', '')
 						if latlon != "":
 							lat, lon = latlon.split(',')
-							a = datetime.datetime.now()
 							timezoneName = timezoneFetcher.tzNameAt(float(lat), float(lon))
-							b = datetime.datetime.now()
 							responses.append(timezoneName)
 						
 					print "Total request time: %s" % (datetime.datetime.now() - start)

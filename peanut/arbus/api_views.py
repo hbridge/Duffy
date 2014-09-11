@@ -225,9 +225,13 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 
 	def populateTimezonesForPhotos(self, photos):
+
 		params = list()
+		photosNeedingTimezone = list()
 		for photo in photos:
-			params.append("ll=%s,%s" % (photo.location_point.y, photo.location_point.x))
+			if not photo.time_taken and photo.local_time_taken and photo.location_point:
+				photosNeedingTimezone.append(photo)
+				params.append("ll=%s,%s" % (photo.location_point.y, photo.location_point.x))
 		timezonerParams = '&'.join(params)
 
 		timezonerUrl = "http://localhost:12345/timezone?%s" % (timezonerParams)
@@ -237,7 +241,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 		
 		if (timezonerResultJson):
 			timezonerResult = json.loads(timezonerResultJson)
-			for i, photo in enumerate(photos):
+			for i, photo in enumerate(photosNeedingTimezone):
 				timezoneName = timezonerResult[i]
 				if not timezoneName:
 					logger.error("got no timezone with lat:%s lon:%s, setting to Eastern" % (photo.location_point.y, photo.location_point.x))
@@ -276,13 +280,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 				dupPhotoData.append(photoData)
 
-			# Now gather all photos which need a time_taken converted from local_time_taken
-			timezoneNeedingPhotos = list()
-			for photo in objsToCreate:
-				if not photo.time_taken and photo.local_time_taken and photo.location_point:
-					timezoneNeedingPhotos.append(photo)
-
-			self.populateTimezonesForPhotos(timezoneNeedingPhotos)
+			self.populateTimezonesForPhotos(objsToCreate)
 
 			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
 			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
