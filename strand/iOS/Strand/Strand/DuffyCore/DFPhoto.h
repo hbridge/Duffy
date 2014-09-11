@@ -18,7 +18,8 @@
 @property (nonatomic) DFPhotoIDType photoID;
 @property (nonatomic, retain) DFPhotoAsset *asset;
 
-@property (nonatomic, retain) NSDate *creationDate;
+@property (nonatomic, retain) NSDate *utcCreationDate;
+@property (nonatomic, retain) NSDate *localCreationDate;
 @property (nonatomic, retain) NSDate *uploadThumbDate;
 @property (nonatomic, retain) NSDate *uploadLargeDate;
 @property (nonatomic) BOOL isUploadProcessed;

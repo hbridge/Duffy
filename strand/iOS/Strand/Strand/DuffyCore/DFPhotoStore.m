@@ -103,7 +103,7 @@ static DFPhotoStore *defaultStore;
   NSEntityDescription *entity = [[self.managedObjectModel entitiesByName] objectForKey:@"DFPhoto"];
   request.entity = entity;
   
-  NSSortDescriptor *dateSort = [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:YES];
+  NSSortDescriptor *dateSort = [NSSortDescriptor sortDescriptorWithKey:@"localCreationDate" ascending:YES];
   request.sortDescriptors = [NSArray arrayWithObject:dateSort];
   
   NSError *error;

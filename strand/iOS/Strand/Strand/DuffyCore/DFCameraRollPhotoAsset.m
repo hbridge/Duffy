@@ -48,9 +48,30 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
                        insertNewObjectForEntityForName:@"DFCameraRollPhotoAsset"
                        inManagedObjectContext:managedObjectContext];
   newAsset.alAssetURLString = [[asset.defaultRepresentation url] absoluteString];
-  newAsset.storedMetadata = [[asset defaultRepresentation] metadata];
+  // TODO(Derek) Figure out how to do the full metadata pull and do another sync.
   
+  // metadata = [[asset defaultRepresentation] metadata];
+  newAsset.storedMetadata = [newAsset createMetadata:asset];
   return newAsset;
+}
+
+- (NSMutableDictionary *)createMetadata:(ALAsset *)asset
+{
+  CLLocation *location = [self.asset valueForProperty:ALAssetPropertyLocation];
+ 
+  CLLocationCoordinate2D coords = location.coordinate;
+  CLLocationDistance altitude = location.altitude;
+  
+  NSDictionary *latlongDict = @{@"Latitude": @(fabs(coords.latitude)),
+                                @"LatitudeRef" : coords.latitude >= 0.0 ? @"N" : @"S",
+                                @"Longitude" : @(fabs(coords.longitude)),
+                                @"LongitudeRef" : coords.longitude >= 0.0 ? @"E" : @"W",
+                                @"Altitude" : @(altitude),
+                                };
+  NSMutableDictionary *latLongMetadata = [NSMutableDictionary new];
+  latLongMetadata[@"{GPS}"] = latlongDict;
+
+  return latLongMetadata;
 }
 
 - (ALAsset *)asset
@@ -311,13 +332,16 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
     }
   }
   
+  // If we can't return the date in the correct timezone, then return nothing.
+  //   Callers can then call creationDateInAssetTimeZone
+  return nil;
+}
+
+- (NSDate *)creationDateInAssetTimeZone
+{
   return [self.asset valueForProperty:ALAssetPropertyDate];
 }
 
-- (NSDate *)creationDate
-{
-  return [self creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
-}
 
 
 @end

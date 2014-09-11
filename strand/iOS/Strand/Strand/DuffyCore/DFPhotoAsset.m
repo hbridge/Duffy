@@ -11,7 +11,6 @@
 
 @implementation DFPhotoAsset
 
-
 @synthesize metadata;
 @synthesize location;
 
@@ -20,7 +19,7 @@
 
 #pragma mark Methods to Override from here down
 
-- (NSDictionary *)metadata
+- (NSMutableDictionary *)metadata
 {
   return self.storedMetadata;
 }
@@ -48,6 +47,13 @@
   [DFPhotoAsset abstractClassException];
   return nil;
 }
+
+- (NSDate *)creationDateInAssetTimeZone
+{
+  [DFPhotoAsset abstractClassException];
+  return nil;
+}
+
 
 - (void)loadImageResizedToLength:(CGFloat)length success:(DFPhotoAssetLoadSuccessBlock)success failure:(DFPhotoAssetLoadFailureBlock)failure
 {

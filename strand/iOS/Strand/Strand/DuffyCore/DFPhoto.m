@@ -20,7 +20,8 @@
 @implementation DFPhoto
 
 @dynamic asset;
-@dynamic creationDate;
+@dynamic localCreationDate;
+@dynamic utcCreationDate;
 @dynamic photoID;
 @dynamic uploadThumbDate;
 @dynamic uploadLargeDate;
@@ -39,7 +40,12 @@
                        insertNewObjectForEntityForName:@"DFPhoto"
                        inManagedObjectContext:context];
   newPhoto.asset = asset;
-  newPhoto.creationDate = [asset creationDateForTimeZone:timeZone];
+  newPhoto.localCreationDate = [asset creationDateForTimeZone:timeZone];
+  if (!newPhoto.localCreationDate) {
+    newPhoto.localCreationDate = [asset creationDateInAssetTimeZone];
+  }
+  newPhoto.utcCreationDate = [asset creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+  
   newPhoto.userID = userID;
   
   return newPhoto;

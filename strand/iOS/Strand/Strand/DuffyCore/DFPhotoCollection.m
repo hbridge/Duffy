@@ -52,7 +52,7 @@
                                            inSortedRange:(NSRange){0, photosByDate.count}
                                                  options:NSBinarySearchingInsertionIndex
                                          usingComparator:^NSComparisonResult(DFPhoto *photo1, DFPhoto *photo2) {
-                                           return [photo1.creationDate compare:photo2.creationDate];
+                                           return [photo1.localCreationDate compare:photo2.localCreationDate];
                                          }];
     [photosByDate insertObject:newPhoto atIndex:insertIndex];
     [objectIDsByDate insertObject:newPhoto.objectID atIndex:insertIndex];

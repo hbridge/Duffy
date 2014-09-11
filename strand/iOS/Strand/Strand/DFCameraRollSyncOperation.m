@@ -76,7 +76,7 @@ static int NumChangesFlushThreshold = 100;
   
   for (DFPhoto *photo in [knownPhotos photoSet]) {
     mapping[photo.asset.canonicalURL] =
-    [photo creationDate];
+    [photo localCreationDate];
   }
   
   return mapping;
@@ -168,7 +168,6 @@ static int NumChangesFlushThreshold = 100;
 {
   NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   return ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
-    //DDLogDebug(@"In enumeration block, index %lu", (unsigned long)index);
     if(photoAsset != NULL) {
       if (self.isCancelled) {
         *stop = YES;
@@ -182,8 +181,7 @@ static int NumChangesFlushThreshold = 100;
       DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
                                        createWithALAsset:photoAsset
                                        inContext:self.managedObjectContext];
-      
-      NSDate *assetDate = [asset creationDateForTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
+      NSDate *assetDate = [asset creationDateInAssetTimeZone];
       [self.knownNotFoundURLs removeObject:assetURL];
       
       // We have this asset in our DB, see if it matches what we expect
@@ -218,7 +216,6 @@ static int NumChangesFlushThreshold = 100;
       [self.allObjectIDsToChanges addEntriesFromDictionary:groupObjectIDsToChanges];
       [groupObjectIDsToChanges removeAllObjects];
     }
-    //DDLogDebug(@"In enumeration block, index %lu, done", (unsigned long)index);
   };
 }
 
