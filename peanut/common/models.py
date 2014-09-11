@@ -95,6 +95,7 @@ class Photo(models.Model):
 	overfeat_data = models.TextField(null=True)
 	faces_data = models.TextField(null=True)
 	time_taken = models.DateTimeField(null=True)
+	local_time_taken = models.DateTimeField(null=True)
 	clustered_time = models.DateTimeField(null=True)
 	neighbored_time = models.DateTimeField(null=True)
 	strand_evaluated = models.BooleanField(default=False, db_index=True)

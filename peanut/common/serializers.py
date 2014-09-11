@@ -19,7 +19,7 @@ class PhotoForApiSerializer(serializers.ModelSerializer):
 
 	class Meta:
 		model = Photo
-		fields = ('id', 'user', 'time_taken','full_image_path', 'thumb_image_path', 'user_display_name',)
+		fields = ('id', 'user', 'time_taken', 'local_time_taken', 'full_image_path', 'thumb_image_path', 'user_display_name',)
 
 
 class UserSerializer(serializers.ModelSerializer):
