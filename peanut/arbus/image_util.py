@@ -140,7 +140,7 @@ def getTimeTakenFromExtraData(photo, tryFile=False):
 				timeStr = metadata["{DFCameraRollExtras}"]["DateTimeCreated"]
 				dt = datetime.strptime(timeStr, "%Y:%m:%d %H:%M:%S")
 				return dt
-	
+
 	if tryFile:
 		exif = getExifData(photo)
 
@@ -150,9 +150,10 @@ def getTimeTakenFromExtraData(photo, tryFile=False):
 			return dt
 
 	try:
-		filenameNoExt = os.path.splitext(os.path.basename(photo.orig_filename))[0]
-		dt = datetime.strptime(filenameNoExt, "%Y-%m-%d %H.%M.%S")
-		return dt
+		if photo.orig_filename:
+			filenameNoExt = os.path.splitext(os.path.basename(photo.orig_filename))[0]
+			dt = datetime.strptime(filenameNoExt, "%Y-%m-%d %H.%M.%S")
+			return dt
 	except ValueError:
 		pass
 

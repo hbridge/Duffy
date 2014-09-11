@@ -49,6 +49,8 @@ logger = logging.getLogger(__name__)
 
 
 class BasePhotoAPI(APIView):
+	timezoneFetcher = tzwhere.tzwhere()
+
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
 		for key in jsonDict:
@@ -60,17 +62,12 @@ class BasePhotoAPI(APIView):
 
 		return ret
 
-
 	"""
 		Fill in extra data that needs a bit more processing.
 		Right now time_taken and location_point.  Both will look at the file exif data if
 		  we don't have iphone metadata
 	"""
 	def populateExtraData(self, photo):
-		if not photo.time_taken:
-			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
-			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
-
 		# Bug fix for bad data in photo where date was before 1900
 		# Initial bug was from a photo in iPhone 1, guessing at the date
 		if (photo.time_taken.date() < datetime.date(1900, 1, 1)):
@@ -97,6 +94,15 @@ class BasePhotoAPI(APIView):
 		elif accuracy and accuracy >= photo.location_accuracy_meters:
 			logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
 	
+		if not photo.time_taken:
+			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
+			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
+		
+		if not photo.time_taken and photo.location_point:
+			timezoneName = timezoneFetcher.tzNameAt(photo.location_point.y, photo.location_point.x)
+
+			photo.time_taken = pytz.timezone(timezoneName).localize(photo.local_time_taken)
+
 		return photo
 
 	def populateExtraDataForPhotos(self, photos):
