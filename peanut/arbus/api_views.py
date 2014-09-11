@@ -51,7 +51,7 @@ logger = logging.getLogger(__name__)
 
 
 class BasePhotoAPI(APIView):
-	timezoneFetcher = tzwhere.tzwhere()
+	#timezoneFetcher = tzwhere.tzwhere()
 
 	def jsonDictToSimple(self, jsonDict):
 		ret = dict()
@@ -100,11 +100,12 @@ class BasePhotoAPI(APIView):
 			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
 			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
 		
+		"""
 		if not photo.time_taken and photo.location_point:
 			timezoneName = timezoneFetcher.tzNameAt(photo.location_point.y, photo.location_point.x)
 
 			photo.time_taken = pytz.timezone(timezoneName).localize(photo.local_time_taken)
-
+		"""
 		return photo
 
 	def populateExtraDataForPhotos(self, photos):
