@@ -89,7 +89,7 @@ class BasePhotoAPI(APIView):
 		if not photo.time_taken:
 			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
 			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
-		
+					
 		# Bug fix for bad data in photo where date was before 1900
 		# Initial bug was from a photo in iPhone 1, guessing at the date
 		if (photo.time_taken and photo.time_taken.date() < datetime.date(1900, 1, 1)):
@@ -113,7 +113,9 @@ class BasePhotoAPI(APIView):
 
 		if "time_taken" in photoData:
 			photoData["time_taken"] = datetime.datetime.strptime(photoData["time_taken"], "%Y-%m-%dT%H:%M:%SZ")
-			print photoData["time_taken"]
+
+		if "local_time_taken" in photoData:
+			photoData["local_time_taken"] = datetime.datetime.strptime(photoData["time_taken"], "%Y-%m-%dT%H:%M:%SZ")
 
 		if "id" in photoData and int(photoData["id"]) == 0:
 			del photoData["id"]
@@ -220,6 +222,29 @@ class PhotoBulkAPI(BasePhotoAPI):
 		return photoDups
 
 
+	def populateTimezonesForPhotos(self, photos):
+		for photo in timezoneNeedingPhotos:
+			params.append("ll=%s,%s" % (photo.location_point.latitude, photo.location_point.longitude))
+		timezonerParams = '&'.join(params)
+
+		timezonerUrl = "http://localhost:12345/?%s" % (timezonerParams)
+
+		logger.debug("Requesting URL:  %s" % timezonerUrl)
+		timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
+		
+		if (timezonerResultJson):
+			timezonerResult = json.loads(timezonerResultJson)
+			for i, photo in enumerate(photos):
+				timezoneName = timezonerResult[i]
+				if not timezoneName:
+					logger.error("got no timezone with lat:%s lon:%s, setting to Eastern" % (photo.location_point.y, photo.location_point.x))
+					tzinfo = pytz.timezone('US/Eastern')
+				else:	
+					tzinfo = pytz.timezone(timezoneName)
+						
+				photo.local_time_taken = photo.local_time_taken.replace(tzinfo=tzinfo)
+				photo.time_taken = photo.local_time_taken.astimezone(pytz.timezone("UTC"))
+
 	def post(self, request, format=None):
 		response = list()
 
@@ -245,6 +270,14 @@ class PhotoBulkAPI(BasePhotoAPI):
 				objsToCreate.append(photo)
 
 				dupPhotoData.append(photoData)
+
+			# Now gather all photos which need a time_taken converted from local_time_taken
+			timezoneNeedingPhotos = list()
+			for photo in objsToCreate:
+				if not photo.time_taken and photo.local_time_taken and photo.location_point:
+					timezoneNeedingPhotos.append(photo)
+
+			self.populateTimezonesForPhotos(timezoneNeedingPhotos)
 
 			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
 			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which

@@ -7,8 +7,6 @@ import urllib
 import json
 import pytz
 
-from tzwhere import tzwhere
-
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
@@ -19,7 +17,6 @@ from common.models import Photo
 from arbus import location_util
 
 logger = logging.getLogger(__name__)
-
 
 def chunks(l, n):
 	""" Yield successive n-sized chunks from l.
@@ -75,7 +72,7 @@ def getDataFromTwoFishesBulk(latLonList):
 
 	Static so it can be called in its own thread.
 """
-def populateLocationInfo(allPhotos, timezoneFetcher):
+def populateLocationInfo(allPhotos):
 	allPhotosUpdated = list()
 	
 	for photos in chunks(allPhotos, 100):
@@ -114,32 +111,16 @@ def populateLocationInfo(allPhotos, timezoneFetcher):
 
 			formattedResult = {"interpretations": twoFishesResults[i]}
 			photo.twofishes_data = json.dumps(formattedResult)
-
-			if not photo.time_taken and photo.location_point and photo.local_time_taken:
-				timezoneName = timezoneFetcher.tzNameAt(photo.location_point.y, photo.location_point.x)
-
-				if not timezoneName:
-					logger.error("got no timezone with lat:%s lon:%s, setting to Eastern" % (photo.location_point.y, photo.location_point.x))
-					tzinfo = pytz.timezone('US/Eastern')
-				else:	
-					tzinfo = pytz.timezone(timezoneName)
-					
-				photo.local_time_taken = photo.local_time_taken.replace(tzinfo=tzinfo)
-				photo.time_taken = photo.local_time_taken.astimezone(pytz.timezone("UTC"))
-				logger.debug("Set time_taken based on local.  From %s  to  %s" % (photo.local_time_taken, photo.time_taken))
-
+			
 			photosToUpdate.append(photo)
 
-
 		logger.info("Updating %s photos" % len(photosToUpdate))
-		Photo.bulkUpdate(photosToUpdate, ["twofishes_data", "location_city", "location_point", "location_accuracy_meters", "time_taken"])
+		Photo.bulkUpdate(photosToUpdate, ["twofishes_data", "location_city", "location_point", "location_accuracy_meters"])
 		allPhotosUpdated.extend(photosToUpdate)
 		
 	return len(allPhotosUpdated)
 
 def main(argv):
-	timezoneFetcher = tzwhere.tzwhere()
-	
 	logger.info("Starting... ")
 	baseQuery = Photo.objects.all().filter(twofishes_data=None)
 	while True:
@@ -148,7 +129,7 @@ def main(argv):
 
 		if len(photos) > 0:
 			logger.info("Found {0} images that need two fishes data".format(len(photos)))
-			numUpdated = populateLocationInfo(photos, timezoneFetcher)
+			numUpdated = populateLocationInfo(photos)
 		else:
 			time.sleep(1)
 
