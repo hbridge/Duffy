@@ -271,11 +271,16 @@ static const CGFloat ItemSpacing = 2.5;
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
-  cell.likeIconImageView.hidden = [[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] == 0;
+  cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
+  cell.imageView.clipsToBounds = YES;
+  
+  NSArray *likeActions = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
+  cell.likeIconImageView.hidden = (likeActions.count <= 0);
+  DFImageType preferredType = (likeActions.count > 0) ? DFImageFull : DFImageThumbnail;
   
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
-   preferredType:DFImageThumbnail
+   preferredType:preferredType
    thumbnailPath:photoObject.thumb_image_path
    fullPath:photoObject.full_image_path
    completion:^(UIImage *image) {
