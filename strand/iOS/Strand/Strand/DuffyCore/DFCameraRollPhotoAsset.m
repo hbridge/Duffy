@@ -49,13 +49,13 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
                        inManagedObjectContext:managedObjectContext];
   newAsset.alAssetURLString = [[asset.defaultRepresentation url] absoluteString];
   // TODO(Derek) Figure out how to do the full metadata pull and do another sync.
-  // Code to do that:
+  
   // metadata = [[asset defaultRepresentation] metadata];
   newAsset.storedMetadata = [newAsset createMetadata:asset];
   return newAsset;
 }
 
-- (NSDictionary *)createMetadata:(ALAsset *)asset
+- (NSMutableDictionary *)createMetadata:(ALAsset *)asset
 {
   CLLocation *location = [self.asset valueForProperty:ALAssetPropertyLocation];
  
@@ -341,6 +341,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 {
   return [self.asset valueForProperty:ALAssetPropertyDate];
 }
+
 
 
 @end

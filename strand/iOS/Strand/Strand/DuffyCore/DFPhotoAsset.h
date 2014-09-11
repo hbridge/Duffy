@@ -24,7 +24,7 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 // Metadata accessors
 @property (readonly, nonatomic, retain) NSURL *canonicalURL;
 // This gets pulled from the storedMetadata if it exists, if not pulls from asset
-@property (nonatomic, retain, readonly) NSDictionary *metadata;
+@property (nonatomic, retain, readonly) NSMutableDictionary *metadata;
 // This is a cached version of the metadata set upon creation of this class
 @property (nonatomic, retain) id storedMetadata;
 @property (nonatomic, retain) CLLocation *location;

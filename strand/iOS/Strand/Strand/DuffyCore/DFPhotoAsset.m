@@ -19,7 +19,7 @@
 
 #pragma mark Methods to Override from here down
 
-- (NSDictionary *)metadata
+- (NSMutableDictionary *)metadata
 {
   return self.storedMetadata;
 }
