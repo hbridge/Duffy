@@ -23,6 +23,8 @@
 		5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */; };
 		5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */; };
 		5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */; };
+		5A113B1219C0F647004CA85B /* DFProfilePhotoStackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */; };
+		5A113B1419C2472D004CA85B /* DFGallerySectionFooter.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A113B1319C2472D004CA85B /* DFGallerySectionFooter.xib */; };
 		5A13E09719BF61FE005357D2 /* DFStrandsFeedViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A13E09519BF61FE005357D2 /* DFStrandsFeedViewController.m */; };
 		5A13E09819BF61FE005357D2 /* DFStrandsFeedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A13E09619BF61FE005357D2 /* DFStrandsFeedViewController.xib */; };
 		5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */; };
@@ -239,6 +241,8 @@
 		5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDefaultsStore.m; sourceTree = "<group>"; };
 		5A0E12371976DCBF00B6FF04 /* DFNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationController.h; sourceTree = "<group>"; };
 		5A0E12381976DCBF00B6FF04 /* DFNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNavigationController.m; sourceTree = "<group>"; };
+		5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFProfilePhotoStackView.swift; sourceTree = "<group>"; };
+		5A113B1319C2472D004CA85B /* DFGallerySectionFooter.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFGallerySectionFooter.xib; sourceTree = "<group>"; };
 		5A13E09419BF61FE005357D2 /* DFStrandsFeedViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandsFeedViewController.h; sourceTree = "<group>"; };
 		5A13E09519BF61FE005357D2 /* DFStrandsFeedViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandsFeedViewController.m; sourceTree = "<group>"; };
 		5A13E09619BF61FE005357D2 /* DFStrandsFeedViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandsFeedViewController.xib; sourceTree = "<group>"; };
@@ -601,6 +605,7 @@
 				5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */,
 				5A0DC38219C0A72400654CAD /* ProfilePhotoView.xib */,
 				5A0DC38419C0A78300654CAD /* DFProfilePhotoView.swift */,
+				5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */,
 				5A0DC37F19C0A71000654CAD /* Strand-Bridging-Header.h */,
 			);
 			name = "Common Views";
@@ -931,6 +936,7 @@
 				5A9BC30E19A26A22002D1CD7 /* DFGallerySectionHeader.h */,
 				5A9BC30F19A26A22002D1CD7 /* DFGallerySectionHeader.m */,
 				5A9BC31119A26A34002D1CD7 /* DFGallerySectionHeader.xib */,
+				5A113B1319C2472D004CA85B /* DFGallerySectionFooter.xib */,
 				5A7F8FF819A7D09700EF0119 /* Cells */,
 			);
 			name = Gallery;
@@ -1363,6 +1369,7 @@
 				5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */,
 				5A9BC31219A26A34002D1CD7 /* DFGallerySectionHeader.xib in Resources */,
 				5AC4A8D119476F9000862D9C /* Assets in Resources */,
+				5A113B1419C2472D004CA85B /* DFGallerySectionFooter.xib in Resources */,
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5A13E09819BF61FE005357D2 /* DFStrandsFeedViewController.xib in Resources */,
 				5A4BBD3019B8BA8500359299 /* DFCreateStrandTableViewCell.xib in Resources */,
@@ -1509,6 +1516,7 @@
 				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */,
+				5A113B1219C0F647004CA85B /* DFProfilePhotoStackView.swift in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,

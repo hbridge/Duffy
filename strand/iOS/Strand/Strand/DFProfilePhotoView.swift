@@ -15,7 +15,13 @@ class DFProfilePhotoView: UIView {
   
   override func layoutSubviews() {
     super.layoutSubviews()
-    self.layer.cornerRadius = self.frame.size.width/2
+    self.imageView.backgroundColor = UIColor(white: 0.5, alpha: 1.0);
+    //self.layer.cornerRadius = self.frame.size.width/2
+  }
+  
+  override func awakeFromNib() {
+    //self.layer.cornerRadius = self.frame.size.width/2
+    self.layer.masksToBounds = true
   }
   
   func setProfileImage(image: UIImage){

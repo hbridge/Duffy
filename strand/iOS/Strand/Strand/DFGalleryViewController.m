@@ -79,9 +79,14 @@ static const CGFloat ItemSpacing = 2.5;
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionHeader" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionFooter" bundle:nil]
+        forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+               withReuseIdentifier:@"footerView"];
+  
   
   self.collectionView.backgroundColor = [UIColor whiteColor];
   self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
+  self.flowLayout.footerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionFooterHeight);
   self.flowLayout.itemSize = CGSizeMake(ItemSize, ItemSize);
   self.flowLayout.minimumInteritemSpacing = ItemSpacing;
   self.flowLayout.minimumLineSpacing = ItemSpacing;
@@ -119,7 +124,9 @@ static const CGFloat ItemSpacing = 2.5;
 }
 
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath
 {
   UICollectionReusableView *view;
   if (kind == UICollectionElementKindSectionHeader) {
@@ -134,10 +141,17 @@ static const CGFloat ItemSpacing = 2.5;
       DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
       headerView.titleLabel.text = sectionObject.title;
       headerView.subtitleLabel.text = sectionObject.subtitle;
+      NSString *userAbbreviation = [[[DFUser currentUser] displayName] substringToIndex:1];
+      headerView.profilePhotoStackView.abbreviations = @[userAbbreviation];
     }
     
     view = headerView;
+  } else if (kind == UICollectionElementKindSectionFooter) {
+    view = [self.collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+                                                   withReuseIdentifier:@"footerView"
+                                                          forIndexPath:indexPath];
   }
+  
   return view;
 }
 
