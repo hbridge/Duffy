@@ -282,6 +282,9 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			self.populateTimezonesForPhotos(objsToCreate)
 
+			for photo in objsToCreate:
+				logger.debug("2Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
+
 			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
 			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
 			#   ones were created
