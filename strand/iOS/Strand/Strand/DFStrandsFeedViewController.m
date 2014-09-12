@@ -8,11 +8,12 @@
 
 #import "DFStrandsFeedViewController.h"
 #import "DFPeanutFeedObject.h"
-#import "DFCreateStrandTableViewCell.h"
+#import "DFActivityFeedTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFImageStore.h"
 #import "DFFeedViewController.h"
 #import "DFSelectPhotosViewController.h"
+#import "NSString+DFHelpers.h"
 
 @interface DFStrandsFeedViewController ()
 
@@ -66,8 +67,8 @@
 - (void)configureTableView
 {
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFCreateStrandTableViewCell class] description] bundle:nil]
-   forCellReuseIdentifier:[[DFCreateStrandTableViewCell class] description]];
+   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   forCellReuseIdentifier:[[DFActivityFeedTableViewCell class] description]];
 }
 
 - (void)didReceiveMemoryWarning
@@ -117,12 +118,6 @@ didFinishServerFetchWithError:(NSError *)error
   return self.regularStrands;
 }
 
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-  if ([self strandsForSection:section] == self.invitedStrands) return @"Invitations";
-  return @"Strands";
-}
-
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return [[self strandsForSection:section] count];
@@ -135,20 +130,34 @@ didFinishServerFetchWithError:(NSError *)error
   DFPeanutFeedObject *strandObject = [self strandsForSection:indexPath.section][indexPath.row];
   
   cell = [self cellWithStrandObject:strandObject];
+  if (self.invitedStrands.count > 0 && indexPath.section == 0) {
+    cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
+  } else {
+    cell.contentView.backgroundColor = [UIColor whiteColor];
+  }
+  
   [cell setNeedsLayout];
   return cell;
 }
 
 - (UITableViewCell *)cellWithStrandObject:(DFPeanutFeedObject *)strandObject
 {
-  DFCreateStrandTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:[[DFCreateStrandTableViewCell class] description]];
+  DFActivityFeedTableViewCell *cell = [self.tableView
+                                       dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
   DFPeanutFeedObject *photoObject = strandObject.objects.firstObject;
   if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
   
   // Set the header attributes
-  cell.titleLabel.text = strandObject.title;
-  cell.locationLabel.text = strandObject.subtitle;
+  NSMutableArray *abbreviations = [NSMutableArray new];
+  for (DFPeanutFeedObject *photoObject in strandObject.objects) {
+    NSString *abbreviation = [photoObject.user_display_name substringToIndex:1];
+    if ([abbreviation isNotEmpty] && [abbreviations indexOfObject:abbreviation] == NSNotFound) {
+      [abbreviations addObject:abbreviation];
+    }
+  }
+  cell.profilePhotoStackView.abbreviations = [abbreviations subarrayWithRange:(NSRange){0,1}];
+
+  cell.actionTextLabel.text = strandObject.title;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
                          stringFromDate:photoObject.time_taken];
   [self setRemotePhotosForCell:cell withSection:strandObject];
@@ -156,7 +165,7 @@ didFinishServerFetchWithError:(NSError *)error
   return cell;
 }
 
-- (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
+- (void)setRemotePhotosForCell:(DFActivityFeedTableViewCell *)cell
                    withSection:(DFPeanutFeedObject *)section
 {
   NSMutableArray *photoIDs = [NSMutableArray new];

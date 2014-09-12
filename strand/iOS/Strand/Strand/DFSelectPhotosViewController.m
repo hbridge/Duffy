@@ -155,7 +155,9 @@ CGFloat const ToFieldHeight = 44.0;
                                           withReuseIdentifier:@"headerView"
                                           forIndexPath:indexPath];
     headerView.titleLabel.text = sectionObject.title;
-    headerView.subtitleLabel.text = sectionObject.subtitle;
+    if (sectionObject.user_display_name) {
+      headerView.profilePhotoStackView.abbreviations = @[[sectionObject.user_display_name substringToIndex:1]];
+    }
     
     
     view = headerView;

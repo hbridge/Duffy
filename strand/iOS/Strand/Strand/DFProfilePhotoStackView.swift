@@ -21,6 +21,7 @@ class DFProfilePhotoStackView: UIView {
   func setProfilePhotoViews() {
     self.sizeToFit()
     self.setNeedsDisplay()
+    self.superview?.setNeedsLayout()
   }
   
   override func sizeThatFits(size: CGSize) -> CGSize {
@@ -35,13 +36,16 @@ class DFProfilePhotoStackView: UIView {
     var context = UIGraphicsGetCurrentContext()
     
     for (i, abbreviation) in enumerate(abbreviations) {
-      CGContextSetFillColor(context, [0.5, 0.5, 0.5, 1.0])
       var abbreviationRect =
         CGRectMake(
-          CGFloat(i) * (self.frame.size.width - profilePhotoWidth)/CGFloat(abbreviations.count),
+          CGFloat(i) * self.profilePhotoWidth,
           0,
           profilePhotoWidth,
           profilePhotoWidth)
+      if i > 0 {
+        abbreviationRect.origin.x += 2
+      }
+      CGContextSetFillColor(context, [0.5, 0.5, 0.5, 1.0])
       CGContextFillEllipseInRect(context, abbreviationRect)
       
       var label = UILabel(frame: abbreviationRect)
@@ -50,7 +54,6 @@ class DFProfilePhotoStackView: UIView {
       label.text = abbreviation
       label.drawTextInRect(abbreviationRect)
     }
-    
   }
   
   

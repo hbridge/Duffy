@@ -20,6 +20,8 @@
 #import "DFLockedPhotoViewCell.h"
 #import "DFAnalytics.h"
 #import "DFGalleryCollectionViewFlowLayout.h"
+#import "NSString+DFHelpers.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 
 static const CGFloat ItemSize = 105;
@@ -137,13 +139,19 @@ static const CGFloat ItemSpacing = 2.5;
                                         forIndexPath:indexPath];
     if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
       headerView.titleLabel.text = @"Uploading Photos";
-      headerView.subtitleLabel.text = @"These photos are currently uploading";
     } else {
       DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
       headerView.titleLabel.text = sectionObject.title;
-      headerView.subtitleLabel.text = sectionObject.subtitle;
-      NSString *userAbbreviation = [[[DFUser currentUser] displayName] substringToIndex:1];
-      headerView.profilePhotoStackView.abbreviations = @[userAbbreviation];
+      headerView.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:sectionObject.time_taken];
+      
+      NSMutableArray *abbreviations = [NSMutableArray new];
+      for (DFPeanutFeedObject *photoObject in sectionObject.enumeratorOfDescendents.allObjects) {
+        NSString *abbreviation = [photoObject.user_display_name substringToIndex:1];
+        if ([abbreviation isNotEmpty] && [abbreviations indexOfObject:abbreviation] == NSNotFound) {
+          [abbreviations addObject:abbreviation];
+        }
+      }
+      headerView.profilePhotoStackView.abbreviations = abbreviations;
     }
     
     view = headerView;
