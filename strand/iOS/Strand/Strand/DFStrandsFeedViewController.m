@@ -155,7 +155,9 @@ didFinishServerFetchWithError:(NSError *)error
       [abbreviations addObject:abbreviation];
     }
   }
-  cell.profilePhotoStackView.abbreviations = [abbreviations subarrayWithRange:(NSRange){0,1}];
+  if (abbreviations.count > 0) {
+    cell.profilePhotoStackView.abbreviations = [abbreviations subarrayWithRange:(NSRange){0,1}];
+  }
 
   cell.actionTextLabel.text = strandObject.title;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
