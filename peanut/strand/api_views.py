@@ -116,16 +116,13 @@ def getTitleForStrand(user, strand):
 
 	return title
 
-def getActorsObjectData(actors, thisUser):
+def getActorsObjectData(actors):
 	if not isinstance(actors, list):
 		actors = [actors]
 
 	userData = list()
 	for user in actors:
-		if user.id == thisUser.id:
-			userData.append({'display_name': "You", 'id': user.id})
-		else:
-			userData.append({'display_name': user.display_name, 'id': user.id})
+		userData.append({'display_name': user.display_name, 'id': user.id})
 
 	return userData
 """
@@ -376,7 +373,7 @@ def getObjectsDataForActions(user):
 	photoActions = PhotoAction.objects.filter(photo__user_id=user.id).exclude(user=user).order_by("-added")[:20]
 
 	for photoAction in photoActions:
-		metadata = {'type': "like_action", 'title': "liked your photo", 'actors': getActorsObjectData(photoAction.user, user), 'time_stamp': photoAction.added, 'id': photoAction.id}
+		metadata = {'type': "like_action", 'title': "liked your photo", 'actors': getActorsObjectData(photoAction.user), 'time_stamp': photoAction.added, 'id': photoAction.id}
 
 		photoData = PhotoForApiSerializer(photoAction.photo).data
 		photoData['type'] = "photo"
@@ -508,7 +505,7 @@ def strand_activity(request):
 
 		inviteObjects = list()
 		for strandInvite in receivedStrandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user, user), 'time_stamp': strandInvite.added}
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user), 'time_stamp': strandInvite.added}
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 			inviteObjects.append(entry)
 		responseObjects.extend(inviteObjects)
@@ -526,7 +523,7 @@ def strand_activity(request):
 		createdStrandObjects = list()
 		for strand in createdStrandList:
 			entry = getObjectsDataForStrands(user, [strand], constants.FEED_OBJECT_TYPE_STRAND)
-			entry[0].update({'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strand.id, 'title': "started a strand", 'actors': getActorsObjectData(user, user), 'time_stamp': strand.added})
+			entry[0].update({'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strand.id, 'title': "started a strand", 'actors': getActorsObjectData(user), 'time_stamp': strand.added})
 
 			createdStrandObjects.append(entry[0])
 		responseObjects.extend(createdStrandObjects)
