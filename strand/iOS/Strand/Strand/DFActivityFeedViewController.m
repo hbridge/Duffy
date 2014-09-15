@@ -161,20 +161,17 @@ didFinishServerFetchWithError:(NSError *)error
   
   
   // actor/ action
-  NSArray *actors;
-  NSString *action;
+  DFPeanutFeedObject *actionObject;
   if (inviteObject) {
-    actors = inviteObject.actors;
-    action = inviteObject.title;
+    actionObject = inviteObject;
     cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
   } else {
-    actors = strandObject.actors;
-    action = strandObject.title;
+    actionObject = strandObject;
     cell.contentView.backgroundColor = [UIColor whiteColor];
   }
   
   NSMutableArray *abbreviations = [NSMutableArray new];
-  for (DFPeanutUserObject *actor in actors) {
+  for (DFPeanutUserObject *actor in actionObject.actors) {
     NSString *abbreviation = [actor.display_name substringToIndex:1];
     if ([abbreviation isNotEmpty] && [abbreviations indexOfObject:abbreviation] == NSNotFound) {
       [abbreviations addObject:abbreviation];
@@ -183,13 +180,17 @@ didFinishServerFetchWithError:(NSError *)error
   
   cell.profilePhotoStackView.abbreviations = abbreviations;
   
-  cell.actorLabel.text = [(DFPeanutUserObject *)actors.firstObject display_name];
-  cell.actionTextLabel.text = action;
+  DFPeanutUserObject *firstActor = actionObject.actors.firstObject;
+  if (firstActor.id == [[DFUser currentUser] userID]) {
+    cell.actorLabel.text = @"You";
+  } else {
+    cell.actorLabel.text = firstActor.display_name;
+  }
+  cell.actionTextLabel.text = actionObject.title;
+  
   // time taken
-  DFPeanutFeedObject *photoObject = strandObject.objects.firstObject;
-  if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
-                         stringFromDate:photoObject.time_taken];
+                         stringFromDate:actionObject.time_stamp];
   // photo preview
   [self setRemotePhotosForCell:cell withSection:strandObject];
   

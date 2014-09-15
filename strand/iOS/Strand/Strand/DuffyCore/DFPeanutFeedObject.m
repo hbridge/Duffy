@@ -67,6 +67,7 @@ static NSArray *FeedObjectTypes;
            @"time_taken",
            @"user",
            @"user_display_name",
+           @"time_stamp",
            ];
 }
 
