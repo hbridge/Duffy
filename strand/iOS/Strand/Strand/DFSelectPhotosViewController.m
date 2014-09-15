@@ -115,9 +115,9 @@ CGFloat const ToFieldHeight = 44.0;
     }
   }
   
-  self.suggestedPhotoObjects = photos;
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self.tableView reloadData];
+    self.suggestedPhotoObjects = photos;
+    [self.collectionView reloadData];
   });
 }
 
@@ -134,7 +134,7 @@ CGFloat const ToFieldHeight = 44.0;
   self.sharedPhotoObjects = photos;
   dispatch_async(dispatch_get_main_queue(), ^{
     
-    [self.tableView reloadData];
+    [self.collectionView reloadData];
   });
 }
 

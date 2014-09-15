@@ -14,6 +14,7 @@
 #import "DFFeedViewController.h"
 #import "DFSelectPhotosViewController.h"
 #import "NSString+DFHelpers.h"
+#import "DFPeanutStrandFeedAdapter.h"
 
 @interface DFStrandsFeedViewController ()
 
@@ -205,12 +206,24 @@ didFinishServerFetchWithError:(NSError *)error
   NSArray *strandsForSection = [self strandsForSection:indexPath.section];
   if (strandsForSection == self.invitedStrands) {
     DFPeanutFeedObject *inviteObject = self.inviteObjects[indexPath.row];
+    DFPeanutFeedObject *invitedStrand = inviteObject.objects.firstObject;
     
     DFSelectPhotosViewController *vc = [[DFSelectPhotosViewController alloc]
                                         initWithTitle:@"Accept Invite"
                                         showsToField:NO
                                         suggestedSectionObject:nil
-                                        sharedSectionObject:inviteObject.objects.firstObject];
+                                        sharedSectionObject:invitedStrand];
+    
+    
+    DFPeanutStrandFeedAdapter *feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+    [feedAdapter
+     fetchSuggestedPhotosForStrand:@(invitedStrand.id)
+     completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
+       if (!error) {
+         vc.suggestedSectionObject = response.objects.firstObject;
+       }
+     }];
+    
     [self.navigationController pushViewController:vc animated:YES];
   } else {
     DFFeedViewController *feedController = [[DFFeedViewController alloc] init];
