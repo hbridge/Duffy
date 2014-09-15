@@ -16,7 +16,7 @@ from django.db import IntegrityError
 from peanut.settings import constants
 
 from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor
-from common.serializers import UserSerializer
+from common.serializers import UserSerializer, PhotoForApiSerializer
 
 from common import api_util, cluster_util
 
@@ -82,16 +82,21 @@ def addActionsToClusters(clusters, actionsByPhotoIdCache):
 
 	return clusters
 
-def getTitleForStrand(user, strand):
+def getBestLocationForPhotos(photos):
 	# Grab title from the location_city of a photo...but find the first one that has
 	#   a valid location_city
 	bestLocation = None
-	i = 0
-	photos = strand.photos.all()
-	users = strand.users.all()
+	i = 0	
 	while (not bestLocation) and i < len(photos):
 		bestLocation = getBestLocation(photos[i])
 		i += 1
+
+	return bestLocation
+		
+def getTitleForStrand(user, strand):
+	photos = strand.photos.all()
+	users = strand.users.all()
+	location = getBestLocationForPhotos(photos)
 
 	names = list()
 	for u in users:
@@ -102,10 +107,10 @@ def getTitleForStrand(user, strand):
 
 	if len(users) == 1 and users[0].id == user.id:
 		title = "Just you"
-	elif user.display_name not in users:
+	elif user not in users:
 		title = "From " + "& ".join(names)
-		if bestLocation:
-			title += " near " + bestLocation
+		if location:
+			title += " near " + location
 	else:
 		title = ", ".join(names) + " and You"
 
@@ -181,7 +186,12 @@ def getFormattedGroups(groups):
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 
 		metadata = group['metadata']
-		#metadata.update({'title': title, 'subtitle': location, 'location': location})
+
+		location = getBestLocationForPhotos(group['photos'])
+		if not location:
+			location = "Location Unknown"
+		
+		metadata.update({'subtitle': location, 'location': location})
 
 		output.append({'clusters': clusters, 'metadata': metadata})
 	return output
@@ -257,6 +267,33 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 	return user
 
+
+"""
+	Creates a cache which is a dictionary with the key being the strandId and the value
+	a list of neighbor strands
+"""
+def getStrandNeighborsCache(strands):
+	strandIds = Strand.getIds(strands)
+
+	strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+
+	strandNeighborsCache = dict()
+	for strand in strands:
+		for strandNeighbor in strandNeighbors:
+			added = False
+			if strand.id == strandNeighbor.strand_1_id:
+				if strand.id not in strandNeighborsCache:
+					strandNeighborsCache[strand.id] = list()
+				if strandNeighbor.strand_2 not in strandNeighborsCache[strand.id]:
+					strandNeighborsCache[strand.id].append(strandNeighbor.strand_2)
+			elif strand.id == strandNeighbor.strand_2_id:
+				if strand.id not in strandNeighborsCache:
+					strandNeighborsCache[strand.id] = list()
+				if strandNeighbor.strand_1 not in strandNeighborsCache[strand.id]:
+					strandNeighborsCache[strand.id].append(strandNeighbor.strand_1)
+					
+	return strandNeighborsCache
+	
 def getObjectsDataForPhotos(user, photos, feedObjectType):
 	metadata = {'type': feedObjectType, 'title': ""}
 	groups = [{'photos': photos, 'metadata': metadata}]
@@ -291,33 +328,6 @@ def getObjectsDataForStrands(user, strands, feedObjectType):
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
-
-
-"""
-	Creates a cache which is a dictionary with the key being the strandId and the value
-	a list of neighbor strands
-"""
-def getStrandNeighborsCache(strands):
-	strandIds = Strand.getIds(strands)
-
-	strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
-
-	strandNeighborsCache = dict()
-	for strand in strands:
-		for strandNeighbor in strandNeighbors:
-			added = False
-			if strand.id == strandNeighbor.strand_1_id:
-				if strand.id not in strandNeighborsCache:
-					strandNeighborsCache[strand.id] = list()
-				if strandNeighbor.strand_2 not in strandNeighborsCache[strand.id]:
-					strandNeighborsCache[strand.id].append(strandNeighbor.strand_2)
-			elif strand.id == strandNeighbor.strand_2_id:
-				if strand.id not in strandNeighborsCache:
-					strandNeighborsCache[strand.id] = list()
-				if strandNeighbor.strand_1 not in strandNeighborsCache[strand.id]:
-					strandNeighborsCache[strand.id].append(strandNeighbor.strand_1)
-					
-	return strandNeighborsCache
 
 """
 	Returns back the objects data for private strands which includes neighbor_users.
@@ -359,6 +369,19 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	return objects
 
 
+def getObjectsDataForActions(user):
+	objectResponse = []
+	photoActions = PhotoAction.objects.filter(photo__user_id=user.id).exclude(user=user).order_by("-added")[:20]
+
+	for photoAction in photoActions:
+		metadata = {'type': "like_action", 'title': "liked your photo", 'actors': getActorsObjectData(user), 'time_stamp': photoAction.added, 'id': photoAction.id}
+
+		photoData = PhotoForApiSerializer(photoAction.photo).data
+		photoData['type'] = "photo"
+		metadata['objects'] = photoData
+		objectResponse.append(metadata)	
+		
+	return objectResponse
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
@@ -459,8 +482,20 @@ def strand_feed(request):
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
-	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
+		objectData = getObjectsDataForStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
+
+		response['objects'] = objectData
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+def strand_activity(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
@@ -471,21 +506,23 @@ def strand_feed(request):
 
 		inviteObjects = list()
 		for strandInvite in strandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user), 'time_stamp': strandInvite.added}
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 			inviteObjects.append(entry)
 
 		responseObjects.extend(inviteObjects)
 
-		# Grab regular feed objects
-		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
-		feedObjects = getObjectsDataForStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
-		responseObjects.extend(feedObjects)
+		actionObjects = getObjectsDataForActions(user)
+
+		responseObjects.extend(actionObjects)
+
+		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
 
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
 
 
 """
