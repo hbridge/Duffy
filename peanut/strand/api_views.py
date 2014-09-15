@@ -352,7 +352,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		title = ', '.join(neighborUsers)
 		if len(neighborUsers) > 0:
 			title += " might like these photos"
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand)}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
