@@ -9,6 +9,7 @@
 #import "DFPeanutFeedObject.h"
 #import <Restkit/RestKit.h>
 #import "DFPeanutUserObject.h"
+#import "NSString+DFHelpers.h"
 
 @implementation DFPeanutFeedObject
 
@@ -179,5 +180,18 @@ static NSArray *FeedObjectTypes;
   return NO;
 }
 
+- (NSArray *)actorAbbreviations
+{
+  NSMutableArray *abbreviations = [NSMutableArray new];
+  for (DFPeanutUserObject *actor in self.actors) {
+    if ([actor.display_name isNotEmpty]) {
+      NSString *abbreviation = [actor.display_name substringToIndex:1];
+      if ([abbreviations indexOfObject:abbreviation] == NSNotFound) {
+        [abbreviations addObject:abbreviation];
+      }
+    }
+  }
+  return abbreviations;
+}
 
 @end

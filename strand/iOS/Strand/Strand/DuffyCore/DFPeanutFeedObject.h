@@ -48,6 +48,6 @@ extern DFFeedObjectType DFFeedObjectLikeAction;
 - (NSEnumerator *)enumeratorOfDescendents;
 
 - (BOOL)isLockedSection;
-
+- (NSArray *)actorAbbreviations;
 
 @end

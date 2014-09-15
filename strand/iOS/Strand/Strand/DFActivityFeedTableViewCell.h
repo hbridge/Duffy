@@ -10,6 +10,7 @@
 #import "Strand-Swift.h"
 
 extern CGFloat const ActivityFeedTableViewCellHeight;
+extern CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight;
 
 @interface DFActivityFeedTableViewCell : DFCollectionViewTableViewCell
 
