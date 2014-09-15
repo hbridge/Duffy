@@ -95,7 +95,7 @@
   self.locationManager.delegate = self;
   self.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
   if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
-    // iOS 8 method
+    // iOS 8 method, the actual text displayed is kept in Info.plist
     [self.locationManager requestAlwaysAuthorization];
   } else {
     // iOS 7 method
