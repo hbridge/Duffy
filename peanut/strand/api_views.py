@@ -509,10 +509,7 @@ def strand_activity(request):
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 			inviteObjects.append(entry)
 		responseObjects.extend(inviteObjects)
-
-		actionObjects = getObjectsDataForActions(user)
-		responseObjects.extend(actionObjects)
-
+		
 		# Created Strands
 		# TODO(Derek): remove hack
 		# This is a hack right now that looks at strand invites and assumes that if you did the invite,
@@ -526,9 +523,17 @@ def strand_activity(request):
 			entry[0].update({'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strand.id, 'title': "started a strand", 'actors': getActorsObjectData(user), 'time_stamp': strand.added})
 
 			createdStrandObjects.append(entry[0])
-		responseObjects.extend(createdStrandObjects)
 
-		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
+		actionObjects = getObjectsDataForActions(user)
+
+		# Grab sent created strands and action data, then sort.  We put invites at the top
+		tmpObjects = list()
+		tmpObjects.extend(actionObjects)
+		tmpObjects.extend(createdStrandObjects)
+
+		tmpObjects = sorted(tmpObjects, key=lambda x: x['time_stamp'], reverse=True)
+
+		responseObjects.extend(tmpObjects)
 
 		response['objects'] = responseObjects
 	else:
