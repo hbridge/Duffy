@@ -82,18 +82,44 @@ def addActionsToClusters(clusters, actionsByPhotoIdCache):
 
 	return clusters
 
-def groupIsSolo(group, userId):
-	for photo in group:
-		if photo.user_id != userId:
-			return False
-	return True
+def getTitleForStrand(user, strand):
+	# Grab title from the location_city of a photo...but find the first one that has
+	#   a valid location_city
+	bestLocation = None
+	i = 0
+	photos = strand.photos.all()
+	users = strand.users.all()
+	while (not bestLocation) and i < len(photos):
+		bestLocation = getBestLocation(photos[i])
+		i += 1
 
-def groupDoesNotHaveUser(group, userId):
-	for photo in group:
-		if photo.user_id == userId:
-			return False
-	return True
+	names = list()
+	for u in users:
+		if u.id != user.id:
+			names.append(u.display_name)
 
+	names = set(names)
+
+	if len(users) == 1 and users[0].id == user.id:
+		title = "Just you"
+	elif user.display_name not in users:
+		title = "From " + "& ".join(names)
+		if bestLocation:
+			title += " near " + bestLocation
+	else:
+		title = ", ".join(names) + " and You"
+
+	return title
+
+def getActorsObjectData(actors):
+	if not isinstance(actors, list):
+		actors = [actors]
+
+	userData = list()
+	for user in actors:
+		userData.append({'display_name': user.display_name, 'id': user.id})
+
+	return userData
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -129,7 +155,7 @@ def groupDoesNotHaveUser(group, userId):
 		},
 	]
 """
-def getFormattedGroups(groups, userId):
+def getFormattedGroups(groups):
 	if len(groups) == 0:
 		return []
 
@@ -149,44 +175,13 @@ def getFormattedGroups(groups, userId):
 	for group in groups:
 		if len(group['photos']) == 0:
 			continue
-			
-		# Grab title from the location_city of a photo...but find the first one that has
-		#   a valid location_city
-		bestLocation = None
-		i = 0
-		while (not bestLocation) and i < len(group['photos']):
-			bestLocation = getBestLocation(group['photos'][i])
-			i += 1
 
-		names = list()
-		for photo in group['photos']:
-			if photo.user_id != userId:
-				names.append(photo.user.display_name)
-
-		names = set(names)
-
-		if "title" in group['metadata']:
-			title = group['metadata']['title']
-		elif (groupIsSolo(group['photos'], userId)):
-			title = "Just you"
-		elif (groupDoesNotHaveUser(group['photos'], userId)):
-			title = "From " + "& ".join(names)
-			if bestLocation:
-				title += " near " + bestLocation
-		else:
-			title = ", ".join(names) + " and You"
-
-		if bestLocation:
-			location = bestLocation
-		else:
-			location = "Location Unknown"
-			
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 
 		metadata = group['metadata']
-		metadata.update({'title': title, 'subtitle': location, 'location': location})
+		#metadata.update({'title': title, 'subtitle': location, 'location': location})
 
 		output.append({'clusters': clusters, 'metadata': metadata})
 	return output
@@ -262,26 +257,26 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 	return user
 
-def getObjectsDataForPhotos(userId, photos, feedObjectType):
-	metadata = {'type': feedObjectType}
+def getObjectsDataForPhotos(user, photos, feedObjectType):
+	metadata = {'type': feedObjectType, 'title': ""}
 	groups = [{'photos': photos, 'metadata': metadata}]
 
-	formattedGroups = getFormattedGroups(groups, userId)
+	formattedGroups = getFormattedGroups(groups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
 
-def getObjectsDataForStrands(userId, strands, feedObjectType):
-	friendsData = friends_util.getFriendsData(userId)
+def getObjectsDataForStrands(user, strands, feedObjectType):
+	friendsData = friends_util.getFriendsData(user.id)
 
 	# list of list of photos
 	groups = list()
 	for strand in strands:
 		strandId = strand.id
-		photos = friends_util.filterStrandPhotosByFriends(userId, friendsData, strand)
+		photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
 		
-		metadata = {'type': feedObjectType, 'id': strandId}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand)}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
@@ -291,7 +286,7 @@ def getObjectsDataForStrands(userId, strands, feedObjectType):
 		# now sort groups by the time_taken of the first photo in each group
 		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	formattedGroups = getFormattedGroups(groups, userId)
+	formattedGroups = getFormattedGroups(groups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
@@ -328,7 +323,7 @@ def getStrandNeighborsCache(strands):
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(userId, strands, feedObjectType):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = list()
 	
 	strandNeighborsCache = getStrandNeighborsCache(strands)
@@ -347,7 +342,7 @@ def getObjectsDataForPrivateStrands(userId, strands, feedObjectType):
 		title = ', '.join(neighborUsers)
 		if len(neighborUsers) > 0:
 			title += " might like these photos"
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand)}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
@@ -357,7 +352,7 @@ def getObjectsDataForPrivateStrands(userId, strands, feedObjectType):
 		# now sort groups by the time_taken of the first photo in each group
 		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	formattedGroups = getFormattedGroups(groups, userId)
+	formattedGroups = getFormattedGroups(groups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
@@ -384,8 +379,8 @@ def invited_strands(request):
 		responseObjects = list()
 
 		for strandInvite in strandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id}
-			entry['objects'] = getObjectsDataForStrands(user.id, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand"}
+			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 			responseObjects.append(entry)
 			
 		response['objects'] = responseObjects
@@ -409,7 +404,7 @@ def unshared_strands(request):
 		
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
-		response['objects'] = getObjectsDataForPrivateStrands(user.id, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -476,15 +471,15 @@ def strand_feed(request):
 
 		inviteObjects = list()
 		for strandInvite in strandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id}
-			entry['objects'] = getObjectsDataForStrands(user.id, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
+			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 			inviteObjects.append(entry)
 
 		responseObjects.extend(inviteObjects)
 
 		# Grab regular feed objects
 		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
-		feedObjects = getObjectsDataForStrands(user.id, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		feedObjects = getObjectsDataForStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 		responseObjects.extend(feedObjects)
 
 		response['objects'] = responseObjects
@@ -520,7 +515,7 @@ def get_joinable_strands(request):
 
 		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, lon, lat, strands, friendsData)
 		
-		response['objects'] = getObjectsDataForPhotos(user.id, joinableStrandPhotos, constants.FEED_OBJECT_TYPE_STRAND)
+		response['objects'] = getObjectsDataForPhotos(user, joinableStrandPhotos, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -546,7 +541,7 @@ def get_new_photos(request):
 
 		photoList = removeDups(photoList, lambda x: x.id)
 
-		response['objects'] = getObjectsDataForPhotos(user.id, photoList, constants.FEED_OBJECT_TYPE_STRAND)
+		response['objects'] = getObjectsDataForPhotos(user, photoList, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

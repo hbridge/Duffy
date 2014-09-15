@@ -347,7 +347,7 @@ class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
 	device_token = models.TextField(null=True)
 	msg = models.TextField(null=True)
-	msg_type = models.IntegerField()
+	msg_type = models.IntegerField(db_index=True)
 	custom_payload = models.TextField(null=True)
 	metadata = models.TextField(null=True)
 	# Not used, probably can remove at some point
