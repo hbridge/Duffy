@@ -24,6 +24,7 @@
 #import "DFNetworkingConstants.h"
 #import "AppDelegate.h"
 #import "DFContactsViewController.h"
+#import <AssetsLibrary/AssetsLibrary.h>
 
 @interface DFSettingsViewController ()
 
@@ -248,8 +249,16 @@ accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            [(id)[UIApplication sharedApplication] suspend];
-
+            ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
+            [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll | ALAssetsGroupLibrary usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
+              DDLogVerbose(@"Found group:%@", [group valueForProperty:ALAssetsGroupPropertyName]);
+              [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
+                DDLogVerbose(@"Found asset: %@", [result valueForProperty:ALAssetPropertyAssetURL]);
+              }];
+            } failureBlock:^(NSError *error) {
+              DDLogVerbose(@"error: %@",error);
+            }];
+            
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
