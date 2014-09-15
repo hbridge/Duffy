@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="vXZ-lx-hvc">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="ufC-wZ-h7g">
+            <objects>
+                <viewController id="vXZ-lx-hvc" customClass="ViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="jyV-Pf-zRb"/>
+                        <viewControllerLayoutGuide type="bottom" id="2fi-mo-0CV"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="kh9-bI-dsS">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Import Photos From" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="HqE-n8-cDq">
+                                <rect key="frame" x="223" y="138" width="154" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Hzm-Uf-gli">
+                                <rect key="frame" x="274" y="285" width="53" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <state key="normal" title="Import">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="importButtonPressed:" destination="vXZ-lx-hvc" eventType="touchUpInside" id="qxR-h7-817"/>
+                                </connections>
+                            </button>
+                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="NYt-S3-fn3">
+                                <rect key="frame" x="225" y="205" width="150" height="2"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="p2B-D2-lOh"/>
+                                </constraints>
+                            </progressView>
+                            <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="/Users/hbridge/Pictures/Simulator" borderStyle="roundedRect" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fsQ-e6-ZaV">
+                                <rect key="frame" x="16" y="167" width="568" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="261" id="yeD-ZM-loW"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <variation key="default">
+                                    <mask key="constraints">
+                                        <exclude reference="yeD-ZM-loW"/>
+                                    </mask>
+                                </variation>
+                            </textField>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="HqE-n8-cDq" firstAttribute="top" secondItem="jyV-Pf-zRb" secondAttribute="bottom" constant="118" id="0jY-ct-7Qi"/>
+                            <constraint firstItem="fsQ-e6-ZaV" firstAttribute="trailing" secondItem="kh9-bI-dsS" secondAttribute="trailingMargin" id="1e0-he-NES"/>
+                            <constraint firstAttribute="centerX" secondItem="Hzm-Uf-gli" secondAttribute="centerX" id="GKA-cG-iOC"/>
+                            <constraint firstItem="fsQ-e6-ZaV" firstAttribute="leading" secondItem="kh9-bI-dsS" secondAttribute="leadingMargin" id="Gt6-DT-JT7"/>
+                            <constraint firstItem="NYt-S3-fn3" firstAttribute="top" secondItem="fsQ-e6-ZaV" secondAttribute="bottom" constant="8" id="Mgn-OW-s9d"/>
+                            <constraint firstAttribute="centerX" secondItem="HqE-n8-cDq" secondAttribute="centerX" id="UAg-OA-5Zg"/>
+                            <constraint firstItem="Hzm-Uf-gli" firstAttribute="top" secondItem="fsQ-e6-ZaV" secondAttribute="bottom" constant="88" id="aCi-1N-plE"/>
+                            <constraint firstItem="fsQ-e6-ZaV" firstAttribute="top" secondItem="HqE-n8-cDq" secondAttribute="bottom" constant="8" id="qUs-H1-m5x"/>
+                            <constraint firstAttribute="centerX" secondItem="NYt-S3-fn3" secondAttribute="centerX" id="xqH-M8-5Qj"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="pathTextField" destination="fsQ-e6-ZaV" id="RmS-Om-jYg"/>
+                        <outlet property="progressView" destination="NYt-S3-fn3" id="A5i-mB-RBT"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="x5A-6p-PRh" sceneMemberID="firstResponder"/>
+            </objects>
+        </scene>
+    </scenes>
+</document>
