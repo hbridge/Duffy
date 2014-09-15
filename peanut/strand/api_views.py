@@ -116,13 +116,16 @@ def getTitleForStrand(user, strand):
 
 	return title
 
-def getActorsObjectData(actors):
+def getActorsObjectData(actors, thisUser):
 	if not isinstance(actors, list):
 		actors = [actors]
 
 	userData = list()
 	for user in actors:
-		userData.append({'display_name': user.display_name, 'id': user.id})
+		if user.id == thisUser.id:
+			userData.append({'display_name': "You", 'id': user.id})
+		else:
+			userData.append({'display_name': user.display_name, 'id': user.id})
 
 	return userData
 """
@@ -185,12 +188,11 @@ def getFormattedGroups(groups):
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 
-		metadata = group['metadata']
-
 		location = getBestLocationForPhotos(group['photos'])
 		if not location:
 			location = "Location Unknown"
 		
+		metadata = group['metadata']
 		metadata.update({'subtitle': location, 'location': location})
 
 		output.append({'clusters': clusters, 'metadata': metadata})
@@ -374,7 +376,7 @@ def getObjectsDataForActions(user):
 	photoActions = PhotoAction.objects.filter(photo__user_id=user.id).exclude(user=user).order_by("-added")[:20]
 
 	for photoAction in photoActions:
-		metadata = {'type': "like_action", 'title': "liked your photo", 'actors': getActorsObjectData(user), 'time_stamp': photoAction.added, 'id': photoAction.id}
+		metadata = {'type': "like_action", 'title': "liked your photo", 'actors': getActorsObjectData(photoAction.user, user), 'time_stamp': photoAction.added, 'id': photoAction.id}
 
 		photoData = PhotoForApiSerializer(photoAction.photo).data
 		photoData['type'] = "photo"
@@ -502,19 +504,32 @@ def strand_activity(request):
 		responseObjects = list()
 
 		# Grab invites
-		strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+		receivedStrandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 
 		inviteObjects = list()
-		for strandInvite in strandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user), 'time_stamp': strandInvite.added}
+		for strandInvite in receivedStrandInvites:
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user, user), 'time_stamp': strandInvite.added}
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 			inviteObjects.append(entry)
-
 		responseObjects.extend(inviteObjects)
 
 		actionObjects = getObjectsDataForActions(user)
-
 		responseObjects.extend(actionObjects)
+
+		# Created Strands
+		# TODO(Derek): remove hack
+		# This is a hack right now that looks at strand invites and assumes that if you did the invite,
+		#   you created the strand
+		sentStrandInvites = StrandInvite.objects.select_related().filter(user=user).exclude(skip=True)
+		createdStrandList = [x.strand for x in sentStrandInvites]
+		
+		createdStrandObjects = list()
+		for strand in createdStrandList:
+			entry = getObjectsDataForStrands(user, [strand], constants.FEED_OBJECT_TYPE_STRAND)
+			entry[0].update({'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strand.id, 'title': "started a strand", 'actors': getActorsObjectData(user, user), 'time_stamp': strand.added})
+
+			createdStrandObjects.append(entry[0])
+		responseObjects.extend(createdStrandObjects)
 
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
 
