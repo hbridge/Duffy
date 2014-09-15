@@ -163,6 +163,7 @@ didFinishServerFetchWithError:(NSError *)error
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
+  [self.class resetCell:cell];
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
@@ -196,6 +197,7 @@ didFinishServerFetchWithError:(NSError *)error
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
+  [self.class resetCell:cell];
   cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
   cell.profilePhotoStackView.abbreviations = inviteObject.actorAbbreviations;
   cell.actorLabel.text = [self.class firstActorNameForObject:inviteObject];
@@ -211,6 +213,7 @@ didFinishServerFetchWithError:(NSError *)error
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
+  [self.class resetCell:cell];
   
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
@@ -226,6 +229,12 @@ didFinishServerFetchWithError:(NSError *)error
   [self setRemotePreviewPhotoForCell:cell withFeedObject:actionObject];
 
   return cell;
+}
+
++ (void)resetCell:(DFActivityFeedTableViewCell *)cell
+{
+  cell.objects = @[];
+  cell.previewImageView.image = nil;
 }
 
 - (void)setRemotePhotosForCell:(DFActivityFeedTableViewCell *)cell
