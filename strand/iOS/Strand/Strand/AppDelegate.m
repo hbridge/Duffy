@@ -69,6 +69,11 @@
      launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]];
   }
   
+#if TARGET_IPHONE_SIMULATOR
+  NSLog(@"Simulator build running from: %@", [ [NSBundle mainBundle] bundleURL] );
+#endif
+
+  
   return YES;
 }
 
