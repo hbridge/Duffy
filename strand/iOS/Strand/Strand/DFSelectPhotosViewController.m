@@ -7,7 +7,6 @@
 //
 
 #import "DFSelectPhotosViewController.h"
-#import "DFGallerySectionHeader.h"
 #import "DFPhotoStore.h"
 #import "DFSelectablePhotoViewCell.h"
 #import "DFPeanutStrandAdapter.h"
@@ -19,6 +18,7 @@
 #import "DFImageStore.h"
 #import "DFPeanutStrand.h"
 #import "DFPeanutStrandInviteAdapter.h"
+#import "Strand-Swift.h"
 
 CGFloat const ToFieldHeight = 44.0;
 
@@ -90,10 +90,11 @@ CGFloat const ToFieldHeight = 44.0;
 
 - (void)configureCollectionView
 {
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionHeader" bundle:nil]
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFSelectPhotosHeaderView" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
-  self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
+  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width,
+                                                   [DFSelectPhotosHeaderView HeaderHeight]);
   [self.collectionView registerNib:[UINib nibWithNibName:[DFSelectablePhotoViewCell description] bundle:nil]
         forCellWithReuseIdentifier:@"selectableCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:[DFPhotoViewCell description] bundle:nil]
@@ -104,7 +105,7 @@ CGFloat const ToFieldHeight = 44.0;
 - (void)setSuggestedSectionObject:(DFPeanutFeedObject *)sectionObject
 {
   _suggestedSectionObject = sectionObject;
-  sectionObject.title = @"Your Photos (Not Shared)";
+  sectionObject.title = @"Select Photos to Share";
   NSMutableArray *photos = [NSMutableArray new];
   self.selectedPhotoIDs = [NSMutableArray new];
   for (DFPeanutFeedObject *object in sectionObject.enumeratorOfDescendents.allObjects) {
@@ -150,15 +151,11 @@ CGFloat const ToFieldHeight = 44.0;
   UICollectionReusableView *view;
   if (kind == UICollectionElementKindSectionHeader) {
     DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
-    DFGallerySectionHeader *headerView = [self.collectionView
+    DFSelectPhotosHeaderView *headerView = [self.collectionView
                                           dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                                           withReuseIdentifier:@"headerView"
                                           forIndexPath:indexPath];
-    headerView.titleLabel.text = sectionObject.title;
-    if (sectionObject.user_display_name) {
-      headerView.profilePhotoStackView.abbreviations = @[[sectionObject.user_display_name substringToIndex:1]];
-    }
-    
+    headerView.textLabel.text = sectionObject.title;
     
     view = headerView;
   }
