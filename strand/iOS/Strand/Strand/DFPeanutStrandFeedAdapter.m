@@ -12,7 +12,8 @@
 NSString *const UnsharedPath = @"unshared_strands";
 NSString *const GalleryPath = @"strand_feed";
 NSString *const InvitedPath = @"invited_strands";
-NSString *const SuggestedUnshared = @"suggested_unshared_photos";
+NSString *const SuggestedUnsharedPath = @"suggested_unshared_photos";
+NSString *const ActivityPath = @"strand_activity";
 
 
 @implementation DFPeanutStrandFeedAdapter
@@ -24,36 +25,19 @@ NSString *const SuggestedUnshared = @"suggested_unshared_photos";
 
 + (NSArray *)responseDescriptors
 {
-  RKResponseDescriptor *galleryResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:GalleryPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-
-  RKResponseDescriptor *suggestedResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:UnsharedPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-  RKResponseDescriptor *invitedResponseDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:InvitedPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-  RKResponseDescriptor *suggestedUnsharedDescriptor =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:SuggestedUnshared
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+  NSArray *paths = @[GalleryPath, UnsharedPath, InvitedPath, SuggestedUnsharedPath, ActivityPath];
   
-  return @[galleryResponseDescriptor,
-           suggestedResponseDescriptor,
-           invitedResponseDescriptor,
-           suggestedUnsharedDescriptor];
+  NSMutableArray *responseDescriptors = [NSMutableArray new];
+  for (NSString *path in paths) {
+    RKResponseDescriptor *descriptor = [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutObjectsResponse objectMapping]
+                                                                                    method:RKRequestMethodAny
+                                                                               pathPattern:path
+                                                                                   keyPath:nil
+                                                                               statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
+    [responseDescriptors addObject:descriptor];
+  }
+  
+  return responseDescriptors;
 }
 
 + (NSArray *)requestDescriptors
@@ -79,10 +63,14 @@ NSString *const SuggestedUnshared = @"suggested_unshared_photos";
 - (void)fetchSuggestedPhotosForStrand:(NSNumber *)strandID
                            completion:(DFPeanutObjectsCompletion)completionBlock
 {
-  [super fetchObjectsAtPath:SuggestedUnshared
+  [super fetchObjectsAtPath:SuggestedUnsharedPath
         withCompletionBlock:completionBlock
                  parameters:@{@"strand_id": strandID}];
 }
 
+- (void)fetchStrandActivityWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+{
+  [super fetchObjectsAtPath:ActivityPath withCompletionBlock:completionBlock];
+}
 
 @end

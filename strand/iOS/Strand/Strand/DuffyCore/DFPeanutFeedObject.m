@@ -8,6 +8,7 @@
 
 #import "DFPeanutFeedObject.h"
 #import <Restkit/RestKit.h>
+#import "DFPeanutUserObject.h"
 
 @implementation DFPeanutFeedObject
 
@@ -17,6 +18,7 @@ DFFeedObjectType DFFeedObjectCluster = @"cluster";
 DFFeedObjectType DFFeedObjectDocstack = @"docstack";
 DFFeedObjectType DFFeedObjectInviteStrand = @"invite_strand";
 DFFeedObjectType DFFeedObjectStrand = @"strand";
+DFFeedObjectType DFFeedObjectLikeAction = @"like_action";
 
 static NSArray *FeedObjectTypes;
 
@@ -48,7 +50,7 @@ static NSArray *FeedObjectTypes;
   [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"objects" mapping:objectMapping];
   [objectMapping addRelationshipMappingWithSourceKeyPath:@"actions" mapping:[DFPeanutAction objectMapping]];
-  
+  [objectMapping addRelationshipMappingWithSourceKeyPath:@"actors" mapping:[DFPeanutUserObject objectMapping]];
   
   return objectMapping;
 }

@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFStrandsFeedViewController.h"
+#import "DFActivityFeedViewController.h"
 #import "DFPeanutFeedObject.h"
 #import "DFActivityFeedTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
@@ -15,8 +15,9 @@
 #import "DFSelectPhotosViewController.h"
 #import "NSString+DFHelpers.h"
 #import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutUserObject.h"
 
-@interface DFStrandsFeedViewController ()
+@interface DFActivityFeedViewController ()
 
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 
@@ -26,16 +27,17 @@
 
 @end
 
-@implementation DFStrandsFeedViewController
+@implementation DFActivityFeedViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
+
+- (instancetype)init
 {
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-      self.delegate = self;
-      [self initTabBarItem];
-    }
-    return self;
+  self = [super initWithFeedType:activityFeed];
+  if (self) {
+    self.delegate = self;
+    [self initTabBarItem];
+  }
+  return self;
 }
 
 - (void)initTabBarItem
@@ -124,45 +126,71 @@ didFinishServerFetchWithError:(NSError *)error
   return [[self strandsForSection:section] count];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutFeedObject *strandObject = [self strandsForSection:indexPath.section][indexPath.row];
+  if ([strandObject.type isEqualToString:DFFeedObjectLikeAction]) {
+    return ActivityFeedTableViewCellHeight / 2.0;
+  }
+  return ActivityFeedTableViewCellHeight;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
   
   DFPeanutFeedObject *strandObject = [self strandsForSection:indexPath.section][indexPath.row];
   
-  cell = [self cellWithStrandObject:strandObject];
+  DFPeanutFeedObject *inviteObject;
+
   if (self.invitedStrands.count > 0 && indexPath.section == 0) {
-    cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
-  } else {
-    cell.contentView.backgroundColor = [UIColor whiteColor];
+    inviteObject = self.inviteObjects[indexPath.row];
   }
+  
+  cell = [self cellWithStrandObject:strandObject inviteObject:inviteObject];
   
   [cell setNeedsLayout];
   return cell;
 }
 
 - (UITableViewCell *)cellWithStrandObject:(DFPeanutFeedObject *)strandObject
+                             inviteObject:(DFPeanutFeedObject *)inviteObject
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
-  DFPeanutFeedObject *photoObject = strandObject.objects.firstObject;
-  if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
   
-  // Set the header attributes
+  
+  // actor/ action
+  NSArray *actors;
+  NSString *action;
+  if (inviteObject) {
+    actors = inviteObject.actors;
+    action = inviteObject.title;
+    cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
+  } else {
+    actors = strandObject.actors;
+    action = strandObject.title;
+    cell.contentView.backgroundColor = [UIColor whiteColor];
+  }
+  
   NSMutableArray *abbreviations = [NSMutableArray new];
-  for (DFPeanutFeedObject *photoObject in strandObject.objects) {
-    NSString *abbreviation = [photoObject.user_display_name substringToIndex:1];
+  for (DFPeanutUserObject *actor in actors) {
+    NSString *abbreviation = [actor.display_name substringToIndex:1];
     if ([abbreviation isNotEmpty] && [abbreviations indexOfObject:abbreviation] == NSNotFound) {
       [abbreviations addObject:abbreviation];
     }
   }
-  if (abbreviations.count > 0) {
-    cell.profilePhotoStackView.abbreviations = [abbreviations subarrayWithRange:(NSRange){0,1}];
-  }
-
-  cell.actionTextLabel.text = strandObject.title;
+  
+  cell.profilePhotoStackView.abbreviations = abbreviations;
+  
+  cell.actorLabel.text = [(DFPeanutUserObject *)actors.firstObject display_name];
+  cell.actionTextLabel.text = action;
+  // time taken
+  DFPeanutFeedObject *photoObject = strandObject.objects.firstObject;
+  if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
                          stringFromDate:photoObject.time_taken];
+  // photo preview
   [self setRemotePhotosForCell:cell withSection:strandObject];
   
   return cell;

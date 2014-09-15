@@ -8,7 +8,7 @@
 
 #import "DFStrandsViewController.h"
 
-@interface DFStrandsFeedViewController : DFStrandsViewController <UITableViewDataSource, UITableViewDelegate, DFStrandViewControllerDelegate>
+@interface DFActivityFeedViewController : DFStrandsViewController <UITableViewDataSource, UITableViewDelegate, DFStrandViewControllerDelegate>
 
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 

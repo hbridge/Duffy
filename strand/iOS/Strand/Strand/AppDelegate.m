@@ -38,7 +38,7 @@
 #import "DFSettingsViewController.h"
 #import "DFCreateStrandViewController.h"
 #import "DFTopBarController.h"
-#import "DFStrandsFeedViewController.h"
+#import "DFActivityFeedViewController.h"
 #import "DFGalleryViewController.h"
 
 
@@ -159,7 +159,7 @@
   
   [DFPhotoStore sharedStore];
   
-  DFStrandsFeedViewController *strandsFeedViewCotnroller = [[DFStrandsFeedViewController alloc] init];
+  DFActivityFeedViewController *strandsFeedViewCotnroller = [[DFActivityFeedViewController alloc] init];
   DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 

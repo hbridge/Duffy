@@ -42,18 +42,31 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 @property (nonatomic, retain) UIView *connectionErrorPlaceholder;
 @property (nonatomic, retain) UIView *nuxPlaceholder;
 
+@property (nonatomic) DFFeedType feedType;
+
 @end
 
 @implementation DFStrandsViewController
 
 @synthesize feedAdapter = _feedAdapter;
 
-- (instancetype)init
+
+- (instancetype)initWithFeedType:(DFFeedType)feedType
 {
   self = [super init];
   if (self) {
+    _feedType = feedType;
     [self configureView];
     [self observeNotifications];
+  }
+  return self;
+}
+
+- (instancetype)init
+{
+  self = [self initWithFeedType:strandsFeed];
+  if (self) {
+   
   }
   return self;
 }
@@ -209,9 +222,19 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (void)reloadFeedIsSilent:(BOOL)isSilent
 {
-  [self.feedAdapter fetchGalleryWithCompletionBlock:^(DFPeanutObjectsResponse *response,
-                                                         NSData *hashData,
-                                                         NSError *error) {
+  if (self.feedType == strandsFeed) {
+    [self.feedAdapter fetchGalleryWithCompletionBlock:[self fetchCompleteBlock:isSilent]];
+  } else if (self.feedType == activityFeed) {
+    [self.feedAdapter fetchStrandActivityWithCompletion:[self fetchCompleteBlock:isSilent]];
+  }
+  [[DFUploadController sharedUploadController] uploadPhotos];
+}
+
+- (DFPeanutObjectsCompletion)fetchCompleteBlock:(BOOL)isSilent
+{
+  return ^(DFPeanutObjectsResponse *response,
+           NSData *hashData,
+           NSError *error) {
     dispatch_async(dispatch_get_main_queue(), ^{
       BOOL newServerData = NO;
       
@@ -255,9 +278,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
       [self refreshView:newServerData];
       [self.delegate strandsViewController:self didFinishServerFetchWithError:error];
     });
-  }];
-  
-  [[DFUploadController sharedUploadController] uploadPhotos];
+  };
 }
 
 - (NSArray *)unprocessedFeedPhotos:(NSArray *)sectionObjects

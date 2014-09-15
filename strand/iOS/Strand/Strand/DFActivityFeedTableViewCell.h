@@ -9,8 +9,9 @@
 #import "DFCollectionViewTableViewCell.h"
 #import "Strand-Swift.h"
 
-@interface DFActivityFeedTableViewCell : DFCollectionViewTableViewCell
+extern CGFloat const ActivityFeedTableViewCellHeight;
 
+@interface DFActivityFeedTableViewCell : DFCollectionViewTableViewCell
 
 @property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;

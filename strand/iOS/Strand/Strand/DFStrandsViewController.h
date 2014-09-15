@@ -42,6 +42,12 @@ didFinishServerFetchWithError:(NSError *)error;
 @property (nonatomic, retain) DFNotificationsViewController *notificationsViewController;
 
 
+typedef enum {
+  strandsFeed,
+  activityFeed
+} DFFeedType;
+
+- (instancetype)initWithFeedType:(DFFeedType)feedType;
 - (void)reloadFeed;
 
 - (void)settingsButtonPressed:(id)sender;

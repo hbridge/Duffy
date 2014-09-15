@@ -22,6 +22,7 @@ extern DFFeedObjectType DFFeedObjectCluster;
 extern DFFeedObjectType DFFeedObjectDocstack;
 extern DFFeedObjectType DFFeedObjectInviteStrand;
 extern DFFeedObjectType DFFeedObjectStrand;
+extern DFFeedObjectType DFFeedObjectLikeAction;
 
 
 // Simple attribures
@@ -38,6 +39,7 @@ extern DFFeedObjectType DFFeedObjectStrand;
 // Relationships
 @property (nonatomic, retain) NSArray *objects;
 @property (nonatomic, retain) NSArray *actions;
+@property (nonatomic, retain) NSArray *actors;
 
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
