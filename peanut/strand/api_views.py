@@ -377,7 +377,7 @@ def getObjectsDataForActions(user):
 
 		photoData = PhotoForApiSerializer(photoAction.photo).data
 		photoData['type'] = "photo"
-		metadata['objects'] = photoData
+		metadata['objects'] = [photoData]
 		objectResponse.append(metadata)	
 		
 	return objectResponse
