@@ -40,5 +40,7 @@
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 	</array>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app uses your location to find friend&apos;s photos taken near you.</string>
 </dict>
 </plist>

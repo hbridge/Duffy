@@ -93,7 +93,14 @@
   }
   
   self.locationManager.delegate = self;
-  [self.locationManager startUpdatingLocation];
+  self.locationManager.desiredAccuracy = kCLLocationAccuracyKilometer;
+  if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+    // iOS 8 method
+    [self.locationManager requestAlwaysAuthorization];
+  } else {
+    // iOS 7 method
+    [self.locationManager startUpdatingLocation];
+  }
 }
 
 
@@ -108,27 +115,46 @@
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-  [DFAnalytics logSetupLocationCompletedWithResult:DFAnalyticsValueResultFailure
-                               userTappedLearnMore:self.didShowLearnMore];
-  DFPermissionStateType newState;
   if (error.code == kCLErrorDenied) {
-    newState = DFPermissionStateDenied;
+    [self locationManager:manager didChangeAuthorizationStatus:kCLAuthorizationStatusDenied];
   } else {
-    newState = DFPermissionStateUnavailable;
+    // we should probably figure out something finer grained than this, but it suffices for now
+    [self locationManager:manager didChangeAuthorizationStatus:kCLAuthorizationStatusDenied];
   }
-  [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:nil newState:newState];
-  [DFDefaultsStore setState:newState forPermission:DFPermissionLocation];
-  
-  [self.locationManager stopUpdatingLocation];
-  [self dismiss];
 }
 
 - (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
 {
-  [DFAnalytics logSetupLocationCompletedWithResult:DFAnalyticsValueResultSuccess
+  // in iOS7, locationManager didChangeAuthorizationStatus doesn't exist, so we rely on a
+  // successful location fetch to indicate that the authorization was granted
+  [self locationManager:manager didChangeAuthorizationStatus:kCLAuthorizationStatusAuthorized];
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+  DFPermissionStateType dfPermissionState;
+  NSString *analyticsResult;
+  
+  if (status == kCLAuthorizationStatusNotDetermined) {
+    // as soon as you request access, iOS 8 calls back with this
+    // return immediately since we don't have the results yet
+    return;
+  } else if (status == kCLAuthorizationStatusAuthorized || status == kCLAuthorizationStatusAuthorizedAlways) {
+    analyticsResult = DFAnalyticsValueResultSuccess;
+    dfPermissionState = DFPermissionStateGranted;
+  } else if (status == kCLAuthorizationStatusDenied) {
+    analyticsResult = DFAnalyticsValueResultFailure;
+    dfPermissionState = DFPermissionStateDenied;
+  } else if (status == kCLAuthorizationStatusRestricted) {
+    analyticsResult = DFAnalyticsValueResultFailure;
+    dfPermissionState = DFPermissionStateRestricted;
+  }
+  
+  [DFAnalytics logSetupLocationCompletedWithResult:analyticsResult
                                userTappedLearnMore:self.didShowLearnMore];
-  [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:nil newState:DFPermissionStateGranted];
-  [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionLocation];
+  [DFAnalytics logPermission:DFPermissionLocation changedWithOldState:nil newState:dfPermissionState];
+  [DFDefaultsStore setState:dfPermissionState forPermission:DFPermissionLocation];
+
   [self.locationManager stopUpdatingLocation];
   [self dismiss];
 }
