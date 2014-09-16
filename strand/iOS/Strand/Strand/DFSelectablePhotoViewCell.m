@@ -10,13 +10,12 @@
 
 @implementation DFSelectablePhotoViewCell
 
-- (id)initWithFrame:(CGRect)frame
+- (void)awakeFromNib
 {
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code
-    }
-    return self;
+  [super awakeFromNib];
+  
+  self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+  self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
 }
 
 - (void)setShowTickMark:(BOOL)showTickMark

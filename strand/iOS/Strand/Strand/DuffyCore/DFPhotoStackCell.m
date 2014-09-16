@@ -10,27 +10,14 @@
 
 @implementation DFPhotoStackCell
 
-- (id)initWithFrame:(CGRect)frame
-{
-    self = [super initWithFrame:frame];
-    if (self) {
-        // Initialization code
-    }
-    return self;
-}
-
 - (void)awakeFromNib
 {
-  self.countLabel.font = [UIFont fontWithName:@"ProximaNova-Semibold" size:13];
+  [super awakeFromNib];
+  
+  self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+  self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
-{
-    // Drawing code
-}
-*/
+
 
 @end

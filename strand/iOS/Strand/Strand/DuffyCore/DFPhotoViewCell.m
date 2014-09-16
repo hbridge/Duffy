@@ -11,6 +11,14 @@
 
 @implementation DFPhotoViewCell
 
+- (void)awakeFromNib
+{
+  [super awakeFromNib];
+  
+  self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
+  self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
+}
+
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
