@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "Strand-Swift.h"
+
 static const CGFloat SectionHeaderWidth = 320;
 static const CGFloat SectionHeaderHeight = 70;
 static const CGFloat SectionFooterHeight = 25;

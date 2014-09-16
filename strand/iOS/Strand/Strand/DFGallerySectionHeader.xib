@@ -27,7 +27,7 @@
                                 <constraint firstAttribute="height" priority="900" constant="35" id="Fd5-O8-AMA"/>
                             </constraints>
                         </view>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T2b-ur-GJN">
+                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T2b-ur-GJN">
                             <rect key="frame" x="290" y="34" width="22" height="22"/>
                             <constraints>
                                 <constraint firstAttribute="width" constant="22" id="w3V-qZ-Frs"/>
