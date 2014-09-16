@@ -95,24 +95,17 @@ def getBestLocationForPhotos(photos):
 		
 def getTitleForStrand(user, strand):
 	photos = strand.photos.all()
-	users = strand.users.all()
 	location = getBestLocationForPhotos(photos)
 
-	names = list()
-	for u in users:
-		if u.id != user.id:
-			names.append(u.display_name)
+	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
 
-	names = set(names)
+	if strand.first_photo_time.year != datetime.datetime.now().year:
+		dateStr += ", " + strand.first_photo_time.strftime("%Y")
 
-	if len(users) == 1 and users[0].id == user.id:
-		title = "Just you"
-	elif user not in users:
-		title = "From " + "& ".join(names)
-		if location:
-			title += " near " + location
-	else:
-		title = ", ".join(names) + " and You"
+	title = dateStr
+
+	if location:
+		title += " in " + location
 
 	return title
 
