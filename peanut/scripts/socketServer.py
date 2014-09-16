@@ -1,10 +1,11 @@
 #!/usr/bin/python
 import sys, os
 import logging
-import threading
+from threading import Thread
 import signal
 import datetime
 import pytz
+import time
 
 from twisted.internet.protocol import Factory, Protocol
 from twisted.internet import reactor
@@ -19,7 +20,6 @@ from common.models import NotificationLog
 logger = logging.getLogger(__name__)
 
 clients = dict()
-running = False
 stop = False
 
 class MobileClient(Protocol):
@@ -59,39 +59,35 @@ class MobileClient(Protocol):
 		self.transport.write(message + '\n')
 
 def processMessages():
-	global running
-
-	if not stop:
-		threading.Timer(0.1, processMessages).start()
-
-	if running:
-		return
+	while not stop:
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		now = now.replace(microsecond=0)
 		
-	running = True
-
-	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-
-	timeWithin = now - datetime.timedelta(seconds=10)
-	notificationLogs = NotificationLog.objects.filter(result=None).filter(msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED).filter(added__gt=timeWithin)
-
-	entriesToWrite = list()
-	for logEntry in notificationLogs:
-		userId = logEntry.user_id 
-		if userId in clients:
-			logger.info("Sending refresh message to %s" % (userId))
-			clients[userId].message("refresh:%s" % (logEntry.id))
-			logEntry.result = constants.IOS_NOTIFICATIONS_RESULT_SENT
-			entriesToWrite.append(logEntry)
-
-		if logEntry.added + datetime.timedelta(seconds=4) < now:
-			logEntry.result = constants.IOS_NOTIFICATIONS_RESULT_ERROR
-			entriesToWrite.append(logEntry)
-			logger.info("Failed to send to %s after 4 seconds, canceling" % (userId))
-
-	if len(entriesToWrite) > 0:
-		NotificationLog.bulkUpdate(entriesToWrite, ["result"])
+		if now.second < 4:
+			timeWithin = now - datetime.timedelta(seconds=now.second, minutes=1)
+		else:
+			timeWithin = now.replace(second=0)
+			
+		notificationLogs = NotificationLog.objects.filter(result=None).filter(msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED).filter(added__gt=timeWithin)
 		
-	running = False
+		entriesToWrite = list()
+		for logEntry in notificationLogs:
+			userId = logEntry.user_id 
+			if userId in clients:
+				logger.info("Sending refresh message to %s" % (userId))
+				clients[userId].message("refresh:%s" % (logEntry.id))
+				logEntry.result = constants.IOS_NOTIFICATIONS_RESULT_SENT
+				entriesToWrite.append(logEntry)
+
+			if logEntry.added + datetime.timedelta(seconds=4) < now:
+				logEntry.result = constants.IOS_NOTIFICATIONS_RESULT_ERROR
+				entriesToWrite.append(logEntry)
+				logger.info("Failed to send to %s after 4 seconds, canceling" % (userId))
+
+		if len(entriesToWrite) > 0:
+			NotificationLog.bulkUpdate(entriesToWrite, ["result"])
+		
+		time.sleep(.1)
 
 def main(argv):
 	if (len(sys.argv) > 1):
@@ -106,7 +102,7 @@ def main(argv):
 	reactor.listenTCP(port, factory)
 	logger.info("Starting... ")
 	
-	processMessages()
+	Thread(target = processMessages).start()
 
 	def customHandler(signum, stackframe):
 		global stop
