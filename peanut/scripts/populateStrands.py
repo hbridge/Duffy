@@ -150,7 +150,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	writes a new row for each loop.  Would be faster to manually write the table entries in a batch call
 """
 def main(argv):
-	maxPhotosAtTime = 100
+	maxPhotosAtTime = 5
 	timeWithinSecondsForNotification = 30 # seconds
 
 	timeWithinMinutesForNeighboring = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
@@ -280,7 +280,7 @@ def main(argv):
 			
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 		else:
-			time.sleep(.1)	
+			time.sleep(.1)
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/stranding.log',

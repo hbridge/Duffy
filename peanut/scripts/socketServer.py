@@ -86,8 +86,8 @@ def processMessages():
 
 		if len(entriesToWrite) > 0:
 			NotificationLog.bulkUpdate(entriesToWrite, ["result"])
-		
-		time.sleep(.1)
+		else:
+			time.sleep(.1)
 
 def main(argv):
 	if (len(sys.argv) > 1):
