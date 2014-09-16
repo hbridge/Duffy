@@ -15,8 +15,6 @@
 		5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEAE194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m */; };
 		5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB1194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m */; };
 		5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */; };
-		5A0DC38319C0A72400654CAD /* ProfilePhotoView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A0DC38219C0A72400654CAD /* ProfilePhotoView.xib */; };
-		5A0DC38519C0A78300654CAD /* DFProfilePhotoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A0DC38419C0A78300654CAD /* DFProfilePhotoView.swift */; };
 		5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */; };
 		5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122719747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m */; };
 		5A0E122A1974839200B6FF04 /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A0E12291974839200B6FF04 /* MessageUI.framework */; };
@@ -232,8 +230,6 @@
 		5A02CEB31950D53300C4EBA6 /* DFLocationStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationStore.h; sourceTree = "<group>"; };
 		5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLocationStore.m; sourceTree = "<group>"; };
 		5A0DC37F19C0A71000654CAD /* Strand-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strand-Bridging-Header.h"; sourceTree = "<group>"; };
-		5A0DC38219C0A72400654CAD /* ProfilePhotoView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ProfilePhotoView.xib; sourceTree = "<group>"; };
-		5A0DC38419C0A78300654CAD /* DFProfilePhotoView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFProfilePhotoView.swift; sourceTree = "<group>"; };
 		5A0E121C1974465700B6FF04 /* Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Beta.xcconfig; sourceTree = "<group>"; };
 		5A0E122319747BD800B6FF04 /* DFPeanutInviteMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutInviteMessageResponse.h; sourceTree = "<group>"; };
 		5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutInviteMessageResponse.m; sourceTree = "<group>"; };
@@ -615,8 +611,6 @@
 				5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */,
 				5A3F6A971999498900C2F7D4 /* UIView+DFExtensions.h */,
 				5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */,
-				5A0DC38219C0A72400654CAD /* ProfilePhotoView.xib */,
-				5A0DC38419C0A78300654CAD /* DFProfilePhotoView.swift */,
 				5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */,
 				5A0DC37F19C0A71000654CAD /* Strand-Bridging-Header.h */,
 			);
@@ -1405,7 +1399,6 @@
 				5A7F8FFE19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib in Resources */,
 				5AF32EC4197C6444004B5CC4 /* DFPhotoFeedCell.xib in Resources */,
 				5AA45294196708D00099CBD2 /* DFPhotoSectionHeader.xib in Resources */,
-				5A0DC38319C0A72400654CAD /* ProfilePhotoView.xib in Resources */,
 				5AAF038819B0D5AE00EF021C /* DFSelectPhotosViewController.xib in Resources */,
 				5AA9292B19A6502200032A3F /* DFPeoplePickerViewController.xib in Resources */,
 				5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */,
@@ -1593,7 +1586,6 @@
 				6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */,
 				5A02CE9E194F70E200C4EBA6 /* DFMultiPhotoViewController.m in Sources */,
 				651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */,
-				5A0DC38519C0A78300654CAD /* DFProfilePhotoView.swift in Sources */,
 				5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */,
 				5AAF039D19B1168500EF021C /* DFPeanutStrandAdapter.m in Sources */,
 				5AAF039519B10A7200EF021C /* DFSelectablePhotoViewCell.m in Sources */,

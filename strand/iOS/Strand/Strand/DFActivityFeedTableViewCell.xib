@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
-        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -61,27 +61,21 @@
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="IEd-zt-0Vr" firstAttribute="trailing" secondItem="edi-gP-GBl" secondAttribute="trailingMargin" id="1p4-dv-8gH"/>
                     <constraint firstItem="Ejx-vN-IUf" firstAttribute="leading" secondItem="rlM-Qb-grC" secondAttribute="trailing" constant="3" id="4fU-Nj-v1i"/>
                     <constraint firstItem="IEd-zt-0Vr" firstAttribute="leading" secondItem="Ejx-vN-IUf" secondAttribute="trailing" constant="8" id="67k-cJ-Soj"/>
                     <constraint firstItem="Kln-so-NCf" firstAttribute="top" secondItem="qA2-bH-hjM" secondAttribute="bottom" constant="8" id="6oc-R0-tZv"/>
-                    <constraint firstAttribute="trailingMargin" secondItem="Kln-so-NCf" secondAttribute="trailing" constant="-8" id="EGg-nc-cTq"/>
-                    <constraint firstItem="qA2-bH-hjM" firstAttribute="top" secondItem="edi-gP-GBl" secondAttribute="topMargin" id="FUj-ZI-HWo"/>
-                    <constraint firstItem="qA2-bH-hjM" firstAttribute="leading" secondItem="edi-gP-GBl" secondAttribute="leadingMargin" id="LnO-Hg-FfT"/>
+                    <constraint firstItem="Kln-so-NCf" firstAttribute="leading" secondItem="edi-gP-GBl" secondAttribute="leading" id="IFp-8u-UCX"/>
                     <constraint firstItem="rlM-Qb-grC" firstAttribute="leading" secondItem="qA2-bH-hjM" secondAttribute="trailing" constant="8" id="OCQ-XD-QZ5"/>
+                    <constraint firstItem="qA2-bH-hjM" firstAttribute="leading" secondItem="edi-gP-GBl" secondAttribute="leading" constant="8" id="P3w-N6-QZQ"/>
                     <constraint firstItem="pik-Vg-OiT" firstAttribute="leading" secondItem="qA2-bH-hjM" secondAttribute="trailing" constant="8" id="Pgk-x2-JKs"/>
-                    <constraint firstItem="Kln-so-NCf" firstAttribute="leading" secondItem="edi-gP-GBl" secondAttribute="leadingMargin" constant="-8" id="bZf-te-BwP"/>
+                    <constraint firstAttribute="trailing" secondItem="Kln-so-NCf" secondAttribute="trailing" id="abk-sf-CFr"/>
+                    <constraint firstItem="qA2-bH-hjM" firstAttribute="top" secondItem="edi-gP-GBl" secondAttribute="top" constant="8" id="e4G-WQ-9xp"/>
                     <constraint firstItem="qA2-bH-hjM" firstAttribute="centerY" secondItem="rlM-Qb-grC" secondAttribute="centerY" constant="9" id="eZE-wl-yN4"/>
-                    <constraint firstItem="Kln-so-NCf" firstAttribute="bottom" secondItem="edi-gP-GBl" secondAttribute="bottomMargin" id="fbA-t7-5XB"/>
+                    <constraint firstAttribute="trailing" secondItem="IEd-zt-0Vr" secondAttribute="trailing" constant="8" id="ghb-Mq-pmT"/>
                     <constraint firstItem="qA2-bH-hjM" firstAttribute="centerY" secondItem="IEd-zt-0Vr" secondAttribute="centerY" constant="-0.5" id="hYW-n7-hze"/>
                     <constraint firstItem="qA2-bH-hjM" firstAttribute="centerY" secondItem="pik-Vg-OiT" secondAttribute="centerY" constant="-9.5" id="j0t-or-gY8"/>
                     <constraint firstItem="Ejx-vN-IUf" firstAttribute="bottom" secondItem="rlM-Qb-grC" secondAttribute="bottom" id="qcE-XX-mgo"/>
                 </constraints>
-                <variation key="default">
-                    <mask key="constraints">
-                        <exclude reference="fbA-t7-5XB"/>
-                    </mask>
-                </variation>
             </tableViewCellContentView>
             <inset key="separatorInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
             <connections>
@@ -92,7 +86,7 @@
                 <outlet property="profilePhotoStackView" destination="qA2-bH-hjM" id="A3d-AL-505"/>
                 <outlet property="timeLabel" destination="pik-Vg-OiT" id="9xi-el-Ul3"/>
             </connections>
-            <point key="canvasLocation" x="130" y="241.5"/>
+            <point key="canvasLocation" x="-39" y="117.5"/>
         </tableViewCell>
     </objects>
 </document>
