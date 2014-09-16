@@ -307,7 +307,9 @@ didFinishServerFetchWithError:(NSError *)error
                                         initWithTitle:@"Accept Invite"
                                         showsToField:NO
                                         suggestedSectionObject:nil
-                                        sharedSectionObject:invitedStrand];
+                                        sharedSectionObject:invitedStrand
+                                        inviteObject:feedObject
+                                        ];
     
     
     DFPeanutStrandFeedAdapter *feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];

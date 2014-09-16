@@ -37,13 +37,18 @@ CGFloat const ToFieldHeight = 44.0;
 
 - (instancetype)init
 {
-  return [self initWithTitle:nil showsToField:NO suggestedSectionObject:nil sharedSectionObject:nil];
+  return [self initWithTitle:nil
+                showsToField:NO
+      suggestedSectionObject:nil
+         sharedSectionObject:nil
+                inviteObject:nil];
 }
 
 - (instancetype)initWithTitle:(NSString *)title
                  showsToField:(BOOL)showsToField
        suggestedSectionObject:(DFPeanutFeedObject *)suggestedSectionObject
           sharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject
+                 inviteObject:(DFPeanutFeedObject *)inviteObject
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
@@ -51,6 +56,7 @@ CGFloat const ToFieldHeight = 44.0;
     [self configureNavBarWithTitle:title];
     self.suggestedSectionObject = suggestedSectionObject;
     self.sharedSectionObject = sharedSectionObject;
+    self.inviteObject = inviteObject;
   }
   return self;
 }
