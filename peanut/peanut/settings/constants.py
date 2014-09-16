@@ -100,5 +100,6 @@ INVITE_LINK_APP_STORE = 'bit.ly/strand-appstore'
 
 FEED_OBJECT_TYPE_STRAND = 'section' # will be strand
 FEED_OBJECT_TYPE_INVITE_STRAND = 'invite_strand'
+FEED_OBJECT_TYPE_STRAND_POST = 'strand_post'
 FEED_OBJECT_TYPE_SUGGESTED_PHOTOS = 'suggested_photos'
 

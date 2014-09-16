@@ -512,10 +512,10 @@ def strand_activity(request):
 		
 		createdStrandObjects = list()
 		for strand in createdStrandList:
-			entry = getObjectsDataForStrands(user, [strand], constants.FEED_OBJECT_TYPE_STRAND)
-			entry[0].update({'type': constants.FEED_OBJECT_TYPE_STRAND, 'id': strand.id, 'title': "started a strand", 'actors': getActorsObjectData(user), 'time_stamp': strand.added})
+			entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'title': "started a Strand", 'actors': getActorsObjectData(user), 'time_stamp': strand.added}
+			entry['objects'] = getObjectsDataForStrands(user, [strand], constants.FEED_OBJECT_TYPE_STRAND)
 
-			createdStrandObjects.append(entry[0])
+			createdStrandObjects.append(entry)
 
 		actionObjects = getObjectsDataForActions(user)
 
