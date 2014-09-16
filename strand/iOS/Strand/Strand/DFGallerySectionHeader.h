@@ -10,7 +10,7 @@
 #import "Strand-Swift.h"
 static const CGFloat SectionHeaderWidth = 320;
 static const CGFloat SectionHeaderHeight = 70;
-static const CGFloat SectionFooterHeight = 54;
+static const CGFloat SectionFooterHeight = 25;
 
 @interface DFGallerySectionHeader : UICollectionReusableView
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;

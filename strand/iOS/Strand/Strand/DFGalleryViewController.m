@@ -62,7 +62,12 @@ static const CGFloat ItemSpacing = 2.5;
   self.collectionView = [[UICollectionView alloc] initWithFrame:self.view.frame
                                            collectionViewLayout:self.flowLayout];
   [self.view addSubview:self.collectionView];
-  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, 75, 0);
+  
+  CGFloat tabBarHeight = self.tabBarController.tabBar.frame.size.height;
+  self.collectionView.contentInset = UIEdgeInsetsMake(0,
+                                                      0,
+                                                      tabBarHeight * 2,
+                                                      0);
   [self configureCollectionView];
   
 }
