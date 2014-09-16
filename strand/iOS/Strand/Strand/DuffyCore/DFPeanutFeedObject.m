@@ -185,7 +185,7 @@ static NSArray *FeedObjectTypes;
   NSMutableArray *abbreviations = [NSMutableArray new];
   for (DFPeanutUserObject *actor in self.actors) {
     if ([actor.display_name isNotEmpty]) {
-      NSString *abbreviation = [actor.display_name substringToIndex:1];
+      NSString *abbreviation = [[actor.display_name substringToIndex:1] uppercaseString];
       if ([abbreviations indexOfObject:abbreviation] == NSNotFound) {
         [abbreviations addObject:abbreviation];
       }
