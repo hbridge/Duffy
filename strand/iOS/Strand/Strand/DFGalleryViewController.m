@@ -354,7 +354,9 @@ static const CGFloat ItemSpacing = 2.5;
     DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
     photoFeedController.strandToShow = section;
     [self.navigationController pushViewController:photoFeedController animated:YES];
-    [photoFeedController showPhoto:photoID animated:NO];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [photoFeedController jumpToPhoto:photoID];
+    });
   }
 }
 

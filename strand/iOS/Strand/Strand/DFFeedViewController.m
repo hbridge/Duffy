@@ -91,7 +91,7 @@ const CGFloat LockedCellHeight = 157.0;
   [self.view addSubview:self.tableView];
   self.tableView.dataSource = self;
   self.tableView.delegate = self;
-  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, 70, 0);
+  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
   
   self.automaticallyAdjustsScrollViewInsets = NO;
@@ -161,6 +161,10 @@ const CGFloat LockedCellHeight = 157.0;
     if (indexPath) {
       if ([[self sectionObjectForTableSection:indexPath.section] isLockedSection]) {
         indexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
+      }
+      
+      if (self.strandToShow) {
+        indexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:0];
       }
       
       // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
