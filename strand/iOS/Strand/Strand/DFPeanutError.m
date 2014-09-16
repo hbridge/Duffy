@@ -15,13 +15,12 @@
 + (RKObjectMapping *)objectMapping
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[self class]];
-  [objectMapping addAttributeMappingsFromArray:[self simpleAttributeKeys]];
+  [objectMapping addAttributeMappingsFromDictionary:@{
+                                                      @"name" : @"name",
+                                                      @"description" : @"error_description"
+                                                      }];
   return objectMapping;
 }
 
-+ (NSArray *)simpleAttributeKeys
-{
-  return @[@"name", @"description"];
-}
 
 @end

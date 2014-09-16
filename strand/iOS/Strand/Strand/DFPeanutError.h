@@ -12,6 +12,6 @@
 @interface DFPeanutError : NSObject <DFPeanutObject>
 
 @property (nonatomic, retain) NSString *name;
-@property (nonatomic, retain) NSString *description;
+@property (nonatomic, retain) NSString *error_description;
 
 @end
