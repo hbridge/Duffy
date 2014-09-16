@@ -305,7 +305,7 @@ def getObjectsDataForStrands(user, strands, feedObjectType):
 		strandId = strand.id
 		photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
 		
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand)}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand), 'time_taken': strand.first_photo_time}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
@@ -344,7 +344,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		title = ', '.join(neighborUsers)
 		if len(neighborUsers) > 0:
 			title += " might like these photos"
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
