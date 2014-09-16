@@ -23,6 +23,7 @@ extern DFFeedObjectType DFFeedObjectDocstack;
 extern DFFeedObjectType DFFeedObjectInviteStrand;
 extern DFFeedObjectType DFFeedObjectStrand;
 extern DFFeedObjectType DFFeedObjectLikeAction;
+extern DFFeedObjectType DFFeedObjectStrandPost;
 
 
 // Simple attribures

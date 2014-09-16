@@ -144,8 +144,8 @@ didFinishServerFetchWithError:(NSError *)error
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     cell = [self cellForInviteObject:feedObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
-    cell = [self cellForStrandObject:feedObject];
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
+    cell = [self cellForStrandPost:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
     cell = [self cellForAction:feedObject];
   }
@@ -156,8 +156,9 @@ didFinishServerFetchWithError:(NSError *)error
   return cell;
 }
 
-- (UITableViewCell *)cellForStrandObject:(DFPeanutFeedObject *)strandObject
+- (UITableViewCell *)cellForStrandPost:(DFPeanutFeedObject *)strandPost
 {
+  DFPeanutFeedObject *strandObject = strandPost.objects.firstObject;
   DFActivityFeedTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"collectionCell"];
   if (cell.previewImageView.superview) {
@@ -167,12 +168,12 @@ didFinishServerFetchWithError:(NSError *)error
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
-  cell.profilePhotoStackView.names = strandObject.actorNames;
-  cell.actorLabel.text = [self.class firstActorNameForObject:strandObject];
-  cell.actionTextLabel.text = strandObject.title;
+  cell.profilePhotoStackView.names = strandPost.actorNames;
+  cell.actorLabel.text = [self.class firstActorNameForObject:strandPost];
+  cell.actionTextLabel.text = strandPost.title;
   
   // time taken
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandObject.time_stamp
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp
                                                           abbreviate:NO];
   // photo preview
   [self setRemotePhotosForCell:cell withSection:strandObject];
@@ -329,9 +330,10 @@ didFinishServerFetchWithError:(NSError *)error
      }];
     
     [self.navigationController pushViewController:vc animated:YES];
-  } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
+    DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
     DFFeedViewController *feedController = [[DFFeedViewController alloc] init];
-    feedController.strandToShow = feedObject;
+    feedController.strandToShow = strandObject;
     [self.navigationController pushViewController:feedController animated:YES];
   } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
   
