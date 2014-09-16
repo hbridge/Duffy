@@ -110,7 +110,7 @@ def getTitleForStrand(user, strand):
 	return title
 
 def getActorsObjectData(actors):
-	if not isinstance(actors, list):
+	if not (isinstance(actors, list) or isinstance(actors, set)):
 		actors = [actors]
 
 	userData = list()
@@ -305,7 +305,7 @@ def getObjectsDataForStrands(user, strands, feedObjectType):
 		strandId = strand.id
 		photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
 		
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand), 'time_taken': strand.first_photo_time}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(user, strand), 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(strand.users.all())}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
