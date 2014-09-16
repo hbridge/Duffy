@@ -21,6 +21,7 @@
 #import "DFPeanutStrandAdapter.h"
 #import "DFImageStore.h"
 #import "NSString+DFHelpers.h"
+#import "DFStrandConstants.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -36,18 +37,30 @@ const CGFloat CreateCellTitleSpacing = 8;
 @property (nonatomic, retain) DFPeanutObjectsResponse *suggestedResponse;
 @property (nonatomic, retain) NSArray *inviteObjects;
 
+@property (nonatomic, retain) NSData *lastResponseHash;
+
 @end
 
 @implementation DFCreateStrandViewController
 @synthesize feedAdapter = _feedAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
 @synthesize strandAdapter = _strandAdapter;
+@synthesize showInvites = _showInvites;
 
-- (instancetype)initWithShowInvites:(BOOL)showInvites
+static DFCreateStrandViewController *instance;
++ (DFCreateStrandViewController *)createStrandViewController
+{
+  if (!instance) {
+    instance = [[DFCreateStrandViewController alloc] init];
+  }
+  return instance;
+}
+
+- (instancetype)initWithShowInvites
 {
   self = [self init];
   if (self) {
-    _showInvites = showInvites;
+    self.showInvites = NO;
   }
   return self;
 }
@@ -58,6 +71,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   if (self) {
     [self configureNav];
     [self configureTableView];
+    [self observeNotifications];
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
                                      imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
@@ -85,10 +99,20 @@ const CGFloat CreateCellTitleSpacing = 8;
   
 }
 
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reload)
+                                               name:DFStrandReloadRemoteUIRequestedNotificationName
+                                             object:nil];
+}
+
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  [self updateSuggestions:self];
+  [self reload];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -111,7 +135,8 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)setShowInvites:(BOOL)showInvites
 {
-  [self updateSuggestions:self];
+  _showInvites = showInvites;
+  [self refresh];
 }
 
 
@@ -316,7 +341,15 @@ const CGFloat CreateCellTitleSpacing = 8;
   [[DFCameraRollSyncManager sharedManager] sync];
 }
 
-- (void)updateSuggestions:(id)sender
+
+- (void)refresh
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.tableView reloadData];
+  });
+}
+
+- (void)reload
 {
   [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
                                                           NSData *responseHash,
@@ -325,9 +358,14 @@ const CGFloat CreateCellTitleSpacing = 8;
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
       self.suggestedResponse = response;
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [self.tableView reloadData];
-      });
+      
+      if (![responseHash isEqual:self.lastResponseHash]) {
+        DDLogDebug(@"New data for suggestions, updating view...");
+        [self refresh];
+        self.lastResponseHash = responseHash;
+      } else {
+        DDLogDebug(@"Got back response for strand suggestions but it was the same");
+      }
     }
   }];
   

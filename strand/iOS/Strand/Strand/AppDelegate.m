@@ -202,6 +202,9 @@
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];
+      
+      // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
+      [[DFCreateStrandViewController createStrandViewController] reload];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
@@ -336,7 +339,9 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 
 - (void)showCreateStrand
 {
-  DFCreateStrandViewController *vc = [[DFCreateStrandViewController alloc] initWithShowInvites:YES];
+  DFCreateStrandViewController *vc = [DFCreateStrandViewController createStrandViewController];
+  vc.showInvites = YES;
+  
   [self.tabBarController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
                                       animated:YES
                                     completion:nil];

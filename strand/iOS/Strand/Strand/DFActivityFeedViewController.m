@@ -289,9 +289,9 @@ didFinishServerFetchWithError:(NSError *)error
 
 - (void)createButtonPressed:(id)sender
 {
-  DFCreateStrandViewController *createController = [[DFCreateStrandViewController alloc]
-                                                    initWithShowInvites:YES];
-  createController.showInvites = YES;
+  DFCreateStrandViewController *createController = [DFCreateStrandViewController createStrandViewController];
+  createController.showInvites = NO;
+  
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
   
