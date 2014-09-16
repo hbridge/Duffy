@@ -61,13 +61,44 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
 
 }
 
-+ (NSString *)relativeTimeStringSinceDate:(NSDate *)date
++ (NSString *)relativeTimeStringSinceDate:(NSDate *)date abbreviate:(BOOL)abbreviate
 {
   NSTimeInterval timeSinceDate = [[NSDate date] timeIntervalSinceDate:date];
-  if (timeSinceDate < 60.0) return @"1m";
-  if (timeSinceDate < 60.0 * 60) return [NSString stringWithFormat:@"%dm", (int)timeSinceDate/60];
-  if (timeSinceDate < 60.0 * 60 * 24) return [NSString stringWithFormat:@"%dh", (int)timeSinceDate/60/60];
-  return [NSString stringWithFormat:@"%dd", (int)timeSinceDate/60/60/24];
+  NSString *result;
+  if (timeSinceDate < 60.0 * 60) {
+    int minutes = ((int)timeSinceDate/60);
+    if (abbreviate) {
+      result = [NSString stringWithFormat:@"%dm", minutes];
+    } else {
+      result = [self pluralizedStringWithNumber:minutes unitString:@"minute"];
+    }
+  } else if (timeSinceDate < 60.0 * 60 * 24) {
+    int hours = (int)timeSinceDate/60/60;
+    if (abbreviate) {
+      result = [NSString stringWithFormat:@"%dh", hours];
+    } else {
+      result = [self pluralizedStringWithNumber:hours unitString:@"hour"];
+    }
+  } else if (timeSinceDate < 60.0 * 60 * 24 * 7) {
+    int days = (int)timeSinceDate/60/60/24;
+    if (abbreviate) {
+      result = [NSString stringWithFormat:@"%dd", days];
+    } else {
+      result = [self pluralizedStringWithNumber:days unitString:@"day"];
+    }
+  } else {
+    result = [[self HumanDateFormatter] stringFromDate:date];
+  }
+  
+  return result;
+}
+
++ (NSString *)pluralizedStringWithNumber:(int)number unitString:(NSString *)unitString
+{
+  return [NSString stringWithFormat:@"%d %@%@ ago",
+          number,
+          unitString,
+          number > 1 ? @"s" : @""];
 }
 
 @end

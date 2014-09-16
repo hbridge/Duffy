@@ -13,7 +13,7 @@
 + (NSDateFormatter *)EXIFDateFormatter;
 
 + (NSDateFormatter *)DjangoDateFormatter;
-+ (NSString *)relativeTimeStringSinceDate:(NSDate *)date;
++ (NSString *)relativeTimeStringSinceDate:(NSDate *)date abbreviate:(BOOL)abbreviate;
 + (NSDateFormatter *)HumanDateFormatter;
 
 

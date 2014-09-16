@@ -172,8 +172,8 @@ didFinishServerFetchWithError:(NSError *)error
   cell.actionTextLabel.text = strandObject.title;
   
   // time taken
-  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
-                         stringFromDate:strandObject.time_stamp];
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandObject.time_stamp
+                                                          abbreviate:NO];
   // photo preview
   [self setRemotePhotosForCell:cell withSection:strandObject];
   
@@ -202,8 +202,8 @@ didFinishServerFetchWithError:(NSError *)error
   cell.profilePhotoStackView.abbreviations = inviteObject.actorAbbreviations;
   cell.actorLabel.text = [self.class firstActorNameForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;
-  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
-                         stringFromDate:inviteObject.time_stamp];
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
+                                                          abbreviate:NO];
   [self setRemotePhotosForCell:cell withSection:inviteObject.objects.firstObject];
   
   return cell;
@@ -223,8 +223,8 @@ didFinishServerFetchWithError:(NSError *)error
   cell.actionTextLabel.text = actionObject.title;
   
   // time taken
-  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
-                         stringFromDate:actionObject.time_stamp];
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:actionObject.time_stamp
+                         abbreviate:NO];
   // photo preview
   [self setRemotePreviewPhotoForCell:cell withFeedObject:actionObject];
 

@@ -95,7 +95,8 @@
   // set cell basic data
   cell.nameLabel.text = peanutNotification.actor_display_name;
   cell.descriptionLabel.text = peanutNotification.action_text;
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:peanutNotification.time];
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:peanutNotification.time
+                         abbreviate:YES];
   
   //set the preview image
   cell.previewImageView.image = nil;

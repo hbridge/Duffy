@@ -427,7 +427,8 @@ const CGFloat LockedCellHeight = 157.0;
 {
   cell.titleLabel.text = searchObject.user == [[DFUser currentUser] userID] ?
     @"You" : searchObject.user_display_name;
-  cell.photoDateLabel.text = [NSDateFormatter relativeTimeStringSinceDate:searchObject.time_taken];
+  cell.photoDateLabel.text = [NSDateFormatter relativeTimeStringSinceDate:searchObject.time_taken
+                              abbreviate:YES];
   
   if (searchObject.actions.count > 0) {
     [cell setFavoritersListHidden:NO];

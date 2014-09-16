@@ -142,7 +142,8 @@ static const CGFloat ItemSpacing = 2.5;
     } else {
       DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
       headerView.titleLabel.text = sectionObject.title;
-      headerView.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:sectionObject.time_taken];
+      headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_taken
+                                   abbreviate:YES];
       
       NSMutableArray *abbreviations = [NSMutableArray new];
       for (DFPeanutFeedObject *photoObject in sectionObject.enumeratorOfDescendents.allObjects) {
