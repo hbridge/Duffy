@@ -12,6 +12,7 @@ class DFProfilePhotoStackView: UIView {
   let MaxProfilePhotos = 4;
   let profilePhotoWidth:CGFloat = 35.0;
   var expandedNameLabel: UILabel = UILabel()
+  var shouldShowNameLabel = false
   
   var names: [String] = [] {
     didSet {
@@ -73,6 +74,7 @@ class DFProfilePhotoStackView: UIView {
   }
   
   func tapped(sender: UITapGestureRecognizer) {
+    if !self.shouldShowNameLabel {return}
     // figure out which name was tapped
     for i in 0...self.names.count {
       var rect = self.rectForIndex(i)
@@ -83,15 +85,15 @@ class DFProfilePhotoStackView: UIView {
     }
   }
   
-  let labelHeight: CGFloat = 20.0
+  let labelHeight: CGFloat = 24.0
   func iconTappedForIndex(i: Int, rect: CGRect) {
     if i > self.names.count {return}
-    var name = self.names[i]
+    var name = " " + self.names[i]
     
     var labelRect = CGRectMake(
       rect.maxX,
       rect.midY - labelHeight/2.0,
-      rect.size.width * 2.0,
+      self.frame.size.width/3.0,
       labelHeight)
     var rectInSuper = self.superview?.convertRect(labelRect, fromView: self)
     
@@ -105,7 +107,7 @@ class DFProfilePhotoStackView: UIView {
     expandedNameLabel.textColor = UIColor.whiteColor()
     expandedNameLabel.layer.cornerRadius = 5.0
     expandedNameLabel.layer.masksToBounds = true
-    expandedNameLabel.textAlignment = .Center
+    expandedNameLabel.textAlignment = .Left
 
     self.superview?.addSubview(expandedNameLabel)
     

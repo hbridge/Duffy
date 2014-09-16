@@ -288,7 +288,8 @@ const CGFloat CreateCellTitleSpacing = 8;
                              initWithTitle:@"Accept Invite"
                              showsToField:NO
                              suggestedSectionObject:suggestionObject
-                             sharedSectionObject:feedObject.objects.firstObject];
+                             sharedSectionObject:feedObject.objects.firstObject
+                                                           inviteObject:feedObject];
          selectController.inviteObject = feedObject;
          [self.navigationController pushViewController:selectController animated:YES];
        });
@@ -303,7 +304,9 @@ const CGFloat CreateCellTitleSpacing = 8;
                         initWithTitle:@"Create Strand"
                         showsToField:YES
                         suggestedSectionObject:feedObject
-                        sharedSectionObject:nil];
+                        sharedSectionObject:nil
+                        inviteObject:nil
+                        ];
     [self.navigationController pushViewController:selectController animated:YES];
   }
 }

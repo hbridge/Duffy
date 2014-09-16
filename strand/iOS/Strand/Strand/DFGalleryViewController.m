@@ -138,17 +138,17 @@ static const CGFloat ItemSpacing = 2.5;
 {
   UICollectionReusableView *view;
   if (kind == UICollectionElementKindSectionHeader) {
-  DFGallerySectionHeader *headerView = [self.collectionView
-                                        dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                        withReuseIdentifier:@"headerView"
-                                        forIndexPath:indexPath];
+    DFGallerySectionHeader *headerView = [self.collectionView
+                                          dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                          withReuseIdentifier:@"headerView"
+                                          forIndexPath:indexPath];
     if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
       headerView.titleLabel.text = @"Uploading Photos";
     } else {
       DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
       headerView.titleLabel.text = sectionObject.title;
       headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_taken
-                                   abbreviate:YES];
+                                                                    abbreviate:YES];
       
       NSMutableArray *names = [NSMutableArray new];
       for (DFPeanutFeedObject *photoObject in sectionObject.enumeratorOfDescendents.allObjects) {

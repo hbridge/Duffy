@@ -19,4 +19,9 @@
     return self;
 }
 
+- (void)awakeFromNib
+{
+  self.profilePhotoStackView.shouldShowNameLabel = YES;
+}
+
 @end
