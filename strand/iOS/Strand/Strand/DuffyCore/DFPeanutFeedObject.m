@@ -194,4 +194,18 @@ static NSArray *FeedObjectTypes;
   return abbreviations;
 }
 
+- (NSArray *)actorNames
+{
+  NSMutableArray *names = [NSMutableArray new];
+  for (DFPeanutUserObject *actor in self.actors) {
+    if ([actor.display_name isNotEmpty]) {
+      if ([names indexOfObject:actor.display_name] == NSNotFound) {
+        [names addObject:actor.display_name];
+      }
+    }
+  }
+  return names;
+}
+
+
 @end

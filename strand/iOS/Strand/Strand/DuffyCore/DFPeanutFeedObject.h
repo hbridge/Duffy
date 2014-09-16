@@ -49,5 +49,6 @@ extern DFFeedObjectType DFFeedObjectLikeAction;
 
 - (BOOL)isLockedSection;
 - (NSArray *)actorAbbreviations;
+- (NSArray *)actorNames;
 
 @end

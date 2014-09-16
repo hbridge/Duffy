@@ -612,7 +612,6 @@
 				5A3F6A971999498900C2F7D4 /* UIView+DFExtensions.h */,
 				5A3F6A981999498900C2F7D4 /* UIView+DFExtensions.m */,
 				5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */,
-				5A0DC37F19C0A71000654CAD /* Strand-Bridging-Header.h */,
 			);
 			name = "Common Views";
 			sourceTree = "<group>";
@@ -1223,6 +1222,7 @@
 		5ADD857119465C790037A6D5 /* Strand */ = {
 			isa = PBXGroup;
 			children = (
+				5A0DC37F19C0A71000654CAD /* Strand-Bridging-Header.h */,
 				5ADD857619465C790037A6D5 /* AppDelegate.h */,
 				5ADD857719465C790037A6D5 /* AppDelegate.m */,
 				5A9BC32619A3E299002D1CD7 /* DFPushNotificationsManager.h */,

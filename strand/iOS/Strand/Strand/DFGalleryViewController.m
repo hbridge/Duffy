@@ -150,14 +150,14 @@ static const CGFloat ItemSpacing = 2.5;
       headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_taken
                                    abbreviate:YES];
       
-      NSMutableArray *abbreviations = [NSMutableArray new];
+      NSMutableArray *names = [NSMutableArray new];
       for (DFPeanutFeedObject *photoObject in sectionObject.enumeratorOfDescendents.allObjects) {
-        NSString *abbreviation = [photoObject.user_display_name substringToIndex:1];
-        if ([abbreviation isNotEmpty] && [abbreviations indexOfObject:abbreviation] == NSNotFound) {
-          [abbreviations addObject:abbreviation];
+        NSString *name = photoObject.user_display_name;
+        if ([name isNotEmpty] && [names indexOfObject:name] == NSNotFound) {
+          [names addObject:name];
         }
       }
-      headerView.profilePhotoStackView.abbreviations = abbreviations;
+      headerView.profilePhotoStackView.names = names;
     }
     
     view = headerView;

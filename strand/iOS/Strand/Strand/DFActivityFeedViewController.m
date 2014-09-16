@@ -167,7 +167,7 @@ didFinishServerFetchWithError:(NSError *)error
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
-  cell.profilePhotoStackView.abbreviations = strandObject.actorAbbreviations;
+  cell.profilePhotoStackView.names = strandObject.actorNames;
   cell.actorLabel.text = [self.class firstActorNameForObject:strandObject];
   cell.actionTextLabel.text = strandObject.title;
   
@@ -199,7 +199,7 @@ didFinishServerFetchWithError:(NSError *)error
                                        dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
   [self.class resetCell:cell];
   cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
-  cell.profilePhotoStackView.abbreviations = inviteObject.actorAbbreviations;
+  cell.profilePhotoStackView.names = inviteObject.actorNames;
   cell.actorLabel.text = [self.class firstActorNameForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
@@ -218,7 +218,7 @@ didFinishServerFetchWithError:(NSError *)error
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
-  cell.profilePhotoStackView.abbreviations = actionObject.actorAbbreviations;
+  cell.profilePhotoStackView.names = actionObject.actorNames;
   cell.actorLabel.text = [self.class firstActorNameForObject:actionObject];
   cell.actionTextLabel.text = actionObject.title;
   
