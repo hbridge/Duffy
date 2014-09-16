@@ -214,17 +214,17 @@ static const CGFloat ItemSpacing = 2.5;
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    return CGSizeMake(ItemSize, ItemSize);
-  }
-  
-  DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
-  NSArray *itemsForSection = section.objects;
-  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
-  
-  if (object.actions.count > 0) {
-    return CGSizeMake(ItemSize * 3.0/2.0, ItemSize * 3.0/2.0);
-  }
+//  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
+//    return CGSizeMake(ItemSize, ItemSize);
+//  }
+//  
+//  DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
+//  NSArray *itemsForSection = section.objects;
+//  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
+//  
+//  if (object.actions.count > 0) {
+//    return CGSizeMake(ItemSize * 3.0/2.0, ItemSize * 3.0/2.0);
+//  }
   
   return CGSizeMake(ItemSize, ItemSize);
 }
