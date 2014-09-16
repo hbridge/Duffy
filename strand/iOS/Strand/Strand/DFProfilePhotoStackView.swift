@@ -34,6 +34,8 @@ class DFProfilePhotoStackView: UIView {
   
   override func drawRect(rect: CGRect) {
     var context = UIGraphicsGetCurrentContext()
+    // no CGColorRelease needed, swift handles memory management
+    var fillColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), [0.5, 0.5, 0.5, 1.0])
     
     for (i, abbreviation) in enumerate(abbreviations) {
       var abbreviationRect =
@@ -45,15 +47,17 @@ class DFProfilePhotoStackView: UIView {
       if i > 0 {
         abbreviationRect.origin.x += 2
       }
-      CGContextSetFillColor(context, [0.5, 0.5, 0.5, 1.0])
+      CGContextSetFillColorWithColor(context, fillColor)
       CGContextFillEllipseInRect(context, abbreviationRect)
       
       var label = UILabel(frame: abbreviationRect)
       label.textColor = UIColor(white: 1.0, alpha: 1.0)
       label.textAlignment = .Center
       label.text = abbreviation
+      label.font = UIFont(name:"HelveticaNeue", size: abbreviationRect.size.height/2)
       label.drawTextInRect(abbreviationRect)
     }
+    
   }
   
   
