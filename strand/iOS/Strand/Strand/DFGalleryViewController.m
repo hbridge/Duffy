@@ -149,15 +149,7 @@ static const CGFloat ItemSpacing = 2.5;
       headerView.titleLabel.text = sectionObject.title;
       headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_taken
                                                                     abbreviate:YES];
-      
-      NSMutableArray *names = [NSMutableArray new];
-      for (DFPeanutFeedObject *photoObject in sectionObject.enumeratorOfDescendents.allObjects) {
-        NSString *name = photoObject.user_display_name;
-        if ([name isNotEmpty] && [names indexOfObject:name] == NSNotFound) {
-          [names addObject:name];
-        }
-      }
-      headerView.profilePhotoStackView.names = names;
+      headerView.profilePhotoStackView.names = sectionObject.actorNames;
     }
     
     view = headerView;
