@@ -21,8 +21,6 @@
 
 @interface DFActivityFeedViewController ()
 
-@property (nonatomic, retain) UIRefreshControl *refreshControl;
-
 @property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
 
@@ -72,18 +70,16 @@
   self.refreshControl = [[UIRefreshControl alloc] init];
   [self.refreshControl addTarget:self action:@selector(reloadData)
                 forControlEvents:UIControlEventValueChanged];
-  [self.tableView addSubview:self.refreshControl];
-  
-//  UITableViewController *tableViewController = [[UITableViewController alloc] init];
-//  tableViewController.tableView = self.tableView;
-//  tableViewController.refreshControl = self.refreshControl;
 }
 
 - (void)configureTableView
 {
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
-   forCellReuseIdentifier:[[DFActivityFeedTableViewCell class] description]];
+   forCellReuseIdentifier:@"collectionCell"];
+  [self.tableView
+   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   forCellReuseIdentifier:@"singleCell"];
 }
 
 - (void)didReceiveMemoryWarning
@@ -107,6 +103,7 @@
          [self.tableView reloadData];
        });
      }
+     [self.refreshControl endRefreshing];
    }];
 }
 
@@ -162,7 +159,10 @@ didFinishServerFetchWithError:(NSError *)error
 - (UITableViewCell *)cellForStrandObject:(DFPeanutFeedObject *)strandObject
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
+                                       dequeueReusableCellWithIdentifier:@"collectionCell"];
+  if (cell.previewImageView.superview) {
+    [cell.previewImageView removeFromSuperview];
+  }
   [self.class resetCell:cell];
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
@@ -196,7 +196,10 @@ didFinishServerFetchWithError:(NSError *)error
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
+                                       dequeueReusableCellWithIdentifier:@"collectionCell"];
+  if (cell.previewImageView.superview) {
+    [cell.previewImageView removeFromSuperview];
+  }
   [self.class resetCell:cell];
   cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
   cell.profilePhotoStackView.names = inviteObject.actorNames;
@@ -212,7 +215,11 @@ didFinishServerFetchWithError:(NSError *)error
 - (UITableViewCell *)cellForAction:(DFPeanutFeedObject *)actionObject
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:[[DFActivityFeedTableViewCell class] description]];
+                                       dequeueReusableCellWithIdentifier:@"singleCell"];
+  if (cell.collectionView.superview) {
+    [cell.collectionView removeFromSuperview];
+  }
+  
   [self.class resetCell:cell];
   
   cell.contentView.backgroundColor = [UIColor whiteColor];
