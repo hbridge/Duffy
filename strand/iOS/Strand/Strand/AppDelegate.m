@@ -204,7 +204,7 @@
        object:self];
       
       // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
-      [[DFCreateStrandViewController createStrandViewController] reload];
+      [[DFCreateStrandViewController sharedViewController] refreshFromServer];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",
@@ -339,7 +339,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 
 - (void)showCreateStrand
 {
-  DFCreateStrandViewController *vc = [DFCreateStrandViewController createStrandViewController];
+  DFCreateStrandViewController *vc = [DFCreateStrandViewController sharedViewController];
   vc.showInvites = YES;
   
   [self.tabBarController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]

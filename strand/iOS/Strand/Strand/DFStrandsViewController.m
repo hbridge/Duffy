@@ -375,7 +375,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)createButtonPressed:(id)sender
 {
   DDLogInfo(@"Create button pressed");
-  DFCreateStrandViewController *createController = [DFCreateStrandViewController createStrandViewController];
+  DFCreateStrandViewController *createController = [DFCreateStrandViewController sharedViewController];
   createController.showInvites = NO;
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
@@ -466,7 +466,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 }
 
 - (IBAction)createStrandButtonPressed:(id)sender {
-  DFCreateStrandViewController *vc = [DFCreateStrandViewController createStrandViewController];
+  DFCreateStrandViewController *vc = [DFCreateStrandViewController sharedViewController];
   vc.showInvites = NO;
   
   [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]

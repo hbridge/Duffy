@@ -48,7 +48,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @synthesize showInvites = _showInvites;
 
 static DFCreateStrandViewController *instance;
-+ (DFCreateStrandViewController *)createStrandViewController
++ (DFCreateStrandViewController *)sharedViewController
 {
   if (!instance) {
     instance = [[DFCreateStrandViewController alloc] init];
@@ -56,19 +56,11 @@ static DFCreateStrandViewController *instance;
   return instance;
 }
 
-- (instancetype)initWithShowInvites
-{
-  self = [self init];
-  if (self) {
-    self.showInvites = NO;
-  }
-  return self;
-}
-
 - (instancetype)init
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
+    _showInvites = NO;
     [self configureNav];
     [self configureTableView];
     [self observeNotifications];
@@ -112,7 +104,7 @@ static DFCreateStrandViewController *instance;
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  [self reload];
+  [self refreshFromServer];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -136,7 +128,9 @@ static DFCreateStrandViewController *instance;
 - (void)setShowInvites:(BOOL)showInvites
 {
   _showInvites = showInvites;
-  [self refresh];
+  
+  // Redraw the controller since we might have changed what is shown
+  [self reloadData];
 }
 
 
@@ -342,14 +336,14 @@ static DFCreateStrandViewController *instance;
 }
 
 
-- (void)refresh
+- (void)reloadData
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     [self.tableView reloadData];
   });
 }
 
-- (void)reload
+- (void)refreshFromServer
 {
   [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
                                                           NSData *responseHash,
@@ -361,7 +355,7 @@ static DFCreateStrandViewController *instance;
       
       if (![responseHash isEqual:self.lastResponseHash]) {
         DDLogDebug(@"New data for suggestions, updating view...");
-        [self refresh];
+        [self reloadData];
         self.lastResponseHash = responseHash;
       } else {
         DDLogDebug(@"Got back response for strand suggestions but it was the same");

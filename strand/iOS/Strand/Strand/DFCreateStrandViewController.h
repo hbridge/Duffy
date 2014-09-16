@@ -12,7 +12,7 @@
 
 @property (nonatomic) BOOL showInvites;
 
-+ (instancetype)createStrandViewController;
-- (void)reload;
++ (instancetype)sharedViewController;
+- (void)refreshFromServer;
 
 @end
