@@ -508,7 +508,7 @@ def strand_activity(request):
 		# This is a hack right now that looks at strand invites and assumes that if you did the invite,
 		#   you created the strand
 		sentStrandInvites = StrandInvite.objects.select_related().filter(user=user).exclude(skip=True)
-		createdStrandList = [x.strand for x in sentStrandInvites]
+		createdStrandList = set([x.strand for x in sentStrandInvites])
 		
 		createdStrandObjects = list()
 		for strand in createdStrandList:
