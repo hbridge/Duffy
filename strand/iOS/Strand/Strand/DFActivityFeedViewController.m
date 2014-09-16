@@ -70,7 +70,7 @@
 - (void)configureRefreshControl
 {
   self.refreshControl = [[UIRefreshControl alloc] init];
-  [self.refreshControl addTarget:self action:@selector(reloadFeed)
+  [self.refreshControl addTarget:self action:@selector(reloadData)
                 forControlEvents:UIControlEventValueChanged];
   [self.tableView addSubview:self.refreshControl];
   
