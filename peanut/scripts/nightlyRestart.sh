@@ -29,12 +29,6 @@ sleep 1
 
 sleep 5
 
-/sbin/initctl stop duffy-strand-notifications
-sleep 1
-/sbin/initctl start duffy-strand-notifications
-
-sleep 5
-
 /sbin/initctl stop duffy-stranding
 sleep 1
 /sbin/initctl start duffy-stranding
