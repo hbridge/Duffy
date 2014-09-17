@@ -1,14 +1,16 @@
 from django.contrib import admin
 from common.models import Photo, User, Classification, Similarity, NotificationLog, PhotoAction, Strand, StrandNeighbor
+from django.contrib.admin.actions import delete_selected as delete_selected_
 
 # Register your models here.
-admin.site.register(User)
 admin.site.register(Classification)
 admin.site.register(Similarity)
 admin.site.register(NotificationLog)
 admin.site.register(PhotoAction)
 
-
+class UserAdmin(admin.ModelAdmin):
+	list_display = ['id', 'display_name', 'phone_number', 'photos_info', 'private_strands', 'shared_strands']
+admin.site.register(User, UserAdmin)
 
 class PhotoAdmin(admin.ModelAdmin):
 	readonly_fields = ['photo_html']

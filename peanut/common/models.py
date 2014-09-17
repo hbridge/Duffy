@@ -1,10 +1,13 @@
 import os
 import json
 import datetime
+import logging
 
 from django.contrib.gis.db import models
 from django.template.defaultfilters import escape
 from django.core.urlresolvers import reverse
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 from phonenumber_field.modelfields import PhoneNumberField
 from uuidfield import UUIDField
@@ -15,6 +18,7 @@ from common import bulk_updater
 
 from ios_notifications.models import Notification
 
+logger = logging.getLogger(__name__)
 
 # Create your models here.
 class User(models.Model):
@@ -98,6 +102,15 @@ class User(models.Model):
 			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_number)
 		else:
 			return "(%s - %s) %s - %s" % (self.id, productStr, self.display_name, self.phone_id)			
+
+@receiver(pre_delete, sender=User, dispatch_uid='user_delete_signal')
+def delete_empty_strands(sender, instance, using, **kwargs):
+	user = instance
+	strands = user.strand_set.all()
+	for strand in strands:
+		logger.debug("Deleting empty strand %s" % (strand.id))
+		if strand.users.count() == 1 and strand.users.all()[0].id == user.id:
+			strand.delete()
 
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
