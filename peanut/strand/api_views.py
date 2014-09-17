@@ -350,11 +350,11 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		interestedUsers = set(interestedUsers)
 
 		names = list()
-		for user in interestedUsers:
-			if user in privatePhotoCount:
-				name = "%s [%s]" % (user.display_name, privatePhotoCount[user])
+		for interestedUser in interestedUsers:
+			if interestedUser in privatePhotoCount:
+				name = "%s [%s]" % (interestedUser.display_name, privatePhotoCount[interestedUser])
 			else:
-				name = user.display_name
+				name = interestedUser.display_name
 			names.append(name)
 
 		title = ', '.join(names)
