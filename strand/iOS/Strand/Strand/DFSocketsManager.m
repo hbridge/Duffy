@@ -31,20 +31,18 @@ static DFSocketsManager *defaultManager;
 }
 
 - (void) initNetworkCommunication {
-  if (!self.inputStream) {
-    CFReadStreamRef readStream;
-    CFWriteStreamRef writeStream;
-    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef) DFServerBaseHost, DFSocketPort, &readStream, &writeStream);
-    
-    self.inputStream = (__bridge NSInputStream *)readStream;
-    self.outputStream = (__bridge NSOutputStream *)writeStream;
-    [self.inputStream setDelegate:self];
-    [self.outputStream setDelegate:self];
-    [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self.inputStream open];
-    [self.outputStream open];
-  }
+  CFReadStreamRef readStream;
+  CFWriteStreamRef writeStream;
+  CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef) DFServerBaseHost, DFSocketPort, &readStream, &writeStream);
+  
+  self.inputStream = (__bridge NSInputStream *)readStream;
+  self.outputStream = (__bridge NSOutputStream *)writeStream;
+  [self.inputStream setDelegate:self];
+  [self.outputStream setDelegate:self];
+  [self.inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+  [self.outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+  [self.inputStream open];
+  [self.outputStream open];
 }
 
 - (void) sendMessage:(NSString *)message {
