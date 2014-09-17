@@ -14,6 +14,7 @@
 
 - (void)resetApplication;
 - (void)firstTimeSetupComplete;
+- (void)firstTimeSetupUserIdStepComplete;
 - (void)showCreateStrand;
 
 @end

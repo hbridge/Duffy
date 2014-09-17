@@ -129,11 +129,33 @@
                                     initWithRootViewController:setupViewController];
 }
 
+
+/*
+ This gets called as soon as the last of the first time setup steps area complete.
+ Right now, that is after the location permission is done.  This is called directly from the
+ controller.
+ */
 - (void)firstTimeSetupComplete
 {
   [self showMainView];
   [self performForegroundOperations];
   [self showCreateStrand];
+}
+
+/*
+  Put things here that should be kicked off as soon as we have a user ID.
+  This is called directly from the SMSAuth controller.
+ 
+  This is only called on first time setup, so all these calls should also exist in other areas like
+    performForegroundOperations and all the calls should be idempotent.
+ */
+- (void)firstTimeSetupUserIdStepComplete
+{
+  // Start up the socket server so we can start getting real time updates for when there's new data on the server
+  [[DFSocketsManager sharedManager] initNetworkCommunication];
+  
+  // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
+  [[DFCreateStrandViewController sharedViewController] refreshFromServer];
 }
 
 - (void)createRootViewController

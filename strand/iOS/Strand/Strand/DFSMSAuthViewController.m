@@ -14,6 +14,7 @@
 #import "SVProgressHUD.h"
 #import "DFContactsViewController.h"
 #import "DFPhotosPermissionViewController.h"
+#import "AppDelegate.h"
 
 const UInt16 DFCodeLength = 4;
 
@@ -244,6 +245,9 @@ replacementString:(NSString *)string
 
 - (void)showNextStep
 {
+  AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+  [delegate firstTimeSetupUserIdStepComplete];
+  
   DFPhotosPermissionViewController *vc = [[DFPhotosPermissionViewController alloc] init];
   [self.navigationController setViewControllers:@[vc] animated:YES];
 }
