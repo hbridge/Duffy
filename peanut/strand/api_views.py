@@ -109,13 +109,18 @@ def getTitleForStrand(user, strand):
 
 	return title
 
-def getActorsObjectData(actors):
+def getActorsObjectData(actors, includePhone = False):
 	if not isinstance(actors, list):
 		actors = [actors]
 
 	userData = list()
 	for user in actors:
-		userData.append({'display_name': user.display_name, 'id': user.id})
+		entry = {'display_name': user.display_name, 'id': user.id}
+
+		if includePhone:
+			entry['phone_number'] = user.phone_number
+
+		userData.append(entry)
 
 	return userData
 """
@@ -335,32 +340,19 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		strandId = strand.id
 		photos = strand.photos.all().order_by("-time_taken")
 		
-		privatePhotoCount = dict()
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				# If this is another person's private strand
-				if neighborStrand.shared == False and user not in neighborStrand.users.all():
-					otherUser = neighborStrand.users.all()[0]
-					if otherUser not in privatePhotoCount:
-						privatePhotoCount[otherUser] = 0
-					privatePhotoCount[otherUser] += neighborStrand.photos.count()
 				interestedUsers.extend(neighborStrand.users.all())
 
-		interestedUsers = set(interestedUsers)
+		#interestedUsers = set(interestedUsers)
 
-		names = list()
-		for interestedUser in interestedUsers:
-			if interestedUser in privatePhotoCount:
-				name = "%s [%s]" % (interestedUser.display_name, privatePhotoCount[interestedUser])
-			else:
-				name = interestedUser.display_name
-			names.append(name)
+		names = [x.display_name for x in interestedUsers]
 
 		title = ', '.join(names)
 		if len(names) > 0:
 			title += " might like these photos"
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'target_users': getActorsObjectData(interestedUsers, True)}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
