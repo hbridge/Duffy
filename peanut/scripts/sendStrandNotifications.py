@@ -221,15 +221,15 @@ def main(argv):
 		# Raw firestarter
 		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - rawFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_RAW_FIRESTARTER_ID))
 
-		notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
+		#notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
 
 		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
 
 		notificationLogsCache = sendGpsNotification(now, gpsRefreshTime, notificationLogsCache)
 
-		notificationLogsCache = sendPhotoFirestarter(now, photosFirestarterPhotoTakenWithin, photosFirestarterGpsUpdatedWithin, photosFirestarterNotifiedWithin, photosFirestarterAccuracyWithinMeters, notificationLogsCache)
+		#notificationLogsCache = sendPhotoFirestarter(now, photosFirestarterPhotoTakenWithin, photosFirestarterGpsUpdatedWithin, photosFirestarterNotifiedWithin, photosFirestarterAccuracyWithinMeters, notificationLogsCache)
 
-		notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
+		#notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
 				
 		# Always sleep since we're doing a time based search above
 		time.sleep(5)
