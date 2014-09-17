@@ -383,6 +383,29 @@ def getObjectsDataForActions(user):
 		
 	return objectResponse
 
+def getPhotosSuggestionsForStrand(user, strand):
+	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
+	# Get all the unshared strands for the given user that are close to the given strand
+	unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
+	
+	unsharedPhotos = list()
+	for unsharedStrand in unsharedStrands:
+		unsharedPhotos.extend(unsharedStrand.photos.all())
+	unsharedPhotos = set(unsharedPhotos)
+
+	matchingPhotos = list()
+	if len(unsharedPhotos) > 0:
+		# For each photo, see if it would do well in a strand from the cache
+		for photo in unsharedPhotos:
+			if strands_util.photoBelongsInStrand(photo, strand):
+				matchingPhotos.append(photo)
+
+		matchingPhotos = sorted(matchingPhotos, key=lambda x: x.time_taken, reverse=True)
+
+	return matchingPhotos
+	
 def getInviteObjectsDataForUser(user):
 	responseObjects = list()
 
@@ -391,6 +414,12 @@ def getInviteObjectsDataForUser(user):
 	for strandInvite in strandInvites:
 		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
 		entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+
+		"""
+
+		TODO (Derek): Figure out a way to use neighbors.
+			Can't right now because with newly created strands, those entries aren't written
+
 
 		# Find this user's private strands which are neighbors to the invited strand
 		strandNeighborsCache = getStrandNeighborsCache([strandInvite.strand])
@@ -404,7 +433,12 @@ def getInviteObjectsDataForUser(user):
 			suggestionsEntries = getObjectsDataForStrands(user, privateNeighborStrands, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
 
 			entry['objects'].extend(suggestionsEntries)
-		
+		"""
+		photos = getPhotosSuggestionsForStrand(user, strandInvite.strand)
+		suggestionsEntries = getObjectsDataForPhotos(user, photos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
+
+		entry['objects'].extend(suggestionsEntries)
+
 		responseObjects.append(entry)
 	return responseObjects
 		
@@ -468,25 +502,7 @@ def suggested_unshared_photos(request):
 		"""
 		TODO(Derek):  If needed, move this over to using Strand neighbors
 
-		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
-		timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
-
-		# Get all the unshared strands for the given user that are close to the given strand
-		unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 		
-		unsharedPhotos = list()
-		for unsharedStrand in unsharedStrands:
-			unsharedPhotos.extend(unsharedStrand.photos.all())
-		unsharedPhotos = set(unsharedPhotos)
-
-		matchingPhotos = list()
-		if len(unsharedPhotos) > 0:
-			# For each photo, see if it would do well in a strand from the cache
-			for photo in unsharedPhotos:
-				if strands_util.photoBelongsInStrand(photo, strand):
-					matchingPhotos.append(photo)
-
-			matchingPhotos = sorted(matchingPhotos, key=lambda x: x.time_taken, reverse=True)
 		"""
 
 		response['objects'] = []
