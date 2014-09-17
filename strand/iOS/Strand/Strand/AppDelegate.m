@@ -29,6 +29,7 @@
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFCameraRollChangeManager.h"
+#import "DFCameraRollSyncManager.h"
 #import "DFNavigationController.h"
 #import "DFContactSyncManager.h"
 #import "DFSocketsManager.h"
@@ -218,6 +219,7 @@
 {
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
     if ([self isAppSetupComplete]) {
+      [[DFCameraRollSyncManager sharedManager] sync];
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
