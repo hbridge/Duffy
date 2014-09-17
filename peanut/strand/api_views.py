@@ -263,6 +263,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 """
 	Creates a cache which is a dictionary with the key being the strandId and the value
 	a list of neighbor strands
+
+	returns cache[strandId] = list(neighborStrand1, neighborStrand2...)
 """
 def getStrandNeighborsCache(strands):
 	strandIds = Strand.getIds(strands)
@@ -374,6 +376,32 @@ def getObjectsDataForActions(user):
 		objectResponse.append(metadata)	
 		
 	return objectResponse
+
+def getInviteObjectsDataForUser(user):
+	responseObjects = list()
+
+	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+
+	for strandInvite in strandInvites:
+		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand"}
+		entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+
+		# Find this user's private strands which are neighbors to the invited strand
+		strandNeighborsCache = getStrandNeighborsCache([strandInvite.strand])
+		
+		privateNeighborStrands = list()
+		# If we found some neighbors to this strand, add them in as suggestion objects
+		if strandInvite.strand.id in strandNeighborsCache:
+			for strand in strandNeighborsCache[strandInvite.strand.id]:
+				if strand.shared == False and user in strand.users.all():
+					privateNeighborStrands.append(strand)
+			suggestionsEntries = getObjectsDataForStrands(user, privateNeighborStrands, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
+
+			entry['objects'].extend(suggestionsEntries)
+		
+		responseObjects.append(entry)
+	return responseObjects
+		
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
@@ -388,17 +416,7 @@ def invited_strands(request):
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		
-		strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
-
-		responseObjects = list()
-
-		for strandInvite in strandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand"}
-			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
-			responseObjects.append(entry)
-			
-		response['objects'] = responseObjects
+		response['objects'] = getInviteObjectsDataForUser(user)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
@@ -426,6 +444,8 @@ def unshared_strands(request):
 
 """
 	Return the Duffy JSON for "private" photos for a user that are a good match for the given strand
+
+	TODO(Derek):  Remove this
 """
 def suggested_unshared_photos(request):
 	response = dict({'result': True})
@@ -438,6 +458,8 @@ def suggested_unshared_photos(request):
 		# This is the strand we're looking in the users's private photos to see if there's any good matches
 		strand = form.cleaned_data['strand']
 
+
+		"""
 		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 		timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
@@ -457,8 +479,9 @@ def suggested_unshared_photos(request):
 					matchingPhotos.append(photo)
 
 			matchingPhotos = sorted(matchingPhotos, key=lambda x: x.time_taken, reverse=True)
-	
-		response['objects'] = getObjectsDataForPhotos(user.id, matchingPhotos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
+		"""
+
+		response['objects'] = []
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -493,14 +516,8 @@ def strand_activity(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 
-		# Grab invites
-		receivedStrandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
-
-		inviteObjects = list()
-		for strandInvite in receivedStrandInvites:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user), 'time_stamp': strandInvite.added}
-			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
-			inviteObjects.append(entry)
+		# First throw in invite objects
+		inviteObjects = getInviteObjectsDataForUser(user)
 		responseObjects.extend(inviteObjects)
 		
 		# Created Strands
@@ -520,13 +537,13 @@ def strand_activity(request):
 		actionObjects = getObjectsDataForActions(user)
 
 		# Grab sent created strands and action data, then sort.  We put invites at the top
-		tmpObjects = list()
-		tmpObjects.extend(actionObjects)
-		tmpObjects.extend(createdStrandObjects)
+		afterInviteFeedObjects = list()
+		afterInviteFeedObjects.extend(actionObjects)
+		afterInviteFeedObjects.extend(createdStrandObjects)
 
-		tmpObjects = sorted(tmpObjects, key=lambda x: x['time_stamp'], reverse=True)
+		afterInviteFeedObjects = sorted(afterInviteFeedObjects, key=lambda x: x['time_stamp'], reverse=True)
 
-		responseObjects.extend(tmpObjects)
+		responseObjects.extend(afterInviteFeedObjects)
 
 		response['objects'] = responseObjects
 	else:
