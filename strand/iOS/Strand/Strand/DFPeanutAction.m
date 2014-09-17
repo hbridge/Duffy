@@ -27,7 +27,7 @@
 {
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in actionArray) {
-    if ([action.action_type isEqualToString:DFPeanutActionFavorite]) {
+    if (action.action_type == DFPeanutActionFavorite) {
       if (action.user == [[DFUser currentUser] userID]) {
         [result addObject:@"You"];
       } else {

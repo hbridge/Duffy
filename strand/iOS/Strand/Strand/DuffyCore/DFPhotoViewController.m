@@ -75,7 +75,7 @@
 {
   self.favoritedOtherUserNames = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in self.photoActions) {
-    if ([action.action_type isEqualToString:DFPeanutActionFavorite]) {
+    if (action.action_type == DFPeanutActionFavorite) {
       if (action.user == [[DFUser currentUser] userID]) {
         self.userFavoritedAction = action;
       } else {
