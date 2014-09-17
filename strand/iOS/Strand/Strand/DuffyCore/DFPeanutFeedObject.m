@@ -21,6 +21,7 @@ DFFeedObjectType DFFeedObjectInviteStrand = @"invite_strand";
 DFFeedObjectType DFFeedObjectStrand = @"strand";
 DFFeedObjectType DFFeedObjectLikeAction = @"like_action";
 DFFeedObjectType DFFeedObjectStrandPost = @"strand_post";
+DFFeedObjectType DFFeedObjectSuggestedPhotos = @"suggested_photos";
 
 static NSArray *FeedObjectTypes;
 
@@ -208,5 +209,10 @@ static NSArray *FeedObjectTypes;
   return names;
 }
 
+- (NSArray *)subobjectsOfType:(DFFeedObjectType)type
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
+  return [self.objects filteredArrayUsingPredicate:predicate];
+}
 
 @end

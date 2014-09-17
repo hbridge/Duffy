@@ -24,7 +24,7 @@ extern DFFeedObjectType DFFeedObjectInviteStrand;
 extern DFFeedObjectType DFFeedObjectStrand;
 extern DFFeedObjectType DFFeedObjectLikeAction;
 extern DFFeedObjectType DFFeedObjectStrandPost;
-
+extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
 
 // Simple attribures
 @property (nonatomic) DFPhotoIDType id;
@@ -51,5 +51,7 @@ extern DFFeedObjectType DFFeedObjectStrandPost;
 - (BOOL)isLockedSection;
 - (NSArray *)actorAbbreviations;
 - (NSArray *)actorNames;
+
+- (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
 
 @end

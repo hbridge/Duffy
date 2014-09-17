@@ -298,8 +298,6 @@ didFinishServerFetchWithError:(NSError *)error
 - (void)createButtonPressed:(id)sender
 {
   DFCreateStrandViewController *createController = [DFCreateStrandViewController sharedViewController];
-  createController.showInvites = NO;
-  
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
   
@@ -310,25 +308,17 @@ didFinishServerFetchWithError:(NSError *)error
 {
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *invitedStrand = feedObject.objects.firstObject;
+    DFPeanutFeedObject *invitedStrand = [[feedObject subobjectsOfType:DFFeedObjectSection]
+                                         firstObject];
+    DFPeanutFeedObject *suggestedPhotos = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
+                                           firstObject];
     DFSelectPhotosViewController *vc = [[DFSelectPhotosViewController alloc]
                                         initWithTitle:@"Accept Invite"
                                         showsToField:NO
-                                        suggestedSectionObject:nil
+                                        suggestedSectionObject:suggestedPhotos
                                         sharedSectionObject:invitedStrand
                                         inviteObject:feedObject
                                         ];
-    
-    
-    DFPeanutStrandFeedAdapter *feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
-    [feedAdapter
-     fetchSuggestedPhotosForStrand:@(invitedStrand.id)
-     completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
-       if (!error) {
-         vc.suggestedSectionObject = response.objects.firstObject;
-       }
-     }];
-    
     [self.navigationController pushViewController:vc animated:YES];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
     DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;

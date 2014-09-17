@@ -22,6 +22,7 @@
 #import "DFImageStore.h"
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
+#import "DFPeanutUserObject.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -133,8 +134,13 @@ static DFCreateStrandViewController *instance;
 {
   _showInvites = showInvites;
   
+  // Fetch the invites since we may not have before
+  if (showInvites) [self refreshInvitesFromServer];
+  
   // Redraw the controller since we might have changed what is shown
-  [self reloadData];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self reloadData];
+  });
 }
 
 
@@ -206,7 +212,12 @@ static DFCreateStrandViewController *instance;
   if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
   
   // Set the header attributes
-  cell.titleLabel.text = strandObject.title;
+  NSMutableString *actorString = [NSMutableString new];
+  for (DFPeanutUserObject *user in strandObject.actors) {
+    if (user != strandObject.actors.firstObject) [actorString appendString:@", "];
+    [actorString appendString:user.display_name];
+  }
+  cell.titleLabel.text = [actorString stringByAppendingString:strandObject.title];
   cell.locationLabel.text = strandObject.subtitle;
   cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
                          stringFromDate:photoObject.time_taken];
@@ -294,32 +305,20 @@ static DFCreateStrandViewController *instance;
   DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
   DFSelectPhotosViewController *selectController;
   if ([feedObject.type isEqualToString:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
-    [self.feedAdapter
-     fetchSuggestedPhotosForStrand:@(strandObject.id)
-     completion:^(DFPeanutObjectsResponse *response, NSData *responseHash, NSError *error) {
-       
-       dispatch_async(dispatch_get_main_queue(), ^{
-         DFPeanutFeedObject *suggestionObject;
-         if (!error) {
-           suggestionObject = response.objects.firstObject;
-         }
-         
-         // this is an invite, the object that user selected represenets the shared photos
-         // don't show the to field
-         DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc]
-                             initWithTitle:@"Accept Invite"
-                             showsToField:NO
-                             suggestedSectionObject:suggestionObject
-                             sharedSectionObject:feedObject.objects.firstObject
-                                                           inviteObject:feedObject];
-         selectController.inviteObject = feedObject;
-         [self.navigationController pushViewController:selectController animated:YES];
-       });
-       
-       
-     }];
-    
+    DFPeanutFeedObject *invitedStrand = [[feedObject subobjectsOfType:DFFeedObjectSection]
+                                         firstObject];
+    DFPeanutFeedObject *suggestedPhotos = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
+                                           firstObject];
+    // this is an invite, the object that user selected represenets the shared photos
+    // don't show the to field
+    DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc]
+                                                      initWithTitle:@"Accept Invite"
+                                                      showsToField:NO
+                                                      suggestedSectionObject:suggestedPhotos
+                                                      sharedSectionObject:invitedStrand
+                                                      inviteObject:feedObject];
+    selectController.inviteObject = feedObject;
+    [self.navigationController pushViewController:selectController animated:YES];
   } else {
     // this is creating a new strand, the object they selected is a suggestion
     // we also want to show a to field to invite others
@@ -380,23 +379,33 @@ static DFCreateStrandViewController *instance;
   }];
   
   if (self.showInvites) {
-    [self.feedAdapter
-     fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
-                                         NSData *responseHash,
-                                         NSError *error) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         NSArray *oldInvites = self.inviteObjects;
-         self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
-         if ([DFCreateStrandViewController inviteObjectsChangedForOldInvites:oldInvites
-                                                                  newInvites:self.inviteObjects])
-         {
+    [self refreshInvitesFromServer];
+  }
+}
+
+- (void)refreshInvitesFromServer
+{
+  [self.feedAdapter
+   fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
+                                       NSData *responseHash,
+                                       NSError *error) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       NSArray *oldInvites = self.inviteObjects;
+       self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
+       if ([DFCreateStrandViewController inviteObjectsChangedForOldInvites:oldInvites
+                                                                newInvites:self.inviteObjects])
+       {
+         if (oldInvites.count > 0) {
            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0]
                          withRowAnimation:UITableViewRowAnimationNone];
+         } else {
+           [self.tableView insertSections:[NSIndexSet indexSetWithIndex:0]
+                         withRowAnimation:UITableViewRowAnimationFade];
          }
-
-       });
-    }];
-  }
+       }
+       
+     });
+   }];
 }
 
 + (BOOL)inviteObjectsChangedForOldInvites:(NSArray *)oldInvites newInvites:(NSArray *)newInvites

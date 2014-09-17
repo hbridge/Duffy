@@ -124,15 +124,7 @@ CGFloat const ToFieldHeight = 44.0;
   
   dispatch_async(dispatch_get_main_queue(), ^{
     self.suggestedPhotoObjects = photos;
-    if (sectionObject) {
-      [self.collectionView performBatchUpdates:^{
-        [self.collectionView insertSections:[NSIndexSet indexSetWithIndex:0]];
-      } completion:^(BOOL finished) {
-        
-      }];
-    } else {
-      [self.collectionView reloadData];
-    }
+    [self.collectionView reloadData];
   });
 }
 
