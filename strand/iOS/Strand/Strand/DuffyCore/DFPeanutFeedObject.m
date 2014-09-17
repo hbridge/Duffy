@@ -177,7 +177,7 @@ static NSArray *FeedObjectTypes;
 - (BOOL)isEqual:(id)object
 {
   DFPeanutFeedObject *otherObject = object;
-  if (otherObject.id == self.id) return YES;
+  if (otherObject.id == self.id && [otherObject.type isEqual:self.type]) return YES;
   return NO;
 }
 

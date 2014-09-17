@@ -358,11 +358,14 @@ static DFCreateStrandViewController *instance;
     if (error) {
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
+      DFPeanutObjectsResponse *lastResponse = self.suggestedResponse;
       self.suggestedResponse = response;
       
       if (![responseHash isEqual:self.lastResponseHash]) {
         DDLogDebug(@"New data for suggestions, updating view...");
-        [self reloadData];
+        dispatch_async(dispatch_get_main_queue(), ^{
+          [self updateTableViewForOldResponse:lastResponse newResponse:response];
+        });
         self.lastResponseHash = responseHash;
       } else {
         DDLogDebug(@"Got back response for strand suggestions but it was the same");
@@ -370,7 +373,9 @@ static DFCreateStrandViewController *instance;
     }
     
     if (response.objects.count > 0 || error) {
-      [self.refreshControl endRefreshing];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [self.refreshControl endRefreshing];
+      });
     }
   }];
   
@@ -379,10 +384,79 @@ static DFCreateStrandViewController *instance;
      fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
                                          NSData *responseHash,
                                          NSError *error) {
-      self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
-      [self.tableView reloadData];
+       dispatch_async(dispatch_get_main_queue(), ^{
+         NSArray *oldInvites = self.inviteObjects;
+         self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
+         if ([DFCreateStrandViewController inviteObjectsChangedForOldInvites:oldInvites
+                                                                  newInvites:self.inviteObjects])
+         {
+           [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0]
+                         withRowAnimation:UITableViewRowAnimationNone];
+         }
+
+       });
     }];
   }
+}
+
++ (BOOL)inviteObjectsChangedForOldInvites:(NSArray *)oldInvites newInvites:(NSArray *)newInvites
+{
+  if (oldInvites.count != newInvites.count) return YES;
+  for (NSUInteger i = 0; i < oldInvites.count; i++) {
+    if (![newInvites[i] isEqual:oldInvites[i]]) return YES;
+  }
+  
+  return NO;
+}
+
+- (void)updateTableViewForOldResponse:(DFPeanutObjectsResponse *)oldResponse
+                           newResponse:(DFPeanutObjectsResponse *)newResponse
+{
+  NSDictionary *oldIDsToIPs = [self mapIDsToIPs:oldResponse];
+  NSDictionary *newIDsToIPs = [self mapIDsToIPs:newResponse];
+  
+  // any IDs that are in newIDsToIPs but not in oldIDsToIPs was added
+  NSMutableSet *addedIDs = [[NSMutableSet alloc] initWithArray:newIDsToIPs.allKeys];
+  [addedIDs minusSet:[NSSet setWithArray:oldIDsToIPs.allKeys]];
+  NSMutableArray *addedIPs = [NSMutableArray new];
+  for (NSNumber *idNum in addedIDs) {
+    [addedIPs addObject:newIDsToIPs[idNum]];
+  }
+  
+  // find all old rows that might have moved or been deleted
+  NSMutableSet *movedIDs = [NSMutableSet new];
+  NSMutableSet *deletedIPs = [NSMutableSet new];
+  for (NSNumber *idNum in oldIDsToIPs.allKeys) {
+    NSIndexPath *oldIP = oldIDsToIPs[idNum];
+    NSIndexPath *newIP = newIDsToIPs[idNum];
+    
+    if (!newIP) {
+      [deletedIPs addObject:oldIDsToIPs[idNum]];
+    } else if (![oldIP isEqual:newIP]) {
+      [movedIDs addObject:idNum];
+    }
+  }
+  
+  // tell the table view update the table view with changes
+  [self.tableView beginUpdates];
+  [self.tableView deleteRowsAtIndexPaths:deletedIPs.allObjects withRowAnimation:UITableViewRowAnimationNone];
+  [self.tableView insertRowsAtIndexPaths:addedIPs withRowAnimation:UITableViewRowAnimationRight];
+  for (NSNumber *idNum in movedIDs) {
+    [self.tableView moveRowAtIndexPath:oldIDsToIPs[idNum] toIndexPath:newIDsToIPs[idNum]];
+  }
+  
+  [self.tableView endUpdates];
+}
+
+- (NSDictionary *)mapIDsToIPs:(DFPeanutObjectsResponse *)response
+{
+  NSUInteger section = [self numberOfSectionsInTableView:self.tableView] - 1;
+  NSMutableDictionary *IDsToIPs = [NSMutableDictionary new];
+  for (NSUInteger i = 0; i < response.objects.count; i++) {
+    DFPeanutFeedObject *object = response.objects[i];
+    IDsToIPs[@(object.id)] = [NSIndexPath indexPathForRow:i inSection:section];
+  }
+  return IDsToIPs;
 }
 
 - (void)cancelPressed:(id)sender
