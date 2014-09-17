@@ -13,10 +13,13 @@
 @interface DFInviteStrandViewController ()
 
 @property (nonatomic, retain) NSArray *pickedContacts;
+@property (nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
 @end
 
 @implementation DFInviteStrandViewController
+
+@synthesize inviteAdapter = _inviteAdapter;
 
 - (instancetype)init
 {
@@ -82,27 +85,47 @@
 - (void)doneButtonPressed:(id)sender
 {
   DDLogVerbose(@"done pressed for section: %@contacts: %@", self.sectionObject, self.pickedContacts);
-  NSMutableArray *invites = [NSMutableArray new];
-  for (DFPeanutContact *contact in self.pickedContacts) {
-    DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
-    invite.user = @([[DFUser currentUser] userID]);
-    invite.phone_number = contact.phone_number;
-    invite.strand = @(self.sectionObject.id);
-    [invites addObject:invite];
-  }
-  
-  DFPeanutStrandInviteAdapter *inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
-  [inviteAdapter
-   postInvites:invites
-   success:^(NSArray *resultObjects) {
-     [self dismissViewControllerAnimated:YES completion:^{
-       [SVProgressHUD showSuccessWithStatus:@"Success!"];
-     }];
+  DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
+  peanutStrand.id = @(self.sectionObject.id);
+  [self sendInvitesForStrand:peanutStrand toPeanutContacts:self.pickedContacts];
+}
+
+- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
+            toPeanutContacts:(NSArray *)peanutContacts
+{
+  [self.inviteAdapter
+   sendInvitesForStrand:peanutStrand
+   toPeanutContacts:peanutContacts
+   success:^(DFSMSInviteStrandComposeViewController *vc) {
+     vc.messageComposeDelegate = self;
+     if (vc) [self presentViewController:vc
+                                animated:YES
+                              completion:nil];
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:@"Failed."];
+     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
+                self.class, peanutStrand, error);
    }];
-  
-  
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+                 didFinishWithResult:(MessageComposeResult)result
+{
+  [self.presentingViewController
+   dismissViewControllerAnimated:YES
+   completion:^{
+     if (result == MessageComposeResultSent) {
+       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+     } else {
+       [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+     }
+   }];
+}
+
+- (DFPeanutStrandInviteAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+  return _inviteAdapter;
 }
 
 @end

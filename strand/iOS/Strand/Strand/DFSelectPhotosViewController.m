@@ -29,10 +29,15 @@ CGFloat const ToFieldHeight = 44.0;
 @property (nonatomic, retain) NSMutableArray *selectedPhotoIDs;
 @property (nonatomic, retain) NSArray *selectedContacts;
 @property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
+@property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 
 @end
 
 @implementation DFSelectPhotosViewController
+
+@synthesize inviteAdapter = _inviteAdapter;
+@synthesize strandAdapter = _strandAdapter;
 
 
 - (instancetype)init
@@ -360,34 +365,52 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedPhotoObjects];
   
   [SVProgressHUD show];
-  DFPeanutStrandAdapter *strandAdapter = [[DFPeanutStrandAdapter alloc] init];
-  [strandAdapter
+  [self.strandAdapter
    performRequest:RKRequestMethodPOST
    withPeanutStrand:requestStrand success:^(DFPeanutStrand *peanutStrand) {
      DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
      // invite selected users
-     DFPeanutStrandInviteAdapter *inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
-     NSMutableArray *invites = [NSMutableArray new];
-     for (DFPeanutContact *contact in self.peoplePicker.selectedPeanutContacts) {
-       DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
-       invite.user = @([[DFUser currentUser] userID]);
-       invite.strand = peanutStrand.id;
-       invite.phone_number = contact.phone_number;
-       [invites addObject:invite];
-     }
-     [inviteAdapter postInvites:invites success:^(NSArray *resultObjects) {
-       [SVProgressHUD showSuccessWithStatus:@"Success!"];
-       [self.tabBarController setSelectedIndex:0];
-       [self.navigationController popViewControllerAnimated:NO];
-     } failure:^(NSError *error) {
-       [SVProgressHUD showErrorWithStatus:@"Inviting friends failed."];
-     }];
+     [self sendInvitesForStrand:peanutStrand
+               toPeanutContacts:self.peoplePicker.selectedPeanutContacts];
      
+     // start uploading the photos
      [self markPhotosForUpload:peanutStrand.photos];
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:@"Failed."];
      DDLogError(@"%@ failed to create strand: %@, error: %@",
                 self.class, requestStrand, error);
+   }];
+}
+
+- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
+            toPeanutContacts:(NSArray *)peanutContacts
+{
+  [self.inviteAdapter
+   sendInvitesForStrand:peanutStrand
+   toPeanutContacts:peanutContacts
+   success:^(DFSMSInviteStrandComposeViewController *vc) {
+     vc.messageComposeDelegate = self;
+     if (vc) [self presentViewController:vc
+                                animated:YES
+                              completion:nil];
+   } failure:^(NSError *error) {
+     [SVProgressHUD showErrorWithStatus:@"Failed."];
+     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
+                self.class, peanutStrand, error);
+   }];
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+                 didFinishWithResult:(MessageComposeResult)result
+{
+  [self.presentingViewController
+   dismissViewControllerAnimated:YES
+   completion:^{
+     if (result == MessageComposeResultSent) {
+       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+     } else {
+       [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+     }
    }];
 }
 
@@ -443,6 +466,19 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   [self.tokenField resignFirstResponder];
 }
+
+- (DFPeanutStrandInviteAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+  return _inviteAdapter;
+}
+
+- (DFPeanutStrandAdapter *)strandAdapter
+{
+  if (!_strandAdapter) _strandAdapter = [[DFPeanutStrandAdapter alloc] init];
+  return _strandAdapter;
+}
+
 
 
 @end

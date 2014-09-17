@@ -8,8 +8,9 @@
 
 #import "DFPeoplePickerViewController.h"
 #import "DFPeanutFeedObject.h"
+#import <MessageUI/MessageUI.h>
 
-@interface DFInviteStrandViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate>
+@interface DFInviteStrandViewController : DFPeoplePickerViewController <DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutFeedObject *sectionObject;
 

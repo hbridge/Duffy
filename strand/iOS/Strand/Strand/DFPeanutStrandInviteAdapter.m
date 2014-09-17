@@ -46,9 +46,9 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
    parameters:nil
    forceCollection:YES
    success:^(NSArray *resultObjects) {
-     success(success);
+     success(resultObjects);
    } failure:^(NSError *error) {
-     failure(failure);
+     failure(error);
    }];
 }
 
@@ -87,6 +87,40 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
      failure(failure);
    }];
 }
+
+- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
+            toPeanutContacts:(NSArray *)peanutContacts
+                     success:(void(^)(DFSMSInviteStrandComposeViewController *))success
+                     failure:(DFPeanutRestFetchFailure)failure
+{
+  NSMutableArray *invites = [NSMutableArray new];
+  for (DFPeanutContact *contact in peanutContacts) {
+    DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
+    invite.user = @([[DFUser currentUser] userID]);
+    invite.strand = peanutStrand.id;
+    invite.phone_number = contact.phone_number;
+    [invites addObject:invite];
+  }
+  [self postInvites:invites success:^(NSArray *resultObjects) {
+    NSMutableArray *numbersToSMS = [NSMutableArray new];
+    for (DFPeanutStrandInvite *invite in resultObjects) {
+      if (!invite.invited_user) {
+        [numbersToSMS addObject:invite.phone_number];
+      }
+    }
+    
+    if (numbersToSMS.count > 0) {
+      DFSMSInviteStrandComposeViewController *smsInviteVC = [[DFSMSInviteStrandComposeViewController alloc]
+                                                             initWithRecipients:numbersToSMS];
+      success(smsInviteVC);
+    }
+    success(nil);
+  } failure:^(NSError *error) {
+    failure(error);
+  }];
+
+}
+
 
 
 @end

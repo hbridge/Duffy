@@ -10,8 +10,9 @@
 #import "DFPeanutFeedObject.h"
 #import "VENTokenField.h"
 #import "DFPeoplePickerViewController.h"
+#import <MessageUI/MessageUI.h>
 
-@interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate,UIScrollViewDelegate, DFPeoplePickerDelegate>
+@interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate,UIScrollViewDelegate, DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestedSectionObject;
 @property (nonatomic, retain) DFPeanutFeedObject *sharedSectionObject;

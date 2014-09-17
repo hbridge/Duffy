@@ -65,6 +65,7 @@
 		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
 		5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */; };
 		5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */; };
+		5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */; };
 		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
 		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
 		5A7B1841196DFEB300E5A1D1 /* DFNearbyFriendsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */; };
@@ -319,6 +320,8 @@
 		5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContactAdapter.m; sourceTree = "<group>"; };
 		5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactSyncManager.h; sourceTree = "<group>"; };
 		5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactSyncManager.m; sourceTree = "<group>"; };
+		5A6E8B6C19CA323500870423 /* DFSMSInviteStrandComposeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSInviteStrandComposeViewController.h; sourceTree = "<group>"; };
+		5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSInviteStrandComposeViewController.m; sourceTree = "<group>"; };
 		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
 		5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsAdapter.m; sourceTree = "<group>"; };
 		5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutMessageResponse.h; sourceTree = "<group>"; };
@@ -1044,6 +1047,8 @@
 				5AA9293719A67CC500032A3F /* DFABResultTableViewCell.xib */,
 				5AA9293119A6598600032A3F /* DFNoContactsTableViewCell.xib */,
 				5AA9293319A66AB700032A3F /* DFNoResultsTableViewCell.xib */,
+				5A6E8B6C19CA323500870423 /* DFSMSInviteStrandComposeViewController.h */,
+				5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */,
 			);
 			name = "People Picker";
 			sourceTree = "<group>";
@@ -1594,6 +1599,7 @@
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */,
 				5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */,
+				5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */,
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
 				651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */,
 				5AB4CC04198306C800EFB3E3 /* DFCameraRollChangeManager.m in Sources */,
@@ -1913,7 +1919,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "c199e3aa-79ae-4890-9b30-b2e94386e413";
+				PROVISIONING_PROFILE = "a683a4db-877c-4b7e-b034-781dd2c83fe1";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Strand/Strand-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
