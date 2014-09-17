@@ -80,8 +80,9 @@ def sendRefreshFeedToUsers(users):
 		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
 
 	# Next send through push notifications
-	for user in users:
-		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, dict())
+	# TODO(Derek) Maybe put this back in if we don't want to use socket server
+	#for user in users:
+	#	sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, dict())
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)

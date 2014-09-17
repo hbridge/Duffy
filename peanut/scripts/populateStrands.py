@@ -117,7 +117,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 
 		usersToUpdateFeed.extend(nearbyUsers)
 	
-	userIds = User.getIds(set(usersToUpdateFeed))
+	userIds = set(User.getIds(usersToUpdateFeed))
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
 	
 	"""

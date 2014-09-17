@@ -215,7 +215,9 @@ class CreateStrandAPI(CreateAPIView):
         
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
     def pre_save(self, strand):
-        updateStrandWithCorrectPhotoTimes(strand)
+        changed = updateStrandWithCorrectPhotoTimes(strand)
 
-        logger.info("Updated strand %s", (strand.id))
+        if changed:
+            logger.debug("Updated strand %d with new times" % (strand.id))
+            strand.save()
 
