@@ -58,6 +58,9 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic) CGFloat previousScrollViewYOffset;
 @property (nonatomic) BOOL isViewTransitioning;
 
+@property (readonly, nonatomic, retain) NSDictionary *photoIndexPathsById;
+@property (readonly, nonatomic, retain) NSDictionary *photoObjectsById;
+
 @end
 
 @implementation DFFeedViewController
@@ -68,7 +71,6 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self = [super init];
   if (self) {
-    self.delegate = self;
     [self initTabBarItem];
   }
   return self;
@@ -86,15 +88,9 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidLoad];
   
-  self.tableView = [[UITableView alloc] initWithFrame:self.view.frame
-                                                style:UITableViewStylePlain];
-  [self.view addSubview:self.tableView];
-  self.tableView.dataSource = self;
-  self.tableView.delegate = self;
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
   
-  self.automaticallyAdjustsScrollViewInsets = NO;
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
        forCellReuseIdentifier:@"photoCell"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
@@ -111,14 +107,6 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.tableView.rowHeight = MinRowHeight;
 
-  
-  self.refreshControl = [[UIRefreshControl alloc] init];
-  [self.refreshControl addTarget:self action:@selector(reloadFeed)
-                forControlEvents:UIControlEventValueChanged];
-
-  UITableViewController *tableViewController = [[UITableViewController alloc] init];
-  tableViewController.tableView = self.tableView;
-  tableViewController.refreshControl = self.refreshControl;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -129,7 +117,6 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  if (self.strandObjects.count == 0) [self.refreshControl beginRefreshing];
   self.isViewTransitioning = NO;
   [super viewDidAppear:animated];
   [[NSNotificationCenter defaultCenter] postNotificationName:DFStrandGalleryAppearedNotificationName
@@ -151,20 +138,48 @@ const CGFloat LockedCellHeight = 157.0;
   [super viewDidDisappear:animated];
 }
 
+- (void)setStrandObjects:(NSArray *)strandObjects
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSMutableDictionary *objectsByID = [NSMutableDictionary new];
+    NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
+    
+    for (NSUInteger sectionIndex = 0; sectionIndex < strandObjects.count; sectionIndex++) {
+      NSArray *objectsForSection = [strandObjects[sectionIndex] objects];
+      for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
+        DFPeanutFeedObject *object = objectsForSection[objectIndex];
+        NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
+        if ([object.type isEqual:DFFeedObjectPhoto]) {
+          objectsByID[@(object.id)] = object;
+          indexPathsByID[@(object.id)] = indexPath;
+        } else if ([object.type isEqual:DFFeedObjectCluster]) {
+          for (DFPeanutFeedObject *subObject in object.objects) {
+            objectsByID[@(subObject.id)] = subObject;
+            indexPathsByID[@(subObject.id)] = indexPath;
+          }
+        }
+      }
+    }
+    
+    _photoObjectsById = objectsByID;
+    _photoIndexPathsById = indexPathsByID;
+    _strandObjects = strandObjects;
+    
+    [self.tableView reloadData];
+  });
+}
+
+
 #pragma mark - Jump to a specific photo
 
 - (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSIndexPath *indexPath = self.indexPathsByID[@(photoId)];
+    NSIndexPath *indexPath = self.photoIndexPathsById[@(photoId)];
    
     if (indexPath) {
       if ([[self sectionObjectForTableSection:indexPath.section] isLockedSection]) {
         indexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
-      }
-      
-      if (self.strandToShow) {
-        indexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:0];
       }
       
       // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
@@ -190,7 +205,6 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)jumpToPhoto:(DFPhotoIDType)photoID
 {
   self.requestedPhotoIDToJumpTo = photoID;
-  [self reloadFeed];
 }
 
 #pragma mark - DFStrandsViewControllerDelegate
@@ -215,21 +229,11 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  NSInteger sections = 0;
-  sections += (self.uploadingPhotos.count > 0 ? 1 : 0);
-  
-  if (self.strandToShow) sections += 1;
-  else sections += self.strandObjects.count;
-
-  return sections;
+  return self.strandObjects.count;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
-  if (self.uploadingPhotos.count > 0 && section == 0) {
-    return nil;
-  }
-  
   DFFeedSectionHeaderView *headerView =
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
@@ -244,7 +248,6 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
-  if (self.uploadingPhotos.count > 0 && section == 0) return 0.0;
   return SectionHeaderHeight;
 }
 
@@ -253,15 +256,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  if (self.uploadingPhotos.count > 0 && section == 0) {
-    return 1;
-  }
-  
   DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:section];
-  
-  if ([sectionObject isLockedSection]) {
-    return 1;
-  }
   
   NSArray *items = sectionObject.objects;
   return items.count;
@@ -269,9 +264,6 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (DFPeanutFeedObject *)sectionObjectForTableSection:(NSUInteger)tableSection
 {
-  if (self.strandToShow) return self.strandToShow;
-  if (self.uploadingPhotos.count > 0) return self.strandObjects[tableSection - 1];
-  
   return self.strandObjects[tableSection];
 }
 
@@ -279,83 +271,19 @@ const CGFloat LockedCellHeight = 157.0;
 {
   UITableViewCell *cell;
   
-  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    cell = [self cellForUploadAtIndexPath:indexPath];
-  } else {
-    DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
-    NSArray *itemsForSection = section.objects;
-    DFPeanutFeedObject *object = itemsForSection[indexPath.row];
-    
-    if ([section isLockedSection]) {
-      cell = [self cellForLockedSection:section indexPath:indexPath];
-    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
-      cell = [self cellForPhoto:object indexPath:indexPath];
-    } else if ([object.type isEqual:DFFeedObjectCluster]) {
-      cell = [self cellForCluster:object indexPath:indexPath];
-    }
+  DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
+  NSArray *itemsForSection = section.objects;
+  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
+  
+  if ([object.type isEqual:DFFeedObjectPhoto]) {
+    cell = [self cellForPhoto:object indexPath:indexPath];
+  } else if ([object.type isEqual:DFFeedObjectCluster]) {
+    cell = [self cellForCluster:object indexPath:indexPath];
   }
-
+  
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
   [cell setNeedsLayout];
   return cell;
-}
-
-- (DFUploadingFeedCell *)cellForUploadAtIndexPath:(NSIndexPath *)indexPath
-{
-  DFUploadingFeedCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"uploadingCell"];
-  
-  cell.images = @[];
-  if (indexPath.row == 0) {
-    if (!self.uploadError) {
-      cell.statusTextLabel.text = @"Uploading";
-      [cell.activityIndicator startAnimating];
-    } else {
-      cell.statusTextLabel.text = @"Retry Pending";
-      [cell.activityIndicator stopAnimating];
-    }
-  }
-  
-  for (DFPhoto *photo in self.uploadingPhotos) {
-    [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self.tableView.visibleCells containsObject:cell]) return;
-        [cell addImage:image];
-      });
-    } failureBlock:^(NSError *error) {
-      DDLogError(@"Error loading thumbnail for uploading asset.");
-    }];
-  }
-  
-  return cell;
-}
-
-- (DFLockedStrandCell *)cellForLockedSection:(DFPeanutFeedObject *)section
-                                   indexPath:(NSIndexPath *)indexPath
-{
-  DFLockedStrandCell *lockedCell = [self.tableView dequeueReusableCellWithIdentifier:@"lockedCell"
-                                                                   forIndexPath:indexPath];
-  
-  NSMutableArray *objectIDs = [NSMutableArray new];
-  for (DFPeanutFeedObject *object in section.objects) {
-    [objectIDs addObject:@(object.id)];
-  }
-  lockedCell.objects = objectIDs;
-  
-  for (DFPeanutFeedObject *object in section.objects) {
-    [[DFImageStore sharedStore]
-     imageForID:object.id
-     preferredType:DFImageThumbnail
-     thumbnailPath:object.thumb_image_path
-     fullPath:object.full_image_path
-     completion:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         if (![self.tableView.visibleCells containsObject:lockedCell]) return;
-         [lockedCell setImage:image forObject:@(object.id)];
-         [lockedCell setNeedsLayout];
-       });
-     }];
-  }
-  return lockedCell;
 }
 
 - (DFPhotoFeedCell *)cellForPhoto:(DFPeanutFeedObject *)photoObject
@@ -457,14 +385,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    return UploadingCellVerticalMargin + UploadingCellTitleArea
-     + (self.uploadingPhotos.count / UploadingCellImagesPerRow + 1) * UploadingCellImageRowHeight
-     + (self.uploadingPhotos.count / UploadingCellImagesPerRow) * UploadingCellImageRowSpacing
-    + UploadingCellVerticalMargin;
-  }
-  
-  CGFloat rowHeight = MinRowHeight;
+   CGFloat rowHeight = MinRowHeight;
   
   
   DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
@@ -489,16 +410,8 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   id object;
-  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    object = self.uploadingPhotos[indexPath.row];
-  } else {
-    DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
-    if ([section isLockedSection]) {
-      object = section;
-    } else {
-      object = section.objects[indexPath.row];
-    }
-  }
+  DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
+  object = section.objects[indexPath.row];
   
   DDLogVerbose(@"Row tapped for object: %@", object);
                
@@ -523,7 +436,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"Favorite button pressed");
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
-  DFPeanutFeedObject *object = self.objectsByID[objectIDNumber];
+  DFPeanutFeedObject *object = self.photoObjectsById[objectIDNumber];
   DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFPeanutActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
                                firstObject];
@@ -581,7 +494,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"More options button pressed");
   DFPhotoIDType objectId = [objectIDNumber longLongValue];
-  DFPeanutFeedObject *object = self.objectsByID[objectIDNumber];
+  DFPeanutFeedObject *object = self.photoObjectsById[objectIDNumber];
   self.actionSheetPhotoID = objectId;
   
   NSString *deleteTitle = [self isObjectDeletableByUser:object] ? @"Delete" : nil;
@@ -602,7 +515,7 @@ selectedObjectChanged:(id)newObject
       fromObject:(id)oldObject
 {
   DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
-  DFPeanutFeedObject *searchObject = self.objectsByID[newObject];
+  DFPeanutFeedObject *searchObject = self.photoObjectsById[newObject];
   [DFFeedViewController configureNonImageAttributesForCell:feedCell searchObject:searchObject];
   [feedCell setNeedsLayout];
 }
@@ -647,10 +560,10 @@ selectedObjectChanged:(id)newObject
 
 - (void)deletePhoto
 {
-  DFPeanutFeedObject *object = self.objectsByID[@(self.actionSheetPhotoID)];
+  DFPeanutFeedObject *object = self.photoObjectsById[@(self.actionSheetPhotoID)];
   [self.photoAdapter deletePhoto:self.actionSheetPhotoID completionBlock:^(NSError *error) {
     if (!error) {
-      [self reloadFeed];
+      [self removePhotoObjectFromView:object];
       
       // remove it from the db
       [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.actionSheetPhotoID];
@@ -668,6 +581,35 @@ selectedObjectChanged:(id)newObject
       });
     }
   }];
+}
+
+// Removes a photo object from the local cache of strand objects and updates the view
+- (void)removePhotoObjectFromView:(DFPeanutFeedObject *)photoObject
+{
+  NSIndexPath *indexPath = self.photoIndexPathsById[@(self.actionSheetPhotoID)];
+  DFPeanutFeedObject *containingStrand = self.strandObjects[indexPath.section];
+  DFPeanutFeedObject *objectInStrand = containingStrand.objects[indexPath.row];
+  DFPeanutFeedObject *containingObject;
+  if ([objectInStrand.type isEqual:DFFeedObjectCluster]) {
+    // the object is in a cluster row
+    containingObject = objectInStrand;
+  } else {
+    containingObject = containingStrand;
+  }
+  
+  NSMutableArray *newObjects = containingObject.objects.mutableCopy;
+  [newObjects removeObject:photoObject];
+  containingObject.objects = newObjects;
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (containingObject == containingStrand) {
+      // if the containing object was the strand, the entire row disappears.  animate it
+      [self.tableView deleteRowsAtIndexPaths:@[indexPath]
+                            withRowAnimation:UITableViewRowAnimationFade];
+    } else {
+      [self.tableView reloadData];
+    }
+  });
 }
 
 - (void)savePhotoToCameraRoll
@@ -712,10 +654,7 @@ selectedObjectChanged:(id)newObject
 
 - (void)reloadRowForPhotoID:(DFPhotoIDType)photoID
 {
-  NSIndexPath *indexPath = self.indexPathsByID[@(photoID)];
-  if (indexPath) {
-    [self.tableView reloadData];
-  }
+  [self.tableView reloadData];
 }
 
 

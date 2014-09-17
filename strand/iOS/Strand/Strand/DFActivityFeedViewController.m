@@ -333,7 +333,7 @@ didFinishServerFetchWithError:(NSError *)error
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
     DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
     DFFeedViewController *feedController = [[DFFeedViewController alloc] init];
-    feedController.strandToShow = strandObject;
+    feedController.strandObjects = @[strandObject];
     [self.navigationController pushViewController:feedController animated:YES];
   } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
   

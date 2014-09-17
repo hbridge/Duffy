@@ -16,13 +16,11 @@
 #import "DFFeedSectionHeaderView.h"
 #import "DFPeanutFeedObject.h"
 
-@interface DFFeedViewController : DFStrandsViewController
+@interface DFFeedViewController : UITableViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
 DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderViewDelegate>
 
-@property (nonatomic, retain) UITableView *tableView;
-@property (nonatomic, retain) UIRefreshControl *refreshControl;
-@property (nonatomic, retain) DFPeanutFeedObject *strandToShow;
+@property (nonatomic, retain) NSArray *strandObjects;
 
 - (void)jumpToPhoto:(DFPhotoIDType)photoID;
 
