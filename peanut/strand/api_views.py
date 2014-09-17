@@ -335,16 +335,29 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		strandId = strand.id
 		photos = strand.photos.all().order_by("-time_taken")
 		
-		neighborUsers = list()
+		privatePhotoCount = dict()
+		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				users = neighborStrand.users.all()
-				neighborUsers.extend([user.display_name for user in users])
+				# If this is another person's private strand
+				if neighborStrand.shared == False and user not in neighborStrand.users.all():
+					if user not in privatePhotoCount:
+						privatePhotoCount[user] = 0
+					privatePhotoCount[user] += neighborStrand.photos.count()
+				interestedUsers.extend([user for user in neighborStrand.users.all()])
 
-		neighborUsers = set(neighborUsers)
+		interestedUsers = set(interestedUsers)
 
-		title = ', '.join(neighborUsers)
-		if len(neighborUsers) > 0:
+		names = list()
+		for user in interestedUsers:
+			if user in privatePhotoCount:
+				name = "%s [%s]" % (user.display_name, privatePhotoCount[user])
+			else:
+				name = user.display_name
+			names.append(name)
+
+		title = ', '.join(names)
+		if len(names) > 0:
 			title += " might like these photos"
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time}
 		groupEntry = {'photos': photos, 'metadata': metadata}
@@ -460,6 +473,8 @@ def suggested_unshared_photos(request):
 
 
 		"""
+		TODO(Derek):  If needed, move this over to using Strand neighbors
+
 		timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 		timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
