@@ -355,7 +355,7 @@ static const CGFloat ItemSpacing = 2.5;
     photoFeedController.strandObjects = @[section];
     [self.navigationController pushViewController:photoFeedController animated:YES];
     dispatch_async(dispatch_get_main_queue(), ^{
-      [photoFeedController jumpToPhoto:photoID];
+      [photoFeedController showPhoto:photoID animated:NO];
     });
   }
 }

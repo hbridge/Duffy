@@ -45,7 +45,7 @@ static RootViewController *mainRootViewController;
     _photoFeedController = [[DFFeedViewController alloc] init];
     _strandsNavController = [[DFTopBarController alloc]
                              initWithRootViewController:[[DFGalleryViewController alloc] init]];
-    [_strandsNavController pushViewController:_photoFeedController animated:NO];
+    //    [_strandsNavController pushViewController:_photoFeedController animated:NO];
     _subviewControllers =
     @[
       _strandsNavController,
@@ -130,9 +130,9 @@ static RootViewController *mainRootViewController;
 - (void)showPhotoWithID:(DFPhotoIDType)photoID
 {
   [self showGallery];
-  if ([self.photoFeedController respondsToSelector:@selector(jumpToPhoto:)]){
-    [self.photoFeedController jumpToPhoto:photoID];
-  }
+//  if ([self.photoFeedController respondsToSelector:@selector(jumpToPhoto:)]){
+//    [self.photoFeedController jumpToPhoto:photoID];
+//  }
 }
 
 #pragma mark - Page View Controller Data Source

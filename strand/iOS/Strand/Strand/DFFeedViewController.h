@@ -22,6 +22,7 @@ DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderView
 
 @property (nonatomic, retain) NSArray *strandObjects;
 
-- (void)jumpToPhoto:(DFPhotoIDType)photoID;
+- (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;
+
 
 @end

@@ -202,11 +202,6 @@ const CGFloat LockedCellHeight = 157.0;
   });
 }
 
-- (void)jumpToPhoto:(DFPhotoIDType)photoID
-{
-  self.requestedPhotoIDToJumpTo = photoID;
-}
-
 #pragma mark - DFStrandsViewControllerDelegate
 
 - (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
