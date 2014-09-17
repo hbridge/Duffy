@@ -128,7 +128,7 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return self.strandObjects.count + (self.uploadingPhotos.count > 0 ? 1 : 0);
+  return self.strandObjects.count;
 }
 
 
@@ -142,15 +142,13 @@ static const CGFloat ItemSpacing = 2.5;
                                           dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                                           withReuseIdentifier:@"headerView"
                                           forIndexPath:indexPath];
-    if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-      headerView.titleLabel.text = @"Uploading Photos";
-    } else {
-      DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
-      headerView.titleLabel.text = sectionObject.title;
-      headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_taken
-                                                                    abbreviate:YES];
-      headerView.profilePhotoStackView.names = sectionObject.actorNames;
-    }
+    
+    DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:indexPath.section];
+    headerView.titleLabel.text = sectionObject.title;
+    headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_taken
+                                                                  abbreviate:YES];
+    headerView.profilePhotoStackView.names = sectionObject.actorNames;
+    
     
     view = headerView;
   } else if (kind == UICollectionElementKindSectionFooter) {
@@ -165,10 +163,6 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  if (self.uploadingPhotos.count > 0 && section == 0) {
-    return self.uploadingPhotos.count;
-  }
-  
   DFPeanutFeedObject *sectionObject = [self sectionObjectForUploadedSection:section];
   
   NSArray *items = sectionObject.objects;
@@ -177,8 +171,6 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (DFPeanutFeedObject *)sectionObjectForUploadedSection:(NSUInteger)tableSection
 {
-  if (self.uploadingPhotos.count > 0) return self.strandObjects[tableSection - 1];
-  
   return self.strandObjects[tableSection];
 }
 
@@ -187,20 +179,16 @@ static const CGFloat ItemSpacing = 2.5;
 {
   UICollectionViewCell *cell;
   
-  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    cell = [self cellForUploadAtIndexPath:indexPath];
-  } else {
-    DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
-    NSArray *itemsForSection = section.objects;
-    DFPeanutFeedObject *object = itemsForSection[indexPath.row];
-    
-    if ([section isLockedSection]) {
-      cell = [self cellForLockedSection:section indexPath:indexPath];
-    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
-      cell = [self cellForPhoto:object indexPath:indexPath];
-    } else if ([object.type isEqual:DFFeedObjectCluster]) {
-      cell = [self cellForCluster:object indexPath:indexPath];
-    }
+  DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
+  NSArray *itemsForSection = section.objects;
+  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
+  
+  if ([section isLockedSection]) {
+    cell = [self cellForLockedSection:section indexPath:indexPath];
+  } else if ([object.type isEqual:DFFeedObjectPhoto]) {
+    cell = [self cellForPhoto:object indexPath:indexPath];
+  } else if ([object.type isEqual:DFFeedObjectCluster]) {
+    cell = [self cellForCluster:object indexPath:indexPath];
   }
   
   [cell setNeedsLayout];
@@ -211,18 +199,6 @@ static const CGFloat ItemSpacing = 2.5;
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-//  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-//    return CGSizeMake(ItemSize, ItemSize);
-//  }
-//  
-//  DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
-//  NSArray *itemsForSection = section.objects;
-//  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
-//  
-//  if (object.actions.count > 0) {
-//    return CGSizeMake(ItemSize * 3.0/2.0, ItemSize * 3.0/2.0);
-//  }
-  
   return CGSizeMake(ItemSize, ItemSize);
 }
 
@@ -339,25 +315,21 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (self.uploadingPhotos.count > 0 && indexPath.section == 0) {
-    // don't do anything for uploading rows right now
-  } else {
-    DFPhotoIDType photoID;
-    DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
-    DFPeanutFeedObject *object = section.objects[indexPath.row];
-    if ([object.type isEqualToString:DFFeedObjectPhoto]) {
-      photoID = object.id;
-    } else if ([object.type isEqualToString:DFFeedObjectCluster]) {
-      photoID = ((DFPeanutFeedObject *)object.objects.firstObject).id;
-    }
-    
-    DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
-    photoFeedController.strandObjects = @[section];
-    [self.navigationController pushViewController:photoFeedController animated:YES];
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [photoFeedController showPhoto:photoID animated:NO];
-    });
+  DFPhotoIDType photoID;
+  DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
+  DFPeanutFeedObject *object = section.objects[indexPath.row];
+  if ([object.type isEqualToString:DFFeedObjectPhoto]) {
+    photoID = object.id;
+  } else if ([object.type isEqualToString:DFFeedObjectCluster]) {
+    photoID = ((DFPeanutFeedObject *)object.objects.firstObject).id;
   }
+  
+  DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
+  photoFeedController.strandObjects = @[section];
+  [self.navigationController pushViewController:photoFeedController animated:YES];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [photoFeedController showPhoto:photoID animated:NO];
+  });
 }
 
 
