@@ -74,12 +74,7 @@ class BasePhotoAPI(APIView):
 			photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
 			photo.location_accuracy_meters = accuracy
 
-			logger.debug("For photo %s, Looked for lat lon and got %s" % (photo.id, photo.location_point))
-			logger.debug("With accuracy %s" % (photo.location_accuracy_meters))
 		elif accuracy and accuracy < photo.location_accuracy_meters:
-			logger.debug("For photo %s, Updated location from %s  to  %s " % (photo.id, photo.location_point, fromstr("POINT(%s %s)" % (lon, lat))))
-			logger.debug("And accuracy from %s to %s", photo.location_accuracy_meters, accuracy)
-
 			photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
 			photo.location_accuracy_meters = accuracy
 
@@ -253,8 +248,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 							
 					localTimeTaken = photo.local_time_taken.replace(tzinfo=tzinfo)
 					photo.time_taken = localTimeTaken.astimezone(pytz.timezone("UTC"))
-					
-					logger.debug("Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
 
 	def post(self, request, format=None):
 		response = list()
@@ -324,7 +317,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 			
 			for photo in createdPhotos:
 				response.append(model_to_dict(photo))
-				logger.debug("2Setting time_taken to %s with local_time_taken %s" % (photo.time_taken, photo.local_time_taken))
 
 			# We don't need to update/save the dups since other code does that, but we still
 			#   want to add it to the response
