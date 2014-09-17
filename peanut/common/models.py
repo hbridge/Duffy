@@ -56,6 +56,30 @@ class User(models.Model):
 		else:
 			return str(self.id)
 
+	def photos_info(self):
+		photoCount = self.photo_set.count()
+
+		if photoCount == 1:
+			return "1 photo"
+		else:
+			return "%s photos" % (photoCount)
+
+	def private_strands(self):
+		strandCount = self.strand_set.filter(shared=False).count()
+
+		if strandCount == 1:
+			return "1 strand"
+		else:
+			return "%s strands" % (strandCount)
+
+	def shared_strands(self):
+		strandCount = self.strand_set.filter(shared=True).count()
+
+		if strandCount == 1:
+			return "1 strand"
+		else:
+			return "%s strands" % (strandCount)
+
 	@classmethod
 	def getIds(cls, objs):
 		ids = list()
@@ -244,7 +268,14 @@ class Photo(models.Model):
 	def getUserDisplayName(self):
 		return self.user.display_name
 
-
+	def delete(self):
+		strands = self.strand_set.all()
+		for strand in strands:
+			if strand.photos.count() == 1 and strand.photos.all()[0].id == self.id:
+				strand.delete()
+				
+		super(Photo, self).delete()
+		
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
 		if not isinstance(objs, list):
