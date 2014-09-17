@@ -4,6 +4,7 @@ import time, datetime
 import logging
 import math
 import pytz
+from threading import Thread
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -50,6 +51,19 @@ def getAllStrandIds(neighborRows):
 
 	return set(strandIds)
 
+
+def threadedSendNotifications(userIds):
+	logging.basicConfig(filename='/var/log/duffy/stranding.log',
+						level=logging.DEBUG,
+						format='%(asctime)s %(levelname)s %(message)s')
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	logger = logging.getLogger(__name__)
+
+	users = User.objects.filter(id__in=userIds)
+
+	# Send update feed msg to folks who are involved in these photos
+	notifications_util.sendRefreshFeedToUsers(users)
+
 """
 	Takes in:
 	photosAndStrandDict - Dictionary key being a photo and value the strandId
@@ -62,8 +76,8 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	notificationLogsCutoff = now - datetime.timedelta(seconds=timeWithinSecondsForNotification)
 	
 	# Grab logs from last 30 seconds (default) then grab the last time they were notified
-	notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
-	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [msgType, constants.NOTIFICATIONS_JOIN_STRAND_ID])
+	#notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
+	#notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [msgType, constants.NOTIFICATIONS_JOIN_STRAND_ID])
 
 	# This is a dict with the user as the key and a list of other users w photos as the value
 	usersToNotifyAboutById = dict()
@@ -102,11 +116,12 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 		nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
 
 		usersToUpdateFeed.extend(nearbyUsers)
-		
-	# Send update feed msg to folks who are involved in these photos
-	notifications_util.sendRefreshFeedToUsers(set(usersToUpdateFeed))
-
 	
+	userIds = User.getIds(set(usersToUpdateFeed))
+	Thread(target=threadedSendNotifications, args=(userIds,)).start()
+	
+	"""
+	Commenting out since we're not notifying people close by anymore
 
 	# For each user, look at all the new photos taken around them and construct a message for them
 	#  With all the names in there
@@ -135,7 +150,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 			else:
 				logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
 
-
+	"""
 
 
 
