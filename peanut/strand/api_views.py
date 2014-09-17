@@ -345,14 +345,9 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 			for neighborStrand in strandNeighborsCache[strand.id]:
 				interestedUsers.extend(neighborStrand.users.all())
 
-		#interestedUsers = set(interestedUsers)
+		interestedUsers = list(set(interestedUsers))
 
-		names = [x.display_name for x in interestedUsers]
-
-		title = ', '.join(names)
-		if len(names) > 0:
-			title += " might like these photos"
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'target_users': getActorsObjectData(interestedUsers, True)}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': "might like these photos", 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True)}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
