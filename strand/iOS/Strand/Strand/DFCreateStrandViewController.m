@@ -95,7 +95,7 @@ static DFCreateStrandViewController *instance;
 - (void)observeNotifications
 {
   [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(reload)
+                                           selector:@selector(refreshFromServer)
                                                name:DFStrandReloadRemoteUIRequestedNotificationName
                                              object:nil];
 }
