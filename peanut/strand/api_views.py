@@ -498,14 +498,10 @@ def suggested_unshared_photos(request):
 		# This is the strand we're looking in the users's private photos to see if there's any good matches
 		strand = form.cleaned_data['strand']
 
+		photos = getPhotosSuggestionsForStrand(user, strandInvite.strand)
+		suggestionsEntries = getObjectsDataForPhotos(user, photos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
 
-		"""
-		TODO(Derek):  If needed, move this over to using Strand neighbors
-
-		
-		"""
-
-		response['objects'] = []
+		response['objects'] = suggestionsEntries
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
