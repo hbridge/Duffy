@@ -341,10 +341,11 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 			for neighborStrand in strandNeighborsCache[strand.id]:
 				# If this is another person's private strand
 				if neighborStrand.shared == False and user not in neighborStrand.users.all():
-					if user not in privatePhotoCount:
-						privatePhotoCount[user] = 0
-					privatePhotoCount[user] += neighborStrand.photos.count()
-				interestedUsers.extend([user for user in neighborStrand.users.all()])
+					otherUser = neighborStrand.users.all()[0]
+					if otherUser not in privatePhotoCount:
+						privatePhotoCount[otherUser] = 0
+					privatePhotoCount[otherUser] += neighborStrand.photos.count()
+				interestedUsers.extend(neighborStrand.users.all())
 
 		interestedUsers = set(interestedUsers)
 
