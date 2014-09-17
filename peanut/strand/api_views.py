@@ -347,7 +347,12 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 		interestedUsers = list(set(interestedUsers))
 
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': "might like these photos", 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True)}
+		if len(interestedUsers) > 0:
+			title = "might like these photos"
+		else:
+			title = ""
+			
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True)}
 		groupEntry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
