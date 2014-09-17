@@ -383,7 +383,7 @@ def getInviteObjectsDataForUser(user):
 	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 
 	for strandInvite in strandInvites:
-		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand"}
+		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
 		entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
 		# Find this user's private strands which are neighbors to the invited strand
