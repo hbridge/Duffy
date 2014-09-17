@@ -52,5 +52,5 @@ typedef NSString *DFUIActionType;
 extern DFUIActionType DFUIActionButtonPress;
 extern DFUIActionType DFUIActionDoubleTap;
 
-typedef NSString *const DFPeanutActionType;
+typedef UInt64 DFPeanutActionType;
 extern DFPeanutActionType DFPeanutActionFavorite;

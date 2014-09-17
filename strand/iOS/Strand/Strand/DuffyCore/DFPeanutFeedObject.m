@@ -122,7 +122,7 @@ static NSArray *FeedObjectTypes;
 {
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in self.actions) {
-    if ([action.action_type isEqual:type] && (action.user == user || user == 0)) {
+    if (action.action_type == type && (action.user == user || user == 0)) {
       [result addObject:action];
     }
   }

@@ -11,8 +11,8 @@
 #import "RestKit/RestKit.h"
 #import "DFPeanutInvalidField.h"
 
-NSString *const ActionPostPath = @"photo_actions/";
-NSString *const ActionIDPath = @"photo_actions/:id/";
+NSString *const ActionPostPath = @"actions/";
+NSString *const ActionIDPath = @"actions/:id/";
 
 @implementation DFPeanutActionAdapter
 
