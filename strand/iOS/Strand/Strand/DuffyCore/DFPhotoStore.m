@@ -601,6 +601,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   DFPhoto *photo = [self photoWithPhotoID:photoID];
   if (photo) {
     [[self managedObjectContext] deleteObject:photo];
+    [self saveContext];
   }
 }
 
