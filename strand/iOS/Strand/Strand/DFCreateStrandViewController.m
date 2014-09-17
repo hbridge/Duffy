@@ -88,7 +88,11 @@ static DFCreateStrandViewController *instance;
        forCellReuseIdentifier:@"cellWithTitle"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"cellNoTitle"];
-  
+  self.refreshControl = [[UIRefreshControl alloc] init];
+  [self.refreshControl addTarget:self
+                          action:@selector(refreshFromServer)
+                forControlEvents:UIControlEventValueChanged];
+  [self.refreshControl beginRefreshing];
 }
 
 
@@ -363,6 +367,10 @@ static DFCreateStrandViewController *instance;
       } else {
         DDLogDebug(@"Got back response for strand suggestions but it was the same");
       }
+    }
+    
+    if (response.objects.count > 0 || error) {
+      [self.refreshControl endRefreshing];
     }
   }];
   
