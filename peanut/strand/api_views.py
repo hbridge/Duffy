@@ -498,7 +498,7 @@ def suggested_unshared_photos(request):
 		# This is the strand we're looking in the users's private photos to see if there's any good matches
 		strand = form.cleaned_data['strand']
 
-		photos = getPhotosSuggestionsForStrand(user, strandInvite.strand)
+		photos = getPhotosSuggestionsForStrand(user, strand)
 		suggestionsEntries = getObjectsDataForPhotos(user, photos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
 
 		response['objects'] = suggestionsEntries
