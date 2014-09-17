@@ -82,6 +82,10 @@ static DFUploadController *defaultUploadController;
                                                  name:NSManagedObjectContextDidSaveNotification
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(uploadPhotos)
+                                                 name:DFPhotoChangedNotificationName
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(cameraRollSyncCompleted:)
                                                  name:DFCameraRollSyncCompleteNotificationName
                                                object:nil];
@@ -113,6 +117,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadPhotos
 {
+  DDLogDebug(@"Uploads starting...");
   [self addPhotosIDsToQueue];
 }
 
