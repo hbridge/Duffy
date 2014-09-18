@@ -98,10 +98,12 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		result = self.getResult('auth_phone', forms.AuthPhoneForm)
 		self.assertTrue("user" in result)
 
+	"""
 	def testGetInviteMessage(self):
 		result = self.getResult('get_invite_message', forms.OnlyUserIdForm)
 		self.assertTrue("invite_message" in result)		
-
+	"""
+	
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		# Backwards to forwards
