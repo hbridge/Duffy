@@ -462,6 +462,50 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     [[DFPhotoStore sharedStore] saveContext];
     [[DFUploadController sharedUploadController] uploadPhotos];
   });
+  
+  [self cachePhotosInImageStore:photoIDs];
+}
+
+- (void)cachePhotosInImageStore:(NSArray *)photoIDs
+{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    @autoreleasepool {
+      NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+      NSArray *photos = [DFPhotoStore photosWithPhotoIDs:photoIDs retainOrder:NO inContext:context];
+      for (DFPhoto *photo in photos) {
+        DFPhotoIDType photoID = photo.photoID;
+        [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
+          [[DFImageStore sharedStore]
+           setImage:image
+           type:DFImageThumbnail
+           forID:photoID
+           completion:^(NSError *error) {
+             if (!error)
+               DDLogVerbose(@"%@ successfully cached thumnbnail for %@", self.class, @(photoID));
+             else
+               DDLogError(@"%@ failed to cache thumbnail:%@", self.class, error);
+           }];
+        } failureBlock:^(NSError *error) {
+          DDLogError(@"%@ failed to cache thumbnail:%@", self.class, error);
+        }];
+        [photo.asset loadHighResImage:^(UIImage *image) {
+          [[DFImageStore sharedStore]
+           setImage:image
+           type:DFImageFull
+           forID:photoID
+           completion:^(NSError *error) {
+             if (!error)
+               DDLogVerbose(@"%@ successfully cached full image for %@", self.class, @(photoID));
+             else
+               DDLogError(@"%@ failed to cache full image:%@", self.class, error);
+             
+           }];
+        } failureBlock:^(NSError *error) {
+          DDLogError(@"%@ failed to cache full image:%@", self.class, error);
+        }];
+      }
+    }
+  });
 }
 
 #pragma mark - DFPeoplePicker delegate
