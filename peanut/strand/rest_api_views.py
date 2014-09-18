@@ -11,10 +11,11 @@ from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdat
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
+from rest_framework.exceptions import ParseError
 
 from peanut.settings import constants
 
-from common.models import PhotoAction, ContactEntry, StrandInvite, User
+from common.models import ContactEntry, StrandInvite, User, Photo, Action
 from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 from strand import notifications_util
@@ -153,7 +154,7 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
 class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
     def sendNotification(self, strandInviteId):
         strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
-        msg = "%s just looked at the photos you shared from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
+        msg = "%s just joined your Strand from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
         
         logger.debug("going to send %s to user id %s" % (msg, strandInvite.user.id))
         notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
@@ -165,24 +166,28 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
             thread.start()
             logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
 
+            action = Action(user=strandInvite.accepted_user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
+            action.save()
+
 """
-    REST interface for creating new PhotoActions.
+    REST interface for creating new Actions.
 
     Use a custom overload of the create method so we don't double create likes
 """
-class CreatePhotoActionAPI(CreateAPIView):
+class CreateActionAPI(CreateAPIView):
     def post(self, request):
         serializer = self.get_serializer(data=request.DATA, files=request.FILES)
 
         if serializer.is_valid():
             obj = serializer.object
-            results = PhotoAction.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
+
+            results = Action.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
 
             if len(results) > 0:
                 serializer = self.get_serializer(results[0])
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
             else:
-                return super(CreatePhotoActionAPI, self).post(request)
+                return super(CreateActionAPI, self).post(request)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -211,13 +216,44 @@ class CreateStrandAPI(CreateAPIView):
             logger.debug("Updated strand %d with new times" % (strand.id))
             strand.save()
 
+        # Now we want to create the "Added photos to a strand" Action
+        try:
+            user = User.objects.get(id=self.request.DATA['user_id'])
+        except User.DoesNotExist:
+            raise ParseError('User not found')
+
+        if strand.shared == True:
+            action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_CREATE_STRAND)
+            action.save()
+
         logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
         
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
-    def pre_save(self, strand):
-        changed = updateStrandWithCorrectPhotoTimes(strand)
+    def pre_save(self, strand):      
+        # Don't need to explicity save here since this is pre_save
+        updateStrandWithCorrectPhotoTimes(strand)
 
-        if changed:
-            logger.debug("Updated strand %d with new times" % (strand.id))
-            strand.save()
+        # Now we want to create the "Added photos to a strand" Action
+        try:
+            user = User.objects.get(id=self.request.DATA['user_id'])
+        except User.DoesNotExist:
+            raise ParseError('User not found')
+
+        currentPhotoIds = Photo.getIds(strand.photos.all())
+
+        # Find the photo ids that are in the post data but not in the strand
+        newPhotoIds = list()
+        for photoId in self.request.DATA['photos']:
+            if photoId not in currentPhotoIds:
+                newPhotoIds.append(photoId)
+
+        if len(newPhotoIds) > 0:
+            action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+            action.save()
+
+            action.photos = newPhotoIds
+
+
+
+
 

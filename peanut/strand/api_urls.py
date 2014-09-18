@@ -7,7 +7,7 @@ from strand import api_views as strand_api_views
 from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import PhotoAction, User, ContactEntry, Strand, StrandInvite
+from common.models import User, ContactEntry, Strand, StrandInvite, Action
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
@@ -35,8 +35,8 @@ urlpatterns = patterns('',
 	url(r'^get_invite_message', 'strand.api_views.get_invite_message'),
 	url(r'^get_notifications', 'strand.api_views.get_notifications'),
 
-	url(r'^photo_actions/$', strand_rest_api_views.CreatePhotoActionAPI.as_view(model=PhotoAction, lookup_field='id')),
-	url(r'^photo_actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=PhotoAction, lookup_field='id')),
+	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
+	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),
 
 	url(r'^users/(?P<id>[0-9]+)/$', RetrieveUpdateAPIView.as_view(model=User, lookup_field='id', serializer_class=UserSerializer)),
 

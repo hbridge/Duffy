@@ -308,6 +308,10 @@ class Photo(models.Model):
 			ids.append(photo.id)
 
 		return ids
+
+	@classmethod
+	def getIds(cls, objs):
+		return [obj.id for obj in objs]
 	
 	def __eq__(self, other):
 		# Apparently django is sending different types of objects as 'other'.  Sometimes its an object
@@ -429,23 +433,6 @@ class SmsAuth(models.Model):
 
 	def __unicode__(self):
 		return "%s %s %s" % (self.id, self.phone_number, self.added)
-
-
-class PhotoAction(models.Model):
-	photo = models.ForeignKey(Photo, db_index=True)
-	user = models.ForeignKey(User)
-	action_type = models.CharField(max_length=50, db_index=True)
-	user_notified_time = models.DateTimeField(null=True, db_index=True)
-	added = models.DateTimeField(auto_now_add=True)
-
-	class Meta:
-		db_table = 'strand_photo_action'
-
-	def getUserDisplayName(self):
-		return self.user.display_name
-
-	def __unicode__(self):
-		return "%s %s %s %s" % (self.id, self.photo_id, self.user_id, self.action_type)
 
 class DuffyNotification(Notification):
 	content_available = models.IntegerField(null=True)
@@ -615,3 +602,21 @@ class StrandNeighbor(models.Model):
 	class Meta:
 		unique_together = ("strand_1", "strand_2")
 		db_table = 'strand_neighbor'
+
+
+class Action(models.Model):
+	user = models.ForeignKey(User, db_index=True)
+	action_type = models.IntegerField(db_index=True)
+	photo = models.ForeignKey(Photo, db_index=True, related_name = "action_photo", null=True)
+	photos = models.ManyToManyField(Photo, related_name = "action_photos")
+	strand = models.ForeignKey(Strand, db_index=True, null=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	def getUserDisplayName(self):
+		return self.user.display_name
+		
+	class Meta:
+		db_table = 'strand_action'
+
+

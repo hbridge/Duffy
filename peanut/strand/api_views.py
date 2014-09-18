@@ -15,7 +15,7 @@ from django.db import IntegrityError
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, PhotoAction, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action
 from common.serializers import UserSerializer, PhotoForApiSerializer
 
 from common import api_util, cluster_util
@@ -64,7 +64,7 @@ def getBestLocation(photo):
 	return None
 
 def getActionsByPhotoIdCache(photoIds):
-	actions = PhotoAction.objects.select_related().filter(photo_id__in=photoIds)
+	actions = Action.objects.select_related().filter(photo_id__in=photoIds)
 	actionsByPhotoId = dict()
 
 	for action in actions:
@@ -371,16 +371,46 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 def getObjectsDataForActions(user):
 	objectResponse = []
-	photoActions = PhotoAction.objects.filter(photo__user_id=user.id).exclude(user=user).order_by("-added")[:20]
+	#strands = Strand.objects.filter(users__in=[user]).filter(shared=True)
 
-	for photoAction in photoActions:
-		metadata = {'type': "like_action", 'title': "liked your photo", 'actors': getActorsObjectData(photoAction.user), 'time_stamp': photoAction.added, 'id': photoAction.id}
+	actions = Action.objects.filter(Q(photo__user_id=user.id) | Q(user=user) | Q(strand__users__in=[user])).order_by("-added")[:20]
+	
+	actions = set(actions)
+	for action in actions:
+		if action.action_type == constants.ACTION_TYPE_FAVORITE:
+			if action.user.id == user.id and action.photo.user.id == user.id:
+				title = "need some friends"
+			elif action.user.id == user.id:
+				title = "liked a photo"
+			elif action.photo.user.id == user.id:
+				title = "liked your photo"
+			else:
+				title = "Unknown"
+				
+			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
 
-		photoData = PhotoForApiSerializer(photoAction.photo).data
-		photoData['type'] = "photo"
-		metadata['objects'] = [photoData]
-		objectResponse.append(metadata)	
-		
+			photoData = PhotoForApiSerializer(action.photo).data
+			photoData['type'] = "photo"
+			entry['objects'] = [photoData]
+			objectResponse.append(entry)
+			continue
+		elif action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
+			title = "added photos to a Strand"
+			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
+			objects[0]['title'] = getTitleForStrand(user, action.strand)
+		elif action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
+			title = "created a Strand"
+			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
+		elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND:
+			title = "joined a Strand"
+			feedType = constants.FEED_OBJECT_TYPE_STRAND_JOIN
+			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
+
+		entry = {'type': feedType, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
+		objectResponse.append(entry)
+
 	return objectResponse
 
 def getPhotosSuggestionsForStrand(user, strand):
@@ -544,6 +574,7 @@ def strand_activity(request):
 		# TODO(Derek): remove hack
 		# This is a hack right now that looks at strand invites and assumes that if you did the invite,
 		#   you created the strand
+		"""
 		sentStrandInvites = StrandInvite.objects.select_related().filter(user=user).exclude(skip=True)
 		createdStrandList = set([x.strand for x in sentStrandInvites])
 		
@@ -553,13 +584,13 @@ def strand_activity(request):
 			entry['objects'] = getObjectsDataForStrands(user, [strand], constants.FEED_OBJECT_TYPE_STRAND)
 
 			createdStrandObjects.append(entry)
-
+		"""
 		actionObjects = getObjectsDataForActions(user)
 
 		# Grab sent created strands and action data, then sort.  We put invites at the top
 		afterInviteFeedObjects = list()
 		afterInviteFeedObjects.extend(actionObjects)
-		afterInviteFeedObjects.extend(createdStrandObjects)
+		#afterInviteFeedObjects.extend(createdStrandObjects)
 
 		afterInviteFeedObjects = sorted(afterInviteFeedObjects, key=lambda x: x['time_stamp'], reverse=True)
 
@@ -952,6 +983,7 @@ def auth_phone(request):
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+"""
 def get_invite_message(request):
 	response = dict({'result': True})
 
@@ -998,5 +1030,5 @@ def get_notifications(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
+"""
 

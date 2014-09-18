@@ -18,7 +18,7 @@ from haystack.query import SearchQuerySet
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, NotificationLog, Strand, PhotoAction
+from common.models import Photo, User, Classification, NotificationLog, Strand, Action
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -127,11 +127,11 @@ def userbaseSummary(request):
 	# This photo call is taking over a second on the dev database right now.
 	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
 	strandDataRaw = Strand.objects.filter(shared=True).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').order_by().annotate(weeklyStrands=Count('users'))	
-	actionDataRaw = PhotoAction.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyActions=Count('user'))
+	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyActions=Count('user'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
-	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('photoaction')).order_by('-id'))
+	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('action')).order_by('-id'))
 	#strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand__shared')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))

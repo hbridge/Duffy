@@ -12,7 +12,7 @@ from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import NotificationLog, Photo, User, PhotoAction, Strand
+from common.models import NotificationLog, Photo, User, Strand
 
 from strand import notifications_util, geo_util, strands_util, friends_util
 

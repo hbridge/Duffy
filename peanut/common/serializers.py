@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from common.models import Photo, User, PhotoAction, ContactEntry, StrandInvite
+from common.models import Photo, User, Action, ContactEntry, StrandInvite
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -30,11 +30,11 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 		fields = ('id', 'display_name', 'phone_number', 'phone_id', 'auth_token', 'device_token', 'last_location_point', 'last_location_accuracy', 'last_photo_timestamp', 'invites_remaining', 'invites_sent', 'added')
 
-class PhotoActionWithUserNameSerializer(serializers.ModelSerializer):
+class ActionWithUserNameSerializer(serializers.ModelSerializer):
 	user_display_name = serializers.Field('getUserDisplayName')
 	
 	class Meta:
-		model = PhotoAction
+		model = Action
 		fields = ('id', 'photo', 'user', 'user_display_name', 'action_type')
 
 	
