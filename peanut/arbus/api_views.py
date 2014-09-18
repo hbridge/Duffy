@@ -88,7 +88,6 @@ class BasePhotoAPI(APIView):
 		
 		if not photo.time_taken:
 			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
-			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
 					
 		# Bug fix for bad data in photo where date was before 1900
 		# Initial bug was from a photo in iPhone 1, guessing at the date
@@ -222,7 +221,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 		if len(photosNeedingTimezone) > 0:
 			timezonerUrl = "%s%s" % (timezonerBaseUrl, timezonerParams)
 
-			logger.debug("Requesting URL:  %s" % timezonerUrl)
 			logger.info("requesting timezones for %s photos" % len(photosNeedingTimezone))
 			timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
 			

@@ -442,12 +442,15 @@ def getInviteObjectsDataForUser(user):
 	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 
 	for strandInvite in strandInvites:
-		hasAllThumbs = True
-		#for photo in strandInvite.strand.photos.all():
-		#	if not photo.thumb_filename:
-		#		hasAllThumbs = False
+		shouldShowInvite = True
+		
+		# Go through all photos and see if there's any that don't belong to this user
+		#  and don't have a thumb.  If a user just created an invite this should be fine
+		for photo in strandInvite.strand.photos.all():
+			if photo.user_id != user.id and not photo.thumb_filename:
+				shouldShowInvite = False
 
-		if hasAllThumbs:
+		if shouldShowInvite:
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
