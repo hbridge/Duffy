@@ -85,6 +85,7 @@
 - (void)doneButtonPressed:(id)sender
 {
   DDLogVerbose(@"done pressed for section: %@contacts: %@", self.sectionObject, self.pickedContacts);
+  [SVProgressHUD show];
   DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
   peanutStrand.id = @(self.sectionObject.id);
   [self sendInvitesForStrand:peanutStrand toPeanutContacts:self.pickedContacts];
@@ -98,9 +99,12 @@
    toPeanutContacts:peanutContacts
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      vc.messageComposeDelegate = self;
-     if (vc) [self presentViewController:vc
+     if (vc) {[self presentViewController:vc
                                 animated:YES
                               completion:nil];
+     } else {
+       [self dismissWithErrorString:nil];
+     }
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:@"Failed."];
      DDLogError(@"%@ failed to invite to strand: %@, error: %@",
@@ -111,13 +115,26 @@
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
+  if (result == MessageComposeResultSent) {
+    [self dismissWithErrorString:nil];
+  } else {
+    [self dismissWithErrorString:@"Cancelled"];
+  }
+}
+
+- (void)dismissWithErrorString:(NSString *)errorString
+{
   [self.presentingViewController
    dismissViewControllerAnimated:YES
    completion:^{
-     if (result == MessageComposeResultSent) {
-       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+     if (!errorString) {
+       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+       });
      } else {
-       [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         [SVProgressHUD showErrorWithStatus:errorString];
+       });
      }
    }];
 }
