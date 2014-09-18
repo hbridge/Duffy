@@ -23,7 +23,6 @@ logger = logging.getLogger(__name__)
 # Create your models here.
 class User(models.Model):
 	uuid = UUIDField(auto=True)
-	use_uuid = models.BooleanField(default=True)
 	display_name = models.CharField(max_length=100)
 	phone_id = models.CharField(max_length=100, null=True)
 	phone_number = PhoneNumberField(null=True, db_index=True)
@@ -55,10 +54,7 @@ class User(models.Model):
 		return os.path.join(constants.PIPELINE_LOCAL_BASE_PATH, self.getUserDataId())
 
 	def getUserDataId(self):
-		if self.use_uuid:
-			return str(self.uuid)
-		else:
-			return str(self.id)
+		return str(self.uuid)
 
 	def photos_info(self):
 		photoCount = self.photo_set.count()
@@ -114,7 +110,6 @@ def delete_empty_strands(sender, instance, using, **kwargs):
 
 class Photo(models.Model):
 	uuid = UUIDField(auto=True)
-	use_uuid = models.BooleanField(default=True)
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
@@ -153,10 +148,7 @@ class Photo(models.Model):
 		return str(self.id)
 
 	def getUserDataId(self):
-		if self.use_uuid:
-			return str(self.uuid)
-		else:
-			return str(self.id)
+		return str(self.uuid)
 			
 	"""
 		Look to see from the iphone's location data if there's a city present

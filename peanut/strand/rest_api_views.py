@@ -94,7 +94,6 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         TODO(Derek): Can this be combined with StrandInviteBulkAPI?
     """
     def pre_save(self, obj):
-        logger.info("Doing a ContactEntry bulk update for user %s of number %s" % (obj.user, obj.phone_number))
         foundMatch = False      
         for match in phonenumbers.PhoneNumberMatcher(obj.phone_number, "US"):
             foundMatch = True

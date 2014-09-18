@@ -12,6 +12,7 @@ import datetime
 import HTMLParser
 import operator
 import pytz
+import uuid
 from random import randint
 from collections import Counter
 
@@ -115,9 +116,17 @@ class BasePhotoAPI(APIView):
 		if "local_time_taken" in photoData:
 			photoData["local_time_taken"] = datetime.datetime.strptime(photoData["local_time_taken"], "%Y-%m-%dT%H:%M:%SZ")
 
-		if "id" in photoData and int(photoData["id"]) == 0:
-			del photoData["id"]
+		if "id" in photoData:
+			photoId = int(photoData["id"])
 
+			if photoId == 0:
+				del photoData["id"]
+			else:
+				photoData["id"] = photoId
+
+		if "uuid" in photoData:
+			photoData["uuid"] = uuid.UUID(photoData['uuid']).hex
+			
 		photo = Photo(**photoData)
 		return photo
 
@@ -249,7 +258,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
 				photoData["bulk_batch_key"] = batchKey
-					
+
 				photo = self.simplePhotoSerializer(photoData)
 
 				userId = photo.user_id

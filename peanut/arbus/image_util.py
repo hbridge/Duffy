@@ -167,9 +167,7 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		os.rename(tempFilepath, photo.getDefaultThumbPath())
 		photo.thumb_filename = photo.getDefaultThumbFilename()
 
-		if bulk:
-			return photo
-		else:
+		if not bulk:
 			photo.save()
 	else:
 		# Must put this in first since getFullfilename needs it
@@ -181,8 +179,8 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		# Don't worry about bulk here since that's only used for thumbnails
 		photo.save()
 
-		createThumbnail(photo)
-	return photo
+		if not photo.thumb_filename:
+			createThumbnail(photo)
 
 def handleUploadedImage(request, fileKey, photo):
 	if fileKey in request.FILES:
