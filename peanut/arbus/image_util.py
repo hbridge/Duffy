@@ -203,8 +203,7 @@ def handleUploadedImagesBulk(request, photos):
 				
 				logger.debug("Processed photo file, now called %s %s" % (photo.thumb_filename, photo.full_filename))
 				count += 1
-			else:
-				#logger.debug("Tried to look for key: %s in FILES and didn't find" % photo.file_key)
+				
 	return count
 """
 	Moves an uploaded file to a new destination
