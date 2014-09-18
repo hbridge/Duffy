@@ -364,7 +364,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 - (void)showCreateStrand
 {
   DFCreateStrandViewController *vc = [DFCreateStrandViewController sharedViewController];
-  vc.showInvites = YES;
+  vc.showAsFirstTimeSetup = YES;
   
   [self.tabBarController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
                                       animated:YES

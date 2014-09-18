@@ -48,7 +48,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @synthesize feedAdapter = _feedAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
 @synthesize strandAdapter = _strandAdapter;
-@synthesize showInvites = _showInvites;
+@synthesize showAsFirstTimeSetup = _showAsFirstTimeSetup;
 
 static DFCreateStrandViewController *instance;
 + (DFCreateStrandViewController *)sharedViewController
@@ -63,7 +63,7 @@ static DFCreateStrandViewController *instance;
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
-    _showInvites = NO;
+    _showAsFirstTimeSetup = NO;
     [self configureNav];
     [self configureTableView];
     [self observeNotifications];
@@ -140,12 +140,12 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   // Dispose of any resources that can be recreated.
 }
 
-- (void)setShowInvites:(BOOL)showInvites
+- (void)setShowAsFirstTimeSetup:(BOOL)showAsFirstTimeSetup
 {
-  _showInvites = showInvites;
+  _showAsFirstTimeSetup = showAsFirstTimeSetup;
   
   // Fetch the invites since we may not have before
-  if (showInvites) [self refreshInvitesFromServer];
+  if (showAsFirstTimeSetup) [self refreshInvitesFromServer];
   
   // Redraw the controller since we might have changed what is shown
   dispatch_async(dispatch_get_main_queue(), ^{
@@ -158,12 +158,12 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return 1 + (self.inviteObjects.count > 0 && self.showInvites);
+  return 1 + (self.inviteObjects.count > 0 && self.showAsFirstTimeSetup);
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  if (self.showInvites && self.inviteObjects.count > 0 && section == 0) {
+  if (self.showAsFirstTimeSetup && self.inviteObjects.count > 0 && section == 0) {
     return @"Invitations";
   }
  
@@ -186,7 +186,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (BOOL)shouldShowInvites
 {
-  if (self.showInvites && self.inviteObjects.count > 0) {
+  if (self.showAsFirstTimeSetup && self.inviteObjects.count > 0) {
     return YES;
   }
   
@@ -320,18 +320,21 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[InviteId];
     if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleInvite];
     self.cellTemplatesByIdentifier[InviteId] = templateCell;
-    return [templateCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    return height;
   } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
     if (feedObject.actors.count > 0) {
       DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[SuggestionWithPeopleId];
       if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
       self.cellTemplatesByIdentifier[SuggestionWithPeopleId] = templateCell;
-      return [templateCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+      CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+      return height;
     } else {
       DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[SuggestionNoPeopleId];
       if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionNoPeople];
       self.cellTemplatesByIdentifier[SuggestionNoPeopleId] = templateCell;
-      return [templateCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+      CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+      return height;
     }
   }
 
@@ -417,7 +420,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     }
   }];
   
-  if (self.showInvites) {
+  if (self.showAsFirstTimeSetup) {
     [self refreshInvitesFromServer];
   }
 }

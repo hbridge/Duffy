@@ -10,7 +10,7 @@
 
 @interface DFCreateStrandViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>
 
-@property (nonatomic) BOOL showInvites;
+@property (nonatomic) BOOL showAsFirstTimeSetup;
 
 + (instancetype)sharedViewController;
 - (void)refreshFromServer;
