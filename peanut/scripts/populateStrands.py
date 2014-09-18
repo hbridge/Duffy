@@ -264,15 +264,20 @@ def main(argv):
 
 						logger.debug("Created new Strand %s for photo %s.  shared = %s" % (newStrand.id, photo.id, shared))
 		
-				strandNeighbors = set(strandNeighbors)
-				# Now create the StrandNeighbor rows
-				for strand in strandNeighbors:
+				# If our photo got put into a strand (it might not incase there was a dup already in it)
+				#    Then we figure out which strand it got put in and go through each strand neighbor
+				#    we marked off and create the strandNeighbor row for later
+				if photo in photoToStrandIdDict:
 					finalStrandId = photoToStrandIdDict[photo]
-					if strand.id < finalStrandId:
-						# Add in a tuple because we're going do dedup later
-						strandNeighborsToCreate.append((strand.id, finalStrandId))
-					else:
-						strandNeighborsToCreate.append((finalStrandId, strand.id))
+					strandNeighbors = set(strandNeighbors)
+					# Now create the StrandNeighbor rows
+					for strand in strandNeighbors:
+						
+						if strand.id < finalStrandId:
+							# Add in a tuple because we're going do dedup later
+							strandNeighborsToCreate.append((strand.id, finalStrandId))
+						else:
+							strandNeighborsToCreate.append((finalStrandId, strand.id))
 
 				photo.strand_evaluated = True
 			
