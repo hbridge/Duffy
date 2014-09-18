@@ -165,8 +165,14 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
             thread.start()
             logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
 
+            oldActions = Action.objects.filter(user=strandInvite.accepted_user, strand=strandInvite.strand).order_by("-added")
             action = Action(user=strandInvite.accepted_user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
             action.save()
+
+            for oldAction in oldActions:
+                if oldAction.added < action.added:
+                    action.added = oldAction.added - datetime.timedelta(seconds=1)
+                    action.save()
 
 """
     REST interface for creating new Actions.
