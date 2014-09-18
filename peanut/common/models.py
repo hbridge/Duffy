@@ -501,11 +501,11 @@ class FriendConnection(models.Model):
 		db_table = 'strand_friends'
 
 class Strand(models.Model):
-	first_photo_time = models.DateTimeField()
-	last_photo_time = models.DateTimeField()
+	first_photo_time = models.DateTimeField(db_index=True)
+	last_photo_time = models.DateTimeField(db_index=True)
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
-	shared = models.BooleanField(default=True)
+	shared = models.BooleanField(default=True, db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
