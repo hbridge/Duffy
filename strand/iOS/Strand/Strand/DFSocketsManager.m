@@ -46,7 +46,6 @@ static DFSocketsManager *defaultManager;
 }
 
 - (void) sendMessage:(NSString *)message {
-  DDLogInfo(@"%@ sending message: %@", self.class, message);
 	NSData *data = [[NSData alloc] initWithData:[message dataUsingEncoding:NSASCIIStringEncoding]];
 	[self.outputStream write:[data bytes] maxLength:[data length]];
 }
@@ -71,7 +70,6 @@ static DFSocketsManager *defaultManager;
 						NSString *output = [[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding];
 						
 						if (nil != output) {
-							DDLogInfo(@"Socket received message: %@", output);
 							[self messageReceived:output];
 						}
 					}
@@ -111,7 +109,7 @@ static DFSocketsManager *defaultManager;
   NSString *value = a[1];
   
   if ([command isEqualToString:@"refresh"]) {
-    DDLogInfo(@"Was told to refresh my feed, with id %@", value);
+    DDLogInfo(@"Was told to refresh my feed from socket server");
     [[NSNotificationCenter defaultCenter]
      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
      object:self];

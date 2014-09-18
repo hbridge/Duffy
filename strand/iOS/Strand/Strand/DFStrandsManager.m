@@ -70,9 +70,6 @@ static DFStrandsManager *defaultStrandsManager;
   if ([[NSDate date] timeIntervalSinceDate:self.lastFetchAttemptDate] < MinSecondsBetweenFetch)
     return UIBackgroundFetchResultNoData;
   
-  [self updateJoinableStrands];
-  [self updateNewPhotos];
-  
   return UIBackgroundFetchResultNewData;
 }
 
