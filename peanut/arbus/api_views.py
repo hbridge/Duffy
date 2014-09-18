@@ -260,8 +260,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 		startTime = datetime.datetime.now()
 
 		if "bulk_photos" in request.DATA:
-			userId = request.DATA['user_id']
-			logger.info("Got request for bulk photo update with %s files for user %s" % (len(request.FILES), userId))
+			logger.info("Got request for bulk photo update with %s files" % (len(request.FILES)))
 			photosData = json.loads(request.DATA["bulk_photos"])
 
 			objsToCreate = list()
@@ -276,6 +275,8 @@ class PhotoBulkAPI(BasePhotoAPI):
 				photoData["bulk_batch_key"] = batchKey
 					
 				photo = self.simplePhotoSerializer(photoData)
+
+				userId = photo.user_id
 
 				if (photo.iphone_hash and photo.iphone_hash not in seenHashCodes) or not photo.iphone_hash:
 					self.populateExtraData(photo)
