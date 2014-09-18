@@ -443,9 +443,9 @@ def getInviteObjectsDataForUser(user):
 
 	for strandInvite in strandInvites:
 		hasAllThumbs = True
-		for photo in strandInvite.strand.photos.all():
-			if not photo.thumb_filename:
-				hasAllThumbs = False
+		#for photo in strandInvite.strand.photos.all():
+		#	if not photo.thumb_filename:
+		#		hasAllThumbs = False
 
 		if hasAllThumbs:
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
