@@ -260,8 +260,10 @@ class PhotoBulkAPI(BasePhotoAPI):
 		startTime = datetime.datetime.now()
 
 		if "bulk_photos" in request.DATA:
-			logger.info("Got request for bulk photo update with %s files" % (len(request.FILES)))
 			photosData = json.loads(request.DATA["bulk_photos"])
+
+			logger.info("Got request for bulk photo update with %s photos and %s files" % (len(photosData), len(request.FILES)))
+			
 
 			objsToCreate = list()
 
