@@ -22,6 +22,7 @@ DFFeedObjectType DFFeedObjectStrand = @"strand";
 DFFeedObjectType DFFeedObjectLikeAction = @"like_action";
 DFFeedObjectType DFFeedObjectStrandPost = @"strand_post";
 DFFeedObjectType DFFeedObjectSuggestedPhotos = @"suggested_photos";
+DFFeedObjectType DFFeedObjectStrandJoin = @"strand_join";
 
 static NSArray *FeedObjectTypes;
 

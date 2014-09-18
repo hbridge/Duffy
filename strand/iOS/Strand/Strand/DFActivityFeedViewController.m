@@ -132,7 +132,8 @@ didFinishServerFetchWithError:(NSError *)error
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *strandObject = self.feedObjects[indexPath.row];
-  if ([strandObject.type isEqualToString:DFFeedObjectLikeAction]) {
+  if ([strandObject.type isEqualToString:DFFeedObjectLikeAction]
+      || [strandObject.type isEqual:DFFeedObjectStrandJoin]) {
     return ActivityFeedTableViewCellNoCollectionViewHeight;
   }
   return ActivityFeedTableViewCellHeight;
@@ -148,9 +149,9 @@ didFinishServerFetchWithError:(NSError *)error
     cell = [self cellForStrandPost:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
     cell = [self cellForAction:feedObject];
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandJoin]) {
+    cell = [self cellForAction:feedObject];
   }
-  
-  
   
   [cell setNeedsLayout];
   return cell;
