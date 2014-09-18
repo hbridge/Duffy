@@ -77,7 +77,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	
 	# Grab logs from last 30 seconds (default) then grab the last time they were notified
 	notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
-	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [msgType])
+	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogs, msgType)
 
 	# This is a dict with the user as the key and a list of other users w photos as the value
 	usersToNotifyAboutById = dict()

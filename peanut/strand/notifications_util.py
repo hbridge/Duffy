@@ -99,7 +99,7 @@ def getNotificationsForTypeById(notificationLogs, msgType, timeCutoff = None):
 	notificationsById = dict()
 	for notificationLog in notificationLogs:
 		if notificationLog.msg_type == msgType:
-			if timeCutoff and notificationLog.added > timeCutoff:
+			if (timeCutoff and notificationLog.added > timeCutoff) or (not timeCutoff):
 				if notificationLog.user_id not in notificationsById:
 					notificationsById[notificationLog.user_id] = list()
 				notificationsById[notificationLog.user_id].append(notificationLog)
