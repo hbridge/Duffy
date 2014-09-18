@@ -32,8 +32,6 @@ urlpatterns = patterns('',
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
-	url(r'^get_invite_message', 'strand.api_views.get_invite_message'),
-
 	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
 	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),
 
