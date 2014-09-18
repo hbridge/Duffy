@@ -169,10 +169,16 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
             action = Action(user=strandInvite.accepted_user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
             action.save()
 
+            # Run through old actions to see if we need to change the timing of the join (incase the "add"
+            #    action happened first).  Also remove if any old ones exist
             for oldAction in oldActions:
                 if oldAction.added < action.added:
                     action.added = oldAction.added - datetime.timedelta(seconds=1)
                     action.save()
+
+                # Can't join a strand more than once, just do a quick check for that
+                if oldAction.action_type == action.action_type:
+                    action.delete()
 
 """
     REST interface for creating new Actions.
