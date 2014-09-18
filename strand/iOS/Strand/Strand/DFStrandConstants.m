@@ -90,4 +90,9 @@ UIColor *DFStrandMainColor;
   return [UIColor colorWithRed:245/255.0 green:81/255.0 blue:48/255.0 alpha:1.0];
 }
 
++ (UIColor *)inviteCellBackgroundColor
+{
+  return [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
+}
+
 @end

@@ -11,9 +11,23 @@
 
 @interface DFCreateStrandTableViewCell : DFCollectionViewTableViewCell
 
-@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
+typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
+  DFCreateStrandCellStyleInvite,
+  DFCreateStrandCellStyleSuggestionWithPeople,
+  DFCreateStrandCellStyleSuggestionNoPeople,
+};
+
+@property (weak, nonatomic) IBOutlet UIView *solidBackground;
+@property (weak, nonatomic) IBOutlet UILabel *inviterLabel;
+@property (weak, nonatomic) IBOutlet UILabel *invitedText;
+
 @property (weak, nonatomic) IBOutlet UILabel *locationLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+
+
++ (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
+- (void)configureWithStyle:(DFCreateStrandCellStyle)style;
 
 @end

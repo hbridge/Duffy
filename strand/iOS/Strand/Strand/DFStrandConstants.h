@@ -40,5 +40,6 @@ extern NSString *const DFStrandCameraPhotoSavedNotificationName;
 + (UIColor *)strandYellow;
 + (UIColor *)strandBlue;
 + (UIColor *)strandRed;
++ (UIColor *)inviteCellBackgroundColor;
 
 @end

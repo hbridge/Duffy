@@ -32,6 +32,7 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
 @property (nonatomic, retain) DFFeedObjectType type;
 @property (nonatomic, retain) NSString *title;
 @property (nonatomic, retain) NSString *subtitle;
+@property (nonatomic, retain) NSString *location;
 @property (nonatomic, retain) NSString *thumb_image_path;
 @property (nonatomic, retain) NSString *full_image_path;
 @property (nonatomic, retain) NSDate *time_taken;

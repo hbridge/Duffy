@@ -64,6 +64,7 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
 + (NSString *)relativeTimeStringSinceDate:(NSDate *)date abbreviate:(BOOL)abbreviate
 {
   NSTimeInterval timeSinceDate = [[NSDate date] timeIntervalSinceDate:date];
+  if (timeSinceDate < 0) timeSinceDate = 0;
   NSString *result;
   if (timeSinceDate < 60.0 * 60) {
     int minutes = ((int)timeSinceDate/60);
@@ -98,7 +99,7 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
   return [NSString stringWithFormat:@"%d %@%@ ago",
           number,
           unitString,
-          number > 1 ? @"s" : @""];
+          number > 1 || number == 0 ? @"s" : @""];
 }
 
 @end

@@ -18,6 +18,7 @@
 #import "DFPeanutUserObject.h"
 #import "DFCreateStrandViewController.h"
 #import "DFNavigationController.h"
+#import "DFStrandConstants.h"
 
 @interface DFActivityFeedViewController ()
 
@@ -213,7 +214,7 @@ didFinishServerFetchWithError:(NSError *)error
     [cell.previewImageView removeFromSuperview];
   }
   [self.class resetCell:cell];
-  cell.contentView.backgroundColor = [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
+  cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   cell.profilePhotoStackView.names = inviteObject.actorNames;
   cell.actorLabel.text = [self.class firstActorNameForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;

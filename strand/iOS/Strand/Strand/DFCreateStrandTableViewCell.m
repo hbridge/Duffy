@@ -7,19 +7,37 @@
 //
 
 #import "DFCreateStrandTableViewCell.h"
+#import "DFStrandConstants.h"
 
 @implementation DFCreateStrandTableViewCell
 
-- (void)awakeFromNib
++ (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
 {
-  [super awakeFromNib];
+  DFCreateStrandTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
+  [cell configureWithStyle:style];
+  return cell;
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
+- (void)configureWithStyle:(DFCreateStrandCellStyle)style
 {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
+  
+  if (style == DFCreateStrandCellStyleInvite) {
+    self.solidBackground.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
+  }
+  
+  // if it's a suggestion, remove the invite labels
+  if (style == DFCreateStrandCellStyleSuggestionNoPeople
+      || style == DFCreateStrandCellStyleSuggestionWithPeople) {
+    [self.inviterLabel removeFromSuperview];
+    [self.invitedText removeFromSuperview];
+  }
+  
+  if (style == DFCreateStrandCellStyleSuggestionNoPeople) {
+    [self.peopleLabel removeFromSuperview];
+  }
+  
+  [self layoutSubviews];
+  
 }
 
 @end

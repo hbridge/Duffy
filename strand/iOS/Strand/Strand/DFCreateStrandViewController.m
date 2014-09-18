@@ -23,6 +23,7 @@
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
+#import "DFActivityFeedTableViewCell.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -39,6 +40,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @property (nonatomic, retain) NSArray *inviteObjects;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
+@property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 
 @end
 
@@ -83,12 +85,20 @@ static DFCreateStrandViewController *instance;
                                            action:nil];
 }
 
+NSString *const InviteId = @"invite";
+NSString *const SuggestionWithPeopleId = @"suggestionWithPeople";
+NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
+
+
 - (void)configureTableView
 {
+  self.cellTemplatesByIdentifier = [NSMutableDictionary new];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"cellWithTitle"];
+       forCellReuseIdentifier:InviteId];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"cellNoTitle"];
+       forCellReuseIdentifier:SuggestionWithPeopleId];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+       forCellReuseIdentifier:SuggestionNoPeopleId];
   self.refreshControl = [[UIRefreshControl alloc] init];
   [self.refreshControl addTarget:self
                           action:@selector(refreshFromServer)
@@ -188,47 +198,58 @@ static DFCreateStrandViewController *instance;
   UITableViewCell *cell;
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
-    cell = [self cellWithStrandObject:strandObject isInviteCell:YES];
+    cell = [self cellWithInviteObject:feedObject];
   } else {
-    cell = [self cellWithStrandObject:feedObject isInviteCell:NO];
+    cell = [self cellWithSuggestedStrandObject:feedObject];
   }
   
   return cell;
 }
 
-- (UITableViewCell *)cellWithStrandObject:(DFPeanutFeedObject *)strandObject
-                             isInviteCell:(BOOL)isInviteCell
+- (UITableViewCell *)cellWithInviteObject:(DFPeanutFeedObject *)inviteObject
+{
+  DFCreateStrandTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:InviteId];
+  [cell configureWithStyle:DFCreateStrandCellStyleInvite];
+  cell.inviterLabel.text = [inviteObject.actors.firstObject display_name];
+  
+  DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
+  [self configureTextForCreateStrandCell:cell withStrand:strandObject];
+  [self setRemotePhotosForCell:cell withSection:strandObject];
+  
+  return cell;
+}
+
+- (UITableViewCell *)cellWithSuggestedStrandObject:(DFPeanutFeedObject *)strandObject
 {
   DFCreateStrandTableViewCell *cell;
-  if ([strandObject.title isNotEmpty]) {
-   cell = [self.tableView dequeueReusableCellWithIdentifier:@"cellWithTitle"];
+  if (strandObject.actors.count > 0) {
+    cell = [self.tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
+    [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
   } else {
-    cell = [self.tableView dequeueReusableCellWithIdentifier:@"cellNoTitle"];
-    if (cell.titleLabel.superview) [cell.titleLabel removeFromSuperview];
+    cell = [self.tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
+    [cell configureWithStyle:DFCreateStrandCellStyleSuggestionNoPeople];
   }
   
-  DFPeanutFeedObject *photoObject = strandObject.objects.firstObject;
-  if ([photoObject.type isEqual:DFFeedObjectCluster]) photoObject = photoObject.objects.firstObject;
+  [self configureTextForCreateStrandCell:cell withStrand:strandObject];
+  [self setLocalPhotosForCell:cell section:strandObject];
   
+  return cell;
+}
+
+- (void)configureTextForCreateStrandCell:(DFCreateStrandTableViewCell *)cell
+                       withStrand:(DFPeanutFeedObject *)strandObject
+{
   // Set the header attributes
   NSMutableString *actorString = [NSMutableString new];
+  [actorString appendString:@"with "];
   for (DFPeanutUserObject *user in strandObject.actors) {
     if (user != strandObject.actors.firstObject) [actorString appendString:@", "];
     [actorString appendString:user.display_name];
   }
-  cell.titleLabel.text = [actorString stringByAppendingString:strandObject.title];
-  cell.locationLabel.text = strandObject.subtitle;
-  cell.timeLabel.text = [[NSDateFormatter HumanDateFormatter]
-                         stringFromDate:photoObject.time_taken];
   
-  if (isInviteCell) {
-    [self setRemotePhotosForCell:cell withSection:strandObject];
-  } else {
-    [self setLocalPhotosForCell:cell section:strandObject];
-  }
-  
-  return cell;
+  cell.peopleLabel.text = actorString;
+  cell.locationLabel.text = strandObject.location;
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken abbreviate:NO];
 }
 
 - (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
@@ -294,9 +315,27 @@ static DFCreateStrandViewController *instance;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]
-      || [feedObject.title isNotEmpty]) return CreateCellWithTitleHeight;
-  else return CreateCellWithTitleHeight - CreateCellTitleHeight - CreateCellTitleSpacing;
+  
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[InviteId];
+    if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleInvite];
+    self.cellTemplatesByIdentifier[InviteId] = templateCell;
+    return [templateCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
+    if (feedObject.actors.count > 0) {
+      DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[SuggestionWithPeopleId];
+      if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
+      self.cellTemplatesByIdentifier[SuggestionWithPeopleId] = templateCell;
+      return [templateCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    } else {
+      DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[SuggestionNoPeopleId];
+      if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionNoPeople];
+      self.cellTemplatesByIdentifier[SuggestionNoPeopleId] = templateCell;
+      return [templateCell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    }
+  }
+
+  return 230.0;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

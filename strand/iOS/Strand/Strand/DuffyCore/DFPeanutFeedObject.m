@@ -66,6 +66,7 @@ static NSArray *FeedObjectTypes;
            @"type",
            @"title",
            @"subtitle",
+           @"location",
            @"thumb_image_path",
            @"full_image_path",
            @"time_taken",
