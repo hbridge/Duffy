@@ -189,6 +189,9 @@ static const CGFloat ItemSpacing = 2.5;
     cell = [self cellForPhoto:object indexPath:indexPath];
   } else if ([object.type isEqual:DFFeedObjectCluster]) {
     cell = [self cellForCluster:object indexPath:indexPath];
+  } else {
+    // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
+    cell = [self cellForUnknownObject:section atIndexPath:indexPath];
   }
   
   [cell setNeedsLayout];
@@ -202,6 +205,19 @@ static const CGFloat ItemSpacing = 2.5;
   return CGSizeMake(ItemSize, ItemSize);
 }
 
+- (UICollectionViewCell *)cellForUnknownObject:(DFPeanutFeedObject *)object atIndexPath:(NSIndexPath *)indexPath
+{
+  #ifdef DEBUG
+  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
+                                                                         forIndexPath:indexPath];
+  cell.imageView.image = nil;
+  cell.backgroundColor = [UIColor yellowColor];
+  #else
+  //assume it's a regular photo
+  UICollectionViewCell *cell = [self cellForPhoto:object indexPath:indexPath];
+  #endif
+  return cell;
+}
 
 - (UICollectionViewCell *)cellForUploadAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -258,7 +274,7 @@ static const CGFloat ItemSpacing = 2.5;
   
   NSArray *likeActions = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
   cell.likeIconImageView.hidden = (likeActions.count <= 0);
-  DFImageType preferredType = (likeActions.count > 0) ? DFImageFull : DFImageThumbnail;
+  DFImageType preferredType = DFImageThumbnail;
   
   [[DFImageStore sharedStore]
    imageForID:photoObject.id

@@ -80,6 +80,7 @@
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"singleCell"];
+  [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
 
 - (void)didReceiveMemoryWarning
@@ -151,6 +152,15 @@ didFinishServerFetchWithError:(NSError *)error
     cell = [self cellForAction:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandJoin]) {
     cell = [self cellForAction:feedObject];
+  } else {
+    // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
+    #ifdef DEBUG
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"unknown"];
+    cell.contentView.backgroundColor = [UIColor yellowColor];
+    cell.textLabel.text = [NSString stringWithFormat:@"Unknown type: %@", feedObject.type];
+    #else
+    cell = [self cellForAction:feedObject];
+    #endif
   }
   
   [cell setNeedsLayout];
