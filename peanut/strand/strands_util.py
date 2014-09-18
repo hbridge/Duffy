@@ -8,6 +8,7 @@ from peanut.settings import constants
 
 from strand import geo_util, friends_util
 
+logger = logging.getLogger(__name__)
 
 """
 	Utility method to grab all photos that are in a joinable strand near the given lat, lon
