@@ -39,9 +39,6 @@
 }
 
 - (IBAction)importButtonPressed:(id)sender {
-  
-  
-  
   NSFileManager *fm = [[NSFileManager alloc] init];
   
   NSError *error;
@@ -61,6 +58,8 @@
   
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     NSUInteger i = 0;
+    int __block errors = 0;
+    int __block successfulImports = 0;
     for (NSString *path in files) {
       NSLog(@"Saving image at: %@", path);
       
@@ -71,6 +70,9 @@
        completionBlock:^(NSURL *assetURL, NSError *error) {
          if (error) {
            NSLog(@"Error saving image:%@", error);
+           errors++;
+         } else {
+           successfulImports++;
          }
          dispatch_semaphore_signal(writeSemaphore);
        }];
@@ -81,6 +83,16 @@
         self.progressView.progress = (float)i/(float)files.count;
       });
     }
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      UIAlertView *doneAlert = [[UIAlertView alloc]
+                                initWithTitle:@"Import Complete"
+                                message:[NSString stringWithFormat:@"Successfully imported: %d \nFailed: %d",
+                                         successfulImports, errors]
+                                delegate:nil cancelButtonTitle:@"OK"
+                                otherButtonTitles:nil];
+      [doneAlert show];
+    });
   });
 }
 
