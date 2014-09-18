@@ -90,7 +90,7 @@ class BasePhotoAPI(APIView):
 		# Bug fix for bad data in photo where date was before 1900
 		# Initial bug was from a photo in iPhone 1, guessing at the date
 		if (photo.time_taken and photo.time_taken.date() < datetime.date(1900, 1, 1)):
-			logger.warning("Found a photo with a date earlier than 1900: %s" % (photo.id))
+			logger.debug("Found a photo with a date earlier than 1900: %s" % (photo.id))
 			photo.time_taken = datetime.date(2007, 9, 1)
 		
 				
@@ -155,6 +155,7 @@ class PhotoAPI(BasePhotoAPI):
 			image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 			Photo.bulkUpdate(photo, ["location_point", "strand_needs_reeval", "location_accuracy_meters", "full_filename", "thumb_filename", "metadata", "time_taken"])
 
+			logger.info("Successfully did a put for photo %s" % (photo.id))
 			return Response(PhotoSerializer(photo).data)
 		else:
 			logger.info("Photo serialization failed, returning 400.  Errors %s" % (serializer.errors))
@@ -169,8 +170,10 @@ class PhotoAPI(BasePhotoAPI):
 				image_util.handleUploadedImage(request, serializer.data["file_key"], serializer.object)
 
 				# This will look at the uploaded metadata or exif data in the file to populate more fields
-				photos = self.populateExtraData(serializer.object)
+				photo = self.populateExtraData(serializer.object)
 				Photo.bulkUpdate(photo, ["location_point", "strand_needs_reeval", "location_accuracy_meters", "full_filename", "thumb_filename", "metadata", "time_taken"])
+
+				logger.info("Successfully did a post for photo %s" % (photo.id))
 				return Response(PhotoSerializer(photo).data)
 			except IntegrityError:
 				logger.error("IntegrityError")
@@ -255,7 +258,8 @@ class PhotoBulkAPI(BasePhotoAPI):
 		startTime = datetime.datetime.now()
 
 		if "bulk_photos" in request.DATA:
-			logger.info("Got request for bulk photo update with %s files" % len(request.FILES))
+			userId = request.DATA['user_id']
+			logger.info("Got request for bulk photo update with %s files for user %s" % (len(request.FILES), userId))
 			photosData = json.loads(request.DATA["bulk_photos"])
 
 			objsToCreate = list()
@@ -289,7 +293,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			try:
 				Photo.objects.bulk_create(objsToCreate)
 			except IntegrityError:
-				logger.warning("Found dups in bulk upload")
+				logger.info("Found dups in bulk upload")
 				dups = self.handleDups(objsToCreate, dupPhotoData)
 
 			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
@@ -302,7 +306,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			# Now that we've created the images in the db, we need to deal with any uploaded images
 			#   and fill in any EXIF data (time_taken, gps, etc)
 			if len(createdPhotos) > 0:
-				logger.debug("Successfully created %s entries in db, now processing photos" % (len(createdPhotos)))
+				logger.info("Successfully created %s entries in db, now processing photos" % (len(createdPhotos)))
 
 				# This will move the uploaded image over to the filesystem, and create needed thumbs
 				numImagesProcessed = image_util.handleUploadedImagesBulk(request, createdPhotos)
@@ -311,7 +315,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 					# These are all the fields that we might want to update.  List of the extra fields from above
 					# TODO(Derek):  Probably should do this more intelligently
 					Photo.bulkUpdate(createdPhotos, ["full_filename", "thumb_filename"])
-					logger.debug("Doing another update for created photos because %s photos had images" % (numImagesProcessed))
+					logger.info("Doing another update for created photos because %s photos had images" % (numImagesProcessed))
 			else:
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
@@ -323,6 +327,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			for photo in dups:
 				response.append(model_to_dict(photo))
 
+			logger.info("Successfully processed %s photos for user %s" % (len(response), userId))
 			return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json", status=201)
 		else:
 			logger.error("Got request with no bulk_photos, returning 400")
