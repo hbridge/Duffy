@@ -68,21 +68,23 @@ class BasePhotoAPI(APIView):
 		  we don't have iphone metadata
 	"""
 	def populateExtraData(self, photo):
-		lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
+		if not photo.location_point:
+			lat, lon, accuracy = location_util.getLatLonAccuracyFromExtraData(photo, True)
 
-		if not photo.location_point and (lat and lon):
-			photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-			photo.location_accuracy_meters = accuracy
+			if (lat and lon):
+				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+				photo.location_accuracy_meters = accuracy
 
-		elif accuracy and accuracy < photo.location_accuracy_meters:
-			photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
-			photo.location_accuracy_meters = accuracy
+			elif accuracy and accuracy < photo.location_accuracy_meters:
+				photo.location_point = fromstr("POINT(%s %s)" % (lon, lat))
+				photo.location_accuracy_meters = accuracy
 
-			if photo.strand_evaluated:
-				photo.strand_needs_reeval = True
-		elif accuracy and accuracy >= photo.location_accuracy_meters:
-			logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
-	
+				if photo.strand_evaluated:
+					photo.strand_needs_reeval = True
+					
+			elif accuracy and accuracy >= photo.location_accuracy_meters:
+				logger.debug("For photo %s, Got new accuracy but was the same or greater:  %s  %s" % (photo.id, accuracy, photo.location_accuracy_meters))
+		
 		if not photo.time_taken:
 			photo.time_taken = image_util.getTimeTakenFromExtraData(photo, True)
 			logger.debug("Didn't find time_taken, looked myself and found %s" % (photo.time_taken))
@@ -92,7 +94,6 @@ class BasePhotoAPI(APIView):
 		if (photo.time_taken and photo.time_taken.date() < datetime.date(1900, 1, 1)):
 			logger.debug("Found a photo with a date earlier than 1900: %s" % (photo.id))
 			photo.time_taken = datetime.date(2007, 9, 1)
-		
 				
 		return photo
 
@@ -241,6 +242,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			logger.info("Got request for bulk photo update with %s photos and %s files" % (len(photosData), len(request.FILES)))
 			
 			objsToCreate = list()
+			objsToUpdate = list()
 
 			batchKey = randint(1,10000)
 
@@ -253,36 +255,39 @@ class PhotoBulkAPI(BasePhotoAPI):
 				userId = photo.user_id
 
 				self.populateExtraData(photo)
-				objsToCreate.append(photo)
+
+				if photo.id:
+					objsToUpdate.append(photo)
+				else:
+					objsToCreate.append(photo)
 				
 			self.populateTimezonesForPhotos(objsToCreate)
-
-			
 			Photo.objects.bulk_create(objsToCreate)
 
 			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
 			dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
-
 			createdPhotos = list(Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt))
 
+			allPhotos = list()
+			allPhotos.extend(createdPhotos)
+			allPhotos.extend(objsToUpdate)
 			# Now that we've created the images in the db, we need to deal with any uploaded images
 			#   and fill in any EXIF data (time_taken, gps, etc)
-			if len(createdPhotos) > 0:
-				logger.info("Successfully created %s entries in db, now processing photos" % (len(createdPhotos)))
+			if len(allPhotos) > 0:
+				logger.info("Successfully created %s entries in db, and had %s existing ... now processing photos" % (len(createdPhotos), len(objsToUpdate)))
 
 				# This will move the uploaded image over to the filesystem, and create needed thumbs
-				numImagesProcessed = image_util.handleUploadedImagesBulk(request, createdPhotos)
+				numImagesProcessed = image_util.handleUploadedImagesBulk(request, allPhotos)
 
 				if numImagesProcessed > 0:
 					# These are all the fields that we might want to update.  List of the extra fields from above
 					# TODO(Derek):  Probably should do this more intelligently
-					Photo.bulkUpdate(createdPhotos, ["full_filename", "thumb_filename"])
+					Photo.bulkUpdate(allPhotos, ["full_filename", "thumb_filename"])
 					logger.info("Doing another update for created photos because %s photos had images" % (numImagesProcessed))
 			else:
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
-			for photo in createdPhotos:
-				response.append(model_to_dict(photo))
+			response = [model_to_dict(photo) for photo in allPhotos]
 
 			logger.info("Successfully processed %s photos for user %s" % (len(response), userId))
 			return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json", status=201)
