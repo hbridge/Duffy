@@ -33,7 +33,6 @@ urlpatterns = patterns('',
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
 	url(r'^get_invite_message', 'strand.api_views.get_invite_message'),
-	url(r'^get_notifications', 'strand.api_views.get_notifications'),
 
 	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
 	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),
