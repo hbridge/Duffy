@@ -19,6 +19,7 @@
 #import "DFPeanutStrand.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "Strand-Swift.h"
+#import "DFPushNotificationsManager.h"
 
 CGFloat const ToFieldHeight = 44.0;
 
@@ -390,11 +391,15 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
    toPeanutContacts:peanutContacts
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      vc.messageComposeDelegate = self;
-     if (vc) [self presentViewController:vc
-                                animated:YES
-                              completion:nil];
+     if (vc) {
+       [self presentViewController:vc
+                          animated:YES
+                        completion:nil];
+     } else {
+       [self dismissWithErrorString:nil];
+     }
    } failure:^(NSError *error) {
-     [SVProgressHUD showErrorWithStatus:@"Failed."];
+     [self dismissWithErrorString:@"Invite failed"];
      DDLogError(@"%@ failed to invite to strand: %@, error: %@",
                 self.class, peanutStrand, error);
    }];
@@ -403,13 +408,25 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
+  [self dismissWithErrorString:(result == MessageComposeResultSent ? nil : @"Cancelled")];
+}
+
+- (void)dismissWithErrorString:(NSString *)errorString
+{
   [self.presentingViewController
    dismissViewControllerAnimated:YES
    completion:^{
-     if (result == MessageComposeResultSent) {
-       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+     if (!errorString) {
+       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+       });
+       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
+       });
      } else {
-       [SVProgressHUD showErrorWithStatus:@"Cancelled"];
+       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+         [SVProgressHUD showErrorWithStatus:errorString];
+       });
      }
    }];
 }
