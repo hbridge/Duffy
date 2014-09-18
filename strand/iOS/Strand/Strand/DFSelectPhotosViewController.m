@@ -390,14 +390,17 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
    sendInvitesForStrand:peanutStrand
    toPeanutContacts:peanutContacts
    success:^(DFSMSInviteStrandComposeViewController *vc) {
-     vc.messageComposeDelegate = self;
-     if (vc) {
-       [self presentViewController:vc
-                          animated:YES
-                        completion:nil];
-     } else {
-       [self dismissWithErrorString:nil];
-     }
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if (vc) {
+         vc.messageComposeDelegate = self;
+         [self presentViewController:vc
+                            animated:YES
+                          completion:nil];
+         
+       } else {
+         [self dismissWithErrorString:nil];
+       }
+     });
    } failure:^(NSError *error) {
      [self dismissWithErrorString:@"Invite failed"];
      DDLogError(@"%@ failed to invite to strand: %@, error: %@",

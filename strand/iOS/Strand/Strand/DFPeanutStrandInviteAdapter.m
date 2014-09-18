@@ -113,8 +113,9 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
       DFSMSInviteStrandComposeViewController *smsInviteVC = [[DFSMSInviteStrandComposeViewController alloc]
                                                              initWithRecipients:numbersToSMS];
       success(smsInviteVC);
+    } else {
+      success(nil);
     }
-    success(nil);
   } failure:^(NSError *error) {
     failure(error);
   }];
