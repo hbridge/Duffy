@@ -237,6 +237,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			timezonerUrl = "%s%s" % (timezonerBaseUrl, timezonerParams)
 
 			logger.debug("Requesting URL:  %s" % timezonerUrl)
+			logger.info("requesting timezones for %s photos" % len(photosNeedingTimezone))
 			timezonerResultJson = urllib2.urlopen(timezonerUrl).read()
 			
 			if (timezonerResultJson):
@@ -251,6 +252,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 							
 					localTimeTaken = photo.local_time_taken.replace(tzinfo=tzinfo)
 					photo.time_taken = localTimeTaken.astimezone(pytz.timezone("UTC"))
+				logger.info("Successfully updated timezones for %s photos" % len(photosNeedingTimezone))
 
 	def post(self, request, format=None):
 		response = list()
