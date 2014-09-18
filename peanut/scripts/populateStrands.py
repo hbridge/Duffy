@@ -71,13 +71,13 @@ def threadedSendNotifications(userIds):
 
 """
 def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification):
-	msgType = constants.NOTIFICATIONS_NEW_PHOTO_ID
+	msgType = constants.NOTIFICATIONS_SOCKET_REFRESH_FEED
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	notificationLogsCutoff = now - datetime.timedelta(seconds=timeWithinSecondsForNotification)
 	
 	# Grab logs from last 30 seconds (default) then grab the last time they were notified
-	#notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
-	#notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [msgType, constants.NOTIFICATIONS_JOIN_STRAND_ID])
+	notificationLogs = notifications_util.getNotificationLogs(notificationLogsCutoff)
+	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [msgType])
 
 	# This is a dict with the user as the key and a list of other users w photos as the value
 	usersToNotifyAboutById = dict()
@@ -109,15 +109,24 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	# TODO(Derek): Swap out this 3 for a constants var once that is figured out
 	# TODO(Derek): Filter by friends who are actually in the feed (right now everyone in a strand)
 	#    get a refreshFeed, even if they can't see the new photos
-	frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=3)
-	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
+	#frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=3)
+	#users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
-	for photo in newPhotos:
-		nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
+	#for photo in newPhotos:
+	#	nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
 
-		usersToUpdateFeed.extend(nearbyUsers)
+	#	usersToUpdateFeed.extend(nearbyUsers)
 	
-	userIds = set(User.getIds(usersToUpdateFeed))
+	usersWithoutRecentNot = list()
+	for user in usersToUpdateFeed:
+		# If the user is new, send the notitification
+		if now < user.added + datetime.timedelta(seconds=20):
+			usersWithoutRecentNot.append(user)
+		elif user.id not in notificationsById:
+			usersWithoutRecentNot.append(user)
+
+	userIds = set(User.getIds(usersWithoutRecentNot))
+
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
 	
 	"""
@@ -165,8 +174,8 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	writes a new row for each loop.  Would be faster to manually write the table entries in a batch call
 """
 def main(argv):
-	maxPhotosAtTime = 5
-	timeWithinSecondsForNotification = 30 # seconds
+	maxPhotosAtTime = 10
+	timeWithinSecondsForNotification = 10 # seconds
 
 	timeWithinMinutesForNeighboring = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 	
