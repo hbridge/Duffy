@@ -11,6 +11,13 @@
 
 @implementation DFCreateStrandTableViewCell
 
+- (void)awakeFromNib
+{
+  [super awakeFromNib];
+  
+  self.selectionStyle = UITableViewCellSelectionStyleNone;
+}
+
 + (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
 {
   DFCreateStrandTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
@@ -39,5 +46,6 @@
   [self layoutSubviews];
   
 }
+
 
 @end
