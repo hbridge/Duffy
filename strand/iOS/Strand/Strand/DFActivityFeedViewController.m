@@ -322,15 +322,24 @@ didFinishServerFetchWithError:(NSError *)error
                                         ];
     [self.navigationController pushViewController:vc animated:YES];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
-    DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
-    DFFeedViewController *feedController = [[DFFeedViewController alloc] init];
-    feedController.strandObjects = @[strandObject];
-    [self.navigationController pushViewController:feedController animated:YES];
+    [self showStrandForContainingObject:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
-  
+    // the like action has a photo as subobject, need to handle
+
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandJoin]) {
+    [self showStrandForContainingObject:feedObject];
   }
 
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
+- (void)showStrandForContainingObject:(DFPeanutFeedObject *)feedObject
+{
+  DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
+  DFFeedViewController *feedController = [[DFFeedViewController alloc] init];
+  feedController.strandObjects = @[strandObject];
+  [self.navigationController pushViewController:feedController animated:YES];
+
 }
 
 
