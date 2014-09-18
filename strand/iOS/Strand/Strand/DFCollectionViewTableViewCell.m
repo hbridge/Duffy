@@ -51,6 +51,8 @@
       [self.collectionView reloadData];
       [self setNeedsLayout];
     });
+  } else {
+    DDLogVerbose(@"Attempting to set nil image for %@", self.class);
   }
 }
 
