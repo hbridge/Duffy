@@ -147,7 +147,6 @@ class Photo(models.Model):
 	objects = models.GeoManager()
 
 	class Meta:
-		unique_together = ("user", "iphone_hash")
 		db_table = 'photos_photo'
 
 	def __unicode__(self):

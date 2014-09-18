@@ -198,30 +198,6 @@ class PhotoAPI(BasePhotoAPI):
 		return Response(status=status.HTTP_204_NO_CONTENT)
 
 class PhotoBulkAPI(BasePhotoAPI):
-	"""
-		This goes through and tries to save each photo and deals with IntegrityError's (dups)
-		If we find one, grab the current one in the db (which could be wrong), and update it
-		with the latest info
-	"""
-	def handleDups(self, photos, dupPhotoData):
-		photoDups = list()
-		for i, photo in enumerate(photos):
-			try:
-				photo.save()
-			except IntegrityError:
-				dup = Photo.objects.filter(iphone_hash=photo.iphone_hash).filter(user=photo.user)
-				if len(dup) > 0:
-					logger.warning("Found dup photo in upload: " + str(dup[0].id))
-					serializer = PhotoSerializer(dup[0], data=dupPhotoData[i], partial=True)
-					if serializer.is_valid():
-						serializer.save()
-						photoDups.append(serializer.object)
-
-				if len(dup) > 1:
-					logger.error("Validation error for user id: " + str(photo.user) + " and " + photo.iphone_hash)
-		return photoDups
-
-
 	def populateTimezonesForPhotos(self, photos):
 		timezonerBaseUrl = "http://localhost:8234/timezone?"
 		
@@ -264,13 +240,9 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			logger.info("Got request for bulk photo update with %s photos and %s files" % (len(photosData), len(request.FILES)))
 			
-
 			objsToCreate = list()
 
-			# Keep this around incase we find dups, then we can update the photo with new data
-			dupPhotoData = list()
 			batchKey = randint(1,10000)
-			seenHashCodes = list()
 
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
@@ -280,32 +252,17 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 				userId = photo.user_id
 
-				if (photo.iphone_hash and photo.iphone_hash not in seenHashCodes) or not photo.iphone_hash:
-					self.populateExtraData(photo)
-					objsToCreate.append(photo)
-
-					dupPhotoData.append(photoData)
-					seenHashCodes.append(photo.iphone_hash)
-				else:
-					logger.debug("Saw a repeat hash in the same request, so ignoring.  Hash was %s" % (photo.iphone_hash))
-
+				self.populateExtraData(photo)
+				objsToCreate.append(photo)
+				
 			self.populateTimezonesForPhotos(objsToCreate)
 
-			# Dups happen when the iphone doesn't think its uploaded a photo, but we have seen it before
-			#   (maybe connection died).  So if we can't create in bulk, do it individually and track which
-			#   ones were created
-			dups = list()
-			try:
-				Photo.objects.bulk_create(objsToCreate)
-			except IntegrityError:
-				logger.info("Found dups in bulk upload")
-				dups = self.handleDups(objsToCreate, dupPhotoData)
+			
+			Photo.objects.bulk_create(objsToCreate)
 
 			# Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
 			dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
 
-			# This grabs all photos created in bulk_create and dups, since we're updating the batch_key
-			# with dups
 			createdPhotos = list(Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt))
 
 			# Now that we've created the images in the db, we need to deal with any uploaded images
@@ -325,11 +282,6 @@ class PhotoBulkAPI(BasePhotoAPI):
 				logger.error("For some reason got back 0 photos created.  Using batch key %s at time %s", batchKey, dt)
 			
 			for photo in createdPhotos:
-				response.append(model_to_dict(photo))
-
-			# We don't need to update/save the dups since other code does that, but we still
-			#   want to add it to the response
-			for photo in dups:
 				response.append(model_to_dict(photo))
 
 			logger.info("Successfully processed %s photos for user %s" % (len(response), userId))

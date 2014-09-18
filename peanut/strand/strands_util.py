@@ -70,6 +70,12 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 		strand.photos.add(photo)
 		photosByStrandId[strand.id] = [photo]
 	elif photo not in photosByStrandId[strand.id]:
+
+		for p in photosByStrandId[strand.id]:
+			if p.iphone_hash == p.iphone_hash:
+				logger.debug("Found a hash conflict in strand %s for photo %s" % (strand.id, photo.id))
+				return False
+
 		strand.photos.add(photo)
 		photosByStrandId[strand.id].append(photo)
 
@@ -80,7 +86,7 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	elif photo.user not in usersByStrandId[strand.id]:
 		strand.users.add(photo.user)
 		usersByStrandId[strand.id].append(photo.user)
-		
+	return True
 		
 def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
 	photoList = photosByStrandId[strand2.id]

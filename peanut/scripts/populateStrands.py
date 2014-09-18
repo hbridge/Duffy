@@ -225,11 +225,11 @@ def main(argv):
 				
 				if len(matchingStrands) == 1:
 					strand = matchingStrands[0]
-					strands_util.addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId)
-					strandsAddedTo.append(strand)
-					photoToStrandIdDict[photo] = strand.id
-					
-					logger.debug("Just added photo %s to strand %s" % (photo.id, strand.id))
+					if strands_util.addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
+						strandsAddedTo.append(strand)
+						photoToStrandIdDict[photo] = strand.id
+						
+						logger.debug("Just added photo %s to strand %s" % (photo.id, strand.id))
 				elif len(matchingStrands) > 1:
 					logger.debug("Found %s matching strands for photo %s, merging" % (len(matchingStrands), photo.id))
 					targetStrand = matchingStrands[0]
@@ -256,14 +256,14 @@ def main(argv):
 					shared = photo.taken_with_strand
 					
 					newStrand = Strand.objects.create(first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, shared = shared)
-					strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId)
-					strandsCreated.append(newStrand)
-					strandsCache.append(newStrand)
+					if strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId):
+						strandsCreated.append(newStrand)
+						strandsCache.append(newStrand)
 
-					photoToStrandIdDict[photo] = newStrand.id
+						photoToStrandIdDict[photo] = newStrand.id
 
-					logger.debug("Created new Strand %s for photo %s.  shared = %s" % (newStrand.id, photo.id, shared))
-	
+						logger.debug("Created new Strand %s for photo %s.  shared = %s" % (newStrand.id, photo.id, shared))
+		
 				strandNeighbors = set(strandNeighbors)
 				# Now create the StrandNeighbor rows
 				for strand in strandNeighbors:
