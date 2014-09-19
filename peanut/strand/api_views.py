@@ -60,7 +60,6 @@ def getBestLocation(photo):
 							return bestLocationName
 						else:
 							return photo.location_city
-	
 	return None
 
 def getActionsByPhotoIdCache(photoIds):
@@ -86,13 +85,13 @@ def getBestLocationForPhotos(photos):
 	# Grab title from the location_city of a photo...but find the first one that has
 	#   a valid location_city
 	bestLocation = None
-	i = 0	
+	i = 0
 	while (not bestLocation) and i < len(photos):
 		bestLocation = getBestLocation(photos[i])
 		i += 1
 
 	return bestLocation
-		
+
 def getTitleForStrand(user, strand):
 	photos = strand.photos.all()
 	location = getBestLocationForPhotos(photos)
@@ -182,14 +181,14 @@ def getFormattedGroups(groups):
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
-
+		
 		location = getBestLocationForPhotos(group['photos'])
 		if not location:
 			location = "Location Unknown"
-		
+
 		metadata = group['metadata']
 		metadata.update({'subtitle': location, 'location': location})
-
+		
 		output.append({'clusters': clusters, 'metadata': metadata})
 	return output
 
@@ -394,22 +393,23 @@ def getObjectsDataForActions(user):
 			entry['objects'] = [photoData]
 			objectResponse.append(entry)
 			continue
-		elif action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-			title = "added photos to a Strand"
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
-			objects[0]['title'] = getTitleForStrand(user, action.strand)
-		elif action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
-			title = "created a Strand"
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
-		elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND:
-			title = "joined a Strand"
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_JOIN
-			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
+		if action.user.id != user.id:
+			if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
+				title = "added photos to a Strand"
+				feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+				objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
+				objects[0]['title'] = getTitleForStrand(user, action.strand)
+			elif action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
+				title = "created a Strand"
+				feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+				objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND:
+				title = "joined a Strand"
+				feedType = constants.FEED_OBJECT_TYPE_STRAND_JOIN
+				objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
-		entry = {'type': feedType, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
-		objectResponse.append(entry)
+			entry = {'type': feedType, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
+			objectResponse.append(entry)
 
 	return objectResponse
 
@@ -514,7 +514,7 @@ def unshared_strands(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
+		strands = set(Strand.objects.select_related().filter(user=user).filter(shared=False))
 
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
