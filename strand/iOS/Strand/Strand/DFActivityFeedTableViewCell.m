@@ -8,8 +8,9 @@
 
 #import "DFActivityFeedTableViewCell.h"
 
-CGFloat const ActivityFeedTableViewCellHeight = 155;
-CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = ActivityFeedTableViewCellHeight - 104.0;
+CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = 51;
+CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight = 148;
+CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight = 8;
 
 @implementation DFActivityFeedTableViewCell
 

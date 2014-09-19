@@ -129,12 +129,18 @@ didFinishServerFetchWithError:(NSError *)error
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *strandObject = self.feedObjects[indexPath.row];
-  if ([strandObject.type isEqualToString:DFFeedObjectLikeAction]
-      || [strandObject.type isEqual:DFFeedObjectStrandJoin]) {
+  DFPeanutFeedObject *activityObject = self.feedObjects[indexPath.row];
+  if ([activityObject.type isEqualToString:DFFeedObjectLikeAction]
+      || [activityObject.type isEqual:DFFeedObjectStrandJoin]) {
     return ActivityFeedTableViewCellNoCollectionViewHeight;
   }
-  return ActivityFeedTableViewCellHeight;
+  
+  DFPeanutFeedObject *strandObject = activityObject.objects.firstObject;
+  NSUInteger numRows = ceil((float)MIN(4,strandObject.objects.count)/2.0);
+  
+  return ActivityFeedTableViewCellNoCollectionViewHeight
+  + numRows * ActivtyFeedTableViewCellCollectionViewRowHeight
+  + (numRows - 1) * ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -179,10 +185,11 @@ didFinishServerFetchWithError:(NSError *)error
   cell.profilePhotoStackView.names = strandPost.actorNames;
   cell.actorLabel.text = [self.class firstActorNameForObject:strandPost];
   cell.actionTextLabel.text = strandPost.title;
+  cell.subtitleLabel.text = strandPost.subtitle;
   
   // time taken
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp
-                                                          abbreviate:NO];
+                                                          abbreviate:YES];
   // photo preview
   [self setRemotePhotosForCell:cell withSection:strandObject];
   
@@ -274,7 +281,7 @@ didFinishServerFetchWithError:(NSError *)error
   for (DFPeanutFeedObject *photoObject in photos) {
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
-     preferredType:DFImageThumbnail
+     preferredType:DFImageFull
      thumbnailPath:photoObject.thumb_image_path
      fullPath:photoObject.full_image_path
      completion:^(UIImage *image) {

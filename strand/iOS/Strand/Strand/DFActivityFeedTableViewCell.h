@@ -11,6 +11,9 @@
 
 extern CGFloat const ActivityFeedTableViewCellHeight;
 extern CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight;
+extern CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight;
+extern CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
+
 
 @interface DFActivityFeedTableViewCell : DFCollectionViewTableViewCell
 
@@ -20,5 +23,6 @@ extern CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *previewImageView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 
 @end
