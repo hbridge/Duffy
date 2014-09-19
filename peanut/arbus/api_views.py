@@ -123,9 +123,6 @@ class BasePhotoAPI(APIView):
 			else:
 				photoData["id"] = photoId
 
-		if "uuid" in photoData:
-			photoData["uuid"] = uuid.UUID(photoData['uuid']).hex
-			
 		photo = Photo(**photoData)
 		return photo
 
@@ -277,6 +274,11 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			allPhotos = list()
 			allPhotos.extend(createdPhotos)
+
+			# Fetch real db objects instead of using the serialized ones.  Only doing this with things
+			#   that are already created
+			objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
+
 			allPhotos.extend(objsToUpdate)
 			# Now that we've created the images in the db, we need to deal with any uploaded images
 			#   and fill in any EXIF data (time_taken, gps, etc)
