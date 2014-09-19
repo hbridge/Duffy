@@ -209,8 +209,8 @@ def main(argv):
 				matchingStrands = list()
 				strandNeighbors = list()
 
-				for strand in strandsCache:
-					if strand.shared and len(strand.users.count()) == 0:
+				for strand in strandsCache:			
+					if strand.shared and strand.users.count() == 0:
 						logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
 						# remove from our cache and db
 						strandsCache = filter(lambda a: a.id != strand.id, strandsCache)
@@ -221,7 +221,7 @@ def main(argv):
 					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
 						# If this is a private strand and the photo doesn't belong to the strand's user
 						#   then create strand neighbor entry
-						if not strand.shared and photo.user_id != strand.user.id:
+						if not strand.shared and photo.user_id != strand.user_id:
 							strandNeighbors.append(strand)
 						# If the photo wasn't taken with strand (is private) and the strand is shared
 						#    then create a strand neighbor entry
@@ -265,6 +265,7 @@ def main(argv):
 					newStrand = Strand(first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, shared = shared)
 					if not shared:
 						newStrand.user = photo.user
+
 					newStrand.save()
 					
 					if strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId):

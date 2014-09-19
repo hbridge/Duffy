@@ -8,7 +8,7 @@ admin.site.register(Similarity)
 admin.site.register(NotificationLog)
 
 class ActionAdmin(admin.ModelAdmin):
-	list_display = ['id', 'action_type', 'added']
+	list_display = ['id', 'action_type', 'added', 'user', 'strand']
 admin.site.register(Action, ActionAdmin)
 
 class UserAdmin(admin.ModelAdmin):

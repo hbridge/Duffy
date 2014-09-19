@@ -94,6 +94,7 @@ def getBestLocationForPhotos(photos):
 
 def getTitleForStrand(strand):
 	photos = strand.photos.all()
+		
 	location = getBestLocationForPhotos(photos)
 
 	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
@@ -367,12 +368,13 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
 
-
+"""
 def addPhotosActionExists(user, strand, actions):
 	for action in actions:
 		if action.action_type == ACTION_TYPE_ADD_PHOTOS_TO_STRAND and action.user.id == user.id and action.strand.id == strand.id:
 			return True
 	return False
+"""
 
 def getObjectsDataForActions(user):
 	objectResponse = []
@@ -382,13 +384,14 @@ def getObjectsDataForActions(user):
 	
 	actions = set(actions)
 	for action in actions:
+		objects = None
 		if action.action_type == constants.ACTION_TYPE_FAVORITE:
 			if action.user.id == user.id and action.photo.user.id == user.id:
-				title = "need some friends"
+				title = "liked your photo from %s" % (getTitleForStrand(action.strand))
 			elif action.user.id == user.id:
-				title = "liked a photo"
+				title = "liked %s's photo from %s" % (action.photo.user.display_name, getTitleForStrand(action.strand))
 			elif action.photo.user.id == user.id:
-				title = "liked your photo"
+				title = "liked your photo from %s" % (getTitleForStrand(action.strand))
 			else:
 				title = "Unknown"
 				
@@ -402,23 +405,27 @@ def getObjectsDataForActions(user):
 
 		# Show this for yourself
 		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
-			title = "created a Strand"
+			title = "%s photos from %s" % (action.photos.count(), getTitleForStrand(action.strand))
 			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
 			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
 		# Don't show added or joined for yourself, only other people
 		if action.user.id != user.id:
 			if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-				title = "added photos to a Strand"
+				title = "%s photos from %s" % (action.photos.count(), getTitleForStrand(action.strand))
 				feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
 				objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
 				objects[0]['title'] = getTitleForStrand(action.strand)
+
+			"""
 			# only show joined if there isn't also an "add photos"
 			elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND and not addPhotosActionExists(user, action.strand, actions):
 				title = "joined a Strand"
 				feedType = constants.FEED_OBJECT_TYPE_STRAND_JOIN
 				objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
-
+			"""
+		
+		if objects:
 			entry = {'type': feedType, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
 			objectResponse.append(entry)
 
@@ -525,7 +532,7 @@ def unshared_strands(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		
-		strands = set(Strand.objects.select_related().filter(user=user).filter(shared=False))
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 	else:

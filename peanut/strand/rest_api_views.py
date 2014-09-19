@@ -232,6 +232,7 @@ class CreateStrandAPI(CreateAPIView):
         if strand.shared == True:
             action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_CREATE_STRAND)
             action.save()
+            action.photos = strand.photos.all()
 
         logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
         

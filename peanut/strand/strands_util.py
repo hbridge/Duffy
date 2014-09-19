@@ -66,6 +66,8 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 		strand.first_photo_time = photo.time_taken
 		strand.save()
 	
+	# Add photo to strand
+	#   Don't add in if there's a dup in it already though
 	if strand.id not in photosByStrandId:
 		# Handle case that this is a new strand
 		strand.photos.add(photo)
@@ -79,18 +81,15 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 		strand.photos.add(photo)
 		photosByStrandId[strand.id].append(photo)
 
+	# Add user to strand
 	if strand.id not in usersByStrandId:
 		# Handle case that this is a new strand
 		usersByStrandId[strand.id]= [photo.user]
-
-		if strand.shared:
-			strand.users.add(photo.user)
+		strand.users.add(photo.user)
 
 	elif photo.user not in usersByStrandId[strand.id]:
 		usersByStrandId[strand.id].append(photo.user)
-
-		if strand.shared:
-			strand.users.add(photo.user)
+		strand.users.add(photo.user)
 	return True
 		
 def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
