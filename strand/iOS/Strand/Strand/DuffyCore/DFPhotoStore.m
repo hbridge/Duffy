@@ -131,6 +131,7 @@ static int const FetchStride = 500;
 
 + (NSArray *)photosWithValueStrings:(NSArray *)values
                              forKey:(NSString *)key
+                         entityName:(NSString *)entityName
                    comparisonString:(NSString *)comparisonString
                           inContext:(NSManagedObjectContext *)context
 {
@@ -141,7 +142,7 @@ static int const FetchStride = 500;
   unsigned int numFetched = 0;
   while (numFetched < values.count) {
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:@"DFPhoto"];
+    NSEntityDescription *entity = [[[DFPhotoStore managedObjectModel] entitiesByName] objectForKey:entityName];
     request.entity = entity;
     
     NSMutableArray *predicates = [[NSMutableArray alloc] init];
@@ -172,10 +173,18 @@ static int const FetchStride = 500;
 
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 {
-  return [self photosWithValueStrings:assetURLStrings
+  NSArray *photoAssets = [self photosWithValueStrings:assetURLStrings
                                forKey:@"alAssetURLString"
+                          entityName:@"DFCameraRollPhotoAsset"
                      comparisonString:@"==[c]"
                             inContext:context];
+  NSMutableArray *photos = [NSMutableArray new];
+  for (DFCameraRollPhotoAsset *asset in photoAssets)
+  {
+    [photos addObject:asset.photo];
+  }
+ 
+  return photos;
 }
 
 
@@ -203,6 +212,7 @@ static int const FetchStride = 500;
 {
   NSArray *results = [self photosWithValueStrings:photoIDs
                                            forKey:@"photoID"
+                                       entityName:@"DFPhoto"
                                  comparisonString:@"="
                                         inContext:context];
   if (results == nil || results.count == 0 || !retainOrder) return results;
