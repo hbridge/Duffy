@@ -247,7 +247,7 @@ didFinishServerFetchWithError:(NSError *)error
   
   // time taken
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:actionObject.time_stamp
-                         abbreviate:NO];
+                         abbreviate:YES];
   // photo preview
   [self setRemotePreviewPhotoForCell:cell withFeedObject:actionObject];
 
