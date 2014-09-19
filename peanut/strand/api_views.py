@@ -336,7 +336,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	interestedUsersGroups = list()
 	noInterestedUsersGroups = list()
 
-	
 	strandNeighborsCache = getStrandNeighborsCache(strands)
 	for strand in strands:
 		strandId = strand.id
@@ -376,7 +375,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(interestedUsersFormattedGroups, 1000)
 
-	noInterestedUsersFormattedGroups = getFormattedGroups(interestedUsersGroups)
+	noInterestedUsersFormattedGroups = getFormattedGroups(noInterestedUsersGroups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects.extend(api_util.turnFormattedGroupsIntoFeedObjects(noInterestedUsersFormattedGroups, 1000))
