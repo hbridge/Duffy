@@ -333,7 +333,9 @@ def getObjectsDataForStrands(user, strands, feedObjectType):
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
-	groups = list()
+	interestedUsersGroups = list()
+	noInterestedUsersGroups = list()
+
 	
 	strandNeighborsCache = getStrandNeighborsCache(strands)
 	for strand in strands:
@@ -353,19 +355,32 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 			title = ""
 			
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True)}
-		groupEntry = {'photos': photos, 'metadata': metadata}
+		entry = {'photos': photos, 'metadata': metadata}
 
 		if len(photos) > 0:
-			groups.append(groupEntry)
+			if len(interestedUsers):
+				interestedUsersGroups.append(entry)
+			else:
+				noInterestedUsersGroups.append(entry)
 
-	if len(groups) > 0:
+	if len(interestedUsersGroups) > 0:
 		# now sort groups by the time_taken of the first photo in each group
-		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
+		interestedUsersGroups = sorted(interestedUsersGroups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	formattedGroups = getFormattedGroups(groups)
+	if len(noInterestedUsersGroups) > 0:
+		# now sort groups by the time_taken of the first photo in each group
+		noInterestedUsersGroups = sorted(noInterestedUsersGroups, key=lambda x: x['photos'][0].time_taken, reverse=True)
+
+	interestedUsersFormattedGroups = getFormattedGroups(interestedUsersGroups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(interestedUsersFormattedGroups, 1000)
+
+	noInterestedUsersFormattedGroups = getFormattedGroups(interestedUsersGroups)
+		
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects.extend(api_util.turnFormattedGroupsIntoFeedObjects(noInterestedUsersFormattedGroups, 1000))
+
 	return objects
 
 def getActionSubtitle(strand):
@@ -383,13 +398,6 @@ def getActionSubtitle(strand):
 
 	return subtitle
 
-"""
-def addPhotosActionExists(user, strand, actions):
-	for action in actions:
-		if action.action_type == ACTION_TYPE_ADD_PHOTOS_TO_STRAND and action.user.id == user.id and action.strand.id == strand.id:
-			return True
-	return False
-"""
 def getObjectsDataForActions(user):
 	objectResponse = []
 	#strands = Strand.objects.filter(users__in=[user]).filter(shared=True)
@@ -430,14 +438,6 @@ def getObjectsDataForActions(user):
 				feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
 				objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
 				objects[0]['title'] = getTitleForStrand(action.strand)
-
-			"""
-			# only show joined if there isn't also an "add photos"
-			elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND and not addPhotosActionExists(user, action.strand, actions):
-				title = "joined a Strand"
-				feedType = constants.FEED_OBJECT_TYPE_STRAND_JOIN
-				objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
-			"""
 		
 		if objects:
 			entry = {'type': feedType, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
