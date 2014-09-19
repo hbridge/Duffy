@@ -193,6 +193,24 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
    }];
 }
 
+- (void)loadUIImageForThumbnailOfSize:(NSUInteger)size
+                         successBlock:(DFPhotoAssetLoadSuccessBlock)successBlock
+                         failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  if (self.asset) {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      @autoreleasepool {
+        DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
+        UIImage *image = [resizer squareImageWithPixelSize:size];
+        successBlock(image);
+      }
+    });
+  } else {
+    failureBlock([NSError errorWithDomain:@"" code:-1
+                                 userInfo:@{NSLocalizedDescriptionKey: @"Could not get asset for photo."}]);
+  }
+}
+
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {

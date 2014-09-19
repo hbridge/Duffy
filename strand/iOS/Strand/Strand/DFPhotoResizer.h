@@ -15,6 +15,7 @@
 - (id)initWithALAsset:(ALAsset *)asset;
 - (id)initWithURL:(NSURL *)imageURL;
 - (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size;
+- (UIImage *)squareImageWithPixelSize:(NSUInteger)size;
 
 
 @end

@@ -9,6 +9,7 @@
 #import "DFPhotoResizer.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <ImageIO/ImageIO.h>
+#import "UIImage+Resize.h"
 
 
 @interface DFPhotoResizer()
@@ -94,6 +95,16 @@ static void releaseAssetCallback(void *info) {
   
   
   return imageRef;
+}
+
+- (UIImage *)squareImageWithPixelSize:(NSUInteger)size {
+  @autoreleasepool {
+    UIImage *largeImage = [self aspectImageWithMaxPixelSize:1024];
+    return [largeImage thumbnailImage:size
+                    transparentBorder:0
+                         cornerRadius:0
+                 interpolationQuality:kCGInterpolationDefault];
+  }
 }
 
 - (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size {

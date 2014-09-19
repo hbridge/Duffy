@@ -39,6 +39,9 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
+- (void)loadUIImageForThumbnailOfSize:(NSUInteger)size
+                         successBlock:(DFPhotoAssetLoadSuccessBlock)successBlock
+                   failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
 - (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock;
 - (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
