@@ -368,9 +368,9 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	return objects
 
 
-def addPhotosActionExists(user, actions):
+def addPhotosActionExists(user, strand, actions):
 	for action in actions:
-		if action.action_type == ACTION_TYPE_ADD_PHOTOS_TO_STRAND and action.user.id == user.id
+		if action.action_type == ACTION_TYPE_ADD_PHOTOS_TO_STRAND and action.user.id == user.id and action.strand.id == strand.id:
 			return True
 	return False
 
@@ -414,7 +414,7 @@ def getObjectsDataForActions(user):
 				objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
 				objects[0]['title'] = getTitleForStrand(action.strand)
 			# only show joined if there isn't also an "add photos"
-			elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND and not addPhotosActionExists(user, actions):
+			elif action.action_type == constants.ACTION_TYPE_JOIN_STRAND and not addPhotosActionExists(user, action.strand, actions):
 				title = "joined a Strand"
 				feedType = constants.FEED_OBJECT_TYPE_STRAND_JOIN
 				objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
