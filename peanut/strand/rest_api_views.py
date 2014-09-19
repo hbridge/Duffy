@@ -153,7 +153,7 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
 class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
     def sendNotification(self, strandInviteId):
         strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
-        msg = "%s just joined your Strand from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
+        msg = "%s just joined your Strand from %s" % (strandInvite.accepted_user.display_name, strandInvite.strand.photos.all()[0].location_city)
         
         logger.debug("going to send %s to user id %s" % (msg, strandInvite.user.id))
         notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
