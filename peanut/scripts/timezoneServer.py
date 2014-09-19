@@ -5,6 +5,8 @@ import json
 import subprocess, os, signal, sys
 import logging
 import datetime
+from math import radians, cos, sin, asin, sqrt
+
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 from tzwhere import tzwhere
@@ -12,6 +14,21 @@ from tzwhere import tzwhere
 logger = logging.getLogger(__name__)
 
 timezoneFetcher = tzwhere.tzwhere()
+
+def haversine(lon1, lat1, lon2, lat2):
+	"""
+	Calculate the great circle distance between two points 
+	on the earth (specified in decimal degrees)
+	"""
+	# convert decimal degrees to radians 
+	lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
+	# haversine formula 
+	dlon = lon2 - lon1 
+	dlat = lat2 - lat1 
+	a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+	c = 2 * asin(sqrt(a)) 
+	km = 6367 * c
+	return km
 
 class HttpHandler(BaseHTTPRequestHandler):
 	def respondSuccess(self, response):
@@ -21,6 +38,16 @@ class HttpHandler(BaseHTTPRequestHandler):
 		self.wfile.write(json.dumps(response))
 		logging.debug("Just sent: " + json.dumps(response))
 		return
+
+	def getCachedTimeZone(self, lat, lon, latLonCache):
+		for entry in latLonCache:
+			lat2, lon2, timezoneName = entry
+
+			geoDistance = int(haversine(lon, lat, lon2, lat2))
+
+			if geoDistance < 1000:
+				return timezoneName
+		return None
 
 	def do_GET(self):
 		try:
@@ -32,12 +59,23 @@ class HttpHandler(BaseHTTPRequestHandler):
 					query = self.path.split('?')[1]
 
 					responses = list()
+					latLonCache = list()
 					latlons = query.split('ll=')
 					for latlon in latlons:
 						latlon = latlon.replace('&', '')
 						if latlon != "":
 							lat, lon = latlon.split(',')
-							timezoneName = timezoneFetcher.tzNameAt(float(lat), float(lon))
+							lat = float(lat)
+							lon = float(lon)
+
+							timezoneName = self.getCachedTimeZone(lat, lon, latLonCache)
+
+							if not timezoneName:
+								timezoneName = timezoneFetcher.tzNameAt(lat, lon)
+
+								if timezoneName:
+									latLonCache.append((lat, lon, timezoneName))
+								
 							responses.append(timezoneName)
 						
 					print "Total request time: %s" % (datetime.datetime.now() - start)
