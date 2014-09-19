@@ -396,7 +396,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
          [self presentViewController:vc
                             animated:YES
                           completion:nil];
-         
+         [SVProgressHUD dismiss];
        } else {
          [self dismissWithErrorString:nil];
        }
