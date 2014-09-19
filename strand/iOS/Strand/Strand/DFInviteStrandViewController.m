@@ -99,9 +99,11 @@
    toPeanutContacts:peanutContacts
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      vc.messageComposeDelegate = self;
-     if (vc) {[self presentViewController:vc
-                                animated:YES
-                              completion:nil];
+     if (vc) {
+       [self presentViewController:vc
+                          animated:YES
+                        completion:nil];
+       [SVProgressHUD dismiss];
      } else {
        [self dismissWithErrorString:nil];
      }

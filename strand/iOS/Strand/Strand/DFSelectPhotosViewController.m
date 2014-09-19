@@ -416,22 +416,28 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)dismissWithErrorString:(NSString *)errorString
 {
-  [self.presentingViewController
-   dismissViewControllerAnimated:YES
-   completion:^{
-     if (!errorString) {
-       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-         [SVProgressHUD showSuccessWithStatus:@"Sent!"];
-       });
-       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-         [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
-       });
-     } else {
-       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-         [SVProgressHUD showErrorWithStatus:errorString];
-       });
-     }
-   }];
+  void (^completion)(void) = ^{
+    if (!errorString) {
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+      });
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
+      });
+    } else {
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [SVProgressHUD showErrorWithStatus:errorString];
+      });
+    }
+  };
+  
+  if (self.presentedViewController) {
+    [self dismissViewControllerAnimated:YES completion:completion];
+    [self.navigationController popViewControllerAnimated:NO];
+  } else {
+    [self.navigationController popViewControllerAnimated:YES];
+    completion();
+  }
 }
 
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
