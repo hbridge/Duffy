@@ -48,10 +48,6 @@
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-                                            target:self
-                                            action:@selector(createButtonPressed:)];
 }
 
 - (void)viewDidLoad

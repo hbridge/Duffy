@@ -64,7 +64,7 @@ static DFCreateStrandViewController *instance;
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
     _showAsFirstTimeSetup = NO;
-    [self configureNav];
+    [self configureNavAndTab];
     [self configureTableView];
     [self observeNotifications];
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
@@ -75,7 +75,7 @@ static DFCreateStrandViewController *instance;
   return self;
 }
 
-- (void)configureNav
+- (void)configureNavAndTab
 {
   self.navigationItem.title = @"Start Strand";
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
@@ -83,6 +83,11 @@ static DFCreateStrandViewController *instance;
                                            style:UIBarButtonItemStylePlain
                                            target:nil
                                            action:nil];
+  self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateBarButton"]
+                                   imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+  self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/CreateBarButton"]
+                           imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+
 }
 
 NSString *const InviteId = @"invite";

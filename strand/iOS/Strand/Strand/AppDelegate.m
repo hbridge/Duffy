@@ -183,13 +183,14 @@
   [DFPhotoStore sharedStore];
   
   DFActivityFeedViewController *strandsFeedViewCotnroller = [[DFActivityFeedViewController alloc] init];
-  DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
+  DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
+  // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:strandsFeedViewCotnroller],
-    [[DFNavigationController alloc] initWithRootViewController:galleryviewController],
+    [[DFNavigationController alloc] initWithRootViewController:createViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   
@@ -363,12 +364,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 
 - (void)showCreateStrand
 {
-  DFCreateStrandViewController *vc = [DFCreateStrandViewController sharedViewController];
-  vc.showAsFirstTimeSetup = YES;
-  
-  [self.tabBarController presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
-                                      animated:YES
-                                    completion:nil];
+  self.tabBarController.selectedIndex = 1;
 }
 
 
