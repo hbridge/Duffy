@@ -431,6 +431,12 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"Favorite button pressed");
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
+  
+  // Figure out the strand the photo is in that we're viewing
+  NSIndexPath *indexPath = self.photoIndexPathsById[@(photoID)];
+  DFPeanutFeedObject *containingStrand = self.strandObjects[indexPath.section];
+  DFStrandIDType strandID = containingStrand.id;
+
   DFPeanutFeedObject *object = self.photoObjectsById[objectIDNumber];
   DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFPeanutActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
@@ -442,6 +448,7 @@ const CGFloat LockedCellHeight = 157.0;
     newAction.user = [[DFUser currentUser] userID];
     newAction.action_type = DFPeanutActionFavorite;
     newAction.photo = photoID;
+    newAction.strand = strandID;
   } else {
     newAction = nil;
   }

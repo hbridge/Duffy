@@ -10,6 +10,8 @@ typedef NS_OPTIONS(unsigned int, DFImageType) {
   DFImageThumbnail,
 };
 
+typedef UInt64 DFStrandIDType;
+
 
 // Permissions
 typedef NSString *DFPermissionType;

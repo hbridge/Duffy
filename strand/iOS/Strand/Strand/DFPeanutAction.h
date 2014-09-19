@@ -28,6 +28,7 @@ typedef UInt64 DFActionID;
 @property (nonatomic) DFActionID id;
 @property (nonatomic) DFPeanutActionType action_type;
 @property (nonatomic) DFPhotoIDType photo;
+@property (nonatomic) DFStrandIDType strand;
 @property (nonatomic) DFUserIDType user;
 @property (nonatomic, retain) NSString *user_display_name;
 
