@@ -368,6 +368,21 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
 
+def getActionSubtitle(strand):
+	photos = strand.photos.all()
+		
+	location = getBestLocationForPhotos(photos)
+
+	# Jan 4
+	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
+
+	subtitle = dateStr
+
+	if location:
+		subtitle += " in " + location
+
+	return subtitle
+
 """
 def addPhotosActionExists(user, strand, actions):
 	for action in actions:
@@ -375,7 +390,6 @@ def addPhotosActionExists(user, strand, actions):
 			return True
 	return False
 """
-
 def getObjectsDataForActions(user):
 	objectResponse = []
 	#strands = Strand.objects.filter(users__in=[user]).filter(shared=True)
@@ -387,15 +401,15 @@ def getObjectsDataForActions(user):
 		objects = None
 		if action.action_type == constants.ACTION_TYPE_FAVORITE:
 			if action.user.id == user.id and action.photo.user.id == user.id:
-				title = "liked your photo from %s" % (getTitleForStrand(action.strand))
+				title = "liked your photo"
 			elif action.user.id == user.id:
-				title = "liked %s's photo from %s" % (action.photo.user.display_name, getTitleForStrand(action.strand))
+				title = "liked %s's photo" % action.photo.user.display_name
 			elif action.photo.user.id == user.id:
-				title = "liked your photo from %s" % (getTitleForStrand(action.strand))
+				title = "liked your photo"
 			else:
 				title = "Unknown"
 				
-			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
+			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
 
 			photoData = PhotoForApiSerializer(action.photo).data
 			photoData['type'] = "photo"
@@ -405,14 +419,14 @@ def getObjectsDataForActions(user):
 
 		# Show this for yourself
 		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
-			title = "%s photos from %s" % (action.photos.count(), getTitleForStrand(action.strand))
+			title = "shared %s photos" % action.photos.count()
 			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
 			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
 		# Don't show added or joined for yourself, only other people
 		if action.user.id != user.id:
 			if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-				title = "%s photos from %s" % (action.photos.count(), getTitleForStrand(action.strand))
+				title = "shared %s photos" % action.photos.count()
 				feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
 				objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
 				objects[0]['title'] = getTitleForStrand(action.strand)
@@ -426,7 +440,7 @@ def getObjectsDataForActions(user):
 			"""
 		
 		if objects:
-			entry = {'type': feedType, 'title': title, 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
+			entry = {'type': feedType, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
 			objectResponse.append(entry)
 
 	return objectResponse
