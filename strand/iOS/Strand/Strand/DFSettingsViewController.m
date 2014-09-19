@@ -245,6 +245,13 @@
             }
           }
 accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+  [mapping button:@"Log Out"
+       identifier:@"logOut"
+          handler:^(id object) {
+            [DFUser setCurrentUser:nil];
+            [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
+          }
+     accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
