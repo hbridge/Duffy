@@ -41,6 +41,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
+@property (nonatomic, retain) NSTimer *refreshTimer;
 
 @end
 
@@ -137,6 +138,23 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
                                              target:self
                                              action:@selector(cancelPressed:)];
   }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  if (self.showAsFirstTimeSetup && !self.refreshTimer) {
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:3.0
+                                                         target:self
+                                                       selector:@selector(refreshFromServer)
+                                                       userInfo:nil
+                                                        repeats:YES];
+  }
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [self.refreshTimer invalidate];
 }
 
 - (void)didReceiveMemoryWarning
@@ -416,9 +434,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
       } else {
         DDLogDebug(@"Got back response for strand suggestions but it was the same");
       }
-    }
-    
-    if (response.objects.count > 0 || error) {
       dispatch_async(dispatch_get_main_queue(), ^{
         [self.refreshControl endRefreshing];
       });
