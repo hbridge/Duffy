@@ -64,7 +64,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 + (NSArray *)attributes
 {
   return @[@"user", @"id", @"time_taken", @"local_time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
-           @"full_filename", @"full_image_path", @"taken_with_strand", @"uuid"];
+           @"full_filename", @"full_image_path", @"taken_with_strand"];
 }
 
 - (NSDictionary *)dictionaryForAttributes:(NSArray *)attributes
