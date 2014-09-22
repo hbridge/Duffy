@@ -352,6 +352,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     
     [[DFUploadController sharedUploadController] cancelUploads];
     [[DFPhotoStore sharedStore] resetStore];
+    [[DFContactsStore sharedStore] resetStore];
     
     // clear user defaults
     NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
