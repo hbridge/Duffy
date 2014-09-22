@@ -8,6 +8,8 @@ from peanut.settings import constants
 
 from strand import geo_util, friends_util
 
+from common.models import StrandUserMembership, StrandPhotoMembership
+
 logger = logging.getLogger(__name__)
 
 """
@@ -70,7 +72,7 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	#   Don't add in if there's a dup in it already though
 	if strand.id not in photosByStrandId:
 		# Handle case that this is a new strand
-		strand.photos.add(photo)
+		StrandPhotoMembership.objects.create(strand=strand, photo=photo)
 		photosByStrandId[strand.id] = [photo]
 	elif photo not in photosByStrandId[strand.id]:
 		for p in photosByStrandId[strand.id]:
@@ -78,18 +80,18 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 				logger.debug("Found a hash conflict in strand %s for photo %s" % (strand.id, photo.id))
 				return False
 
-		strand.photos.add(photo)
+		StrandPhotoMembership.objects.create(strand=strand, photo=photo)
 		photosByStrandId[strand.id].append(photo)
 
 	# Add user to strand
 	if strand.id not in usersByStrandId:
 		# Handle case that this is a new strand
 		usersByStrandId[strand.id]= [photo.user]
-		strand.users.add(photo.user)
+		StrandUserMembership.objects.create(strand=strand, user=user)
 
 	elif photo.user not in usersByStrandId[strand.id]:
 		usersByStrandId[strand.id].append(photo.user)
-		strand.users.add(photo.user)
+		StrandUserMembership.objects.create(strand=strand, user=user)
 	return True
 		
 def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
