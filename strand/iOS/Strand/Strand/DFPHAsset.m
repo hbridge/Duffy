@@ -14,7 +14,7 @@
 
 @interface DFPHAsset()
 
-@property (readonly, nonatomic, retain) PHAsset *asset;
+@property (nonatomic, retain) PHAsset *asset;
 
 @end
 
@@ -27,9 +27,10 @@
                        inContext:(NSManagedObjectContext *)managedObjectContext
 {
   DFPHAsset *newAsset = [NSEntityDescription
-                                      insertNewObjectForEntityForName:NSStringFromClass([self class])
-                                      inManagedObjectContext:managedObjectContext];
+                         insertNewObjectForEntityForName:NSStringFromClass([self class])
+                         inManagedObjectContext:managedObjectContext];
   newAsset.localIdentifier = asset.localIdentifier;
+  newAsset.asset = asset;
   
   return newAsset;
 }

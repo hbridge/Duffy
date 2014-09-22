@@ -73,6 +73,11 @@ const CGFloat DFPhotoAssetDefaultJPEGCompressionQuality = 0.8;
   [DFPhotoAsset abstractClassException];
 }
 
+- (void)loadUIImageForThumbnailOfSize:(NSUInteger)size successBlock:(DFPhotoAssetLoadSuccessBlock)successBlock failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  [DFPhotoAsset abstractClassException];
+}
+
 - (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
   [DFPhotoAsset abstractClassException];
