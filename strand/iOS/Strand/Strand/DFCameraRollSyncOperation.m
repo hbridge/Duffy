@@ -199,6 +199,7 @@ static int NumChangesFlushThreshold = 100;
   NSDate *startDate = [NSDate date];
 
   //enumerate PHAssets
+  NSUInteger assetCount = 0;
   PHFetchResult *allMomentsList = [PHCollectionList
                                fetchMomentListsWithSubtype:PHCollectionListSubtypeMomentListCluster
                                options:nil];
@@ -209,6 +210,7 @@ static int NumChangesFlushThreshold = 100;
       PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
       for (PHAsset *asset in assets) {
         if (self.isCancelled) return self.allObjectIDsToChanges;
+        assetCount++;
         [self scanPHAssetForChange:asset];
       }
     }
@@ -223,9 +225,10 @@ static int NumChangesFlushThreshold = 100;
   [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   [self flushChanges];
-  DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@",
+  DDLogInfo(@"Scan complete.  Took %.02f Change summary for %@ assets: \n%@",
             [[NSDate date]
              timeIntervalSinceDate:startDate],
+            @(assetCount),
             [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
   
   return self.allObjectIDsToChanges;
