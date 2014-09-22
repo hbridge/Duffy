@@ -186,7 +186,7 @@ def main(argv):
 		searchEndTime = datetime.datetime.now()
 
 		if len(photos) > 0:
-			milliDiff = ((b - a).microseconds / 1000) + ((b - a).seconds * 1000)
+			milliDiff = ((searchStartTime - searchEndTime).microseconds / 1000) + ((searchStartTime - searchEndTime).seconds * 1000)
 			logger.debug("Starting a run with %s photos, search took %s milli" % (len(photos), milliDiff))
 			strandsCreated = list()
 			strandsAddedTo = list()
