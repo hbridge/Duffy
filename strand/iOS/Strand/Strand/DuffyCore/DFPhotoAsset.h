@@ -16,6 +16,10 @@
 
 @property (nonatomic, retain) DFPhoto *photo;
 
+extern const CGFloat DFPhotoAssetDefaultThumbnailSize;
+extern const CGFloat DFPhotoAssetHighQualitySize;
+extern const CGFloat DFPhotoAssetDefaultJPEGCompressionQuality;
+
 // Use these to access image data asynchronously
 typedef void (^DFPhotoAssetLoadSuccessBlock)(UIImage *image);
 typedef void (^DFPhotoDataLoadSuccessBlock)(NSData *data);

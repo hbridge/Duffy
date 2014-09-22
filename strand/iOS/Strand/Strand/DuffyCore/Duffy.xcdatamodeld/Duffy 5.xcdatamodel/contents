@@ -3,6 +3,9 @@
     <entity name="DFCameraRollPhotoAsset" representedClassName="DFCameraRollPhotoAsset" parentEntity="DFPhotoAsset" syncable="YES">
         <attribute name="alAssetURLString" optional="YES" attributeType="String" syncable="YES"/>
     </entity>
+    <entity name="DFPHAsset" representedClassName="DFPHAsset" parentEntity="DFPhotoAsset" syncable="YES">
+        <attribute name="localIdentifier" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
     <entity name="DFPhoto" representedClassName="DFPhoto" syncable="YES">
         <attribute name="isUploadProcessed" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="localCreationDate" optional="YES" attributeType="Date" syncable="YES"/>
@@ -29,5 +32,6 @@
         <element name="DFPhoto" positionX="0" positionY="0" width="128" height="195"/>
         <element name="DFPhotoAsset" positionX="63" positionY="126" width="128" height="73"/>
         <element name="DFStrandPhotoAsset" positionX="81" positionY="126" width="128" height="88"/>
+        <element name="DFPHAsset" positionX="45" positionY="90" width="128" height="58"/>
     </elements>
 </model>

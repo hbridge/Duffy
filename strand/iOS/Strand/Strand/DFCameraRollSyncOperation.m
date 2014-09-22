@@ -8,6 +8,7 @@
 
 #import "DFCameraRollSyncOperation.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <Photos/Photos.h>
 #import "DFPhotoCollection.h"
 #import "DFPhoto.h"
 #import "DFPhotoStore.h"
@@ -17,6 +18,8 @@
 #import "NSNotificationCenter+DFThreadingAddons.h"
 #import "DFCameraRollPhotoAsset.h"
 #import "ALAsset+DFExtensions.h"
+#import "UIDevice+DFHelpers.h"
+#import "DFPHAsset.h"
 
 static int NumChangesFlushThreshold = 100;
 
@@ -44,8 +47,25 @@ static int NumChangesFlushThreshold = 100;
       [self cancelled];
       return;
     }
+    
+    if ([UIDevice majorVersionNumber] >= 8) {
+      // for iOS 8 devices, check to see if we need to migrate old assets
+      [self migrateALAssets];
+    }
+    
+    if (self.isCancelled) {
+      [self cancelled];
+      return;
+    }
+    
     self.knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
-    [self findChanges];
+    
+    if ([UIDevice majorVersionNumber] >= 8) {
+      [self findPHAssetChanges];
+    } else {
+      [self findALAssetChanges];
+    }
+    
     
     if (self.isCancelled) {
       [self cancelled];
@@ -69,6 +89,48 @@ static int NumChangesFlushThreshold = 100;
   DDLogInfo(@"DFCameraRollSyncOperationCancelled.  Stopping.");
 }
 
+- (void)migrateALAssets
+{
+  // fetch all DFCameraRollPhotoAssets, if any
+  NSFetchRequest *request = [[NSFetchRequest alloc] init];
+  
+  NSEntityDescription *entityDescription = [[self.managedObjectContext.persistentStoreCoordinator.managedObjectModel
+                                             entitiesByName]
+                                      objectForKey:NSStringFromClass([DFCameraRollPhotoAsset class])];
+  request.entity = entityDescription;
+  
+  NSError *error;
+  NSArray *result = [self.managedObjectContext executeFetchRequest:request error:&error];
+  if (!result) {
+    [NSException raise:@"Could not fetch ALAssets"
+                format:@"Error: %@", [error localizedDescription]];
+  }
+  
+  // migrate them to iOS8 PHAssets
+  if (result.count > 0) {
+    DDLogInfo(@"%@ alAssets found on iOS8, migrating...", self.class);
+    // for each alAsset get the corresponding iOS8 PHAsset and reassign
+    // can't do in bulk because we need to know the which alAsset maps to which PHAsset
+    for (DFCameraRollPhotoAsset *cameraRollAsset in result) {
+      // keep track of the photo that the camera roll asset was attached to
+      DFPhoto *photo = cameraRollAsset.photo;
+      
+      // get the PHAsset and create it's DFPHAsset
+      NSURL *assetURL = [NSURL URLWithString:cameraRollAsset.alAssetURLString];
+      PHAsset *phAsset = [[PHAsset fetchAssetsWithALAssetURLs:@[assetURL] options:nil] firstObject];
+      DFPHAsset *dfphAsset = [DFPHAsset createWithPHAsset:phAsset inContext:self.managedObjectContext];
+      
+      // delete the old asset and set the dfphoto's new asset
+      photo.asset = dfphAsset;
+      [self.managedObjectContext deleteObject:cameraRollAsset];
+    }
+    
+    [self.managedObjectContext save:&error];
+    if (error) {
+      DDLogError(@"%@: failed to save context after ALAsset migration: %@)", self.class, error);
+    }
+  }
+}
 
 - (NSDictionary *)mapKnownPhotoURLsToDates:(DFPhotoCollection *)knownPhotos
 {
@@ -82,7 +144,7 @@ static int NumChangesFlushThreshold = 100;
   return mapping;
 }
 
-- (NSDictionary *)findChanges
+- (NSDictionary *)findALAssetChanges
 {
   // setup lists of objects
   self.enumerationCompleteSemaphore = dispatch_semaphore_create(0);
@@ -124,6 +186,77 @@ static int NumChangesFlushThreshold = 100;
   return self.allObjectIDsToChanges;
 }
 
+- (NSDictionary *)findPHAssetChanges
+{
+  // setup dicts for enumeration
+  self.foundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
+  self.knownNotFoundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
+  self.knownAndFoundURLsToDates = [[self mapKnownPhotoURLsToDates:self.knownPhotos] mutableCopy];
+  
+  self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
+  self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
+  DDLogDebug(@"Starting camera roll in findChanges");
+  NSDate *startDate = [NSDate date];
+
+  //enumerate PHAssets
+  PHFetchResult *allMomentsList = [PHCollectionList
+                               fetchMomentListsWithSubtype:PHCollectionListSubtypeMomentListCluster
+                               options:nil];
+  for (PHCollectionList *momentList in allMomentsList) {
+    PHFetchResult *collections = [PHCollection fetchCollectionsInCollectionList:momentList
+                                                                        options:nil];
+    for (PHAssetCollection *assetCollection in collections) {
+      PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
+      for (PHAsset *asset in assets) {
+        if (self.isCancelled) return self.allObjectIDsToChanges;
+        [self scanPHAssetForChange:asset];
+      }
+    }
+  }
+  
+  // enumeration finished
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
+  }
+  
+  NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
+  [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  [self flushChanges];
+  DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@",
+            [[NSDate date]
+             timeIntervalSinceDate:startDate],
+            [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
+  
+  return self.allObjectIDsToChanges;
+}
+
+- (void)scanPHAssetForChange:(PHAsset *)asset
+{
+  if (self.unsavedObjectIDsToChanges.count > NumChangesFlushThreshold) {
+    [self flushChanges];
+  }
+  
+  NSURL *assetURL = [DFPHAsset URLForPHAsset:asset];
+  [self.knownNotFoundURLs removeObject:assetURL];
+  
+  // We have this asset in our DB, see if it matches what we expect
+  if (![self.knownPhotos.photoURLSet containsObject:assetURL]) {
+    DFPHAsset *dfphAsset = [DFPHAsset createWithPHAsset:asset inContext:self.managedObjectContext];
+    DFPhoto *newPhoto = [DFPhoto createWithAsset:dfphAsset
+                                          userID:[[DFUser currentUser] userID]
+                                        timeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]
+                                       inContext:self.managedObjectContext];
+    
+    // store information about the new photo to notify
+    self.unsavedObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
+    // add to list of knownURLs so we don't duplicate add it
+    // in either case, add mappings
+    [self.foundURLs addObject:assetURL];
+    self.knownAndFoundURLsToDates[assetURL] = asset.creationDate;
+  }
+}
+
 
 - (void)findRemoteChanges
 {
@@ -131,8 +264,6 @@ static int NumChangesFlushThreshold = 100;
   
   // TODO compare server list to whether we have photos with those ids or not, whether hashes match etc
 }
-
-
 
 - (ALAssetsLibraryGroupsEnumerationResultsBlock)enumerateGroupsBlockSkippingGroupsNamed:(NSArray *)groupNamesToSkip
 {
@@ -189,7 +320,7 @@ static int NumChangesFlushThreshold = 100;
         // Check the actual asset hash against our stored date, if it doesn't match, delete and recreate the DFPhoto with new info.
         
         if (![assetDate isEqual:self.knownAndFoundURLsToDates[assetURL]]){
-          NSDictionary *changes = [self assetDataChangedForAsset:photoAsset];
+          NSDictionary *changes = [self assetDataChangedForALAsset:photoAsset];
           [self.unsavedObjectIDsToChanges addEntriesFromDictionary:changes];
           // set to the new known date
           self.knownAndFoundURLsToDates[assetURL] = assetDate;
@@ -220,7 +351,7 @@ static int NumChangesFlushThreshold = 100;
 }
 
 
-- (NSDictionary *)assetDataChangedForAsset:(ALAsset *)asset
+- (NSDictionary *)assetDataChangedForALAsset:(ALAsset *)asset
 {
   NSMutableDictionary *objectIDsToChanges = [[NSMutableDictionary alloc] init];
   
@@ -244,8 +375,18 @@ static int NumChangesFlushThreshold = 100;
 {
   DDLogInfo(@"%lu photos in DB not present on device.", (unsigned long)photoURLsNotFound.count);
   NSMutableDictionary *objectIDsToChanges = [[NSMutableDictionary alloc] init];
-  NSArray *photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:photoURLsNotFound.allObjects
-                                                              context:self.managedObjectContext];
+  
+  NSArray *photosToRemove;
+  if ([UIDevice majorVersionNumber] >= 8) {
+    NSMutableArray *phAssetIDs = [NSMutableArray new];
+    for (NSURL *url in photoURLsNotFound) {
+      [phAssetIDs addObject:[DFPHAsset localIdentifierFromURL:url]];
+    }
+    photosToRemove = [DFPhotoStore photosWithPHAssetIdentifiers:phAssetIDs context:self.managedObjectContext];
+  } else {
+    photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:photoURLsNotFound.allObjects
+                                                                context:self.managedObjectContext];
+  }
   
   for (DFPhoto *photo in photosToRemove) {
     objectIDsToChanges[photo.objectID] = DFPhotoChangeTypeRemoved;

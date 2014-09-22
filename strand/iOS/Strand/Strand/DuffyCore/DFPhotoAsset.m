@@ -8,6 +8,9 @@
 
 #import "DFPhotoAsset.h"
 
+const CGFloat DFPhotoAssetDefaultThumbnailSize = 157.0;
+const CGFloat DFPhotoAssetHighQualitySize = 2048.0; // max texture
+const CGFloat DFPhotoAssetDefaultJPEGCompressionQuality = 0.8;
 
 @implementation DFPhotoAsset
 

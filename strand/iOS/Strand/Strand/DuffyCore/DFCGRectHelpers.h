@@ -10,6 +10,6 @@
 
 @interface DFCGRectHelpers : NSObject
 
-+ (CGRect) aspectFittedSize:(CGSize)inSize max:(CGRect)maxRect;
++ (CGRect) aspectFittedSize:(CGSize)originalSize max:(CGRect)maxRect;
 
 @end

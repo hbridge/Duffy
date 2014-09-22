@@ -13,6 +13,8 @@
 
 @implementation DFDataHasher
 
+const float HasherImageJPEGQuality = 0.8;
+
 + (NSData *)hashDataForData:(NSData *)inputData
 {
     uint8_t digest[CC_SHA1_DIGEST_LENGTH];
@@ -23,9 +25,14 @@
 }
 
 
++ (NSData *)hashDataForUIImage:(UIImage *)image
+{
+  return [DFDataHasher hashDataForData:[self JPEGDataForCGImage:image.CGImage withQuality:HasherImageJPEGQuality]];
+}
+
 + (NSData *)hashDataForALAsset:(ALAsset *)asset
 {
-  return [DFDataHasher hashDataForData:[DFDataHasher JPEGDataForCGImage:asset.thumbnail withQuality:0.8]];
+  return [DFDataHasher hashDataForData:[DFDataHasher JPEGDataForCGImage:asset.thumbnail withQuality:HasherImageJPEGQuality]];
 }
 
 + (NSString *)hashStringForHashData:(NSData *)hashData

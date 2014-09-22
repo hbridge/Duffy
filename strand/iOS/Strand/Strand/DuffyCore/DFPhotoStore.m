@@ -187,6 +187,23 @@ static int const FetchStride = 500;
   return photos;
 }
 
++ (NSArray *)photosWithPHAssetIdentifiers:(NSArray *)assetIds context:(NSManagedObjectContext *)context;
+{
+  NSArray *photoAssets = [self photosWithValueStrings:assetIds
+                                               forKey:@"localIdentifier"
+                                           entityName:@"DFPHAsset"
+                                     comparisonString:@"==[c]"
+                                            inContext:context];
+  NSMutableArray *photos = [NSMutableArray new];
+  for (DFCameraRollPhotoAsset *asset in photoAssets)
+  {
+    [photos addObject:asset.photo];
+  }
+  
+  return photos;
+}
+
+
 
 + (DFPhotoCollection *)photosWithPredicate:(NSPredicate *)predicate inContext:(NSManagedObjectContext *)context
 {

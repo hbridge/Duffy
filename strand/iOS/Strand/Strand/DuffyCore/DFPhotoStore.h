@@ -45,6 +45,7 @@ typedef enum {
 - (NSSet *)photosWithObjectIDs:(NSSet *)objectIDs;
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 + (DFPhoto *)photoWithALAssetURLString:(NSString *)assetURLString context:(NSManagedObjectContext *)context;
++ (NSArray *)photosWithPHAssetIdentifiers:(NSArray *)assetIds context:(NSManagedObjectContext *)context;;
 + (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
                     retainOrder:(BOOL)retainOrder
                       inContext:(NSManagedObjectContext *)context;
