@@ -87,11 +87,11 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	if strand.id not in usersByStrandId:
 		# Handle case that this is a new strand
 		usersByStrandId[strand.id]= [photo.user]
-		StrandUserMembership.objects.create(strand=strand, user=user)
+		StrandUserMembership.objects.create(strand=strand, user=photo.user)
 
 	elif photo.user not in usersByStrandId[strand.id]:
 		usersByStrandId[strand.id].append(photo.user)
-		StrandUserMembership.objects.create(strand=strand, user=user)
+		StrandUserMembership.objects.create(strand=strand, user=photo.user)
 	return True
 		
 def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
