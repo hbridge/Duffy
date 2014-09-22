@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /home/derek/prod/Duffy
+cd /home/ubuntu/Duffy
 git fetch
 git rebase origin/master
 sudo apachectl -k restart
@@ -13,7 +13,7 @@ sudo start duffy-friends
 sudo stop duffy-stranding
 sudo start duffy-stranding
 
-python /home/derek/prod/Duffy/peanut/tests/black_box_api_tests.py dev.duffyapp.com 297
+python /home/ubuntu/Duffy/peanut/tests/black_box_api_tests.py dev.duffyapp.com 297
 
 initctl list | grep duffy-strand-notifications
 initctl list | grep duffy-friends
