@@ -181,9 +181,13 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
+		searchStartTime = datetime.datetime.now()
 		photos = Photo.objects.all().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
+		searchEndTime = datetime.datetime.now()
 
 		if len(photos) > 0:
+			milliDiff = ((b - a).microseconds / 1000) + ((b - a).seconds * 1000)
+			logger.debug("Starting a run with %s photos, search took %s milli" % (len(photos), milliDiff))
 			strandsCreated = list()
 			strandsAddedTo = list()
 			strandsDeleted = 0
@@ -307,10 +311,13 @@ def main(argv):
 			existingRows = StrandNeighbor.objects.filter(strand_1__in=allIds).filter(strand_2_id__in=allIds)
 			neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
 			StrandNeighbor.objects.bulk_create(neighborRowsToCreate)	
-
-			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(strandNeighborsToCreate)))
+			
+			logger.debug("Starting sending notifications...")
 			
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
+
+			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(strandNeighborsToCreate)))
+
 		else:
 			time.sleep(.1)
 
