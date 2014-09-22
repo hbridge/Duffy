@@ -203,8 +203,6 @@ static int const FetchStride = 500;
   return photos;
 }
 
-
-
 + (DFPhotoCollection *)photosWithPredicate:(NSPredicate *)predicate inContext:(NSManagedObjectContext *)context
 {
   NSFetchRequest *request = [[NSFetchRequest alloc] init];

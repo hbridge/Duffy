@@ -11,6 +11,7 @@
 #import <Photos/Photos.h>
 #import "DFDataHasher.h"
 #import "DFCGRectHelpers.h"
+#import "DFPHAssetCache.h"
 
 @interface DFPHAsset()
 
@@ -50,11 +51,7 @@
 - (PHAsset *)asset
 {
   if (!_asset) {
-    PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[self.localIdentifier]
-                                                                  options:nil];
-    if (fetchResult.count > 0) {
-      _asset = fetchResult.firstObject;
-    }
+    [[DFPHAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
   }
   
   return _asset;
