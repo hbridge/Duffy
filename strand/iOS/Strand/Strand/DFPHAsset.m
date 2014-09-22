@@ -51,7 +51,7 @@
 - (PHAsset *)asset
 {
   if (!_asset) {
-    [[DFPHAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
+    _asset = [[DFPHAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
   }
   
   return _asset;
