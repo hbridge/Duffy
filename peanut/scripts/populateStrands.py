@@ -174,20 +174,17 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	writes a new row for each loop.  Would be faster to manually write the table entries in a batch call
 """
 def main(argv):
-	maxPhotosAtTime = 10
+	maxPhotosAtTime = 50
 	timeWithinSecondsForNotification = 10 # seconds
 
 	timeWithinMinutesForNeighboring = constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING
 	
 	logger.info("Starting... ")
 	while True:
-		searchStartTime = datetime.datetime.now()
 		photos = Photo.objects.all().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
-		searchEndTime = datetime.datetime.now()
-
+		
 		if len(photos) > 0:
-			milliDiff = ((searchEndTime - searchSearchTime).microseconds / 1000) + ((searchEndTime - searchStartTime).seconds * 1000)
-			logger.debug("Starting a run with %s photos, search took %s milli" % (len(photos), milliDiff))
+			logger.debug("Starting a run with %s photos" % (len(photos)))
 			strandsCreated = list()
 			strandsAddedTo = list()
 			strandsDeleted = 0
@@ -198,12 +195,14 @@ def main(argv):
 			# Used for notifications
 			photoToStrandIdDict = dict()
 			photos = list(photos)
+
 			strandNeighborsToCreate = list()
 
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
 			strandsCache = list(Strand.objects.select_related().filter(first_photo_time__gt=timeLow).filter(last_photo_time__lt=timeHigh))
+
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
@@ -213,7 +212,7 @@ def main(argv):
 				matchingStrands = list()
 				strandNeighbors = list()
 
-				for strand in strandsCache:			
+				for strand in strandsCache:		
 					if strand.shared and strand.users.count() == 0:
 						logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
 						# remove from our cache and db
