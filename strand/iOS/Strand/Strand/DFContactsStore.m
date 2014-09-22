@@ -200,6 +200,15 @@ static DFContactsStore *defaultStore;
   }
 }
 
+- (void)resetStore
+{
+  NSArray *contacts = [self allContacts];
+  for (DFContact *contact in contacts) {
+    [[self context] deleteObject:contact];
+  }
+  [self saveContext];
+}
+
 + (NSURL *)applicationDocumentsDirectory
 {
   return [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];

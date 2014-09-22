@@ -20,6 +20,7 @@
 - (NSArray *)contactsModifiedAfterDate:(NSDate *)date;
 - (DFContact *)createContactWithName:(NSString *)name phoneNumberString:(NSString *)phoneNumberString;
 - (DFContact *)contactWithPhoneNumberString:(NSString *)phoneNumberString;
+- (void)resetStore;
 
 - (void)saveContext;
 
