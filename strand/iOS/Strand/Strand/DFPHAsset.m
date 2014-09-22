@@ -136,31 +136,53 @@
   return self.asset.creationDate;
 }
 
-+ (PHImageRequestOptions *)defaultImageRequestOptions
++ (PHImageRequestOptions *)highQualityImageRequestOptions
 {
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   options.synchronous = NO;
   options.version = PHImageRequestOptionsVersionOriginal;
-  options.resizeMode = PHImageRequestOptionsResizeModeFast;
+  options.resizeMode = PHImageRequestOptionsResizeModeExact;
   options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
   return options;
+}
+
++ (PHImageRequestOptions *)defaultImageRequestOptions
+{
+  return nil;
+}
+
+- (void)loadUIImageForSize:(CGSize)size
+                    contentMode:(PHImageContentMode)contentMode
+              success:(DFPhotoAssetLoadSuccessBlock)successBlock
+                   failure:(DFPhotoAssetLoadFailureBlock)failureBlock
+{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [[PHImageManager defaultManager]
+     requestImageForAsset:self.asset
+     targetSize:size
+     contentMode:contentMode
+     options:[self.class defaultImageRequestOptions]
+     resultHandler:^(UIImage *result, NSDictionary *info) {
+       if (result) {
+//         DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
+//                      @(contentMode),
+//                      NSStringFromCGSize(size),
+//                      NSStringFromCGSize(result.size));
+         successBlock(result);
+       } else {
+         failureBlock(info[PHImageErrorKey]);
+       }
+     }];
+  });
 }
 
 - (void)loadUIImageForFullImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [[PHImageManager defaultManager]
-   requestImageForAsset:self.asset
-   targetSize:PHImageManagerMaximumSize
-   contentMode:PHImageContentModeAspectFill
-   options:[self.class defaultImageRequestOptions]
-   resultHandler:^(UIImage *result, NSDictionary *info) {
-     if (result) {
-       successBlock(result);
-     } else {
-       failureBlock(info[PHImageErrorKey]);
-     }
-   }];
+  [self loadUIImageForSize:PHImageManagerMaximumSize
+               contentMode:PHImageContentModeAspectFill
+                   success:successBlock
+                   failure:failureBlock];
 }
 
 - (void)loadUIImageForThumbnail:(DFPhotoAssetLoadSuccessBlock)successBlock
@@ -175,52 +197,28 @@
                          successBlock:(DFPhotoAssetLoadSuccessBlock)successBlock
                          failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [[PHImageManager defaultManager]
-   requestImageForAsset:self.asset
-   targetSize:CGSizeMake(size, size)
-   contentMode:PHImageContentModeAspectFill
-   options:[self.class defaultImageRequestOptions]
-   resultHandler:^(UIImage *result, NSDictionary *info) {
-     if (result) {
-       successBlock(result);
-     } else {
-       failureBlock(info[PHImageErrorKey]);
-     }
-   }];
+  [self loadUIImageForSize:CGSizeMake(size, size)
+               contentMode:PHImageContentModeAspectFill
+                   success:successBlock
+                   failure:failureBlock];
 }
 
 - (void)loadHighResImage:(DFPhotoAssetLoadSuccessBlock)successBlock
             failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [[PHImageManager defaultManager]
-   requestImageForAsset:self.asset
-   targetSize:CGSizeMake(DFPhotoAssetHighQualitySize, DFPhotoAssetHighQualitySize)
-   contentMode:PHImageContentModeAspectFit
-   options:[self.class defaultImageRequestOptions]
-   resultHandler:^(UIImage *result, NSDictionary *info) {
-     if (result) {
-       successBlock(result);
-     } else {
-       failureBlock(info[PHImageErrorKey]);
-     }
-   }];
+  [self loadUIImageForSize:CGSizeMake(DFPhotoAssetHighQualitySize, DFPhotoAssetHighQualitySize)
+               contentMode:PHImageContentModeAspectFit
+                   success:successBlock
+                   failure:failureBlock];
 }
 
 - (void)loadFullScreenImage:(DFPhotoAssetLoadSuccessBlock)successBlock
                failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
-  [[PHImageManager defaultManager]
-   requestImageForAsset:self.asset
-   targetSize:[[UIScreen mainScreen] bounds].size
-   contentMode:PHImageContentModeAspectFit
-   options:[self.class defaultImageRequestOptions]
-   resultHandler:^(UIImage *result, NSDictionary *info) {
-     if (result) {
-       successBlock(result);
-     } else {
-       failureBlock(info[PHImageErrorKey]);
-     }
-   }];
+  [self loadUIImageForSize:[[UIScreen mainScreen] bounds].size
+               contentMode:PHImageContentModeAspectFit
+                   success:successBlock
+                   failure:failureBlock];
 }
 - (void)loadImageResizedToLength:(CGFloat)length
                          success:(DFPhotoAssetLoadSuccessBlock)success
@@ -229,19 +227,10 @@
   CGRect aspectRect = [DFCGRectHelpers
                        aspectFittedSize:CGSizeMake(self.asset.pixelWidth, self.asset.pixelHeight)
                        max:CGRectMake(0, 0, length, length)];
-  
-  [[PHImageManager defaultManager]
-   requestImageForAsset:self.asset
-   targetSize:aspectRect.size
-   contentMode:PHImageContentModeAspectFit
-   options:[self.class defaultImageRequestOptions]
-   resultHandler:^(UIImage *result, NSDictionary *info) {
-     if (result) {
-       success(result);
-     } else {
-       failure(info[PHImageErrorKey]);
-     }
-   }];
+  [self loadUIImageForSize:aspectRect.size
+               contentMode:PHImageContentModeAspectFit
+                   success:success
+                   failure:failure];
 }
 
 // Access image data.  Blocking call, avoid on main thread.

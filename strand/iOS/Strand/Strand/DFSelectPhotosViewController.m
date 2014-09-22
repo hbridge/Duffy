@@ -229,7 +229,6 @@ CGFloat const ToFieldHeight = 44.0;
     //if ([self.collectionView.visibleCells containsObject:cell]) {
     dispatch_async(dispatch_get_main_queue(), ^{
       cell.imageView.image = image;
-      [cell setNeedsLayout];
     });
     //}
   } failureBlock:^(NSError *error) {
