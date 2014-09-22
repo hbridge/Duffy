@@ -210,6 +210,7 @@ static int NumChangesFlushThreshold = 100;
       PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
       for (PHAsset *asset in assets) {
         if (self.isCancelled) return self.allObjectIDsToChanges;
+        if (asset.mediaType != PHAssetMediaTypeImage) continue;
         assetCount++;
         [self scanPHAssetForChange:asset];
       }
