@@ -422,19 +422,17 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     if (error) {
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
+      dispatch_async(dispatch_get_main_queue(), ^{
       DFPeanutObjectsResponse *lastResponse = self.suggestedResponse;
       self.suggestedResponse = response;
       
       if (![responseHash isEqual:self.lastResponseHash]) {
         DDLogDebug(@"New data for suggestions, updating view...");
-        dispatch_async(dispatch_get_main_queue(), ^{
           [self updateTableViewForOldResponse:lastResponse newResponse:response];
-        });
         self.lastResponseHash = responseHash;
       } else {
         DDLogDebug(@"Got back response for strand suggestions but it was the same");
       }
-      dispatch_async(dispatch_get_main_queue(), ^{
         [self.refreshControl endRefreshing];
       });
     }
