@@ -25,6 +25,7 @@
 #import "DFPeanutUserObject.h"
 #import "DFActivityFeedTableViewCell.h"
 #import "UIDevice+DFHelpers.h"
+#import "NSArray+DFHelpers.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -516,6 +517,13 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     }
   }
   
+  NSArray *idsOfObjectsWithChanges = [self idsOfObjectsWithMetadataChanges:oldResponse
+                                                               newResponse:newResponse];
+  NSArray *ipsOfObjectsWithChanges =
+  [idsOfObjectsWithChanges arrayByMappingObjectsWithBlock:^id(id input) {
+    return newIDsToIPs[input];
+  }];
+  
   // tell the table view update the table view with changes
   [self.tableView beginUpdates];
   [self.tableView deleteRowsAtIndexPaths:deletedIPs.allObjects withRowAnimation:UITableViewRowAnimationNone];
@@ -523,6 +531,10 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   for (NSNumber *idNum in movedIDs) {
     [self.tableView moveRowAtIndexPath:oldIDsToIPs[idNum] toIndexPath:newIDsToIPs[idNum]];
   }
+  
+  [self.tableView reloadRowsAtIndexPaths:ipsOfObjectsWithChanges
+                          withRowAnimation:UITableViewRowAnimationNone];
+
   
   [self.tableView endUpdates];
 }
@@ -536,6 +548,30 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     IDsToIPs[@(object.id)] = [NSIndexPath indexPathForRow:i inSection:section];
   }
   return IDsToIPs;
+}
+
+- (NSArray *)idsOfObjectsWithMetadataChanges:(DFPeanutObjectsResponse *)oldResponse
+                                 newResponse:(DFPeanutObjectsResponse *)newResponse
+{
+  NSDictionary *oldIDsToTitles = [self mapIDsToTitles:oldResponse];
+  NSDictionary *newIDsToTitles = [self mapIDsToTitles:newResponse];
+  
+  NSMutableArray *idsOfChangedObjects = [NSMutableArray new];
+  for (NSNumber *idNum in oldIDsToTitles.allKeys) {
+    if (![oldIDsToTitles[idNum] isEqual:newIDsToTitles[idNum]]) {
+      [idsOfChangedObjects addObject:idNum];
+    }
+  }
+  return idsOfChangedObjects;
+}
+
+- (NSDictionary *)mapIDsToTitles:(DFPeanutObjectsResponse *)response
+{
+  NSMutableDictionary *IDsToTitles = [NSMutableDictionary new];
+  for (DFPeanutFeedObject *feedObject in response.objects) {
+    IDsToTitles[@(feedObject.id)] = feedObject.title;
+  }
+  return IDsToTitles;
 }
 
 - (void)cancelPressed:(id)sender

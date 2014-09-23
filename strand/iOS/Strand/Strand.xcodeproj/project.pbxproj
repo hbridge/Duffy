@@ -66,6 +66,7 @@
 		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
 		5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */; };
 		5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */; };
+		5A6E4D7B19D20A51002CB0A2 /* NSArray+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */; };
 		5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */; };
 		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
 		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
@@ -325,6 +326,8 @@
 		5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContactAdapter.m; sourceTree = "<group>"; };
 		5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactSyncManager.h; sourceTree = "<group>"; };
 		5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactSyncManager.m; sourceTree = "<group>"; };
+		5A6E4D7919D20A51002CB0A2 /* NSArray+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+DFHelpers.h"; sourceTree = "<group>"; };
+		5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DFHelpers.m"; sourceTree = "<group>"; };
 		5A6E8B6C19CA323500870423 /* DFSMSInviteStrandComposeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSInviteStrandComposeViewController.h; sourceTree = "<group>"; };
 		5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSInviteStrandComposeViewController.m; sourceTree = "<group>"; };
 		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
@@ -740,6 +743,8 @@
 				5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */,
 				5A7B817019D07AEA00758AC0 /* UIDevice+DFHelpers.h */,
 				5A7B817119D07AEA00758AC0 /* UIDevice+DFHelpers.m */,
+				5A6E4D7919D20A51002CB0A2 /* NSArray+DFHelpers.h */,
+				5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -1614,6 +1619,7 @@
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
 				5A0E12361975C1C600B6FF04 /* DFDefaultsStore.m in Sources */,
+				5A6E4D7B19D20A51002CB0A2 /* NSArray+DFHelpers.m in Sources */,
 				5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */,
 				5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */,
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
