@@ -14,8 +14,6 @@ from django.template import RequestContext, loader
 from django.db.models import Q, Count, Max
 from django.db import connection
 
-from haystack.query import SearchQuerySet
-
 from peanut.settings import constants
 
 from common.models import Photo, User, Classification, NotificationLog, Strand, Action
@@ -94,11 +92,6 @@ def userbaseSummary(request):
 				entry['classifications'] = 0
 				
 			entry['faces'] = user.faceCount*100/user.totalCount
-
-			# Search results count
-			searchResults = SearchQuerySet().all().filter(userId=user.id)
-			entry['resultsCount'] = searchResults.count()*100/user.totalCount
-
 
 			entry['internal'] = False
 
