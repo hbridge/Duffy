@@ -153,12 +153,14 @@
               success:(DFPhotoAssetLoadSuccessBlock)successBlock
                    failure:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
+  // Cache the asset on the calling thread because self.asset accesses core data
+  PHAsset *asset = self.asset;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     [[PHImageManager defaultManager]
-     requestImageForAsset:self.asset
+     requestImageForAsset:asset
      targetSize:size
      contentMode:contentMode
-     options:[self.class defaultImageRequestOptions]
+     options:[DFPHAsset defaultImageRequestOptions]
      resultHandler:^(UIImage *result, NSDictionary *info) {
        if (result) {
          DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",

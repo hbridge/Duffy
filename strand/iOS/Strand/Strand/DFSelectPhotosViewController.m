@@ -464,9 +464,9 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     }
     [[DFPhotoStore sharedStore] saveContext];
     [[DFUploadController sharedUploadController] uploadPhotos];
+
+    [self cachePhotosInImageStore:photoIDs];
   });
-  
-  [self cachePhotosInImageStore:photoIDs];
 }
 
 - (void)cachePhotosInImageStore:(NSArray *)photoIDs
