@@ -184,6 +184,7 @@
   
   DFActivityFeedViewController *strandsFeedViewCotnroller = [[DFActivityFeedViewController alloc] init];
   DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
+  createViewController.showAsFirstTimeSetup = YES;
   // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
