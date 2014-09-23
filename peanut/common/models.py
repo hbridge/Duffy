@@ -614,7 +614,7 @@ class Action(models.Model):
 @receiver(post_save, sender=Action)
 def sendNotificationsUponActions(sender, **kwargs):
 	action = kwargs.get('instance')
-	users = action.strand.users.all()
+	users = list(action.strand.users.all())
 	users = set(users.append(action.user))
 
 	# First send to sockets
