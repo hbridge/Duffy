@@ -183,8 +183,10 @@ def main(argv):
 	while True:
 		photos = Photo.objects.all().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
 		
+		a = datetime.datetime.now()
 		if len(photos) > 0:
-			logger.debug("Starting a run with %s photos" % (len(photos)))
+			b = datetime.datetime.now()
+			logger.debug("Starting a run with %s photos, took %s milli" % (len(photos), ((b-a).microseconds/1000) + (b-a).seconds*1000))
 			strandsCreated = list()
 			strandsAddedTo = list()
 			strandsDeleted = 0
@@ -316,7 +318,6 @@ def main(argv):
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 
 			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(strandNeighborsToCreate)))
-
 		else:
 			time.sleep(.1)
 

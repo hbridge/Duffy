@@ -482,7 +482,7 @@ def getInviteObjectsDataForUser(user):
 				shouldShowInvite = False
 
 		if shouldShowInvite:
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user)}
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': "invited you to a Strand", 'actors': getActorsObjectData(strandInvite.user, 'time_stamp': strandInvite.added)}
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
 			"""
