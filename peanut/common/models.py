@@ -6,7 +6,7 @@ import logging
 from django.contrib.gis.db import models
 from django.template.defaultfilters import escape
 from django.core.urlresolvers import reverse
-from django.db.models.signals import pre_delete
+from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 
 from phonenumber_field.modelfields import PhoneNumberField
@@ -610,5 +610,18 @@ class Action(models.Model):
 		
 	class Meta:
 		db_table = 'strand_action'
+
+	def save(self):
+
+@receiver(post_save, sender=Action)
+def sendNotificationsUponActions(sender, **kwargs):
+	action = kwargs.get('instance')
+	users = action.strand.users.all()
+	users = set(users.append(action.user))
+
+	# First send to sockets
+	for user in users:
+		logger.debug("Sending refresh feed to user %s from action_save" % (user.id))
+		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
 
 
