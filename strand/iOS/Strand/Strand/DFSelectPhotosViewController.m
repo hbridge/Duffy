@@ -90,8 +90,15 @@
   // configure the token field
   self.tokenField = [[VENTokenField alloc] initWithFrame:self.searchBarWrapperView.bounds];
   self.tokenField.maxHeight = self.searchBarWrapperView.bounds.size.height;
+  
+  NSArray *actors = nil;
+  if (self.suggestedSectionObject && self.suggestedSectionObject.actors.count > 0) {
+    actors = self.suggestedSectionObject.actors;
+  }
+  
   self.peoplePicker = [[DFPeoplePickerViewController alloc]
                        initWithTokenField:self.tokenField
+                       withPeanutUsers:actors
                        tableView:self.tableView];
   self.peoplePicker.allowsMultipleSelection = YES;
   self.peoplePicker.delegate = self;
