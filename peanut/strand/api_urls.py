@@ -8,7 +8,7 @@ from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
 from common.models import User, ContactEntry, Strand, StrandInvite, Action
-from common.serializers import UserSerializer, StrandSerializer
+from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
