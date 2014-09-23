@@ -326,7 +326,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   for (NSNumber *photoID in idsToShow) {
     DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
     if (photo) {
-      [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
+      [photo.asset
+       loadUIImageForThumbnailOfSize:cell.flowLayout.itemSize.height
+       successBlock:^(UIImage *image) {
         [cell setImage:image forObject:photoID];
       } failureBlock:^(NSError *error) {
         DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);

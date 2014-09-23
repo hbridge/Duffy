@@ -21,8 +21,6 @@
 #import "Strand-Swift.h"
 #import "DFPushNotificationsManager.h"
 
-CGFloat const ToFieldHeight = 44.0;
-
 @interface DFSelectPhotosViewController ()
 
 @property (nonatomic, retain) NSArray *suggestedPhotoObjects;
@@ -91,7 +89,7 @@ CGFloat const ToFieldHeight = 44.0;
 {
   // configure the token field
   self.tokenField = [[VENTokenField alloc] initWithFrame:self.searchBarWrapperView.bounds];
-  self.tokenField.maxHeight = ToFieldHeight;
+  self.tokenField.maxHeight = self.searchBarWrapperView.bounds.size.height;
   self.peoplePicker = [[DFPeoplePickerViewController alloc]
                        initWithTokenField:self.tokenField
                        tableView:self.tableView];

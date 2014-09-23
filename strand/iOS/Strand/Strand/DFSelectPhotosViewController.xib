@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -19,7 +20,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="Km3-sv-lcM">
-                    <rect key="frame" x="0.0" y="44" width="320" height="524"/>
+                    <rect key="frame" x="0.0" y="67" width="320" height="501"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <gestureRecognizers/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="4" minimumInteritemSpacing="4" id="naL-ru-Sc5">
@@ -32,24 +33,25 @@
                     <connections>
                         <outlet property="dataSource" destination="-1" id="0bA-3a-A8s"/>
                         <outlet property="delegate" destination="-1" id="4gh-u4-v64"/>
+                        <outletCollection property="gestureRecognizers" destination="GuV-Bk-Wrl" appends="YES" id="9Gb-eX-bSg"/>
                     </connections>
                 </collectionView>
                 <tableView hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="U6o-km-SAy">
-                    <rect key="frame" x="0.0" y="44" width="320" height="524"/>
+                    <rect key="frame" x="0.0" y="67" width="320" height="501"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </tableView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bEr-Bw-A3D" userLabel="searchBarWrapper">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
-                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="66"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="44" id="ZXZ-U3-IAj"/>
+                        <constraint firstAttribute="height" constant="66" id="ZXZ-U3-IAj"/>
                     </constraints>
                 </view>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
             <gestureRecognizers/>
             <constraints>
-                <constraint firstItem="U6o-km-SAy" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="bottom" id="3No-zD-1wR"/>
+                <constraint firstItem="U6o-km-SAy" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="bottom" constant="1" id="3No-zD-1wR"/>
                 <constraint firstAttribute="trailing" secondItem="U6o-km-SAy" secondAttribute="trailing" id="DLm-Ie-osq"/>
                 <constraint firstItem="Km3-sv-lcM" firstAttribute="leading" secondItem="XUO-Rl-pFv" secondAttribute="leading" id="J8Y-8Z-HwF"/>
                 <constraint firstItem="Km3-sv-lcM" firstAttribute="top" secondItem="XUO-Rl-pFv" secondAttribute="top" priority="900" id="QeW-JZ-Seq"/>
@@ -57,13 +59,26 @@
                 <constraint firstAttribute="trailing" secondItem="Km3-sv-lcM" secondAttribute="trailing" id="W95-Hz-mci"/>
                 <constraint firstItem="bEr-Bw-A3D" firstAttribute="leading" secondItem="XUO-Rl-pFv" secondAttribute="leading" id="XBP-5H-KAP"/>
                 <constraint firstAttribute="bottom" secondItem="U6o-km-SAy" secondAttribute="bottom" id="j8t-Zy-Yi5"/>
-                <constraint firstItem="Km3-sv-lcM" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="bottom" id="pcS-yA-bQm"/>
+                <constraint firstItem="Km3-sv-lcM" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="bottom" constant="1" id="pcS-yA-bQm"/>
                 <constraint firstAttribute="bottom" secondItem="Km3-sv-lcM" secondAttribute="bottom" id="qOs-hu-zwc"/>
                 <constraint firstItem="bEr-Bw-A3D" firstAttribute="top" secondItem="XUO-Rl-pFv" secondAttribute="top" id="rG4-q8-z3x"/>
                 <constraint firstAttribute="trailing" secondItem="bEr-Bw-A3D" secondAttribute="trailing" id="xhH-ag-P1h"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
+            <connections>
+                <outletCollection property="gestureRecognizers" destination="vZE-Ug-Ivo" appends="YES" id="tRP-Mz-cmG"/>
+            </connections>
         </view>
+        <tapGestureRecognizer cancelsTouchesInView="NO" id="GuV-Bk-Wrl">
+            <connections>
+                <action selector="collectionViewTapped:" destination="-1" id="Oy3-AZ-ise"/>
+            </connections>
+        </tapGestureRecognizer>
+        <panGestureRecognizer minimumNumberOfTouches="1" id="vZE-Ug-Ivo">
+            <connections>
+                <action selector="collectionViewTapped:" destination="-1" id="Mga-8l-PTt"/>
+            </connections>
+        </panGestureRecognizer>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>

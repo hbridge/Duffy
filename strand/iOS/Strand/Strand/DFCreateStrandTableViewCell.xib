@@ -113,6 +113,7 @@
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <connections>
                 <outlet property="collectionView" destination="KC9-o9-x02" id="hRG-bJ-Jqd"/>
+                <outlet property="flowLayout" destination="gI2-1t-GGm" id="yvc-My-Rsw"/>
                 <outlet property="invitedText" destination="adG-vZ-Sef" id="M8g-Hw-jj6"/>
                 <outlet property="inviterLabel" destination="aLK-2v-mHU" id="IQb-g4-NA7"/>
                 <outlet property="locationLabel" destination="Ewq-Po-McN" id="2eG-Au-9Ow"/>
@@ -120,7 +121,7 @@
                 <outlet property="solidBackground" destination="IQa-9y-K0P" id="0tm-qs-mlw"/>
                 <outlet property="timeLabel" destination="MJw-rI-6rQ" id="xFN-Rk-bpE"/>
             </connections>
-            <point key="canvasLocation" x="140" y="133"/>
+            <point key="canvasLocation" x="320" y="262.5"/>
         </tableViewCell>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
