@@ -155,7 +155,7 @@ static int NumChangesFlushThreshold = 100;
   
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
-  DDLogDebug(@"Starting camera roll in findChanges");
+  DDLogDebug(@"%@ finding ALAssetChanges", self.class);
   NSDate *startDate = [NSDate date];
   // scan camera roll
   ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
@@ -196,7 +196,7 @@ static int NumChangesFlushThreshold = 100;
   
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
-  DDLogDebug(@"Starting camera roll in findChanges");
+  DDLogDebug(@"%@ finding PHAssetChanges", self.class);
   NSDate *startDate = [NSDate date];
   
   //enumerate PHAssets
