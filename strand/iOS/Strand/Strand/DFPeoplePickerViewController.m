@@ -14,6 +14,7 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFAnalytics.h"
 #import "DFUser.h"
+#import "DFPeanutUserObject.h"
 #import "DFABResultTableViewCell.h"
 
 
@@ -39,12 +40,26 @@
 
 - (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView
 {
+  return [self initWithTokenField:tokenField withPeanutUsers:nil tableView:tableView];
+}
+
+- (instancetype)initWithTokenField:(VENTokenField *)tokenField withPeanutUsers:(NSArray *)peanutUsers tableView:(UITableView *)tableView
+{
   self = [super init];
   if (self) {
     self.tableView = tableView;
     self.tokenField = tokenField;
     [self configureTableView];
     [self configureTokenField];
+    
+    if (peanutUsers) {
+      for (DFPeanutUserObject *user in peanutUsers) {
+        [self.selectedContacts addObject:[[DFPeanutContact alloc ] initWithPeanutUser:user]];
+      }
+      
+      [self.tokenField reloadData];
+    }
+    
   }
   return self;
 }

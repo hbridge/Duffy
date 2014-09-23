@@ -35,5 +35,7 @@
 @property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
 
 - (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView;
+- (instancetype)initWithTokenField:(VENTokenField *)tokenField withPeanutUsers:(NSArray *)peanutUsers tableView:(UITableView *)tableView;
+
 
 @end

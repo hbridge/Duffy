@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFPeanutObject.h"
+#import "DFPeanutUserObject.h"
 
 #import "RestKit/RestKit.h"
 
@@ -25,4 +26,5 @@ extern DFPeanutContactType DFPeanutContactInvited;
 
 @property (nonatomic, retain) NSString *contact_type;
 
+- (instancetype)initWithPeanutUser:(DFPeanutUserObject *)user;
 @end

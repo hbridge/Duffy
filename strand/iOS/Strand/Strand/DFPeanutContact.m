@@ -28,6 +28,17 @@ DFPeanutContactType DFPeanutContactInvited = @"invited";
   return @[@"id", @"user", @"name", @"phone_number", @"contact_type"];
 }
 
+- (instancetype)initWithPeanutUser:(DFPeanutUserObject *)user
+{
+  self = [super init];
+  if (self) {
+    self.name = user.display_name;
+    self.phone_number = user.phone_number;
+  }
+  return self;
+}
+
+
 - (NSString *)description
 {
   NSDictionary *dictRep = [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
