@@ -34,7 +34,7 @@ INSTALLED_APPS = (
     'common',
     'strand',
     # Added.
-    'haystack',
+    #'haystack',
     'rest_framework',
     'ios_notifications',
 )
@@ -67,7 +67,7 @@ WSGI_APPLICATION = 'peanut.wsgi.application'
 #    }
 #}
 
-
+"""
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
@@ -76,7 +76,7 @@ HAYSTACK_CONNECTIONS = {
         # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },
 }
-
+"""
 #HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 TEMPLATE_CONTEXT_PROCESSORS = (                                       
