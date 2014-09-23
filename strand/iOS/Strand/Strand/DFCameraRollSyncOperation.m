@@ -252,7 +252,7 @@ static int NumChangesFlushThreshold = 100;
     [self flushChanges];
   }
   
-  NSURL *assetURL = [DFPHAsset URLForPHAsset:asset];
+  NSURL *assetURL = [DFPHAsset URLForPHAssetLocalIdentifier:asset.localIdentifier];
   [self.knownNotFoundURLs removeObject:assetURL];
   
   // We have this asset in our DB, see if it matches what we expect

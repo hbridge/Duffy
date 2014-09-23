@@ -17,7 +17,7 @@
 
 + (DFPHAsset *)createWithPHAsset:(PHAsset *)asset
                        inContext:(NSManagedObjectContext *)managedObjectContext;
-+ (NSURL *)URLForPHAsset:(PHAsset *)asset;
++ (NSURL *)URLForPHAssetLocalIdentifier:(NSString *)identifier;
 + (NSString *)localIdentifierFromURL:(NSURL *)url;
 
 @end

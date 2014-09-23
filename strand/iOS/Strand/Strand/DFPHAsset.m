@@ -36,10 +36,10 @@
   return newAsset;
 }
 
-+ (NSURL *)URLForPHAsset:(PHAsset *)asset
++ (NSURL *)URLForPHAssetLocalIdentifier:(NSString *)identifier
 {
     // there is no such thing as a url for a PHAsset, so we make one up
-  NSString *urlString = [NSString stringWithFormat:@"phassets://%@", asset.localIdentifier];
+  NSString *urlString = [NSString stringWithFormat:@"phassets://%@", identifier];
   return [NSURL URLWithString:urlString];
 }
 
@@ -59,7 +59,7 @@
 
 - (NSURL*) canonicalURL
 {
-  return [self.class URLForPHAsset:self.asset];
+  return [self.class URLForPHAssetLocalIdentifier:self.localIdentifier];
 }
 
 // This gets pulled from the storedMetadata if it exists, if not pulls from asset
