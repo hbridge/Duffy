@@ -494,8 +494,8 @@ class FriendConnection(models.Model):
 class Strand(models.Model):
 	first_photo_time = models.DateTimeField(db_index=True)
 	last_photo_time = models.DateTimeField(db_index=True)
-	photos = models.ManyToManyField(Photo, through='StrandPhotoMembership')
-	users = models.ManyToManyField(User, through='StrandUserMembership')
+	photos = models.ManyToManyField(Photo)
+	users = models.ManyToManyField(User)
 	shared = models.BooleanField(default=True, db_index=True)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	added = models.DateTimeField(auto_now_add=True)
@@ -553,22 +553,6 @@ class Strand(models.Model):
 
 	class Meta:
 		db_table = 'strand_objects'
-
-class StrandPhotoMembership(models.Model):
-	strand = models.ForeignKey(Strand)
-	photo = models.ForeignKey(Photo)
-	added = models.DateTimeField(auto_now_add=True)
-
-	class Meta:
-		db_table = 'strand_objects_photos'
-
-class StrandUserMembership(models.Model):
-	strand = models.ForeignKey(Strand)
-	user = models.ForeignKey(User)
-	added = models.DateTimeField(auto_now_add=True)
-
-	class Meta:
-		db_table = 'strand_objects_users'
 
 class StrandInvite(models.Model):
 	strand = models.ForeignKey(Strand, db_index=True)
