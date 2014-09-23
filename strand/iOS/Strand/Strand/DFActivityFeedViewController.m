@@ -129,18 +129,27 @@ didFinishServerFetchWithError:(NSError *)error
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  CGFloat height;
+  NSUInteger numRows = 0;
   DFPeanutFeedObject *activityObject = self.feedObjects[indexPath.row];
   if ([activityObject.type isEqualToString:DFFeedObjectLikeAction]
       || [activityObject.type isEqual:DFFeedObjectStrandJoin]) {
-    return ActivityFeedTableViewCellNoCollectionViewHeight;
+
+    height = ActivityFeedTableViewCellNoCollectionViewHeight;
+  } else {
+    DFPeanutFeedObject *strandObject = activityObject.objects.firstObject;
+    numRows = ceil((float)MIN(4,strandObject.objects.count)/2.0);
+    
+    height = ActivityFeedTableViewCellNoCollectionViewHeight
+    + numRows * ActivtyFeedTableViewCellCollectionViewRowHeight
+    + (numRows - 1) * ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
   }
-  
-  DFPeanutFeedObject *strandObject = activityObject.objects.firstObject;
-  NSUInteger numRows = ceil((float)MIN(4,strandObject.objects.count)/2.0);
-  
-  return ActivityFeedTableViewCellNoCollectionViewHeight
-  + numRows * ActivtyFeedTableViewCellCollectionViewRowHeight
-  + (numRows - 1) * ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
+  DDLogVerbose(@"IP: %@ is type %@ numRows:%d height :%.01f",
+               indexPath,
+               activityObject.type,
+               (int)numRows,
+               height);
+  return height;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
