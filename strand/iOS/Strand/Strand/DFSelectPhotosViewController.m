@@ -322,9 +322,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
       performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
       success:^(DFPeanutStrand *peanutStrand) {
         DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
-        [SVProgressHUD showSuccessWithStatus:@"Success!"];
-        [self.tabBarController setSelectedIndex:0];
-        [self.navigationController popViewControllerAnimated:NO];
         
         // mark the selected photos for upload
         [self markPhotosForUpload:self.selectedPhotoIDs];
@@ -335,8 +332,13 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
           [strandInviteAdapter
            markInviteWithIDUsed:@(self.inviteObject.id)
            success:^(NSArray *resultObjects) {
+             [SVProgressHUD showSuccessWithStatus:@"Success!"];
+             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+               [self.navigationController popViewControllerAnimated:NO];
+             });
              DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
            } failure:^(NSError *error) {
+             [SVProgressHUD showErrorWithStatus:@"Error."];
              DDLogWarn(@"Failed to mark invite used: %@", error);
            }];
         }
