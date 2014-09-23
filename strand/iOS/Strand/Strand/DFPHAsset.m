@@ -104,20 +104,16 @@
 {
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   options.synchronous = YES;
-  options.version = PHImageRequestOptionsVersionOriginal;
-  options.resizeMode = PHImageRequestOptionsResizeModeFast;
   
-  UIImage __block *imageResult;
+  NSData __block *resultImageData;
   [[PHImageManager defaultManager]
-   requestImageForAsset:self.asset
-   targetSize:CGSizeMake(DFPhotoAssetDefaultThumbnailSize, DFPhotoAssetDefaultThumbnailSize)
-   contentMode:PHImageContentModeAspectFill
+   requestImageDataForAsset:self.asset
    options:options
-   resultHandler:^(UIImage *result, NSDictionary *info) {
-     imageResult = result;
+   resultHandler:^(NSData *imageData, NSString *dataUTI, UIImageOrientation orientation, NSDictionary *info) {
+     resultImageData = imageData;
    }];
   
-  NSString *hash = [DFDataHasher hashStringForHashData:[DFDataHasher hashDataForUIImage:imageResult]];
+  NSString *hash = [DFDataHasher hashStringForHashData:[DFDataHasher hashDataForData:resultImageData]];
   return hash;
 }
 
