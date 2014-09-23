@@ -24,6 +24,7 @@
 
 @property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
+@property (nonatomic, retain) NSData *lastResponseHash;
 
 @end
 
@@ -60,12 +61,16 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [self reloadData];
+  if (!self.lastResponseHash) {
+    [self.refreshControl beginRefreshing];
+  }
 }
 
 - (void)configureRefreshControl
 {
   self.refreshControl = [[UIRefreshControl alloc] init];
-  [self.refreshControl addTarget:self action:@selector(reloadData)
+  [self.refreshControl addTarget:self
+                          action:@selector(reloadData)
                 forControlEvents:UIControlEventValueChanged];
 }
 
@@ -91,28 +96,23 @@
 
 - (void)reloadData
 {
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self.feedAdapter
    fetchStrandActivityWithCompletion:^(DFPeanutObjectsResponse *response,
                                        NSData *responseHash,
                                        NSError *error) {
-     if (!error) {
+     if (!error && ![responseHash isEqual:self.lastResponseHash]) {
+       self.lastResponseHash = responseHash;
        dispatch_async(dispatch_get_main_queue(), ^{
          _feedObjects = response.objects;
          [self.tableView reloadData];
        });
      }
-     [self.refreshControl endRefreshing];
+     dispatch_async(dispatch_get_main_queue(), ^{
+       [self.refreshControl endRefreshing];
+       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+     });
    }];
-}
-
-
-#pragma mark - DFStrandsViewControllerDelegate
-
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController
-didFinishServerFetchWithError:(NSError *)error
-{
-  // Turn off spinner since we successfully did a server fetch
-  [self.refreshControl endRefreshing];
 }
 
 #pragma mark - Table view data source
