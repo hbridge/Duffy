@@ -138,7 +138,6 @@
 {
   PHImageRequestOptions *options = [PHImageRequestOptions new];
   options.synchronous = NO;
-  options.version = PHImageRequestOptionsVersionOriginal;
   options.resizeMode = PHImageRequestOptionsResizeModeExact;
   options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
   return options;
@@ -146,7 +145,7 @@
 
 + (PHImageRequestOptions *)defaultImageRequestOptions
 {
-  return nil;
+  return [self highQualityImageRequestOptions];
 }
 
 - (void)loadUIImageForSize:(CGSize)size
@@ -162,10 +161,10 @@
      options:[self.class defaultImageRequestOptions]
      resultHandler:^(UIImage *result, NSDictionary *info) {
        if (result) {
-//         DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
-//                      @(contentMode),
-//                      NSStringFromCGSize(size),
-//                      NSStringFromCGSize(result.size));
+         DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
+                      @(contentMode),
+                      NSStringFromCGSize(size),
+                      NSStringFromCGSize(result.size));
          successBlock(result);
        } else {
          failureBlock(info[PHImageErrorKey]);
