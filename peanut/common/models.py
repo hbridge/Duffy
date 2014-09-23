@@ -611,8 +611,6 @@ class Action(models.Model):
 	class Meta:
 		db_table = 'strand_action'
 
-	def save(self):
-
 @receiver(post_save, sender=Action)
 def sendNotificationsUponActions(sender, **kwargs):
 	action = kwargs.get('instance')
