@@ -13,8 +13,10 @@
 #import "ALAsset+DFExtensions.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFPhotoResizer.h"
+#import "DFAssetCache.h"
 
 static ALAssetsLibrary *defaultAssetLibrary;
+const CGFloat DFPhotoAssetALAssetThumbnailSize = 157.0;
 
 @interface DFCameraRollPhotoAsset()
 
@@ -76,28 +78,30 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 - (ALAsset *)asset
 {
-  //if (!_asset) {
-  ALAsset __block *returnAsset;
-  NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
-  ALAssetsLibrary *assetsLibrary = [DFCameraRollPhotoAsset sharedAssetsLibrary];
-  
-  
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
-      returnAsset = asset;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  //}
-  return returnAsset;
-  //return _asset;
+  if (!_asset) {
+    NSURL *assetURL = [NSURL URLWithString:self.alAssetURLString];
+    _asset = [[DFAssetCache sharedCache] assetForURL:assetURL];
+    if (_asset) return _asset;
+    
+    NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
+    ALAssetsLibrary *assetsLibrary = [DFCameraRollPhotoAsset sharedAssetsLibrary];
+    
+    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+    
+    // must dispatch this off the main thread or it will deadlock!
+    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+      [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
+        _asset = asset;
+        [[DFAssetCache sharedCache] setALAsset:asset forURL:assetURL];
+        dispatch_semaphore_signal(sema);
+      } failureBlock:^(NSError *error) {
+        dispatch_semaphore_signal(sema);
+      }];
+    });
+    
+    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+  }
+  return _asset;
 }
 
 - (NSURL *)canonicalURL
@@ -127,46 +131,6 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 #pragma mark - Image Accessors
 
-- (UIImage *)thumbnail
-{
-  UIImage __block *loadedThumbnail;
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // Synchronously load the thunbnail
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [self loadUIImageForThumbnail:^(UIImage *thumbnailImage) {
-      loadedThumbnail = thumbnailImage;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  
-  return  loadedThumbnail;
-}
-
-- (UIImage *)fullResolutionImage
-{
-  UIImage __block *loadedFullImage;
-  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-  
-  // Synchronously load the thunbnail
-  // must dispatch this off the main thread or it will deadlock!
-  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    [self loadUIImageForFullImage:^(UIImage *image) {
-      loadedFullImage = image;
-      dispatch_semaphore_signal(sema);
-    } failureBlock:^(NSError *error) {
-      dispatch_semaphore_signal(sema);
-    }];
-  });
-  
-  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  return loadedFullImage;
-}
 
 - (UIImage *)imageResizedToLength:(CGFloat)length
 {
@@ -197,6 +161,13 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
                          successBlock:(DFPhotoAssetLoadSuccessBlock)successBlock
                          failureBlock:(DFPhotoAssetLoadFailureBlock)failureBlock
 {
+  if (size == DFPhotoAssetALAssetThumbnailSize) {
+    // if the requested size is the default size (157) return that, as it's optimized
+    [self loadUIImageForThumbnail:successBlock failureBlock:failureBlock];
+    return;
+  }
+  
+  DDLogWarn(@"Warning: gloadUIImageForThumbnailOfSize on DFCameraRollAsset.  Performance will suffer.");
   if (self.asset) {
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
       @autoreleasepool {

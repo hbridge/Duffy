@@ -20,7 +20,7 @@
 #import "ALAsset+DFExtensions.h"
 #import "UIDevice+DFHelpers.h"
 #import "DFPHAsset.h"
-#import "DFPHAssetCache.h"
+#import "DFAssetCache.h"
 
 static int NumChangesFlushThreshold = 100;
 
@@ -222,7 +222,7 @@ static int NumChangesFlushThreshold = 100;
         if (self.isCancelled) return self.allObjectIDsToChanges;
         if (asset.mediaType != PHAssetMediaTypeImage) continue;
         assetCount++;
-        [[DFPHAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
+        [[DFAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
         [self scanPHAssetForChange:asset];
       }
     }

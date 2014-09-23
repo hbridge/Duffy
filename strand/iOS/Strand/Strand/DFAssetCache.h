@@ -8,11 +8,15 @@
 
 #import <Foundation/Foundation.h>
 #import <Photos/Photos.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 
-@interface DFPHAssetCache : NSObject
+@interface DFAssetCache : NSObject
 
-+ (DFPHAssetCache *)sharedCache;
++ (DFAssetCache *)sharedCache;
 - (PHAsset *)assetForLocalIdentifier:(NSString *)localIdentifier;
 - (void)setAsset:(PHAsset *)asset forIdentifier:(NSString *)identifier;
+
+- (void)setALAsset:(ALAsset *)asset forURL:(NSURL *)url;
+- (ALAsset *)assetForURL:(NSURL *)url;
 
 @end

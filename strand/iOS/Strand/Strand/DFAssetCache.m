@@ -6,22 +6,23 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPHAssetCache.h"
+#import "DFAssetCache.h"
 
-@interface DFPHAssetCache()
+@interface DFAssetCache()
 
-@property (readonly, atomic, retain) NSMutableDictionary *idsToAssets;
+@property (readonly, atomic, retain) NSMutableDictionary *idsToPHAssets;
+@property (readonly, atomic, retain) NSMutableDictionary *URLsToALAssets;
 
 @end
 
-@implementation DFPHAssetCache
+@implementation DFAssetCache
 
 
-static DFPHAssetCache *defaultCache;
-+ (DFPHAssetCache *)sharedCache
+static DFAssetCache *defaultCache;
++ (DFAssetCache *)sharedCache
 {
   if (!defaultCache) {
-    defaultCache = [[DFPHAssetCache alloc] init];
+    defaultCache = [[DFAssetCache alloc] init];
   }
   return defaultCache;
 }
@@ -30,20 +31,21 @@ static DFPHAssetCache *defaultCache;
 {
   self = [super init];
   if (self) {
-    _idsToAssets = [NSMutableDictionary new];
+    _idsToPHAssets = [NSMutableDictionary new];
+    _URLsToALAssets = [NSMutableDictionary new];
   }
   return self;
 }
 
 - (PHAsset *)assetForLocalIdentifier:(NSString *)localIdentifier
 {
-  PHAsset *asset = self.idsToAssets[localIdentifier];
+  PHAsset *asset = self.idsToPHAssets[localIdentifier];
   if (!asset) {
     PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[localIdentifier]
                                                                   options:nil];
     if (fetchResult.count > 0) {
       asset = fetchResult.firstObject;
-      self.idsToAssets[localIdentifier] = asset;
+      self.idsToPHAssets[localIdentifier] = asset;
     }
   }
   return asset;
@@ -51,7 +53,7 @@ static DFPHAssetCache *defaultCache;
 
 - (void)refresh
 {
-  [self.idsToAssets removeAllObjects];
+  [self.idsToPHAssets removeAllObjects];
   
   PHFetchResult *allMomentsList = [PHCollectionList
                                    fetchMomentListsWithSubtype:PHCollectionListSubtypeMomentListCluster
@@ -62,7 +64,7 @@ static DFPHAssetCache *defaultCache;
     for (PHAssetCollection *assetCollection in collections) {
       PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:nil];
       for (PHAsset *asset in assets) {
-        self.idsToAssets[asset.localIdentifier] = asset;
+        self.idsToPHAssets[asset.localIdentifier] = asset;
       }
     }
   }
@@ -70,7 +72,20 @@ static DFPHAssetCache *defaultCache;
 
 - (void)setAsset:(PHAsset *)asset forIdentifier:(NSString *)identifier
 {
-  self.idsToAssets[identifier] = asset;
+  self.idsToPHAssets[identifier] = asset;
 }
+
+
+
+- (void)setALAsset:(ALAsset *)asset forURL:(NSURL *)url
+{
+  self.URLsToALAssets[url] = asset;
+}
+
+- (ALAsset *)assetForURL:(NSURL *)url
+{
+  return self.URLsToALAssets[url];
+}
+
 
 @end

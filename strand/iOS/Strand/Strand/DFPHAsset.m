@@ -11,7 +11,7 @@
 #import <Photos/Photos.h>
 #import "DFDataHasher.h"
 #import "DFCGRectHelpers.h"
-#import "DFPHAssetCache.h"
+#import "DFAssetCache.h"
 
 @interface DFPHAsset()
 
@@ -51,7 +51,7 @@
 - (PHAsset *)asset
 {
   if (!_asset) {
-    _asset = [[DFPHAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
+    _asset = [[DFAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
   }
   
   return _asset;

@@ -181,7 +181,7 @@
 		5AC4A970194A42EE00862D9C /* DFPeanutObjectsResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A96F194A42EE00862D9C /* DFPeanutObjectsResponse.m */; };
 		5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A972194A434700862D9C /* DFPeanutSuggestion.m */; };
 		5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */; };
-		5AC8B1E819D0D9AC00BAC55F /* DFPHAssetCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8B1E719D0D9AC00BAC55F /* DFPHAssetCache.m */; };
+		5AC8B1E819D0D9AC00BAC55F /* DFAssetCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */; };
 		5ACA38FD1947A67D00834D86 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FC1947A67D00834D86 /* Security.framework */; };
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
@@ -535,8 +535,8 @@
 		5AC4A972194A434700862D9C /* DFPeanutSuggestion.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DFPeanutSuggestion.m; path = DuffyCore/DFPeanutSuggestion.m; sourceTree = "<group>"; };
 		5AC4A974194A4AB900862D9C /* DFPeanutNewPhotosAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNewPhotosAdapter.h; sourceTree = "<group>"; };
 		5AC4A975194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNewPhotosAdapter.m; sourceTree = "<group>"; };
-		5AC8B1E619D0D9AC00BAC55F /* DFPHAssetCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPHAssetCache.h; sourceTree = "<group>"; };
-		5AC8B1E719D0D9AC00BAC55F /* DFPHAssetCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPHAssetCache.m; sourceTree = "<group>"; };
+		5AC8B1E619D0D9AC00BAC55F /* DFAssetCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAssetCache.h; sourceTree = "<group>"; };
+		5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAssetCache.m; sourceTree = "<group>"; };
 		5ACA38FC1947A67D00834D86 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5ACA39001947A6F100834D86 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1121,8 +1121,8 @@
 				5AB32B5B19537A610082F716 /* DFStrandStore.m */,
 				5A0E12341975C1C600B6FF04 /* DFDefaultsStore.h */,
 				5A0E12351975C1C600B6FF04 /* DFDefaultsStore.m */,
-				5AC8B1E619D0D9AC00BAC55F /* DFPHAssetCache.h */,
-				5AC8B1E719D0D9AC00BAC55F /* DFPHAssetCache.m */,
+				5AC8B1E619D0D9AC00BAC55F /* DFAssetCache.h */,
+				5AC8B1E719D0D9AC00BAC55F /* DFAssetCache.m */,
 			);
 			name = Database;
 			sourceTree = "<group>";
@@ -1668,7 +1668,7 @@
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
 				5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */,
 				5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */,
-				5AC8B1E819D0D9AC00BAC55F /* DFPHAssetCache.m in Sources */,
+				5AC8B1E819D0D9AC00BAC55F /* DFAssetCache.m in Sources */,
 				5AAF039A19B112F700EF021C /* DFPeanutStrand.m in Sources */,
 				5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */,
 			);

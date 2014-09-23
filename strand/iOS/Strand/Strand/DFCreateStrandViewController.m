@@ -24,6 +24,7 @@
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
 #import "DFActivityFeedTableViewCell.h"
+#import "UIDevice+DFHelpers.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -326,13 +327,20 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   for (NSNumber *photoID in idsToShow) {
     DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
     if (photo) {
-      [photo.asset
-       loadUIImageForThumbnailOfSize:cell.flowLayout.itemSize.height
-       successBlock:^(UIImage *image) {
-        [cell setImage:image forObject:photoID];
-      } failureBlock:^(NSError *error) {
-        DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
-      }];
+      CGFloat thumbnailSize;
+      if ([UIDevice majorVersionNumber] >= 8) {
+        // only use the larger thumbnails on iOS 8+, the scaling will kill perf on iOS7
+        thumbnailSize = cell.flowLayout.itemSize.height * [[UIScreen mainScreen] scale];
+      } else {
+        thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
+      }
+        [photo.asset
+         loadUIImageForThumbnailOfSize:thumbnailSize
+         successBlock:^(UIImage *image) {
+           [cell setImage:image forObject:photoID];
+         } failureBlock:^(NSError *error) {
+           DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
+         }];
     }
   }
 }
