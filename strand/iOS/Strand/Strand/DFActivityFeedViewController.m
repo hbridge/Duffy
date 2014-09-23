@@ -226,12 +226,16 @@
     [cell.previewImageView removeFromSuperview];
   }
   [self.class resetCell:cell];
+  
+  DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
   cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   cell.profilePhotoStackView.names = inviteObject.actorNames;
   cell.actorLabel.text = [self.class firstActorNameForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
-                                                          abbreviate:NO];
+                                                          abbreviate:YES];
+  cell.subtitleLabel.text = strandObject.title;
+
   [self setRemotePhotosForCell:cell withSection:inviteObject.objects.firstObject];
   
   return cell;
@@ -254,6 +258,9 @@
   cell.actorLabel.text = [self.class firstActorNameForObject:actionObject];
   cell.actionTextLabel.text = actionObject.title;
   
+  //Subtitle (strand name_
+  cell.subtitleLabel.text = actionObject.subtitle;
+  
   // time taken
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:actionObject.time_stamp
                          abbreviate:YES];
@@ -265,6 +272,10 @@
 
 + (void)resetCell:(DFActivityFeedTableViewCell *)cell
 {
+  cell.timeLabel.text = @"T";
+  cell.actorLabel.text = @"Actor";
+  cell.actionTextLabel.text = @"Action";
+  cell.subtitleLabel.text = @"Subtitle";
   cell.objects = @[];
   cell.previewImageView.image = nil;
 }
