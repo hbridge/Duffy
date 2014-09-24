@@ -80,7 +80,7 @@
 {
   self.refreshControl = [[UIRefreshControl alloc] init];
   [self.refreshControl addTarget:self
-                          action:@selector(reloadData)
+                          action:@selector(refreshFromServer)
                 forControlEvents:UIControlEventValueChanged];
 }
 
