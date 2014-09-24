@@ -41,6 +41,7 @@
   
   if (style == DFCreateStrandCellStyleSuggestionNoPeople) {
     [self.peopleLabel removeFromSuperview];
+    [self.peopleExplanationLabel removeFromSuperview];
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
   }
   
