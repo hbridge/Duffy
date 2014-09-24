@@ -19,12 +19,14 @@
 #import "DFCreateStrandViewController.h"
 #import "DFNavigationController.h"
 #import "DFStrandConstants.h"
+#import "MMPopLabel.h"
 
 @interface DFActivityFeedViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
 @property (nonatomic, retain) NSData *lastResponseHash;
+@property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
 
 @end
 
@@ -56,14 +58,22 @@
   [super viewDidLoad];
   [self configureRefreshControl];
   [self configureTableView];
+  [self configurePopLabel];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  [super viewDidAppear:animated];
   [self refreshFromServer];
   if (!self.lastResponseHash) {
     [self.refreshControl beginRefreshing];
   }
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+  [super viewWillDisappear:animated];
+  [self.noItemsPopLabel dismiss];
 }
 
 - (void)configureRefreshControl
@@ -83,6 +93,14 @@
    registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"singleCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
+}
+
+- (void)configurePopLabel
+{
+  self.noItemsPopLabel = [MMPopLabel
+                          popLabelWithText:@"Tap here to share photos and get started"];
+  [self.tabBarController.view addSubview:self.noItemsPopLabel];
+
 }
 
 - (void)didReceiveMemoryWarning
@@ -111,8 +129,31 @@
      dispatch_async(dispatch_get_main_queue(), ^{
        [self.refreshControl endRefreshing];
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+       
+       if (response.objects.count == 0) {
+         [self showCreateBalloon];
+       }
+       
      });
    }];
+}
+
+- (void)showCreateBalloon
+{
+  //create a view over the top portion of the create tab
+  CGFloat dummyWidth = self.tabBarController.tabBar.frame.size.width / 3.0;
+  CGFloat dummyHeight = self.tabBarController.tabBar.frame.size.height / 2.0;
+  UIView *dummyView = [[UIView alloc]
+                       initWithFrame:
+                       CGRectMake(CGRectGetMidX(self.tabBarController.view.frame) - dummyWidth / 2.0,
+                                  CGRectGetMaxY(self.tabBarController.view.frame) -
+                                  self.tabBarController.tabBar.frame.size.height,
+                                  dummyWidth,
+                                  dummyHeight)];
+  dummyView.backgroundColor = [UIColor clearColor];
+  [self.tabBarController.view insertSubview:dummyView belowSubview:self.tabBarController.tabBar];
+  [self.noItemsPopLabel popAtView:dummyView animatePopLabel:YES animateTargetView:NO];
+  [dummyView removeFromSuperview];
 }
 
 #pragma mark - Table view data source
