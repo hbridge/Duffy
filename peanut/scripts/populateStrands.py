@@ -10,7 +10,7 @@ parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
 
-from django.db.models import Count
+from django.db.models import Count, Q
 
 from peanut.settings import constants
 from common.models import Photo, Strand, User, StrandNeighbor
@@ -203,8 +203,7 @@ def main(argv):
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-			strandsCache = list(Strand.objects.select_related().filter(first_photo_time__gt=timeLow).filter(last_photo_time__lt=timeHigh))
-
+			strandsCache = list(Strand.objects.select_related().filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))))
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
