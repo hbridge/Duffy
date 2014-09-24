@@ -443,7 +443,7 @@ def getObjectsDataForActions(user):
 		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
 			title = "shared %s photos" % action.photos.count()
 			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			objects = getObjectsDataForStrands(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
 
 		if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
 			title = "shared %s photos" % action.photos.count()
