@@ -428,6 +428,8 @@ def getObjectsDataForActions(user):
 				title = "liked %s's photo" % action.photo.user.display_name
 			elif action.photo.user.id == user.id:
 				title = "liked your photo"
+			elif action.photo.user.id == action.user.id:
+				title = "liked their photo"
 			else:
 				title = "Unknown"
 				
