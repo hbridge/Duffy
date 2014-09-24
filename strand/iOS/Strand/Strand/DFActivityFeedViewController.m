@@ -251,7 +251,9 @@
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp
                                                           abbreviate:YES];
   // photo preview
-  [self setRemotePhotosForCell:cell withSection:strandObject];
+  [self setRemotePhotosForCell:cell
+                   withSection:strandObject
+   maxPhotos:4];
   
   return cell;
 }
@@ -269,6 +271,8 @@
   return name;
 }
 
+const NSUInteger inviteRowMaxImages = 3;
+
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
@@ -278,12 +282,12 @@
   }
   [self.class resetCell:cell];
   
-  CGFloat numCells = 3.0;
   CGFloat margin = 2;
-  CGFloat size = cell.collectionView.frame.size.width / numCells - margin * numCells;
+  CGFloat size = cell.collectionView.frame.size.width / 3 - margin * 3 - 4.0 * 2;
   cell.flowLayout.itemSize = CGSizeMake(size, size);
   cell.flowLayout.minimumInteritemSpacing = margin;
   cell.flowLayout.minimumLineSpacing = margin;
+  cell.flowLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
   
   DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
   cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
@@ -294,7 +298,9 @@
                                                           abbreviate:YES];
   cell.subtitleLabel.text = strandObject.title;
 
-  [self setRemotePhotosForCell:cell withSection:inviteObject.objects.firstObject];
+  [self setRemotePhotosForCell:cell
+                   withSection:inviteObject.objects.firstObject
+                     maxPhotos:inviteRowMaxImages];
   
   return cell;
 }
@@ -340,11 +346,13 @@
 
 - (void)setRemotePhotosForCell:(DFActivityFeedTableViewCell *)cell
                    withSection:(DFPeanutFeedObject *)section
+                     maxPhotos:(NSUInteger)maxPhotosToFetch
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
   NSMutableArray *photos = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *object in section.objects) {
+  for (NSUInteger i = 0; i < MIN(section.objects.count, maxPhotosToFetch); i++) {
+    DFPeanutFeedObject *object = section.objects[i];
     DFPeanutFeedObject *photoObject;
     if ([object.type isEqual:DFFeedObjectCluster]) {
       photoObject = object.objects.firstObject;
