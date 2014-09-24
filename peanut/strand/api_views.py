@@ -445,13 +445,11 @@ def getObjectsDataForActions(user):
 			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
 			objects = getObjectsDataForStrands(user, [action.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
-		# Don't show added or joined for yourself, only other people
-		if action.user.id != user.id:
-			if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-				title = "shared %s photos" % action.photos.count()
-				feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-				objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
-				objects[0]['title'] = getTitleForStrand(action.strand)
+		if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
+			title = "shared %s photos" % action.photos.count()
+			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
+			objects[0]['title'] = getTitleForStrand(action.strand)
 		
 		if objects:
 			entry = {'type': feedType, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
