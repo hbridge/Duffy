@@ -95,6 +95,7 @@
                 <outlet property="actionTextLabel" destination="Ejx-vN-IUf" id="fez-Pf-gld"/>
                 <outlet property="actorLabel" destination="rlM-Qb-grC" id="gMi-e7-qZA"/>
                 <outlet property="collectionView" destination="Kln-so-NCf" id="Wpj-xa-riQ"/>
+                <outlet property="flowLayout" destination="F9p-PL-bzA" id="QBK-Ne-lOd"/>
                 <outlet property="previewImageView" destination="IEd-zt-0Vr" id="xDx-wF-OZZ"/>
                 <outlet property="profilePhotoStackView" destination="qA2-bH-hjM" id="A3d-AL-505"/>
                 <outlet property="subtitleLabel" destination="kFu-j8-B9v" id="m82-dR-CgV"/>

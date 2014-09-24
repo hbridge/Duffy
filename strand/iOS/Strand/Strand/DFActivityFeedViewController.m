@@ -96,6 +96,9 @@
    forCellReuseIdentifier:@"collectionCell"];
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   forCellReuseIdentifier:@"inviteCell"];
+  [self.tableView
+   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"singleCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
@@ -182,6 +185,8 @@
       || [activityObject.type isEqual:DFFeedObjectStrandJoin]) {
 
     height = ActivityFeedTableViewCellNoCollectionViewHeight;
+  } else if ([activityObject.type isEqual:DFFeedObjectInviteStrand]){
+    height = ActivityFeedTableViewCellNoCollectionViewHeight + 101.0;
   } else {
     DFPeanutFeedObject *strandObject = activityObject.objects.firstObject;
     numRows = ceil((float)MIN(4,strandObject.objects.count)/2.0);
@@ -267,11 +272,18 @@
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
   DFActivityFeedTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:@"collectionCell"];
+                                       dequeueReusableCellWithIdentifier:@"inviteCell"];
   if (cell.previewImageView.superview) {
     [cell.previewImageView removeFromSuperview];
   }
   [self.class resetCell:cell];
+  
+  CGFloat numCells = 3.0;
+  CGFloat margin = 2;
+  CGFloat size = cell.collectionView.frame.size.width / numCells - margin * numCells;
+  cell.flowLayout.itemSize = CGSizeMake(size, size);
+  cell.flowLayout.minimumInteritemSpacing = margin;
+  cell.flowLayout.minimumLineSpacing = margin;
   
   DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
   cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
