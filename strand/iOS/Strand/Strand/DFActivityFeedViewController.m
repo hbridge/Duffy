@@ -138,7 +138,7 @@
        [self.refreshControl endRefreshing];
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
-       if (response.objects.count == 0) {
+       if (response.objects.count == 0 && !error && self.view.window) {
          [self showCreateBalloon];
        }
        
