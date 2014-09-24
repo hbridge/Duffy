@@ -297,6 +297,8 @@ def getStrandNeighborsCache(strands):
 def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	metadata = {'type': feedObjectType, 'title': ""}
 
+	# We are looking at this variable as a temp fix so that a strand id is passed
+	# to the client who can then hand it back.
 	if strand:
 		metadata['id'] = strand.id
 		
