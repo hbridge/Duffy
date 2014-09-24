@@ -535,7 +535,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (void)updateTableViewForOldResponse:(DFPeanutObjectsResponse *)oldResponse
                            newResponse:(DFPeanutObjectsResponse *)newResponse
 {
-  if (!oldResponse || oldResponse.objects.count < 10) {
+  if (!oldResponse || oldResponse.objects.count < 10
+      || !self.view.window || self.tabBarController.selectedViewController != self) {
     [self.tableView reloadData];
     self.reloadBackground.hidden = YES; // immediately hide, don't animate
     return;
