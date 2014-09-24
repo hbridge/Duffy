@@ -165,7 +165,7 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
             thread.start()
             logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
 
-            oldActions = Action.objects.filter(user=strandInvite.accepted_user, strand=strandInvite.strand).order_by("-added")
+            oldActions = list(Action.objects.filter(user=strandInvite.accepted_user, strand=strandInvite.strand).order_by("-added"))
             action = Action(user=strandInvite.accepted_user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
             action.save()
 
