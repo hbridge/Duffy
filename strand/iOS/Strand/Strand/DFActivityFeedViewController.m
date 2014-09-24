@@ -60,7 +60,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  [self reloadData];
+  [self refreshFromServer];
   if (!self.lastResponseHash) {
     [self.refreshControl beginRefreshing];
   }
@@ -94,7 +94,7 @@
 
 #pragma mark - Data Fetch
 
-- (void)reloadData
+- (void)refreshFromServer
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self.feedAdapter

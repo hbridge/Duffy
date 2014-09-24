@@ -161,7 +161,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  if (self.showAsFirstTimeSetup && !self.refreshTimer) {
+  if (self.showAsFirstTimeSetup && !self.refreshTimer && self.suggestedResponse.objects.count == 0) {
     self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:3.0
                                                          target:self
                                                        selector:@selector(refreshFromServer)
