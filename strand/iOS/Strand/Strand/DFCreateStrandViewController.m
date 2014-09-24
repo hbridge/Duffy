@@ -59,7 +59,7 @@ static DFCreateStrandViewController *instance;
 - (IBAction)reloadButtonPressed:(id)sender {
   [self.tableView reloadData];
   self.tableView.contentOffset = CGPointMake(0, 0);
-  self.reloadBackground.hidden = YES;
+  [self setReloadButtonHidden:YES];
 }
 
 + (DFCreateStrandViewController *)sharedViewController
@@ -540,11 +540,29 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   if (!oldResponse || oldResponse.objects.count < 10) {
     [self.tableView reloadData];
-    self.reloadBackground.hidden = YES;
+    self.reloadBackground.hidden = YES; // immediately hide, don't animate
     return;
   }
   
-  self.reloadBackground.hidden = NO;
+  [self setReloadButtonHidden:NO];
+}
+
+- (void)setReloadButtonHidden:(BOOL)hidden
+{
+  if (hidden) {
+    if (self.reloadBackground.hidden || self.reloadBackground.alpha == 0.0) return;
+    [UIView animateWithDuration:0.7 animations:^{
+      self.reloadBackground.alpha = 0.0;
+    } completion:^(BOOL finished) {
+      self.reloadBackground.hidden = YES;
+    }];
+  } else {
+    self.reloadBackground.hidden = NO;
+    self.reloadBackground.alpha = fmax(self.reloadBackground.alpha, 0.0);
+    [UIView animateWithDuration:0.7 animations:^{
+      self.reloadBackground.alpha = 1.0;
+    }];
+  }
 }
 
 - (NSDictionary *)mapIDsToIPs:(DFPeanutObjectsResponse *)response

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -24,33 +25,42 @@
                         <outlet property="delegate" destination="-1" id="FK1-w9-LHY"/>
                     </connections>
                 </tableView>
-                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FCq-o3-f9O">
-                    <rect key="frame" x="69" y="0.0" width="183" height="46"/>
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="FCq-o3-f9O" userLabel="Reload Wrapper">
+                    <rect key="frame" x="69" y="-4" width="183" height="48"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="gzA-Va-82T">
-                            <rect key="frame" x="25" y="12" width="133" height="22"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                            <rect key="frame" x="0.0" y="26" width="183" height="16"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
                             <state key="normal" title=" Tap to Reload" image="Assets/Icons/RefreshButtonIcon">
-                                <color key="titleColor" red="0.098039224743843079" green="0.58039218187332153" blue="0.9803922176361084" alpha="1" colorSpace="deviceRGB"/>
+                                <color key="titleColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
                                 <action selector="reloadButtonPressed:" destination="-1" eventType="touchUpInside" id="Bjk-nt-Eg2"/>
                             </connections>
                         </button>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="New Suggestions Found" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vDU-q3-dNP">
+                            <rect key="frame" x="28" y="10" width="126" height="14"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="0.80000000000000004" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="183" id="NDI-Uu-T7q"/>
-                        <constraint firstAttribute="centerY" secondItem="gzA-Va-82T" secondAttribute="centerY" id="WGW-iQ-sbj"/>
+                        <constraint firstItem="gzA-Va-82T" firstAttribute="leading" secondItem="FCq-o3-f9O" secondAttribute="leading" id="P0C-6O-TIF"/>
+                        <constraint firstAttribute="bottom" secondItem="gzA-Va-82T" secondAttribute="bottom" constant="6" id="aNZ-yi-b6a"/>
+                        <constraint firstAttribute="centerX" secondItem="vDU-q3-dNP" secondAttribute="centerX" id="gfI-Pj-LFl"/>
+                        <constraint firstItem="vDU-q3-dNP" firstAttribute="top" secondItem="FCq-o3-f9O" secondAttribute="top" constant="10" id="ohZ-X4-4RJ"/>
                         <constraint firstAttribute="centerX" secondItem="gzA-Va-82T" secondAttribute="centerX" id="sFO-qJ-wb6"/>
-                        <constraint firstAttribute="height" constant="46" id="zlm-FY-KvD"/>
+                        <constraint firstAttribute="height" constant="48" id="zlm-FY-KvD"/>
                     </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="FCq-o3-f9O" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" id="39B-S0-s6v"/>
+                <constraint firstItem="FCq-o3-f9O" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" constant="-4" id="39B-S0-s6v"/>
                 <constraint firstItem="KYO-2q-Y2p" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="LhR-QU-JUX"/>
                 <constraint firstItem="KYO-2q-Y2p" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" id="Vcc-bR-1jT"/>
                 <constraint firstAttribute="bottom" secondItem="KYO-2q-Y2p" secondAttribute="bottom" id="Vrv-31-y9L"/>
@@ -58,7 +68,7 @@
                 <constraint firstAttribute="centerX" secondItem="FCq-o3-f9O" secondAttribute="centerX" id="dr4-Ix-Oyx"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
-            <point key="canvasLocation" x="554" y="220"/>
+            <point key="canvasLocation" x="249" y="233"/>
         </view>
     </objects>
     <resources>
