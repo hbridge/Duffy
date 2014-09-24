@@ -150,6 +150,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   [super viewWillAppear:animated];
   
+  [self.tableView reloadData];
   if (self.navigationController.isBeingPresented) {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                              initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
