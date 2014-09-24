@@ -23,6 +23,7 @@
 #import "DFSelectPhotosInviteSectionHeader.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFStrandConstants.h"
+#import "DFSelectPhotosInviteSectionFooter.h"
 
 @interface DFSelectPhotosViewController ()
 
@@ -174,67 +175,85 @@
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return (self.suggestedPhotoObjects.count > 0) + (self.sharedPhotoObjects.count > 0);
+  return (self.sharedPhotoObjects.count > 0) + 1;
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
   if (kind == UICollectionElementKindSectionHeader) {
-    if ([sectionObject.type isEqual:DFFeedObjectInviteStrand]) {
-      DFSelectPhotosInviteSectionHeader *inviteHeaderView = [self.collectionView
-                                              dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                              withReuseIdentifier:@"inviteHeaderView"
-                                              forIndexPath:indexPath];
-      inviteHeaderView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
-      
-      DFPeanutUserObject *actor = sectionObject.actors.firstObject;
-      inviteHeaderView.actorsLabel.text = actor.display_name;
-      inviteHeaderView.actionLabel.text = sectionObject.title;
-      
-      //context
-      DFPeanutFeedObject *strandObject = sectionObject.objects.firstObject;
-      NSMutableString *contextString = [NSMutableString new];
-      [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
-                                                                    abbreviate:NO]];
-      [contextString appendFormat:@" in %@", strandObject.location];
-      inviteHeaderView.contextLabel.text = contextString;
-      
-      return inviteHeaderView;
-    } else {
-      DFSelectPhotosHeaderView *headerView = [self.collectionView
-                                              dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                              withReuseIdentifier:@"headerView"
-                                              forIndexPath:indexPath];
-      if (self.inviteObject) {
-        NSMutableString *inviteText = [[NSMutableString alloc] initWithString:@"with "];
-        for (NSUInteger i = 0; i < self.inviteObject.actors.count; i++) {
-          if (i > 0) [inviteText appendString:@", "];
-          [inviteText appendString:[self.inviteObject.actors[i] display_name]];
-        }
-        headerView.actorsLabel.text = inviteText;
-      } else {
-        [headerView.actorsLabel removeFromSuperview];
-      }
-      return headerView;
-    }
+    return [self viewForHeaderAtIndexPath:indexPath];
   } else if (kind == UICollectionElementKindSectionFooter) {
-    UICollectionReusableView *footerView = [self.collectionView
-                                            dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-                                            withReuseIdentifier:@"inviteFooterView"
-                                            forIndexPath:indexPath];
-    if ([sectionObject.type isEqual:DFFeedObjectInviteStrand]) {
-      // the invite section for the footer view shouldn't have any thing in it
-      for (UIView *view in footerView.subviews) {
-        [view removeFromSuperview];
-      }
-    }
-    return footerView;
+    return [self viewForFooterAtIndexPath:indexPath];
   }
 
   return nil;
+}
+
+- (UICollectionReusableView *)viewForHeaderAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
+  if ([sectionObject.type isEqual:DFFeedObjectInviteStrand]) {
+    DFSelectPhotosInviteSectionHeader *inviteHeaderView = [self.collectionView
+                                                           dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                                           withReuseIdentifier:@"inviteHeaderView"
+                                                           forIndexPath:indexPath];
+    inviteHeaderView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
+    
+    DFPeanutUserObject *actor = sectionObject.actors.firstObject;
+    inviteHeaderView.actorsLabel.text = actor.display_name;
+    inviteHeaderView.actionLabel.text = sectionObject.title;
+    
+    //context
+    DFPeanutFeedObject *strandObject = sectionObject.objects.firstObject;
+    NSMutableString *contextString = [NSMutableString new];
+    [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+                                                                  abbreviate:NO]];
+    [contextString appendFormat:@" in %@", strandObject.location];
+    inviteHeaderView.contextLabel.text = contextString;
+    
+    return inviteHeaderView;
+  } else {
+    DFSelectPhotosHeaderView *headerView = [self.collectionView
+                                            dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                            withReuseIdentifier:@"headerView"
+                                            forIndexPath:indexPath];
+    if (self.inviteObject) {
+      NSMutableString *inviteText = [[NSMutableString alloc] initWithString:@"with "];
+      for (NSUInteger i = 0; i < self.inviteObject.actors.count; i++) {
+        if (i > 0) [inviteText appendString:@", "];
+        [inviteText appendString:[self.inviteObject.actors[i] display_name]];
+      }
+      headerView.actorsLabel.text = inviteText;
+    } else {
+      [headerView.actorsLabel removeFromSuperview];
+    }
+    return headerView;
+  }
+}
+
+- (UICollectionReusableView *)viewForFooterAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
+  DFSelectPhotosInviteSectionFooter *footerView = [self.collectionView
+                                          dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+                                          withReuseIdentifier:@"inviteFooterView"
+                                          forIndexPath:indexPath];
+  if ([sectionObject.type isEqual:DFFeedObjectInviteStrand] || !self.inviteObject) {
+    // the invite section for the footer view shouldn't have any thing in it
+    // or if this is not an invite, don't show the footer
+    footerView.textLabel.hidden = YES;
+  } else if (self.suggestedSectionObject.objects.count == 0){
+    // there are no suggestions, show an explanatory message
+    footerView.textLabel.hidden = NO;
+    footerView.textLabel.text = @"None of your photos were taken at the same time and place.";
+  } else {
+    // show the explanation for why we're suggesting photos
+    footerView.textLabel.hidden = NO;
+    footerView.textLabel.text = @"These photos were selected because they were taken at the same time and place.";
+  }
+  return footerView;
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
