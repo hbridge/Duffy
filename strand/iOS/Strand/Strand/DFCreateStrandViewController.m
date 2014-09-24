@@ -229,9 +229,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   NSMutableArray *sections = [NSMutableArray new];
   if ([self shouldShowInvites]) {
     [sections addObject:self.inviteObjects];
-  } if (self.friendSuggestions) {
+  } if (self.friendSuggestions.count > 0) {
     [sections addObject:self.friendSuggestions];
-  } if (self.noFriendSuggestions) {
+  } if (self.noFriendSuggestions.count >0) {
     [sections addObject:self.noFriendSuggestions];
   }
   
@@ -432,7 +432,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     // this is creating a new strand, the object they selected is a suggestion
     // we also want to show a to field to invite others
     selectController = [[DFSelectPhotosViewController alloc]
-                        initWithTitle:@"Create Strand"
+                        initWithTitle:@"Select Photos"
                         showsToField:YES
                         suggestedSectionObject:feedObject
                         sharedSectionObject:nil
