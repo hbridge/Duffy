@@ -11,8 +11,7 @@
 #import "RestKit/RestKit.h"
 #import "DFPeanutInvalidField.h"
 
-NSString *const ActionPostPath = @"actions/";
-NSString *const ActionIDPath = @"actions/:id/";
+NSString *const ActionBasePath = @"actions/";
 
 @implementation DFPeanutActionAdapter
 
@@ -23,102 +22,15 @@ NSString *const ActionIDPath = @"actions/:id/";
 
 + (NSArray *)responseDescriptors
 {
-  RKResponseDescriptor *successReponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutAction objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:ActionPostPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
-  
-  RKResponseDescriptor *errorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:ActionPostPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
-  RKResponseDescriptor *actionErrorResponse =
-  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
-                                               method:RKRequestMethodAny
-                                          pathPattern:ActionIDPath
-                                              keyPath:nil
-                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
-  
-  
-  return [NSArray arrayWithObjects:successReponse, errorResponse, actionErrorResponse, nil];
+  return [super responseDescriptorsForPeanutObjectClass:[DFPeanutAction class]
+                                        basePath:ActionBasePath
+                                     bulkKeyPath:nil];
 }
 
 + (NSArray *)requestDescriptors
 {
-  return nil;
+  return [super requestDescriptorsForPeanutObjectClass:[DFPeanutAction class]
+                                       bulkPostKeyPath:nil];
 }
-
-
-- (void)performAction:(DFPeanutAction *)action
-    withRequestMethod:(RKRequestMethod)method
-         useActionURL:(BOOL)useActionURL
-      completionBlock:(DFPeanutActionResponseBlock)completionBlock
-{
-  NSDictionary *parameters = [action
-                              dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]];
-  
-  NSString *path = ActionPostPath;
-  if (useActionURL) {
-    path = [NSString stringWithFormat:@"%@%@", ActionPostPath, @(action.id)];
-  }
-  
-  NSURLRequest *getRequest = [DFObjectManager
-                              requestWithObject:[[DFPeanutAction alloc] init]
-                              method:method
-                              path:path
-                              parameters:parameters
-                              ];
-  DDLogInfo(@"%@ getting endpoint: %@, parameters:%@", [[self class] description],
-            getRequest.URL.absoluteString,
-            parameters.description);
-  
-  RKObjectRequestOperation *requestOp =
-  [[DFObjectManager sharedManager]
-   objectRequestOperationWithRequest:getRequest
-   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
-   {
-     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutAction class]]) {
-       DFPeanutAction *action = mappingResult.firstObject;
-       DDLogInfo(@"%@ created peanut action with id: %llu", [self.class description], action.id);
-       completionBlock(action, nil);
-     } else if (method == RKRequestMethodDELETE && mappingResult == nil) {
-       DDLogInfo(@"%@ deleted peanut action with id: %llu", [self.class description], action.id);
-       completionBlock(nil,nil);
-     } else {
-       DDLogError(@"%@ unexpected response: %@", [self.class description], mappingResult.firstObject);
-     }
-   }
-   failure:^(RKObjectRequestOperation *operation, NSError *error)
-   {
-     NSError *betterError = [DFPeanutInvalidField invalidFieldsErrorForError:error];
-     DDLogWarn(@"%@ got error: %@", [self.class description], betterError);
-     completionBlock(nil, betterError);
-   }];
-  
-  [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
-}
-
-- (void)postAction:(DFPeanutAction *)action
-withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock
-{
-  [self performAction:action
-    withRequestMethod:RKRequestMethodPOST
-         useActionURL:NO
-      completionBlock:completionBlock];
-}
-
-- (void)deleteAction:(DFPeanutAction *)action
- withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock
-{
-  [self performAction:action
-    withRequestMethod:RKRequestMethodDELETE
-   useActionURL:YES
-      completionBlock:completionBlock];
-}
-
 
 @end

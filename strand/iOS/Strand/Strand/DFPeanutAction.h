@@ -25,7 +25,7 @@ typedef UInt64 DFActionID;
 
 @interface DFPeanutAction : NSObject <DFPeanutObject>
 
-@property (nonatomic) DFActionID id;
+@property (nonatomic, retain) NSNumber *id;
 @property (nonatomic) DFPeanutActionType action_type;
 @property (nonatomic) DFPhotoIDType photo;
 @property (nonatomic) DFStrandIDType strand;

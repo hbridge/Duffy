@@ -9,15 +9,12 @@
 #import <Foundation/Foundation.h>
 #import "DFNetworkAdapter.h"
 #import "DFPeanutAction.h"
+#import "DFPeanutRestEndpointAdapter.h"
 
-@interface DFPeanutActionAdapter : NSObject <DFNetworkAdapter>
+extern NSString *const ActionBasePath;
+
+@interface DFPeanutActionAdapter : DFPeanutRestEndpointAdapter <DFNetworkAdapter>
 
 typedef void (^DFPeanutActionResponseBlock)(DFPeanutAction *action, NSError *error);
-
-
-- (void)postAction:(DFPeanutAction *)action
-withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock;
-- (void)deleteAction:(DFPeanutAction *)action
- withCompletionBlock:(DFPeanutActionResponseBlock)completionBlock;
 
 @end

@@ -457,39 +457,48 @@ const CGFloat LockedCellHeight = 157.0;
   
   [self reloadRowForPhotoID:photoID];
   
-  DFPeanutActionResponseBlock responseBlock = ^(DFPeanutAction *action, NSError *error) {
-    if (!error) {
-      if (action) {
-        [object setUserFavoriteAction:action];
-      } // no need for the else case, it was already removed optimistically
-      
-      [DFAnalytics
-       logPhotoLikePressedWithNewValue:(newAction != nil)
-       result:DFAnalyticsValueResultSuccess
-       actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
-       timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
-    } else {
-      [object setUserFavoriteAction:oldFavoriteAction];
-      [self reloadRowForPhotoID:photoID];
-      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                      message:error.localizedDescription
-                                                     delegate:nil
-                                            cancelButtonTitle:@"OK"
-                                            otherButtonTitles:nil];
-      [alert show];
-      [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
-                                            result:DFAnalyticsValueResultFailure
-                                        actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
-                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
-    }
-  };
+  RKRequestMethod method;
+  DFPeanutAction *action;
+  if (!oldFavoriteAction) {
+    method = RKRequestMethodPOST;
+    action = newAction;
+  } else {
+    method = RKRequestMethodDELETE;
+    action = oldFavoriteAction;
+  }
   
   DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
-  if (!oldFavoriteAction) {
-    [adapter postAction:newAction withCompletionBlock:responseBlock];
-  } else {
-    [adapter deleteAction:oldFavoriteAction withCompletionBlock:responseBlock];
-  }
+  [adapter
+   performRequest:method withPath:ActionBasePath
+   objects:@[action]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     DFPeanutAction *action = resultObjects.firstObject;
+     if (action) {
+       [object setUserFavoriteAction:action];
+     } // no need for the else case, it was already removed optimistically
+     
+     [DFAnalytics
+      logPhotoLikePressedWithNewValue:(newAction != nil)
+      result:DFAnalyticsValueResultSuccess
+      actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
+      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
+   } failure:^(NSError *error) {
+     [object setUserFavoriteAction:oldFavoriteAction];
+     [self reloadRowForPhotoID:photoID];
+     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                     message:error.localizedDescription
+                                                    delegate:nil
+                                           cancelButtonTitle:@"OK"
+                                           otherButtonTitles:nil];
+     [alert show];
+     [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
+                                           result:DFAnalyticsValueResultFailure
+                                       actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
+                           timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
+   }];
+
 }
 
 - (void)moreOptionsButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender

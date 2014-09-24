@@ -22,6 +22,7 @@
 #import "DFPeanutActionAdapter.h"
 #import "DFPeanutAction.h"
 #import "DFStrandConstants.h"
+#import "UIAlertView+DFHelpers.h"
 
 @interface DFPhotoViewController ()
 
@@ -428,34 +429,45 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
   self.userFavoritedAction = newAction;
   [self updateFavoriteButton];
   
-  DFPeanutActionResponseBlock responseBlock = ^(DFPeanutAction *action, NSError *error) {
-    if (!error) {
-      self.userFavoritedAction = action;
-      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
-                                            result:DFAnalyticsValueResultSuccess
-                                        actionType:DFUIActionButtonPress
-                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
-    } else {
-      [DFAnalytics logPhotoLikePressedWithNewValue:self.isUserFavorited
-                                            result:DFAnalyticsValueResultFailure
-                                        actionType:DFUIActionButtonPress
-                            timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
-      self.userFavoritedAction = oldAction;
-      [self updateFavoriteButton];
-      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
-                                                      message:error.localizedDescription
-                                                     delegate:nil
-                                            cancelButtonTitle:@"OK"
-                                            otherButtonTitles:nil];
-      [alert show];
-    }
-  };
-  
+  RKRequestMethod method;
+  DFPeanutAction *action;
   if (!oldAction) {
-    [adapter postAction:newAction withCompletionBlock:responseBlock];
+    method = RKRequestMethodPOST;
+    action = newAction;
   } else {
-    [adapter deleteAction:oldAction withCompletionBlock:responseBlock];
+    method = RKRequestMethodDELETE;
+    action = oldAction;
   }
+  
+  [adapter
+   performRequest:method withPath:ActionBasePath
+   objects:@[action]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     self.userFavoritedAction = resultObjects.firstObject;
+     [DFAnalytics
+      logPhotoLikePressedWithNewValue:self.isUserFavorited
+      result:DFAnalyticsValueResultSuccess
+      actionType:DFUIActionButtonPress
+      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
+   } failure:^(NSError *error) {
+     [DFAnalytics
+      logPhotoLikePressedWithNewValue:self.isUserFavorited
+      result:DFAnalyticsValueResultFailure
+      actionType:DFUIActionButtonPress
+      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
+     self.userFavoritedAction = oldAction;
+     [self updateFavoriteButton];
+
+     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                     message:error.localizedDescription
+                                                    delegate:nil
+                                           cancelButtonTitle:@"OK"
+                                           otherButtonTitles:nil];
+     [alert show];
+     
+   }];
 }
 
 
