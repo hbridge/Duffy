@@ -482,7 +482,7 @@ def getInviteObjectsDataForUser(user):
 				shouldShowInvite = False
 
 		if shouldShowInvite:
-			title = "shared %s photos with you" % len(strandInvite.strand.photos.count())
+			title = "shared %s photos with you" % strandInvite.strand.photos.count()
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(strandInvite.user), 'time_stamp': strandInvite.added}
 			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
 
