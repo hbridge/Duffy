@@ -46,6 +46,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 @property (nonatomic, retain) NSTimer *refreshTimer;
+@property (atomic, retain) NSTimer *showReloadButtonTimer;
 
 @end
 
@@ -536,13 +537,19 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
                            newResponse:(DFPeanutObjectsResponse *)newResponse
 {
   if (!oldResponse || oldResponse.objects.count < 10
-      || !self.view.window || self.tabBarController.selectedViewController != self) {
+      || !self.view.window || self.tabBarController.selectedViewController != self.navigationController) {
     [self.tableView reloadData];
     self.reloadBackground.hidden = YES; // immediately hide, don't animate
     return;
   }
   
-  [self setReloadButtonHidden:NO];
+  if (!self.showReloadButtonTimer && self.reloadBackground.hidden) {
+    self.showReloadButtonTimer = [NSTimer scheduledTimerWithTimeInterval:7.0
+                                                                  target:self
+                                                                selector:@selector(showReloadButton)
+                                                                userInfo:nil
+                                                                 repeats:NO];
+  }
 }
 
 - (void)setReloadButtonHidden:(BOOL)hidden
@@ -561,6 +568,12 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
       self.reloadBackground.alpha = 1.0;
     }];
   }
+}
+
+- (void)showReloadButton
+{
+  [self setReloadButtonHidden:NO];
+  self.showReloadButtonTimer = nil;
 }
 
 - (NSDictionary *)mapIDsToIPs:(DFPeanutObjectsResponse *)response
