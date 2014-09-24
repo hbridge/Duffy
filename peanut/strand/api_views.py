@@ -608,8 +608,8 @@ def strand_activity(request):
 		responseObjects = list()
 
 		# First throw in invite objects
-		inviteObjects = getInviteObjectsDataForUser(user)
-		responseObjects.extend(inviteObjects)
+		#inviteObjects = getInviteObjectsDataForUser(user)
+		#responseObjects.extend(inviteObjects)
 		
 		# Created Strands
 		# TODO(Derek): remove hack
