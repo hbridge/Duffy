@@ -292,10 +292,17 @@ referenceSizeForFooterInSection:(NSInteger)section
   return ([self photosForSection:section] == self.sharedPhotoObjects);
 }
 
+const NSUInteger MaxSharedPhotosDisplayed = 3;
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  return [[self photosForSection:section] count];
+  DFPeanutFeedObject *objectForSection = [self objectForSection:section];
+  NSUInteger numPhotosForSection = [[self photosForSection:section] count];
+  if ([objectForSection.type isEqual:DFFeedObjectInviteStrand]) {
+    return MIN(numPhotosForSection, MaxSharedPhotosDisplayed);
+  }
+  
+  return numPhotosForSection;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
