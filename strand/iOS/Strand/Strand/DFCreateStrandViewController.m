@@ -272,7 +272,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   DFCreateStrandTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:InviteId];
   [cell configureWithStyle:DFCreateStrandCellStyleInvite];
-  cell.inviterLabel.text = [inviteObject.actors.firstObject display_name];
+  cell.peopleLabel.text = [inviteObject.actors.firstObject display_name];
+  cell.peopleExplanationLabel.text = inviteObject.title;
   
   DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
   [self configureTextForCreateStrandCell:cell withStrand:strandObject];

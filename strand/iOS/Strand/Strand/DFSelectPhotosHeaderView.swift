@@ -10,6 +10,7 @@ import UIKit
 
 class DFSelectPhotosHeaderView: UICollectionReusableView {
   @IBOutlet weak var textLabel: UILabel!
+  @IBOutlet weak var actorsLabel: UILabel!
   
     override func awakeFromNib() {
         super.awakeFromNib()

@@ -16,6 +16,7 @@
   [super awakeFromNib];
   
   self.selectionStyle = UITableViewCellSelectionStyleNone;
+  
 }
 
 + (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
@@ -30,13 +31,7 @@
   
   if (style == DFCreateStrandCellStyleInvite) {
     self.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
-  }
-  
-  // if it's a suggestion, remove the invite labels
-  if (style == DFCreateStrandCellStyleSuggestionNoPeople
-      || style == DFCreateStrandCellStyleSuggestionWithPeople) {
-    [self.inviterLabel removeFromSuperview];
-    [self.invitedText removeFromSuperview];
+    self.callToActionLabel.text = @"Accept";
   }
   
   if (style == DFCreateStrandCellStyleSuggestionNoPeople) {

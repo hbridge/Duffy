@@ -20,6 +20,9 @@
 #import "DFPeanutStrandInviteAdapter.h"
 #import "Strand-Swift.h"
 #import "DFPushNotificationsManager.h"
+#import "DFSelectPhotosInviteSectionHeader.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFStrandConstants.h"
 
 @interface DFSelectPhotosViewController ()
 
@@ -30,6 +33,7 @@
 @property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
+@property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 
 @end
 
@@ -57,6 +61,7 @@
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
     _showsToField = showsToField;
+    self.cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self configureNavBarWithTitle:title];
     self.suggestedSectionObject = suggestedSectionObject;
     self.sharedSectionObject = sharedSectionObject;
@@ -107,15 +112,24 @@
 
 - (void)configureCollectionView
 {
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFSelectPhotosInviteSectionHeader" bundle:nil]
+        forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+               withReuseIdentifier:@"inviteHeaderView"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFSelectPhotosHeaderView" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFSelectPhotosInviteSectionFooter" bundle:nil]
+        forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+               withReuseIdentifier:@"inviteFooterView"];
+  
   self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width,
                                                    [DFSelectPhotosHeaderView HeaderHeight]);
+  
   [self.collectionView registerNib:[UINib nibWithNibName:[DFSelectablePhotoViewCell description] bundle:nil]
         forCellWithReuseIdentifier:@"selectableCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:[DFPhotoViewCell description] bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
+  
   
 }
 
@@ -163,33 +177,114 @@
   return (self.suggestedPhotoObjects.count > 0) + (self.sharedPhotoObjects.count > 0);
 }
 
-- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath
 {
-  UICollectionReusableView *view;
+  DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
   if (kind == UICollectionElementKindSectionHeader) {
-    DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
-    DFSelectPhotosHeaderView *headerView = [self.collectionView
-                                          dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                          withReuseIdentifier:@"headerView"
-                                          forIndexPath:indexPath];
-    headerView.textLabel.text = sectionObject.title;
-    
-    view = headerView;
+    if ([sectionObject.type isEqual:DFFeedObjectInviteStrand]) {
+      DFSelectPhotosInviteSectionHeader *inviteHeaderView = [self.collectionView
+                                              dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                              withReuseIdentifier:@"inviteHeaderView"
+                                              forIndexPath:indexPath];
+      inviteHeaderView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
+      
+      DFPeanutUserObject *actor = sectionObject.actors.firstObject;
+      inviteHeaderView.actorsLabel.text = actor.display_name;
+      inviteHeaderView.actionLabel.text = sectionObject.title;
+      
+      //context
+      DFPeanutFeedObject *strandObject = sectionObject.objects.firstObject;
+      NSMutableString *contextString = [NSMutableString new];
+      [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+                                                                    abbreviate:NO]];
+      [contextString appendFormat:@" in %@", strandObject.location];
+      inviteHeaderView.contextLabel.text = contextString;
+      
+      return inviteHeaderView;
+    } else {
+      DFSelectPhotosHeaderView *headerView = [self.collectionView
+                                              dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                              withReuseIdentifier:@"headerView"
+                                              forIndexPath:indexPath];
+      if (self.inviteObject) {
+        NSMutableString *inviteText = [[NSMutableString alloc] initWithString:@"with "];
+        for (NSUInteger i = 0; i < self.inviteObject.actors.count; i++) {
+          if (i > 0) [inviteText appendString:@", "];
+          [inviteText appendString:[self.inviteObject.actors[i] display_name]];
+        }
+        headerView.actorsLabel.text = inviteText;
+      } else {
+        [headerView.actorsLabel removeFromSuperview];
+      }
+      return headerView;
+    }
+  } else if (kind == UICollectionElementKindSectionFooter) {
+    UICollectionReusableView *footerView = [self.collectionView
+                                            dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
+                                            withReuseIdentifier:@"inviteFooterView"
+                                            forIndexPath:indexPath];
+    if ([sectionObject.type isEqual:DFFeedObjectInviteStrand]) {
+      // the invite section for the footer view shouldn't have any thing in it
+      for (UIView *view in footerView.subviews) {
+        [view removeFromSuperview];
+      }
+    }
+    return footerView;
   }
-  return view;
+
+  return nil;
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceSizeForHeaderInSection:(NSInteger)section
+{
+  DFPeanutFeedObject *feedObject = [self objectForSection:section];
+  
+  NSString *identifier;
+  UINib *nib;
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    identifier = @"inviteHeaderView";
+    nib = [UINib nibWithNibName:NSStringFromClass([DFSelectPhotosInviteSectionHeader class]) bundle:nil];
+  } else {
+    identifier = @"headerView";
+    nib = [UINib nibWithNibName:@"DFSelectPhotosHeaderView" bundle:nil];
+  }
+  
+  UICollectionReusableView *templateView = self.cellTemplatesByIdentifier[identifier];
+  if (!templateView) {
+    templateView = [[nib instantiateWithOwner:nil options:nil] firstObject];
+  }
+  self.cellTemplatesByIdentifier[identifier] = templateView;
+  CGFloat height = [templateView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  return CGSizeMake(self.collectionView.frame.size.width, height);
+}
+
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+referenceSizeForFooterInSection:(NSInteger)section
+{
+  DFPeanutFeedObject *feedObject = [self objectForSection:section];
+  CGFloat height;
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    height = 10;
+  } else {
+    height = 53.0;
+  }
+  
+  return CGSizeMake(self.collectionView.frame.size.width, height);
 }
 
 - (DFPeanutFeedObject *)objectForSection:(NSUInteger)section
 {
-  if (section == 0 && self.suggestedPhotoObjects.count > 0) return self.suggestedSectionObject;
- return self.sharedSectionObject;
+  if (section == 0 && self.inviteObject) return self.inviteObject;
+  return self.suggestedSectionObject;
 }
 
 - (NSArray *)photosForSection:(NSUInteger)section
 {
-  if (section == 0 && self.suggestedPhotoObjects.count > 0) return self.suggestedPhotoObjects;
-  
-  return self.sharedPhotoObjects;
+  if (section == 0 && self.inviteObject) return self.sharedPhotoObjects;
+  return self.suggestedPhotoObjects;
 }
 
 - (BOOL)areImagesForSectionRemote:(NSUInteger)section

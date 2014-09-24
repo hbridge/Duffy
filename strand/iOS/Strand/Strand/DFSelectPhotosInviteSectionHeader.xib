@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="hM4-jf-dEA" customClass="DFSelectPhotosInviteSectionHeader">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="53"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <view clipsSubviews="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3Hf-LQ-mUU" userLabel="Info Wrapper">
+                    <rect key="frame" x="8" y="10" width="304" height="33"/>
+                    <subviews>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="752" verticalCompressionResistancePriority="900" text="Actor" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="W2S-qL-WKW">
+                            <rect key="frame" x="0.0" y="0.0" width="36" height="17"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Sep 30 2014 in Williamsburg, Brooklyn" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gjW-yN-Hl6">
+                            <rect key="frame" x="0.0" y="18" width="304" height="15"/>
+                            <constraints>
+                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="15" id="pbj-Cv-2a2"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" verticalHuggingPriority="251" text="might want these" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bkB-yV-FXl">
+                            <rect key="frame" x="40" y="0.0" width="264" height="17"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="W2S-qL-WKW" firstAttribute="leading" secondItem="3Hf-LQ-mUU" secondAttribute="leading" id="76s-0s-gA2"/>
+                        <constraint firstItem="gjW-yN-Hl6" firstAttribute="top" secondItem="3Hf-LQ-mUU" secondAttribute="top" priority="700" id="8uD-7P-bKg"/>
+                        <constraint firstAttribute="trailing" secondItem="gjW-yN-Hl6" secondAttribute="trailing" id="Fkx-Ww-6ew"/>
+                        <constraint firstItem="bkB-yV-FXl" firstAttribute="leading" secondItem="W2S-qL-WKW" secondAttribute="trailing" constant="4" id="Gg7-gd-der"/>
+                        <constraint firstItem="gjW-yN-Hl6" firstAttribute="leading" secondItem="3Hf-LQ-mUU" secondAttribute="leading" id="LTt-mw-tPR"/>
+                        <constraint firstAttribute="trailing" secondItem="bkB-yV-FXl" secondAttribute="trailing" id="MaZ-f2-IbF"/>
+                        <constraint firstAttribute="centerY" secondItem="gjW-yN-Hl6" secondAttribute="centerY" priority="800" id="UvB-Hg-tas"/>
+                        <constraint firstItem="gjW-yN-Hl6" firstAttribute="top" secondItem="W2S-qL-WKW" secondAttribute="bottom" constant="1" id="itk-eC-Oaa"/>
+                        <constraint firstAttribute="height" constant="33" id="vfO-Up-f9v"/>
+                        <constraint firstItem="W2S-qL-WKW" firstAttribute="top" secondItem="3Hf-LQ-mUU" secondAttribute="top" id="yLV-ZB-Fy9"/>
+                        <constraint firstAttribute="trailing" secondItem="gjW-yN-Hl6" secondAttribute="trailing" id="yaC-m7-OzV"/>
+                        <constraint firstItem="bkB-yV-FXl" firstAttribute="centerY" secondItem="W2S-qL-WKW" secondAttribute="centerY" id="zH5-YB-hlb"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <constraints>
+                <constraint firstAttribute="trailing" secondItem="3Hf-LQ-mUU" secondAttribute="trailing" constant="8" id="BDe-9t-m67"/>
+                <constraint firstItem="3Hf-LQ-mUU" firstAttribute="top" secondItem="hM4-jf-dEA" secondAttribute="top" constant="10" id="BW9-j4-T16"/>
+                <constraint firstAttribute="bottom" secondItem="3Hf-LQ-mUU" secondAttribute="bottom" constant="10" id="E2H-lc-0qi"/>
+                <constraint firstItem="3Hf-LQ-mUU" firstAttribute="leading" secondItem="hM4-jf-dEA" secondAttribute="leading" constant="8" id="j3W-RP-LCX"/>
+            </constraints>
+            <connections>
+                <outlet property="actionLabel" destination="bkB-yV-FXl" id="em8-5b-Igu"/>
+                <outlet property="actorsLabel" destination="W2S-qL-WKW" id="URF-Iq-wWu"/>
+                <outlet property="contextLabel" destination="gjW-yN-Hl6" id="EVF-re-n9Q"/>
+            </connections>
+            <point key="canvasLocation" x="239" y="546"/>
+        </collectionReusableView>
+    </objects>
+</document>
