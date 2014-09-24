@@ -170,16 +170,22 @@ def getFormattedGroups(groups):
 			photoIds.append(photo.id)
 
 	# Fetch all the similarities at once so we can process in memory
+	a = datetime.datetime.now()
 	simCaches = cluster_util.getSimCaches(photoIds)
+	print "here11 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 
 	# Do same with actions
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
 	
+	print "here12 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 	for group in groups:
 		if len(group['photos']) == 0:
 			continue
 
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
+
+		print "here13 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 		
@@ -187,10 +193,15 @@ def getFormattedGroups(groups):
 		if not location:
 			location = "Location Unknown"
 
+		print "here14 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 		metadata = group['metadata']
 		metadata.update({'subtitle': location, 'location': location})
 		
 		output.append({'clusters': clusters, 'metadata': metadata})
+
+	print "here15 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 	return output
 
 """
@@ -274,7 +285,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 def getStrandNeighborsCache(strands):
 	strandIds = Strand.getIds(strands)
 
-	strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+	strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
 
 	strandNeighborsCache = dict()
 	for strand in strands:
@@ -336,7 +347,10 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	interestedUsersGroups = list()
 	noInterestedUsersGroups = list()
 
+	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
+
+	print "here1 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 	for strand in strands:
 		strandId = strand.id
 		photos = strand.photos.all().order_by("-time_taken")
@@ -362,6 +376,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 			else:
 				noInterestedUsersGroups.append(entry)
 
+	print "here2 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 	if len(interestedUsersGroups) > 0:
 		# now sort groups by the time_taken of the first photo in each group
 		interestedUsersGroups = sorted(interestedUsersGroups, key=lambda x: x['photos'][0].time_taken, reverse=True)
@@ -372,13 +388,22 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 	interestedUsersFormattedGroups = getFormattedGroups(interestedUsersGroups)
 		
+	print "here3 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(interestedUsersFormattedGroups, 1000)
 
+	print "here4 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 	noInterestedUsersFormattedGroups = getFormattedGroups(noInterestedUsersGroups)
+
+	print "here5 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects.extend(api_util.turnFormattedGroupsIntoFeedObjects(noInterestedUsersFormattedGroups, 1000))
+
+	print "here6 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 
 	return objects
 
@@ -545,10 +570,15 @@ def unshared_strands(request):
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
+
+		a = datetime.datetime.now()
 		
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
 
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		b = datetime.datetime.now()
+
+		print "unshared_strands took %s" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -608,8 +638,8 @@ def strand_activity(request):
 		responseObjects = list()
 
 		# First throw in invite objects
-		#inviteObjects = getInviteObjectsDataForUser(user)
-		#responseObjects.extend(inviteObjects)
+		inviteObjects = getInviteObjectsDataForUser(user)
+		responseObjects.extend(inviteObjects)
 		
 		# Created Strands
 		# TODO(Derek): remove hack
