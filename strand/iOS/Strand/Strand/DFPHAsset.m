@@ -117,15 +117,8 @@
   return hash;
 }
 
-
-/* Returns the asset's  creation date for the given timezone.  Usually UTC will be specified */
-- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone
-{
-  return self.asset.creationDate;
-}
-
 /* Returns the asset's creation date for the local timezone it was taken in */
-- (NSDate *)creationDateInAssetTimeZone
+- (NSDate *)creationDateInUTC
 {
   return self.asset.creationDate;
 }

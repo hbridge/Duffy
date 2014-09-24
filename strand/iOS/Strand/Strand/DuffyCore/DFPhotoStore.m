@@ -648,7 +648,6 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
            
            DFPhoto *newPhoto = [DFPhoto createWithAsset:dfAsset
                                                  userID:[[DFUser currentUser] userID]
-                                               timeZone:[NSTimeZone defaultTimeZone]
                                               inContext:self.managedObjectContext];
            NSError *error;
            [self.managedObjectContext save:&error];

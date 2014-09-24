@@ -45,13 +45,7 @@ const CGFloat DFPhotoAssetDefaultJPEGCompressionQuality = 0.8;
   return nil;
 }
 
-- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone
-{
-  [DFPhotoAsset abstractClassException];
-  return nil;
-}
-
-- (NSDate *)creationDateInAssetTimeZone
+- (NSDate *)creationDateInUTC
 {
   [DFPhotoAsset abstractClassException];
   return nil;
