@@ -255,6 +255,9 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             if photoId not in currentPhotoIds:
                 newPhotoIds.append(photoId)
 
+        action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
+        action.save()
+
         if len(newPhotoIds) > 0:
             action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
             action.save()
