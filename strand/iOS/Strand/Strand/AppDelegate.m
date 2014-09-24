@@ -51,6 +51,8 @@
 @end
 
 @implementation AppDelegate
+
+const NSUInteger MinValidAccountId = 650;
             
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -163,7 +165,7 @@
 {
   if (![self isAppSetupComplete]) {
     [self showFirstTimeSetup];
-  } else if (![self isAuthTokenValid]) {
+  } else if (![self isUserValid]) {
     [self resetApplication];
   } else {
     [self showMainView];
@@ -208,13 +210,13 @@
    startUpdatingOnSignificantLocationChange];
 }
 
-- (BOOL)isAuthTokenValid
+- (BOOL)isUserValid
 {
-  NSString *authToken = [[DFUser currentUser] authToken];
-  // for now, if there is an authToken at all, we'll consider it valid
-  if (authToken && ![authToken isEqualToString:@""]) return YES;
-  
-  return NO;
+  if ([[DFUser currentUser] userID] < MinValidAccountId) {
+    return NO;
+  }
+
+  return YES;
 }
 
 - (void)performForegroundOperations
