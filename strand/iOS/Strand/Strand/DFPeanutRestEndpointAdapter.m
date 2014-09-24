@@ -88,10 +88,18 @@
 {
   NSURLRequest *request;
   if (objects.count == 1 && !forceCollection) {
+    NSString *objectPath = path;
+    id object = objects.firstObject;
+    if ([object respondsToSelector:@selector(id)]) {
+      NSNumber *objectID = [object valueForKey:@"id"];
+      if (objectID) {
+        objectPath = [[path stringByAppendingPathComponent:[objectID stringValue]] stringByAppendingString:@"/"];
+      }
+    }
     request = [DFObjectManager
                requestWithObject:objects.firstObject
                method:requestMethod
-               path:path
+               path:objectPath
                parameters:parameters];
   } else {
     request = [DFObjectManager
