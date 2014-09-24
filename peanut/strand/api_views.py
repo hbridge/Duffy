@@ -294,8 +294,12 @@ def getStrandNeighborsCache(strands):
 					
 	return strandNeighborsCache
 	
-def getObjectsDataForPhotos(user, photos, feedObjectType):
+def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	metadata = {'type': feedObjectType, 'title': ""}
+
+	if strand:
+		metadata['id'] = strand.id
+		
 	groups = [{'photos': photos, 'metadata': metadata}]
 
 	formattedGroups = getFormattedGroups(groups)
@@ -445,12 +449,12 @@ def getObjectsDataForActions(user):
 		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
 			title = "shared %s photos" % action.photos.count()
 			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
+			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
 
 		if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
 			title = "shared %s photos" % action.photos.count()
 			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND)
+			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
 			objects[0]['title'] = getTitleForStrand(action.strand)
 		
 		if objects:
