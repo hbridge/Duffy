@@ -78,19 +78,12 @@ static NSMutableArray *idsBeingCached;
   return [NSURL URLWithString:self.localURLString];
 }
 
-- (NSDate *)creationDateForTimezone:(NSTimeZone *)timezone
-{
-  // this DFStrand assets get their timezone set explicitly, so TZ correction should be unnecessary
-  return self.creationDate;
-}
-
-- (NSDate *)creationDateInAssetTimeZone
+- (NSDate *)creationDateInUTC
 {
   // We're tracking the timezone for Strand Photos right now so this shouldn't return anything
   // TODO(Derek): We really shouldn't do this, this should be corrected based on timezone
   return self.creationDate;
 }
-
 
 - (UIImage *)imageResizedToLength:(CGFloat)length
 {

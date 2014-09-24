@@ -139,7 +139,7 @@ static int NumChangesFlushThreshold = 100;
   
   for (DFPhoto *photo in [knownPhotos photoSet]) {
     mapping[photo.asset.canonicalURL] =
-    [photo localCreationDate];
+    [photo utcCreationDate];
   }
   
   return mapping;
@@ -260,7 +260,6 @@ static int NumChangesFlushThreshold = 100;
     DFPHAsset *dfphAsset = [DFPHAsset createWithPHAsset:asset inContext:self.managedObjectContext];
     DFPhoto *newPhoto = [DFPhoto createWithAsset:dfphAsset
                                           userID:[[DFUser currentUser] userID]
-                                        timeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]
                                        inContext:self.managedObjectContext];
     
     // store information about the new photo to notify
@@ -327,7 +326,7 @@ static int NumChangesFlushThreshold = 100;
       DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
                                        createWithALAsset:photoAsset
                                        inContext:self.managedObjectContext];
-      NSDate *assetDate = [asset creationDateInAssetTimeZone];
+      NSDate *assetDate = [asset creationDateInUTC];
       [self.knownNotFoundURLs removeObject:assetURL];
       
       // We have this asset in our DB, see if it matches what we expect
@@ -346,7 +345,6 @@ static int NumChangesFlushThreshold = 100;
       } else {//(![knownAndFoundURLs containsObject:assetURLString])
         DFPhoto *newPhoto = [DFPhoto createWithAsset:asset
                                               userID:[[DFUser currentUser] userID]
-                                            timeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]
                                            inContext:self.managedObjectContext];
         
         // store information about the new photo to notify
@@ -379,7 +377,6 @@ static int NumChangesFlushThreshold = 100;
   DFCameraRollPhotoAsset *photoAsset = [DFCameraRollPhotoAsset createWithALAsset:asset inContext:self.managedObjectContext];
   DFPhoto *newPhoto = [DFPhoto createWithAsset:photoAsset
                                         userID:[[DFUser currentUser] userID]
-                                      timeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]
                                      inContext:self.managedObjectContext];
   objectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
   

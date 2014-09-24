@@ -19,7 +19,6 @@
 @property (nonatomic, retain) DFPhotoAsset *asset;
 
 @property (nonatomic, retain) NSDate *utcCreationDate;
-@property (nonatomic, retain) NSDate *localCreationDate;
 @property (nonatomic, retain) NSDate *uploadThumbDate;
 @property (nonatomic, retain) NSDate *uploadLargeDate;
 @property (nonatomic) BOOL isUploadProcessed;
@@ -32,7 +31,6 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 // Create a new DFPhoto in a context
 + (DFPhoto *)createWithAsset:(DFPhotoAsset *)asset
                         userID:(DFUserIDType)userID
-                    timeZone:(NSTimeZone *)timeZone
                    inContext:(NSManagedObjectContext *)context;
 
 - (BOOL)isDeleteableByUser:(DFUserIDType)userID;

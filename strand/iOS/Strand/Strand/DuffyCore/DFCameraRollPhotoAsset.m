@@ -307,26 +307,7 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   return fileName;
 }
 
-- (NSDate *)creationDateForTimeZone:(NSTimeZone *)timezone
-{
-  if (self.storedMetadata) {
-    NSDictionary *exifDict = self.storedMetadata[@"{Exif}"];
-    if (exifDict) {
-      if (exifDict[@"DateTimeOriginal"]){
-        NSDateFormatter *exifFormatter = [NSDateFormatter EXIFDateFormatter];
-        exifFormatter.timeZone = timezone;
-        NSDate *date = [exifFormatter dateFromString:exifDict[@"DateTimeOriginal"]];
-        return date;
-      }
-    }
-  }
-  
-  // If we can't return the date in the correct timezone, then return nothing.
-  //   Callers can then call creationDateInAssetTimeZone
-  return nil;
-}
-
-- (NSDate *)creationDateInAssetTimeZone
+- (NSDate *)creationDateInUTC
 {
   return [self.asset valueForProperty:ALAssetPropertyDate];
 }

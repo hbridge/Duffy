@@ -478,7 +478,6 @@ const unsigned int SavePromptMinPhotos = 3;
           NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
           DFCameraRollPhotoAsset *dfAsset = [DFCameraRollPhotoAsset createWithALAsset:asset inContext:context];
           DFPhoto *photo = [DFPhoto createWithAsset:dfAsset userID:[[DFUser currentUser] userID]
-                                           timeZone:[NSTimeZone defaultTimeZone]
                                           inContext:context];
           photo.sourceString = @"strand";
           photo.shouldUploadImage = YES;
