@@ -17,5 +17,6 @@
 + (void)refreshPushToken;
 + (void)registerDeviceToken:(NSData *)data;
 + (void)registerFailedWithError:(NSError *)error;
++ (void)registerUserNotificationSettings:(UIUserNotificationSettings *)settings;
 
 @end

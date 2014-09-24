@@ -274,6 +274,12 @@
   [DFAnalytics CloseAnalyticsSession];
 }
 
+- (void)application:(UIApplication *)application
+didRegisterUserNotificationSettings:(UIUserNotificationSettings *)notificationSettings
+{
+  [DFPushNotificationsManager registerUserNotificationSettings:notificationSettings];
+}
+
 - (void)application:(UIApplication*)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData*)deviceToken
 {
 	[DFPushNotificationsManager registerDeviceToken:deviceToken];

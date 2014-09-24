@@ -64,6 +64,7 @@
   if ([[UIApplication sharedApplication]
        respondsToSelector:@selector(registerUserNotificationSettings:)]) {
     // iOS 8
+    DDLogInfo(@"%@ iOS8+ detected, calling registerUserNotificationSettings", self.class);
     UIUserNotificationSettings *settings = [UIUserNotificationSettings
                                             settingsForTypes:UIUserNotificationTypeAlert
                                             | UIUserNotificationTypeBadge
@@ -71,6 +72,7 @@
                                             categories:nil];
     [[UIApplication sharedApplication] registerUserNotificationSettings:settings];
   } else {
+    DDLogInfo(@"%@ iOS7- detected, calling registerRemoteNotificationTypes", self.class);
     [[UIApplication sharedApplication] registerForRemoteNotificationTypes:
      (UIRemoteNotificationTypeBadge | UIRemoteNotificationTypeSound | UIRemoteNotificationTypeAlert)];
   }
@@ -94,6 +96,9 @@
   }
 }
 
+// in iOS7, this is the callback we get after registerRemoteNotificationTypes
+// in iOS8, we first get, registerUserNotificationSettings, then must call registerForRemoteNotifications
+// THEN we get this callback
 + (void)registerDeviceToken:(NSData *)data
 {
   DFPeanutPushTokenAdapter *pushTokenAdapter = [[DFPeanutPushTokenAdapter alloc] init];
@@ -107,6 +112,20 @@
   }];
   
   [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionRemoteNotifications];
+}
+
+// in iOS8, this is the callback we get after registerUserNotificationSettings
++ (void)registerUserNotificationSettings:(UIUserNotificationSettings *)settings
+{
+  if (settings.types != UIUserNotificationTypeNone) {
+    DDLogInfo(@"%@ userNotificationSettings not none, register for remote notifs", self.class);
+    [DFDefaultsStore setLastUserNotificationType:settings.types];
+    [[UIApplication sharedApplication] registerForRemoteNotifications];
+  } else {
+    DDLogInfo(@"%@ userNotificationSettings are NONE not requesting remote notif", self.class);
+    [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionRemoteNotifications];
+    [DFDefaultsStore setLastUserNotificationType:settings.types];
+  }
 }
 
 + (void)registerFailedWithError:(NSError *)error
