@@ -40,6 +40,8 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 @property (nonatomic, retain) DFPeanutObjectsResponse *suggestedResponse;
 @property (nonatomic, retain) NSArray *inviteObjects;
+@property (nonatomic, retain) NSMutableArray *friendSuggestions;
+@property (nonatomic, retain) NSMutableArray *noFriendSuggestions;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
@@ -54,6 +56,12 @@ const CGFloat CreateCellTitleSpacing = 8;
 @synthesize showAsFirstTimeSetup = _showAsFirstTimeSetup;
 
 static DFCreateStrandViewController *instance;
+- (IBAction)reloadButtonPressed:(id)sender {
+  [self.tableView reloadData];
+  self.tableView.contentOffset = CGPointMake(0, 0);
+  self.reloadBackground.hidden = YES;
+}
+
 + (DFCreateStrandViewController *)sharedViewController
 {
   if (!instance) {
@@ -68,7 +76,7 @@ static DFCreateStrandViewController *instance;
   if (self) {
     _showAsFirstTimeSetup = NO;
     [self configureNavAndTab];
-    [self configureTableView];
+    
     [self observeNotifications];
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
                                      imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
@@ -80,7 +88,7 @@ static DFCreateStrandViewController *instance;
 
 - (void)configureNavAndTab
 {
-  self.navigationItem.title = @"Start Strand";
+  self.navigationItem.title = @"Share Photos";
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
                                            initWithTitle:@"Back"
                                            style:UIBarButtonItemStylePlain
@@ -127,7 +135,15 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (void)viewDidLoad
 {
   [super viewDidLoad];
+  [self configureTableView];
   [self refreshFromServer];
+  [self configureReloadButton];
+}
+
+- (void)configureReloadButton
+{
+  self.reloadBackground.layer.cornerRadius = 5.0;
+  self.reloadBackground.layer.masksToBounds = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -183,16 +199,23 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return 1 + (self.inviteObjects.count > 0 && self.showAsFirstTimeSetup);
+  return ([self shouldShowInvites])
+  + (self.friendSuggestions.count > 0)
+  + (self.noFriendSuggestions.count > 0);
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  if (self.showAsFirstTimeSetup && self.inviteObjects.count > 0 && section == 0) {
-    return @"Invitations";
+  NSArray *sectionObjects = [self sectionObjectsForSection:section];
+  if (sectionObjects == self.inviteObjects) {
+    return [NSString stringWithFormat:@"Invitations (%d)", (int)sectionObjects.count];
+  } else if (sectionObjects == self.friendSuggestions) {
+    return [NSString stringWithFormat:@"With Friends (%d)", (int)sectionObjects.count];
+  } else if (sectionObjects == self.noFriendSuggestions) {
+    return [NSString stringWithFormat:@"Other Events (%d)", (int)sectionObjects.count];
   }
- 
-  return @"Start a Strand";
+  
+  return @"Other";
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -202,11 +225,16 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (NSArray *)sectionObjectsForSection:(NSUInteger)section
 {
-  if ([self shouldShowInvites] && section == 0) {
-    return self.inviteObjects;
+  NSMutableArray *sections = [NSMutableArray new];
+  if ([self shouldShowInvites]) {
+    [sections addObject:self.inviteObjects];
+  } if (self.friendSuggestions) {
+    [sections addObject:self.friendSuggestions];
+  } if (self.noFriendSuggestions) {
+    [sections addObject:self.noFriendSuggestions];
   }
   
-  return self.suggestedResponse.topLevelSectionObjects;
+  return sections[section];
 }
 
 - (BOOL)shouldShowInvites
@@ -266,15 +294,19 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   // Set the header attributes
   NSMutableString *actorString = [NSMutableString new];
-  [actorString appendString:@"with "];
-  for (DFPeanutUserObject *user in strandObject.actors) {
+    for (DFPeanutUserObject *user in strandObject.actors) {
     if (user != strandObject.actors.firstObject) [actorString appendString:@", "];
     [actorString appendString:user.display_name];
   }
   
   cell.peopleLabel.text = actorString;
-  cell.locationLabel.text = strandObject.location;
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken abbreviate:NO];
+  
+  // context label "Date in Location"
+  NSMutableString *contextString = [NSMutableString new];
+  [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+                                                                abbreviate:NO]];
+  [contextString appendFormat:@" in %@", strandObject.location];
+  cell.contextLabel.text = contextString;
 }
 
 - (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
@@ -434,11 +466,18 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
       dispatch_async(dispatch_get_main_queue(), ^{
-      DFPeanutObjectsResponse *lastResponse = self.suggestedResponse;
-      self.suggestedResponse = response;
-      
       if (![responseHash isEqual:self.lastResponseHash]) {
         DDLogDebug(@"New data for suggestions, updating view...");
+        DFPeanutObjectsResponse *lastResponse = self.suggestedResponse;
+        self.suggestedResponse = response;
+        
+        self.friendSuggestions = [NSMutableArray new];
+        self.noFriendSuggestions = [NSMutableArray new];
+        for (DFPeanutFeedObject *object in response.objects) {
+          if (object.actors.count > 0) [self.friendSuggestions addObject:object];
+          else [self.noFriendSuggestions addObject:object];
+        }
+        
         [self updateTableViewForOldResponse:lastResponse newResponse:response];
         self.lastResponseHash = responseHash;
       } else {
@@ -498,59 +537,21 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (void)updateTableViewForOldResponse:(DFPeanutObjectsResponse *)oldResponse
                            newResponse:(DFPeanutObjectsResponse *)newResponse
 {
-  NSDictionary *oldIDsToIPs = [self mapIDsToIPs:oldResponse];
-  NSDictionary *newIDsToIPs = [self mapIDsToIPs:newResponse];
-  
-  // any IDs that are in newIDsToIPs but not in oldIDsToIPs was added
-  NSMutableSet *addedIDs = [[NSMutableSet alloc] initWithArray:newIDsToIPs.allKeys];
-  [addedIDs minusSet:[NSSet setWithArray:oldIDsToIPs.allKeys]];
-  NSMutableArray *addedIPs = [NSMutableArray new];
-  for (NSNumber *idNum in addedIDs) {
-    [addedIPs addObject:newIDsToIPs[idNum]];
+  if (!oldResponse || oldResponse.objects.count < 10) {
+    [self.tableView reloadData];
+    self.reloadBackground.hidden = YES;
+    return;
   }
   
-  // find all old rows that might have moved or been deleted
-  NSMutableSet *movedIDs = [NSMutableSet new];
-  NSMutableSet *deletedIPs = [NSMutableSet new];
-  for (NSNumber *idNum in oldIDsToIPs.allKeys) {
-    NSIndexPath *oldIP = oldIDsToIPs[idNum];
-    NSIndexPath *newIP = newIDsToIPs[idNum];
-    
-    if (!newIP) {
-      [deletedIPs addObject:oldIDsToIPs[idNum]];
-    } else if (![oldIP isEqual:newIP]) {
-      [movedIDs addObject:idNum];
-    }
-  }
-  
-  NSArray *idsOfObjectsWithChanges = [self idsOfObjectsWithMetadataChanges:oldResponse
-                                                               newResponse:newResponse];
-  NSArray *ipsOfObjectsWithChanges =
-  [idsOfObjectsWithChanges arrayByMappingObjectsWithBlock:^id(id input) {
-    return newIDsToIPs[input];
-  }];
-  
-  // tell the table view update the table view with changes
-  [self.tableView beginUpdates];
-  [self.tableView deleteRowsAtIndexPaths:deletedIPs.allObjects withRowAnimation:UITableViewRowAnimationNone];
-  [self.tableView insertRowsAtIndexPaths:addedIPs withRowAnimation:UITableViewRowAnimationRight];
-  for (NSNumber *idNum in movedIDs) {
-    [self.tableView moveRowAtIndexPath:oldIDsToIPs[idNum] toIndexPath:newIDsToIPs[idNum]];
-  }
-  
-  [self.tableView reloadRowsAtIndexPaths:ipsOfObjectsWithChanges
-                          withRowAnimation:UITableViewRowAnimationNone];
-
-  
-  [self.tableView endUpdates];
+  self.reloadBackground.hidden = NO;
 }
 
 - (NSDictionary *)mapIDsToIPs:(DFPeanutObjectsResponse *)response
 {
-  NSUInteger section = [self numberOfSectionsInTableView:self.tableView] - 1;
   NSMutableDictionary *IDsToIPs = [NSMutableDictionary new];
   for (NSUInteger i = 0; i < response.objects.count; i++) {
     DFPeanutFeedObject *object = response.objects[i];
+    NSUInteger section = (object.actors.count > 0) ? 1 : 2;
     IDsToIPs[@(object.id)] = [NSIndexPath indexPathForRow:i inSection:section];
   }
   return IDsToIPs;

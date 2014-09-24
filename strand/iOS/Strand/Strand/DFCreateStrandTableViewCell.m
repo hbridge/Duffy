@@ -29,7 +29,7 @@
 {
   
   if (style == DFCreateStrandCellStyleInvite) {
-    self.solidBackground.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
+    self.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   }
   
   // if it's a suggestion, remove the invite labels
@@ -41,6 +41,7 @@
   
   if (style == DFCreateStrandCellStyleSuggestionNoPeople) {
     [self.peopleLabel removeFromSuperview];
+    self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
   }
   
   [self layoutSubviews];

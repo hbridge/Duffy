@@ -17,15 +17,12 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
   DFCreateStrandCellStyleSuggestionNoPeople,
 };
 
-@property (weak, nonatomic) IBOutlet UIView *solidBackground;
 @property (weak, nonatomic) IBOutlet UILabel *inviterLabel;
 @property (weak, nonatomic) IBOutlet UILabel *invitedText;
-
-@property (weak, nonatomic) IBOutlet UILabel *locationLabel;
-@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *contextLabel;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
+@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 
 
 + (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;

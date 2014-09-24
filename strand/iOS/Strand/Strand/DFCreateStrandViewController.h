@@ -8,9 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFCreateStrandViewController : UITableViewController <UITableViewDataSource, UITableViewDelegate>
+@interface DFCreateStrandViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic) BOOL showAsFirstTimeSetup;
+@property (nonatomic, retain) IBOutlet UITableView *tableView;
+@property (nonatomic, retain) UIRefreshControl *refreshControl;
+@property (weak, nonatomic) IBOutlet UIView *reloadBackground;
+- (IBAction)reloadButtonPressed:(id)sender;
+
 
 + (instancetype)sharedViewController;
 - (void)refreshFromServer;
