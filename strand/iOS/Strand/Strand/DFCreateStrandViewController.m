@@ -480,6 +480,10 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
         }
         
         [self updateTableViewForOldResponse:lastResponse newResponse:response];
+        NSUInteger badgeCount = self.inviteObjects.count + self.friendSuggestions.count;
+        self.tabBarItem.badgeValue = [NSString stringWithFormat:@"%@",
+                                      badgeCount > 0 ? @(badgeCount) : @""];
+        
         self.lastResponseHash = responseHash;
       } else {
         DDLogDebug(@"Got back response for strand suggestions but it was the same");
