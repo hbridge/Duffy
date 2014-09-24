@@ -516,21 +516,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
        if ([DFCreateStrandViewController inviteObjectsChangedForOldInvites:oldInvites
                                                                 newInvites:self.inviteObjects])
        {
-         if (oldInvites.count > 0 && self.inviteObjects.count > 0) {
-           [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0]
-                         withRowAnimation:UITableViewRowAnimationNone];
-         } else if (oldInvites.count == 0 && self.inviteObjects.count > 0) {
-           [self.tableView insertSections:[NSIndexSet indexSetWithIndex:0]
-                         withRowAnimation:UITableViewRowAnimationFade];
-         } else if (oldInvites.count > 0 && self.inviteObjects.count == 0){
-           [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:0]
-                         withRowAnimation:UITableViewRowAnimationLeft];
-         } else {
-           DDLogError(@"%@ unexpected condition: oldInvites:%d newInvites:%d",
-                      self.class, (int)oldInvites.count, (int)self.inviteObjects.count);
-         }
+         [self.tableView reloadData];
        }
-       
      });
    }];
 }
