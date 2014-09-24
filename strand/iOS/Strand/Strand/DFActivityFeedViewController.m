@@ -61,10 +61,15 @@
   [self configurePopLabel];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [self refreshFromServer];
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [self refreshFromServer];
   if (!self.lastResponseHash) {
     [self.refreshControl beginRefreshing];
   }

@@ -119,6 +119,11 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [self.refreshControl addTarget:self
                           action:@selector(refreshFromServer)
                 forControlEvents:UIControlEventValueChanged];
+  
+  UITableViewController *mockTVC = [[UITableViewController alloc] init];
+  mockTVC.tableView = self.tableView;
+  mockTVC.refreshControl = self.refreshControl;
+  
   [self.refreshControl beginRefreshing];
 }
 
@@ -151,6 +156,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [super viewWillAppear:animated];
   
   [self.tableView reloadData];
+  [self refreshFromServer];
   if (self.navigationController.isBeingPresented) {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                              initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
@@ -174,6 +180,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   [super viewDidDisappear:animated];
   [self.refreshTimer invalidate];
+  self.refreshTimer = nil;
 }
 
 - (void)didReceiveMemoryWarning
