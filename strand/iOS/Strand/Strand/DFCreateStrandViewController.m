@@ -350,12 +350,15 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 }
 
 
+const NSUInteger MaxPhotosPerCell = 3;
+
 - (void)setLocalPhotosForCell:(DFCreateStrandTableViewCell *)cell
                       section:(DFPeanutFeedObject *)section
 {
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];
-  for (DFPeanutFeedObject *object in section.objects) {
+  for (NSUInteger i = 0; i < MIN(MaxPhotosPerCell, section.objects.count); i++) {
+    DFPeanutFeedObject *object = section.objects[i];
     if ([object.type isEqual:DFFeedObjectPhoto]) {
       [idsToShow addObject:@(object.id)];
       
