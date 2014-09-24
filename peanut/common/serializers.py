@@ -11,17 +11,6 @@ class PhotoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Photo
 
-
-class PhotoForApiSerializer(serializers.ModelSerializer):
-	full_image_path = serializers.Field(source='getFullUrlImagePath')
-	thumb_image_path = serializers.Field(source='getThumbUrlImagePath')
-	user_display_name = serializers.Field(source='getUserDisplayName')
-
-	class Meta:
-		model = Photo
-		fields = ('id', 'user', 'time_taken', 'local_time_taken', 'full_image_path', 'thumb_image_path', 'user_display_name',)
-
-
 class UserSerializer(serializers.ModelSerializer):
 	partial = True
 	display_name = serializers.CharField(required=False)
@@ -59,3 +48,15 @@ class BulkStrandInviteSerializer(serializers.Serializer):
 
 	bulk_model = StrandInvite
 	bulk_key = 'invites'
+
+def photoDataForApiSerializer(photo):
+	photoData = dict()
+	photoData['id'] = photo.id
+	photoData['user'] = photo.user_id
+	photoData['time_taken'] = photo.time_taken
+	photoData['local_time_taken'] = None
+	photoData['full_image_path'] = photo.getFullUrlImagePath()
+	photoData['thumb_image_path'] = photo.getThumbUrlImagePath()
+	photoData['user_display_name'] = photo.getUserDisplayName()
+
+	return photoData

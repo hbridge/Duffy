@@ -11,7 +11,8 @@ from django.contrib.gis.geos import Point
 from peanut.settings import constants
 
 from common.models import Photo
-from common.serializers import ActionWithUserNameSerializer, PhotoForApiSerializer
+from common.serializers import ActionWithUserNameSerializer
+from common import serializers
 
 class DuffyJsonEncoder(json.JSONEncoder):
 	def default(self, obj):
@@ -58,7 +59,9 @@ def getPhotoObject(entry):
 	photo = entry['photo']
 
 	if (photo.isDbPhoto()):
-		photoData.update(PhotoForApiSerializer(photo.getDbPhoto()).data)
+		photo = photo.getDbPhoto()
+		photoData.update(serializers.photoDataForApiSerializer(photo))
+
 	else:
 		photoData.update(photo.serialize())
 

@@ -353,7 +353,7 @@ class SimplePhoto:
 			self.id = self.dbPhoto.id
 			self.time_taken = self.dbPhoto.time_taken
 			self.user = self.dbPhoto.user_id
-			self.display_name = self.dbPhoto.user.display_name
+			#self.display_name = self.dbPhoto.user.display_name
 
 			
 

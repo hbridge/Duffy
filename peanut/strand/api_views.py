@@ -16,9 +16,9 @@ from django.db import IntegrityError
 from peanut.settings import constants
 
 from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action
-from common.serializers import UserSerializer, PhotoForApiSerializer
+from common.serializers import UserSerializer
 
-from common import api_util, cluster_util
+from common import api_util, cluster_util, serializers
 
 from strand import geo_util, notifications_util, friends_util, strands_util
 from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm, SuggestedUnsharedPhotosForm
@@ -172,35 +172,25 @@ def getFormattedGroups(groups):
 	# Fetch all the similarities at once so we can process in memory
 	a = datetime.datetime.now()
 	simCaches = cluster_util.getSimCaches(photoIds)
-	print "here11 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
+	
 	# Do same with actions
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
-	
-	print "here12 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 
 	for group in groups:
 		if len(group['photos']) == 0:
 			continue
 
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
-
-		print "here13 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 		
 		location = getBestLocationForPhotos(group['photos'])
 		if not location:
 			location = "Location Unknown"
 
-		print "here14 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
 		metadata = group['metadata']
 		metadata.update({'subtitle': location, 'location': location})
 		
 		output.append({'clusters': clusters, 'metadata': metadata})
-
-	print "here15 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 
 	return output
 
@@ -443,7 +433,7 @@ def getObjectsDataForActions(user):
 				
 			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
 
-			photoData = PhotoForApiSerializer(action.photo).data
+			photoData = serializers.photoDataForApiSerializer(action.photo)
 			photoData['type'] = "photo"
 			entry['objects'] = [photoData]
 			objectResponse.append(entry)
