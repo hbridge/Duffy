@@ -58,14 +58,12 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
                      success:(DFPeanutRestFetchSuccess)success
                      failure:(DFPeanutRestFetchFailure)failure
 {
-  NSString *invitePath = [[StrandInviteBasePath stringByAppendingPathComponent:[inviteID stringValue]]
-                          stringByAppendingString:@"/"];
   DFPeanutStrandInvite *invite = [[DFPeanutStrandInvite alloc] init];
   invite.id = inviteID;
   // get the invite object
   [super
    performRequest:RKRequestMethodGET
-   withPath:invitePath
+   withPath:StrandInviteBasePath
    objects:@[invite]
    parameters:nil
    forceCollection:NO
@@ -74,7 +72,7 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
      fetchedInvite.accepted_user = @([[DFUser currentUser] userID]);
      [super
       performRequest:RKRequestMethodPUT
-      withPath:invitePath
+      withPath:StrandInviteBasePath
       objects:@[fetchedInvite]
       parameters:nil
       forceCollection:NO
