@@ -1,39 +1,44 @@
 # Strand
 
-## Aug 26th 2015 (1.0.2 4725/4726)
+# Sep 24th, 2014
+
+Totally new and redesigned app! Strand finds photos you want that are trapped on other people's phones and helps you get them. First, share photos on your phone with people you were with. Then, when people receive your photos, they'll be prompted to automatically share back photos they have from the same event
+
+
+## Aug 26th 2014 (1.0.2 4725/4726)
 
 - Minor bug fixes
 
-## Aug 22nd 2015 (1.0.2 4722/4724)
+## Aug 22nd 2014 (1.0.2 4722/4724)
 
 - New Gallery View!  See all your strand photos in a gallery.  Just press the button at the top left corner of the feed.
 - Minor bug fixes
 
-## Aug 21st 2015 (1.0.2 4721)
+## Aug 21st 2014 (1.0.2 4721)
 
 - New invite user flow
 
-## Aug 20th 2015 (1.0.2 4719)
+## Aug 20th 2014 (1.0.2 4719)
 
 - New app icon!
 - Tapping an in app notification takes you to the photo in feed
 
-## Aug 19th, 2015 (4718)
+## Aug 19th, 2014 (4718)
 
 - Access your recent notifications from the top of the feed
 - Add contacts manually in settings if you don't give the app permission to access your contacts
 - Performance improvements: new photos appear faster, feed loads faster
 
-## Aug 13th, 2015 (4717)
+## Aug 13th, 2014 (4717)
 
 - Status bar hides in feed to give you more space to see photos
 - More work on fixing the blank camera and battery life
 
-## Aug 11th, 2015
+## Aug 11th, 2014
 
 - Totally new camera with improved speed and reliability
 
-## Aug 7th, 2015
+## Aug 7th, 2014
 
 - Improved battery drain
 - Other minor bug fixes

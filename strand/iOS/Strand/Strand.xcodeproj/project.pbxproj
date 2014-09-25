@@ -1764,6 +1764,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -1840,6 +1841,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -1957,6 +1959,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
@@ -1979,13 +1982,14 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				GCC_PREFIX_HEADER = "Strand/Strand-Prefix.pch";
 				INFOPLIST_FILE = Strand/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "69BE47F0-26B1-4E44-8825-87D856B8E00D";
+				PROVISIONING_PROFILE = "1ff12b2a-56a4-4055-9f22-5cc7dc03a5f7";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Strand/Strand-Bridging-Header.h";
 			};
