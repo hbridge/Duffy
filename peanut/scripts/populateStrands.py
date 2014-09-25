@@ -110,7 +110,7 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	# TODO(Derek): Filter by friends who are actually in the feed (right now everyone in a strand)
 	#    get a refreshFeed, even if they can't see the new photos
 	#frequencyOfGpsUpdatesCutoff = now - datetime.timedelta(hours=3)
-	#users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
+	#users = User.objects.filter(product_id=2).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
 
 	#for photo in newPhotos:
 	#	nearbyUsers = geo_util.getNearbyUsers(photo.location_point.x, photo.location_point.y, users)
@@ -181,7 +181,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=1).order_by('-time_taken')[:maxPhotosAtTime]
+		photos = Photo.objects.all().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=2).order_by('-time_taken')[:maxPhotosAtTime]
 		
 		a = datetime.datetime.now()
 		if len(photos) > 0:

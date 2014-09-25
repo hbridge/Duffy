@@ -208,7 +208,7 @@ def getFormattedGroups(groups):
 """
 def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
 	try:
-		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=1))
+		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=2))
 		
 		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
 			return user
@@ -225,7 +225,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	# TODO(Derek): Make this more interesting when we add auth to the APIs
 	authToken = random.randrange(10000, 10000000)
 
-	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 1, auth_token = str(authToken))
+	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 2, auth_token = str(authToken))
 
 	if smsAuth:
 		smsAuth.user_created = user
@@ -834,7 +834,7 @@ def register_apns_token(request):
 	If people are around but haven't taken a photo, returns:  "5 friends are near you"
 	If people are around and someone has taken a photo, returns:  "Henry & 4 other friends are near you"
 	If more than one person is nearby, returns:  "Henry & Aseem & 1 other friend are near you"
-"""
+
 def get_nearby_friends_message(request):
 	response = dict({'result': True})
 	form = GetFriendsNearbyMessageForm(api_util.getRequestData(request))
@@ -852,7 +852,7 @@ def get_nearby_friends_message(request):
 		friendsData = friends_util.getFriendsData(user.id)
 		
 		# For now, search through all Users, when we have more, do something more efficent
-		users = User.objects.exclude(id=user.id).exclude(last_location_point=None).filter(product_id=1).filter(last_location_timestamp__gt=timeWithin)
+		users = User.objects.exclude(id=user.id).exclude(last_location_point=None).filter(product_id=2).filter(last_location_timestamp__gt=timeWithin)
 		users = friends_util.filterUsersByFriends(user.id, friendsData, users)
 
 		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=user.id)
@@ -919,7 +919,7 @@ def get_nearby_friends_message(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
-
+"""
 """
 	Sends a notification to the device based on the user_id
 """

@@ -22,12 +22,12 @@ urlpatterns = patterns('',
 	url(r'^suggested_unshared_photos', 'strand.api_views.suggested_unshared_photos'),
 	url(r'^strand_activity', 'strand.api_views.strand_activity'),
 
-	url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands'),
-	url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
+	#url(r'^get_joinable_strands', 'strand.api_views.get_joinable_strands'),
+	#url(r'^get_new_photos', 'strand.api_views.get_new_photos'),
 
 	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
 	url(r'^update_user_location', 'strand.api_views.update_user_location'),
-	url(r'^get_nearby_friends_message', 'strand.api_views.get_nearby_friends_message'),
+	#url(r'^get_nearby_friends_message', 'strand.api_views.get_nearby_friends_message'),
 
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
