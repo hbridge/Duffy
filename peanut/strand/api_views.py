@@ -27,23 +27,6 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-# TODO(Derek): move to a common loc, used in sendStrandNotifications
-def cleanName(str):
-	return str.split(' ')[0].split("'")[0]
-
-def removeDups(seq, idFunction=None): 
-   # order preserving
-   if idFunction is None:
-	   def idFunction(x): return x
-   seen = {}
-   result = []
-   for item in seq:
-	   id = idFunction(item)
-	   if id in seen: continue
-	   seen[id] = 1
-	   result.append(item)
-   return result
-
 def getBestLocation(photo):
 	if photo.twofishes_data:
 		twoFishesData = json.loads(photo.twofishes_data)
@@ -108,6 +91,107 @@ def getTitleForStrand(strand):
 		title += " in " + location
 
 	return title
+
+
+"""
+	Creates a cache which is a dictionary with the key being the strandId and the value
+	a list of neighbor strands
+
+	returns cache[strandId] = list(neighborStrand1, neighborStrand2...)
+"""
+def getStrandNeighborsCache(strands):
+	strandIds = Strand.getIds(strands)
+
+	strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+
+	strandNeighborsCache = dict()
+	for strand in strands:
+		for strandNeighbor in strandNeighbors:
+			added = False
+			if strand.id == strandNeighbor.strand_1_id:
+				if strand.id not in strandNeighborsCache:
+					strandNeighborsCache[strand.id] = list()
+				if strandNeighbor.strand_2 not in strandNeighborsCache[strand.id]:
+					strandNeighborsCache[strand.id].append(strandNeighbor.strand_2)
+			elif strand.id == strandNeighbor.strand_2_id:
+				if strand.id not in strandNeighborsCache:
+					strandNeighborsCache[strand.id] = list()
+				if strandNeighbor.strand_1 not in strandNeighborsCache[strand.id]:
+					strandNeighborsCache[strand.id].append(strandNeighbor.strand_1)
+					
+	return strandNeighborsCache
+
+"""
+	Helper Method for auth_phone
+
+	Strand specific code for creating a user.  If a user already exists, this will
+	archive the old one by changing the phone number to an archive format (2352+15555555555)
+
+	This also updates the SmsAuth object to point to this user
+
+	Lastly, this creates the local directory
+
+	TODO(Derek):  If we create users in more places, might want to move this
+"""
+def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
+	try:
+		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=2))
+		
+		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
+			return user
+		else:
+			# User exists, so need to archive
+			# To do that, re-do the phone number, adding in an archive code
+			archiveCode = random.randrange(1000, 10000)
+			
+			user.phone_number = "%s%s" %(archiveCode, phoneNumber)
+			user.save()
+	except User.DoesNotExist:
+		pass
+
+	# TODO(Derek): Make this more interesting when we add auth to the APIs
+	authToken = random.randrange(10000, 10000000)
+
+	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 2, auth_token = str(authToken))
+
+	if smsAuth:
+		smsAuth.user_created = user
+		smsAuth.save()
+
+	logger.info("Created new user %s" % user)
+
+	# Now pre-populate friends who this user was invited by
+	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invited").exclude(skip=True)
+	
+	for invite in invitedBy:
+		try:
+			if user.id < invite.user.id:
+				FriendConnection.objects.create(user_1=user, user_2=invite.user)
+			else:
+				FriendConnection.objects.create(user_1=invite.user, user_2=user)
+			logger.debug("Created invite friend entry for user %s with user %s" % (user.id, invite.user.id))
+		except IntegrityError:
+			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
+
+	# Now fill in strand invites for this phone number
+	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user__isnull=True).filter(accepted_user__isnull=True)
+	for strandInvite in strandInvites:
+		strandInvite.invited_user = user
+	if len(strandInvites) > 0:
+		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
+		logger.debug("Updated %s invites with user id %s" % (len(strandInvites), user.id))
+	
+	# Create directory for photos
+	# TODO(Derek): Might want to move to a more common location if more places that we create users
+	try:
+		userBasePath = user.getUserDataPath()
+		os.stat(userBasePath)
+	except:
+		os.mkdir(userBasePath)
+		os.chmod(userBasePath, 0775)
+
+	return user
+
 
 def getActorsObjectData(actors, includePhone = False):
 	if not isinstance(actors, list):
@@ -193,106 +277,6 @@ def getFormattedGroups(groups):
 		output.append({'clusters': clusters, 'metadata': metadata})
 
 	return output
-
-"""
-	Helper Method for auth_phone
-
-	Strand specific code for creating a user.  If a user already exists, this will
-	archive the old one by changing the phone number to an archive format (2352+15555555555)
-
-	This also updates the SmsAuth object to point to this user
-
-	Lastly, this creates the local directory
-
-	TODO(Derek):  If we create users in more places, might want to move this
-"""
-def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist = False):
-	try:
-		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=2))
-		
-		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
-			return user
-		else:
-			# User exists, so need to archive
-			# To do that, re-do the phone number, adding in an archive code
-			archiveCode = random.randrange(1000, 10000)
-			
-			user.phone_number = "%s%s" %(archiveCode, phoneNumber)
-			user.save()
-	except User.DoesNotExist:
-		pass
-
-	# TODO(Derek): Make this more interesting when we add auth to the APIs
-	authToken = random.randrange(10000, 10000000)
-
-	user = User.objects.create(phone_number = phoneNumber, display_name = displayName, phone_id = phoneId, product_id = 2, auth_token = str(authToken))
-
-	if smsAuth:
-		smsAuth.user_created = user
-		smsAuth.save()
-
-	logger.info("Created new user %s" % user)
-
-	# Now pre-populate friends who this user was invited by
-	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invited").exclude(skip=True)
-	
-	for invite in invitedBy:
-		try:
-			if user.id < invite.user.id:
-				FriendConnection.objects.create(user_1=user, user_2=invite.user)
-			else:
-				FriendConnection.objects.create(user_1=invite.user, user_2=user)
-			logger.debug("Created invite friend entry for user %s with user %s" % (user.id, invite.user.id))
-		except IntegrityError:
-			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
-
-	# Now fill in strand invites for this phone number
-	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user__isnull=True).filter(accepted_user__isnull=True)
-	for strandInvite in strandInvites:
-		strandInvite.invited_user = user
-	if len(strandInvites) > 0:
-		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
-		logger.debug("Updated %s invites with user id %s" % (len(strandInvites), user.id))
-	
-	# Create directory for photos
-	# TODO(Derek): Might want to move to a more common location if more places that we create users
-	try:
-		userBasePath = user.getUserDataPath()
-		os.stat(userBasePath)
-	except:
-		os.mkdir(userBasePath)
-		os.chmod(userBasePath, 0775)
-
-	return user
-
-
-"""
-	Creates a cache which is a dictionary with the key being the strandId and the value
-	a list of neighbor strands
-
-	returns cache[strandId] = list(neighborStrand1, neighborStrand2...)
-"""
-def getStrandNeighborsCache(strands):
-	strandIds = Strand.getIds(strands)
-
-	strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
-
-	strandNeighborsCache = dict()
-	for strand in strands:
-		for strandNeighbor in strandNeighbors:
-			added = False
-			if strand.id == strandNeighbor.strand_1_id:
-				if strand.id not in strandNeighborsCache:
-					strandNeighborsCache[strand.id] = list()
-				if strandNeighbor.strand_2 not in strandNeighborsCache[strand.id]:
-					strandNeighborsCache[strand.id].append(strandNeighbor.strand_2)
-			elif strand.id == strandNeighbor.strand_2_id:
-				if strand.id not in strandNeighborsCache:
-					strandNeighborsCache[strand.id] = list()
-				if strandNeighbor.strand_1 not in strandNeighborsCache[strand.id]:
-					strandNeighborsCache[strand.id].append(strandNeighbor.strand_1)
-					
-	return strandNeighborsCache
 	
 def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	metadata = {'type': feedObjectType, 'title': ""}
@@ -346,7 +330,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
 
-	print "here1 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 	for strand in strands:
 		strandId = strand.id
 		photos = strand.photos.all().order_by("-time_taken")
@@ -372,8 +355,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 			else:
 				noInterestedUsersGroups.append(entry)
 
-	print "here2 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
 	if len(interestedUsersGroups) > 0:
 		# now sort groups by the time_taken of the first photo in each group
 		interestedUsersGroups = sorted(interestedUsersGroups, key=lambda x: x['photos'][0].time_taken, reverse=True)
@@ -384,22 +365,13 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 	interestedUsersFormattedGroups = getFormattedGroups(interestedUsersGroups)
 		
-	print "here3 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(interestedUsersFormattedGroups, 1000)
 
-	print "here4 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
 	noInterestedUsersFormattedGroups = getFormattedGroups(noInterestedUsersGroups)
 
-	print "here5 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects.extend(api_util.turnFormattedGroupsIntoFeedObjects(noInterestedUsersFormattedGroups, 1000))
-
-	print "here6 took %s" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
-
 
 	return objects
 
@@ -541,19 +513,6 @@ def getInviteObjectsDataForUser(user):
 
 # ----------------------- FEED ENDPOINTS --------------------
 
-def invited_strands(request):
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		response['objects'] = getInviteObjectsDataForUser(user)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
 """
 	Return the Duffy JSON for the strands a user has that are private and unshared
 
@@ -579,51 +538,26 @@ def unshared_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-"""
-	Return the Duffy JSON for "private" photos for a user that are a good match for the given strand
-
-	TODO(Derek):  Remove this
-"""
-def suggested_unshared_photos(request):
-	response = dict({'result': True})
-
-	form = SuggestedUnsharedPhotosForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-
-		# This is the strand we're looking in the users's private photos to see if there's any good matches
-		strand = form.cleaned_data['strand']
-
-		photos = getPhotosSuggestionsForStrand(user, strand)
-		suggestionsEntries = getObjectsDataForPhotos(user, photos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
-
-		response['objects'] = suggestionsEntries
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
-"""
-	Return the Duffy JSON for the photo feed.
+# ---------------------------------------------------------------
 
-	This uses the Strand objects instead of neighbors
-"""
-def strand_feed(request):
+# Soon to be deprecated
+def invited_strands(request):
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
 
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
-		strands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=True)
-		objectData = getObjectsDataForStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
-
-		response['objects'] = objectData
+		response['objects'] = getInviteObjectsDataForUser(user)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+
+# Soon to be deprecated
 def strand_activity(request):
 	response = dict({'result': True})
 
@@ -664,66 +598,6 @@ def strand_activity(request):
 		responseObjects.extend(afterInviteFeedObjects)
 
 		response['objects'] = responseObjects
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-
-
-"""
-	the user would join if they took a picture at the given startTime (defaults to now)
-
-	Searches for all photos of their friends within the time range and geo range but that don't have a
-	  neighbor entry
-
-	Used by the web view and the mobile client call
-
-	returns (lastDate, objects) which should be handed back in the response as response['objects']
-"""
-def get_joinable_strands(request):
-	response = dict({'result': True})
-
-	nowTime = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	timeLow = nowTime - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
-
-	form = GetJoinableStrandsForm(api_util.getRequestData(request)) 
-	if form.is_valid():
-		user = form.cleaned_data['user']
-		lon = form.cleaned_data['lon']
-		lat = form.cleaned_data['lat']
-
-		friendsData = friends_util.getFriendsData(user.id)
-		strands = Strand.objects.select_related().filter(last_photo_time__gt=timeLow)
-
-		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, lon, lat, strands, friendsData)
-		
-		response['objects'] = getObjectsDataForPhotos(user, joinableStrandPhotos, constants.FEED_OBJECT_TYPE_STRAND)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-"""
-	Returns back any new photos in the user's strands after the given date and time
-"""
-def get_new_photos(request):
-	response = dict({'result': True})
-
-	form = GetNewPhotosForm(api_util.getRequestData(request))
-	if form.is_valid():
-		user = form.cleaned_data['user']
-		startTime = form.cleaned_data['start_date_time']
-		photoList = list()
-
-		strands = Strand.objects.filter(last_photo_time__gt=startTime).filter(users=user.id).filter(shared=True)
-		
-		for strand in strands:
-			for photo in strand.photos.filter(time_taken__gt=startTime):
-				if photo.user_id != user.id:
-					photoList.append(photo)
-
-		photoList = removeDups(photoList, lambda x: x.id)
-
-		response['objects'] = getObjectsDataForPhotos(user, photoList, constants.FEED_OBJECT_TYPE_STRAND)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -829,99 +703,6 @@ def register_apns_token(request):
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
-def nothing(request):
-	return HttpResponse(json.dumps(dict()), content_type="application/json")
-"""
-	Returns a string that describes who is around.
-	If people are around but haven't taken a photo, returns:  "5 friends are near you"
-	If people are around and someone has taken a photo, returns:  "Henry & 4 other friends are near you"
-	If more than one person is nearby, returns:  "Henry & Aseem & 1 other friend are near you"
-
-def get_nearby_friends_message(request):
-	response = dict({'result': True})
-	form = GetFriendsNearbyMessageForm(api_util.getRequestData(request))
-
-	timeWithinHours = 3
-	
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		lat = form.cleaned_data['lat']
-		lon = form.cleaned_data['lon']
-
-		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		timeWithin = now - datetime.timedelta(hours=timeWithinHours)
-
-		friendsData = friends_util.getFriendsData(user.id)
-		
-		# For now, search through all Users, when we have more, do something more efficent
-		users = User.objects.exclude(id=user.id).exclude(last_location_point=None).filter(product_id=2).filter(last_location_timestamp__gt=timeWithin)
-		users = friends_util.filterUsersByFriends(user.id, friendsData, users)
-
-		nearbyUsers = geo_util.getNearbyUsers(lon, lat, users, filterUserId=user.id)
-
-		photos = Photo.objects.filter(user_id__in=User.getIds(nearbyUsers)).filter(time_taken__gt=timeWithin)
-		
-		nearbyPhotosData = geo_util.getNearbyPhotos(now, lon, lat, photos, filterUserId=user.id)
-
-		photoUsers = list()
-		nonPhotoUsers = nearbyUsers
-		
-		for user in users:
-			hasPhoto = False
-			for nearbyPhotoData in nearbyPhotosData:
-				photo, timeDistance, geoDistance = nearbyPhotoData
-				if photo.user_id == user.id:
-					hasPhoto = True
-
-			if hasPhoto:
-				photoUsers.append(user)
-
-				# Remove this user from the nonPhotos list since we've found a photo
-				nonPhotoUsers = filter(lambda a: a.id != user.id, nonPhotoUsers)
-
-		if len(photoUsers) == 0 and len(nonPhotoUsers) == 0:
-			message = ""
-			expMessage = "No friends are near you."
-		elif len(photoUsers) == 0:
-			if len(nonPhotoUsers) == 1:
-				message = "1 friend will see this photo"
-				expMessage = "1 friend near you hasn't taken a photo yet. Take a photo to share with them."
-			else:
-				message = "%s friends will see this photo" % (len(nonPhotoUsers))
-				expMessage = "%s friends near you haven't taken a photo yet. Take a photo to share with them." % (len(nearbyUsers))
-		elif len(photoUsers) > 0:
-			names = list()
-			for user in photoUsers:
-				names.append(cleanName(user.display_name))
-		
-			if len(nonPhotoUsers) == 0:
-				if len(names) <= 2:
-					message = " & ".join(names)
-				else:
-					numNames = len(names)
-					message = ", ".join(names[:numNames-2])
-					message += " & %s" % (names[numNames-1])
-				expMessage = message + " took a photo near you."
-			else:
-				message = ", ".join(names)
-				expMessage = message + " took a photo near you."
-
-				if len(nonPhotoUsers) == 1:
-					message += " & 1 friend"
-					expMessage += " 1 other friend near you hasn't taken a photo yet."
-				else:
-					message += " & %s friends" % len(nonPhotoUsers)
-					expMessage += " %s other friends near you haven't taken a photo yet." % len (nonPhotoUsers)
-
-			message += " will see this photo"
-
-		response['message'] = message
-		response['expanded_message'] = expMessage
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	
-	return HttpResponse(json.dumps(response), content_type="application/json")
-"""
 """
 	Sends a notification to the device based on the user_id
 """
@@ -1052,52 +833,8 @@ def auth_phone(request):
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-"""
-def get_invite_message(request):
-	response = dict({'result': True})
 
-	form = OnlyUserIdForm(api_util.getRequestData(request))
 
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-	
-		if ('enterprise' in form.cleaned_data['build_id'].lower()):
-			inviteLink = constants.INVITE_LINK_ENTERPRISE
-		else:
-			inviteLink = constants.INVITE_LINK_APP_STORE
-
-		response['invite_message'] = "Try this app so we can share photos when we hang out: "  + inviteLink + "."
-		response['invites_remaining'] = user.invites_remaining
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-def get_notifications(request):
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		response['notifications'] = list()
-
-		photoActions = PhotoAction.objects.filter(photo__user_id=user.id).order_by("-added")[:20]
-
-		for photoAction in photoActions:
-			if photoAction.user_id != user.id:
-				metadataMsg = 'liked your photo'
-				metadata = {'photo_id': photoAction.photo_id,
-							'action_text': metadataMsg,
-							'actor_user': photoAction.user_id,
-							'actor_display_name':  photoAction.user.display_name,
-							'photo_thumb_path': photoAction.photo.getThumbUrlImagePath(),
-							'time': photoAction.added}
-				response['notifications'].append(metadata)
-		
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-"""
+def nothing(request):
+	return HttpResponse(json.dumps(dict()), content_type="application/json")
 

@@ -11,27 +11,17 @@ from common.models import User, ContactEntry, Strand, StrandInvite, Action
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
+	url(r'^unshared_strands', 'strand.api_views.unshared_strands'),
+	url(r'^strand_inbox', 'strand.api_views.strand_inbox'),
+
+	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
+	url(r'^update_user_location', 'strand.api_views.update_user_location'),
+
+	# REST
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/(?P<photoId>[0-9]+)/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/bulk/$', arbus_api_views.PhotoBulkAPI.as_view()),
 	
-	url(r'^neighbors', 'strand.api_views.strand_feed'),
-	url(r'^strand_feed', 'strand.api_views.strand_feed'),
-	url(r'^unshared_strands', 'strand.api_views.unshared_strands'),
-	url(r'^invited_strands', 'strand.api_views.invited_strands'),
-	url(r'^suggested_unshared_photos', 'strand.api_views.suggested_unshared_photos'),
-	url(r'^strand_activity', 'strand.api_views.strand_activity'),
-
-	url(r'^get_joinable_strands', 'strand.api_views.nothing'),
-	url(r'^get_new_photos', 'strand.api_views.nothing'),
-
-	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
-	url(r'^update_user_location', 'strand.api_views.update_user_location'),
-	url(r'^get_nearby_friends_message', 'strand.api_views.nothing'),
-
-	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
-	url(r'^auth_phone', 'strand.api_views.auth_phone'),
-
 	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
 	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),
 
@@ -47,7 +37,20 @@ urlpatterns = patterns('',
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
-	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),	
+	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),
+
+	# Soon to be deprecated
+	url(r'^strand_activity', 'strand.api_views.strand_activity'),
+	url(r'^invited_strands', 'strand.api_views.invited_strands'),
+
+	# Deprecated
+	url(r'^strand_feed', 'strand.api_views.nothing'),
+	url(r'^get_joinable_strands', 'strand.api_views.nothing'),
+	url(r'^get_new_photos', 'strand.api_views.nothing'),
+	url(r'^suggested_unshared_photos', 'strand.api_views.nothing'),
+	url(r'^neighbors', 'strand.api_views.nothing'),
+
+	url(r'^get_nearby_friends_message', 'strand.api_views.nothing'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)
