@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFActivityFeedViewController.h"
+#import "DFInboxViewController.h"
 #import "DFPeanutFeedObject.h"
-#import "DFActivityFeedTableViewCell.h"
+#import "DFInboxTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFImageStore.h"
 #import "DFFeedViewController.h"
@@ -21,7 +21,7 @@
 #import "DFStrandConstants.h"
 #import "MMPopLabel.h"
 
-@interface DFActivityFeedViewController ()
+@interface DFInboxViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
@@ -30,7 +30,7 @@
 
 @end
 
-@implementation DFActivityFeedViewController
+@implementation DFInboxViewController
 
 @synthesize feedAdapter = _feedAdapter;
 
@@ -101,13 +101,13 @@
 - (void)configureTableView
 {
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"collectionCell"];
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"inviteCell"];
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"singleCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
@@ -242,7 +242,7 @@
 - (UITableViewCell *)cellForStrandPost:(DFPeanutFeedObject *)strandPost
 {
   DFPeanutFeedObject *strandObject = strandPost.objects.firstObject;
-  DFActivityFeedTableViewCell *cell = [self.tableView
+  DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"collectionCell"];
   if (cell.previewImageView.superview) {
     [cell.previewImageView removeFromSuperview];
@@ -284,7 +284,7 @@ const NSUInteger inviteRowMaxImages = 3;
 
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
-  DFActivityFeedTableViewCell *cell = [self.tableView
+  DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"inviteCell"];
   if (cell.previewImageView.superview) {
     [cell.previewImageView removeFromSuperview];
@@ -316,7 +316,7 @@ const NSUInteger inviteRowMaxImages = 3;
 
 - (UITableViewCell *)cellForAction:(DFPeanutFeedObject *)actionObject
 {
-  DFActivityFeedTableViewCell *cell = [self.tableView
+  DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"singleCell"];
   if (cell.collectionView.superview) {
     [cell.collectionView removeFromSuperview];
@@ -343,7 +343,7 @@ const NSUInteger inviteRowMaxImages = 3;
   return cell;
 }
 
-+ (void)resetCell:(DFActivityFeedTableViewCell *)cell
++ (void)resetCell:(DFInboxTableViewCell *)cell
 {
   cell.timeLabel.text = @"T";
   cell.actorLabel.text = @"Actor";
@@ -353,7 +353,7 @@ const NSUInteger inviteRowMaxImages = 3;
   cell.previewImageView.image = nil;
 }
 
-- (void)setRemotePhotosForCell:(DFActivityFeedTableViewCell *)cell
+- (void)setRemotePhotosForCell:(DFInboxTableViewCell *)cell
                    withSection:(DFPeanutFeedObject *)section
                      maxPhotos:(NSUInteger)maxPhotosToFetch
 {
@@ -385,7 +385,7 @@ const NSUInteger inviteRowMaxImages = 3;
   }
 }
 
-- (void)setRemotePreviewPhotoForCell:(DFActivityFeedTableViewCell *)cell
+- (void)setRemotePreviewPhotoForCell:(DFInboxTableViewCell *)cell
                       withFeedObject:(DFPeanutFeedObject *)object
 {
   DFPeanutFeedObject *photoObject = object.objects.firstObject;

@@ -39,7 +39,7 @@
 #import "DFSettingsViewController.h"
 #import "DFCreateStrandViewController.h"
 #import "DFTopBarController.h"
-#import "DFActivityFeedViewController.h"
+#import "DFInboxViewController.h"
 #import "DFGalleryViewController.h"
 
 
@@ -184,7 +184,7 @@ const NSUInteger MinValidAccountId = 650;
   
   [DFPhotoStore sharedStore];
   
-  DFActivityFeedViewController *strandsFeedViewCotnroller = [[DFActivityFeedViewController alloc] init];
+  DFInboxViewController *strandsFeedViewCotnroller = [[DFInboxViewController alloc] init];
   DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
   createViewController.showAsFirstTimeSetup = YES;
   // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
