@@ -17,6 +17,9 @@ urlpatterns = patterns('',
 	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
 	url(r'^update_user_location', 'strand.api_views.update_user_location'),
 
+	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
+	url(r'^auth_phone', 'strand.api_views.auth_phone'),
+
 	# REST
 	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
 	url(r'^photos/(?P<photoId>[0-9]+)/$', arbus_api_views.PhotoAPI.as_view()),

@@ -65,8 +65,13 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		self.assertTrue("last-build" in result)
 		self.assertTrue("Last Upload" in result)
 
-	def testStrandFeed(self):
-		result = self.getResult('strand_feed', forms.OnlyUserIdForm)
+	def testStrandInbox(self):
+		result = self.getResult('strand_inbox', forms.OnlyUserIdForm)
+
+		self.assertTrue("objects" in result)
+
+	def testUnsharedStrands(self):
+		result = self.getResult('unshared_strands', forms.OnlyUserIdForm)
 
 		self.assertTrue("objects" in result)
 
