@@ -69,14 +69,6 @@ class BlackBoxUrlsTests(unittest.TestCase):
 		result = self.getResult('strand_feed', forms.OnlyUserIdForm)
 
 		self.assertTrue("objects" in result)
-	
-	def testGetJoinableStrands(self):
-		result = self.getResult('get_joinable_strands', forms.GetJoinableStrandsForm)
-		self.assertTrue("objects" in result)
-
-	def testGetNewPhotos(self):
-		result = self.getResult('get_new_photos', forms.GetNewPhotosForm)
-		self.assertTrue("objects" in result)
 
 	def testRegisterApnsToken(self):
 		result = self.getResult('register_apns_token', forms.RegisterAPNSTokenForm)
@@ -85,10 +77,6 @@ class BlackBoxUrlsTests(unittest.TestCase):
 	def testUpdateUserLocation(self):
 		result = self.getResult('update_user_location', forms.UpdateUserLocationForm)
 		self.assertTrue("result" in result)
-
-	def testGetNearbyFriendsMessage(self):
-		result = self.getResult('get_nearby_friends_message', forms.GetFriendsNearbyMessageForm)
-		self.assertTrue("message" in result)
 
 	def testSendSmsCode(self):
 		result = self.getResult('send_sms_code', forms.SendSmsCodeForm)
