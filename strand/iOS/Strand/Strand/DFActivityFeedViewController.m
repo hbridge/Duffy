@@ -40,6 +40,7 @@
   self = [super init];
   if (self) {
     [self initTabBarItemAndNav];
+    [self observeNotifications];
   }
   return self;
 }
@@ -51,6 +52,14 @@
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(refreshFromServer)
+                                               name:DFStrandReloadRemoteUIRequestedNotificationName
+                                             object:nil];
 }
 
 - (void)viewDidLoad
