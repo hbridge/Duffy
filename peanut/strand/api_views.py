@@ -77,6 +77,8 @@ def getBestLocationForPhotos(photos):
 
 def getTitleForStrand(strand):
 	photos = strand.photos.all()
+	if len(photos) == 0:
+		photos = strand.getPostPhotos()
 		
 	location = getBestLocationForPhotos(photos)
 
@@ -193,6 +195,99 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	return user
 
 
+# ------------------------
+
+# Deprecated
+def getObjectsDataForStrands(user, strands, feedObjectType):
+	friendsData = friends_util.getFriendsData(user.id)
+
+	# list of list of photos
+	groups = list()
+	for strand in strands:
+		strandId = strand.id
+		photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
+		
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(strand), 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(list(strand.users.all()))}
+		groupEntry = {'photos': photos, 'metadata': metadata}
+
+		if len(photos) > 0:
+			groups.append(groupEntry)
+
+	if len(groups) > 0:
+		# now sort groups by the time_taken of the first photo in each group
+		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
+
+	formattedGroups = getFormattedGroups(groups)
+		
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	return objects
+
+
+# Deprecated
+def getActionSubtitle(strand):
+	photos = strand.photos.all()
+		
+	location = getBestLocationForPhotos(photos)
+
+	# Jan 4
+	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
+
+	subtitle = dateStr
+
+	if location:
+		subtitle += " in " + location
+
+	return subtitle
+
+# Deprecated
+def getObjectsDataForActions(user):
+	objectResponse = []
+	#strands = Strand.objects.filter(users__in=[user]).filter(shared=True)
+
+	actions = Action.objects.filter(Q(photo__user_id=user.id) | Q(user=user) | Q(strand__users__in=[user])).order_by("-added")[:20]
+	
+	actions = set(actions)
+	for action in actions:
+		objects = None
+		if action.action_type == constants.ACTION_TYPE_FAVORITE:
+			if action.user.id == user.id and action.photo.user.id == user.id:
+				title = "liked your photo"
+			elif action.user.id == user.id:
+				title = "liked %s's photo" % action.photo.user.display_name
+			elif action.photo.user.id == user.id:
+				title = "liked your photo"
+			elif action.photo.user.id == action.user.id:
+				title = "liked their photo"
+			else:
+				title = "Unknown"
+				
+			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
+
+			photoData = serializers.photoDataForApiSerializer(action.photo)
+			photoData['type'] = "photo"
+			entry['objects'] = [photoData]
+			objectResponse.append(entry)
+			continue
+
+		# Show this for yourself
+		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
+			title = "shared %s photos" % action.photos.count()
+			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
+
+		if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
+			title = "shared %s photos" % action.photos.count()
+			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
+			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
+			objects[0]['title'] = getTitleForStrand(action.strand)
+		
+		if objects:
+			entry = {'type': feedType, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
+			objectResponse.append(entry)
+
+	return objectResponse
+
 def getActorsObjectData(actors, includePhone = False):
 	if not isinstance(actors, list):
 		actors = [actors]
@@ -207,6 +302,8 @@ def getActorsObjectData(actors, includePhone = False):
 		userData.append(entry)
 
 	return userData
+
+
 """
 	This turns a list of list of photos into groups that contain a title and cluster.
 
@@ -277,7 +374,7 @@ def getFormattedGroups(groups):
 		output.append({'clusters': clusters, 'metadata': metadata})
 
 	return output
-	
+
 def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	metadata = {'type': feedObjectType, 'title': ""}
 
@@ -287,31 +384,6 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 		metadata['id'] = strand.id
 		
 	groups = [{'photos': photos, 'metadata': metadata}]
-
-	formattedGroups = getFormattedGroups(groups)
-		
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
-	return objects
-
-def getObjectsDataForStrands(user, strands, feedObjectType):
-	friendsData = friends_util.getFriendsData(user.id)
-
-	# list of list of photos
-	groups = list()
-	for strand in strands:
-		strandId = strand.id
-		photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
-		
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(strand), 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(list(strand.users.all()))}
-		groupEntry = {'photos': photos, 'metadata': metadata}
-
-		if len(photos) > 0:
-			groups.append(groupEntry)
-
-	if len(groups) > 0:
-		# now sort groups by the time_taken of the first photo in each group
-		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 	formattedGroups = getFormattedGroups(groups)
 		
@@ -375,67 +447,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 	return objects
 
-def getActionSubtitle(strand):
-	photos = strand.photos.all()
-		
-	location = getBestLocationForPhotos(photos)
-
-	# Jan 4
-	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
-
-	subtitle = dateStr
-
-	if location:
-		subtitle += " in " + location
-
-	return subtitle
-
-def getObjectsDataForActions(user):
-	objectResponse = []
-	#strands = Strand.objects.filter(users__in=[user]).filter(shared=True)
-
-	actions = Action.objects.filter(Q(photo__user_id=user.id) | Q(user=user) | Q(strand__users__in=[user])).order_by("-added")[:20]
-	
-	actions = set(actions)
-	for action in actions:
-		objects = None
-		if action.action_type == constants.ACTION_TYPE_FAVORITE:
-			if action.user.id == user.id and action.photo.user.id == user.id:
-				title = "liked your photo"
-			elif action.user.id == user.id:
-				title = "liked %s's photo" % action.photo.user.display_name
-			elif action.photo.user.id == user.id:
-				title = "liked your photo"
-			elif action.photo.user.id == action.user.id:
-				title = "liked their photo"
-			else:
-				title = "Unknown"
-				
-			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
-
-			photoData = serializers.photoDataForApiSerializer(action.photo)
-			photoData['type'] = "photo"
-			entry['objects'] = [photoData]
-			objectResponse.append(entry)
-			continue
-
-		# Show this for yourself
-		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
-			title = "shared %s photos" % action.photos.count()
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
-
-		if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-			title = "shared %s photos" % action.photos.count()
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
-			objects[0]['title'] = getTitleForStrand(action.strand)
-		
-		if objects:
-			entry = {'type': feedType, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
-			objectResponse.append(entry)
-
-	return objectResponse
 
 def getPhotosSuggestionsForStrand(user, strand):
 	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
@@ -460,6 +471,28 @@ def getPhotosSuggestionsForStrand(user, strand):
 
 	return matchingPhotos
 	
+def getObjectsDataForPost(postAction):
+	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
+	groupEntry = {'photos': postAction.photos.all().order_by('time_taken'), 'metadata': metadata}
+
+	formattedGroups = getFormattedGroups([groupEntry])
+		
+	# Lastly, we turn our groups into sections which is the object we convert to json for the api
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	return objects
+
+def getObjectsDataForStrand(strand):
+	response = dict()
+
+	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+
+	actors = [action.user for action in postActions]
+	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(actors)}
+	response['objects'] = list()
+	for post in postActions:
+		response['objects'].extend(getObjectsDataForPost(post))
+	return response
+
 def getInviteObjectsDataForUser(user):
 	responseObjects = list()
 
@@ -476,8 +509,9 @@ def getInviteObjectsDataForUser(user):
 
 		if shouldShowInvite:
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(strandInvite.user), 'time_stamp': strandInvite.added}
-			entry['objects'] = getObjectsDataForStrands(user, [strandInvite.strand], constants.FEED_OBJECT_TYPE_STRAND)
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
+			entry['objects'] = list()
+			entry['objects'].append(getObjectsDataForStrand(strandInvite.strand))
 
 			"""
 
@@ -505,7 +539,8 @@ def getInviteObjectsDataForUser(user):
 
 			responseObjects.append(entry)
 	return responseObjects
-		
+
+
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
@@ -515,8 +550,6 @@ def getInviteObjectsDataForUser(user):
 
 """
 	Return the Duffy JSON for the strands a user has that are private and unshared
-
-	This uses the Strand objects instead of neighbors
 """
 def unshared_strands(request):
 	response = dict({'result': True})
@@ -534,6 +567,34 @@ def unshared_strands(request):
 		b = datetime.datetime.now()
 
 		print "unshared_strands took %s" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
+
+"""
+	Returns back the invites and strands a user has
+"""
+def strand_inbox(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		responseObjects = list()
+
+		# First throw in invite objects
+		responseObjects.extend(getInviteObjectsDataForUser(user))
+		
+		# Next throw in the list of existing Strands
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True))
+
+		for strand in strands:
+			responseObjects.append(getObjectsDataForStrand(strand))
+
+		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

@@ -544,6 +544,15 @@ class Strand(models.Model):
 	users_link.allow_tags = True
 	users_link.short_description = "Users"
 	
+	def getPostPhotos(self):
+		postActions = self.action_set.filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+		photos = list()
+		for action in postActions:
+			photos.append(action.photos.all())
+
+		return photos
+
+
 	@classmethod
 	def getIds(cls, objs):
 		ids = list()
