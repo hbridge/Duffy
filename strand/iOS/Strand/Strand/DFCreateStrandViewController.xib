@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -46,6 +47,7 @@
                         </label>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="0.80000000000000004" colorSpace="calibratedWhite"/>
+                    <gestureRecognizers/>
                     <constraints>
                         <constraint firstAttribute="width" constant="183" id="NDI-Uu-T7q"/>
                         <constraint firstItem="gzA-Va-82T" firstAttribute="leading" secondItem="FCq-o3-f9O" secondAttribute="leading" id="P0C-6O-TIF"/>
@@ -55,6 +57,9 @@
                         <constraint firstAttribute="centerX" secondItem="gzA-Va-82T" secondAttribute="centerX" id="sFO-qJ-wb6"/>
                         <constraint firstAttribute="height" constant="48" id="zlm-FY-KvD"/>
                     </constraints>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="rzf-pu-7az" appends="YES" id="GW1-tg-3OL"/>
+                    </connections>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -69,6 +74,11 @@
             <nil key="simulatedTopBarMetrics"/>
             <point key="canvasLocation" x="249" y="233"/>
         </view>
+        <tapGestureRecognizer id="rzf-pu-7az">
+            <connections>
+                <action selector="reloadButtonPressed:" destination="-1" id="N0w-yC-zyE"/>
+            </connections>
+        </tapGestureRecognizer>
     </objects>
     <resources>
         <image name="Assets/Icons/RefreshButtonIcon" width="16" height="16"/>
