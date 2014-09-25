@@ -112,7 +112,7 @@ def userbaseSummary(request):
 	strandList = list()
 
 
-	userStats = User.objects.filter(product_id=1).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
+	userStats = User.objects.filter(product_id__gt=0).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
 			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-lastAdded')
@@ -124,10 +124,10 @@ def userbaseSummary(request):
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
-	actionsCount = list(User.objects.filter(product_id=1).annotate(totalActions=Count('action')).order_by('-id'))
+	actionsCount = list(User.objects.filter(product_id__gt=0).annotate(totalActions=Count('action')).order_by('-id'))
 	#strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand__shared')).order_by('-id'))
-	contactCount = list(User.objects.filter(product_id=1).annotate(totalContacts=Count('contactentry')).order_by('-id'))
-	friendCount = list(User.objects.filter(product_id=1).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
+	contactCount = list(User.objects.filter(product_id__gt=0).annotate(totalContacts=Count('contactentry')).order_by('-id'))
+	friendCount = list(User.objects.filter(product_id__gt=0).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
 	extras = dict()
 	for i in range(len(userStats)):
