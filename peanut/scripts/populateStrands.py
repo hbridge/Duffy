@@ -181,7 +181,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=2).order_by('-time_taken')[:maxPhotosAtTime]
+		photos = Photo.objects.all().select_related().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=2).order_by('-time_taken')[:maxPhotosAtTime]
 		
 		a = datetime.datetime.now()
 		if len(photos) > 0:
@@ -203,7 +203,7 @@ def main(argv):
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-			strandsCache = list(Strand.objects.select_related().filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))))
+			strandsCache = list(Strand.objects.select_related().filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh)))).filter(product_id=2)
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
