@@ -829,6 +829,8 @@ def register_apns_token(request):
 	
 	return HttpResponse(json.dumps(response), content_type="application/json")
 
+def nothing(request):
+	return HttpResponse(json.dumps(dict()), content_type="application/json")
 """
 	Returns a string that describes who is around.
 	If people are around but haven't taken a photo, returns:  "5 friends are near you"
