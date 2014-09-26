@@ -20,6 +20,7 @@
 #import "NSString+DFHelpers.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFStrandGallerySectionHeaderView.h"
+#import "DFStrandGalleryTitleView.h"
 
 static const CGFloat StrandGalleryItemSize = 159.5;
 static const CGFloat StrandGalleryItemSpacing = 0.5;
@@ -33,10 +34,21 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (void)viewDidLoad {
   [super viewDidLoad];
 
-  self.peopleLabel.text = [@"with " stringByAppendingString:[self.strandPosts.actorNames
-                                                             componentsJoinedByString:@", "]];
+  [self configureNavBar];
+  
   self.hidesBottomBarWhenPushed = YES;
   [self configureCollectionView];
+}
+
+- (void)configureNavBar
+{
+  self.peopleLabel.text = [@"with " stringByAppendingString:[self.strandPosts.actorNames
+                                                             componentsJoinedByString:@", "]];
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+                                            style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:@selector(inviteButtonPressed:)];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -47,6 +59,14 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (void)setStrandPosts:(DFPeanutFeedObject *)strandPosts
 {
   _strandPosts = strandPosts;
+  
+  DFStrandGalleryTitleView *titleView = [[[UINib nibWithNibName:NSStringFromClass([DFStrandGalleryTitleView class])
+                                       bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
+  titleView.locationLabel.text = strandPosts.location;
+  titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_taken
+                                                             abbreviate:NO];
+  
+  self.navigationItem.titleView = titleView;
   [self.collectionView reloadData];
 }
 
@@ -282,6 +302,11 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   dispatch_async(dispatch_get_main_queue(), ^{
     [photoFeedController showPhoto:photoID animated:NO];
   });
+}
+
+- (void)inviteButtonPressed:(id)sender
+{
+  
 }
 
 @end

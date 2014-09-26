@@ -21,6 +21,7 @@
 #import "DFStrandConstants.h"
 #import "MMPopLabel.h"
 #import "DFStrandGalleryViewController.h"
+#import "DFStrandGalleryTitleView.h"
 
 @interface DFInboxViewController ()
 
