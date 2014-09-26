@@ -94,6 +94,15 @@ def getTitleForStrand(strand):
 
 	return title
 
+def getLocationForStrand(strand):
+	photos = strand.photos.all()
+	if len(photos) == 0:
+		photos = strand.getPostPhotos()
+		
+	location = getBestLocationForPhotos(photos)
+
+	return location
+
 def getTimeTakenForStrand(strand):
 	photos = strand.photos.all().order_by('-time_taken')
 	if len(photos) == 0:
@@ -494,7 +503,7 @@ def getObjectsDataForStrand(strand):
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
 
 	actors = [action.user for action in postActions]
-	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(actors), 'time_taken': getTimeTakenForStrand(strand)}
+	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(actors), 'time_taken': getTimeTakenForStrand(strand), 'location': getLocationForStrand(strand)}
 	response['objects'] = list()
 	for post in postActions:
 		response['objects'].extend(getObjectsDataForPost(post))
