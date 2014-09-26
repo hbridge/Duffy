@@ -5,6 +5,7 @@ import logging
 
 from django.contrib.gis.db import models
 from django.template.defaultfilters import escape
+from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
@@ -516,6 +517,10 @@ class Strand(models.Model):
 			return "1 photo"
 		else:
 			return "%s photos" % (photoCount)
+
+	def photo_posts_info(self):
+		postActions = self.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+		return "%s posts" % len(postActions)
 		
 	def sharing_info(self):
 		if self.shared:
@@ -550,7 +555,7 @@ class Strand(models.Model):
 		for action in postActions:
 			photos.append(action.photos.all())
 
-		return photos
+		return sorted(photos, key=lambda x: x.time_taken, reverse=True)
 
 
 	@classmethod

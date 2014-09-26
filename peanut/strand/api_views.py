@@ -94,6 +94,13 @@ def getTitleForStrand(strand):
 
 	return title
 
+def getTimeTakenForStrand(strand):
+	photos = strand.photos.all().order_by('-time_taken')
+	if len(photos) == 0:
+		photos = strand.getPostPhotos()
+
+	return photos[0].time_taken
+
 
 """
 	Creates a cache which is a dictionary with the key being the strandId and the value
@@ -487,7 +494,7 @@ def getObjectsDataForStrand(strand):
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
 
 	actors = [action.user for action in postActions]
-	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(actors)}
+	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(actors), 'time_taken': getTimeTakenForStrand(strand)}
 	response['objects'] = list()
 	for post in postActions:
 		response['objects'].extend(getObjectsDataForPost(post))
