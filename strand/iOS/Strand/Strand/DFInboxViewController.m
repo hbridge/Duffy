@@ -303,13 +303,6 @@ const NSUInteger inviteRowMaxImages = 3;
   [cell configureForInboxCellStyle:DFInboxCellStyleInvite];
   [self.class resetCell:cell];
   
-  CGFloat margin = 2;
-  CGFloat size = cell.collectionView.frame.size.width / 3 - margin * 3 - 4.0 * 2;
-  cell.flowLayout.itemSize = CGSizeMake(size, size);
-  cell.flowLayout.minimumInteritemSpacing = margin;
-  cell.flowLayout.minimumLineSpacing = margin;
-  cell.flowLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
-  
   DFPeanutFeedObject *strandPostsObject = inviteObject.objects.firstObject;
   cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   cell.actorLabel.text = [inviteObject.actorNames componentsJoinedByString:@","];
