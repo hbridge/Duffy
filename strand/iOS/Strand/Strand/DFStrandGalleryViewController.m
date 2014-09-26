@@ -162,22 +162,26 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   return self.strandPosts.objects[tableSection];
 }
 
+- (DFPeanutFeedObject *)photoForIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
+  NSArray *itemsForPost = postObject.enumeratorOfDescendents.allObjects;
+  DFPeanutFeedObject *peanutPhoto = itemsForPost[indexPath.row];
+  return peanutPhoto;
+}
+
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
   UICollectionViewCell *cell;
   
-  DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
-  NSArray *itemsForPost = postObject.enumeratorOfDescendents.allObjects;
-  DFPeanutFeedObject *object = itemsForPost[indexPath.row];
+  DFPeanutFeedObject *peanutPhoto = [self photoForIndexPath:indexPath];
   
-  if ([object.type isEqual:DFFeedObjectPhoto]) {
-    cell = [self cellForPhoto:object indexPath:indexPath];
-  } else if ([object.type isEqual:DFFeedObjectCluster]) {
-    cell = [self cellForCluster:object indexPath:indexPath];
+  if ([peanutPhoto.type isEqual:DFFeedObjectPhoto]) {
+    cell = [self cellForPhoto:peanutPhoto indexPath:indexPath];
   } else {
     // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
-    cell = [self cellForUnknownObject:postObject atIndexPath:indexPath];
+    cell = [self cellForUnknownObject:peanutPhoto atIndexPath:indexPath];
   }
   
   [cell setNeedsLayout];
@@ -267,11 +271,9 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
   DFPhotoIDType photoID;
   DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
-  DFPeanutFeedObject *object = postObject.objects[indexPath.row];
-  if ([object.type isEqualToString:DFFeedObjectPhoto]) {
-    photoID = object.id;
-  } else if ([object.type isEqualToString:DFFeedObjectCluster]) {
-    photoID = ((DFPeanutFeedObject *)object.objects.firstObject).id;
+  DFPeanutFeedObject *peanutPhoto = [self photoForIndexPath:indexPath];
+  if ([peanutPhoto.type isEqualToString:DFFeedObjectPhoto]) {
+    photoID = peanutPhoto.id;
   }
   
   DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
