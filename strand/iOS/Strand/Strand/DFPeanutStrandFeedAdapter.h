@@ -16,5 +16,6 @@
 - (void)fetchSuggestedPhotosForStrand:(NSNumber *)strandID
                            completion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchStrandActivityWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 
 @end

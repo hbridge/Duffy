@@ -39,7 +39,7 @@
 #import "DFSettingsViewController.h"
 #import "DFCreateStrandViewController.h"
 #import "DFTopBarController.h"
-#import "DFActivityFeedViewController.h"
+#import "DFInboxViewController.h"
 #import "DFGalleryViewController.h"
 
 
@@ -184,16 +184,15 @@ const NSUInteger MinValidAccountId = 650;
   
   [DFPhotoStore sharedStore];
   
-  DFActivityFeedViewController *strandsFeedViewCotnroller = [[DFActivityFeedViewController alloc] init];
-  DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc] init];
-  createViewController.showAsFirstTimeSetup = YES;
+  DFInboxViewController *inboxViewController = [[DFInboxViewController alloc] init];
+  DFCreateStrandViewController *createStrandViewController = [[DFCreateStrandViewController alloc] init];
   // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
-  @[[[DFNavigationController alloc] initWithRootViewController:strandsFeedViewCotnroller],
-    [[DFNavigationController alloc] initWithRootViewController:createViewController],
+  @[[[DFNavigationController alloc] initWithRootViewController:inboxViewController],
+    [[DFNavigationController alloc] initWithRootViewController:createStrandViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   

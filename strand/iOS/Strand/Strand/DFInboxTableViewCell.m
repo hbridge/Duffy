@@ -6,13 +6,13 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFActivityFeedTableViewCell.h"
+#import "DFInboxTableViewCell.h"
 
 CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = 51;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight = 148;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight = 8;
 
-@implementation DFActivityFeedTableViewCell
+@implementation DFInboxTableViewCell
 
 /*
 // Only override drawRect: if you perform custom drawing.

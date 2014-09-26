@@ -6,9 +6,9 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFActivityFeedViewController.h"
+#import "DFInboxViewController.h"
 #import "DFPeanutFeedObject.h"
-#import "DFActivityFeedTableViewCell.h"
+#import "DFInboxTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFImageStore.h"
 #import "DFFeedViewController.h"
@@ -21,7 +21,7 @@
 #import "DFStrandConstants.h"
 #import "MMPopLabel.h"
 
-@interface DFActivityFeedViewController ()
+@interface DFInboxViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
@@ -30,7 +30,7 @@
 
 @end
 
-@implementation DFActivityFeedViewController
+@implementation DFInboxViewController
 
 @synthesize feedAdapter = _feedAdapter;
 
@@ -47,7 +47,7 @@
 
 - (void)initTabBarItemAndNav
 {
-  self.navigationItem.title = @"Activity";
+  self.navigationItem.title = @"Inbox";
   self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
@@ -101,13 +101,13 @@
 - (void)configureTableView
 {
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"collectionCell"];
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"inviteCell"];
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFActivityFeedTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"singleCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
@@ -133,7 +133,7 @@
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self.feedAdapter
-   fetchStrandActivityWithCompletion:^(DFPeanutObjectsResponse *response,
+   fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
                                        NSData *responseHash,
                                        NSError *error) {
      if (!error && ![responseHash isEqual:self.lastResponseHash]) {
@@ -218,8 +218,8 @@
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     cell = [self cellForInviteObject:feedObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
-    cell = [self cellForStrandPost:feedObject];
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+    cell = [self cellForStrandPosts:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
     cell = [self cellForAction:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandJoin]) {
@@ -239,10 +239,9 @@
   return cell;
 }
 
-- (UITableViewCell *)cellForStrandPost:(DFPeanutFeedObject *)strandPost
+- (UITableViewCell *)cellForStrandPosts:(DFPeanutFeedObject *)strandPosts
 {
-  DFPeanutFeedObject *strandObject = strandPost.objects.firstObject;
-  DFActivityFeedTableViewCell *cell = [self.tableView
+  DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"collectionCell"];
   if (cell.previewImageView.superview) {
     [cell.previewImageView removeFromSuperview];
@@ -251,18 +250,18 @@
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
-  cell.profilePhotoStackView.names = strandPost.actorNames;
-  cell.actorLabel.text = [self.class firstActorNameForObject:strandPost];
-  cell.actionTextLabel.text = strandPost.title;
-  cell.subtitleLabel.text = strandPost.subtitle;
+  cell.profilePhotoStackView.names = strandPosts.actorNames;
+  cell.actorLabel.text = [self.class multiActorNamesForObject:strandPosts];
+  cell.actionTextLabel.text = strandPosts.title;
+  cell.subtitleLabel.text = strandPosts.subtitle;
   
   // time taken
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp
+  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_stamp
                                                           abbreviate:YES];
   // photo preview
   [self setRemotePhotosForCell:cell
-                   withSection:strandObject
-   maxPhotos:4];
+               withStrandPosts:strandPosts
+                     maxPhotos:4];
   
   return cell;
 }
@@ -280,11 +279,34 @@
   return name;
 }
 
++ (NSString *)multiActorNamesForObject:(DFPeanutFeedObject *)object
+{
+  NSMutableString *actorsText = [[NSMutableString alloc] initWithString:@""];
+  BOOL includeYou = false;
+  
+  for (NSUInteger i = 0; i < object.actors.count; i++) {
+    DFPeanutUserObject *actor = object.actors[i];
+    if (actor.id != [[DFUser currentUser] userID]) {
+      if (i > 0) [actorsText appendString:@", "];
+      [actorsText appendString:[actor display_name]];
+    } else {
+      includeYou = true;
+    }
+  }
+  if (includeYou) {
+    if (object.actors.count > 1) [actorsText appendString:@", "];
+    [actorsText appendString:@"You"];
+  }
+
+  return actorsText;
+}
+
+
 const NSUInteger inviteRowMaxImages = 3;
 
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
-  DFActivityFeedTableViewCell *cell = [self.tableView
+  DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"inviteCell"];
   if (cell.previewImageView.superview) {
     [cell.previewImageView removeFromSuperview];
@@ -298,17 +320,18 @@ const NSUInteger inviteRowMaxImages = 3;
   cell.flowLayout.minimumLineSpacing = margin;
   cell.flowLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
   
-  DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
+  DFPeanutFeedObject *strandPostsObject = inviteObject.objects.firstObject;
   cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   cell.profilePhotoStackView.names = inviteObject.actorNames;
-  cell.actorLabel.text = [self.class firstActorNameForObject:inviteObject];
+  
+  cell.actorLabel.text = [self.class multiActorNamesForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
                                                           abbreviate:YES];
-  cell.subtitleLabel.text = strandObject.title;
-
+  cell.subtitleLabel.text = strandPostsObject.title;
+  
   [self setRemotePhotosForCell:cell
-                   withSection:inviteObject.objects.firstObject
+               withStrandPosts:strandPostsObject
                      maxPhotos:inviteRowMaxImages];
   
   return cell;
@@ -316,7 +339,7 @@ const NSUInteger inviteRowMaxImages = 3;
 
 - (UITableViewCell *)cellForAction:(DFPeanutFeedObject *)actionObject
 {
-  DFActivityFeedTableViewCell *cell = [self.tableView
+  DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"singleCell"];
   if (cell.collectionView.superview) {
     [cell.collectionView removeFromSuperview];
@@ -343,7 +366,7 @@ const NSUInteger inviteRowMaxImages = 3;
   return cell;
 }
 
-+ (void)resetCell:(DFActivityFeedTableViewCell *)cell
++ (void)resetCell:(DFInboxTableViewCell *)cell
 {
   cell.timeLabel.text = @"T";
   cell.actorLabel.text = @"Actor";
@@ -353,23 +376,27 @@ const NSUInteger inviteRowMaxImages = 3;
   cell.previewImageView.image = nil;
 }
 
-- (void)setRemotePhotosForCell:(DFActivityFeedTableViewCell *)cell
-                   withSection:(DFPeanutFeedObject *)section
+- (void)setRemotePhotosForCell:(DFInboxTableViewCell *)cell
+                   withStrandPosts:(DFPeanutFeedObject *)strandPosts
                      maxPhotos:(NSUInteger)maxPhotosToFetch
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
   NSMutableArray *photos = [NSMutableArray new];
   
-  for (NSUInteger i = 0; i < MIN(section.objects.count, maxPhotosToFetch); i++) {
-    DFPeanutFeedObject *object = section.objects[i];
-    DFPeanutFeedObject *photoObject;
-    if ([object.type isEqual:DFFeedObjectCluster]) {
-      photoObject = object.objects.firstObject;
-    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
-      photoObject = object;
+  for (NSUInteger i = 0; i < strandPosts.objects.count && photos.count < maxPhotosToFetch; i++) {
+    DFPeanutFeedObject *strandPost = strandPosts.objects[i];
+    
+    for (NSUInteger j = 0; j < strandPost.objects.count && photos.count < maxPhotosToFetch; j++) {
+      DFPeanutFeedObject *object = strandPost.objects[j];
+      DFPeanutFeedObject *photoObject;
+      if ([object.type isEqual:DFFeedObjectCluster]) {
+        photoObject = object.objects.firstObject;
+      } else if ([object.type isEqual:DFFeedObjectPhoto]) {
+        photoObject = object;
+      }
+      [photoIDs addObject:@(photoObject.id)];
+      [photos addObject:photoObject];
     }
-    [photoIDs addObject:@(photoObject.id)];
-    [photos addObject:photoObject];
   }
   
   cell.objects = photoIDs;
@@ -385,7 +412,7 @@ const NSUInteger inviteRowMaxImages = 3;
   }
 }
 
-- (void)setRemotePreviewPhotoForCell:(DFActivityFeedTableViewCell *)cell
+- (void)setRemotePreviewPhotoForCell:(DFInboxTableViewCell *)cell
                       withFeedObject:(DFPeanutFeedObject *)object
 {
   DFPeanutFeedObject *photoObject = object.objects.firstObject;
@@ -418,7 +445,7 @@ const NSUInteger inviteRowMaxImages = 3;
 {
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *invitedStrand = [[feedObject subobjectsOfType:DFFeedObjectSection]
+    DFPeanutFeedObject *invitedStrandPosts = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts]
                                          firstObject];
     DFPeanutFeedObject *suggestedPhotos = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
                                            firstObject];
@@ -426,7 +453,7 @@ const NSUInteger inviteRowMaxImages = 3;
                                         initWithTitle:@"Accept Invite"
                                         showsToField:NO
                                         suggestedSectionObject:suggestedPhotos
-                                        sharedSectionObject:invitedStrand
+                                        sharedSectionObject:invitedStrandPosts
                                         inviteObject:feedObject
                                         ];
     [self.navigationController pushViewController:vc animated:YES];

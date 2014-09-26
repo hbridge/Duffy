@@ -15,7 +15,7 @@
 @interface DFSelectPhotosViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate,UIScrollViewDelegate, UICollectionViewDelegateFlowLayout,DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestedSectionObject;
-@property (nonatomic, retain) DFPeanutFeedObject *sharedSectionObject;
+@property (nonatomic, retain) DFPeanutFeedObject *invitedStrandPosts;
 @property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
 
 @property (weak, nonatomic) IBOutlet UIView *searchBarWrapperView;

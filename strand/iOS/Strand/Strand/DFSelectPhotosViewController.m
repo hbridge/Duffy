@@ -56,7 +56,7 @@
 - (instancetype)initWithTitle:(NSString *)title
                  showsToField:(BOOL)showsToField
        suggestedSectionObject:(DFPeanutFeedObject *)suggestedSectionObject
-          sharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject
+          sharedSectionObject:(DFPeanutFeedObject *)invitedStrandPosts
                  inviteObject:(DFPeanutFeedObject *)inviteObject
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
@@ -65,7 +65,7 @@
     self.cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self configureNavBarWithTitle:title];
     self.suggestedSectionObject = suggestedSectionObject;
-    self.sharedSectionObject = sharedSectionObject;
+    self.invitedStrandPosts = invitedStrandPosts;
     self.inviteObject = inviteObject;
   }
   return self;
@@ -154,11 +154,11 @@
   });
 }
 
-- (void)setSharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject
+- (void)setInvitedStrandPosts:(DFPeanutFeedObject *)invitedStrandPosts
 {
-  _sharedSectionObject = sharedSectionObject;
+  _invitedStrandPosts = invitedStrandPosts;
   NSMutableArray *photos = [NSMutableArray new];
-  for (DFPeanutFeedObject *object in sharedSectionObject.enumeratorOfDescendents.allObjects) {
+  for (DFPeanutFeedObject *object in invitedStrandPosts.enumeratorOfDescendents.allObjects) {
     if ([object.type isEqual:DFFeedObjectPhoto]) {
       [photos addObject:object];
     }
@@ -201,18 +201,23 @@
                                                            forIndexPath:indexPath];
     inviteHeaderView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
     
-    DFPeanutUserObject *actor = sectionObject.actors.firstObject;
-    inviteHeaderView.actorsLabel.text = actor.display_name;
+    NSMutableString *actorsText = [[NSMutableString alloc] initWithString:@""];
+    for (NSUInteger i = 0; i < sectionObject.actors.count; i++) {
+      if (i > 0) [actorsText appendString:@", "];
+      [actorsText appendString:[sectionObject.actors[i] display_name]];
+    }
+    
+    inviteHeaderView.actorsLabel.text = actorsText;
     inviteHeaderView.actionLabel.text = sectionObject.title;
     
     //context
-    DFPeanutFeedObject *strandObject = sectionObject.objects.firstObject;
+    DFPeanutFeedObject *strandPosts = sectionObject.objects.firstObject;
     NSMutableString *contextString = [NSMutableString new];
-    [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+    [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_taken
                                                                   abbreviate:NO]];
-    [contextString appendFormat:@" in %@", strandObject.location];
+    [contextString appendFormat:@" in %@", strandPosts.location];
     inviteHeaderView.contextLabel.text = contextString;
-    
+  
     return inviteHeaderView;
   } else {
     DFSelectPhotosHeaderView *headerView = [self.collectionView
@@ -286,9 +291,9 @@ referenceSizeForFooterInSection:(NSInteger)section
   DFPeanutFeedObject *feedObject = [self objectForSection:section];
   CGFloat height;
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    height = 10;
+    height = 50.0;
   } else {
-    height = 53.0;
+    height = 50.0;
   }
   
   return CGSizeMake(self.collectionView.frame.size.width, height);
@@ -414,8 +419,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)donePressed:(id)sender
 {
-  if (self.sharedSectionObject.id) {
-    [self updateStrandWithID:@(self.sharedSectionObject.id)];
+  if (self.invitedStrandPosts.id) {
+    [self updateStrandWithID:@(self.invitedStrandPosts.id)];
   } else {
     [self createNewStrandWithSelection];
   }

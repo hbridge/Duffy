@@ -23,7 +23,7 @@
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
-#import "DFActivityFeedTableViewCell.h"
+#import "DFInboxTableViewCell.h"
 #import "UIDevice+DFHelpers.h"
 #import "NSArray+DFHelpers.h"
 

@@ -15,7 +15,7 @@ extern CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight;
 extern CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
 
 
-@interface DFActivityFeedTableViewCell : DFCollectionViewTableViewCell
+@interface DFInboxTableViewCell : DFCollectionViewTableViewCell
 
 @property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;
