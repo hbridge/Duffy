@@ -97,6 +97,8 @@
 		5A9BC32219A2AA64002D1CD7 /* DFContactsModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 5A9BC32019A2AA64002D1CD7 /* DFContactsModel.xcdatamodeld */; };
 		5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9BC32419A2AA9C002D1CD7 /* DFContact.m */; };
 		5A9BC32819A3E299002D1CD7 /* DFPushNotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9BC32719A3E299002D1CD7 /* DFPushNotificationsManager.m */; };
+		5A9E9CFB19D5BE85007328AD /* DFStrandGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9E9CF919D5BE85007328AD /* DFStrandGalleryViewController.m */; };
+		5A9E9CFC19D5BE85007328AD /* DFStrandGalleryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9E9CFA19D5BE85007328AD /* DFStrandGalleryViewController.xib */; };
 		5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */; };
 		5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */; };
 		5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */; };
@@ -384,6 +386,9 @@
 		5A9BC32419A2AA9C002D1CD7 /* DFContact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContact.m; sourceTree = "<group>"; };
 		5A9BC32619A3E299002D1CD7 /* DFPushNotificationsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPushNotificationsManager.h; sourceTree = "<group>"; };
 		5A9BC32719A3E299002D1CD7 /* DFPushNotificationsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPushNotificationsManager.m; sourceTree = "<group>"; };
+		5A9E9CF819D5BE85007328AD /* DFStrandGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGalleryViewController.h; sourceTree = "<group>"; };
+		5A9E9CF919D5BE85007328AD /* DFStrandGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGalleryViewController.m; sourceTree = "<group>"; };
+		5A9E9CFA19D5BE85007328AD /* DFStrandGalleryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandGalleryViewController.xib; sourceTree = "<group>"; };
 		5AA38DF3199D1A1800AD1805 /* DFNotificationsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationsViewController.h; sourceTree = "<group>"; };
 		5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationsViewController.m; sourceTree = "<group>"; };
 		5AA38DF6199D1A4700AD1805 /* DFNotificationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationTableViewCell.h; sourceTree = "<group>"; };
@@ -872,6 +877,7 @@
 				5AA38DFC199E87CD00AD1805 /* DFStrandsViewController.m */,
 				5AA38DF2199D19CA00AD1805 /* Notifs Popover */,
 				5A13E09019BF61AA005357D2 /* Strands Feed */,
+				5A9E9CFD19D5BE92007328AD /* Strand Detail */,
 				5AA38DFE199EB2D000AD1805 /* Photo Feed */,
 				5A7F8FF919A7D9F300EF0119 /* Gallery */,
 				5A188D6D19804AAB009D3244 /* Error and NUX */,
@@ -997,6 +1003,16 @@
 				5A9BC32419A2AA9C002D1CD7 /* DFContact.m */,
 			);
 			name = Contacts;
+			sourceTree = "<group>";
+		};
+		5A9E9CFD19D5BE92007328AD /* Strand Detail */ = {
+			isa = PBXGroup;
+			children = (
+				5A9E9CF819D5BE85007328AD /* DFStrandGalleryViewController.h */,
+				5A9E9CF919D5BE85007328AD /* DFStrandGalleryViewController.m */,
+				5A9E9CFA19D5BE85007328AD /* DFStrandGalleryViewController.xib */,
+			);
+			name = "Strand Detail";
 			sourceTree = "<group>";
 		};
 		5AA38DF2199D19CA00AD1805 /* Notifs Popover */ = {
@@ -1447,6 +1463,7 @@
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
 				5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
+				5A9E9CFC19D5BE85007328AD /* DFStrandGalleryViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
 				5AAF039219B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib in Resources */,
 				5A188D6C19804A94009D3244 /* DFLockedStrandCell.xib in Resources */,
@@ -1634,6 +1651,7 @@
 				5A3172CB196B620100CA7693 /* DFPeanutUserObject.m in Sources */,
 				5AAF039D19B1168500EF021C /* DFPeanutStrandAdapter.m in Sources */,
 				5AAF039519B10A7200EF021C /* DFSelectablePhotoViewCell.m in Sources */,
+				5A9E9CFB19D5BE85007328AD /* DFStrandGalleryViewController.m in Sources */,
 				5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */,
 				5AC4A9341947C30800862D9C /* DFUploadQueue.m in Sources */,
 				5AC4A92F1947C30800862D9C /* DFPhotoStore+IntegrityCheck.m in Sources */,
