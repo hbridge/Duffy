@@ -538,7 +538,7 @@ def getInviteObjectsDataForUser(user):
 
 		title = "shared %s photos with you" % strandInvite.strand.photos.count()
 		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
-		entry['invite_ready'] = shouldShowInvite
+		entry['visible'] = shouldShowInvite
 		entry['objects'] = list()
 		entry['objects'].append(getObjectsDataForStrand(strandInvite.strand))
 
