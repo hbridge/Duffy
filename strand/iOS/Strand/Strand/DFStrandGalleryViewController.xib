@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="collectionView" destination="qQw-mg-bqu" id="sqZ-3W-7i2"/>
                 <outlet property="flowLayout" destination="7KE-aA-mQ9" id="FsQ-KY-U8C"/>
+                <outlet property="peopleBackgroundView" destination="oSA-Sf-c6J" id="InY-ay-1hF"/>
                 <outlet property="peopleLabel" destination="oSA-Sf-c6J" id="PLk-a3-do3"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>

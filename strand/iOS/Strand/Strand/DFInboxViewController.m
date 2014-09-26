@@ -20,6 +20,7 @@
 #import "DFNavigationController.h"
 #import "DFStrandConstants.h"
 #import "MMPopLabel.h"
+#import "DFStrandGalleryViewController.h"
 
 @interface DFInboxViewController ()
 
@@ -457,25 +458,18 @@ const NSUInteger inviteRowMaxImages = 3;
                                         inviteObject:feedObject
                                         ];
     [self.navigationController pushViewController:vc animated:YES];
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPost]) {
-    [self showStrandForContainingObject:feedObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
-    // the like action has a photo as subobject, need to handle
-
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandJoin]) {
-    [self showStrandForContainingObject:feedObject];
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+    [self showStrandPostsObject:feedObject];
   }
 
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
-- (void)showStrandForContainingObject:(DFPeanutFeedObject *)feedObject
+- (void)showStrandPostsObject:(DFPeanutFeedObject *)strandPostsObject
 {
-  DFPeanutFeedObject *strandObject = feedObject.objects.firstObject;
-  DFFeedViewController *feedController = [[DFFeedViewController alloc] init];
-  feedController.strandObjects = @[strandObject];
-  [self.navigationController pushViewController:feedController animated:YES];
-
+  DFStrandGalleryViewController *vc = [[DFStrandGalleryViewController alloc] init];
+  vc.strandPosts = strandPostsObject;
+  [self.navigationController pushViewController:vc animated:YES];
 }
 
 

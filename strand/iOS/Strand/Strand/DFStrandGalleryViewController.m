@@ -13,16 +13,16 @@
 #import "DFPhoto.h"
 #import "DFImageStore.h"
 #import "DFSettingsViewController.h"
-#import "DFGallerySectionHeader.h"
 #import "DFFeedViewController.h"
 #import "RootViewController.h"
 #import "DFAnalytics.h"
 #import "DFGalleryCollectionViewFlowLayout.h"
 #import "NSString+DFHelpers.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFStrandGallerySectionHeaderView.h"
 
-static const CGFloat StrandGalleryItemSize = 105;
-static const CGFloat StrandGalleryItemSpacing = 2.5;
+static const CGFloat StrandGalleryItemSize = 159.5;
+static const CGFloat StrandGalleryItemSpacing = 0.5;
 
 @interface DFStrandGalleryViewController ()
 
@@ -32,7 +32,9 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  
+
+  self.peopleLabel.text = [@"with " stringByAppendingString:[self.strandPosts.actorNames
+                                                             componentsJoinedByString:@", "]];
   self.hidesBottomBarWhenPushed = YES;
   [self configureCollectionView];
 }
@@ -40,6 +42,12 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)setStrandPosts:(DFPeanutFeedObject *)strandPosts
+{
+  _strandPosts = strandPosts;
+  [self.collectionView reloadData];
 }
 
 - (void)initNavigationAndTab
@@ -51,11 +59,13 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
 {
    self.collectionView.scrollsToTop = YES;
   
+  self.collectionView.contentInset = UIEdgeInsetsMake(self.peopleBackgroundView.frame.size.height, 0, 0, 0);
+  
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"photoCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoStackCell" bundle:nil]
         forCellWithReuseIdentifier:@"clusterCell"];
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionHeader" bundle:nil]
+  [self.collectionView registerNib:[UINib nibWithNibName:@"DFStrandGallerySectionHeaderView" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionFooter" bundle:nil]
@@ -64,8 +74,8 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
   
   
   self.collectionView.backgroundColor = [UIColor whiteColor];
-  self.flowLayout.headerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionHeaderHeight);
-  self.flowLayout.footerReferenceSize = CGSizeMake(SectionHeaderWidth, SectionFooterHeight);
+  self.flowLayout.headerReferenceSize = CGSizeMake(self.view.frame.size.width, 51.0);
+  self.flowLayout.footerReferenceSize = CGSizeMake(self.view.frame.size.width, 30.0);
   self.flowLayout.itemSize = CGSizeMake(StrandGalleryItemSize, StrandGalleryItemSize);
   self.flowLayout.minimumInteritemSpacing = StrandGalleryItemSpacing;
   self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing;
@@ -109,19 +119,7 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
 {
   UICollectionReusableView *view;
   if (kind == UICollectionElementKindSectionHeader) {
-    DFGallerySectionHeader *headerView = [self.collectionView
-                                          dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-                                          withReuseIdentifier:@"headerView"
-                                          forIndexPath:indexPath];
-    
-    DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
-    headerView.titleLabel.text = postObject.title;
-    headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:postObject.time_taken
-                                                                  abbreviate:YES];
-    headerView.profilePhotoStackView.names = postObject.actorNames;
-    
-    
-    view = headerView;
+    return [self headerForIndexPath:indexPath];
   } else if (kind == UICollectionElementKindSectionFooter) {
     view = [self.collectionView dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionFooter
                                                    withReuseIdentifier:@"footerView"
@@ -131,12 +129,31 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
   return view;
 }
 
+- (UICollectionReusableView *)headerForIndexPath:(NSIndexPath *)indexPath
+{
+  DFStrandGallerySectionHeaderView *headerView = [self.collectionView
+                                        dequeueReusableSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                                        withReuseIdentifier:@"headerView"
+                                        forIndexPath:indexPath];
+  
+  DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
+  
+  headerView.actorLabel.text = postObject.actorNames.firstObject;
+  headerView.actionLabel.text = postObject.title;
+  headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:postObject.time_taken
+                                                                abbreviate:YES];
+  headerView.profilePhotoView.names = postObject.actorNames;
+  headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:postObject.time_stamp
+                                                                abbreviate:NO];
+  return headerView;
+}
+
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
   DFPeanutFeedObject *postObject = [self postObjectForSection:section];
   
-  NSArray *items = postObject.objects;
+  NSArray *items = postObject.enumeratorOfDescendents.allObjects;
   return items.count;
 }
 
@@ -151,7 +168,7 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
   UICollectionViewCell *cell;
   
   DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
-  NSArray *itemsForPost = postObject.objects;
+  NSArray *itemsForPost = postObject.enumeratorOfDescendents.allObjects;
   DFPeanutFeedObject *object = itemsForPost[indexPath.row];
   
   if ([object.type isEqual:DFFeedObjectPhoto]) {
@@ -191,7 +208,7 @@ static const CGFloat StrandGalleryItemSpacing = 2.5;
   
   NSArray *likeActions = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
   cell.likeIconImageView.hidden = (likeActions.count <= 0);
-  DFImageType preferredType = DFImageThumbnail;
+  DFImageType preferredType = DFImageFull;
   
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
