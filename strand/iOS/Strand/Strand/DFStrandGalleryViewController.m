@@ -21,6 +21,8 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFStrandGallerySectionHeaderView.h"
 #import "DFStrandGalleryTitleView.h"
+#import "DFInviteStrandViewController.h"
+#import "DFNavigationController.h"
 
 static const CGFloat StrandGalleryItemSize = 159.5;
 static const CGFloat StrandGalleryItemSpacing = 0.5;
@@ -306,7 +308,12 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 
 - (void)inviteButtonPressed:(id)sender
 {
-  
+  DFInviteStrandViewController *vc = [[DFInviteStrandViewController alloc] init];
+  vc.sectionObject = self.strandPosts;
+  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
+                     animated:YES
+                   completion:nil];
+
 }
 
 @end
