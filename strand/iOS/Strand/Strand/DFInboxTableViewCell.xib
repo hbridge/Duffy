@@ -19,7 +19,7 @@
                         <constraints>
                             <constraint firstAttribute="height" constant="45" id="SYw-CP-P2h"/>
                         </constraints>
-                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="F9p-PL-bzA">
+                        <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.5" minimumInteritemSpacing="0.5" id="F9p-PL-bzA">
                             <size key="itemSize" width="49" height="49"/>
                             <size key="headerReferenceSize" width="0.0" height="0.0"/>
                             <size key="footerReferenceSize" width="0.0" height="0.0"/>

@@ -11,16 +11,17 @@
 CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = 51;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight = 148;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight = 8;
+NSUInteger const InboxCellMaxPhotos = 6;
+
 
 @implementation DFInboxTableViewCell
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
+
+- (void)awakeFromNib
+{
+  [super awakeFromNib];
+  self.collectionView.backgroundColor = [UIColor clearColor];
 }
-*/
 
 - (UIEdgeInsets)layoutMargins
 {

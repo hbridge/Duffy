@@ -253,7 +253,7 @@
   // photo preview
   [self setRemotePhotosForCell:cell
                withStrandPosts:strandPosts
-                     maxPhotos:4];
+                     maxPhotos:InboxCellMaxPhotos];
   
   return cell;
 }
@@ -366,7 +366,7 @@ const NSUInteger inviteRowMaxImages = 3;
   for (DFPeanutFeedObject *photoObject in photos) {
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
-     preferredType:DFImageFull
+     preferredType:DFImageThumbnail
      thumbnailPath:photoObject.thumb_image_path
      fullPath:photoObject.full_image_path
      completion:^(UIImage *image) {

@@ -25,6 +25,7 @@ extern CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 
+extern NSUInteger const InboxCellMaxPhotos;
 
 typedef NS_OPTIONS(NSInteger, DFInboxCellStyle) {
   DFInboxCellStyleInvite,
