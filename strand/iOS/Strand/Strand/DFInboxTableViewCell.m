@@ -7,6 +7,7 @@
 //
 
 #import "DFInboxTableViewCell.h"
+#import "DFStrandConstants.h"
 
 CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = 51;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight = 148;
@@ -31,6 +32,10 @@ NSUInteger const InboxCellMaxPhotos = 6;
 
 - (void)configureForInboxCellStyle:(DFInboxCellStyle)style
 {
+  if (style == DFInboxCellStyleInvite) {
+    self.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
+
+  }
   if (style == DFInboxCellStyleStrand) {
     [self.actorLabel removeFromSuperview];
     [self.actionTextLabel removeFromSuperview];

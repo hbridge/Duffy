@@ -304,14 +304,15 @@ const NSUInteger inviteRowMaxImages = 3;
   [self.class resetCell:cell];
   
   DFPeanutFeedObject *strandPostsObject = inviteObject.objects.firstObject;
-  cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
-  cell.actorLabel.text = [inviteObject.actorNames componentsJoinedByString:@","];
   
   cell.actorLabel.text = [self.class multiActorNamesForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;
+  cell.titleLabel.text = strandPostsObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
                                                           abbreviate:YES];
-  cell.titleLabel.text = strandPostsObject.title;
+  cell.peopleLabel.text = [NSString stringWithFormat:@"with %@",
+                            [self.class multiActorNamesForObject:strandPostsObject]];
+  
   
   [self setRemotePhotosForCell:cell
                withStrandPosts:strandPostsObject
