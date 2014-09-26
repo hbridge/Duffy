@@ -14,7 +14,7 @@ NSString *const GalleryPath = @"strand_feed";
 NSString *const InvitedPath = @"invited_strands";
 NSString *const SuggestedUnsharedPath = @"suggested_unshared_photos";
 NSString *const ActivityPath = @"strand_activity";
-
+NSString *const InboxPath = @"strand_inbox";
 
 @implementation DFPeanutStrandFeedAdapter
 
@@ -25,7 +25,7 @@ NSString *const ActivityPath = @"strand_activity";
 
 + (NSArray *)responseDescriptors
 {
-  NSArray *paths = @[GalleryPath, UnsharedPath, InvitedPath, SuggestedUnsharedPath, ActivityPath];
+  NSArray *paths = @[GalleryPath, UnsharedPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath];
   
   NSMutableArray *responseDescriptors = [NSMutableArray new];
   for (NSString *path in paths) {
@@ -71,6 +71,11 @@ NSString *const ActivityPath = @"strand_activity";
 - (void)fetchStrandActivityWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
   [super fetchObjectsAtPath:ActivityPath withCompletionBlock:completionBlock];
+}
+
+- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+{
+  [super fetchObjectsAtPath:InboxPath withCompletionBlock:completionBlock];
 }
 
 @end
