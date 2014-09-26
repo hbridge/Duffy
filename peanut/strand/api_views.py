@@ -519,44 +519,54 @@ def getInviteObjectsDataForUser(user):
 
 	for strandInvite in strandInvites:
 		shouldShowInvite = True
+		invitePhotos = strandInvite.strand.photos.all()
 		
 		# Go through all photos and see if there's any that don't belong to this user
 		#  and don't have a thumb.  If a user just created an invite this should be fine
-		for photo in strandInvite.strand.photos.all():
+		for photo in invitePhotos:
 			if photo.user_id != user.id and not photo.thumb_filename:
 				shouldShowInvite = False
 
-		if shouldShowInvite:
-			title = "shared %s photos with you" % strandInvite.strand.photos.count()
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
-			entry['objects'] = list()
-			entry['objects'].append(getObjectsDataForStrand(strandInvite.strand))
-
-			"""
-
-			TODO (Derek): Figure out a way to use neighbors.
-				Can't right now because with newly created strands, those entries aren't written
+		# If the last stranded photo 
+		lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+		if len(lastStrandedPhotos) > 0:
+			if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
+				shouldShowInvite = False
+		else:
+			shouldShowInvite = False
 
 
-			# Find this user's private strands which are neighbors to the invited strand
-			strandNeighborsCache = getStrandNeighborsCache([strandInvite.strand])
-			
-			privateNeighborStrands = list()
-			# If we found some neighbors to this strand, add them in as suggestion objects
-			if strandInvite.strand.id in strandNeighborsCache:
-				for strand in strandNeighborsCache[strandInvite.strand.id]:
-					if strand.shared == False and user in strand.users.all():
-						privateNeighborStrands.append(strand)
-				suggestionsEntries = getObjectsDataForStrands(user, privateNeighborStrands, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
+		title = "shared %s photos with you" % strandInvite.strand.photos.count()
+		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
+		entry['invite_ready'] = shouldShowInvite
+		entry['objects'] = list()
+		entry['objects'].append(getObjectsDataForStrand(strandInvite.strand))
 
-				entry['objects'].extend(suggestionsEntries)
-			"""
-			photos = getPhotosSuggestionsForStrand(user, strandInvite.strand)
-			suggestionsEntries = getObjectsDataForPhotos(user, photos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
+		"""
+
+		TODO (Derek): Figure out a way to use neighbors.
+			Can't right now because with newly created strands, those entries aren't written
+
+
+		# Find this user's private strands which are neighbors to the invited strand
+		strandNeighborsCache = getStrandNeighborsCache([strandInvite.strand])
+		
+		privateNeighborStrands = list()
+		# If we found some neighbors to this strand, add them in as suggestion objects
+		if strandInvite.strand.id in strandNeighborsCache:
+			for strand in strandNeighborsCache[strandInvite.strand.id]:
+				if strand.shared == False and user in strand.users.all():
+					privateNeighborStrands.append(strand)
+			suggestionsEntries = getObjectsDataForStrands(user, privateNeighborStrands, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
 
 			entry['objects'].extend(suggestionsEntries)
+		"""
 
-			responseObjects.append(entry)
+		suggestedPhotos = getPhotosSuggestionsForStrand(user, strandInvite.strand)
+		suggestionsEntries = getObjectsDataForPhotos(user, suggestedPhotos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
+		entry['objects'].extend(suggestionsEntries)
+
+		responseObjects.append(entry)
 	return responseObjects
 
 
