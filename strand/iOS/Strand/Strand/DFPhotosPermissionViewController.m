@@ -11,6 +11,7 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFLocationPermissionViewController.h"
 #import "DFAnalytics.h"
+#import "AppDelegate.h"
 #import "SAMGradientView.h"
 #import "DFStrandConstants.h"
 #import "DFCameraRollSyncManager.h"
@@ -87,8 +88,8 @@
   [[DFCameraRollSyncManager sharedManager] sync];
   [[DFUploadController sharedUploadController] uploadPhotos];
   dispatch_async(dispatch_get_main_queue(), ^{
-    DFLocationPermissionViewController *vc = [[DFLocationPermissionViewController alloc] init];
-    [self.navigationController setViewControllers:@[vc] animated:YES];
+    AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
+    [delegate firstTimeSetupComplete];
   });
 }
 

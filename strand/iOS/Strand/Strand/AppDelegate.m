@@ -118,9 +118,6 @@ const NSUInteger MinValidAccountId = 650;
 {
   return  ([[DFUser currentUser] userID]
            && ![[DFUser currentUser] userID] == 0
-           && [DFDefaultsStore  stateForPermission:DFPermissionLocation]
-           && ![[DFDefaultsStore stateForPermission:DFPermissionLocation]
-                isEqual:DFPermissionStateNotRequested]
            && ![[DFDefaultsStore stateForPermission:DFPermissionContacts]
                 isEqual:DFPermissionStateNotRequested]);
 }
@@ -142,7 +139,7 @@ const NSUInteger MinValidAccountId = 650;
 {
   [self showMainView];
   [self performForegroundOperations];
-  [self showCreateStrand];
+  [self showInbox];
 }
 
 /*
@@ -204,9 +201,6 @@ const NSUInteger MinValidAccountId = 650;
   self.tabBarController.tabBar.translucent = NO;
   
   self.window.rootViewController = self.tabBarController;
-  
-  [[DFBackgroundLocationManager sharedBackgroundLocationManager]
-   startUpdatingOnSignificantLocationChange];
 }
 
 - (BOOL)isUserValid
@@ -371,9 +365,9 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   });
 }
 
-- (void)showCreateStrand
+- (void)showInbox
 {
-  self.tabBarController.selectedIndex = 1;
+  self.tabBarController.selectedIndex = 0;
 }
 
 
