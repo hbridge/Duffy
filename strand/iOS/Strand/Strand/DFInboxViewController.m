@@ -28,6 +28,7 @@
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
+@property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 
 @end
 
@@ -40,6 +41,7 @@
 {
   self = [super init];
   if (self) {
+    _cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self initTabBarItemAndNav];
     [self observeNotifications];
   }
@@ -103,13 +105,10 @@
 {
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
-   forCellReuseIdentifier:@"collectionCell"];
+   forCellReuseIdentifier:@"strandCell"];
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"inviteCell"];
-  [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
-   forCellReuseIdentifier:@"singleCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
 
@@ -188,28 +187,25 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  CGFloat height;
-  NSUInteger numRows = 0;
-  DFPeanutFeedObject *activityObject = self.feedObjects[indexPath.row];
-  if ([activityObject.type isEqualToString:DFFeedObjectLikeAction]
-      || [activityObject.type isEqual:DFFeedObjectStrandJoin]) {
-
-    height = ActivityFeedTableViewCellNoCollectionViewHeight;
-  } else if ([activityObject.type isEqual:DFFeedObjectInviteStrand]){
-    height = ActivityFeedTableViewCellNoCollectionViewHeight + 101.0;
-  } else {
-    DFPeanutFeedObject *strandObject = activityObject.objects.firstObject;
-    numRows = ceil((float)MIN(4,strandObject.objects.count)/2.0);
-    
-    height = ActivityFeedTableViewCellNoCollectionViewHeight
-    + numRows * ActivtyFeedTableViewCellCollectionViewRowHeight
-    + (numRows - 1) * ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
+  CGFloat height = 44.0;
+  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
+  DFInboxCellStyle cellStyle = DFInboxCellStyleInvite;
+  NSString *cellIdentifier;
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    cellIdentifier = @"inviteCell";
+    cellStyle = DFInboxCellStyleInvite;
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+    cellIdentifier = @"strandCell";
+    cellStyle = DFInboxCellStyleStrand;
   }
-  DDLogVerbose(@"IP: %@ is type %@ numRows:%d height :%.01f",
-               indexPath,
-               activityObject.type,
-               (int)numRows,
-               height);
+  
+  if (cellIdentifier) {
+    UITableViewCell *templateCell = self.cellTemplatesByIdentifier[cellIdentifier];
+    if (!templateCell) templateCell = [DFInboxTableViewCell createWithStyle:cellStyle];
+    self.cellTemplatesByIdentifier[cellIdentifier] = templateCell;
+    height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  }
+  
   return height;
 }
 
@@ -221,10 +217,6 @@
     cell = [self cellForInviteObject:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
     cell = [self cellForStrandPosts:feedObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectLikeAction]) {
-    cell = [self cellForAction:feedObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandJoin]) {
-    cell = [self cellForAction:feedObject];
   } else {
     // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
     #ifdef DEBUG
@@ -243,18 +235,17 @@
 - (UITableViewCell *)cellForStrandPosts:(DFPeanutFeedObject *)strandPosts
 {
   DFInboxTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:@"collectionCell"];
-  if (cell.previewImageView.superview) {
-    [cell.previewImageView removeFromSuperview];
-  }
+                                       dequeueReusableCellWithIdentifier:@"strandCell"];
+  [cell configureForInboxCellStyle:DFInboxCellStyleStrand];
   [self.class resetCell:cell];
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
-  cell.profilePhotoStackView.names = strandPosts.actorNames;
-  cell.actorLabel.text = [self.class multiActorNamesForObject:strandPosts];
+  
+  cell.peopleLabel.text = [NSString stringWithFormat:@"with %@", [strandPosts.actorNames
+                                                                  componentsJoinedByString:@","]];
   cell.actionTextLabel.text = strandPosts.title;
-  cell.subtitleLabel.text = strandPosts.subtitle;
+  cell.titleLabel.text = strandPosts.title;
   
   // time taken
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_stamp
@@ -309,9 +300,7 @@ const NSUInteger inviteRowMaxImages = 3;
 {
   DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"inviteCell"];
-  if (cell.previewImageView.superview) {
-    [cell.previewImageView removeFromSuperview];
-  }
+  [cell configureForInboxCellStyle:DFInboxCellStyleInvite];
   [self.class resetCell:cell];
   
   CGFloat margin = 2;
@@ -323,13 +312,13 @@ const NSUInteger inviteRowMaxImages = 3;
   
   DFPeanutFeedObject *strandPostsObject = inviteObject.objects.firstObject;
   cell.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
-  cell.profilePhotoStackView.names = inviteObject.actorNames;
+  cell.actorLabel.text = [inviteObject.actorNames componentsJoinedByString:@","];
   
   cell.actorLabel.text = [self.class multiActorNamesForObject:inviteObject];
   cell.actionTextLabel.text = inviteObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
                                                           abbreviate:YES];
-  cell.subtitleLabel.text = strandPostsObject.title;
+  cell.titleLabel.text = strandPostsObject.title;
   
   [self setRemotePhotosForCell:cell
                withStrandPosts:strandPostsObject
@@ -338,43 +327,16 @@ const NSUInteger inviteRowMaxImages = 3;
   return cell;
 }
 
-- (UITableViewCell *)cellForAction:(DFPeanutFeedObject *)actionObject
-{
-  DFInboxTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:@"singleCell"];
-  if (cell.collectionView.superview) {
-    [cell.collectionView removeFromSuperview];
-  }
-  
-  [self.class resetCell:cell];
-  
-  cell.contentView.backgroundColor = [UIColor whiteColor];
-  
-  // actor/ action
-  cell.profilePhotoStackView.names = actionObject.actorNames;
-  cell.actorLabel.text = [self.class firstActorNameForObject:actionObject];
-  cell.actionTextLabel.text = actionObject.title;
-  
-  //Subtitle (strand name_
-  cell.subtitleLabel.text = actionObject.subtitle;
-  
-  // time taken
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:actionObject.time_stamp
-                         abbreviate:YES];
-  // photo preview
-  [self setRemotePreviewPhotoForCell:cell withFeedObject:actionObject];
 
-  return cell;
-}
 
 + (void)resetCell:(DFInboxTableViewCell *)cell
 {
   cell.timeLabel.text = @"T";
   cell.actorLabel.text = @"Actor";
   cell.actionTextLabel.text = @"Action";
-  cell.subtitleLabel.text = @"Subtitle";
+  cell.titleLabel.text = @"Subtitle";
+  cell.peopleLabel.text = @"People";
   cell.objects = @[];
-  cell.previewImageView.image = nil;
 }
 
 - (void)setRemotePhotosForCell:(DFInboxTableViewCell *)cell
@@ -411,23 +373,6 @@ const NSUInteger inviteRowMaxImages = 3;
        [cell setImage:image forObject:@(photoObject.id)];
      }];
   }
-}
-
-- (void)setRemotePreviewPhotoForCell:(DFInboxTableViewCell *)cell
-                      withFeedObject:(DFPeanutFeedObject *)object
-{
-  DFPeanutFeedObject *photoObject = object.objects.firstObject;
-  [[DFImageStore sharedStore]
-   imageForID:photoObject.id
-   preferredType:DFImageThumbnail
-   thumbnailPath:photoObject.thumb_image_path
-   fullPath:photoObject.full_image_path
-   completion:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       cell.previewImageView.image = image;
-       [cell setNeedsDisplay];
-     });
-   }];
 }
 
 

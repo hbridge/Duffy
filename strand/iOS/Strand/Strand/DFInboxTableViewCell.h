@@ -17,13 +17,21 @@ extern CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight;
 
 @interface DFInboxTableViewCell : DFCollectionViewTableViewCell
 
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *actionTextLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *previewImageView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
-@property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
+@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
+
+
+typedef NS_OPTIONS(NSInteger, DFInboxCellStyle) {
+  DFInboxCellStyleInvite,
+  DFInboxCellStyleStrand,
+};
+
++ (DFInboxTableViewCell *)createWithStyle:(DFInboxCellStyle)style;
+- (void)configureForInboxCellStyle:(DFInboxCellStyle)style;
 
 @end

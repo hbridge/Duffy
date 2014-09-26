@@ -27,4 +27,22 @@ CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight = 8;
   return UIEdgeInsetsZero;
 }
 
+
+- (void)configureForInboxCellStyle:(DFInboxCellStyle)style
+{
+  if (style == DFInboxCellStyleStrand) {
+    [self.actorLabel removeFromSuperview];
+    [self.actionTextLabel removeFromSuperview];
+  }
+}
+
++ (DFInboxTableViewCell *)createWithStyle:(DFInboxCellStyle)style {
+  DFInboxTableViewCell *cell = [[[UINib nibWithNibName:NSStringFromClass([self class])
+                                                bundle:nil]
+                                 instantiateWithOwner:nil options:nil]
+                                firstObject];
+  [cell configureForInboxCellStyle:style];
+  return cell;
+}
+
 @end
