@@ -489,7 +489,10 @@ def getPhotosSuggestionsForStrand(user, strand):
 	
 def getObjectsDataForPost(postAction):
 	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
-	groupEntry = {'photos': postAction.photos.all().order_by('time_taken'), 'metadata': metadata}
+	photos = postAction.photos.all().order_by('time_taken')
+	metadata['title'] = "added %s photos" % len(photos)
+
+	groupEntry = {'photos': photos, 'metadata': metadata}
 
 	formattedGroups = getFormattedGroups([groupEntry])
 		
