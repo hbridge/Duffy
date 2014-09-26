@@ -1,81 +1,78 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
         <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFFeedSectionHeaderView">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
+            <rect key="frame" x="0.0" y="0.0" width="320" height="51"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="dMB-6d-4Qm" userLabel="backgroundView">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="48"/>
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="51"/>
                     <subviews>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eoo-53-PLK">
-                            <rect key="frame" x="10" y="4" width="300" height="20"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="252" text="action text" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="eoo-53-PLK">
+                            <rect key="frame" x="87" y="9" width="63.5" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8mb-Xn-eUJ">
-                            <rect key="frame" x="27" y="24" width="283" height="20"/>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Actor" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nj5-ys-zcv">
+                            <rect key="frame" x="51" y="9" width="33.5" height="16"/>
                             <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Y0u-L2-2Lz" customClass="DFProfilePhotoStackView" customModule="Strand" customModuleProvider="target">
+                            <rect key="frame" x="8" y="8" width="35" height="35"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="35" id="g5E-B5-c9f"/>
+                                <constraint firstAttribute="height" constant="35" id="ize-H8-7d9"/>
+                            </constraints>
+                        </view>
+                        <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8mb-Xn-eUJ">
+                            <rect key="frame" x="51" y="27" width="40" height="13.5"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="11"/>
                             <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="4Md-XX-oaS">
-                            <rect key="frame" x="10" y="26" width="15" height="15"/>
-                            <constraints>
-                                <constraint firstAttribute="height" constant="15" id="5f1-Ew-GTT"/>
-                                <constraint firstAttribute="width" constant="15" id="HHs-TM-He0"/>
-                            </constraints>
-                        </imageView>
-                        <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="L8d-Rs-vGG">
-                            <rect key="frame" x="281" y="6" width="35" height="35"/>
-                            <state key="normal" image="Assets/Icons/InviteBarButton.png">
-                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                            </state>
-                            <connections>
-                                <action selector="inviteButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="2VV-Z5-txE"/>
-                            </connections>
-                        </button>
                     </subviews>
                     <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="custom" customColorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstItem="8mb-Xn-eUJ" firstAttribute="leading" secondItem="4Md-XX-oaS" secondAttribute="trailing" constant="2" id="19g-Wd-MDZ"/>
-                        <constraint firstItem="eoo-53-PLK" firstAttribute="leading" secondItem="4Md-XX-oaS" secondAttribute="leading" id="2ar-r1-64f"/>
-                        <constraint firstAttribute="trailing" secondItem="eoo-53-PLK" secondAttribute="trailing" constant="10" id="MH8-2H-6iV"/>
-                        <constraint firstAttribute="trailing" secondItem="8mb-Xn-eUJ" secondAttribute="trailing" constant="10" id="OrB-E2-Oor"/>
-                        <constraint firstAttribute="bottom" secondItem="8mb-Xn-eUJ" secondAttribute="bottom" constant="4" id="Qeo-nF-xJl"/>
-                        <constraint firstItem="8mb-Xn-eUJ" firstAttribute="top" secondItem="eoo-53-PLK" secondAttribute="bottom" id="QqM-TJ-W5U"/>
-                        <constraint firstItem="8mb-Xn-eUJ" firstAttribute="centerY" secondItem="4Md-XX-oaS" secondAttribute="centerY" id="cdE-SP-KpG"/>
-                        <constraint firstItem="eoo-53-PLK" firstAttribute="leading" secondItem="dMB-6d-4Qm" secondAttribute="leading" constant="10" id="wBO-pf-8m7"/>
-                        <constraint firstItem="eoo-53-PLK" firstAttribute="top" secondItem="dMB-6d-4Qm" secondAttribute="top" constant="4" id="xCd-lz-eEa"/>
-                        <constraint firstItem="8mb-Xn-eUJ" firstAttribute="top" secondItem="eoo-53-PLK" secondAttribute="bottom" id="y80-ZC-p2k"/>
+                        <constraint firstItem="8mb-Xn-eUJ" firstAttribute="leading" secondItem="Y0u-L2-2Lz" secondAttribute="trailing" constant="8" id="7pM-vM-1co"/>
+                        <constraint firstItem="Y0u-L2-2Lz" firstAttribute="leading" secondItem="dMB-6d-4Qm" secondAttribute="leading" constant="8" id="8s7-Sh-bqF"/>
+                        <constraint firstItem="eoo-53-PLK" firstAttribute="leading" secondItem="Nj5-ys-zcv" secondAttribute="trailing" constant="2" id="EhU-KZ-4pR"/>
+                        <constraint firstItem="Y0u-L2-2Lz" firstAttribute="centerY" secondItem="Nj5-ys-zcv" secondAttribute="centerY" constant="8" id="JFS-56-9pK"/>
+                        <constraint firstItem="8mb-Xn-eUJ" firstAttribute="centerY" secondItem="Y0u-L2-2Lz" secondAttribute="centerY" constant="8" id="M1y-z5-0jt"/>
+                        <constraint firstAttribute="bottom" secondItem="Y0u-L2-2Lz" secondAttribute="bottom" constant="8" id="PK6-Bb-Y0q"/>
+                        <constraint firstItem="Y0u-L2-2Lz" firstAttribute="top" secondItem="dMB-6d-4Qm" secondAttribute="top" constant="8" id="c8X-wK-I75"/>
+                        <constraint firstItem="eoo-53-PLK" firstAttribute="centerY" secondItem="Nj5-ys-zcv" secondAttribute="centerY" id="ec9-KM-Iyw"/>
+                        <constraint firstItem="Nj5-ys-zcv" firstAttribute="leading" secondItem="Y0u-L2-2Lz" secondAttribute="trailing" constant="8" id="x6F-BQ-TbK"/>
                     </constraints>
                 </view>
             </subviews>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="dMB-6d-4Qm" secondAttribute="bottom" id="55m-EF-Jk5"/>
-                <constraint firstItem="dMB-6d-4Qm" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="nVk-8U-i0e"/>
-                <constraint firstItem="dMB-6d-4Qm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="vaO-dE-DZI"/>
-                <constraint firstAttribute="trailing" secondItem="dMB-6d-4Qm" secondAttribute="trailing" id="xNG-rF-V7C"/>
+                <constraint firstItem="dMB-6d-4Qm" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="4Of-ru-AhE"/>
+                <constraint firstAttribute="trailing" secondItem="dMB-6d-4Qm" secondAttribute="trailing" id="RcU-aj-tDM"/>
+                <constraint firstItem="dMB-6d-4Qm" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="RlV-9Y-ULP"/>
+                <constraint firstAttribute="bottom" secondItem="dMB-6d-4Qm" secondAttribute="bottom" id="oYg-vl-Zfj"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="actionTextLabel" destination="eoo-53-PLK" id="Xgc-ux-pxS"/>
+                <outlet property="actorLabel" destination="Nj5-ys-zcv" id="Fup-lf-hTF"/>
                 <outlet property="backgroundView" destination="dMB-6d-4Qm" id="kdi-ne-8eU"/>
-                <outlet property="subtitleImageView" destination="4Md-XX-oaS" id="L59-Ax-c5e"/>
+                <outlet property="profilePhotoStackView" destination="Y0u-L2-2Lz" id="TwZ-RM-6ai"/>
                 <outlet property="subtitleLabel" destination="8mb-Xn-eUJ" id="Rcj-Ho-nNH"/>
-                <outlet property="titleLabel" destination="eoo-53-PLK" id="2pb-D9-hVO"/>
             </connections>
+            <point key="canvasLocation" x="139" y="158"/>
         </view>
     </objects>
-    <resources>
-        <image name="Assets/Icons/InviteBarButton.png" width="24" height="24"/>
-    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>

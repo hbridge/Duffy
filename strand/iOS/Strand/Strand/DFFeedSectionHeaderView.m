@@ -21,8 +21,7 @@
 
 - (void)awakeFromNib
 {
-  self.subtitleImageView.image = [UIImage imageNamed:@"Assets/Icons/LocationHeaderIcon"];
-  self.subtitleImageView.contentMode = UIViewContentModeCenter;
+  [super awakeFromNib];
 }
 
 /*

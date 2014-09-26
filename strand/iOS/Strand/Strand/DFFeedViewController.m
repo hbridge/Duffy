@@ -36,7 +36,7 @@ const CGFloat UploadingCellImageRowHeight = 45.0;
 const CGFloat UploadingCellImageRowSpacing = 6.0;
 const int UploadingCellImagesPerRow = 6;
 // Section Header
-const CGFloat SectionHeaderHeight = 48.0;
+const CGFloat SectionHeaderHeight = 51.0;
 // constants used for row height calculations
 const CGFloat TitleAreaHeight = 32; // height plus spacing around
 const CGFloat ImageViewHeight = 320; // height plus spacing around
@@ -233,8 +233,10 @@ const CGFloat LockedCellHeight = 157.0;
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
   DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:section];
-  headerView.titleLabel.text = sectionObject.title;
-  headerView.subtitleLabel.text = sectionObject.subtitle;
+  headerView.actorLabel.text = [[sectionObject actorNames] firstObject];
+  headerView.profilePhotoStackView.names = [sectionObject actorNames];
+  headerView.actionTextLabel.text = sectionObject.title;
+  headerView.subtitleLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_stamp abbreviate:NO];
   headerView.representativeObject = sectionObject;
   headerView.delegate = self;
   
