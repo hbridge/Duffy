@@ -28,6 +28,7 @@
 #import "RootViewController.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFInviteStrandViewController.h"
+#import "DFStrandGalleryTitleView.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -141,6 +142,20 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)setStrandObjects:(NSArray *)strandObjects
 {
   dispatch_async(dispatch_get_main_queue(), ^{
+    DFStrandGalleryTitleView *titleView =
+    [[[UINib nibWithNibName:NSStringFromClass([DFStrandGalleryTitleView class])
+                     bundle:nil]
+      instantiateWithOwner:nil options:nil]
+     firstObject];
+    DFPeanutFeedObject *strandObject = strandObjects.firstObject;
+    titleView.locationLabel.text = strandObject.location;
+    titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+                                                                 abbreviate:NO];
+    
+    self.navigationItem.titleView = titleView;
+    self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc]
+                                                 initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil]];
+    
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
     
