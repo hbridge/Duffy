@@ -507,8 +507,7 @@ def getObjectsDataForStrand(strand):
 
 	recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
 
-	actors = [action.user for action in postActions]
-	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(actors), 'time_taken': getTimeTakenForStrand(strand), 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
+	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(strand.users.all()), 'time_taken': getTimeTakenForStrand(strand), 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
 	response['objects'] = list()
 	for post in postActions:
 		response['objects'].extend(getObjectsDataForPost(post))
