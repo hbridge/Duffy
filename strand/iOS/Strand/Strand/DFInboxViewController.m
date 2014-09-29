@@ -181,9 +181,9 @@
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self shouldSpinnerBeOn]) {
          if (self.showAsFirstTimeSetup) {
-           [SVProgressHUD dismiss];
            self.showAsFirstTimeSetup = NO;
          }
+         [SVProgressHUD dismiss];
          
          [self.refreshControl endRefreshing];
          [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
