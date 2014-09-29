@@ -81,8 +81,6 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
    self.collectionView.scrollsToTop = YES;
   
-  self.collectionView.contentInset = UIEdgeInsetsMake(self.peopleBackgroundView.frame.size.height, 0, 0, 0);
-  
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"photoCell"];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoStackCell" bundle:nil]
