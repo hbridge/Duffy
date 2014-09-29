@@ -10,6 +10,8 @@
 
 @interface DFInboxViewController : UITableViewController
 
+@property (nonatomic) BOOL showAsFirstTimeSetup;
+
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
 - (void)showStrandPostsForStrandID:(DFStrandIDType)strandID;

@@ -47,7 +47,7 @@
 
 @property (nonatomic, retain) UITabBarController *tabBarController;
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
-
+@property (nonatomic, retain) DFInboxViewController *inboxViewController;
 @end
 
 @implementation AppDelegate
@@ -139,7 +139,7 @@ const NSUInteger MinValidAccountId = 650;
 {
   [self showMainView];
   [self performForegroundOperations];
-  [self showInbox];
+  [self showInboxForFirstTime];
 }
 
 /*
@@ -181,14 +181,14 @@ const NSUInteger MinValidAccountId = 650;
   
   [DFPhotoStore sharedStore];
   
-  DFInboxViewController *inboxViewController = [[DFInboxViewController alloc] init];
+  self.inboxViewController = [[DFInboxViewController alloc] init];
   DFCreateStrandViewController *createStrandViewController = [[DFCreateStrandViewController alloc] init];
   // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
-  @[[[DFNavigationController alloc] initWithRootViewController:inboxViewController],
+  @[[[DFNavigationController alloc] initWithRootViewController:self.inboxViewController],
     [[DFNavigationController alloc] initWithRootViewController:createStrandViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
@@ -365,8 +365,9 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   });
 }
 
-- (void)showInbox
+- (void)showInboxForFirstTime
 {
+  self.inboxViewController.showAsFirstTimeSetup = YES;
   self.tabBarController.selectedIndex = 0;
 }
 
