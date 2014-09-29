@@ -61,6 +61,8 @@ const CGFloat LockedCellHeight = 157.0;
 
 @property (readonly, nonatomic, retain) NSDictionary *photoIndexPathsById;
 @property (readonly, nonatomic, retain) NSDictionary *photoObjectsById;
+@property (readonly, nonatomic, retain) NSMutableDictionary *rowHeights;
+@property (nonatomic, retain) NSMutableDictionary *templateCellsByStyle;
 
 @end
 
@@ -72,6 +74,8 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self = [super init];
   if (self) {
+    _rowHeights = [NSMutableDictionary new];
+    _templateCellsByStyle = [NSMutableDictionary new];
     [self initTabBarItem];
   }
   return self;
@@ -93,13 +97,10 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.scrollsToTop = YES;
   
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:@"photoCell"];
+       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleSquare]];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:@"clusterCell"];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFLockedStrandCell" bundle:nil]
-       forCellReuseIdentifier:@"lockedCell"];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFUploadingFeedCell" bundle:nil]
-       forCellReuseIdentifier:@"uploadingCell"];
+       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleSquare
+                               | DFPhotoFeedCellStyleCollectionVisible]];
   
   [self.tableView
    registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView"
@@ -108,6 +109,11 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.tableView.rowHeight = MinRowHeight;
 
+}
+
+- (NSString *)identifierForCellStyle:(DFPhotoFeedCellStyle)style
+{
+  return [@(style) stringValue];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -279,6 +285,12 @@ const CGFloat LockedCellHeight = 157.0;
   return self.strandObjects[tableSection];
 }
 
+- (DFPeanutFeedObject *)objectAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
+  return sectionObject.objects[indexPath.row];
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
@@ -301,11 +313,13 @@ const CGFloat LockedCellHeight = 157.0;
 - (DFPhotoFeedCell *)cellForPhoto:(DFPeanutFeedObject *)photoObject
                            indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoFeedCell *photoFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"photoCell"
-                                                                   forIndexPath:indexPath];
+  DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
+  DFPhotoFeedCell *photoFeedCell = [self.tableView
+                                    dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style]
+                                    forIndexPath:indexPath];
+  [photoFeedCell configureWithStyle:style];
   photoFeedCell.delegate = self;
   [photoFeedCell setObjects:@[@(photoObject.id)]];
-  [photoFeedCell setClusterViewHidden:YES];
   [DFFeedViewController configureNonImageAttributesForCell:photoFeedCell
                                                searchObject:photoObject];
   photoFeedCell.imageView.image = nil;
@@ -329,13 +343,32 @@ const CGFloat LockedCellHeight = 157.0;
   return photoFeedCell;
 }
 
+- (void)updateHeightForCell:(DFPhotoFeedCell *)cell
+                      image:(UIImage *)image
+                atIndexPath:(NSIndexPath *)indexPath
+{
+  DFPhotoFeedCellStyle newStyle;
+  if (image.size.height > image.size.width) {
+    newStyle = DFPhotoFeedCellStylePortrait;
+  } else if (image.size.width > image.size.height) {
+    newStyle = DFPhotoFeedCellStyleLandscape;
+  }
+  [cell configureWithStyle:newStyle];
+  CGFloat height = [cell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  [self setHeight:height forRowAtIndexPath:indexPath];
+  [self.tableView beginUpdates];
+  [self.tableView endUpdates];
+}
+
 - (DFPhotoFeedCell *)cellForCluster:(DFPeanutFeedObject *)cluster
                         indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoFeedCell *clusterFeedCell = [self.tableView dequeueReusableCellWithIdentifier:@"clusterCell"
-                                                                   forIndexPath:indexPath];
+  DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
+  DFPhotoFeedCell *clusterFeedCell = [self.tableView
+                                      dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style]
+                                      forIndexPath:indexPath];
+  [clusterFeedCell configureWithStyle:style];
   clusterFeedCell.delegate = self;
-  [clusterFeedCell setClusterViewHidden:NO];
   [clusterFeedCell setObjects:[DFFeedViewController objectIDNumbers:cluster.objects]];
   [DFFeedViewController configureNonImageAttributesForCell:clusterFeedCell
                                                searchObject:[cluster.objects firstObject]];
@@ -387,7 +420,7 @@ const CGFloat LockedCellHeight = 157.0;
 }
 
 
-- (id)keyForIndexPath:(NSIndexPath *)indexPath
++ (id)keyForIndexPath:(NSIndexPath *)indexPath
 {
   if ([indexPath class] == [NSIndexPath class]) {
     return indexPath;
@@ -397,24 +430,30 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-   CGFloat rowHeight = MinRowHeight;
-  
-  
-  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
-  if ([sectionObject isLockedSection]) {
-    // If it's a section object, its height is fixed
-    return LockedCellHeight;
+  DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
+  DFPhotoFeedCell *cell = self.templateCellsByStyle[@(style)];
+  if (!cell) {
+    cell = [DFPhotoFeedCell createCellWithStyle:style];
   }
   
-  DFPeanutFeedObject *rowObject = sectionObject.objects[indexPath.row];
-  if (rowObject.actions.count > 0) {
-    rowHeight += FavoritersListHeight;
-  }
-  if ([rowObject.type isEqual:DFFeedObjectCluster]) {
-    rowHeight += CollectionViewHeight;
-  }
-  
+  CGFloat rowHeight = MinRowHeight;
+  rowHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
   return rowHeight;
+}
+
+- (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
+  if ([object.type isEqual:DFFeedObjectCluster]) {
+    return DFPhotoFeedCellStyleSquare | DFPhotoFeedCellStyleCollectionVisible;
+  } else {
+    return DFPhotoFeedCellStyleSquare;
+  }
+}
+
+- (void)setHeight:(CGFloat)height forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  self.rowHeights[[self.class keyForIndexPath:indexPath]] = @(height);
 }
 
 #pragma mark - Actions

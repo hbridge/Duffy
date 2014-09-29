@@ -23,7 +23,6 @@
 - (void)awakeFromNib
 {
   [self configureView];
-  [self saveConstraints];
   UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
                                                 initWithTarget:self
                                                 action:@selector(favoriteButtonPressed:)];
@@ -67,7 +66,6 @@
     if (!self.favoritersButton.superview || !self.favoritersButton) {
       DDLogVerbose(@"Re adding favoriters button: %@", self.favoritersButton);
       [self.contentView addSubview:self.favoritersButton];
-      [self loadConstraintsForView:self.favoritersButton];
     }
   }
 }
@@ -78,7 +76,6 @@
     [self.collectionView removeFromSuperview];
   } else {
     [self.contentView addSubview:self.collectionView];
-    [self loadConstraintsForView:self.collectionView];
   }
 }
 
@@ -118,34 +115,6 @@
     self.photoImageView.alpha = 1.0;
   }
 
-}
-
-- (void)saveConstraints
-{
-  self.savedConstraints = [NSMutableDictionary new];
-  NSArray *viewsToSave = @[self.favoritersButton, self.collectionView];
-  for (UIView *view in viewsToSave) {
-    NSMutableArray *viewConstraints = [NSMutableArray new];
-    for (NSLayoutConstraint *con in self.contentView.constraints) {
-      if (con.firstItem == view || con.secondItem == view) {
-        [viewConstraints addObject:con];
-      }
-    }
-    self.savedConstraints[view.restorationIdentifier] = viewConstraints;
-  }
-}
-
-- (void)loadConstraintsForView:(UIView *)view
-{
-  NSArray *constraints = self.savedConstraints[view.restorationIdentifier];
-  for (NSLayoutConstraint *constraint in constraints) {
-    // Ensure that both items that the constraint is referring to are in the view
-    UIView *firstItem = constraint.firstItem;
-    UIView *secondItem = constraint.secondItem;
-    if ([firstItem superview] && [secondItem superview]) {
-      [self.contentView addConstraint:constraint];
-    }
-  }
 }
 
 - (UIImageView *)imageView
@@ -211,6 +180,33 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   }
 }
 
+- (void)configureWithStyle:(DFPhotoFeedCellStyle)style
+{
+    NSArray *verticalConstraints = [self.photoImageView constraintsAffectingLayoutForAxis:UILayoutConstraintAxisVertical];
+    for (NSLayoutConstraint *constraint in verticalConstraints) {
+      if (constraint.constant == 320.0) {
+        if (style == DFPhotoFeedCellStylePortrait) {
+          //constraint.constant = self.contentView.frame.size.width * 4.0/3.0;
+        } else if (style == DFPhotoFeedCellStyleLandscape) {
+          //constraint.constant = self.contentView.frame.size.width * 3.0/4.0;
+        }
+      }
+    }
+  
+  if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
+    [self.collectionView removeFromSuperview];
+  }
+}
+
++ (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style
+{
+  DFPhotoFeedCell *cell =
+  [[[UINib nibWithNibName:NSStringFromClass([DFPhotoFeedCell class]) bundle:nil]
+    instantiateWithOwner:nil options:nil]
+   firstObject];
+  [cell configureWithStyle:style];
+  return cell;
+}
 
 
 @end

@@ -40,11 +40,20 @@
 - (void)setImage:(UIImage *)image forObject:(id)clusterObject;
 
 - (void)setFavoritersListHidden:(BOOL)hidden;
-- (void)setClusterViewHidden:(BOOL)hidden;
-
 
 - (IBAction)favoriteButtonPressed:(id)sender;
 - (IBAction)moreOptionsButtonPressed:(id)sender;
+
+
+typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
+  DFPhotoFeedCellStyleSquare,
+  DFPhotoFeedCellStylePortrait,
+  DFPhotoFeedCellStyleLandscape,
+  DFPhotoFeedCellStyleCollectionVisible,
+};
+
+- (void)configureWithStyle:(DFPhotoFeedCellStyle)style;
++ (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style;
 
 
 
