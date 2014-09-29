@@ -342,10 +342,10 @@ const NSUInteger inviteRowMaxImages = 3;
   NSMutableArray *photoIDs = [NSMutableArray new];
   NSMutableArray *photos = [NSMutableArray new];
   
-  for (NSUInteger i = 0; i < strandPosts.objects.count && photos.count < maxPhotosToFetch; i++) {
+  for (NSUInteger i = 0; i < strandPosts.objects.count; i++) {
     DFPeanutFeedObject *strandPost = strandPosts.objects[i];
     
-    for (NSUInteger j = 0; j < strandPost.objects.count && photos.count < maxPhotosToFetch; j++) {
+    for (NSUInteger j = 0; j < strandPost.objects.count; j++) {
       DFPeanutFeedObject *object = strandPost.objects[j];
       DFPeanutFeedObject *photoObject;
       if ([object.type isEqual:DFFeedObjectCluster]) {
@@ -359,7 +359,8 @@ const NSUInteger inviteRowMaxImages = 3;
   }
   
   cell.objects = photoIDs;
-  for (DFPeanutFeedObject *photoObject in photos) {
+  for (NSUInteger i = 0; i < MIN(photos.count, maxPhotosToFetch); i++) {
+    DFPeanutFeedObject *photoObject = photos[i];
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
      preferredType:DFImageThumbnail

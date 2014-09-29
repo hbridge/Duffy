@@ -8,6 +8,7 @@
 
 #import "DFInboxTableViewCell.h"
 #import "DFStrandConstants.h"
+#import "DFLabelCollectionViewCell.h"
 
 CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = 51;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight = 148;
@@ -22,6 +23,9 @@ NSUInteger const InboxCellMaxPhotos = 6;
 {
   [super awakeFromNib];
   self.collectionView.backgroundColor = [UIColor clearColor];
+  [self.collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFLabelCollectionViewCell class])
+                                                  bundle:nil]
+        forCellWithReuseIdentifier:@"labelCell"];
 }
 
 - (UIEdgeInsets)layoutMargins
@@ -48,6 +52,19 @@ NSUInteger const InboxCellMaxPhotos = 6;
                                  instantiateWithOwner:nil options:nil]
                                 firstObject];
   [cell configureForInboxCellStyle:style];
+  return cell;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  if (indexPath.row < InboxCellMaxPhotos - 1 || self.objects.count <= InboxCellMaxPhotos)
+    return [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
+  
+  DFLabelCollectionViewCell *cell = [self.collectionView
+                                     dequeueReusableCellWithReuseIdentifier:@"labelCell"
+                                     forIndexPath:indexPath];
+  cell.abbreviationSquare.elementAbbreviation = [NSString stringWithFormat:@"+%d", (int)(self.objects.count - InboxCellMaxPhotos)];
+  cell.abbreviationSquare.displayMode = OFElementSquareDisplayAbbreviation;
   return cell;
 }
 
