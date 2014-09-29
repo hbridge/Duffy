@@ -6,6 +6,8 @@
 #    open Strand.xcworkspace
 # From now on use Strand.xcworkspace
 
+source 'https://github.com/CocoaPods/Specs.git'
+
 xcodeproj 'Strand.xcodeproj'
 
 platform :ios, '7.0' 
@@ -14,7 +16,7 @@ inhibit_all_warnings!
 pod 'RestKit', '~> 0.20.0'
 pod 'JDStatusBarNotification', '~> 1.4.7'
 pod 'CocoaLumberjack', '~> 1.8.1'
-pod 'HockeySDK', '~> 3.5.5'
+pod 'HockeySDK', :git => 'https://github.com/bitstadium/HockeySDK-iOS.git'
 pod 'MMPopLabel', :git => 'https://github.com/hbridge/MMPopLabel.git'
 pod 'CRToast', '~> 0.0.7'
 pod 'Localytics-iOS-Client', '~> 2.23.0'

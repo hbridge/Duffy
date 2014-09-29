@@ -14,7 +14,7 @@ PODS:
     - BWLongTextViewController (~> 1.0)
     - BWSelectViewController
   - FrameAccessor (1.3.2)
-  - HockeySDK (3.5.7)
+  - HockeySDK (3.6.1)
   - JDStatusBarNotification (1.4.8)
   - LiveFrost (1.1.2)
   - LKbadgeView (1.1.0)
@@ -48,7 +48,7 @@ DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
   - CRToast (~> 0.0.7)
   - FormKit.m (~> 0.4.0)
-  - HockeySDK (~> 3.5.5)
+  - HockeySDK (from `https://github.com/bitstadium/HockeySDK-iOS.git`)
   - JDStatusBarNotification (~> 1.4.7)
   - LiveFrost (~> 1.1.2)
   - LKbadgeView (~> 1.1.0)
@@ -62,6 +62,8 @@ DEPENDENCIES:
   - WYPopoverController (~> 0.2.2)
 
 EXTERNAL SOURCES:
+  HockeySDK:
+    :git: https://github.com/bitstadium/HockeySDK-iOS.git
   MMPopLabel:
     :git: https://github.com/hbridge/MMPopLabel.git
   SVProgressHUD:
@@ -76,7 +78,7 @@ SPEC CHECKSUMS:
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   FormKit.m: 68e35d2e70558109fa9ce5935e0f16a65c8b2b51
   FrameAccessor: 5eec95b29b5e9a3afe72a7a2e9ed25b000d3bcc3
-  HockeySDK: f0e874d1c6833163ee0c4e423606faf33ad04071
+  HockeySDK: bf1964134fa6ef0c4c207c329e9aa6b866cee8f4
   JDStatusBarNotification: c68611370dedc0ef865fb0fc1768dfbaf8fd961f
   LiveFrost: 8c7e447e6833902ddc2a639faa27e71e091b5062
   LKbadgeView: 8e14044ee22c6d570c07e69e1ce73a3f91061730
@@ -91,4 +93,4 @@ SPEC CHECKSUMS:
   VENTokenField: 8f6a986421fbe77b5cf449a0f3e6ff17df26eb98
   WYPopoverController: c233d69fdfd5c7e316b481df1060624d7a9e629d
 
-COCOAPODS: 0.33.1
+COCOAPODS: 0.34.1
