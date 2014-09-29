@@ -88,14 +88,9 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFStrandGallerySectionHeaderView" bundle:nil]
         forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
                withReuseIdentifier:@"headerView"];
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFGallerySectionFooter" bundle:nil]
-        forSupplementaryViewOfKind:UICollectionElementKindSectionFooter
-               withReuseIdentifier:@"footerView"];
-  
   
   self.collectionView.backgroundColor = [UIColor whiteColor];
   self.flowLayout.headerReferenceSize = CGSizeMake(self.view.frame.size.width, 51.0);
-  self.flowLayout.footerReferenceSize = CGSizeMake(self.view.frame.size.width, 30.0);
   self.flowLayout.itemSize = CGSizeMake(StrandGalleryItemSize, StrandGalleryItemSize);
   self.flowLayout.minimumInteritemSpacing = StrandGalleryItemSpacing;
   self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing;

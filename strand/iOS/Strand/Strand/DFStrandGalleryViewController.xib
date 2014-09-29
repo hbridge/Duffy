@@ -21,6 +21,7 @@
             <subviews>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="qQw-mg-bqu">
                     <rect key="frame" x="0.0" y="18" width="600" height="582"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="7KE-aA-mQ9" customClass="DFGalleryCollectionViewFlowLayout">
                         <size key="itemSize" width="50" height="50"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
@@ -58,16 +59,10 @@
                 <constraint firstAttribute="bottom" secondItem="qQw-mg-bqu" secondAttribute="bottom" id="CNJ-Zy-P42"/>
                 <constraint firstAttribute="trailing" secondItem="PHW-KG-z5B" secondAttribute="trailing" id="JIx-fR-fZY"/>
                 <constraint firstAttribute="trailing" secondItem="qQw-mg-bqu" secondAttribute="trailing" id="hIy-Xu-rCp"/>
-                <constraint firstItem="qQw-mg-bqu" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="m5f-Pw-FKb"/>
                 <constraint firstItem="PHW-KG-z5B" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="pCW-Of-HIV"/>
                 <constraint firstItem="PHW-KG-z5B" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="zPg-Sh-Vd0"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
-            <variation key="default">
-                <mask key="constraints">
-                    <exclude reference="m5f-Pw-FKb"/>
-                </mask>
-            </variation>
         </view>
     </objects>
 </document>
