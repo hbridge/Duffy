@@ -398,7 +398,9 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *photoObject = self.suggestedPhotoObjects[indexPath.row];
+  DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
+  if  (![sectionObject.type isEqual:DFFeedObjectSuggestedPhotos]) return;
+  DFPeanutFeedObject *photoObject = [self photosForSection:indexPath.section][indexPath.row];
   NSUInteger index = [self.selectedPhotoIDs indexOfObject:@(photoObject.id)];
   if (index != NSNotFound) {
     [self.selectedPhotoIDs removeObjectAtIndex:index];
