@@ -12,4 +12,6 @@
 
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
+- (void)showStrandPostsForStrandID:(DFStrandIDType)strandID;
+
 @end

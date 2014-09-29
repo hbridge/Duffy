@@ -51,7 +51,7 @@
 
 - (void)initTabBarItemAndNav
 {
-  self.navigationItem.title = @"Inbox";
+  self.navigationItem.title = @"Strand";
   self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
@@ -225,7 +225,7 @@
     cell.contentView.backgroundColor = [UIColor yellowColor];
     cell.textLabel.text = [NSString stringWithFormat:@"Unknown type: %@", feedObject.type];
     #else
-    cell = [self cellForAction:feedObject];
+    cell = [self cellForStrandPosts:feedObject];
     #endif
   }
   
@@ -412,6 +412,23 @@ const NSUInteger inviteRowMaxImages = 3;
   [self.navigationController pushViewController:vc animated:YES];
 }
 
+- (void)showStrandPostsForStrandID:(DFStrandIDType)strandID
+{
+  DFPeanutFeedObject *strandPostObject;
+  for (DFPeanutFeedObject *strandPost in self.feedObjects) {
+    if (![strandPost.type isEqual:DFFeedObjectStrandPost]) return;
+    if (strandPost.id == strandID) {
+      strandPostObject = strandPost;
+      break;
+    }
+  }
+  
+  if (strandPostObject) [self showStrandPostsObject:strandPostObject];
+  DDLogError(@"%@ got a request to show strand with id:%lu but none loaded with that ID",
+             self.class,
+             (long)strandID);
+}
+
 
 #pragma mark - Network Adapter
 
@@ -420,6 +437,7 @@ const NSUInteger inviteRowMaxImages = 3;
   if (!_feedAdapter) _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
   return _feedAdapter;
 }
+
 
 
 @end
