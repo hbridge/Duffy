@@ -97,6 +97,8 @@
                                                        selector:@selector(refreshFromServer)
                                                        userInfo:nil
                                                         repeats:YES];
+  } else if (!self.lastResponseHash) {
+    [self.refreshControl beginRefreshing];
   }
 }
 
@@ -180,17 +182,18 @@
      }
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self shouldSpinnerBeOn]) {
-         if (self.showAsFirstTimeSetup) {
-           self.showAsFirstTimeSetup = NO;
-         }
+         self.showAsFirstTimeSetup = NO;
          [SVProgressHUD dismiss];
          
-         [self.refreshControl endRefreshing];
-         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-         
-         if (response.objects.count == 0 && !error && self.view.window) {
-           [self showCreateBalloon];
-         }
+         [self.refreshTimer invalidate];
+         self.refreshTimer = nil;
+       }
+       
+       [self.refreshControl endRefreshing];
+       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+       
+       if (response.objects.count == 0 && !error && self.view.window) {
+         [self showCreateBalloon];
        }
      });
    }];
