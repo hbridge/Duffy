@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -31,45 +32,66 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="action text label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ejx-vN-IUf">
-                        <rect key="frame" x="47" y="8" width="241" height="17"/>
+                        <rect key="frame" x="47" y="8" width="240.5" height="17"/>
                         <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="900" text="1d" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="pik-Vg-OiT">
-                        <rect key="frame" x="296" y="8" width="16" height="16"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <rect key="frame" x="295.5" y="10" width="16.5" height="17"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Title Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="kFu-j8-B9v">
-                        <rect key="frame" x="8" y="24" width="280" height="17"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                        <rect key="frame" x="8" y="24" width="279.5" height="17"/>
+                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="People label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lsr-zM-wpW">
-                        <rect key="frame" x="8" y="40" width="79.5" height="17"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="5dI-dr-scV">
+                        <rect key="frame" x="8" y="40" width="95" height="17"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="People label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lsr-zM-wpW">
+                                <rect key="frame" x="16" y="0.0" width="80" height="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/PeopleHeaderIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="9rx-M8-icC">
+                                <rect key="frame" x="0.0" y="2" width="13" height="13"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="13" id="o0T-85-Lbx"/>
+                                    <constraint firstAttribute="width" constant="13" id="oSR-os-lUg"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="lsr-zM-wpW" secondAttribute="bottom" id="85x-0q-AJf"/>
+                            <constraint firstItem="lsr-zM-wpW" firstAttribute="leading" secondItem="9rx-M8-icC" secondAttribute="trailing" constant="3" id="IG6-dV-GHu"/>
+                            <constraint firstAttribute="centerY" secondItem="9rx-M8-icC" secondAttribute="centerY" id="K7h-El-gVB"/>
+                            <constraint firstItem="lsr-zM-wpW" firstAttribute="top" secondItem="5dI-dr-scV" secondAttribute="top" id="XDH-XF-5fo"/>
+                            <constraint firstItem="9rx-M8-icC" firstAttribute="leading" secondItem="5dI-dr-scV" secondAttribute="leading" id="hBI-BK-nnB"/>
+                            <constraint firstAttribute="trailing" secondItem="lsr-zM-wpW" secondAttribute="trailing" id="psO-Rj-wBD"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="pik-Vg-OiT" firstAttribute="top" secondItem="edi-gP-GBl" secondAttribute="top" constant="8" id="3VA-5E-M8W"/>
+                    <constraint firstItem="pik-Vg-OiT" firstAttribute="top" secondItem="edi-gP-GBl" secondAttribute="top" constant="10" id="3VA-5E-M8W"/>
                     <constraint firstAttribute="trailing" secondItem="Ejx-vN-IUf" secondAttribute="trailing" priority="900" constant="8" id="4H8-ec-053"/>
                     <constraint firstItem="Ejx-vN-IUf" firstAttribute="leading" secondItem="rlM-Qb-grC" secondAttribute="trailing" constant="3" id="4fU-Nj-v1i"/>
                     <constraint firstItem="Ejx-vN-IUf" firstAttribute="trailing" secondItem="kFu-j8-B9v" secondAttribute="trailing" id="60a-KI-6MW"/>
                     <constraint firstItem="kFu-j8-B9v" firstAttribute="top" secondItem="rlM-Qb-grC" secondAttribute="bottom" constant="-1" id="GrN-Dg-9AP"/>
                     <constraint firstItem="pik-Vg-OiT" firstAttribute="leading" secondItem="Ejx-vN-IUf" secondAttribute="trailing" constant="8" id="IvP-aw-p73"/>
+                    <constraint firstItem="Kln-so-NCf" firstAttribute="top" secondItem="5dI-dr-scV" secondAttribute="bottom" constant="10" id="Lh8-z6-YVm"/>
+                    <constraint firstItem="5dI-dr-scV" firstAttribute="top" secondItem="kFu-j8-B9v" secondAttribute="bottom" constant="-1" id="M7O-PP-On5"/>
+                    <constraint firstItem="5dI-dr-scV" firstAttribute="leading" secondItem="kFu-j8-B9v" secondAttribute="leading" id="NqE-h9-yAd"/>
                     <constraint firstItem="Kln-so-NCf" firstAttribute="leading" secondItem="kFu-j8-B9v" secondAttribute="leading" id="OHG-WH-xKY"/>
                     <constraint firstItem="rlM-Qb-grC" firstAttribute="top" secondItem="Ejx-vN-IUf" secondAttribute="top" id="Rxk-cG-3pN"/>
-                    <constraint firstItem="Kln-so-NCf" firstAttribute="top" secondItem="lsr-zM-wpW" secondAttribute="bottom" constant="10" id="TTP-Yu-Gf9"/>
                     <constraint firstItem="rlM-Qb-grC" firstAttribute="top" secondItem="edi-gP-GBl" secondAttribute="top" constant="8" id="Us9-bc-Pbq"/>
-                    <constraint firstItem="kFu-j8-B9v" firstAttribute="leading" secondItem="lsr-zM-wpW" secondAttribute="leading" id="Vf8-yX-C8Z"/>
                     <constraint firstItem="kFu-j8-B9v" firstAttribute="top" secondItem="edi-gP-GBl" secondAttribute="top" priority="700" constant="10" id="a1A-uq-Uzt"/>
                     <constraint firstAttribute="bottom" secondItem="Kln-so-NCf" secondAttribute="bottom" constant="10" id="lmf-Xv-hLD"/>
-                    <constraint firstItem="lsr-zM-wpW" firstAttribute="top" secondItem="kFu-j8-B9v" secondAttribute="bottom" constant="-1" id="lrZ-2z-4fc"/>
                     <constraint firstAttribute="trailing" secondItem="pik-Vg-OiT" secondAttribute="trailing" constant="8" id="ltW-wi-5jp"/>
                     <constraint firstItem="kFu-j8-B9v" firstAttribute="leading" secondItem="edi-gP-GBl" secondAttribute="leading" constant="8" id="nOW-S7-rre"/>
                     <constraint firstItem="Ejx-vN-IUf" firstAttribute="bottom" secondItem="rlM-Qb-grC" secondAttribute="bottom" id="qcE-XX-mgo"/>
@@ -87,7 +109,10 @@
                 <outlet property="timeLabel" destination="pik-Vg-OiT" id="9xi-el-Ul3"/>
                 <outlet property="titleLabel" destination="kFu-j8-B9v" id="wvw-Gd-qRp"/>
             </connections>
-            <point key="canvasLocation" x="-249" y="10.5"/>
+            <point key="canvasLocation" x="-248" y="13.5"/>
         </tableViewCell>
     </objects>
+    <resources>
+        <image name="Assets/Icons/PeopleHeaderIcon.png" width="16" height="16"/>
+    </resources>
 </document>
