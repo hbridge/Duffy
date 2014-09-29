@@ -297,6 +297,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   }
   
   DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
+  postObject.time_taken = self.strandPosts.time_taken;
   photoFeedController.strandObjects = @[postObject];
   [self.navigationController pushViewController:photoFeedController animated:YES];
   dispatch_async(dispatch_get_main_queue(), ^{
