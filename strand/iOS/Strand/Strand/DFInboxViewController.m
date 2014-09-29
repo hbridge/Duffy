@@ -20,6 +20,7 @@
 #import "DFNavigationController.h"
 #import "DFStrandConstants.h"
 #import "MMPopLabel.h"
+#import "SVProgressHUD.h"
 #import "DFStrandGalleryViewController.h"
 #import "DFStrandGalleryTitleView.h"
 
@@ -29,6 +30,7 @@
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
+@property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 
 @end
@@ -45,6 +47,9 @@
     _cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self initTabBarItemAndNav];
     [self observeNotifications];
+    
+    // This is set to YES after the controller is created
+    self.showAsFirstTimeSetup = NO;
   }
   return self;
 }
@@ -83,8 +88,15 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (!self.lastResponseHash) {
-    [self.refreshControl beginRefreshing];
+  if (self.showAsFirstTimeSetup) {
+    // If we don't have a lastResponseHash then this is the first run and we should show
+    //   a spinner bar until we get some good data (visible invite).  This is turned off in refreshFromServer
+    [SVProgressHUD showWithStatus:@"Loading your photos..."];
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
+                                                         target:self
+                                                       selector:@selector(refreshFromServer)
+                                                       userInfo:nil
+                                                        repeats:YES];
   }
 }
 
@@ -92,6 +104,8 @@
 {
   [super viewWillDisappear:animated];
   [self.noItemsPopLabel dismiss];
+  [self.refreshTimer invalidate];
+  self.refreshTimer = nil;
 }
 
 - (void)configureRefreshControl
@@ -127,6 +141,26 @@
     // Dispose of any resources that can be recreated.
 }
 
+/*
+ Return if a spinner should be showing on the inbox screen
+ 
+ If we have an invite but its not visible yet (stranding isn't done or images aren't uploaded)
+    Then we want to return true since the spinner should be on
+ If we find anything other than an invite then return false, spinner should be off
+ */
+- (BOOL)shouldSpinnerBeOn
+{
+  for (DFPeanutFeedObject *object in self.feedObjects) {
+    if ([object.type isEqualToString:DFFeedObjectInviteStrand] && [object.visible isEqual: @(YES)]) {
+      return NO;
+    }
+    if (![object.type isEqualToString:DFFeedObjectInviteStrand]) {
+      return NO;
+    }
+  }
+  return YES;
+}
+
 
 #pragma mark - Data Fetch
 
@@ -145,13 +179,19 @@
        });
      }
      dispatch_async(dispatch_get_main_queue(), ^{
-       [self.refreshControl endRefreshing];
-       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-       
-       if (response.objects.count == 0 && !error && self.view.window) {
-         [self showCreateBalloon];
+       if (![self shouldSpinnerBeOn]) {
+         if (self.showAsFirstTimeSetup) {
+           [SVProgressHUD dismiss];
+           self.showAsFirstTimeSetup = NO;
+         }
+         
+         [self.refreshControl endRefreshing];
+         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+         
+         if (response.objects.count == 0 && !error && self.view.window) {
+           [self showCreateBalloon];
+         }
        }
-       
      });
    }];
 }

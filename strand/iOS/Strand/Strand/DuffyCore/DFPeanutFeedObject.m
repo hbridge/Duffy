@@ -74,6 +74,7 @@ static NSArray *FeedObjectTypes;
            @"user",
            @"user_display_name",
            @"time_stamp",
+           @"visible",
            ];
 }
 
@@ -173,6 +174,7 @@ static NSArray *FeedObjectTypes;
   newObject.time_taken = [self.time_taken copyWithZone:zone];
   newObject.user = self.user;
   newObject.user_display_name = [self.user_display_name copy];
+  newObject.visible = self.visible;
   
   return newObject;
 }
