@@ -94,12 +94,6 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   self.flowLayout.itemSize = CGSizeMake(StrandGalleryItemSize, StrandGalleryItemSize);
   self.flowLayout.minimumInteritemSpacing = StrandGalleryItemSpacing;
   self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing;
-  
-  
-  self.refreshControl = [[UIRefreshControl alloc] init];
-  [self.refreshControl addTarget:self action:@selector(reloadFeed)
-                forControlEvents:UIControlEventValueChanged];
-  [self.collectionView addSubview:self.refreshControl];
 }
 
 - (void)viewDidAppear:(BOOL)animated
