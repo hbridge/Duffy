@@ -138,7 +138,7 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
         else:
             # Found a valid phone number, now lets see if we can find a valid user for that
             try:
-                user = User.objects.get(phone_number=strandInvite.phone_number)
+                user = User.objects.get(phone_number=strandInvite.phone_number, product_id=2)
                 strandInvite.invited_user = user
             except User.DoesNotExist:
                 logger.debug("Looked for %s but didn't find matching user" % (strandInvite.phone_number))
