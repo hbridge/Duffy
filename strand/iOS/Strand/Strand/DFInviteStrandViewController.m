@@ -46,6 +46,7 @@
   self.delegate = self;
   self.allowsMultipleSelection = YES;
   
+  self.navigationItem.title = @"Invite People";
   self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                            initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                            target:self
