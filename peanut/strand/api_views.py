@@ -591,7 +591,7 @@ def unshared_strands(request):
 
 		a = datetime.datetime.now()
 		
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False))
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(visible=True))
 
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 		b = datetime.datetime.now()
