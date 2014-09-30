@@ -181,6 +181,8 @@ static int const FetchStride = 500;
   NSMutableArray *photos = [NSMutableArray new];
   for (DFCameraRollPhotoAsset *asset in photoAssets)
   {
+    if (asset.isDeleted) continue;
+    if (!asset.photo) continue;
     [photos addObject:asset.photo];
   }
  
