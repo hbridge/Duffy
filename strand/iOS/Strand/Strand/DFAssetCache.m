@@ -39,6 +39,10 @@ static DFAssetCache *defaultCache;
 
 - (PHAsset *)assetForLocalIdentifier:(NSString *)localIdentifier
 {
+  if (!localIdentifier){
+    DDLogWarn(@"%@ assetForLocalIdentifier: localIdentifier nil", self.class);
+    return nil;
+  }
   PHAsset *asset = self.idsToPHAssets[localIdentifier];
   if (!asset) {
     PHFetchResult *fetchResult = [PHAsset fetchAssetsWithLocalIdentifiers:@[localIdentifier]
@@ -72,6 +76,9 @@ static DFAssetCache *defaultCache;
 
 - (void)setAsset:(PHAsset *)asset forIdentifier:(NSString *)identifier
 {
+  if (!identifier || !asset){
+    DDLogWarn(@"%@ warning setAsset:%@ forLocalIdentifier:%@", self.class, asset, identifier);
+  }
   self.idsToPHAssets[identifier] = asset;
 }
 
