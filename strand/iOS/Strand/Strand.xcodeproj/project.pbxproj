@@ -1141,13 +1141,13 @@
 			children = (
 				5AAF038419B0D5AE00EF021C /* DFSelectPhotosViewController.h */,
 				5AAF038519B0D5AE00EF021C /* DFSelectPhotosViewController.m */,
+				5AAF038619B0D5AE00EF021C /* DFSelectPhotosViewController.xib */,
 				5A5488CE19D3531500147EBE /* DFSelectPhotosInviteSectionHeader.h */,
 				5A5488CF19D3531500147EBE /* DFSelectPhotosInviteSectionHeader.m */,
 				5A5488D119D3533E00147EBE /* DFSelectPhotosInviteSectionHeader.xib */,
 				5A5488D519D3744C00147EBE /* DFSelectPhotosInviteSectionFooter.h */,
 				5A5488D619D3744C00147EBE /* DFSelectPhotosInviteSectionFooter.m */,
 				5A5488D319D35D9D00147EBE /* DFSelectPhotosInviteSectionFooter.xib */,
-				5AAF038619B0D5AE00EF021C /* DFSelectPhotosViewController.xib */,
 				5AC483A119C789D100929965 /* DFSelectPhotosHeaderView.swift */,
 				5AC483A219C789D100929965 /* DFSelectPhotosHeaderView.xib */,
 			);

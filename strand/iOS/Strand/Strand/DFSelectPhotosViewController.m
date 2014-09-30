@@ -26,6 +26,8 @@
 #import "DFSelectPhotosInviteSectionFooter.h"
 #import "AppDelegate.h"
 
+NSUInteger const NumPhotosPerRow = 3;
+
 @interface DFSelectPhotosViewController ()
 
 @property (nonatomic, retain) NSArray *suggestedPhotoObjects;
@@ -82,6 +84,16 @@
   } else {
     [self.searchBarWrapperView removeFromSuperview];
   }
+}
+
+- (void)viewDidLayoutSubviews
+{
+  [super viewDidLayoutSubviews];
+  
+  CGFloat usableWidth = self.collectionView.frame.size.width -
+  ((CGFloat)(NumPhotosPerRow - 1)  * self.flowLayout.minimumInteritemSpacing);
+  CGFloat itemSize = usableWidth / (CGFloat)NumPhotosPerRow;
+  self.flowLayout.itemSize = CGSizeMake(itemSize, itemSize);
 }
 
 - (void)configureNavBarWithTitle:(NSString *)title
