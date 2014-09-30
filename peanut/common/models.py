@@ -500,7 +500,9 @@ class Strand(models.Model):
 	shared = models.BooleanField(default=True, db_index=True)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2)
-	created_from = models.ForeignKey("Strand")
+
+	# This is the id of the Strand that created this.  Not doing ForeignKey though
+	created_from_id = models.IntegerField(null=True)
 	visible = models.BooleanField(default=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	

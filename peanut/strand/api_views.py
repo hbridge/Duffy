@@ -90,7 +90,7 @@ def getTitleForStrand(strand):
 	title = dateStr
 
 	if location:
-		title = location + " on " + dateStr
+		title += " in " + location
 
 	return title
 
