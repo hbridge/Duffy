@@ -63,6 +63,7 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
  */
 - (NSString *)actorsString;
 - (NSString *)invitedActorsStringCondensed:(BOOL)condensed;
+- (NSAttributedString *)peopleSummaryString;
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
 

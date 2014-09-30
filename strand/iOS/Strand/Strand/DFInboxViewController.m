@@ -286,7 +286,7 @@
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
-  cell.peopleLabel.attributedText = [self.class attributedPeopleStringForObject:strandPosts];
+  cell.peopleLabel.attributedText = [strandPosts peopleSummaryString];
   cell.actionTextLabel.text = strandPosts.title;
   cell.titleLabel.text = strandPosts.title;
   
@@ -299,22 +299,6 @@
                      maxPhotos:InboxCellMaxPhotos];
   
   return cell;
-}
-
-+ (NSAttributedString *)attributedPeopleStringForObject:(DFPeanutFeedObject *)object
-{
-  NSMutableAttributedString *peopleString = [[NSMutableAttributedString alloc] initWithString:object.actorsString];
-  NSString *invitedString = [object invitedActorsStringCondensed:YES];
-  if ([invitedString isNotEmpty]) {
-    invitedString = [NSString stringWithFormat:@" (%@)", invitedString];
-    NSAttributedString *invitedAttributedString = [[NSAttributedString alloc]
-                                                   initWithString:invitedString
-                                                   attributes:@{
-                                                                NSForegroundColorAttributeName : [UIColor lightGrayColor]
-                                                                }];
-    [peopleString appendAttributedString:invitedAttributedString];
-  }
-  return peopleString;
 }
 
 + (NSString *)firstActorNameForObject:(DFPeanutFeedObject *)object
@@ -347,7 +331,7 @@ const NSUInteger inviteRowMaxImages = 3;
   cell.titleLabel.text = strandPostsObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
                                                           abbreviate:YES];
-  cell.peopleLabel.attributedText = [self.class attributedPeopleStringForObject:inviteObject.objects.firstObject];
+  cell.peopleLabel.attributedText = [inviteObject.objects.firstObject peopleSummaryString];
   
   
   [self setRemotePhotosForCell:cell

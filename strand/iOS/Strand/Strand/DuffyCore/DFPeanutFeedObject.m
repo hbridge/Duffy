@@ -255,7 +255,23 @@ static NSArray *FeedObjectTypes;
   }
   
   if (numInvited == 0) return nil;
-  return [NSString stringWithFormat:@"%d pending", (int)numInvited];
+  return [NSString stringWithFormat:@"+%d pending", (int)numInvited];
+}
+
+- (NSAttributedString *)peopleSummaryString
+{
+  NSMutableAttributedString *peopleString = [[NSMutableAttributedString alloc] initWithString:self.actorsString];
+  NSString *invitedString = [self invitedActorsStringCondensed:YES];
+  if ([invitedString isNotEmpty]) {
+    invitedString = [NSString stringWithFormat:@" (%@)", invitedString];
+    NSAttributedString *invitedAttributedString = [[NSAttributedString alloc]
+                                                   initWithString:invitedString
+                                                   attributes:@{
+                                                                NSForegroundColorAttributeName : [UIColor lightGrayColor]
+                                                                }];
+    [peopleString appendAttributedString:invitedAttributedString];
+  }
+  return peopleString;
 }
 
 

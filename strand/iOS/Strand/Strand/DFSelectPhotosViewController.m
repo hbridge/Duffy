@@ -225,12 +225,9 @@
                                             withReuseIdentifier:@"headerView"
                                             forIndexPath:indexPath];
     if (self.inviteObject) {
-      NSMutableString *inviteText = [[NSMutableString alloc] initWithString:@"with "];
-      for (NSUInteger i = 0; i < self.inviteObject.actors.count; i++) {
-        if (i > 0) [inviteText appendString:@", "];
-        [inviteText appendString:[self.inviteObject.actors[i] display_name]];
-      }
-      headerView.actorsLabel.text = inviteText;
+      NSMutableAttributedString *headerString = [[NSMutableAttributedString alloc] initWithString:@"with "];
+      [headerString appendAttributedString: [self.inviteObject.objects.firstObject peopleSummaryString]];
+       headerView.actorsLabel.attributedText = headerString;
     } else {
       [headerView.actorsLabel removeFromSuperview];
     }
