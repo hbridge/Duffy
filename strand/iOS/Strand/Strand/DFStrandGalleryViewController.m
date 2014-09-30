@@ -24,7 +24,7 @@
 #import "DFInviteStrandViewController.h"
 #import "DFNavigationController.h"
 
-static const CGFloat StrandGalleryItemSize = 159.5;
+static const CGFloat StrandGalleryHeaderHeight = 51;
 static const CGFloat StrandGalleryItemSpacing = 0.5;
 
 @interface DFStrandGalleryViewController ()
@@ -97,10 +97,18 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
                withReuseIdentifier:@"headerView"];
   
   self.collectionView.backgroundColor = [UIColor whiteColor];
-  self.flowLayout.headerReferenceSize = CGSizeMake(self.view.frame.size.width, 51.0);
-  self.flowLayout.itemSize = CGSizeMake(StrandGalleryItemSize, StrandGalleryItemSize);
+ }
+
+- (void)viewDidLayoutSubviews
+{
+  [super viewDidLayoutSubviews];
+  
+  self.flowLayout.headerReferenceSize = CGSizeMake(self.view.frame.size.width, StrandGalleryHeaderHeight);
+  CGFloat itemSize = (self.collectionView.frame.size.width - StrandGalleryItemSpacing)/2.0;
+  self.flowLayout.itemSize = CGSizeMake(itemSize, itemSize);
   self.flowLayout.minimumInteritemSpacing = StrandGalleryItemSpacing;
   self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing;
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
