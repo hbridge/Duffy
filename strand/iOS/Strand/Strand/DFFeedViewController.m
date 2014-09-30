@@ -434,10 +434,15 @@ const CGFloat LockedCellHeight = 157.0;
   DFPhotoFeedCell *cell = self.templateCellsByStyle[@(style)];
   if (!cell) {
     cell = [DFPhotoFeedCell createCellWithStyle:style];
+    CGRect frame = cell.frame;
+    frame.size.width = self.view.frame.size.width;
+    cell.frame = frame;
+    [cell layoutSubviews];
   }
   
-  CGFloat rowHeight = MinRowHeight;
-  rowHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  CGFloat rowHeightNoImageView = MinRowHeight;
+  rowHeightNoImageView = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  CGFloat rowHeight = rowHeightNoImageView + self.view.frame.size.width;
   return rowHeight;
 }
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
@@ -23,10 +23,6 @@
                     <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPr-aP-pSV">
                         <rect key="frame" x="0.0" y="32" width="320" height="320"/>
                         <gestureRecognizers/>
-                        <constraints>
-                            <constraint firstAttribute="height" constant="320" id="ikG-p7-8RR"/>
-                            <constraint firstAttribute="width" constant="320" id="t1L-J8-dky"/>
-                        </constraints>
                     </imageView>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000000000000004" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h07-n4-DgV">
                         <rect key="frame" x="0.0" y="353" width="320" height="79"/>
@@ -84,9 +80,11 @@
                     <constraint firstItem="h07-n4-DgV" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" constant="1" id="Q48-yN-yzu"/>
                     <constraint firstAttribute="centerX" secondItem="EPr-aP-pSV" secondAttribute="centerX" id="UMD-W8-k6d"/>
                     <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="W57-RD-aTX"/>
-                    <constraint firstAttribute="bottom" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="700" id="Xtu-ci-aht"/>
+                    <constraint firstAttribute="bottom" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="800" id="Xtu-ci-aht"/>
+                    <constraint firstAttribute="trailing" secondItem="EPr-aP-pSV" secondAttribute="trailing" id="a0s-oA-S46"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="32" id="fDr-AQ-CiI"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="HE2-Vf-wok" secondAttribute="bottom" constant="3" id="flS-ZR-bpc"/>
+                    <constraint firstItem="EPr-aP-pSV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="mPc-8w-nGX"/>
                     <constraint firstItem="HE2-Vf-wok" firstAttribute="centerY" secondItem="xhR-gV-Znx" secondAttribute="centerY" id="n4h-3S-fks"/>
                     <constraint firstItem="HE2-Vf-wok" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="10" id="o1z-cd-LaE"/>
                     <constraint firstItem="B5M-0I-S31" firstAttribute="trailing" secondItem="EPr-aP-pSV" secondAttribute="trailing" id="z0G-lF-dn0"/>
@@ -100,12 +98,7 @@
                 <outlet property="photoImageView" destination="EPr-aP-pSV" id="f4q-6k-aBD"/>
                 <outlet property="titleLabel" destination="HE2-Vf-wok" id="epE-vc-jiD"/>
             </connections>
-            <point key="canvasLocation" x="389" y="236.5"/>
+            <point key="canvasLocation" x="510" y="473.5"/>
         </tableViewCell>
     </objects>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
-    </simulatedMetricsContainer>
 </document>
