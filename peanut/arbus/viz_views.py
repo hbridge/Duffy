@@ -245,11 +245,11 @@ def userbaseSummary(request):
 	# This photo call is taking over a second on the dev database right now.
 	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
 	strandDataRaw = Strand.objects.filter(shared=True).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').order_by().annotate(weeklyStrands=Count('users'))	
-	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyActions=Count('user'))
+	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').order_by().annotate(weeklyActions=Count('user'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
-	actionsCount = list(User.objects.filter(product_id=2).annotate(totalActions=Count('action')).order_by('-id'))
+	#actionsCount = list(User.objects.filter(product_id=2).annotate(totalActions=Count('action')).order_by('-id'))
 	#strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand__shared')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=2).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
@@ -257,11 +257,11 @@ def userbaseSummary(request):
 	extras = dict()
 	for i in range(len(userStats)):
 		entry = dict()
-		entry['actions'] = actionsCount[i].totalActions
+		#entry['actions'] = actionsCount[i].totalActions
 		#entry['strands'] = strandCount[i].totalStrands
 		entry['contacts'] = contactCount[i].totalContacts
 		entry['friends'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
-		extras[actionsCount[i].id] = entry
+		extras[contactCount[i].id] = entry
 
 	# Exclude type GPS fetch since it happens so frequently
 	notificationDataRaw = NotificationLog.objects.filter(result=constants.IOS_NOTIFICATIONS_RESULT_SENT).exclude(msg_type=constants.NOTIFICATIONS_FETCH_GPS_ID).exclude(msg_type=constants.NOTIFICATIONS_REFRESH_FEED).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalNotifs=Count('user'), lastSent=Max('added'))
@@ -280,9 +280,28 @@ def userbaseSummary(request):
 	for strandData in strandDataRaw:
 		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
 
-	weeklyActionsById = dict()
+	''' # from constants.py
+	ACTION_TYPE_FAVORITE = 0
+	ACTION_TYPE_CREATE_STRAND = 1
+	ACTION_TYPE_ADD_PHOTOS_TO_STRAND = 2
+	ACTION_TYPE_JOIN_STRAND = 3
+	'''
+
+	weeklyFavsById = dict() #action_type=0
+	weeklyStrandsCreatedById = dict() #action_type=1
+	weeklyPhotosAddedById = dict() #action_type=2
+	weeklyStrandsJoinedById = dict() #action_type =3
+
 	for actionData in actionDataRaw:
-		weeklyActionsById[actionData['user']] = actionData['weeklyActions']
+		#weeklyActionsById[actionData['user']] = actionData['weeklyActions']
+		if (actionData['action_type'] == 0):
+			weeklyFavsById[actionData['user']] = actionData['weeklyActions']
+		elif (actionData['action_type'] == 1):
+			weeklyStrandsCreatedById[actionData['user']] = actionData['weeklyActions']
+		elif (actionData['action_type'] == 2):
+			weeklyPhotosAddedById[actionData['user']] = actionData['weeklyActions']		
+		elif (actionData['action_type'] == 3):
+			weeklyStrandsJoinedById[actionData['user']] = actionData['weeklyActions']
 
 	for i, user in enumerate(userStats):
 		entry = dict()
@@ -313,15 +332,26 @@ def userbaseSummary(request):
 		else:
 			entry['weeklyStrands'] = '-'
 
-		if user.id in weeklyActionsById:
-			entry['weeklyActions'] = weeklyActionsById[user.id]
+		if user.id in weeklyFavsById:
+			entry['weeklyFavs'] = weeklyFavsById[user.id]
 		else:
-			entry['weeklyActions'] = '-'
+			entry['weeklyFavs'] = '-'
 
-		if (extras[user.id]['actions'] > 0):
-			entry['actions'] = extras[user.id]['actions']
+		if user.id in weeklyStrandsCreatedById:
+			entry['weeklyStrandsCreated'] = weeklyStrandsCreatedById[user.id]
 		else:
-			entry['actions'] = '-'
+			entry['weeklyStrandsCreated'] = '-'
+
+		if user.id in weeklyPhotosAddedById:
+			entry['weeklyPhotosAdded'] = weeklyPhotosAddedById[user.id]
+		else:
+			entry['weeklyPhotosAdded'] = '-'
+
+		if user.id in weeklyStrandsJoinedById:
+			entry['weeklyStrandsJoined'] = weeklyStrandsJoinedById[user.id]
+		else:
+			entry['weeklyStrandsJoined'] = '-'
+
 
 		entry['contactCount'] = extras[user.id]['contacts']
 		entry['friendCount'] = extras[user.id]['friends']
