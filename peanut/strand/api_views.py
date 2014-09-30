@@ -311,7 +311,7 @@ def getActorsObjectData(users, includePhone = False, invitedUsers = None):
 
 	if invitedUsers:
 		for user in invitedUsers:
-			entry = {'display_name': "(" + user.display_name + ")", 'id': user.id, 'invited': True}
+			entry = {'display_name': user.display_name, 'id': user.id, 'invited': True}
 
 			if includePhone:
 				entry['phone_number'] = user.phone_number
