@@ -1,5 +1,11 @@
 # Strand
 
+## Sep 30th, 2014
+
+- Support for iPhone 6 without scaling
+- UI tweaks
+- Crash fixes
+
 ## Sep 29th, 2014
 
 - Changed main view from activity to a list of your Strands by update time
