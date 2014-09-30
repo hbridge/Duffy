@@ -17,12 +17,15 @@
 
 @implementation DFAssetCache
 
-
 static DFAssetCache *defaultCache;
 + (DFAssetCache *)sharedCache
 {
+  static dispatch_once_t onceToken;
+  
   if (!defaultCache) {
-    defaultCache = [[DFAssetCache alloc] init];
+    dispatch_once(&onceToken, ^{
+      defaultCache = [[DFAssetCache alloc] init];
+    });
   }
   return defaultCache;
 }
