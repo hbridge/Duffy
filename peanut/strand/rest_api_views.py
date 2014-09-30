@@ -235,8 +235,8 @@ class CreateStrandAPI(CreateAPIView):
             action.photos = strand.photos.all()
 
         # Created from is the private strand of the user.  We now want to hide it from view
-        if strand.created_from:
-            createdFromStrand = Strand.objects.get(id=strand.created_from)
+        if strand.created_from_id:
+            createdFromStrand = Strand.objects.get(id=strand.created_from_id)
             if createdFromStrand.user.id == strand.user.id and createdFromStrand.shared == False:
                 createdFromStrand.visible = False
                 createdFromStrand.save()
