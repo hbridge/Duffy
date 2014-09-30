@@ -304,18 +304,27 @@ def getObjectsDataForActions(user):
 
 	return objectResponse
 
-def getActorsObjectData(actors, includePhone = False):
-	if not isinstance(actors, list):
-		actors = [actors]
+def getActorsObjectData(users, includePhone = False, invitedUsers = None):
+	if not isinstance(users, list):
+		users = [users]
 
 	userData = list()
-	for user in actors:
+	for user in users:
 		entry = {'display_name': user.display_name, 'id': user.id}
 
 		if includePhone:
 			entry['phone_number'] = user.phone_number
 
 		userData.append(entry)
+
+	if invitedUsers:
+		for user in invitedUsers:
+			entry = {'display_name': user.display_name, 'id': user.id, 'invited': True}
+
+			if includePhone:
+				entry['phone_number'] = user.phone_number
+
+			userData.append(entry)
 
 	return userData
 
@@ -506,8 +515,16 @@ def getObjectsDataForStrand(strand):
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
 
 	recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
+	users = strand.users.all()
 
-	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all())), 'time_taken': getTimeTakenForStrand(strand), 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
+	invitedUsers = list()
+	for invite in strand.strandinvite_set.select_related().filter(accepted_user__isnull=True):
+		if invite.invited_user and invite.invited_user not in users:
+			invitedUsers.append(invite.invited_user)
+
+	invitedUsers = set(invitedUsers)
+	
+	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': getTimeTakenForStrand(strand), 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
 	response['objects'] = list()
 	for post in postActions:
 		response['objects'].extend(getObjectsDataForPost(post))

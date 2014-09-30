@@ -584,7 +584,6 @@ class StrandInvite(models.Model):
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
-
 	class Meta:
 		db_table = 'strand_invite'
 
