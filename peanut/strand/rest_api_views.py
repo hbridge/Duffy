@@ -15,7 +15,7 @@ from rest_framework.exceptions import ParseError
 
 from peanut.settings import constants
 
-from common.models import ContactEntry, StrandInvite, User, Photo, Action
+from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand
 from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 from strand import notifications_util
