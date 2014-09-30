@@ -145,7 +145,7 @@ const CGFloat LockedCellHeight = 157.0;
   [super viewDidDisappear:animated];
 }
 
-- (void)setStrandObjects:(NSArray *)strandObjects
+- (void)setStrandPostsObject:(DFPeanutFeedObject *)strandPostsObject
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     DFStrandGalleryTitleView *titleView =
@@ -153,9 +153,8 @@ const CGFloat LockedCellHeight = 157.0;
                      bundle:nil]
       instantiateWithOwner:nil options:nil]
      firstObject];
-    DFPeanutFeedObject *strandObject = strandObjects.firstObject;
-    titleView.locationLabel.text = strandObject.location;
-    titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+    titleView.locationLabel.text = strandPostsObject.location;
+    titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPostsObject.time_taken
                                                                  abbreviate:NO];
     
     self.navigationItem.titleView = titleView;
@@ -165,8 +164,8 @@ const CGFloat LockedCellHeight = 157.0;
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
     
-    for (NSUInteger sectionIndex = 0; sectionIndex < strandObjects.count; sectionIndex++) {
-      NSArray *objectsForSection = [strandObjects[sectionIndex] objects];
+    for (NSUInteger sectionIndex = 0; sectionIndex < strandPostsObject.objects.count; sectionIndex++) {
+      NSArray *objectsForSection = [strandPostsObject.objects[sectionIndex] objects];
       for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
         DFPeanutFeedObject *object = objectsForSection[objectIndex];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
@@ -184,7 +183,7 @@ const CGFloat LockedCellHeight = 157.0;
     
     _photoObjectsById = objectsByID;
     _photoIndexPathsById = indexPathsByID;
-    _strandObjects = strandObjects;
+    _strandPostsObject = strandPostsObject;
     
     [self.tableView reloadData];
   });
@@ -199,10 +198,6 @@ const CGFloat LockedCellHeight = 157.0;
     NSIndexPath *indexPath = self.photoIndexPathsById[@(photoId)];
    
     if (indexPath) {
-      if ([[self sectionObjectForTableSection:indexPath.section] isLockedSection]) {
-        indexPath = [NSIndexPath indexPathForRow:0 inSection:indexPath.section];
-      }
-      
       // set isViewTransitioning to prevent the nav bar from disappearing from the scroll
       self.isViewTransitioning = YES;
       [self.tableView scrollToRowAtIndexPath:indexPath
@@ -245,7 +240,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return self.strandObjects.count;
+  return self.strandPostsObject.objects.count;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -253,12 +248,12 @@ const CGFloat LockedCellHeight = 157.0;
   DFFeedSectionHeaderView *headerView =
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
-  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:section];
-  headerView.actorLabel.text = [[sectionObject actorNames] firstObject];
-  headerView.profilePhotoStackView.names = [sectionObject actorNames];
-  headerView.actionTextLabel.text = sectionObject.title;
-  headerView.subtitleLabel.text = [NSDateFormatter relativeTimeStringSinceDate:sectionObject.time_stamp abbreviate:NO];
-  headerView.representativeObject = sectionObject;
+  DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:section];
+  headerView.actorLabel.text = [[strandPost actorNames] firstObject];
+  headerView.profilePhotoStackView.names = [strandPost actorNames];
+  headerView.actionTextLabel.text = strandPost.title;
+  headerView.subtitleLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp abbreviate:NO];
+  headerView.representativeObject = strandPost;
   headerView.delegate = self;
   
   return headerView;
@@ -274,31 +269,28 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:section];
+  DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:section];
   
-  NSArray *items = sectionObject.objects;
+  NSArray *items = strandPost.objects;
   return items.count;
 }
 
-- (DFPeanutFeedObject *)sectionObjectForTableSection:(NSUInteger)tableSection
+- (DFPeanutFeedObject *)strandPostObjectForSection:(NSUInteger)tableSection
 {
-  return self.strandObjects[tableSection];
+  return self.strandPostsObject.objects[tableSection];
 }
 
 - (DFPeanutFeedObject *)objectAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *sectionObject = [self sectionObjectForTableSection:indexPath.section];
-  return sectionObject.objects[indexPath.row];
+  DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:indexPath.section];
+  return strandPost.objects[indexPath.row];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
   
-  DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
-  NSArray *itemsForSection = section.objects;
-  DFPeanutFeedObject *object = itemsForSection[indexPath.row];
-  
+  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
   if ([object.type isEqual:DFFeedObjectPhoto]) {
     cell = [self cellForPhoto:object indexPath:indexPath];
   } else if ([object.type isEqual:DFFeedObjectCluster]) {
@@ -465,9 +457,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  id object;
-  DFPeanutFeedObject *section = [self sectionObjectForTableSection:indexPath.section];
-  object = section.objects[indexPath.row];
+  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
   
   DDLogVerbose(@"Row tapped for object: %@", object);
                
@@ -495,8 +485,8 @@ const CGFloat LockedCellHeight = 157.0;
   
   // Figure out the strand the photo is in that we're viewing
   NSIndexPath *indexPath = self.photoIndexPathsById[@(photoID)];
-  DFPeanutFeedObject *containingStrand = self.strandObjects[indexPath.section];
-  DFStrandIDType strandID = containingStrand.id;
+  DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:indexPath.section];
+  DFStrandIDType strandID = strandPost.id;
 
   DFPeanutFeedObject *object = self.photoObjectsById[objectIDNumber];
   DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFPeanutActionFavorite
@@ -659,14 +649,14 @@ selectedObjectChanged:(id)newObject
 - (void)removePhotoObjectFromView:(DFPeanutFeedObject *)photoObject
 {
   NSIndexPath *indexPath = self.photoIndexPathsById[@(self.actionSheetPhotoID)];
-  DFPeanutFeedObject *containingStrand = self.strandObjects[indexPath.section];
-  DFPeanutFeedObject *objectInStrand = containingStrand.objects[indexPath.row];
+  DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:indexPath.section];
+  DFPeanutFeedObject *objectInStrand = strandPost.objects[indexPath.row];
   DFPeanutFeedObject *containingObject;
   if ([objectInStrand.type isEqual:DFFeedObjectCluster]) {
     // the object is in a cluster row
     containingObject = objectInStrand;
   } else {
-    containingObject = containingStrand;
+    containingObject = strandPost;
   }
   
   NSMutableArray *newObjects = containingObject.objects.mutableCopy;
@@ -674,7 +664,7 @@ selectedObjectChanged:(id)newObject
   containingObject.objects = newObjects;
 
   dispatch_async(dispatch_get_main_queue(), ^{
-    if (containingObject == containingStrand) {
+    if (containingObject == strandPost) {
       // if the containing object was the strand, the entire row disappears.  animate it
       [self.tableView deleteRowsAtIndexPaths:@[indexPath]
                             withRowAnimation:UITableViewRowAnimationFade];
