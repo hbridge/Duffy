@@ -97,7 +97,7 @@
 		{% for entry in strandV2List %}
 			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
 				<td class='userid b-r'> {{ entry.user.id }} </td>
-				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_new href='/strand/viz/neighbors?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
+				<td class='name b-r' title='{{ entry.user.phone_number }}' > <a target=_new href='/strand/api/strand_inbox?user_id={{ entry.user.id }}'>{{ entry.user.display_name}}</a></td>
 				<td class='created timeago b-r' title="{{ entry.userCreated }}">  </td>
 				<td class='db-count right b-r'>	{{ entry.metadataCount }} </td>		
 				<td class='thumbs right b-r'> {{ entry.weeklyPhotos }} | {{ entry.user.thumbsCount }} </td>
