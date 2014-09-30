@@ -56,6 +56,13 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
 - (NSArray *)actorAbbreviations;
 - (NSArray *)actorNames;
 
+/* 
+- (NSString *)actorsString; 
+ Comma separated list of actors, with the current actor replaced with "You" i.e.
+ Aseem, Derek and You 
+ */
+- (NSString *)actorsString;
+
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
 
 @end

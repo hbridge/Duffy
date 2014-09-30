@@ -287,8 +287,7 @@
   
   // actor/ action
   
-  cell.peopleLabel.text = [NSString stringWithFormat:@"%@", [self.class multiActorNamesForObject:strandPosts]];
-  
+  cell.peopleLabel.text = strandPosts.actorsString;
   cell.actionTextLabel.text = strandPosts.title;
   cell.titleLabel.text = strandPosts.title;
   
@@ -316,28 +315,6 @@
   return name;
 }
 
-+ (NSString *)multiActorNamesForObject:(DFPeanutFeedObject *)object
-{
-  NSMutableString *actorsText = [NSMutableString new];
-  BOOL includeYou = false;
-  
-  for (NSUInteger i = 0; i < object.actors.count; i++) {
-    DFPeanutUserObject *actor = object.actors[i];
-    if (actor.id != [[DFUser currentUser] userID]) {
-      if (actorsText.length > 0) [actorsText appendString:@", "];
-      [actorsText appendString:[actor display_name]];
-    } else {
-      includeYou = true;
-    }
-  }
-  if (includeYou) {
-    if (object.actors.count > 1) [actorsText appendString:@" and "];
-    [actorsText appendString:@"You"];
-  }
-
-  return actorsText;
-}
-
 
 const NSUInteger inviteRowMaxImages = 3;
 
@@ -350,13 +327,12 @@ const NSUInteger inviteRowMaxImages = 3;
   
   DFPeanutFeedObject *strandPostsObject = inviteObject.objects.firstObject;
   
-  cell.actorLabel.text = [self.class multiActorNamesForObject:inviteObject];
+  cell.actorLabel.text = inviteObject.actorsString;
   cell.actionTextLabel.text = inviteObject.title;
   cell.titleLabel.text = strandPostsObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
                                                           abbreviate:YES];
-  cell.peopleLabel.text = [NSString stringWithFormat:@"%@",
-                            [self.class multiActorNamesForObject:strandPostsObject]];
+  cell.peopleLabel.text = inviteObject.actorsString;
   
   
   [self setRemotePhotosForCell:cell

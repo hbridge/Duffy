@@ -44,8 +44,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 
 - (void)configureNavBar
 {
-  self.peopleLabel.text = [@"with " stringByAppendingString:[self.strandPosts.actorNames
-                                                             componentsJoinedByString:@", "]];
+  self.peopleLabel.text = self.strandPosts.actorsString;
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                             initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
                                             style:UIBarButtonItemStylePlain

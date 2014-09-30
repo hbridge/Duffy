@@ -214,6 +214,30 @@ static NSArray *FeedObjectTypes;
   return names;
 }
 
+- (NSString *)actorsString
+{
+  NSMutableString *actorsText = [NSMutableString new];
+  BOOL includeYou = false;
+  
+  for (NSUInteger i = 0; i < self.actors.count; i++) {
+    DFPeanutUserObject *actor = self.actors[i];
+    if (actor.id != [[DFUser currentUser] userID]) {
+      if (actorsText.length > 0) [actorsText appendString:@", "];
+      [actorsText appendString:[actor display_name]];
+    } else {
+      includeYou = true;
+    }
+  }
+  if (includeYou) {
+    if (self.actors.count > 1) [actorsText appendString:@" and "];
+    [actorsText appendString:@"You"];
+  }
+  
+  return actorsText;
+}
+
+
+
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type
 {
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
