@@ -26,6 +26,7 @@
 @property (nonatomic, retain) NSNumber *invites_remaining;
 @property (nonatomic, retain) NSNumber *invites_sent;
 @property (nonatomic, retain) NSDate *added;
+@property (nonatomic, retain) NSNumber *invited;
 
 - (NSDictionary *)requestParameters;
 - (void)setLocation:(CLLocation *)location;

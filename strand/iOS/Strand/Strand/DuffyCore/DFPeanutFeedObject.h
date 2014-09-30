@@ -62,6 +62,7 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
  Aseem, Derek and You 
  */
 - (NSString *)actorsString;
+- (NSString *)invitedActorsStringCondensed:(BOOL)condensed;
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
 

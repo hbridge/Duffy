@@ -261,7 +261,7 @@
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     cell = [self cellForInviteObject:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    cell = [self cellForStrandPosts:feedObject];
+    cell = [self cellForStrandPostsObject:feedObject];
   } else {
     // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
     #ifdef DEBUG
@@ -277,7 +277,7 @@
   return cell;
 }
 
-- (UITableViewCell *)cellForStrandPosts:(DFPeanutFeedObject *)strandPosts
+- (UITableViewCell *)cellForStrandPostsObject:(DFPeanutFeedObject *)strandPosts
 {
   DFInboxTableViewCell *cell = [self.tableView
                                        dequeueReusableCellWithIdentifier:@"strandCell"];
@@ -286,8 +286,20 @@
   cell.contentView.backgroundColor = [UIColor whiteColor];
   
   // actor/ action
+  NSMutableAttributedString *peopleString = [[NSMutableAttributedString alloc] initWithString:strandPosts.actorsString];
+  NSString *invitedString = [strandPosts invitedActorsStringCondensed:YES];
+  if ([invitedString isNotEmpty]) {
+    invitedString = [NSString stringWithFormat:@" (%@)", invitedString];
+    NSAttributedString *invitedAttributedString = [[NSAttributedString alloc]
+                                                initWithString:invitedString
+                                                attributes:@{
+                                                             NSForegroundColorAttributeName : [UIColor lightGrayColor]
+                                                             }];
+    [peopleString appendAttributedString:invitedAttributedString];
+  }
   
-  cell.peopleLabel.text = strandPosts.actorsString;
+  
+  cell.peopleLabel.attributedText = peopleString;
   cell.actionTextLabel.text = strandPosts.title;
   cell.titleLabel.text = strandPosts.title;
   

@@ -34,6 +34,7 @@
            @"invites_remaining",
            @"invites_sent",
            @"added",
+           @"invited",
            ];
 }
 

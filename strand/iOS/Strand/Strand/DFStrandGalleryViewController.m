@@ -45,6 +45,14 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (void)configureNavBar
 {
   self.peopleLabel.text = self.strandPosts.actorsString;
+  NSString *invitedPeopleText = [self.strandPosts invitedActorsStringCondensed:NO];
+  if ([invitedPeopleText isNotEmpty]) {
+    self.invitedPeopleLabel.text = invitedPeopleText;
+  } else {
+    [self.invitedPeopleIcon removeFromSuperview];
+    [self.invitedPeopleLabel removeFromSuperview];
+  }
+  
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                             initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
                                             style:UIBarButtonItemStylePlain

@@ -203,25 +203,32 @@ static NSArray *FeedObjectTypes;
 
 - (NSArray *)actorNames
 {
-  NSMutableArray *names = [NSMutableArray new];
+  NSMutableOrderedSet *names = [NSMutableOrderedSet new];
   for (DFPeanutUserObject *actor in self.actors) {
     if ([actor.display_name isNotEmpty]) {
-      if ([names indexOfObject:actor.display_name] == NSNotFound) {
-        [names addObject:actor.display_name];
-      }
+      [names addObject:actor.display_name];
     }
   }
-  return names;
+  return names.array;
 }
 
 - (NSString *)actorsString
 {
+  return [self actorsStringForInvited:NO];
+}
+
+- (NSString *)actorsStringForInvited:(BOOL)invited
+{
   NSMutableString *actorsText = [NSMutableString new];
   BOOL includeYou = false;
+  NSUInteger numUnnamed = 0;
   
   for (NSUInteger i = 0; i < self.actors.count; i++) {
     DFPeanutUserObject *actor = self.actors[i];
-    if (actor.id != [[DFUser currentUser] userID]) {
+    if (actor.invited.boolValue != invited) continue;
+    if (![actor.display_name isNotEmpty]) {
+      numUnnamed++;
+    } else if (actor.id != [[DFUser currentUser] userID]) {
       if (actorsText.length > 0) [actorsText appendString:@", "];
       [actorsText appendString:[actor display_name]];
     } else {
@@ -232,8 +239,23 @@ static NSArray *FeedObjectTypes;
     if (self.actors.count > 1) [actorsText appendString:@" and "];
     [actorsText appendString:@"You"];
   }
+  if (numUnnamed > 0) {
+    [actorsText appendString:[NSString stringWithFormat:@" + %d", (int)numUnnamed]];
+  }
   
   return actorsText;
+}
+
+- (NSString *)invitedActorsStringCondensed:(BOOL)condensed
+{
+  if (!condensed) return [self actorsStringForInvited:YES];
+  NSUInteger numInvited = 0;
+  for (DFPeanutUserObject *actor in self.actors) {
+    if (actor.invited.boolValue == YES) numInvited++;
+  }
+  
+  if (numInvited == 0) return nil;
+  return [NSString stringWithFormat:@"%d pending", (int)numInvited];
 }
 
 
