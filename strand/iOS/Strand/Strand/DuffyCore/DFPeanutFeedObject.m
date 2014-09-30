@@ -221,6 +221,7 @@ static NSArray *FeedObjectTypes;
 {
   NSMutableString *actorsText = [NSMutableString new];
   BOOL includeYou = false;
+  NSUInteger numOtherMembers = 0;
   NSUInteger numUnnamed = 0;
   
   for (NSUInteger i = 0; i < self.actors.count; i++) {
@@ -231,12 +232,13 @@ static NSArray *FeedObjectTypes;
     } else if (actor.id != [[DFUser currentUser] userID]) {
       if (actorsText.length > 0) [actorsText appendString:@", "];
       [actorsText appendString:[actor display_name]];
+      numOtherMembers++;
     } else {
       includeYou = true;
     }
   }
   if (includeYou) {
-    if (self.actors.count > 1) [actorsText appendString:@" and "];
+    if (numOtherMembers > 1) [actorsText appendString:@" and "];
     [actorsText appendString:@"You"];
   }
   if (numUnnamed > 0) {
