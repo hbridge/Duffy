@@ -531,7 +531,7 @@ def getObjectsDataForStrand(strand, user):
 def getInviteObjectsDataForUser(user):
 	responseObjects = list()
 
-	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True).order_by('-added')
 
 	for strandInvite in strandInvites:
 		shouldShowInvite = True
