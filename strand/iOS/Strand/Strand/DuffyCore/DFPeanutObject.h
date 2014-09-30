@@ -14,4 +14,7 @@
 
 + (RKObjectMapping *)objectMapping;
 
+@optional
+- (NSNumber *)id;
+
 @end

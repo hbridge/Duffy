@@ -294,7 +294,6 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPhotoIDType photoID;
-  DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
   DFPeanutFeedObject *peanutPhoto = [self photoForIndexPath:indexPath];
   if ([peanutPhoto.type isEqualToString:DFFeedObjectPhoto]) {
     photoID = peanutPhoto.id;
