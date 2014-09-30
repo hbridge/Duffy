@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" launchScreen="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ied-uX-I9D" userLabel="Status bar background">
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="20"/>
+                    <color key="backgroundColor" red="0.96078437566757202" green="0.31764706969261169" blue="0.18823531270027161" alpha="1" colorSpace="deviceRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="cS9-E3-dSq"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zG1-Dy-SMA" userLabel="Nav bar background">
+                    <rect key="frame" x="0.0" y="20" width="480" height="44"/>
+                    <color key="backgroundColor" red="0.96078437569999997" green="0.31764706970000001" blue="0.18823531269999999" alpha="1" colorSpace="deviceRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="44" id="ucq-fO-Dx9"/>
+                    </constraints>
+                </view>
+                <tabBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="d2X-ih-8kb">
+                    <rect key="frame" x="0.0" y="431" width="480" height="49"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="49" id="b7k-3N-3UB"/>
+                    </constraints>
+                    <items/>
+                </tabBar>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="ied-uX-I9D" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="AF4-x2-WOA"/>
+                <constraint firstItem="ied-uX-I9D" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="DvN-EL-Wtn"/>
+                <constraint firstAttribute="bottom" secondItem="d2X-ih-8kb" secondAttribute="bottom" id="Exe-r0-Pr6"/>
+                <constraint firstItem="zG1-Dy-SMA" firstAttribute="top" secondItem="ied-uX-I9D" secondAttribute="bottom" id="Myg-1c-qca"/>
+                <constraint firstAttribute="trailing" secondItem="d2X-ih-8kb" secondAttribute="trailing" id="NZh-cu-rdr"/>
+                <constraint firstAttribute="trailing" secondItem="ied-uX-I9D" secondAttribute="trailing" id="WcW-G0-yJO"/>
+                <constraint firstAttribute="trailing" secondItem="zG1-Dy-SMA" secondAttribute="trailing" id="Wfq-Lg-Aev"/>
+                <constraint firstItem="zG1-Dy-SMA" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="dif-Y5-0mE"/>
+                <constraint firstItem="d2X-ih-8kb" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="nkF-Lv-nIz"/>
+            </constraints>
+            <nil key="simulatedTopBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="600" y="446"/>
+        </view>
+    </objects>
+</document>

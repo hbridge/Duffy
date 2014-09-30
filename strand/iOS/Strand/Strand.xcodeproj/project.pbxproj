@@ -93,6 +93,7 @@
 		5A9115DC19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */; };
 		5A9115DF19DA0F6B003F2A68 /* OFElementSquare.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115DE19DA0F6B003F2A68 /* OFElementSquare.m */; };
 		5A9115E219DB0B80003F2A68 /* UIImageView+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115E119DB0B80003F2A68 /* UIImageView+DFHelpers.m */; };
+		5A9115E419DB2B2F003F2A68 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9115E319DB2B2F003F2A68 /* LaunchScreen.xib */; };
 		5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
 		5A9BC31019A26A22002D1CD7 /* DFGallerySectionHeader.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9BC30F19A26A22002D1CD7 /* DFGallerySectionHeader.m */; };
@@ -388,6 +389,7 @@
 		5A9115DE19DA0F6B003F2A68 /* OFElementSquare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OFElementSquare.m; sourceTree = "<group>"; };
 		5A9115E019DB0B80003F2A68 /* UIImageView+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+DFHelpers.h"; sourceTree = "<group>"; };
 		5A9115E119DB0B80003F2A68 /* UIImageView+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+DFHelpers.m"; sourceTree = "<group>"; };
+		5A9115E319DB2B2F003F2A68 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		5A93B59E19B6290F00A3DBA7 /* DFABResultTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFABResultTableViewCell.h; sourceTree = "<group>"; };
 		5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFABResultTableViewCell.m; sourceTree = "<group>"; };
 		5A98653B195879D10044F727 /* DFPeanutLocationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutLocationAdapter.h; sourceTree = "<group>"; };
@@ -1351,6 +1353,7 @@
 				5ADD857319465C790037A6D5 /* Info.plist */,
 				5ADD857419465C790037A6D5 /* main.m */,
 				5A0E121C1974465700B6FF04 /* Beta.xcconfig */,
+				5A9115E319DB2B2F003F2A68 /* LaunchScreen.xib */,
 			);
 			name = "Supporting Files";
 			sourceTree = "<group>";
@@ -1510,6 +1513,7 @@
 				5AA9292B19A6502200032A3F /* DFPeoplePickerViewController.xib in Resources */,
 				5AEFA25B19D607150027BC5E /* DFStrandGallerySectionHeaderView.xib in Resources */,
 				5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */,
+				5A9115E419DB2B2F003F2A68 /* LaunchScreen.xib in Resources */,
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
 				5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
@@ -1834,7 +1838,6 @@
 			baseConfigurationReference = 9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -1911,7 +1914,6 @@
 				APP_BUNDLE_DISPLAY_NAME_SUFFIX = "";
 				APP_BUNDLE_ID_SUFFIX = "";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -2029,7 +2031,6 @@
 			baseConfigurationReference = 4D2C31741B75506BAA4B9E9E /* Pods.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -2052,7 +2053,6 @@
 			baseConfigurationReference = 64C49F58D18B551B4E8252CD /* Pods.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
