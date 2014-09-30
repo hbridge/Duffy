@@ -634,10 +634,12 @@ def strand_inbox(request):
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True).order_by("-updated"))
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True))
 
 		for strand in strands:
 			responseObjects.append(getObjectsDataForStrand(strand, user))
+
+		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
 
 		response['objects'] = responseObjects
 	else:
