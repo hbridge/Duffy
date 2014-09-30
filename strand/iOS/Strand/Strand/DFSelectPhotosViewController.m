@@ -52,14 +52,14 @@ NSUInteger const NumPhotosPerRow = 3;
   return [self initWithTitle:nil
                 showsToField:NO
       suggestedSectionObject:nil
-         sharedSectionObject:nil
+          invitedStrandPosts:nil
                 inviteObject:nil];
 }
 
 - (instancetype)initWithTitle:(NSString *)title
                  showsToField:(BOOL)showsToField
        suggestedSectionObject:(DFPeanutFeedObject *)suggestedSectionObject
-          sharedSectionObject:(DFPeanutFeedObject *)invitedStrandPosts
+           invitedStrandPosts:(DFPeanutFeedObject *)invitedStrandPosts
                  inviteObject:(DFPeanutFeedObject *)inviteObject
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
@@ -485,6 +485,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                [(AppDelegate *)[[UIApplication sharedApplication] delegate]
                 showStrandWithID:peanutStrand.id.longLongValue];
              });
+
+             [[NSNotificationCenter defaultCenter]
+              postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+              object:self];
+             DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
            } failure:^(NSError *error) {
              [SVProgressHUD showErrorWithStatus:@"Error."];
              DDLogWarn(@"Failed to mark invite used: %@", error);
@@ -509,6 +514,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectedPhotoIDs;
+  requestStrand.created_from_id = [NSNumber numberWithLongLong:self.suggestedSectionObject.id];
   requestStrand.shared = YES;
   [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedPhotoObjects];
   
@@ -517,6 +523,11 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
    performRequest:RKRequestMethodPOST
    withPeanutStrand:requestStrand success:^(DFPeanutStrand *peanutStrand) {
      DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
+     
+     [[NSNotificationCenter defaultCenter]
+      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+      object:self];
+     
      // invite selected users
      [self sendInvitesForStrand:peanutStrand
                toPeanutContacts:self.peoplePicker.selectedPeanutContacts];

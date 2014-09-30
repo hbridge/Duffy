@@ -29,7 +29,7 @@
 - (instancetype)initWithTitle:(NSString *)title
                  showsToField:(BOOL)showsToField
        suggestedSectionObject:(DFPeanutFeedObject *)suggestedSectionObject
-          sharedSectionObject:(DFPeanutFeedObject *)sharedSectionObject
+           invitedStrandPosts:(DFPeanutFeedObject *)invitedStrandPosts
                  inviteObject:(DFPeanutFeedObject *)inviteObject;
 - (IBAction)collectionViewTapped:(id)sender;
 
