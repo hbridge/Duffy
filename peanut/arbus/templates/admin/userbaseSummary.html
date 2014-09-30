@@ -82,7 +82,7 @@
 				<th class='before b-r' colspan='5' > </th>
 				<th class='actions b-r' colspan='4'> Action_type </th>
 				<th class='notifications b-r' colspan='2'> Notifications </th>
-				<th class='location b-r' colspan='2'> Location </th>
+				<!-- <th class='location b-r' colspan='2'> Location </th> -->
 				<th class='after' colspan='7' > </th>
 			</tr>
 			<tr class='ui-row-header' >
@@ -96,9 +96,9 @@
 				<td class='photos_added center b-r'> Photos <br> Added (7d) </td>
 				<td class='favs center b-r'> Favs <br> (7d) </td>
 				<td class='notifications center b-r'> Sent <br> (7d)</td>
-				<td class='last-not-timestamp b-r'> Last Timestamp </td>
-				<td class='location b-r'> GPS </td>
-				<td class='location-timestamp b-r'> Timestamp </td>
+				<td class='last-not-timestamp b-r'> Timestamp </td>
+				<!-- <td class='location b-r'> GPS </td>
+				<td class='location-timestamp b-r'> Timestamp </td> -->
 				<td class='contacts b-r'> Friends | <br> Contacts </td> 
 				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
@@ -116,7 +116,7 @@
 				<td class='favs center b-r'> {{entry.weeklyFavs }} </td>
 				<td class='notifications right b-r'> {{ entry.notifications }} </td>
 				<td class='last-not-timestamp right timeago b-r' title='{{ entry.lastNotifSent }}'> </td>				
-				<td class='location right b-r'> 
+				<!--<td class='location right b-r'> 
 					{% if entry.user.last_location_point %}
 					<a target=_blank href='http://maps.google.com?q={{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}'>{{ entry.user.last_location_point.y }},{{entry.user.last_location_point.x}}</a>
 					{% endif %}
@@ -124,7 +124,7 @@
 					(&plusmn;{{ entry.user.last_location_accuracy }}m)
 					{% endif %}
 				</td>
-				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td>
+				<td class='location-timestamp timeago b-r' title='{{ entry.lastLocationTimestamp}}'></td> -->
 				<td class='contacts b-r center'> {{ entry.friendCount}} | {{ entry.contactCount }} </td>
 				<td class='last-build b-r'> {{ entry.build }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
