@@ -426,8 +426,8 @@ const NSUInteger MaxPhotosPerCell = 3;
   DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
   DFSelectPhotosViewController *selectController;
   if ([feedObject.type isEqualToString:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *invitedStrand = [[feedObject subobjectsOfType:DFFeedObjectSection]
-                                         firstObject];
+    DFPeanutFeedObject *invitedStrandPosts = [[feedObject subobjectsOfType:DFFeedObjectSection]
+                                              firstObject];
     DFPeanutFeedObject *suggestedPhotos = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
                                            firstObject];
     // this is an invite, the object that user selected represenets the shared photos
@@ -436,7 +436,7 @@ const NSUInteger MaxPhotosPerCell = 3;
                                                       initWithTitle:@"Accept Invite"
                                                       showsToField:NO
                                                       suggestedSectionObject:suggestedPhotos
-                                                      sharedSectionObject:invitedStrand
+                                                      invitedStrandPosts:invitedStrandPosts
                                                       inviteObject:feedObject];
     selectController.inviteObject = feedObject;
     [self.navigationController pushViewController:selectController animated:YES];
@@ -447,7 +447,7 @@ const NSUInteger MaxPhotosPerCell = 3;
                         initWithTitle:@"Select Photos"
                         showsToField:YES
                         suggestedSectionObject:feedObject
-                        sharedSectionObject:nil
+                        invitedStrandPosts:nil
                         inviteObject:nil
                         ];
     [self.navigationController pushViewController:selectController animated:YES];
@@ -481,7 +481,6 @@ const NSUInteger MaxPhotosPerCell = 3;
       dispatch_async(dispatch_get_main_queue(), ^{
       if (![responseHash isEqual:self.lastResponseHash]) {
         DDLogDebug(@"New data for suggestions, updating view...");
-        DFPeanutObjectsResponse *lastResponse = self.suggestedResponse;
         self.suggestedResponse = response;
         
         self.friendSuggestions = [NSMutableArray new];
@@ -491,7 +490,7 @@ const NSUInteger MaxPhotosPerCell = 3;
           else [self.noFriendSuggestions addObject:object];
         }
         
-        [self updateTableViewForOldResponse:lastResponse newResponse:response];
+        [self.tableView reloadData];
         NSUInteger badgeCount = self.inviteObjects.count + self.friendSuggestions.count;
         self.tabBarItem.badgeValue = badgeCount > 0 ? [@(badgeCount) stringValue] : nil;
         
@@ -535,25 +534,6 @@ const NSUInteger MaxPhotosPerCell = 3;
   }
   
   return NO;
-}
-
-- (void)updateTableViewForOldResponse:(DFPeanutObjectsResponse *)oldResponse
-                           newResponse:(DFPeanutObjectsResponse *)newResponse
-{
-  if (!oldResponse || oldResponse.objects.count < 10
-      || !self.view.window || self.tabBarController.selectedViewController != self.navigationController) {
-    [self.tableView reloadData];
-    self.reloadBackground.hidden = YES; // immediately hide, don't animate
-    return;
-  }
-  
-  if (!self.showReloadButtonTimer && self.reloadBackground.hidden) {
-    self.showReloadButtonTimer = [NSTimer scheduledTimerWithTimeInterval:7.0
-                                                                  target:self
-                                                                selector:@selector(showReloadButton)
-                                                                userInfo:nil
-                                                                 repeats:NO];
-  }
 }
 
 - (void)setReloadButtonHidden:(BOOL)hidden

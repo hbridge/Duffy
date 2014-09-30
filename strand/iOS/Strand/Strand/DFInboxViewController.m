@@ -439,7 +439,7 @@ const NSUInteger inviteRowMaxImages = 3;
                                         initWithTitle:@"Accept Invite"
                                         showsToField:NO
                                         suggestedSectionObject:suggestedPhotos
-                                        sharedSectionObject:invitedStrandPosts
+                                        invitedStrandPosts:invitedStrandPosts
                                         inviteObject:feedObject
                                         ];
     [self.navigationController pushViewController:vc animated:YES];
