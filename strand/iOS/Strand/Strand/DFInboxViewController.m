@@ -61,7 +61,11 @@
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"" style:UIBarButtonItemStylePlain target:nil action:nil];
+  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithTitle:@""
+                                           style:UIBarButtonItemStylePlain
+                                           target:nil
+                                           action:nil];
 }
 
 - (void)observeNotifications
@@ -83,7 +87,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self refreshFromServer];
+  [self refreshFromServer:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -169,6 +173,11 @@
 
 - (void)refreshFromServer
 {
+  [self refreshFromServer:nil];
+}
+
+- (void)refreshFromServer:(void(^)(void))completion
+{
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   [self.feedAdapter
    fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
@@ -179,6 +188,7 @@
        dispatch_async(dispatch_get_main_queue(), ^{
          _feedObjects = response.objects;
          [self.tableView reloadData];
+         if (completion) completion();
        });
      }
      dispatch_async(dispatch_get_main_queue(), ^{
@@ -434,19 +444,32 @@ const NSUInteger inviteRowMaxImages = 3;
 
 - (void)showStrandPostsForStrandID:(DFStrandIDType)strandID
 {
-  DFPeanutFeedObject *strandPostObject;
-  for (DFPeanutFeedObject *strandPost in self.feedObjects) {
-    if (![strandPost.type isEqual:DFFeedObjectStrandPost]) return;
-    if (strandPost.id == strandID) {
-      strandPostObject = strandPost;
-      break;
+  [self refreshFromServer:^{
+    DFPeanutFeedObject *strandPostsObject;
+    for (DFPeanutFeedObject *object in self.feedObjects) {
+      if (object.id == strandID) {
+        // the strand is still in the invites section, return
+        if (![object.type isEqual:DFFeedObjectStrandPosts]) return;
+        strandPostsObject = object;
+        break;
+      }
     }
-  }
-  
-  if (strandPostObject) [self showStrandPostsObject:strandPostObject];
-  DDLogError(@"%@ got a request to show strand with id:%lu but none loaded with that ID",
-             self.class,
-             (long)strandID);
+    
+    if (strandPostsObject) {
+      dispatch_async(dispatch_get_main_queue(), ^{
+        DDLogInfo(@"%@ showing strand posts with id%lu",
+                  self.class,
+                  (long)strandID);
+        DFStrandGalleryViewController *vc = [[DFStrandGalleryViewController alloc] init];
+        vc.strandPosts = strandPostsObject;
+        [self.navigationController setViewControllers:@[self, vc] animated:YES];
+      });
+    } else {
+      DDLogError(@"%@ got a request to show strand with id:%lu but none loaded with that ID",
+                 self.class,
+                 (long)strandID);
+    }
+  }];
 }
 
 

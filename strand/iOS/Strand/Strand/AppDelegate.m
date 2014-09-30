@@ -371,6 +371,11 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   self.tabBarController.selectedIndex = 0;
 }
 
-
+- (void)showStrandWithID:(DFStrandIDType)strandID
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.inboxViewController showStrandPostsForStrandID:strandID];
+  });
+}
 
 @end

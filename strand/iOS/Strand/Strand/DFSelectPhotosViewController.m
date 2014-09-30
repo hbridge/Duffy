@@ -24,6 +24,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFStrandConstants.h"
 #import "DFSelectPhotosInviteSectionFooter.h"
+#import "AppDelegate.h"
 
 @interface DFSelectPhotosViewController ()
 
@@ -418,6 +419,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)donePressed:(id)sender
 {
+  [self.tokenField resignFirstResponder];
   if (self.invitedStrandPosts.id) {
     [self updateStrandWithID:@(self.invitedStrandPosts.id)];
   } else {
@@ -464,11 +466,13 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
           [strandInviteAdapter
            markInviteWithIDUsed:@(self.inviteObject.id)
            success:^(NSArray *resultObjects) {
-             [SVProgressHUD showSuccessWithStatus:@"Success!"];
-             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-               [self.navigationController popViewControllerAnimated:NO];
-             });
              DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
+             [SVProgressHUD showSuccessWithStatus:@"Accepted"];
+             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+               // show the strand that we just accepted an invite to
+               [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+                showStrandWithID:peanutStrand.id.longLongValue];
+             });
            } failure:^(NSError *error) {
              [SVProgressHUD showErrorWithStatus:@"Error."];
              DDLogWarn(@"Failed to mark invite used: %@", error);
