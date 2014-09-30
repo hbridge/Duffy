@@ -238,7 +238,7 @@ static NSArray *FeedObjectTypes;
     }
   }
   if (includeYou) {
-    if (numOtherMembers > 1) [actorsText appendString:@" and "];
+    if (numOtherMembers > 0) [actorsText appendString:@" and "];
     [actorsText appendString:@"You"];
   }
   if (numUnnamed > 0) {
