@@ -279,7 +279,7 @@
     cell.contentView.backgroundColor = [UIColor yellowColor];
     cell.textLabel.text = [NSString stringWithFormat:@"Unknown type: %@", feedObject.type];
     #else
-    cell = [self cellForStrandPosts:feedObject];
+    cell = [self cellForStrandPostsObject:feedObject];
     #endif
   }
   
