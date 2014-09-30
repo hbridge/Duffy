@@ -519,10 +519,10 @@ def getObjectsDataForStrand(strand):
 
 	invitedUsers = list()
 	for invite in strand.strandinvite_set.select_related().filter(accepted_user__isnull=True):
-		if invite.invited_user and invite.invited_user not in users:
+		if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
 			invitedUsers.append(invite.invited_user)
-
-	invitedUsers = set(invitedUsers)
+		elif not invite.invited_user:
+			invitedUsers.append(User(id=0, display_name=""))
 	
 	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': getTimeTakenForStrand(strand), 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
 	response['objects'] = list()
