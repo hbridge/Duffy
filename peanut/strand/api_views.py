@@ -634,7 +634,7 @@ def strand_inbox(request):
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True))
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True).order_by("-updated"))
 
 		for strand in strands:
 			responseObjects.append(getObjectsDataForStrand(strand, user))
