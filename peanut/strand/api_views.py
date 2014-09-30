@@ -103,14 +103,6 @@ def getLocationForStrand(strand):
 
 	return location
 
-def getTimeTakenForStrand(strand):
-	photos = strand.photos.all().order_by('-time_taken')
-	if len(photos) == 0:
-		photos = strand.getPostPhotos()
-
-	return photos[0].time_taken
-
-
 """
 	Creates a cache which is a dictionary with the key being the strandId and the value
 	a list of neighbor strands
@@ -319,7 +311,7 @@ def getActorsObjectData(users, includePhone = False, invitedUsers = None):
 
 	if invitedUsers:
 		for user in invitedUsers:
-			entry = {'display_name': user.display_name, 'id': user.id, 'invited': True}
+			entry = {'display_name': "(" + user.display_name + ")", 'id': user.id, 'invited': True}
 
 			if includePhone:
 				entry['phone_number'] = user.phone_number
@@ -509,7 +501,7 @@ def getObjectsDataForPost(postAction):
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
 
-def getObjectsDataForStrand(strand):
+def getObjectsDataForStrand(strand, user):
 	response = dict()
 
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
@@ -522,9 +514,15 @@ def getObjectsDataForStrand(strand):
 		if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
 			invitedUsers.append(invite.invited_user)
 		elif not invite.invited_user:
-			invitedUsers.append(User(id=0, display_name=""))
+			contactEntries = ContactEntry.objects.filter(user=user, phone_number=invite.phone_number, skip=False)
+			name = ""
+			for entry in contactEntries:
+				if name == "":
+					name = entry.name.split(" ")[0]
+
+			invitedUsers.append(User(id=0, display_name=name))
 	
-	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': getTimeTakenForStrand(strand), 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
+	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
 	response['objects'] = list()
 	for post in postActions:
 		response['objects'].extend(getObjectsDataForPost(post))
@@ -558,7 +556,7 @@ def getInviteObjectsDataForUser(user):
 		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
 		entry['visible'] = shouldShowInvite
 		entry['objects'] = list()
-		entry['objects'].append(getObjectsDataForStrand(strandInvite.strand))
+		entry['objects'].append(getObjectsDataForStrand(strandInvite.strand, user))
 
 		"""
 
@@ -639,7 +637,7 @@ def strand_inbox(request):
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True))
 
 		for strand in strands:
-			responseObjects.append(getObjectsDataForStrand(strand))
+			responseObjects.append(getObjectsDataForStrand(strand, user))
 
 		response['objects'] = responseObjects
 	else:
