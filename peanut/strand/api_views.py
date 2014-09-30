@@ -510,7 +510,7 @@ def getObjectsDataForStrand(strand, user):
 	users = strand.users.all()
 
 	invitedUsers = list()
-	for invite in strand.strandinvite_set.select_related().filter(accepted_user__isnull=True):
+	for invite in strand.strandinvite_set.select_related().filter(accepted_user__isnull=True).exclude(invited_user=user):
 		if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
 			invitedUsers.append(invite.invited_user)
 		elif not invite.invited_user:
