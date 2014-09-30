@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <deployment defaultVersion="1792" identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSMSAuthViewController">
@@ -17,21 +18,21 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="We have sent you an SMS with a 4-digit activation code. To verify your phone number, please enter it below." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="OX4-2A-iKz">
-                    <rect key="frame" x="20" y="11" width="280" height="84"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="We have sent you an SMS with a 4-digit activation code. To verify your phone number, please enter it below." textAlignment="center" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="OX4-2A-iKz">
+                    <rect key="frame" x="20" y="11" width="280" height="82"/>
                     <fontDescription key="fontDescription" type="system" pointSize="17"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="- - - -" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hlQ-D4-OFh">
-                    <rect key="frame" x="20" y="103" width="280" height="35"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <textField opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="- - - -" textAlignment="center" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hlQ-D4-OFh">
+                    <rect key="frame" x="20" y="103" width="280" height="31"/>
                     <fontDescription key="fontDescription" name="Menlo-Bold" family="Menlo" pointSize="26"/>
                     <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                 </textField>
-                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NgE-B8-hxj">
-                    <rect key="frame" x="126" y="146" width="69" height="30"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <button opaque="NO" contentMode="scaleToFill" enabled="NO" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NgE-B8-hxj">
+                    <rect key="frame" x="126" y="142" width="69" height="33"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="69" id="JRT-Jn-5MI"/>
+                    </constraints>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                     <state key="normal" title="Done">
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
@@ -40,15 +41,30 @@
                         <action selector="doneButtonPressed:" destination="-1" eventType="touchUpInside" id="lO6-wC-ngs"/>
                     </connections>
                 </button>
-                <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-6S-ler">
-                    <rect key="frame" x="20" y="103" width="280" height="35"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="o9Q-6S-ler">
+                    <rect key="frame" x="20" y="103" width="280" height="31"/>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <gestureRecognizers/>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
-            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
+            <constraints>
+                <constraint firstItem="o9Q-6S-ler" firstAttribute="trailing" secondItem="hlQ-D4-OFh" secondAttribute="trailing" id="8eO-We-r29"/>
+                <constraint firstItem="o9Q-6S-ler" firstAttribute="bottom" secondItem="hlQ-D4-OFh" secondAttribute="bottom" id="Ewk-6K-Rw3"/>
+                <constraint firstItem="NgE-B8-hxj" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="126" id="M0c-t8-4sx"/>
+                <constraint firstItem="NgE-B8-hxj" firstAttribute="top" secondItem="hlQ-D4-OFh" secondAttribute="bottom" constant="8" id="Vra-F0-QQx"/>
+                <constraint firstItem="o9Q-6S-ler" firstAttribute="top" secondItem="hlQ-D4-OFh" secondAttribute="top" id="WT1-Bq-qhp"/>
+                <constraint firstItem="hlQ-D4-OFh" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="Zhg-24-FY7"/>
+                <constraint firstAttribute="trailing" secondItem="hlQ-D4-OFh" secondAttribute="trailing" constant="20" id="acV-Ib-FQ2"/>
+                <constraint firstItem="NgE-B8-hxj" firstAttribute="top" secondItem="o9Q-6S-ler" secondAttribute="bottom" constant="8" id="bOZ-KI-fdL"/>
+                <constraint firstItem="hlQ-D4-OFh" firstAttribute="top" secondItem="OX4-2A-iKz" secondAttribute="bottom" constant="10" id="d5K-8u-cv8"/>
+                <constraint firstItem="OX4-2A-iKz" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="11" id="dfJ-gX-BOR"/>
+                <constraint firstItem="OX4-2A-iKz" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="hrL-Nh-OQ2"/>
+                <constraint firstAttribute="trailing" secondItem="NgE-B8-hxj" secondAttribute="trailing" constant="125" id="kxv-76-dXH"/>
+                <constraint firstAttribute="trailing" secondItem="OX4-2A-iKz" secondAttribute="trailing" constant="20" id="xDm-on-v8F"/>
+                <constraint firstItem="o9Q-6S-ler" firstAttribute="leading" secondItem="hlQ-D4-OFh" secondAttribute="leading" id="yF4-We-XRe"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
         </view>
         <tapGestureRecognizer id="Zhq-tZ-pml">
             <connections>
@@ -56,4 +72,9 @@
             </connections>
         </tapGestureRecognizer>
     </objects>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
 </document>

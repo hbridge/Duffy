@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -15,28 +16,32 @@
             <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Welcome to Strand" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vtd-FE-1Jp">
-                    <rect key="frame" x="47" y="47" width="226" height="21"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Welcome to Strand" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vtd-FE-1Jp">
+                    <rect key="frame" x="69" y="47" width="182" height="24"/>
                     <fontDescription key="fontDescription" name="HelveticaNeue-Bold" family="Helvetica Neue" pointSize="20"/>
                     <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="deviceRGB"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Strand helps you find photos your friends took with you. Please grant photos access to proceed." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="285" translatesAutoresizingMaskIntoConstraints="NO" id="3j1-n9-YIe">
-                    <rect key="frame" x="18" y="91" width="285" height="58"/>
+                <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Strand helps you find photos your friends took with you. Please grant photos access to proceed." textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="285" translatesAutoresizingMaskIntoConstraints="NO" id="3j1-n9-YIe">
+                    <rect key="frame" x="32" y="94" width="256" height="58"/>
                     <fontDescription key="fontDescription" type="system" pointSize="16"/>
                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
-                <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TOc-TO-Gbk">
-                    <rect key="frame" x="118" y="150" width="84" height="30"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TOc-TO-Gbk">
+                    <rect key="frame" x="126" y="153" width="69" height="28"/>
                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                     <state key="normal" title="Learn More">
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
-                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="Assets/Intro/LocationNUXGraphic.png" translatesAutoresizingMaskIntoConstraints="NO" id="JU1-qK-iVT">
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Intro/LocationNUXGraphic.png" translatesAutoresizingMaskIntoConstraints="NO" id="JU1-qK-iVT">
                     <rect key="frame" x="51" y="200" width="219" height="150"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="219" id="2Wb-xh-XuN"/>
+                        <constraint firstAttribute="height" constant="150" id="sOk-8y-VN3"/>
+                    </constraints>
                 </imageView>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="56U-G0-LkK">
                     <rect key="frame" x="60" y="393" width="200" height="40"/>
@@ -55,9 +60,18 @@
             </subviews>
             <color key="backgroundColor" red="0.97254908080000002" green="0.4156863093" blue="0.29019609089999998" alpha="1" colorSpace="deviceRGB"/>
             <constraints>
+                <constraint firstAttribute="centerX" secondItem="56U-G0-LkK" secondAttribute="centerX" id="0a0-cs-yhI"/>
+                <constraint firstItem="JU1-qK-iVT" firstAttribute="top" secondItem="TOc-TO-Gbk" secondAttribute="bottom" constant="19" id="1Mr-4c-Jy5"/>
+                <constraint firstAttribute="centerX" secondItem="3j1-n9-YIe" secondAttribute="centerX" id="1pL-7W-hQk"/>
                 <constraint firstAttribute="bottom" secondItem="56U-G0-LkK" secondAttribute="bottom" constant="47" id="EbQ-wA-DMv"/>
                 <constraint firstAttribute="trailing" secondItem="56U-G0-LkK" secondAttribute="trailing" constant="60" id="FGv-OC-ujp"/>
+                <constraint firstAttribute="centerX" secondItem="TOc-TO-Gbk" secondAttribute="centerX" id="Jbx-l6-ML9"/>
+                <constraint firstAttribute="centerX" secondItem="JU1-qK-iVT" secondAttribute="centerX" id="OTJ-hW-kdn"/>
+                <constraint firstItem="TOc-TO-Gbk" firstAttribute="top" secondItem="3j1-n9-YIe" secondAttribute="bottom" constant="1" id="SL2-eP-KIH"/>
                 <constraint firstItem="56U-G0-LkK" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="60" id="Ymb-c1-m5j"/>
+                <constraint firstItem="3j1-n9-YIe" firstAttribute="top" secondItem="Vtd-FE-1Jp" secondAttribute="bottom" constant="23" id="aQy-yy-TE0"/>
+                <constraint firstAttribute="centerX" secondItem="Vtd-FE-1Jp" secondAttribute="centerX" id="t0h-wy-ktB"/>
+                <constraint firstItem="Vtd-FE-1Jp" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="47" id="zIg-dE-UNP"/>
             </constraints>
             <simulatedScreenMetrics key="simulatedDestinationMetrics"/>
         </view>
