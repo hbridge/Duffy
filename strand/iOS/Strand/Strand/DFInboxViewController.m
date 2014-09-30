@@ -324,9 +324,6 @@
   return name;
 }
 
-
-const NSUInteger inviteRowMaxImages = 3;
-
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
   DFInboxTableViewCell *cell = [self.tableView
@@ -343,10 +340,9 @@ const NSUInteger inviteRowMaxImages = 3;
                                                           abbreviate:YES];
   cell.peopleLabel.attributedText = [inviteObject.objects.firstObject peopleSummaryString];
   
-  
   [self setRemotePhotosForCell:cell
                withStrandPosts:strandPostsObject
-                     maxPhotos:inviteRowMaxImages];
+                     maxPhotos:InboxCellMaxPhotos];
   
   return cell;
 }

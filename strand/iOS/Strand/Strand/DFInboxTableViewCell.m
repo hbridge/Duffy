@@ -13,7 +13,7 @@
 CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight = 51;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowHeight = 148;
 CGFloat const ActivtyFeedTableViewCellCollectionViewRowSeparatorHeight = 8;
-NSUInteger const InboxCellMaxPhotos = 6;
+NSUInteger const InboxCellMaxPhotos = 10;
 
 
 @implementation DFInboxTableViewCell
@@ -57,15 +57,25 @@ NSUInteger const InboxCellMaxPhotos = 6;
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (indexPath.row < InboxCellMaxPhotos - 1 || self.objects.count <= InboxCellMaxPhotos)
+  NSUInteger maxPhotos = [self maxObjectsDisplayed];
+
+  if (indexPath.row < maxPhotos - 1 || self.objects.count <= maxPhotos)
     return [super collectionView:collectionView cellForItemAtIndexPath:indexPath];
   
   DFLabelCollectionViewCell *cell = [self.collectionView
                                      dequeueReusableCellWithReuseIdentifier:@"labelCell"
                                      forIndexPath:indexPath];
-  cell.abbreviationSquare.elementAbbreviation = [NSString stringWithFormat:@"+%d", (int)(self.objects.count - InboxCellMaxPhotos)];
+  cell.abbreviationSquare.elementAbbreviation = [NSString stringWithFormat:@"+%d", (int)(self.objects.count - maxPhotos)];
   cell.abbreviationSquare.displayMode = OFElementSquareDisplayAbbreviation;
   return cell;
+}
+
+- (NSUInteger)maxObjectsDisplayed
+{
+  NSUInteger numThatFitWithSpacing = floor(self.collectionView.frame.size.width /
+  (self.flowLayout.itemSize.width + self.flowLayout.minimumInteritemSpacing));
+  
+  return numThatFitWithSpacing;
 }
 
 @end
