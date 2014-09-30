@@ -347,7 +347,7 @@ const NSUInteger inviteRowMaxImages = 3;
   cell.titleLabel.text = strandPostsObject.title;
   cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
                                                           abbreviate:YES];
-  cell.peopleLabel.attributedText = [self.class attributedPeopleStringForObject:inviteObject];
+  cell.peopleLabel.attributedText = [self.class attributedPeopleStringForObject:inviteObject.objects.firstObject];
   
   
   [self setRemotePhotosForCell:cell
