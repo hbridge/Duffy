@@ -449,9 +449,12 @@
     for (DFPeanutFeedObject *object in self.feedObjects) {
       if (object.id == strandID) {
         // the strand is still in the invites section, return
-        if (![object.type isEqual:DFFeedObjectStrandPosts]) return;
-        strandPostsObject = object;
-        break;
+        if ([object.type isEqual:DFFeedObjectStrandPosts]) {
+          strandPostsObject = object;
+          break;
+        } else {
+          DDLogError(@"%@ showStrandPostsForStrandID: object.type = %@", self.class, object.type);
+        }
       }
     }
     
