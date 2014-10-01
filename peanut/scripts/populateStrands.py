@@ -264,7 +264,7 @@ def main(argv):
 					photoToStrandIdDict[photo] = targetStrand.id
 				else:
 					# If we're creating a strand with a photo that wasn't taken with strand, then turn off sharing
-					private = !photo.taken_with_strand
+					private = not photo.taken_with_strand
 					
 					newStrand = Strand(first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, private = private)
 					if private:
