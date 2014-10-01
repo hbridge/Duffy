@@ -506,6 +506,34 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
      DDLogError(@"%@ failed to get strand: %@, error: %@",
                 self.class, requestStrand, error);
    }];
+
+  // Now go through each of the private strands and update their visibility to NO
+  //   Doing this seperate from the strand update code above so we can do it in parallel
+  // For a suggestion type, the subobjects are strand objects
+  for (DFPeanutFeedObject *object in self.suggestedSectionObject.objects) {
+    DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
+    privateStrand.id = [NSNumber numberWithLongLong:object.id];
+    
+    [strandAdapter
+     performRequest:RKRequestMethodGET
+     withPeanutStrand:privateStrand
+     success:^(DFPeanutStrand *peanutStrand) {
+       peanutStrand.been_shared = YES;
+       
+       // Put the peanut strand
+       [strandAdapter
+        performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+        success:^(DFPeanutStrand *peanutStrand) {
+          DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
+        } failure:^(NSError *error) {
+          DDLogError(@"%@ failed to put private strand: %@, error: %@",
+                     self.class, peanutStrand, error);
+        }];
+     } failure:^(NSError *error) {
+       DDLogError(@"%@ failed to get private strand: %@, error: %@",
+                  self.class, requestStrand, error);
+     }];
+  }
 }
 
 - (void)createNewStrandWithSelection
@@ -515,7 +543,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectedPhotoIDs;
   requestStrand.created_from_id = [NSNumber numberWithLongLong:self.suggestedSectionObject.id];
-  requestStrand.shared = YES;
+  requestStrand.private = NO;
   [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedPhotoObjects];
   
   [SVProgressHUD show];

@@ -29,10 +29,11 @@
 @property (nonatomic, retain) NSNumber  *id;
 @property (nonatomic, retain) NSDate *first_photo_time;
 @property (nonatomic, retain) NSDate *last_photo_time;
-@property (nonatomic) BOOL shared;
+@property (nonatomic) BOOL private;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSDate *updated;
 @property (nonatomic, retain) NSNumber  *created_from_id;
+@property (nonatomic) BOOL been_shared;
 @property (nonatomic, retain) NSArray *photos; // array of photo IDs
 @property (nonatomic, retain) NSArray *users; // array of photo IDs
 
