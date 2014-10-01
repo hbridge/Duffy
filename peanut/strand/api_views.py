@@ -516,37 +516,39 @@ def getInviteObjectsDataForUser(user):
 
 	for strandInvite in strandInvites:
 		shouldShowInvite = True
+		thumbsLoaded = True
 		invitePhotos = strandInvite.strand.photos.all()
 		
 		# Go through all photos and see if there's any that don't belong to this user
 		#  and don't have a thumb.  If a user just created an invite this should be fine
 		for photo in invitePhotos:
 			if photo.user_id != user.id and not photo.thumb_filename:
+				thumbsLoaded = False
+
+		if thumbsLoaded:
+			# If the last stranded photo 
+			lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+			if len(lastStrandedPhotos) > 0:
+				if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
+					shouldShowInvite = False
+			else:
 				shouldShowInvite = False
 
-		# If the last stranded photo 
-		lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-		if len(lastStrandedPhotos) > 0:
-			if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
-				shouldShowInvite = False
-		else:
-			shouldShowInvite = False
 
+			title = "shared %s photos with you" % strandInvite.strand.photos.count()
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
+			entry['visible'] = shouldShowInvite
+			entry['objects'] = list()
+			entry['objects'].append(getObjectsDataForStrand(strandInvite.strand, user))
 
-		title = "shared %s photos with you" % strandInvite.strand.photos.count()
-		entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
-		entry['visible'] = shouldShowInvite
-		entry['objects'] = list()
-		entry['objects'].append(getObjectsDataForStrand(strandInvite.strand, user))
+			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
 
-		privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
+			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
+			suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND)
 
-		suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
-		suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND)
+			entry['objects'].append(suggestionsEntry)
 
-		entry['objects'].append(suggestionsEntry)
-
-		responseObjects.append(entry)
+			responseObjects.append(entry)
 	return responseObjects
 
 
