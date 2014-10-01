@@ -257,7 +257,7 @@ static NSArray *FeedObjectTypes;
   }
   
   if (numInvited == 0) return nil;
-  return [NSString stringWithFormat:@"+%d pending", (int)numInvited];
+  return [NSString stringWithFormat:@"+%d invited", (int)numInvited];
 }
 
 - (NSAttributedString *)peopleSummaryString
