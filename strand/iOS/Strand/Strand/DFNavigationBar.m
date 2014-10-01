@@ -52,6 +52,12 @@
                                  [DFStrandConstants defaultBarForegroundColor]
                                };
   self.translucent = NO;
+  
+  [self setBackgroundImage:[UIImage new]
+                     forBarPosition:UIBarPositionAny
+                         barMetrics:UIBarMetricsDefault];
+  
+  [self setShadowImage:[UIImage new]];
 }
 
 - (void)setItemAlpha:(CGFloat)alpha

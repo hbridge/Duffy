@@ -111,6 +111,11 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
