@@ -1,9 +1,9 @@
 # Strand
 
-## Oct 1, 2014 (4742)
+## Oct 1, 2014 (4742, 4743)
 
-- Added second tab to create Strand view
-- UI tweaks
+- Smarter, prettier suggestions!
+- UI tweaks and bug fixes
 
 ## Sep 30th, 2014
 
