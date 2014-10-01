@@ -13,14 +13,14 @@
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ied-uX-I9D" userLabel="Status bar background">
                     <rect key="frame" x="0.0" y="0.0" width="480" height="20"/>
-                    <color key="backgroundColor" red="0.97254901959999995" green="0.31372549020000001" blue="0.14117647059999999" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="20" id="cS9-E3-dSq"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="zG1-Dy-SMA" userLabel="Nav bar background">
                     <rect key="frame" x="0.0" y="20" width="480" height="44"/>
-                    <color key="backgroundColor" red="0.97254901960784312" green="0.31372549019607843" blue="0.14117647058823529" alpha="1" colorSpace="calibratedRGB"/>
+                    <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="44" id="ucq-fO-Dx9"/>
                     </constraints>
