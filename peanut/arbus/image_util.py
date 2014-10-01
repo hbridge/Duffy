@@ -175,6 +175,11 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 		photo.full_filename = photo.getDefaultFullFilename()
 
 		os.rename(tempFilepath, photo.getDefaultFullPath())
+
+		im = Image.open(photo.getDefaultFullPath())
+
+		photo.full_width = im.size[0]
+		photo.full_height = im.size[1]
 		
 		# Don't worry about bulk here since that's only used for thumbnails
 		photo.save()

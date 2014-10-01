@@ -116,6 +116,8 @@ class Photo(models.Model):
 	full_filename = models.CharField(max_length=100, null=True)
 	thumb_filename = models.CharField(max_length=100, null=True)
 	metadata = models.CharField(max_length=10000, null=True)
+	full_width = models.IntegerField(null=True)
+	full_height = models.IntegerField(null=True)
 	location_data = models.TextField(null=True)
 	location_city =  models.CharField(max_length=1000, null=True)
 	location_point = models.PointField(null=True, db_index=True)

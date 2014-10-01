@@ -58,5 +58,7 @@ def photoDataForApiSerializer(photo):
 	photoData['full_image_path'] = photo.getFullUrlImagePath()
 	photoData['thumb_image_path'] = photo.getThumbUrlImagePath()
 	photoData['user_display_name'] = photo.getUserDisplayName()
+	photoData['full_width'] = photo.full_width
+	photoData['full_height'] = photo.full_height
 
 	return photoData
