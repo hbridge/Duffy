@@ -458,21 +458,23 @@
       }
     }
     
-    if (strandPostsObject) {
-      dispatch_async(dispatch_get_main_queue(), ^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+      if (strandPostsObject) {
+        
         DDLogInfo(@"%@ showing strand posts with id%lu",
                   self.class,
                   (long)strandID);
         DFStrandGalleryViewController *vc = [[DFStrandGalleryViewController alloc] init];
         vc.strandPosts = strandPostsObject;
         [self.navigationController setViewControllers:@[self, vc] animated:YES];
-      });
-    } else {
-      [self.navigationController setViewControllers:@[self]];
-      DDLogError(@"%@ got a request to show strand with id:%lu but none loaded with that ID",
-                 self.class,
-                 (long)strandID);
-    }
+        
+      } else {
+        [self.navigationController setViewControllers:@[self]];
+        DDLogError(@"%@ got a request to show strand with id:%lu but none loaded with that ID",
+                   self.class,
+                   (long)strandID);
+      }
+    });
   }];
 }
 
