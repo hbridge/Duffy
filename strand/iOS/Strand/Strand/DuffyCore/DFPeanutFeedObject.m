@@ -75,6 +75,7 @@ static NSArray *FeedObjectTypes;
            @"user_display_name",
            @"time_stamp",
            @"visible",
+           @"suggestible",
            ];
 }
 
@@ -175,6 +176,7 @@ static NSArray *FeedObjectTypes;
   newObject.user = self.user;
   newObject.user_display_name = [self.user_display_name copy];
   newObject.visible = self.visible;
+  newObject.suggestible = self.suggestible;
   
   return newObject;
 }

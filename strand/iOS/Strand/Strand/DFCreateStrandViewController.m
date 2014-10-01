@@ -38,9 +38,9 @@ const CGFloat CreateCellTitleSpacing = 8;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 
-@property (nonatomic, retain) DFPeanutObjectsResponse *suggestedResponse;
+@property (nonatomic, retain) DFPeanutObjectsResponse *allObjectsResponse;
 @property (nonatomic, retain) NSArray *inviteObjects;
-@property (nonatomic, retain) NSMutableArray *friendSuggestions;
+@property (nonatomic, retain) NSMutableArray *suggestionObjects;
 @property (nonatomic, retain) NSMutableArray *noFriendSuggestions;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
@@ -206,7 +206,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  if (self.showAsFirstTimeSetup && !self.refreshTimer && self.suggestedResponse.objects.count == 0) {
+  if (self.showAsFirstTimeSetup && !self.refreshTimer && self.allObjectsResponse.objects.count == 0) {
     self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:3.0
                                                          target:self
                                                        selector:@selector(refreshFromServer)
@@ -257,9 +257,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (NSArray *)sectionObjectsForSection:(NSUInteger)section tableView:(UITableView *)tableView
 {
   if (tableView == self.suggestedTableView) {
-    return self.friendSuggestions;
+    return self.suggestionObjects;
   } else {
-    return self.suggestedResponse.objects;
+    return self.allObjectsResponse.objects;
   }
 }
 
@@ -489,17 +489,16 @@ const NSUInteger MaxPhotosPerCell = 3;
       dispatch_async(dispatch_get_main_queue(), ^{
       if (![responseHash isEqual:self.lastResponseHash]) {
         DDLogDebug(@"New data for suggestions, updating view...");
-        self.suggestedResponse = response;
+        self.allObjectsResponse = response;
         
-        self.friendSuggestions = [NSMutableArray new];
-        self.noFriendSuggestions = [NSMutableArray new];
+        self.suggestionObjects = [NSMutableArray new];
         for (DFPeanutFeedObject *object in response.objects) {
-          if (object.actors.count > 0) [self.friendSuggestions addObject:object];
-          else [self.noFriendSuggestions addObject:object];
+          
+          if (object.suggestible.boolValue) [self.suggestionObjects addObject:object];
         }
         
         [self reloadTableViews];
-        NSUInteger badgeCount = self.inviteObjects.count + self.friendSuggestions.count;
+        NSUInteger badgeCount = self.inviteObjects.count + self.suggestionObjects.count;
         self.tabBarItem.badgeValue = badgeCount > 0 ? [@(badgeCount) stringValue] : nil;
         
         self.lastResponseHash = responseHash;
