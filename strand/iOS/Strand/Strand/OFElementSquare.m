@@ -45,6 +45,7 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
 {
     elementAbbreviation = newElementAbbreviation;
     self.displayMode = self.displayMode;
+  DDLogVerbose(@"new element abbreviation: %@", newElementAbbreviation);
 }
 
 
@@ -56,14 +57,16 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
 
 - (void)setDisplayMode:(OFElementSquareDisplayMode)newDisplayMode
 {
-    displayMode = newDisplayMode;
-    
-    if (self.displayMode == OFElementSquareDisplayAbbreviation) {
-        _displayedText = self.elementAbbreviation;
-    } else {
-        _displayedText = [self.elementName stringByReplacingOccurrencesOfString:@" " withString:@"\n"];
-    }
-    [self calculateFontSize];
+  displayMode = newDisplayMode;
+  
+  if (self.displayMode == OFElementSquareDisplayAbbreviation) {
+    _displayedText = self.elementAbbreviation;
+  } else {
+    _displayedText = [self.elementName stringByReplacingOccurrencesOfString:@" " withString:@"\n"];
+  }
+  
+  [self calculateFontSize];
+  [self setNeedsDisplay];
 }
 
 - (void)calculateFontSize
@@ -81,6 +84,9 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
         CGSize textSize = [self.displayedText sizeWithAttributes:attributes];
         if (textSize.width <= textArea.size.width && textSize.height <= textArea.size.height) {
             self.fontSize = curSize;
+          if (curSize < 8.0) {
+            DDLogWarn(@"%@ warning, fontsize: %.02f", self.class, curSize);
+          }
             break;
         }
         curSize -= 0.5;
@@ -126,6 +132,7 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
     textRect.origin.x = center.x - textRect.size.width / 2.0;
     textRect.origin.y = center.y - textRect.size.height / 2.0; // Set the fill color of the current context to black
     [self.displayedText drawInRect:textRect withAttributes:attributes];
+  DDLogVerbose(@"drawing text:%@", self.displayedText);
 }
 
 @end

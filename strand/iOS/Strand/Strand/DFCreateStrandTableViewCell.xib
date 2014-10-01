@@ -99,18 +99,38 @@
                                     <constraint firstAttribute="centerY" secondItem="b4X-bq-qoX" secondAttribute="centerY" id="gAh-1L-nGH"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R9G-TK-7rF" userLabel="Count View Wrapper">
+                                <rect key="frame" x="270" y="219" width="29" height="29"/>
+                                <subviews>
+                                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nPB-Pd-SIx" customClass="OFElementSquare">
+                                        <rect key="frame" x="8" y="8" width="13" height="13"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                                    </view>
+                                </subviews>
+                                <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="29" id="1R5-i4-ba8"/>
+                                    <constraint firstItem="nPB-Pd-SIx" firstAttribute="top" secondItem="R9G-TK-7rF" secondAttribute="top" constant="8" id="8nE-z5-ezG"/>
+                                    <constraint firstAttribute="height" constant="29" id="Bzq-x6-bW4"/>
+                                    <constraint firstAttribute="bottom" secondItem="nPB-Pd-SIx" secondAttribute="bottom" constant="8" id="Fbs-QY-fbm"/>
+                                    <constraint firstAttribute="trailing" secondItem="nPB-Pd-SIx" secondAttribute="trailing" constant="8" id="SgF-j5-9mU"/>
+                                    <constraint firstItem="nPB-Pd-SIx" firstAttribute="leading" secondItem="R9G-TK-7rF" secondAttribute="leading" constant="8" id="pNn-LH-EV0"/>
+                                </constraints>
+                            </view>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="7rK-fT-t9G" secondAttribute="trailing" id="Afm-ix-OWP"/>
                             <constraint firstItem="Ry2-wJ-FfO" firstAttribute="top" secondItem="5S6-hD-wpk" secondAttribute="top" constant="10" id="GtM-ak-JTh"/>
                             <constraint firstItem="7rK-fT-t9G" firstAttribute="top" secondItem="5S6-hD-wpk" secondAttribute="top" id="JsQ-pY-qQ1"/>
+                            <constraint firstAttribute="trailing" secondItem="R9G-TK-7rF" secondAttribute="trailing" constant="5" id="MmA-4n-8KS"/>
                             <constraint firstItem="7rK-fT-t9G" firstAttribute="leading" secondItem="Ry2-wJ-FfO" secondAttribute="trailing" constant="2" id="WLG-K6-UPX"/>
                             <constraint firstItem="KC9-o9-x02" firstAttribute="top" secondItem="7rK-fT-t9G" secondAttribute="bottom" id="WTz-fO-2m2"/>
                             <constraint firstItem="7rK-fT-t9G" firstAttribute="top" secondItem="5S6-hD-wpk" secondAttribute="top" id="Z9r-Cr-8mn"/>
                             <constraint firstItem="KC9-o9-x02" firstAttribute="top" secondItem="Ry2-wJ-FfO" secondAttribute="bottom" constant="10" id="bht-sd-EuP"/>
                             <constraint firstItem="KC9-o9-x02" firstAttribute="leading" secondItem="5S6-hD-wpk" secondAttribute="leading" id="c80-aw-Z59"/>
                             <constraint firstAttribute="trailing" secondItem="KC9-o9-x02" secondAttribute="trailing" id="ggS-WM-Llx"/>
+                            <constraint firstAttribute="bottom" secondItem="R9G-TK-7rF" secondAttribute="bottom" constant="5" id="r65-oi-Dj6"/>
                             <constraint firstItem="Ry2-wJ-FfO" firstAttribute="leading" secondItem="5S6-hD-wpk" secondAttribute="leading" constant="8" id="tWv-iI-EH4"/>
                             <constraint firstAttribute="bottom" secondItem="KC9-o9-x02" secondAttribute="bottom" id="yrz-bm-Arc"/>
                         </constraints>
@@ -129,6 +149,8 @@
             <connections>
                 <outlet property="collectionView" destination="KC9-o9-x02" id="hRG-bJ-Jqd"/>
                 <outlet property="contextLabel" destination="MJw-rI-6rQ" id="cIg-b5-yU5"/>
+                <outlet property="countBadge" destination="nPB-Pd-SIx" id="5Qf-gd-lQQ"/>
+                <outlet property="countBadgeBackground" destination="R9G-TK-7rF" id="Yvv-Hl-PdP"/>
                 <outlet property="flowLayout" destination="gI2-1t-GGm" id="yvc-My-Rsw"/>
                 <outlet property="peopleExplanationLabel" destination="6Us-ce-ejk" id="4Q1-cd-j6a"/>
                 <outlet property="peopleLabel" destination="NPB-S6-YvY" id="9Qq-xE-lSl"/>

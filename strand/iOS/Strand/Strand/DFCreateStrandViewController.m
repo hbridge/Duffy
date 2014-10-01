@@ -317,6 +317,16 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
                                                                 abbreviate:NO]];
   [contextString appendFormat:@" in %@", strandObject.location];
   cell.contextLabel.text = contextString;
+  
+  NSInteger count = strandObject.objects.count - MaxPhotosPerCell;
+  if (count > 0) {
+    cell.countBadgeBackground.hidden = NO;
+    cell.countBadge.elementAbbreviation = [NSString stringWithFormat:@"+%d", (int)count];
+  } else {
+    cell.countBadgeBackground.hidden = YES;
+  }
+  
+  DDLogVerbose(@"strand.objects.count= %d, maxPhotos=%d, count=%d", strandObject.objects.count, MaxPhotosPerCell, count);
 }
 
 - (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
