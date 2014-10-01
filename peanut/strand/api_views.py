@@ -413,8 +413,7 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
-	interestedUsersGroups = list()
-	noInterestedUsersGroups = list()
+	groups = list()
 
 	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
@@ -438,29 +437,15 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True)}
 		entry = {'photos': photos, 'metadata': metadata}
 
-		if len(photos) > 0:
-			if len(interestedUsers):
-				interestedUsersGroups.append(entry)
-			else:
-				noInterestedUsersGroups.append(entry)
+		groups.append(entry)
 
-	if len(interestedUsersGroups) > 0:
-		# now sort groups by the time_taken of the first photo in each group
-		interestedUsersGroups = sorted(interestedUsersGroups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	if len(noInterestedUsersGroups) > 0:
-		# now sort groups by the time_taken of the first photo in each group
-		noInterestedUsersGroups = sorted(noInterestedUsersGroups, key=lambda x: x['photos'][0].time_taken, reverse=True)
+	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	interestedUsersFormattedGroups = getFormattedGroups(interestedUsersGroups)
+	formattedGroups = getFormattedGroups(groups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(interestedUsersFormattedGroups, 1000)
-
-	noInterestedUsersFormattedGroups = getFormattedGroups(noInterestedUsersGroups)
-
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects.extend(api_util.turnFormattedGroupsIntoFeedObjects(noInterestedUsersFormattedGroups, 1000))
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 
 	return objects
 
@@ -531,7 +516,7 @@ def getObjectsDataForStrand(strand, user):
 def getInviteObjectsDataForUser(user):
 	responseObjects = list()
 
-	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True).order_by('-added')
+	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 
 	for strandInvite in strandInvites:
 		shouldShowInvite = True
@@ -611,7 +596,7 @@ def unshared_strands(request):
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 		b = datetime.datetime.now()
 
-		print "unshared_strands took %s" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
+		print "unshared_strands took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
@@ -636,13 +621,8 @@ def strand_inbox(request):
 		# Next throw in the list of existing Strands
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True))
 
-		nonInviteStrandObjects = list()
 		for strand in strands:
-			nonInviteStrandObjects.append(getObjectsDataForStrand(strand, user))
-
-		# sorting by last action on the strand
-		nonInviteStrandObjects = sorted(nonInviteStrandObjects, key=lambda x: x['time_stamp'], reverse=True)
-		responseObjects.extend(nonInviteStrandObjects)
+			responseObjects.append(getObjectsDataForStrand(strand, user))
 
 		response['objects'] = responseObjects
 	else:
