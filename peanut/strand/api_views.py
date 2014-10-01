@@ -21,7 +21,7 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util, serializers
 
 from strand import geo_util, notifications_util, friends_util, strands_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm, SuggestedUnsharedPhotosForm
+from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm
 
 from ios_notifications.models import APNService, Device, Notification
 
@@ -251,7 +251,6 @@ def getActionSubtitle(strand):
 # Deprecated
 def getObjectsDataForActions(user):
 	objectResponse = []
-	#strands = Strand.objects.filter(users__in=[user]).filter(shared=True)
 
 	actions = Action.objects.filter(Q(photo__user_id=user.id) | Q(user=user) | Q(strand__users__in=[user])).order_by("-added")[:20]
 	
@@ -455,7 +454,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
 	# Get all the unshared strands for the given user that are close to the given strand
-	privateStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
+	privateStrands = Strand.objects.select_related().filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 	
 	strandsThatMatch = list()
 	for privateStrand in privateStrands:
@@ -535,27 +534,6 @@ def getInviteObjectsDataForUser(user):
 		entry['objects'] = list()
 		entry['objects'].append(getObjectsDataForStrand(strandInvite.strand, user))
 
-		"""
-
-		TODO (Derek): Figure out a way to use neighbors.
-			Can't right now because with newly created strands, those entries aren't written
-
-
-		# Find this user's private strands which are neighbors to the invited strand
-		strandNeighborsCache = getStrandNeighborsCache([strandInvite.strand])
-		
-		privateNeighborStrands = list()
-		# If we found some neighbors to this strand, add them in as suggestion objects
-		if strandInvite.strand.id in strandNeighborsCache:
-			for strand in strandNeighborsCache[strandInvite.strand.id]:
-				if strand.shared == False and user in strand.users.all():
-					privateNeighborStrands.append(strand)
-			suggestionsEntries = getObjectsDataForStrands(user, privateNeighborStrands, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
-
-			entry['objects'].extend(suggestionsEntries)
-		"""
-
-
 		privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
 
 		suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
@@ -577,7 +555,7 @@ def getInviteObjectsDataForUser(user):
 """
 	Return the Duffy JSON for the strands a user has that are private and unshared
 """
-def unshared_strands(request):
+def private_strands(request):
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
@@ -587,7 +565,7 @@ def unshared_strands(request):
 
 		a = datetime.datetime.now()
 		
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(visible=True))
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(private=True))
 
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 		b = datetime.datetime.now()
@@ -615,7 +593,7 @@ def strand_inbox(request):
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(shared=True))
+		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(private=False))
 
 		for strand in strands:
 			responseObjects.append(getObjectsDataForStrand(strand, user))

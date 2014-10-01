@@ -11,7 +11,7 @@ from common.models import User, ContactEntry, Strand, StrandInvite, Action
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
-	url(r'^unshared_strands', 'strand.api_views.unshared_strands'),
+	url(r'^unshared_strands', 'strand.api_views.private_strands'),
 	url(r'^strand_inbox', 'strand.api_views.strand_inbox'),
 
 	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),

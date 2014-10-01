@@ -66,7 +66,7 @@ class User(models.Model):
 			return "%s photos" % (photoCount)
 
 	def private_strands(self):
-		strandCount = self.strand_set.filter(shared=False).count()
+		strandCount = self.strand_set.filter(private=True).count()
 
 		if strandCount == 1:
 			return "1 strand"
@@ -74,7 +74,7 @@ class User(models.Model):
 			return "%s strands" % (strandCount)
 
 	def shared_strands(self):
-		strandCount = self.strand_set.filter(shared=True).count()
+		strandCount = self.strand_set.filter(private=False).count()
 
 		if strandCount == 1:
 			return "1 strand"
@@ -499,13 +499,13 @@ class Strand(models.Model):
 	last_photo_time = models.DateTimeField(db_index=True)
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
-	shared = models.BooleanField(default=True, db_index=True)
+	private = models.BooleanField(default=True, db_index=True)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2)
 
 	# This is the id of the Strand that created this.  Not doing ForeignKey though
 	created_from_id = models.IntegerField(null=True)
-	visible = models.BooleanField(default=True)
+	been_shared = models.BooleanField(default=False)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
@@ -529,10 +529,10 @@ class Strand(models.Model):
 		return "%s posts" % len(postActions)
 		
 	def sharing_info(self):
-		if self.shared:
-			return "Shared"
-		else:
+		if self.private:
 			return "Private"
+		else:
+			return "Shared"
 
 	def photos_link(self):
 		photos = self.photos.all()

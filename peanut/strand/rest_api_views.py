@@ -254,7 +254,7 @@ class CreateStrandAPI(CreateAPIView):
         except User.DoesNotExist:
             raise ParseError('User not found')
 
-        if strand.shared == True:
+        if strand.private == False:
             action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_CREATE_STRAND)
             action.save()
             action.photos = strand.photos.all()
@@ -262,14 +262,14 @@ class CreateStrandAPI(CreateAPIView):
         # Created from is the private strand of the user.  We now want to hide it from view
         if strand.created_from_id:
             createdFromStrand = Strand.objects.get(id=strand.created_from_id)
-            if createdFromStrand and createdFromStrand.user_id == user.id and createdFromStrand.shared == False:
+            if createdFromStrand and createdFromStrand.user_id == user.id and createdFromStrand.private == True:
                 createdFromStrand.visible = False
                 createdFromStrand.save()
 
         logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
         
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
-    def pre_save(self, strand):      
+    def pre_save(self, strand):
         # Don't need to explicity save here since this is pre_save
         updateStrandWithCorrectPhotoTimes(strand)
 

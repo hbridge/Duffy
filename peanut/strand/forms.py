@@ -79,20 +79,3 @@ class AuthPhoneForm(StrandApiForm):
 
 class OnlyUserIdForm(StrandApiForm, UserIdMixin):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
-
-class SuggestedUnsharedPhotosForm(StrandApiForm, UserIdMixin):
-	user_id = forms.IntegerField(min_value=1, max_value=10000)
-	strand_id = forms.IntegerField(min_value=1, max_value=1000000)
-
-	def clean_strand_id(self):
-		strandId = self.cleaned_data['strand_id']
-		try:
-			strand = Strand.objects.get(id=strandId)
-			self.cleaned_data['strand'] = strand
-		except Strand.DoesNotExist:
-			raise forms.ValidationError("Strand not found")
-
-		if strand.shared == False:
-			raise forms.ValidationError("Invalid strand id - code 2")
-	
-		return self.cleaned_data['strand_id']
