@@ -36,7 +36,7 @@ class ContactEntrySerializer(serializers.ModelSerializer):
 class BulkContactEntrySerializer(serializers.Serializer):
 	contacts = ContactEntrySerializer(many=True)
 
-	bulk_model = ContactEntry
+	# key in the json that links to the list of objects
 	bulk_key = 'contacts'
 
 class StrandInviteSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class StrandInviteSerializer(serializers.ModelSerializer):
 class BulkStrandInviteSerializer(serializers.Serializer):
 	invites = StrandInviteSerializer(many=True)
 
-	bulk_model = StrandInvite
+	# key in the json that links to the list of objects
 	bulk_key = 'invites'
 
 def photoDataForApiSerializer(photo):

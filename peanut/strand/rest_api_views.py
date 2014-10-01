@@ -6,6 +6,7 @@ import phonenumbers
 from threading import Thread
 
 from django.shortcuts import get_list_or_404
+from django.db import IntegrityError
 
 from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
@@ -33,6 +34,19 @@ class BulkCreateModelMixin(CreateModelMixin):
     batchSize = 1000
 
     """
+        Return back all new objects, filtering out existing if they already exist
+        based on the unique fields
+    """
+    def getNewObjects(self, objects, model):
+        newObjects = list()
+        for obj in objects:
+            result = self.fetchWithUniqueKeys(obj)
+            if not result:
+                newObjects.append(obj)
+
+        return newObjects
+        
+    """
     Either create a single or many model instances in bulk by using the
     Serializer's ``many=True`` ability from Django REST >= 2.2.5.
 
@@ -47,7 +61,7 @@ class BulkCreateModelMixin(CreateModelMixin):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.DATA)
 
-        model = serializer.bulk_model
+        model = self.model
         if serializer.is_valid():
             objects = serializer.object[serializer.bulk_key]
             
@@ -57,10 +71,14 @@ class BulkCreateModelMixin(CreateModelMixin):
             for chunk in self.chunks(objects, self.batchSize):
 
                 batchKey = randint(1,10000)
-                for obj in objects:
+                for obj in chunk:
                     obj.bulk_batch_key = batchKey
 
-                model.objects.bulk_create(objects)
+                try:
+                    model.objects.bulk_create(chunk)
+                except IntegrityError:
+                    newObjects = self.getNewObjects(chunk, model)
+                    model.objects.bulk_create(newObjects)
 
                 # Only want to grab stuff from the last 10 seconds since bulk_batch_key could repeat
                 dt = datetime.datetime.now() - datetime.timedelta(seconds=10)
@@ -110,6 +128,13 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
     model = StrandInvite
     lookup_field = 'id'
     serializer_class = BulkStrandInviteSerializer
+
+    def fetchWithUniqueKeys(self, obj):
+        try:
+            return self.model.objects.get(strand_id=obj.strand_id, user_id=obj.user_id, phone_number=obj.phone_number)
+        except self.model.DoesNotExist:
+            return None
+
 
     def sendNotification(self, strandInviteId):
         logger.debug("in sendNotification for id %s" % strandInviteId)

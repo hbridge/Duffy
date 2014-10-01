@@ -586,6 +586,7 @@ class StrandInvite(models.Model):
 
 	class Meta:
 		db_table = 'strand_invite'
+		unique_together = ("strand", "user", "phone_number")
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
