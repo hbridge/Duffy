@@ -450,28 +450,20 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	return objects
 
 
-def getPhotosSuggestionsForStrand(user, strand):
+def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
 	# Get all the unshared strands for the given user that are close to the given strand
-	unsharedStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
+	privateStrands = Strand.objects.select_related().filter(users__in=[user]).filter(shared=False).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 	
-	unsharedPhotos = list()
-	for unsharedStrand in unsharedStrands:
-		unsharedPhotos.extend(unsharedStrand.photos.all())
-	unsharedPhotos = set(unsharedPhotos)
+	strandsThatMatch = list()
+	for privateStrand in privateStrands:
+		for photo in privateStrand.photos.all():
+			if strands_util.photoBelongsInStrand(photo, strand) and privateStrand not in strandsThatMatch:
+				strandsThatMatch.append(privateStrand)
 
-	matchingPhotos = list()
-	if len(unsharedPhotos) > 0:
-		# For each photo, see if it would do well in a strand from the cache
-		for photo in unsharedPhotos:
-			if strands_util.photoBelongsInStrand(photo, strand):
-				matchingPhotos.append(photo)
-
-		matchingPhotos = sorted(matchingPhotos, key=lambda x: x.time_taken, reverse=True)
-
-	return matchingPhotos
+	return strandsThatMatch
 	
 def getObjectsDataForPost(postAction):
 	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
@@ -563,9 +555,13 @@ def getInviteObjectsDataForUser(user):
 			entry['objects'].extend(suggestionsEntries)
 		"""
 
-		suggestedPhotos = getPhotosSuggestionsForStrand(user, strandInvite.strand)
-		suggestionsEntries = getObjectsDataForPhotos(user, suggestedPhotos, constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS)
-		entry['objects'].extend(suggestionsEntries)
+
+		privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
+
+		suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
+		suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND)
+
+		entry['objects'].append(suggestionsEntry)
 
 		responseObjects.append(entry)
 	return responseObjects
