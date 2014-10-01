@@ -505,7 +505,7 @@ class Strand(models.Model):
 
 	# This is the id of the Strand that created this.  Not doing ForeignKey though
 	created_from_id = models.IntegerField(null=True)
-	suggestible = models.BooleanField(default=False)
+	suggestible = models.BooleanField(default=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
