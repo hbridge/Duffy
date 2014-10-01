@@ -21,6 +21,8 @@
 @property (nonatomic, retain) NSURL *file_key;
 @property (nonatomic, retain) NSString *thumb_filename;
 @property (nonatomic, retain) NSString *full_filename;
+@property (nonatomic, retain) NSNumber *full_width;
+@property (nonatomic, retain) NSNumber *full_height;
 @property (nonatomic, retain) NSSet *iphone_faceboxes_topleft; //array of DFPeanutFaceFeatures
 @property (nonatomic, retain) NSString *full_image_path;
 @property (nonatomic, retain) NSString *thumbnail_image_path;

@@ -63,7 +63,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 + (NSArray *)attributes
 {
   return @[@"user", @"id", @"time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
-           @"full_filename", @"full_image_path", @"taken_with_strand"];
+           @"full_filename", @"full_width", @"full_height", @"full_image_path", @"taken_with_strand"];
 }
 
 - (NSDictionary *)dictionaryForAttributes:(NSArray *)attributes
@@ -142,8 +142,8 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 - (NSString *)description
 {
-  return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, iphone_hash:%@, file_key:%@, metadata:%@, thumb_filename:%@ full_filename:%@ iphone_faceboxes_topleft:%@}",
-          (int)self.user, (int)self.id, self.time_taken, self.iphone_hash, self.file_key.absoluteString, self.metadata, self.thumb_filename, self.full_filename, self.iphone_faceboxes_topleft];
+  return [NSString stringWithFormat:@"DFPeanutPhoto: {user:%d, id:%d, time_taken:%@, iphone_hash:%@, file_key:%@, metadata:%@, thumb_filename:%@ full_filename:%@ full_width: %@ full_height: %@ iphone_faceboxes_topleft:%@}",
+          (int)self.user, (int)self.id, self.time_taken, self.iphone_hash, self.file_key.absoluteString, self.metadata, self.thumb_filename, self.full_filename, self.full_width, self.full_height, self.iphone_faceboxes_topleft];
 }
 
 - (NSString *)thumbnail_image_path
