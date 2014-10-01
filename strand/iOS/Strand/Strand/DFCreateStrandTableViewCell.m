@@ -8,6 +8,7 @@
 
 #import "DFCreateStrandTableViewCell.h"
 #import "DFStrandConstants.h"
+#import "DFPhotoViewCell.h"
 
 @implementation DFCreateStrandTableViewCell
 
@@ -16,7 +17,8 @@
   [super awakeFromNib];
   
   self.selectionStyle = UITableViewCellSelectionStyleNone;
-  
+  self.solidBackgroundView.layer.cornerRadius = 4.0;
+  self.solidBackgroundView.layer.masksToBounds = YES;
 }
 
 + (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
@@ -30,8 +32,7 @@
 {
   
   if (style == DFCreateStrandCellStyleInvite) {
-    self.contentView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
-    self.callToActionLabel.text = @"Accept";
+    self.solidBackgroundView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   }
   
   if (style == DFCreateStrandCellStyleSuggestionNoPeople) {
@@ -41,8 +42,29 @@
   }
   
   [self layoutSubviews];
-  
 }
 
+- (CGSize)collectionView:(UICollectionView *)collectionView
+                  layout:(UICollectionViewLayout *)collectionViewLayout
+  sizeForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  if (self.objects.count == 1) return self.collectionView.frame.size;
+  else if (self.objects.count == 2) {
+    return CGSizeMake(self.collectionView.frame.size.width / 2.0,
+                      self.collectionView.frame.size.height);
+  } else {
+    CGFloat spacing = self.flowLayout.minimumInteritemSpacing / 2.0;
+    CGFloat largeImageWidth = self.collectionView.frame.size.height - spacing;
+    if (indexPath.row == 0) {
+      return CGSizeMake(largeImageWidth,
+                        self.collectionView.frame.size.height);
+    } else {
+      return CGSizeMake(self.collectionView.frame.size.width - largeImageWidth - spacing,
+                        self.collectionView.frame.size.height/2.0 - spacing);
+    }
+  }
+  
+  return CGSizeZero;
+}
 
 @end

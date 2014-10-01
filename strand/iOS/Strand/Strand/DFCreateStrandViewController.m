@@ -376,7 +376,7 @@ const NSUInteger MaxPhotosPerCell = 3;
       CGFloat thumbnailSize;
       if ([UIDevice majorVersionNumber] >= 8) {
         // only use the larger thumbnails on iOS 8+, the scaling will kill perf on iOS7
-        thumbnailSize = cell.flowLayout.itemSize.height * [[UIScreen mainScreen] scale];
+        thumbnailSize = cell.collectionView.frame.size.height * [[UIScreen mainScreen] scale];
       } else {
         thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
       }
@@ -394,30 +394,27 @@ const NSUInteger MaxPhotosPerCell = 3;
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
-  
+  NSString *identifier;
+  DFCreateStrandCellStyle style = DFCreateStrandCellStyleSuggestionWithPeople;
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[InviteId];
-    if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleInvite];
-    self.cellTemplatesByIdentifier[InviteId] = templateCell;
-    CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-    return height;
+    identifier = InviteId;
+    style = DFCreateStrandCellStyleInvite;
   } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
     if (feedObject.actors.count > 0) {
-      DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[SuggestionWithPeopleId];
-      if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
-      self.cellTemplatesByIdentifier[SuggestionWithPeopleId] = templateCell;
-      CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-      return height;
+      identifier = SuggestionWithPeopleId;
+      style = DFCreateStrandCellStyleSuggestionWithPeople;
     } else {
-      DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[SuggestionNoPeopleId];
-      if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionNoPeople];
-      self.cellTemplatesByIdentifier[SuggestionNoPeopleId] = templateCell;
-      CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-      return height;
+      identifier = SuggestionNoPeopleId;
+      style = DFCreateStrandCellStyleSuggestionNoPeople;
     }
   }
-
-  return 230.0;
+  
+  DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[identifier];
+  if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:style];
+  self.cellTemplatesByIdentifier[identifier] = templateCell;
+  CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  DDLogVerbose(@"identifier:%@ heightForRow:%.02f", identifier, height);
+  return height;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

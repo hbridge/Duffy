@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import "DFCollectionViewTableViewCell.h"
 
-@interface DFCreateStrandTableViewCell : DFCollectionViewTableViewCell
+@interface DFCreateStrandTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
 typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
   DFCreateStrandCellStyleInvite,
@@ -22,7 +22,7 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *peopleExplanationLabel;
-@property (weak, nonatomic) IBOutlet UILabel *callToActionLabel;
+@property (weak, nonatomic) IBOutlet UIView *solidBackgroundView;
 
 
 + (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
