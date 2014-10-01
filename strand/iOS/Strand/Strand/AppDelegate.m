@@ -217,6 +217,7 @@ const NSUInteger MinValidAccountId = 650;
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
     if ([self isAppSetupComplete]) {
       [[DFCameraRollSyncManager sharedManager] sync];
+      [[DFContactSyncManager sharedManager] sync];
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
