@@ -192,7 +192,6 @@
        dispatch_async(dispatch_get_main_queue(), ^{
          _feedObjects = response.objects;
          [self.tableView reloadData];
-         if (completion) completion();
        });
      }
      dispatch_async(dispatch_get_main_queue(), ^{
@@ -210,6 +209,9 @@
        if (response.objects.count == 0 && !error && self.view.window) {
          [self showCreateBalloon];
        }
+     });
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if (completion) completion();
      });
    }];
 }
@@ -444,7 +446,9 @@
 
 - (void)showStrandPostsForStrandID:(DFStrandIDType)strandID
 {
+  DDLogInfo(@"%@ showStrandPostsForStrandID called for %@requesting refresh", self.class, @(strandID));
   [self refreshFromServer:^{
+    DDLogInfo(@"%@ showStrandPostsForStrandID for %@ refresh callback", self.class, @(strandID));
     DFPeanutFeedObject *strandPostsObject;
     for (DFPeanutFeedObject *object in self.feedObjects) {
       if (object.id == strandID) {
