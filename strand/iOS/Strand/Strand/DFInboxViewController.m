@@ -160,11 +160,15 @@
   for (DFPeanutFeedObject *object in self.feedObjects) {
     if ([object.type isEqualToString:DFFeedObjectInviteStrand] && [object.visible isEqual: @(YES)]) {
       return NO;
-    }
-    if (![object.type isEqualToString:DFFeedObjectInviteStrand]) {
+    } else if (![object.type isEqualToString:DFFeedObjectInviteStrand]) {
       return NO;
     }
   }
+    
+  if (self.feedObjects.count == 0) {
+    return NO;
+  }
+  
   return YES;
 }
 
