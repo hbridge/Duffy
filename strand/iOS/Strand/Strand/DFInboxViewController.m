@@ -468,6 +468,7 @@
         [self.navigationController setViewControllers:@[self, vc] animated:YES];
       });
     } else {
+      [self.navigationController setViewControllers:@[self]];
       DDLogError(@"%@ got a request to show strand with id:%lu but none loaded with that ID",
                  self.class,
                  (long)strandID);
