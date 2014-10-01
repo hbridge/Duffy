@@ -491,7 +491,7 @@ const NSUInteger MaxPhotosPerCell = 3;
           else [self.noFriendSuggestions addObject:object];
         }
         
-        [self.tableView reloadData];
+        [self reloadTableViews];
         NSUInteger badgeCount = self.inviteObjects.count + self.friendSuggestions.count;
         self.tabBarItem.badgeValue = badgeCount > 0 ? [@(badgeCount) stringValue] : nil;
         
@@ -507,6 +507,12 @@ const NSUInteger MaxPhotosPerCell = 3;
   if (self.showAsFirstTimeSetup) {
     [self refreshInvitesFromServer];
   }
+}
+
+- (void)reloadTableViews
+{
+  [self.suggestedTableView reloadData];
+  [self.allTableView reloadData];
 }
 
 - (void)refreshInvitesFromServer
