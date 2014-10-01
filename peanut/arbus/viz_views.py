@@ -251,6 +251,7 @@ def userbaseSummary(request):
 
 	#actionsCount = list(User.objects.filter(product_id=2).annotate(totalActions=Count('action')).order_by('-id'))
 	#strandCount = list(User.objects.filter(product_id=1).annotate(totalStrands=Count('strand__shared')).order_by('-id'))
+	inviteCount = list(User.objects.filter(product_id=2).annotate(totalInvites=Count('inviting_user')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
 	friendCount = list(User.objects.filter(product_id=2).annotate(totalFriends1=Count('friend_user_1', distinct=True), totalFriends2=Count('friend_user_2', distinct=True)).order_by('-id'))
 
@@ -261,6 +262,7 @@ def userbaseSummary(request):
 		#entry['strands'] = strandCount[i].totalStrands
 		entry['contacts'] = contactCount[i].totalContacts
 		entry['friends'] = friendCount[i].totalFriends1 + friendCount[i].totalFriends2
+		entry['invites'] = inviteCount[i].totalInvites
 		extras[contactCount[i].id] = entry
 
 	# Exclude type GPS fetch since it happens so frequently
@@ -355,6 +357,7 @@ def userbaseSummary(request):
 
 		entry['contactCount'] = extras[user.id]['contacts']
 		entry['friendCount'] = extras[user.id]['friends']
+		entry['inviteCount'] = extras[user.id]['invites']
 
 
 		if user.last_build_info:
