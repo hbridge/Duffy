@@ -220,6 +220,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
                                                        selector:@selector(refreshFromServer)
                                                        userInfo:nil
                                                         repeats:YES];
+    [self.refreshControl beginRefreshing];
   }
 }
 
