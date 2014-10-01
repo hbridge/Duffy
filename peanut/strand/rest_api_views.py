@@ -263,7 +263,7 @@ class CreateStrandAPI(CreateAPIView):
         if strand.created_from_id:
             createdFromStrand = Strand.objects.get(id=strand.created_from_id)
             if createdFromStrand and createdFromStrand.user_id == user.id and createdFromStrand.private == True:
-                createdFromStrand.visible = False
+                createdFromStrand.suggestible = False
                 createdFromStrand.save()
 
         logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
