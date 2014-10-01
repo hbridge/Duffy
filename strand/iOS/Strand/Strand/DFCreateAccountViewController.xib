@@ -113,12 +113,10 @@
                         <constraint firstAttribute="bottom" secondItem="x5Y-Td-bBZ" secondAttribute="bottom" constant="1" id="xqm-1F-i9E"/>
                     </constraints>
                 </view>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NCZ-gh-ZBO">
-                    <rect key="frame" x="20" y="193" width="280" height="46"/>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="wordWrap" translatesAutoresizingMaskIntoConstraints="NO" id="NCZ-gh-ZBO" userLabel="By continuing, you agree to our Terms of Use and our Privacy Policy. .">
+                    <rect key="frame" x="20" y="193" width="280" height="29"/>
                     <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                    <state key="normal">
-                        <string key="title">By continuing, you agree to our Terms of Use and our Privacy Policy.
-.</string>
+                    <state key="normal" title="By continuing, you agree to our Terms of Use and our Privacy Policy.">
                         <color key="titleColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
