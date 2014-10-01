@@ -433,7 +433,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		else:
 			title = ""
 			
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True)}
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': strand.suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
@@ -570,7 +570,7 @@ def private_strands(request):
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 		b = datetime.datetime.now()
 
-		print "unshared_strands took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
+		print "private_strands took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
