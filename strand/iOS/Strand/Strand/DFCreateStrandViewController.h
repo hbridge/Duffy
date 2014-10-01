@@ -13,7 +13,8 @@
 @property (nonatomic) BOOL showAsFirstTimeSetup;
 @property (nonatomic, retain) IBOutlet UITableView *suggestedTableView;
 @property (nonatomic, retain) IBOutlet UITableView *allTableView;
-@property (nonatomic, retain) UIRefreshControl *refreshControl;
+@property (nonatomic, retain) NSArray *refreshControls;
+@property (readonly, nonatomic, retain) UIRefreshControl *refreshControl;
 @property (weak, nonatomic) IBOutlet UIView *reloadBackground;
 - (IBAction)reloadButtonPressed:(id)sender;
 

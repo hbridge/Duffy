@@ -123,6 +123,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   self.cellTemplatesByIdentifier = [NSMutableDictionary new];
   
+  NSMutableArray *refreshControls = [NSMutableArray new];
+  
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
     [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
@@ -130,24 +132,30 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
          forCellReuseIdentifier:SuggestionWithPeopleId];
     [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-         forCellReuseIdentifier:SuggestionNoPeopleId];
+    forCellReuseIdentifier:SuggestionNoPeopleId];
     
-    
-    self.refreshControl = [[UIRefreshControl alloc] init];
-    [self.refreshControl addTarget:self
-                            action:@selector(refreshFromServer)
-                  forControlEvents:UIControlEventValueChanged];
+    UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self
+                       action:@selector(refreshFromServer)
+             forControlEvents:UIControlEventValueChanged];
     
     UITableViewController *mockTVC = [[UITableViewController alloc] init];
     mockTVC.tableView = tableView;
-    mockTVC.refreshControl = self.refreshControl;
+    mockTVC.refreshControl = refreshControl;
+    [refreshControls addObject:refreshControl];
     
     tableView.sectionHeaderHeight = 0.0;
     tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, tableView.bounds.size.width, 0.01f)];
 
   }
   
+  self.refreshControls = refreshControls;
   [self.refreshControl beginRefreshing];
+}
+
+- (UIRefreshControl *)refreshControl
+{
+  return self.refreshControls[self.segmentedControl.selectedSegmentIndex];
 }
 
 
@@ -325,8 +333,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   } else {
     cell.countBadgeBackground.hidden = YES;
   }
-  
-  DDLogVerbose(@"strand.objects.count= %d, maxPhotos=%d, count=%d", strandObject.objects.count, MaxPhotosPerCell, count);
 }
 
 - (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
