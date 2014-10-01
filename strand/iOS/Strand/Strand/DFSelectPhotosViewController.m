@@ -409,7 +409,7 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
-  if  (![sectionObject.type isEqual:DFFeedObjectSuggestedPhotos]) return;
+  if  (sectionObject != self.suggestedSectionObject) return;
   DFPeanutFeedObject *photoObject = [self photosForSection:indexPath.section][indexPath.row];
   NSUInteger index = [self.selectedPhotoIDs indexOfObject:@(photoObject.id)];
   if (index != NSNotFound) {
