@@ -518,7 +518,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
      performRequest:RKRequestMethodGET
      withPeanutStrand:privateStrand
      success:^(DFPeanutStrand *peanutStrand) {
-       peanutStrand.been_shared = YES;
+       peanutStrand.suggestible = NO;
        
        // Put the peanut strand
        [strandAdapter

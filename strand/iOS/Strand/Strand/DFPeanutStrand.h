@@ -33,7 +33,7 @@
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSDate *updated;
 @property (nonatomic, retain) NSNumber  *created_from_id;
-@property (nonatomic) BOOL been_shared;
+@property (nonatomic) BOOL suggestible;
 @property (nonatomic, retain) NSArray *photos; // array of photo IDs
 @property (nonatomic, retain) NSArray *users; // array of photo IDs
 
