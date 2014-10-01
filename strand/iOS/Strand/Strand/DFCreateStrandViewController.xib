@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
@@ -7,8 +7,11 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFCreateStrandViewController">
             <connections>
+                <outlet property="allTableView" destination="EUy-9X-8nC" id="jiX-MU-tJD"/>
                 <outlet property="reloadBackground" destination="FCq-o3-f9O" id="7e4-Ky-FGe"/>
-                <outlet property="tableView" destination="KYO-2q-Y2p" id="05b-FU-gkU"/>
+                <outlet property="segmentWrapper" destination="Yvz-qE-zsB" id="mII-NZ-W1I"/>
+                <outlet property="segmentedControl" destination="7wg-2n-b5b" id="skG-yn-Wgg"/>
+                <outlet property="suggestedTableView" destination="KYO-2q-Y2p" id="ibG-RD-BtQ"/>
                 <outlet property="view" destination="u3X-ZH-sCM" id="PuK-Zh-YmK"/>
             </connections>
         </placeholder>
@@ -17,8 +20,16 @@
             <rect key="frame" x="0.0" y="64" width="320" height="568"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="none" rowHeight="167" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="KYO-2q-Y2p">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="none" rowHeight="167" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="EUy-9X-8nC" userLabel="All Table View">
+                    <rect key="frame" x="0.0" y="39" width="320" height="529"/>
+                    <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="hvY-W6-0CY"/>
+                        <outlet property="delegate" destination="-1" id="JK9-nd-XcP"/>
+                    </connections>
+                </tableView>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="none" rowHeight="167" sectionHeaderHeight="1" sectionFooterHeight="1" translatesAutoresizingMaskIntoConstraints="NO" id="KYO-2q-Y2p" userLabel="SuggestedTableView">
+                    <rect key="frame" x="0.0" y="39" width="320" height="529"/>
                     <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="Tci-FG-SLF"/>
@@ -61,15 +72,44 @@
                         <outletCollection property="gestureRecognizers" destination="rzf-pu-7az" appends="YES" id="GW1-tg-3OL"/>
                     </connections>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Yvz-qE-zsB" userLabel="Segment wrapper">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
+                    <subviews>
+                        <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="7wg-2n-b5b">
+                            <rect key="frame" x="10" y="6" width="300" height="29"/>
+                            <segments>
+                                <segment title="Suggested"/>
+                                <segment title="All"/>
+                            </segments>
+                            <connections>
+                                <action selector="segmentedControlValueChanged:" destination="-1" eventType="valueChanged" id="81s-xF-7jf"/>
+                            </connections>
+                        </segmentedControl>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="centerY" secondItem="7wg-2n-b5b" secondAttribute="centerY" id="93i-Fo-mb2"/>
+                        <constraint firstAttribute="height" constant="39" id="HVB-T0-ocF"/>
+                        <constraint firstItem="7wg-2n-b5b" firstAttribute="leading" secondItem="Yvz-qE-zsB" secondAttribute="leading" constant="10" id="Ik9-ao-mSF"/>
+                        <constraint firstAttribute="trailing" secondItem="7wg-2n-b5b" secondAttribute="trailing" constant="10" id="fnm-DA-cnZ"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="FCq-o3-f9O" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" constant="-4" id="39B-S0-s6v"/>
+                <constraint firstAttribute="trailing" secondItem="Yvz-qE-zsB" secondAttribute="trailing" id="5DX-Bj-AsU"/>
+                <constraint firstItem="EUy-9X-8nC" firstAttribute="top" secondItem="Yvz-qE-zsB" secondAttribute="bottom" id="A96-9H-yCK"/>
+                <constraint firstItem="Yvz-qE-zsB" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" id="KvQ-z0-BL8"/>
                 <constraint firstItem="KYO-2q-Y2p" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="LhR-QU-JUX"/>
-                <constraint firstItem="KYO-2q-Y2p" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" id="Vcc-bR-1jT"/>
+                <constraint firstAttribute="bottom" secondItem="EUy-9X-8nC" secondAttribute="bottom" id="MKU-Kt-3xd"/>
                 <constraint firstAttribute="bottom" secondItem="KYO-2q-Y2p" secondAttribute="bottom" id="Vrv-31-y9L"/>
+                <constraint firstItem="EUy-9X-8nC" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="XMF-oH-jQ3"/>
                 <constraint firstAttribute="trailing" secondItem="KYO-2q-Y2p" secondAttribute="trailing" id="ZhG-st-6MJ"/>
+                <constraint firstAttribute="trailing" secondItem="EUy-9X-8nC" secondAttribute="trailing" id="b9Q-Tk-FTL"/>
                 <constraint firstAttribute="centerX" secondItem="FCq-o3-f9O" secondAttribute="centerX" id="dr4-Ix-Oyx"/>
+                <constraint firstItem="KYO-2q-Y2p" firstAttribute="top" secondItem="Yvz-qE-zsB" secondAttribute="bottom" id="lRN-dt-KRQ"/>
+                <constraint firstItem="Yvz-qE-zsB" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="lcX-aQ-8Ih"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <point key="canvasLocation" x="249" y="233"/>

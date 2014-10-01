@@ -58,9 +58,21 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 static DFCreateStrandViewController *instance;
 - (IBAction)reloadButtonPressed:(id)sender {
-  [self.tableView reloadData];
-  self.tableView.contentOffset = CGPointMake(0, 0);
+  [self.allTableView reloadData];
+  [self.suggestedTableView reloadData];
+  self.allTableView.contentOffset = CGPointZero;
+  self.suggestedTableView.contentOffset = CGPointZero;
   [self setReloadButtonHidden:YES];
+}
+
+- (IBAction)segmentedControlValueChanged:(UISegmentedControl *)sender {
+  if (sender.selectedSegmentIndex == 0) { // suggestions
+    self.suggestedTableView.hidden = NO;
+    self.allTableView.hidden = YES;
+  } else {
+    self.suggestedTableView.hidden = YES;
+    self.allTableView.hidden = NO;
+  }
 }
 
 + (DFCreateStrandViewController *)sharedViewController
@@ -110,20 +122,30 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (void)configureTableView
 {
   self.cellTemplatesByIdentifier = [NSMutableDictionary new];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:InviteId];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:SuggestionWithPeopleId];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
-       forCellReuseIdentifier:SuggestionNoPeopleId];
-  self.refreshControl = [[UIRefreshControl alloc] init];
-  [self.refreshControl addTarget:self
-                          action:@selector(refreshFromServer)
-                forControlEvents:UIControlEventValueChanged];
   
-  UITableViewController *mockTVC = [[UITableViewController alloc] init];
-  mockTVC.tableView = self.tableView;
-  mockTVC.refreshControl = self.refreshControl;
+  NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
+  for (UITableView *tableView in tableViews) {
+    [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+         forCellReuseIdentifier:InviteId];
+    [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+         forCellReuseIdentifier:SuggestionWithPeopleId];
+    [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+         forCellReuseIdentifier:SuggestionNoPeopleId];
+    
+    
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self
+                            action:@selector(refreshFromServer)
+                  forControlEvents:UIControlEventValueChanged];
+    
+    UITableViewController *mockTVC = [[UITableViewController alloc] init];
+    mockTVC.tableView = tableView;
+    mockTVC.refreshControl = self.refreshControl;
+    
+    tableView.sectionHeaderHeight = 0.0;
+    tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, tableView.bounds.size.width, 0.01f)];
+
+  }
   
   [self.refreshControl beginRefreshing];
 }
@@ -144,6 +166,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [self configureTableView];
   [self refreshFromServer];
   [self configureReloadButton];
+  [self configureSegmentView];
 }
 
 - (void)configureReloadButton
@@ -152,11 +175,26 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   self.reloadBackground.layer.masksToBounds = YES;
 }
 
+- (void)configureSegmentView
+{
+  self.segmentWrapper.backgroundColor = [DFStrandConstants defaultBackgroundColor];
+  self.segmentedControl.tintColor = [DFStrandConstants defaultBarForegroundColor];
+}
+
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
   
-  [self.tableView reloadData];
+  UINavigationBar *navigationBar = self.navigationController.navigationBar;
+  
+  [navigationBar setBackgroundImage:[UIImage new]
+                     forBarPosition:UIBarPositionAny
+                         barMetrics:UIBarMetricsDefault];
+  
+  [navigationBar setShadowImage:[UIImage new]];
+  
+  [self.allTableView reloadData];
+  [self.suggestedTableView reloadData];
   [self refreshFromServer];
   if (self.navigationController.isBeingPresented) {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
@@ -208,42 +246,21 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return ([self shouldShowInvites])
-  + (self.friendSuggestions.count > 0)
-  + (self.noFriendSuggestions.count > 0);
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
-{
-  NSArray *sectionObjects = [self sectionObjectsForSection:section];
-  if (sectionObjects == self.inviteObjects) {
-    return [NSString stringWithFormat:@"Invitations (%d)", (int)sectionObjects.count];
-  } else if (sectionObjects == self.friendSuggestions) {
-    return [NSString stringWithFormat:@"With Friends (%d)", (int)sectionObjects.count];
-  } else if (sectionObjects == self.noFriendSuggestions) {
-    return [NSString stringWithFormat:@"Other Events (%d)", (int)sectionObjects.count];
-  }
-  
-  return @"Other";
+  return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [[self sectionObjectsForSection:section] count];
+  return [[self sectionObjectsForSection:section tableView:tableView] count];
 }
 
-- (NSArray *)sectionObjectsForSection:(NSUInteger)section
+- (NSArray *)sectionObjectsForSection:(NSUInteger)section tableView:(UITableView *)tableView
 {
-  NSMutableArray *sections = [NSMutableArray new];
-  if ([self shouldShowInvites]) {
-    [sections addObject:self.inviteObjects];
-  } if (self.friendSuggestions.count > 0) {
-    [sections addObject:self.friendSuggestions];
-  } if (self.noFriendSuggestions.count >0) {
-    [sections addObject:self.noFriendSuggestions];
+  if (tableView == self.suggestedTableView) {
+    return self.friendSuggestions;
+  } else {
+    return self.suggestedResponse.objects;
   }
-  
-  return sections[section];
 }
 
 - (BOOL)shouldShowInvites
@@ -258,38 +275,21 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
-  DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    cell = [self cellWithInviteObject:feedObject];
-  } else {
-    cell = [self cellWithSuggestedStrandObject:feedObject];
-  }
-  
-  return cell;
-}
-
-- (UITableViewCell *)cellWithInviteObject:(DFPeanutFeedObject *)inviteObject
-{
-  DFCreateStrandTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:InviteId];
-  [cell configureWithStyle:DFCreateStrandCellStyleInvite];
-  cell.peopleLabel.text = [inviteObject.actors.firstObject display_name];
-  cell.peopleExplanationLabel.text = inviteObject.title;
-  
-  DFPeanutFeedObject *strandObject = inviteObject.objects.firstObject;
-  [self configureTextForCreateStrandCell:cell withStrand:strandObject];
-  [self setRemotePhotosForCell:cell withSection:strandObject];
+  DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
+  cell = [self cellWithSuggestedStrandObject:feedObject forTableView:tableView];
   
   return cell;
 }
 
 - (UITableViewCell *)cellWithSuggestedStrandObject:(DFPeanutFeedObject *)strandObject
+                                      forTableView:(UITableView *)tableView
 {
   DFCreateStrandTableViewCell *cell;
   if (strandObject.actors.count > 0) {
-    cell = [self.tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
+    cell = [tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
     [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
   } else {
-    cell = [self.tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
+    cell = [tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
     [cell configureWithStyle:DFCreateStrandCellStyleSuggestionNoPeople];
   }
   
@@ -393,7 +393,7 @@ const NSUInteger MaxPhotosPerCell = 3;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section][indexPath.row];
+  DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
   
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[InviteId];
@@ -422,7 +422,7 @@ const NSUInteger MaxPhotosPerCell = 3;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *feedObjectsForSection = [self sectionObjectsForSection:indexPath.section];
+  NSArray *feedObjectsForSection = [self sectionObjectsForSection:indexPath.section tableView:tableView];
   DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
   DFSelectPhotosViewController *selectController;
   if ([feedObject.type isEqualToString:DFFeedObjectInviteStrand]) {
@@ -466,7 +466,8 @@ const NSUInteger MaxPhotosPerCell = 3;
 - (void)reloadData
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self.tableView reloadData];
+    [self.allTableView reloadData];
+    [self.suggestedTableView reloadData];
   });
 }
 
@@ -521,7 +522,8 @@ const NSUInteger MaxPhotosPerCell = 3;
        if ([DFCreateStrandViewController inviteObjectsChangedForOldInvites:oldInvites
                                                                 newInvites:self.inviteObjects])
        {
-         [self.tableView reloadData];
+         [self.suggestedTableView reloadData];
+         [self.allTableView reloadData];
        }
      });
    }];
@@ -542,7 +544,8 @@ const NSUInteger MaxPhotosPerCell = 3;
 {
   if (!oldResponse || oldResponse.objects.count < 10
       || !self.view.window || self.tabBarController.selectedViewController != self.navigationController) {
-    [self.tableView reloadData];
+    [self.suggestedTableView reloadData];
+    [self.allTableView reloadData];
     self.reloadBackground.hidden = YES; // immediately hide, don't animate
     return;
   }
