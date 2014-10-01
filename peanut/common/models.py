@@ -559,7 +559,7 @@ class Strand(models.Model):
 		postActions = self.action_set.filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
 		photos = list()
 		for action in postActions:
-			photos.append(action.photos.all())
+			photos.extend(action.photos.all())
 
 		return sorted(photos, key=lambda x: x.time_taken, reverse=True)
 
