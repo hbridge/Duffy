@@ -240,7 +240,7 @@ def userbaseSummary(request):
 	userStats = User.objects.filter(product_id=2).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
 			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
 			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
-			strandedCount=Count('photo__strand_evaluated'), lastAdded=Max('photo__added')).order_by('-lastAdded')
+			strandedCount=Count('photo__strand_evaluated'), lastUpdated=Max('photo__updated'), lastAdded=Max('photo__added')).order_by('-lastUpdated')
 
 	# This photo call is taking over a second on the dev database right now.
 	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(weeklyPhotos=Count('user'))
@@ -313,7 +313,7 @@ def userbaseSummary(request):
 
 
 		if (user.totalCount > 0):
-			entry['lastUploadTime'] = user.lastAdded.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
+			entry['lastUploadTime'] = user.lastUpdated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 			entry['metadataCount'] = user.totalCount - user.thumbsCount
 
 		if user.id in notificationCountById:
