@@ -435,7 +435,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		
 		suggestible = strand.suggestible
 
-		if suggestible and interestedUsers == 0:
+		if suggestible and len(interestedUsers) == 0:
 			suggestible = False
 			
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
