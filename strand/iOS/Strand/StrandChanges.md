@@ -1,5 +1,10 @@
 # Strand
 
+## Oct 1, 2014 (4742)
+
+- Added second tab to create Strand view
+- UI tweaks
+
 ## Sep 30th, 2014
 
 - Support for iPhone 6 without scaling
