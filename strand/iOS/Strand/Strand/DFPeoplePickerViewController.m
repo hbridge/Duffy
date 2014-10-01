@@ -16,6 +16,7 @@
 #import "DFUser.h"
 #import "DFPeanutUserObject.h"
 #import "DFABResultTableViewCell.h"
+#import "DFContactSyncManager.h"
 
 
 @interface DFPeoplePickerViewController ()
@@ -328,6 +329,7 @@
       dispatch_async(dispatch_get_main_queue(), ^{
         [weakSelf updateSearchResults];
         [weakSelf.tableView reloadData];
+        [[DFContactSyncManager sharedManager] sync];
       });
     } else {
       [weakSelf showContactsDeniedAlert];
