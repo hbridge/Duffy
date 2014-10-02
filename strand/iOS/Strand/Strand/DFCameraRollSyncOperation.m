@@ -272,7 +272,6 @@ static int NumChangesFlushThreshold = 100;
   }
 }
 
-
 - (void)findRemoteChanges
 {
   // TODO download a list of what the server thinks it has

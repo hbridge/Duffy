@@ -118,7 +118,7 @@ static DFUploadController *defaultUploadController;
 - (void)uploadPhotos
 {
   DDLogDebug(@"Uploads starting...");
-  [self addPhotosIDsToQueue];
+  [self addPhotoIDsToQueue];
 }
 
 - (void)cancelUploads
@@ -135,18 +135,14 @@ static DFUploadController *defaultUploadController;
 
 #pragma mark - Upload scheduling
 
-- (void)addPhotosIDsToQueue
+- (void)addPhotoIDsToQueue
 {
   [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
-    
-    
     NSArray *photosWithoutIDs =
     [DFPhotoStore photosWithPhotoIDs:@[@(0)] retainOrder:NO inContext:self.managedObjectContext];
     NSMutableArray *photosWithMetadataToUpload = [NSMutableArray new];
     for (DFPhoto *photo in photosWithoutIDs) {
-      if (photo.asset.location) {
-        [photosWithMetadataToUpload addObject:photo.objectID];
-      }
+      [photosWithMetadataToUpload addObject:photo.objectID];
     }
     
     DFPhotoCollection *photosWithThumbsToUpload =
