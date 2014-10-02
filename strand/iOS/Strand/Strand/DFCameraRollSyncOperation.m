@@ -264,6 +264,7 @@ static int NumChangesFlushThreshold = 100;
     
     // store information about the new photo to notify
     self.unsavedObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
+    self.allObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
     // add to list of knownURLs so we don't duplicate add it
     // in either case, add mappings
     [self.foundURLs addObject:assetURL];
