@@ -181,7 +181,7 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().select_related().exclude(location_point=None).filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=2).order_by('-time_taken')[:maxPhotosAtTime]
+		photos = Photo.objects.all().select_related().filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=2).order_by('-time_taken')[:maxPhotosAtTime]
 		
 		a = datetime.datetime.now()
 		if len(photos) > 0:

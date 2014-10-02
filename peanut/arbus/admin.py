@@ -17,7 +17,7 @@ admin.site.register(User, UserAdmin)
 
 class PhotoAdmin(admin.ModelAdmin):
 	readonly_fields = ['photoHtml', 'strandListHtml']
-	list_display = ['id', 'user', 'location_city', 'private_strands', 'shared_strands', 'added', 'updated']
+	list_display = ['id', 'user', 'time_taken', 'location_city', 'private_strands', 'shared_strands', 'added', 'updated']
 admin.site.register(Photo, PhotoAdmin)
 
 class StrandAdmin(admin.ModelAdmin):
