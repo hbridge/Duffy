@@ -89,6 +89,9 @@ static DFAssetCache *defaultCache;
 
 - (void)setALAsset:(ALAsset *)asset forURL:(NSURL *)url
 {
+  if (!url || !asset){
+    DDLogWarn(@"%@ warning setALAsset:%@ forLocalIdentifier:%@", self.class, asset, url);
+  }
   self.URLsToALAssets[url] = asset;
 }
 

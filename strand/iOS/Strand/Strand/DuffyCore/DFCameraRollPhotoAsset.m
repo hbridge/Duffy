@@ -88,7 +88,11 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
   dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *foundAsset) {
       asset = foundAsset;
-      [[DFAssetCache sharedCache] setALAsset:asset forURL:assetURL];
+      if (asset) {
+        [[DFAssetCache sharedCache] setALAsset:asset forURL:assetURL];
+      } else {
+        DDLogWarn(@"%@ warning: could not get asset for URL:%@", self.class, assetURL);
+      }
       dispatch_semaphore_signal(sema);
     } failureBlock:^(NSError *error) {
       dispatch_semaphore_signal(sema);
