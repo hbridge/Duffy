@@ -1,5 +1,9 @@
 # Strand
 
+## Oct 2, 2014 (4744)
+
+- Crash fixes
+
 ## Oct 1, 2014 (4742, 4743)
 
 - Smarter, prettier suggestions!
