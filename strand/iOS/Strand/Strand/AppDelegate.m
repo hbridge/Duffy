@@ -28,7 +28,6 @@
 #import "DFPeanutPushNotification.h"
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
-#import "DFCameraRollChangeManager.h"
 #import "DFCameraRollSyncManager.h"
 #import "DFNavigationController.h"
 #import "DFContactSyncManager.h"
@@ -336,16 +335,35 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
 }
 
+/*
+ * This is called every few minutes or so as a background process.
+ * We have 30 seconds to return, so put in a timer to enforce that.
+ */
 - (void)application:(UIApplication *)application
 performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   NSDate *startDate = [NSDate date];
   DDLogInfo(@"Strand background app refresh called at %@", startDate);
-  UIBackgroundFetchResult result = [[DFCameraRollChangeManager sharedManager] backgroundChangeScan];
-  DDLogInfo(@"Strand background app refresh finishing after %.02f seconds with result: %d",
-            [[NSDate date] timeIntervalSinceDate:startDate],
-            (int)result);
-  completionHandler(result);
+  
+  [[DFUploadController sharedUploadController] init];
+  
+  int64_t delayInSeconds = 29;
+  
+  // We want to cancel a second before we return
+  dispatch_time_t popTimeCancelUploads = dispatch_time(DISPATCH_TIME_NOW, (delayInSeconds-3) * NSEC_PER_SEC);
+  dispatch_time_t popTimeReturn = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
+  
+  dispatch_after(popTimeCancelUploads, dispatch_get_main_queue(), ^(void){
+    DDLogInfo(@"Telling uploads to stop");
+    [[DFUploadController sharedUploadController] cancelUploads:YES];
+  });
+  
+  dispatch_after(popTimeReturn, dispatch_get_main_queue(), ^(void){
+    DDLogInfo(@"Leaving background app refresh at %@", [NSDate date]);
+    completionHandler(UIBackgroundFetchResultNewData);
+  });
+  
+  [[DFCameraRollSyncManager sharedManager] sync];
 }
 
 - (void)resetApplication
@@ -359,7 +377,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     [alert show];
     
     
-    [[DFUploadController sharedUploadController] cancelUploads];
+    [[DFUploadController sharedUploadController] cancelUploads:NO];
     [[DFPhotoStore sharedStore] resetStore];
     [[DFContactsStore sharedStore] resetStore];
     

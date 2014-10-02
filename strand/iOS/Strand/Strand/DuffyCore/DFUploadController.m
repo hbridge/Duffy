@@ -121,9 +121,13 @@ static DFUploadController *defaultUploadController;
   [self addPhotoIDsToQueue];
 }
 
-- (void)cancelUploads
+/*
+ * General function to have the uploader actively stop uploads.  If files a cancel operation into the right queues.
+ * Use where we have a limited time to do uploads, like in a background task.
+ */
+- (void)cancelUploads:(BOOL)isSilent
 {
-  NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:NO];
+  NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:isSilent];
   cancelOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
   [self scheduleWithDispatchUploads:NO operation:cancelOperation];
 }
@@ -161,6 +165,12 @@ static DFUploadController *defaultUploadController;
     [self.metadataQueue addObjectsFromArray:photosWithMetadataToUpload];
     [self.thumbnailsObjectIDQueue addObjectsFromArray:[photosWithThumbsToUpload objectIDsByDateAscending:NO]];
     [self.fullImageObjectIDQueue addObjectsFromArray:[eligibleFullImagesToUpload objectIDsByDateAscending:NO]];
+    
+    if (photosWithMetadataToUpload.count == 0 &&
+        photosWithThumbsToUpload.photoSet.count == 0 &&
+        eligibleFullImagesToUpload.photoSet.count == 0) {
+      DDLogVerbose(@"No images found to upload");
+    }
   }]];
 }
 
@@ -218,35 +228,10 @@ static DFUploadController *defaultUploadController;
               || self.fullImageObjectIDQueue.numObjectsComplete > 0))
       {
         [self scheduleWithDispatchUploads:NO operation:[self allUploadsCompleteOperation]];
+        DDLogVerbose(@"Finished with upload opperations");
       }
     }
   }];
-}
-
-- (BOOL)isDeviceStateGoodForBackgroundUploads
-{
-  UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
-  AFNetworkReachabilityStatus reachabilityStatus = [[[RKObjectManager sharedManager] HTTPClient] networkReachabilityStatus];
-  
-  // if we're in the background we may not want upload
-  if (appState == UIApplicationStateBackground) {
-    // if we're not on wifi don't upload
-    if (reachabilityStatus != AFNetworkReachabilityStatusReachableViaWiFi) {
-      return NO;
-      DDLogInfo(@"Not on wifi. isDeviceStateGoodForBackgroundUploads:NO");
-    }
-    
-    // if the battery is < 50% and it's not plugged in (or don't know) don't upload
-    UIDeviceBatteryState batteryState = [[UIDevice currentDevice] batteryState];
-    float batteryChargeLevel = [[UIDevice currentDevice] batteryLevel];
-    if ((batteryState == UIDeviceBatteryStateUnplugged)
-        && batteryChargeLevel < 0.05) {
-      DDLogInfo(@"Battery state unplugged and charge level %.02f. isDeviceStateGoodForBackgroundUploads:NO", batteryChargeLevel);
-      return NO;
-    }
-  }
-  
-  return YES;
 }
 
 #pragma mark - Upload operation response handlers
@@ -524,15 +509,12 @@ static DFUploadController *defaultUploadController;
     return;
   }
   
-  
   self.backgroundUpdateTask = [[UIApplication sharedApplication] beginBackgroundTaskWithExpirationHandler:^{
     DDLogInfo(@"Background upload task about to expire.  Canceling uploads...");
     
     // By cancel will throw an exception on the main thread because it could block.  That's the behavior
     // we want here so we create a semaphore an wait on it.
-    NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:NO silent:YES];
-    cancelOperation.queuePriority = NSOperationQueuePriorityVeryHigh;
-    [self scheduleWithDispatchUploads:NO operation:cancelOperation];
+    [self cancelUploads:YES];
     // the cancel operation ends the background task
   }];
 }
