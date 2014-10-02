@@ -20,8 +20,6 @@ const CGFloat DFPhotoAssetALAssetThumbnailSize = 157.0;
 
 @interface DFCameraRollPhotoAsset()
 
-@property (nonatomic, retain) ALAsset *asset;
-
 @end
 
 
@@ -31,7 +29,6 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 @implementation DFCameraRollPhotoAsset
 
 @dynamic alAssetURLString;
-@synthesize asset = _asset;
 @synthesize hashString = _hashString;
 
 + (ALAssetsLibrary *)sharedAssetsLibrary
@@ -78,30 +75,28 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 
 - (ALAsset *)asset
 {
-  if (!_asset) {
-    NSURL *assetURL = [NSURL URLWithString:self.alAssetURLString];
-    _asset = [[DFAssetCache sharedCache] assetForURL:assetURL];
-    if (_asset) return _asset;
-    
-    NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
-    ALAssetsLibrary *assetsLibrary = [DFCameraRollPhotoAsset sharedAssetsLibrary];
-    
-    dispatch_semaphore_t sema = dispatch_semaphore_create(0);
-    
-    // must dispatch this off the main thread or it will deadlock!
-    dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-      [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *asset) {
-        _asset = asset;
-        [[DFAssetCache sharedCache] setALAsset:asset forURL:assetURL];
-        dispatch_semaphore_signal(sema);
-      } failureBlock:^(NSError *error) {
-        dispatch_semaphore_signal(sema);
-      }];
-    });
-    
-    dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
-  }
-  return _asset;
+  NSURL *assetURL = [NSURL URLWithString:self.alAssetURLString];
+  ALAsset __block *asset = [[DFAssetCache sharedCache] assetForURL:assetURL];
+  if (asset) return asset;
+  
+  NSURL *asseturl = [NSURL URLWithString:self.alAssetURLString];
+  ALAssetsLibrary *assetsLibrary = [DFCameraRollPhotoAsset sharedAssetsLibrary];
+  
+  dispatch_semaphore_t sema = dispatch_semaphore_create(0);
+  
+  // must dispatch this off the main thread or it will deadlock!
+  dispatch_async( dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+    [assetsLibrary assetForURL:asseturl resultBlock:^(ALAsset *foundAsset) {
+      asset = foundAsset;
+      [[DFAssetCache sharedCache] setALAsset:asset forURL:assetURL];
+      dispatch_semaphore_signal(sema);
+    } failureBlock:^(NSError *error) {
+      dispatch_semaphore_signal(sema);
+    }];
+  });
+  
+  dispatch_semaphore_wait(sema, DISPATCH_TIME_FOREVER);
+  return asset;
 }
 
 - (NSURL *)canonicalURL
