@@ -44,7 +44,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @property (nonatomic, retain) NSMutableArray *noFriendSuggestions;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
-@property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
+@property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (atomic, retain) NSTimer *showReloadButtonTimer;
 
@@ -121,7 +121,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)configureTableView
 {
-  self.cellTemplatesByIdentifier = [NSMutableDictionary new];
+  self.cellHeightsByIdentifier = [NSMutableDictionary new];
   
   NSMutableArray *refreshControls = [NSMutableArray new];
   
@@ -428,12 +428,13 @@ const NSUInteger MaxPhotosPerCell = 3;
     }
   }
   
-  DFCreateStrandTableViewCell *templateCell = self.cellTemplatesByIdentifier[identifier];
-  if (!templateCell) templateCell = [DFCreateStrandTableViewCell cellWithStyle:style];
-  self.cellTemplatesByIdentifier[identifier] = templateCell;
-  CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-  DDLogVerbose(@"identifier:%@ heightForRow:%.02f", identifier, height);
-  return height;
+  NSNumber *cachedHeight = self.cellHeightsByIdentifier[identifier];
+  if (!cachedHeight) {
+    DFCreateStrandTableViewCell *templateCell = [DFCreateStrandTableViewCell cellWithStyle:style];
+    CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    self.cellHeightsByIdentifier[identifier] = cachedHeight = @(height);
+  }
+  return cachedHeight.floatValue;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
