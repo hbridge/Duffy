@@ -142,9 +142,15 @@
   unsigned long __block numBytes = 0;
   NSDate *startDate = [NSDate date];
   for (DFPhoto *photo in photos) {
-    DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
-    [peanutPhotos addObject:peanutPhoto];
-    numBytes += peanutPhoto.metadataSizeBytes;
+    @try {
+      DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+      [peanutPhotos addObject:peanutPhoto];
+      numBytes += peanutPhoto.metadataSizeBytes;
+    }
+    @catch (NSException *exception) {
+      DDLogError(@"%@ postPhotos:appendThumbnailData skipping photo error: %@", self.class, exception);
+      continue;
+    }
   }
   DDLogInfo(@"Generating peanut photos for %lu photos took %.02f seconds", (unsigned long)photos.count,
             [[NSDate date] timeIntervalSinceDate:startDate]);
@@ -227,7 +233,23 @@
 {
   NSDictionary *result;
   @autoreleasepool {
-    DFPeanutPhoto __block *peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+    DFPeanutPhoto __block *peanutPhoto;
+    @try {
+      peanutPhoto = [[DFPeanutPhoto alloc] initWithDFPhoto:photo];
+    }
+    @catch (NSException *exception) {
+      DDLogError(@"%@ postPhotos:appendThumbnailData skipping photo error: %@", self.class, exception);
+      NSError *error = [NSError errorWithDomain:@"com.duffyapp.strand"
+                                           code:-1
+                                       userInfo:@{
+                                                  NSLocalizedDescriptionKey: exception.description
+                                                  }];
+      return @{DFUploadResultErrorKey : error,
+               DFUploadResultPeanutPhotos : @[],
+               DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
+               DFUploadResultNumBytes : @(0)
+               };
+    }
     NSString *photoParamater =
      updateMetadata ? [peanutPhoto JSONString] : [peanutPhoto photoUploadJSONString];
     unsigned long __block imageDataBytes = 0;
