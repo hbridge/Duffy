@@ -323,26 +323,23 @@ static int NumChangesFlushThreshold = 100;
         [self flushChanges];
       }
       NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
-      DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
-                                       createWithALAsset:photoAsset
-                                       inContext:self.managedObjectContext];
-      NSDate *assetDate = [asset creationDateInUTC];
+      NSDate *assetDate = [photoAsset valueForProperty:ALAssetPropertyDate];
       [self.knownNotFoundURLs removeObject:assetURL];
       
       // We have this asset in our DB, see if it matches what we expect
       if ([self.knownPhotos.photoURLSet containsObject:assetURL]) {
-        // Check the actual asset hash against our stored date, if it doesn't match, delete and recreate the DFPhoto with new info.
-        
+        // Check the actual asset hash against our stored date, if it doesn't match,
+        // delete and recreate the DFPhoto with new info.
         if (![assetDate isEqual:self.knownAndFoundURLsToDates[assetURL]]){
           NSDictionary *changes = [self assetDataChangedForALAsset:photoAsset];
           [self.unsavedObjectIDsToChanges addEntriesFromDictionary:changes];
           // set to the new known date
           self.knownAndFoundURLsToDates[assetURL] = assetDate;
-        } {
-          // If we found what we expected, then delete the one we just created since its a dup
-          [self.managedObjectContext deleteObject:asset];
         }
       } else {//(![knownAndFoundURLs containsObject:assetURLString])
+        DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
+                                         createWithALAsset:photoAsset
+                                         inContext:self.managedObjectContext];
         DFPhoto *newPhoto = [DFPhoto createWithAsset:asset
                                               userID:[[DFUser currentUser] userID]
                                            inContext:self.managedObjectContext];
