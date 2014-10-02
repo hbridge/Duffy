@@ -253,15 +253,35 @@ class Photo(models.Model):
 		else:
 			return ""
 
-	def photo_html(self):
+	def photoHtml(self):
 		if self.thumb_filename:
 			return "<img src='%s'></img>" % (self.getThumbUrlImagePath())
 		if self.full_filename:
 			return "<img src='%s'></img>" % (self.getFullUrlImagePath())
 		else:
 			return "No image"
-	photo_html.allow_tags = True
-	photo_html.short_description = "Photo"
+	photoHtml.allow_tags = True
+	photoHtml.short_description = "Photo"
+
+	def strandListHtml(self):
+		links = list()
+		for strand in self.strand_set.all():
+			links.append('<a href="%s">%s</a>' % (reverse("admin:common_strand_change", args=(strand.id,)) , escape(strand)))
+		return ', '.join(links)	
+
+	strandListHtml.allow_tags = True
+	strandListHtml.short_description = "Strands"
+
+
+	def private_strands(self):
+		strandCount = self.strand_set.filter(private=True).count()
+
+		return "%s" % (strandCount)
+
+	def shared_strands(self):
+		strandCount = self.strand_set.filter(private=False).count()
+
+		return "%s" % (strandCount)
 
 	"""
 		Returns the URL path (after the port) of the image.  Hardcoded for now but maybe change later
@@ -499,7 +519,7 @@ class Strand(models.Model):
 	last_photo_time = models.DateTimeField(db_index=True)
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
-	private = models.BooleanField(default=True, db_index=True)
+	private = models.BooleanField(db_index=True)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2)
 
