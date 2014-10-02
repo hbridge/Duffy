@@ -349,8 +349,10 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     } else if ([object.type isEqual:DFFeedObjectPhoto]) {
       photoObject = object;
     }
-    [photoIDs addObject:@(photoObject.id)];
-    [photos addObject:photoObject];
+    if (photoObject) {
+      [photoIDs addObject:@(photoObject.id)];
+      [photos addObject:photoObject];
+    }
   }
   
   cell.objects = photoIDs;
