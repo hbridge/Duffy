@@ -497,32 +497,29 @@ const NSUInteger MaxPhotosPerCell = 3;
       DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
     } else {
       dispatch_async(dispatch_get_main_queue(), ^{
-      if (![responseHash isEqual:self.lastResponseHash]) {
-        DDLogDebug(@"New data for suggestions, updating view...");
-        self.allObjectsResponse = response;
-        
-        self.suggestionObjects = [NSMutableArray new];
-        for (DFPeanutFeedObject *object in response.objects) {
+        if (![responseHash isEqual:self.lastResponseHash]) {
+          DDLogDebug(@"New data for suggestions, updating view...");
+          self.allObjectsResponse = response;
           
-          if (object.suggestible.boolValue) [self.suggestionObjects addObject:object];
+          self.suggestionObjects = [NSMutableArray new];
+          for (DFPeanutFeedObject *object in response.objects) {
+            
+            if (object.suggestible.boolValue) [self.suggestionObjects addObject:object];
+          }
+          
+          [self reloadTableViews];
+          NSUInteger badgeCount = self.inviteObjects.count + self.suggestionObjects.count;
+          self.tabBarItem.badgeValue = badgeCount > 0 ? [@(badgeCount) stringValue] : nil;
+          
+          self.lastResponseHash = responseHash;
+        } else {
+          DDLogDebug(@"Got back response for strand suggestions but it was the same");
         }
-        
-        [self reloadTableViews];
-        NSUInteger badgeCount = self.inviteObjects.count + self.suggestionObjects.count;
-        self.tabBarItem.badgeValue = badgeCount > 0 ? [@(badgeCount) stringValue] : nil;
-        
-        self.lastResponseHash = responseHash;
-      } else {
-        DDLogDebug(@"Got back response for strand suggestions but it was the same");
-      }
         [self.refreshControl endRefreshing];
       });
     }
   }];
   
-  if (self.showAsFirstTimeSetup) {
-    [self refreshInvitesFromServer];
-  }
 }
 
 - (void)reloadTableViews
