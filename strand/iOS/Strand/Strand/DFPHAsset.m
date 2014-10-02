@@ -15,14 +15,11 @@
 
 @interface DFPHAsset()
 
-@property (nonatomic, retain) PHAsset *asset;
-
 @end
 
 @implementation DFPHAsset
 
 @dynamic localIdentifier;
-@synthesize asset = _asset;
 
 + (DFPHAsset *)createWithPHAsset:(PHAsset *)asset
                        inContext:(NSManagedObjectContext *)managedObjectContext
@@ -31,7 +28,7 @@
                          insertNewObjectForEntityForName:NSStringFromClass([self class])
                          inManagedObjectContext:managedObjectContext];
   newAsset.localIdentifier = asset.localIdentifier;
-  newAsset.asset = asset;
+  [[DFAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
   
   return newAsset;
 }
@@ -50,11 +47,7 @@
 
 - (PHAsset *)asset
 {
-  if (!_asset) {
-    _asset = [[DFAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
-  }
-  
-  return _asset;
+  return [[DFAssetCache sharedCache] assetForLocalIdentifier:self.localIdentifier];
 }
 
 - (NSURL*) canonicalURL
