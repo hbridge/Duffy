@@ -66,7 +66,7 @@ NSUInteger const NumPhotosPerRow = 3;
   if (self) {
     _showsToField = showsToField;
     self.cellTemplatesByIdentifier = [NSMutableDictionary new];
-    [self configureNavBarWithTitle:title];
+    [self configureNavBarWithTitle:title isInvite:(inviteObject != nil)];
     self.suggestedSectionObject = suggestedSectionObject;
     self.invitedStrandPosts = invitedStrandPosts;
     self.inviteObject = inviteObject;
@@ -97,10 +97,11 @@ NSUInteger const NumPhotosPerRow = 3;
 }
 
 - (void)configureNavBarWithTitle:(NSString *)title
+                        isInvite:(BOOL)isInvite
 {
   self.navigationItem.title = title ? title : @"Select Photos";
   NSString *buttonTitle;
-  if (self.inviteObject) {
+  if (isInvite) {
     buttonTitle = @"Accept";
   } else {
     buttonTitle = @"Share";
@@ -152,7 +153,7 @@ NSUInteger const NumPhotosPerRow = 3;
   [self.collectionView registerNib:[UINib nibWithNibName:[DFPhotoViewCell description] bundle:nil]
         forCellWithReuseIdentifier:@"cell"];
   
-  
+  self.collectionView.alwaysBounceVertical = YES;
 }
 
 - (void)setSuggestedSectionObject:(DFPeanutFeedObject *)sectionObject
@@ -371,6 +372,11 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
   
   // show the selected status
   cell.showTickMark = [self.selectedPhotoIDs containsObject:@(object.id)];
+  if (cell.showTickMark) {
+    cell.alpha = 1.0;
+  } else {
+    cell.alpha = 0.5;
+  }
   
   // set the image
   cell.imageView.image = nil;
