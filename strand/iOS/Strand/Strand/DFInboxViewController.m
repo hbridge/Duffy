@@ -466,7 +466,6 @@
     
     dispatch_async(dispatch_get_main_queue(), ^{
       if (strandPostsObject) {
-        
         DDLogInfo(@"%@ showing strand posts with id%lu",
                   self.class,
                   (long)strandID);

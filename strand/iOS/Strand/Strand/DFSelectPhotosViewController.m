@@ -497,13 +497,10 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
              [(AppDelegate *)[[UIApplication sharedApplication] delegate]
               showStrandWithID:peanutStrand.id.longLongValue completion:^{
                 [SVProgressHUD showSuccessWithStatus:@"Accepted"];
+                [[NSNotificationCenter defaultCenter]
+                 postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+                 object:self];
               }];
-             
-             
-             [[NSNotificationCenter defaultCenter]
-              postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-              object:self];
-             DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
            } failure:^(NSError *error) {
              [SVProgressHUD showErrorWithStatus:@"Error."];
              DDLogWarn(@"Failed to mark invite used: %@", error);
