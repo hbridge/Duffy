@@ -99,9 +99,17 @@ NSUInteger const NumPhotosPerRow = 3;
 - (void)configureNavBarWithTitle:(NSString *)title
 {
   self.navigationItem.title = title ? title : @"Select Photos";
+  NSString *buttonTitle;
+  if (self.inviteObject) {
+    buttonTitle = @"Accept";
+  } else {
+    buttonTitle = @"Share";
+  }
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                            target:self action:@selector(donePressed:)];
+                                            initWithTitle:buttonTitle
+                                            style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:@selector(donePressed:)];
 }
 
 - (void)configurePeoplePicker
