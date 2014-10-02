@@ -151,7 +151,6 @@
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */; };
 		5AB4CC001982AF7C00EFB3E3 /* DFInviteUserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */; };
-		5AB4CC04198306C800EFB3E3 /* DFCameraRollChangeManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CC03198306C800EFB3E3 /* DFCameraRollChangeManager.m */; };
 		5AC483A319C789D100929965 /* DFSelectPhotosHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5AC483A119C789D100929965 /* DFSelectPhotosHeaderView.swift */; };
 		5AC483A419C789D100929965 /* DFSelectPhotosHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AC483A219C789D100929965 /* DFSelectPhotosHeaderView.xib */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
@@ -488,8 +487,6 @@
 		5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBadgeButton.m; sourceTree = "<group>"; };
 		5AB4CBFD1982AF7C00EFB3E3 /* DFInviteUserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFInviteUserViewController.h; sourceTree = "<group>"; };
 		5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFInviteUserViewController.m; sourceTree = "<group>"; };
-		5AB4CC02198306C800EFB3E3 /* DFCameraRollChangeManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraRollChangeManager.h; sourceTree = "<group>"; };
-		5AB4CC03198306C800EFB3E3 /* DFCameraRollChangeManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraRollChangeManager.m; sourceTree = "<group>"; };
 		5AC483A119C789D100929965 /* DFSelectPhotosHeaderView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DFSelectPhotosHeaderView.swift; sourceTree = "<group>"; };
 		5AC483A219C789D100929965 /* DFSelectPhotosHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSelectPhotosHeaderView.xib; sourceTree = "<group>"; };
 		5AC4A8D019476F9000862D9C /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
@@ -1277,8 +1274,6 @@
 				5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */,
 				5AC4A961194A295700862D9C /* DFStrandConstants.h */,
 				5AC4A962194A295700862D9C /* DFStrandConstants.m */,
-				5AB4CC02198306C800EFB3E3 /* DFCameraRollChangeManager.h */,
-				5AB4CC03198306C800EFB3E3 /* DFCameraRollChangeManager.m */,
 				5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */,
 				5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */,
 				5A14A3A7198C2B4600A4F032 /* DFUserInfoManager.h */,
@@ -1725,7 +1720,6 @@
 				5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */,
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
 				651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */,
-				5AB4CC04198306C800EFB3E3 /* DFCameraRollChangeManager.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
 				5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */,
