@@ -20,5 +20,6 @@ typedef enum {
 @property (nonatomic) OFElementSquareDisplayMode displayMode;
 @property (nonatomic, strong) NSString *fontName;
 @property (nonatomic) UIEdgeInsets insets;
+@property (nonatomic) CGFloat maxFontSize;
 
 @end

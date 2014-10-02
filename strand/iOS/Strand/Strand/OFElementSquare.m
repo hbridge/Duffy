@@ -28,8 +28,6 @@ static CGFloat const INSETS_DEFAULT = 5.0f;
 static CGFloat const MAX_FONT_SIZE = 128.0f;
 
 
-
-
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -37,6 +35,7 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
         self.insets = UIEdgeInsetsMake(INSETS_DEFAULT, INSETS_DEFAULT, INSETS_DEFAULT, INSETS_DEFAULT);
         self.fontSize = 0.0;
         self.fontName = @"Avenir-Light";
+      self.maxFontSize = MAX_FONT_SIZE;
     }
     return self;
 }
@@ -45,7 +44,6 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
 {
     elementAbbreviation = newElementAbbreviation;
     self.displayMode = self.displayMode;
-  DDLogVerbose(@"new element abbreviation: %@", newElementAbbreviation);
 }
 
 
@@ -77,7 +75,7 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
     }
     
     CGRect textArea = CGRectInset(self.frame, (self.insets.left + self.insets.right)/2.0, (self.insets.top + self.insets.bottom)/2.0);
-    CGFloat curSize = MAX_FONT_SIZE;
+  CGFloat curSize = self.maxFontSize ? self.maxFontSize : MAX_FONT_SIZE;
     NSMutableDictionary *attributes = [[NSMutableDictionary alloc] init];
     while (curSize >= 0.0) {
         [attributes setValue:[UIFont fontWithName:self.fontName size:curSize] forKey:NSFontAttributeName];
@@ -89,10 +87,8 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
           }
             break;
         }
-        curSize -= 0.5;
+        curSize -= 1.0;
     }
-    
-    
 }
 
 - (void)setFrame:(CGRect)frame
@@ -115,24 +111,23 @@ static CGFloat const MAX_FONT_SIZE = 128.0f;
 
 - (void)drawRect:(CGRect)rect
 {
-    CGRect textRect;
-    
-    
-    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
-    paragraphStyle.alignment = NSTextAlignmentCenter;
-    
-    NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
-                                self.font, NSFontAttributeName,
-                                [UIColor whiteColor], NSForegroundColorAttributeName,
-                                paragraphStyle,NSParagraphStyleAttributeName,
-                                nil];
-    textRect.size = [self.displayedText sizeWithAttributes:attributes];
-    // Let's put that string in the center of the view
-    CGPoint center = CGPointMake(rect.origin.x + rect.size.width/2, rect.origin.y + rect.size.height/2);
-    textRect.origin.x = center.x - textRect.size.width / 2.0;
-    textRect.origin.y = center.y - textRect.size.height / 2.0; // Set the fill color of the current context to black
-    [self.displayedText drawInRect:textRect withAttributes:attributes];
-  DDLogVerbose(@"drawing text:%@", self.displayedText);
+  CGRect textRect;
+  
+  
+  NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+  paragraphStyle.alignment = NSTextAlignmentCenter;
+  
+  NSDictionary *attributes = [NSDictionary dictionaryWithObjectsAndKeys:
+                              self.font, NSFontAttributeName,
+                              [UIColor whiteColor], NSForegroundColorAttributeName,
+                              paragraphStyle,NSParagraphStyleAttributeName,
+                              nil];
+  textRect.size = [self.displayedText sizeWithAttributes:attributes];
+  // Let's put that string in the center of the view
+  CGPoint center = CGPointMake(rect.origin.x + rect.size.width/2, rect.origin.y + rect.size.height/2);
+  textRect.origin.x = center.x - textRect.size.width / 2.0;
+  textRect.origin.y = center.y - textRect.size.height / 2.0; // Set the fill color of the current context to black
+  [self.displayedText drawInRect:textRect withAttributes:attributes];
 }
 
 @end

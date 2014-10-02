@@ -65,6 +65,7 @@ NSUInteger const InboxCellMaxPhotos = 10;
   DFLabelCollectionViewCell *cell = [self.collectionView
                                      dequeueReusableCellWithReuseIdentifier:@"labelCell"
                                      forIndexPath:indexPath];
+  cell.abbreviationSquare.maxFontSize = cell.frame.size.height;
   cell.abbreviationSquare.elementAbbreviation = [NSString stringWithFormat:@"+%d", (int)(self.objects.count - maxPhotos)];
   cell.abbreviationSquare.displayMode = OFElementSquareDisplayAbbreviation;
   return cell;
