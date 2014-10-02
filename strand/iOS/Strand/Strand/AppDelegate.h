@@ -15,7 +15,8 @@
 - (void)resetApplication;
 - (void)firstTimeSetupComplete;
 - (void)firstTimeSetupUserIdStepComplete;
-- (void)showStrandWithID:(DFStrandIDType)strandID;
+- (void)showStrandWithID:(DFStrandIDType)strandID
+              completion:(void(^)(void))completion;
 
 @end
 

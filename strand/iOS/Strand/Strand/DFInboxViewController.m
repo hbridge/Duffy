@@ -446,7 +446,7 @@
   [self.navigationController pushViewController:vc animated:YES];
 }
 
-- (void)showStrandPostsForStrandID:(DFStrandIDType)strandID
+- (void)showStrandPostsForStrandID:(DFStrandIDType)strandID completion:(void(^)(void))completion
 {
   DDLogInfo(@"%@ showStrandPostsForStrandID called for %@requesting refresh", self.class, @(strandID));
   [self refreshFromServer:^{
@@ -480,6 +480,7 @@
                    self.class,
                    (long)strandID);
       }
+      completion();
     });
   }];
 }

@@ -379,10 +379,11 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 }
 
 - (void)showStrandWithID:(DFStrandIDType)strandID
+              completion:(void(^)(void))completion
 {
   DDLogInfo(@"%@ showStrandWithID:%@", self.class, @(strandID));
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self.inboxViewController showStrandPostsForStrandID:strandID];
+    [self.inboxViewController showStrandPostsForStrandID:strandID completion:completion];
   });
 }
 

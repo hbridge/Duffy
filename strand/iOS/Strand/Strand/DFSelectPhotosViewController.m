@@ -493,13 +493,13 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
            markInviteWithIDUsed:@(self.inviteObject.id)
            success:^(NSArray *resultObjects) {
              DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
-             [SVProgressHUD showSuccessWithStatus:@"Accepted"];
-             dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-               // show the strand that we just accepted an invite to
-               [(AppDelegate *)[[UIApplication sharedApplication] delegate]
-                showStrandWithID:peanutStrand.id.longLongValue];
-             });
-
+             // show the strand that we just accepted an invite to
+             [(AppDelegate *)[[UIApplication sharedApplication] delegate]
+              showStrandWithID:peanutStrand.id.longLongValue completion:^{
+                [SVProgressHUD showSuccessWithStatus:@"Accepted"];
+              }];
+             
+             
              [[NSNotificationCenter defaultCenter]
               postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
               object:self];

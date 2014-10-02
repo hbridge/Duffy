@@ -14,6 +14,6 @@
 
 @property (strong, nonatomic) IBOutlet UITableView *tableView;
 
-- (void)showStrandPostsForStrandID:(DFStrandIDType)strandID;
+- (void)showStrandPostsForStrandID:(DFStrandIDType)strandID completion:(void(^)(void))completion;
 
 @end
