@@ -1,6 +1,6 @@
 # Strand
 
-## Oct 2, 2014 (4744)
+## Oct 2, 2014 (4744, 4745)
 
 - Crash fixes
 
