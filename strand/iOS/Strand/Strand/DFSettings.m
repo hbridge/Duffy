@@ -163,6 +163,9 @@ static DFSettings *defaultSettings;
   return _userAdapter;
 }
 
-
+- (NSString *)userID
+{
+  return [@([[DFUser currentUser] userID]) stringValue];
+}
 
 @end

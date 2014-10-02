@@ -207,8 +207,9 @@
 
 + (void)addDeveloperOptions:(FKFormMapping *)mapping
 {
-  // Support
   [mapping sectionWithTitle:@"Developer" identifier:@"developer"];
+  
+  [mapping mapAttribute:@"userID" title:@"User ID" type:FKFormAttributeMappingTypeLabel];
   [mapping mapAttribute:@"serverURL"
                   title:@"Server"
                    type:FKFormAttributeMappingTypeText
@@ -244,7 +245,13 @@
               NSLog (@"%@: %@", fontFamily, fontNames);
             }
           }
-accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+     accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+  [mapping button:@"Crash"
+       identifier:@"crash"
+          handler:^(id object) {
+            [NSException raise:@"Intentional Crash" format:@"Hit crash button in Dev settings"];
+          }
+     accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   [mapping button:@"Log Out"
        identifier:@"logOut"
           handler:^(id object) {
@@ -252,6 +259,7 @@ accesoryType:UITableViewCellAccessoryDisclosureIndicator];
             [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+  
   
   [mapping button:@"Test Something..."
        identifier:@"testSomething"

@@ -33,6 +33,8 @@
 @property (readonly, nonatomic, retain) NSString *addFriends;
 @property (readonly, nonatomic, retain) NSString *printAllFonts;
 @property (readonly, nonatomic, retain) NSString *logOut;
+@property (readonly, nonatomic, retain) NSString *crash;
+@property (readonly, nonatomic, retain) NSString *userID;
 
 
 

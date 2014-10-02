@@ -10,12 +10,12 @@
 #import <CocoaLumberjack/DDTTYLogger.h>
 #import <CocoaLumberjack/DDASLLogger.h>
 #import <CocoaLumberjack/DDFileLogger.h>
+#import <HockeySDK/HockeySDK.h>
 #import "DFUploadController.h"
 #import "DFPhotoStore.h"
 #import "DFUser.h"
 #import "DFUserPeanutAdapter.h"
 #import "DFCreateAccountViewController.h"
-#import "HockeySDK.h"
 #import "DFStrandsManager.h"
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
@@ -48,6 +48,10 @@
 @property (nonatomic, retain) UITabBarController *tabBarController;
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
 @property (nonatomic, retain) DFInboxViewController *inboxViewController;
+@end
+
+@interface AppDelegate () <BITHockeyManagerDelegate> {}
+@property (nonatomic) DDFileLogger *fileLogger;
 @end
 
 @implementation AppDelegate
@@ -85,12 +89,12 @@ const NSUInteger MinValidAccountId = 650;
   [DDLog addLogger:[DDASLLogger sharedInstance]];
   [DDLog addLogger:[DDTTYLogger sharedInstance]];
   
-  DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
-  fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
-  fileLogger.logFileManager.maximumNumberOfLogFiles = 3; // 3 days of files
+  self.fileLogger = [[DDFileLogger alloc] init];
+  self.fileLogger.rollingFrequency = 60 * 60 * 24; // 24 hour rolling
+  self.fileLogger.logFileManager.maximumNumberOfLogFiles = 3; // 3 days of files
   
   // To simulate the amount of log data saved, use the release log level for the fileLogger
-  [DDLog addLogger:fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
+  [DDLog addLogger:self.fileLogger withLogLevel:DFRELEASE_LOG_LEVEL];
 
 #ifdef DEBUG
   //RKLogConfigureByName("RestKit/Network", RKLogLevelTrace);
@@ -104,9 +108,11 @@ const NSUInteger MinValidAccountId = 650;
 - (void)configureHockey
 {
 #ifdef DEBUG
-  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"f4cd14764b2b5695063cdfc82e5097f6"];
+  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"f4cd14764b2b5695063cdfc82e5097f6"
+                                                         delegate:self];
 #else
-  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"81845532ce7ca873cdfce8e43f8abce9"];
+  [[BITHockeyManager sharedHockeyManager] configureWithIdentifier:@"81845532ce7ca873cdfce8e43f8abce9"
+                                                         delegate:self];
 #endif
   
   [[BITHockeyManager sharedHockeyManager] startManager];
@@ -379,5 +385,46 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     [self.inboxViewController showStrandPostsForStrandID:strandID];
   });
 }
+
+
+#pragma mark - BITCrashManagerDelegate
+
+- (NSString *)applicationLogForCrashManager:(BITCrashManager *)crashManager {
+  NSString *description = [self getLogFilesContentWithMaxSize:10000]; // 10K bytes should be enough!
+  if ([description length] == 0) {
+    return nil;
+  } else {
+    return description;
+  }
+}
+
+// get the log content with a maximum byte size
+- (NSString *) getLogFilesContentWithMaxSize:(NSInteger)maxSize {
+  NSMutableString *description = [NSMutableString string];
+  
+  NSArray *sortedLogFileInfos = [[_fileLogger logFileManager] sortedLogFileInfos];
+  NSInteger count = [sortedLogFileInfos count];
+  
+  // we start from the last one
+  for (NSInteger index = count - 1; index >= 0; index--) {
+    DDLogFileInfo *logFileInfo = [sortedLogFileInfos objectAtIndex:index];
+    
+    NSData *logData = [[NSFileManager defaultManager] contentsAtPath:[logFileInfo filePath]];
+    if ([logData length] > 0) {
+      NSString *result = [[NSString alloc] initWithBytes:[logData bytes]
+                                                  length:[logData length]
+                                                encoding: NSUTF8StringEncoding];
+      
+      [description appendString:result];
+    }
+  }
+  
+  if ([description length] > maxSize) {
+    description = (NSMutableString *)[description substringWithRange:NSMakeRange([description length]-maxSize-1, maxSize)];
+  }
+  
+  return description;
+}
+
 
 @end
