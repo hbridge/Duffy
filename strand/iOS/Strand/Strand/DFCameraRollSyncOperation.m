@@ -21,6 +21,7 @@
 #import "UIDevice+DFHelpers.h"
 #import "DFPHAsset.h"
 #import "DFAssetCache.h"
+#import "NSArray+DFHelpers.h"
 
 static int NumChangesFlushThreshold = 100;
 
@@ -393,7 +394,11 @@ static int NumChangesFlushThreshold = 100;
     }
     photosToRemove = [DFPhotoStore photosWithPHAssetIdentifiers:phAssetIDs context:self.managedObjectContext];
   } else {
-    photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:photoURLsNotFound.allObjects
+    NSArray *urlStrings =
+     [photoURLsNotFound.allObjects arrayByMappingObjectsWithBlock:^id(NSURL *url) {
+      return url.absoluteString;
+    }];
+    photosToRemove = [DFPhotoStore photosWithALAssetURLStrings:urlStrings
                                                                 context:self.managedObjectContext];
   }
   
