@@ -22,6 +22,7 @@ NSString *DFUploadStatusUpdateSessionUserInfoKey = @"sessionStats";
 
 NSString *const DFPhotoStoreCameraRollUpdatedNotificationName = @"DFPhotoStoreCameraRollUpdatedNotificationName";
 NSString *const DFCameraRollSyncCompleteNotificationName = @"DFCameraRollSyncCompleteNotificationName";
+NSString *const DFUploaderCompleteNotificationName = @"DFUploaderCompleteNotificationName";
 
 
 

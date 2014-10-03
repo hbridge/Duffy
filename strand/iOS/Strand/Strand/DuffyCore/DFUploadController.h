@@ -15,7 +15,7 @@
 
 + (DFUploadController *)sharedUploadController;
 - (void)uploadPhotos;
-- (void)cancelUploads;
+- (void)cancelUploads:(BOOL)isSilent;
 - (BOOL)isUploadInProgress;
 
 @end
