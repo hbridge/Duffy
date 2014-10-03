@@ -52,7 +52,7 @@
                                            target:self
                                            action:@selector(cancelButtonPressed:)];
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                            initWithTitle:@"Invite" style:UIBarButtonItemStylePlain
                                             target:self
                                             action:@selector(doneButtonPressed:)];
   self.navigationItem.rightBarButtonItem.enabled = NO;
