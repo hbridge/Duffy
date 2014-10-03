@@ -55,6 +55,7 @@
                                             initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                             target:self
                                             action:@selector(doneButtonPressed:)];
+  self.navigationItem.rightBarButtonItem.enabled = NO;
 }
 
 - (void)viewDidLoad
@@ -76,6 +77,7 @@
 {
   DDLogVerbose(@"picked contacts: %@", peanutContacts);
   self.pickedContacts = peanutContacts;
+  self.navigationItem.rightBarButtonItem.enabled = (peanutContacts.count > 0);
 }
 
 - (void)cancelButtonPressed:(id)sender

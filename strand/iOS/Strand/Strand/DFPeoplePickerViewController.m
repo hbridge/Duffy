@@ -311,6 +311,7 @@
 {
   [self.selectedContacts removeObjectAtIndex:index];
   [self.tokenField reloadData];
+  [self.delegate pickerController:self didPickContacts:self.selectedContacts];
 }
 
 #pragma mark - Cotnacts Permission
