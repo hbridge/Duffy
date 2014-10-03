@@ -46,6 +46,7 @@ static DFSocketsManager *defaultManager;
 }
 
 - (void) sendMessage:(NSString *)message {
+  message = [message stringByAppendingString:@"\n"];
 	NSData *data = [[NSData alloc] initWithData:[message dataUsingEncoding:NSASCIIStringEncoding]];
 	[self.outputStream write:[data bytes] maxLength:[data length]];
 }
