@@ -35,6 +35,7 @@
 		5A1E402519955570009A9FB2 /* DFAVCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A1E402319955570009A9FB2 /* DFAVCameraViewController.m */; };
 		5A249C5819C334920047AE91 /* DFInboxTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A249C5719C334920047AE91 /* DFInboxTableViewCell.m */; };
 		5A249C5A19C3349F0047AE91 /* DFInboxTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A249C5919C3349F0047AE91 /* DFInboxTableViewCell.xib */; };
+		5A28652F19DF4EC300638B94 /* DFOutlineSubviewsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */; };
 		5A3172C0196B188100CA7693 /* DFSMSVerificationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */; };
 		5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A3172C2196B1C4200CA7693 /* DFSMSAuthViewController.m */; };
 		5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A3172C3196B1C4200CA7693 /* DFSMSAuthViewController.xib */; };
@@ -285,6 +286,8 @@
 		5A249C5619C334920047AE91 /* DFInboxTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFInboxTableViewCell.h; sourceTree = "<group>"; };
 		5A249C5719C334920047AE91 /* DFInboxTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFInboxTableViewCell.m; sourceTree = "<group>"; };
 		5A249C5919C3349F0047AE91 /* DFInboxTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFInboxTableViewCell.xib; sourceTree = "<group>"; };
+		5A28652D19DF4EC300638B94 /* DFOutlineSubviewsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOutlineSubviewsView.h; sourceTree = "<group>"; };
+		5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOutlineSubviewsView.m; sourceTree = "<group>"; };
 		5A3172BE196B188100CA7693 /* DFSMSVerificationAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSVerificationAdapter.h; sourceTree = "<group>"; };
 		5A3172BF196B188100CA7693 /* DFSMSVerificationAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSVerificationAdapter.m; sourceTree = "<group>"; };
 		5A3172C1196B1C4200CA7693 /* DFSMSAuthViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSAuthViewController.h; sourceTree = "<group>"; };
@@ -1113,6 +1116,8 @@
 				5AAF038919B0D99200EF021C /* DFCreateStrandTableViewCell.h */,
 				5AAF038A19B0D99200EF021C /* DFCreateStrandTableViewCell.m */,
 				5A4BBD2F19B8BA8500359299 /* DFCreateStrandTableViewCell.xib */,
+				5A28652D19DF4EC300638B94 /* DFOutlineSubviewsView.h */,
+				5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */,
 				5AB4CBFD1982AF7C00EFB3E3 /* DFInviteUserViewController.h */,
 				5AB4CBFE1982AF7C00EFB3E3 /* DFInviteUserViewController.m */,
 				5AAF03A419B509B400EF021C /* DFInviteStrandViewController.h */,
@@ -1684,6 +1689,7 @@
 				5A4BBD2B19B7D55500359299 /* DFPeanutStrandFeedAdapter.m in Sources */,
 				5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
+				5A28652F19DF4EC300638B94 /* DFOutlineSubviewsView.m in Sources */,
 				5A7F8FFC19A7DA1D00EF0119 /* DFLockedPhotoViewCell.m in Sources */,
 				5A3F6AA4199AB64B00C2F7D4 /* DFTopBarController.m in Sources */,
 				5A9BC32819A3E299002D1CD7 /* DFPushNotificationsManager.m in Sources */,
