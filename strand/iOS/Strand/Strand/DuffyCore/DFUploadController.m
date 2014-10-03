@@ -170,6 +170,11 @@ static DFUploadController *defaultUploadController;
         photosWithThumbsToUpload.photoSet.count == 0 &&
         eligibleFullImagesToUpload.photoSet.count == 0) {
       DDLogVerbose(@"No images found to upload");
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:DFUploaderCompleteNotificationName
+         object:self];
+      });
     }
   }]];
 }
@@ -410,6 +415,12 @@ static DFUploadController *defaultUploadController;
     [self.metadataQueue clearCompleted];
     [self.thumbnailsObjectIDQueue clearCompleted];
     [self.fullImageObjectIDQueue clearCompleted];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFUploaderCompleteNotificationName
+       object:self];
+    });
   }];
   
   operation.queuePriority = NSOperationQueuePriorityHigh;

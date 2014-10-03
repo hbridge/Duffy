@@ -19,6 +19,7 @@
 #import "DFStrandsManager.h"
 #import <RestKit/RestKit.h>
 #import "DFAppInfo.h"
+#import "DFNotificationSharedConstants.h"
 #import "DFPeanutPushTokenAdapter.h"
 #import "DFAnalytics.h"
 #import "DFToastNotificationManager.h"
@@ -51,12 +52,18 @@
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 @property (nonatomic) DDFileLogger *fileLogger;
+
+@property (nonatomic, assign) BOOL backgroundSyncHasFinished;
+@property (nonatomic, assign) BOOL backgroundSyncAndUploaderHaveFinished;
+
 @end
 
 @implementation AppDelegate
 
 const NSUInteger MinValidAccountId = 650;
-            
+
+// This is used to store the completion handler during our background syncs
+void (^_completionHandler)(UIBackgroundFetchResult);
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [self configureLogs];
@@ -79,6 +86,16 @@ const NSUInteger MinValidAccountId = 650;
   NSLog(@"Simulator build running from: %@", [ [NSBundle mainBundle] bundleURL] );
 #endif
 
+  // These are used for background syncs
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(backgroundCameraRollSyncFinished)
+                                               name:DFCameraRollSyncCompleteNotificationName
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(backgroundUploaderFinished)
+                                               name:DFUploaderCompleteNotificationName
+                                             object:nil];
   
   return YES;
 }
@@ -335,6 +352,24 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
   if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
 }
 
+- (void)backgroundCameraRollSyncFinished
+{
+  self.backgroundSyncHasFinished = YES;
+}
+
+- (void)backgroundUploaderFinished
+{
+  if (self.backgroundSyncHasFinished && self.backgroundSyncAndUploaderHaveFinished == NO) {
+    DDLogVerbose(@"Uploader finished and so has sync, so returning");
+    self.backgroundSyncAndUploaderHaveFinished = YES;
+    _completionHandler(UIBackgroundFetchResultNewData);
+  } else if (self.backgroundSyncAndUploaderHaveFinished == YES) {
+    DDLogVerbose(@"Uploader finished but we should have already returned...ignoring");
+  } else {
+    DDLogVerbose(@"Uploader finished but sync hasn't yet...waiting");
+  }
+}
+
 /*
  * This is called every few minutes or so as a background process.
  * We have 30 seconds to return, so put in a timer to enforce that.
@@ -344,25 +379,38 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 {
   NSDate *startDate = [NSDate date];
   DDLogInfo(@"Strand background app refresh called at %@", startDate);
+
+  // Copy the completion handler
+  _completionHandler = [completionHandler copy];
   
-  [[DFUploadController sharedUploadController] init];
+  // We must set these everytime since state is saved
+  self.backgroundSyncHasFinished = NO;
+  self.backgroundSyncAndUploaderHaveFinished = NO;
   
+  
+  // Now we want to setup a backup system incase our uploads take more than 30 seconds.
   int64_t delayInSeconds = 29;
   
-  // We want to cancel a second before we return
+  // We want to cancel a few seconds before we return
   dispatch_time_t popTimeCancelUploads = dispatch_time(DISPATCH_TIME_NOW, (delayInSeconds-3) * NSEC_PER_SEC);
   dispatch_time_t popTimeReturn = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
   
   dispatch_after(popTimeCancelUploads, dispatch_get_main_queue(), ^(void){
-    DDLogInfo(@"Telling uploads to stop");
-    [[DFUploadController sharedUploadController] cancelUploads:YES];
+    if (self.backgroundSyncAndUploaderHaveFinished == NO) {
+      DDLogInfo(@"Telling uploads to stop");
+      [[DFUploadController sharedUploadController] cancelUploads:YES];
+    }
   });
   
   dispatch_after(popTimeReturn, dispatch_get_main_queue(), ^(void){
-    DDLogInfo(@"Leaving background app refresh at %@", [NSDate date]);
-    completionHandler(UIBackgroundFetchResultNewData);
+    if (self.backgroundSyncAndUploaderHaveFinished == NO) {
+      DDLogInfo(@"Leaving background app refresh at %@", [NSDate date]);
+      completionHandler(UIBackgroundFetchResultNewData);
+    }
   });
   
+  // Need to do this to have the class start listening to signals
+  [DFUploadController sharedUploadController];
   [[DFCameraRollSyncManager sharedManager] sync];
 }
 
