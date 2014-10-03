@@ -320,7 +320,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     [hideLabel sizeToFit];
     [cell setSwipeGestureWithView:hideLabel
                             color:[UIColor lightGrayColor]
-                             mode:MCSwipeTableViewCellModeSwitch
+                             mode:MCSwipeTableViewCellModeExit
                             state:MCSwipeTableViewCellState3
                   completionBlock:[self hideCompletionBlock]];
     // the default color is the color that appears before you swipe far enough for the action
