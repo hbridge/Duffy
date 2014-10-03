@@ -482,10 +482,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
       performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
       success:^(DFPeanutStrand *peanutStrand) {
         DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
-        
-        // mark the selected photos for upload
-        [self markPhotosForUpload:self.selectedPhotoIDs];
-        
         // mark the invite as used
         if (self.inviteObject) {
           DFPeanutStrandInviteAdapter *strandInviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
@@ -500,10 +496,16 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
                 [[NSNotificationCenter defaultCenter]
                  postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
                  object:self];
+                // mark the selected photos for upload AFTER all other work completed to prevent
+                // slowness in downloading other photos etc
+                [self markPhotosForUpload:self.selectedPhotoIDs];
               }];
            } failure:^(NSError *error) {
              [SVProgressHUD showErrorWithStatus:@"Error."];
              DDLogWarn(@"Failed to mark invite used: %@", error);
+             // mark photos for upload even if we fail to mark the invite used since they're
+             // now part of the strand
+             [self markPhotosForUpload:self.selectedPhotoIDs];
            }];
         }
         
