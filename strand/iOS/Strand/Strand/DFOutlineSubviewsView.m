@@ -16,6 +16,7 @@
   
   for (UIView *subview in self.subviews) {
     CGRect solidFrame = subview.frame;
+    solidFrame = CGRectInset(solidFrame, -0.5, -0.5);
     // setup
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     CGContextSetLineWidth(ctx, self.outlineThickness);
