@@ -1,6 +1,6 @@
 # Strand
 
-## Oct 3, 2014 (4746)
+## Oct 3, 2014 (4746, 4747)
 
 - Hide suggestions on the "Suggestions" tab by swiping left
 - Faster updates when you take new photos
