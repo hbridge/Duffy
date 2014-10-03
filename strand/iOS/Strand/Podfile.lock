@@ -19,6 +19,7 @@ PODS:
   - LiveFrost (1.1.2)
   - LKbadgeView (1.1.0)
   - Localytics-iOS-Client (2.23.0)
+  - MCSwipeTableViewCell (2.1.2)
   - MMPopLabel (0.1.1)
   - RestKit (0.20.3):
     - RestKit/Core
@@ -53,6 +54,7 @@ DEPENDENCIES:
   - LiveFrost (~> 1.1.2)
   - LKbadgeView (~> 1.1.0)
   - Localytics-iOS-Client (~> 2.23.0)
+  - MCSwipeTableViewCell (~> 2.1.2)
   - MMPopLabel (from `https://github.com/hbridge/MMPopLabel.git`)
   - RestKit (~> 0.20.0)
   - RHAddressBook (~> 1.1.1)
@@ -83,6 +85,7 @@ SPEC CHECKSUMS:
   LiveFrost: 8c7e447e6833902ddc2a639faa27e71e091b5062
   LKbadgeView: 8e14044ee22c6d570c07e69e1ce73a3f91061730
   Localytics-iOS-Client: 3f878379d40c67945ea5972c1e1bf9762b5e5b9f
+  MCSwipeTableViewCell: 8e78ff197ab06ba7bfd5c938a00149de8a33afa9
   MMPopLabel: e094a5b49eeff1d80a72cb4508219cb10e4c7e65
   RestKit: 7f9490e709ee745e166c4d2aa7a8d132831275b0
   RHAddressBook: 0cad9d33b9494d1e28323b62e5c7afc109cc4294

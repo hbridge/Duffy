@@ -529,7 +529,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
      performRequest:RKRequestMethodGET
      withPeanutStrand:privateStrand
      success:^(DFPeanutStrand *peanutStrand) {
-       peanutStrand.suggestible = NO;
+       peanutStrand.suggestible = @(NO);
        
        // Put the peanut strand
        [strandAdapter
@@ -554,7 +554,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectedPhotoIDs;
   requestStrand.created_from_id = [NSNumber numberWithLongLong:self.suggestedSectionObject.id];
-  requestStrand.private = NO;
+  requestStrand.private = @(NO);
   [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedPhotoObjects];
   
   [SVProgressHUD show];

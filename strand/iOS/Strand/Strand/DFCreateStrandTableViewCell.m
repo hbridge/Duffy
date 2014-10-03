@@ -16,6 +16,7 @@
 {
   [super awakeFromNib];
   
+  
   self.selectionStyle = UITableViewCellSelectionStyleNone;
   self.solidBackgroundView.layer.cornerRadius = 4.0;
   self.solidBackgroundView.layer.masksToBounds = YES;

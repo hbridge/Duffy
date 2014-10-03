@@ -41,7 +41,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @property (nonatomic, retain) DFPeanutObjectsResponse *allObjectsResponse;
 @property (nonatomic, retain) NSArray *inviteObjects;
 @property (nonatomic, retain) NSMutableArray *suggestionObjects;
-@property (nonatomic, retain) NSMutableArray *noFriendSuggestions;
+@property (nonatomic, retain) NSMutableArray *allObjects;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
@@ -73,6 +73,13 @@ static DFCreateStrandViewController *instance;
     self.suggestedTableView.hidden = YES;
     self.allTableView.hidden = NO;
   }
+}
+
+- (UITableView *)visibleTableView
+{
+  if (!self.suggestedTableView.hidden) return self.suggestedTableView;
+  if (!self.allTableView.hidden) return self.allTableView;
+  return nil;
 }
 
 + (DFCreateStrandViewController *)sharedViewController
@@ -268,7 +275,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   if (tableView == self.suggestedTableView) {
     return self.suggestionObjects;
   } else {
-    return self.allObjectsResponse.objects;
+    return self.allObjects;
   }
 }
 
@@ -305,7 +312,64 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [self configureTextForCreateStrandCell:cell withStrand:strandObject];
   [self setLocalPhotosForCell:cell section:strandObject];
   
+  // add the swipe gesture
+  if (!cell.view3) {
+    UILabel *hideLabel = [[UILabel alloc] init];
+    hideLabel.text = @"Hide";
+    hideLabel.textColor = [UIColor whiteColor];
+    [hideLabel sizeToFit];
+    [cell setSwipeGestureWithView:hideLabel
+                            color:[UIColor lightGrayColor]
+                             mode:MCSwipeTableViewCellModeSwitch
+                            state:MCSwipeTableViewCellState3
+                  completionBlock:[self hideCompletionBlock]];
+    // the default color is the color that appears before you swipe far enough for the action
+    // we set to the group tableview background color to blend in
+    cell.defaultColor = [UIColor groupTableViewBackgroundColor];
+    cell.delegate = self;
+  }
+  
   return cell;
+}
+
+- (MCSwipeCompletionBlock)hideCompletionBlock
+{
+  return ^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+    UITableView *tableView = [self visibleTableView];
+    NSIndexPath *indexPath = [tableView indexPathForCell:cell];
+    if (indexPath) {
+      //Update the view locally
+      [tableView beginUpdates];
+      DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
+      [self.suggestionObjects removeObject:feedObject];
+      [tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+      [tableView endUpdates];
+      
+      // Mark the strand as no longer suggestiblw with the server
+      DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
+      privateStrand.id = @(feedObject.id);
+      
+      [self.strandAdapter
+       performRequest:RKRequestMethodGET
+       withPeanutStrand:privateStrand
+       success:^(DFPeanutStrand *peanutStrand) {
+         peanutStrand.suggestible = @(NO);
+         
+         // Put the peanut strand
+         [self.strandAdapter
+          performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+          success:^(DFPeanutStrand *peanutStrand) {
+            DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
+          } failure:^(NSError *error) {
+            DDLogError(@"%@ failed to put private strand: %@, error: %@",
+                       self.class, peanutStrand, error);
+          }];
+       } failure:^(NSError *error) {
+         DDLogError(@"%@ failed to get private strand: %@, error: %@",
+                    self.class, privateStrand, error);
+       }];
+    }
+  };
 }
 
 - (void)configureTextForCreateStrandCell:(DFCreateStrandTableViewCell *)cell
@@ -501,9 +565,10 @@ const NSUInteger MaxPhotosPerCell = 3;
           DDLogDebug(@"New data for suggestions, updating view...");
           self.allObjectsResponse = response;
           
+          self.allObjects = [NSMutableArray new];
           self.suggestionObjects = [NSMutableArray new];
           for (DFPeanutFeedObject *object in response.objects) {
-            
+            [self.allObjects addObject:object];
             if (object.suggestible.boolValue) [self.suggestionObjects addObject:object];
           }
           
