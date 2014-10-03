@@ -313,7 +313,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [self setLocalPhotosForCell:cell section:strandObject];
   
   // add the swipe gesture
-  if (!cell.view3) {
+  if (tableView == self.suggestedTableView && !cell.view3) {
     UILabel *hideLabel = [[UILabel alloc] init];
     hideLabel.text = @"Hide";
     hideLabel.textColor = [UIColor whiteColor];
