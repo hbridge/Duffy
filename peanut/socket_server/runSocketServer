@@ -1,0 +1,1 @@
+java -cp $CLASSPATH:/usr/share/java/mysql-connector-java.jar:bin:. StrandSocketServer 8005
