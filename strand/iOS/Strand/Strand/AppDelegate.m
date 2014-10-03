@@ -53,8 +53,12 @@
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 @property (nonatomic) DDFileLogger *fileLogger;
 
+// These are used to track the state of background fetch signals from the syncer and uploader
 @property (nonatomic, assign) BOOL backgroundSyncHasFinished;
 @property (nonatomic, assign) BOOL backgroundSyncAndUploaderHaveFinished;
+@property (nonatomic, assign) BOOL backgroundSyncInProgress;
+@property (nonatomic, retain) NSTimer *backgroundSyncCancelUploadsTimer;
+@property (nonatomic, retain) NSTimer *backgroundSyncReturnTimer;
 
 @end
 
@@ -354,20 +358,51 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 
 - (void)backgroundCameraRollSyncFinished
 {
-  self.backgroundSyncHasFinished = YES;
+  if (self.backgroundSyncInProgress == YES) {
+    self.backgroundSyncHasFinished = YES;
+  }
 }
 
+/*
+ * Called during a background refresh when the uploader has completed a pass.
+ * This doesn't necessarily mean we're done, we want to wait for the syncer to finish.
+ * The syncer tells the uploader to do one last pass after it finishes, and thats what we're listening for.
+ * 
+ * Once we're done, cancel the timers we set in performFetchWithCompletionHandler.
+ */
 - (void)backgroundUploaderFinished
 {
-  if (self.backgroundSyncHasFinished && self.backgroundSyncAndUploaderHaveFinished == NO) {
-    DDLogVerbose(@"Uploader finished and so has sync, so returning");
-    self.backgroundSyncAndUploaderHaveFinished = YES;
-    _completionHandler(UIBackgroundFetchResultNewData);
-  } else if (self.backgroundSyncAndUploaderHaveFinished == YES) {
-    DDLogVerbose(@"Uploader finished but we should have already returned...ignoring");
-  } else {
-    DDLogVerbose(@"Uploader finished but sync hasn't yet...waiting");
+  if (self.backgroundSyncInProgress == YES) {
+    if (self.backgroundSyncHasFinished && self.backgroundSyncAndUploaderHaveFinished == NO) {
+      DDLogVerbose(@"Uploader finished and so has sync, so returning");
+      self.backgroundSyncAndUploaderHaveFinished = YES;
+      self.backgroundSyncInProgress = NO;
+      
+      [self.backgroundSyncCancelUploadsTimer invalidate];
+      self.backgroundSyncCancelUploadsTimer = nil;
+      
+      [self.backgroundSyncReturnTimer invalidate];
+      self.backgroundSyncReturnTimer = nil;
+      
+      _completionHandler(UIBackgroundFetchResultNewData);
+    } else if (self.backgroundSyncAndUploaderHaveFinished == YES) {
+      DDLogVerbose(@"Uploader finished but we should have already returned...ignoring");
+    } else {
+      DDLogVerbose(@"Uploader finished but sync hasn't yet...waiting");
+    }
   }
+}
+- (void)backgroundSyncCancelUploads
+{
+  DDLogInfo(@"Telling uploads to stop");
+  [[DFUploadController sharedUploadController] cancelUploads:YES];
+}
+
+- (void)backgroundSyncReturn
+{
+  DDLogInfo(@"Leaving background app refresh at %@", [NSDate date]);
+  self.backgroundSyncInProgress = NO;
+  _completionHandler(UIBackgroundFetchResultNewData);
 }
 
 /*
@@ -380,34 +415,28 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
   NSDate *startDate = [NSDate date];
   DDLogInfo(@"Strand background app refresh called at %@", startDate);
 
-  // Copy the completion handler
+  // Copy the completion handler for use later
   _completionHandler = [completionHandler copy];
   
   // We must set these everytime since state is saved
   self.backgroundSyncHasFinished = NO;
   self.backgroundSyncAndUploaderHaveFinished = NO;
-  
+  self.backgroundSyncInProgress = YES;
   
   // Now we want to setup a backup system incase our uploads take more than 30 seconds.
   int64_t delayInSeconds = 29;
+
+  self.backgroundSyncCancelUploadsTimer = [NSTimer scheduledTimerWithTimeInterval:delayInSeconds - 3
+                                                        target:self
+                                                      selector:@selector(backgroundSyncCancelUploads)
+                                                      userInfo:nil
+                                                       repeats:NO];
   
-  // We want to cancel a few seconds before we return
-  dispatch_time_t popTimeCancelUploads = dispatch_time(DISPATCH_TIME_NOW, (delayInSeconds-3) * NSEC_PER_SEC);
-  dispatch_time_t popTimeReturn = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-  
-  dispatch_after(popTimeCancelUploads, dispatch_get_main_queue(), ^(void){
-    if (self.backgroundSyncAndUploaderHaveFinished == NO) {
-      DDLogInfo(@"Telling uploads to stop");
-      [[DFUploadController sharedUploadController] cancelUploads:YES];
-    }
-  });
-  
-  dispatch_after(popTimeReturn, dispatch_get_main_queue(), ^(void){
-    if (self.backgroundSyncAndUploaderHaveFinished == NO) {
-      DDLogInfo(@"Leaving background app refresh at %@", [NSDate date]);
-      completionHandler(UIBackgroundFetchResultNewData);
-    }
-  });
+  self.backgroundSyncReturnTimer = [NSTimer scheduledTimerWithTimeInterval:delayInSeconds
+                                                                           target:self
+                                                                         selector:@selector(backgroundSyncReturn)
+                                                                         userInfo:nil
+                                                                          repeats:NO];
   
   // Need to do this to have the class start listening to signals
   [DFUploadController sharedUploadController];
