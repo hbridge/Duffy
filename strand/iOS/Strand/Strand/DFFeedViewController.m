@@ -29,6 +29,7 @@
 #import "UIAlertView+DFHelpers.h"
 #import "DFInviteStrandViewController.h"
 #import "DFStrandGalleryTitleView.h"
+#import "NSIndexPath+DFHelpers.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -412,14 +413,6 @@ const CGFloat LockedCellHeight = 157.0;
 }
 
 
-+ (id)keyForIndexPath:(NSIndexPath *)indexPath
-{
-  if ([indexPath class] == [NSIndexPath class]) {
-    return indexPath;
-  }
-  return [NSIndexPath indexPathForRow:indexPath.row inSection:indexPath.section];
-}
-
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
@@ -450,7 +443,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)setHeight:(CGFloat)height forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  self.rowHeights[[self.class keyForIndexPath:indexPath]] = @(height);
+  self.rowHeights[[indexPath dictKey]] = @(height);
 }
 
 #pragma mark - Actions

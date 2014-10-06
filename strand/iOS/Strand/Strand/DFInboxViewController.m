@@ -23,6 +23,7 @@
 #import "SVProgressHUD.h"
 #import "DFStrandGalleryViewController.h"
 #import "DFStrandGalleryTitleView.h"
+#import "DFAcceptInviteViewController.h"
 
 @interface DFInboxViewController ()
 
@@ -420,18 +421,9 @@
 {
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *invitedStrandPosts = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts]
-                                         firstObject];
-    DFPeanutFeedObject *suggestedPhotos = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
-                                           firstObject];
-    DFSelectPhotosViewController *vc = [[DFSelectPhotosViewController alloc]
-                                        initWithTitle:@"Accept Invite"
-                                        showsToField:NO
-                                        suggestedSectionObject:suggestedPhotos
-                                        invitedStrandPosts:invitedStrandPosts
-                                        inviteObject:feedObject
-                                        ];
-    [self.navigationController pushViewController:vc animated:YES];
+    DFAcceptInviteViewController *acceptController = [[DFAcceptInviteViewController alloc]
+                                                      initWithInviteObject:feedObject];
+    [self.navigationController pushViewController:acceptController animated:YES];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
     [self showStrandPostsObject:feedObject];
   }

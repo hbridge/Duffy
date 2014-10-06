@@ -210,6 +210,10 @@
 		5ADD858619465C790037A6D5 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5ADD858519465C790037A6D5 /* Images.xcassets */; };
 		5ADD859219465C790037A6D5 /* StrandTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859119465C790037A6D5 /* StrandTests.m */; };
 		5ADD859E19465F520037A6D5 /* DFCameraViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ADD859C19465F520037A6D5 /* DFCameraViewController.m */; };
+		5AED01D919E3404D001F075D /* DFAcceptInviteViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED01D719E3404D001F075D /* DFAcceptInviteViewController.m */; };
+		5AED01DA19E3404D001F075D /* DFAcceptInviteViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AED01D819E3404D001F075D /* DFAcceptInviteViewController.xib */; };
+		5AED01DD19E34722001F075D /* DFImageDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED01DC19E34722001F075D /* DFImageDataSource.m */; };
+		5AED01E019E348DF001F075D /* NSIndexPath+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED01DF19E348DF001F075D /* NSIndexPath+DFHelpers.m */; };
 		5AEFA25A19D607150027BC5E /* DFStrandGallerySectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEFA25819D607150027BC5E /* DFStrandGallerySectionHeaderView.m */; };
 		5AEFA25B19D607150027BC5E /* DFStrandGallerySectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AEFA25919D607150027BC5E /* DFStrandGallerySectionHeaderView.xib */; };
 		5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */; };
@@ -602,6 +606,13 @@
 		5ADD859119465C790037A6D5 /* StrandTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StrandTests.m; sourceTree = "<group>"; };
 		5ADD859B19465F520037A6D5 /* DFCameraViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraViewController.h; sourceTree = "<group>"; };
 		5ADD859C19465F520037A6D5 /* DFCameraViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraViewController.m; sourceTree = "<group>"; };
+		5AED01D619E3404D001F075D /* DFAcceptInviteViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAcceptInviteViewController.h; sourceTree = "<group>"; };
+		5AED01D719E3404D001F075D /* DFAcceptInviteViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAcceptInviteViewController.m; sourceTree = "<group>"; };
+		5AED01D819E3404D001F075D /* DFAcceptInviteViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFAcceptInviteViewController.xib; sourceTree = "<group>"; };
+		5AED01DB19E34722001F075D /* DFImageDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageDataSource.h; sourceTree = "<group>"; };
+		5AED01DC19E34722001F075D /* DFImageDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageDataSource.m; sourceTree = "<group>"; };
+		5AED01DE19E348DF001F075D /* NSIndexPath+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSIndexPath+DFHelpers.h"; sourceTree = "<group>"; };
+		5AED01DF19E348DF001F075D /* NSIndexPath+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSIndexPath+DFHelpers.m"; sourceTree = "<group>"; };
 		5AEFA25719D607150027BC5E /* DFStrandGallerySectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGallerySectionHeaderView.h; sourceTree = "<group>"; };
 		5AEFA25819D607150027BC5E /* DFStrandGallerySectionHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGallerySectionHeaderView.m; sourceTree = "<group>"; };
 		5AEFA25919D607150027BC5E /* DFStrandGallerySectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandGallerySectionHeaderView.xib; sourceTree = "<group>"; };
@@ -1117,6 +1128,13 @@
 				5A28652E19DF4EC300638B94 /* DFOutlineSubviewsView.m */,
 				5AAF03A419B509B400EF021C /* DFInviteStrandViewController.h */,
 				5AAF03A519B509B400EF021C /* DFInviteStrandViewController.m */,
+				5AED01D619E3404D001F075D /* DFAcceptInviteViewController.h */,
+				5AED01D719E3404D001F075D /* DFAcceptInviteViewController.m */,
+				5AED01D819E3404D001F075D /* DFAcceptInviteViewController.xib */,
+				5AED01DB19E34722001F075D /* DFImageDataSource.h */,
+				5AED01DC19E34722001F075D /* DFImageDataSource.m */,
+				5AED01DE19E348DF001F075D /* NSIndexPath+DFHelpers.h */,
+				5AED01DF19E348DF001F075D /* NSIndexPath+DFHelpers.m */,
 			);
 			name = "Create Strand";
 			sourceTree = "<group>";
@@ -1517,6 +1535,7 @@
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
 				5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
+				5AED01DA19E3404D001F075D /* DFAcceptInviteViewController.xib in Resources */,
 				5A9E9CFC19D5BE85007328AD /* DFStrandGalleryViewController.xib in Resources */,
 				5AA4529A196708D00099CBD2 /* DFPhotoViewCell.xib in Resources */,
 				5AAF039219B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib in Resources */,
@@ -1658,6 +1677,7 @@
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */,
 				5A113B1219C0F647004CA85B /* DFProfilePhotoStackView.swift in Sources */,
+				5AED01E019E348DF001F075D /* NSIndexPath+DFHelpers.m in Sources */,
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
@@ -1723,6 +1743,7 @@
 				651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */,
+				5AED01DD19E34722001F075D /* DFImageDataSource.m in Sources */,
 				5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */,
 				5A4501F019D07FC70075E183 /* DFPHAsset.m in Sources */,
 				5AC4A976194A4AB900862D9C /* DFPeanutNewPhotosAdapter.m in Sources */,
@@ -1743,6 +1764,7 @@
 				5A9115E219DB0B80003F2A68 /* UIImageView+DFHelpers.m in Sources */,
 				5AC4A94F1947C54C00862D9C /* Duffy.xcdatamodeld in Sources */,
 				5AA8FA52197DD0E200421513 /* DFFeedSectionHeaderView.m in Sources */,
+				5AED01D919E3404D001F075D /* DFAcceptInviteViewController.m in Sources */,
 				5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */,
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
 				5AA38E01199EB2F600AD1805 /* DFGalleryViewController.m in Sources */,

@@ -38,6 +38,7 @@ NSUInteger const NumPhotosPerRow = 3;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
+@property (nonatomic) BOOL areSuggestionsExpanded;
 
 @end
 
@@ -70,6 +71,7 @@ NSUInteger const NumPhotosPerRow = 3;
     self.suggestedSectionObject = suggestedSectionObject;
     self.invitedStrandPosts = invitedStrandPosts;
     self.inviteObject = inviteObject;
+    if (!inviteObject) _areSuggestionsExpanded = YES;
   }
   return self;
 }
@@ -188,7 +190,6 @@ NSUInteger const NumPhotosPerRow = 3;
   
   self.sharedPhotoObjects = photos;
   dispatch_async(dispatch_get_main_queue(), ^{
-    
     [self.collectionView reloadData];
   });
 }
