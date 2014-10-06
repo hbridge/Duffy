@@ -11,7 +11,6 @@
 
 #import "DFBadgeButton.h"
 #import "DFErrorScreen.h"
-#import "DFInviteUserViewController.h"
 #import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFPeanutStrandFeedAdapter.h"
@@ -361,16 +360,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 #pragma mark - Navbar Action Handlers
 
-
-- (void)inviteButtonPressed:(id)sender
-{
-  DDLogInfo(@"Invite button pressed");
-  DFInviteUserViewController *inviteController = [[DFInviteUserViewController alloc] init];
-  DFNavigationController *navController = [[DFNavigationController
-                                            alloc] initWithRootViewController:inviteController];
-
-  [self presentViewController:navController animated:YES completion:nil];
-}
 
 - (void)createButtonPressed:(id)sender
 {

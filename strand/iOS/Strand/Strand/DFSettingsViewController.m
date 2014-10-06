@@ -15,7 +15,6 @@
 #import "DFBackgroundLocationManager.h"
 #import "DFMapViewController.h"
 #import "DFPeanutInviteMessageAdapter.h"
-#import "DFInviteUserViewController.h"
 #import "DFAnalytics.h"
 #import "DFStrandConstants.h"
 #import "DFUser.h"
@@ -30,7 +29,6 @@
 
 @property (nonatomic, retain) FKFormModel *formModel;
 @property (nonatomic, retain) DFSettings *settings;
-@property (nonatomic, retain) DFInviteUserViewController *inviteController;
 
 @end
 
@@ -182,18 +180,6 @@
 - (void)closeButtonPressed:(UIBarButtonItem *)sender
 {
   [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-#pragma mark - Inviting
-
-- (FKFormMappingButtonHandlerBlock)inviteUserHandler
-{
-  return ^(id object){
-    if (!self.inviteController.isBeingPresented) {
-      self.inviteController = [[DFInviteUserViewController alloc] init];
-      [self.navigationController pushViewController:self.inviteController animated:YES];
-    }
-  };
 }
 
 
