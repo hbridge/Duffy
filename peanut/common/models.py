@@ -66,12 +66,16 @@ class User(models.Model):
 			return "%s photos" % (photoCount)
 
 	def private_strands(self):
-		strandCount = self.strand_set.filter(private=True).count()
+		strands = self.strand_set.filter(private=True)
 
-		if strandCount == 1:
+		photoCount = 0
+		for strand in strands:
+			photoCount += strand.photos.count()
+
+		if len(strands) == 1:
 			return "1 strand"
 		else:
-			return "%s strands" % (strandCount)
+			return "%s strands (%s photos)" % (len(strands), photoCount)
 
 	def shared_strands(self):
 		strandCount = self.strand_set.filter(private=False).count()
