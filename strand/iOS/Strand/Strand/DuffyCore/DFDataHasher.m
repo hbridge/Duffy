@@ -15,13 +15,17 @@
 
 const float HasherImageJPEGQuality = 0.8;
 
+// Use the first 20k of bytes to generate the hash
+const int MaxNumHashBytes = 20000;
+
 + (NSData *)hashDataForData:(NSData *)inputData
 {
-    uint8_t digest[CC_SHA1_DIGEST_LENGTH];
-    
-    CC_SHA1(inputData.bytes, (CC_LONG)inputData.length, digest);
-    
-    return [NSData dataWithBytes:&digest length:CC_SHA1_DIGEST_LENGTH];
+  uint8_t digest[CC_SHA1_DIGEST_LENGTH];
+  
+  CC_LONG len = inputData.length > MaxNumHashBytes ? MaxNumHashBytes : (CC_LONG)inputData.length;
+  CC_SHA1(inputData.bytes, len, digest);
+  
+  return [NSData dataWithBytes:&digest length:CC_SHA1_DIGEST_LENGTH];
 }
 
 
