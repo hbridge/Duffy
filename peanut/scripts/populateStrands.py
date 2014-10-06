@@ -240,7 +240,7 @@ def main(argv):
 						strandsAddedTo.append(strand)
 						photoToStrandIdDict[photo] = strand.id
 						
-						logger.debug("Just added photo %s to strand %s" % (photo.id, strand.id))
+						logger.debug("Just added photo %s to strand %s users %s" % (photo.id, strand.id, usersByStrandId[strand.id]))
 				elif len(matchingStrands) > 1:
 					logger.debug("Found %s matching strands for photo %s, merging" % (len(matchingStrands), photo.id))
 					targetStrand = matchingStrands[0]
@@ -249,7 +249,7 @@ def main(argv):
 					for i, strand in enumerate(matchingStrands):
 						if i > 0:
 							strands_util.mergeStrands(targetStrand, strand, photosByStrandId, usersByStrandId)
-							logger.debug("Merged strand %s into %s" % (strand.id, targetStrand.id))
+							logger.debug("Merged strand %s into %s users %s" % (strand.id, targetStrand.id, usersByStrandId[targetStrand.id]))
 
 					# Delete unneeded Srands
 					for i, strand in enumerate(matchingStrands):
@@ -278,7 +278,7 @@ def main(argv):
 
 						photoToStrandIdDict[photo] = newStrand.id
 
-						logger.debug("Created new Strand %s for photo %s.  private = %s" % (newStrand.id, photo.id, private))
+						logger.debug("Created new Strand %s for photo %s and user %s.  private = %s" % (newStrand.id, photo.id, usersByStrandId[newStrand.id], private))
 		
 				# If our photo got put into a strand (it might not incase there was a dup already in it)
 				#    Then we figure out which strand it got put in and go through each strand neighbor
