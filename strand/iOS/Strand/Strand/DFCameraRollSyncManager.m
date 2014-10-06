@@ -7,7 +7,12 @@
 //
 
 #import "DFCameraRollSyncManager.h"
+
+#import "UIDevice+DFHelpers.h"
+
 #import "DFCameraRollSyncOperation.h"
+#import "DFIOS7CameraRollSyncOperation.h"
+#import "DFIOS8CameraRollSyncOperation.h"
 
 
 @interface DFCameraRollSyncManager()
@@ -48,7 +53,14 @@ static DFCameraRollSyncManager *defaultSyncController;
 {
     DDLogInfo(@"Camera roll sync requested. %d sync operations ahead in queue.",
               (unsigned int)self.syncOperationQueue.operationCount);
-  DFCameraRollSyncOperation *syncOperation = [[DFCameraRollSyncOperation alloc] init];
+  DFCameraRollSyncOperation *syncOperation;
+  
+  if ([UIDevice majorVersionNumber] >= 8) {
+    syncOperation = [[DFIOS8CameraRollSyncOperation alloc] init];
+  } else {
+    syncOperation = [[DFIOS7CameraRollSyncOperation alloc] init];
+  }
+  
   syncOperation.threadPriority = 0.2; //low, 0.5 is default
   [self.syncOperationQueue addOperation:syncOperation];
 }
