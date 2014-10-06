@@ -85,6 +85,21 @@ class User(models.Model):
 		else:
 			return "%s strands" % (strandCount)
 
+	def missingPhotos(self):
+		strands = self.strand_set.filter(private=True)
+
+		photosInStrands = list()
+		[photosInStrands.extend(strand.photos.all()) for strand in strands]
+
+		links = list()
+		for photo in self.photo_set.all():
+			if photo not in photosInStrands:
+				links.append('<a href="%s">%s</a>' % (reverse("admin:common_photo_change", args=(photo.id,)) , escape(photo)))
+
+		return ', '.join(links)
+	missingPhotos.allow_tags = True
+	missingPhotos.short_description = "Missing photos"
+
 	@classmethod
 	def getIds(cls, objs):
 		ids = list()

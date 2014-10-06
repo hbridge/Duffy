@@ -12,6 +12,7 @@ class ActionAdmin(admin.ModelAdmin):
 admin.site.register(Action, ActionAdmin)
 
 class UserAdmin(admin.ModelAdmin):
+	readonly_fields = ['missingPhotos']
 	list_display = ['id', 'display_name', 'phone_number', 'photos_info', 'private_strands', 'shared_strands']
 admin.site.register(User, UserAdmin)
 
