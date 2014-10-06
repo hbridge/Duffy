@@ -108,7 +108,7 @@ static DFCreateStrandViewController *instance;
 
 - (void)configureNavAndTab
 {
-  self.navigationItem.title = @"Share Photos";
+  self.navigationItem.title = @"Swap Photos";
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
                                            initWithTitle:@"Back"
                                            style:UIBarButtonItemStylePlain
