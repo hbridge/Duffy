@@ -117,7 +117,7 @@ static DFUploadController *defaultUploadController;
 
 - (void)uploadPhotos
 {
-  DDLogDebug(@"Uploads starting...");
+  DDLogInfo(@"Uploads starting...");
   [self addPhotoIDsToQueue];
 }
 
