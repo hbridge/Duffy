@@ -424,6 +424,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	for strand in strands:
 		strandId = strand.id
 		photos = strand.photos.all().order_by("-time_taken")
+		if len(photos) == 0:
+			logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
 		
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
@@ -446,7 +448,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
-
 
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
@@ -490,6 +491,9 @@ def getObjectsDataForStrand(strand, user):
 	response = dict()
 
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+
+	if len(postActions) == 0:
+		logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
 
 	recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
 	users = strand.users.all()
