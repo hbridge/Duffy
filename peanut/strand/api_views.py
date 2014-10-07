@@ -495,9 +495,10 @@ def getObjectsDataForStrand(strand, user):
 
 	if len(postActions) == 0:
 		logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
-		return response
+		recentTimeStamp = None
+	else:
+		recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
 		
-	recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
 	users = strand.users.all()
 
 	invitedUsers = list()
