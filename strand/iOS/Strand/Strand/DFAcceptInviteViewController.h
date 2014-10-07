@@ -10,7 +10,8 @@
 #import "DFPeanutFeedObject.h"
 #import "DFSelectPhotosController.h"
 
-@interface DFAcceptInviteViewController : UIViewController <DFSelectPhotosControllerDelegate>
+@interface DFAcceptInviteViewController : UIViewController <DFSelectPhotosControllerDelegate, UIScrollViewDelegate>
+@property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 
 /* invite area */
 @property (weak, nonatomic) IBOutlet UIView *inviteWrapper;
@@ -27,6 +28,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *matchResultsTitleLabel;
 @property (weak, nonatomic) IBOutlet UICollectionView *matchedCollectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *matchedFlowLayout;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *matchedCollectionViewHeight;
+
 
 /* swap photos bottom bar */
 @property (weak, nonatomic) IBOutlet UIView *swapPhotosBar;

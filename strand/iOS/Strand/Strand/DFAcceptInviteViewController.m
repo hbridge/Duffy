@@ -62,6 +62,7 @@
   return YES;
 }
 
+
 - (void)configureInviteArea
 {
   // aesthetics
@@ -102,7 +103,9 @@
                                     collectionView:self.matchedCollectionView
                                     sourceMode:DFImageDataSourceModeLocal imageType:DFImageThumbnail];
   self.suggestedPhotosController.delegate = self;
+  
   self.matchedCollectionView.contentInset = UIEdgeInsetsMake(0, 0, self.swapPhotosBar.frame.size.height, 0);
+  self.scrollView.contentInset = UIEdgeInsetsMake(0, 0, self.matchResultsView.frame.origin.y - 2, 0);
 }
 
 
@@ -134,6 +137,11 @@
   self.matchedFlowLayout.itemSize = CGSizeMake(size1d, size1d);
   self.matchedFlowLayout.minimumInteritemSpacing = interItemSpacing;
   self.matchedFlowLayout.minimumLineSpacing = interItemSpacing;
+  
+  // set collection view height
+  CGSize contentSize = self.matchedFlowLayout.collectionViewContentSize;
+  self.matchedCollectionViewHeight.constant = contentSize.height;
+
 }
 
 

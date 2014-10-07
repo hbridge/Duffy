@@ -25,7 +25,6 @@
 #import "DFUploadingFeedCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "NSString+DFHelpers.h"
-#import "RootViewController.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFInviteStrandViewController.h"
 #import "DFStrandGalleryTitleView.h"
