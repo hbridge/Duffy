@@ -535,7 +535,7 @@ def getInviteObjectsDataForUser(user):
 			else:
 				inviteIsReady = False
 
-			if user.first_fun_sync_complete:
+			if user.first_run_sync_complete:
 				inviteIsReady = True
 
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
