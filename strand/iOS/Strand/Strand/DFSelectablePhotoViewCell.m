@@ -18,6 +18,13 @@
   self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
 }
 
+- (void)setCount:(NSUInteger)count
+{
+  _count = count;
+  if (count > 0) self.countView.text = [@(count) stringValue];
+  self.countView.hidden = YES;
+}
+
 - (void)setShowTickMark:(BOOL)showTickMark
 {
   self.selectPhotoButton.selected = showTickMark;

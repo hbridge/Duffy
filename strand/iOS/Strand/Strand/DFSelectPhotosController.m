@@ -47,8 +47,10 @@
   DFPeanutFeedObject *photoObject;
   if ([feedObject.type isEqual:DFFeedObjectCluster]) {
     photoObject = feedObject.objects.firstObject;
+    cell.count = feedObject.objects.count;
   } else if ([feedObject.type isEqualToString:DFFeedObjectPhoto]) {
     photoObject = feedObject;
+    cell.count = 0;
   } else {
     photoObject = nil;
   }
@@ -66,10 +68,20 @@
 
 - (NSArray *)selectedPhotoIDs
 {
-  return [self.selectedFeedObjects
-          arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photoObject) {
-            return @(photoObject.id);
-          }];
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutFeedObject *object in self.selectedFeedObjects)
+  {
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
+      [result addObject:object];
+      continue;
+    }
+    for (DFPeanutFeedObject *subObject in object.enumeratorOfDescendents.allObjects) {
+      if ([subObject isEqual:DFFeedObjectPhoto]) {
+        [result addObject:@(subObject.id)];
+      }
+    }
+  }
+  return result;
 }
 
 const NSUInteger MaxSharedPhotosDisplayed = 3;

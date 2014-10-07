@@ -98,7 +98,7 @@ NSUInteger const NumPhotosPerRow = 3;
 - (void)configureCollectionView
 {
   self.selectPhotosController = [[DFSelectPhotosController alloc]
-                                 initWithFeedPhotos:self.suggestionsObject.enumeratorOfDescendents.allObjects
+                                 initWithFeedPhotos:self.suggestionsObject.objects
                                  collectionView:self.collectionView
                                  sourceMode:DFImageDataSourceModeLocal
                                  imageType:DFImageThumbnail];
@@ -114,15 +114,17 @@ NSUInteger const NumPhotosPerRow = 3;
 
 - (void)configureSwapButtonTitle
 {
-  NSUInteger selectedCount = self.selectPhotosController.selectedFeedObjects.count;
+  NSUInteger selectedCount = self.selectPhotosController.selectedPhotoIDs.count;
   if (selectedCount > 0) {
     NSString *title = [NSString stringWithFormat:@"Swap %d Photos",
                        (int)selectedCount];
     [self.swapPhotosButton setTitle:title forState:UIControlStateNormal];
     self.swapPhotosButton.enabled = YES;
+    self.swapBarWrapper.alpha = 1.0;
   } else {
     [self.swapPhotosButton setTitle:@"No Photos Selected" forState:UIControlStateDisabled];
     self.swapPhotosButton.enabled = NO;
+    self.swapBarWrapper.alpha = 0.7;
   }
   
 }

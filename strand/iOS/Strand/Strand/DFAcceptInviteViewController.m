@@ -117,9 +117,13 @@
   });
   
   [self setMatchedAreaAttributes];
-  
+  [self configureSwapPhotosButtonText];
+}
+
+- (void)configureSwapPhotosButtonText
+{
   NSString *swapPhotosButtonText = [NSString stringWithFormat:@"Swap %d Photos",
-                                    (int)self.suggestedPhotosController.selectedFeedObjects.count];
+                                    (int)self.suggestedPhotosController.selectedPhotoIDs.count];
   [self.swapPhotosButton setTitle:swapPhotosButtonText forState:UIControlStateNormal];
 }
 
@@ -145,9 +149,7 @@
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
 {
-  NSString *swapPhotosButtonText = [NSString stringWithFormat:@"Swap %d Photos",
-                                    (int)newSelectedFeedObjects.count];
-  [self.swapPhotosButton setTitle:swapPhotosButtonText forState:UIControlStateNormal];
+  [self configureSwapPhotosButtonText];
 }
 
 #pragma mark - Swap Photos Handler
@@ -177,7 +179,7 @@
      }
      
      // add any selected photos to the list of shared photos
-     if (self.suggestedPhotosController.selectedFeedObjects.count > 0) {
+     if (selectedPhotoIDs.count > 0) {
        NSMutableSet *newPhotoIDs = [[NSMutableSet alloc] initWithArray:peanutStrand.photos];
        [newPhotoIDs addObjectsFromArray:selectedPhotoIDs];
        peanutStrand.photos = [newPhotoIDs allObjects];

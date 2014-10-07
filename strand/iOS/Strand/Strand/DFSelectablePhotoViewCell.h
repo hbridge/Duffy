@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPhotoViewCell.h"
+#import "LKBadgeView.h"
 
 @class DFSelectablePhotoViewCell;
 
@@ -23,6 +24,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *selectPhotoButton;
 @property (nonatomic, weak) id<DFSelectablePhotoViewCellDelegate> delegate;
 @property (nonatomic) BOOL showTickMark;
+@property (nonatomic) NSUInteger count;
+@property (weak, nonatomic) IBOutlet LKBadgeView *countView;
 
 
 - (IBAction)selectPhotoButtonPressed:(UIButton *)sender;
