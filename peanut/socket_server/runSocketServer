@@ -1,1 +1,3 @@
+rm bin/*.class
+javac -cp . src/* -d bin/
 java -cp $CLASSPATH:/usr/share/java/mysql-connector-java.jar:bin:. StrandSocketServer 8005

@@ -228,6 +228,8 @@
 		651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */; };
 		651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */; };
 		6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */; };
+		65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */; };
+		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -639,6 +641,10 @@
 		651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsManager.m; sourceTree = "<group>"; };
 		6523FF3E199E67BE00FA8C59 /* DFSocketsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSocketsManager.h; sourceTree = "<group>"; };
 		6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSocketsManager.m; sourceTree = "<group>"; };
+		65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS7CameraRollSyncOperation.m; sourceTree = "<group>"; };
+		65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFIOS7CameraRollSyncOperation.h; sourceTree = "<group>"; };
+		65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS8CameraRollSyncOperation.m; sourceTree = "<group>"; };
+		65BEA79D19E351310087930F /* DFIOS8CameraRollSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIOS8CameraRollSyncOperation.h; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
 		9CFF5D7C92B449CB884517E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -906,6 +912,10 @@
 				5AAF037319AE888500EF021C /* DFCameraRollSyncManager.m */,
 				5AAF037419AE888500EF021C /* DFCameraRollSyncOperation.h */,
 				5AAF037519AE888500EF021C /* DFCameraRollSyncOperation.m */,
+				65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */,
+				65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */,
+				65BEA79D19E351310087930F /* DFIOS8CameraRollSyncOperation.h */,
+				65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */,
 			);
 			name = "Photo DB";
 			sourceTree = "<group>";
@@ -1699,6 +1709,7 @@
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */,
 				5AAF038719B0D5AE00EF021C /* DFSelectPhotosController.m in Sources */,
+				65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */,
 				5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */,
 				5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
@@ -1764,6 +1775,7 @@
 				5AA452A6196739900099CBD2 /* DFFeedViewController.m in Sources */,
 				5AAF039119B0DBAE00EF021C /* DFCollectionViewTableViewCell.m in Sources */,
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
+				65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */,
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
 				5A9BC31019A26A22002D1CD7 /* DFGallerySectionHeader.m in Sources */,
 				5AC4A9351947C30800862D9C /* DFUploadSessionStats.m in Sources */,
