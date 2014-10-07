@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -10,6 +11,8 @@
                 <outlet property="inviteWrapper" destination="gHH-je-Wr8" id="DQx-BW-Yxd"/>
                 <outlet property="invitedCollectionView" destination="myg-5d-5re" id="SSN-V8-0ON"/>
                 <outlet property="matchButtonWrapper" destination="VWK-OM-57E" id="VW3-ti-S8c"/>
+                <outlet property="matchResultsTitleLabel" destination="bWa-Lo-Lnl" id="NDR-4Q-Jee"/>
+                <outlet property="matchResultsView" destination="w98-7I-99P" id="DYn-uI-KG0"/>
                 <outlet property="matchedCollectionView" destination="UKh-g2-w6Y" id="PBQ-Gh-Dju"/>
                 <outlet property="matchedFlowLayout" destination="qVg-qD-MWp" id="Gom-Qg-7u0"/>
                 <outlet property="matchingActivityWrapper" destination="WnG-LY-rGA" id="tWx-s0-Vaf"/>
@@ -81,19 +84,6 @@
                         </mask>
                     </variation>
                 </view>
-                <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="UKh-g2-w6Y" userLabel="Matched collection view">
-                    <rect key="frame" x="0.0" y="135" width="600" height="465"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qVg-qD-MWp">
-                        <size key="itemSize" width="50" height="50"/>
-                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
-                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
-                    </collectionViewFlowLayout>
-                    <userDefinedRuntimeAttributes>
-                        <userDefinedRuntimeAttribute type="boolean" keyPath="alwaysBounceVertical" value="YES"/>
-                    </userDefinedRuntimeAttributes>
-                </collectionView>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WnG-LY-rGA" userLabel="Matching activity wrapper">
                     <rect key="frame" x="256" y="127" width="88" height="77"/>
                     <subviews>
@@ -138,6 +128,65 @@
                         <constraint firstItem="Qac-tT-DKp" firstAttribute="leading" secondItem="VWK-OM-57E" secondAttribute="leading" constant="18" id="l3r-XF-il8"/>
                         <constraint firstAttribute="bottom" secondItem="Qac-tT-DKp" secondAttribute="bottom" constant="8" id="sYF-Cn-21h"/>
                     </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w98-7I-99P" userLabel="Matched area">
+                    <rect key="frame" x="0.0" y="135" width="600" height="465"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aDw-hA-TG9" userLabel="Matches Header">
+                            <rect key="frame" x="5" y="0.0" width="590" height="465"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your matching photos from" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GBf-mE-QRU">
+                                    <rect key="frame" x="8" y="8" width="163" height="16"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Date in City, State" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bWa-Lo-Lnl">
+                                    <rect key="frame" x="8" y="26" width="110" height="16"/>
+                                    <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="bWa-Lo-Lnl" firstAttribute="top" secondItem="GBf-mE-QRU" secondAttribute="bottom" constant="2" id="1Q7-Pn-bs5"/>
+                                <constraint firstItem="GBf-mE-QRU" firstAttribute="leading" secondItem="aDw-hA-TG9" secondAttribute="leading" constant="8" id="1hy-Iu-tr5"/>
+                                <constraint firstItem="bWa-Lo-Lnl" firstAttribute="leading" secondItem="aDw-hA-TG9" secondAttribute="leading" constant="8" id="Y83-zE-VhT"/>
+                                <constraint firstItem="GBf-mE-QRU" firstAttribute="top" secondItem="aDw-hA-TG9" secondAttribute="top" constant="8" id="nIH-wt-te6"/>
+                            </constraints>
+                        </view>
+                        <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="UKh-g2-w6Y" userLabel="Matched collection view">
+                            <rect key="frame" x="0.0" y="54" width="600" height="411"/>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qVg-qD-MWp">
+                                <size key="itemSize" width="50" height="50"/>
+                                <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                                <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                            </collectionViewFlowLayout>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="alwaysBounceVertical" value="YES"/>
+                            </userDefinedRuntimeAttributes>
+                        </collectionView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="UKh-g2-w6Y" secondAttribute="trailing" id="07D-4l-4xj"/>
+                        <constraint firstItem="UKh-g2-w6Y" firstAttribute="top" secondItem="w98-7I-99P" secondAttribute="top" constant="54" id="1xi-uM-hgO"/>
+                        <constraint firstItem="aDw-hA-TG9" firstAttribute="leading" secondItem="w98-7I-99P" secondAttribute="leading" constant="5" id="7vs-MI-2Gq"/>
+                        <constraint firstAttribute="trailing" secondItem="aDw-hA-TG9" secondAttribute="trailing" constant="5" id="IYX-28-vsb"/>
+                        <constraint firstAttribute="bottom" secondItem="aDw-hA-TG9" secondAttribute="bottom" id="Xnj-0E-PjC"/>
+                        <constraint firstItem="aDw-hA-TG9" firstAttribute="top" secondItem="w98-7I-99P" secondAttribute="top" id="iHI-K0-oaq"/>
+                        <constraint firstItem="UKh-g2-w6Y" firstAttribute="leading" secondItem="w98-7I-99P" secondAttribute="leading" id="nat-3N-T4e"/>
+                        <constraint firstAttribute="bottom" secondItem="UKh-g2-w6Y" secondAttribute="bottom" id="qRs-JB-n1W"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="4"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.clipsToBounds" value="YES"/>
+                    </userDefinedRuntimeAttributes>
                 </view>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wM1-ZQ-dvb" userLabel="Swap photos bar">
                     <rect key="frame" x="0.0" y="550" width="600" height="50"/>
@@ -185,18 +234,18 @@
             <constraints>
                 <constraint firstItem="VWK-OM-57E" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="8" id="1db-Mb-DIm"/>
                 <constraint firstItem="wM1-ZQ-dvb" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="70q-CN-SDV"/>
+                <constraint firstItem="w98-7I-99P" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="N6J-QJ-whQ"/>
                 <constraint firstItem="gHH-je-Wr8" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="16" id="ONE-bD-8eh"/>
                 <constraint firstAttribute="bottom" secondItem="wM1-ZQ-dvb" secondAttribute="bottom" id="OWf-Zk-kD8"/>
                 <constraint firstItem="gHH-je-Wr8" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="5" id="UeU-qy-6F5"/>
                 <constraint firstAttribute="trailing" secondItem="wM1-ZQ-dvb" secondAttribute="trailing" id="YP2-RV-EuE"/>
-                <constraint firstAttribute="trailing" secondItem="UKh-g2-w6Y" secondAttribute="trailing" id="YaE-8w-sNU"/>
-                <constraint firstItem="UKh-g2-w6Y" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="e5q-U6-Fd7"/>
+                <constraint firstItem="w98-7I-99P" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="16" id="eVq-Jj-i4a"/>
                 <constraint firstAttribute="centerX" secondItem="VWK-OM-57E" secondAttribute="centerX" id="mnZ-Be-5qi"/>
+                <constraint firstAttribute="trailing" secondItem="w98-7I-99P" secondAttribute="trailing" id="oR6-KL-VnJ"/>
                 <constraint firstAttribute="centerX" secondItem="WnG-LY-rGA" secondAttribute="centerX" id="vwf-OC-KQr"/>
-                <constraint firstAttribute="bottom" secondItem="UKh-g2-w6Y" secondAttribute="bottom" id="wlO-b4-72X"/>
+                <constraint firstAttribute="bottom" secondItem="w98-7I-99P" secondAttribute="bottom" id="xW2-DO-We2"/>
                 <constraint firstAttribute="trailing" secondItem="gHH-je-Wr8" secondAttribute="trailing" constant="5" id="xbC-ci-R2N"/>
                 <constraint firstItem="WnG-LY-rGA" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="8" id="y70-BA-6k6"/>
-                <constraint firstItem="UKh-g2-w6Y" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="16" id="yVJ-Al-BEC"/>
             </constraints>
         </view>
     </objects>

@@ -85,7 +85,7 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
     [self.selectedFeedObjects addObject:object];
   }
   
-  [self.collectionView reloadData];
+  [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
   if (self.delegate) {
     [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
   }

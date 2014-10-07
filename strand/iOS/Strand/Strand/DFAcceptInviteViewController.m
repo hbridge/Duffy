@@ -86,6 +86,13 @@
 
 - (void)configureMatchedArea
 {
+  // hide the match results view until the match button is pressed and we have results
+  self.matchResultsView.hidden = YES;
+  
+  // set the title for the match results area
+  self.matchResultsTitleLabel.text = self.invitedStrandPosts.title;
+  
+  // create the suggested photos select controller to populate the data
   NSMutableArray *suggestedPhotos = [NSMutableArray new];
   for (DFPeanutFeedObject *suggestedPhotosSection in self.suggestedPhotosPosts.objects) {
     [suggestedPhotos addObjectsFromArray:suggestedPhotosSection.enumeratorOfDescendents.allObjects];
@@ -95,6 +102,7 @@
                                     collectionView:self.matchedCollectionView
                                     sourceMode:DFImageDataSourceModeLocal imageType:DFImageThumbnail];
   self.suggestedPhotosController.delegate = self;
+  self.matchedCollectionView.contentInset = UIEdgeInsetsMake(0, 0, self.swapPhotosBar.frame.size.height, 0);
 }
 
 
@@ -103,7 +111,7 @@
   self.matchingActivityWrapper.hidden = NO;
   dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
     self.matchingActivityWrapper.hidden = YES;
-    self.matchedCollectionView.hidden = NO;
+    self.matchResultsView.hidden = NO;
     self.swapPhotosBar.hidden = NO;
   });
   
