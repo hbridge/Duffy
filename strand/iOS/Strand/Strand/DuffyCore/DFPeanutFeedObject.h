@@ -40,7 +40,7 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
 @property (nonatomic) DFUserIDType user;
 @property (nonatomic, retain) NSString *user_display_name;
 @property (nonatomic, retain) NSDate *time_stamp;
-@property (nonatomic, retain) NSNumber *visible;
+@property (nonatomic, retain) NSNumber *ready;
 @property (nonatomic, retain) NSNumber *suggestible;
 
 // Relationships
