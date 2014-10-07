@@ -56,6 +56,7 @@ NSUInteger const NumPhotosPerRow = 3;
   
   [self configureCollectionView];
   [self configurePeoplePicker];
+  [self configureSwapButtonTitle];
 }
 
 - (void)viewDidLayoutSubviews
@@ -71,11 +72,6 @@ NSUInteger const NumPhotosPerRow = 3;
 - (void)configureNavBar
 {
   self.navigationItem.title = @"Invite to Swap";
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithTitle:@"Invite"
-                                            style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(donePressed:)];
 }
 
 
@@ -106,19 +102,37 @@ NSUInteger const NumPhotosPerRow = 3;
                                  collectionView:self.collectionView
                                  sourceMode:DFImageDataSourceModeLocal
                                  imageType:DFImageThumbnail];
+  self.selectPhotosController.delegate = self;
   self.collectionView.alwaysBounceVertical = YES;
+  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, self.swapBarWrapper.frame.size.height, 0);
 }
 
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
+{
+  [self configureSwapButtonTitle];
+}
+
+- (void)configureSwapButtonTitle
+{
+  NSUInteger selectedCount = self.selectPhotosController.selectedFeedObjects.count;
+  if (selectedCount > 0) {
+    NSString *title = [NSString stringWithFormat:@"Swap %d Photos",
+                       (int)selectedCount];
+    [self.swapPhotosButton setTitle:title forState:UIControlStateNormal];
+    self.swapPhotosButton.enabled = YES;
+  } else {
+    [self.swapPhotosButton setTitle:@"No Photos Selected" forState:UIControlStateDisabled];
+    self.swapPhotosButton.enabled = NO;
+  }
+  
+}
 
 #pragma mark - Actions
 
-- (void)donePressed:(id)sender
-{
+- (IBAction)swapPhotosButtonPressed:(UIButton *)sender {
   [self.tokenField resignFirstResponder];
   [self createNewStrandWithSelection];
 }
-
-
 
 - (void)createNewStrandWithSelection
 {
@@ -227,6 +241,8 @@ NSUInteger const NumPhotosPerRow = 3;
   strand.first_photo_time = minDateFound;
   strand.last_photo_time = maxDateFound;
 }
+
+
 
 #pragma mark - DFPeoplePicker delegate
 
