@@ -85,10 +85,10 @@
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w98-7I-99P" userLabel="Matched area">
-                            <rect key="frame" x="0.0" y="135" width="600" height="308"/>
+                            <rect key="frame" x="0.0" y="135" width="600" height="281"/>
                             <subviews>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aDw-hA-TG9" userLabel="Matches Header">
-                                    <rect key="frame" x="5" y="0.0" width="590" height="308"/>
+                                    <rect key="frame" x="5" y="0.0" width="590" height="281"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Your matching photos from" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="GBf-mE-QRU">
                                             <rect key="frame" x="8" y="8" width="163" height="16"/>
@@ -143,7 +143,7 @@
                                 <constraint firstAttribute="bottom" secondItem="aDw-hA-TG9" secondAttribute="bottom" id="Xnj-0E-PjC"/>
                                 <constraint firstItem="aDw-hA-TG9" firstAttribute="top" secondItem="w98-7I-99P" secondAttribute="top" id="iHI-K0-oaq"/>
                                 <constraint firstItem="UKh-g2-w6Y" firstAttribute="leading" secondItem="w98-7I-99P" secondAttribute="leading" id="nat-3N-T4e"/>
-                                <constraint firstAttribute="bottom" secondItem="UKh-g2-w6Y" secondAttribute="bottom" constant="54" id="qRs-JB-n1W"/>
+                                <constraint firstAttribute="bottom" secondItem="UKh-g2-w6Y" secondAttribute="bottom" constant="27" id="qRs-JB-n1W"/>
                             </constraints>
                         </view>
                         <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WnG-LY-rGA" userLabel="Matching activity wrapper">

@@ -103,9 +103,7 @@
                                     collectionView:self.matchedCollectionView
                                     sourceMode:DFImageDataSourceModeLocal imageType:DFImageThumbnail];
   self.suggestedPhotosController.delegate = self;
-  
-  self.matchedCollectionView.contentInset = UIEdgeInsetsMake(0, 0, self.swapPhotosBar.frame.size.height, 0);
-  self.scrollView.contentInset = UIEdgeInsetsMake(0, 0, self.matchResultsView.frame.origin.y - 2, 0);
+  self.scrollView.contentInset = UIEdgeInsetsMake(0, 0, self.swapPhotosBar.frame.size.height + 16, 0);
 }
 
 
