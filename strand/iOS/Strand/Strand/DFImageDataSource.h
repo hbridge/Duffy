@@ -7,6 +7,8 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPhotoViewCell.h"
+#import "DFPeanutFeedObject.h"
 
 @interface DFImageDataSource : NSObject <UICollectionViewDataSource>
 
@@ -15,7 +17,7 @@ typedef enum {
   DFImageDataSourceModeLocal,
 } DFImageDataSourceMode;
 
-@property (nonatomic, retain) NSDictionary *indexPathsToObjects;
+@property (nonatomic, retain) NSArray *feedObjects;
 @property (nonatomic, weak) UICollectionView *collectionView;
 @property (nonatomic) DFImageDataSourceMode sourceMode;
 @property (nonatomic) DFImageType imageType;
@@ -24,4 +26,15 @@ typedef enum {
                     collectionView:(UICollectionView *)collectionView
                         sourceMode:(DFImageDataSourceMode)sourceMode
                          imageType:(DFImageType)imageType;
+
+
+#pragma mark - For use by subclasses only;
+
+- (void)setRemotePhotoForCell:(DFPhotoViewCell *)cell
+                  photoObject:(DFPeanutFeedObject *)photoObject
+                    indexPath:(NSIndexPath *)indexPath;
+- (void)setLocalPhotosForCell:(DFPhotoViewCell *)cell
+                  photoObject:(DFPeanutFeedObject *)photoObject
+                    indexPath:(NSIndexPath *)indexPath;
+
 @end

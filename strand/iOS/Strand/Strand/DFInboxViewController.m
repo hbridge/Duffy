@@ -12,7 +12,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFImageStore.h"
 #import "DFFeedViewController.h"
-#import "DFSelectPhotosViewController.h"
+#import "DFSelectPhotosController.h"
 #import "NSString+DFHelpers.h"
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFPeanutUserObject.h"

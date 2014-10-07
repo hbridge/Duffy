@@ -80,4 +80,9 @@ typedef enum {
 + (void)fetchMostRecentSavedPhotoDate:(void (^)(NSDate *date))completion
                 promptUserIfNecessary:(BOOL)promptUser;
 
+
+- (void)markPhotosForUpload:(NSArray *)photoIDs;
+- (void)cachePhotosInImageStore:(NSArray *)photoIDs;
+
+
 @end

@@ -20,13 +20,18 @@
 
 - (void)setShowTickMark:(BOOL)showTickMark
 {
-  self.selectedImageView.hidden = !showTickMark;
+  self.selectPhotoButton.selected = showTickMark;
   [self setNeedsLayout];
 }
 
 - (BOOL)showTickMark
 {
-  return !self.selectedImageView.hidden;
+  return self.selectPhotoButton.selected;
+}
+
+- (IBAction)selectPhotoButtonPressed:(UIButton *)sender {
+  if (self.delegate)
+    [self.delegate cell:self selectPhotoButtonPressed:sender];
 }
 
 @end

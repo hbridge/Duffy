@@ -5,7 +5,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSelectPhotosViewController">
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFCreateStrandViewController">
             <connections>
                 <outlet property="collectionView" destination="Km3-sv-lcM" id="4bR-q1-qkK"/>
                 <outlet property="flowLayout" destination="naL-ru-Sc5" id="3Zm-63-zTJ"/>

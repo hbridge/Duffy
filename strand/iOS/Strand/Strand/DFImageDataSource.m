@@ -30,13 +30,7 @@
 {
   self = [super init];
   if (self) {
-    NSMutableDictionary *indexPathsToObjects = [NSMutableDictionary new];
-    for (NSUInteger i = 0; i < feedObjects.count; i++) {
-      NSIndexPath *indexPath = [NSIndexPath indexPathForRow:i inSection:0];
-      indexPathsToObjects[[indexPath dictKey]] = feedObjects[i];
-    }
-    _indexPathsToObjects = indexPathsToObjects;
-    
+    _feedObjects = feedObjects;
     _collectionView = collectionView;
     [collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFPhotoViewCell class]) bundle:nil]
      forCellWithReuseIdentifier:@"cell"];
@@ -84,7 +78,7 @@
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
   if (self.sourceMode == DFImageDataSourceModeRemote)
-    return self.indexPathsToObjects.keyEnumerator.allObjects.count;
+    return self.feedObjects.count;
   else if (self.sourceMode == DFImageDataSourceModeLocal)
     return self.localPhotoAssets.count;
   
@@ -97,7 +91,7 @@
   DFPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
   cell.imageView.image = nil;
   
-  DFPeanutFeedObject *feedObject = self.indexPathsToObjects[[indexPath dictKey]];
+  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
   DFPeanutFeedObject *photoObject;
   if ([feedObject.type isEqual:DFFeedObjectCluster]) {
     photoObject = feedObject.objects.firstObject;
@@ -108,22 +102,30 @@
   }
   
   if (_sourceMode == DFImageDataSourceModeRemote) {
-    [[DFImageStore sharedStore]
-     imageForID:photoObject.id
-     preferredType:DFImageThumbnail
-     thumbnailPath:photoObject.thumb_image_path
-     fullPath:photoObject.full_image_path
-     completion:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         cell.imageView.image = image;
-         [cell setNeedsLayout];
-       });
-     }];
+    [self setRemotePhotoForCell:cell photoObject:photoObject indexPath:indexPath];
   } else if (_sourceMode == DFImageDataSourceModeLocal){
     [self setLocalPhotosForCell:cell photoObject:photoObject indexPath:indexPath];
   }
   
   return cell;
+}
+
+- (void)setRemotePhotoForCell:(DFPhotoViewCell *)cell
+                  photoObject:(DFPeanutFeedObject *)photoObject
+                    indexPath:(NSIndexPath *)indexPath
+{
+  [[DFImageStore sharedStore]
+   imageForID:photoObject.id
+   preferredType:DFImageThumbnail
+   thumbnailPath:photoObject.thumb_image_path
+   fullPath:photoObject.full_image_path
+   completion:^(UIImage *image) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       cell.imageView.image = image;
+       [cell setNeedsLayout];
+     });
+   }];
+
 }
 
 - (void)setLocalPhotosForCell:(DFPhotoViewCell *)cell

@@ -16,7 +16,7 @@
 #import "DFStrandSuggestionTableViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "DFSelectPhotosViewController.h"
+#import "DFSelectPhotosController.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFPeanutStrandAdapter.h"
 #import "DFImageStore.h"
@@ -27,6 +27,7 @@
 #import "UIDevice+DFHelpers.h"
 #import "NSArray+DFHelpers.h"
 #import "UINib+DFHelpers.h"
+#import "DFCreateStrandViewController.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -506,34 +507,10 @@ const NSUInteger MaxPhotosPerCell = 3;
 {
   NSArray *feedObjectsForSection = [self sectionObjectsForSection:indexPath.section tableView:tableView];
   DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
-  DFSelectPhotosViewController *selectController;
-  if ([feedObject.type isEqualToString:DFFeedObjectInviteStrand]) {
-    DFPeanutFeedObject *invitedStrandPosts = [[feedObject subobjectsOfType:DFFeedObjectSection]
-                                              firstObject];
-    DFPeanutFeedObject *suggestedPhotos = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
-                                           firstObject];
-    // this is an invite, the object that user selected represenets the shared photos
-    // don't show the to field
-    DFSelectPhotosViewController *selectController = [[DFSelectPhotosViewController alloc]
-                                                      initWithTitle:@"Accept Invite"
-                                                      showsToField:NO
-                                                      suggestedSectionObject:suggestedPhotos
-                                                      invitedStrandPosts:invitedStrandPosts
-                                                      inviteObject:feedObject];
-    selectController.inviteObject = feedObject;
-    [self.navigationController pushViewController:selectController animated:YES];
-  } else {
-    // this is creating a new strand, the object they selected is a suggestion
-    // we also want to show a to field to invite others
-    selectController = [[DFSelectPhotosViewController alloc]
-                        initWithTitle:@"Select Photos"
-                        showsToField:YES
-                        suggestedSectionObject:feedObject
-                        invitedStrandPosts:nil
-                        inviteObject:nil
-                        ];
-    [self.navigationController pushViewController:selectController animated:YES];
-  }
+  
+  DFCreateStrandViewController *createStrandController = [[DFCreateStrandViewController alloc]
+                                                          initWithSuggestions:feedObject];
+  [self.navigationController pushViewController:createStrandController animated:YES];
 }
 
 

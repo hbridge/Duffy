@@ -7,10 +7,24 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFPhotoViewCell.h"
 
-@interface DFSelectablePhotoViewCell : UICollectionViewCell
+@class DFSelectablePhotoViewCell;
+
+@protocol DFSelectablePhotoViewCellDelegate <NSObject>
+
+- (void)cell:(DFSelectablePhotoViewCell *)cell selectPhotoButtonPressed:(UIButton *)selectPhotoButton;
+
+@end
+
+
+@interface DFSelectablePhotoViewCell : DFPhotoViewCell
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (weak, nonatomic) IBOutlet UIImageView *selectedImageView;
+@property (weak, nonatomic) IBOutlet UIButton *selectPhotoButton;
+@property (nonatomic, weak) id<DFSelectablePhotoViewCellDelegate> delegate;
 @property (nonatomic) BOOL showTickMark;
+
+
+- (IBAction)selectPhotoButtonPressed:(UIButton *)sender;
 
 @end

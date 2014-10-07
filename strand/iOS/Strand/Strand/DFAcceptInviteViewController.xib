@@ -14,6 +14,8 @@
                 <outlet property="matchedCollectionView" destination="UKh-g2-w6Y" id="PBQ-Gh-Dju"/>
                 <outlet property="matchedFlowLayout" destination="qVg-qD-MWp" id="Gom-Qg-7u0"/>
                 <outlet property="matchingActivityWrapper" destination="WnG-LY-rGA" id="tWx-s0-Vaf"/>
+                <outlet property="swapPhotosBar" destination="wM1-ZQ-dvb" id="jAN-P6-LEk"/>
+                <outlet property="swapPhotosButton" destination="tUl-GC-OhM" id="308-l5-VRP"/>
                 <outlet property="titleLabel" destination="exL-RF-vhS" id="EBF-UW-Th7"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
@@ -138,7 +140,7 @@
                         <constraint firstAttribute="bottom" secondItem="Qac-tT-DKp" secondAttribute="bottom" constant="8" id="sYF-Cn-21h"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wM1-ZQ-dvb" userLabel="Swap photos bar">
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wM1-ZQ-dvb" userLabel="Swap photos bar">
                     <rect key="frame" x="0.0" y="550" width="600" height="50"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yGH-Re-BLa">
@@ -150,6 +152,9 @@
                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
+                                    <connections>
+                                        <action selector="swapPhotosButtonPressed:" destination="-1" eventType="touchUpInside" id="E3i-Lh-5Dn"/>
+                                    </connections>
                                 </button>
                             </subviews>
                             <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>

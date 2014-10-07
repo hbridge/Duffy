@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -16,34 +17,38 @@
                     <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Hac-QT-qXU">
                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                     </imageView>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/PhotoSelectedIcon" translatesAutoresizingMaskIntoConstraints="NO" id="Wx8-sz-NF2" userLabel="SelectedIcon">
-                        <rect key="frame" x="34" y="4" width="26" height="26"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="26" id="FSe-ao-zer"/>
-                            <constraint firstAttribute="height" constant="26" id="biz-oe-IaD"/>
-                        </constraints>
-                    </imageView>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GLf-nM-dzo">
+                        <rect key="frame" x="36" y="8" width="16" height="22"/>
+                        <state key="normal" image="Assets/Icons/PhotoNotSelectedIcon">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <state key="selected" image="Assets/Icons/PhotoSelectedIcon"/>
+                        <connections>
+                            <action selector="selectPhotoButtonPressed:" destination="Lih-fC-ket" eventType="touchUpInside" id="UZa-tx-y5X"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
             <color key="backgroundColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
             <constraints>
                 <constraint firstItem="Hac-QT-qXU" firstAttribute="top" secondItem="Lih-fC-ket" secondAttribute="top" id="FnD-pE-LYU"/>
+                <constraint firstItem="GLf-nM-dzo" firstAttribute="top" secondItem="Lih-fC-ket" secondAttribute="top" constant="8" id="Ix8-zj-3Z4"/>
                 <constraint firstAttribute="bottom" secondItem="Hac-QT-qXU" secondAttribute="bottom" id="Sfq-4z-Udd"/>
-                <constraint firstAttribute="trailing" secondItem="Wx8-sz-NF2" secondAttribute="trailing" id="YHI-ZF-76g"/>
                 <constraint firstItem="Hac-QT-qXU" firstAttribute="leading" secondItem="Lih-fC-ket" secondAttribute="leading" id="az0-M3-h2J"/>
-                <constraint firstItem="Wx8-sz-NF2" firstAttribute="top" secondItem="Lih-fC-ket" secondAttribute="top" constant="4" id="eqt-yv-Nyj"/>
+                <constraint firstAttribute="trailing" secondItem="GLf-nM-dzo" secondAttribute="trailing" constant="8" id="eny-9z-Fba"/>
                 <constraint firstAttribute="trailing" secondItem="Hac-QT-qXU" secondAttribute="trailing" id="h9J-iw-eYt"/>
             </constraints>
             <size key="customSize" width="-53" height="-56"/>
             <connections>
                 <outlet property="imageView" destination="Hac-QT-qXU" id="WOx-u3-SfB"/>
-                <outlet property="selectedImageView" destination="Wx8-sz-NF2" id="fd6-7V-zUM"/>
+                <outlet property="selectPhotoButton" destination="GLf-nM-dzo" id="3FR-DV-VpV"/>
             </connections>
-            <point key="canvasLocation" x="366" y="221.5"/>
+            <point key="canvasLocation" x="366" y="221"/>
         </collectionViewCell>
     </objects>
     <resources>
+        <image name="Assets/Icons/PhotoNotSelectedIcon" width="16" height="16"/>
         <image name="Assets/Icons/PhotoSelectedIcon" width="16" height="16"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
