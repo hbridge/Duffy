@@ -17,7 +17,7 @@ class UserSerializer(serializers.ModelSerializer):
 	
 	class Meta:
 		model = User
-		fields = ('id', 'display_name', 'phone_number', 'phone_id', 'auth_token', 'device_token', 'last_location_point', 'last_location_accuracy', 'invites_remaining', 'invites_sent', 'added')
+		fields = ('id', 'display_name', 'phone_number', 'phone_id', 'auth_token', 'device_token', 'last_location_point', 'last_location_accuracy', 'first_run_sync_timestamp', 'first_run_sync_complete', 'invites_remaining', 'invites_sent', 'added')
 
 class ActionWithUserNameSerializer(serializers.ModelSerializer):
 	user_display_name = serializers.Field('getUserDisplayName')

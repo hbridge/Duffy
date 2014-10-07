@@ -190,6 +190,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	if len(strandInvites) > 0:
 		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
 		logger.debug("Updated %s invites with user id %s" % (len(strandInvites), user.id))
+		user.first_run_sync_timestamp = strandInvites[0].strand.time_taken
 	
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
@@ -515,7 +516,7 @@ def getInviteObjectsDataForUser(user):
 	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
 
 	for strandInvite in strandInvites:
-		shouldShowInvite = True
+		inviteIsReady = True
 		thumbsLoaded = True
 		invitePhotos = strandInvite.strand.photos.all()
 		
@@ -528,16 +529,18 @@ def getInviteObjectsDataForUser(user):
 		if thumbsLoaded:
 			# If the last stranded photo 
 			lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-			if len(lastStrandedPhotos) > 0:
+			if len(lastStrandedPhotos) > 0 and not user.first_run_sync_complete:
 				if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
-					shouldShowInvite = False
+					inviteIsReady = False
 			else:
-				shouldShowInvite = False
+				inviteIsReady = False
 
+			if user.first_fun_sync_complete:
+				inviteIsReady = True
 
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
-			entry['visible'] = shouldShowInvite
+			entry['ready'] = inviteIsReady
 			entry['objects'] = list()
 			entry['objects'].append(getObjectsDataForStrand(strandInvite.strand, user))
 
