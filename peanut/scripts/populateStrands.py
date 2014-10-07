@@ -209,6 +209,9 @@ def main(argv):
 				photosByStrandId[strand.id] = list(strand.photos.all())
 				usersByStrandId[strand.id] = list(strand.users.all())
 
+			c = datetime.datetime.now()
+			logger.debug("Building Strands cache with %s strands took took %s milli" % (len(strandsCache), ((c-b).microseconds/1000) + (c-b).seconds*1000))
+
 			for photo in photos:
 				matchingStrands = list()
 				strandNeighbors = list()
