@@ -133,13 +133,6 @@ def turnFormattedGroupsIntoFeedObjects(formattedGroups, num):
 						mostRecentPhotoDate = photoData['time_taken']
 				feedObject['objects'].append(clusterObj)
 
-			count += 1
-			if count == num:
-				if mostRecentPhotoDate:
-					feedObject['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
-
-				result.append(feedObject)
-				return result
 		if ('docs' in group and len(group['docs']) > 0):
 			docObj = {'type': 'docstack', 'title': 'Your docs', 'objects': list()}
 			for entry in group['docs']:
@@ -150,6 +143,14 @@ def turnFormattedGroupsIntoFeedObjects(formattedGroups, num):
 		if mostRecentPhotoDate:
 			feedObject['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
 
+		count += 1
+		if count == num:
+			if mostRecentPhotoDate:
+				feedObject['expire_time'] = mostRecentPhotoDate + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING)
+
+			result.append(feedObject)
+			return result
+			
 		result.append(feedObject)
 	return result
 

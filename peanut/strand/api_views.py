@@ -408,7 +408,7 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	formattedGroups = getFormattedGroups(groups)
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	return objects
 
 """
@@ -453,9 +453,9 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 	formattedGroups = getFormattedGroups(groups)
-		
+	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 
 	return objects
 
@@ -485,7 +485,7 @@ def getObjectsDataForPost(postAction):
 	formattedGroups = getFormattedGroups([groupEntry])
 		
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	return objects
 
 def getObjectsDataForStrand(strand, user):
@@ -585,7 +585,7 @@ def private_strands(request):
 
 		a = datetime.datetime.now()
 		
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(private=True))
+		strands = list(Strand.objects.select_related().filter(users__in=[user]).filter(private=True))
 
 		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
 		b = datetime.datetime.now()
