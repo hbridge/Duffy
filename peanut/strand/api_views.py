@@ -697,7 +697,6 @@ def update_user_location(request):
 		lat = form.cleaned_data['lat']
 		timestamp = form.cleaned_data['timestamp']
 		accuracy = form.cleaned_data['accuracy']
-		last_photo_timestamp = form.cleaned_data['last_photo_timestamp']
 		
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		
@@ -711,11 +710,7 @@ def update_user_location(request):
 					user.last_location_timestamp = now
 
 				user.last_location_accuracy = accuracy
-
-				if last_photo_timestamp:
-					user.last_photo_timestamp = last_photo_timestamp
-					logger.info("Last Photo: %s, %s" % (user.id, last_photo_timestamp))
-				
+							
 				# We're saving last build info here since we are already writing to the user row in the database
 				if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
 					# if last_build_info is empty or if either build_id or build_number is not in last_build_info
@@ -874,7 +869,7 @@ def auth_phone(request):
 	response = dict({'result': True})
 	form = AuthPhoneForm(api_util.getRequestData(request))
 
-	timeWithinMinutes = 720
+	timeWithinMinutes = 10
 
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['phone_number'])

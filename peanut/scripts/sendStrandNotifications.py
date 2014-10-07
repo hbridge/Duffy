@@ -18,57 +18,6 @@ from strand import notifications_util, geo_util, strands_util, friends_util
 
 logger = logging.getLogger(__name__)
 
-"""
-	Look through all recent photos from last 30 minutes and see if any users have a 
-	  last_location_point near there...and haven't been notified recently about that user
-"""
-def sendJoinStrandNotification(now, joinStrandWithin, joinStrandLimitGpsUpdatedWithin, notificationLogsCache):
-	msgType = constants.NOTIFICATIONS_JOIN_STRAND_ID
-
-	newPhotosStartTimeCutoff = now - joinStrandWithin
-	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, [msgType, constants.NOTIFICATIONS_NEW_PHOTO_ID], newPhotosStartTimeCutoff)
-
-	# 30 minute cut off for join strand messages
-	joinStrandStartTimeCutoff = now - joinStrandWithin
-	strands = Strand.objects.select_related().filter(last_photo_time__gt=joinStrandStartTimeCutoff)
-	
-	frequencyOfGpsUpdatesCutoff = now - joinStrandLimitGpsUpdatedWithin
-	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=frequencyOfGpsUpdatesCutoff)
-
-	for user in users:
-		friendsData = friends_util.getFriendsData(user.id)
-		joinableStrandPhotos = strands_util.getJoinableStrandPhotos(user.id, user.last_location_point.x, user.last_location_point.y, strands, friendsData)
-
-		names = list()
-		for photo in joinableStrandPhotos:
-			names.append(photo.user.display_name)
-
-		# Grab unique names
-		names = set(names)
-		
-		if len(names) > 0:
-			msg = " & ".join(names) + " took a photo near you! Take a photo to see it."
-
-			# We want to see if the user has gotten this message before.  Also, we want to support
-			#   new people showing up so if the message is longer than they got before, send.
-			skipNotification = False
-			if user.id in notificationsById:
-				for notification in notificationsById[user.id]:
-
-					if notification.msg_type == msgType:
-						if (len(notification.msg) == len(msg) or 
-							notification.msg == ""):
-						
-							skipNotification = True
-					if notification.msg_type == constants.NOTIFICATIONS_NEW_PHOTO_ID:
-						skipNotification = True
-
-			if not skipNotification:
-				logger.debug("Sending %s to %s" % (msg, user.id))
-				logEntries = notifications_util.sendNotification(user, msg, msgType, None)
-				notificationLogsCache.extend(logEntries)
-
-	return notificationLogsCache
 			
 """
 	Send notifications for actions on photos.
@@ -151,41 +100,6 @@ def sendRawFirestarter(now, gpsUpdatedWithin, notifiedWithin, distanceWithinMete
 			notificationLogsCache.extend(logEntries)
 				
 	return notificationLogsCache
-"""
-	Photo firestarter kicks off when a user has taken a photo recently
-"""
-def sendPhotoFirestarter(now, photoTakenWithin, gpsUpdatedWithin, notifiedWithin, accuracyWithinMeters, notificationLogsCache):
-	msgType = constants.NOTIFICATIONS_PHOTO_FIRESTARTER_ID
-	
-	gpsUpdatedCutoff = now - gpsUpdatedWithin
-	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=gpsUpdatedCutoff)
-
-	notifiedCutoff = now - notifiedWithin
-	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, constants.NOTIFICATIONS_ANY, notifiedCutoff)
-
-	photoTakenCutoff = now - photoTakenWithin
-
-	for user in users:
-		nearbyUsers = geo_util.getNearbyUsers(user.last_location_point.x, user.last_location_point.y, users, filterUserId=user.id, accuracyWithin = accuracyWithinMeters)
-
-		numNearbyUsers = len(nearbyUsers)
-
-		# Check to see if they took a photo recently and have nearby users
-		# Also make sure we haven't sent them either a raw firestarter or a photo one recently
-		if (numNearbyUsers > 0 and
-		  user.last_photo_timestamp and 
-		  user.last_photo_timestamp.replace(tzinfo=pytz.utc) > photoTakenCutoff and 
-		  user.id not in notificationsById):
-			if numNearbyUsers == 1:
-				msg = "You have a friend on Strand nearby. Take a photo to share with them!"
-			else:
-				msg = "You have %s friends on Strand nearby. Take a photo to share with them!" % (numNearbyUsers)
-				
-			logger.debug("Sending photo firestarter msg to user %s " % (user.id))
-			logEntries = notifications_util.sendNotification(user, msg, msgType, dict())
-			notificationLogsCache.extend(logEntries)
-			
-	return notificationLogsCache
 
 def main(argv):
 	joinStrandWithin = datetime.timedelta(minutes=30)
@@ -221,13 +135,9 @@ def main(argv):
 		# Raw firestarter
 		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - rawFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_RAW_FIRESTARTER_ID))
 
-		#notificationLogsCache = sendJoinStrandNotification(now, joinStrandWithin, joinStrandGpsUpdatedWithin, notificationLogsCache)
-
 		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
 
 		notificationLogsCache = sendGpsNotification(now, gpsRefreshTime, notificationLogsCache)
-
-		#notificationLogsCache = sendPhotoFirestarter(now, photosFirestarterPhotoTakenWithin, photosFirestarterGpsUpdatedWithin, photosFirestarterNotifiedWithin, photosFirestarterAccuracyWithinMeters, notificationLogsCache)
 
 		#notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
 				
