@@ -468,6 +468,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	# Get all the unshared strands for the given user that are close to the given strand
 	privateStrands = Strand.objects.select_related().filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 	
+	strandsThatMatch = list()
 	for privateStrand in privateStrands:
 		for photo in privateStrand.photos.all():
 			if strands_util.photoBelongsInStrand(photo, strand) and privateStrand not in strandsThatMatch:
