@@ -9,7 +9,8 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutFeedObject.h"
 
-@interface DFAcceptInviteViewController : UIViewController
+@interface DFAcceptInviteViewController : UIViewController <UICollectionViewDataSource, UICollectionViewDelegate>
+
 @property (weak, nonatomic) IBOutlet UIView *inviteWrapper;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;

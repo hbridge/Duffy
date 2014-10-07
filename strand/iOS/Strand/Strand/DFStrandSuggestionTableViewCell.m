@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFCreateStrandTableViewCell.h"
+#import "DFStrandSuggestionTableViewCell.h"
 #import "DFStrandConstants.h"
 #import "DFPhotoViewCell.h"
 
-@implementation DFCreateStrandTableViewCell
+@implementation DFStrandSuggestionTableViewCell
 
 - (void)awakeFromNib
 {
@@ -25,9 +25,9 @@
   self.countBadgeBackground.layer.opacity = 0.9;
 }
 
-+ (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
++ (DFStrandSuggestionTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
 {
-  DFCreateStrandTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
+  DFStrandSuggestionTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
   [cell configureWithStyle:style];
   return cell;
 }

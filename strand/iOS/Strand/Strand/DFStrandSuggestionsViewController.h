@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 #import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
 
-@interface DFCreateStrandViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MCSwipeTableViewCellDelegate>
+@interface DFStrandSuggestionsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MCSwipeTableViewCellDelegate>
 
 @property (nonatomic) BOOL showAsFirstTimeSetup;
 @property (nonatomic, retain) IBOutlet UITableView *suggestedTableView;

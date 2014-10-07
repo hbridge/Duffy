@@ -10,7 +10,7 @@
 #import "DFCollectionViewTableViewCell.h"
 #import "OFElementSquare.h"
 
-@interface DFCreateStrandTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
+@interface DFStrandSuggestionTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
 typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
   DFCreateStrandCellStyleInvite,
@@ -28,7 +28,7 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 @property (weak, nonatomic) IBOutlet UIView *countBadgeBackground;
 
 
-+ (DFCreateStrandTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
++ (DFStrandSuggestionTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
 - (void)configureWithStyle:(DFCreateStrandCellStyle)style;
 
 @end

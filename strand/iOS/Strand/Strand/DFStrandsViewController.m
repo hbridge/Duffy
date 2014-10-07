@@ -23,7 +23,7 @@
 #import "DFStrandConstants.h"
 #import "DFToastNotificationManager.h"
 #import "DFUploadController.h"
-#import "DFCreateStrandViewController.h"
+#import "DFStrandSuggestionsViewController.h"
 #import "AppDelegate.h"
 
 
@@ -364,7 +364,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)createButtonPressed:(id)sender
 {
   DDLogInfo(@"Create button pressed");
-  DFCreateStrandViewController *createController = [DFCreateStrandViewController sharedViewController];
+  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
   createController.showAsFirstTimeSetup = NO;
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
@@ -455,7 +455,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 }
 
 - (IBAction)createStrandButtonPressed:(id)sender {
-  DFCreateStrandViewController *vc = [DFCreateStrandViewController sharedViewController];
+  DFStrandSuggestionsViewController *vc = [DFStrandSuggestionsViewController sharedViewController];
   vc.showAsFirstTimeSetup = NO;
   
   [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]

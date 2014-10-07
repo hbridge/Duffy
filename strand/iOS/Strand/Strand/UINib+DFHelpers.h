@@ -11,5 +11,6 @@
 @interface UINib (DFHelpers)
 
 + (id)instantiateViewWithClass:(Class)class;
++ (UINib *)nibForClass:(Class)class;
 
 @end

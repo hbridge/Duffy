@@ -9,7 +9,6 @@
 #import <UIKit/UIKit.h>
 
 @interface DFSelectablePhotoViewCell : UICollectionViewCell
-@property (readonly, weak, nonatomic) IBOutlet UIView *contentView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIImageView *selectedImageView;
 @property (nonatomic) BOOL showTickMark;

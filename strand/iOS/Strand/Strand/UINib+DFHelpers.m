@@ -15,4 +15,9 @@
   return [[[UINib nibWithNibName:NSStringFromClass(class) bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
 }
 
++ (UINib *)nibForClass:(Class)class
+{
+  return [UINib nibWithNibName:NSStringFromClass(class) bundle:nil];
+}
+
 @end

@@ -15,7 +15,7 @@
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
 #import "RootViewController.h"
-#import "DFCreateStrandViewController.h"
+#import "DFStrandSuggestionsViewController.h"
 #import "DFNavigationController.h"
 
 @interface DFLocationPermissionViewController ()

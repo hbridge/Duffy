@@ -16,7 +16,7 @@
 #import "NSString+DFHelpers.h"
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFPeanutUserObject.h"
-#import "DFCreateStrandViewController.h"
+#import "DFStrandSuggestionsViewController.h"
 #import "DFNavigationController.h"
 #import "DFStrandConstants.h"
 #import "MMPopLabel.h"
@@ -410,7 +410,7 @@
 
 - (void)createButtonPressed:(id)sender
 {
-  DFCreateStrandViewController *createController = [DFCreateStrandViewController sharedViewController];
+  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
   

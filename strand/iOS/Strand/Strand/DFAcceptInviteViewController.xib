@@ -64,7 +64,7 @@
                         <constraint firstItem="myg-5d-5re" firstAttribute="leading" secondItem="gHH-je-Wr8" secondAttribute="leading" constant="8" id="DHE-ki-Dag"/>
                         <constraint firstItem="exL-RF-vhS" firstAttribute="leading" secondItem="gHH-je-Wr8" secondAttribute="leading" constant="8" id="DHY-ho-MfG"/>
                         <constraint firstItem="4xl-zy-LzF" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="top" constant="8" id="GUs-b7-gCu"/>
-                        <constraint firstItem="zyD-kI-jkf" firstAttribute="leading" secondItem="4xl-zy-LzF" secondAttribute="trailing" constant="3" id="U8f-7Q-9pq"/>
+                        <constraint firstItem="zyD-kI-jkf" firstAttribute="leading" secondItem="4xl-zy-LzF" secondAttribute="trailing" constant="2" id="U8f-7Q-9pq"/>
                         <constraint firstItem="exL-RF-vhS" firstAttribute="top" secondItem="zyD-kI-jkf" secondAttribute="bottom" constant="2" id="VD9-XK-vw2"/>
                         <constraint firstItem="4xl-zy-LzF" firstAttribute="leading" secondItem="gHH-je-Wr8" secondAttribute="leading" constant="8" id="WcQ-XS-Jy7"/>
                         <constraint firstAttribute="trailing" secondItem="zyD-kI-jkf" secondAttribute="trailing" constant="8" id="bR4-gq-CPq"/>
@@ -80,8 +80,8 @@
                         </mask>
                     </variation>
                 </view>
-                <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="UKh-g2-w6Y" userLabel="Matched collection view">
-                    <rect key="frame" x="0.0" y="127" width="600" height="473"/>
+                <collectionView hidden="YES" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="UKh-g2-w6Y" userLabel="Matched collection view">
+                    <rect key="frame" x="0.0" y="135" width="600" height="465"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="qVg-qD-MWp">
                         <size key="itemSize" width="50" height="50"/>
@@ -89,6 +89,9 @@
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
                         <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
                     </collectionViewFlowLayout>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="alwaysBounceVertical" value="YES"/>
+                    </userDefinedRuntimeAttributes>
                 </collectionView>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="WnG-LY-rGA" userLabel="Matching activity wrapper">
                     <rect key="frame" x="256" y="127" width="88" height="77"/>
@@ -100,7 +103,7 @@
                             <nil key="highlightedColor"/>
                         </label>
                         <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="KmA-G5-KeL">
-                            <rect key="frame" x="34" y="36" width="20" height="20"/>
+                            <rect key="frame" x="34" y="37" width="20" height="20"/>
                         </activityIndicatorView>
                     </subviews>
                     <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
@@ -135,12 +138,53 @@
                         <constraint firstAttribute="bottom" secondItem="Qac-tT-DKp" secondAttribute="bottom" constant="8" id="sYF-Cn-21h"/>
                     </constraints>
                 </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wM1-ZQ-dvb" userLabel="Swap photos bar">
+                    <rect key="frame" x="0.0" y="550" width="600" height="50"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="yGH-Re-BLa">
+                            <rect key="frame" x="170" y="5" width="260" height="40"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tUl-GC-OhM">
+                                    <rect key="frame" x="12" y="7" width="236" height="26"/>
+                                    <state key="normal" title="Swap Photos">
+                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstItem="tUl-GC-OhM" firstAttribute="leading" secondItem="yGH-Re-BLa" secondAttribute="leading" constant="12" id="E5C-Ad-IjM"/>
+                                <constraint firstAttribute="bottom" secondItem="tUl-GC-OhM" secondAttribute="bottom" constant="7" id="Gg2-hy-sEJ"/>
+                                <constraint firstItem="tUl-GC-OhM" firstAttribute="top" secondItem="yGH-Re-BLa" secondAttribute="top" constant="7" id="J8a-jg-UCR"/>
+                                <constraint firstAttribute="width" constant="260" id="XQg-GM-QXT"/>
+                                <constraint firstAttribute="trailing" secondItem="tUl-GC-OhM" secondAttribute="trailing" constant="12" id="uEq-Bj-z4C"/>
+                            </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                    <integer key="value" value="4"/>
+                                </userDefinedRuntimeAttribute>
+                                <userDefinedRuntimeAttribute type="boolean" keyPath="layer.clipsToBounds" value="YES"/>
+                            </userDefinedRuntimeAttributes>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="0.80000000000000004" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="50" id="3sL-dU-Qx7"/>
+                        <constraint firstItem="yGH-Re-BLa" firstAttribute="top" secondItem="wM1-ZQ-dvb" secondAttribute="top" constant="5" id="3zl-BB-MEd"/>
+                        <constraint firstAttribute="bottom" secondItem="yGH-Re-BLa" secondAttribute="bottom" constant="5" id="Kbv-4p-V0k"/>
+                        <constraint firstAttribute="centerX" secondItem="yGH-Re-BLa" secondAttribute="centerX" id="nEx-Sd-97d"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
             <constraints>
                 <constraint firstItem="VWK-OM-57E" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="8" id="1db-Mb-DIm"/>
+                <constraint firstItem="wM1-ZQ-dvb" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="70q-CN-SDV"/>
                 <constraint firstItem="gHH-je-Wr8" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="16" id="ONE-bD-8eh"/>
+                <constraint firstAttribute="bottom" secondItem="wM1-ZQ-dvb" secondAttribute="bottom" id="OWf-Zk-kD8"/>
                 <constraint firstItem="gHH-je-Wr8" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="5" id="UeU-qy-6F5"/>
+                <constraint firstAttribute="trailing" secondItem="wM1-ZQ-dvb" secondAttribute="trailing" id="YP2-RV-EuE"/>
                 <constraint firstAttribute="trailing" secondItem="UKh-g2-w6Y" secondAttribute="trailing" id="YaE-8w-sNU"/>
                 <constraint firstItem="UKh-g2-w6Y" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="e5q-U6-Fd7"/>
                 <constraint firstAttribute="centerX" secondItem="VWK-OM-57E" secondAttribute="centerX" id="mnZ-Be-5qi"/>
@@ -148,7 +192,7 @@
                 <constraint firstAttribute="bottom" secondItem="UKh-g2-w6Y" secondAttribute="bottom" id="wlO-b4-72X"/>
                 <constraint firstAttribute="trailing" secondItem="gHH-je-Wr8" secondAttribute="trailing" constant="5" id="xbC-ci-R2N"/>
                 <constraint firstItem="WnG-LY-rGA" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="8" id="y70-BA-6k6"/>
-                <constraint firstItem="UKh-g2-w6Y" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="8" id="yVJ-Al-BEC"/>
+                <constraint firstItem="UKh-g2-w6Y" firstAttribute="top" secondItem="gHH-je-Wr8" secondAttribute="bottom" constant="16" id="yVJ-Al-BEC"/>
             </constraints>
         </view>
     </objects>

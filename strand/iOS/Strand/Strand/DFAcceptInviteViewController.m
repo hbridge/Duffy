@@ -76,10 +76,9 @@
   for (DFPeanutFeedObject *suggestedPhotosSection in self.suggestedPhotosPosts.objects) {
     [suggestedPhotos addObjectsFromArray:suggestedPhotosSection.objects];
   }
-  self.suggestedPhotosDatasource = [[DFImageDataSource alloc]
-                                    initWithFeedPhotos:suggestedPhotos
-                                    collectionView:self.matchedCollectionView sourceMode:DFImageDataSourceModeLocal
-                                    imageType:DFImageFull];
+  
+  self.matchedCollectionView.dataSource = self;
+  self.matchedCollectionView.delegate = self;
 }
 
 
@@ -87,16 +86,6 @@
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
 }
-
-/*
- #pragma mark - Navigation
- 
- // In a storyboard-based application, you will often want to do a little preparation before navigation
- - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
- // Get the new view controller using [segue destinationViewController].
- // Pass the selected object to the new view controller.
- }
- */
 
 - (IBAction)matchButtonPressed:(UIButton *)sender {
   [self.matchButtonWrapper removeFromSuperview];
@@ -107,6 +96,7 @@
   });
   
   [self setMatchedAreaAttributes];
+  
 }
 
 - (void)setMatchedAreaAttributes
@@ -122,4 +112,12 @@
   self.matchedFlowLayout.minimumInteritemSpacing = interItemSpacing;
   self.matchedFlowLayout.minimumLineSpacing = interItemSpacing;
 }
+
+
+
+#pragma mark - UICollectionView Datasource
+
+ 
+
+
 @end

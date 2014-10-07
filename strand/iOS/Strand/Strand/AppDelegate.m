@@ -37,7 +37,7 @@
 #import "DFPushNotificationsManager.h"
 #import "DFFeedViewController.h"
 #import "DFSettingsViewController.h"
-#import "DFCreateStrandViewController.h"
+#import "DFStrandSuggestionsViewController.h"
 #import "DFTopBarController.h"
 #import "DFInboxViewController.h"
 #import "DFGalleryViewController.h"
@@ -181,7 +181,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [[DFSocketsManager sharedManager] initNetworkCommunication];
   
   // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
-  [[DFCreateStrandViewController sharedViewController] refreshFromServer];
+  [[DFStrandSuggestionsViewController sharedViewController] refreshFromServer];
 }
 
 - (void)createRootViewController
@@ -208,7 +208,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [DFPhotoStore sharedStore];
   
   self.inboxViewController = [[DFInboxViewController alloc] init];
-  DFCreateStrandViewController *createStrandViewController = [[DFCreateStrandViewController alloc] init];
+  DFStrandSuggestionsViewController *createStrandViewController = [[DFStrandSuggestionsViewController alloc] init];
   // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
 
@@ -252,7 +252,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
        object:self];
       
       // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
-      [[DFCreateStrandViewController sharedViewController] refreshFromServer];
+      [[DFStrandSuggestionsViewController sharedViewController] refreshFromServer];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",

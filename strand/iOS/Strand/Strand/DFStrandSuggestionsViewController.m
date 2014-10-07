@@ -6,14 +6,14 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFCreateStrandViewController.h"
+#import "DFStrandSuggestionsViewController.h"
 #import "DFCameraRollSyncManager.h"
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFPhotoViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFGallerySectionHeader.h"
-#import "DFCreateStrandTableViewCell.h"
+#import "DFStrandSuggestionTableViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosViewController.h"
@@ -26,13 +26,14 @@
 #import "DFInboxTableViewCell.h"
 #import "UIDevice+DFHelpers.h"
 #import "NSArray+DFHelpers.h"
+#import "UINib+DFHelpers.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
 const CGFloat CreateCellTitleSpacing = 8;
 
 
-@interface DFCreateStrandViewController ()
+@interface DFStrandSuggestionsViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
@@ -50,13 +51,13 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 @end
 
-@implementation DFCreateStrandViewController
+@implementation DFStrandSuggestionsViewController
 @synthesize feedAdapter = _feedAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
 @synthesize strandAdapter = _strandAdapter;
 @synthesize showAsFirstTimeSetup = _showAsFirstTimeSetup;
 
-static DFCreateStrandViewController *instance;
+static DFStrandSuggestionsViewController *instance;
 - (IBAction)reloadButtonPressed:(id)sender {
   [self.allTableView reloadData];
   [self.suggestedTableView reloadData];
@@ -82,10 +83,10 @@ static DFCreateStrandViewController *instance;
   return nil;
 }
 
-+ (DFCreateStrandViewController *)sharedViewController
++ (DFStrandSuggestionsViewController *)sharedViewController
 {
   if (!instance) {
-    instance = [[DFCreateStrandViewController alloc] init];
+    instance = [[DFStrandSuggestionsViewController alloc] init];
   }
   return instance;
 }
@@ -134,11 +135,11 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
-    [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+    [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
          forCellReuseIdentifier:InviteId];
-    [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+    [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
          forCellReuseIdentifier:SuggestionWithPeopleId];
-    [tableView registerNib:[UINib nibWithNibName:@"DFCreateStrandTableViewCell" bundle:nil]
+    [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
     forCellReuseIdentifier:SuggestionNoPeopleId];
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
@@ -300,7 +301,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (UITableViewCell *)cellWithSuggestedStrandObject:(DFPeanutFeedObject *)strandObject
                                       forTableView:(UITableView *)tableView
 {
-  DFCreateStrandTableViewCell *cell;
+  DFStrandSuggestionTableViewCell *cell;
   if (strandObject.actors.count > 0) {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
     [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
@@ -372,7 +373,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   };
 }
 
-- (void)configureTextForCreateStrandCell:(DFCreateStrandTableViewCell *)cell
+- (void)configureTextForCreateStrandCell:(DFStrandSuggestionTableViewCell *)cell
                        withStrand:(DFPeanutFeedObject *)strandObject
 {
   // Set the header attributes
@@ -400,7 +401,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   }
 }
 
-- (void)setRemotePhotosForCell:(DFCreateStrandTableViewCell *)cell
+- (void)setRemotePhotosForCell:(DFStrandSuggestionTableViewCell *)cell
                    withSection:(DFPeanutFeedObject *)section
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
@@ -435,7 +436,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 const NSUInteger MaxPhotosPerCell = 3;
 
-- (void)setLocalPhotosForCell:(DFCreateStrandTableViewCell *)cell
+- (void)setLocalPhotosForCell:(DFStrandSuggestionTableViewCell *)cell
                       section:(DFPeanutFeedObject *)section
 {
   // Get the IDs of all the photos we want to show
@@ -494,7 +495,7 @@ const NSUInteger MaxPhotosPerCell = 3;
   
   NSNumber *cachedHeight = self.cellHeightsByIdentifier[identifier];
   if (!cachedHeight) {
-    DFCreateStrandTableViewCell *templateCell = [DFCreateStrandTableViewCell cellWithStyle:style];
+    DFStrandSuggestionTableViewCell *templateCell = [DFStrandSuggestionTableViewCell cellWithStyle:style];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
     self.cellHeightsByIdentifier[identifier] = cachedHeight = @(height);
   }
@@ -602,7 +603,7 @@ const NSUInteger MaxPhotosPerCell = 3;
      dispatch_async(dispatch_get_main_queue(), ^{
        NSArray *oldInvites = self.inviteObjects;
        self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
-       if ([DFCreateStrandViewController inviteObjectsChangedForOldInvites:oldInvites
+       if ([DFStrandSuggestionsViewController inviteObjectsChangedForOldInvites:oldInvites
                                                                 newInvites:self.inviteObjects])
        {
          [self.suggestedTableView reloadData];
