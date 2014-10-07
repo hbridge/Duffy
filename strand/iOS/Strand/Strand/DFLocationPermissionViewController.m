@@ -14,7 +14,6 @@
 #import "AppDelegate.h"
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
-#import "RootViewController.h"
 #import "DFStrandSuggestionsViewController.h"
 #import "DFNavigationController.h"
 

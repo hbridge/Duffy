@@ -7,8 +7,6 @@
 //
 
 #import "WYPopoverController.h"
-#import "RootViewController.h"
-
 #import "DFBadgeButton.h"
 #import "DFErrorScreen.h"
 #import "DFNavigationController.h"

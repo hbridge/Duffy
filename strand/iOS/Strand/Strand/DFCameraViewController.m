@@ -21,7 +21,6 @@
 #import "DFStrandConstants.h"
 #import "DFUploadController.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "RootViewController.h"
 #import "UIImage+Resize.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFPhotoAsset.h"
@@ -147,7 +146,7 @@ const unsigned int SavePromptMinPhotos = 3;
   [self showHelpTextIfNeeded];
   
   
-  [(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
+  //[(RootViewController *)self.view.window.rootViewController setSwipingEnabled:YES];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
@@ -374,7 +373,7 @@ const unsigned int SavePromptMinPhotos = 3;
 
 - (void)galleryButtonPressed:(UIButton *)sender
 {
-  [(RootViewController *)self.view.window.rootViewController showGallery];
+  //[(RootViewController *)self.view.window.rootViewController showGallery];
 }
 
 - (void)flashButtonPressed:(UIButton *)flashButton

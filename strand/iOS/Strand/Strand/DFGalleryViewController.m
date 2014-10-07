@@ -16,7 +16,6 @@
 #import "DFSettingsViewController.h"
 #import "DFGallerySectionHeader.h"
 #import "DFFeedViewController.h"
-#import "RootViewController.h"
 #import "DFLockedPhotoViewCell.h"
 #import "DFAnalytics.h"
 #import "DFGalleryCollectionViewFlowLayout.h"

@@ -11,7 +11,6 @@
 #import <AudioToolbox/AudioServices.h>
 #import "DFStrandConstants.h"
 #import "DFPeanutAction.h"
-#import "RootViewController.h"
 
 @implementation DFToastNotificationManager
 
@@ -124,7 +123,7 @@ static DFToastNotificationManager *defaultManager;
           interactionResponderWithInteractionType:CRToastInteractionTypeAll
           automaticallyDismiss:YES
           block:^(CRToastInteractionType interactionType) {
-            [[RootViewController rootViewController] showPhotoWithID:photoID];
+//            [[RootViewController rootViewController] showPhotoWithID:photoID];
           }];
 }
 

@@ -14,7 +14,6 @@
 #import "DFImageStore.h"
 #import "DFSettingsViewController.h"
 #import "DFFeedViewController.h"
-#import "RootViewController.h"
 #import "DFAnalytics.h"
 #import "DFGalleryCollectionViewFlowLayout.h"
 #import "NSString+DFHelpers.h"
