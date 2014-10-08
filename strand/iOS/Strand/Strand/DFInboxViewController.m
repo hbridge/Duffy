@@ -33,6 +33,7 @@
 @property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
+@property (nonatomic, retain) UILabel *noPhotosLabel;
 
 @end
 
@@ -124,7 +125,7 @@
 - (void)configurePopLabel
 {
   self.noItemsPopLabel = [MMPopLabel
-                          popLabelWithText:@"Tap here to share photos and get started"];
+                          popLabelWithText:@"Tap here to swap photos"];
   [self.tabBarController.view addSubview:self.noItemsPopLabel];
 
 }
@@ -154,6 +155,22 @@
        dispatch_async(dispatch_get_main_queue(), ^{
          _feedObjects = response.objects;
          [self.tableView reloadData];
+         
+         if (response.objects.count == 0) {
+           self.noPhotosLabel = [[UILabel alloc] init];
+           self.noPhotosLabel.font = [UIFont systemFontOfSize:20.0];
+           self.noPhotosLabel.textColor = [UIColor darkGrayColor];
+           self.noPhotosLabel.text = @"No Photos Swapped";
+           [self.noPhotosLabel sizeToFit];
+           [self.view addSubview:self.noPhotosLabel];
+           CGRect frame = self.noPhotosLabel.frame;
+           frame.origin.x = self.view.frame.size.width / 2.0 - frame.size.width / 2.0;
+           frame.origin.y = self.view.frame.size.height / 2.0 - frame.size.height / 2.0;
+           self.noPhotosLabel.frame = frame;
+         } else {
+           [self.noPhotosLabel removeFromSuperview];
+           self.noPhotosLabel = nil;
+         }
        });
      }
      dispatch_async(dispatch_get_main_queue(), ^{
