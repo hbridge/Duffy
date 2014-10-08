@@ -109,7 +109,7 @@
 		5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */; };
 		5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */; };
 		5AA38DFD199E87CD00AD1805 /* DFStrandsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DFC199E87CD00AD1805 /* DFStrandsViewController.m */; };
-		5AA38E01199EB2F600AD1805 /* DFGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38E00199EB2F600AD1805 /* DFGalleryViewController.m */; };
+		5AA38E01199EB2F600AD1805 /* DFAllStrandsGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38E00199EB2F600AD1805 /* DFAllStrandsGalleryViewController.m */; };
 		5AA4528019648A120099CBD2 /* DFBackgroundLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */; };
 		5AA45297196708D00099CBD2 /* DFPhotoStackCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA4528E196708D00099CBD2 /* DFPhotoStackCell.m */; };
 		5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA4528F196708D00099CBD2 /* DFPhotoStackCell.xib */; };
@@ -414,8 +414,8 @@
 		5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNotificationTableViewCell.xib; sourceTree = "<group>"; };
 		5AA38DFB199E87CD00AD1805 /* DFStrandsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandsViewController.h; sourceTree = "<group>"; };
 		5AA38DFC199E87CD00AD1805 /* DFStrandsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandsViewController.m; sourceTree = "<group>"; };
-		5AA38DFF199EB2F600AD1805 /* DFGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFGalleryViewController.h; sourceTree = "<group>"; };
-		5AA38E00199EB2F600AD1805 /* DFGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFGalleryViewController.m; sourceTree = "<group>"; };
+		5AA38DFF199EB2F600AD1805 /* DFAllStrandsGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAllStrandsGalleryViewController.h; sourceTree = "<group>"; };
+		5AA38E00199EB2F600AD1805 /* DFAllStrandsGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAllStrandsGalleryViewController.m; sourceTree = "<group>"; };
 		5AA4527E19648A120099CBD2 /* DFBackgroundLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBackgroundLocationManager.h; sourceTree = "<group>"; };
 		5AA4527F19648A120099CBD2 /* DFBackgroundLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBackgroundLocationManager.m; sourceTree = "<group>"; };
 		5AA4528D196708D00099CBD2 /* DFPhotoStackCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DFPhotoStackCell.h; path = DuffyCore/DFPhotoStackCell.h; sourceTree = "<group>"; };
@@ -1005,8 +1005,8 @@
 		5A7F8FF919A7D9F300EF0119 /* Gallery */ = {
 			isa = PBXGroup;
 			children = (
-				5AA38DFF199EB2F600AD1805 /* DFGalleryViewController.h */,
-				5AA38E00199EB2F600AD1805 /* DFGalleryViewController.m */,
+				5AA38DFF199EB2F600AD1805 /* DFAllStrandsGalleryViewController.h */,
+				5AA38E00199EB2F600AD1805 /* DFAllStrandsGalleryViewController.m */,
 				5A113B1519C24E0F004CA85B /* DFGalleryCollectionViewFlowLayout.h */,
 				5A113B1619C24E0F004CA85B /* DFGalleryCollectionViewFlowLayout.m */,
 				5A9BC30E19A26A22002D1CD7 /* DFGallerySectionHeader.h */,
@@ -1750,7 +1750,7 @@
 				5AED01D919E3404D001F075D /* DFAcceptInviteViewController.m in Sources */,
 				5A0E122819747C6200B6FF04 /* DFPeanutInviteMessageAdapter.m in Sources */,
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
-				5AA38E01199EB2F600AD1805 /* DFGalleryViewController.m in Sources */,
+				5AA38E01199EB2F600AD1805 /* DFAllStrandsGalleryViewController.m in Sources */,
 				5A1E402519955570009A9FB2 /* DFAVCameraViewController.m in Sources */,
 				5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */,
 				5A9BC31F19A2A77F002D1CD7 /* DFContactsStore.m in Sources */,

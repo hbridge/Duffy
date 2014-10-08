@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFGalleryViewController.h"
+#import "DFAllStrandsGalleryViewController.h"
 #import "DFPhotoViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStackCell.h"
@@ -26,13 +26,13 @@
 static const CGFloat ItemSize = 105;
 static const CGFloat ItemSpacing = 2.5;
 
-@interface DFGalleryViewController ()
+@interface DFAllStrandsGalleryViewController ()
 
 @property (nonatomic, retain) DFGalleryCollectionViewFlowLayout *flowLayout;
 
 @end
 
-@implementation DFGalleryViewController
+@implementation DFAllStrandsGalleryViewController
 
 - (instancetype)init
 {

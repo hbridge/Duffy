@@ -40,7 +40,7 @@
 #import "DFStrandSuggestionsViewController.h"
 #import "DFTopBarController.h"
 #import "DFInboxViewController.h"
-#import "DFGalleryViewController.h"
+#import "DFAllStrandsGalleryViewController.h"
 
 
 @interface AppDelegate ()
