@@ -91,7 +91,8 @@
   [SVProgressHUD show];
   DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
   peanutStrand.id = @(self.sectionObject.id);
-  [self sendInvitesForStrand:peanutStrand toPeanutContacts:self.pickedContacts];
+  [self sendInvitesForStrand:peanutStrand
+            toPeanutContacts:self.pickedContacts];
 }
 
 - (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
@@ -100,6 +101,8 @@
   [self.inviteAdapter
    sendInvitesForStrand:peanutStrand
    toPeanutContacts:peanutContacts
+   inviteLocationString:self.sectionObject.location
+   invitedPhotosDate:self.sectionObject.time_taken
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      vc.messageComposeDelegate = self;
      if (vc) {
