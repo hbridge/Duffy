@@ -106,7 +106,9 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   CGFloat itemSize = (self.collectionView.frame.size.width - StrandGalleryItemSpacing)/2.0;
   self.flowLayout.itemSize = CGSizeMake(itemSize, itemSize);
   self.flowLayout.minimumInteritemSpacing = StrandGalleryItemSpacing;
-  self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing;
+  self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing * 1.5; // for some reason the
+                                                                       // line spacing sometimes
+                                                                       // disapppears at 0.5
 
 }
 
@@ -237,6 +239,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
+  cell.imageView.backgroundColor = [UIColor lightGrayColor];
   [cell.loadingActivityIndicator startAnimating];
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
@@ -270,6 +273,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
   DFPhotoStackCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"clusterCell"
                                                                          forIndexPath:indexPath];
+  cell.imageView.backgroundColor = [UIColor lightGrayColor];
   cell.imageView.image = nil;
   [cell.loadingActivityIndicator startAnimating];
   for (DFPeanutFeedObject *object in clusterObject.objects) {
@@ -282,7 +286,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
   
   [[DFImageStore sharedStore]
    imageForID:firstObject.id
-   preferredType:DFImageThumbnail
+   preferredType:DFImageFull
    thumbnailPath:firstObject.thumb_image_path
    fullPath:firstObject.full_image_path
    completion:^(UIImage *image) {
