@@ -31,6 +31,8 @@
  that don't have strand yet */
 - (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrandObject
             toPeanutContacts:(NSArray *)peanutContacts
+        inviteLocationString:(NSString *)inviteLocationString
+            inviteDateString:(NSString *)inviteDateString
                      success:(void(^)(DFSMSInviteStrandComposeViewController *))success
                      failure:(DFPeanutRestFetchFailure)failure;
 

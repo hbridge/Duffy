@@ -3,6 +3,7 @@
     <dependencies>
         <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -18,7 +19,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GLf-nM-dzo">
-                        <rect key="frame" x="36" y="8" width="16" height="22"/>
+                        <rect key="frame" x="34" y="8" width="18" height="18"/>
                         <state key="normal" image="Assets/Icons/PhotoNotSelectedIcon">
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
@@ -40,6 +41,7 @@
             </view>
             <color key="backgroundColor" red="0.93333339689999995" green="0.40000003579999999" blue="0.0" alpha="1" colorSpace="deviceRGB"/>
             <constraints>
+                <constraint firstItem="GLf-nM-dzo" firstAttribute="height" secondItem="Hac-QT-qXU" secondAttribute="height" multiplier="0.3" id="3uT-TL-i37"/>
                 <constraint firstAttribute="trailing" secondItem="6M1-To-d3U" secondAttribute="trailing" constant="8" id="8WM-Rl-Ql5"/>
                 <constraint firstAttribute="bottom" secondItem="6M1-To-d3U" secondAttribute="bottom" constant="8" id="BCa-d1-lj9"/>
                 <constraint firstItem="Hac-QT-qXU" firstAttribute="top" secondItem="Lih-fC-ket" secondAttribute="top" id="FnD-pE-LYU"/>
@@ -48,6 +50,7 @@
                 <constraint firstItem="Hac-QT-qXU" firstAttribute="leading" secondItem="Lih-fC-ket" secondAttribute="leading" id="az0-M3-h2J"/>
                 <constraint firstAttribute="trailing" secondItem="GLf-nM-dzo" secondAttribute="trailing" constant="8" id="eny-9z-Fba"/>
                 <constraint firstAttribute="trailing" secondItem="Hac-QT-qXU" secondAttribute="trailing" id="h9J-iw-eYt"/>
+                <constraint firstItem="GLf-nM-dzo" firstAttribute="width" secondItem="Hac-QT-qXU" secondAttribute="width" multiplier="0.3" id="mP7-1w-gn8"/>
             </constraints>
             <size key="customSize" width="-53" height="-56"/>
             <connections>

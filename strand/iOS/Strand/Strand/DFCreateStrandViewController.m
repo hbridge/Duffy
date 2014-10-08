@@ -15,6 +15,7 @@
 #import "DFStrandConstants.h"
 #import "DFPhotoStore.h"
 #import "DFPushNotificationsManager.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 @interface DFCreateStrandViewController()
 
@@ -158,7 +159,8 @@ NSUInteger const NumPhotosPerRow = 3;
      
      // invite selected users
      [self sendInvitesForStrand:peanutStrand
-               toPeanutContacts:self.peoplePicker.selectedPeanutContacts];
+               toPeanutContacts:self.peoplePicker.selectedPeanutContacts
+      ];
      
      // start uploading the photos
      [[DFPhotoStore sharedStore] markPhotosForUpload:peanutStrand.photos];
@@ -175,6 +177,9 @@ NSUInteger const NumPhotosPerRow = 3;
   [self.inviteAdapter
    sendInvitesForStrand:peanutStrand
    toPeanutContacts:peanutContacts
+   inviteLocationString:self.suggestionsObject.location
+   inviteDateString:[NSDateFormatter relativeTimeStringSinceDate:self.suggestionsObject.time_taken
+                                                      abbreviate:NO]
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (vc) {

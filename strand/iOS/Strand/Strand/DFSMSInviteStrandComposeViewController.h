@@ -10,6 +10,8 @@
 
 @interface DFSMSInviteStrandComposeViewController : MFMessageComposeViewController <MFMessageComposeViewControllerDelegate>
 
-- (instancetype)initWithRecipients:(NSArray *)recipients;
+- (instancetype)initWithRecipients:(NSArray *)recipients
+                    locationString:(NSString *)locationString
+                        dateString:(NSString *)dateString;
 
 @end
