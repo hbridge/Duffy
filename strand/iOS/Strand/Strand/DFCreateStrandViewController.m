@@ -164,6 +164,7 @@ NSUInteger const NumPhotosPerRow = 2;
      
      // start uploading the photos
      [[DFPhotoStore sharedStore] markPhotosForUpload:peanutStrand.photos];
+     [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:peanutStrand.photos];
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:@"Failed."];
      DDLogError(@"%@ failed to create strand: %@, error: %@",

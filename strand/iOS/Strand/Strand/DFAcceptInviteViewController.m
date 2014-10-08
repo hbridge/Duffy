@@ -244,6 +244,9 @@
       performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
       success:^(DFPeanutStrand *peanutStrand) {
         DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
+        // cache the photos locally
+        [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:selectedPhotoIDs];
+        
         // mark the invite as used
         if (self.inviteObject) {
           DFPeanutStrandInviteAdapter *strandInviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
@@ -252,6 +255,7 @@
            success:^(NSArray *resultObjects) {
              DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
              // show the strand that we just accepted an invite to
+             [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:selectedPhotoIDs];
              [(AppDelegate *)[[UIApplication sharedApplication] delegate]
               showStrandWithID:peanutStrand.id.longLongValue completion:^{
                 [SVProgressHUD showSuccessWithStatus:@"Accepted"];

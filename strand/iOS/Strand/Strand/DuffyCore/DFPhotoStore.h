@@ -82,7 +82,7 @@ typedef enum {
 
 
 - (void)markPhotosForUpload:(NSArray *)photoIDs;
-- (void)cachePhotosInImageStore:(NSArray *)photoIDs;
+- (void)cachePhotoIDsInImageStore:(NSArray *)photoIDs;
 
 
 @end

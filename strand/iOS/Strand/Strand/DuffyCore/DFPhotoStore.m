@@ -786,12 +786,10 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
     }
     [[DFPhotoStore sharedStore] saveContext];
     [[DFUploadController sharedUploadController] uploadPhotos];
-    
-    [self cachePhotosInImageStore:photoIDs];
   });
 }
 
-- (void)cachePhotosInImageStore:(NSArray *)photoIDs
+- (void)cachePhotoIDsInImageStore:(NSArray *)photoIDs
 {
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     @autoreleasepool {
