@@ -72,7 +72,9 @@ def main(argv):
 				if contactEntry.phone_number in usersByPhoneNumber:
 					friend = usersByPhoneNumber[contactEntry.phone_number]
 					try:
-						if contactEntry.user.id < friend.id:
+						if contactEntry.user.id == friend.id:
+							continue
+						elif contactEntry.user.id < friend.id:
 							FriendConnection.objects.create(user_1=contactEntry.user, user_2=friend)
 						else:
 							FriendConnection.objects.create(user_1=friend, user_2=contactEntry.user)
