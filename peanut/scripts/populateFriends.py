@@ -73,9 +73,9 @@ def main(argv):
 					friend = usersByPhoneNumber[contactEntry.phone_number]
 					try:
 						if contactEntry.user.id < friend.id:
-							FriendConnection.objects.create(user_1=contactEntry.user, user_2=possibleFriend)
+							FriendConnection.objects.create(user_1=contactEntry.user, user_2=friend)
 						else:
-							FriendConnection.objects.create(user_1=possibleFriend, user_2=contactEntry.user)
+							FriendConnection.objects.create(user_1=friend, user_2=contactEntry.user)
 
 						newConnectionCount += 1
 					except IntegrityError:
