@@ -549,6 +549,8 @@ class FriendConnection(models.Model):
 		existingFriendConnections = FriendConnection.objects.filter(Q(user_1__in=allUsers) | Q(user_2__in=allUsers))
 		newFriendConnections = list()
 		for user in users:
+			if user.id == userToAddTo.id:
+				continue
 			if (user.id < userToAddTo.id and not cls.friendConnectionExists(user, userToAddTo, existingFriendConnections)):
 				newFriendConnections.append(FriendConnection(user_1 = user, user_2 = userToAddTo))
 			elif (userToAddTo.id < user.id and not cls.friendConnectionExists(userToAddTo, user, existingFriendConnections)):
