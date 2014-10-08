@@ -10,6 +10,7 @@
 #import "DFImageDataSource.h"
 #import "DFSelectPhotosController.h"
 #import "DFPeanutStrandAdapter.h"
+#import "DFPeanutStrandFeedAdapter.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "SVProgressHUD.h"
 #import "NSArray+DFHelpers.h"
@@ -28,6 +29,9 @@
 
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
+
+@property (nonatomic, retain) NSTimer *refreshTimer;
 
 @end
 
@@ -35,19 +39,27 @@
 
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
+@synthesize feedAdapter = _feedAdapter;
 
 - (instancetype)initWithInviteObject:(DFPeanutFeedObject *)inviteObject
 {
   self = [super init];
   if (self) {
-    _inviteObject = inviteObject;
-    _invitedStrandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts]
-                               firstObject];
-    _suggestedPhotosPosts = [[inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
-                            firstObject];
     self.navigationItem.title = @"Swap Photos";
+    
+    [self setupViewWithInviteObject:inviteObject];
   }
   return self;
+}
+
+- (void)setupViewWithInviteObject:(DFPeanutFeedObject *)inviteObject
+{
+  _inviteObject = inviteObject;
+  _invitedStrandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts]
+                         firstObject];
+  _suggestedPhotosPosts = [[inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
+                           firstObject];
+  
 }
 
 - (void)viewDidLoad {
@@ -55,6 +67,15 @@
 
   [self configureInviteArea];
   [self configureMatchedArea];
+  
+  if ([self.inviteObject.ready isEqual:@(NO)]) {
+    DDLogVerbose(@"Invite not ready, setting up timer...");
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
+                                                         target:self
+                                                       selector:@selector(refreshFromServer)
+                                                       userInfo:nil
+                                                        repeats:YES];
+  }
 }
 
 - (BOOL)hidesBottomBarWhenPushed
@@ -110,14 +131,26 @@
 - (IBAction)matchButtonPressed:(UIButton *)sender {
   [self.matchButtonWrapper removeFromSuperview];
   self.matchingActivityWrapper.hidden = NO;
-  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-    self.matchingActivityWrapper.hidden = YES;
-    self.matchResultsView.hidden = NO;
-    self.swapPhotosBar.hidden = NO;
-  });
-  
+
+  if ([self.inviteObject.ready isEqual:@(YES)]) {
+    DDLogVerbose(@"Invite ready, showing in 1 second");
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self showMatchedArea];
+    });
+  } else {
+    // If we're not ready, the timer is running and it will show the matched area once the invite is ready
+    DDLogVerbose(@"Invite not ready, relying upon timer");
+  }
+}
+
+- (void)showMatchedArea
+{
   [self setMatchedAreaAttributes];
   [self configureSwapPhotosButtonText];
+  
+  self.matchingActivityWrapper.hidden = YES;
+  self.matchResultsView.hidden = NO;
+  self.swapPhotosBar.hidden = NO;
 }
 
 - (void)configureSwapPhotosButtonText
@@ -143,7 +176,6 @@
   // set collection view height
   CGSize contentSize = self.matchedFlowLayout.collectionViewContentSize;
   self.matchedCollectionViewHeight.constant = contentSize.height;
-
 }
 
 
@@ -159,6 +191,28 @@
   [self acceptInvite];
 }
 
+- (void)refreshFromServer
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  [self.feedAdapter
+   fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
+                              NSData *responseHash,
+                              NSError *error) {
+     DDLogVerbose(@"Got back inbox...");
+     for (DFPeanutFeedObject *object in response.objects) {
+       if (object.id == self.inviteObject.id && [object.ready isEqual: @(YES)]) {
+         DDLogVerbose(@"Invite ready.  Showing view");
+         dispatch_async(dispatch_get_main_queue(), ^{
+           [self setupViewWithInviteObject:object];
+           [self configureMatchedArea];
+           [self showMatchedArea];
+         });
+         [self.refreshTimer invalidate];
+         self.refreshTimer = nil;
+       }
+     }
+  }];
+}
 
 - (void)acceptInvite
 {
@@ -267,6 +321,12 @@
 {
   if (!_strandAdapter) _strandAdapter = [[DFPeanutStrandAdapter alloc] init];
   return _strandAdapter;
+}
+
+- (DFPeanutStrandFeedAdapter *)feedAdapter
+{
+  if (!_feedAdapter) _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+  return _feedAdapter;
 }
 
 

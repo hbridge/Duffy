@@ -19,9 +19,14 @@
 
 @implementation DFIOS7CameraRollSyncOperation
 
+- (ALAssetsLibraryAccessFailureBlock)libraryAccessFailureBlock {
+  return ^(NSError *error) {
+    DDLogError(@"Failed to enumerate photo groups: %@", error.localizedDescription);
+    dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
+  };
+}
 
-
-- (NSDictionary *)findAssetChanges
+- (NSDictionary *)findAssetChangesBetweenTimes:(NSDate *)startDate beforeEndDate:(NSDate *)endDate;
 {
   // setup lists of objects
   self.enumerationCompleteSemaphore = dispatch_semaphore_create(0);
@@ -32,12 +37,12 @@
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   DDLogDebug(@"%@ finding ALAssetChanges", self.class);
-  NSDate *startDate = [NSDate date];
+  NSDate *timerStartDate = [NSDate date];
   // scan camera roll
   ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
   [library
    enumerateGroupsWithTypes: ALAssetsGroupSavedPhotos
-   usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:nil]
+   usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:nil startingAfter:startDate beforeEndDate:endDate]
    failureBlock:[self libraryAccessFailureBlock]];
   dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
   [self flushChanges];
@@ -45,7 +50,7 @@
   // scan other items
   [library
    enumerateGroupsWithTypes: ALAssetsGroupAlbum
-   usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:@[@"Camera Roll"]]
+   usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:@[@"Camera Roll"] startingAfter:startDate beforeEndDate:endDate]
    failureBlock:[self libraryAccessFailureBlock]];
   
   dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
@@ -58,20 +63,38 @@
   [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   [self flushChanges];
-  DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@", [[NSDate date] timeIntervalSinceDate:startDate], [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
+  DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@", [[NSDate date] timeIntervalSinceDate:timerStartDate], [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
   
   return self.allObjectIDsToChanges;
 }
 
-- (ALAssetsLibraryAccessFailureBlock)libraryAccessFailureBlock {
-  return ^(NSError *error) {
-    DDLogError(@"Failed to enumerate photo groups: %@", error.localizedDescription);
-    dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
+
+- (ALAssetsLibraryGroupsEnumerationResultsBlock)enumerateGroupsBlockSkippingGroupsNamed:(NSArray *)groupNamesToSkip startingAfter:(NSDate *)startDate beforeEndDate:(NSDate *)endDate
+{
+  return ^(ALAssetsGroup *group, BOOL *stop) {
+    if (self.isCancelled) {
+      *stop = YES;
+      dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
+      return;
+    }
+    if(group != nil) {
+      NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
+      if ([groupNamesToSkip containsObject:groupName]) {
+        return;
+      }
+      
+      [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
+      DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
+      [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:[self photosEnumerationBlock:startDate beforeEndDate:endDate]];
+    } else {
+      dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
+    }
   };
 }
 
 
-- (ALAssetsGroupEnumerationResultsBlock)photosEnumerationBlock
+
+- (ALAssetsGroupEnumerationResultsBlock)photosEnumerationBlock:(NSDate *)startDate beforeEndDate:(NSDate *)endDate
 {
   NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   return ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
@@ -84,8 +107,14 @@
         [groupObjectIDsToChanges addEntriesFromDictionary:self.unsavedObjectIDsToChanges];
         [self flushChanges];
       }
-      NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
       NSDate *assetDate = [photoAsset valueForProperty:ALAssetPropertyDate];
+      
+      if ((startDate && [assetDate compare:startDate] == NSOrderedAscending) || (endDate && [assetDate compare:endDate] == NSOrderedDescending)) {
+        // This picture is outside our date range, so skip it
+        return;
+      }
+      
+      NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
       [self.knownNotFoundURLs removeObject:assetURL];
       
       // We have this asset in our DB, see if it matches what we expect
@@ -118,30 +147,6 @@
       DDLogInfo(@"...all assets in group enumerated, changes: \n%@", [self changeTypesToCountsForChanges:groupObjectIDsToChanges].description);
       [self.allObjectIDsToChanges addEntriesFromDictionary:groupObjectIDsToChanges];
       [groupObjectIDsToChanges removeAllObjects];
-    }
-  };
-}
-
-
-- (ALAssetsLibraryGroupsEnumerationResultsBlock)enumerateGroupsBlockSkippingGroupsNamed:(NSArray *)groupNamesToSkip
-{
-  return ^(ALAssetsGroup *group, BOOL *stop) {
-    if (self.isCancelled) {
-      *stop = YES;
-      dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
-      return;
-    }
-    if(group != nil) {
-      NSString *groupName = [group valueForProperty:ALAssetsGroupPropertyName];
-      if ([groupNamesToSkip containsObject:groupName]) {
-        return;
-      }
-      
-      [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
-      DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-      [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:[self photosEnumerationBlock]];
-    } else {
-      dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
     }
   };
 }

@@ -57,6 +57,7 @@
 @property (nonatomic, assign) BOOL backgroundSyncHasFinished;
 @property (nonatomic, assign) BOOL backgroundSyncAndUploaderHaveFinished;
 @property (nonatomic, assign) BOOL backgroundSyncInProgress;
+@property (nonatomic, retain) NSDate * firstRunSyncTimestamp;
 @property (nonatomic, retain) NSTimer *backgroundSyncCancelUploadsTimer;
 @property (nonatomic, retain) NSTimer *backgroundSyncReturnTimer;
 
@@ -163,9 +164,24 @@ void (^_completionHandler)(UIBackgroundFetchResult);
  */
 - (void)firstTimeSetupComplete
 {
+  // If we got a timestamp to sync to, then lets sync to that first
+  if (self.firstRunSyncTimestamp) {
+    // If we already have a sync going, cancel and do the one with the timestamp.
+    // If we don't, just do the sync to a timestamp
+    if ([[DFCameraRollSyncManager sharedManager] isSyncInProgress]) {
+      [[DFCameraRollSyncManager sharedManager] cancelSyncOperations];
+      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp];
+      [[DFCameraRollSyncManager sharedManager] sync];
+    } else {
+      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp];
+    }
+  }
+  
   [self showMainView];
   [self performForegroundOperations];
-  [self showInboxForFirstTime];
+  
+  // Show the Inbox
+  self.tabBarController.selectedIndex = 0;
 }
 
 /*
@@ -175,8 +191,11 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   This is only called on first time setup, so all these calls should also exist in other areas like
     performForegroundOperations and all the calls should be idempotent.
  */
-- (void)firstTimeSetupUserIdStepComplete
+- (void)firstTimeSetupUserIdStepCompleteWithSyncTimestamp:(NSDate *)date
 {
+  self.firstRunSyncTimestamp = date;
+  DDLogVerbose(@"Setting firstRunSyncTimestamp to: %@", self.firstRunSyncTimestamp);
+  
   // Start up the socket server so we can start getting real time updates for when there's new data on the server
   [[DFSocketsManager sharedManager] initNetworkCommunication];
   
@@ -465,12 +484,6 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     DDLogInfo(@"App reset complete.  Showing first time setup.");
     [self showFirstTimeSetup];
   });
-}
-
-- (void)showInboxForFirstTime
-{
-  self.inboxViewController.showAsFirstTimeSetup = YES;
-  self.tabBarController.selectedIndex = 0;
 }
 
 - (void)showStrandWithID:(DFStrandIDType)strandID

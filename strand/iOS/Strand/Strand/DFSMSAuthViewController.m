@@ -205,7 +205,7 @@ replacementString:(NSString *)string
      [DFUser setCurrentUser:newUser];
      [DFAnalytics logSetupSMSCodeEnteredWithResult:DFAnalyticsValueResultSuccess];
      [SVProgressHUD dismiss];
-     [self showNextStep];
+     [self showNextStepWithFirstRunSyncTimestamp: peanutUser.first_run_sync_timestamp];
    }
    failureBlock:^(NSError *error) {
      DDLogWarn(@"Create user failed: %@", error.localizedDescription);
@@ -243,10 +243,10 @@ replacementString:(NSString *)string
   }];
 }
 
-- (void)showNextStep
+- (void)showNextStepWithFirstRunSyncTimestamp:(NSDate *)date
 {
   AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
-  [delegate firstTimeSetupUserIdStepComplete];
+  [delegate firstTimeSetupUserIdStepCompleteWithSyncTimestamp:date];
   
   DFPhotosPermissionViewController *vc = [[DFPhotosPermissionViewController alloc] init];
   [self.navigationController setViewControllers:@[vc] animated:YES];
