@@ -149,7 +149,7 @@
   [self configureSwapPhotosButtonText];
   
   self.matchingActivityWrapper.hidden = YES;
-  self.matchedCollectionView.hidden = NO;
+  self.matchResultsView.hidden = NO;
   self.swapPhotosBar.hidden = NO;
 }
 
