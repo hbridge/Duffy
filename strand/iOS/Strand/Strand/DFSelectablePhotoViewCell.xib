@@ -28,12 +28,12 @@
                             <action selector="selectPhotoButtonPressed:" destination="Lih-fC-ket" eventType="touchUpInside" id="UZa-tx-y5X"/>
                         </connections>
                     </button>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6M1-To-d3U" customClass="LKBadgeView">
-                        <rect key="frame" x="30" y="32" width="22" height="20"/>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="6M1-To-d3U" customClass="DFCircleBadge">
+                        <rect key="frame" x="32" y="32" width="20" height="20"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="20" id="AOC-Rg-zva"/>
-                            <constraint firstAttribute="width" constant="22" id="a3J-Ml-UpN"/>
+                            <constraint firstAttribute="width" constant="20" id="a3J-Ml-UpN"/>
                         </constraints>
                     </view>
                 </subviews>

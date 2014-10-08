@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPhotoViewCell.h"
-#import "LKBadgeView.h"
+#import "DFCircleBadge.h"
 
 @class DFSelectablePhotoViewCell;
 
@@ -25,7 +25,7 @@
 @property (nonatomic, weak) id<DFSelectablePhotoViewCellDelegate> delegate;
 @property (nonatomic) BOOL showTickMark;
 @property (nonatomic) NSUInteger count;
-@property (weak, nonatomic) IBOutlet LKBadgeView *countView;
+@property (weak, nonatomic) IBOutlet DFCircleBadge *countView;
 
 
 - (IBAction)selectPhotoButtonPressed:(UIButton *)sender;

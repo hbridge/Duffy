@@ -7,6 +7,7 @@
 //
 
 #import "DFSelectablePhotoViewCell.h"
+#import "DFStrandConstants.h"
 
 @implementation DFSelectablePhotoViewCell
 
@@ -16,13 +17,19 @@
   
   self.contentView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
   self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
+  
+  self.countView.backgroundColor = [DFStrandConstants photoCellBadgeColor];
 }
 
 - (void)setCount:(NSUInteger)count
 {
   _count = count;
-  if (count > 0) self.countView.text = [@(count) stringValue];
-  self.countView.hidden = YES;
+  if (count > 0) {
+    self.countView.text = [@(count) stringValue];
+    self.countView.hidden = NO;
+  } else {
+    self.countView.hidden = YES;
+  }
 }
 
 - (void)setShowTickMark:(BOOL)showTickMark

@@ -61,7 +61,7 @@
     [self setLocalPhotosForCell:cell photoObject:photoObject indexPath:indexPath];
   }
   
-  cell.showTickMark = [self.selectedFeedObjects containsObject:photoObject];
+  cell.showTickMark = [self.selectedFeedObjects containsObject:feedObject];
   
   return cell;
 }
