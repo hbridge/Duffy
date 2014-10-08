@@ -44,7 +44,19 @@
     
     self.knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
     
-    [self findAssetChanges];
+    if (self.targetDate) {
+      NSTimeInterval secondsPerDay = 24 * 60 * 60;
+      NSDate *dayBefore, *dayAfter;
+      
+      dayBefore = [self.targetDate dateByAddingTimeInterval: -secondsPerDay];
+      dayAfter = [self.targetDate dateByAddingTimeInterval: secondsPerDay];
+      
+      DDLogVerbose(@"Doing a camera roll sync between %@ and %@", dayBefore, dayAfter);
+      [self findAssetChangesBetweenTimes:dayBefore beforeEndDate:dayAfter];
+    } else {
+      [self findAssetChanges];
+    }
+    
     
     if (self.isCancelled) {
       [self cancelled];
@@ -80,6 +92,10 @@
   return mapping;
 }
 
+- (NSDictionary *)findAssetChanges
+{
+  return [self findAssetChangesBetweenTimes:nil beforeEndDate:nil];
+}
 
 - (void)findRemoteChanges
 {

@@ -37,8 +37,6 @@ static DFCameraRollSyncManager *defaultSyncController;
   return [self sharedManager];
 }
 
-
-
 - (id)init
 {
     self = [super init];
@@ -51,17 +49,28 @@ static DFCameraRollSyncManager *defaultSyncController;
 
 - (void)sync
 {
-    DDLogInfo(@"Camera roll sync requested. %d sync operations ahead in queue.",
-              (unsigned int)self.syncOperationQueue.operationCount);
+  [self syncAroundDate:nil];
+}
+
+- (void)syncAroundDate:(NSDate *)date
+{
+  DDLogInfo(@"Camera roll sync requested. %d sync operations ahead in queue.",
+            (unsigned int)self.syncOperationQueue.operationCount);
   DFCameraRollSyncOperation *syncOperation;
   
   if ([UIDevice majorVersionNumber] >= 8) {
     syncOperation = [[DFIOS8CameraRollSyncOperation alloc] init];
+    syncOperation.qualityOfService = NSOperationQualityOfServiceBackground;
   } else {
     syncOperation = [[DFIOS7CameraRollSyncOperation alloc] init];
+    syncOperation.threadPriority = 0.2; //low, 0.5 is default
   }
   
-  syncOperation.threadPriority = 0.2; //low, 0.5 is default
+  if (date) {
+    DDLogVerbose(@"Sync targeting date: %@", date);
+    syncOperation.targetDate = date;
+  }
+  
   [self.syncOperationQueue addOperation:syncOperation];
 }
 
@@ -72,6 +81,7 @@ static DFCameraRollSyncManager *defaultSyncController;
 
 - (void)cancelSyncOperations
 {
+  DDLogVerbose(@"Canceling all camera roll sync operations");
   [self.syncOperationQueue cancelAllOperations];
 }
 

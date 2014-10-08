@@ -12,6 +12,7 @@
 
 + (DFCameraRollSyncManager *)sharedManager;
 - (void)sync;
+- (void)syncAroundDate:(NSDate *)date;
 - (void)cancelSyncOperations;
 - (BOOL)isSyncInProgress;
 
