@@ -113,23 +113,29 @@ NSUInteger const NumPhotosPerRow = 2;
   self.collectionView.alwaysBounceVertical = YES;
 }
 
-- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
+    selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
 {
   [self configureNavTitle];
 }
 
 - (void)configureNavTitle
 {
-  NSUInteger selectedCount = self.selectPhotosController.selectedPhotoIDs.count;
-  if (selectedCount > 0) {
-    NSString *title = [NSString stringWithFormat:@"Swap %d Photos",
-                       (int)selectedCount];
-    self.navigationItem.title = title;
-    self.navigationItem.rightBarButtonItem.enabled = YES;
-  } else {
+  NSUInteger selectedPhotosCount = self.selectPhotosController.selectedPhotoIDs.count;
+  NSUInteger selectedPeopleCount = self.peoplePicker.selectedPeanutContacts.count;
+  
+  // set the title based on photos selected
+  if (selectedPhotosCount == 0) {
     self.navigationItem.title = @"No Photos Selected";
-    self.navigationItem.rightBarButtonItem.enabled = NO;
+  } else {
+    NSString *title = [NSString stringWithFormat:@"Swap %d Photos",
+                       (int)selectedPhotosCount];
+    self.navigationItem.title = title;
   }
+  
+  // enable/disable the done button based on photo/people selected
+  self.navigationItem.rightBarButtonItem.enabled = (selectedPeopleCount > 0
+                                                    && selectedPhotosCount > 0);
 }
 
 #pragma mark - Actions
@@ -259,6 +265,7 @@ NSUInteger const NumPhotosPerRow = 2;
          didPickContacts:(NSArray *)peanutContacts
 {
   self.selectedContacts = peanutContacts;
+  [self configureNavTitle];
 }
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
