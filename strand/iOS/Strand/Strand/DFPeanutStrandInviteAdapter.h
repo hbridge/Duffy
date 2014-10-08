@@ -32,7 +32,7 @@
 - (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrandObject
             toPeanutContacts:(NSArray *)peanutContacts
         inviteLocationString:(NSString *)inviteLocationString
-            inviteDateString:(NSString *)inviteDateString
+            invitedPhotosDate:(NSDate *)invitedPhotosDate
                      success:(void(^)(DFSMSInviteStrandComposeViewController *))success
                      failure:(DFPeanutRestFetchFailure)failure;
 

@@ -89,7 +89,7 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
 - (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
             toPeanutContacts:(NSArray *)peanutContacts
         inviteLocationString:(NSString *)inviteLocationString
-            inviteDateString:(NSString *)inviteDateString
+            invitedPhotosDate:(NSDate *)invitedPhotosDate
                      success:(void(^)(DFSMSInviteStrandComposeViewController *))success
                      failure:(DFPeanutRestFetchFailure)failure
 {
@@ -113,7 +113,7 @@ NSString *const StrandInviteBasePath = @"strand_invite/";
       DFSMSInviteStrandComposeViewController *smsInviteVC = [[DFSMSInviteStrandComposeViewController alloc]
                                                              initWithRecipients:numbersToSMS
                                                              locationString:inviteLocationString
-                                                             dateString:inviteDateString];
+                                                             date:invitedPhotosDate];
       success(smsInviteVC);
     } else {
       success(nil);

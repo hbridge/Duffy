@@ -22,14 +22,18 @@ static NSString *const appURL = @"http://bit.ly/strand-appstore";
 
 - (instancetype)initWithRecipients:(NSArray *)recipients
                     locationString:(NSString *)locationString
-                        dateString:(NSString *)dateString
+                        date:(NSDate *)date
 {
   self = [super init];
   if (self) {
     self.recipients = recipients;
-    self.body = [NSString stringWithFormat:@"Hey! Photos from %@ here %@. "
-                 "You'll have to register, but the app will make it easy to send your phots back.",
-                 locationString, appURL];
+    
+    NSString *fromString = locationString;
+    
+    self.body = [NSString stringWithFormat:@"Hey! Sent you photos from %@. "
+                 "Try this new app to view them and easily swap your matching photos. %@",
+                 fromString,
+                 appURL];
   }
   return self;
 }

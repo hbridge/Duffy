@@ -12,6 +12,5 @@
 
 - (instancetype)initWithRecipients:(NSArray *)recipients
                     locationString:(NSString *)locationString
-                        dateString:(NSString *)dateString;
-
+                              date:(NSDate *)date;
 @end

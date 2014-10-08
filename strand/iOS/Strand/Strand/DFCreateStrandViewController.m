@@ -178,8 +178,7 @@ NSUInteger const NumPhotosPerRow = 2;
    sendInvitesForStrand:peanutStrand
    toPeanutContacts:peanutContacts
    inviteLocationString:self.suggestionsObject.location
-   inviteDateString:[NSDateFormatter relativeTimeStringSinceDate:self.suggestionsObject.time_taken
-                                                      abbreviate:NO]
+   invitedPhotosDate:self.suggestionsObject.time_taken
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (vc) {
