@@ -85,7 +85,8 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 
 - (void)configureCollectionView
 {
-   self.collectionView.scrollsToTop = YES;
+  self.collectionView.scrollsToTop = YES;
+  self.collectionView.alwaysBounceVertical = YES;
   
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"photoCell"];
