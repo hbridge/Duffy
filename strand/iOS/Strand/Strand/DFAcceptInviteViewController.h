@@ -27,6 +27,7 @@
 - (instancetype)initWithInviteObject:(DFPeanutFeedObject *)inviteObject;
 - (IBAction)matchButtonPressed:(UIButton *)sender;
 - (IBAction)swapPhotosButtonPressed:(id)sender;
+- (void)setupViewWithInviteObject:(DFPeanutFeedObject *)inviteObject;
 
 
 @end

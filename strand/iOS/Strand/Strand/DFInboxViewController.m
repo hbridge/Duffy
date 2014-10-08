@@ -48,9 +48,6 @@
     _cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self initTabBarItemAndNav];
     [self observeNotifications];
-    
-    // This is set to YES after the controller is created
-    self.showAsFirstTimeSetup = NO;
   }
   return self;
 }
@@ -94,16 +91,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (self.showAsFirstTimeSetup) {
-    // If we don't have a lastResponseHash then this is the first run and we should show
-    //   a spinner bar until we get some good data (ready invite).  This is turned off in refreshFromServer
-    [SVProgressHUD showWithStatus:@"Loading your photos..."];
-    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
-                                                         target:self
-                                                       selector:@selector(refreshFromServer)
-                                                       userInfo:nil
-                                                        repeats:YES];
-  } else if (!self.lastResponseHash) {
+  if (!self.lastResponseHash) {
     [self.refreshControl beginRefreshing];
   }
 }
@@ -112,8 +100,6 @@
 {
   [super viewWillDisappear:animated];
   [self.noItemsPopLabel dismiss];
-  [self.refreshTimer invalidate];
-  self.refreshTimer = nil;
 }
 
 - (void)configureRefreshControl
@@ -149,31 +135,6 @@
     // Dispose of any resources that can be recreated.
 }
 
-/*
- Return if a spinner should be showing on the inbox screen
- 
- If we have an invite but its not ready yet (stranding isn't done or images aren't uploaded)
-    Then we want to return true since the spinner should be on
- If we find anything other than an invite then return false, spinner should be off
- */
-- (BOOL)shouldSpinnerBeOn
-{
-  for (DFPeanutFeedObject *object in self.feedObjects) {
-    if ([object.type isEqualToString:DFFeedObjectInviteStrand] && [object.ready isEqual: @(YES)]) {
-      return NO;
-    } else if (![object.type isEqualToString:DFFeedObjectInviteStrand]) {
-      return NO;
-    }
-  }
-    
-  if (self.feedObjects.count == 0) {
-    return NO;
-  }
-  
-  return YES;
-}
-
-
 #pragma mark - Data Fetch
 
 - (void)refreshFromServer
@@ -196,14 +157,6 @@
        });
      }
      dispatch_async(dispatch_get_main_queue(), ^{
-       if (![self shouldSpinnerBeOn]) {
-         self.showAsFirstTimeSetup = NO;
-         [SVProgressHUD dismiss];
-         
-         [self.refreshTimer invalidate];
-         self.refreshTimer = nil;
-       }
-       
        [self.refreshControl endRefreshing];
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        

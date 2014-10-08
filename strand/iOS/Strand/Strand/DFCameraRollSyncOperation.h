@@ -22,6 +22,7 @@ static int NumChangesFlushThreshold = 100;
 @property (nonatomic, retain) NSMutableDictionary *knownAndFoundURLsToDates;
 @property (nonatomic, retain) NSMutableDictionary *allObjectIDsToChanges;
 @property (nonatomic, retain) NSMutableDictionary *unsavedObjectIDsToChanges;
+@property (nonatomic, retain) NSDate *targetDate;
 
 - (NSDictionary *)mapKnownPhotoURLsToDates:(DFPhotoCollection *)knownPhotos;
 - (void)flushChanges;
@@ -31,6 +32,7 @@ static int NumChangesFlushThreshold = 100;
 
 // To be overridden
 - (NSDictionary *)findAssetChanges;
+- (NSDictionary *)findAssetChangesBetweenTimes:(NSDate *)startDate beforeEndDate:(NSDate *)endDate;
 - (NSArray *)photosToRemove:(NSSet *)photoURLsNotFound;
 - (void)migrateAssets;
 @end

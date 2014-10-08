@@ -21,7 +21,7 @@
 
 @implementation DFIOS8CameraRollSyncOperation
 
-- (NSDictionary *)findAssetChanges
+- (NSDictionary *)findAssetChangesBetweenTimes:(NSDate *)startDate beforeEndDate:(NSDate *)endDate
 {
   // setup dicts for enumeration
   self.foundURLs = [[self.knownPhotos photoURLSet] mutableCopy];
@@ -31,7 +31,7 @@
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   DDLogDebug(@"%@ finding PHAssetChanges", self.class);
-  NSDate *startDate = [NSDate date];
+  NSDate *timerStartDate = [NSDate date];
   
   //enumerate PHAssets
   NSUInteger assetCount = 0;
@@ -55,6 +55,13 @@
       for (PHAsset *asset in assets) {
         if (self.isCancelled) return self.allObjectIDsToChanges;
         if (asset.mediaType != PHAssetMediaTypeImage) continue;
+        
+        if ((startDate && [asset.creationDate compare:startDate] == NSOrderedAscending) ||
+            (endDate && [asset.creationDate compare:endDate] == NSOrderedDescending)) {
+          // This picture is outside our date range, so skip it
+          continue;
+        }
+        
         assetCount++;
         [[DFAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
         [self scanPHAssetForChange:asset];
@@ -73,7 +80,7 @@
   [self flushChanges];
   DDLogInfo(@"Scan complete.  Took %.02f Change summary for %@ assets: \n%@",
             [[NSDate date]
-             timeIntervalSinceDate:startDate],
+             timeIntervalSinceDate:timerStartDate],
             @(assetCount),
             [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
   
