@@ -20,6 +20,8 @@ static NSString *const appURL = @"http://bit.ly/strand-beta";
 static NSString *const appURL = @"http://bit.ly/strand-appstore";
 #endif
 
+const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
+
 - (instancetype)initWithRecipients:(NSArray *)recipients
                     locationString:(NSString *)locationString
                         date:(NSDate *)date
@@ -28,7 +30,15 @@ static NSString *const appURL = @"http://bit.ly/strand-appstore";
   if (self) {
     self.recipients = recipients;
     
+    NSUInteger daysSincePhotos = fabs(date.timeIntervalSinceNow / DaysMultiplier);
     NSString *fromString = locationString;
+    if (daysSincePhotos == 0) {
+      fromString = @"today";
+    } else if (daysSincePhotos == 1) {
+      fromString = @"yesterday";
+    } else if (daysSincePhotos < 8) {
+      fromString = [self getDayOfTheWeek:date];
+    }
     
     self.body = [NSString stringWithFormat:@"Hey! Sent you photos from %@. "
                  "Try this new app to view them and easily swap your matching photos. %@",
@@ -38,6 +48,13 @@ static NSString *const appURL = @"http://bit.ly/strand-appstore";
   return self;
 }
 
+- (NSString *)getDayOfTheWeek:(NSDate *)date{
+  NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+  
+  dateFormatter.dateFormat = @"EEEE";
+  NSString *formattedDateString = [dateFormatter stringFromDate:date];
+  return formattedDateString;
+}
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result

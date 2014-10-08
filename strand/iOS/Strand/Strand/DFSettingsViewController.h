@@ -7,7 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MessageUI/MessageUI.h>
 
-@interface DFSettingsViewController : UITableViewController
+@interface DFSettingsViewController : UITableViewController <MFMessageComposeViewControllerDelegate>
 
 @end

@@ -24,6 +24,7 @@
 #import "AppDelegate.h"
 #import "DFContactsViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
+#import "DFSMSInviteStrandComposeViewController.h"
 
 @interface DFSettingsViewController ()
 
@@ -150,7 +151,7 @@
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     
     if ([[DFUser currentUser] isUserDeveloper]) {
-      [DFSettingsViewController addDeveloperOptions:mapping];
+      [self addDeveloperOptions:mapping];
     }
     
     [self.formModel registerMapping:mapping];
@@ -185,7 +186,7 @@
 
 #pragma mark - Developer settings
 
-+ (void)addDeveloperOptions:(FKFormMapping *)mapping
+- (void)addDeveloperOptions:(FKFormMapping *)mapping
 {
   [mapping sectionWithTitle:@"Developer" identifier:@"developer"];
   
@@ -244,20 +245,24 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            ALAssetsLibrary *assetsLibrary = [[ALAssetsLibrary alloc] init];
-            [assetsLibrary enumerateGroupsWithTypes:ALAssetsGroupAll | ALAssetsGroupLibrary usingBlock:^(ALAssetsGroup *group, BOOL *stop) {
-              DDLogVerbose(@"Found group:%@", [group valueForProperty:ALAssetsGroupPropertyName]);
-              [group enumerateAssetsUsingBlock:^(ALAsset *result, NSUInteger index, BOOL *stop) {
-                DDLogVerbose(@"Found asset: %@", [result valueForProperty:ALAssetPropertyAssetURL]);
-              }];
-            } failureBlock:^(NSError *error) {
-              DDLogVerbose(@"error: %@",error);
-            }];
-            
+            int numDays = rand() % 8;
+            DFSMSInviteStrandComposeViewController *vc =
+            [[DFSMSInviteStrandComposeViewController alloc]
+             initWithRecipients:@[[@(numDays) stringValue]]
+             locationString:@"Croatia"
+             date:[NSDate dateWithTimeIntervalSinceNow:(60 * 60 * 24 * numDays + 100) * -1]];
+            [self presentViewController:vc animated:YES completion:nil];
+            vc.messageComposeDelegate = self;
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
 }
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
+
 
 
 @end
