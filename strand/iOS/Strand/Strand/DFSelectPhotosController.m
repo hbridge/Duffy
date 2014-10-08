@@ -76,7 +76,7 @@
       continue;
     }
     for (DFPeanutFeedObject *subObject in object.enumeratorOfDescendents.allObjects) {
-      if ([subObject isEqual:DFFeedObjectPhoto]) {
+      if ([subObject.type isEqual:DFFeedObjectPhoto]) {
         [result addObject:@(subObject.id)];
       }
     }
