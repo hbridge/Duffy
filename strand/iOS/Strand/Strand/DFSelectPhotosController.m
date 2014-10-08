@@ -72,7 +72,7 @@
   for (DFPeanutFeedObject *object in self.selectedFeedObjects)
   {
     if ([object.type isEqual:DFFeedObjectPhoto]) {
-      [result addObject:object];
+      [result addObject:@(object.id)];
       continue;
     }
     for (DFPeanutFeedObject *subObject in object.enumeratorOfDescendents.allObjects) {
