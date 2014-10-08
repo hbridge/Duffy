@@ -93,11 +93,12 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
   DFPeanutFeedObject *object = self.feedObjects[indexPath.row];
   if (selectPhotoButton.selected) {
     [self.selectedFeedObjects removeObject:object];
+    selectPhotoButton.selected = NO;
   } else {
     [self.selectedFeedObjects addObject:object];
+    selectPhotoButton.selected = YES;
   }
   
-  [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
   if (self.delegate) {
     [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
   }
