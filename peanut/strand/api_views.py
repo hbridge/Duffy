@@ -423,6 +423,8 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = list()
 
+	friendsData = friends_util.getFriendsData(user)
+
 	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
 
@@ -436,7 +438,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				interestedUsers.extend(neighborStrand.users.all())
+				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friendsData, neighborStrand.users.all()))
 
 		interestedUsers = list(set(interestedUsers))
 
