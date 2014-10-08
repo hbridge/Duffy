@@ -21,13 +21,11 @@
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (nonatomic, retain) VENTokenField *tokenField;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
-@property (weak, nonatomic) IBOutlet UIView *swapBarWrapper;
-@property (weak, nonatomic) IBOutlet UIButton *swapPhotosButton;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
 - (instancetype)initWithSuggestions:(DFPeanutFeedObject *)suggestions;
-- (IBAction)swapPhotosButtonPressed:(UIButton *)sender;
+- (void)swapPhotosButtonPressed:(UIButton *)sender;
 
 
 @end

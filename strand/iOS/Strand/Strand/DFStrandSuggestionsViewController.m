@@ -112,7 +112,7 @@ static DFStrandSuggestionsViewController *instance;
 {
   self.navigationItem.title = @"Swap Photos";
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
-                                           initWithTitle:@"Back"
+                                           initWithTitle:@""
                                            style:UIBarButtonItemStylePlain
                                            target:nil
                                            action:nil];

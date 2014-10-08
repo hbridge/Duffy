@@ -57,7 +57,7 @@ NSUInteger const NumPhotosPerRow = 2;
   
   [self configureCollectionView];
   [self configurePeoplePicker];
-  [self configureSwapButtonTitle];
+  [self configureNavTitle];
 }
 
 - (void)viewDidLayoutSubviews
@@ -73,6 +73,12 @@ NSUInteger const NumPhotosPerRow = 2;
 - (void)configureNavBar
 {
   self.navigationItem.title = @"Invite to Swap";
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/DoneBarButton"]
+                                            style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:@selector(swapPhotosButtonPressed:)
+                                            ];
 }
 
 
@@ -105,29 +111,25 @@ NSUInteger const NumPhotosPerRow = 2;
                                  imageType:DFImageThumbnail];
   self.selectPhotosController.delegate = self;
   self.collectionView.alwaysBounceVertical = YES;
-  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, self.swapBarWrapper.frame.size.height, 0);
 }
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
 {
-  [self configureSwapButtonTitle];
+  [self configureNavTitle];
 }
 
-- (void)configureSwapButtonTitle
+- (void)configureNavTitle
 {
   NSUInteger selectedCount = self.selectPhotosController.selectedPhotoIDs.count;
   if (selectedCount > 0) {
     NSString *title = [NSString stringWithFormat:@"Swap %d Photos",
                        (int)selectedCount];
-    [self.swapPhotosButton setTitle:title forState:UIControlStateNormal];
-    self.swapPhotosButton.enabled = YES;
-    self.swapBarWrapper.alpha = 1.0;
+    self.navigationItem.title = title;
+    self.navigationItem.rightBarButtonItem.enabled = YES;
   } else {
-    [self.swapPhotosButton setTitle:@"No Photos Selected" forState:UIControlStateDisabled];
-    self.swapPhotosButton.enabled = NO;
-    self.swapBarWrapper.alpha = 0.7;
+    self.navigationItem.title = @"No Photos Selected";
+    self.navigationItem.rightBarButtonItem.enabled = NO;
   }
-  
 }
 
 #pragma mark - Actions
