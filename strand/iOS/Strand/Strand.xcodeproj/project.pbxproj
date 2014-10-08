@@ -88,7 +88,7 @@
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A9115DB19DA08D3003F2A68 /* DFLabelCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */; };
 		5A9115DC19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */; };
-		5A9115DF19DA0F6B003F2A68 /* OFElementSquare.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115DE19DA0F6B003F2A68 /* OFElementSquare.m */; };
+		5A9115DF19DA0F6B003F2A68 /* DFCircleBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115DE19DA0F6B003F2A68 /* DFCircleBadge.m */; };
 		5A9115E219DB0B80003F2A68 /* UIImageView+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115E119DB0B80003F2A68 /* UIImageView+DFHelpers.m */; };
 		5A9115E419DB2B2F003F2A68 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9115E319DB2B2F003F2A68 /* LaunchScreen.xib */; };
 		5A9115EC19DB7F90003F2A68 /* UINib+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115EB19DB7F90003F2A68 /* UINib+DFHelpers.m */; };
@@ -377,8 +377,8 @@
 		5A9115D819DA08D3003F2A68 /* DFLabelCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLabelCollectionViewCell.h; sourceTree = "<group>"; };
 		5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLabelCollectionViewCell.m; sourceTree = "<group>"; };
 		5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLabelCollectionViewCell.xib; sourceTree = "<group>"; };
-		5A9115DD19DA0F6B003F2A68 /* OFElementSquare.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OFElementSquare.h; sourceTree = "<group>"; };
-		5A9115DE19DA0F6B003F2A68 /* OFElementSquare.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OFElementSquare.m; sourceTree = "<group>"; };
+		5A9115DD19DA0F6B003F2A68 /* DFCircleBadge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCircleBadge.h; sourceTree = "<group>"; };
+		5A9115DE19DA0F6B003F2A68 /* DFCircleBadge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCircleBadge.m; sourceTree = "<group>"; };
 		5A9115E019DB0B80003F2A68 /* UIImageView+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+DFHelpers.h"; sourceTree = "<group>"; };
 		5A9115E119DB0B80003F2A68 /* UIImageView+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+DFHelpers.m"; sourceTree = "<group>"; };
 		5A9115E319DB2B2F003F2A68 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
@@ -657,8 +657,8 @@
 				5A13E08E19BF60D6005357D2 /* Navigation */,
 				5AF32EC5197C9DCE004B5CC4 /* DFRoundedButton.h */,
 				5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */,
-				5A9115DD19DA0F6B003F2A68 /* OFElementSquare.h */,
-				5A9115DE19DA0F6B003F2A68 /* OFElementSquare.m */,
+				5A9115DD19DA0F6B003F2A68 /* DFCircleBadge.h */,
+				5A9115DE19DA0F6B003F2A68 /* DFCircleBadge.m */,
 				5A7F8FF819A7D09700EF0119 /* CollectionViewCells */,
 				5A13E08F19BF613E005357D2 /* TableViewCells */,
 				5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */,
@@ -1673,7 +1673,7 @@
 				5AC4A9281947C30800862D9C /* DFObjectManager.m in Sources */,
 				5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */,
 				5AC4A92D1947C30800862D9C /* DFPhotoMetadataAdapter.m in Sources */,
-				5A9115DF19DA0F6B003F2A68 /* OFElementSquare.m in Sources */,
+				5A9115DF19DA0F6B003F2A68 /* DFCircleBadge.m in Sources */,
 				5A02CEB2194FA73D00C4EBA6 /* DFPeanutTrueFalseResponse.m in Sources */,
 				5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */,
 				5AAF038719B0D5AE00EF021C /* DFSelectPhotosController.m in Sources */,

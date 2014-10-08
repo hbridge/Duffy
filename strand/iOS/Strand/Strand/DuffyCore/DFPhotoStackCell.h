@@ -7,11 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFCircleBadge.h"
 
 @interface DFPhotoStackCell : UICollectionViewCell
-@property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
-@property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
-@property (weak, nonatomic) IBOutlet UILabel *countLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *likeIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *imageView;
+@property (weak, nonatomic) IBOutlet DFCircleBadge *badgeView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingActivityIndicator;
+@property (nonatomic) NSUInteger count;
+
 
 @end

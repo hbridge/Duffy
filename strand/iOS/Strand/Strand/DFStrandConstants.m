@@ -95,4 +95,9 @@ UIColor *DFStrandMainColor;
   return [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
 }
 
++ (UIColor *)photoCellBadgeColor
+{
+  return [[self defaultBackgroundColor] colorWithAlphaComponent:0.8];
+}
+
 @end

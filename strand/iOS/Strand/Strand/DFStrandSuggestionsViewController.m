@@ -395,10 +395,10 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   NSInteger count = strandObject.objects.count - MaxPhotosPerCell;
   if (count > 0) {
-    cell.countBadgeBackground.hidden = NO;
-    cell.countBadge.elementAbbreviation = [NSString stringWithFormat:@"+%d", (int)count];
+    cell.countBadge.hidden = NO;
+    cell.countBadge.text = [NSString stringWithFormat:@"+%d", (int)count];
   } else {
-    cell.countBadgeBackground.hidden = YES;
+    cell.countBadge.hidden = YES;
   }
 }
 

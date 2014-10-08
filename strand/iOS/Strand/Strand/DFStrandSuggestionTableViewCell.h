@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFCollectionViewTableViewCell.h"
-#import "OFElementSquare.h"
+#import "DFCircleBadge.h"
 
 @interface DFStrandSuggestionTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
@@ -24,8 +24,7 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *peopleExplanationLabel;
 @property (weak, nonatomic) IBOutlet UIView *solidBackgroundView;
-@property (weak, nonatomic) IBOutlet OFElementSquare *countBadge;
-@property (weak, nonatomic) IBOutlet UIView *countBadgeBackground;
+@property (weak, nonatomic) IBOutlet DFCircleBadge *countBadge;
 
 
 + (DFStrandSuggestionTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;

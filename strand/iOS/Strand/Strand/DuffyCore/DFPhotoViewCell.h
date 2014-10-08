@@ -12,5 +12,6 @@
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIImageView *likeIconImageView;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingActivityIndicator;
 
 @end

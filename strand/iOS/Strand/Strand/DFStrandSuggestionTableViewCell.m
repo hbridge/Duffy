@@ -20,9 +20,6 @@
   self.selectionStyle = UITableViewCellSelectionStyleNone;
   self.solidBackgroundView.layer.cornerRadius = 4.0;
   self.solidBackgroundView.layer.masksToBounds = YES;
-  self.countBadgeBackground.layer.cornerRadius = self.countBadgeBackground.frame.size.width/2.0;
-  self.countBadgeBackground.layer.masksToBounds = YES;
-  self.countBadgeBackground.layer.opacity = 0.9;
 }
 
 + (DFStrandSuggestionTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style

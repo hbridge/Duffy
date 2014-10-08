@@ -181,7 +181,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
   DFPeanutFeedObject *postObject = [self postObjectForSection:section];
   
-  NSArray *items = postObject.enumeratorOfDescendents.allObjects;
+  NSArray *items = postObject.objects;
   return items.count;
 }
 
@@ -193,7 +193,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (DFPeanutFeedObject *)photoForIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *postObject = [self postObjectForSection:indexPath.section];
-  NSArray *itemsForPost = postObject.enumeratorOfDescendents.allObjects;
+  NSArray *itemsForPost = postObject.objects;
   DFPeanutFeedObject *peanutPhoto = itemsForPost[indexPath.row];
   return peanutPhoto;
 }
@@ -203,13 +203,15 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
   UICollectionViewCell *cell;
   
-  DFPeanutFeedObject *peanutPhoto = [self photoForIndexPath:indexPath];
+  DFPeanutFeedObject *feedObject = [self photoForIndexPath:indexPath];
   
-  if ([peanutPhoto.type isEqual:DFFeedObjectPhoto]) {
-    cell = [self cellForPhoto:peanutPhoto indexPath:indexPath];
+  if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
+    cell = [self cellForPhoto:feedObject indexPath:indexPath];
+  }else if ([feedObject.type isEqual:DFFeedObjectCluster]){
+    cell = [self cellForCluster:feedObject indexPath:indexPath];
   } else {
     // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
-    cell = [self cellForUnknownObject:peanutPhoto atIndexPath:indexPath];
+    cell = [self cellForUnknownObject:feedObject atIndexPath:indexPath];
   }
   
   [cell setNeedsLayout];
@@ -235,6 +237,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 {
   DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell" forIndexPath:indexPath];
   cell.imageView.image = nil;
+  [cell.loadingActivityIndicator startAnimating];
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
   
@@ -254,6 +257,7 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
          (image) cell.imageView.image = image;
        else
          cell.imageView.image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
+       [cell.loadingActivityIndicator stopAnimating];
        [cell setNeedsLayout];
      });
    }];
@@ -264,13 +268,12 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (UICollectionViewCell *)cellForCluster:(DFPeanutFeedObject *)clusterObject
                                indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoViewCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"photoCell"
+  DFPhotoStackCell *cell = [self.collectionView dequeueReusableCellWithReuseIdentifier:@"clusterCell"
                                                                          forIndexPath:indexPath];
   cell.imageView.image = nil;
-  cell.likeIconImageView.hidden = YES;
+  [cell.loadingActivityIndicator startAnimating];
   for (DFPeanutFeedObject *object in clusterObject.objects) {
     if ([[object actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
-      cell.likeIconImageView.hidden = NO;
       break;
     }
   }
@@ -285,6 +288,8 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:cell]) return;
+       [cell.loadingActivityIndicator stopAnimating];
+       cell.count = clusterObject.objects.count;
        cell.imageView.image = image;
        [cell setNeedsLayout];
      });
@@ -298,9 +303,11 @@ static const CGFloat StrandGalleryItemSpacing = 0.5;
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPhotoIDType photoID;
-  DFPeanutFeedObject *peanutPhoto = [self photoForIndexPath:indexPath];
-  if ([peanutPhoto.type isEqualToString:DFFeedObjectPhoto]) {
-    photoID = peanutPhoto.id;
+  DFPeanutFeedObject *feedObject = [self photoForIndexPath:indexPath];
+  if ([feedObject.type isEqualToString:DFFeedObjectPhoto]) {
+    photoID = feedObject.id;
+  } else if ([feedObject.type isEqualToString:DFFeedObjectCluster]) {
+    photoID = ((DFPeanutFeedObject *)feedObject.objects.firstObject).id;
   }
   
   DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];

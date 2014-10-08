@@ -7,9 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "OFElementSquare.h"
+#import "DFCircleBadge.h"
 
 @interface DFLabelCollectionViewCell : UICollectionViewCell
-@property (weak, nonatomic) IBOutlet OFElementSquare *abbreviationSquare;
+@property (weak, nonatomic) IBOutlet DFCircleBadge *abbreviationSquare;
 
 @end
