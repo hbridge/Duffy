@@ -102,7 +102,7 @@ def getLatLonAccuracyFromExtraData(photo, tryFile=False):
 			if lat and lon:
 				return (lat, lon, accuracy)
 			else:
-				logger.error("Thought I should have found GPS data but didn't in photo %s and metadata: %s" % (photo.id, metadata))
+				#logger.error("Thought I should have found GPS data but didn't in photo %s and metadata: %s" % (photo.id, metadata))
 				return (None, None, None)
 		
 	if (tryFile):
