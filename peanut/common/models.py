@@ -534,6 +534,28 @@ class FriendConnection(models.Model):
 		unique_together = ("user_1", "user_2")
 		db_table = 'strand_friends'
 
+	@classmethod
+	def friendConnectionExists(cls, user1, user2, existingFriendConnections):
+		for connection in existingFriendConnections:
+			if connection.user_1.id == user1.id and connection.user_2.id == user2.id:
+				return True
+
+	@classmethod
+	def addNewConnections(cls, userToAddTo, users):
+		allUsers = list()
+		allUsers.extend(users)
+		allUsers.append(userToAddTo)
+		
+		existingFriendConnections = FriendConnection.objects.filter(Q(user_1__in=allUsers) | Q(user_2__in=allUsers))
+		newFriendConnections = list()
+		for user in users:
+			if (user.id < userToAddTo.id and not cls.friendConnectionExists(user, userToAddTo, existingFriendConnections)):
+				newFriendConnections.append(FriendConnection(user_1 = user, user_2 = userToAddTo))
+			elif (userToAddTo.id < user.id and not cls.friendConnectionExists(userToAddTo, user, existingFriendConnections)):
+				newFriendConnections.append(FriendConnection(user_1 = userToAddTo, user_2 = user))
+
+		FriendConnection.objects.bulk_create(newFriendConnections)
+
 class Strand(models.Model):
 	first_photo_time = models.DateTimeField(db_index=True)
 	last_photo_time = models.DateTimeField(db_index=True)

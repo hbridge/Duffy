@@ -7,6 +7,7 @@ from threading import Thread
 
 from django.shortcuts import get_list_or_404
 from django.db import IntegrityError
+from django.db.models import Q
 
 from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.response import Response
@@ -16,7 +17,7 @@ from rest_framework.exceptions import ParseError
 
 from peanut.settings import constants
 
-from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand
+from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection
 from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 from strand import notifications_util
@@ -183,7 +184,6 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
         logger.debug("going to send %s to user id %s" % (msg, strandInvite.user.id))
         notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
 
-
     def post_save(self, strandInvite, created):
         if strandInvite.accepted_user_id:
             thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
@@ -201,6 +201,7 @@ class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
                 if oldAction.action_type == action.action_type and oldAction.user == action.user:
                     action.delete()
 
+            FriendConnection.addNewConnections(strandInvite.accepted_user, strandInvite.strand.users.all())
 """
     REST interface for creating new Actions.
 
@@ -222,7 +223,6 @@ class CreateActionAPI(CreateAPIView):
                 return super(CreateActionAPI, self).post(request)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 def updateStrandWithCorrectPhotoTimes(strand):
     changed = False

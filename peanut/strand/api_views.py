@@ -193,8 +193,13 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		user.first_run_sync_timestamp = strandInvites[0].strand.first_photo_time
 
 		logger.debug("Updated %s invites with user id %s and set first_run_sync_timestamp to %s" % (len(strandInvites), user.id, user.first_run_sync_timestamp))
-		
-	
+
+
+	contacts = ContactEntry.objects.filter(phone_number = user.phone_number).exclude(user=user).exclude(skip=True)
+	friends = set([contact.user for contact in contacts])
+
+	FriendConnection.addNewConnections(user, friends)
+
 	# Create directory for photos
 	# TODO(Derek): Might want to move to a more common location if more places that we create users
 	try:
