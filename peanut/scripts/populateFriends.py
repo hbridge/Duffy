@@ -63,7 +63,7 @@ def main(argv):
 		if len(contactEntries) > 0:
 			# Grab users who these new contact entries point to
 			phoneNumbers = [contactEntry.phone_number for contactEntry in contactEntries]
-			users = User.objects.filter(phone_number__in=phoneNumbers)
+			users = User.objects.filter(phone_number__in=phoneNumbers).filter(product_id=2)
 
 			usersByPhoneNumber = getUsersByPhoneNumber(users)
 
