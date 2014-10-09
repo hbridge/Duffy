@@ -451,6 +451,10 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 		if suggestible and len(interestedUsers) == 0:
 			suggestible = False
+
+		if not getLocationForStrand(strand):
+			interestedUsers = list()
+			suggestible = False
 			
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
