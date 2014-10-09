@@ -1,5 +1,11 @@
 # Strand
 
+## Oct 9, 2014 (4748)
+
+- New accept photos screen
+- UI tweaks
+- Bug fixes
+
 ## Oct 3, 2014 (4746, 4747)
 
 - Hide suggestions on the "Suggestions" tab by swiping left
