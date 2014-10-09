@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
@@ -10,12 +11,14 @@
                 <outlet property="inviteWrapper" destination="gHH-je-Wr8" id="DQx-BW-Yxd"/>
                 <outlet property="invitedCollectionView" destination="myg-5d-5re" id="SSN-V8-0ON"/>
                 <outlet property="matchButtonWrapper" destination="VWK-OM-57E" id="VW3-ti-S8c"/>
+                <outlet property="matchResultsHeader" destination="aDw-hA-TG9" id="mUX-gO-Qge"/>
                 <outlet property="matchResultsTitleLabel" destination="bWa-Lo-Lnl" id="NDR-4Q-Jee"/>
                 <outlet property="matchResultsView" destination="w98-7I-99P" id="DYn-uI-KG0"/>
                 <outlet property="matchedCollectionView" destination="UKh-g2-w6Y" id="PBQ-Gh-Dju"/>
                 <outlet property="matchedCollectionViewHeight" destination="yU4-lR-2PV" id="igT-re-wT8"/>
                 <outlet property="matchedFlowLayout" destination="qVg-qD-MWp" id="Gom-Qg-7u0"/>
                 <outlet property="matchingActivityWrapper" destination="WnG-LY-rGA" id="tWx-s0-Vaf"/>
+                <outlet property="noMatchingPhotosLabel" destination="BWH-gD-PdM" id="UjI-m1-chc"/>
                 <outlet property="scrollView" destination="SSs-zt-Tem" id="ZcE-fb-rve"/>
                 <outlet property="swapPhotosBar" destination="wM1-ZQ-dvb" id="jAN-P6-LEk"/>
                 <outlet property="swapPhotosButton" destination="tUl-GC-OhM" id="308-l5-VRP"/>
@@ -86,6 +89,12 @@
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="w98-7I-99P" userLabel="Matched area">
                             <rect key="frame" x="0.0" y="135" width="600" height="281"/>
                             <subviews>
+                                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Matching Photos" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BWH-gD-PdM">
+                                    <rect key="frame" x="213" y="20" width="174" height="241"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aDw-hA-TG9" userLabel="Matches Header">
                                     <rect key="frame" x="5" y="0.0" width="590" height="281"/>
                                     <subviews>
@@ -136,11 +145,14 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="UKh-g2-w6Y" secondAttribute="trailing" id="07D-4l-4xj"/>
+                                <constraint firstItem="BWH-gD-PdM" firstAttribute="top" secondItem="w98-7I-99P" secondAttribute="top" constant="20" id="0dQ-0k-eHh"/>
                                 <constraint firstItem="UKh-g2-w6Y" firstAttribute="top" secondItem="w98-7I-99P" secondAttribute="top" constant="54" id="1xi-uM-hgO"/>
                                 <constraint firstItem="aDw-hA-TG9" firstAttribute="leading" secondItem="w98-7I-99P" secondAttribute="leading" constant="5" id="7vs-MI-2Gq"/>
                                 <constraint firstAttribute="trailing" secondItem="aDw-hA-TG9" secondAttribute="trailing" constant="5" id="IYX-28-vsb"/>
+                                <constraint firstAttribute="centerX" secondItem="BWH-gD-PdM" secondAttribute="centerX" id="N8x-PT-DOd"/>
                                 <constraint firstAttribute="bottom" secondItem="aDw-hA-TG9" secondAttribute="bottom" id="Xnj-0E-PjC"/>
                                 <constraint firstItem="aDw-hA-TG9" firstAttribute="top" secondItem="w98-7I-99P" secondAttribute="top" id="iHI-K0-oaq"/>
+                                <constraint firstAttribute="bottom" secondItem="BWH-gD-PdM" secondAttribute="bottom" constant="20" id="iaQ-wd-bzV"/>
                                 <constraint firstItem="UKh-g2-w6Y" firstAttribute="leading" secondItem="w98-7I-99P" secondAttribute="leading" id="nat-3N-T4e"/>
                                 <constraint firstAttribute="bottom" secondItem="UKh-g2-w6Y" secondAttribute="bottom" constant="27" id="qRs-JB-n1W"/>
                             </constraints>
@@ -169,11 +181,11 @@
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VWK-OM-57E" userLabel="Match Button Wrapper">
-                            <rect key="frame" x="222" y="150" width="157" height="46"/>
+                            <rect key="frame" x="225" y="150" width="151" height="46"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Qac-tT-DKp">
-                                    <rect key="frame" x="18" y="8" width="121" height="30"/>
-                                    <state key="normal" title="Match my Photos">
+                                    <rect key="frame" x="18" y="8" width="115" height="30"/>
+                                    <state key="normal" title="See my Matches">
                                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>

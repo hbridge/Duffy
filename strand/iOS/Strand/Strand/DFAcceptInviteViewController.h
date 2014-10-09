@@ -25,10 +25,12 @@
 
 /* match results*/
 @property (weak, nonatomic) IBOutlet UIView *matchResultsView;
+@property (weak, nonatomic) IBOutlet UIView *matchResultsHeader;
 @property (weak, nonatomic) IBOutlet UILabel *matchResultsTitleLabel;
 @property (weak, nonatomic) IBOutlet UICollectionView *matchedCollectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *matchedFlowLayout;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *matchedCollectionViewHeight;
+@property (weak, nonatomic) IBOutlet UILabel *noMatchingPhotosLabel;
 
 
 /* swap photos bottom bar */

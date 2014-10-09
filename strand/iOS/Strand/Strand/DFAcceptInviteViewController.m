@@ -130,12 +130,19 @@
   for (DFPeanutFeedObject *suggestedPhotosSection in self.suggestedPhotosPosts.objects) {
     [suggestedPhotos addObjectsFromArray:suggestedPhotosSection.enumeratorOfDescendents.allObjects];
   }
-  self.suggestedPhotosController = [[DFSelectPhotosController alloc]
-                                    initWithFeedPhotos:suggestedPhotos
-                                    collectionView:self.matchedCollectionView
-                                    sourceMode:DFImageDataSourceModeLocal
-                                    imageType:DFImageFull];
-  self.suggestedPhotosController.delegate = self;
+  
+  if (suggestedPhotos.count > 0) {
+    self.suggestedPhotosController = [[DFSelectPhotosController alloc]
+                                      initWithFeedPhotos:suggestedPhotos
+                                      collectionView:self.matchedCollectionView
+                                      sourceMode:DFImageDataSourceModeLocal
+                                      imageType:DFImageFull];
+    self.suggestedPhotosController.delegate = self;
+    self.matchResultsHeader.hidden = NO;
+  } else {
+    self.matchResultsHeader.hidden = YES;
+    self.noMatchingPhotosLabel.hidden = NO;
+  }
   self.scrollView.contentInset = UIEdgeInsetsMake(0, 0, self.swapPhotosBar.frame.size.height + 16, 0);
 }
 
@@ -167,9 +174,15 @@
 
 - (void)configureSwapPhotosButtonText
 {
-  NSString *swapPhotosButtonText = [NSString stringWithFormat:@"Swap %d Photos",
-                                    (int)self.suggestedPhotosController.selectedPhotoIDs.count];
-  [self.swapPhotosButton setTitle:swapPhotosButtonText forState:UIControlStateNormal];
+  int selectedCount = (int)self.suggestedPhotosController.selectedPhotoIDs.count;
+  NSString *buttonText;
+  if (selectedCount == 0) {
+    buttonText = @"View Photos";
+  } else {
+    buttonText = [NSString stringWithFormat:@"Swap %d Photos", selectedCount];
+  }
+  
+  [self.swapPhotosButton setTitle:buttonText forState:UIControlStateNormal];
 }
 
 - (void)setMatchedAreaAttributes
