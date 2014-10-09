@@ -22,6 +22,7 @@
 @property (weak, nonatomic) IBOutlet UIView *segmentWrapper;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *segmentedControl;
 - (IBAction)segmentedControlValueChanged:(id)sender;
+@property (weak, nonatomic) IBOutlet UILabel *noResultsLabel;
 
 + (instancetype)sharedViewController;
 - (void)refreshFromServer;

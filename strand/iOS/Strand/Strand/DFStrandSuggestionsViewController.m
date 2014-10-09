@@ -75,6 +75,8 @@ static DFStrandSuggestionsViewController *instance;
     self.suggestedTableView.hidden = YES;
     self.allTableView.hidden = NO;
   }
+  
+  [self updateNoResultsLabel];
 }
 
 - (UITableView *)visibleTableView
@@ -181,9 +183,14 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 {
   [super viewDidLoad];
   [self configureTableView];
-  [self refreshFromServer];
   [self configureReloadButton];
   [self configureSegmentView];
+  
+  // if there are no suggestions, show the all tab the first time
+  if (self.suggestionObjects.count == 0 && self.allObjects.count > 0) {
+    self.segmentedControl.selectedSegmentIndex = 1;
+    [self segmentedControlValueChanged:self.segmentedControl];
+  }
 }
 
 - (void)configureReloadButton
@@ -560,7 +567,9 @@ const NSUInteger MaxPhotosPerCell = 3;
         } else {
           DDLogInfo(@"Got back response for strand suggestions but it was the same. requestDate: %@ oldHash:%@ newHash:%@", requestDate, self.lastResponseHash, responseHash);
         }
-        [self.refreshControl endRefreshing];
+        for (UIRefreshControl *refreshControl in self.refreshControls) {
+          [refreshControl endRefreshing];
+        }
       });
     }
   }];
@@ -571,6 +580,20 @@ const NSUInteger MaxPhotosPerCell = 3;
 {
   [self.suggestedTableView reloadData];
   [self.allTableView reloadData];
+  [self updateNoResultsLabel];
+}
+
+- (void)updateNoResultsLabel
+{
+  if (self.suggestionObjects.count == 0 && self.segmentedControl.selectedSegmentIndex == 0) {
+    self.noResultsLabel.hidden = NO;
+    self.noResultsLabel.text = @"No Suggestions";
+  } else if (self.allObjects.count == 0 && self.segmentedControl.selectedSegmentIndex == 1) {
+    self.noResultsLabel.hidden = NO;
+    self.noResultsLabel.text = @"No Photos Found";
+  } else {
+    self.noResultsLabel.hidden = YES;
+  }
 }
 
 - (void)refreshInvitesFromServer

@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFStrandSuggestionsViewController">
             <connections>
                 <outlet property="allTableView" destination="EUy-9X-8nC" id="jiX-MU-tJD"/>
+                <outlet property="noResultsLabel" destination="EkY-iB-wPQ" id="BuN-mw-RGw"/>
                 <outlet property="reloadBackground" destination="FCq-o3-f9O" id="7e4-Ky-FGe"/>
                 <outlet property="segmentWrapper" destination="Yvz-qE-zsB" id="mII-NZ-W1I"/>
                 <outlet property="segmentedControl" destination="7wg-2n-b5b" id="skG-yn-Wgg"/>
@@ -93,17 +95,25 @@
                         <constraint firstAttribute="trailing" secondItem="7wg-2n-b5b" secondAttribute="trailing" constant="10" id="fnm-DA-cnZ"/>
                     </constraints>
                 </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Suggestions" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="EkY-iB-wPQ">
+                    <rect key="frame" x="93" y="273" width="135" height="23"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="19"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="FCq-o3-f9O" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" constant="-4" id="39B-S0-s6v"/>
                 <constraint firstAttribute="trailing" secondItem="Yvz-qE-zsB" secondAttribute="trailing" id="5DX-Bj-AsU"/>
                 <constraint firstItem="EUy-9X-8nC" firstAttribute="top" secondItem="Yvz-qE-zsB" secondAttribute="bottom" id="A96-9H-yCK"/>
+                <constraint firstAttribute="centerY" secondItem="EkY-iB-wPQ" secondAttribute="centerY" id="KmT-hJ-if8"/>
                 <constraint firstItem="Yvz-qE-zsB" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" id="KvQ-z0-BL8"/>
                 <constraint firstItem="KYO-2q-Y2p" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="LhR-QU-JUX"/>
                 <constraint firstAttribute="bottom" secondItem="EUy-9X-8nC" secondAttribute="bottom" id="MKU-Kt-3xd"/>
                 <constraint firstAttribute="bottom" secondItem="KYO-2q-Y2p" secondAttribute="bottom" id="Vrv-31-y9L"/>
                 <constraint firstItem="EUy-9X-8nC" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="XMF-oH-jQ3"/>
+                <constraint firstAttribute="centerX" secondItem="EkY-iB-wPQ" secondAttribute="centerX" id="Xf0-gR-oin"/>
                 <constraint firstAttribute="trailing" secondItem="KYO-2q-Y2p" secondAttribute="trailing" id="ZhG-st-6MJ"/>
                 <constraint firstAttribute="trailing" secondItem="EUy-9X-8nC" secondAttribute="trailing" id="b9Q-Tk-FTL"/>
                 <constraint firstAttribute="centerX" secondItem="FCq-o3-f9O" secondAttribute="centerX" id="dr4-Ix-Oyx"/>
