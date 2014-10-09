@@ -190,6 +190,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   if (self.suggestionObjects.count == 0 && self.allObjects.count > 0) {
     self.segmentedControl.selectedSegmentIndex = 1;
     [self segmentedControlValueChanged:self.segmentedControl];
+  } else {
+    [self updateNoResultsLabel];
   }
 }
 
