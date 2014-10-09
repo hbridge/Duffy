@@ -114,6 +114,17 @@
   // set the title for the match results area
   self.matchResultsTitleLabel.text = self.invitedStrandPosts.title;
   
+  // set the layout attributes
+  static int itemsPerRow = 2;
+  static CGFloat interItemSpacing = 0.5;
+  static CGFloat interItemSpacingPerRow = 0.5 * (2 - 1);
+  CGFloat size1d = ([[UIScreen mainScreen] bounds].size.width - interItemSpacingPerRow)
+  / (CGFloat)itemsPerRow;
+  size1d = floor(size1d);
+  self.matchedFlowLayout.itemSize = CGSizeMake(size1d, size1d);
+  self.matchedFlowLayout.minimumInteritemSpacing = interItemSpacing;
+  self.matchedFlowLayout.minimumLineSpacing = interItemSpacing;
+  
   // create the suggested photos select controller to populate the data
   NSMutableArray *suggestedPhotos = [NSMutableArray new];
   for (DFPeanutFeedObject *suggestedPhotosSection in self.suggestedPhotosPosts.objects) {
@@ -122,7 +133,8 @@
   self.suggestedPhotosController = [[DFSelectPhotosController alloc]
                                     initWithFeedPhotos:suggestedPhotos
                                     collectionView:self.matchedCollectionView
-                                    sourceMode:DFImageDataSourceModeLocal imageType:DFImageThumbnail];
+                                    sourceMode:DFImageDataSourceModeLocal
+                                    imageType:DFImageFull];
   self.suggestedPhotosController.delegate = self;
   self.scrollView.contentInset = UIEdgeInsetsMake(0, 0, self.swapPhotosBar.frame.size.height + 16, 0);
 }
@@ -162,17 +174,6 @@
 
 - (void)setMatchedAreaAttributes
 {
-  // configure flow layout cell size
-  static int itemsPerRow = 2;
-  static CGFloat interItemSpacing = 0.5;
-  static CGFloat interItemSpacingPerRow = 0.5 * (2 - 1);
-  CGFloat size1d = (self.matchedCollectionView.frame.size.width - interItemSpacingPerRow)
-  / (CGFloat)itemsPerRow;
-  size1d = floor(size1d);
-  self.matchedFlowLayout.itemSize = CGSizeMake(size1d, size1d);
-  self.matchedFlowLayout.minimumInteritemSpacing = interItemSpacing;
-  self.matchedFlowLayout.minimumLineSpacing = interItemSpacing;
-  
   // set collection view height
   CGSize contentSize = self.matchedFlowLayout.collectionViewContentSize;
   self.matchedCollectionViewHeight.constant = contentSize.height;
