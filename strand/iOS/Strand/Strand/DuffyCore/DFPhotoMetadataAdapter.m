@@ -403,23 +403,43 @@ withImageDataTypes:(DFImageType)imageTypes
    [self.objectManager enqueueObjectRequestOperation:requestOperation];
 }
 
+const BOOL UseNetworkingQueue = NO;
+
 - (void)getImageDataForTypesWithPaths:(NSDictionary *)pathsDict
                   withCompletionBlock:(DFImageDataFetchCompletionBlock)completion
 {
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     @autoreleasepool {
       NSMutableDictionary *result = [NSMutableDictionary new];
       for (NSNumber *imageType in pathsDict.allKeys) {
         NSURL *url = [[[DFUser currentUser] serverURL]
                       URLByAppendingPathComponent:pathsDict[imageType]];
         DDLogVerbose(@"Getting image data at: %@", url);
-        NSData *data= [NSData dataWithContentsOfURL:url];
-        if (data) {
-          result[imageType] = data;
+        if (!UseNetworkingQueue) {
+          NSData *data= [NSData dataWithContentsOfURL:url];
+          if (data) {
+            result[imageType] = data;
+          }
+          completion(result, nil);
+        } else {
+          NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
+                                                  initWithURL:url
+                                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                  timeoutInterval:30.0];
+          AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
+          requestOperation.queuePriority = NSOperationQueuePriorityHigh; // image downloads are high pri
+          
+          [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+            // Use my success callback with the binary data and MIME type string
+            if (operation.responseData) result[imageType] = operation.responseData;
+            completion(result, nil);
+          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            // Error callback
+            completion(nil, error);
+          }];
+          [self.objectManager.HTTPClient enqueueHTTPRequestOperation:requestOperation];
         }
       }
-      
-      completion(result, nil);
     }
   });
 }
