@@ -532,6 +532,7 @@ const NSUInteger MaxPhotosPerCell = 3;
 
 - (void)refreshFromServer
 {
+  NSDate *requestDate = [NSDate date];
   [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
                                                           NSData *responseHash,
                                                           NSError *error) {
@@ -540,7 +541,8 @@ const NSUInteger MaxPhotosPerCell = 3;
     } else {
       dispatch_async(dispatch_get_main_queue(), ^{
         if (![responseHash isEqual:self.lastResponseHash]) {
-          DDLogDebug(@"New data for suggestions, updating view...");
+          DDLogInfo(@"New data for suggestions, updating view... requestDate: %@ oldHash:%@ newHash:%@",
+                    requestDate, self.lastResponseHash, responseHash);
           self.allObjectsResponse = response;
           
           self.allObjects = [NSMutableArray new];
@@ -556,7 +558,7 @@ const NSUInteger MaxPhotosPerCell = 3;
           
           self.lastResponseHash = responseHash;
         } else {
-          DDLogDebug(@"Got back response for strand suggestions but it was the same");
+          DDLogInfo(@"Got back response for strand suggestions but it was the same. requestDate: %@ oldHash:%@ newHash:%@", requestDate, self.lastResponseHash, responseHash);
         }
         [self.refreshControl endRefreshing];
       });
