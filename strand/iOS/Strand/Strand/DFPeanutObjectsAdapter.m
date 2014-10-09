@@ -29,7 +29,8 @@
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
      NSData *responseHash = [DFDataHasher
-                             hashDataForData:operation.HTTPRequestOperation.responseData];
+                             hashDataForData:operation.HTTPRequestOperation.responseData
+                             maxLength:operation.HTTPRequestOperation.responseData.length];
      if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutObjectsResponse class]]){
        DFPeanutObjectsResponse *response = mappingResult.firstObject;
        completionBlock(response, responseHash, nil);

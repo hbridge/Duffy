@@ -16,6 +16,7 @@
 + (NSData *)hashDataForALAsset:(ALAsset *)asset;
 + (NSString *)hashStringForHashData:(NSData *)hashData;
 + (NSData *)hashDataForData:(NSData *)inputData;
++ (NSData *)hashDataForData:(NSData *)inputData maxLength:(NSUInteger)maxLength;
 + (NSData *)hashDataForUIImage:(UIImage *)image;
 
 @end
