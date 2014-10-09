@@ -165,7 +165,7 @@
            [self.view addSubview:self.noPhotosLabel];
            CGRect frame = self.noPhotosLabel.frame;
            frame.origin.x = self.view.frame.size.width / 2.0 - frame.size.width / 2.0;
-           frame.origin.y = self.view.frame.size.height / 2.0 - frame.size.height / 2.0;
+           frame.origin.y = self.tableView.rowHeight /2.0 - frame.size.height / 2.0;
            self.noPhotosLabel.frame = frame;
          } else {
            [self.noPhotosLabel removeFromSuperview];
