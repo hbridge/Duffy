@@ -49,7 +49,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'snippetscream.ProfileMiddleware',
+#    'snippetscream.ProfileMiddleware', # not compatible with Django 1.7
 )
 
 ROOT_URLCONF = 'peanut.urls'
