@@ -168,10 +168,11 @@ def userbaseSummary(request):
 			entry['weeklyStrandsJoined'] = '-'
 
 		if user.id in lastActionTimeById:
-			entry['lastActionTime'] = lastActionTimeById[user.id]
+			entry['lastActionTimestamp'] = lastActionTimeById[user.id]
 		else:
-			print "No actions found for user %s" % (user.id)
-			entry['lastActionTime'] = user.added
+			entry['lastActionTimestamp'] = user.added
+
+		entry['lastActionTime'] = entry['lastActionTimestamp'].astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 
 
 		entry['contactCount'] = extras[user.id]['contacts']
@@ -209,7 +210,7 @@ def userbaseSummary(request):
 
 		strandV2List.append(entry)
 
-	strandV2List = sorted(strandV2List, key=lambda x: x['lastActionTime'], reverse=True)
+	strandV2List = sorted(strandV2List, key=lambda x: x['lastActionTimestamp'], reverse=True)
 
 
 	context = {	'arbusList': list(),
