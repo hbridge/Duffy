@@ -103,6 +103,7 @@
 				<td class='contacts b-r'> Friends | <br> Contacts </td> 
 				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
+				<td class='last-action-timestamp b-r'> Last Action </td>
 			</tr>
 		{% for entry in strandV2List %}
 			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
@@ -130,6 +131,7 @@
 				<td class='contacts b-r center'> {{ entry.friendCount}} | {{ entry.contactCount }} </td>
 				<td class='last-build b-r'> {{ entry.build }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
+				<td class='last-action-timestamp timeago b-r' title="{{ entry.lastActionTime }}"> </td>
 			</tr>
 		{% endfor %}
 		</table>
