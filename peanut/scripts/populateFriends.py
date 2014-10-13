@@ -81,7 +81,7 @@ def main(argv):
 
 						newConnectionCount += 1
 					except IntegrityError:
-						logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, possibleFriend.id))
+						logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, friend.id))
 
 				contactEntry.evaluated = True
 
