@@ -41,6 +41,7 @@
 #import "DFTopBarController.h"
 #import "DFInboxViewController.h"
 #import "DFAllStrandsGalleryViewController.h"
+#import "DFFriendsViewController.h"
 
 
 @interface AppDelegate ()
@@ -228,13 +229,12 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
   self.inboxViewController = [[DFInboxViewController alloc] init];
   DFStrandSuggestionsViewController *createStrandViewController = [[DFStrandSuggestionsViewController alloc] init];
-  // DFGalleryViewController *galleryviewController = [[DFGalleryViewController alloc] init];
+  DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
-
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:self.inboxViewController],
-    [[DFNavigationController alloc] initWithRootViewController:createStrandViewController],
+    [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
     [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   
