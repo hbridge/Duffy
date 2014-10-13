@@ -65,6 +65,10 @@
                                            style:UIBarButtonItemStylePlain
                                            target:nil
                                            action:nil];
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                            target:self
+                                            action:@selector(createButtonPressed:)];
 }
 
 - (void)observeNotifications

@@ -228,7 +228,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [DFPhotoStore sharedStore];
   
   self.inboxViewController = [[DFInboxViewController alloc] init];
-  DFStrandSuggestionsViewController *createStrandViewController = [[DFStrandSuggestionsViewController alloc] init];
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
   self.tabBarController = [[UITabBarController alloc] init];
