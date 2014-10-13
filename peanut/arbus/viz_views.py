@@ -51,7 +51,8 @@ def userbaseSummary(request):
 	# This photo call is taking over a second on the dev database right now.
 	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(weeklyPhotos=Count('user'))
 	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'))	
-	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type', 'added').annotate(weeklyActions=Count('user'))
+	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(weeklyActions=Count('user'))
+	lastActionDateRaw = Action.objects.all().exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(lastActionTimestamp=Max('added'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 	#contactsDataRaw = ContactEntry.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalContacts=Count('user'))	
 
@@ -112,11 +113,12 @@ def userbaseSummary(request):
 		elif (actionData['action_type'] == 3):
 			weeklyStrandsJoinedById[actionData['user']] = actionData['weeklyActions']
 
+	for lastActionDate in lastActionDateRaw:
 		if actionData['user'] in lastActionTimeById:
-			if lastActionTimeById[actionData['user']] < actionData['added']:
-				lastActionTimeById[actionData['user']] = actionData['added']
+			if lastActionTimeById[lastActionDate['user']] < lastActionDate['lastActionTimestamp']:
+				lastActionTimeById[lastActionDate['user']] = lastActionDate['lastActionTimestamp']
 		else:
-			lastActionTimeById[actionData['user']] = actionData['added']
+			lastActionTimeById[lastActionDate['user']] = lastActionDate['lastActionTimestamp']
 
 	for i, user in enumerate(userStats):
 		entry = dict()
