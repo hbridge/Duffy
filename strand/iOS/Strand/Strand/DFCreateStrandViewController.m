@@ -32,7 +32,7 @@
 @synthesize inviteAdapter = _inviteAdapter;
 
 
-NSUInteger const NumPhotosPerRow = 2;
+NSUInteger const NumPhotosPerRow = 4;
 
 - (instancetype)initWithSuggestions:(DFPeanutFeedObject *)suggestions
 {
