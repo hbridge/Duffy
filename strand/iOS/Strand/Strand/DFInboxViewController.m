@@ -7,29 +7,33 @@
 //
 
 #import "DFInboxViewController.h"
-#import "DFPeanutFeedObject.h"
-#import "DFInboxTableViewCell.h"
+
+#import "MMPopLabel.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "DFImageStore.h"
-#import "DFFeedViewController.h"
-#import "DFSelectPhotosController.h"
+#import "SVProgressHUD.h"
+
 #import "NSString+DFHelpers.h"
+
+#import "DFAcceptInviteViewController.h"
+#import "DFFeedViewController.h"
+#import "DFImageStore.h"
+#import "DFInboxDataManager.h"
+#import "DFInboxTableViewCell.h"
+#import "DFNavigationController.h"
+#import "DFPeanutFeedObject.h"
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFPeanutUserObject.h"
-#import "DFStrandSuggestionsViewController.h"
-#import "DFNavigationController.h"
+#import "DFSelectPhotosController.h"
 #import "DFStrandConstants.h"
-#import "MMPopLabel.h"
-#import "SVProgressHUD.h"
-#import "DFStrandGalleryViewController.h"
+#import "DFStrandSuggestionsViewController.h"
 #import "DFStrandGalleryTitleView.h"
-#import "DFAcceptInviteViewController.h"
+#import "DFStrandGalleryViewController.h"
+
 
 @interface DFInboxViewController ()
 
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
+@property (nonatomic, retain) DFInboxDataManager *manager;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
-@property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
@@ -39,8 +43,6 @@
 
 @implementation DFInboxViewController
 
-@synthesize feedAdapter = _feedAdapter;
-
 
 - (instancetype)init
 {
@@ -49,8 +51,17 @@
     _cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self initTabBarItemAndNav];
     [self observeNotifications];
+    self.manager = [DFInboxDataManager new];
   }
   return self;
+}
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
 }
 
 - (void)initTabBarItemAndNav
@@ -71,14 +82,6 @@
                                             action:@selector(createButtonPressed:)];
 }
 
-- (void)observeNotifications
-{
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(refreshFromServer)
-                                               name:DFStrandReloadRemoteUIRequestedNotificationName
-                                             object:nil];
-}
-
 - (void)viewDidLoad
 {
   [super viewDidLoad];
@@ -90,13 +93,13 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self refreshFromServer:nil];
+  [self.manager refreshFromServer:nil];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (!self.lastResponseHash) {
+  if (![self.manager hasData]) {
     [self.refreshControl beginRefreshing];
   }
 }
@@ -131,64 +134,47 @@
   self.noItemsPopLabel = [MMPopLabel
                           popLabelWithText:@"Tap here to swap photos"];
   [self.tabBarController.view addSubview:self.noItemsPopLabel];
-
+  
 }
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 #pragma mark - Data Fetch
 
-- (void)refreshFromServer
+- (void)reloadData
 {
-  [self refreshFromServer:nil];
+  DDLogVerbose(@"Reloading data");
+  dispatch_async(dispatch_get_main_queue(), ^{
+    _feedObjects = self.manager.feedObjects;
+    [self.tableView reloadData];
+    
+    if (self.feedObjects.count == 0) {
+      self.noPhotosLabel = [[UILabel alloc] init];
+      self.noPhotosLabel.font = [UIFont systemFontOfSize:20.0];
+      self.noPhotosLabel.textColor = [UIColor darkGrayColor];
+      self.noPhotosLabel.text = @"No Photos Swapped";
+      [self.noPhotosLabel sizeToFit];
+      [self.view addSubview:self.noPhotosLabel];
+      CGRect frame = self.noPhotosLabel.frame;
+      frame.origin.x = self.view.frame.size.width / 2.0 - frame.size.width / 2.0;
+      frame.origin.y = self.tableView.rowHeight /2.0 - frame.size.height / 2.0;
+      self.noPhotosLabel.frame = frame;
+    } else {
+      [self.noPhotosLabel removeFromSuperview];
+      self.noPhotosLabel = nil;
+    }
+  });
 }
 
-- (void)refreshFromServer:(void(^)(void))completion
+- (void)refreshFromServer
 {
-  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-  [self.feedAdapter
-   fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
-                                       NSData *responseHash,
-                                       NSError *error) {
-     if (!error && ![responseHash isEqual:self.lastResponseHash]) {
-       self.lastResponseHash = responseHash;
-       dispatch_async(dispatch_get_main_queue(), ^{
-         _feedObjects = response.objects;
-         [self.tableView reloadData];
-         
-         if (response.objects.count == 0) {
-           self.noPhotosLabel = [[UILabel alloc] init];
-           self.noPhotosLabel.font = [UIFont systemFontOfSize:20.0];
-           self.noPhotosLabel.textColor = [UIColor darkGrayColor];
-           self.noPhotosLabel.text = @"No Photos Swapped";
-           [self.noPhotosLabel sizeToFit];
-           [self.view addSubview:self.noPhotosLabel];
-           CGRect frame = self.noPhotosLabel.frame;
-           frame.origin.x = self.view.frame.size.width / 2.0 - frame.size.width / 2.0;
-           frame.origin.y = self.tableView.rowHeight /2.0 - frame.size.height / 2.0;
-           self.noPhotosLabel.frame = frame;
-         } else {
-           [self.noPhotosLabel removeFromSuperview];
-           self.noPhotosLabel = nil;
-         }
-       });
-     }
-     dispatch_async(dispatch_get_main_queue(), ^{
-       [self.refreshControl endRefreshing];
-       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-       
-       if (response.objects.count == 0 && !error && self.view.window) {
-         [self showCreateBalloon];
-       }
-     });
-     dispatch_async(dispatch_get_main_queue(), ^{
-       if (completion) completion();
-     });
-   }];
+  [self.manager refreshFromServer:^{
+    [self.refreshControl endRefreshing];
+  }];
 }
 
 - (void)showCreateBalloon
@@ -290,19 +276,6 @@
                      maxPhotos:InboxCellMaxPhotos];
   
   return cell;
-}
-
-+ (NSString *)firstActorNameForObject:(DFPeanutFeedObject *)object
-{
-  NSString *name;
-  DFPeanutUserObject *firstActor = object.actors.firstObject;
-  if (firstActor.id == [[DFUser currentUser] userID]) {
-    name = @"You";
-  } else {
-    name = firstActor.display_name;
-  }
-
-  return name;
 }
 
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
@@ -414,10 +387,11 @@
 
 - (void)showStrandPostsForStrandID:(DFStrandIDType)strandID completion:(void(^)(void))completion
 {
-  DDLogInfo(@"%@ showStrandPostsForStrandID called for %@requesting refresh", self.class, @(strandID));
-  [self refreshFromServer:^{
+  DDLogInfo(@"%@ showStrandPostsForStrandID called for %@ requesting refresh", self.class, @(strandID));
+  [self.manager refreshFromServer:^{
     DDLogInfo(@"%@ showStrandPostsForStrandID for %@ refresh callback", self.class, @(strandID));
     DFPeanutFeedObject *strandPostsObject;
+    _feedObjects = self.manager.feedObjects;
     for (DFPeanutFeedObject *object in self.feedObjects) {
       if (object.id == strandID) {
         // the strand is still in the invites section, return
@@ -449,16 +423,6 @@
     });
   }];
 }
-
-
-#pragma mark - Network Adapter
-
-- (DFPeanutStrandFeedAdapter *)feedAdapter
-{
-  if (!_feedAdapter) _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
-  return _feedAdapter;
-}
-
 
 
 @end

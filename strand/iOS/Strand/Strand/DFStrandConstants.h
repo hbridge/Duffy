@@ -28,6 +28,7 @@ extern NSString *const DFStrandLastFetchAttemptDateDefaultsKey;
 
 extern NSString *const DFStrandReloadRemoteUIRequestedNotificationName;
 extern NSString *const DFStrandCameraPhotoSavedNotificationName;
+extern NSString *const DFStrandNewInboxDataNotificationName;
 
 
 + (UIColor *)defaultBackgroundColor;
