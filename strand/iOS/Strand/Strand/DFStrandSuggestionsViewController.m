@@ -68,15 +68,16 @@ static DFStrandSuggestionsViewController *instance;
 }
 
 - (IBAction)segmentedControlValueChanged:(UISegmentedControl *)sender {
-  if (sender.selectedSegmentIndex == 0) { // suggestions
-    self.suggestedTableView.hidden = NO;
-    self.allTableView.hidden = YES;
-  } else {
-    self.suggestedTableView.hidden = YES;
-    self.allTableView.hidden = NO;
-  }
-  
-  [self updateNoResultsLabel];
+  //disable for now
+//  if (sender.selectedSegmentIndex == 0) { // suggestions
+//    self.suggestedTableView.hidden = NO;
+//    self.allTableView.hidden = YES;
+//  } else {
+//    self.suggestedTableView.hidden = YES;
+//    self.allTableView.hidden = NO;
+//  }
+//  
+//  [self updateNoResultsLabel];
 }
 
 - (UITableView *)visibleTableView
@@ -130,6 +131,22 @@ NSString *const SuggestionWithPeopleId = @"suggestionWithPeople";
 NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(refreshFromServer)
+                                               name:DFStrandReloadRemoteUIRequestedNotificationName
+                                             object:nil];
+}
+
+- (void)viewDidLoad
+{
+  [super viewDidLoad];
+  [self configureTableView];
+  [self configureReloadButton];
+  [self configureSegmentView];
+}
+
 - (void)configureTableView
 {
   self.cellHeightsByIdentifier = [NSMutableDictionary new];
@@ -139,9 +156,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
     [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
-         forCellReuseIdentifier:InviteId];
+    forCellReuseIdentifier:InviteId];
     [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
-         forCellReuseIdentifier:SuggestionWithPeopleId];
+    forCellReuseIdentifier:SuggestionWithPeopleId];
     [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
     forCellReuseIdentifier:SuggestionNoPeopleId];
     
@@ -157,9 +174,11 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     
     tableView.sectionHeaderHeight = 0.0;
     tableView.tableHeaderView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, tableView.bounds.size.width, 0.01f)];
-
+    
   }
   
+  self.allTableView.hidden = NO;
+  self.suggestedTableView.hidden = YES;
   self.refreshControls = refreshControls;
   [self.refreshControl beginRefreshing];
 }
@@ -170,31 +189,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 }
 
 
-- (void)observeNotifications
-{
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(refreshFromServer)
-                                               name:DFStrandReloadRemoteUIRequestedNotificationName
-                                             object:nil];
-}
-
-
-- (void)viewDidLoad
-{
-  [super viewDidLoad];
-  [self configureTableView];
-  [self configureReloadButton];
-  [self configureSegmentView];
-  
-  // if there are no suggestions, show the all tab the first time
-  if (self.suggestionObjects.count == 0 && self.allObjects.count > 0) {
-    self.segmentedControl.selectedSegmentIndex = 1;
-    [self segmentedControlValueChanged:self.segmentedControl];
-  } else {
-    [self updateNoResultsLabel];
-  }
-}
-
 - (void)configureReloadButton
 {
   self.reloadBackground.layer.cornerRadius = 5.0;
@@ -203,6 +197,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)configureSegmentView
 {
+  // remove segment view for now
+  [self.segmentWrapper removeFromSuperview];
+  
   self.segmentWrapper.backgroundColor = [DFStrandConstants defaultBackgroundColor];
   self.segmentedControl.tintColor = [DFStrandConstants defaultBarForegroundColor];
 }
@@ -219,8 +216,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   [navigationBar setShadowImage:[UIImage new]];
   
-  [self.allTableView reloadData];
-  [self.suggestedTableView reloadData];
+  [self reloadTableViews];
   [self refreshFromServer];
   if (self.navigationController.isBeingPresented) {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
@@ -534,8 +530,7 @@ const NSUInteger MaxPhotosPerCell = 3;
 - (void)reloadData
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self.allTableView reloadData];
-    [self.suggestedTableView reloadData];
+    [self reloadTableViews];
   });
 }
 
@@ -587,10 +582,10 @@ const NSUInteger MaxPhotosPerCell = 3;
 
 - (void)updateNoResultsLabel
 {
-  if (self.suggestionObjects.count == 0 && self.segmentedControl.selectedSegmentIndex == 0) {
+  if (self.suggestionObjects.count == 0 && [self visibleTableView] == self.suggestedTableView) {
     self.noResultsLabel.hidden = NO;
     self.noResultsLabel.text = @"No Suggestions";
-  } else if (self.allObjects.count == 0 && self.segmentedControl.selectedSegmentIndex == 1) {
+  } else if (self.allObjects.count == 0 && [self visibleTableView] == self.allTableView) {
     self.noResultsLabel.hidden = NO;
     self.noResultsLabel.text = @"No Photos Found";
   } else {
@@ -610,8 +605,7 @@ const NSUInteger MaxPhotosPerCell = 3;
        if ([DFStrandSuggestionsViewController inviteObjectsChangedForOldInvites:oldInvites
                                                                 newInvites:self.inviteObjects])
        {
-         [self.suggestedTableView reloadData];
-         [self.allTableView reloadData];
+         [self reloadTableViews];
        }
      });
    }];

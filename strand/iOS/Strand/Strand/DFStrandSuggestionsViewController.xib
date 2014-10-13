@@ -73,7 +73,7 @@
                         <outletCollection property="gestureRecognizers" destination="rzf-pu-7az" appends="YES" id="GW1-tg-3OL"/>
                     </connections>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Yvz-qE-zsB" userLabel="Segment wrapper">
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Yvz-qE-zsB" userLabel="Segment wrapper">
                     <rect key="frame" x="0.0" y="0.0" width="320" height="39"/>
                     <subviews>
                         <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="7wg-2n-b5b">
@@ -119,6 +119,7 @@
                 <constraint firstAttribute="centerX" secondItem="FCq-o3-f9O" secondAttribute="centerX" id="dr4-Ix-Oyx"/>
                 <constraint firstItem="KYO-2q-Y2p" firstAttribute="top" secondItem="Yvz-qE-zsB" secondAttribute="bottom" id="lRN-dt-KRQ"/>
                 <constraint firstItem="Yvz-qE-zsB" firstAttribute="leading" secondItem="u3X-ZH-sCM" secondAttribute="leading" id="lcX-aQ-8Ih"/>
+                <constraint firstItem="EUy-9X-8nC" firstAttribute="top" secondItem="u3X-ZH-sCM" secondAttribute="top" priority="900" id="mJj-uW-Hji"/>
             </constraints>
             <nil key="simulatedTopBarMetrics"/>
             <point key="canvasLocation" x="249" y="233"/>
