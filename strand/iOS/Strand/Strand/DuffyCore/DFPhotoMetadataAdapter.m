@@ -403,7 +403,7 @@ withImageDataTypes:(DFImageType)imageTypes
    [self.objectManager enqueueObjectRequestOperation:requestOperation];
 }
 
-const BOOL UseNetworkingQueue = NO;
+const BOOL UseNetworkingQueue = YES;
 
 - (void)getImageDataForTypesWithPaths:(NSDictionary *)pathsDict
                   withCompletionBlock:(DFImageDataFetchCompletionBlock)completion
