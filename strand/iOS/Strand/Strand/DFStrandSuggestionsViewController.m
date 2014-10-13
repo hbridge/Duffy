@@ -13,7 +13,7 @@
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFGallerySectionHeader.h"
-#import "DFStrandSuggestionTableViewCell.h"
+#import "DFLargeCardTableViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosController.h"
@@ -155,11 +155,11 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
-    [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
+    [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
     forCellReuseIdentifier:InviteId];
-    [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
+    [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
     forCellReuseIdentifier:SuggestionWithPeopleId];
-    [tableView registerNib:[UINib nibForClass:[DFStrandSuggestionTableViewCell class]]
+    [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
     forCellReuseIdentifier:SuggestionNoPeopleId];
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
@@ -307,7 +307,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (UITableViewCell *)cellWithSuggestedStrandObject:(DFPeanutFeedObject *)strandObject
                                       forTableView:(UITableView *)tableView
 {
-  DFStrandSuggestionTableViewCell *cell;
+  DFLargeCardTableViewCell *cell;
   if (strandObject.actors.count > 0) {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
     [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
@@ -379,7 +379,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   };
 }
 
-- (void)configureTextForCreateStrandCell:(DFStrandSuggestionTableViewCell *)cell
+- (void)configureTextForCreateStrandCell:(DFLargeCardTableViewCell *)cell
                        withStrand:(DFPeanutFeedObject *)strandObject
 {
   // Set the header attributes
@@ -407,7 +407,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   }
 }
 
-- (void)setRemotePhotosForCell:(DFStrandSuggestionTableViewCell *)cell
+- (void)setRemotePhotosForCell:(DFLargeCardTableViewCell *)cell
                    withSection:(DFPeanutFeedObject *)section
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
@@ -442,7 +442,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 const NSUInteger MaxPhotosPerCell = 3;
 
-- (void)setLocalPhotosForCell:(DFStrandSuggestionTableViewCell *)cell
+- (void)setLocalPhotosForCell:(DFLargeCardTableViewCell *)cell
                       section:(DFPeanutFeedObject *)section
 {
   // Get the IDs of all the photos we want to show
@@ -501,7 +501,7 @@ const NSUInteger MaxPhotosPerCell = 3;
   
   NSNumber *cachedHeight = self.cellHeightsByIdentifier[identifier];
   if (!cachedHeight) {
-    DFStrandSuggestionTableViewCell *templateCell = [DFStrandSuggestionTableViewCell cellWithStyle:style];
+    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:style];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
     self.cellHeightsByIdentifier[identifier] = cachedHeight = @(height);
   }

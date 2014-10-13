@@ -6,11 +6,11 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFStrandSuggestionTableViewCell.h"
+#import "DFLargeCardTableViewCell.h"
 #import "DFStrandConstants.h"
 #import "DFPhotoViewCell.h"
 
-@implementation DFStrandSuggestionTableViewCell
+@implementation DFLargeCardTableViewCell
 
 - (void)awakeFromNib
 {
@@ -22,9 +22,9 @@
   self.solidBackgroundView.layer.masksToBounds = YES;
 }
 
-+ (DFStrandSuggestionTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
++ (DFLargeCardTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
 {
-  DFStrandSuggestionTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
+  DFLargeCardTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
   [cell configureWithStyle:style];
   return cell;
 }

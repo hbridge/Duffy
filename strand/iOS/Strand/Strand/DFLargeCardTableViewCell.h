@@ -10,7 +10,7 @@
 #import "DFCollectionViewTableViewCell.h"
 #import "DFCircleBadge.h"
 
-@interface DFStrandSuggestionTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
+@interface DFLargeCardTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
 typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
   DFCreateStrandCellStyleInvite,
@@ -27,7 +27,7 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 @property (weak, nonatomic) IBOutlet DFCircleBadge *countBadge;
 
 
-+ (DFStrandSuggestionTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
++ (DFLargeCardTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
 - (void)configureWithStyle:(DFCreateStrandCellStyle)style;
 
 @end
