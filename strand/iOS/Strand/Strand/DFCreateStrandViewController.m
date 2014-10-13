@@ -22,7 +22,6 @@
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (nonatomic, retain) NSArray *selectedContacts;
-@property (nonatomic, retain) DFPeoplePickerViewController *peoplePicker;
 @property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
 
 @end
@@ -46,6 +45,30 @@ NSUInteger const NumPhotosPerRow = 2;
   return self;
 }
 
+- (IBAction)selectAllButtonPressed:(UIButton *)sender {
+  // if everything's selected, deselect all
+  NSString *newTitle;
+  BOOL showTickMark;
+
+  if (self.selectPhotosController.selectedFeedObjects.count == self.suggestionsObject.objects.count) {
+    [self.selectPhotosController.selectedFeedObjects removeAllObjects];
+    newTitle = @"Select All";
+    showTickMark = NO;
+  } else {
+    [self.selectPhotosController.selectedFeedObjects removeAllObjects];
+    newTitle = @"Deselect All";
+    showTickMark = YES;
+    [self.selectPhotosController.selectedFeedObjects addObjectsFromArray:self.suggestionsObject.objects];
+  }
+  
+  for (DFSelectablePhotoViewCell *cell in self.collectionView.visibleCells) {
+    cell.showTickMark = showTickMark;
+    [cell setNeedsLayout];
+  }
+  [self.selectAllButton setTitle:newTitle forState:UIControlStateNormal];
+  [self configureNavTitle];
+}
+
 - (BOOL)hidesBottomBarWhenPushed
 {
   return YES;
@@ -55,8 +78,8 @@ NSUInteger const NumPhotosPerRow = 2;
 {
   [super viewDidLoad];
   
+  [self configureHeader];
   [self configureCollectionView];
-  [self configurePeoplePicker];
   [self configureNavTitle];
 }
 
@@ -72,34 +95,19 @@ NSUInteger const NumPhotosPerRow = 2;
 
 - (void)configureNavBar
 {
-  self.navigationItem.title = @"Invite to Swap";
+  self.navigationItem.title = @"Select Photos";
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/DoneBarButton"]
+                                            initWithTitle:@"Next"
                                             style:UIBarButtonItemStylePlain
                                             target:self
-                                            action:@selector(swapPhotosButtonPressed:)
-                                            ];
+                                            action:@selector(nextPressed:)];
 }
 
-
-- (void)configurePeoplePicker
+- (void)configureHeader
 {
-  // configure the token field
-  self.tokenField = [[VENTokenField alloc] initWithFrame:self.searchBarWrapperView.bounds];
-  self.tokenField.maxHeight = self.searchBarWrapperView.bounds.size.height;
-  
-  NSArray *actors = nil;
-  if (self.suggestionsObject && self.suggestionsObject.actors.count > 0) {
-    actors = self.suggestionsObject.actors;
-  }
-  
-  self.peoplePicker = [[DFPeoplePickerViewController alloc]
-                       initWithTokenField:self.tokenField
-                       withPeanutUsers:actors
-                       tableView:self.tableView];
-  self.peoplePicker.allowsMultipleSelection = YES;
-  self.peoplePicker.delegate = self;
-  [self.searchBarWrapperView addSubview:self.tokenField];
+  self.locationLabel.text = self.suggestionsObject.location;
+  self.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.suggestionsObject.time_taken
+                                                          abbreviate:NO];
 }
 
 - (void)configureCollectionView
@@ -122,30 +130,30 @@ NSUInteger const NumPhotosPerRow = 2;
 - (void)configureNavTitle
 {
   NSUInteger selectedPhotosCount = self.selectPhotosController.selectedPhotoIDs.count;
-  NSUInteger selectedPeopleCount = self.peoplePicker.selectedPeanutContacts.count;
   
   // set the title based on photos selected
   if (selectedPhotosCount == 0) {
     self.navigationItem.title = @"No Photos Selected";
+    self.navigationItem.rightBarButtonItem.enabled = NO;
   } else {
-    NSString *title = [NSString stringWithFormat:@"Swap %d Photos",
+    NSString *title = [NSString stringWithFormat:@"%d Photos Selected",
                        (int)selectedPhotosCount];
     self.navigationItem.title = title;
+    self.navigationItem.rightBarButtonItem.enabled = YES;
   }
-  
-  // enable/disable the done button based on photo/people selected
-  self.navigationItem.rightBarButtonItem.enabled = (selectedPeopleCount > 0
-                                                    && selectedPhotosCount > 0);
 }
 
 #pragma mark - Actions
 
-- (IBAction)swapPhotosButtonPressed:(UIButton *)sender {
-  [self.tokenField resignFirstResponder];
-  [self createNewStrandWithSelection];
+- (void)nextPressed:(id)sender {
+  DFPeoplePickerViewController *peoplePicker =[[DFPeoplePickerViewController alloc] init];
+  peoplePicker.delegate = self;
+  peoplePicker.allowsMultipleSelection = YES;
+  [self.navigationController pushViewController:peoplePicker animated:YES];
 }
 
-- (void)createNewStrandWithSelection
+- (void)createNewStrandWithSelectedPhotoIDs:(NSArray *)selectedPhotoIDs
+                     selectedPeanutContacts:(NSArray *)selectedPeanutContacts
 {
   // Create the strand
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
@@ -167,7 +175,7 @@ NSUInteger const NumPhotosPerRow = 2;
      
      // invite selected users
      [self sendInvitesForStrand:peanutStrand
-               toPeanutContacts:self.peoplePicker.selectedPeanutContacts
+               toPeanutContacts:selectedPeanutContacts
       ];
      
      // start uploading the photos
@@ -190,7 +198,8 @@ NSUInteger const NumPhotosPerRow = 2;
    invitedPhotosDate:self.suggestionsObject.time_taken
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      dispatch_async(dispatch_get_main_queue(), ^{
-       if (vc) {
+       // Some of the invitees aren't Strand users, send them a text
+       if (vc && [DFSMSInviteStrandComposeViewController canSendText]) {
          vc.messageComposeDelegate = self;
          [self presentViewController:vc
                             animated:YES
@@ -210,17 +219,17 @@ NSUInteger const NumPhotosPerRow = 2;
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
-  [self dismissWithErrorString:(result == MessageComposeResultSent ? nil : @"Cancelled")];
+  [self dismissWithErrorString:(result == MessageComposeResultSent ? nil : @"Some invites not sent")];
 }
 
 - (void)dismissWithErrorString:(NSString *)errorString
 {
   void (^completion)(void) = ^{
     if (!errorString) {
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [SVProgressHUD showSuccessWithStatus:@"Sent!"];
       });
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
       });
     } else {
@@ -230,12 +239,17 @@ NSUInteger const NumPhotosPerRow = 2;
     }
   };
   
-  if (self.presentedViewController) {
-    [self dismissViewControllerAnimated:YES completion:completion];
-    [self.navigationController popViewControllerAnimated:NO];
+  if (self.presentingViewController) {
+    // the create flow was presented as a sheet, dismiss the whole thing
+    [self.presentingViewController dismissViewControllerAnimated:YES completion:completion];
   } else {
-    [self.navigationController popViewControllerAnimated:YES];
-    completion();
+    if (self.presentedViewController) {
+      [self dismissViewControllerAnimated:YES completion:completion];
+      [self.navigationController popViewControllerAnimated:NO];
+    } else {
+      [self.navigationController popViewControllerAnimated:YES];
+      completion();
+    }
   }
 }
 
@@ -262,25 +276,11 @@ NSUInteger const NumPhotosPerRow = 2;
 #pragma mark - DFPeoplePicker delegate
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
-         didPickContacts:(NSArray *)peanutContacts
+didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
-  self.selectedContacts = peanutContacts;
-  [self configureNavTitle];
-}
-
-- (void)pickerController:(DFPeoplePickerViewController *)pickerController
-           textDidChange:(NSString *)text
-{
-  self.tableView.hidden = ![text isNotEmpty];
-}
-
-- (IBAction)collectionViewTapped:(id)sender {
-  [self.tokenField resignFirstResponder];
-}
-
-- (void)scrollViewWillBeginDragging:(UIScrollView *)scrollView
-{
-  [self.tokenField resignFirstResponder];
+  // create strand
+  [self createNewStrandWithSelectedPhotoIDs:self.selectPhotosController.selectedPhotoIDs
+                     selectedPeanutContacts:peanutContacts];
 }
 
 - (DFPeanutStrandAdapter *)strandAdapter

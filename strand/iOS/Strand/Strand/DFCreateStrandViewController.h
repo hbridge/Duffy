@@ -14,18 +14,18 @@
 #import "DFSelectPhotosController.h"
 
 
-@interface DFCreateStrandViewController : UIViewController <UIScrollViewDelegate, UICollectionViewDelegateFlowLayout, DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate, DFSelectPhotosControllerDelegate>
+@interface DFCreateStrandViewController : UIViewController <UIScrollViewDelegate, UICollectionViewDelegateFlowLayout, DFSelectPhotosControllerDelegate, DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
-@property (weak, nonatomic) IBOutlet UIView *searchBarWrapperView;
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
-@property (nonatomic, retain) VENTokenField *tokenField;
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UILabel *locationLabel;
+@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+@property (weak, nonatomic) IBOutlet UIButton *selectAllButton;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
 - (instancetype)initWithSuggestions:(DFPeanutFeedObject *)suggestions;
-- (void)swapPhotosButtonPressed:(UIButton *)sender;
+- (IBAction)selectAllButtonPressed:(UIButton *)sender;
 
 
 @end

@@ -17,10 +17,13 @@
 @required
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
-         didPickContacts:(NSArray *)peanutContacts;
+         didFinishWithPickedContacts:(NSArray *)peanutContacts;
 
 @optional
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController textDidChange:(NSString *)text;
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+         pickedContactsDidChange:(NSArray *)peanutContacts;
+
 
 @end
 
@@ -34,8 +37,12 @@
 @property (nonatomic) BOOL allowsMultipleSelection;
 @property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
 
-- (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView;
-- (instancetype)initWithTokenField:(VENTokenField *)tokenField withPeanutUsers:(NSArray *)peanutUsers tableView:(UITableView *)tableView;
+
+- (instancetype)initWithTokenField:(VENTokenField *)tokenField
+                         tableView:(UITableView *)tableView;
+- (instancetype)initWithTokenField:(VENTokenField *)tokenField
+                   withPeanutUsers:(NSArray *)peanutUsers
+                         tableView:(UITableView *)tableView;
 
 
 @end

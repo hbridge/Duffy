@@ -73,6 +73,17 @@
   [self configureTokenField];
 }
 
+- (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
+{
+  _allowsMultipleSelection = allowsMultipleSelection;
+  if (allowsMultipleSelection) {
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                              initWithTitle:@"Send"
+                                              style:UIBarButtonItemStylePlain
+                                              target:self action:@selector(doneButtonPressed:)];
+  }
+}
+
 - (void)configureTableView
 {
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
@@ -275,9 +286,16 @@
       [self updateSearchResults];
       [self.tableView reloadData];
       [self tokenField:self.tokenField didChangeText:self.tokenField.inputText];
-      [self.delegate pickerController:self didPickContacts:self.selectedContacts];
+      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+        [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+      }
     } else {
-      [self.delegate pickerController:self didPickContacts:@[selectedContact]];
+      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+        [self.delegate pickerController:self pickedContactsDidChange:@[selectedContact]];
+      }
+      
+      //didChange is optional, didFinish is not so no need to check for responds to select
+      [self.delegate pickerController:self didFinishWithPickedContacts:@[selectedContact]];
     }
   }
   
@@ -291,6 +309,11 @@
   contact.phone_number = number;
   contact.user = @([[DFUser currentUser] userID]);
   return contact;
+}
+
+- (void)doneButtonPressed:(id)sender
+{
+  [self.delegate pickerController:self didFinishWithPickedContacts:self.selectedPeanutContacts];
 }
 
 
@@ -311,10 +334,12 @@
 {
   [self.selectedContacts removeObjectAtIndex:index];
   [self.tokenField reloadData];
-  [self.delegate pickerController:self didPickContacts:self.selectedContacts];
+  if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+    [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+  }
 }
 
-#pragma mark - Cotnacts Permission
+#pragma mark - Contacts Permission
 
 - (void)askForContactsPermission
 {

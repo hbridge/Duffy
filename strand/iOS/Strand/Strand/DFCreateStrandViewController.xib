@@ -9,8 +9,9 @@
             <connections>
                 <outlet property="collectionView" destination="Km3-sv-lcM" id="4bR-q1-qkK"/>
                 <outlet property="flowLayout" destination="naL-ru-Sc5" id="3Zm-63-zTJ"/>
-                <outlet property="searchBarWrapperView" destination="bEr-Bw-A3D" id="rOi-U9-Qz4"/>
-                <outlet property="tableView" destination="U6o-km-SAy" id="K12-Kc-AEJ"/>
+                <outlet property="locationLabel" destination="Nah-PW-r37" id="5Vv-hy-NX1"/>
+                <outlet property="selectAllButton" destination="6m3-vT-2y9" id="bgI-Pb-fpj"/>
+                <outlet property="timeLabel" destination="Mbs-iA-MPI" id="Meg-9X-eT9"/>
                 <outlet property="view" destination="XUO-Rl-pFv" id="BQ7-KV-dfn"/>
             </connections>
         </placeholder>
@@ -20,7 +21,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="Km3-sv-lcM">
-                    <rect key="frame" x="0.0" y="67" width="320" height="501"/>
+                    <rect key="frame" x="0.0" y="51" width="320" height="517"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <gestureRecognizers/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="4" minimumInteritemSpacing="4" id="naL-ru-Sc5">
@@ -33,52 +34,59 @@
                     <connections>
                         <outlet property="dataSource" destination="-1" id="0bA-3a-A8s"/>
                         <outlet property="delegate" destination="-1" id="4gh-u4-v64"/>
-                        <outletCollection property="gestureRecognizers" destination="GuV-Bk-Wrl" appends="YES" id="9Gb-eX-bSg"/>
                     </connections>
                 </collectionView>
-                <tableView hidden="YES" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="onDrag" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="U6o-km-SAy">
-                    <rect key="frame" x="0.0" y="67" width="320" height="501"/>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                </tableView>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bEr-Bw-A3D" userLabel="searchBarWrapper">
-                    <rect key="frame" x="0.0" y="0.0" width="320" height="66"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="bEr-Bw-A3D" userLabel="headerWrapper">
+                    <rect key="frame" x="0.0" y="0.0" width="320" height="50"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nah-PW-r37">
+                            <rect key="frame" x="8" y="8" width="91" height="16"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Mbs-iA-MPI">
+                            <rect key="frame" x="8" y="26" width="66" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="6m3-vT-2y9">
+                            <rect key="frame" x="241" y="10" width="71" height="28"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <state key="normal" title="Deselect All">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="selectAllButtonPressed:" destination="-1" eventType="touchUpInside" id="HLQ-zf-QpI"/>
+                            </connections>
+                        </button>
+                    </subviews>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="66" id="ZXZ-U3-IAj"/>
+                        <constraint firstItem="Nah-PW-r37" firstAttribute="leading" secondItem="bEr-Bw-A3D" secondAttribute="leading" constant="8" id="6mL-NX-h6k"/>
+                        <constraint firstAttribute="bottom" secondItem="Mbs-iA-MPI" secondAttribute="bottom" constant="8" id="Cvt-2p-ndm"/>
+                        <constraint firstItem="Nah-PW-r37" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="top" constant="8" id="JDF-tG-zpX"/>
+                        <constraint firstAttribute="trailing" secondItem="6m3-vT-2y9" secondAttribute="trailing" constant="8" id="R51-7X-aAm"/>
+                        <constraint firstItem="6m3-vT-2y9" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="top" constant="10" id="Tzi-Fp-aUc"/>
+                        <constraint firstItem="Mbs-iA-MPI" firstAttribute="leading" secondItem="bEr-Bw-A3D" secondAttribute="leading" constant="8" id="fqZ-Vw-aLd"/>
+                        <constraint firstItem="Mbs-iA-MPI" firstAttribute="top" secondItem="Nah-PW-r37" secondAttribute="bottom" constant="2" id="pZu-BW-YWq"/>
                     </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
             <gestureRecognizers/>
             <constraints>
-                <constraint firstItem="U6o-km-SAy" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="bottom" constant="1" id="3No-zD-1wR"/>
-                <constraint firstAttribute="trailing" secondItem="U6o-km-SAy" secondAttribute="trailing" id="DLm-Ie-osq"/>
                 <constraint firstItem="Km3-sv-lcM" firstAttribute="leading" secondItem="XUO-Rl-pFv" secondAttribute="leading" id="J8Y-8Z-HwF"/>
-                <constraint firstItem="Km3-sv-lcM" firstAttribute="top" secondItem="XUO-Rl-pFv" secondAttribute="top" priority="900" id="QeW-JZ-Seq"/>
-                <constraint firstItem="U6o-km-SAy" firstAttribute="leading" secondItem="XUO-Rl-pFv" secondAttribute="leading" id="Sf6-f9-x7M"/>
                 <constraint firstAttribute="trailing" secondItem="Km3-sv-lcM" secondAttribute="trailing" id="W95-Hz-mci"/>
                 <constraint firstItem="bEr-Bw-A3D" firstAttribute="leading" secondItem="XUO-Rl-pFv" secondAttribute="leading" id="XBP-5H-KAP"/>
-                <constraint firstAttribute="bottom" secondItem="U6o-km-SAy" secondAttribute="bottom" id="j8t-Zy-Yi5"/>
                 <constraint firstItem="Km3-sv-lcM" firstAttribute="top" secondItem="bEr-Bw-A3D" secondAttribute="bottom" constant="1" id="pcS-yA-bQm"/>
                 <constraint firstAttribute="bottom" secondItem="Km3-sv-lcM" secondAttribute="bottom" id="qOs-hu-zwc"/>
                 <constraint firstItem="bEr-Bw-A3D" firstAttribute="top" secondItem="XUO-Rl-pFv" secondAttribute="top" id="rG4-q8-z3x"/>
                 <constraint firstAttribute="trailing" secondItem="bEr-Bw-A3D" secondAttribute="trailing" id="xhH-ag-P1h"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
-            <connections>
-                <outletCollection property="gestureRecognizers" destination="vZE-Ug-Ivo" appends="YES" id="tRP-Mz-cmG"/>
-            </connections>
         </view>
-        <tapGestureRecognizer cancelsTouchesInView="NO" id="GuV-Bk-Wrl">
-            <connections>
-                <action selector="collectionViewTapped:" destination="-1" id="Oy3-AZ-ise"/>
-            </connections>
-        </tapGestureRecognizer>
-        <panGestureRecognizer minimumNumberOfTouches="1" id="vZE-Ug-Ivo">
-            <connections>
-                <action selector="collectionViewTapped:" destination="-1" id="Mga-8l-PTt"/>
-            </connections>
-        </panGestureRecognizer>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
