@@ -114,7 +114,7 @@ def userbaseSummary(request):
 			weeklyStrandsJoinedById[actionData['user']] = actionData['weeklyActions']
 
 	for lastActionDate in lastActionDateRaw:
-		if actionData['user'] in lastActionTimeById:
+		if lastActionDate['user'] in lastActionTimeById:
 			if lastActionTimeById[lastActionDate['user']] < lastActionDate['lastActionTimestamp']:
 				lastActionTimeById[lastActionDate['user']] = lastActionDate['lastActionTimestamp']
 		else:
