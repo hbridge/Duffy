@@ -14,10 +14,10 @@
 
 @interface DFLargeCardTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
-typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
-  DFCreateStrandCellStyleInvite,
-  DFCreateStrandCellStyleSuggestionWithPeople,
-  DFCreateStrandCellStyleSuggestionNoPeople,
+typedef NS_OPTIONS(NSInteger, DFLargeCardCellStyle) {
+  DFLargeCardCellStyleInvite,
+  DFLargeCardCellStyleSuggestionWithPeople,
+  DFLargeCardCellStyleSuggestionNoPeople,
 };
 
 @property (weak, nonatomic) IBOutlet UILabel *contextLabel;
@@ -29,8 +29,8 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 @property (weak, nonatomic) IBOutlet DFCircleBadge *countBadge;
 
 
-+ (DFLargeCardTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
-- (void)configureWithStyle:(DFCreateStrandCellStyle)style;
++ (DFLargeCardTableViewCell *)cellWithStyle:(DFLargeCardCellStyle)style;
+- (void)configureWithStyle:(DFLargeCardCellStyle)style;
 - (void)configureWithFeedObject:(DFPeanutFeedObject *)feedObject;
 
 @end

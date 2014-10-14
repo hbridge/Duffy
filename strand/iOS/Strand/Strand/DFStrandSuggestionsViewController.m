@@ -271,10 +271,10 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   DFLargeCardTableViewCell *cell;
   if (strandObject.actors.count > 0) {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
-    [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
+    [cell configureWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
   } else {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
-    [cell configureWithStyle:DFCreateStrandCellStyleSuggestionNoPeople];
+    [cell configureWithStyle:DFLargeCardCellStyleSuggestionNoPeople];
   }
   
   [self configureTextForCreateStrandCell:cell withStrand:strandObject];
@@ -446,14 +446,14 @@ const NSUInteger MaxPhotosPerCell = 3;
 {
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
   NSString *identifier;
-  DFCreateStrandCellStyle style = DFCreateStrandCellStyleSuggestionWithPeople;
+  DFLargeCardCellStyle style = DFLargeCardCellStyleSuggestionWithPeople;
   if ([feedObject.type isEqual:DFFeedObjectSection]) {
     if (feedObject.actors.count > 0) {
       identifier = SuggestionWithPeopleId;
-      style = DFCreateStrandCellStyleSuggestionWithPeople;
+      style = DFLargeCardCellStyleSuggestionWithPeople;
     } else {
       identifier = SuggestionNoPeopleId;
-      style = DFCreateStrandCellStyleSuggestionNoPeople;
+      style = DFLargeCardCellStyleSuggestionNoPeople;
     }
   }
   

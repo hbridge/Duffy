@@ -19,6 +19,7 @@
 #import "DFImageStore.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFInboxTableViewCell.h"
+#import "DFLargeCardTableViewCell.h"
 #import "DFNavigationController.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPeanutFeedAdapter.h"
@@ -39,6 +40,7 @@
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 @property (nonatomic, retain) UILabel *noPhotosLabel;
+@property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
 
 @end
 
@@ -123,11 +125,8 @@
 - (void)configureTableView
 {
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFLargeCardTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"strandCell"];
-  [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFInboxTableViewCell class] description] bundle:nil]
-   forCellReuseIdentifier:@"inviteCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
 
@@ -149,7 +148,6 @@
 
 - (void)reloadData
 {
-  DDLogVerbose(@"Reloading data");
   dispatch_async(dispatch_get_main_queue(), ^{
     _feedObjects = [self.manager publicStrands];
     [self.tableView reloadData];
@@ -211,99 +209,25 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  CGFloat height = 44.0;
-  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
-  DFInboxCellStyle cellStyle = DFInboxCellStyleInvite;
-  NSString *cellIdentifier;
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    cellIdentifier = @"inviteCell";
-    cellStyle = DFInboxCellStyleInvite;
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    cellIdentifier = @"strandCell";
-    cellStyle = DFInboxCellStyleStrand;
+  NSNumber *cachedHeight = self.cellHeightsByIdentifier[@"strandCell"];
+  if (!cachedHeight) {
+    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+    CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+    self.cellHeightsByIdentifier[@"strandCell"] = cachedHeight = @(height);
   }
-  
-  if (cellIdentifier) {
-    UITableViewCell *templateCell = self.cellTemplatesByIdentifier[cellIdentifier];
-    if (!templateCell) templateCell = [DFInboxTableViewCell createWithStyle:cellStyle];
-    self.cellTemplatesByIdentifier[cellIdentifier] = templateCell;
-    height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-  }
-  
-  return height;
+  return cachedHeight.floatValue;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UITableViewCell *cell;
-  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    cell = [self cellForInviteObject:feedObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    cell = [self cellForStrandPostsObject:feedObject];
-  } else {
-    // we don't know what type this is, show an unknown cell on Dev and make a best effort on prod
-    #ifdef DEBUG
-    cell = [self.tableView dequeueReusableCellWithIdentifier:@"unknown"];
-    cell.contentView.backgroundColor = [UIColor yellowColor];
-    cell.textLabel.text = [NSString stringWithFormat:@"Unknown type: %@", feedObject.type];
-    #else
-    cell = [self cellForStrandPostsObject:feedObject];
-    #endif
-  }
+  DFPeanutFeedObject *strandObject = self.feedObjects[indexPath.row];
   
-  [cell setNeedsLayout];
+  DFLargeCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
+  [cell configureWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+  
+  [cell configureWithFeedObject:strandObject];
   return cell;
 }
-
-- (UITableViewCell *)cellForStrandPostsObject:(DFPeanutFeedObject *)strandPosts
-{
-  DFInboxTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:@"strandCell"];
-  [cell configureForInboxCellStyle:DFInboxCellStyleStrand];
-  [self.class resetCell:cell];
-  cell.contentView.backgroundColor = [UIColor whiteColor];
-  
-  // actor/ action
-  cell.peopleLabel.attributedText = [strandPosts peopleSummaryString];
-  cell.actionTextLabel.text = strandPosts.title;
-  cell.titleLabel.text = strandPosts.title;
-  
-  // time taken
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_stamp
-                                                          abbreviate:YES];
-  // photo preview
-  [self setRemotePhotosForCell:cell
-               withStrandPosts:strandPosts
-                     maxPhotos:InboxCellMaxPhotos];
-  
-  return cell;
-}
-
-- (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
-{
-  DFInboxTableViewCell *cell = [self.tableView
-                                       dequeueReusableCellWithIdentifier:@"inviteCell"];
-  [cell configureForInboxCellStyle:DFInboxCellStyleInvite];
-  [self.class resetCell:cell];
-  
-  DFPeanutFeedObject *strandPostsObject = inviteObject.objects.firstObject;
-  
-  cell.actorLabel.text = inviteObject.actorsString;
-  cell.actionTextLabel.text = inviteObject.title;
-  cell.titleLabel.text = strandPostsObject.title;
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:inviteObject.time_stamp
-                                                          abbreviate:YES];
-  cell.peopleLabel.attributedText = [inviteObject.objects.firstObject peopleSummaryString];
-  
-  [self setRemotePhotosForCell:cell
-               withStrandPosts:strandPostsObject
-                     maxPhotos:InboxCellMaxPhotos];
-  
-  return cell;
-}
-
-
 
 + (void)resetCell:(DFInboxTableViewCell *)cell
 {

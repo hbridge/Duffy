@@ -30,21 +30,21 @@
   self.solidBackgroundView.layer.masksToBounds = YES;
 }
 
-+ (DFLargeCardTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style
++ (DFLargeCardTableViewCell *)cellWithStyle:(DFLargeCardCellStyle)style
 {
   DFLargeCardTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
   [cell configureWithStyle:style];
   return cell;
 }
 
-- (void)configureWithStyle:(DFCreateStrandCellStyle)style
+- (void)configureWithStyle:(DFLargeCardCellStyle)style
 {
   
-  if (style == DFCreateStrandCellStyleInvite) {
+  if (style == DFLargeCardCellStyleInvite) {
     self.solidBackgroundView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   }
   
-  if (style == DFCreateStrandCellStyleSuggestionNoPeople) {
+  if (style == DFLargeCardCellStyleSuggestionNoPeople) {
     [self.peopleLabel removeFromSuperview];
     [self.peopleExplanationLabel removeFromSuperview];
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];

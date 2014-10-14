@@ -95,7 +95,7 @@
   DFPeanutFeedObject *strandObject = self.strandsToShow[indexPath.row];
   
   DFLargeCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
-  [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
+  [cell configureWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
   
   [cell configureWithFeedObject:strandObject];
   return cell;
@@ -123,7 +123,7 @@
 {
   NSNumber *cachedHeight = self.cellHeightsByIdentifier[@"strandCell"];
   if (!cachedHeight) {
-    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
+    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
     self.cellHeightsByIdentifier[@"strandCell"] = cachedHeight = @(height);
   }
