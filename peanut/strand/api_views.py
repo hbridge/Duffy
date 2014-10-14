@@ -635,29 +635,8 @@ def strand_inbox(request):
 		nonInviteStrandObjects = sorted(nonInviteStrandObjects, key=lambda x: x['time_stamp'], reverse=True)
 		responseObjects.extend(nonInviteStrandObjects)
 
-		response['objects'] = responseObjects
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-
-
-
-"""
-	Returns back the invites and strands a user has
-"""
-def friends_list(request):
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		responseObjects = list()
-
-		friends = friends_util.getFriends(user.id)
-		
-		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends, True)}
+		# Add in the list of all friends at the end
+		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
 		responseObjects.append(entry)
 
 		response['objects'] = responseObjects

@@ -13,7 +13,6 @@ from common.serializers import UserSerializer
 urlpatterns = patterns('',
 	url(r'^unshared_strands', 'strand.api_views.private_strands'),
 	url(r'^strand_inbox', 'strand.api_views.strand_inbox'),
-	url(r'^friends_list', 'strand.api_views.friends_list'),
 
 	url(r'^register_apns_token', 'strand.api_views.register_apns_token'),
 	url(r'^update_user_location', 'strand.api_views.update_user_location'),
