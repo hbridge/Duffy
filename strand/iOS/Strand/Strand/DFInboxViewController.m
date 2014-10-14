@@ -28,6 +28,7 @@
 #import "DFStrandSuggestionsViewController.h"
 #import "DFStrandGalleryTitleView.h"
 #import "DFStrandGalleryViewController.h"
+#import "DFFeedViewController.h"
 
 
 @interface DFInboxViewController ()
@@ -368,22 +369,20 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
+  DFPeanutFeedObject *inviteObject;
+  DFPeanutFeedObject *postsObject;
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    DFAcceptInviteViewController *acceptController = [[DFAcceptInviteViewController alloc]
-                                                      initWithInviteObject:feedObject];
-    [self.navigationController pushViewController:acceptController animated:YES];
+    inviteObject = feedObject;
+    postsObject = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    [self showStrandPostsObject:feedObject];
+    inviteObject = nil;
+    postsObject = feedObject;
   }
 
-  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
-- (void)showStrandPostsObject:(DFPeanutFeedObject *)strandPostsObject
-{
-  DFStrandGalleryViewController *vc = [[DFStrandGalleryViewController alloc] init];
-  vc.strandPosts = strandPostsObject;
-  [self.navigationController pushViewController:vc animated:YES];
+  DFFeedViewController *feedViewController = [[DFFeedViewController alloc] init];
+  feedViewController.inviteObject = inviteObject;
+  feedViewController.strandPostsObject = postsObject;
+  [self.navigationController pushViewController:feedViewController animated:YES];
 }
 
 - (void)showStrandPostsForStrandID:(DFStrandIDType)strandID completion:(void(^)(void))completion
