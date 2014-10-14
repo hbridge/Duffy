@@ -32,6 +32,9 @@ DFPeanutContactType DFPeanutContactInvited = @"invited";
 {
   self = [super init];
   if (self) {
+    if (user.id) {
+      self.user = @(user.id);
+    }
     self.name = user.display_name;
     self.phone_number = user.phone_number;
   }
@@ -43,6 +46,16 @@ DFPeanutContactType DFPeanutContactInvited = @"invited";
 {
   NSDictionary *dictRep = [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
   return [dictRep JSONStringPrettyPrinted:NO];
+}
+
+- (BOOL)isEqual:(id)object
+{
+  if (![[object class] isSubclassOfClass:[self class]]) return NO;
+  
+  DFPeanutContact *otherContact = (DFPeanutContact *)object;
+  NSDictionary *selfDict = [self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
+  NSDictionary *otherDict = [otherContact dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]];
+  return [selfDict isEqualToDictionary:otherDict];
 }
 
 @end

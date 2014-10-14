@@ -16,6 +16,7 @@
 #import "DFPhotoStore.h"
 #import "DFPushNotificationsManager.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "NSArray+DFHelpers.h"
 
 @interface DFCreateStrandViewController()
 
@@ -146,7 +147,12 @@ NSUInteger const NumPhotosPerRow = 4;
 #pragma mark - Actions
 
 - (void)nextPressed:(id)sender {
-  DFPeoplePickerViewController *peoplePicker =[[DFPeoplePickerViewController alloc] init];
+  NSArray *peanutContacts = [self.suggestionsObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:user];
+    return contact;
+  }];
+  DFPeoplePickerViewController *peoplePicker =[[DFPeoplePickerViewController alloc]
+                                               initWithSuggestedPeanutContacts:peanutContacts];
   peoplePicker.delegate = self;
   peoplePicker.allowsMultipleSelection = YES;
   [self.navigationController pushViewController:peoplePicker animated:YES];

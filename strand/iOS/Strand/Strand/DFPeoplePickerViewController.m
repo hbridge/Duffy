@@ -17,27 +17,30 @@
 #import "DFPeanutUserObject.h"
 #import "DFABResultTableViewCell.h"
 #import "DFContactSyncManager.h"
+#import "DFPersonSelectionTableViewCell.h"
+#import "UINib+DFHelpers.h"
+#import "DFStrandConstants.h"
 
 
 @interface DFPeoplePickerViewController ()
 
 @property (readonly, nonatomic, retain) RHAddressBook *addressBook;
-@property (nonatomic, retain) NSArray *unfilteredSectionTitles;
-@property (nonatomic, retain) NSArray *unfilteredSections;
+@property (nonatomic, retain) NSMutableArray *unfilteredSectionTitles;
+@property (nonatomic, retain) NSMutableArray *unfilteredSections;
 @property (nonatomic, retain) NSArray *suggestedList;
 @property (nonatomic, retain) NSArray *onStrandList;
 @property (nonatomic, retain) NSArray *ABList;
-@property (nonatomic, retain) NSMutableArray *selectedContacts;
-@property (nonatomic) BOOL isSearching;
 
+@property (nonatomic, retain) UISearchDisplayController *sdc;
 @property (nonatomic, retain) NSArray *filteredSectionTitles;
 @property (nonatomic, retain) NSArray *filteredSections;
 @property (nonatomic, retain) NSArray *filteredSuggestedList;
 @property (nonatomic, retain) NSArray *filteredOnStrandList;
 @property (nonatomic, retain) NSArray *filteredABList;
 
+@property (nonatomic, retain) NSMutableArray *manualNumbersList;
+@property (nonatomic, retain) NSMutableArray *selectedContacts;
 
-@property (nonatomic, retain) UISearchDisplayController *sdc;
 @end
 
 @implementation DFPeoplePickerViewController
@@ -57,7 +60,7 @@
 {
   self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
   if (self) {
-    [self loadUnfilteredArrays];
+    self.selectedContacts = [NSMutableArray new];
   }
   return self;
 }
@@ -66,8 +69,10 @@
 {
   [super viewDidLoad];
   
+  [self loadUnfilteredArrays];
   [self configureTableView];
   [self configureSearch];
+  [self configureNav];
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
@@ -79,30 +84,58 @@
                                               style:UIBarButtonItemStylePlain
                                               target:self action:@selector(doneButtonPressed:)];
   }
+  
+  self.tableView.allowsMultipleSelection = allowsMultipleSelection;
 }
 
 - (void)loadUnfilteredArrays
 {
-  self.suggestedList = [NSArray arrayWithArray:self.suggestedPeanutContacts];
-  self.onStrandList = @[]; // TODO fill in when available from server
-  if (!self.ABList) {
-    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
-      self.ABList = [self abSearchResultsForString:nil];
-    }
+  NSMutableArray *unfilteredSectionTitles = [NSMutableArray new];
+  NSMutableArray *unfilteredSections = [NSMutableArray new];
+  
+  if (self.suggestedPeanutContacts.count > 0) {
+    [unfilteredSectionTitles addObject:@"Suggestions"];
+    self.suggestedList = self.suggestedPeanutContacts;
+    [unfilteredSections addObject:self.suggestedList];
+    [self.selectedContacts addObjectsFromArray:self.suggestedList];
   }
-  self.unfilteredSections = @[self.ABList, @[@""]];
-  self.unfilteredSectionTitles = @[@"Contacts"];
+  
+  NSArray *onStrandArray = @[];
+  if (onStrandArray.count > 0) {// TODO fill in when available from server
+    [unfilteredSectionTitles addObject:@"On Strand"];
+    self.onStrandList = onStrandArray;
+    [unfilteredSections addObject:self.onStrandList];
+  }
+
+  if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+    [unfilteredSectionTitles addObject:@"Contacts"];
+    self.ABList = [self abSearchResultsForString:nil];
+    [unfilteredSections addObject:self.ABList];
+  }
+  
+  self.unfilteredSections = unfilteredSections;
+  self.unfilteredSectionTitles = unfilteredSectionTitles;
 }
 
 - (void)configureTableView
 {
+  // account for the gap caused by not having a navbar shadow image
+  UIEdgeInsets insets = self.tableView.contentInset;
+  insets.top = insets.top - 1;
+  self.tableView.contentInset = insets;
+  
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFABResultTableViewCell" bundle:nil]
-       forCellReuseIdentifier:@"abResult"];
+  [self.tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
+       forCellReuseIdentifier:@"nonUser"];
+  [self.tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
+       forCellReuseIdentifier:@"user"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFNoContactsTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"noContacts"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFNoResultsTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"noResults"];
+  if (self.allowsMultipleSelection) {
+    self.tableView.allowsMultipleSelection = YES;
+  }
 }
 
 - (void)configureSearch
@@ -115,6 +148,18 @@
   self.sdc.searchResultsDataSource = self;
   self.sdc.searchResultsDelegate = self;
   self.tableView.tableHeaderView = searchBar;
+}
+
+- (void)configureNav
+{
+  int count = (int)self.selectedContacts.count;
+  if (count > 0) {
+    self.navigationItem.title = [NSString stringWithFormat:@"%d Selected", count];
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+  } else {
+    self.navigationItem.title = @"None Selected";
+    self.navigationItem.rightBarButtonItem.enabled = NO;
+  }
 }
 
 - (NSArray *)selectedPeanutContacts
@@ -132,21 +177,6 @@
   }
 }
 
-- (void)searchDisplayControllerDidBeginSearch:(UISearchDisplayController *)controller
-{
-  self.isSearching = YES;
-}
-
-- (void)searchDisplayControllerDidEndSearch:(UISearchDisplayController *)controller
-{
-  self.isSearching = NO;
-}
-
-- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
-{
-  return YES;
-}
-
 - (void)updateSearchResults
 {
   NSString *searchText = self.searchDisplayController.searchBar.text;
@@ -161,14 +191,14 @@
       [sections addObject:@[self.textNumberString]];
     }
     
-    NSPredicate *nameFilterPredicate = [NSPredicate predicateWithFormat:@"name ==[c] %@", searchText];
+    NSPredicate *nameFilterPredicate = [NSPredicate predicateWithFormat:@"name BEGINSWITH[cd] %@", searchText];
     self.filteredSuggestedList = [self.suggestedList filteredArrayUsingPredicate:nameFilterPredicate];
     if (self.filteredSuggestedList.count > 0) {
       [sectionTitles addObject:@"Suggestions"];
       [sections addObject:self.filteredSuggestedList];
     }
     
-    self.filteredOnStrandList = [self.suggestedList filteredArrayUsingPredicate:nameFilterPredicate];
+    self.filteredOnStrandList = [self.onStrandList filteredArrayUsingPredicate:nameFilterPredicate];
     if (self.filteredOnStrandList.count > 0) {
       [sectionTitles addObject:@"On Strand"];
       [sections addObject:self.filteredOnStrandList];
@@ -237,13 +267,9 @@
   NSInteger result = 1;
   
   if (tableView == self.tableView) {
-    result += (self.suggestedList.count > 0);
-    result += (self.onStrandList.count > 0);
+    return self.unfilteredSections.count;
   } else {
-    //search results table view
-    result += (self.filteredSuggestedList.count > 0);
-    result += (self.filteredOnStrandList.count > 0);
-    result += [self.textNumberString isNotEmpty];
+    return self.filteredSections.count;
   }
   
   return result;
@@ -295,12 +321,18 @@
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
     // all of these sections have cells for peanut users
-      cell = [self cellForPeanutContact:(DFPeanutContact *)object indexPath:indexPath];
+    cell = [self cellForPeanutContact:(DFPeanutContact *)object indexPath:indexPath];
   } else if ([[object class] isSubclassOfClass:[NSString class]]) {
     cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
     cell.textLabel.text = [NSString stringWithFormat:@"Text %@", object];
     cell.imageView.image = [UIImage imageNamed:@"SMSTableCellIcon"];
   }
+  
+  if ([self.selectedContacts containsObject:object]) {
+    [self.tableView selectRowAtIndexPath:indexPath animated:NO scrollPosition:UITableViewScrollPositionNone];
+  }
+  
+  if (!cell) [NSException raise:@"Cell is Nil" format:@"Returning nil cell for object: %@.", object];
 
   return cell;
 }
@@ -325,12 +357,15 @@
                                 indexPath:(NSIndexPath *)indexPath
 {
   if (peanutContact.user) {
-    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
-    cell.textLabel.text = peanutContact.name;
+    DFPersonSelectionTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
+    [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser];
+    cell.nameLabel.text = peanutContact.name;
+    cell.profilePhotoStackView.names = @[peanutContact.name];
     return cell;
   } else {
-    DFABResultTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"abResult"];
-    cell.titleLabel.text = peanutContact.name;
+    DFPersonSelectionTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"nonUser"];
+    [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleNonUser];
+    cell.nameLabel.text = peanutContact.name;
     cell.subtitleLabel.text = [NSString stringWithFormat:@"%@ %@",
                           peanutContact.phone_type,
                           peanutContact.phone_number];
@@ -343,7 +378,7 @@
 {
  
   id object = [self objectForIndexPath:indexPath tableView:tableView];
-  if (object) return 44.0;
+  if (object) return 54.0;
   
   return 91.0;
 }
@@ -351,42 +386,74 @@
 #pragma mark - Action Responses
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-//  DFPeanutContact *selectedContact;
-//  if (indexPath.section == 0 && self.abSearchResults.count > 0) {
-//    NSDictionary *resultDict = self.abSearchResults[indexPath.row];
-//    RHPerson *person = resultDict[@"person"];
-//    int phoneIndex = [resultDict[@"index"] intValue];
-//    selectedContact = [self contactForName:person.name number:[person.phoneNumbers valueAtIndex:phoneIndex]];
-//  } else if (indexPath.section == 1 && self.textNumberString) {
-//    selectedContact = [self contactForName:@"" number:self.textNumberString];
-//  } else if (indexPath.section == 0 && ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
-//    ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
-//    if (status == kABAuthorizationStatusNotDetermined) {
-//      [self askForContactsPermission];
-//    } else {
-//      [self showContactsDeniedAlert];
-//    }
-//  }
-//  
-//  if (selectedContact) {
-//    if (self.allowsMultipleSelection) {
-//      [self.selectedContacts addObject:selectedContact];
-//      [self updateSearchResults];
-//      [self.tableView reloadData];
-//      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-//        [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
-//      }
-//    } else {
-//      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-//        [self.delegate pickerController:self pickedContactsDidChange:@[selectedContact]];
-//      }
-//      
-//      //didChange is optional, didFinish is not so no need to check for responds to select
-//      [self.delegate pickerController:self didFinishWithPickedContacts:@[selectedContact]];
-//    }
-//  }
+  id object = [self objectForIndexPath:indexPath tableView:tableView];
+  DDLogVerbose(@"tapped object:%@", object);
   
-  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+  if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
+    // all of these sections have cells for peanut users
+    [self.selectedContacts addObject:object];
+    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+    }
+  } else if ([[object class] isSubclassOfClass:[NSString class]]) {
+    [self textNumberRowTapped:object];
+    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+    }
+  } else {
+    if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
+      ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
+      if (status == kABAuthorizationStatusNotDetermined) {
+        [self askForContactsPermission];
+      } else {
+        [self showContactsDeniedAlert];
+      }
+    }
+    [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+  } 
+
+  DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
+  
+  // if this happened in the search tableview, we have to reload the regular table view in the bg
+  if (tableView != self.tableView) [self.tableView reloadData];
+  
+  [self configureNav];
+}
+
+- (void)textNumberRowTapped:(NSString *)phoneNumber
+{
+  DFPeanutContact *textNumberContact = [[DFPeanutContact alloc] init];
+  textNumberContact.phone_number = phoneNumber;
+  textNumberContact.name = phoneNumber;
+  textNumberContact.phone_type = @"unknown";
+  if (!self.manualNumbersList) {
+    self.manualNumbersList = [NSMutableArray new];
+    [self.unfilteredSections insertObject:self.manualNumbersList atIndex:1];
+    [self.unfilteredSectionTitles insertObject:@"Phone Numbers" atIndex:1];
+  }
+  [self.manualNumbersList addObject:textNumberContact];
+  [self.selectedContacts addObject:textNumberContact];
+  self.searchDisplayController.searchBar.text = @"";
+  //    [self.searchDisplayController.searchBar resignFirstResponder];
+  [self.searchDisplayController setActive:NO animated:YES];
+}
+
+- (void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  id object = [self objectForIndexPath:indexPath tableView:tableView];
+  DDLogVerbose(@"tapped object:%@", object);
+  if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
+    [self.selectedContacts removeObject:object];
+    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+    }
+  }
+  
+  // if this happened in the search tableview, we have to reload the regular table view in the bg
+  if (tableView != self.tableView) [self.tableView reloadData];
+  [self configureNav];
+  
+  DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
 }
 
 - (DFPeanutContact *)contactForName:(NSString *)name number:(NSString *)number
@@ -400,7 +467,8 @@
 
 - (void)doneButtonPressed:(id)sender
 {
-  [self.delegate pickerController:self didFinishWithPickedContacts:self.selectedPeanutContacts];
+  [self.delegate pickerController:self
+      didFinishWithPickedContacts:self.selectedPeanutContacts];
 }
 
 #pragma mark - Contacts Permission

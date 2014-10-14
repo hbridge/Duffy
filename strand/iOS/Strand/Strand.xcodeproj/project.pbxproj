@@ -60,6 +60,8 @@
 		5A4BBD3019B8BA8500359299 /* DFLargeCardTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2F19B8BA8500359299 /* DFLargeCardTableViewCell.xib */; };
 		5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */; };
 		5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */; };
+		5A4C820519ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C820319ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m */; };
+		5A4C820619ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4C820419ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib */; };
 		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
 		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
 		5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */; };
@@ -331,6 +333,9 @@
 		5A4BBD3C19BA4F9600359299 /* DFPhotosPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotosPermissionViewController.h; sourceTree = "<group>"; };
 		5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotosPermissionViewController.m; sourceTree = "<group>"; };
 		5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotosPermissionViewController.xib; sourceTree = "<group>"; };
+		5A4C820219ED8E0900C22A12 /* DFPersonSelectionTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPersonSelectionTableViewCell.h; sourceTree = "<group>"; };
+		5A4C820319ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPersonSelectionTableViewCell.m; sourceTree = "<group>"; };
+		5A4C820419ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPersonSelectionTableViewCell.xib; sourceTree = "<group>"; };
 		5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOverlayViewController.h; sourceTree = "<group>"; };
 		5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayViewController.m; sourceTree = "<group>"; };
 		5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationBar.h; sourceTree = "<group>"; };
@@ -700,6 +705,9 @@
 				5AAF038E19B0DBAE00EF021C /* DFCollectionViewTableViewCell.h */,
 				5AAF038F19B0DBAE00EF021C /* DFCollectionViewTableViewCell.m */,
 				5AAF039019B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib */,
+				5A4C820219ED8E0900C22A12 /* DFPersonSelectionTableViewCell.h */,
+				5A4C820319ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m */,
+				5A4C820419ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib */,
 			);
 			name = TableViewCells;
 			sourceTree = "<group>";
@@ -1351,6 +1359,7 @@
 				5ADD857719465C790037A6D5 /* AppDelegate.m */,
 				5AC4A9501947C75700862D9C /* First Time Setup */,
 				5A9636C119E47C8300F3B606 /* Main Views */,
+				5A0E123A1976DCC300B6FF04 /* Common Views */,
 				5AC4A8DC1947B61900862D9C /* Database */,
 				5AC4A95D194A257E00862D9C /* Managers */,
 				5AB4CBFC1982AF2500EFB3E3 /* People Picker */,
@@ -1358,7 +1367,6 @@
 				5AC4A8D019476F9000862D9C /* Assets */,
 				5ADD858519465C790037A6D5 /* Images.xcassets */,
 				5ADD857219465C790037A6D5 /* Supporting Files */,
-				5A0E123A1976DCC300B6FF04 /* Common Views */,
 				5AD8589619797E6000BFDC4E /* DFPermissionsHelpers.h */,
 				5AD8589719797E6000BFDC4E /* DFPermissionsHelpers.m */,
 			);
@@ -1573,6 +1581,7 @@
 				5AA9293419A66AB700032A3F /* DFNoResultsTableViewCell.xib in Resources */,
 				5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */,
 				5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */,
+				5A4C820619ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib in Resources */,
 				5AA9293819A67CC500032A3F /* DFABResultTableViewCell.xib in Resources */,
 				5A249C5A19C3349F0047AE91 /* DFInboxTableViewCell.xib in Resources */,
 			);
@@ -1740,6 +1749,7 @@
 				5A7B185019707D9600E5A1D1 /* DFPeanutActionResponse.m in Sources */,
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
+				5A4C820519ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m in Sources */,
 				5A188D6B19804A94009D3244 /* DFLockedStrandCell.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
 				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
