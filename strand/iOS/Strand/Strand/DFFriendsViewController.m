@@ -7,11 +7,18 @@
 //
 
 #import "DFFriendsViewController.h"
+
+#import "DFPeanutFeedDataManager.h"
 #import "DFPeanutUserObject.h"
+#import "DFSingleFriendViewController.h"
+#import "DFStrandConstants.h"
+
 
 @interface DFFriendsViewController ()
 
+@property (nonatomic, retain) DFPeanutFeedDataManager *peanutDataManager;
 @property (nonatomic, strong) NSArray *friendPeanutUsers;
+@property (nonatomic, retain) UIRefreshControl *refreshControl;
 
 @end
 
@@ -22,7 +29,8 @@
   self = [super init];
   if (self) {
     [self configureTabAndNav];
-    _friendPeanutUsers = [self.class mockPeanutUsers];
+    self.peanutDataManager = [DFPeanutFeedDataManager sharedManager];
+    [self observeNotifications];
   }
   return self;
 }
@@ -42,33 +50,61 @@
 
 }
 
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewPrivatePhotosDataNotificationName
+                                             object:nil];
+}
+
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   
   [self configureTableView:self.tableView];
 }
 
-+ (NSArray *)mockPeanutUsers
+
+- (void)configureRefreshControl
 {
-  DFPeanutUserObject *aseem = [[DFPeanutUserObject alloc] init];
-  aseem.display_name = @"aseem";
-  DFPeanutUserObject *derek = [[DFPeanutUserObject alloc] init];
-  derek.display_name = @"derek";
-  
-  return @[
-           aseem,
-           derek
-           ];
+  self.refreshControl = [[UIRefreshControl alloc] init];
+  [self.refreshControl addTarget:self
+                          action:@selector(refreshFromServer)
+                forControlEvents:UIControlEventValueChanged];
+}
+
+- (void)refreshFromServer
+{
+  [self.peanutDataManager refreshInboxFromServer:^{
+    [self.refreshControl endRefreshing];
+  }];
+}
+
+- (void)reloadData
+{
+  _friendPeanutUsers = [self.peanutDataManager friendsList];
 }
 
 - (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+  [super didReceiveMemoryWarning];
+  // Dispose of any resources that can be recreated.
 }
 
 - (void)configureTableView:(UITableView *)tableView
 {
   [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+
+  [self configureRefreshControl];
+  
+  UITableViewController *mockTVC = [[UITableViewController alloc] init];
+  mockTVC.tableView = tableView;
+  mockTVC.refreshControl = self.refreshControl;
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -80,6 +116,18 @@
 {
   return self.friendPeanutUsers.count;
 }
+
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
+
+  DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:user];
+  [self.navigationController pushViewController:vc animated:YES];
+  
+  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+}
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {

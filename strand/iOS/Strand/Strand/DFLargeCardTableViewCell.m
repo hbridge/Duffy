@@ -7,8 +7,15 @@
 //
 
 #import "DFLargeCardTableViewCell.h"
-#import "DFStrandConstants.h"
+
+#import "UIDevice+DFHelpers.h"
+
+#import "DFPeanutFeedObject.h"
+#import "DFPeanutUserObject.h"
+#import "DFPhotoStore.h"
 #import "DFPhotoViewCell.h"
+#import "DFStrandConstants.h"
+#import "DFImageStore.h"
 
 @implementation DFLargeCardTableViewCell
 
@@ -67,5 +74,96 @@
   
   return CGSizeZero;
 }
+
+
+/*
+ * Set the photos for this cell.  Right now only look at the photos in the first strand post
+ */
+- (void)setPhotosWithStrandPosts:(DFPeanutFeedObject *)strandPosts
+{
+  DFPeanutUserObject *user = strandPosts.actors[0];
+  DFPeanutFeedObject *firstPost = strandPosts.objects.firstObject;
+  
+  if (user.id == [[DFUser currentUser] userID]) {
+    return [self setLocalPhotosWithStrandPost:firstPost];
+  } else {
+    return [self setRemotePhotosWithStrandPost:firstPost];
+  }
+  
+}
+
+const NSUInteger MaxPhotosPerCell = 3;
+
+- (void)setLocalPhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
+{
+  // Get the IDs of all the photos we want to show
+  NSMutableArray *idsToShow = [NSMutableArray new];
+  for (NSUInteger i = 0; i < MIN(MaxPhotosPerCell, strandPost.objects.count); i++) {
+    DFPeanutFeedObject *object = strandPost.objects[i];
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
+      [idsToShow addObject:@(object.id)];
+      
+    } else if ([object.type isEqual:DFFeedObjectCluster]) {
+      DFPeanutFeedObject *repObject = object.objects.firstObject;
+      [idsToShow addObject:@(repObject.id)];
+    }
+  }
+  
+  // Set the images for the collection view
+  self.objects = idsToShow;
+  for (NSNumber *photoID in idsToShow) {
+    DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
+    if (photo) {
+      CGFloat thumbnailSize;
+      if ([UIDevice majorVersionNumber] >= 8) {
+        // only use the larger thumbnails on iOS 8+, the scaling will kill perf on iOS7
+        thumbnailSize = self.collectionView.frame.size.height * [[UIScreen mainScreen] scale];
+      } else {
+        thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
+      }
+      [photo.asset
+       loadUIImageForThumbnailOfSize:thumbnailSize
+       successBlock:^(UIImage *image) {
+         [self setImage:image forObject:photoID];
+       } failureBlock:^(NSError *error) {
+         DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
+       }];
+    }
+  }
+}
+
+
+- (void)setRemotePhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
+{
+  NSMutableArray *photoIDs = [NSMutableArray new];
+  NSMutableArray *photos = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *object in strandPost.objects) {
+    DFPeanutFeedObject *photoObject;
+    if ([object.type isEqual:DFFeedObjectCluster]) {
+      photoObject = object.objects.firstObject;
+    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
+      photoObject = object;
+    }
+    if (photoObject) {
+      [photoIDs addObject:@(photoObject.id)];
+      [photos addObject:photoObject];
+    }
+  }
+  
+  self.objects = photoIDs;
+  for (DFPeanutFeedObject *photoObject in photos) {
+    [[DFImageStore sharedStore]
+     imageForID:photoObject.id
+     preferredType:DFImageThumbnail
+     thumbnailPath:photoObject.thumb_image_path
+     fullPath:photoObject.full_image_path
+     completion:^(UIImage *image) {
+       [self setImage:image forObject:@(photoObject.id)];
+     }];
+  }
+}
+
+
 
 @end

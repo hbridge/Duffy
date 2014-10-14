@@ -10,6 +10,8 @@
 #import "DFCollectionViewTableViewCell.h"
 #import "DFCircleBadge.h"
 
+#import "DFPeanutFeedObject.h"
+
 @interface DFLargeCardTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
 typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
@@ -29,5 +31,6 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 
 + (DFLargeCardTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
 - (void)configureWithStyle:(DFCreateStrandCellStyle)style;
+- (void)setPhotosWithStrandPosts:(DFPeanutFeedObject *)strandPost;
 
 @end

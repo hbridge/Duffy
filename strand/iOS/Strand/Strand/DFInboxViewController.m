@@ -150,7 +150,7 @@
 {
   DDLogVerbose(@"Reloading data");
   dispatch_async(dispatch_get_main_queue(), ^{
-    _feedObjects = self.manager.inboxFeedObjects;
+    _feedObjects = [self.manager publicStrands];
     [self.tableView reloadData];
     
     if (self.feedObjects.count == 0) {
@@ -173,7 +173,7 @@
 
 - (void)refreshFromServer
 {
-  [self.manager refreshFromServer:^{
+  [self.manager refreshInboxFromServer:^{
     [self.refreshControl endRefreshing];
   }];
 }
@@ -389,10 +389,10 @@
 - (void)showStrandPostsForStrandID:(DFStrandIDType)strandID completion:(void(^)(void))completion
 {
   DDLogInfo(@"%@ showStrandPostsForStrandID called for %@ requesting refresh", self.class, @(strandID));
-  [self.manager refreshFromServer:^{
+  [self.manager refreshInboxFromServer:^{
     DDLogInfo(@"%@ showStrandPostsForStrandID for %@ refresh callback", self.class, @(strandID));
     DFPeanutFeedObject *strandPostsObject;
-    _feedObjects = self.manager.inboxFeedObjects;
+    _feedObjects = [self.manager publicStrands];
     for (DFPeanutFeedObject *object in self.feedObjects) {
       if (object.id == strandID) {
         // the strand is still in the invites section, return

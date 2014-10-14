@@ -218,7 +218,8 @@
 		651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A85199D170800678D16 /* DFPeanutNotification.m */; };
 		651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */; };
 		651E9A8C199D2B1400678D16 /* DFPeanutNotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */; };
-		65232E9219EC66A400F3832A /* DFInboxDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65232E9119EC66A400F3832A /* DFInboxDataManager.m */; };
+		65232E9219EC66A400F3832A /* DFPeanutFeedDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65232E9119EC66A400F3832A /* DFPeanutFeedDataManager.m */; };
+		65232E9919EC90CD00F3832A /* DFSingleFriendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65232E9819EC90CD00F3832A /* DFSingleFriendViewController.m */; };
 		6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */; };
 		65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */; };
 		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
@@ -618,8 +619,10 @@
 		651E9A88199D190F00678D16 /* DFPeanutNotificationsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsAdapter.m; sourceTree = "<group>"; };
 		651E9A8A199D2B1400678D16 /* DFPeanutNotificationsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutNotificationsManager.h; sourceTree = "<group>"; };
 		651E9A8B199D2B1400678D16 /* DFPeanutNotificationsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutNotificationsManager.m; sourceTree = "<group>"; };
-		65232E9019EC66A400F3832A /* DFInboxDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFInboxDataManager.h; sourceTree = "<group>"; };
-		65232E9119EC66A400F3832A /* DFInboxDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFInboxDataManager.m; sourceTree = "<group>"; };
+		65232E9019EC66A400F3832A /* DFPeanutFeedDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFeedDataManager.h; sourceTree = "<group>"; };
+		65232E9119EC66A400F3832A /* DFPeanutFeedDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFeedDataManager.m; sourceTree = "<group>"; };
+		65232E9719EC90CD00F3832A /* DFSingleFriendViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSingleFriendViewController.h; sourceTree = "<group>"; };
+		65232E9819EC90CD00F3832A /* DFSingleFriendViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSingleFriendViewController.m; sourceTree = "<group>"; };
 		6523FF3E199E67BE00FA8C59 /* DFSocketsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSocketsManager.h; sourceTree = "<group>"; };
 		6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSocketsManager.m; sourceTree = "<group>"; };
 		65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS7CameraRollSyncOperation.m; sourceTree = "<group>"; };
@@ -1302,8 +1305,8 @@
 				5AC4A95F194A25A300862D9C /* DFStrandsManager.m */,
 				5A14A3A7198C2B4600A4F032 /* DFUserInfoManager.h */,
 				5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */,
-				65232E9019EC66A400F3832A /* DFInboxDataManager.h */,
-				65232E9119EC66A400F3832A /* DFInboxDataManager.m */,
+				65232E9019EC66A400F3832A /* DFPeanutFeedDataManager.h */,
+				65232E9119EC66A400F3832A /* DFPeanutFeedDataManager.m */,
 			);
 			name = Managers;
 			sourceTree = "<group>";
@@ -1397,6 +1400,8 @@
 				5AF64D0219EC61AA00EE1473 /* DFFriendsViewController.h */,
 				5AF64D0319EC61AA00EE1473 /* DFFriendsViewController.m */,
 				5AF64D0419EC61AA00EE1473 /* DFFriendsViewController.xib */,
+				65232E9719EC90CD00F3832A /* DFSingleFriendViewController.h */,
+				65232E9819EC90CD00F3832A /* DFSingleFriendViewController.m */,
 			);
 			name = "Friends View";
 			sourceTree = "<group>";
@@ -1712,6 +1717,7 @@
 				5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */,
 				5AC4A9371947C30800862D9C /* DFUser.m in Sources */,
 				5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */,
+				65232E9919EC90CD00F3832A /* DFSingleFriendViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
@@ -1772,7 +1778,7 @@
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
 				65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */,
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
-				65232E9219EC66A400F3832A /* DFInboxDataManager.m in Sources */,
+				65232E9219EC66A400F3832A /* DFPeanutFeedDataManager.m in Sources */,
 				5A9BC31019A26A22002D1CD7 /* DFGallerySectionHeader.m in Sources */,
 				5AC4A9351947C30800862D9C /* DFUploadSessionStats.m in Sources */,
 				5A9115E219DB0B80003F2A68 /* UIImageView+DFHelpers.m in Sources */,

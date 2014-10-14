@@ -19,6 +19,9 @@
 @property (nonatomic, retain) NSData *inboxLastResponseHash;
 @property (nonatomic, retain) NSData *privatePhotosLastResponseHash;
 
+@property (nonatomic, retain) NSArray *inboxFeedObjects;
+@property (nonatomic, retain) NSArray *privatePhotosFeedObjects;
+
 @end
 
 @implementation DFPeanutFeedDataManager
@@ -55,10 +58,11 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)refreshFromServer
 {
-  [self refreshFromServer:nil];
+  [self refreshInboxFromServer:nil];
+  [self refreshPrivatePhotosFromServer:nil];
 }
 
-- (void)refreshFromServer:(void(^)(void))completion
+- (void)refreshInboxFromServer:(void(^)(void))completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
@@ -79,6 +83,29 @@ static DFPeanutFeedDataManager *defaultManager;
      if (completion) completion();
    }
   ];
+}
+
+- (void)refreshPrivatePhotosFromServer:(void(^)(void))completion
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  
+  [self.privatePhotosFeedAdapter
+   fetchAllPrivateStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
+                              NSData *responseHash,
+                              NSError *error) {
+     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+     
+     if (!error && ![responseHash isEqual:self.privatePhotosLastResponseHash]) {
+       self.privatePhotosLastResponseHash = responseHash;
+       self.privatePhotosFeedObjects = response.objects;
+       
+       [[NSNotificationCenter defaultCenter]
+        postNotificationName:DFStrandNewPrivatePhotosDataNotificationName
+        object:self];
+     }
+     if (completion) completion();
+   }
+   ];
 }
 
 - (BOOL)hasData{
@@ -102,6 +129,18 @@ static DFPeanutFeedDataManager *defaultManager;
     }
   }
   
+  return strands;
+}
+
+- (NSArray *)publicStrands
+{
+  NSMutableArray *strands = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts] || [object.type isEqual:DFFeedObjectInviteStrand]) {
+      [strands addObject:object];
+    }
+  }
   return strands;
 }
 

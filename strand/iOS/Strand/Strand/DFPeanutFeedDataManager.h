@@ -11,12 +11,13 @@
 
 @interface DFPeanutFeedDataManager : NSObject
 
-@property (nonatomic, retain) NSArray *inboxFeedObjects;
-
 + (DFPeanutFeedDataManager *)sharedManager;
 
-- (void)refreshFromServer:(void(^)(void))completion;
+- (void)refreshInboxFromServer:(void(^)(void))completion;
+- (void)refreshPrivatePhotosFromServer:(void(^)(void))completion;
+
 - (BOOL)hasData;
+- (NSArray *)publicStrands;
 - (NSArray *)strandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)friendsList;
 @end
