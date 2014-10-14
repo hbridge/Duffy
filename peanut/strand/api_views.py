@@ -216,13 +216,13 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 # Deprecated
 def getObjectsDataForStrands(user, strands, feedObjectType):
-	friendsData = friends_util.getFriendsData(user.id)
+	friends = friends_util.getFriends(user.id)
 
 	# list of list of photos
 	groups = list()
 	for strand in strands:
 		strandId = strand.id
-		photos = friends_util.filterStrandPhotosByFriends(user.id, friendsData, strand)
+		photos = friends_util.filterStrandPhotosByFriends(user.id, friends, strand)
 		
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(strand), 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(list(strand.users.all()))}
 		groupEntry = {'photos': photos, 'metadata': metadata}
@@ -423,7 +423,7 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = list()
 
-	friendsData = friends_util.getFriendsData(user.id)
+	friends = friends_util.getFriendsData(user.id)
 
 	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
@@ -438,7 +438,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friendsData, neighborStrand.users.all()))
+				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
 		interestedUsers = list(set(interestedUsers))
 
@@ -634,6 +634,31 @@ def strand_inbox(request):
 		# sorting by last action on the strand
 		nonInviteStrandObjects = sorted(nonInviteStrandObjects, key=lambda x: x['time_stamp'], reverse=True)
 		responseObjects.extend(nonInviteStrandObjects)
+
+		response['objects'] = responseObjects
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
+
+
+"""
+	Returns back the invites and strands a user has
+"""
+def friends_list(request):
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		responseObjects = list()
+
+		friends = friends_util.getFriends(user.id)
+		
+		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends, True)}
+		responseObjects.append(entry)
 
 		response['objects'] = responseObjects
 	else:
