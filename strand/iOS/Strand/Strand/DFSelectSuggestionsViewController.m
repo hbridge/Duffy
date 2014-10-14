@@ -21,6 +21,7 @@
 @interface DFSelectSuggestionsViewController ()
 
 @property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
+@property (nonatomic, retain) NSArray *items;
 
 @end
 
@@ -29,15 +30,25 @@
 
 NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 
-- (instancetype)initWithSuggestions:(DFPeanutFeedObject *)suggestions
+- (instancetype)initWithSuggestions:(NSArray *)suggestedSections
 {
-  self = [super init];
+  self = [super initWithNibName:NSStringFromClass([DFSelectSuggestionsViewController class]) bundle:nil];
   if (self) {
-    _suggestionsObject = suggestions;
     _numPhotosPerRow = DefaultNumSuggestedPhotosPerRow;
+    self.suggestedSections = suggestedSections;
   }
   
   return self;
+}
+
+- (void)setSuggestedSections:(NSArray *)suggestedSections
+{
+  _suggestedSections = suggestedSections;
+  NSMutableArray *items = [NSMutableArray new];
+  for (DFPeanutFeedObject *section in suggestedSections) {
+    [items addObjectsFromArray:section.objects];
+  }
+  _items = items;
 }
 
 - (IBAction)selectAllButtonPressed:(UIButton *)sender {
@@ -45,7 +56,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   NSString *newTitle;
   BOOL showTickMark;
   
-  if (self.selectPhotosController.selectedFeedObjects.count == self.suggestionsObject.objects.count) {
+  if (self.selectPhotosController.selectedFeedObjects.count == self.items.count) {
     [self.selectPhotosController.selectedFeedObjects removeAllObjects];
     newTitle = @"Select All";
     showTickMark = NO;
@@ -53,7 +64,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
     [self.selectPhotosController.selectedFeedObjects removeAllObjects];
     newTitle = @"Deselect All";
     showTickMark = YES;
-    [self.selectPhotosController.selectedFeedObjects addObjectsFromArray:self.suggestionsObject.objects];
+    [self.selectPhotosController.selectedFeedObjects addObjectsFromArray:self.items];
   }
   
   for (DFSelectablePhotoViewCell *cell in self.collectionView.visibleCells) {
@@ -90,15 +101,16 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 
 - (void)configureHeader
 {
-  self.locationLabel.text = self.suggestionsObject.location;
-  self.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.suggestionsObject.time_taken
+  DFPeanutFeedObject *firstSection = self.suggestedSections.firstObject;
+  self.locationLabel.text = firstSection.location;
+  self.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:firstSection.time_taken
                                                           abbreviate:NO];
 }
 
 - (void)configureCollectionView
 {
   self.selectPhotosController = [[DFSelectPhotosController alloc]
-                                 initWithFeedPhotos:self.suggestionsObject.objects
+                                 initWithFeedPhotos:self.items
                                  collectionView:self.collectionView
                                  sourceMode:DFImageDataSourceModeLocal
                                  imageType:DFImageThumbnail];

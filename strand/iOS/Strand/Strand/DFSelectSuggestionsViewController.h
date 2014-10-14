@@ -18,10 +18,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 @property (weak, nonatomic) IBOutlet UIButton *selectAllButton;
 
-@property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
+/* Array of DFPeanutFeedObjects that are section objects */
+@property (nonatomic, retain) NSArray *suggestedSections;
 @property (nonatomic) NSUInteger numPhotosPerRow;
 
-- (instancetype)initWithSuggestions:(DFPeanutFeedObject *)suggestions;
+- (instancetype)initWithSuggestions:(NSArray *)suggestedSections;
 - (IBAction)selectAllButtonPressed:(UIButton *)sender;
 
 

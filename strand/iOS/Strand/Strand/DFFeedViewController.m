@@ -31,6 +31,7 @@
 #import "NSIndexPath+DFHelpers.h"
 #import "DFSwapUpsellView.h"
 #import "UINib+DFHelpers.h"
+#import "DFAddPhotosViewController.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -131,6 +132,9 @@ const CGFloat LockedCellHeight = 157.0;
     if (!self.swapUpsellView) {
       self.swapUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
       [self.view addSubview:self.swapUpsellView];
+      [self.swapUpsellView.matchMyPhotosButton addTarget:self
+                                                  action:@selector(matchPhotosButtonPressed:)
+                                        forControlEvents:UIControlEventTouchUpInside];
     }
     self.swapUpsellView.frame = CGRectMake(0,
                                            self.view.frame.size.height / 3.0,
@@ -148,9 +152,6 @@ const CGFloat LockedCellHeight = 157.0;
     } else {
       self.swapUpsellView.sharedPhotosCountLabel.hidden = YES;
     }
-    
-    
-    
   } else {
     if (self.swapUpsellView) {
       [self.swapUpsellView removeFromSuperview];
@@ -500,6 +501,31 @@ const CGFloat LockedCellHeight = 157.0;
 }
 
 #pragma mark - Actions
+
+
+- (void)matchPhotosButtonPressed:(id)sender
+{
+  NSArray *suggestionsArray = [self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos];
+#ifdef DEBUG
+  if (suggestionsArray.count > 1) [NSException raise:@"more than one suggestions object" format:@""];
+#endif
+
+  DFPeanutFeedObject *suggestionsObject = suggestionsArray.firstObject;
+  DFAddPhotosViewController *addPhotosController = [[DFAddPhotosViewController alloc]
+                                                    initWithSuggestions:suggestionsObject.objects];
+  DFNavigationController *navController = [[DFNavigationController alloc]
+                                           initWithRootViewController:addPhotosController];
+  addPhotosController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                    initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                    target:self
+                                                    action:@selector(dismissMatch:)];
+  [self presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)dismissMatch:(id)sender
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {

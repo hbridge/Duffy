@@ -514,7 +514,7 @@ const NSUInteger MaxPhotosPerCell = 3;
   DFPeanutFeedObject *feedObject = feedObjectsForSection[indexPath.row];
   
   DFCreateStrandViewController *createStrandController = [[DFCreateStrandViewController alloc]
-                                                          initWithSuggestions:feedObject];
+                                                          initWithSuggestions:@[feedObject]];
   [self.navigationController pushViewController:createStrandController animated:YES];
 }
 

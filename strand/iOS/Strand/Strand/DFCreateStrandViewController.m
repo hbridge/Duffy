@@ -24,6 +24,7 @@
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (nonatomic, retain) NSArray *selectedContacts;
 @property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestedSection;
 
 @end
 
@@ -35,10 +36,11 @@
 
 NSUInteger const NumPhotosPerRow = 4;
 
-- (instancetype)initWithSuggestions:(DFPeanutFeedObject *)suggestions
+- (instancetype)initWithSuggestions:(NSArray *)suggestions
 {
   self = [super initWithSuggestions:suggestions];
   if (self) {
+    _suggestedSection = [suggestions firstObject];
     [self configureNavBar];
   }
   return self;
@@ -54,10 +56,17 @@ NSUInteger const NumPhotosPerRow = 4;
                                             action:@selector(nextPressed:)];
 }
 
+- (void)setSuggestedSections:(NSArray *)suggestedSections
+{
+  [super setSuggestedSections:suggestedSections];
+  self.suggestedSection = suggestedSections.firstObject;
+}
+
 #pragma mark - Actions
 
+
 - (void)nextPressed:(id)sender {
-  NSArray *peanutContacts = [self.suggestionsObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+  NSArray *peanutContacts = [self.suggestedSection.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
     DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:user];
     return contact;
   }];
@@ -75,9 +84,9 @@ NSUInteger const NumPhotosPerRow = 4;
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectPhotosController.selectedPhotoIDs;
-  requestStrand.created_from_id = [NSNumber numberWithLongLong:self.suggestionsObject.id];
+  requestStrand.created_from_id = [NSNumber numberWithLongLong:self.suggestedSection.id];
   requestStrand.private = @(NO);
-  [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestionsObject.enumeratorOfDescendents.allObjects];
+  [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedSection.enumeratorOfDescendents.allObjects];
   
   [SVProgressHUD show];
   [self.strandAdapter
@@ -110,8 +119,8 @@ NSUInteger const NumPhotosPerRow = 4;
   [self.inviteAdapter
    sendInvitesForStrand:peanutStrand
    toPeanutContacts:peanutContacts
-   inviteLocationString:self.suggestionsObject.location
-   invitedPhotosDate:self.suggestionsObject.time_taken
+   inviteLocationString:self.suggestedSection.location
+   invitedPhotosDate:self.suggestedSection.time_taken
    success:^(DFSMSInviteStrandComposeViewController *vc) {
      dispatch_async(dispatch_get_main_queue(), ^{
        // Some of the invitees aren't Strand users, send them a text
