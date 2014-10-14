@@ -159,7 +159,10 @@
   DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
 
   if (buttonIndex == 0) {
-    DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:self.actionSheetUserSelected];
+    DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:self.actionSheetUserSelected withSharedPhotos:YES];
+    [self.navigationController pushViewController:vc animated:YES];
+  } else if (buttonIndex == 1) {
+    DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:self.actionSheetUserSelected withSharedPhotos: NO];
     [self.navigationController pushViewController:vc animated:YES];
   }
 }

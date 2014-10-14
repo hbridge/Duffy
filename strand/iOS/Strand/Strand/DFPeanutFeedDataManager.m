@@ -147,7 +147,6 @@ static DFPeanutFeedDataManager *defaultManager;
   NSMutableArray *strands = [NSMutableArray new];
 
   for (DFPeanutFeedObject *object in self.privateStrandsFeedObjects) {
-    DDLogVerbose(@"object: %@", object);
     for (NSUInteger i = 0; i < object.actors.count; i++) {
       DFPeanutUserObject *actor = object.actors[i];
       if (user.id == actor.id) {

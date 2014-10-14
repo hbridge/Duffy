@@ -6,17 +6,21 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
+#import "DFCreateStrandViewController.h"
 #import "DFSingleFriendViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFLargeCardTableViewCell.h"
 #import "DFFeedViewController.h"
 #import "DFPeanutUserObject.h"
 #import "DFPeanutFeedObject.h"
+#import "DFStrandConstants.h"
 
 @interface DFSingleFriendViewController ()
 
-@property (nonatomic, retain) DFPeanutFeedDataManager *manager;
+@property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 @property (nonatomic, retain) DFPeanutUserObject *userToView;
+@property (nonatomic, retain) NSArray *strandsToShow;
+@property (nonatomic) BOOL useSharedPhotos;
 @property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
 
 @end
@@ -24,19 +28,34 @@
 @implementation DFSingleFriendViewController
 
 
-- (instancetype)initWithUser:(DFPeanutUserObject *)userToView
+- (instancetype)initWithUser:(DFPeanutUserObject *)userToView withSharedPhotos:(BOOL)useSharedPhotos
 {
   self = [super init];
   if (self) {
-    self.manager = [DFPeanutFeedDataManager sharedManager];
+    self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.userToView = userToView;
+    self.useSharedPhotos = useSharedPhotos;
   }
   return self;
+}
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewPrivatePhotosDataNotificationName
+                                             object:nil];
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
   [self configureTableView];
+  [self reloadData];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -51,6 +70,16 @@
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
 
+
+- (void)reloadData
+{
+  if (self.useSharedPhotos) {
+    self.strandsToShow = [self.dataManager publicStrandsWithUser:self.userToView];
+  } else {
+    self.strandsToShow = [self.dataManager privateStrandsWithUser:self.userToView];
+  }
+}
+
 #pragma mark - Table view data source
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView {
@@ -58,41 +87,35 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  NSArray *strands = [self.manager publicStrandsWithUser:self.userToView];
-  
-  return strands.count;
+  return self.strandsToShow.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UITableViewCell *cell;
-  NSArray *strands = [self.manager publicStrandsWithUser:self.userToView];
-  DFPeanutFeedObject *strandPosts = strands[indexPath.row];
+  DFPeanutFeedObject *strandObject = self.strandsToShow[indexPath.row];
   
-  cell = [self cellWithStrandObject:strandPosts forTableView:tableView];
-  
-  return cell;
-}
-
-- (UITableViewCell *)cellWithStrandObject:(DFPeanutFeedObject *)strandPosts
-                                      forTableView:(UITableView *)tableView
-{
   DFLargeCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
   [cell configureWithStyle:DFCreateStrandCellStyleSuggestionWithPeople];
   
-  [cell setPhotosWithStrandPosts:strandPosts];
-
+  [cell configureWithFeedObject:strandObject];
   return cell;
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *strands = [self.manager publicStrandsWithUser:self.userToView];
-  DFPeanutFeedObject *strandPosts = strands[indexPath.row];
-  
-  DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
-  photoFeedController.strandPostsObject = strandPosts;
-  [self.navigationController pushViewController:photoFeedController animated:YES];
+  if (self.useSharedPhotos) {
+    DFPeanutFeedObject *strandPosts = self.strandsToShow[indexPath.row];
+    
+    DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
+    photoFeedController.strandPostsObject = strandPosts;
+    [self.navigationController pushViewController:photoFeedController animated:YES];
+  } else {
+    DFPeanutFeedObject *sectionObject = self.strandsToShow[indexPath.row];
+    
+    DFCreateStrandViewController *createStrandController = [[DFCreateStrandViewController alloc]
+                                                            initWithSuggestions:@[sectionObject]];
+    [self.navigationController pushViewController:createStrandController animated:YES];
+  }
 }
 
 

@@ -11,6 +11,6 @@
 
 @interface DFSingleFriendViewController : UITableViewController
 
-- (instancetype)initWithUser:(DFPeanutUserObject *)user;
+- (instancetype)initWithUser:(DFPeanutUserObject *)user withSharedPhotos:(BOOL)sharedPhotos;
 
 @end

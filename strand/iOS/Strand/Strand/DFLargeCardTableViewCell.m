@@ -8,6 +8,7 @@
 
 #import "DFLargeCardTableViewCell.h"
 
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UIDevice+DFHelpers.h"
 
 #import "DFPeanutFeedObject.h"
@@ -78,19 +79,26 @@
 
 /*
  * Set the photos for this cell.  Right now only look at the photos in the first strand post
+ * Strand posts have both public and private content, so must figure that out.
+ * Sections only have private photos, so just do local
  */
-- (void)setPhotosWithStrandPosts:(DFPeanutFeedObject *)strandPosts
+- (void)configureWithFeedObject:(DFPeanutFeedObject *)feedObject
 {
-  DFPeanutUserObject *user = strandPosts.actors[0];
-  DFPeanutFeedObject *firstPost = strandPosts.objects.firstObject;
-  
-  if (user.id == [[DFUser currentUser] userID]) {
-    return [self setLocalPhotosWithStrandPost:firstPost];
-  } else {
-    return [self setRemotePhotosWithStrandPost:firstPost];
+  [self configureTextWithStrand:feedObject];
+  if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+    DFPeanutUserObject *user = feedObject.actors[0];
+    DFPeanutFeedObject *firstPost = feedObject.objects.firstObject;
+    
+    if (user.id == [[DFUser currentUser] userID]) {
+      return [self setLocalPhotosWithStrandPost:firstPost];
+    } else {
+      return [self setRemotePhotosWithStrandPost:firstPost];
+    }
+  } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
+    return [self setLocalPhotosWithStrandPost:feedObject];
   }
-  
 }
+
 
 const NSUInteger LargeCardMaxPhotosPerCell = 3;
 
@@ -161,6 +169,39 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
      completion:^(UIImage *image) {
        [self setImage:image forObject:@(photoObject.id)];
      }];
+  }
+}
+
+- (void)configureTextWithStrand:(DFPeanutFeedObject *)strandObject
+{
+  // Set the header attributes
+  NSMutableString *actorString = [NSMutableString new];
+  for (DFPeanutUserObject *user in strandObject.actors) {
+    if (user != strandObject.actors.firstObject) [actorString appendString:@", "];
+    [actorString appendString:user.display_name];
+  }
+  
+  self.peopleLabel.text = actorString;
+  
+  // context label "Date in Location"
+  NSMutableString *contextString = [NSMutableString new];
+  [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+                                                                abbreviate:NO]];
+  [contextString appendFormat:@" in %@", strandObject.location];
+  self.contextLabel.text = contextString;
+  
+  // Bit of a hack.  Sections are private so we go with default text of "Swap with"
+  //   But Strand Posts are public so change wording
+  if ([strandObject.type isEqual:DFFeedObjectStrandPosts]) {
+    self.peopleExplanationLabel.text = @"Swapped with";
+  }
+  
+  NSInteger count = strandObject.objects.count - LargeCardMaxPhotosPerCell;
+  if (count > 0) {
+    self.countBadge.hidden = NO;
+    self.countBadge.text = [NSString stringWithFormat:@"+%d", (int)count];
+  } else {
+    self.countBadge.hidden = YES;
   }
 }
 

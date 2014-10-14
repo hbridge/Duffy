@@ -31,6 +31,6 @@ typedef NS_OPTIONS(NSInteger, DFCreateStrandCellStyle) {
 
 + (DFLargeCardTableViewCell *)cellWithStyle:(DFCreateStrandCellStyle)style;
 - (void)configureWithStyle:(DFCreateStrandCellStyle)style;
-- (void)setPhotosWithStrandPosts:(DFPeanutFeedObject *)strandPost;
+- (void)configureWithFeedObject:(DFPeanutFeedObject *)feedObject;
 
 @end
