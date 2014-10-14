@@ -423,7 +423,7 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = list()
 
-	friends = friends_util.getFriendsData(user.id)
+	friends = friends_util.getFriends(user.id)
 
 	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
