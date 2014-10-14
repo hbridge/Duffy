@@ -22,45 +22,42 @@
 @interface DFPeoplePickerViewController ()
 
 @property (readonly, nonatomic, retain) RHAddressBook *addressBook;
+@property (nonatomic, retain) NSArray *unfilteredSectionTitles;
+@property (nonatomic, retain) NSArray *unfilteredSections;
+@property (nonatomic, retain) NSArray *suggestedList;
+@property (nonatomic, retain) NSArray *onStrandList;
+@property (nonatomic, retain) NSArray *ABList;
 @property (nonatomic, retain) NSMutableArray *selectedContacts;
+@property (nonatomic) BOOL isSearching;
 
+@property (nonatomic, retain) NSArray *filteredSectionTitles;
+@property (nonatomic, retain) NSArray *filteredSections;
+@property (nonatomic, retain) NSArray *filteredSuggestedList;
+@property (nonatomic, retain) NSArray *filteredOnStrandList;
+@property (nonatomic, retain) NSArray *filteredABList;
+
+
+@property (nonatomic, retain) UISearchDisplayController *sdc;
 @end
 
 @implementation DFPeoplePickerViewController
 @synthesize addressBook = _addressBook;
 
 
-- (instancetype)init
+- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
 {
-  self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
+  self = [self init];
   if (self) {
-    
+    _suggestedPeanutContacts = suggestedPeanutContacts;
   }
   return self;
 }
 
-- (instancetype)initWithTokenField:(VENTokenField *)tokenField tableView:(UITableView *)tableView
+- (instancetype)init
 {
-  return [self initWithTokenField:tokenField withPeanutUsers:nil tableView:tableView];
-}
-
-- (instancetype)initWithTokenField:(VENTokenField *)tokenField withPeanutUsers:(NSArray *)peanutUsers tableView:(UITableView *)tableView
-{
-  self = [super init];
+  self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
   if (self) {
-    self.tableView = tableView;
-    self.tokenField = tokenField;
-    [self configureTableView];
-    [self configureTokenField];
-    
-    if (peanutUsers) {
-      for (DFPeanutUserObject *user in peanutUsers) {
-        [self.selectedContacts addObject:[[DFPeanutContact alloc ] initWithPeanutUser:user]];
-      }
-      
-      [self.tokenField reloadData];
-    }
-    
+    [self loadUnfilteredArrays];
   }
   return self;
 }
@@ -70,7 +67,7 @@
   [super viewDidLoad];
   
   [self configureTableView];
-  [self configureTokenField];
+  [self configureSearch];
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
@@ -84,6 +81,19 @@
   }
 }
 
+- (void)loadUnfilteredArrays
+{
+  self.suggestedList = [NSArray arrayWithArray:self.suggestedPeanutContacts];
+  self.onStrandList = @[]; // TODO fill in when available from server
+  if (!self.ABList) {
+    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+      self.ABList = [self abSearchResultsForString:nil];
+    }
+  }
+  self.unfilteredSections = @[self.ABList, @[@""]];
+  self.unfilteredSectionTitles = @[@"Contacts"];
+}
+
 - (void)configureTableView
 {
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
@@ -93,22 +103,18 @@
        forCellReuseIdentifier:@"noContacts"];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFNoResultsTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"noResults"];
-
 }
 
-- (void)configureTokenField
+- (void)configureSearch
 {
-  self.selectedContacts = [NSMutableArray new];
-  if (!self.tokenField) {
-    self.tokenField = [[VENTokenField alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, 50)];
-    self.tokenField.maxHeight = 50.0;
-    self.tokenField.verticalInset = 3.0;
-    self.tokenField.backgroundColor = [UIColor whiteColor];
-    self.tableView.tableHeaderView = self.tokenField;
-  }
-  self.tokenField.delegate = self;
-  self.tokenField.dataSource = self;
-  self.tokenField.placeholderText = @"Enter a name or phone number";
+  UISearchBar *searchBar = [[UISearchBar alloc] init];
+  searchBar.delegate = self;
+  self.sdc = [[UISearchDisplayController alloc]
+                                    initWithSearchBar:searchBar
+                                    contentsController:self];
+  self.sdc.searchResultsDataSource = self;
+  self.sdc.searchResultsDelegate = self;
+  self.tableView.tableHeaderView = searchBar;
 }
 
 - (NSArray *)selectedPeanutContacts
@@ -116,28 +122,68 @@
   return self.selectedContacts;
 }
 
-#pragma mark - Text Field Changes and Filtering
+#pragma mark - UISearchDisplayController Delegate
 
-- (void)tokenField:(VENTokenField *)tokenField didChangeText:(NSString *)text
+- (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
   [self updateSearchResults];
-  [self.tableView reloadData];
   if ([self.delegate respondsToSelector:@selector(pickerController:textDidChange:)]) {
-    [self.delegate pickerController:self textDidChange:text];
+    [self.delegate pickerController:self textDidChange:searchText];
   }
+}
+
+- (void)searchDisplayControllerDidBeginSearch:(UISearchDisplayController *)controller
+{
+  self.isSearching = YES;
+}
+
+- (void)searchDisplayControllerDidEndSearch:(UISearchDisplayController *)controller
+{
+  self.isSearching = NO;
+}
+
+- (BOOL)searchDisplayController:(UISearchDisplayController *)controller shouldReloadTableForSearchString:(NSString *)searchString
+{
+  return YES;
 }
 
 - (void)updateSearchResults
 {
-  self.abSearchResults = nil;
-  self.textNumberString = nil;
+  NSString *searchText = self.searchDisplayController.searchBar.text;
   
-  if ([self.tokenField.inputText isNotEmpty]) {
-    self.abSearchResults = @[];
-    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
-      self.abSearchResults = [self abSearchResultsForString:self.tokenField.inputText];
+  if ([searchText isNotEmpty]) {
+    NSMutableArray *sectionTitles = [NSMutableArray new];
+    NSMutableArray *sections = [NSMutableArray new];
+    
+    self.textNumberString = [self textNumberStringForString:searchText];
+    if (self.textNumberString) {
+      [sectionTitles addObject:@"Text Number"];
+      [sections addObject:@[self.textNumberString]];
     }
-    self.textNumberString = [self textNumberStringForString:self.tokenField.inputText];
+    
+    NSPredicate *nameFilterPredicate = [NSPredicate predicateWithFormat:@"name ==[c] %@", searchText];
+    self.filteredSuggestedList = [self.suggestedList filteredArrayUsingPredicate:nameFilterPredicate];
+    if (self.filteredSuggestedList.count > 0) {
+      [sectionTitles addObject:@"Suggestions"];
+      [sections addObject:self.filteredSuggestedList];
+    }
+    
+    self.filteredOnStrandList = [self.suggestedList filteredArrayUsingPredicate:nameFilterPredicate];
+    if (self.filteredOnStrandList.count > 0) {
+      [sectionTitles addObject:@"On Strand"];
+      [sections addObject:self.filteredOnStrandList];
+    }
+    
+    self.filteredABList = @[];
+    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+      self.filteredABList = [self abSearchResultsForString:searchText];
+    }
+    [sectionTitles addObject:@"Contacts"];
+    [sections addObject:self.filteredABList];
+    
+    
+    self.filteredSections = sections;
+    self.filteredSectionTitles = sectionTitles;
   }
 }
 
@@ -146,14 +192,20 @@
   if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) return @[];
   
   NSMutableArray *results = [NSMutableArray new];
-  NSArray *people = [self.addressBook peopleWithName:string];
+
+  NSArray *people;
+  if ([string isNotEmpty] ) {
+    people = [self.addressBook peopleWithName:string];
+  } else {
+    people = [self.addressBook peopleOrderedByFirstName];
+  }
   for (RHPerson *person in people) {
     for (int i = 0; i < person.phoneNumbers.values.count; i++) {
-      NSDictionary *resultDict = @{
-                                   @"person": person,
-                                   @"index": @(i),
-                                   };
-      [results addObject:resultDict];
+      DFPeanutContact *contact = [[DFPeanutContact alloc] init];
+      contact.name = person.name;
+      contact.phone_number = [person.phoneNumbers valueAtIndex:i];
+      contact.phone_type = [person.phoneNumbers localizedLabelAtIndex:i];
+      [results addObject:contact];
     }
   }
   
@@ -182,17 +234,28 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  NSInteger result = 0;
-  if (self.abSearchResults) result += 1;
-  if (self.textNumberString) result += 1;
+  NSInteger result = 1;
+  
+  if (tableView == self.tableView) {
+    result += (self.suggestedList.count > 0);
+    result += (self.onStrandList.count > 0);
+  } else {
+    //search results table view
+    result += (self.filteredSuggestedList.count > 0);
+    result += (self.filteredOnStrandList.count > 0);
+    result += [self.textNumberString isNotEmpty];
+  }
   
   return result;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  if (section == 0) return @"Contacts";
-  if (section == 1) return @"Text Phone Number";
+  if (tableView == self.tableView) {
+    return self.unfilteredSectionTitles[section];
+  } else {
+    return self.filteredSectionTitles[section];
+  }
   return nil;
 }
 
@@ -204,100 +267,124 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  if (section == 0) {
-    return MAX(self.abSearchResults.count, 1);
-  } else if (section == 1) {
-    return self.textNumberString ? 1 : 0;
+  NSArray *sectionArray;
+  
+  if (tableView == self.tableView) {
+    sectionArray = self.unfilteredSections[section];
+  } else {
+    sectionArray = self.filteredSections[section];
   }
   
-  return 0;
+  return MAX(1, sectionArray.count);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
   
-  if (indexPath.section == 0) {
-    if (self.abSearchResults.count > 0) {
-      cell = [self.tableView dequeueReusableCellWithIdentifier:@"abResult"];
-      [self configureABCell:(DFABResultTableViewCell *)cell forIndexPath:indexPath];
-      cell.imageView.image = nil;
-    } else if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined) {
+  id object = [self objectForIndexPath:indexPath tableView:tableView];
+  
+  if (!object) {
+    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined) {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noContacts"];
     } else {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
     }
-  } else if (indexPath.section == 1) {
-    cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
-    cell.textLabel.text = [NSString stringWithFormat:@"Text %@", self.textNumberString];
-    cell.imageView.image = [UIImage imageNamed:@"SMSTableCellIcon"];
+    return cell;
   }
   
+  if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
+    // all of these sections have cells for peanut users
+      cell = [self cellForPeanutContact:(DFPeanutContact *)object indexPath:indexPath];
+  } else if ([[object class] isSubclassOfClass:[NSString class]]) {
+    cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
+    cell.textLabel.text = [NSString stringWithFormat:@"Text %@", object];
+    cell.imageView.image = [UIImage imageNamed:@"SMSTableCellIcon"];
+  }
+
   return cell;
 }
 
-- (void)configureABCell:(DFABResultTableViewCell *)cell forIndexPath:(NSIndexPath *)indexPath
+- (id)objectForIndexPath:(NSIndexPath *)indexPath tableView:(UITableView *)tableView
 {
-  NSDictionary *resultDict = self.abSearchResults[indexPath.row];
-  RHPerson *person = resultDict[@"person"];
-  int phoneIndex = [resultDict[@"index"] intValue];
+  NSArray *resultsArray;
+  if (tableView != self.tableView) {
+    resultsArray = self.filteredSections[indexPath.section];
+  } else {
+    resultsArray = self.unfilteredSections[indexPath.section];
+  }
   
-  cell.titleLabel.text = person.name;
-  cell.subtitleLabel.text = [NSString stringWithFormat:@"%@ %@",
-                               [person.phoneNumbers localizedLabelAtIndex:phoneIndex],
-                               [person.phoneNumbers valueAtIndex:phoneIndex]
-                               ];
+  id object = nil;
+  if (indexPath.row < resultsArray.count) {
+    object = resultsArray[indexPath.row];
+  }
+  return object;
+}
+
+- (UITableViewCell *)cellForPeanutContact:(DFPeanutContact *)peanutContact
+                                indexPath:(NSIndexPath *)indexPath
+{
+  if (peanutContact.user) {
+    UITableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"cell"];
+    cell.textLabel.text = peanutContact.name;
+    return cell;
+  } else {
+    DFABResultTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"abResult"];
+    cell.titleLabel.text = peanutContact.name;
+    cell.subtitleLabel.text = [NSString stringWithFormat:@"%@ %@",
+                          peanutContact.phone_type,
+                          peanutContact.phone_number];
+    return cell;
+  }
+  return nil;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (indexPath.section == 0) {
-    if (self.abSearchResults.count > 0) return 44.0;
-    return 91.0;
-  }
+ 
+  id object = [self objectForIndexPath:indexPath tableView:tableView];
+  if (object) return 44.0;
   
-  return 44.0;
+  return 91.0;
 }
 
 #pragma mark - Action Responses
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutContact *selectedContact;
-  if (indexPath.section == 0 && self.abSearchResults.count > 0) {
-    NSDictionary *resultDict = self.abSearchResults[indexPath.row];
-    RHPerson *person = resultDict[@"person"];
-    int phoneIndex = [resultDict[@"index"] intValue];
-    selectedContact = [self contactForName:person.name number:[person.phoneNumbers valueAtIndex:phoneIndex]];
-  } else if (indexPath.section == 1 && self.textNumberString) {
-    selectedContact = [self contactForName:@"" number:self.textNumberString];
-  } else if (indexPath.section == 0 && ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
-    ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
-    if (status == kABAuthorizationStatusNotDetermined) {
-      [self askForContactsPermission];
-    } else {
-      [self showContactsDeniedAlert];
-    }
-  }
-  
-  if (selectedContact) {
-    if (self.allowsMultipleSelection) {
-      [self.selectedContacts addObject:selectedContact];
-      [self.tokenField reloadData];
-      [self updateSearchResults];
-      [self.tableView reloadData];
-      [self tokenField:self.tokenField didChangeText:self.tokenField.inputText];
-      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-        [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
-      }
-    } else {
-      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-        [self.delegate pickerController:self pickedContactsDidChange:@[selectedContact]];
-      }
-      
-      //didChange is optional, didFinish is not so no need to check for responds to select
-      [self.delegate pickerController:self didFinishWithPickedContacts:@[selectedContact]];
-    }
-  }
+//  DFPeanutContact *selectedContact;
+//  if (indexPath.section == 0 && self.abSearchResults.count > 0) {
+//    NSDictionary *resultDict = self.abSearchResults[indexPath.row];
+//    RHPerson *person = resultDict[@"person"];
+//    int phoneIndex = [resultDict[@"index"] intValue];
+//    selectedContact = [self contactForName:person.name number:[person.phoneNumbers valueAtIndex:phoneIndex]];
+//  } else if (indexPath.section == 1 && self.textNumberString) {
+//    selectedContact = [self contactForName:@"" number:self.textNumberString];
+//  } else if (indexPath.section == 0 && ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
+//    ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
+//    if (status == kABAuthorizationStatusNotDetermined) {
+//      [self askForContactsPermission];
+//    } else {
+//      [self showContactsDeniedAlert];
+//    }
+//  }
+//  
+//  if (selectedContact) {
+//    if (self.allowsMultipleSelection) {
+//      [self.selectedContacts addObject:selectedContact];
+//      [self updateSearchResults];
+//      [self.tableView reloadData];
+//      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+//        [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+//      }
+//    } else {
+//      if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+//        [self.delegate pickerController:self pickedContactsDidChange:@[selectedContact]];
+//      }
+//      
+//      //didChange is optional, didFinish is not so no need to check for responds to select
+//      [self.delegate pickerController:self didFinishWithPickedContacts:@[selectedContact]];
+//    }
+//  }
   
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
@@ -314,29 +401,6 @@
 - (void)doneButtonPressed:(id)sender
 {
   [self.delegate pickerController:self didFinishWithPickedContacts:self.selectedPeanutContacts];
-}
-
-
-#pragma mark - Token Field Delegate/Datasource
-
--(NSUInteger)numberOfTokensInTokenField:(VENTokenField *)tokenField
-{
-  return self.selectedContacts.count;
-}
-
-- (NSString *)tokenField:(VENTokenField *)tokenField titleForTokenAtIndex:(NSUInteger)index
-{
-  DFPeanutContact *contact = self.selectedContacts[index];
-  return [contact.name isNotEmpty] ? contact.name : contact.phone_number;
-}
-
-- (void)tokenField:(VENTokenField *)tokenField didDeleteTokenAtIndex:(NSUInteger)index
-{
-  [self.selectedContacts removeObjectAtIndex:index];
-  [self.tokenField reloadData];
-  if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-    [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
-  }
 }
 
 #pragma mark - Contacts Permission

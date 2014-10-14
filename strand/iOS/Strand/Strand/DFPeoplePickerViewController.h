@@ -24,25 +24,19 @@
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
          pickedContactsDidChange:(NSArray *)peanutContacts;
 
-
 @end
 
 
-@interface DFPeoplePickerViewController : UITableViewController <VENTokenFieldDelegate, VENTokenFieldDataSource>
+@interface DFPeoplePickerViewController : UITableViewController <UISearchBarDelegate, UISearchDisplayDelegate>
 
 @property (nonatomic, weak) NSObject<DFPeoplePickerDelegate>* delegate;
-@property (nonatomic, retain) VENTokenField *tokenField;
-@property (nonatomic, retain) NSArray *abSearchResults;
 @property (nonatomic, retain) NSString *textNumberString;
 @property (nonatomic) BOOL allowsMultipleSelection;
+@property (nonatomic, retain) NSArray *suggestedPeanutContacts;
 @property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
 
 
-- (instancetype)initWithTokenField:(VENTokenField *)tokenField
-                         tableView:(UITableView *)tableView;
-- (instancetype)initWithTokenField:(VENTokenField *)tokenField
-                   withPeanutUsers:(NSArray *)peanutUsers
-                         tableView:(UITableView *)tableView;
+- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
 
 
 @end
