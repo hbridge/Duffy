@@ -17,7 +17,12 @@
 - (void)refreshPrivatePhotosFromServer:(void(^)(void))completion;
 
 - (BOOL)hasData;
+
+- (BOOL)isRefreshingInbox;
+
 - (NSArray *)publicStrands;
-- (NSArray *)strandsWithUser:(DFPeanutUserObject *)user;
+- (NSArray *)privateStrands;
+- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;
+- (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)friendsList;
 @end

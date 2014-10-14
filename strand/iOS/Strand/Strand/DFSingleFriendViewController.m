@@ -58,7 +58,7 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-  NSArray *strands = [self.manager strandsWithUser:self.userToView];
+  NSArray *strands = [self.manager publicStrandsWithUser:self.userToView];
   
   return strands.count;
 }
@@ -66,7 +66,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   UITableViewCell *cell;
-  NSArray *strands = [self.manager strandsWithUser:self.userToView];
+  NSArray *strands = [self.manager publicStrandsWithUser:self.userToView];
   DFPeanutFeedObject *strandPosts = strands[indexPath.row];
   
   cell = [self cellWithStrandObject:strandPosts forTableView:tableView];
@@ -87,7 +87,7 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSArray *strands = [self.manager strandsWithUser:self.userToView];
+  NSArray *strands = [self.manager publicStrandsWithUser:self.userToView];
   DFPeanutFeedObject *strandPosts = strands[indexPath.row];
   
   DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];

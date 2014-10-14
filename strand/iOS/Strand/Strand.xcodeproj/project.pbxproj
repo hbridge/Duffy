@@ -56,7 +56,7 @@
 		5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A40344C196340A0003D7546 /* DFPhotoResizer.m */; };
 		5A40344F19646BC6003D7546 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5A40344E19646BC6003D7546 /* AudioToolbox.framework */; };
 		5A4501F019D07FC70075E183 /* DFPHAsset.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4501EF19D07FC70075E183 /* DFPHAsset.m */; };
-		5A4BBD2B19B7D55500359299 /* DFPeanutStrandFeedAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2A19B7D55500359299 /* DFPeanutStrandFeedAdapter.m */; };
+		5A4BBD2B19B7D55500359299 /* DFPeanutFeedAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2A19B7D55500359299 /* DFPeanutFeedAdapter.m */; };
 		5A4BBD3019B8BA8500359299 /* DFLargeCardTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD2F19B8BA8500359299 /* DFLargeCardTableViewCell.xib */; };
 		5A4BBD3F19BA4F9600359299 /* DFPhotosPermissionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */; };
 		5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4BBD3E19BA4F9600359299 /* DFPhotosPermissionViewController.xib */; };
@@ -327,8 +327,8 @@
 		5A40344E19646BC6003D7546 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		5A4501EE19D07FC70075E183 /* DFPHAsset.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPHAsset.h; sourceTree = "<group>"; };
 		5A4501EF19D07FC70075E183 /* DFPHAsset.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPHAsset.m; sourceTree = "<group>"; };
-		5A4BBD2919B7D55500359299 /* DFPeanutStrandFeedAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutStrandFeedAdapter.h; sourceTree = "<group>"; };
-		5A4BBD2A19B7D55500359299 /* DFPeanutStrandFeedAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutStrandFeedAdapter.m; sourceTree = "<group>"; };
+		5A4BBD2919B7D55500359299 /* DFPeanutFeedAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFeedAdapter.h; sourceTree = "<group>"; };
+		5A4BBD2A19B7D55500359299 /* DFPeanutFeedAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFeedAdapter.m; sourceTree = "<group>"; };
 		5A4BBD2F19B8BA8500359299 /* DFLargeCardTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLargeCardTableViewCell.xib; sourceTree = "<group>"; };
 		5A4BBD3C19BA4F9600359299 /* DFPhotosPermissionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotosPermissionViewController.h; sourceTree = "<group>"; };
 		5A4BBD3D19BA4F9600359299 /* DFPhotosPermissionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotosPermissionViewController.m; sourceTree = "<group>"; };
@@ -962,8 +962,8 @@
 				5AAF03AB19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m */,
 				5AAF03AD19B5145200EF021C /* DFPeanutStrandInviteAdapter.h */,
 				5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */,
-				5A4BBD2919B7D55500359299 /* DFPeanutStrandFeedAdapter.h */,
-				5A4BBD2A19B7D55500359299 /* DFPeanutStrandFeedAdapter.m */,
+				5A4BBD2919B7D55500359299 /* DFPeanutFeedAdapter.h */,
+				5A4BBD2A19B7D55500359299 /* DFPeanutFeedAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -1731,7 +1731,7 @@
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,
-				5A4BBD2B19B7D55500359299 /* DFPeanutStrandFeedAdapter.m in Sources */,
+				5A4BBD2B19B7D55500359299 /* DFPeanutFeedAdapter.m in Sources */,
 				5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
 				5A28652F19DF4EC300638B94 /* DFOutlineSubviewsView.m in Sources */,

@@ -8,32 +8,36 @@
 
 #import "DFPeanutFeedDataManager.h"
 
-#import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutFeedAdapter.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
 
 @interface DFPeanutFeedDataManager ()
 
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *inboxFeedAdapter;
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *privatePhotosFeedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFeedAdapter *inboxFeedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFeedAdapter *privateStrandsFeedAdapter;
+
+@property (atomic) BOOL inboxRefreshing;
+@property (atomic) BOOL privateStrandsRefreshing;
 @property (nonatomic, retain) NSData *inboxLastResponseHash;
-@property (nonatomic, retain) NSData *privatePhotosLastResponseHash;
+@property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
 
 @property (nonatomic, retain) NSArray *inboxFeedObjects;
-@property (nonatomic, retain) NSArray *privatePhotosFeedObjects;
+@property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
 
 @end
 
 @implementation DFPeanutFeedDataManager
 
 @synthesize inboxFeedAdapter = _inboxFeedAdapter;
-@synthesize privatePhotosFeedAdapter = _privatePhotosFeedAdapter;
+@synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
 
 - (instancetype)init
 {
   self = [super init];
   if (self) {
     [self observeNotifications];
+    [self refreshFromServer];
   }
   return self;
 }
@@ -66,66 +70,89 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
-  [self.inboxFeedAdapter
-   fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
-                              NSData *responseHash,
-                              NSError *error) {
-     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-     
-     if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
-       self.inboxLastResponseHash = responseHash;
-       self.inboxFeedObjects = response.objects;
+  if (!self.inboxRefreshing) {
+    self.inboxRefreshing = YES;
+    [self.inboxFeedAdapter
+     fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
+                                NSData *responseHash,
+                                NSError *error) {
+       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
-       [[NSNotificationCenter defaultCenter]
-        postNotificationName:DFStrandNewInboxDataNotificationName
-        object:self];
+       if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
+         self.inboxLastResponseHash = responseHash;
+         self.inboxFeedObjects = response.objects;
+         
+         [[NSNotificationCenter defaultCenter]
+          postNotificationName:DFStrandNewInboxDataNotificationName
+          object:self];
+       }
+       if (completion) completion();
+       self.inboxRefreshing = NO;
      }
-     if (completion) completion();
-   }
-  ];
+     ];
+  }
 }
 
 - (void)refreshPrivatePhotosFromServer:(void(^)(void))completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
-  [self.privatePhotosFeedAdapter
-   fetchAllPrivateStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
-                              NSData *responseHash,
-                              NSError *error) {
-     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-     
-     if (!error && ![responseHash isEqual:self.privatePhotosLastResponseHash]) {
-       self.privatePhotosLastResponseHash = responseHash;
-       self.privatePhotosFeedObjects = response.objects;
+  if (!self.privateStrandsRefreshing) {
+    self.privateStrandsRefreshing = YES;
+    [self.privateStrandsFeedAdapter
+     fetchAllPrivateStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
+                                            NSData *responseHash,
+                                            NSError *error) {
+       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        
-       [[NSNotificationCenter defaultCenter]
-        postNotificationName:DFStrandNewPrivatePhotosDataNotificationName
-        object:self];
+       if (!error && ![responseHash isEqual:self.privateStrandsLastResponseHash]) {
+         self.privateStrandsLastResponseHash = responseHash;
+         self.privateStrandsFeedObjects = response.objects;
+         
+         [[NSNotificationCenter defaultCenter]
+          postNotificationName:DFStrandNewPrivatePhotosDataNotificationName
+          object:self];
+       }
+       if (completion) completion();
+       self.privateStrandsRefreshing = NO;
      }
-     if (completion) completion();
-   }
-   ];
+     ];
+  }
 }
 
 - (BOOL)hasData{
   return self.inboxLastResponseHash;
 }
 
-- (NSArray *)strandsWithUser:(DFPeanutUserObject *)user
+- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user
 {
   NSMutableArray *strands = [NSMutableArray new];
   
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts]) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts] || [object.type isEqual:DFFeedObjectInviteStrand]) {
       for (NSUInteger i = 0; i < object.actors.count; i++) {
         DFPeanutUserObject *actor = object.actors[i];
         if (user.id == actor.id) {
           [strands addObject:object];
         }
       }
-    } else if ([object.type isEqual:DFFeedObjectInviteStrand]) {
+    }
+  }
+  
+  return strands;
+}
 
+- (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user
+{
+  NSMutableArray *strands = [NSMutableArray new];
+
+  for (DFPeanutFeedObject *object in self.privateStrandsFeedObjects) {
+    DDLogVerbose(@"object: %@", object);
+    for (NSUInteger i = 0; i < object.actors.count; i++) {
+      DFPeanutUserObject *actor = object.actors[i];
+      if (user.id == actor.id) {
+        [strands addObject:object];
+      }
     }
   }
   
@@ -144,6 +171,11 @@ static DFPeanutFeedDataManager *defaultManager;
   return strands;
 }
 
+- (NSArray *)privateStrands
+{
+  return self.privateStrandsFeedObjects;
+}
+
 - (NSArray *)friendsList
 {
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
@@ -154,18 +186,23 @@ static DFPeanutFeedDataManager *defaultManager;
   return [NSArray new];
 }
 
+- (BOOL)isRefreshingInbox
+{
+  return self.inboxRefreshing;
+}
+
 #pragma mark - Network Adapter
 
-- (DFPeanutStrandFeedAdapter *)inboxFeedAdapter
+- (DFPeanutFeedAdapter *)inboxFeedAdapter
 {
-  if (!_inboxFeedAdapter) _inboxFeedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+  if (!_inboxFeedAdapter) _inboxFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
   return _inboxFeedAdapter;
 }
 
-- (DFPeanutStrandFeedAdapter *)privatePhotosFeedAdapter
+- (DFPeanutFeedAdapter *)privateStrandsFeedAdapter
 {
-  if (!_privatePhotosFeedAdapter) _privatePhotosFeedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
-  return _privatePhotosFeedAdapter;
+  if (!_privateStrandsFeedAdapter) _privateStrandsFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
+  return _privateStrandsFeedAdapter;
 }
 
 @end
