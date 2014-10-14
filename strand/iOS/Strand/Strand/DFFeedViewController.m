@@ -29,6 +29,8 @@
 #import "DFInviteStrandViewController.h"
 #import "DFStrandGalleryTitleView.h"
 #import "NSIndexPath+DFHelpers.h"
+#import "DFSwapUpsellView.h"
+#import "UINib+DFHelpers.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -63,6 +65,7 @@ const CGFloat LockedCellHeight = 157.0;
 @property (readonly, nonatomic, retain) NSDictionary *photoObjectsById;
 @property (readonly, nonatomic, retain) NSMutableDictionary *rowHeights;
 @property (nonatomic, retain) NSMutableDictionary *templateCellsByStyle;
+@property (nonatomic, retain) DFSwapUpsellView *swapUpsellView;
 
 @end
 
@@ -89,10 +92,21 @@ const CGFloat LockedCellHeight = 157.0;
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 }
 
+- (BOOL)hidesBottomBarWhenPushed
+{
+  return YES;
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   
+  [self configureTableView];
+  [self configureUpsell];
+}
+
+- (void)configureTableView
+{
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
   
@@ -109,6 +123,40 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.tableView.rowHeight = MinRowHeight;
 
+}
+
+- (void)configureUpsell
+{
+  if (self.inviteObject) {
+    if (!self.swapUpsellView) {
+      self.swapUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
+      [self.view addSubview:self.swapUpsellView];
+    }
+    self.swapUpsellView.frame = CGRectMake(0,
+                                           self.view.frame.size.height / 3.0,
+                                           self.view.frame.size.width,
+                                           self.view.frame.size.height * .66);
+    [self.swapUpsellView setNeedsUpdateConstraints];
+    self.tableView.scrollEnabled = NO;
+    
+    // set the data on the view
+    unsigned long otherPhotosCount = [self.tableView numberOfRowsInSection:0] - 1;
+    if (otherPhotosCount > 0) {
+      self.swapUpsellView.sharedPhotosCountLabel.text = [NSString stringWithFormat:@"+%lu Photos",
+                                                       otherPhotosCount];
+      self.swapUpsellView.sharedPhotosCountLabel.hidden = NO;
+    } else {
+      self.swapUpsellView.sharedPhotosCountLabel.hidden = YES;
+    }
+    
+    
+    
+  } else {
+    if (self.swapUpsellView) {
+      [self.swapUpsellView removeFromSuperview];
+    }
+    self.tableView.scrollEnabled = YES;
+  }
 }
 
 - (NSString *)identifierForCellStyle:(DFPhotoFeedCellStyle)style
@@ -143,6 +191,12 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.isViewTransitioning = NO;
   [super viewDidDisappear:animated];
+}
+
+- (void)viewWillLayoutSubviews
+{
+  [super viewDidLayoutSubviews];
+  [self configureUpsell];
 }
 
 - (void)setStrandPostsObject:(DFPeanutFeedObject *)strandPostsObject
