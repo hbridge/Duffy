@@ -17,7 +17,7 @@
 #import "DFAcceptInviteViewController.h"
 #import "DFFeedViewController.h"
 #import "DFImageStore.h"
-#import "DFInboxDataManager.h"
+#import "DFPeanutFeedDataManager.h"
 #import "DFInboxTableViewCell.h"
 #import "DFNavigationController.h"
 #import "DFPeanutFeedObject.h"
@@ -32,7 +32,7 @@
 
 @interface DFInboxViewController ()
 
-@property (nonatomic, retain) DFInboxDataManager *manager;
+@property (nonatomic, retain) DFPeanutFeedDataManager *manager;
 @property (readonly, nonatomic, retain) NSArray *feedObjects;
 @property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
 @property (nonatomic, retain) NSTimer *refreshTimer;
@@ -51,7 +51,7 @@
     _cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self initTabBarItemAndNav];
     [self observeNotifications];
-    self.manager = [DFInboxDataManager new];
+    self.manager = [DFPeanutFeedDataManager new];
   }
   return self;
 }
@@ -93,7 +93,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self.manager refreshFromServer:nil];
+  [self refreshFromServer];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -101,6 +101,7 @@
   [super viewDidAppear:animated];
   if (![self.manager hasData]) {
     [self.refreshControl beginRefreshing];
+    [self refreshFromServer];
   }
 }
 
@@ -149,7 +150,7 @@
 {
   DDLogVerbose(@"Reloading data");
   dispatch_async(dispatch_get_main_queue(), ^{
-    _feedObjects = self.manager.feedObjects;
+    _feedObjects = self.manager.inboxFeedObjects;
     [self.tableView reloadData];
     
     if (self.feedObjects.count == 0) {
@@ -391,7 +392,7 @@
   [self.manager refreshFromServer:^{
     DDLogInfo(@"%@ showStrandPostsForStrandID for %@ refresh callback", self.class, @(strandID));
     DFPeanutFeedObject *strandPostsObject;
-    _feedObjects = self.manager.feedObjects;
+    _feedObjects = self.manager.inboxFeedObjects;
     for (DFPeanutFeedObject *object in self.feedObjects) {
       if (object.id == strandID) {
         // the strand is still in the invites section, return

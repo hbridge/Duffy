@@ -9,15 +9,14 @@
 #import <Foundation/Foundation.h>
 #import "DFPeanutUserObject.h"
 
-@interface DFInboxDataManager : NSObject
+@interface DFPeanutFeedDataManager : NSObject
 
-@property (nonatomic, retain) NSArray *feedObjects;
+@property (nonatomic, retain) NSArray *inboxFeedObjects;
 
-+ (DFInboxDataManager *)sharedManager;
++ (DFPeanutFeedDataManager *)sharedManager;
 
 - (void)refreshFromServer:(void(^)(void))completion;
 - (BOOL)hasData;
-- (NSArray *)allPeanutUsers;
 - (NSArray *)strandsWithUser:(DFPeanutUserObject *)user;
-
+- (NSArray *)friendsList;
 @end

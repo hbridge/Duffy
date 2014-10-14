@@ -9,7 +9,7 @@
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFObjectManager.h"
 
-NSString *const UnsharedPath = @"unshared_strands";
+NSString *const PrivatePhotosPath = @"unshared_strands";
 NSString *const GalleryPath = @"strand_feed";
 NSString *const InvitedPath = @"invited_strands";
 NSString *const SuggestedUnsharedPath = @"suggested_unshared_photos";
@@ -25,7 +25,7 @@ NSString *const InboxPath = @"strand_inbox";
 
 + (NSArray *)responseDescriptors
 {
-  NSArray *paths = @[GalleryPath, UnsharedPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath];
+  NSArray *paths = @[GalleryPath, PrivatePhotosPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath];
   
   NSMutableArray *responseDescriptors = [NSMutableArray new];
   for (NSString *path in paths) {
@@ -50,9 +50,9 @@ NSString *const InboxPath = @"strand_inbox";
   [super fetchObjectsAtPath:GalleryPath withCompletionBlock:completionBlock];
 }
 
-- (void)fetchSuggestedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+- (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
-  [super fetchObjectsAtPath:UnsharedPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:PrivatePhotosPath withCompletionBlock:completionBlock];
 }
 
 - (void)fetchInvitedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock

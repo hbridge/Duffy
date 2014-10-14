@@ -22,6 +22,7 @@ DFFeedObjectType DFFeedObjectStrand = @"strand";
 DFFeedObjectType DFFeedObjectLikeAction = @"like_action";
 DFFeedObjectType DFFeedObjectStrandPost = @"strand_post";
 DFFeedObjectType DFFeedObjectStrandPosts = @"strand_posts";
+DFFeedObjectType DFFeedObjectFriendsList = @"friends_list";
 DFFeedObjectType DFFeedObjectSuggestedPhotos = @"suggested_photos";
 DFFeedObjectType DFFeedObjectStrandJoin = @"strand_join";
 

@@ -6,22 +6,25 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFInboxDataManager.h"
+#import "DFPeanutFeedDataManager.h"
 
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
 
-@interface DFInboxDataManager ()
+@interface DFPeanutFeedDataManager ()
 
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
-@property (nonatomic, retain) NSData *lastResponseHash;
+@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *inboxFeedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *privatePhotosFeedAdapter;
+@property (nonatomic, retain) NSData *inboxLastResponseHash;
+@property (nonatomic, retain) NSData *privatePhotosLastResponseHash;
 
 @end
 
-@implementation DFInboxDataManager
+@implementation DFPeanutFeedDataManager
 
-@synthesize feedAdapter = _feedAdapter;
+@synthesize inboxFeedAdapter = _inboxFeedAdapter;
+@synthesize privatePhotosFeedAdapter = _privatePhotosFeedAdapter;
 
 - (instancetype)init
 {
@@ -32,8 +35,8 @@
   return self;
 }
 
-static DFInboxDataManager *defaultManager;
-+ (DFInboxDataManager *)sharedManager {
+static DFPeanutFeedDataManager *defaultManager;
++ (DFPeanutFeedDataManager *)sharedManager {
   if (!defaultManager) {
     defaultManager = [[super allocWithZone:nil] init];
   }
@@ -59,15 +62,15 @@ static DFInboxDataManager *defaultManager;
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
-  [self.feedAdapter
+  [self.inboxFeedAdapter
    fetchInboxWithCompletion:^(DFPeanutObjectsResponse *response,
                               NSData *responseHash,
                               NSError *error) {
      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
      
-     if (!error && ![responseHash isEqual:self.lastResponseHash]) {
-       self.lastResponseHash = responseHash;
-       self.feedObjects = response.objects;
+     if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
+       self.inboxLastResponseHash = responseHash;
+       self.inboxFeedObjects = response.objects;
        
        [[NSNotificationCenter defaultCenter]
         postNotificationName:DFStrandNewInboxDataNotificationName
@@ -79,33 +82,14 @@ static DFInboxDataManager *defaultManager;
 }
 
 - (BOOL)hasData{
-  return self.lastResponseHash;
+  return self.inboxLastResponseHash;
 }
-
-- (NSArray *)allPeanutUsers
-{
-  NSMutableDictionary *users = [NSMutableDictionary new];
-  
-  for (DFPeanutFeedObject *object in self.feedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts]) {
-      for (NSUInteger i = 0; i < object.actors.count; i++) {
-        DFPeanutUserObject *actor = object.actors[i];
-        
-        if (actor.id != [[DFUser currentUser] userID]) {
-          [users setObject:actor forKey:@(actor.id)];
-        }
-      }
-    }
-  }
-  return [users allValues];
-}
-
 
 - (NSArray *)strandsWithUser:(DFPeanutUserObject *)user
 {
   NSMutableArray *strands = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *object in self.feedObjects) {
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectStrandPosts]) {
       for (NSUInteger i = 0; i < object.actors.count; i++) {
         DFPeanutUserObject *actor = object.actors[i];
@@ -121,12 +105,28 @@ static DFInboxDataManager *defaultManager;
   return strands;
 }
 
+- (NSArray *)friendsList
+{
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectFriendsList]) {
+      return object.actors;
+    }
+  }
+  return [NSArray new];
+}
+
 #pragma mark - Network Adapter
 
-- (DFPeanutStrandFeedAdapter *)feedAdapter
+- (DFPeanutStrandFeedAdapter *)inboxFeedAdapter
 {
-  if (!_feedAdapter) _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
-  return _feedAdapter;
+  if (!_inboxFeedAdapter) _inboxFeedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+  return _inboxFeedAdapter;
+}
+
+- (DFPeanutStrandFeedAdapter *)privatePhotosFeedAdapter
+{
+  if (!_privatePhotosFeedAdapter) _privatePhotosFeedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+  return _privatePhotosFeedAdapter;
 }
 
 @end

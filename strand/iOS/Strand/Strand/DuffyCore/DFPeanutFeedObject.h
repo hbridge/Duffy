@@ -25,6 +25,7 @@ extern DFFeedObjectType DFFeedObjectStrand;
 extern DFFeedObjectType DFFeedObjectLikeAction;
 extern DFFeedObjectType DFFeedObjectStrandPost;
 extern DFFeedObjectType DFFeedObjectStrandPosts;
+extern DFFeedObjectType DFFeedObjectFriendsList;
 extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
 extern DFFeedObjectType DFFeedObjectStrandJoin;
 

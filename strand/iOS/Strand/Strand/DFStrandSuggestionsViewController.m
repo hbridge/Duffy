@@ -537,7 +537,7 @@ const NSUInteger MaxPhotosPerCell = 3;
 - (void)refreshFromServer
 {
   NSDate *requestDate = [NSDate date];
-  [self.feedAdapter fetchSuggestedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
+  [self.feedAdapter fetchAllPrivateStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
                                                           NSData *responseHash,
                                                           NSError *error) {
     if (error) {

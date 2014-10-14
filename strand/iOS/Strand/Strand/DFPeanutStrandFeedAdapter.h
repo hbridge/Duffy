@@ -10,12 +10,16 @@
 
 @interface DFPeanutStrandFeedAdapter : DFPeanutObjectsAdapter
 
+// Used
+- (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+
+// Deprecated
 - (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;
-- (void)fetchSuggestedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+
 - (void)fetchInvitedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchSuggestedPhotosForStrand:(NSNumber *)strandID
                            completion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchStrandActivityWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
-- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 
 @end
