@@ -70,6 +70,8 @@ def main(argv):
 			usersByPhoneNumber = getUsersByPhoneNumber(users)
 
 			for contactEntry in contactEntries:
+				contactEntry.evaluated = True
+				
 				# If we have a user associated with a given phone number
 				if contactEntry.phone_number in usersByPhoneNumber:
 					friend = usersByPhoneNumber[contactEntry.phone_number]
@@ -85,7 +87,7 @@ def main(argv):
 					except IntegrityError:
 						logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, friend.id))
 
-				contactEntry.evaluated = True
+				
 
 			logger.info("Wrote out %s friend entries after evaluating %s contact entries" % (newConnectionCount, len(contactEntries)))
 			ContactEntry.bulkUpdate(contactEntries, ["evaluated"])
