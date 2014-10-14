@@ -169,6 +169,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.isViewTransitioning = YES;
   [super viewWillAppear:animated];
+  [self configureUpsell];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -512,7 +513,8 @@ const CGFloat LockedCellHeight = 157.0;
 
   DFPeanutFeedObject *suggestionsObject = suggestionsArray.firstObject;
   DFAddPhotosViewController *addPhotosController = [[DFAddPhotosViewController alloc]
-                                                    initWithSuggestions:suggestionsObject.objects];
+                                                    initWithSuggestions:suggestionsObject.objects
+                                                    invite:self.inviteObject];
   DFNavigationController *navController = [[DFNavigationController alloc]
                                            initWithRootViewController:addPhotosController];
   addPhotosController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]

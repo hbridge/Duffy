@@ -23,7 +23,6 @@
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (nonatomic, retain) NSArray *selectedContacts;
-@property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
 @property (nonatomic, retain) DFPeanutFeedObject *suggestedSection;
 
 @end

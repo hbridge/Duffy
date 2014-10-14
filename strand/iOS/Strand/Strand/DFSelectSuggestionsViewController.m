@@ -20,7 +20,6 @@
 
 @interface DFSelectSuggestionsViewController ()
 
-@property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
 @property (nonatomic, retain) NSArray *items;
 
 @end
@@ -43,6 +42,8 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 
 - (void)setSuggestedSections:(NSArray *)suggestedSections
 {
+  // in most cases, there should only be one suggested section, but if there are multiple
+  // we pull all the photos out of each section
   _suggestedSections = suggestedSections;
   NSMutableArray *items = [NSMutableArray new];
   for (DFPeanutFeedObject *section in suggestedSections) {
@@ -101,6 +102,9 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 
 - (void)configureHeader
 {
+  // in most cases, there should only be one suggested section
+  // however, if there are multiple suggested sections, we use all the photos (see setSuggestedSections)
+  // though we use the first object to configure the header
   DFPeanutFeedObject *firstSection = self.suggestedSections.firstObject;
   self.locationLabel.text = firstSection.location;
   self.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:firstSection.time_taken

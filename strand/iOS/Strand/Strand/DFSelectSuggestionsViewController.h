@@ -22,6 +22,8 @@
 @property (nonatomic, retain) NSArray *suggestedSections;
 @property (nonatomic) NSUInteger numPhotosPerRow;
 
+@property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
+
 - (instancetype)initWithSuggestions:(NSArray *)suggestedSections;
 - (IBAction)selectAllButtonPressed:(UIButton *)sender;
 
