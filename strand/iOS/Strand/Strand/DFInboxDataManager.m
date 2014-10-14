@@ -10,6 +10,7 @@
 
 #import "DFPeanutStrandFeedAdapter.h"
 #import "DFStrandConstants.h"
+#import "DFPeanutUserObject.h"
 
 @interface DFInboxDataManager ()
 
@@ -29,6 +30,14 @@
     [self observeNotifications];
   }
   return self;
+}
+
+static DFInboxDataManager *defaultManager;
++ (DFInboxDataManager *)sharedManager {
+  if (!defaultManager) {
+    defaultManager = [[super allocWithZone:nil] init];
+  }
+  return defaultManager;
 }
 
 - (void)observeNotifications
@@ -71,6 +80,45 @@
 
 - (BOOL)hasData{
   return self.lastResponseHash;
+}
+
+- (NSArray *)allPeanutUsers
+{
+  NSMutableDictionary *users = [NSMutableDictionary new];
+  
+  for (DFPeanutFeedObject *object in self.feedObjects) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts]) {
+      for (NSUInteger i = 0; i < object.actors.count; i++) {
+        DFPeanutUserObject *actor = object.actors[i];
+        
+        if (actor.id != [[DFUser currentUser] userID]) {
+          [users setObject:actor forKey:@(actor.id)];
+        }
+      }
+    }
+  }
+  return [users allValues];
+}
+
+
+- (NSArray *)strandsWithUser:(DFPeanutUserObject *)user
+{
+  NSMutableArray *strands = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *object in self.feedObjects) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts]) {
+      for (NSUInteger i = 0; i < object.actors.count; i++) {
+        DFPeanutUserObject *actor = object.actors[i];
+        if (user.id == actor.id) {
+          [strands addObject:object];
+        }
+      }
+    } else if ([object.type isEqual:DFFeedObjectInviteStrand]) {
+
+    }
+  }
+  
+  return strands;
 }
 
 #pragma mark - Network Adapter
