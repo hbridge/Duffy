@@ -92,13 +92,13 @@
   
 }
 
-const NSUInteger MaxPhotosPerCell = 3;
+const NSUInteger LargeCardMaxPhotosPerCell = 3;
 
 - (void)setLocalPhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
 {
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];
-  for (NSUInteger i = 0; i < MIN(MaxPhotosPerCell, strandPost.objects.count); i++) {
+  for (NSUInteger i = 0; i < MIN(LargeCardMaxPhotosPerCell, strandPost.objects.count); i++) {
     DFPeanutFeedObject *object = strandPost.objects[i];
     if ([object.type isEqual:DFFeedObjectPhoto]) {
       [idsToShow addObject:@(object.id)];
