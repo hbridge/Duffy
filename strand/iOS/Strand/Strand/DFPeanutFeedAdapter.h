@@ -8,7 +8,7 @@
 
 #import "DFPeanutObjectsAdapter.h"
 
-@interface DFPeanutStrandFeedAdapter : DFPeanutObjectsAdapter
+@interface DFPeanutFeedAdapter : DFPeanutObjectsAdapter
 
 // Used
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;

@@ -6,17 +6,17 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutFeedAdapter.h"
 #import "DFObjectManager.h"
 
-NSString *const PrivatePhotosPath = @"unshared_strands";
+NSString *const PrivateStrandsPath = @"unshared_strands";
 NSString *const GalleryPath = @"strand_feed";
 NSString *const InvitedPath = @"invited_strands";
 NSString *const SuggestedUnsharedPath = @"suggested_unshared_photos";
 NSString *const ActivityPath = @"strand_activity";
 NSString *const InboxPath = @"strand_inbox";
 
-@implementation DFPeanutStrandFeedAdapter
+@implementation DFPeanutFeedAdapter
 
 + (void)initialize
 {
@@ -25,7 +25,7 @@ NSString *const InboxPath = @"strand_inbox";
 
 + (NSArray *)responseDescriptors
 {
-  NSArray *paths = @[GalleryPath, PrivatePhotosPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath];
+  NSArray *paths = @[GalleryPath, PrivateStrandsPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath];
   
   NSMutableArray *responseDescriptors = [NSMutableArray new];
   for (NSString *path in paths) {
@@ -52,7 +52,7 @@ NSString *const InboxPath = @"strand_inbox";
 
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
-  [super fetchObjectsAtPath:PrivatePhotosPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:PrivateStrandsPath withCompletionBlock:completionBlock];
 }
 
 - (void)fetchInvitedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock

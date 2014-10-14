@@ -10,7 +10,7 @@
 #import "DFImageDataSource.h"
 #import "DFSelectPhotosController.h"
 #import "DFPeanutStrandAdapter.h"
-#import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutFeedAdapter.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "SVProgressHUD.h"
 #import "NSArray+DFHelpers.h"
@@ -29,7 +29,7 @@
 
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFeedAdapter *feedAdapter;
 
 @property (nonatomic, retain) NSTimer *refreshTimer;
 
@@ -345,9 +345,9 @@
   return _strandAdapter;
 }
 
-- (DFPeanutStrandFeedAdapter *)feedAdapter
+- (DFPeanutFeedAdapter *)feedAdapter
 {
-  if (!_feedAdapter) _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+  if (!_feedAdapter) _feedAdapter = [[DFPeanutFeedAdapter alloc] init];
   return _feedAdapter;
 }
 

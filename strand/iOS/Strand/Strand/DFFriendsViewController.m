@@ -20,6 +20,8 @@
 @property (nonatomic, strong) NSArray *friendPeanutUsers;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 
+@property (nonatomic, retain) DFPeanutUserObject *actionSheetUserSelected;
+
 @end
 
 @implementation DFFriendsViewController
@@ -121,10 +123,20 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
-
-  DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:user];
-  [self.navigationController pushViewController:vc animated:YES];
+  self.actionSheetUserSelected = user;
+  NSArray *swappedStrands = [self.peanutDataManager publicStrandsWithUser:user];
+  NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:user];
+  NSString *swappedTitle = [NSString stringWithFormat:@"Swapped (%lu)", (unsigned long)swappedStrands.count];
+  NSString *unswappedTitle = [NSString stringWithFormat:@"To Swap (%lu)", (unsigned long)unswappedStrands.count];
   
+  UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
+                                                           delegate:self
+                                                  cancelButtonTitle:@"Cancel"
+                                             destructiveButtonTitle:nil
+                                                  otherButtonTitles:swappedTitle, unswappedTitle, nil];
+  
+  
+  [actionSheet showInView:self.tableView];
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 
@@ -137,5 +149,20 @@
   cell.textLabel.text = peanutUser.display_name;
   return cell;
 }
+
+
+#pragma mark - Action Handler Helpers
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+  NSString *buttonTitle = [actionSheet buttonTitleAtIndex:buttonIndex];
+  DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
+
+  if (buttonIndex == 0) {
+    DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:self.actionSheetUserSelected];
+    [self.navigationController pushViewController:vc animated:YES];
+  }
+}
+
 
 @end

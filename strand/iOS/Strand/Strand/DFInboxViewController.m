@@ -21,7 +21,7 @@
 #import "DFInboxTableViewCell.h"
 #import "DFNavigationController.h"
 #import "DFPeanutFeedObject.h"
-#import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutFeedAdapter.h"
 #import "DFPeanutUserObject.h"
 #import "DFSelectPhotosController.h"
 #import "DFStrandConstants.h"
@@ -52,7 +52,7 @@
     _cellTemplatesByIdentifier = [NSMutableDictionary new];
     [self initTabBarItemAndNav];
     [self observeNotifications];
-    self.manager = [DFPeanutFeedDataManager new];
+    self.manager = [DFPeanutFeedDataManager sharedManager];
   }
   return self;
 }
@@ -100,7 +100,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (![self.manager hasData]) {
+  if (![self.manager hasData] && ![self.manager isRefreshingInbox]) {
     [self.refreshControl beginRefreshing];
     [self refreshFromServer];
   }

@@ -8,7 +8,7 @@
 
 #import "DFStrandSuggestionsViewController.h"
 #import "DFCameraRollSyncManager.h"
-#import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutFeedAdapter.h"
 #import "DFPhotoViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
@@ -17,8 +17,8 @@
 #import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosController.h"
-#import "DFPeanutStrandInviteAdapter.h"
 #import "DFPeanutStrandAdapter.h"
+#import "DFPeanutFeedDataManager.h"
 #import "DFImageStore.h"
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
@@ -36,12 +36,10 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 @interface DFStrandSuggestionsViewController ()
 
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
-@property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 
 @property (nonatomic, retain) DFPeanutObjectsResponse *allObjectsResponse;
-@property (nonatomic, retain) NSArray *inviteObjects;
 @property (nonatomic, retain) NSMutableArray *suggestionObjects;
 @property (nonatomic, retain) NSMutableArray *allObjects;
 
@@ -53,10 +51,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 @end
 
 @implementation DFStrandSuggestionsViewController
-@synthesize feedAdapter = _feedAdapter;
-@synthesize inviteAdapter = _inviteAdapter;
 @synthesize strandAdapter = _strandAdapter;
-@synthesize showAsFirstTimeSetup = _showAsFirstTimeSetup;
 
 static DFStrandSuggestionsViewController *instance;
 - (IBAction)reloadButtonPressed:(id)sender {
@@ -99,10 +94,9 @@ static DFStrandSuggestionsViewController *instance;
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
-    _showAsFirstTimeSetup = NO;
     [self configureNavAndTab];
-    
     [self observeNotifications];
+    self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
                                      imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/CreateStrandBarButton"]
@@ -126,7 +120,6 @@ static DFStrandSuggestionsViewController *instance;
 
 }
 
-NSString *const InviteId = @"invite";
 NSString *const SuggestionWithPeopleId = @"suggestionWithPeople";
 NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
@@ -134,8 +127,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (void)observeNotifications
 {
   [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(refreshFromServer)
-                                               name:DFStrandReloadRemoteUIRequestedNotificationName
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewPrivatePhotosDataNotificationName
                                              object:nil];
 }
 
@@ -155,8 +148,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
-    [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
-    forCellReuseIdentifier:InviteId];
     [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
     forCellReuseIdentifier:SuggestionWithPeopleId];
     [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
@@ -228,14 +219,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  if (self.showAsFirstTimeSetup && !self.refreshTimer && self.allObjectsResponse.objects.count == 0) {
-    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:3.0
-                                                         target:self
-                                                       selector:@selector(refreshFromServer)
-                                                       userInfo:nil
-                                                        repeats:YES];
-    [self.refreshControl beginRefreshing];
-  }
+  [self reloadData];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -250,20 +234,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [super didReceiveMemoryWarning];
   // Dispose of any resources that can be recreated.
 }
-
-- (void)setShowAsFirstTimeSetup:(BOOL)showAsFirstTimeSetup
-{
-  _showAsFirstTimeSetup = showAsFirstTimeSetup;
-  
-  // Fetch the invites since we may not have before
-  if (showAsFirstTimeSetup) [self refreshInvitesFromServer];
-  
-  // Redraw the controller since we might have changed what is shown
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [self reloadData];
-  });
-}
-
 
 #pragma mark - UITableView Data/Delegate
 
@@ -284,15 +254,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   } else {
     return self.allObjects;
   }
-}
-
-- (BOOL)shouldShowInvites
-{
-  if (self.showAsFirstTimeSetup && self.inviteObjects.count > 0) {
-    return YES;
-  }
-  
-  return NO;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -486,10 +447,7 @@ const NSUInteger MaxPhotosPerCell = 3;
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
   NSString *identifier;
   DFCreateStrandCellStyle style = DFCreateStrandCellStyleSuggestionWithPeople;
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    identifier = InviteId;
-    style = DFCreateStrandCellStyleInvite;
-  } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
+  if ([feedObject.type isEqual:DFFeedObjectSection]) {
     if (feedObject.actors.count > 0) {
       identifier = SuggestionWithPeopleId;
       style = DFCreateStrandCellStyleSuggestionWithPeople;
@@ -530,47 +488,18 @@ const NSUInteger MaxPhotosPerCell = 3;
 - (void)reloadData
 {
   dispatch_async(dispatch_get_main_queue(), ^{
+    self.allObjects = [self.dataManager privateStrands];
     [self reloadTableViews];
   });
 }
 
 - (void)refreshFromServer
 {
-  NSDate *requestDate = [NSDate date];
-  [self.feedAdapter fetchAllPrivateStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
-                                                          NSData *responseHash,
-                                                          NSError *error) {
-    if (error) {
-      DDLogError(@"%@ error fetching suggested strands:%@", self.class, error);
-    } else {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        if (![responseHash isEqual:self.lastResponseHash]) {
-          DDLogInfo(@"New data for suggestions, updating view... requestDate: %@ oldHash:%@ newHash:%@",
-                    requestDate, self.lastResponseHash, responseHash);
-          self.allObjectsResponse = response;
-          
-          self.allObjects = [NSMutableArray new];
-          self.suggestionObjects = [NSMutableArray new];
-          for (DFPeanutFeedObject *object in response.objects) {
-            [self.allObjects addObject:object];
-            if (object.suggestible.boolValue) [self.suggestionObjects addObject:object];
-          }
-          
-          [self reloadTableViews];
-          NSUInteger badgeCount = self.inviteObjects.count + self.suggestionObjects.count;
-          self.tabBarItem.badgeValue = badgeCount > 0 ? [@(badgeCount) stringValue] : nil;
-          
-          self.lastResponseHash = responseHash;
-        } else {
-          DDLogInfo(@"Got back response for strand suggestions but it was the same. requestDate: %@ oldHash:%@ newHash:%@", requestDate, self.lastResponseHash, responseHash);
-        }
-        for (UIRefreshControl *refreshControl in self.refreshControls) {
-          [refreshControl endRefreshing];
-        }
-      });
+  [self.dataManager refreshPrivatePhotosFromServer:^{
+    for (UIRefreshControl *refreshControl in self.refreshControls) {
+      [refreshControl endRefreshing];
     }
   }];
-  
 }
 
 - (void)reloadTableViews
@@ -591,34 +520,6 @@ const NSUInteger MaxPhotosPerCell = 3;
   } else {
     self.noResultsLabel.hidden = YES;
   }
-}
-
-- (void)refreshInvitesFromServer
-{
-  [self.feedAdapter
-   fetchInvitedStrandsWithCompletion:^(DFPeanutObjectsResponse *response,
-                                       NSData *responseHash,
-                                       NSError *error) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       NSArray *oldInvites = self.inviteObjects;
-       self.inviteObjects = [response topLevelObjectsOfType:DFFeedObjectInviteStrand];
-       if ([DFStrandSuggestionsViewController inviteObjectsChangedForOldInvites:oldInvites
-                                                                newInvites:self.inviteObjects])
-       {
-         [self reloadTableViews];
-       }
-     });
-   }];
-}
-
-+ (BOOL)inviteObjectsChangedForOldInvites:(NSArray *)oldInvites newInvites:(NSArray *)newInvites
-{
-  if (oldInvites.count != newInvites.count) return YES;
-  for (NSUInteger i = 0; i < oldInvites.count; i++) {
-    if (![newInvites[i] isEqual:oldInvites[i]]) return YES;
-  }
-  
-  return NO;
 }
 
 - (void)setReloadButtonHidden:(BOOL)hidden
@@ -683,23 +584,6 @@ const NSUInteger MaxPhotosPerCell = 3;
 - (void)cancelPressed:(id)sender
 {
   [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (DFPeanutStrandFeedAdapter *)feedAdapter
-{
-  if (!_feedAdapter) {
-    _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
-  }
-  
-  return _feedAdapter;
-}
-- (DFPeanutStrandInviteAdapter *)inviteAdapter
-{
-  if (!_inviteAdapter) {
-    _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
-  }
-  
-  return _inviteAdapter;
 }
 
 - (DFPeanutStrandAdapter *)strandAdapter

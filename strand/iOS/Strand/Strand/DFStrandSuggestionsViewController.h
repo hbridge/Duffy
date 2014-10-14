@@ -11,7 +11,6 @@
 
 @interface DFStrandSuggestionsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, MCSwipeTableViewCellDelegate>
 
-@property (nonatomic) BOOL showAsFirstTimeSetup;
 @property (nonatomic, retain) IBOutlet UITableView *suggestedTableView;
 @property (nonatomic, retain) IBOutlet UITableView *allTableView;
 @property (nonatomic, retain) NSArray *refreshControls;

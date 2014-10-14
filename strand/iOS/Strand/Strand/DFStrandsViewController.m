@@ -11,7 +11,7 @@
 #import "DFErrorScreen.h"
 #import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
-#import "DFPeanutStrandFeedAdapter.h"
+#import "DFPeanutFeedAdapter.h"
 #import "DFPeanutNotificationsManager.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
@@ -29,7 +29,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 @interface DFStrandsViewController ()
 
-@property (readonly, nonatomic, retain) DFPeanutStrandFeedAdapter *feedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFeedAdapter *feedAdapter;
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSTimer *autoRefreshTimer;
 
@@ -363,7 +363,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 {
   DDLogInfo(@"Create button pressed");
   DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
-  createController.showAsFirstTimeSetup = NO;
   DFNavigationController *navController = [[DFNavigationController
                                             alloc] initWithRootViewController:createController];
   
@@ -435,10 +434,10 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 #pragma mark - Network controllers
 
-- (DFPeanutStrandFeedAdapter *)feedAdapter
+- (DFPeanutFeedAdapter *)feedAdapter
 {
   if (!_feedAdapter) {
-    _feedAdapter = [[DFPeanutStrandFeedAdapter alloc] init];
+    _feedAdapter = [[DFPeanutFeedAdapter alloc] init];
   }
   
   return _feedAdapter;
@@ -454,7 +453,6 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 
 - (IBAction)createStrandButtonPressed:(id)sender {
   DFStrandSuggestionsViewController *vc = [DFStrandSuggestionsViewController sharedViewController];
-  vc.showAsFirstTimeSetup = NO;
   
   [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
                      animated:YES completion:nil];
