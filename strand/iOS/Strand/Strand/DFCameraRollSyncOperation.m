@@ -158,6 +158,30 @@
   return changeTypesToCounts;
 }
 
+- (NSDictionary *)findAssetChangesBetweenTimes:(NSDate *)startDate beforeEndDate:(NSDate *)endDate;
+{
+  [DFCameraRollSyncOperation abstractClassError];
+  return nil;
+}
+
+- (NSArray *)photosToRemove:(NSSet *)photoURLsNotFound
+{
+  [DFCameraRollSyncOperation abstractClassError];
+  return nil;
+}
+
+- (void)migrateAssets
+{
+  [DFCameraRollSyncOperation abstractClassError];
+}
+
+
++ (NSError *)abstractClassError
+{
+  return [NSError errorWithDomain:@"com.DuffyApp.DuffyCore"
+                             code:-1
+                         userInfo:@{NSLocalizedDescriptionKey: @"DFCameraRollSyncOperation is an abstract class. This method must be implemented"}];
+}
 
 - (NSManagedObjectContext *)managedObjectContext
 {

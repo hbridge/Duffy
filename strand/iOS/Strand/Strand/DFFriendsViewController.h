@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFFriendsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface DFFriendsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 

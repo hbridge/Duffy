@@ -41,7 +41,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 @property (nonatomic, retain) DFPeanutObjectsResponse *allObjectsResponse;
 @property (nonatomic, retain) NSMutableArray *suggestionObjects;
-@property (nonatomic, retain) NSMutableArray *allObjects;
+@property (nonatomic, retain) NSArray *allObjects;
 
 @property (nonatomic, retain) NSData *lastResponseHash;
 @property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
