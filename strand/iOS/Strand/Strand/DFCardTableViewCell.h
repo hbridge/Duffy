@@ -30,6 +30,7 @@ typedef NS_OPTIONS(NSInteger, DFCardCellStyle) {
 @property (weak, nonatomic) IBOutlet UIView *solidBackgroundView;
 @property (weak, nonatomic) IBOutlet DFCircleBadge *countBadge;
 
+@property (nonatomic) NSUInteger maxPhotosToShow;
 
 + (DFCardTableViewCell *)cellWithStyle:(DFCardCellStyle)style;
 - (void)configureWithStyle:(DFCardCellStyle)style;

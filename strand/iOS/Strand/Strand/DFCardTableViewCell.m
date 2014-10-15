@@ -18,6 +18,9 @@
 #import "DFStrandConstants.h"
 #import "DFImageStore.h"
 
+const NSUInteger LargeCardMaxPhotosPerCell = 3;
+
+
 @interface DFCardTableViewCell()
 
 @property (nonatomic) CGFloat fixedItemSize;
@@ -57,6 +60,9 @@
 {
   if (style & DFCardCellStyleSmall) {
     self.fixedItemSize = 157/2.0;
+    self.maxPhotosToShow = 5;
+  } else {
+    self.maxPhotosToShow = LargeCardMaxPhotosPerCell;
   }
   
   if (style & DFCardCellStyleInvite) {
@@ -137,14 +143,11 @@
   }
 }
 
-
-const NSUInteger LargeCardMaxPhotosPerCell = 3;
-
 - (void)setLocalPhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
 {
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];
-  for (NSUInteger i = 0; i < MIN(LargeCardMaxPhotosPerCell, strandPost.objects.count); i++) {
+  for (NSUInteger i = 0; i < MIN(self.maxPhotosToShow, strandPost.objects.count); i++) {
     DFPeanutFeedObject *object = strandPost.objects[i];
     if ([object.type isEqual:DFFeedObjectPhoto]) {
       [idsToShow addObject:@(object.id)];
@@ -246,7 +249,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     self.peopleSuffixLabel.text = @"sent you photos";
   }
   
-  NSInteger count = strandPosts.objects.count - LargeCardMaxPhotosPerCell;
+  NSInteger count = strandPosts.objects.count - self.maxPhotosToShow;
   if (count > 0) {
     self.countBadge.hidden = NO;
     self.countBadge.text = [NSString stringWithFormat:@"+%d", (int)count];
