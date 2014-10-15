@@ -260,9 +260,6 @@
 - (UITableViewCell *)cellForStrandObject:(DFPeanutFeedObject *)strandObject
 {
   DFCardTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"strandCell"];
-  DDLogDebug(@"DFCardCellStyleSmall: %@", binaryStringFromInteger(DFCardCellStyleSmall));
-
-  DDLogDebug(@"DFCardCellStyleSuggestionWithPeople: %@", binaryStringFromInteger(DFCardCellStyleSuggestionWithPeople));
   [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
   
   [cell configureWithFeedObject:strandObject];
