@@ -60,8 +60,8 @@ NSUInteger const NumPhotosPerRow = 4;
 {
   [super viewDidLoad];
   
-  [self.doneButton setTitle:@"Next" forState:UIControlStateNormal];
-  [self.doneButton addTarget:self action:@selector(nextPressed:)
+  [self.swapButton setTitle:@"Next" forState:UIControlStateNormal];
+  [self.swapButton addTarget:self action:@selector(nextPressed:)
             forControlEvents:UIControlEventTouchUpInside];
 }
 

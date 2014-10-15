@@ -126,22 +126,25 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
     selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
 {
   [self configureNavTitle];
+  [self configureSwapPhotosButtonText];
 }
 
 - (void)configureNavTitle
 {
-  NSUInteger selectedPhotosCount = self.selectPhotosController.selectedPhotoIDs.count;
-  
-  // set the title based on photos selected
-  if (selectedPhotosCount == 0) {
-    self.navigationItem.title = @"No Photos Selected";
-    self.navigationItem.rightBarButtonItem.enabled = NO;
+  self.navigationItem.title = @"Select Photos";
+}
+
+- (void)configureSwapPhotosButtonText
+{
+  int selectedCount = (int)self.selectPhotosController.selectedPhotoIDs.count;
+  NSString *buttonText;
+  if (selectedCount == 0) {
+    buttonText = @"View Photos";
   } else {
-    NSString *title = [NSString stringWithFormat:@"%d Photos Selected",
-                       (int)selectedPhotosCount];
-    self.navigationItem.title = title;
-    self.navigationItem.rightBarButtonItem.enabled = YES;
+    buttonText = [NSString stringWithFormat:@"Swap %d Photos", selectedCount];
   }
+  
+  [self.swapButton setTitle:buttonText forState:UIControlStateNormal];
 }
 
 

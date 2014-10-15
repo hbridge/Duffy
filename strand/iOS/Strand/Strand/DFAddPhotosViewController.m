@@ -47,11 +47,6 @@
 - (void)configureNavBar
 {
   self.navigationItem.title = @"Select Photos";
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithTitle:@"Swap"
-                                            style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(nextPressed:)];
 }
 
 #pragma mark - Actions
@@ -61,8 +56,6 @@
     [self acceptInvite];
   }
 }
-
-
 
 - (void)acceptInvite
 {
