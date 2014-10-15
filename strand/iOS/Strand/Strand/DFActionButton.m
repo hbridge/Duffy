@@ -41,4 +41,14 @@
   [super layoutSubviews];
 }
 
+- (void)setEnabled:(BOOL)enabled
+{
+  [super setEnabled:enabled];
+  if (enabled) {
+    self.backgroundColor = [DFStrandConstants defaultBackgroundColor];
+  } else {
+    self.backgroundColor = [[DFStrandConstants defaultBackgroundColor] colorWithAlphaComponent:0.7];
+  }
+}
+
 @end

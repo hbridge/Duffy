@@ -74,7 +74,7 @@
   [self loadUnfilteredArrays];
   [self configureTableView];
   [self configureSearch];
-  [self configureNav];
+  [self selectionUpdated];
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
@@ -159,19 +159,27 @@
   self.tableView.tableHeaderView = searchBar;
 }
 
-- (void)configureNav
+- (void)selectionUpdated
 {
   int count = (int)self.selectedContacts.count;
+  NSString *buttonTitle;
   if (count > 1) {
-    self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
+    //self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
+    buttonTitle = [NSString stringWithFormat:@"Send to %d people", count];
+    self.doneButton.enabled = YES;
   } else if (count == 1) {
-    self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
+    //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
+    buttonTitle = @"Send 1 %d person";
+    self.doneButton.enabled = YES;
   } else {
-    self.navigationItem.title = @"None Selected";
+    buttonTitle = @"None Selected";
     self.navigationItem.rightBarButtonItem.enabled = NO;
+    self.doneButton.enabled = NO;
   }
+  
+  [self.doneButton setTitle:buttonTitle forState:UIControlStateNormal];
 }
 
 - (NSArray *)selectedPeanutContacts
@@ -431,7 +439,7 @@
     [self.sdc setActive:NO animated:NO];
   }
   
-  [self configureNav];
+  [self selectionUpdated];
 }
 
 - (void)contactRowSelected:(DFPeanutContact *)contact atIndexPath:(NSIndexPath *)indexPath
@@ -492,7 +500,7 @@
   
   // if this happened in the search tableview, we have to reload the regular table view in the bg
   if (tableView != self.tableView) [self.tableView reloadData];
-  [self configureNav];
+  [self selectionUpdated];
   
   DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
 }

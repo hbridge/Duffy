@@ -50,6 +50,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
     [items addObjectsFromArray:section.objects];
   }
   _items = items;
+  [self configureDoneButtonText];
 }
 
 - (IBAction)selectAllButtonPressed:(UIButton *)sender {
@@ -74,6 +75,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   }
   [self.selectAllButton setTitle:newTitle forState:UIControlStateNormal];
   [self configureNavTitle];
+  [self configureDoneButtonText];
 }
 
 - (BOOL)hidesBottomBarWhenPushed
@@ -88,6 +90,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   [self configureHeader];
   [self configureCollectionView];
   [self configureNavTitle];
+  [self configureDoneButtonText];
 }
 
 - (void)viewDidLayoutSubviews
@@ -126,7 +129,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
     selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
 {
   [self configureNavTitle];
-  [self configureSwapPhotosButtonText];
+  [self configureDoneButtonText];
 }
 
 - (void)configureNavTitle
@@ -134,14 +137,16 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   self.navigationItem.title = @"Select Photos";
 }
 
-- (void)configureSwapPhotosButtonText
+- (void)configureDoneButtonText
 {
   int selectedCount = (int)self.selectPhotosController.selectedPhotoIDs.count;
   NSString *buttonText;
   if (selectedCount == 0) {
-    buttonText = @"View Photos";
+    if (!self.allowsNilSelection) self.swapButton.enabled = NO;
+    buttonText = @"None Selected";
   } else {
-    buttonText = [NSString stringWithFormat:@"Swap %d Photos", selectedCount];
+    if (!self.allowsNilSelection) self.swapButton.enabled = YES;
+    buttonText = [NSString stringWithFormat:@"Select %d Photos", selectedCount];
   }
   
   [self.swapButton setTitle:buttonText forState:UIControlStateNormal];

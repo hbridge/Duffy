@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *selectAllButton;
 @property (weak, nonatomic) IBOutlet UIView *swapButtonWrapper;
 @property (weak, nonatomic) IBOutlet UIButton *swapButton;
+@property (nonatomic) BOOL allowsNilSelection;
 
 /* Array of DFPeanutFeedObjects that are section objects */
 @property (nonatomic, retain) NSArray *suggestedSections;

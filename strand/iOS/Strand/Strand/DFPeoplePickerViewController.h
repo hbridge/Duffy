@@ -36,7 +36,7 @@
 @property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *doneButtonWrapper;
-@property (weak, nonatomic) IBOutlet UIView *doneButton;
+@property (weak, nonatomic) IBOutlet UIButton *doneButton;
 
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
