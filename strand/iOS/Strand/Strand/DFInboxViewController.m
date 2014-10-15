@@ -293,19 +293,8 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
-  DFPeanutFeedObject *inviteObject;
-  DFPeanutFeedObject *postsObject;
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    inviteObject = feedObject;
-    postsObject = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    inviteObject = nil;
-    postsObject = feedObject;
-  }
-
-  DFFeedViewController *feedViewController = [[DFFeedViewController alloc] init];
-  feedViewController.inviteObject = inviteObject;
-  feedViewController.strandPostsObject = postsObject;
+  
+  DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:feedObject];
   [self.navigationController pushViewController:feedViewController animated:YES];
 }
 

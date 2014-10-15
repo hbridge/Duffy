@@ -339,8 +339,7 @@ static const CGFloat ItemSpacing = 2.5;
     photoID = ((DFPeanutFeedObject *)object.objects.firstObject).id;
   }
   
-  DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
-  photoFeedController.strandPostsObject = section;
+  DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] initWithFeedObject:section];
   [self.navigationController pushViewController:photoFeedController animated:YES];
   dispatch_async(dispatch_get_main_queue(), ^{
     [photoFeedController showPhoto:photoID animated:NO];

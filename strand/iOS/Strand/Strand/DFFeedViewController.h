@@ -20,10 +20,7 @@
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
 DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderViewDelegate>
 
-@property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
-@property (nonatomic, retain) DFPeanutFeedObject *strandPostsObject;
-
 - (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;
-
+- (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject;
 
 @end

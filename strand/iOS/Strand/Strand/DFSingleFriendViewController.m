@@ -106,8 +106,7 @@
   if (self.useSharedPhotos) {
     DFPeanutFeedObject *strandPosts = self.strandsToShow[indexPath.row];
     
-    DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] init];
-    photoFeedController.strandPostsObject = strandPosts;
+    DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] initWithFeedObject:strandPosts];
     [self.navigationController pushViewController:photoFeedController animated:YES];
   } else {
     DFPeanutFeedObject *sectionObject = self.strandsToShow[indexPath.row];

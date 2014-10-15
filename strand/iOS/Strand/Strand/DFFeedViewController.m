@@ -68,19 +68,30 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) NSMutableDictionary *templateCellsByStyle;
 @property (nonatomic, retain) DFSwapUpsellView *swapUpsellView;
 
+@property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
+@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
+
 @end
 
 @implementation DFFeedViewController
 
 @synthesize photoAdapter = _photoAdapter;
 
-- (instancetype)init
+- (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject
 {
   self = [super init];
   if (self) {
     _rowHeights = [NSMutableDictionary new];
     _templateCellsByStyle = [NSMutableDictionary new];
     [self initTabBarItem];
+    
+    if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+      self.inviteObject = feedObject;
+      self.postsObject = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+    } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts] || [feedObject.type isEqual:DFFeedObjectSection]) {
+      self.inviteObject = nil;
+      self.postsObject = feedObject;
+    }
   }
   return self;
 }
@@ -201,7 +212,7 @@ const CGFloat LockedCellHeight = 157.0;
   [self configureUpsell];
 }
 
-- (void)setStrandPostsObject:(DFPeanutFeedObject *)strandPostsObject
+- (void)setPostsObject:(DFPeanutFeedObject *)strandPostsObject
 {
   dispatch_async(dispatch_get_main_queue(), ^{
     DFStrandGalleryTitleView *titleView =
@@ -239,7 +250,7 @@ const CGFloat LockedCellHeight = 157.0;
     
     _photoObjectsById = objectsByID;
     _photoIndexPathsById = indexPathsByID;
-    _strandPostsObject = strandPostsObject;
+    _postsObject = strandPostsObject;
     
     [self.tableView reloadData];
   });
@@ -296,7 +307,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-  return self.strandPostsObject.objects.count;
+  return self.postsObject.objects.count;
 }
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
@@ -333,7 +344,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (DFPeanutFeedObject *)strandPostObjectForSection:(NSUInteger)tableSection
 {
-  return self.strandPostsObject.objects[tableSection];
+  return self.postsObject.objects[tableSection];
 }
 
 - (DFPeanutFeedObject *)objectAtIndexPath:(NSIndexPath *)indexPath
