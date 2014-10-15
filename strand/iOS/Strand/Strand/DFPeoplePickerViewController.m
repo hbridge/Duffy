@@ -81,10 +81,9 @@
 {
   _allowsMultipleSelection = allowsMultipleSelection;
   if (allowsMultipleSelection) {
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                              initWithTitle:@"Send"
-                                              style:UIBarButtonItemStylePlain
-                                              target:self action:@selector(doneButtonPressed:)];
+    self.doneButtonWrapper.hidden = NO;
+  } else {
+    self.doneButtonWrapper.hidden = YES;
   }
   
   self.tableView.allowsMultipleSelection = allowsMultipleSelection;
@@ -163,8 +162,11 @@
 - (void)configureNav
 {
   int count = (int)self.selectedContacts.count;
-  if (count > 0) {
-    self.navigationItem.title = [NSString stringWithFormat:@"%d Selected", count];
+  if (count > 1) {
+    self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
+    self.navigationItem.rightBarButtonItem.enabled = YES;
+  } else if (count == 1) {
+    self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
   } else {
     self.navigationItem.title = @"None Selected";
@@ -503,7 +505,7 @@
   return contact;
 }
 
-- (void)doneButtonPressed:(id)sender
+- (IBAction)doneButtonPressed:(id)sender
 {
   [self.delegate pickerController:self
       didFinishWithPickedContacts:self.selectedPeanutContacts];

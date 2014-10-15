@@ -27,16 +27,19 @@
 @end
 
 
-@interface DFPeoplePickerViewController : UITableViewController <UISearchBarDelegate, UISearchDisplayDelegate>
+@interface DFPeoplePickerViewController : UIViewController <UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate, UISearchDisplayDelegate>
 
 @property (nonatomic, weak) NSObject<DFPeoplePickerDelegate>* delegate;
 @property (nonatomic, retain) NSString *textNumberString;
 @property (nonatomic) BOOL allowsMultipleSelection;
 @property (nonatomic, retain) NSArray *suggestedPeanutContacts;
 @property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
+@property (nonatomic, weak) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIView *doneButtonWrapper;
+@property (weak, nonatomic) IBOutlet UIView *doneButton;
 
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
-
+- (IBAction)sendButtonPressed:(id)sender;
 
 @end

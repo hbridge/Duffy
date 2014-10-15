@@ -48,17 +48,21 @@ NSUInteger const NumPhotosPerRow = 4;
 - (void)configureNavBar
 {
   self.navigationItem.title = @"Select Photos";
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithTitle:@"Next"
-                                            style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(nextPressed:)];
 }
 
 - (void)setSuggestedSections:(NSArray *)suggestedSections
 {
   [super setSuggestedSections:suggestedSections];
   self.suggestedSection = suggestedSections.firstObject;
+}
+
+- (void)viewDidLoad
+{
+  [super viewDidLoad];
+  
+  [self.doneButton setTitle:@"Next" forState:UIControlStateNormal];
+  [self.doneButton addTarget:self action:@selector(nextPressed:)
+            forControlEvents:UIControlEventTouchUpInside];
 }
 
 #pragma mark - Actions

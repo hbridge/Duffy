@@ -17,6 +17,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *locationLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
 @property (weak, nonatomic) IBOutlet UIButton *selectAllButton;
+@property (weak, nonatomic) IBOutlet UIView *doneButtonWrapper;
+@property (weak, nonatomic) IBOutlet UIButton *doneButton;
 
 /* Array of DFPeanutFeedObjects that are section objects */
 @property (nonatomic, retain) NSArray *suggestedSections;

@@ -1,31 +1,65 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFPeoplePickerViewController">
             <connections>
-                <outlet property="view" destination="pkn-BI-Fod" id="PGJ-ZK-J1R"/>
+                <outlet property="doneButton" destination="h1z-eC-fV9" id="GbV-aN-Gos"/>
+                <outlet property="doneButtonWrapper" destination="h1z-eC-fV9" id="nwS-cW-XKp"/>
+                <outlet property="tableView" destination="pkn-BI-Fod" id="0W9-ig-PRF"/>
+                <outlet property="view" destination="QF5-wa-mQe" id="2gD-BR-Ddi"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" id="pkn-BI-Fod">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
-            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+        <view contentMode="scaleToFill" id="QF5-wa-mQe">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+            <subviews>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="pkn-BI-Fod">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="hWn-LO-5pu"/>
+                        <outlet property="delegate" destination="-1" id="aWp-HR-ORU"/>
+                    </connections>
+                </tableView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="h1z-eC-fV9">
+                    <rect key="frame" x="0.0" y="546" width="600" height="54"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T24-ju-et9" customClass="DFActionButton">
+                            <rect key="frame" x="150" y="12" width="300" height="30"/>
+                            <state key="normal" title="Done">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="doneButtonPressed:" destination="-1" eventType="touchUpInside" id="VRj-rX-9eO"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="T24-ju-et9" secondAttribute="width" multiplier="2" id="6cS-xw-yHH"/>
+                        <constraint firstAttribute="centerX" secondItem="T24-ju-et9" secondAttribute="centerX" id="CMm-iL-ekC"/>
+                        <constraint firstAttribute="height" constant="54" id="tKM-wW-psa"/>
+                        <constraint firstAttribute="centerY" secondItem="T24-ju-et9" secondAttribute="centerY" id="zYZ-HD-hrO"/>
+                    </constraints>
+                </view>
+            </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-            <nil key="simulatedStatusBarMetrics"/>
-            <connections>
-                <outlet property="dataSource" destination="-1" id="hWn-LO-5pu"/>
-                <outlet property="delegate" destination="-1" id="aWp-HR-ORU"/>
-            </connections>
-            <point key="canvasLocation" x="187" y="157"/>
-        </tableView>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="h1z-eC-fV9" secondAttribute="bottom" id="0fS-nf-puK"/>
+                <constraint firstAttribute="trailing" secondItem="pkn-BI-Fod" secondAttribute="trailing" id="8ff-M8-FVM"/>
+                <constraint firstAttribute="bottom" secondItem="pkn-BI-Fod" secondAttribute="bottom" id="NAB-4y-QvR"/>
+                <constraint firstAttribute="trailing" secondItem="h1z-eC-fV9" secondAttribute="trailing" id="cAs-pW-LGR"/>
+                <constraint firstItem="pkn-BI-Fod" firstAttribute="leading" secondItem="QF5-wa-mQe" secondAttribute="leading" id="mCd-Tj-Xtx"/>
+                <constraint firstItem="h1z-eC-fV9" firstAttribute="leading" secondItem="QF5-wa-mQe" secondAttribute="leading" id="oAa-ia-6yu"/>
+                <constraint firstItem="pkn-BI-Fod" firstAttribute="top" secondItem="QF5-wa-mQe" secondAttribute="top" id="oaR-ng-cGq"/>
+            </constraints>
+            <point key="canvasLocation" x="351" y="217"/>
+        </view>
     </objects>
-    <simulatedMetricsContainer key="defaultSimulatedMetrics">
-        <simulatedStatusBarMetrics key="statusBar"/>
-        <simulatedOrientationMetrics key="orientation"/>
-        <simulatedScreenMetrics key="destination" type="retina4"/>
-    </simulatedMetricsContainer>
 </document>
