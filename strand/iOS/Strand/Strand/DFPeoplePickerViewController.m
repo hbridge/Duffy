@@ -171,7 +171,7 @@
   } else if (count == 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    buttonTitle = @"Send 1 %d person";
+    buttonTitle = @"Send to 1 person";
     self.doneButton.enabled = YES;
   } else {
     buttonTitle = @"None Selected";
