@@ -123,9 +123,10 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
 {
   [self configureTextWithFeedObject:feedObject];
   
+
   if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    DFPeanutUserObject *user = feedObject.actors[0];
     DFPeanutFeedObject *firstPost = feedObject.objects.firstObject;
+    DFPeanutUserObject *user = firstPost.actors[0];
     
     if (user.id == [[DFUser currentUser] userID]) {
       return [self setLocalPhotosWithStrandPost:firstPost];
