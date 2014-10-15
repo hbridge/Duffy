@@ -81,10 +81,14 @@
  * Set the photos for this cell.  Right now only look at the photos in the first strand post
  * Strand posts have both public and private content, so must figure that out.
  * Sections only have private photos, so just do local
+ *
+ * TODO(Derek): This can get cleaned up once we know what we want.
+ * TODO(Derek): Support strands that have multiple people and first post might not have 3 photos
  */
 - (void)configureWithFeedObject:(DFPeanutFeedObject *)feedObject
 {
-  [self configureTextWithStrand:feedObject];
+  [self configureTextWithFeedObject:feedObject];
+  
   if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
     DFPeanutUserObject *user = feedObject.actors[0];
     DFPeanutFeedObject *firstPost = feedObject.objects.firstObject;
@@ -96,6 +100,12 @@
     }
   } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
     return [self setLocalPhotosWithStrandPost:feedObject];
+  } else if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    // Invite will always have only remote photos
+    // Do same as strand posts and use only first post for now
+    DFPeanutFeedObject *strandPosts = feedObject.objects.firstObject;
+    DFPeanutFeedObject *firstPost = strandPosts.objects.firstObject;
+    return [self setRemotePhotosWithStrandPost:firstPost];
   }
 }
 
@@ -172,12 +182,22 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   }
 }
 
-- (void)configureTextWithStrand:(DFPeanutFeedObject *)strandObject
+- (void)configureTextWithFeedObject:(DFPeanutFeedObject *)feedObject
 {
+  DFPeanutFeedObject *strandPosts;
+  
+  // Bit hacky for now, grab the strand_posts out of the invite
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    // This is the strand posts
+    strandPosts = feedObject.objects.firstObject;
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+    strandPosts = feedObject;
+  }
+  
   // Set the header attributes
   NSMutableString *actorString = [NSMutableString new];
-  for (DFPeanutUserObject *user in strandObject.actors) {
-    if (user != strandObject.actors.firstObject) [actorString appendString:@", "];
+  for (DFPeanutUserObject *user in strandPosts.actors) {
+    if (user != strandPosts.actors.firstObject) [actorString appendString:@", "];
     [actorString appendString:user.display_name];
   }
   
@@ -185,18 +205,18 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   
   // context label "Date in Location"
   NSMutableString *contextString = [NSMutableString new];
-  [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
+  [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_taken
                                                                 abbreviate:NO]];
-  [contextString appendFormat:@" in %@", strandObject.location];
+  [contextString appendFormat:@" in %@", strandPosts.location];
   self.contextLabel.text = contextString;
   
   // Bit of a hack.  Sections are private so we go with default text of "Swap with"
   //   But Strand Posts are public so change wording
-  if ([strandObject.type isEqual:DFFeedObjectStrandPosts]) {
+  if ([strandPosts.type isEqual:DFFeedObjectStrandPosts]) {
     self.peopleExplanationLabel.text = @"Swapped with";
   }
   
-  NSInteger count = strandObject.objects.count - LargeCardMaxPhotosPerCell;
+  NSInteger count = strandPosts.objects.count - LargeCardMaxPhotosPerCell;
   if (count > 0) {
     self.countBadge.hidden = NO;
     self.countBadge.text = [NSString stringWithFormat:@"+%d", (int)count];
