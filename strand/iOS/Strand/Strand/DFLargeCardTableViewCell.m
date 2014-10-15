@@ -190,7 +190,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     // This is the strand posts
     strandPosts = feedObject.objects.firstObject;
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts] || [feedObject.type isEqual:DFFeedObjectSection]) {
     strandPosts = feedObject;
   }
   
