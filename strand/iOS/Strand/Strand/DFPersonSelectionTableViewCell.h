@@ -14,9 +14,11 @@
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *checkedImageView;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
+@property (nonatomic) BOOL showsTickMarkWhenSelected;
 
 typedef enum {
   DFPersonSelectionTableViewCellStyleStrandUser,
+  DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle,
   DFPersonSelectionTableViewCellStyleNonUser,
 } DFPersonSelectionTableViewCellStyle;
 - (void)configureWithCellStyle:(DFPersonSelectionTableViewCellStyle)style;

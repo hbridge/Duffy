@@ -15,6 +15,7 @@
   UIView *backgroundColorView = [[UIView alloc] init];
   backgroundColorView.backgroundColor = [UIColor colorWithWhite:.95 alpha:1.0];
   self.selectedBackgroundView = backgroundColorView;
+  self.showsTickMarkWhenSelected = YES;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -24,9 +25,9 @@
 
 - (void)configureChecked
 {
-  if (self.isSelected) {
+  if (self.isSelected && self.showsTickMarkWhenSelected) {
     self.accessoryType = UITableViewCellAccessoryCheckmark;
-  } else {
+  } else if (!self.isSelected && self.showsTickMarkWhenSelected) {
     self.accessoryType = UITableViewCellAccessoryNone;
   }
 }
@@ -39,6 +40,10 @@
 }
 
 - (void)configureWithCellStyle:(DFPersonSelectionTableViewCellStyle)style {
+  if (style == DFPersonSelectionTableViewCellStyleStrandUser
+      || style == DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle) {
+    self.nameLabel.font = [UIFont boldSystemFontOfSize:self.nameLabel.font.pointSize];
+  }
   if (style == DFPersonSelectionTableViewCellStyleStrandUser) {
     [self.subtitleLabel removeFromSuperview];
   } else if (style == DFPersonSelectionTableViewCellStyleNonUser) {

@@ -12,6 +12,7 @@
 #import "DFPeanutUserObject.h"
 #import "DFSingleFriendViewController.h"
 #import "DFStrandConstants.h"
+#import "DFPersonSelectionTableViewCell.h"
 
 
 @interface DFFriendsViewController ()
@@ -100,7 +101,8 @@
 
 - (void)configureTableView:(UITableView *)tableView
 {
-  [tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
+  [tableView registerNib:[UINib nibWithNibName:@"DFPersonSelectionTableViewCell" bundle:nil]
+  forCellReuseIdentifier:@"cell"];
 
   [self configureRefreshControl];
   
@@ -143,10 +145,18 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
-  
+  DFPersonSelectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
+  cell.showsTickMarkWhenSelected = NO;
+  [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle];
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
-  cell.textLabel.text = peanutUser.display_name;
+  NSArray *swappedStrands = [self.peanutDataManager publicStrandsWithUser:peanutUser];
+  NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:peanutUser];
+  
+  cell.profilePhotoStackView.names = @[peanutUser.display_name];
+  cell.nameLabel.text = peanutUser.display_name;
+  cell.subtitleLabel.text = [NSString stringWithFormat:@"%d to Swap", (int)unswappedStrands.count];
+  cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+  
   return cell;
 }
 

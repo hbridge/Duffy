@@ -68,7 +68,7 @@
                 <outlet property="profilePhotoStackView" destination="ZAQ-Nx-9It" id="Jeu-5B-Jvj"/>
                 <outlet property="subtitleLabel" destination="W0w-a5-an4" id="rwy-0b-eOP"/>
             </connections>
-            <point key="canvasLocation" x="400" y="390"/>
+            <point key="canvasLocation" x="337" y="374"/>
         </tableViewCell>
     </objects>
 </document>
