@@ -1,5 +1,9 @@
 # Strand
 
+## Oct 15, 2015 (4750)
+
+- Friends tab etc
+
 ## Oct 9, 2014 (4748)
 
 - New accept photos screen
