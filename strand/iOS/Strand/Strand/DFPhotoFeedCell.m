@@ -182,16 +182,13 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style
 {
-    NSArray *verticalConstraints = [self.photoImageView constraintsAffectingLayoutForAxis:UILayoutConstraintAxisVertical];
-    for (NSLayoutConstraint *constraint in verticalConstraints) {
-      if (constraint.constant == 320.0) {
-        if (style == DFPhotoFeedCellStylePortrait) {
-          //constraint.constant = self.contentView.frame.size.width * 4.0/3.0;
-        } else if (style == DFPhotoFeedCellStyleLandscape) {
-          //constraint.constant = self.contentView.frame.size.width * 3.0/4.0;
-        }
-      }
-    }
+  if (style == DFPhotoFeedCellStyleSquare) {
+    self.imageViewHeightConstraint.constant = self.frame.size.width;
+  } else if (style == DFPhotoFeedCellStylePortrait) {
+    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (4.0/3.0);
+  } else if (style == DFPhotoFeedCellStyleLandscape) {
+    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (3.0/4.0);
+  }
   
   if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
     [self.collectionView removeFromSuperview];

@@ -31,6 +31,7 @@
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UILabel *photoDateLabel;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageViewHeightConstraint;
 
 // Delegate
 @property (nonatomic, weak) NSObject <DFPhotoFeedCellDelegate> *delegate;
@@ -46,10 +47,10 @@
 
 
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
-  DFPhotoFeedCellStyleSquare,
-  DFPhotoFeedCellStylePortrait,
-  DFPhotoFeedCellStyleLandscape,
-  DFPhotoFeedCellStyleCollectionVisible,
+  DFPhotoFeedCellStyleSquare = 1 << 0,
+  DFPhotoFeedCellStylePortrait = 1 << 1,
+  DFPhotoFeedCellStyleLandscape = 1 << 2,
+  DFPhotoFeedCellStyleCollectionVisible = 1 << 3,
 };
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style;

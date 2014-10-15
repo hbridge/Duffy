@@ -121,9 +121,13 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
-  
+
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
        forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleSquare]];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
+       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleLandscape]];
+  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
+       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStylePortrait]];
   [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
        forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleSquare
                                | DFPhotoFeedCellStyleCollectionVisible]];
@@ -488,13 +492,12 @@ const CGFloat LockedCellHeight = 157.0;
     CGRect frame = cell.frame;
     frame.size.width = self.view.frame.size.width;
     cell.frame = frame;
+    [cell updateConstraints];
     [cell layoutSubviews];
   }
   
-  CGFloat rowHeightNoImageView = MinRowHeight;
-  rowHeightNoImageView = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-  CGFloat rowHeight = rowHeightNoImageView + self.view.frame.size.width;
-  return rowHeight;
+  CGFloat rowHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  return rowHeight + [self tableView:tableView heightForHeaderInSection:indexPath.section];
 }
 
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
@@ -503,6 +506,11 @@ const CGFloat LockedCellHeight = 157.0;
   if ([object.type isEqual:DFFeedObjectCluster]) {
     return DFPhotoFeedCellStyleSquare | DFPhotoFeedCellStyleCollectionVisible;
   } else {
+    if (object.full_height.intValue > object.full_width.intValue) {
+      return DFPhotoFeedCellStylePortrait;
+    } else if (object.full_height.intValue < object.full_width.intValue) {
+     return DFPhotoFeedCellStyleLandscape;
+    }
     return DFPhotoFeedCellStyleSquare;
   }
 }

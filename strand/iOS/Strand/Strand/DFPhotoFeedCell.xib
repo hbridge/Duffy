@@ -20,9 +20,12 @@
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
                     </label>
-                    <imageView clipsSubviews="YES" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="EPr-aP-pSV">
+                    <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" translatesAutoresizingMaskIntoConstraints="NO" id="EPr-aP-pSV">
                         <rect key="frame" x="0.0" y="32" width="320" height="320"/>
                         <gestureRecognizers/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="320" id="5rH-Iu-Kcd"/>
+                        </constraints>
                     </imageView>
                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" alpha="0.80000000000000004" contentMode="scaleToFill" restorationIdentifier="collectionView" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="h07-n4-DgV">
                         <rect key="frame" x="0.0" y="353" width="320" height="79"/>
@@ -80,7 +83,7 @@
                     <constraint firstItem="h07-n4-DgV" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" constant="1" id="Q48-yN-yzu"/>
                     <constraint firstAttribute="centerX" secondItem="EPr-aP-pSV" secondAttribute="centerX" id="UMD-W8-k6d"/>
                     <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="W57-RD-aTX"/>
-                    <constraint firstAttribute="bottom" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="800" id="Xtu-ci-aht"/>
+                    <constraint firstAttribute="bottom" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="900" id="Xtu-ci-aht"/>
                     <constraint firstAttribute="trailing" secondItem="EPr-aP-pSV" secondAttribute="trailing" id="a0s-oA-S46"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="32" id="fDr-AQ-CiI"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="HE2-Vf-wok" secondAttribute="bottom" constant="3" id="flS-ZR-bpc"/>
@@ -92,13 +95,14 @@
             </tableViewCellContentView>
             <connections>
                 <outlet property="collectionView" destination="h07-n4-DgV" id="l03-i2-iAq"/>
+                <outlet property="imageViewHeightConstraint" destination="5rH-Iu-Kcd" id="u0I-7j-hbS"/>
                 <outlet property="loadingActivityIndicator" destination="6Gw-h8-Can" id="e70-WN-aaJ"/>
                 <outlet property="moreOptionsButton" destination="B5M-0I-S31" id="vGA-wj-gj8"/>
                 <outlet property="photoDateLabel" destination="xhR-gV-Znx" id="Rm7-Ee-eba"/>
                 <outlet property="photoImageView" destination="EPr-aP-pSV" id="f4q-6k-aBD"/>
                 <outlet property="titleLabel" destination="HE2-Vf-wok" id="epE-vc-jiD"/>
             </connections>
-            <point key="canvasLocation" x="510" y="473.5"/>
+            <point key="canvasLocation" x="443" y="474.5"/>
         </tableViewCell>
     </objects>
 </document>
