@@ -451,8 +451,9 @@
     if (!self.selectedNonSuggestionsList) {
       // add it to the new section
       self.selectedNonSuggestionsList = [NSMutableArray new];
-      [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:1];
-      [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:1];
+      NSUInteger insertIndex = MIN(self.unfilteredSections.count, 1);
+      [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:insertIndex];
+      [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:insertIndex];
     }
     [self.selectedNonSuggestionsList addObject:contact];
 
