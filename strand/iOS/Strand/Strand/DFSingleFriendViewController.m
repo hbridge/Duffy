@@ -73,6 +73,7 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   [self.tableView
    registerNib:[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
   forCellReuseIdentifier:PrivatePhotosCellId];
+  self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 }
 
 
