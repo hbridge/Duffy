@@ -24,5 +24,7 @@
 - (NSArray *)privateStrands;
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
+
+/* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
 @end
