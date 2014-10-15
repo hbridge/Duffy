@@ -19,7 +19,7 @@
 #import "DFImageStore.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFInboxTableViewCell.h"
-#import "DFLargeCardTableViewCell.h"
+#import "DFCardTableViewCell.h"
 #import "DFNavigationController.h"
 #import "DFPeanutFeedObject.h"
 #import "DFPeanutFeedAdapter.h"
@@ -125,7 +125,10 @@
 - (void)configureTableView
 {
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFLargeCardTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
+   forCellReuseIdentifier:@"inviteCell"];
+  [self.tableView
+   registerNib:[UINib nibWithNibName:[[DFCardTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"strandCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
@@ -209,24 +212,87 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSNumber *cachedHeight = self.cellHeightsByIdentifier[@"strandCell"];
+  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
+  NSString *cellIdentifier;
+  DFCardCellStyle style = DFCardCellStyleSuggestionWithPeople;
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    cellIdentifier = @"inviteCell";
+    style = DFCardCellStyleInvite | DFCardCellStyleSmall;
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]){
+    style = DFCardCellStyleSuggestionWithPeople;
+    cellIdentifier = @"strandCell";
+  }
+
+  NSNumber *cachedHeight = self.cellHeightsByIdentifier[cellIdentifier];
   if (!cachedHeight) {
-    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+    DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:style];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-    self.cellHeightsByIdentifier[@"strandCell"] = cachedHeight = @(height);
+    self.cellHeightsByIdentifier[cellIdentifier] = cachedHeight = @(height);
   }
   return cachedHeight.floatValue;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *strandObject = self.feedObjects[indexPath.row];
+  UITableViewCell *cell;
+  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+    cell = [self cellForInviteObject:feedObject];
+  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]){
+    cell = [self cellForStrandObject:feedObject];
+  }
   
-  DFLargeCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
-  [cell configureWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+  if (!cell) [NSException raise:@"Cell nil" format:@""];
+  
+  return cell;
+}
+
+
+- (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
+{
+  DFCardTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"inviteCell"];
+  [cell configureWithStyle:DFCardCellStyleSmall | DFCardCellStyleInvite];
+  
+  [cell configureWithFeedObject:inviteObject];
+  return cell;
+}
+
+- (UITableViewCell *)cellForStrandObject:(DFPeanutFeedObject *)strandObject
+{
+  DFCardTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"strandCell"];
+  DDLogDebug(@"DFCardCellStyleSmall: %@", binaryStringFromInteger(DFCardCellStyleSmall));
+
+  DDLogDebug(@"DFCardCellStyleSuggestionWithPeople: %@", binaryStringFromInteger(DFCardCellStyleSuggestionWithPeople));
+  [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
   
   [cell configureWithFeedObject:strandObject];
   return cell;
+}
+
+NSString * binaryStringFromInteger( NSInteger  number )
+{
+  NSMutableString * string = [[NSMutableString alloc] init];
+  
+  int spacing = pow( 2, 3 );
+  int width = ( sizeof( number ) ) * spacing;
+  int binaryDigit = 0;
+  NSInteger integer = number;
+  
+  while( binaryDigit < width )
+  {
+    binaryDigit++;
+    
+    [string insertString:( (integer & 1) ? @"1" : @"0" )atIndex:0];
+    
+    if( binaryDigit % spacing == 0 && binaryDigit != width )
+    {
+      [string insertString:@" " atIndex:0];
+    }
+    
+    integer = integer >> 1;
+  }
+  
+  return string;
 }
 
 + (void)resetCell:(DFInboxTableViewCell *)cell

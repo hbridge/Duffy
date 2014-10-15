@@ -13,7 +13,7 @@
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStore.h"
 #import "DFGallerySectionHeader.h"
-#import "DFLargeCardTableViewCell.h"
+#import "DFCardTableViewCell.h"
 #import "DFPeanutFeedObject.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosController.h"
@@ -148,9 +148,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
-    [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
+    [tableView registerNib:[UINib nibForClass:[DFCardTableViewCell class]]
     forCellReuseIdentifier:SuggestionWithPeopleId];
-    [tableView registerNib:[UINib nibForClass:[DFLargeCardTableViewCell class]]
+    [tableView registerNib:[UINib nibForClass:[DFCardTableViewCell class]]
     forCellReuseIdentifier:SuggestionNoPeopleId];
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
@@ -268,13 +268,13 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 - (UITableViewCell *)cellWithSuggestedStrandObject:(DFPeanutFeedObject *)strandObject
                                       forTableView:(UITableView *)tableView
 {
-  DFLargeCardTableViewCell *cell;
+  DFCardTableViewCell *cell;
   if (strandObject.actors.count > 0) {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
-    [cell configureWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+    [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
   } else {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
-    [cell configureWithStyle:DFLargeCardCellStyleSuggestionNoPeople];
+    [cell configureWithStyle:DFCardCellStyleSuggestionNoPeople];
   }
   
   [self configureTextForCreateStrandCell:cell withStrand:strandObject];
@@ -340,7 +340,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   };
 }
 
-- (void)configureTextForCreateStrandCell:(DFLargeCardTableViewCell *)cell
+- (void)configureTextForCreateStrandCell:(DFCardTableViewCell *)cell
                        withStrand:(DFPeanutFeedObject *)strandObject
 {
   // Set the header attributes
@@ -368,7 +368,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   }
 }
 
-- (void)setRemotePhotosForCell:(DFLargeCardTableViewCell *)cell
+- (void)setRemotePhotosForCell:(DFCardTableViewCell *)cell
                    withSection:(DFPeanutFeedObject *)section
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
@@ -403,7 +403,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 const NSUInteger MaxPhotosPerCell = 3;
 
-- (void)setLocalPhotosForCell:(DFLargeCardTableViewCell *)cell
+- (void)setLocalPhotosForCell:(DFCardTableViewCell *)cell
                       section:(DFPeanutFeedObject *)section
 {
   // Get the IDs of all the photos we want to show
@@ -446,20 +446,20 @@ const NSUInteger MaxPhotosPerCell = 3;
 {
   DFPeanutFeedObject *feedObject = [self sectionObjectsForSection:indexPath.section tableView:tableView][indexPath.row];
   NSString *identifier;
-  DFLargeCardCellStyle style = DFLargeCardCellStyleSuggestionWithPeople;
+  DFCardCellStyle style = DFCardCellStyleSuggestionWithPeople;
   if ([feedObject.type isEqual:DFFeedObjectSection]) {
     if (feedObject.actors.count > 0) {
       identifier = SuggestionWithPeopleId;
-      style = DFLargeCardCellStyleSuggestionWithPeople;
+      style = DFCardCellStyleSuggestionWithPeople;
     } else {
       identifier = SuggestionNoPeopleId;
-      style = DFLargeCardCellStyleSuggestionNoPeople;
+      style = DFCardCellStyleSuggestionNoPeople;
     }
   }
   
   NSNumber *cachedHeight = self.cellHeightsByIdentifier[identifier];
   if (!cachedHeight) {
-    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:style];
+    DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:style];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
     self.cellHeightsByIdentifier[identifier] = cachedHeight = @(height);
   }

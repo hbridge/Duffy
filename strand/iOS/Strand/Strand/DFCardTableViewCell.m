@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFLargeCardTableViewCell.h"
+#import "DFCardTableViewCell.h"
 
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UIDevice+DFHelpers.h"
@@ -18,7 +18,13 @@
 #import "DFStrandConstants.h"
 #import "DFImageStore.h"
 
-@implementation DFLargeCardTableViewCell
+@interface DFCardTableViewCell()
+
+@property (nonatomic) CGFloat fixedItemSize;
+
+@end
+
+@implementation DFCardTableViewCell
 
 - (void)awakeFromNib
 {
@@ -30,21 +36,34 @@
   self.solidBackgroundView.layer.masksToBounds = YES;
 }
 
-+ (DFLargeCardTableViewCell *)cellWithStyle:(DFLargeCardCellStyle)style
++ (DFCardTableViewCell *)cellWithStyle:(DFCardCellStyle)style
 {
-  DFLargeCardTableViewCell *cell = [[[UINib nibWithNibName:[self description] bundle:nil] instantiateWithOwner:nil options:nil] firstObject];
+  DFCardTableViewCell *cell;
+  if (style & DFCardCellStyleSmall) {
+    cell = [[[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
+             instantiateWithOwner:nil
+             options:nil] firstObject];
+  } else {
+    cell = [[[UINib nibWithNibName:@"DFCardTableViewCell" bundle:nil]
+                                       instantiateWithOwner:nil
+                                       options:nil] firstObject];
+  }
+  
   [cell configureWithStyle:style];
   return cell;
 }
 
-- (void)configureWithStyle:(DFLargeCardCellStyle)style
+- (void)configureWithStyle:(DFCardCellStyle)style
 {
+  if (style & DFCardCellStyleSmall) {
+    self.fixedItemSize = 157/2.0;
+  }
   
-  if (style == DFLargeCardCellStyleInvite) {
+  if (style == DFCardCellStyleInvite) {
     self.solidBackgroundView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
   }
   
-  if (style == DFLargeCardCellStyleSuggestionNoPeople) {
+  if (style == DFCardCellStyleSuggestionNoPeople) {
     [self.peopleLabel removeFromSuperview];
     [self.peopleExplanationLabel removeFromSuperview];
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
@@ -57,6 +76,10 @@
                   layout:(UICollectionViewLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
 {
+  if (self.fixedItemSize > 0.0) {
+    return CGSizeMake(self.fixedItemSize, self.fixedItemSize);
+  }
+  
   if (self.objects.count == 1) return self.collectionView.frame.size;
   else if (self.objects.count == 2) {
     return CGSizeMake(self.collectionView.frame.size.width / 2.0,

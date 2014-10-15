@@ -12,12 +12,13 @@
 
 #import "DFPeanutFeedObject.h"
 
-@interface DFLargeCardTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
+@interface DFCardTableViewCell : DFCollectionViewTableViewCell <UICollectionViewDelegateFlowLayout>
 
-typedef NS_OPTIONS(NSInteger, DFLargeCardCellStyle) {
-  DFLargeCardCellStyleInvite,
-  DFLargeCardCellStyleSuggestionWithPeople,
-  DFLargeCardCellStyleSuggestionNoPeople,
+typedef NS_OPTIONS(NSInteger, DFCardCellStyle) {
+  DFCardCellStyleInvite = 1 << 0,
+  DFCardCellStyleSuggestionWithPeople = 1 << 1,
+  DFCardCellStyleSuggestionNoPeople = 1 << 2,
+  DFCardCellStyleSmall = 1 << 3,
 };
 
 @property (weak, nonatomic) IBOutlet UILabel *contextLabel;
@@ -29,8 +30,8 @@ typedef NS_OPTIONS(NSInteger, DFLargeCardCellStyle) {
 @property (weak, nonatomic) IBOutlet DFCircleBadge *countBadge;
 
 
-+ (DFLargeCardTableViewCell *)cellWithStyle:(DFLargeCardCellStyle)style;
-- (void)configureWithStyle:(DFLargeCardCellStyle)style;
++ (DFCardTableViewCell *)cellWithStyle:(DFCardCellStyle)style;
+- (void)configureWithStyle:(DFCardCellStyle)style;
 - (void)configureWithFeedObject:(DFPeanutFeedObject *)feedObject;
 
 @end

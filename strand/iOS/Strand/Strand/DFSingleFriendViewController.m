@@ -9,7 +9,7 @@
 #import "DFCreateStrandViewController.h"
 #import "DFSingleFriendViewController.h"
 #import "DFPeanutFeedDataManager.h"
-#import "DFLargeCardTableViewCell.h"
+#import "DFCardTableViewCell.h"
 #import "DFFeedViewController.h"
 #import "DFPeanutUserObject.h"
 #import "DFPeanutFeedObject.h"
@@ -65,7 +65,7 @@
 - (void)configureTableView
 {
   [self.tableView
-   registerNib:[UINib nibWithNibName:[[DFLargeCardTableViewCell class] description] bundle:nil]
+   registerNib:[UINib nibWithNibName:[[DFCardTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"strandCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
 }
@@ -94,8 +94,8 @@
 {
   DFPeanutFeedObject *strandObject = self.strandsToShow[indexPath.row];
   
-  DFLargeCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
-  [cell configureWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+  DFCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
+  [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
   
   [cell configureWithFeedObject:strandObject];
   return cell;
@@ -122,7 +122,7 @@
 {
   NSNumber *cachedHeight = self.cellHeightsByIdentifier[@"strandCell"];
   if (!cachedHeight) {
-    DFLargeCardTableViewCell *templateCell = [DFLargeCardTableViewCell cellWithStyle:DFLargeCardCellStyleSuggestionWithPeople];
+    DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:DFCardCellStyleSuggestionWithPeople];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
     self.cellHeightsByIdentifier[@"strandCell"] = cachedHeight = @(height);
   }
