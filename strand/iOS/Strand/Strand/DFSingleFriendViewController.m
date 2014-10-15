@@ -102,11 +102,9 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   DFCardTableViewCell *cell;
   
   if (self.useSharedPhotos) {
-    DDLogVerbose(@"here1");
     cell = [tableView dequeueReusableCellWithIdentifier:PublicPhotosCellId];
     [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
   } else {
-    DDLogVerbose(@"here2");
     cell = [tableView dequeueReusableCellWithIdentifier:PrivatePhotosCellId];
     [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople | DFCardCellStyleSmall];
   }
@@ -134,11 +132,20 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  NSNumber *cachedHeight = self.cellHeightsByIdentifier[@"strandCell"];
+  NSString *identifier;
+  DFCardCellStyle style;
+  if (self.useSharedPhotos) {
+    identifier = PublicPhotosCellId;
+    style = DFCardCellStyleSuggestionWithPeople;
+  } else {
+    identifier = PrivatePhotosCellId;
+    style = DFCardCellStyleSuggestionWithPeople | DFCardCellStyleSmall;
+  }
+  NSNumber *cachedHeight = self.cellHeightsByIdentifier[identifier];
   if (!cachedHeight) {
-    DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:DFCardCellStyleSuggestionWithPeople];
+    DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:style];
     CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-    self.cellHeightsByIdentifier[@"strandCell"] = cachedHeight = @(height);
+    self.cellHeightsByIdentifier[identifier] = cachedHeight = @(height);
   }
   return cachedHeight.floatValue;
 }
