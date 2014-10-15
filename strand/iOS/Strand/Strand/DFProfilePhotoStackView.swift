@@ -13,9 +13,11 @@ class DFProfilePhotoStackView: UIView {
   let profilePhotoWidth:CGFloat = 35.0;
   var expandedNameLabel: UILabel = UILabel()
   var shouldShowNameLabel = false
+  var fillColors: [UIColor] = []
   
   var names: [String] = [] {
     didSet {
+      self.setNameColors()
       self.setProfilePhotoViews()
     }
   }
@@ -26,6 +28,27 @@ class DFProfilePhotoStackView: UIView {
     self.addGestureRecognizer(tapRecognizer)
   }
 
+  func setNameColors()
+  {
+    for (i, name) in enumerate(names) {
+      var numberForName = self.numberForName(name)
+      var colorIndex = numberForName % DFStrandConstants.profilePhotoStackColors().count
+      var color = DFStrandConstants.profilePhotoStackColors()[colorIndex] as UIColor
+      self.fillColors.append(color)
+    }
+  }
+  
+  func numberForName(name: NSString) -> NSInteger
+  {
+    var resultString = ""
+    for var i = 0; i < name.length; i++ {
+      var char:unichar = name.characterAtIndex(i)
+      resultString = NSString(format: "%@%d", resultString, char)
+    }
+    
+    return resultString.toInt()!
+  }
+  
   func setProfilePhotoViews() {
     self.sizeToFit()
     self.setNeedsDisplay()
@@ -55,10 +78,9 @@ class DFProfilePhotoStackView: UIView {
   
   override func drawRect(rect: CGRect) {
     var context = UIGraphicsGetCurrentContext()
-    // no CGColorRelease needed, swift handles memory management
-    var fillColor = CGColorCreate(CGColorSpaceCreateDeviceRGB(), [0.5, 0.5, 0.5, 1.0])
     
     for (i, name) in enumerate(names) {
+      var fillColor = self.fillColors[i].CGColor
       var abbreviation = name.substringToIndex(name.startIndex.successor()).capitalizedString
       var abbreviationRect = self.rectForIndex(i)
       CGContextSetFillColorWithColor(context, fillColor)

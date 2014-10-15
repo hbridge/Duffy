@@ -104,4 +104,26 @@ UIColor *DFStrandMainColor;
   return [[self defaultBackgroundColor] colorWithAlphaComponent:0.8];
 }
 
+static NSArray *colors;
+
++ (NSArray *)profilePhotoStackColors
+{
+  if (!colors) {
+    colors = @[
+               [self strandBlue],
+               [self strandGreen],
+               [self strandOrange],
+               [self strandRed],
+               [self strandSalmon],
+               [self strandYellow],
+               [UIColor purpleColor],
+               [UIColor brownColor],
+               [UIColor cyanColor],
+               [UIColor magentaColor],
+               ];
+  }
+  return colors;
+}
+
+
 @end

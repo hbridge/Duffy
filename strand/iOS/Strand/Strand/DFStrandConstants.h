@@ -44,5 +44,6 @@ extern NSString *const DFStrandNewPrivatePhotosDataNotificationName;
 + (UIColor *)strandRed;
 + (UIColor *)inviteCellBackgroundColor;
 + (UIColor *)photoCellBadgeColor;
++ (NSArray *)profilePhotoStackColors;
 
 @end
