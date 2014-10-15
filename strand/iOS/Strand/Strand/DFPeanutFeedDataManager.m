@@ -158,6 +158,16 @@ static DFPeanutFeedDataManager *defaultManager;
   return strands;
 }
 
+- (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId
+{
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts] && object.id == strandPostsId) {
+      return object;
+    }
+  }
+  return nil;
+}
+
 - (NSArray *)publicStrands
 {
   NSMutableArray *strands = [NSMutableArray new];

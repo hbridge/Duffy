@@ -32,6 +32,7 @@
 #import "DFSwapUpsellView.h"
 #import "UINib+DFHelpers.h"
 #import "DFAddPhotosViewController.h"
+#import "DFPeanutFeedDataManager.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -55,6 +56,7 @@ const CGFloat LockedCellHeight = 157.0;
 @interface DFFeedViewController ()
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
+@property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
@@ -83,6 +85,9 @@ const CGFloat LockedCellHeight = 157.0;
   if (self) {
     _rowHeights = [NSMutableDictionary new];
     _templateCellsByStyle = [NSMutableDictionary new];
+    self.dataManager = [DFPeanutFeedDataManager sharedManager];
+    [self observeNotifications];
+    
     [self initTabBarItem];
     
     if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
@@ -94,6 +99,31 @@ const CGFloat LockedCellHeight = 157.0;
     }
   }
   return self;
+}
+
+/*
+ * This is called as a callback after the "match my photos" button is clicked
+ */
+- (void)setupWithStrandPostsId:(DFStrandIDType)strandPostsId
+{
+  self.inviteObject = nil;
+  self.postsObject = [self.dataManager strandPostsObjectWithId:strandPostsId];
+}
+
+/*
+ * Reload data from the data manager.  We're using the strand id we were init'd with.
+ */
+- (void)reloadData
+{
+  self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+}
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
 }
 
 - (void)initTabBarItem
@@ -533,7 +563,10 @@ const CGFloat LockedCellHeight = 157.0;
   DFPeanutFeedObject *suggestionsObject = suggestionsArray.firstObject;
   DFAddPhotosViewController *addPhotosController = [[DFAddPhotosViewController alloc]
                                                     initWithSuggestions:suggestionsObject.objects
-                                                    invite:self.inviteObject];
+                                                    invite:self.inviteObject
+                                                    swapSuccessful:^{
+                                                      [self setupWithStrandPostsId:self.postsObject.id];
+                                                    }];
   DFNavigationController *navController = [[DFNavigationController alloc]
                                            initWithRootViewController:addPhotosController];
   addPhotosController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]

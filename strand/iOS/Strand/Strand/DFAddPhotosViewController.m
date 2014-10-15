@@ -12,12 +12,14 @@
 #import "DFPhotoStore.h"
 #import "SVProgressHUD.h"
 #import "DFStrandConstants.h"
+#import "DFFeedViewController.h"
 
 
 @interface DFAddPhotosViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (copy)void (^swapSuccessful)(void);
 
 @end
 
@@ -26,11 +28,12 @@
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
 
-- (instancetype)initWithSuggestions:(NSArray *)suggestedSections invite:(DFPeanutFeedObject *)invite
+- (instancetype)initWithSuggestions:(NSArray *)suggestedSections invite:(DFPeanutFeedObject *)invite swapSuccessful:(void(^)(void))swapSuccessful
 {
   self = [self initWithSuggestions:suggestedSections];
   if (self) {
     _inviteObject = invite;
+    self.swapSuccessful = swapSuccessful;
   }
   return self;
 }
@@ -49,9 +52,17 @@
   self.navigationItem.title = @"Select Photos";
 }
 
+- (void)viewDidLoad
+{
+  [super viewDidLoad];
+  
+  [self.swapButton addTarget:self action:@selector(swapPressed:)
+            forControlEvents:UIControlEventTouchUpInside];
+}
+
 #pragma mark - Actions
 
-- (void)nextPressed:(id)sender {
+- (void)swapPressed:(id)sender {
   if (self.inviteObject) {
     [self acceptInvite];
   }
@@ -100,8 +111,11 @@
              DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
              // show the strand that we just accepted an invite to
              [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:selectedPhotoIDs];
+             
+             if (self.swapSuccessful) self.swapSuccessful();
+             
              [self dismissViewControllerAnimated:YES completion:^{
-                [SVProgressHUD showSuccessWithStatus:@"Accepted"];
+                [SVProgressHUD showSuccessWithStatus:@"Swapped!"];
                 [[NSNotificationCenter defaultCenter]
                  postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
                  object:self];

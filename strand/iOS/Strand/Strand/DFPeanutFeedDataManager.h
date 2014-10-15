@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFPeanutUserObject.h"
+#import "DFPeanutFeedObject.h"
 
 @interface DFPeanutFeedDataManager : NSObject
 
@@ -24,6 +25,7 @@
 - (NSArray *)privateStrands;
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
+- (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;

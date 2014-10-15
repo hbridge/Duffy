@@ -12,6 +12,6 @@
 
 @property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
 
-- (instancetype)initWithSuggestions:(NSArray *)suggestedSections invite:(DFPeanutFeedObject *)invite;
+- (instancetype)initWithSuggestions:(NSArray *)suggestedSections invite:(DFPeanutFeedObject *)invite swapSuccessful:(void(^)(void))swapSuccessful;
 
 @end
