@@ -32,7 +32,7 @@ class DFProfilePhotoStackView: UIView {
   {
     for (i, name) in enumerate(names) {
       var numberForName = self.numberForName(name)
-      var colorIndex = numberForName % DFStrandConstants.profilePhotoStackColors().count
+      var colorIndex = abs(numberForName % DFStrandConstants.profilePhotoStackColors().count)
       var color = DFStrandConstants.profilePhotoStackColors()[colorIndex] as UIColor
       self.fillColors.append(color)
     }
