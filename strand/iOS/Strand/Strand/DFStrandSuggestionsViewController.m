@@ -148,9 +148,9 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   
   NSArray *tableViews = @[self.suggestedTableView, self.allTableView];
   for (UITableView *tableView in tableViews) {
-    [tableView registerNib:[UINib nibForClass:[DFCardTableViewCell class]]
+    [tableView registerNib:[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
     forCellReuseIdentifier:SuggestionWithPeopleId];
-    [tableView registerNib:[UINib nibForClass:[DFCardTableViewCell class]]
+    [tableView registerNib:[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
     forCellReuseIdentifier:SuggestionNoPeopleId];
     
     UIRefreshControl *refreshControl = [[UIRefreshControl alloc] init];
@@ -271,10 +271,10 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   DFCardTableViewCell *cell;
   if (strandObject.actors.count > 0) {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionWithPeopleId];
-    [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
+    [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople | DFCardCellStyleSmall];
   } else {
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
-    [cell configureWithStyle:DFCardCellStyleSuggestionNoPeople];
+    [cell configureWithStyle:DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSmall];
   }
   
   [self configureTextForCreateStrandCell:cell withStrand:strandObject];
@@ -350,6 +350,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     [actorString appendString:user.display_name];
   }
   
+  cell.peoplePrefixLabel.text = @"Swap with";
   cell.peopleLabel.text = actorString;
   
   // context label "Date in Location"
@@ -450,10 +451,10 @@ const NSUInteger MaxPhotosPerCell = 3;
   if ([feedObject.type isEqual:DFFeedObjectSection]) {
     if (feedObject.actors.count > 0) {
       identifier = SuggestionWithPeopleId;
-      style = DFCardCellStyleSuggestionWithPeople;
+      style = DFCardCellStyleSuggestionWithPeople | DFCardCellStyleSmall;
     } else {
       identifier = SuggestionNoPeopleId;
-      style = DFCardCellStyleSuggestionNoPeople;
+      style = DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSmall;
     }
   }
   

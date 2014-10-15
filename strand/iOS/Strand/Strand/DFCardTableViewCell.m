@@ -70,6 +70,10 @@
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
   }
   
+  if (style & (DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSuggestionWithPeople)) {
+    [self.peopleSuffixLabel removeFromSuperview];
+  }
+  
   [self layoutSubviews];
 }
 
