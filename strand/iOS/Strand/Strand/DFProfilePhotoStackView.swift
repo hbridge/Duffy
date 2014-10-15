@@ -46,7 +46,11 @@ class DFProfilePhotoStackView: UIView {
       resultString = NSString(format: "%@%d", resultString, char)
     }
     
-    return resultString.toInt()!
+    if let number = resultString.toInt() {
+      return resultString.toInt()!
+    } else {
+      return resultString.hash
+    }
   }
   
   func setProfilePhotoViews() {
