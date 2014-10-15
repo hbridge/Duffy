@@ -163,8 +163,8 @@
                 <outlet property="contextLabel" destination="MJw-rI-6rQ" id="cIg-b5-yU5"/>
                 <outlet property="countBadge" destination="nPB-Pd-SIx" id="5Qf-gd-lQQ"/>
                 <outlet property="flowLayout" destination="gI2-1t-GGm" id="yvc-My-Rsw"/>
-                <outlet property="peopleExplanationLabel" destination="6Us-ce-ejk" id="4Q1-cd-j6a"/>
                 <outlet property="peopleLabel" destination="NPB-S6-YvY" id="9Qq-xE-lSl"/>
+                <outlet property="peoplePrefixLabel" destination="6Us-ce-ejk" id="dGl-6H-13l"/>
                 <outlet property="solidBackgroundView" destination="5S6-hD-wpk" id="2IX-7s-EgS"/>
             </connections>
             <point key="canvasLocation" x="8" y="274"/>

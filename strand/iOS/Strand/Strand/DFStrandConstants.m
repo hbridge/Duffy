@@ -95,7 +95,8 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)inviteCellBackgroundColor
 {
-  return [UIColor colorWithRed:0.5 green:0.5 blue:1.0 alpha:0.2];
+  return [UIColor whiteColor];
+  //return [UIColor colorWithRed:0.95 green:0.95 blue:1.0 alpha:1.0];
 }
 
 + (UIColor *)photoCellBadgeColor

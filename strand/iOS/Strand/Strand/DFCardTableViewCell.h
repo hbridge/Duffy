@@ -25,7 +25,8 @@ typedef NS_OPTIONS(NSInteger, DFCardCellStyle) {
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
-@property (weak, nonatomic) IBOutlet UILabel *peopleExplanationLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peoplePrefixLabel;
+@property (weak, nonatomic) IBOutlet UILabel *peopleSuffixLabel;
 @property (weak, nonatomic) IBOutlet UIView *solidBackgroundView;
 @property (weak, nonatomic) IBOutlet DFCircleBadge *countBadge;
 
