@@ -76,7 +76,7 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)strandGreen
 {
-  return [UIColor colorWithRed:159/255.f green:255/255.f blue:198/255.f alpha:1];
+  return [UIColor colorWithRed:119/255.f green:235/255.f blue:158/255.f alpha:1];
 }
 
 + (UIColor *)strandYellow {

@@ -59,7 +59,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
 - (void)configureWithStyle:(DFCardCellStyle)style
 {
   if (style & DFCardCellStyleSmall) {
-    self.fixedItemSize = 157/2.0;
+    self.fixedItemSize = 78;
     self.maxPhotosToShow = 5;
   } else {
     self.maxPhotosToShow = LargeCardMaxPhotosPerCell;
