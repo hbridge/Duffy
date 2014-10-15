@@ -217,7 +217,7 @@
   DFCardCellStyle style = DFCardCellStyleSuggestionWithPeople;
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     cellIdentifier = @"inviteCell";
-    style = DFCardCellStyleInvite | DFCardCellStyleSmall;
+    style = DFCardCellStyleInvite;
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]){
     style = DFCardCellStyleSuggestionWithPeople;
     cellIdentifier = @"strandCell";
@@ -251,7 +251,7 @@
 - (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
 {
   DFCardTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"inviteCell"];
-  [cell configureWithStyle:DFCardCellStyleSmall | DFCardCellStyleInvite];
+  [cell configureWithStyle:DFCardCellStyleInvite];
   
   [cell configureWithFeedObject:inviteObject];
   return cell;

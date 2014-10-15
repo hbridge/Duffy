@@ -131,7 +131,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     if (user.id == [[DFUser currentUser] userID]) {
       return [self setLocalPhotosWithStrandPost:firstPost];
     } else {
-      return [self setRemotePhotosWithStrandPost:firstPost];
+      return [self setRemotePhotosWithStrandPost:firstPost imageType:DFImageFull];
     }
   } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
     return [self setLocalPhotosWithStrandPost:feedObject];
@@ -140,7 +140,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     // Do same as strand posts and use only first post for now
     DFPeanutFeedObject *strandPosts = feedObject.objects.firstObject;
     DFPeanutFeedObject *firstPost = strandPosts.objects.firstObject;
-    return [self setRemotePhotosWithStrandPost:firstPost];
+    return [self setRemotePhotosWithStrandPost:firstPost imageType:DFImageFull];
   }
 }
 
@@ -184,6 +184,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
 
 
 - (void)setRemotePhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
+                            imageType:(DFImageType)imageType
 {
   NSMutableArray *photoIDs = [NSMutableArray new];
   NSMutableArray *photos = [NSMutableArray new];
@@ -205,7 +206,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   for (DFPeanutFeedObject *photoObject in photos) {
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
-     preferredType:DFImageThumbnail
+     preferredType:imageType
      thumbnailPath:photoObject.thumb_image_path
      fullPath:photoObject.full_image_path
      completion:^(UIImage *image) {
