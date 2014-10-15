@@ -363,7 +363,10 @@ const CGFloat LockedCellHeight = 157.0;
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
   return SectionHeaderHeight;
+
 }
+
+
 
 #pragma mark - Table view data source
 
@@ -522,12 +525,11 @@ const CGFloat LockedCellHeight = 157.0;
     CGRect frame = cell.frame;
     frame.size.width = self.view.frame.size.width;
     cell.frame = frame;
-    [cell updateConstraints];
     [cell layoutSubviews];
   }
   
-  CGFloat rowHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-  return rowHeight + [self tableView:tableView heightForHeaderInSection:indexPath.section];
+  CGFloat rowHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
+  return rowHeight;
 }
 
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath

@@ -15,6 +15,7 @@
 @property (nonatomic, retain) NSMutableDictionary *savedConstraints;
 @property (nonatomic, retain) NSMutableDictionary *imagesForObjects;
 @property (nonatomic, retain) id selectedObject;
+@property (nonatomic) DFPhotoFeedCellStyle style;
 
 @end
 
@@ -52,11 +53,7 @@
     // Configure the view for the selected state
 }
 
-- (void)layoutSubviews
-{
-  [super layoutSubviews];
-  self.imageView.clipsToBounds = YES;
-}
+
 
 - (void)setFavoritersListHidden:(BOOL)hidden
 {
@@ -182,17 +179,27 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style
 {
-  if (style == DFPhotoFeedCellStyleSquare) {
-    self.imageViewHeightConstraint.constant = self.frame.size.width;
-  } else if (style == DFPhotoFeedCellStylePortrait) {
-    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (4.0/3.0);
-  } else if (style == DFPhotoFeedCellStyleLandscape) {
-    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (3.0/4.0);
-  }
+  _style = style;
   
   if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
     [self.collectionView removeFromSuperview];
   }
+}
+
+
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  self.imageView.clipsToBounds = YES;
+  if (self.style & DFPhotoFeedCellStyleSquare) {
+    self.imageViewHeightConstraint.constant = self.frame.size.width;
+  } else if (self.style & DFPhotoFeedCellStylePortrait) {
+    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (4.0/3.0);
+  } else if (self.style & DFPhotoFeedCellStyleLandscape) {
+    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (3.0/4.0);
+    DDLogDebug(@"layout landscape frameWidth:%.02f", self.contentView.frame.size.width);
+  }
+  
 }
 
 + (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style
