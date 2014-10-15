@@ -76,8 +76,8 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
   }
   
-  if (style & (DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSuggestionWithPeople)) {
-    [self.peopleSuffixLabel removeFromSuperview];
+  if (style & (DFCardCellStyleSuggestionWithPeople)) {
+    self.peoplePrefixLabel.text = @"";
   }
   
   [self layoutSubviews];
@@ -241,11 +241,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   [contextString appendFormat:@" in %@", strandPosts.location];
   self.contextLabel.text = contextString;
   
-  // Bit of a hack.  Sections are private so we go with default text of "Swap with"
-  //   But Strand Posts are public so change wording
-  if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-    self.peoplePrefixLabel.text = @"Swapped with";
-  } else {
+  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     self.peopleSuffixLabel.text = @"sent you photos";
   }
   
