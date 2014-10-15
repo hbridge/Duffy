@@ -138,6 +138,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [self configureTableView];
   [self configureReloadButton];
   [self configureSegmentView];
+  [self reloadData];
 }
 
 - (void)configureTableView
@@ -219,7 +220,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)viewDidAppear:(BOOL)animated
 {
-  [self reloadData];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -276,9 +276,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
     cell = [tableView dequeueReusableCellWithIdentifier:SuggestionNoPeopleId];
     [cell configureWithStyle:DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSmall];
   }
-  
-  [self configureTextForCreateStrandCell:cell withStrand:strandObject];
-  [self setLocalPhotosForCell:cell section:strandObject];
+  [cell configureWithFeedObject:strandObject];
   
   // add the swipe gesture
   if (tableView == self.suggestedTableView && !cell.view3) {
@@ -338,106 +336,6 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
        }];
     }
   };
-}
-
-- (void)configureTextForCreateStrandCell:(DFCardTableViewCell *)cell
-                       withStrand:(DFPeanutFeedObject *)strandObject
-{
-  // Set the header attributes
-  NSMutableString *actorString = [NSMutableString new];
-    for (DFPeanutUserObject *user in strandObject.actors) {
-    if (user != strandObject.actors.firstObject) [actorString appendString:@", "];
-    [actorString appendString:user.display_name];
-  }
-  
-  cell.peoplePrefixLabel.text = @"Swap with";
-  cell.peopleLabel.text = actorString;
-  
-  // context label "Date in Location"
-  NSMutableString *contextString = [NSMutableString new];
-  [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandObject.time_taken
-                                                                abbreviate:NO]];
-  [contextString appendFormat:@" in %@", strandObject.location];
-  cell.contextLabel.text = contextString;
-  
-  NSInteger count = strandObject.objects.count - cell.maxPhotosToShow;
-  if (count > 0) {
-    cell.countBadge.hidden = NO;
-    cell.countBadge.text = [NSString stringWithFormat:@"+%d", (int)count];
-  } else {
-    cell.countBadge.hidden = YES;
-  }
-}
-
-- (void)setRemotePhotosForCell:(DFCardTableViewCell *)cell
-                   withSection:(DFPeanutFeedObject *)section
-{
-  NSMutableArray *photoIDs = [NSMutableArray new];
-  NSMutableArray *photos = [NSMutableArray new];
-  
-  for (DFPeanutFeedObject *object in section.objects) {
-    DFPeanutFeedObject *photoObject;
-    if ([object.type isEqual:DFFeedObjectCluster]) {
-      photoObject = object.objects.firstObject;
-    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
-      photoObject = object;
-    }
-    if (photoObject) {
-      [photoIDs addObject:@(photoObject.id)];
-      [photos addObject:photoObject];
-    }
-  }
-  
-  cell.objects = photoIDs;
-  for (DFPeanutFeedObject *photoObject in photos) {
-    [[DFImageStore sharedStore]
-     imageForID:photoObject.id
-     preferredType:DFImageThumbnail
-     thumbnailPath:photoObject.thumb_image_path
-     fullPath:photoObject.full_image_path
-     completion:^(UIImage *image) {
-       [cell setImage:image forObject:@(photoObject.id)];
-     }];
-  }
-}
-
-- (void)setLocalPhotosForCell:(DFCardTableViewCell *)cell
-                      section:(DFPeanutFeedObject *)section
-{
-  // Get the IDs of all the photos we want to show
-  NSMutableArray *idsToShow = [NSMutableArray new];
-  for (NSUInteger i = 0; i < MIN(cell.maxPhotosToShow, section.objects.count); i++) {
-    DFPeanutFeedObject *object = section.objects[i];
-    if ([object.type isEqual:DFFeedObjectPhoto]) {
-      [idsToShow addObject:@(object.id)];
-      
-    } else if ([object.type isEqual:DFFeedObjectCluster]) {
-      DFPeanutFeedObject *repObject = object.objects.firstObject;
-      [idsToShow addObject:@(repObject.id)];
-    }
-  }
-  
-  // Set the images for the collection view
-  cell.objects = idsToShow;
-  for (NSNumber *photoID in idsToShow) {
-    DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
-    if (photo) {
-      CGFloat thumbnailSize;
-      if ([UIDevice majorVersionNumber] >= 8) {
-        // only use the larger thumbnails on iOS 8+, the scaling will kill perf on iOS7
-        thumbnailSize = cell.collectionView.frame.size.height * [[UIScreen mainScreen] scale];
-      } else {
-        thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
-      }
-        [photo.asset
-         loadUIImageForThumbnailOfSize:thumbnailSize
-         successBlock:^(UIImage *image) {
-           [cell setImage:image forObject:photoID];
-         } failureBlock:^(NSError *error) {
-           DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
-         }];
-    }
-  }
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath

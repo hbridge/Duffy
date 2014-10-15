@@ -92,6 +92,7 @@
 - (void)reloadData
 {
   _friendPeanutUsers = [self.peanutDataManager friendsList];
+  [self.tableView reloadData];
 }
 
 - (void)didReceiveMemoryWarning {

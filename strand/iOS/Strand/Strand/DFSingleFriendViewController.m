@@ -62,12 +62,17 @@
     [super didReceiveMemoryWarning];
 }
 
+NSString *const PublicPhotosCellId = @"publicPhotosCell";
+NSString *const PrivatePhotosCellId = @"privatePhotosCell";
+
 - (void)configureTableView
 {
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFCardTableViewCell class] description] bundle:nil]
-   forCellReuseIdentifier:@"strandCell"];
-  [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
+   forCellReuseIdentifier:PublicPhotosCellId];
+  [self.tableView
+   registerNib:[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
+  forCellReuseIdentifier:PrivatePhotosCellId];
 }
 
 
@@ -94,8 +99,17 @@
 {
   DFPeanutFeedObject *strandObject = self.strandsToShow[indexPath.row];
   
-  DFCardTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"strandCell"];
-  [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
+  DFCardTableViewCell *cell;
+  
+  if (self.useSharedPhotos) {
+    DDLogVerbose(@"here1");
+    cell = [tableView dequeueReusableCellWithIdentifier:PublicPhotosCellId];
+    [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
+  } else {
+    DDLogVerbose(@"here2");
+    cell = [tableView dequeueReusableCellWithIdentifier:PrivatePhotosCellId];
+    [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople | DFCardCellStyleSmall];
+  }
   
   [cell configureWithFeedObject:strandObject];
   return cell;

@@ -76,8 +76,8 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
   }
   
-  if (style & (DFCardCellStyleSuggestionWithPeople)) {
-    self.peoplePrefixLabel.text = @"";
+  if (style & (DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSuggestionWithPeople)) {
+    [self.peopleSuffixLabel removeFromSuperview];
   }
   
   [self layoutSubviews];
@@ -241,8 +241,14 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   [contextString appendFormat:@" in %@", strandPosts.location];
   self.contextLabel.text = contextString;
   
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+  // Bit of a hack.  Sections are private so we go with default text of "Swap with"
+  //   But Strand Posts are public so change wording
+  if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+    self.peoplePrefixLabel.text = @"";
+  } else if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     self.peopleSuffixLabel.text = @"sent you photos";
+  } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
+    self.peoplePrefixLabel.text = @"Swap with";
   }
   
   NSInteger count = strandPosts.objects.count - self.maxPhotosToShow;
