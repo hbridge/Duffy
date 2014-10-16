@@ -170,11 +170,13 @@ NSUInteger const NumPhotosPerRow = 4;
     // the create flow was presented as a sheet, dismiss the whole thing
     [self.presentingViewController dismissViewControllerAnimated:YES completion:completion];
   } else {
+    NSInteger selfIndex = [self.navigationController.viewControllers indexOfObject:self];
+    UIViewController *parentViewController = self.navigationController.viewControllers[selfIndex - 1];
     if (self.presentedViewController) {
       [self dismissViewControllerAnimated:YES completion:completion];
-      [self.navigationController popViewControllerAnimated:NO];
+      [self.navigationController popToViewController:parentViewController animated:NO];
     } else {
-      [self.navigationController popViewControllerAnimated:YES];
+      [self.navigationController popToViewController:parentViewController animated:YES];
       completion();
     }
   }
