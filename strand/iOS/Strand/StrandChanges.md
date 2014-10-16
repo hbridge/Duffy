@@ -1,8 +1,10 @@
 # Strand
 
-## Oct 15, 2015 (4750)
+## Oct 16, 2015 (4750, 4751)
 
-- Friends tab etc
+- Added a friends tab: see who else is on Strand and who you have photos to swap with!
+- Compose is now + from inbox
+- New styling for inbox
 
 ## Oct 9, 2014 (4748)
 
