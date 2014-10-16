@@ -233,14 +233,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     strandPosts = feedObject;
   }
   
-  // Set the header attributes
-  NSMutableString *actorString = [NSMutableString new];
-  for (DFPeanutUserObject *user in strandPosts.actors) {
-    if (user != strandPosts.actors.firstObject) [actorString appendString:@", "];
-    [actorString appendString:user.display_name];
-  }
-  
-  self.peopleLabel.text = actorString;
+  self.peopleLabel.attributedText = [strandPosts peopleSummaryString];
   
   // context label "Date in Location"
   NSMutableString *contextString = [NSMutableString new];
