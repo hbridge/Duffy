@@ -13,6 +13,7 @@
 #import "DFSingleFriendViewController.h"
 #import "DFStrandConstants.h"
 #import "DFPersonSelectionTableViewCell.h"
+#import "DFFriendProfileViewController.h"
 
 
 @interface DFFriendsViewController ()
@@ -129,17 +130,11 @@
   self.actionSheetUserSelected = user;
   NSArray *swappedStrands = [self.peanutDataManager publicStrandsWithUser:user];
   NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:user];
-  NSString *swappedTitle = [NSString stringWithFormat:@"Swapped (%lu)", (unsigned long)swappedStrands.count];
-  NSString *unswappedTitle = [NSString stringWithFormat:@"To Swap (%lu)", (unsigned long)unswappedStrands.count];
+//  NSString *swappedTitle = [NSString stringWithFormat:@"Swapped (%lu)", (unsigned long)swappedStrands.count];
+//  NSString *unswappedTitle = [NSString stringWithFormat:@"To Swap (%lu)", (unsigned long)unswappedStrands.count];
   
-  UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:nil
-                                                           delegate:self
-                                                  cancelButtonTitle:@"Cancel"
-                                             destructiveButtonTitle:nil
-                                                  otherButtonTitles:swappedTitle, unswappedTitle, nil];
-  
-  
-  [actionSheet showInView:self.tableView];
+  DFFriendProfileViewController *profileView = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
+  [self.navigationController pushViewController:profileView animated:YES];
   [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
 }
 

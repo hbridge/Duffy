@@ -197,7 +197,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (4.0/3.0);
   } else if (self.style & DFPhotoFeedCellStyleLandscape) {
     self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (3.0/4.0);
-    DDLogDebug(@"layout landscape frameWidth:%.02f", self.contentView.frame.size.width);
   }
   
 }

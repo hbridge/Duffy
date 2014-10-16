@@ -143,15 +143,19 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
 
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleSquare]];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleLandscape]];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStylePortrait]];
-  [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-       forCellReuseIdentifier:[self identifierForCellStyle:DFPhotoFeedCellStyleSquare
-                               | DFPhotoFeedCellStyleCollectionVisible]];
+  
+  NSArray *cellStyles = @[[self identifierForCellStyle:DFPhotoFeedCellStyleSquare],
+                          [self identifierForCellStyle:DFPhotoFeedCellStyleSquare | DFPhotoFeedCellStyleCollectionVisible],
+                          [self identifierForCellStyle:DFPhotoFeedCellStyleLandscape],
+                          [self identifierForCellStyle:DFPhotoFeedCellStyleLandscape | DFPhotoFeedCellStyleCollectionVisible],
+                          [self identifierForCellStyle:DFPhotoFeedCellStylePortrait],
+                          [self identifierForCellStyle:DFPhotoFeedCellStylePortrait | DFPhotoFeedCellStyleCollectionVisible],
+                          ];
+
+  for (NSNumber *styleNumber in cellStyles) {
+    [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
+         forCellReuseIdentifier:[self identifierForCellStyle:styleNumber.intValue]];
+  }
   
   [self.tableView
    registerNib:[UINib nibWithNibName:@"DFFeedSectionHeaderView"
@@ -526,16 +530,21 @@ const CGFloat LockedCellHeight = 157.0;
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
-  if ([object.type isEqual:DFFeedObjectCluster]) {
-    return DFPhotoFeedCellStyleSquare | DFPhotoFeedCellStyleCollectionVisible;
+
+  DFPhotoFeedCellStyle style;
+  if (object.full_height.intValue > object.full_width.intValue) {
+    style = DFPhotoFeedCellStylePortrait;
+  } else if (object.full_height.intValue < object.full_width.intValue) {
+    style = DFPhotoFeedCellStyleLandscape;
   } else {
-    if (object.full_height.intValue > object.full_width.intValue) {
-      return DFPhotoFeedCellStylePortrait;
-    } else if (object.full_height.intValue < object.full_width.intValue) {
-     return DFPhotoFeedCellStyleLandscape;
-    }
-    return DFPhotoFeedCellStyleSquare;
+    style = DFPhotoFeedCellStyleSquare;
   }
+  
+  if ([object.type isEqual:DFFeedObjectCluster]) {
+    style |= DFPhotoFeedCellStyleCollectionVisible;
+  }
+  
+  return style;
 }
 
 - (void)setHeight:(CGFloat)height forRowAtIndexPath:(NSIndexPath *)indexPath

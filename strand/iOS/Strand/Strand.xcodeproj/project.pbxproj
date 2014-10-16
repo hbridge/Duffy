@@ -93,6 +93,8 @@
 		5A7F8FFC19A7DA1D00EF0119 /* DFLockedPhotoViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7F8FFB19A7DA1D00EF0119 /* DFLockedPhotoViewCell.m */; };
 		5A7F8FFE19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A7F8FFD19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib */; };
 		5A83A3D619EED9ED0068F08B /* DFSmallCardTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3D519EED9ED0068F08B /* DFSmallCardTableViewCell.xib */; };
+		5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A83A3D819F019CE0068F08B /* DFFriendProfileViewController.m */; };
+		5A83A3DB19F019CE0068F08B /* DFFriendProfileViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A9115DB19DA08D3003F2A68 /* DFLabelCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */; };
@@ -397,6 +399,9 @@
 		5A7F8FFB19A7DA1D00EF0119 /* DFLockedPhotoViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLockedPhotoViewCell.m; sourceTree = "<group>"; };
 		5A7F8FFD19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLockedPhotoViewCell.xib; sourceTree = "<group>"; };
 		5A83A3D519EED9ED0068F08B /* DFSmallCardTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSmallCardTableViewCell.xib; sourceTree = "<group>"; };
+		5A83A3D719F019CE0068F08B /* DFFriendProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFriendProfileViewController.h; sourceTree = "<group>"; };
+		5A83A3D819F019CE0068F08B /* DFFriendProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFriendProfileViewController.m; sourceTree = "<group>"; };
+		5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFriendProfileViewController.xib; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -1435,6 +1440,9 @@
 				5AF64D0419EC61AA00EE1473 /* DFFriendsViewController.xib */,
 				65232E9719EC90CD00F3832A /* DFSingleFriendViewController.h */,
 				65232E9819EC90CD00F3832A /* DFSingleFriendViewController.m */,
+				5A83A3D719F019CE0068F08B /* DFFriendProfileViewController.h */,
+				5A83A3D819F019CE0068F08B /* DFFriendProfileViewController.m */,
+				5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */,
 			);
 			name = "Friends View";
 			sourceTree = "<group>";
@@ -1578,6 +1586,7 @@
 				5AFDEBDC197748A7005DDA7D /* DFLocationPermissionViewController.xib in Resources */,
 				5A13E09819BF61FE005357D2 /* DFInboxViewController.xib in Resources */,
 				5A4BBD3019B8BA8500359299 /* DFCardTableViewCell.xib in Resources */,
+				5A83A3DB19F019CE0068F08B /* DFFriendProfileViewController.xib in Resources */,
 				5A7F8FFE19A7DCAE00EF0119 /* DFLockedPhotoViewCell.xib in Resources */,
 				5AF32EC4197C6444004B5CC4 /* DFPhotoFeedCell.xib in Resources */,
 				5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */,
@@ -1782,6 +1791,7 @@
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
 				5A4C820519ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m in Sources */,
 				5A188D6B19804A94009D3244 /* DFLockedStrandCell.m in Sources */,
+				5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
 				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
