@@ -321,13 +321,13 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
        success:^(DFPeanutStrand *peanutStrand) {
          peanutStrand.suggestible = @(NO);
          
-         // Put the peanut strand
+         // Patch the peanut strand
          [self.strandAdapter
-          performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+          performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
           success:^(DFPeanutStrand *peanutStrand) {
             DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
           } failure:^(NSError *error) {
-            DDLogError(@"%@ failed to put private strand: %@, error: %@",
+            DDLogError(@"%@ failed to patch private strand: %@, error: %@",
                        self.class, peanutStrand, error);
           }];
        } failure:^(NSError *error) {

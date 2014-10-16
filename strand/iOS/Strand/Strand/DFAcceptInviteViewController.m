@@ -259,7 +259,7 @@
      
      // Put the new peanut strand
      [strandAdapter
-      performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+      performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
       success:^(DFPeanutStrand *peanutStrand) {
         DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
         // cache the photos locally
@@ -319,7 +319,7 @@
        
        // Put the peanut strand
        [strandAdapter
-        performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+        performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
         success:^(DFPeanutStrand *peanutStrand) {
           DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
         } failure:^(NSError *error) {

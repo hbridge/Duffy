@@ -57,9 +57,9 @@ static DFSettings *defaultSettings;
   peanutUser.id = currentUser.userID;
   peanutUser.display_name = displayName;
   
-  // Do the HTTP PUT to the server
+  // Do the HTTP PATCH to the server
   [self.userAdapter
-   performRequest:RKRequestMethodPUT
+   performRequest:RKRequestMethodPATCH
    withPeanutUser:peanutUser
    success:^(DFPeanutUserObject *user) {
      // This writes the settings to local disk since the server returned success

@@ -236,9 +236,9 @@ static DFPeanutFeedDataManager *defaultManager;
        peanutStrand.photos = [newPhotoIDs allObjects];
      }
      
-     // Put the new peanut strand
+     // Patch the new peanut strand
      [self.strandAdapter
-      performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+      performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
       success:^(DFPeanutStrand *peanutStrand) {
         DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
         // cache the photos locally
@@ -266,7 +266,7 @@ static DFPeanutFeedDataManager *defaultManager;
            }];
         }
       } failure:^(NSError *error) {
-        DDLogError(@"%@ failed to put strand: %@, error: %@",
+        DDLogError(@"%@ failed to patch strand: %@, error: %@",
                    self.class, peanutStrand, error);
       }];
    } failure:^(NSError *error) {
@@ -290,13 +290,13 @@ static DFPeanutFeedDataManager *defaultManager;
      success:^(DFPeanutStrand *peanutStrand) {
        peanutStrand.suggestible = @(NO);
        
-       // Put the peanut strand
+       // Patch the peanut strand
        [self.strandAdapter
-        performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+        performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
         success:^(DFPeanutStrand *peanutStrand) {
           DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
         } failure:^(NSError *error) {
-          DDLogError(@"%@ failed to put private strand: %@, error: %@",
+          DDLogError(@"%@ failed to patch private strand: %@, error: %@",
                      self.class, peanutStrand, error);
         }];
      } failure:^(NSError *error) {

@@ -67,14 +67,14 @@
                                         objectClass:peanutObjectClass
                                         rootKeyPath:bulkPostKeyPath
                                              method:RKRequestMethodPOST];
-  RKRequestDescriptor *putRequestDescriptor =
+  RKRequestDescriptor *patchRequestDescriptor =
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:peanutObjectClass
                                         rootKeyPath:nil
-                                             method:RKRequestMethodPUT];
+                                             method:RKRequestMethodPATCH];
   
   
-  return @[bulkPostRequestDescriptor, putRequestDescriptor];
+  return @[bulkPostRequestDescriptor, patchRequestDescriptor];
 }
 
 

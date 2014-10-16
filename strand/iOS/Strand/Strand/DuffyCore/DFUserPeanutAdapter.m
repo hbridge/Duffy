@@ -65,7 +65,7 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
   [RKRequestDescriptor requestDescriptorWithMapping:mapping
                                         objectClass:[DFPeanutUserObject class]
                                         rootKeyPath:nil
-                                             method:RKRequestMethodPUT];
+                                             method:RKRequestMethodPATCH];
   return @[restRequestDescriptor];
 }
 
