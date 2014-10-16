@@ -102,15 +102,6 @@ const CGFloat LockedCellHeight = 157.0;
 }
 
 /*
- * This is called as a callback after the "match my photos" button is clicked
- */
-- (void)setupWithStrandPostsId:(DFStrandIDType)strandPostsId
-{
-  self.inviteObject = nil;
-  self.postsObject = [self.dataManager strandPostsObjectWithId:strandPostsId];
-}
-
-/*
  * Reload data from the data manager.  We're using the strand id we were init'd with.
  */
 - (void)reloadData
@@ -567,7 +558,9 @@ const CGFloat LockedCellHeight = 157.0;
                                                     initWithSuggestions:suggestionsObject.objects
                                                     invite:self.inviteObject
                                                     swapSuccessful:^{
-                                                      [self setupWithStrandPostsId:self.postsObject.id];
+                                                      // Now that we've successfull swapped...turn our view
+                                                      //   into a regular view from an invite
+                                                      self.inviteObject = nil;
                                                     }];
   DFNavigationController *navController = [[DFNavigationController alloc]
                                            initWithRootViewController:addPhotosController];

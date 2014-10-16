@@ -150,7 +150,6 @@
   cell.showsTickMarkWhenSelected = NO;
   [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle];
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
-  NSArray *swappedStrands = [self.peanutDataManager publicStrandsWithUser:peanutUser];
   NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:peanutUser];
   
   cell.profilePhotoStackView.names = @[peanutUser.display_name];
