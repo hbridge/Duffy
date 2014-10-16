@@ -129,7 +129,7 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (BOOL)hasData{
-  return self.inboxLastResponseHash;
+  return (self.inboxLastResponseHash != nil);
 }
 
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user
