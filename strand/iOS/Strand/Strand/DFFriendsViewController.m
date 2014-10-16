@@ -197,7 +197,12 @@
   
   cell.profilePhotoStackView.names = @[peanutUser.display_name];
   cell.nameLabel.text = peanutUser.display_name;
-  cell.subtitleLabel.text = [NSString stringWithFormat:@"%d to Swap", (int)unswappedStrands.count];
+  int unswappedCount = (int)unswappedStrands.count;
+  if (unswappedCount > 0) {
+    cell.subtitleLabel.text = [NSString stringWithFormat:@"%d to Swap", unswappedCount];
+  } else {
+    cell.subtitleLabel.text = @"";
+  }
   cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
   
   return cell;
