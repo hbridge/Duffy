@@ -504,12 +504,13 @@ def getObjectsDataForStrand(strand, user):
 	response = dict()
 
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+	postActions = sorted(postActions, key=lambda x:x.added, reverse=True)
 
 	if len(postActions) == 0:
 		logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
 		recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	else:
-		recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
+		recentTimeStamp = postActions[0].added
 		
 	users = strand.users.all()
 
