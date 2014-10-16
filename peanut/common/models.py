@@ -563,7 +563,7 @@ class Strand(models.Model):
 	last_photo_time = models.DateTimeField(db_index=True)
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
-	private = models.BooleanField(db_index=True)
+	private = models.BooleanField(db_index=True, default=False)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2)
 
