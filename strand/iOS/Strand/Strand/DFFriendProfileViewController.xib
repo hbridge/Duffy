@@ -82,7 +82,7 @@
                             <rect key="frame" x="8" y="10" width="584" height="29"/>
                             <segments>
                                 <segment title="Unshared"/>
-                                <segment title="Shared"/>
+                                <segment title="Swapped"/>
                             </segments>
                             <connections>
                                 <action selector="segmentViewValueChanged:" destination="-1" eventType="valueChanged" id="RlH-RC-len"/>

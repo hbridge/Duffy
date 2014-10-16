@@ -45,7 +45,8 @@
       || style == DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle) {
     self.nameLabel.font = [UIFont boldSystemFontOfSize:self.nameLabel.font.pointSize];
   }
-  if (style == DFPersonSelectionTableViewCellStyleStrandUser) {
+  if (style == DFPersonSelectionTableViewCellStyleStrandUser
+      || style == DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel) {
     [self.subtitleLabel removeFromSuperview];
   } else if (style == DFPersonSelectionTableViewCellStyleNonUser) {
     [self.profilePhotoStackView removeFromSuperview];

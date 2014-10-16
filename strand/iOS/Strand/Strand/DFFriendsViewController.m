@@ -191,7 +191,7 @@
 {
   DFPersonSelectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   cell.showsTickMarkWhenSelected = NO;
-  [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle];
+  [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel];
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
   NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:peanutUser];
   
@@ -199,9 +199,9 @@
   cell.nameLabel.text = peanutUser.display_name;
   int unswappedCount = (int)unswappedStrands.count;
   if (unswappedCount > 0) {
-    cell.subtitleLabel.text = [NSString stringWithFormat:@"%d to Swap", unswappedCount];
+    cell.rightLabel.text = [NSString stringWithFormat:@"%d", unswappedCount];
   } else {
-    cell.subtitleLabel.text = @"";
+    cell.rightLabel.text = @"";
   }
   cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
   

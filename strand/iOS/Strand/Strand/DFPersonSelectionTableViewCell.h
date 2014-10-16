@@ -19,6 +19,7 @@
 typedef enum {
   DFPersonSelectionTableViewCellStyleStrandUser,
   DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle,
+  DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel,
   DFPersonSelectionTableViewCellStyleNonUser,
 } DFPersonSelectionTableViewCellStyle;
 - (void)configureWithCellStyle:(DFPersonSelectionTableViewCellStyle)style;
