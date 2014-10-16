@@ -309,7 +309,7 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             privateStrands = Strand.objects.filter(photos__id__in=newPhotoIds, private=True, user=user)
 
             for privateStrand in privateStrands:
-                createdFromStrand.suggestible = False
+                privateStrand.suggestible = False
                 privateStrand.contributed_to_id = strand.id
                 privateStrand.save()
 
