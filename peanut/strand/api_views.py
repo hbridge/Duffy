@@ -627,13 +627,13 @@ def strand_inbox(request):
 		# Next throw in the list of existing Strands
 		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(private=False))
 
-		nonInviteStrandObjects = list()
+		#nonInviteStrandObjects = list()
 		for strand in strands:
-			nonInviteStrandObjects.append(getObjectsDataForStrand(strand, user))
+			responseObjects.append(getObjectsDataForStrand(strand, user))
 
 		# sorting by last action on the strand
-		nonInviteStrandObjects = sorted(nonInviteStrandObjects, key=lambda x: x['time_stamp'], reverse=True)
-		responseObjects.extend(nonInviteStrandObjects)
+		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
+		#responseObjects.extend(nonInviteStrandObjects)
 
 		# Add in the list of all friends at the end
 		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
