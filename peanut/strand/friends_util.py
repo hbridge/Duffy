@@ -15,6 +15,7 @@ def getFriends(userId):
 		else:
 			friends.append(friendConnection.user_2)
 
+	friends = sorted(friends, key=lambda x: x.display_name)
 	return friends
 
 """
