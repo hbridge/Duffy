@@ -94,7 +94,7 @@ class DFProfilePhotoStackView: UIView {
       label.textColor = UIColor(white: 1.0, alpha: 1.0)
       label.textAlignment = .Center
       label.text = abbreviation
-      label.font = UIFont(name:"HelveticaNeue", size: abbreviationRect.size.height/2)
+      label.font = UIFont(name:"HelveticaNeue", size:ceil(abbreviationRect.size.height)/2.0)
       label.drawTextInRect(abbreviationRect)
     }
   }
