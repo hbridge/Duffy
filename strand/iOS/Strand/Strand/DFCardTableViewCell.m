@@ -70,10 +70,16 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     [self.peoplePrefixLabel removeFromSuperview];
   }
   
+  if (style & DFCardCellStyleShared) {
+    [self.peoplePrefixLabel removeFromSuperview];
+    [self.peopleSuffixLabel removeFromSuperview];
+  }
+  
   if (style & DFCardCellStyleSuggestionNoPeople) {
     [self.peopleLabel removeFromSuperview];
     [self.peoplePrefixLabel removeFromSuperview];
     self.contextLabel.font = [self.contextLabel.font fontWithSize:14.0];
+    self.contextLabel.textColor = [UIColor darkGrayColor];
   }
   
   if (style & (DFCardCellStyleSuggestionNoPeople | DFCardCellStyleSuggestionWithPeople)) {

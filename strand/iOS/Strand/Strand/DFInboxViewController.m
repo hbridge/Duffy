@@ -219,7 +219,7 @@
     cellIdentifier = @"inviteCell";
     style = DFCardCellStyleInvite;
   } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]){
-    style = DFCardCellStyleSuggestionWithPeople;
+    style = DFCardCellStyleShared;
     cellIdentifier = @"strandCell";
   }
 
@@ -260,7 +260,7 @@
 - (UITableViewCell *)cellForStrandObject:(DFPeanutFeedObject *)strandObject
 {
   DFCardTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"strandCell"];
-  [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
+  [cell configureWithStyle:DFCardCellStyleShared];
   
   [cell configureWithFeedObject:strandObject];
   return cell;

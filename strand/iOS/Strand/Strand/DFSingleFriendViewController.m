@@ -110,7 +110,7 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   
   if (self.useSharedPhotos) {
     cell = [tableView dequeueReusableCellWithIdentifier:PublicPhotosCellId];
-    [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople];
+    [cell configureWithStyle:DFCardCellStyleShared];
   } else {
     cell = [tableView dequeueReusableCellWithIdentifier:PrivatePhotosCellId];
     [cell configureWithStyle:DFCardCellStyleSuggestionWithPeople | DFCardCellStyleSmall];

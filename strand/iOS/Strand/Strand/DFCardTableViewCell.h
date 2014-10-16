@@ -18,7 +18,8 @@ typedef NS_OPTIONS(NSInteger, DFCardCellStyle) {
   DFCardCellStyleInvite = 1 << 0,
   DFCardCellStyleSuggestionWithPeople = 1 << 1,
   DFCardCellStyleSuggestionNoPeople = 1 << 2,
-  DFCardCellStyleSmall = 1 << 3,
+  DFCardCellStyleShared = 1 << 3,
+  DFCardCellStyleSmall = 1 << 4,
 };
 
 @property (weak, nonatomic) IBOutlet UILabel *contextLabel;
