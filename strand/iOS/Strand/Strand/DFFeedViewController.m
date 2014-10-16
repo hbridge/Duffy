@@ -72,6 +72,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 @property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
 @property (nonatomic, retain) DFPeanutFeedObject *postsObject;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
 @end
 
@@ -93,6 +94,7 @@ const CGFloat LockedCellHeight = 157.0;
     if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
       self.inviteObject = feedObject;
       self.postsObject = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+      self.suggestionsObject = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
     } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts] || [feedObject.type isEqual:DFFeedObjectSection]) {
       self.inviteObject = nil;
       self.postsObject = feedObject;
@@ -169,34 +171,22 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)configureUpsell
 {
   if (self.inviteObject) {
+    // if this is an invite create an upsell if necessary and add it
     if (!self.swapUpsellView) {
       self.swapUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
       [self.view addSubview:self.swapUpsellView];
-      [self.swapUpsellView.matchMyPhotosButton addTarget:self
-                                                  action:@selector(matchPhotosButtonPressed:)
-                                        forControlEvents:UIControlEventTouchUpInside];
+      
+      [self.swapUpsellView configureWithSwappablePhotos:(self.suggestionsObject.objects.count > 0)
+                                           buttonTarget:self
+                                               selector:@selector(upsellButtonPressed:)];
     }
+    CGFloat swapUpsellHeight = self.view.frame.size.height * .66;
     self.swapUpsellView.frame = CGRectMake(0,
-                                           self.view.frame.size.height / 3.0,
+                                           self.view.frame.size.height - swapUpsellHeight,
                                            self.view.frame.size.width,
-                                           self.view.frame.size.height * .66);
-    [self.swapUpsellView setNeedsUpdateConstraints];
-    self.tableView.scrollEnabled = NO;
-    
-    // set the data on the view
-    unsigned long otherPhotosCount = [self.tableView numberOfRowsInSection:0] - 1;
-    if (otherPhotosCount > 0) {
-      self.swapUpsellView.sharedPhotosCountLabel.text = [NSString stringWithFormat:@"+%lu Photos",
-                                                       otherPhotosCount];
-      self.swapUpsellView.sharedPhotosCountLabel.hidden = NO;
-    } else {
-      self.swapUpsellView.sharedPhotosCountLabel.hidden = YES;
-    }
+                                           swapUpsellHeight);
   } else {
-    if (self.swapUpsellView) {
-      [self.swapUpsellView removeFromSuperview];
-    }
-    self.tableView.scrollEnabled = YES;
+    [self.swapUpsellView removeFromSuperview];
   }
 }
 
@@ -324,7 +314,7 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:(NSError *)error
 {
   // Turn off spinner since we successfully did a server fetch
-  [self.refreshControl endRefreshing];
+  //[self.refreshControl endRefreshing];
   
   if (self.requestedPhotoIDToJumpTo != 0) {
     [self showPhoto:self.requestedPhotoIDToJumpTo animated:NO];
@@ -555,29 +545,34 @@ const CGFloat LockedCellHeight = 157.0;
 #pragma mark - Actions
 
 
-- (void)matchPhotosButtonPressed:(id)sender
+- (void)upsellButtonPressed:(id)sender
 {
-  NSArray *suggestionsArray = [self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos];
-#ifdef DEBUG
-  if (suggestionsArray.count > 1) [NSException raise:@"more than one suggestions object" format:@""];
-#endif
-
-  DFPeanutFeedObject *suggestionsObject = suggestionsArray.firstObject;
-  DFAddPhotosViewController *addPhotosController = [[DFAddPhotosViewController alloc]
-                                                    initWithSuggestions:suggestionsObject.objects
-                                                    invite:self.inviteObject
-                                                    swapSuccessful:^{
-                                                      // Now that we've successfull swapped...turn our view
-                                                      //   into a regular view from an invite
-                                                      self.inviteObject = nil;
-                                                    }];
-  DFNavigationController *navController = [[DFNavigationController alloc]
-                                           initWithRootViewController:addPhotosController];
-  addPhotosController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                                    initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                                    target:self
-                                                    action:@selector(dismissMatch:)];
-  [self presentViewController:navController animated:YES completion:nil];
+  if (self.suggestionsObject.objects.count == 0) {
+    [[DFPeanutFeedDataManager sharedManager]
+     acceptInvite:self.inviteObject
+     addPhotoIDs:nil
+     success:^{
+       self.swapUpsellView.hidden = YES;
+       [self.swapUpsellView removeFromSuperview];
+     } failure:^(NSError *error) {
+     }];
+  } else {
+    DFAddPhotosViewController *addPhotosController = [[DFAddPhotosViewController alloc]
+                                                      initWithSuggestions:self.suggestionsObject.objects
+                                                      invite:self.inviteObject
+                                                      swapSuccessful:^{
+                                                        // Now that we've successfull swapped...turn our view
+                                                        //   into a regular view from an invite
+                                                        self.inviteObject = nil;
+                                                      }];
+    DFNavigationController *navController = [[DFNavigationController alloc]
+                                             initWithRootViewController:addPhotosController];
+    addPhotosController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                            initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                            target:self
+                                                            action:@selector(dismissMatch:)];
+    [self presentViewController:navController animated:YES completion:nil];
+  }
 }
 
 - (void)dismissMatch:(id)sender

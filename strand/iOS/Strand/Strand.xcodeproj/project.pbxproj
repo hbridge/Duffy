@@ -96,6 +96,7 @@
 		5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A83A3D819F019CE0068F08B /* DFFriendProfileViewController.m */; };
 		5A83A3DB19F019CE0068F08B /* DFFriendProfileViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */; };
 		5A83A3DE19F046390068F08B /* DFNoTableItemsLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A83A3DD19F046390068F08B /* DFNoTableItemsLabel.m */; };
+		5A83A3E019F04A6F0068F08B /* DFFeedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
 		5A9115DB19DA08D3003F2A68 /* DFLabelCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */; };
@@ -405,6 +406,7 @@
 		5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFriendProfileViewController.xib; sourceTree = "<group>"; };
 		5A83A3DC19F046390068F08B /* DFNoTableItemsLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNoTableItemsLabel.h; sourceTree = "<group>"; };
 		5A83A3DD19F046390068F08B /* DFNoTableItemsLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNoTableItemsLabel.m; sourceTree = "<group>"; };
+		5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFeedViewController.xib; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
 		5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCameraOverlayView.xib; sourceTree = "<group>"; };
@@ -1170,6 +1172,7 @@
 			children = (
 				5AA452A4196739900099CBD2 /* DFFeedViewController.h */,
 				5AA452A5196739900099CBD2 /* DFFeedViewController.m */,
+				5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */,
 				5A4C820719EDBACE00C22A12 /* DFSwapUpsellView.h */,
 				5A4C820819EDBACE00C22A12 /* DFSwapUpsellView.m */,
 				5A4C820A19EDBADC00C22A12 /* DFSwapUpsellView.xib */,
@@ -1609,6 +1612,7 @@
 				5AAF039219B0DBAE00EF021C /* DFCollectionViewTableViewCell.xib in Resources */,
 				5A188D6C19804A94009D3244 /* DFLockedStrandCell.xib in Resources */,
 				5A7B1846196F2C0800E5A1D1 /* DFMapViewController.xib in Resources */,
+				5A83A3E019F04A6F0068F08B /* DFFeedViewController.xib in Resources */,
 				5A3172DA196C8C6300CA7693 /* DFWebViewController.xib in Resources */,
 				5A4C821319EDC82100C22A12 /* DFSelectSuggestionsViewController.xib in Resources */,
 				5A9115DC19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib in Resources */,

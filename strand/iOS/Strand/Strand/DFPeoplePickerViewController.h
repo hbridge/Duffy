@@ -40,6 +40,5 @@
 
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
-- (IBAction)sendButtonPressed:(id)sender;
 
 @end

@@ -29,4 +29,10 @@
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
+
+
+- (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
+         addPhotoIDs:(NSArray *)photoIDs
+             success:(void(^)(void))success
+             failure:(void(^)(NSError *error))failure;
 @end

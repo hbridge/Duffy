@@ -16,10 +16,11 @@
 #import "DFFeedSectionHeaderView.h"
 #import "DFPeanutFeedObject.h"
 
-@interface DFFeedViewController : UITableViewController
+@interface DFFeedViewController : UIViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
 DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderViewDelegate>
 
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 - (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;
 - (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject;
 

@@ -13,5 +13,10 @@
 
 @property (weak, nonatomic) IBOutlet UILabel *sharedPhotosCountLabel;
 @property (weak, nonatomic) IBOutlet UIButton *matchMyPhotosButton;
+@property (weak, nonatomic) IBOutlet UILabel *upsellTitleLabel;
+
+- (void)configureWithSwappablePhotos:(BOOL)arePhotosSwappable
+                        buttonTarget:(id)target
+                            selector:(SEL)selector;
 
 @end

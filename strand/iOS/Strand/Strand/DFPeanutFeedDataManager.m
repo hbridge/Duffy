@@ -11,11 +11,17 @@
 #import "DFPeanutFeedAdapter.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"
+#import "DFPeanutStrand.h"
+#import "DFPeanutStrandAdapter.h"
+#import "DFPeanutStrandInviteAdapter.h"
+#import "DFPhotoStore.h"
 
 @interface DFPeanutFeedDataManager ()
 
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *inboxFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *privateStrandsFeedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
+@property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
 @property (atomic) BOOL inboxRefreshing;
 @property (atomic) BOOL privateStrandsRefreshing;
@@ -31,6 +37,8 @@
 
 @synthesize inboxFeedAdapter = _inboxFeedAdapter;
 @synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
+@synthesize strandAdapter = _strandAdapter;
+@synthesize inviteAdapter = _inviteAdapter;
 
 - (instancetype)init
 {
@@ -200,6 +208,104 @@ static DFPeanutFeedDataManager *defaultManager;
   return self.inboxRefreshing;
 }
 
+
+
+- (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
+         addPhotoIDs:(NSArray *)photoIDs
+             success:(void(^)(void))success
+             failure:(void(^)(NSError *error))failure
+{
+  DFPeanutFeedObject *invitedStrandPosts = [[inviteFeedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
+  requestStrand.id = @(invitedStrandPosts.id);
+  
+  [self.strandAdapter
+   performRequest:RKRequestMethodGET
+   withPeanutStrand:requestStrand
+   success:^(DFPeanutStrand *peanutStrand) {
+     // add current user to list of users if not there
+     NSNumber *userID = @([[DFUser currentUser] userID]);
+     if (![peanutStrand.users containsObject:userID]) {
+       peanutStrand.users = [peanutStrand.users arrayByAddingObject:userID];
+     }
+     
+     // add any selected photos to the list of shared photos
+     if (photoIDs.count > 0) {
+       NSMutableSet *newPhotoIDs = [[NSMutableSet alloc] initWithArray:peanutStrand.photos];
+       [newPhotoIDs addObjectsFromArray:photoIDs];
+       peanutStrand.photos = [newPhotoIDs allObjects];
+     }
+     
+     // Put the new peanut strand
+     [self.strandAdapter
+      performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+      success:^(DFPeanutStrand *peanutStrand) {
+        DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
+        // cache the photos locally
+        [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:photoIDs];
+        
+        // even if there is an invite, you've been joined to the strand, so we count
+        //  either result of the invite marking as success
+        success();
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+         object:self];
+        [[DFPhotoStore sharedStore] markPhotosForUpload:photoIDs];
+
+        // now mark the invite as used
+        if (inviteFeedObject) {
+          [self.inviteAdapter
+           markInviteWithIDUsed:@(inviteFeedObject.id)
+           success:^(NSArray *resultObjects) {
+             DDLogInfo(@"Marked invite used: %@", resultObjects.firstObject);
+             [[NSNotificationCenter defaultCenter]
+              postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+              object:self];
+           } failure:^(NSError *error) {
+             DDLogError(@"Failed to mark invite used: %@", error);
+           }];
+        }
+      } failure:^(NSError *error) {
+        DDLogError(@"%@ failed to put strand: %@, error: %@",
+                   self.class, peanutStrand, error);
+      }];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ failed to get strand: %@, error: %@",
+                self.class, requestStrand, error);
+   }];
+  
+  // Now go through each of the private strands and update their visibility to NO
+  //   Doing this seperate from the strand update code above so we can do it in parallel
+  // For a suggestion type, the subobjects are strand objects
+  DFPeanutFeedObject *suggestionsObject = [[inviteFeedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
+                                           firstObject];
+  NSArray *suggestedSections = suggestionsObject.objects;
+  for (DFPeanutFeedObject *object in suggestedSections) {
+    DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
+    privateStrand.id = [NSNumber numberWithLongLong:object.id];
+    
+    [self.strandAdapter
+     performRequest:RKRequestMethodGET
+     withPeanutStrand:privateStrand
+     success:^(DFPeanutStrand *peanutStrand) {
+       peanutStrand.suggestible = @(NO);
+       
+       // Put the peanut strand
+       [self.strandAdapter
+        performRequest:RKRequestMethodPUT withPeanutStrand:peanutStrand
+        success:^(DFPeanutStrand *peanutStrand) {
+          DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
+        } failure:^(NSError *error) {
+          DDLogError(@"%@ failed to put private strand: %@, error: %@",
+                     self.class, peanutStrand, error);
+        }];
+     } failure:^(NSError *error) {
+       DDLogError(@"%@ failed to get private strand: %@, error: %@",
+                  self.class, requestStrand, error);
+     }];
+  }
+}
+
 #pragma mark - Network Adapter
 
 - (DFPeanutFeedAdapter *)inboxFeedAdapter
@@ -212,6 +318,18 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_privateStrandsFeedAdapter) _privateStrandsFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
   return _privateStrandsFeedAdapter;
+}
+
+- (DFPeanutStrandAdapter *)strandAdapter
+{
+  if (!_strandAdapter) _strandAdapter = [[DFPeanutStrandAdapter alloc] init];
+  return _strandAdapter;
+}
+
+- (DFPeanutStrandInviteAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+  return _inviteAdapter;
 }
 
 @end

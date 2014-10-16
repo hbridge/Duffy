@@ -128,10 +128,6 @@
 {
   DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
   self.actionSheetUserSelected = user;
-  NSArray *swappedStrands = [self.peanutDataManager publicStrandsWithUser:user];
-  NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:user];
-//  NSString *swappedTitle = [NSString stringWithFormat:@"Swapped (%lu)", (unsigned long)swappedStrands.count];
-//  NSString *unswappedTitle = [NSString stringWithFormat:@"To Swap (%lu)", (unsigned long)unswappedStrands.count];
   
   DFFriendProfileViewController *profileView = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
   [self.navigationController pushViewController:profileView animated:YES];
