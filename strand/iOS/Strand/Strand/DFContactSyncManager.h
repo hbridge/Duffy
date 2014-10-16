@@ -13,5 +13,8 @@
 + (DFContactSyncManager *)sharedManager;
 - (void)sync;
 - (void)forceSync;
++ (void)askForContactsPermissionWithSuccess:(void (^)(void))success
+                                    failure:(void (^)(NSError *error))failure;
++ (void)showContactsDeniedAlert;
 
 @end

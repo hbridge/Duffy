@@ -13,6 +13,8 @@
 #import "DFPeanutContact.h"
 #import "DFUser.h"
 #import "DFContactsStore.h"
+#import "DFAnalytics.h"
+#import "UIAlertView+DFHelpers.h"
 
 @interface DFContactSyncManager()
 
@@ -163,6 +165,40 @@ static DFContactSyncManager *defaultManager;
     });
   });
 }
+
+
+
++ (void)askForContactsPermissionWithSuccess:(void (^)(void))success
+                                    failure:(void (^)(NSError *))failure
+{
+  DDLogInfo(@"%@ asking for contacts permission", self.class);
+  CFErrorRef error;
+  ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
+  
+  ABAuthorizationStatus oldStatus = ABAddressBookGetAuthorizationStatus();
+  ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
+    if (granted) {
+      [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
+      [[self sharedManager] sync];
+      success();
+    } else {
+      failure((__bridge NSError *)error);
+    }
+    
+    [DFAnalytics logInviteAskContactsWithParameters:@{
+                                                      @"oldValue": @(oldStatus),
+                                                      @"newValue": @(ABAddressBookGetAuthorizationStatus())
+                                                      }];
+    
+  });
+}
+
++ (void)showContactsDeniedAlert
+{
+  [UIAlertView showSimpleAlertWithTitle:@"Contacts Denied"
+                          formatMessage:@"Please go to Settings > Privacy > Contacts and change Strand to on."];
+}
+
 
 
 

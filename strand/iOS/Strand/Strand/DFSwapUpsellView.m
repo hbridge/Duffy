@@ -47,4 +47,21 @@
                       forControlEvents:UIControlEventTouchUpInside];
 }
 
+
+- (void)configureForContactsWithError:(BOOL)error
+                         buttonTarget:(id)target
+                                    selector:(SEL)selector
+{
+  if (!error) {
+    self.upsellTitleLabel.text = @"Find More Friends to Swap With";
+  } else {
+    self.upsellTitleLabel.text = @"Contacts Permission Denied";
+  }
+  [self.matchMyPhotosButton setTitle:@"Grant Contacts Access"
+                            forState:UIControlStateNormal];
+  [self.matchMyPhotosButton addTarget:target
+                               action:selector
+                     forControlEvents:UIControlEventTouchUpInside];
+}
+
 @end

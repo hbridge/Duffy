@@ -524,31 +524,16 @@
 
 - (void)askForContactsPermission
 {
-  DDLogInfo(@"%@ asking for contacts permission", self.class);
-  CFErrorRef error;
-  ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
-  
-  ABAuthorizationStatus oldStatus = ABAddressBookGetAuthorizationStatus();
   DFPeoplePickerViewController __weak *weakSelf = self;
-  ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
-    if (granted) {
-      [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [weakSelf updateSearchResults];
-        [weakSelf.tableView reloadData];
-        [[DFContactSyncManager sharedManager] sync];
-      });
-    } else {
-      [weakSelf showContactsDeniedAlert];
-    }
+  [DFContactSyncManager askForContactsPermissionWithSuccess:^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [weakSelf updateSearchResults];
+      [weakSelf.tableView reloadData];
+    });
+  } failure:^(NSError *error) {
     
-    [DFAnalytics logInviteAskContactsWithParameters:@{
-                                                      @"oldValue": @(oldStatus),
-                                                      @"newValue": @(ABAddressBookGetAuthorizationStatus())
-                                                      }];
-    
-  });
-}
+  }];
+  }
 
 - (void)showContactsDeniedAlert
 {

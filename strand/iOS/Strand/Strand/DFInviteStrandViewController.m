@@ -73,7 +73,7 @@
 #pragma mark - DFPeoplePicker Delegate
 
 - (void)pickerController:(DFPeoplePickerViewController *)pickerController
-         didPickContacts:(NSArray *)peanutContacts
+         didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   DDLogVerbose(@"picked contacts: %@", peanutContacts);
   self.pickedContacts = peanutContacts;

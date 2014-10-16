@@ -19,4 +19,9 @@
                         buttonTarget:(id)target
                             selector:(SEL)selector;
 
+- (void)configureForContactsWithError:(BOOL)error
+                         buttonTarget:(id)target
+                             selector:(SEL)selector;
+
+
 @end

@@ -7,13 +7,17 @@
 //
 
 #import "DFFriendsViewController.h"
-
+#import <AddressBook/AddressBook.h>
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutUserObject.h"
 #import "DFSingleFriendViewController.h"
 #import "DFStrandConstants.h"
 #import "DFPersonSelectionTableViewCell.h"
 #import "DFFriendProfileViewController.h"
+#import "DFSwapUpsellView.h"
+#import "UINib+DFHelpers.h"
+#import "UIAlertView+DFHelpers.h"
+#import "DFContactSyncManager.h"
 
 
 @interface DFFriendsViewController ()
@@ -23,6 +27,7 @@
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 
 @property (nonatomic, retain) DFPeanutUserObject *actionSheetUserSelected;
+@property (nonatomic, retain) DFSwapUpsellView *contactsUpsellView;
 
 @end
 
@@ -72,8 +77,20 @@
   [super viewDidLoad];
   
   [self configureTableView:self.tableView];
+  [self configureContactsUpsell];
 }
 
+- (void)configureTableView:(UITableView *)tableView
+{
+  [tableView registerNib:[UINib nibWithNibName:@"DFPersonSelectionTableViewCell" bundle:nil]
+  forCellReuseIdentifier:@"cell"];
+  
+  [self configureRefreshControl];
+  
+  UITableViewController *mockTVC = [[UITableViewController alloc] init];
+  mockTVC.tableView = tableView;
+  mockTVC.refreshControl = self.refreshControl;
+}
 
 - (void)configureRefreshControl
 {
@@ -82,6 +99,51 @@
                           action:@selector(refreshFromServer)
                 forControlEvents:UIControlEventValueChanged];
 }
+
+- (void)configureContactsUpsell
+{
+  ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
+  if (status != kABAuthorizationStatusAuthorized) {
+    // ask for contacts
+    if (!self.contactsUpsellView) {
+      self.contactsUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
+      [self.view addSubview:self.contactsUpsellView];
+      [self.contactsUpsellView configureForContactsWithError:(status != kABAuthorizationStatusNotDetermined)
+                                                buttonTarget:self
+                                                    selector:@selector(contactsUpsellButtonPressed:)];
+    }
+    CGFloat swapUpsellHeight = self.view.frame.size.height * .66;
+    self.contactsUpsellView.frame = CGRectMake(0,
+                                           self.view.frame.size.height - swapUpsellHeight,
+                                           self.view.frame.size.width,
+                                           swapUpsellHeight);
+  } else {
+    [self.contactsUpsellView removeFromSuperview];
+  }
+}
+
+- (void)contactsUpsellButtonPressed:(id)sender
+{
+  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusNotDetermined) {
+    [DFContactSyncManager showContactsDeniedAlert];
+    return;
+  }
+  [DFContactSyncManager askForContactsPermissionWithSuccess:^{
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+       object:self];
+      self.contactsUpsellView.hidden = YES;
+      [self.contactsUpsellView removeFromSuperview];
+    });
+  } failure:^(NSError *error) {
+    [self.contactsUpsellView removeFromSuperview];
+    self.contactsUpsellView = nil;
+    [self configureContactsUpsell];
+  }];
+}
+
+#pragma mark - Data Refresh/Reload
 
 - (void)refreshFromServer
 {
@@ -101,17 +163,7 @@
   // Dispose of any resources that can be recreated.
 }
 
-- (void)configureTableView:(UITableView *)tableView
-{
-  [tableView registerNib:[UINib nibWithNibName:@"DFPersonSelectionTableViewCell" bundle:nil]
-  forCellReuseIdentifier:@"cell"];
 
-  [self configureRefreshControl];
-  
-  UITableViewController *mockTVC = [[UITableViewController alloc] init];
-  mockTVC.tableView = tableView;
-  mockTVC.refreshControl = self.refreshControl;
-}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
