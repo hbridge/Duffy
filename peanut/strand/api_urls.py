@@ -41,19 +41,6 @@ urlpatterns = patterns('',
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),
 	url(r'^send_sms_test', 'strand.api_views.send_sms_test'),
-
-	# Soon to be deprecated
-	url(r'^strand_activity', 'strand.api_views.strand_activity'),
-	url(r'^invited_strands', 'strand.api_views.invited_strands'),
-
-	# Deprecated
-	url(r'^strand_feed', 'strand.api_views.nothing'),
-	url(r'^get_joinable_strands', 'strand.api_views.nothing'),
-	url(r'^get_new_photos', 'strand.api_views.nothing'),
-	url(r'^suggested_unshared_photos', 'strand.api_views.nothing'),
-	url(r'^neighbors', 'strand.api_views.nothing'),
-
-	url(r'^get_nearby_friends_message', 'strand.api_views.nothing'),
 )
 
 urlpatterns = format_suffix_patterns(urlpatterns)

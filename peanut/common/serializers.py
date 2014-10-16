@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from common.models import Photo, User, Action, ContactEntry, StrandInvite
+from common.models import Photo, User, Action, ContactEntry, StrandInvite, Strand
 
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
@@ -25,7 +25,6 @@ class ActionWithUserNameSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = Action
 		fields = ('id', 'photo', 'user', 'user_display_name', 'action_type')
-
 	
 class ContactEntrySerializer(serializers.ModelSerializer):
 	phone_number = serializers.CharField()

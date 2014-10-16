@@ -240,70 +240,6 @@ def getObjectsDataForStrands(user, strands, feedObjectType):
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
 	return objects
 
-
-# Deprecated
-def getActionSubtitle(strand):
-	photos = strand.photos.all()
-		
-	location = getBestLocationForPhotos(photos)
-
-	# Jan 4
-	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
-
-	subtitle = dateStr
-
-	if location:
-		subtitle += " in " + location
-
-	return subtitle
-
-# Deprecated
-def getObjectsDataForActions(user):
-	objectResponse = []
-
-	actions = Action.objects.filter(Q(photo__user_id=user.id) | Q(user=user) | Q(strand__users__in=[user])).order_by("-added")[:20]
-	
-	actions = set(actions)
-	for action in actions:
-		objects = None
-		if action.action_type == constants.ACTION_TYPE_FAVORITE:
-			if action.user.id == user.id and action.photo.user.id == user.id:
-				title = "liked your photo"
-			elif action.user.id == user.id:
-				title = "liked %s's photo" % action.photo.user.display_name
-			elif action.photo.user.id == user.id:
-				title = "liked your photo"
-			elif action.photo.user.id == action.user.id:
-				title = "liked their photo"
-			else:
-				title = "Unknown"
-				
-			entry = {'type': constants.FEED_OBJECT_TYPE_LIKE_ACTION, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id}
-
-			photoData = serializers.photoDataForApiSerializer(action.photo)
-			photoData['type'] = "photo"
-			entry['objects'] = [photoData]
-			objectResponse.append(entry)
-			continue
-
-		# Show this for yourself
-		if action.action_type == constants.ACTION_TYPE_CREATE_STRAND:
-			title = "shared %s photos" % action.photos.count()
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
-
-		if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
-			title = "shared %s photos" % action.photos.count()
-			feedType = constants.FEED_OBJECT_TYPE_STRAND_POST
-			objects = getObjectsDataForPhotos(user, action.photos.all(), constants.FEED_OBJECT_TYPE_STRAND, strand=action.strand)
-			objects[0]['title'] = getTitleForStrand(action.strand)
-		
-		if objects:
-			entry = {'type': feedType, 'title': title, 'subtitle': getActionSubtitle(action.strand), 'actors': getActorsObjectData(action.user), 'time_stamp': action.added, 'id': action.id, 'objects': objects}
-			objectResponse.append(entry)
-
-	return objectResponse
-
 def getActorsObjectData(users, includePhone = False, invitedUsers = None):
 	if not isinstance(users, list):
 		users = [users]
@@ -662,53 +598,6 @@ def invited_strands(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
-
-# Soon to be deprecated
-def strand_activity(request):
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-		responseObjects = list()
-
-		# First throw in invite objects
-		inviteObjects = getInviteObjectsDataForUser(user)
-		responseObjects.extend(inviteObjects)
-		
-		# Created Strands
-		# TODO(Derek): remove hack
-		# This is a hack right now that looks at strand invites and assumes that if you did the invite,
-		#   you created the strand
-		"""
-		sentStrandInvites = StrandInvite.objects.select_related().filter(user=user).exclude(skip=True)
-		createdStrandList = set([x.strand for x in sentStrandInvites])
-		
-		createdStrandObjects = list()
-		for strand in createdStrandList:
-			entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'title': "started a Strand", 'actors': getActorsObjectData(user), 'time_stamp': strand.added}
-			entry['objects'] = getObjectsDataForStrands(user, [strand], constants.FEED_OBJECT_TYPE_STRAND)
-
-			createdStrandObjects.append(entry)
-		"""
-		actionObjects = getObjectsDataForActions(user)
-
-		# Grab sent created strands and action data, then sort.  We put invites at the top
-		afterInviteFeedObjects = list()
-		afterInviteFeedObjects.extend(actionObjects)
-		#afterInviteFeedObjects.extend(createdStrandObjects)
-
-		afterInviteFeedObjects = sorted(afterInviteFeedObjects, key=lambda x: x['time_stamp'], reverse=True)
-
-		responseObjects.extend(afterInviteFeedObjects)
-
-		response['objects'] = responseObjects
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
 
 #   -------------------------  OTHER ENDPOINTS ---------------------
 

@@ -567,8 +567,13 @@ class Strand(models.Model):
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2)
 
-	# This is the id of the Strand that created this.  Not doing ForeignKey though
+	# This is the id of the private Strand that created this.  Not doing ForeignKey because
+	#   django isn't good with recusive
 	created_from_id = models.IntegerField(null=True)
+
+	# This is the id of the public strand that this private strand swapped photos with
+	contributed_to_id = models.IntegerField(null=True)
+
 	suggestible = models.BooleanField(default=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
@@ -679,7 +684,6 @@ class StrandNeighbor(models.Model):
 	class Meta:
 		unique_together = ("strand_1", "strand_2")
 		db_table = 'strand_neighbor'
-
 
 class Action(models.Model):
 	user = models.ForeignKey(User, db_index=True)

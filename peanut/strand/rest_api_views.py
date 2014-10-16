@@ -17,7 +17,7 @@ from rest_framework.exceptions import ParseError
 
 from peanut.settings import constants
 
-from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection
+from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor
 from common.serializers import BulkContactEntrySerializer, BulkStrandInviteSerializer
 
 from strand import notifications_util
@@ -243,31 +243,47 @@ def updateStrandWithCorrectPhotoTimes(strand):
 """
 class CreateStrandAPI(CreateAPIView):
     def post_save(self, strand, created):
-        changed = updateStrandWithCorrectPhotoTimes(strand)
-        if changed:
-            logger.debug("Updated strand %d with new times" % (strand.id))
-            strand.save()
+        if created:
+            changed = updateStrandWithCorrectPhotoTimes(strand)
+            if changed:
+                logger.debug("Updated strand %d with new times" % (strand.id))
+                strand.save()
 
-        # Now we want to create the "Added photos to a strand" Action
-        try:
-            user = User.objects.get(id=self.request.DATA['user_id'])
-        except User.DoesNotExist:
-            raise ParseError('User not found')
+            # Now we want to create the "Added photos to a strand" Action
+            try:
+                user = User.objects.get(id=self.request.DATA['user_id'])
+            except User.DoesNotExist:
+                raise ParseError('User not found')
 
-        if strand.private == False:
-            action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_CREATE_STRAND)
-            action.save()
-            action.photos = strand.photos.all()
+            if strand.private == False:
+                action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_CREATE_STRAND)
+                action.save()
+                action.photos = strand.photos.all()
 
-        # Created from is the private strand of the user.  We now want to hide it from view
-        if strand.created_from_id:
-            createdFromStrand = Strand.objects.get(id=strand.created_from_id)
-            if createdFromStrand and createdFromStrand.user_id == user.id and createdFromStrand.private == True:
-                createdFromStrand.suggestible = False
-                createdFromStrand.save()
+            # Created from is the private strand of the user.  We now want to hide it from view
+            if strand.created_from_id:
+                createdFromStrand = Strand.objects.get(id=strand.created_from_id)
+                if createdFromStrand and createdFromStrand.user_id == user.id and createdFromStrand.private == True:
+                    createdFromStrand.suggestible = False
+                    createdFromStrand.contributed_to_id = strand.id
+                    createdFromStrand.save()
 
-        logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
-        
+                # Next, add in strand Neighbor entries for all the private strands the created from one had
+                #  to the new public one
+                strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1 = createdFromStrand) | Q(strand_2 = createdFromStrand))
+                newStrandNeighbors = list()
+                for strandNeighbor in strandNeighbors:
+                    if strandNeighbor.strand_1_id != createdFromStrand.id:
+                        # The newly created strand will always have the higher id since it was just created
+                        newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_1, strand_2=strand))
+                    else:
+                        newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_2, strand_2=strand))
+
+                if len(newStrandNeighbors) > 0:
+                    StrandNeighbor.objects.bulk_create(newStrandNeighbors)
+                    
+            logger.info("Created new strand %s with users %s and photos %s and neighborRows %s" % (strand.id, strand.users.all(), strand.photos.all(), newStrandNeighbors))
+            
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
     def pre_save(self, strand):
         # Don't need to explicity save here since this is pre_save
@@ -288,12 +304,16 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
                 newPhotoIds.append(photoId)
 
         if len(newPhotoIds) > 0:
+            # Go through all the private strands that have any photos we're contributing
+            #   and mark them as such
+            privateStrands = Strand.objects.filter(photos__id__in=newPhotoIds, private=True, user=user)
+
+            for privateStrand in privateStrands:
+                privateStrand.contributed_to_id = strand.id
+                privateStrand.save()
+
             action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
             action.save()
-
             action.photos = newPhotoIds
-
-
-
 
 
