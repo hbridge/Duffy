@@ -51,11 +51,6 @@
                                            initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
                                            target:self
                                            action:@selector(cancelButtonPressed:)];
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithTitle:@"Invite" style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(doneButtonPressed:)];
-  self.navigationItem.rightBarButtonItem.enabled = NO;
 }
 
 - (void)viewDidLoad
@@ -77,22 +72,16 @@
 {
   DDLogVerbose(@"picked contacts: %@", peanutContacts);
   self.pickedContacts = peanutContacts;
-  self.navigationItem.rightBarButtonItem.enabled = (peanutContacts.count > 0);
-}
-
-- (void)cancelButtonPressed:(id)sender
-{
-  [self dismissViewControllerAnimated:YES completion:nil];
-}
-
-- (void)doneButtonPressed:(id)sender
-{
-  DDLogVerbose(@"done pressed for section: %@contacts: %@", self.sectionObject, self.pickedContacts);
   [SVProgressHUD show];
   DFPeanutStrand *peanutStrand = [[DFPeanutStrand alloc] init];
   peanutStrand.id = @(self.sectionObject.id);
   [self sendInvitesForStrand:peanutStrand
             toPeanutContacts:self.pickedContacts];
+}
+
+- (void)cancelButtonPressed:(id)sender
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand

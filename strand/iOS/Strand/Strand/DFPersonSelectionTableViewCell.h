@@ -12,8 +12,8 @@
 @interface DFPersonSelectionTableViewCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *checkedImageView;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *rightLabel;
 @property (nonatomic) BOOL showsTickMarkWhenSelected;
 
 typedef enum {

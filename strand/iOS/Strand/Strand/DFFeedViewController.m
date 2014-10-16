@@ -33,6 +33,7 @@
 #import "UINib+DFHelpers.h"
 #import "DFAddPhotosViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "NSArray+DFHelpers.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -90,6 +91,7 @@ const CGFloat LockedCellHeight = 157.0;
     [self observeNotifications];
     
     [self initTabBarItem];
+    [self initNavItem];
     
     if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
       self.inviteObject = feedObject;
@@ -125,6 +127,15 @@ const CGFloat LockedCellHeight = 157.0;
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
+}
+
+- (void)initNavItem
+{
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+                                            style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:@selector(inviteButtonPressed:)];
 }
 
 - (BOOL)hidesBottomBarWhenPushed
@@ -244,9 +255,7 @@ const CGFloat LockedCellHeight = 157.0;
                                                                  abbreviate:NO];
     
     self.navigationItem.titleView = titleView;
-    self.navigationItem.rightBarButtonItems = @[[[UIBarButtonItem alloc]
-                                                 initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil]];
-    
+   
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
     
@@ -335,7 +344,7 @@ const CGFloat LockedCellHeight = 157.0;
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
   DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:section];
-  headerView.actorLabel.text = [[strandPost actorNames] firstObject];
+  headerView.actorLabel.text = [strandPost actorsString];
   headerView.profilePhotoStackView.names = [strandPost actorNames];
   headerView.actionTextLabel.text = strandPost.title;
   headerView.subtitleLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp abbreviate:NO];
@@ -842,6 +851,23 @@ selectedObjectChanged:(id)newObject
 - (void)reloadRowForPhotoID:(DFPhotoIDType)photoID
 {
   [self.tableView reloadData];
+}
+
+
+- (void)inviteButtonPressed:(id)sender
+{
+  NSArray *contactsArray = [self.postsObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+    return [[DFPeanutContact alloc] initWithPeanutUser:user];
+  }];
+  DFInviteStrandViewController *vc = [[DFInviteStrandViewController alloc]
+                                      initWithSuggestedPeanutContacts:nil
+                                      notSelectablePeanutContacts:contactsArray
+                                      notSelectableReason:@"Already Member"];
+  vc.sectionObject = self.postsObject;
+  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
+                     animated:YES
+                   completion:nil];
+  
 }
 
 

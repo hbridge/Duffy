@@ -16,6 +16,7 @@
   backgroundColorView.backgroundColor = [UIColor colorWithWhite:.95 alpha:1.0];
   self.selectedBackgroundView = backgroundColorView;
   self.showsTickMarkWhenSelected = YES;
+  self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {

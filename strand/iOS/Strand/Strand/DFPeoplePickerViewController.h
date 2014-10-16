@@ -38,7 +38,12 @@
 @property (weak, nonatomic) IBOutlet UIView *doneButtonWrapper;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
 
+@property (nonatomic, retain) NSArray *notSelectableContacts;
+@property (nonatomic, retain) NSString *notSelectableReason;
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
+- (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
+                    notSelectablePeanutContacts:(NSArray *)notSelectableContacts
+                            notSelectableReason:(NSString *)notSelectableReason;
 
 @end
