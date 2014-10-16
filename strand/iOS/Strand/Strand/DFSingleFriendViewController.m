@@ -55,6 +55,7 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   [self configureTableView];
+  [self configureNavBar];
   [self reloadData];
 }
 
@@ -84,6 +85,11 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   } else {
     self.strandsToShow = [self.dataManager privateStrandsWithUser:self.userToView];
   }
+}
+
+- (void)configureNavBar
+{
+  self.navigationItem.title = self.userToView.display_name;
 }
 
 #pragma mark - Table view data source
