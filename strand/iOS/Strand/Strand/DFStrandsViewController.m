@@ -76,7 +76,7 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)configureNavigationItem
 {
   UILabel *titleLabel = [[UILabel alloc] init];
-  titleLabel.text = @"Strand";
+  titleLabel.text = @"Swap";
   titleLabel.font = [UIFont boldSystemFontOfSize:17.0];
   titleLabel.textColor = [UIColor whiteColor];
   [titleLabel sizeToFit];

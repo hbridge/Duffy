@@ -11,7 +11,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Strand${APP_BUNDLE_DISPLAY_NAME_SUFFIX}</string>
+	<string>Swap${APP_BUNDLE_DISPLAY_NAME_SUFFIX}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
