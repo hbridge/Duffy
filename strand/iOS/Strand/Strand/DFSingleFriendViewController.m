@@ -14,6 +14,7 @@
 #import "DFPeanutUserObject.h"
 #import "DFPeanutFeedObject.h"
 #import "DFStrandConstants.h"
+#import "DFNoTableItemsLabel.h"
 
 @interface DFSingleFriendViewController ()
 
@@ -22,6 +23,7 @@
 @property (nonatomic, retain) NSArray *strandsToShow;
 @property (nonatomic) BOOL useSharedPhotos;
 @property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
+@property (nonatomic, retain) UILabel *noResultsLabel;
 
 @end
 
@@ -57,6 +59,7 @@
   [self configureTableView];
   [self configureNavBar];
   [self reloadData];
+  [self configureNoResultsLabel];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -77,6 +80,20 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
 }
 
+- (void)configureNoResultsLabel
+{
+  if (!self.noResultsLabel && self.tableView) {
+    self.noResultsLabel = [[DFNoTableItemsLabel alloc] initWithSuperView:self.tableView];
+    self.noResultsLabel.text = @"No Photos";
+  }
+  
+  if (self.strandsToShow.count == 0) {
+    self.noResultsLabel.hidden = NO;
+  } else {
+    self.noResultsLabel.hidden = YES;
+  }
+}
+
 
 - (void)reloadData
 {
@@ -85,6 +102,8 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   } else {
     self.strandsToShow = [self.dataManager privateStrandsWithUser:self.userToView];
   }
+  
+  [self configureTableView];
 }
 
 - (void)configureNavBar
