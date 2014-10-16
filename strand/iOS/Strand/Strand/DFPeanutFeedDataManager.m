@@ -157,7 +157,7 @@ static DFPeanutFeedDataManager *defaultManager;
   for (DFPeanutFeedObject *object in self.privateStrandsFeedObjects) {
     for (NSUInteger i = 0; i < object.actors.count; i++) {
       DFPeanutUserObject *actor = object.actors[i];
-      if (user.id == actor.id) {
+      if (user.id == actor.id && [object.suggestible isEqual:@(YES)]) {
         [strands addObject:object];
       }
     }
@@ -273,37 +273,6 @@ static DFPeanutFeedDataManager *defaultManager;
      DDLogError(@"%@ failed to get strand: %@, error: %@",
                 self.class, requestStrand, error);
    }];
-  
-  // Now go through each of the private strands and update their visibility to NO
-  //   Doing this seperate from the strand update code above so we can do it in parallel
-  // For a suggestion type, the subobjects are strand objects
-  DFPeanutFeedObject *suggestionsObject = [[inviteFeedObject subobjectsOfType:DFFeedObjectSuggestedPhotos]
-                                           firstObject];
-  NSArray *suggestedSections = suggestionsObject.objects;
-  for (DFPeanutFeedObject *object in suggestedSections) {
-    DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
-    privateStrand.id = [NSNumber numberWithLongLong:object.id];
-    
-    [self.strandAdapter
-     performRequest:RKRequestMethodGET
-     withPeanutStrand:privateStrand
-     success:^(DFPeanutStrand *peanutStrand) {
-       peanutStrand.suggestible = @(NO);
-       
-       // Patch the peanut strand
-       [self.strandAdapter
-        performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
-        success:^(DFPeanutStrand *peanutStrand) {
-          DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
-        } failure:^(NSError *error) {
-          DDLogError(@"%@ failed to patch private strand: %@, error: %@",
-                     self.class, peanutStrand, error);
-        }];
-     } failure:^(NSError *error) {
-       DDLogError(@"%@ failed to get private strand: %@, error: %@",
-                  self.class, requestStrand, error);
-     }];
-  }
 }
 
 #pragma mark - Network Adapter
