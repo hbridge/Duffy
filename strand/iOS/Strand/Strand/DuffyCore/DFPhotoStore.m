@@ -613,15 +613,22 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   }
 }
 
-- (void)resetStore
++ (void)resetStore
 {
-  DFPhotoCollection *allPhotos = [DFPhotoStore allPhotosCollectionUsingContext:[self managedObjectContext]];
+  NSManagedObjectContext *context = [self createBackgroundManagedObjectContext];
+  DFPhotoCollection *allPhotos = [DFPhotoStore allPhotosCollectionUsingContext:context];
   
   DDLogInfo(@"Reset store requested.  Deleting %lu items.", (unsigned long)allPhotos.photoSet.count);
   for (NSManagedObject *managedObject in allPhotos.photoSet) {
-    [_managedObjectContext deleteObject:managedObject];
+    [context deleteObject:managedObject];
   }
-  [self saveContext];
+  
+  context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
+  NSError *error;
+  [context save:&error];
+  if (error) {
+    DDLogError(@"%@ error resetting store: %@", self, error);
+  }
 }
 
 - (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID

@@ -84,7 +84,6 @@
 
 - (void)showNextStep
 {
-  [[DFPhotoStore sharedStore] resetStore]; // this is a bit of a hack, need to put this in to initialize the DB and it's clear
   dispatch_async(dispatch_get_main_queue(), ^{
     AppDelegate *delegate = [[UIApplication sharedApplication] delegate];
     [delegate firstTimeSetupComplete];

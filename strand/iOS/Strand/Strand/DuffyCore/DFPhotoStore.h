@@ -69,7 +69,7 @@ typedef enum {
 - (void)saveContext;
 
 // wipe the store
-- (void)resetStore;
++ (void)resetStore;
 
 - (void)addAssetWithURL:(NSURL *) assetURL toPhotoAlbum:(NSString *) album;
 

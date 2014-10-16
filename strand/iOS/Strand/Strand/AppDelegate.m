@@ -152,6 +152,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 
 - (void)showFirstTimeSetup
 {
+  [DFPhotoStore resetStore]; // make sure the photo store is clean
   DFCreateAccountViewController *setupViewController = [[DFCreateAccountViewController alloc] init];
   self.window.rootViewController = [[DFNavigationController alloc]
                                     initWithRootViewController:setupViewController];
@@ -473,7 +474,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
     
     
     [[DFUploadController sharedUploadController] cancelUploads:NO];
-    [[DFPhotoStore sharedStore] resetStore];
+    [DFPhotoStore resetStore];
     [[DFContactsStore sharedStore] resetStore];
     
     // clear user defaults
