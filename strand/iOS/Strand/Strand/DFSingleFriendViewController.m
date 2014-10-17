@@ -37,6 +37,7 @@
     self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.userToView = userToView;
     self.useSharedPhotos = useSharedPhotos;
+    [self observeNotifications];
   }
   return self;
 }
