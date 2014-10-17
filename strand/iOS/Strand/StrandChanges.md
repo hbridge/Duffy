@@ -1,11 +1,13 @@
 # Swap
 
-## Oct 17, 2015 (4754, 4755, 4756, 4757)
+## Oct 17, 2015 (4754, 4755, 4756, 4757, 4758)
 
 - Changed name references
 - Badge friends
 - Fix issues with picking phone contacts
 - Show message when you have no swapped photos
+- Show message when you have no friends on Swap
+- Fix bad photos data sometimes created on first run
 
 
 ## Oct 16, 2015 (4750, 4751, 4752)
