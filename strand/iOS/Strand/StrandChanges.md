@@ -1,6 +1,6 @@
 # Swap
 
-## Oct 17, 2015 (4754, 4755, 4756, 4757, 4758)
+## Oct 17, 2015 (4754-4759)
 
 - Changed name references
 - Badge friends
