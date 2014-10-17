@@ -30,6 +30,8 @@
 #import "DFStrandGalleryTitleView.h"
 #import "DFStrandGalleryViewController.h"
 #import "DFFeedViewController.h"
+#import "DFNoTableItemsView.h"
+#import "UINib+DFHelpers.h"
 
 
 @interface DFInboxViewController ()
@@ -39,7 +41,7 @@
 @property (nonatomic, retain) MMPopLabel *noItemsPopLabel;
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
-@property (nonatomic, retain) UILabel *noPhotosLabel;
+@property (nonatomic, retain) DFNoTableItemsView *noItemsView;
 @property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
 
 @end
@@ -91,6 +93,7 @@
   [self configureRefreshControl];
   [self configureTableView];
   [self configurePopLabel];
+  [self reloadData];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -156,19 +159,23 @@
     [self.tableView reloadData];
     
     if (self.feedObjects.count == 0) {
-      self.noPhotosLabel = [[UILabel alloc] init];
-      self.noPhotosLabel.font = [UIFont systemFontOfSize:20.0];
-      self.noPhotosLabel.textColor = [UIColor darkGrayColor];
-      self.noPhotosLabel.text = @"No Photos Swapped";
-      [self.noPhotosLabel sizeToFit];
-      [self.view addSubview:self.noPhotosLabel];
-      CGRect frame = self.noPhotosLabel.frame;
-      frame.origin.x = self.view.frame.size.width / 2.0 - frame.size.width / 2.0;
-      frame.origin.y = self.tableView.rowHeight /2.0 - frame.size.height / 2.0;
-      self.noPhotosLabel.frame = frame;
+      if (!self.noItemsView) {
+        self.noItemsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+        [self.noItemsView setSuperView:self.view];
+      }
+      
+      self.noItemsView.hidden = NO;
+      if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
+        self.noItemsView.titleLabel.text = @"No Photos Swapped";
+        [self.noItemsView.activityIndicator stopAnimating];
+        self.noItemsView.subtitleLabel.text = @"Tap the + to get started";
+      } else {
+        self.noItemsView.titleLabel.text = @"Loading...";
+        [self.noItemsView.activityIndicator startAnimating];
+        self.noItemsView.subtitleLabel.text = @"";
+      }
     } else {
-      [self.noPhotosLabel removeFromSuperview];
-      self.noPhotosLabel = nil;
+      self.noItemsView.hidden = YES;
     }
   });
 }

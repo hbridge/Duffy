@@ -14,7 +14,8 @@
 #import "DFPeanutUserObject.h"
 #import "DFPeanutFeedObject.h"
 #import "DFStrandConstants.h"
-#import "DFNoTableItemsLabel.h"
+#import "DFNoTableItemsView.h"
+#import "UINib+DFHelpers.h"
 
 @interface DFSingleFriendViewController ()
 
@@ -23,7 +24,7 @@
 @property (nonatomic, retain) NSArray *strandsToShow;
 @property (nonatomic) BOOL useSharedPhotos;
 @property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
-@property (nonatomic, retain) UILabel *noResultsLabel;
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
 @end
 
@@ -83,15 +84,17 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
 
 - (void)configureNoResultsLabel
 {
-  if (!self.noResultsLabel && self.tableView) {
-    self.noResultsLabel = [[DFNoTableItemsLabel alloc] initWithSuperView:self.tableView];
-    self.noResultsLabel.text = @"No Photos";
+  if (!self.noResultsView && self.tableView) {
+    self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    [self.noResultsView setSuperView:self.tableView];
+    self.noResultsView.titleLabel.text = @"No Photos";
+    self.noResultsView.subtitleLabel.hidden = YES;
   }
   
   if (self.strandsToShow.count == 0) {
-    self.noResultsLabel.hidden = NO;
+    self.noResultsView.hidden = NO;
   } else {
-    self.noResultsLabel.hidden = YES;
+    self.noResultsView.hidden = YES;
   }
 }
 

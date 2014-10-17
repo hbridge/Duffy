@@ -75,6 +75,7 @@
 		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
 		5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */; };
 		5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */; };
+		5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */; };
 		5A65181E19D62754001FE911 /* DFStrandGalleryTitleView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A65181D19D62754001FE911 /* DFStrandGalleryTitleView.m */; };
 		5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */; };
 		5A6E4D7B19D20A51002CB0A2 /* NSArray+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */; };
@@ -95,7 +96,7 @@
 		5A83A3D619EED9ED0068F08B /* DFSmallCardTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3D519EED9ED0068F08B /* DFSmallCardTableViewCell.xib */; };
 		5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A83A3D819F019CE0068F08B /* DFFriendProfileViewController.m */; };
 		5A83A3DB19F019CE0068F08B /* DFFriendProfileViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */; };
-		5A83A3DE19F046390068F08B /* DFNoTableItemsLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A83A3DD19F046390068F08B /* DFNoTableItemsLabel.m */; };
+		5A83A3DE19F046390068F08B /* DFNoTableItemsView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A83A3DD19F046390068F08B /* DFNoTableItemsView.m */; };
 		5A83A3E019F04A6F0068F08B /* DFFeedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */; };
 		5A8F052D1946716D003C69E0 /* DFCameraOverlayView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */; };
 		5A90343019476BEE00893613 /* DFCameraOverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A90342F19476BEE00893613 /* DFCameraOverlayView.xib */; };
@@ -370,6 +371,7 @@
 		5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContactAdapter.m; sourceTree = "<group>"; };
 		5A56EFC8198AF5C60032CA8A /* DFContactSyncManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactSyncManager.h; sourceTree = "<group>"; };
 		5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactSyncManager.m; sourceTree = "<group>"; };
+		5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFNoTableItemsView.xib; sourceTree = "<group>"; };
 		5A65181C19D62754001FE911 /* DFStrandGalleryTitleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGalleryTitleView.h; sourceTree = "<group>"; };
 		5A65181D19D62754001FE911 /* DFStrandGalleryTitleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGalleryTitleView.m; sourceTree = "<group>"; };
 		5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandGalleryTitleView.xib; sourceTree = "<group>"; };
@@ -404,8 +406,8 @@
 		5A83A3D719F019CE0068F08B /* DFFriendProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFriendProfileViewController.h; sourceTree = "<group>"; };
 		5A83A3D819F019CE0068F08B /* DFFriendProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFriendProfileViewController.m; sourceTree = "<group>"; };
 		5A83A3D919F019CE0068F08B /* DFFriendProfileViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFriendProfileViewController.xib; sourceTree = "<group>"; };
-		5A83A3DC19F046390068F08B /* DFNoTableItemsLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNoTableItemsLabel.h; sourceTree = "<group>"; };
-		5A83A3DD19F046390068F08B /* DFNoTableItemsLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNoTableItemsLabel.m; sourceTree = "<group>"; };
+		5A83A3DC19F046390068F08B /* DFNoTableItemsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNoTableItemsView.h; sourceTree = "<group>"; };
+		5A83A3DD19F046390068F08B /* DFNoTableItemsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNoTableItemsView.m; sourceTree = "<group>"; };
 		5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFFeedViewController.xib; sourceTree = "<group>"; };
 		5A8F052B1946716D003C69E0 /* DFCameraOverlayView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCameraOverlayView.h; sourceTree = "<group>"; };
 		5A8F052C1946716D003C69E0 /* DFCameraOverlayView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCameraOverlayView.m; sourceTree = "<group>"; };
@@ -711,8 +713,9 @@
 				5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */,
 				5A4C820C19EDC11800C22A12 /* DFActionButton.h */,
 				5A4C820D19EDC11800C22A12 /* DFActionButton.m */,
-				5A83A3DC19F046390068F08B /* DFNoTableItemsLabel.h */,
-				5A83A3DD19F046390068F08B /* DFNoTableItemsLabel.m */,
+				5A83A3DC19F046390068F08B /* DFNoTableItemsView.h */,
+				5A83A3DD19F046390068F08B /* DFNoTableItemsView.m */,
+				5A609A6019F1997000531FEA /* DFNoTableItemsView.xib */,
 			);
 			name = "Common Views";
 			sourceTree = "<group>";
@@ -1620,6 +1623,7 @@
 				5AAF039719B10A8600EF021C /* DFSelectablePhotoViewCell.xib in Resources */,
 				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */,
+				5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFStrandSuggestionsViewController.xib in Resources */,
@@ -1871,7 +1875,7 @@
 				5AEFA25A19D607150027BC5E /* DFStrandGallerySectionHeaderView.m in Sources */,
 				5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
-				5A83A3DE19F046390068F08B /* DFNoTableItemsLabel.m in Sources */,
+				5A83A3DE19F046390068F08B /* DFNoTableItemsView.m in Sources */,
 				5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */,
 				5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */,
 				5AF64D0519EC61AA00EE1473 /* DFFriendsViewController.m in Sources */,
