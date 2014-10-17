@@ -201,10 +201,10 @@
   } else if (count == 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    buttonTitle = @"Send to 1 person";
+    buttonTitle = @"Send to 1 Person";
     self.doneButton.enabled = YES;
   } else {
-    buttonTitle = @"No People Selected";
+    buttonTitle = @"No One Selected";
     self.navigationItem.rightBarButtonItem.enabled = NO;
     self.doneButton.enabled = NO;
   }
@@ -327,9 +327,9 @@
   NSInteger result = 1;
   
   if (tableView == self.tableView) {
-    return self.unfilteredSections.count;
+    if (self.unfilteredSections.count > 0) result = self.unfilteredSections.count;
   } else {
-    return self.filteredSections.count;
+    if (self.filteredSections.count > 0) result = self.filteredSections.count;
   }
   
   return result;
@@ -337,11 +337,12 @@
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-  if (tableView == self.tableView) {
+  if (tableView == self.tableView && section < self.unfilteredSectionTitles.count) {
     return self.unfilteredSectionTitles[section];
-  } else {
+  } else if (tableView == self.sdc.searchResultsTableView && section < self.filteredSectionTitles.count){
     return self.filteredSectionTitles[section];
   }
+  
   return nil;
 }
 
@@ -355,9 +356,9 @@
 {
   NSArray *sectionArray;
   
-  if (tableView == self.tableView) {
+  if (tableView == self.tableView && section  < self.unfilteredSections.count) {
     sectionArray = self.unfilteredSections[section];
-  } else {
+  } else if (tableView == self.sdc.searchResultsTableView && section < self.filteredSections.count) {
     sectionArray = self.filteredSections[section];
   }
   
@@ -400,16 +401,17 @@
 - (id)objectForIndexPath:(NSIndexPath *)indexPath tableView:(UITableView *)tableView
 {
   NSArray *resultsArray;
-  if (tableView != self.tableView) {
-    resultsArray = self.filteredSections[indexPath.section];
-  } else {
+  if (tableView == self.tableView && indexPath.section < self.unfilteredSections.count) {
     resultsArray = self.unfilteredSections[indexPath.section];
+  } else if (tableView == self.sdc.searchResultsTableView && indexPath.section < self.filteredSections.count) {
+    resultsArray = self.filteredSections[indexPath.section];
   }
   
   id object = nil;
   if (indexPath.row < resultsArray.count) {
     object = resultsArray[indexPath.row];
   }
+  
   return object;
 }
 
@@ -515,13 +517,12 @@
       [self.unfilteredSectionTitles removeObject:@"On Strand"];
     }
     
-    [self addSelectedContact:contact];
-    
+    [self addContactToSelectedSection:contact];
     [self.tableView reloadData];
   }
 }
 
-- (void)addSelectedContact:(DFPeanutContact *)contact
+- (void)addContactToSelectedSection:(DFPeanutContact *)contact
 {
   if (!self.selectedNonSuggestionsList) {
     // add it to the new section
@@ -530,8 +531,9 @@
     [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:insertIndex];
     [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:insertIndex];
   }
+  
   [self.selectedNonSuggestionsList addObject:contact];
-
+  [self.selectedContacts addObject:contact];
 }
 
 - (void)textNumberRowSelected:(NSString *)phoneNumber
@@ -540,7 +542,8 @@
   textNumberContact.phone_number = phoneNumber;
   textNumberContact.name = phoneNumber;
   textNumberContact.phone_type = @"text";
-  [self addSelectedContact:textNumberContact];
+  [self.selectedContacts addObject:textNumberContact];
+  [self addContactToSelectedSection:textNumberContact];
   self.searchDisplayController.searchBar.text = @"";
   [self.searchDisplayController setActive:NO animated:YES];
 }
