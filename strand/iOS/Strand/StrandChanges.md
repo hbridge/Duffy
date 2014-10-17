@@ -1,9 +1,11 @@
 # Strand
 
-## Oct 17, 2015 (4754)
+## Oct 17, 2015 (4754, 4755)
 
 - Changed name references
 - Badge friends
+- Fix issues with picking phone contacts
+- Show message when you have no swapped photos
 
 
 ## Oct 16, 2015 (4750, 4751, 4752)
