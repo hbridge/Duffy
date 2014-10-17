@@ -40,6 +40,7 @@
 
 @property (nonatomic, retain) NSArray *notSelectableContacts;
 @property (nonatomic, retain) NSString *notSelectableReason;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts

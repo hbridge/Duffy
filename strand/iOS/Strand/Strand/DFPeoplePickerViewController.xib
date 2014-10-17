@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment defaultVersion="1792" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
@@ -9,6 +10,7 @@
             <connections>
                 <outlet property="doneButton" destination="T24-ju-et9" id="B08-fk-NIn"/>
                 <outlet property="doneButtonWrapper" destination="h1z-eC-fV9" id="nwS-cW-XKp"/>
+                <outlet property="searchBar" destination="jD1-Ka-tUi" id="ZuR-cu-LdO"/>
                 <outlet property="tableView" destination="pkn-BI-Fod" id="0W9-ig-PRF"/>
                 <outlet property="view" destination="QF5-wa-mQe" id="2gD-BR-Ddi"/>
             </connections>
@@ -19,7 +21,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="grouped" separatorStyle="default" rowHeight="54" sectionHeaderHeight="10" sectionFooterHeight="10" translatesAutoresizingMaskIntoConstraints="NO" id="pkn-BI-Fod">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <rect key="frame" x="0.0" y="44" width="600" height="556"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="hWn-LO-5pu"/>
@@ -47,17 +49,30 @@
                         <constraint firstAttribute="centerY" secondItem="T24-ju-et9" secondAttribute="centerY" id="zYZ-HD-hrO"/>
                     </constraints>
                 </view>
+                <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="jD1-Ka-tUi">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                    <textInputTraits key="textInputTraits"/>
+                </searchBar>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="h1z-eC-fV9" secondAttribute="bottom" id="0fS-nf-puK"/>
+                <constraint firstItem="pkn-BI-Fod" firstAttribute="top" secondItem="jD1-Ka-tUi" secondAttribute="bottom" id="4dW-zx-Bg0"/>
                 <constraint firstAttribute="trailing" secondItem="pkn-BI-Fod" secondAttribute="trailing" id="8ff-M8-FVM"/>
+                <constraint firstAttribute="trailing" secondItem="jD1-Ka-tUi" secondAttribute="trailing" id="G9b-mw-JfG"/>
+                <constraint firstItem="jD1-Ka-tUi" firstAttribute="top" secondItem="QF5-wa-mQe" secondAttribute="top" id="Ih7-lg-4Yi"/>
                 <constraint firstAttribute="bottom" secondItem="pkn-BI-Fod" secondAttribute="bottom" id="NAB-4y-QvR"/>
+                <constraint firstItem="jD1-Ka-tUi" firstAttribute="leading" secondItem="QF5-wa-mQe" secondAttribute="leading" id="Wlg-8M-bR3"/>
                 <constraint firstAttribute="trailing" secondItem="h1z-eC-fV9" secondAttribute="trailing" id="cAs-pW-LGR"/>
                 <constraint firstItem="pkn-BI-Fod" firstAttribute="leading" secondItem="QF5-wa-mQe" secondAttribute="leading" id="mCd-Tj-Xtx"/>
                 <constraint firstItem="h1z-eC-fV9" firstAttribute="leading" secondItem="QF5-wa-mQe" secondAttribute="leading" id="oAa-ia-6yu"/>
                 <constraint firstItem="pkn-BI-Fod" firstAttribute="top" secondItem="QF5-wa-mQe" secondAttribute="top" id="oaR-ng-cGq"/>
             </constraints>
+            <variation key="default">
+                <mask key="constraints">
+                    <exclude reference="oaR-ng-cGq"/>
+                </mask>
+            </variation>
             <point key="canvasLocation" x="351" y="217"/>
         </view>
     </objects>

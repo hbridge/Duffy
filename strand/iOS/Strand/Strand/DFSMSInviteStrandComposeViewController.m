@@ -15,9 +15,9 @@
 @implementation DFSMSInviteStrandComposeViewController
 
 #if BETA
-static NSString *const appURL = @"http://bit.ly/strand-beta";
+static NSString *const appURL = @"http://bit.ly/swap-beta";
 #else
-static NSString *const appURL = @"http://bit.ly/strand-appstore";
+static NSString *const appURL = @"http://bit.ly/swap-appstore";
 #endif
 
 const NSTimeInterval DaysMultiplier = 60 * 60 * 24;

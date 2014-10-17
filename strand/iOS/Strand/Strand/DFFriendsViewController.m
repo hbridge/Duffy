@@ -156,6 +156,12 @@
 {
   _friendPeanutUsers = [self.peanutDataManager friendsList];
   [self.tableView reloadData];
+  NSUInteger numWithUnshared = [self numPeopleWithUnsharedStrands];
+  if (numWithUnshared > 0) {
+    self.tabBarItem.badgeValue = [@(numWithUnshared) stringValue];
+  } else {
+    self.tabBarItem.badgeValue = nil;
+  }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -163,7 +169,17 @@
   // Dispose of any resources that can be recreated.
 }
 
-
+- (NSUInteger)numPeopleWithUnsharedStrands
+{
+  NSUInteger result = 0;
+  
+  for (DFPeanutUserObject *peanutUser in self.friendPeanutUsers) {
+    NSArray *unswappedForUser = [self.peanutDataManager privateStrandsWithUser:peanutUser];
+    if (unswappedForUser.count > 0) result++;
+  }
+  
+  return result;
+}
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
@@ -199,8 +215,10 @@
   cell.nameLabel.text = peanutUser.display_name;
   int unswappedCount = (int)unswappedStrands.count;
   if (unswappedCount > 0) {
-    cell.rightLabel.text = [NSString stringWithFormat:@"%d", unswappedCount];
+    cell.rightLabel.text = [NSString stringWithFormat:@"%d to swap", unswappedCount];
+    cell.nameLabel.font = [UIFont boldSystemFontOfSize:cell.nameLabel.font.pointSize];
   } else {
+    cell.nameLabel.font = [UIFont systemFontOfSize:cell.nameLabel.font.pointSize];
     cell.rightLabel.text = @"";
   }
   cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;

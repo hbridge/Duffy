@@ -42,6 +42,7 @@
 
 @property (nonatomic, retain) NSMutableArray *selectedNonSuggestionsList;
 @property (nonatomic, retain) NSMutableArray *selectedContacts;
+@property (nonatomic) BOOL hideStatusBar;
 
 @end
 
@@ -88,6 +89,17 @@
   [self configureTableView];
   [self configureSearch];
   [self selectionUpdated];
+}
+
+- (void)setPrefersStatusBarHidden:(BOOL)prefersStatusBarHidden
+{
+  _hideStatusBar = prefersStatusBarHidden;
+  [self setNeedsStatusBarAppearanceUpdate];
+}
+
+- (BOOL)prefersStatusBarHidden
+{
+  return self.hideStatusBar;
 }
 
 - (void)setAllowsMultipleSelection:(BOOL)allowsMultipleSelection
@@ -161,14 +173,14 @@
 
 - (void)configureSearch
 {
-  UISearchBar *searchBar = [[UISearchBar alloc] init];
-  searchBar.delegate = self;
+  self.searchBar.delegate = self;
+
   self.sdc = [[UISearchDisplayController alloc]
-                                    initWithSearchBar:searchBar
+                                    initWithSearchBar:self.searchBar
                                     contentsController:self];
   self.sdc.searchResultsDataSource = self;
   self.sdc.searchResultsDelegate = self;
-  self.tableView.tableHeaderView = searchBar;
+  self.sdc.delegate = self;
 }
 
 - (void)selectionUpdated
@@ -186,7 +198,7 @@
     buttonTitle = @"Send to 1 person";
     self.doneButton.enabled = YES;
   } else {
-    buttonTitle = @"None Selected";
+    buttonTitle = @"No People Selected";
     self.navigationItem.rightBarButtonItem.enabled = NO;
     self.doneButton.enabled = NO;
   }
@@ -200,6 +212,16 @@
 }
 
 #pragma mark - UISearchDisplayController Delegate
+
+- (void)searchDisplayControllerWillBeginSearch:(UISearchDisplayController *)controller
+{
+  self.hideStatusBar = YES;
+}
+
+- (void)searchDisplayControllerWillEndSearch:(UISearchDisplayController *)controller
+{
+  self.hideStatusBar = NO;
+}
 
 - (void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText
 {
@@ -487,18 +509,23 @@
       [self.unfilteredSectionTitles removeObject:@"On Strand"];
     }
     
-    // add it to thew selected section
-    if (!self.selectedNonSuggestionsList) {
-      // add it to the new section
-      self.selectedNonSuggestionsList = [NSMutableArray new];
-      NSUInteger insertIndex = MIN(self.unfilteredSections.count, 1);
-      [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:insertIndex];
-      [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:insertIndex];
-    }
-    [self.selectedNonSuggestionsList addObject:contact];
-
+    [self addSelectedContact:contact];
+    
     [self.tableView reloadData];
   }
+}
+
+- (void)addSelectedContact:(DFPeanutContact *)contact
+{
+  if (!self.selectedNonSuggestionsList) {
+    // add it to the new section
+    self.selectedNonSuggestionsList = [NSMutableArray new];
+    NSUInteger insertIndex = MIN(self.unfilteredSections.count, 0);
+    [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:insertIndex];
+    [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:insertIndex];
+  }
+  [self.selectedNonSuggestionsList addObject:contact];
+
 }
 
 - (void)textNumberRowSelected:(NSString *)phoneNumber
@@ -507,14 +534,7 @@
   textNumberContact.phone_number = phoneNumber;
   textNumberContact.name = phoneNumber;
   textNumberContact.phone_type = @"text";
-  if (!self.selectedNonSuggestionsList) {
-    // add it to the new section
-    self.selectedNonSuggestionsList = [NSMutableArray new];
-    [self.unfilteredSections insertObject:self.selectedNonSuggestionsList atIndex:1];
-    [self.unfilteredSectionTitles insertObject:@"Selected" atIndex:1];
-  }
-  [self.selectedNonSuggestionsList addObject:textNumberContact];
-  [self.selectedContacts addObject:textNumberContact];
+  [self addSelectedContact:textNumberContact];
   self.searchDisplayController.searchBar.text = @"";
   [self.searchDisplayController setActive:NO animated:YES];
 }

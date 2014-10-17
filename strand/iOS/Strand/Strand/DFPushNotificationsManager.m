@@ -33,8 +33,8 @@
       dispatch_async(dispatch_get_main_queue(), ^{
         DDLogInfo(@"%@ prompting for push notifs.", self.class);
         UIAlertView *alertView = [[UIAlertView alloc]
-                                  initWithTitle:@"Receive Updates"
-                                  message:@"Would you like to get notifications when friends add photos?"
+                                  initWithTitle:@"Receive Notifications"
+                                  message:@"Would you like to get notifications when friends send you photos?"
                                   delegate:self
                                   cancelButtonTitle:@"Not Now"
                                   otherButtonTitles:@"Yes", nil];
