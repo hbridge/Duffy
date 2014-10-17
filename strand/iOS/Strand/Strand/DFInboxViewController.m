@@ -157,27 +157,31 @@
   dispatch_async(dispatch_get_main_queue(), ^{
     _feedObjects = [self.manager publicStrands];
     [self.tableView reloadData];
-    
-    if (self.feedObjects.count == 0) {
-      if (!self.noItemsView) {
-        self.noItemsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-        [self.noItemsView setSuperView:self.view];
-      }
-      
-      self.noItemsView.hidden = NO;
-      if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
-        self.noItemsView.titleLabel.text = @"No Photos Swapped";
-        [self.noItemsView.activityIndicator stopAnimating];
-        self.noItemsView.subtitleLabel.text = @"Tap the + to get started";
-      } else {
-        self.noItemsView.titleLabel.text = @"Loading...";
-        [self.noItemsView.activityIndicator startAnimating];
-        self.noItemsView.subtitleLabel.text = @"";
-      }
-    } else {
-      self.noItemsView.hidden = YES;
-    }
+    [self configureNoResultsView];
   });
+}
+
+- (void)configureNoResultsView
+{
+  if (self.feedObjects.count == 0) {
+    if (!self.noItemsView) {
+      self.noItemsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+      [self.noItemsView setSuperView:self.view];
+    }
+    
+    self.noItemsView.hidden = NO;
+    if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
+      self.noItemsView.titleLabel.text = @"No Photos Swapped";
+      [self.noItemsView.activityIndicator stopAnimating];
+      self.noItemsView.subtitleLabel.text = @"Tap the + to get started";
+    } else {
+      self.noItemsView.titleLabel.text = @"Loading...";
+      [self.noItemsView.activityIndicator startAnimating];
+      self.noItemsView.subtitleLabel.text = @"";
+    }
+  } else {
+    self.noItemsView.hidden = YES;
+  }
 }
 
 - (void)refreshFromServer

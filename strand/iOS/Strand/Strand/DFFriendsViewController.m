@@ -18,6 +18,9 @@
 #import "UINib+DFHelpers.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFContactSyncManager.h"
+#import "DFStrandSuggestionsViewController.h"
+#import "DFNavigationController.h"
+#import "DFNoTableItemsView.h"
 
 
 @interface DFFriendsViewController ()
@@ -28,6 +31,7 @@
 
 @property (nonatomic, retain) DFPeanutUserObject *actionSheetUserSelected;
 @property (nonatomic, retain) DFSwapUpsellView *contactsUpsellView;
+@property (nonatomic, retain) DFNoTableItemsView *noFriendsView;
 
 @end
 
@@ -57,6 +61,10 @@
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/PeopleBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                            target:self
+                                            action:@selector(createButtonPressed:)];
 }
 
 
@@ -140,6 +148,7 @@
     [self.contactsUpsellView removeFromSuperview];
     self.contactsUpsellView = nil;
     [self configureContactsUpsell];
+    [self reloadData];
   }];
 }
 
@@ -161,6 +170,37 @@
     self.tabBarItem.badgeValue = [@(numWithUnshared) stringValue];
   } else {
     self.tabBarItem.badgeValue = nil;
+  }
+  
+  
+  [self configureNoResultsView];
+}
+
+- (void)configureNoResultsView
+{
+  if (self.friendPeanutUsers.count == 0) {
+    if (!self.noFriendsView) {
+      self.noFriendsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+      [self.noFriendsView setSuperView:self.view];
+    }
+    
+    self.noFriendsView.hidden = NO;
+    if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
+      self.noFriendsView.titleLabel.text = @"No Friends Yet";
+      [self.noFriendsView.activityIndicator stopAnimating];
+      if (!self.contactsUpsellView.superview) {
+        self.noFriendsView.titleLabel.text = @"No Friends Have Swap";
+        self.noFriendsView.subtitleLabel.text = @"Tap + and send someone photos to invite them";
+      }
+    } else {
+      self.noFriendsView.titleLabel.text = @"Loading...";
+      [self.noFriendsView.activityIndicator startAnimating];
+      self.noFriendsView.subtitleLabel.text = @"";
+    }
+    self.tableView.hidden = YES;
+  } else {
+    self.noFriendsView.hidden = YES;
+    self.tableView.hidden = NO;
   }
 }
 
@@ -243,5 +283,13 @@
   }
 }
 
+- (void)createButtonPressed:(id)sender
+{
+  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
+  DFNavigationController *navController = [[DFNavigationController
+                                            alloc] initWithRootViewController:createController];
+  
+  [self presentViewController:navController animated:YES completion:nil];
+}
 
 @end
