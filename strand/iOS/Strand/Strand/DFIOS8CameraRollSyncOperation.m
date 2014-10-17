@@ -43,6 +43,7 @@
                                                                  ascending:NO],
                                    ];
   NSMutableArray *photoPredicates = [NSMutableArray new];
+  [photoPredicates addObject:[NSPredicate predicateWithFormat:@"mediaType == %d", PHAssetMediaTypeImage]];
   if (startDate && endDate) {
     [photoPredicates addObject:[NSPredicate predicateWithFormat:@"creationDate >= %@", startDate]];
     [photoPredicates addObject:[NSPredicate predicateWithFormat:@"creationDate <= %@", endDate]];
