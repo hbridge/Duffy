@@ -20,7 +20,7 @@
                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="lU9-hh-vj8">
                     <rect key="frame" x="290" y="8" width="20" height="20"/>
                 </activityIndicatorView>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Subtitle" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5o1-IU-s0a">
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" text="Subtitle" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="5o1-IU-s0a">
                     <rect key="frame" x="20" y="67" width="560" height="18"/>
                     <fontDescription key="fontDescription" type="system" pointSize="15"/>
                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
@@ -32,7 +32,6 @@
                 <constraint firstAttribute="trailing" secondItem="5o1-IU-s0a" secondAttribute="trailing" constant="20" id="2a0-FJ-odJ"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="5o1-IU-s0a" secondAttribute="bottom" constant="20" id="3a2-bq-Tvb"/>
                 <constraint firstItem="5o1-IU-s0a" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="3yn-Bu-uaa"/>
-                <constraint firstAttribute="bottom" secondItem="5o1-IU-s0a" secondAttribute="bottom" id="Jdh-wW-Td4"/>
                 <constraint firstAttribute="centerX" secondItem="lU9-hh-vj8" secondAttribute="centerX" id="LDN-cS-Ar2"/>
                 <constraint firstItem="WH2-z2-97B" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="Ra3-Eh-JGq"/>
                 <constraint firstItem="WH2-z2-97B" firstAttribute="top" secondItem="lU9-hh-vj8" secondAttribute="bottom" constant="8" id="XFP-RL-Fa7"/>
@@ -42,16 +41,12 @@
                 <constraint firstItem="lU9-hh-vj8" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="h5U-Is-Vga"/>
                 <constraint firstItem="5o1-IU-s0a" firstAttribute="top" secondItem="WH2-z2-97B" secondAttribute="bottom" constant="8" id="tCb-RQ-f1r"/>
             </constraints>
-            <variation key="default">
-                <mask key="constraints">
-                    <exclude reference="Jdh-wW-Td4"/>
-                </mask>
-            </variation>
             <connections>
                 <outlet property="activityIndicator" destination="lU9-hh-vj8" id="Nr7-MA-iAt"/>
                 <outlet property="subtitleLabel" destination="5o1-IU-s0a" id="407-Ea-wEZ"/>
                 <outlet property="titleLabel" destination="WH2-z2-97B" id="oTR-PN-mDz"/>
             </connections>
+            <point key="canvasLocation" x="562" y="534"/>
         </view>
     </objects>
 </document>
