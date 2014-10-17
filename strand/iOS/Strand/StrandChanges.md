@@ -1,5 +1,11 @@
 # Strand
 
+## Oct 17, 2015 (4754)
+
+- Changed name references
+- Badge friends
+
+
 ## Oct 16, 2015 (4750, 4751, 4752)
 
 - Renamed to Swap!
