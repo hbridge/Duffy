@@ -558,7 +558,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   if (self.suggestionsObject.objects.count == 0) {
     [UIAlertView showSimpleAlertWithTitle:@"No Matches"
-                            formatMessage:@"You have no matching photos.  Enjoy your free photos!"];
+                            formatMessage:@"You have no matching photos. Enjoy your free photos!"];
     [[DFPeanutFeedDataManager sharedManager]
      acceptInvite:self.inviteObject
      addPhotoIDs:nil
