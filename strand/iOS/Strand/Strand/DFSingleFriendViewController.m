@@ -104,6 +104,7 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
   }
   
   [self configureTableView];
+  [self.tableView reloadData];
 }
 
 - (void)configureNavBar
