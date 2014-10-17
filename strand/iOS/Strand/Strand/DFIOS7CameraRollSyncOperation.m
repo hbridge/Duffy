@@ -59,9 +59,13 @@
     return self.allObjectIDsToChanges;
   }
   
-  NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
-  [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
-  [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  // Only look for deletions if we were scanning the entire camera roll!
+  // if you look for deletions but are only scanning a subset, it will delete everything else
+  if (!startDate && !endDate) {
+    NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
+    [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+    [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  }
   [self flushChanges];
   DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@", [[NSDate date] timeIntervalSinceDate:timerStartDate], [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
   

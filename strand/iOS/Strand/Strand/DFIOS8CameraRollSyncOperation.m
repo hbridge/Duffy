@@ -30,20 +30,64 @@
   
   self.allObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   self.unsavedObjectIDsToChanges = [[NSMutableDictionary alloc] init];
-  DDLogDebug(@"%@ finding PHAssetChanges", self.class);
+  DDLogDebug(@"%@ finding PHAssetChanges with startDate:%@ endDate:%@", self.class, startDate, endDate);
   NSDate *timerStartDate = [NSDate date];
   
   //enumerate PHAssets
-  NSUInteger assetCount = 0;
-  PHFetchOptions *assetOptions = [PHFetchOptions new];
-  assetOptions.sortDescriptors = @[
-                                   [NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:NO],
+  NSUInteger __block assetCount = 0;
+  
+  // setup photo fetch options
+  PHFetchOptions *photoFetchOptions = [PHFetchOptions new];
+  photoFetchOptions.sortDescriptors = @[
+                                   [NSSortDescriptor sortDescriptorWithKey:@"creationDate"
+                                                                 ascending:NO],
                                    ];
+  NSMutableArray *photoPredicates = [NSMutableArray new];
+  if (startDate && endDate) {
+    [photoPredicates addObject:[NSPredicate predicateWithFormat:@"creationDate >= %@", startDate]];
+    [photoPredicates addObject:[NSPredicate predicateWithFormat:@"creationDate <= %@", endDate]];
+  }
+  if (photoPredicates.count > 0) {
+    photoFetchOptions.predicate = [[NSCompoundPredicate alloc] initWithType:NSAndPredicateType
+                                                              subpredicates:photoPredicates];
+  }
+  
+  // enumerate all the photo asets, scanning for changes as we go
+  [self enumerateAssetsUsingCollectionsWithAssetOptions:photoFetchOptions assetBlock:^(PHAsset *asset) {
+    assetCount++;
+    [[DFAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
+    [self scanPHAssetForChange:asset];
+  }];
+
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
+  }
+  
+  // Only look for deletions if we were scanning the entire camera roll!
+  // if you look for deletions but are only scanning a subset, it will delete everything else
+  if (!startDate && !endDate) {
+    NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
+    [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+    [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  }
+  
+  [self flushChanges];
+  DDLogInfo(@"Scan complete.  Took %.02f Change summary for %@ assets: \n%@",
+            [[NSDate date]
+             timeIntervalSinceDate:timerStartDate],
+            @(assetCount),
+            [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
+  
+  return self.allObjectIDsToChanges;
+}
+
+- (void)enumerateAssetsUsingCollectionsWithAssetOptions:(PHFetchOptions *)assetOptions
+                                             assetBlock:(void(^)(PHAsset *asset))assetBlock
+{
   PHFetchOptions *collectionOptions = [PHFetchOptions new];
   collectionOptions.sortDescriptors = @[
                                         [NSSortDescriptor sortDescriptorWithKey:@"endDate" ascending:NO],
                                         ];
-  
   PHFetchResult *allMomentsList = [PHCollectionList
                                    fetchMomentListsWithSubtype:PHCollectionListSubtypeMomentListCluster
                                    options:collectionOptions];
@@ -53,38 +97,29 @@
     for (PHAssetCollection *assetCollection in collections) {
       PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:assetOptions];
       for (PHAsset *asset in assets) {
-        if (self.isCancelled) return self.allObjectIDsToChanges;
-        if (asset.mediaType != PHAssetMediaTypeImage) continue;
-        
-        if ((startDate && [asset.creationDate compare:startDate] == NSOrderedAscending) ||
-            (endDate && [asset.creationDate compare:endDate] == NSOrderedDescending)) {
-          // This picture is outside our date range, so skip it
-          continue;
-        }
-        
-        assetCount++;
-        [[DFAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
-        [self scanPHAssetForChange:asset];
+        assetBlock(asset);
       }
     }
   }
-  
-  // enumeration finished
-  if (self.isCancelled) {
-    return self.allObjectIDsToChanges;
+}
+
+- (void)enumerateAssetsUsingFetchAssetOptions:(PHFetchOptions *)assetOptions
+                                             assetBlock:(void(^)(PHAsset *asset))assetBlock
+{
+  for (PHAsset *asset in [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:assetOptions])
+  {
+    if (self.isCancelled) return;
+    
+    BOOL isLocalAsset;
+    if ([[[[UIDevice currentDevice] systemVersion] substringToIndex:3] isEqualToString:@"8.0"]) {
+      isLocalAsset = [asset canPerformEditOperation:PHAssetEditOperationContent];
+    }
+    if (!isLocalAsset) {
+      continue;
+    }
+    
+    assetBlock(asset);
   }
-  
-  NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
-  [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
-  [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
-  [self flushChanges];
-  DDLogInfo(@"Scan complete.  Took %.02f Change summary for %@ assets: \n%@",
-            [[NSDate date]
-             timeIntervalSinceDate:timerStartDate],
-            @(assetCount),
-            [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
-  
-  return self.allObjectIDsToChanges;
 }
 
 - (void)scanPHAssetForChange:(PHAsset *)asset
