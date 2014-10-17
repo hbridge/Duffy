@@ -359,22 +359,43 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = list()
 
+
 	friends = friends_util.getFriends(user.id)
 
 	a = datetime.datetime.now()
 	strandNeighborsCache = getStrandNeighborsCache(strands)
 
+	# Create a dict of strand id to user list who might be interested in it
+	strandToUserListCache = dict()
+	for strand in strands:
+		strandToUserListCache[strand.id] = strand.users.all()
+
+	# We have all the users from the first fetch, now need to fetch all the neighbor's users
+	existingStrandIds = Strand.getIds(strands)
+	needToFetchStrandUsers = list()
+	for strandId, strandNeighbors in strandNeighborsCache.iteritems():
+		for strandNeighbor in strandNeighbors:
+			if strandNeighbor.id not in existingStrandIds:
+				needToFetchStrandUsers.append(strandNeighbor.id)
+	
+	# Add to the user list cache for each of the strand neighbors
+	strandNeighbors = Strand.objects.prefetch_related('users').filter(id__in=needToFetchStrandUsers)
+	for strandNeighbor in strandNeighbors:
+		strandToUserListCache[strandNeighbor.id] = strandNeighbor.users.all()
+
 	for strand in strands:
 		strandId = strand.id
-		photos = strand.photos.all().order_by("-time_taken")
+		photos = strand.photos.all() # .order_by("-time_taken")
+
+		photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
 		if len(photos) == 0:
 			logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
 			continue
-			
+		
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, strandToUserListCache[neighborStrand.id]))
 
 		interestedUsers = list(set(interestedUsers))
 
@@ -391,19 +412,19 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		if not getLocationForStrand(strand):
 			interestedUsers = list()
 			suggestible = False
-			
+
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
-
+	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 	formattedGroups = getFormattedGroups(groups)
-	
+	print "private_strands-1d took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
-
+	print "private_strands-1e took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 	return objects
 
 
@@ -440,13 +461,12 @@ def getObjectsDataForStrand(strand, user):
 	response = dict()
 
 	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
-	postActions = sorted(postActions, key=lambda x:x.added, reverse=True)
 
 	if len(postActions) == 0:
 		logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
 		recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	else:
-		recentTimeStamp = postActions[0].added
+		recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
 		
 	users = strand.users.all()
 
@@ -534,12 +554,18 @@ def private_strands(request):
 
 		a = datetime.datetime.now()
 		
-		strands = list(Strand.objects.select_related().filter(users__in=[user]).filter(private=True))
-
-		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		strands = list(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=True))
+			
 		b = datetime.datetime.now()
 
-		print "private_strands took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
+		print "private_strands-1 took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
+
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		c = datetime.datetime.now()
+
+		print "private_strands-2 took %s ms" % ((c-b).microseconds / 1000 + (c-b).seconds * 1000)
+
+		print "private_strands-total took %s ms" % ((c-a).microseconds / 1000 + (c-a).seconds * 1000)
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

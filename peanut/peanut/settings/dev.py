@@ -56,10 +56,15 @@ LOGGING = {
 			'filename': '/home/derek/logs/duffy-photos.log',
 			'formatter': 'verbose'
 		},
+		#'console': {
+		#	'level': 'DEBUG',
+		#	'class': 'logging.StreamHandler',
+		#	'formatter': 'simple'
+		#	},
 	},
 	'loggers': {
 		'django': {
-			'handlers':['djangofile', 'djangoerror'],
+			'handlers':['djangofile', 'djangoerror'], #'console'],
 			'propagate': True,
 			'level':'DEBUG',
 		},
