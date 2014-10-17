@@ -77,6 +77,7 @@
   self = [super initWithNibName:@"DFPeoplePickerViewController" bundle:nil];
   if (self) {
     self.selectedContacts = [NSMutableArray new];
+    [self configureNav];
   }
   return self;
 }
@@ -89,6 +90,11 @@
   [self configureTableView];
   [self configureSearch];
   [self selectionUpdated];
+}
+
+- (void)configureNav
+{
+  self.navigationItem.title = @"Select People";
 }
 
 - (void)setPrefersStatusBarHidden:(BOOL)prefersStatusBarHidden
@@ -190,7 +196,7 @@
   if (count > 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    buttonTitle = [NSString stringWithFormat:@"Send to %d people", count];
+    buttonTitle = [NSString stringWithFormat:@"Send to %d People", count];
     self.doneButton.enabled = YES;
   } else if (count == 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];

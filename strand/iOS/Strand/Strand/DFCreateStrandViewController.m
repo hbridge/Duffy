@@ -48,6 +48,10 @@ NSUInteger const NumPhotosPerRow = 4;
 - (void)configureNavBar
 {
   self.navigationItem.title = @"Select Photos";
+  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Back"
+                                                                           style:UIBarButtonItemStylePlain
+                                                                          target:nil
+                                                                          action:nil];
 }
 
 - (void)setSuggestedSections:(NSArray *)suggestedSections
