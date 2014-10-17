@@ -27,7 +27,10 @@ static DFCameraRollSyncManager *defaultSyncController;
 
 + (DFCameraRollSyncManager *)sharedManager {
   if (!defaultSyncController) {
-    defaultSyncController = [[super allocWithZone:nil] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      defaultSyncController = [[super allocWithZone:nil] init];
+    });
   }
   return defaultSyncController;
 }

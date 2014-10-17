@@ -58,10 +58,6 @@ static DFPhotoStore *defaultStore;
       DDLogError(@"Integrity check found errors it could not fix!");
     }
     
-    // load photos that have already been imported
-    _cameraRoll = [[DFPhotoCollection alloc] init];
-    [self loadCameraRollDB];
-    
     //register to hear about other context saves so we can merge in changes
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(backgroundContextDidSave:)
@@ -84,15 +80,6 @@ static DFPhotoStore *defaultStore;
   NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
   managedObjectContext.persistentStoreCoordinator = [DFPhotoStore persistentStoreCoordinator];
   return managedObjectContext;
-}
-
-- (void)loadCameraRollDB
-{
-  self.cameraRoll = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
-  
-  [[NSNotificationCenter defaultCenter]
-   postNotificationName:DFPhotoStoreCameraRollUpdatedNotificationName
-   object:self];
 }
 
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context
@@ -490,14 +477,7 @@ static int const FetchStride = 500;
 
 - (void)photosChanged:(NSNotification *)note
 {
-  [note.userInfo enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
-    NSString *changeType = (NSString *)obj;
-    if ([changeType isEqualToString:DFPhotoChangeTypeAdded] || [changeType isEqualToString:DFPhotoChangeTypeRemoved]) {
-      DDLogInfo(@"DFPhotoStore: notification indicates photo added or removed.  Reloading camera roll.");
-      [self loadCameraRollDB];
-      *stop = YES;
-    }
-  }];
+  
 }
 
 - (void)clearUploadInfo

@@ -31,7 +31,6 @@ typedef enum {
 
 // Main accessors for data
 + (DFPhotoCollection *)allPhotosCollectionUsingContext:(NSManagedObjectContext *)context; // used for accessing on another thread using a different context
-- (DFPhotoCollection *)cameraRoll;
 - (DFPhotoCollection *)mostRecentPhotos:(NSUInteger)maxCount;
 - (DFPhoto *)mostRecentUploadedThumbnail;
 + (DFPhotoCollection *)photosWithThumbnailUploadStatus:(DFUploadStatus)thumbnailStatus
