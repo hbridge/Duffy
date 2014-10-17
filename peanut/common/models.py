@@ -134,7 +134,7 @@ class Photo(models.Model):
 	user = models.ForeignKey(User)
 	orig_filename = models.CharField(max_length=100, null=True)
 	full_filename = models.CharField(max_length=100, null=True)
-	thumb_filename = models.CharField(max_length=100, null=True)
+	thumb_filename = models.CharField(max_length=100, null=True, db_index=True)
 	metadata = models.CharField(max_length=10000, null=True)
 	full_width = models.IntegerField(null=True)
 	full_height = models.IntegerField(null=True)
@@ -158,7 +158,7 @@ class Photo(models.Model):
 	taken_with_strand = models.BooleanField(default=True)
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
-	added = models.DateTimeField(auto_now_add=True)
+	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
 
 	 # You MUST use GeoManager to make Geo Queries
@@ -565,7 +565,7 @@ class Strand(models.Model):
 	users = models.ManyToManyField(User)
 	private = models.BooleanField(db_index=True, default=False)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
-	product_id = models.IntegerField(default=2)
+	product_id = models.IntegerField(default=2, db_index=True)
 
 	# This is the id of the private Strand that created this.  Not doing ForeignKey because
 	#   django isn't good with recusive

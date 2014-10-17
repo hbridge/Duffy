@@ -13,6 +13,8 @@ from twisted.internet import reactor
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
+import django
+django.setup()
 
 from peanut.settings import constants
 from common.models import NotificationLog
