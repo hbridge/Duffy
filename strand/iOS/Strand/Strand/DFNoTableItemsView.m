@@ -23,14 +23,14 @@
 {
   [self configureWithSuperView:self.superview];
   self.subtitleLabel.text = @"";
-  [self.titleLabel addObserver:self
-                    forKeyPath:@"text"
-                       options:NSKeyValueObservingOptionNew
-                       context:nil];
-  [self.subtitleLabel addObserver:self
-                    forKeyPath:@"text"
-                       options:NSKeyValueObservingOptionNew
-                       context:nil];
+//  [self.titleLabel addObserver:self
+//                    forKeyPath:@"text"
+//                       options:NSKeyValueObservingOptionNew
+//                       context:nil];
+//  [self.subtitleLabel addObserver:self
+//                    forKeyPath:@"text"
+//                       options:NSKeyValueObservingOptionNew
+//                       context:nil];
 }
 
 - (void)configureWithSuperView:(UIView *)superView

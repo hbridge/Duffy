@@ -1,6 +1,6 @@
-# Strand
+# Swap
 
-## Oct 17, 2015 (4754, 4755)
+## Oct 17, 2015 (4754, 4755, 4756)
 
 - Changed name references
 - Badge friends
