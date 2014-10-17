@@ -533,7 +533,6 @@
   }
   
   [self.selectedNonSuggestionsList addObject:contact];
-  [self.selectedContacts addObject:contact];
 }
 
 - (void)textNumberRowSelected:(NSString *)phoneNumber
