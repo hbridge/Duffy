@@ -22,7 +22,6 @@
  
  
  */
-extern NSString *DFPhotoChangedNotificationName;
 extern NSString *DFPhotoChangeTypeKey;
 extern NSString *DFPhotoChangeTypeAdded;
 extern NSString *DFPhotoChangeTypeRemoved;

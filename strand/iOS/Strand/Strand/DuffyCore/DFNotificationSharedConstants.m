@@ -10,8 +10,6 @@
 
 @implementation DFNotificationSharedConstants
 
-
-NSString const *DFPhotoChangedNotificationName = @"DFPhotoChangedNotificationName";
 NSString const *DFPhotoChangeTypeKey = @"DFPhotoChangeTypeKey";
 NSString const *DFPhotoChangeTypeAdded = @"DFPhotoChangeTypeAdded";
 NSString const *DFPhotoChangeTypeRemoved = @"DFPhotoChangeTypeRemoved";

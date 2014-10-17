@@ -81,11 +81,7 @@ static DFUploadController *defaultUploadController;
                                              selector:@selector(backgroundContextDidSave:)
                                                  name:NSManagedObjectContextDidSaveNotification
                                                object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(uploadPhotos)
-                                                 name:DFPhotoChangedNotificationName
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
+       [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(cameraRollSyncCompleted:)
                                                  name:DFCameraRollSyncCompleteNotificationName
                                                object:nil];
@@ -292,10 +288,6 @@ static DFUploadController *defaultUploadController;
     }
   }
   [self saveContext];
-  
-  [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                                object:self
-                                                              userInfo:metadataChanges];
 }
 
 - (void)updatePhoto:(DFPhoto *)photo withPeanutPhoto:(DFPeanutPhoto *)peanutPhoto

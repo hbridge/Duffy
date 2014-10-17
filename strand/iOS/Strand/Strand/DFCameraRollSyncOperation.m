@@ -78,7 +78,7 @@
 
 - (void)cancelled
 {
-  DDLogInfo(@"DFCameraRollSyncOperationCancelled.  Stopping.");
+  DDLogInfo(@"%@ cancelled.  Stopping.", self.class);
 }
 
 - (NSDictionary *)mapKnownPhotoURLsToDates:(DFPhotoCollection *)knownPhotos
@@ -132,11 +132,7 @@
       DDLogError(@"%@ unresolved error %@, %@", self.class ,error, [error userInfo]);
       [NSException raise:@"Could not save camera roll sync changes."
                   format:@"Error: %@", [error localizedDescription]];
-    } else {
-      [[NSNotificationCenter defaultCenter] postMainThreadNotificationName:DFPhotoChangedNotificationName
-                                                                    object:self
-                                                                  userInfo:changes];
-    }
+    } 
   }
 }
 

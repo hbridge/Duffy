@@ -63,13 +63,6 @@ static DFPhotoStore *defaultStore;
                                              selector:@selector(backgroundContextDidSave:)
                                                  name:NSManagedObjectContextDidSaveNotification
                                                object:nil];
-    
-    // register to hear about more fine grained photo notification changes
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(photosChanged:)
-                                                 name:DFPhotoChangedNotificationName
-                                               object:nil];
-    
   }
   return self;
 }
