@@ -37,8 +37,8 @@
     [self.matchMyPhotosButton setTitle:@"Match my Photos"
                               forState:UIControlStateNormal];
   } else {
-    self.upsellTitleLabel.text = @"No Matching Photos to Swap";
-    [self.matchMyPhotosButton setTitle:@"View Photos"
+    self.upsellTitleLabel.text = @"You May Have Photos to Swap";
+    [self.matchMyPhotosButton setTitle:@"Match my Photos"
                               forState:UIControlStateNormal];
 
   }
