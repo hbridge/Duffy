@@ -176,6 +176,17 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
+
+- (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId
+{
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectInviteStrand] && object.id == inviteId) {
+      return object;
+    }
+  }
+  return nil;
+}
+
 - (NSArray *)publicStrands
 {
   NSMutableArray *strands = [NSMutableArray new];

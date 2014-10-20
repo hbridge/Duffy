@@ -31,24 +31,52 @@
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TJc-Nh-Bq1" userLabel="Matching activity wrapper">
+                    <rect key="frame" x="147" y="287" width="88" height="77"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Matching" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bwY-f3-PRj">
+                            <rect key="frame" x="8" y="8" width="72" height="21"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="VhJ-Nx-k3b">
+                            <rect key="frame" x="34" y="37" width="20" height="20"/>
+                        </activityIndicatorView>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="centerX" secondItem="VhJ-Nx-k3b" secondAttribute="centerX" id="C8K-SK-S0i"/>
+                        <constraint firstAttribute="bottom" secondItem="VhJ-Nx-k3b" secondAttribute="bottom" constant="20" id="DIm-KP-537"/>
+                        <constraint firstItem="bwY-f3-PRj" firstAttribute="leading" secondItem="TJc-Nh-Bq1" secondAttribute="leading" constant="8" id="I5b-bR-3vz"/>
+                        <constraint firstAttribute="trailing" secondItem="bwY-f3-PRj" secondAttribute="trailing" constant="8" id="PoC-wu-cei"/>
+                        <constraint firstItem="bwY-f3-PRj" firstAttribute="top" secondItem="TJc-Nh-Bq1" secondAttribute="top" constant="8" id="SyJ-mm-KaE"/>
+                        <constraint firstItem="VhJ-Nx-k3b" firstAttribute="top" secondItem="bwY-f3-PRj" secondAttribute="bottom" constant="8" id="zhb-AQ-mNU"/>
+                    </constraints>
+                </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="bottom" secondItem="Udl-Nz-hEj" secondAttribute="bottom" constant="43" id="Agr-an-GXg"/>
                 <constraint firstAttribute="centerX" secondItem="Udl-Nz-hEj" secondAttribute="centerX" id="BOg-hj-s1H"/>
+                <constraint firstItem="TJc-Nh-Bq1" firstAttribute="leading" secondItem="Udl-Nz-hEj" secondAttribute="trailing" constant="-104" id="LGp-fA-ToS"/>
                 <constraint firstAttribute="centerX" secondItem="fi9-5y-xZM" secondAttribute="centerX" id="Lf4-1o-9eX"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="top" secondItem="72w-fn-JN9" secondAttribute="bottom" constant="16" id="NJQ-Bw-f75"/>
+                <constraint firstItem="Udl-Nz-hEj" firstAttribute="centerY" secondItem="TJc-Nh-Bq1" secondAttribute="centerY" constant="-4.5" id="NJu-ZC-keX"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="527" id="XUW-86-zlg"/>
                 <constraint firstItem="72w-fn-JN9" firstAttribute="top" secondItem="fi9-5y-xZM" secondAttribute="bottom" constant="32" id="Xne-Fs-6Vd"/>
+                <constraint firstItem="Udl-Nz-hEj" firstAttribute="centerX" secondItem="TJc-Nh-Bq1" secondAttribute="centerX" constant="-0.5" id="bid-xe-1gq"/>
                 <constraint firstAttribute="centerX" secondItem="72w-fn-JN9" secondAttribute="centerX" id="zZA-GC-Tow"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <variation key="default">
                 <mask key="constraints">
+                    <exclude reference="LGp-fA-ToS"/>
                     <exclude reference="XUW-86-zlg"/>
                 </mask>
             </variation>
             <connections>
+                <outlet property="activityWrapper" destination="TJc-Nh-Bq1" id="dDq-Kk-mc6"/>
                 <outlet property="matchMyPhotosButton" destination="Udl-Nz-hEj" id="lt8-Ib-KQR"/>
                 <outlet property="sharedPhotosCountLabel" destination="fi9-5y-xZM" id="TDk-yP-Ifx"/>
                 <outlet property="upsellTitleLabel" destination="72w-fn-JN9" id="Bde-B7-AQK"/>

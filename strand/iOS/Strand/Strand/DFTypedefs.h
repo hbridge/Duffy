@@ -11,6 +11,7 @@ typedef NS_OPTIONS(unsigned int, DFImageType) {
 };
 
 typedef UInt64 DFStrandIDType;
+typedef UInt64 DFInviteIDType;
 
 
 // Permissions

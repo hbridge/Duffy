@@ -14,6 +14,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *sharedPhotosCountLabel;
 @property (weak, nonatomic) IBOutlet UIButton *matchMyPhotosButton;
 @property (weak, nonatomic) IBOutlet UILabel *upsellTitleLabel;
+@property (weak, nonatomic) IBOutlet UIView *activityWrapper;
 
 - (void)configureWithSwappablePhotos:(BOOL)arePhotosSwappable
                         buttonTarget:(id)target
@@ -22,6 +23,9 @@
 - (void)configureForContactsWithError:(BOOL)error
                          buttonTarget:(id)target
                              selector:(SEL)selector;
+
+- (void)configureActivityWithVisibility:(BOOL)visible;
+- (BOOL)isMatchingActivityOn;
 
 
 @end

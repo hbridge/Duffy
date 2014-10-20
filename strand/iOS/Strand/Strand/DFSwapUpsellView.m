@@ -45,6 +45,7 @@
   [self.matchMyPhotosButton addTarget:target
                                 action:selector
                       forControlEvents:UIControlEventTouchUpInside];
+  self.activityWrapper.hidden = YES;
 }
 
 
@@ -62,6 +63,22 @@
   [self.matchMyPhotosButton addTarget:target
                                action:selector
                      forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)configureActivityWithVisibility:(BOOL)visible
+{
+  if (visible) {
+    self.matchMyPhotosButton.hidden = YES;
+    self.activityWrapper.hidden = NO;
+  } else {
+    self.matchMyPhotosButton.hidden = NO;
+    self.activityWrapper.hidden = YES;
+  }
+}
+
+- (BOOL)isMatchingActivityOn
+{
+  return !self.activityWrapper.hidden;
 }
 
 @end

@@ -75,6 +75,8 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) DFPeanutFeedObject *postsObject;
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
+@property (nonatomic, retain) NSTimer *refreshTimer;
+
 @end
 
 @implementation DFFeedViewController
@@ -110,7 +112,23 @@ const CGFloat LockedCellHeight = 157.0;
  */
 - (void)reloadData
 {
-  self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+  if (self.inviteObject) {
+    self.inviteObject = [self.dataManager inviteObjectWithId:self.inviteObject.id];
+    self.suggestionsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+    self.postsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+    
+    // If we're currently showing the matching activity but now our invite is ready, then
+    //   turn off the timer and show the upsell result
+    if ([self.inviteObject.ready isEqual:@(YES)] && [self.swapUpsellView isMatchingActivityOn]) {
+      [self.swapUpsellView configureActivityWithVisibility:NO];
+      [self.refreshTimer invalidate];
+      self.refreshTimer = nil;
+      [self showUpsellResult];
+    }
+  } else {
+    self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+  }
+  
 }
 
 - (void)observeNotifications
@@ -143,12 +161,26 @@ const CGFloat LockedCellHeight = 157.0;
   return YES;
 }
 
+- (void)refreshFromServer
+{
+  [self.dataManager refreshInboxFromServer:nil];
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   
   [self configureTableView];
   [self configureUpsell];
+  
+  if ([self.inviteObject.ready isEqual:@(NO)]) {
+    DDLogVerbose(@"Invite not ready, setting up timer...");
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
+                                                         target:self
+                                                       selector:@selector(refreshFromServer)
+                                                       userInfo:nil
+                                                        repeats:YES];
+  }
 }
 
 - (void)configureTableView
@@ -554,7 +586,7 @@ const CGFloat LockedCellHeight = 157.0;
 #pragma mark - Actions
 
 
-- (void)upsellButtonPressed:(id)sender
+- (void)showUpsellResult
 {
   if (self.suggestionsObject.objects.count == 0) {
     [UIAlertView showSimpleAlertWithTitle:@"No Matches"
@@ -565,6 +597,7 @@ const CGFloat LockedCellHeight = 157.0;
      success:^{
        self.swapUpsellView.hidden = YES;
        [self.swapUpsellView removeFromSuperview];
+       self.inviteObject = nil;
      } failure:^(NSError *error) {
      }];
   } else {
@@ -583,6 +616,21 @@ const CGFloat LockedCellHeight = 157.0;
                                                             target:self
                                                             action:@selector(dismissMatch:)];
     [self presentViewController:navController animated:YES completion:nil];
+  }
+}
+
+- (void)upsellButtonPressed:(id)sender
+{
+  [self.swapUpsellView configureActivityWithVisibility:YES];
+  
+  if ([self.inviteObject.ready isEqual:@(YES)]) {
+    DDLogVerbose(@"Invite ready, showing in .5 second");
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self showUpsellResult];
+    });
+  } else {
+    // If we're not ready, the timer is running and it will show the matched area once the invite is ready
+    DDLogVerbose(@"Invite not ready, relying upon timer");
   }
 }
 
