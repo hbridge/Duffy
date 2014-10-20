@@ -21,6 +21,8 @@
 #import "DFStrandSuggestionsViewController.h"
 #import "DFNavigationController.h"
 #import "DFNoTableItemsView.h"
+#import "DFSeenStateManager.h"
+#import "NSArray+DFHelpers.h"
 
 
 @interface DFFriendsViewController ()
@@ -165,9 +167,9 @@
 {
   _friendPeanutUsers = [self.peanutDataManager friendsList];
   [self.tableView reloadData];
-  NSUInteger numWithUnshared = [self numPeopleWithUnsharedStrands];
-  if (numWithUnshared > 0) {
-    self.tabBarItem.badgeValue = [@(numWithUnshared) stringValue];
+  NSUInteger numWithUnseen = [self numPeopleWithUnseenSuggestions];
+  if (numWithUnseen > 0) {
+    self.tabBarItem.badgeValue = [@(numWithUnseen) stringValue];
   } else {
     self.tabBarItem.badgeValue = nil;
   }
@@ -209,13 +211,13 @@
   // Dispose of any resources that can be recreated.
 }
 
-- (NSUInteger)numPeopleWithUnsharedStrands
+- (NSUInteger)numPeopleWithUnseenSuggestions
 {
   NSUInteger result = 0;
   
   for (DFPeanutUserObject *peanutUser in self.friendPeanutUsers) {
-    NSArray *unswappedForUser = [self.peanutDataManager privateStrandsWithUser:peanutUser];
-    if (unswappedForUser.count > 0) result++;
+    NSArray *unseenForUser = [self unseenPrivateStrandIDsForUser:peanutUser];
+    if (unseenForUser.count > 0) result++;
   }
   
   return result;
@@ -232,16 +234,6 @@
 }
 
 
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
-{
-  DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
-  self.actionSheetUserSelected = user;
-  
-  DFFriendProfileViewController *profileView = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
-  [self.navigationController pushViewController:profileView animated:YES];
-  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
-}
-
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -249,13 +241,13 @@
   cell.showsTickMarkWhenSelected = NO;
   [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel];
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
-  NSArray *unswappedStrands = [self.peanutDataManager privateStrandsWithUser:peanutUser];
+  NSArray *unseenPrivateStrands = [self unseenPrivateStrandIDsForUser:peanutUser];
   
   cell.profilePhotoStackView.names = @[peanutUser.display_name];
   cell.nameLabel.text = peanutUser.display_name;
-  int unswappedCount = (int)unswappedStrands.count;
-  if (unswappedCount > 0) {
-    cell.rightLabel.text = [NSString stringWithFormat:@"%d to swap", unswappedCount];
+  int newUnswappedCount = (int)[unseenPrivateStrands count];
+  if (newUnswappedCount > 0) {
+    cell.rightLabel.text = [NSString stringWithFormat:@"%d new", (int)unseenPrivateStrands.count];
     cell.nameLabel.font = [UIFont boldSystemFontOfSize:cell.nameLabel.font.pointSize];
   } else {
     cell.nameLabel.font = [UIFont systemFontOfSize:cell.nameLabel.font.pointSize];
@@ -266,8 +258,40 @@
   return cell;
 }
 
+- (NSArray *)unseenPrivateStrandIDsForUser:(DFPeanutUserObject *)peanutUser
+{
+  NSArray *unswappedStrandIDs = [[self.peanutDataManager privateStrandsWithUser:peanutUser]
+                                 arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *privateStrand) {
+                                   return @(privateStrand.id);
+                                 }];
+  NSMutableArray *unseenPrivateStrandIDs = [unswappedStrandIDs mutableCopy];
+  NSArray *seenPrivateStrandIDs = [[DFSeenStateManager sharedManager] seenPrivateStrandIDsForUser:peanutUser];
+  [unseenPrivateStrandIDs removeObjectsInArray:seenPrivateStrandIDs];
+  return unseenPrivateStrandIDs;
+}
+
 
 #pragma mark - Action Handler Helpers
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
+  self.actionSheetUserSelected = user;
+  
+  DFFriendProfileViewController *profileView = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
+  [self.navigationController pushViewController:profileView animated:YES];
+  [self.tableView deselectRowAtIndexPath:indexPath animated:YES];
+  
+
+  NSArray *unseenIDs = [self unseenPrivateStrandIDsForUser:user];
+  if (unseenIDs.count > 0) {
+    [[DFSeenStateManager sharedManager] addSeenPrivateStrandIDs:unseenIDs
+                                                        forUser:user];
+    [self reloadData];
+  }
+}
+
+
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {

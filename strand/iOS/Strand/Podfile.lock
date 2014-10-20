@@ -9,6 +9,11 @@ PODS:
   - CocoaLumberjack/Extensions (1.8.1):
     - CocoaLumberjack/Core
   - CRToast (0.0.7)
+  - FMDB/common (2.4)
+  - FMDB/FTS (2.4):
+    - FMDB/standard
+  - FMDB/standard (2.4):
+    - FMDB/common
   - FormKit.m (0.4.0):
     - ActionSheetPicker2 (~> 0.1)
     - BWLongTextViewController (~> 1.0)
@@ -48,6 +53,7 @@ PODS:
 DEPENDENCIES:
   - CocoaLumberjack (~> 1.8.1)
   - CRToast (~> 0.0.7)
+  - FMDB/FTS (~> 2.4)
   - FormKit.m (~> 0.4.0)
   - HockeySDK (from `https://github.com/bitstadium/HockeySDK-iOS.git`)
   - JDStatusBarNotification (~> 1.4.7)
@@ -78,6 +84,7 @@ SPEC CHECKSUMS:
   BWSelectViewController: d1871257a78d980a52aa543804eed8a85c2f75d0
   CocoaLumberjack: 9d198d6e19909b3b113a38c5f06f7bb8eedd0427
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
+  FMDB: 0b2fa25e5264ef177973c0cb8c02c711107979aa
   FormKit.m: 68e35d2e70558109fa9ce5935e0f16a65c8b2b51
   FrameAccessor: 5eec95b29b5e9a3afe72a7a2e9ed25b000d3bcc3
   HockeySDK: bf1964134fa6ef0c4c207c329e9aa6b866cee8f4
