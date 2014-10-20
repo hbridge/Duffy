@@ -264,25 +264,21 @@
      constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
        @autoreleasepool {
          if (uploadImage) {
-           dispatch_semaphore_t loadSemaphore = dispatch_semaphore_create(0);
-           NSData __block *imageData;
            [photo.asset
             loadJPEGDataWithImageLength:IMAGE_UPLOAD_MAX_LENGTH
             compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY
             success:^(NSData *data) {
-              imageData = data;
-              dispatch_semaphore_signal(loadSemaphore);
+              imageDataBytes += data.length;
+              [formData appendPartWithFileData:data
+                                          name:peanutPhoto.file_key.absoluteString
+                                      fileName:peanutPhoto.filename
+                                      mimeType:@"image/jpg"];
+              
             } failure:^(NSError *error) {
-              DDLogError(@"Error: nil data for asset! %@", error);
-              dispatch_semaphore_signal(loadSemaphore);
+              DDLogError(@"Error: nil data for asset with photo id %llu. error: %@", photo.photoID, error);
             }];
-           dispatch_semaphore_wait(loadSemaphore, DISPATCH_TIME_FOREVER);
            
-           imageDataBytes += imageData.length;
-           [formData appendPartWithFileData:imageData
-                                       name:peanutPhoto.file_key.absoluteString
-                                   fileName:peanutPhoto.filename
-                                   mimeType:@"image/jpg"];
+           
          }
        }
      }];
