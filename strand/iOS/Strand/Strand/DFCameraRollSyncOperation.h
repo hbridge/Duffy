@@ -23,6 +23,7 @@ static int NumChangesFlushThreshold = 100;
 @property (nonatomic, retain) NSMutableDictionary *allObjectIDsToChanges;
 @property (nonatomic, retain) NSMutableDictionary *unsavedObjectIDsToChanges;
 @property (nonatomic, retain) NSDate *targetDate;
+@property (copy)void (^completionBlock)(void);
 
 - (NSDictionary *)mapKnownPhotoURLsToDates:(DFPhotoCollection *)knownPhotos;
 - (void)flushChanges;

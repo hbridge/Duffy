@@ -7,16 +7,12 @@
 //
 
 #import "DFUserInfoManager.h"
-#import "DFNotificationSharedConstants.h"
-#import "DFStrandConstants.h"
 #import "DFUserPeanutAdapter.h"
 
-static NSTimeInterval minFetchInterval = 1.0;
 
 @interface DFUserInfoManager()
 
 @property (readonly, nonatomic, retain) DFUserPeanutAdapter *userAdapter;
-@property (nonatomic, retain) NSDate *lastFetchDate;
 
 @end
 
@@ -43,41 +39,31 @@ static DFUserInfoManager *defaultManager;
 {
   self = [super init];
   if (self) {
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(galleryAppeared:)
-                                                 name:DFStrandGalleryAppearedNotificationName
-                                               object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(update)
-                                                 name:DFStrandReloadRemoteUIRequestedNotificationName
-                                               object:nil];
   }
   return self;
 }
 
 
-- (void)galleryAppeared:(NSNotification *)note
+- (void)setFirstTimeSyncComplete
 {
-  [self update];
-}
-
-- (void)update
-{
-  if ([[NSDate date] timeIntervalSinceDate:self.lastFetchDate] < minFetchInterval) {
-    return;
-  }
-  
   DFPeanutUserObject *currentUserPeanutObject = [DFPeanutUserObject new];
   currentUserPeanutObject.id = [[DFUser currentUser] userID];
   [self.userAdapter performRequest:RKRequestMethodGET
                     withPeanutUser:currentUserPeanutObject
                            success:^(DFPeanutUserObject *user) {
+                             user.first_run_sync_complete = @(YES);
+                             [self.userAdapter performRequest:RKRequestMethodPATCH
+                                               withPeanutUser:user
+                                                      success:^(DFPeanutUserObject *user) {
+                                                        DDLogVerbose(@"%@: Successfully set first_run_sync_complete for user %llu", self.class, user.id);
+                                                      } failure:^(NSError *error) {
+                                                        DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
+                                                      }];
                              
                            } failure:^(NSError *error) {
-                             
+                             DDLogError(@"%@: Error in GET for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
                            }];
 }
-
 
 - (DFUserPeanutAdapter *)userAdapter
 {

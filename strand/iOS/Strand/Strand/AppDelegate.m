@@ -42,6 +42,7 @@
 #import "DFInboxViewController.h"
 #import "DFAllStrandsGalleryViewController.h"
 #import "DFFriendsViewController.h"
+#import "DFUserInfoManager.h"
 
 
 @interface AppDelegate ()
@@ -172,10 +173,14 @@ void (^_completionHandler)(UIBackgroundFetchResult);
     // If we don't, just do the sync to a timestamp
     if ([[DFCameraRollSyncManager sharedManager] isSyncInProgress]) {
       [[DFCameraRollSyncManager sharedManager] cancelSyncOperations];
-      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp];
+      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^{
+        [self firstRunSyncComplete];
+      }];
       [[DFCameraRollSyncManager sharedManager] sync];
     } else {
-      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp];
+      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^{
+        [self firstRunSyncComplete];
+      }];
     }
   }
   
@@ -186,6 +191,15 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   self.tabBarController.selectedIndex = 0;
 }
 
+/*
+ * This should be called after we have synced the initial set of photos (if there's an invite, upload photos around
+ * that date and time first).
+ * This then tells the server that we're good to go.
+ */
+- (void)firstRunSyncComplete
+{
+  [[DFUserInfoManager sharedManager] setFirstTimeSyncComplete];
+}
 /*
   Put things here that should be kicked off as soon as we have a user ID.
   This is called directly from the SMSAuth controller.

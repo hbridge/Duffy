@@ -8,11 +8,13 @@
 
 #import <Foundation/Foundation.h>
 
+typedef void (^DFCameraRollSyncCompletionBlock)(void);
+
 @interface DFCameraRollSyncManager : NSObject
 
 + (DFCameraRollSyncManager *)sharedManager;
 - (void)sync;
-- (void)syncAroundDate:(NSDate *)date;
+- (void)syncAroundDate:(NSDate *)date withCompletionBlock:(DFCameraRollSyncCompletionBlock)completionBlock;
 - (void)cancelSyncOperations;
 - (BOOL)isSyncInProgress;
 

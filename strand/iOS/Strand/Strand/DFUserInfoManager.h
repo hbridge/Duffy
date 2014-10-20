@@ -10,4 +10,7 @@
 
 @interface DFUserInfoManager : NSObject
 
++ (DFUserInfoManager *)sharedManager;
+- (void)setFirstTimeSyncComplete;
+
 @end

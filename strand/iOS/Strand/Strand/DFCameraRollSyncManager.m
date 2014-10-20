@@ -52,10 +52,10 @@ static DFCameraRollSyncManager *defaultSyncController;
 
 - (void)sync
 {
-  [self syncAroundDate:nil];
+  [self syncAroundDate:nil withCompletionBlock:nil];
 }
 
-- (void)syncAroundDate:(NSDate *)date
+- (void)syncAroundDate:(NSDate *)date withCompletionBlock:(DFCameraRollSyncCompletionBlock)completionBlock
 {
   DDLogInfo(@"Camera roll sync requested. %d sync operations ahead in queue.",
             (unsigned int)self.syncOperationQueue.operationCount);
@@ -73,6 +73,8 @@ static DFCameraRollSyncManager *defaultSyncController;
     DDLogVerbose(@"Sync targeting date: %@", date);
     syncOperation.targetDate = date;
   }
+  
+  syncOperation.completionBlock = completionBlock;
   
   [self.syncOperationQueue addOperation:syncOperation];
 }

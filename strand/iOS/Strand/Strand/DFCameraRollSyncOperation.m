@@ -72,6 +72,10 @@
        postNotificationName:DFCameraRollSyncCompleteNotificationName
        object:self];
     });
+    
+    if (self.completionBlock) {
+      self.completionBlock();
+    }
     DDLogInfo(@"%@ main ended.", self.class);
   }
 }
