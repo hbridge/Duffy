@@ -1,6 +1,10 @@
 # Swap
 
-## Oct 17, 2015 (4754-4759)
+## Oct 20th, 2014 (4760)
+
+- Logging changes to track down upload bug
+
+## Oct 17, 2014 (4754-4759)
 
 - Changed name references
 - Badge friends
@@ -10,7 +14,7 @@
 - Fix bad photos data sometimes created on first run
 
 
-## Oct 16, 2015 (4750, 4751, 4752)
+## Oct 16, 2014 (4750, 4751, 4752)
 
 - Renamed to Swap!
 - Added a friends tab: see who else is on Strand and who you have photos to swap with!
