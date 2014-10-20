@@ -255,6 +255,8 @@
     unsigned long __block imageDataBytes = 0;
     
     NSString *pathString = [NSString stringWithFormat:@"photos/%llu/", photo.photoID];
+    BOOL __block doneConstructingFormRequest = NO;
+    NSError __block *appendDataError;
     NSMutableURLRequest *request =
     [self.objectManager
      multipartFormRequestWithObject:nil
@@ -264,36 +266,73 @@
      constructingBodyWithBlock:^(id<AFMultipartFormData> formData) {
        @autoreleasepool {
          if (uploadImage) {
+           // Create a load_semaphore to block the constructingBodyWithBlock callback
+           dispatch_semaphore_t load_semaphore = dispatch_semaphore_create(0);
+           NSData __block *imageData = nil;
            [photo.asset
             loadJPEGDataWithImageLength:IMAGE_UPLOAD_MAX_LENGTH
             compressionQuality:IMAGE_UPLOAD_JPEG_QUALITY
             success:^(NSData *data) {
-              imageDataBytes += data.length;
-              [formData appendPartWithFileData:data
-                                          name:peanutPhoto.file_key.absoluteString
-                                      fileName:peanutPhoto.filename
-                                      mimeType:@"image/jpg"];
-              
+              imageData = data;
+              if (doneConstructingFormRequest)
+                DDLogError(@"%@ loadJPEGDataSuccess after doneAppendingData true.",
+                                                self.class);
+              if (!data) DDLogError(@"%@ data for form post nil!", self.class);
+              dispatch_semaphore_signal(load_semaphore);
             } failure:^(NSError *error) {
-              DDLogError(@"Error: nil data for asset with photo id %llu. error: %@", photo.photoID, error);
+              DDLogError(@"Error: error loading image data for photo id %llu. error: %@",
+                         photo.photoID, error);
+              appendDataError = error;
+              dispatch_semaphore_signal(load_semaphore);
             }];
            
+           // We need to wait on the image data load before we let the callback return,
+           // otherwise, the form may contain no data
+           dispatch_semaphore_wait(load_semaphore, DISPATCH_TIME_FOREVER);
            
+           if (imageData) {
+             imageDataBytes += imageData.length;
+             DDLogVerbose(@"%@ appending image with key: %@, filename:%@ and %@ bytes to form post",
+                          self.class,
+                          peanutPhoto.file_key.absoluteString,
+                          peanutPhoto.filename,
+                          @(imageData.length));
+             [formData appendPartWithFileData:imageData
+                                         name:peanutPhoto.file_key.absoluteString
+                                     fileName:peanutPhoto.filename
+                                     mimeType:@"image/jpg"];
+           } else {
+             DDLogVerbose(@"%@ reultData nil, not appending data.", self.class);
+             if (!appendDataError) appendDataError =
+               [NSError
+                errorWithDomain:@"com.duffyapp.strand"
+                code:-66
+                userInfo:@{NSLocalizedDescriptionKey: @"Asset returned nil data with no explanation."}];
+           }
          }
        }
      }];
+    
+    doneConstructingFormRequest = YES;
     RKObjectRequestOperation *requestOperation = [self.objectManager
                                                   objectRequestOperationWithRequest:request
                                                   success:nil
                                                   failure:nil];
     
     [self.objectManager enqueueObjectRequestOperation:requestOperation];
+    
+    DDLogVerbose(@"%@ request: %@ \n body: %@",
+                 [self.class description],
+                 request.URL.absoluteString,
+                 [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
+    
     [requestOperation waitUntilFinished];
     
-    if (requestOperation.error) {
+    if (requestOperation.error || appendDataError) {
+      NSError *nonNilError = appendDataError ? appendDataError : requestOperation.error;
       DDLogVerbose(@"DFPhotoMetadataAdapter put failed: %@",
-                requestOperation.error.localizedDescription);
-      result = @{DFUploadResultErrorKey : requestOperation.error,
+                nonNilError.localizedDescription);
+      result = @{DFUploadResultErrorKey : nonNilError,
                  DFUploadResultPeanutPhotos : @[peanutPhoto],
                  DFUploadResultOperationType : DFPhotoUploadOperationFullImageData,
                  DFUploadResultNumBytes : [NSNumber numberWithUnsignedLong:imageDataBytes]
