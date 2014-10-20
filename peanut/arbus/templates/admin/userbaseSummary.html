@@ -68,8 +68,8 @@
 	}
 
 </style>
-<script src="/static/jquery-1.10.2.min.js"></script>
-<script src="/static/jquery.timeago.js"></script>
+<script src="http://dev.duffyapp.com/static/jquery-1.10.2.min.js"></script>
+<script src="http://dev.duffyapp.com/static/jquery.timeago.js"></script>
 <body>
 <div class="ui-content">
 	<div class='ui-server-id' id='ui-server-id'>
@@ -166,12 +166,14 @@ $(document).ready(function() {
 		$(this).addClass("red");
 	}
   });
+  var otherLinks = "<a href='/admin'>admin</a> | <a href='/phpmyadmin'>phpmyadmin</a>";
+
   if (!(location.hostname.match('prod.strand.duffyapp.com'))){
-	$("#ui-server-id").append('DEV <span class="ui-server-switch">(<a target=_blank href="http://prod.strand.duffyapp.com/viz/summary">Switch to Prod</a>)</span>');
+	$("#ui-server-id").append('DEV <span class="ui-server-switch">(' + otherLinks +' | <a target=_blank href="http://prod.strand.duffyapp.com/viz/summary">switch to Prod</a>)</span>');
 	$("#ui-server-id").css('background-color', '#C0C0C0');
   }
   else {
-	$("#ui-server-id").append('PROD <span class="ui-server-switch">(<a target=_blank href="http://dev.duffyapp.com/viz/summary">Switch to Dev</a>)</span>');
+	$("#ui-server-id").append('PROD <span class="ui-server-switch">('+ otherLinks +' | <a target=_blank href="http://dev.duffyapp.com/viz/summary">switch to Dev</a>)</span>'+otherLinks);
 	$("#ui-server-id").css('background-color', 'orange');
   }
   $('td.timeago').each(function(){
