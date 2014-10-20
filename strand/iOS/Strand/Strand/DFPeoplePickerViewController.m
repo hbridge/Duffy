@@ -470,17 +470,14 @@
 {
   id object = [self objectForIndexPath:indexPath tableView:tableView];
   DDLogVerbose(@"tapped object:%@", object);
+  BOOL contactSelected;
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
     [self contactRowSelected:object atIndexPath:indexPath];
-    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
-    }
+    contactSelected = YES;
   } else if ([[object class] isSubclassOfClass:[NSString class]]) {
     [self textNumberRowSelected:object];
-    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
-      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
-    }
+    contactSelected = YES;
   } else {
     if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
       ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
@@ -495,13 +492,20 @@
 
   DDLogVerbose(@"new selected contacts:%@", self.selectedContacts);
   
-  // if this happened in the search tableview, we have to reload the regular table view in the bg
-  if (tableView != self.tableView) {
-    [self.tableView reloadData];
-    [self.sdc setActive:NO animated:NO];
+  if (contactSelected) {
+    if ([self.delegate respondsToSelector:@selector(pickerController:pickedContactsDidChange:)]){
+      [self.delegate pickerController:self pickedContactsDidChange:self.selectedContacts];
+    }
+    
+    // if this happened in the search tableview and there was a contact object selected,
+    // we have to reload the regular table view in the bg
+    if (tableView != self.tableView) {
+      [self.tableView reloadData];
+      [self.sdc setActive:NO animated:NO];
+    }
+    
+    [self selectionUpdated];
   }
-  
-  [self selectionUpdated];
 }
 
 - (void)contactRowSelected:(DFPeanutContact *)contact atIndexPath:(NSIndexPath *)indexPath
@@ -589,6 +593,7 @@
     dispatch_async(dispatch_get_main_queue(), ^{
       [weakSelf updateSearchResults];
       [weakSelf.tableView reloadData];
+      [weakSelf.sdc.searchResultsTableView reloadData];
     });
   } failure:^(NSError *error) {
     
