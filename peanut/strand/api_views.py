@@ -506,15 +506,18 @@ def getInviteObjectsDataForUser(user):
 				thumbsLoaded = False
 
 		if thumbsLoaded:
-			# If the last stranded photo 
-			lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-			if len(lastStrandedPhotos) > 0 and not user.first_run_sync_complete:
-				if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
+
+			if not user.first_run_sync_complete:
+				# If the last stranded photo 
+				lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+				if len(lastStrandedPhotos) > 0:
+					if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
+						inviteIsReady = False
+					else:
+						inviteIsReady = True
+				else:
 					inviteIsReady = False
 			else:
-				inviteIsReady = False
-
-			if user.first_run_sync_complete:
 				inviteIsReady = True
 
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
