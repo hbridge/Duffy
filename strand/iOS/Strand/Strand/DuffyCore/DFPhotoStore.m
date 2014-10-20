@@ -784,12 +784,12 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
            forID:photoID
            completion:^(NSError *error) {
              if (!error)
-               DDLogVerbose(@"%@ successfully cached thumnbnail for %@", self.class, @(photoID));
+               DDLogVerbose(@"%@ successfully cached thumnbnail for photo id %@", self.class, @(photoID));
              else
-               DDLogError(@"%@ failed to cache thumbnail:%@", self.class, error);
+               DDLogError(@"%@ failed code 1A to cache thumbnail for photo id %@.  error: %@", self.class, @(photoID), error);
            }];
         } failureBlock:^(NSError *error) {
-          DDLogError(@"%@ failed to cache thumbnail:%@", self.class, error);
+          DDLogError(@"%@ failed code 1B to cache thumbnail for photo id %@.  error: %@", self.class, @(photoID), error);
         }];
         [photo.asset loadHighResImage:^(UIImage *image) {
           [[DFImageStore sharedStore]
@@ -798,13 +798,13 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
            forID:photoID
            completion:^(NSError *error) {
              if (!error)
-               DDLogVerbose(@"%@ successfully cached full image for %@", self.class, @(photoID));
+               DDLogVerbose(@"%@ successfully cached full image for photo id %@", self.class, @(photoID));
              else
-               DDLogError(@"%@ failed to cache full image:%@", self.class, error);
+               DDLogError(@"%@ failed code 2A to cache full image for photo id %@. error: %@", self.class, @(photoID), error);
              
            }];
         } failureBlock:^(NSError *error) {
-          DDLogError(@"%@ failed to cache full image:%@", self.class, error);
+          DDLogError(@"%@ failed code 2B to cache full image for photo id %@. error: %@", self.class, @(photoID), error);
         }];
       }
     }
