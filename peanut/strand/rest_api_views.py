@@ -125,7 +125,7 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
             obj.skip = True
 
         # This will filter out 3-byte and up unicode strings.
-        obj.name = re_pattern.sub(u'\uFFFD', obj.name) 
+        obj.name = self.re_pattern.sub(u'\uFFFD', obj.name) 
 
 """
    Strand invite API
