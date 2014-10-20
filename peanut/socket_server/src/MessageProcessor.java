@@ -73,6 +73,7 @@ public class MessageProcessor extends Thread {
 				sqlFetch = "SELECT * FROM strand_notification_log WHERE result is null and msg_type=8 and added >='" + dft.format(timeWithin) + "'";
 				logEntry = stmt.executeQuery(sqlFetch);
 
+				System.err.println(sqlFetch);
 
 				bulkUpdateStmt = dbConnection.prepareStatement(sqlUpdate);
 				dbConnection.setAutoCommit(false);
