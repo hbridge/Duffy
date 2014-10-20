@@ -132,6 +132,8 @@ def userbaseSummary(request):
 		if (user.totalCount > 0):
 			entry['lastUploadTime'] = user.lastUpdated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 			entry['metadataCount'] = user.totalCount - user.thumbsCount
+			entry['photosWithGPS'] = 100.0*float(user.photosWithGPS)/float(user.totalCount)
+
 
 		if user.id in notificationCountById:
 			entry['notifications'] = notificationCountById[user.id]
