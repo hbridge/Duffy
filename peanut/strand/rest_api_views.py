@@ -107,6 +107,8 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
     lookup_field = 'id'
     serializer_class = BulkContactEntrySerializer
 
+    re_pattern = re.compile(u'[^\u0000-\uD7FF\uE000-\uFFFF]', re.UNICODE)
+
     """
         Clean up the phone number and set it.  Should only be one number per entry
 
@@ -121,6 +123,9 @@ class ContactEntryBulkAPI(BulkCreateAPIView):
         if not foundMatch:
             logger.info("Parse error for contact entry")
             obj.skip = True
+
+        # This will filter out 3-byte and up unicode strings.
+        obj.name = re_pattern.sub(u'\uFFFD', obj.name) 
 
 """
    Strand invite API
