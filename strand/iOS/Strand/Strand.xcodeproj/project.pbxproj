@@ -157,6 +157,7 @@
 		5AAF03AF19B5145200EF021C /* DFPeanutStrandInviteAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */; };
+		5ABE5E9A19F570CC009BADC4 /* DFSeenStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ABE5E9919F570CC009BADC4 /* DFSeenStateManager.m */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
 		5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D81947B01100862D9C /* DFLogConfig.m */; };
 		5AC4A9201947C30800862D9C /* ALAsset+DFExtensions.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8E21947C30800862D9C /* ALAsset+DFExtensions.m */; };
@@ -510,6 +511,8 @@
 		5AB32B5B19537A610082F716 /* DFStrandStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandStore.m; sourceTree = "<group>"; };
 		5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgeButton.h; sourceTree = "<group>"; };
 		5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFBadgeButton.m; sourceTree = "<group>"; };
+		5ABE5E9819F570CC009BADC4 /* DFSeenStateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSeenStateManager.h; sourceTree = "<group>"; };
+		5ABE5E9919F570CC009BADC4 /* DFSeenStateManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSeenStateManager.m; sourceTree = "<group>"; };
 		5AC4A8D019476F9000862D9C /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
 		5AC4A8D41947AEF500862D9C /* Strand-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Strand-Prefix.pch"; sourceTree = "<group>"; };
 		5AC4A8D51947AF7C00862D9C /* DFLogConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFLogConfig.h; sourceTree = "<group>"; };
@@ -1225,6 +1228,15 @@
 			name = "People Picker";
 			sourceTree = "<group>";
 		};
+		5ABE5E9719F570AA009BADC4 /* Seen State */ = {
+			isa = PBXGroup;
+			children = (
+				5ABE5E9819F570CC009BADC4 /* DFSeenStateManager.h */,
+				5ABE5E9919F570CC009BADC4 /* DFSeenStateManager.m */,
+			);
+			name = "Seen State";
+			sourceTree = "<group>";
+		};
 		5AC4839E19C7886200929965 /* Collection View Datasources */ = {
 			isa = PBXGroup;
 			children = (
@@ -1267,6 +1279,7 @@
 		5AC4A8DC1947B61900862D9C /* Database */ = {
 			isa = PBXGroup;
 			children = (
+				5ABE5E9719F570AA009BADC4 /* Seen State */,
 				5A9636C319E47D7600F3B606 /* Contacts DB */,
 				5A40343819607C74003D7546 /* Photo DB */,
 				5AC8B1E619D0D9AC00BAC55F /* DFAssetCache.h */,
@@ -1734,6 +1747,7 @@
 				5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */,
 				5A9BC31619A2985D002D1CD7 /* DFContactsViewController.m in Sources */,
 				5AC4A93C1947C30800862D9C /* NSNotificationCenter+DFThreadingAddons.m in Sources */,
+				5ABE5E9A19F570CC009BADC4 /* DFSeenStateManager.m in Sources */,
 				5AC4A9391947C30800862D9C /* NSArray+DFJSON.m in Sources */,
 				5A3172E0196C9EC100CA7693 /* DFPeanutError.m in Sources */,
 				5AC4A970194A42EE00862D9C /* DFPeanutObjectsResponse.m in Sources */,

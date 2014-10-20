@@ -128,6 +128,17 @@
   [self.navigationController setNavigationBarHidden:YES animated:YES];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [self markSuggestionsSeen];
+}
+
+- (void)markSuggestionsSeen
+{
+  
+}
+
 - (void)viewWillDisappear:(BOOL)animated
 {
   [super viewWillDisappear:animated];
