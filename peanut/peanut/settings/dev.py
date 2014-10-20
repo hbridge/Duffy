@@ -87,6 +87,7 @@ LOGGING = {
 	}
 }
 
+
 STATIC_ROOT = '' # uncomment for static files for dev servers
 
 # Additional locations of static files

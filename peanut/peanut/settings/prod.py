@@ -62,7 +62,7 @@ LOGGING = {
 			'level':'DEBUG',
 		},
 		'photos': {
-			'handlers': ['duffyfile'],
+			'handlers': ['duffyfile', 'mail_admins'],
 			'propagate': True,
 			'level': 'DEBUG',
 		},
@@ -72,7 +72,7 @@ LOGGING = {
 			'level': 'DEBUG',
 		},
 		'strand': {
-			'handlers': ['duffyfile'],
+			'handlers': ['duffyfile', 'mail_admins'],
 			'propagate': True,
 			'level': 'DEBUG',
 		},
@@ -80,15 +80,15 @@ LOGGING = {
 	}
 }
 
-DEFAULT_FROM_EMAIL = 'duffyserver@gmail.com'
+DEFAULT_FROM_EMAIL = 'server-errors@duffytech.co'
 
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
 EMAIL_PORT = 587
-EMAIL_HOST_USER = 'duffyserver@gmail.com'
-EMAIL_HOST_PASSWORD = 'duffyserver!'
+EMAIL_HOST_USER = 'AKIAJHHJPIGXPBWBGSKQ'
+EMAIL_HOST_PASSWORD = 'AiAvYbMDxI7DbOlS9wWrsvbyVuykMNwIMnPkefsFH++O'
 EMAIL_USE_TLS = True
 
-SERVER_EMAIL = 'duffyserver@gmail.com'
+SERVER_EMAIL = 'prod@duffyapp.com'
 
 ADMINS = (
 	('Admins', 'server-errors@duffytech.co'),
