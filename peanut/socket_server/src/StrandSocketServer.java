@@ -21,8 +21,8 @@ public class StrandSocketServer {
 
     public static void main(String[] args) throws IOException {
  
-        if (args.length != 1) {
-            System.err.println("Usage: java StrandSocketServer <port number>");
+        if (args.length != 2) {
+            System.err.println("Usage: java StrandSocketServer <port number> <db_url>");
             System.exit(1);
         }
 
@@ -47,11 +47,12 @@ public class StrandSocketServer {
         
         StrandSocketServer ss = new StrandSocketServer();
         int portNumber = Integer.parseInt(args[0]);
+        String dbURL = args[1];
         boolean listening = true;
 
 	    logger.info("Starting StrandSocketServer...");  
         // Start the message processor to query database
-        MessageProcessor mp = new MessageProcessor(ss.clients);
+        MessageProcessor mp = new MessageProcessor(ss.clients, dbURL);
         mp.start();
 
         // Start monitoring port

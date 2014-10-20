@@ -15,7 +15,6 @@ public class MessageProcessor extends Thread {
 	
 	// JDBC driver name and database URL
 	static final String JDBC_DRIVER = "com.mysql.jdbc.Driver";
-	static final String DB_URL = "jdbc:mysql://localhost:3306/duffy";
 
 	//  Database credentials
 	static final String USER = "djangouser";
@@ -28,9 +27,11 @@ public class MessageProcessor extends Thread {
 	private Hashtable<Integer, MobileClient> clients = null;
 	private Connection dbConnection = null;
 	Logger logger = Logger.getLogger("SocketServerLog");
+	String dbURL;
 
-	public MessageProcessor(Hashtable clients) {
+	public MessageProcessor(Hashtable clients, String dbURL) {
         this.clients = (Hashtable<Integer,MobileClient>)clients;
+        this.dbURL = "jdbc:" + dbURL;
 	}
 
 	public void run(){
@@ -50,7 +51,7 @@ public class MessageProcessor extends Thread {
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 
-			dbConnection = DriverManager.getConnection(DB_URL,USER,PASS);
+			dbConnection = DriverManager.getConnection(dbURL,USER,PASS);
 
 			stmt = dbConnection.createStatement();
 
@@ -67,13 +68,9 @@ public class MessageProcessor extends Thread {
 					timeWithin.setSeconds(0);
 				}
 
-				System.err.println(dft.format(timeWithin));
-
 				// Fetch and process entries from database
 				sqlFetch = "SELECT * FROM strand_notification_log WHERE result is null and msg_type=8 and added >='" + dft.format(timeWithin) + "'";
 				logEntry = stmt.executeQuery(sqlFetch);
-
-				System.err.println(sqlFetch);
 
 				bulkUpdateStmt = dbConnection.prepareStatement(sqlUpdate);
 				dbConnection.setAutoCommit(false);
@@ -82,8 +79,6 @@ public class MessageProcessor extends Thread {
 				while (logEntry.next()) {
 					int userId = logEntry.getInt("user_id");
 					int logEntryId = logEntry.getInt("id");
-					System.err.println(userId);
-					System.err.println(logEntryId);
 					if (clients.containsKey(userId)) {
 						logger.info("Sending refresh message to " + userId);
 						clients.get(userId).sendMessage("refresh:" + logEntry.getInt("id"));
