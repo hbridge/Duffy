@@ -260,6 +260,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 - (void)performForegroundOperations
 {
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
+    DDLogInfo(@"%@ became active", [DFAppInfo appInfoString]);
     if ([self isAppSetupComplete]) {
       [[DFCameraRollSyncManager sharedManager] sync];
       [[DFContactSyncManager sharedManager] sync];
