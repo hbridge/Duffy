@@ -169,11 +169,11 @@ $(document).ready(function() {
   var otherLinks = "<a href='/admin'>admin</a> | <a href='/phpmyadmin'>phpmyadmin</a>";
 
   if (!(location.hostname.match('prod.strand.duffyapp.com'))){
-	$("#ui-server-id").append('DEV <span class="ui-server-switch">(' + otherLinks +' | <a target=_blank href="http://prod.strand.duffyapp.com/viz/summary">switch to Prod</a>)</span>');
+	$("#ui-server-id").append('DEV <span class="ui-server-switch">(' + otherLinks +' | <a target=_blank href="http://prod.strand.duffyapp.com/viz/summary">switch to prod</a>)</span>');
 	$("#ui-server-id").css('background-color', '#C0C0C0');
   }
   else {
-	$("#ui-server-id").append('PROD <span class="ui-server-switch">('+ otherLinks +' | <a target=_blank href="http://dev.duffyapp.com/viz/summary">switch to Dev</a>)</span>');
+	$("#ui-server-id").append('PROD <span class="ui-server-switch">('+ otherLinks +' | <a target=_blank href="http://dev.duffyapp.com/viz/summary">switch to dev</a>)</span>');
 	$("#ui-server-id").css('background-color', 'orange');
   }
   $('td.timeago').each(function(){

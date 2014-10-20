@@ -1,0 +1,166 @@
+<html>
+<head>
+	<title>Strand Summary </title> 
+</head>
+<style>
+	html, body { padding: 0; margin: 0; font-family: arial; font-size: 12px;}
+	table {
+		border-collapse: collapse;
+		margin-bottom: 20px;
+	}
+	table, th, td {
+		font-size: 12px;
+	}
+	td {
+		padding: 0px 5px 0px 5px;
+	}
+	.ui-row-internal {
+		background-color: #C0C0C0;
+	}
+	.ui-content {
+		padding: 10px 0px 0px 10px;
+	}
+	.ui-table tr:hover {
+		background-color: #b8d1f3;
+	}
+	.ui-row {
+
+	}
+	.ui-header {
+		font-size: 16px;
+		font-weight: bold;
+		text-align: left;
+		padding-bottom: 4px;
+	}
+	.ui-row-header {
+		font-weight: bold;
+		font-size: 12px;
+		border: 1px solid black;
+	}
+	.ui-key {
+	}
+	.red {
+		color: red;
+	}
+	.recent {
+		font-weight: bold;
+	}
+	#stats{
+		text-align: left;
+	}
+	.right{
+		text-align: right;
+	}
+	.center{
+		text-align: center;
+	}
+	.b-r{
+		border-right: 1px solid black;
+	}
+	.ui-server-id {
+		font-size: 24px;
+		text-align: center;
+		margin-bottom: 10px;
+	}
+	.ui-server-switch {
+		font-size: 16px
+	}
+
+</style>
+<script src="/static/jquery-1.10.2.min.js"></script>
+<script src="/static/jquery.timeago.js"></script>
+<body>
+<div class="ui-content">
+	<div class='ui-server-id' id='ui-server-id'>
+	</div>
+
+	<div class='ui-header'> Strands &mdash; ({{ strandCounts.all }}) </div>
+	<table class='ui-table' cellpadding='3'>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> All </td>
+			<td class='counts'> {{ strandCounts.all }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> 1 photo </td>
+			<td class='counts'> {{ strandCounts.b1 }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> 2-4 photos </td>
+			<td class='counts'> {{ strandCounts.b2 }} </td>
+		</tr>			
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> 5-10 photos </td>
+			<td class='counts'> {{ strandCounts.b3 }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 b-r'> 10+ photos </td>
+			<td class='counts'> {{ strandCounts.b4 }} </td>
+		</tr>			
+
+	</table>
+
+	<div class='ui-header'> Strands &mdash; ({{ userCounts.all }}) </div>
+	<table class='ui-table' cellpadding='3'>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> All </td>
+			<td class='counts'> {{ userCounts.all }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> 1 person </td>
+			<td class='counts'> {{ userCounts.b1 }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> 2 people </td>
+			<td class='counts'> {{ userCounts.b2 }} </td>
+		</tr>			
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> 3 people </td>
+			<td class='counts'> {{ userCounts.b3 }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 b-r'> 3+ people </td>
+			<td class='counts'> {{ userCounts.b4 }} </td>
+		</tr>			
+
+	</table>
+
+	<div class='ui-header'> Invites &mdash; ({{ inviteCounts.all }}) </div>
+	<table class='ui-table' cellpadding='3'>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> All </td>
+			<td class='counts'> {{ inviteCounts.all }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> Accepted </td>
+			<td class='counts'> {{ inviteCounts.accepted }} </td>
+		</tr>
+		<tr class='ui-row' >
+			<td class='col1 right b-r'> Swapped </td>
+			<td class='counts'> {{ inviteCounts.swapped }} </td>
+		</tr>
+	</table>
+
+<div id="stats" class="text">
+	<!-- STATS: Total time: %(total_time).2fs | Python: %(python_time).2fs | DB: %(db_time).2fs | Queries: %(db_queries)d ENDSTATS -->
+</div>
+</div>
+
+
+</body>
+<script>
+
+$(document).ready(function() {
+
+  var otherLinks = "<a href='/admin'>admin</a> | <a href='/phpmyadmin'>phpmyadmin</a>";
+
+  if (!(location.hostname.match('prod.strand.duffyapp.com'))){
+	$("#ui-server-id").append('DEV <span class="ui-server-switch">(' + otherLinks +' | <a target=_blank href="http://prod.strand.duffyapp.com/viz/summary">switch to prod</a>)</span>');
+	$("#ui-server-id").css('background-color', '#C0C0C0');
+  }
+  else {
+	$("#ui-server-id").append('PROD <span class="ui-server-switch">('+ otherLinks +' | <a target=_blank href="http://dev.duffyapp.com/viz/summary">switch to dev</a>)</span>');
+	$("#ui-server-id").css('background-color', 'orange');
+  }
+});
+</script>
+</html>
