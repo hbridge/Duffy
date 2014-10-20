@@ -195,6 +195,7 @@ def handleUploadedImage(request, fileKey, photo):
 		processUploadedPhoto(photo, request.FILES[fileKey].name, tempFilepath)
 	else:
 		logger.warning("File not found in request: " + fileKey)
+		logger.warning(request.FILES)
 
 
 def handleUploadedImagesBulk(request, photos):
