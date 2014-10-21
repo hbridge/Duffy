@@ -182,19 +182,8 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
 
 
 class RetrieveUpdateDestroyStrandInviteAPI(RetrieveUpdateDestroyAPIView):
-    def sendNotification(self, strandInviteId):
-        strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
-        msg = "%s just joined your Strand from %s" % (strandInvite.accepted_user.display_name, strandInvite.strand.photos.all()[0].location_city)
-        
-        logger.debug("going to send %s to user id %s" % (msg, strandInvite.user.id))
-        notifications_util.sendNotification(strandInvite.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
-
     def post_save(self, strandInvite, created):
         if strandInvite.accepted_user_id:
-            thread = Thread(target = self.sendNotification, args = (strandInvite.id,))
-            thread.start()
-            logger.info("Updated strandInvite %s and started thread to send notification", (strandInvite.id))
-
             oldActions = list(Action.objects.filter(user=strandInvite.accepted_user, strand=strandInvite.strand).order_by("-added"))
             action = Action(user=strandInvite.accepted_user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
             action.save()
@@ -290,6 +279,20 @@ class CreateStrandAPI(CreateAPIView):
             logger.info("Created new strand %s with users %s and photos %s and neighborRows %s" % (strand.id, strand.users.all(), strand.photos.all(), newStrandNeighbors))
             
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
+    def sendNotifications(self, userId, strandId, newPhotoIds):
+        userThatJustAdded = User.objects.get(id=userId)
+        strand = Strand.objects.get(id=strandId)
+
+        if len(newPhotoIds) == 1:
+            msg = "%s just added 1 photo to the Strand from %s" % (userThatJustAdded.display_name, strand.photos.all()[0].location_city)
+        else:
+            msg = "%s just added %s photos to the Strand from %s" % (userThatJustAdded.display_name, len(newPhotoIds), strand.photos.all()[0].location_city
+        
+        for user in strand.users.all():
+            logger.debug("going to send %s to user id %s" % (msg, user.id))
+            notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
+
+
     def pre_save(self, strand):
         # Don't need to explicity save here since this is pre_save
         updateStrandWithCorrectPhotoTimes(strand)
@@ -321,5 +324,11 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
             action.save()
             action.photos = newPhotoIds
+
+            # This should really be in the post_save, but doing in pre_save for now for simplicity
+            thread = Thread(target = self.sendNotifications, args = (user.id, strand.id, newPhotoIds))
+            thread.start()
+            logger.info("Updating strand %s and started thread to send notification", (strand.id))
+        
 
 
