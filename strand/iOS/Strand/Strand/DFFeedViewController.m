@@ -34,6 +34,7 @@
 #import "DFAddPhotosViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
+#import "DFStrandPeopleBarView.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -76,6 +77,7 @@ const CGFloat LockedCellHeight = 157.0;
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
 @property (nonatomic, retain) NSTimer *refreshTimer;
+@property (nonatomic, retain) DFStrandPeopleBarView *peopleBar;
 
 @end
 
@@ -151,6 +153,7 @@ const CGFloat LockedCellHeight = 157.0;
     self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
   }
   
+  [self.peopleBar configureWithStrandPostsObject:self.postsObject];
 }
 
 - (void)observeNotifications
@@ -194,6 +197,7 @@ const CGFloat LockedCellHeight = 157.0;
   
   [self configureTableView];
   [self configureUpsell];
+  [self configurePeopleBar];
 }
 
 - (void)configureTableView
@@ -222,6 +226,33 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
   self.tableView.rowHeight = MinRowHeight;
 
+}
+
+- (void)configurePeopleBar
+{
+  
+  if (!self.peopleBar) {
+    self.peopleBar = [UINib instantiateViewWithClass:[DFStrandPeopleBarView class]];
+    [self.view addSubview:self.peopleBar];
+    [self.view addConstraints:[NSLayoutConstraint
+                               constraintsWithVisualFormat:@"|-0-[peopleBar]-0-|"
+                               options:NSLayoutFormatDirectionLeftToRight
+                               metrics:nil
+                               views:@{@"peopleBar" : self.peopleBar}]];
+    [self.view addConstraints:[NSLayoutConstraint
+                               constraintsWithVisualFormat:@"V:|-0-[peopleBar]-0-[tableView]"
+                               options:NSLayoutFormatDirectionLeftToRight
+                               metrics:nil
+                               views:@{@"peopleBar" : self.peopleBar,
+                                       @"tableView" : self.tableView
+                                       }]];
+  }
+  self.peopleBar.frame = CGRectMake(0,
+                                    0,
+                                    [[UIScreen mainScreen] bounds].size.width ,
+                                    20);
+  
+    [self.peopleBar configureWithStrandPostsObject:self.postsObject];
 }
 
 - (void)configureUpsell
@@ -256,6 +287,7 @@ const CGFloat LockedCellHeight = 157.0;
   self.isViewTransitioning = YES;
   [super viewWillAppear:animated];
   [self configureUpsell];
+  [self configurePeopleBar];
   
   if (self.inviteObject && [self.inviteObject.ready isEqual:@(NO)]) {
     DDLogVerbose(@"Invite not ready, setting up timer...");
@@ -299,6 +331,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidLayoutSubviews];
   [self configureUpsell];
+  [self configurePeopleBar];
 }
 
 - (void)setPostsObject:(DFPeanutFeedObject *)strandPostsObject
@@ -312,7 +345,6 @@ const CGFloat LockedCellHeight = 157.0;
     titleView.locationLabel.text = strandPostsObject.location;
     titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPostsObject.time_taken
                                                                  abbreviate:NO];
-    
     self.navigationItem.titleView = titleView;
    
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];

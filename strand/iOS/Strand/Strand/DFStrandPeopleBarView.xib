@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" horizontalCompressionResistancePriority="999" verticalCompressionResistancePriority="999" translatesAutoresizingMaskIntoConstraints="NO" id="8iy-Tp-A8Q" userLabel="PeopleBarView" customClass="DFStrandPeopleBarView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="20"/>
+            <subviews>
+                <view contentMode="scaleToFill" horizontalHuggingPriority="999" translatesAutoresizingMaskIntoConstraints="NO" id="gk7-wI-Dar" userLabel="People Wrapper">
+                    <rect key="frame" x="236" y="0.0" width="128" height="20"/>
+                    <subviews>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/PeopleHeaderIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="3l6-xz-gM7">
+                            <rect key="frame" x="0.0" y="4" width="13" height="13"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="13" id="Crx-Es-gSZ"/>
+                                <constraint firstAttribute="height" constant="13" id="o26-BO-A0k"/>
+                            </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageRenderingMode">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="People" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S23-Fr-g8v" userLabel="People Label">
+                            <rect key="frame" x="17" y="2" width="42" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/InviteHeaderIcon" translatesAutoresizingMaskIntoConstraints="NO" id="m3H-o7-KgE">
+                            <rect key="frame" x="70" y="4" width="13" height="13"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="13" id="ApR-8R-xZa"/>
+                                <constraint firstAttribute="height" constant="13" id="dv1-3M-cRL"/>
+                            </constraints>
+                            <userDefinedRuntimeAttributes>
+                                <userDefinedRuntimeAttribute type="number" keyPath="imageRenderingMode">
+                                    <integer key="value" value="2"/>
+                                </userDefinedRuntimeAttribute>
+                            </userDefinedRuntimeAttributes>
+                        </imageView>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Invited" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="aGy-o9-Qjm" userLabel="Invited Label">
+                            <rect key="frame" x="87" y="2" width="41" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="centerY" secondItem="3l6-xz-gM7" secondAttribute="centerY" id="0qs-o9-XpJ"/>
+                        <constraint firstItem="aGy-o9-Qjm" firstAttribute="leading" secondItem="m3H-o7-KgE" secondAttribute="trailing" constant="4" id="6dh-Fr-uJ0"/>
+                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="3l6-xz-gM7" secondAttribute="bottom" constant="3" id="6xf-cb-iKE"/>
+                        <constraint firstAttribute="trailing" secondItem="S23-Fr-g8v" secondAttribute="trailing" priority="700" id="GJA-pG-E7j"/>
+                        <constraint firstItem="S23-Fr-g8v" firstAttribute="leading" secondItem="3l6-xz-gM7" secondAttribute="trailing" constant="4" id="Nel-nw-Rdj"/>
+                        <constraint firstAttribute="trailing" secondItem="aGy-o9-Qjm" secondAttribute="trailing" id="O7c-iV-RJX"/>
+                        <constraint firstItem="m3H-o7-KgE" firstAttribute="leading" secondItem="S23-Fr-g8v" secondAttribute="trailing" priority="999" constant="11" id="PEP-h0-Sgd"/>
+                        <constraint firstAttribute="centerY" secondItem="m3H-o7-KgE" secondAttribute="centerY" id="VF7-vB-bPc"/>
+                        <constraint firstAttribute="height" constant="20" id="Vgs-Ow-w6a"/>
+                        <constraint firstItem="3l6-xz-gM7" firstAttribute="top" relation="greaterThanOrEqual" secondItem="gk7-wI-Dar" secondAttribute="top" constant="3" id="W4I-pA-Q2P"/>
+                        <constraint firstItem="3l6-xz-gM7" firstAttribute="leading" secondItem="gk7-wI-Dar" secondAttribute="leading" id="kCH-us-Lrm"/>
+                        <constraint firstAttribute="centerY" secondItem="S23-Fr-g8v" secondAttribute="centerY" id="uKg-S0-f8q"/>
+                        <constraint firstAttribute="centerY" secondItem="aGy-o9-Qjm" secondAttribute="centerY" id="y3q-S1-qAU"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="gk7-wI-Dar" secondAttribute="bottom" id="Dgj-RH-9Sp"/>
+                <constraint firstItem="gk7-wI-Dar" firstAttribute="top" relation="greaterThanOrEqual" secondItem="8iy-Tp-A8Q" secondAttribute="top" id="Yw7-Ca-9Zp"/>
+                <constraint firstAttribute="centerY" secondItem="gk7-wI-Dar" secondAttribute="centerY" id="pLV-4Q-qne"/>
+                <constraint firstAttribute="centerX" secondItem="gk7-wI-Dar" secondAttribute="centerX" id="s0G-nX-d3s"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="invitedIcon" destination="m3H-o7-KgE" id="8fg-Vg-XAl"/>
+                <outlet property="invitedLabel" destination="aGy-o9-Qjm" id="42o-wu-Sjf"/>
+                <outlet property="peopleIcon" destination="3l6-xz-gM7" id="ckU-TP-WB7"/>
+                <outlet property="peopleLabel" destination="S23-Fr-g8v" id="Mik-27-c8U"/>
+                <outlet property="peopleToInviteConstraint" destination="PEP-h0-Sgd" id="Fky-k2-ce0"/>
+            </connections>
+            <point key="canvasLocation" x="252" y="425"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="Assets/Icons/InviteHeaderIcon" width="16" height="16"/>
+        <image name="Assets/Icons/PeopleHeaderIcon.png" width="16" height="16"/>
+    </resources>
+</document>
