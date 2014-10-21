@@ -7,142 +7,95 @@ import logging
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
+import django
+django.setup()
 
 from django.db.models import Count
 from django.db.models import Q
 
 from peanut.settings import constants
-from common.models import NotificationLog, Photo, User, Strand
+from common.models import Action, StrandInvite
 
 from strand import notifications_util, geo_util, strands_util, friends_util
 
 logger = logging.getLogger(__name__)
 
-			
-"""
-	Send notifications for actions on photos.
-	Right now, just for favoriting.  We grab all the actions where the user_notified_time isn't set,
-	  so we don't use the notification logs right now.
-"""	
-def sendPhotoActionNotifications(now, waitTime):
-	likeNotificationWaitSeconds = now - waitTime
-
-	photoActions = PhotoAction.objects.select_related().filter(added__lte=likeNotificationWaitSeconds).filter(user_notified_time=None)
-	usersToUpdateFeed = list()
-
-	for photoAction in photoActions:
-		if photoAction.action_type == "favorite":
-			if photoAction.user_id != photoAction.photo.user_id:
-				visibleMsg = "%s just liked your photo!" % (photoAction.user.display_name)
-				metadataMsg = "%s liked your photo" % (photoAction.user.display_name)
-				
-				msgType = constants.NOTIFICATIONS_PHOTO_FAVORITED_ID
-				# Make name small since we only have 256 characters
-				customPayload = {'pid': photoAction.photo_id}
-
-				metadata = {'photo_action': photoAction.id}
-
-				logger.info("Sending %s to %s" % (visibleMsg, photoAction.photo.user))
-				notifications_util.sendNotification(photoAction.photo.user, visibleMsg, msgType, customPayload, metadata)
-
-			photoAction.user_notified_time = datetime.datetime.utcnow()
-			photoAction.save()
-		usersToUpdateFeed.append(photoAction.photo.user)
-
-	# Tell all the users who just had photos liked to refresh their feeds
-	notifications_util.sendRefreshFeedToUsers(set(usersToUpdateFeed))
 
 
-"""
-	If we haven't gotten a gps coordinate from them in the last hour, then send a ping
-"""
-def sendGpsNotification(now, gpsRefreshTime, notificationLogsCache):
-	msgType = constants.NOTIFICATIONS_FETCH_GPS_ID
-	frequencyOfGpsUpdatesCutoff = now - gpsRefreshTime
+def sendInviteNotification(strandInvite):
+	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+	logger.debug("in sendInviteNotification for invite id %s" % strandInvite.id)
+	msg = "%s wants to swap photos from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
 	
-	notificationsById = notifications_util.getNotificationsForTypeById(notificationLogsCache, msgType, frequencyOfGpsUpdatesCutoff)
-	usersWithOldGpsData = User.objects.filter(product_id=1).filter(last_location_timestamp__lt=frequencyOfGpsUpdatesCutoff)
+	doNotification = True
 
-	for user in usersWithOldGpsData:
-		if user.id not in notificationsById:
-			logger.debug("Pinging user %s to update their gps" % (user.id))
-			logEntries = notifications_util.sendNotification(user, "", msgType, dict())
-			notificationLogsCache.extend(logEntries)
-				
-	return notificationLogsCache
+	if not strandInvite.invited_user:
+		doNotification = False
 
-"""
-	Raw firestarter kicks off when a user is simply nearby other users (no photos taken.)
-	Very infrequent right now
-"""
-def sendRawFirestarter(now, gpsUpdatedWithin, notifiedWithin, distanceWithinMeters, notificationLogsCache):
-	msgType = constants.NOTIFICATIONS_RAW_FIRESTARTER_ID
-	
-	gpsUpdatedCutoff = now - gpsUpdatedWithin
-	users = User.objects.filter(product_id=1).filter(last_location_timestamp__gt=gpsUpdatedCutoff)
+	for photo in strandInvite.strand.photos.all():
+		if not photo.thumb_filename:
+			doNotification = False
 
-	notifiedCutoff = now - notifiedWithin
-	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogsCache, constants.NOTIFICATIONS_ANY, notifiedCutoff)
+	if doNotification:
+		logger.debug("going to send %s to user id %s" % (msg, strandInvite.invited_user.id))
+		customPayload = {'id': strandInvite.id}
+		notifications_util.sendNotification(strandInvite.invited_user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, customPayload)
+		return True
+	return False
 
-	for user in users:
-		nearbyUsers = geo_util.getNearbyUsers(user.last_location_point.x, user.last_location_point.y, users, filterUserId=user.id, accuracyWithin = distanceWithinMeters)
+def sendJoinActionNotifications(action):
+	if action.strand.photos.count() == 1:
+		msg = "%s added 1 photo from %s" % (action.user.display_name, action.strand.photos.all()[0].location_city)
+	else:
+		msg = "%s added %s photos from %s" % (action.user.display_name, action.photos.count(), action.strand.photos.all()[0].location_city)
+		
+	doNotification = True
 
-		numNearbyUsers = len(nearbyUsers)
-		if numNearbyUsers > 0 and user.id not in notificationsById:
-			if numNearbyUsers == 1:
-				msg = "You have a friend on Strand nearby. Take a photo to share with them!"
-			else:
-				msg = "You have %s friends on Strand nearby. Take a photo to share with them!" % (numNearbyUsers)
-				
-			logger.debug("Sending raw firestarter msg to user %s " % (user.id))
-			
-			logEntries = notifications_util.sendNotification(user, msg, msgType, dict())
-			notificationLogsCache.extend(logEntries)
-				
-	return notificationLogsCache
+	for photo in action.photos.all():
+		if not photo.thumb_filename:
+			doNotification = False
+
+	if doNotification:
+		for user in action.strand.users.all():
+			if user.id != action.user.id:
+				logger.debug("going to send %s to user id %s" % (msg, user.id))
+				customPayload = {'id': action.strand.id}
+				notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, customPayload)
+		
+		return True
+	return False
 
 def main(argv):
-	joinStrandWithin = datetime.timedelta(minutes=30)
-	joinStrandGpsUpdatedWithin = datetime.timedelta(hours=8)
-	waitTimeForPhotoAction = datetime.timedelta(seconds=5)
-	gpsRefreshTime = datetime.timedelta(hours=3)
-
-	rawFirestarterGpsUpdatedWithin = datetime.timedelta(hours=3)
-	rawFirestarterNotifiedWithin = datetime.timedelta(days=7)
-	rawFirestarterDistanceWithinMeters = 100 # meters
-
-	photosFirestarterGpsUpdatedWithin = datetime.timedelta(hours=3)
-	photosFirestarterNotifiedWithin = datetime.timedelta(days=3)
-	photosFirestarterAccuracyWithinMeters = 100 # meters
-	photosFirestarterPhotoTakenWithin = datetime.timedelta(minutes=30)
-
-	# Want it to be the longest time we could want to grab cache
-	notificationLogsWithin = datetime.timedelta(days=7)
-	
 	logger.info("Starting... ")
+	notificationTimedelta = datetime.timedelta(seconds=300)
+	
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-		# Grap notification logs for use in other methods
-		notificationLogsCutoff = now - notificationLogsWithin
+		inviteNotificationsSent = list()
+		actionNotificationsSent = list()
 
-		notificationLogsCache = list()
-		# Join Strand
-		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - joinStrandWithin, constants.NOTIFICATIONS_JOIN_STRAND_ID))
-		# Gps
-		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - gpsRefreshTime, constants.NOTIFICATIONS_FETCH_GPS_ID))
-		# Photo firestarter
-		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - photosFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_PHOTO_FIRESTARTER_ID))
-		# Raw firestarter
-		notificationLogsCache.extend(notifications_util.getNotificationLogsForType(now - rawFirestarterGpsUpdatedWithin, constants.NOTIFICATIONS_RAW_FIRESTARTER_ID))
+		actions = Action.objects.filter(notification_sent__isnull=True).filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND).filter(added__gt=now-notificationTimedelta)
 
-		sendPhotoActionNotifications(now, waitTimeForPhotoAction)
+		for action in actions:
+			if sendJoinActionNotifications(action):
+				action.notification_sent = now
+				actionNotificationsSent.append(action)
 
-		notificationLogsCache = sendGpsNotification(now, gpsRefreshTime, notificationLogsCache)
+		invites = StrandInvite.objects.select_related().filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(skip=False)
 
-		#notificationLogsCache = sendRawFirestarter(now, rawFirestarterGpsUpdatedWithin, rawFirestarterNotifiedWithin, rawFirestarterDistanceWithinMeters, notificationLogsCache)
-				
-		# Always sleep since we're doing a time based search above
-		time.sleep(5)
+		for invite in invites:
+			if sendInviteNotification(invite):
+				invite.notification_sent = now
+				inviteNotificationsSent.append(invite)
+
+		if len(inviteNotificationsSent) > 0:
+			StrandInvite.bulkUpdate(inviteNotificationsSent, ['notification_sent'])
+
+		if len(actionNotificationsSent) > 0:
+			Action.bulkUpdate(actionNotificationsSent, ['notification_sent'])
+			
+		if invites.count() == 0:
+			time.sleep(1)
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/strand-notifications.log',

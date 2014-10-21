@@ -38,6 +38,7 @@ class User(models.Model):
 	first_run_sync_complete = models.BooleanField(default=False)
 	invites_remaining = models.IntegerField(default=5)
 	invites_sent = models.IntegerField(default=0)
+	api_cache_private_strands_dirty = models.BooleanField(default=True)
 	last_build_info = models.CharField(max_length=100, null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
@@ -668,6 +669,7 @@ class StrandInvite(models.Model):
 	accepted_user = models.ForeignKey(User, null=True, db_index=True, related_name="accepted_user")
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	skip = models.BooleanField(default=False, db_index=True)
+	notification_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
@@ -707,6 +709,7 @@ class Action(models.Model):
 	photo = models.ForeignKey(Photo, db_index=True, related_name = "action_photo", null=True)
 	photos = models.ManyToManyField(Photo, related_name = "action_photos")
 	strand = models.ForeignKey(Strand, db_index=True, null=True)
+	notification_sent = models.DateTimeField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -718,6 +721,26 @@ class Action(models.Model):
 
 	class Meta:
 		db_table = 'strand_action'
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		for obj in objs:
+			obj.updated = datetime.datetime.now()
+
+		if isinstance(attributesList, list):
+			attributesList.append("updated")
+		else:
+			attributesList = [attributesList, "updated"]
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
+
+
+class ApiCache(models.Model):
+	user = models.ForeignKey(User, db_index=True, unique=True)
+	private_strands_data = models.TextField(null=True)
+
+	class Meta:
+		db_table = 'strand_api_cache'
 
 @receiver(post_save, sender=Action)
 def sendNotificationsUponActions(sender, **kwargs):
