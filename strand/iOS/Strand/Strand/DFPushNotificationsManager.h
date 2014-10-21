@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPeanutPushNotification.h"
 
 @interface DFPushNotificationsManager : NSObject <UIAlertViewDelegate>
 
@@ -22,8 +23,11 @@
 
 #pragma mark - Handler
 
+typedef void (^DFNoticationOpenedHandler)(DFPeanutPushNotification *pushNotif);
+
 - (void)handleNotificationForApp:(UIApplication *)application
                         userInfo:(NSDictionary *)userInfo
           fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
+- (DFNoticationOpenedHandler)openedHandlerForNotification:(DFPeanutPushNotification *)pushNotif;
 
 @end

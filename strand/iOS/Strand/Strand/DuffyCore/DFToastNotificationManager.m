@@ -11,6 +11,8 @@
 #import <AudioToolbox/AudioServices.h>
 #import "DFStrandConstants.h"
 #import "DFPeanutAction.h"
+#import "DFPeanutFeedDataManager.h"
+#import "DFFeedViewController.h"
 
 @implementation DFToastNotificationManager
 
@@ -101,6 +103,7 @@ static DFToastNotificationManager *defaultManager;
 }
 
 - (void)showNotificationForPush:(DFPeanutPushNotification *)pushNotif
+                        handler:(DFNoticationOpenedHandler)openedHandler
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
   options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
@@ -108,7 +111,8 @@ static DFToastNotificationManager *defaultManager;
   options[kCRToastTextKey] = pushNotif.message ? pushNotif.message : @"";
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/PhotoNotificationIcon.png"];
   
-  options[kCRToastInteractionRespondersKey] = @[[self.class gotoPhotoInteractionHandler:pushNotif.photoID]];
+  options[kCRToastInteractionRespondersKey] = @[[self.class handlerWithOpenedHandler:openedHandler
+                                                                        forPushNotif:pushNotif]];
   
   [CRToastManager showNotificationWithOptions:options
                               completionBlock:^{
@@ -117,14 +121,16 @@ static DFToastNotificationManager *defaultManager;
 }
 
 
-+ (id)gotoPhotoInteractionHandler:(DFPhotoIDType)photoID
++ (id)handlerWithOpenedHandler:(DFNoticationOpenedHandler)handler
+                    forPushNotif:(DFPeanutPushNotification *)pushNotif
 {
-  return [CRToastInteractionResponder
-          interactionResponderWithInteractionType:CRToastInteractionTypeAll
-          automaticallyDismiss:YES
-          block:^(CRToastInteractionType interactionType) {
-//            [[RootViewController rootViewController] showPhotoWithID:photoID];
-          }];
+  return
+  [CRToastInteractionResponder
+   interactionResponderWithInteractionType:CRToastInteractionTypeAll
+   automaticallyDismiss:YES
+   block:^(CRToastInteractionType interactionType) {
+     handler(pushNotif);
+   }];
 }
 
 + (id)dismissInteractionHandler

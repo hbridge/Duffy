@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFPeanutPushNotification.h"
+#import "DFPushNotificationsManager.h"
 
 @interface DFToastNotificationManager : NSObject
 
@@ -19,7 +20,8 @@ typedef enum {
 + (DFToastNotificationManager *)sharedInstance;
 
 - (void)showNotificationWithType:(DFToastNotificationType)notificationType;
-- (void)showNotificationForPush:(DFPeanutPushNotification *)pushNotif;
+- (void)showNotificationForPush:(DFPeanutPushNotification *)pushNotif
+                        handler:(DFNoticationOpenedHandler)openedHandler;
 
 - (void)showNotificationWithString:(NSString *)string timeout:(NSTimeInterval)timeout;
 - (void)showErrorWithTitle:(NSString *)title subTitle:(NSString *)subtitle;

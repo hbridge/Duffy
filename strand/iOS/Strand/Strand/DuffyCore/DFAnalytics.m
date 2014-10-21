@@ -11,8 +11,8 @@
 #import <AddressBook/AddressBook.h>
 #import "NSDictionary+DFJSON.h"
 #import "LocalyticsSession.h"
-
 #import "DFDefaultsStore.h"
+#import "DFPeanutPushNotification.h"
 
 
 
@@ -290,9 +290,9 @@ static DFAnalytics *defaultLogger;
 
 + (void)logNotificationOpenedWithType:(DFPushNotifType)type
 {
-  [DFAnalytics logEvent:NotificationOpenedEvent
+   [DFAnalytics logEvent:NotificationOpenedEvent
          withParameters:@{
-                          NotificationTypeKey: [self.class pushNotifTypeToString:type],
+                          NotificationTypeKey: [DFPeanutPushNotification pushNotifTypeToString:type],
                           }];
 }
 
@@ -304,28 +304,6 @@ static DFAnalytics *defaultLogger;
                           @"age" : [self bucketStringForTimeInternval:[[NSDate date]
                                                                        timeIntervalSinceDate:notifDate]]
                           }];
-}
-
-
-+ (NSString *)pushNotifTypeToString:(DFPushNotifType)type
-{
-  if (type == DFPushNotifUnknown) {
-    return @"unknown";
-  } else if (type == DFPushNotifFavorited) {
-    return @"favorite";
-  } else if (type == DFPushNotifFetchGPS) {
-    return @"fetchGPS";
-  } else if (type == DFPushNotifFirestarter) {
-    return @"firestarter";
-  } else if (type == DFPushNotifFirestarterPhotoTaken) {
-    return @"firestarterPhoto";
-  } else if (type == DFPushNotifJoinable) {
-    return @"joinable";
-  } else if (type == DFPushNotifNewPhotos) {
-    return @"newPhotos";
-  }
-  
-  return @"unknown";
 }
 
 + (void)logPhotoDeletedWithResult:(NSString *)result

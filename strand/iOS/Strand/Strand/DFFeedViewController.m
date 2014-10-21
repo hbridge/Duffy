@@ -107,6 +107,28 @@ const CGFloat LockedCellHeight = 157.0;
   return self;
 }
 
+
++ (void)presentFeedObject:(DFPeanutFeedObject *)feedObject
+  modallyInViewController:(UIViewController *)viewController
+{
+  DFFeedViewController *feedViewController = [[DFFeedViewController alloc]
+                                              initWithFeedObject:feedObject];
+  DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:feedViewController];
+  feedViewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                                          initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:feedViewController
+                                                          action:@selector(dismissWhenPresented)];
+  
+  
+  [viewController presentViewController:navController animated:YES completion:nil];
+
+}
+
+- (void)dismissWhenPresented
+{
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+
 /*
  * Reload data from the data manager.  We're using the strand id we were init'd with.
  */

@@ -60,33 +60,9 @@
   _contentAvailable = [contentAvailable boolValue];
 }
 
-- (DFPhotoIDType)photoID
+- (NSNumber *)id
 {
-  return [(NSNumber *)self.userInfo[@"pid"] longLongValue];
-}
-
-- (DFScreenType)screenToShow
-{
-  if (self.userInfo[@"view"]) {
-    return [(NSNumber *)self.userInfo[@"view"] intValue];
-  }
-  
-  switch (self.type) {
-    case DFPushNotifUnknown:
-      return DFScreenCamera;
-    case DFPushNotifNewPhotos:
-      return DFScreenGallery;
-    case DFPushNotifJoinable:
-      return DFScreenCamera;
-    case DFPushNotifFavorited:
-      return DFScreenGallery;
-    case DFPushNotifFirestarter:
-      return DFScreenCamera;
-    case DFPushNotifFirestarterPhotoTaken:
-      return DFScreenCamera;
-    default:
-      return DFScreenCamera;
-  }
+  return self.userInfo[@"id"];
 }
 
 - (BOOL)isUpdateLocationRequest
@@ -104,6 +80,35 @@
 - (NSString *)description{
   return self.userInfo.description;
 }
+
+- (NSString *)typeString
+{
+  return [self.class pushNotifTypeToString:self.type];
+}
+
+static NSArray *typeStrings = nil;
++ (NSString *)pushNotifTypeToString:(DFPushNotifType)type
+{
+  if (!typeStrings) {
+    typeStrings = @[@"UNKNOWN",
+                    @"NOTIFICATIONS_NEW_PHOTO_ID",
+                    @"NOTIFICATIONS_JOIN_STRAND_ID",
+                    @"NOTIFICATIONS_PHOTO_FAVORITED_ID",
+                    @"NOTIFICATIONS_FETCH_GPS_ID",
+                    @"NOTIFICATIONS_RAW_FIRESTARTER_ID",
+                    @"NOTIFICATIONS_PHOTO_FIRESTARTER_ID",
+                    @"NOTIFICATIONS_PHOTO_FIRESTARTER_ID",
+                    @"NOTIFICATIONS_REFRESH_FEED",
+                    @"NOTIFICATIONS_SOCKET_REFRESH_FEED",
+                    @"NOTIFICATIONS_INVITED_TO_STRAND",
+                    @"NOTIFICATIONS_ACCEPTED_INVITE",
+                    ];
+  }
+  
+  if ((int)type > typeStrings.count - 1) return @"UNKNOWN";
+  return typeStrings[type];
+}
+
 
 
 @end

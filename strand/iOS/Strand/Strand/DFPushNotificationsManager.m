@@ -13,6 +13,8 @@
 #import "DFPeanutPushNotification.h"
 #import "DFBackgroundLocationManager.h"
 #import "DFToastNotificationManager.h"
+#import "DFPeanutFeedDataManager.h"
+#import "DFFeedViewController.h"
 
 @implementation DFPushNotificationsManager
 
@@ -159,22 +161,19 @@
        backgroundUpdateWithCompletionHandler:completionHandler];
     }
   } else if ([application applicationState] == UIApplicationStateInactive) {
-    // This is the state that the note is received in if the user is swiping a notification
-    if (pushNotif.screenToShow == DFScreenNone) return;
-    
-    if (pushNotif.photoID) {
-      //TODO disabled for now
-    } else if (pushNotif.screenToShow == DFScreenCamera) {
-      //[(RootViewController *)self.window.rootViewController showCamera];
-      // TODO disabled for now
-    } else if (pushNotif.screenToShow == DFScreenGallery) {
-      // TODO disabled for now
+    if (pushNotif.type == NOTIFICATIONS_INVITED_TO_STRAND
+        || pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE)
+    {
+      DFNoticationOpenedHandler handler = [self openedHandlerForNotification:pushNotif];
+      handler(pushNotif);
     }
     
     [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
   } else if ([application applicationState] == UIApplicationStateActive) {
     if ([pushNotif.message isNotEmpty]) {
-      [[DFToastNotificationManager sharedInstance] showNotificationForPush:pushNotif];
+      [[DFToastNotificationManager sharedInstance]
+       showNotificationForPush:pushNotif
+       handler:[self openedHandlerForNotification:pushNotif]];
     }
     [[NSNotificationCenter defaultCenter]
      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
@@ -184,7 +183,28 @@
   if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
 }
 
-
+- (DFNoticationOpenedHandler)openedHandlerForNotification:(DFPeanutPushNotification *)pushNotif
+{
+  DFNoticationOpenedHandler handler = ^(DFPeanutPushNotification *openedNotif) {
+    if (pushNotif.type == NOTIFICATIONS_INVITED_TO_STRAND
+        || pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE) {
+      NSArray *publicStrands = [[DFPeanutFeedDataManager sharedManager] publicStrands];
+      DFPeanutFeedObject *foundObject;
+      for (DFPeanutFeedObject *object in publicStrands) {
+        if (object.id == openedNotif.id.longLongValue) {
+          foundObject = object;
+          break;
+        }
+      }
+      
+      UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
+                                          rootViewController];
+      [DFFeedViewController presentFeedObject:foundObject modallyInViewController:rootController];
+    }
+    
+  };
+  return handler;
+}
 
 
 @end

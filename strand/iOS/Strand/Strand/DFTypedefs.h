@@ -41,14 +41,16 @@ typedef enum {
 
 // Push notif types
 typedef enum {
-  DFPushNotifUnknown = 0,
-  DFPushNotifNewPhotos = 1,
-  DFPushNotifJoinable = 2,
-  DFPushNotifFavorited = 3,
-  DFPushNotifFetchGPS = 4,
-  DFPushNotifFirestarter = 5,
-  DFPushNotifFirestarterPhotoTaken = 6,
-  DFPushNotifRefreshFeed = 7
+  NOTIFICATIONS_NEW_PHOTO_ID = 1,
+  NOTIFICATIONS_JOIN_STRAND_ID = 2,
+  NOTIFICATIONS_PHOTO_FAVORITED_ID = 3,
+  NOTIFICATIONS_FETCH_GPS_ID = 4,
+  NOTIFICATIONS_RAW_FIRESTARTER_ID = 5,
+  NOTIFICATIONS_PHOTO_FIRESTARTER_ID = 6,
+  NOTIFICATIONS_REFRESH_FEED = 7,
+  NOTIFICATIONS_SOCKET_REFRESH_FEED = 8,
+  NOTIFICATIONS_INVITED_TO_STRAND = 9,
+  NOTIFICATIONS_ACCEPTED_INVITE = 10,
 } DFPushNotifType;
 
 typedef NSString *DFUIActionType;

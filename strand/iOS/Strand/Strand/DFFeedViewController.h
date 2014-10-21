@@ -24,4 +24,11 @@ DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderView
 - (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;
 - (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject;
 
+/* 
+ Use this to present a feed view controller modally for a given feed object, for example
+ when responding to a tap on a push notification
+ */
++ (void)presentFeedObject:(DFPeanutFeedObject *)feedObject
+  modallyInViewController:(UIViewController *)viewController;
+
 @end
