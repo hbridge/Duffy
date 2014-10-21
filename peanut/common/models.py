@@ -34,6 +34,7 @@ class User(models.Model):
 	last_location_accuracy = models.IntegerField(null=True)
 	last_location_timestamp = models.DateTimeField(null=True)
 	first_run_sync_timestamp = models.DateTimeField(null=True)
+	first_run_sync_count = models.IntegerField(null=True)
 	first_run_sync_complete = models.BooleanField(default=False)
 	invites_remaining = models.IntegerField(default=5)
 	invites_sent = models.IntegerField(default=0)
@@ -108,6 +109,21 @@ class User(models.Model):
 			ids.append(obj.id)
 
 		return ids
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		if not isinstance(objs, list):
+			objs = [objs]
+
+		if not isinstance(attributesList, list):
+			attributesList = [attributesList]
+			
+		for obj in objs:
+			obj.updated = datetime.datetime.now()
+
+		attributesList.append("updated")
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
 
 	def __unicode__(self):
 		if self.product_id == 0:

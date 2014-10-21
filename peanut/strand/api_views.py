@@ -430,8 +430,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	# Look above and below 10x the number of minutes to strand
-	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*10)
-	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*10)
+	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
+	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
 
 	# Get all the unshared strands for the given user that are close to the given strand
 	privateStrands = Strand.objects.select_related().filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
@@ -506,19 +506,10 @@ def getInviteObjectsDataForUser(user):
 				thumbsLoaded = False
 
 		if thumbsLoaded:
-
-			if not user.first_run_sync_complete:
-				# If the last stranded photo 
-				lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-				if len(lastStrandedPhotos) > 0:
-					if lastStrandedPhotos[0].time_taken > invitePhotos[0].time_taken:
-						inviteIsReady = False
-					else:
-						inviteIsReady = True
-				else:
-					inviteIsReady = False
-			else:
+			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
 				inviteIsReady = True
+			else:
+				inviteIsReady = False
 
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
@@ -558,7 +549,7 @@ def private_strands(request):
 		a = datetime.datetime.now()
 		
 		strands = list(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=True))
-			
+
 		b = datetime.datetime.now()
 
 		print "private_strands-1 took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)

@@ -15,7 +15,7 @@ django.setup()
 from django.db.models import Count, Q
 
 from peanut.settings import constants
-from common.models import Photo, Strand, User, StrandNeighbor
+from common.models import Photo, Strand, User, StrandNeighbor, StrandInvite
 
 from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
@@ -195,6 +195,7 @@ def main(argv):
 
 			photosByStrandId = dict()
 			usersByStrandId = dict()
+			allUsers = list()
 
 			# Used for notifications
 			photoToStrandIdDict = dict()
@@ -205,11 +206,14 @@ def main(argv):
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-			strandsCache = list(Strand.objects.select_related().filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2))
+			strandsCache = list(Strand.objects.prefetch_related('users', 'photos').filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2))
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
 				usersByStrandId[strand.id] = list(strand.users.all())
+				allUsers.extend(strand.users.all())
+
+			allUsers = set(allUsers)
 
 			c = datetime.datetime.now()
 			logger.debug("Building Strands cache with %s strands took took %s milli" % (len(strandsCache), ((c-b).microseconds/1000) + (c-b).seconds*1000))
@@ -320,6 +324,42 @@ def main(argv):
 			logger.debug("Starting sending notifications...")
 			
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
+
+			# Deal with first run sync scenarios
+			usersToUpdate = list()
+			for user in allUsers:
+				if not user.first_run_sync_complete:
+					if user.first_run_sync_count:
+						# If there are no matching photos from the client, then sync is complete
+						if user.first_run_sync_count == 0:
+							usersToUpdate.append(user)
+						else:
+							# If there are 
+							strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+							if strandInvites.count() == 0:
+								usersToUpdate.append(user)
+							else:
+								lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+								if lastStrandedPhotos[0].time_taken <= strandInvites[0].strand.first_photo_time:
+									usersToUpdate.append(user)
+								else:
+									# This means that we have a count, but we haven't actually reached the right date
+									#   this happens if the client is really fast uploading photos, then we might be stranding
+									#   new photos and the invite was an old one.  We want to wait until we hit the age of the old one
+									#   to make sure we find any matches
+									pass
+					else:
+						# This means the client hasn't given us any information yet.
+						# if this happens, then just see if we've stranded anything, if so, then call things good to go.
+						lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+						if lastStrandedPhotos.count() > 0:
+							usersToUpdate.append(user)
+
+			if len(usersToUpdate) > 0:
+				for user in usersToUpdate:
+					user.first_run_sync_complete = True
+					logger.info("Updated first_run_sync_complete for user %s", user)
+				User.bulkUpdate(usersToUpdate, 'first_run_sync_complete')
 
 			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(strandNeighborsToCreate)))
 		else:
