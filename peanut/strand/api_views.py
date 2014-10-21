@@ -742,8 +742,8 @@ def send_notifications_test(request):
 	else:
 		return api_util.returnFailure(response, "Need msgTypeId")
 
-	if data.has_key('pid'):
-		customPayload['pid'] = int(data['pid'])
+	if data.has_key('id'):
+		customPayload['id'] = int(data['id'])
 
 	notifications_util.sendNotification(user, msg, msgTypeId, customPayload)
 
