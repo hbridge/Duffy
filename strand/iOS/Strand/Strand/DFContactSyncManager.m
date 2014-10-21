@@ -45,7 +45,7 @@ static DFContactSyncManager *defaultManager;
     DDLogVerbose(@"%@ sync requested but sync already in progress.  Skipping.", self.class);
     return;
   }
-  if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+  if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
     NSDate *lastABSync = [DFDefaultsStore lastDateForAction:DFUserActionSyncContacts];
     if (!lastABSync) lastABSync = [NSDate dateWithTimeIntervalSince1970:0];
     [self syncABContactsWithLastSyncDate:lastABSync];
@@ -167,6 +167,21 @@ static DFContactSyncManager *defaultManager;
 }
 
 
++ (ABAuthorizationStatus)contactsPermissionStatus
+{
+#ifdef DEBUG
+  DFPermissionStateType state = [DFDefaultsStore stateForPermission:DFPermissionContacts];
+  if ([state isEqual:DFPermissionStateGranted]) {
+    return kABAuthorizationStatusAuthorized;
+  } else if ([state isEqual:DFPermissionStateDenied]) {
+    return kABAuthorizationStatusDenied;
+  } else {
+    return kABAuthorizationStatusNotDetermined;
+  }
+#else
+  return ABAddressBookGetAuthorizationStatus()
+#endif
+}
 
 + (void)askForContactsPermissionWithSuccess:(void (^)(void))success
                                     failure:(void (^)(NSError *))failure
@@ -175,19 +190,20 @@ static DFContactSyncManager *defaultManager;
   CFErrorRef error;
   ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
   
-  ABAuthorizationStatus oldStatus = ABAddressBookGetAuthorizationStatus();
+  ABAuthorizationStatus oldStatus = [self contactsPermissionStatus];
   ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
     if (granted) {
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
       [[self sharedManager] sync];
       success();
     } else {
+      [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionContacts];
       failure((__bridge NSError *)error);
     }
     
     [DFAnalytics logInviteAskContactsWithParameters:@{
                                                       @"oldValue": @(oldStatus),
-                                                      @"newValue": @(ABAddressBookGetAuthorizationStatus())
+                                                      @"newValue": @([self contactsPermissionStatus])
                                                       }];
     
   });

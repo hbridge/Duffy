@@ -73,7 +73,7 @@
 {
   return (self.showAsNUXStep &&
           (self.manualContacts.count > 0
-           || ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized)
+           || [DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized)
           );
 }
 
@@ -114,7 +114,7 @@
   if (indexPath.section == 0) {
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     if (indexPath.row == 0) {
-      if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusDenied) {
+      if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusDenied) {
         cell.textLabel.text = @"Import Contacts Denied";
         cell.textLabel.textColor = [UIColor redColor];
       } else {
@@ -147,7 +147,7 @@
 
 - (void)importContactsPressed
 {
-  if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusDenied) {
+  if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusDenied) {
     [UIAlertView showSimpleAlertWithTitle:@"Enable Contacts"
                             formatMessage:@"Please go to Settings > Privacy > Contacts and turn on Strand."];
      return;
@@ -184,7 +184,7 @@
 
 - (void)showNextStep
 {
-  [DFAnalytics logSetupContactsCompletedWithABPermission:ABAddressBookGetAuthorizationStatus()
+  [DFAnalytics logSetupContactsCompletedWithABPermission:[DFContactSyncManager contactsPermissionStatus]
                                         numAddedManually:self.manualContacts.count];
   DFLocationPermissionViewController *lvc = [[DFLocationPermissionViewController alloc] init];
   [self.navigationController setViewControllers:@[lvc] animated:YES];

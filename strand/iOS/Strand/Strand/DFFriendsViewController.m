@@ -112,7 +112,7 @@
 
 - (void)configureContactsUpsell
 {
-  ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
+  ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
   if (status != kABAuthorizationStatusAuthorized) {
     // ask for contacts
     if (!self.contactsUpsellView) {
@@ -134,7 +134,7 @@
 
 - (void)contactsUpsellButtonPressed:(id)sender
 {
-  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusNotDetermined) {
+  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusNotDetermined) {
     [DFContactSyncManager showContactsDeniedAlert];
     return;
   }

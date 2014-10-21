@@ -146,7 +146,7 @@
     [unfilteredSections addObject:self.onStrandList];
   }
 
-  if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+  if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
     [unfilteredSectionTitles addObject:@"Contacts"];
     self.ABList = [[self abSearchResultsForString:nil] mutableCopy];
     [unfilteredSections addObject:self.ABList];
@@ -265,7 +265,7 @@
     }
     
     self.filteredABList = @[];
-    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusAuthorized) {
+    if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
       self.filteredABList = [self abSearchResultsForString:searchText];
     }
     [sectionTitles addObject:@"Contacts"];
@@ -279,7 +279,7 @@
 
 - (NSArray *)abSearchResultsForString:(NSString *)string
 {
-  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) return @[];
+  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized) return @[];
   
   NSMutableArray *results = [NSMutableArray new];
 
@@ -372,7 +372,7 @@
   id object = [self objectForIndexPath:indexPath tableView:tableView];
   
   if (!object) {
-    if (ABAddressBookGetAuthorizationStatus() == kABAuthorizationStatusNotDetermined) {
+    if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusNotDetermined) {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noContacts"];
     } else {
       cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
@@ -479,8 +479,8 @@
     [self textNumberRowSelected:object];
     contactSelected = YES;
   } else {
-    if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) {
-      ABAuthorizationStatus status = ABAddressBookGetAuthorizationStatus();
+    if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized) {
+      ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
       if (status == kABAuthorizationStatusNotDetermined) {
         [self askForContactsPermission];
       } else {
