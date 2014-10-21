@@ -78,6 +78,7 @@ const CGFloat LockedCellHeight = 157.0;
 
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) DFStrandPeopleBarView *peopleBar;
+@property (nonatomic, retain) DFStrandGalleryTitleView *titleView;
 
 @end
 
@@ -337,16 +338,18 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)setPostsObject:(DFPeanutFeedObject *)strandPostsObject
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    DFStrandGalleryTitleView *titleView =
-    [[[UINib nibWithNibName:NSStringFromClass([DFStrandGalleryTitleView class])
-                     bundle:nil]
-      instantiateWithOwner:nil options:nil]
-     firstObject];
-    titleView.locationLabel.text = strandPostsObject.location;
-    titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPostsObject.time_taken
+    if (!self.titleView) {
+      self.titleView =
+      [[[UINib nibWithNibName:NSStringFromClass([DFStrandGalleryTitleView class])
+                       bundle:nil]
+        instantiateWithOwner:nil options:nil]
+       firstObject];
+      self.navigationItem.titleView = self.titleView;
+    }
+    self.titleView.locationLabel.text = strandPostsObject.location;
+    self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPostsObject.time_taken
                                                                  abbreviate:NO];
-    self.navigationItem.titleView = titleView;
-   
+    
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
     
