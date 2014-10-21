@@ -145,11 +145,12 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
     def sendNotification(self, strandInviteId):
         logger.debug("in sendNotification for id %s" % strandInviteId)
         strandInvite = StrandInvite.objects.select_related().get(id=strandInviteId)
-        msg = "%s just invited you to look at their Strand in %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
+        msg = "%s wants to swap photos from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
         
         if strandInvite.invited_user:
             logger.debug("going to send %s to user id %s" % (msg, strandInvite.invited_user.id))
-            notifications_util.sendNotification(strandInvite.invited_user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, None)
+            customPayload = {'id': strandInviteId}
+            notifications_util.sendNotification(strandInvite.invited_user, msg, constants.NOTIFICATIONS_INVITED_TO_STRAND, customPayload)
 
     """
         Clean up the phone number and set it.  Should only be one number per entry
@@ -284,13 +285,14 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
         strand = Strand.objects.get(id=strandId)
 
         if len(newPhotoIds) == 1:
-            msg = "%s just added 1 photo to the Strand from %s" % (userThatJustAdded.display_name, strand.photos.all()[0].location_city)
+            msg = "%s added 1 photo from %s" % (userThatJustAdded.display_name, strand.photos.all()[0].location_city)
         else:
-            msg = "%s just added %s photos to the Strand from %s" % (userThatJustAdded.display_name, len(newPhotoIds), strand.photos.all()[0].location_city
+            msg = "%s added %s photos from %s" % (userThatJustAdded.display_name, len(newPhotoIds), strand.photos.all()[0].location_city
         
         for user in strand.users.all():
             logger.debug("going to send %s to user id %s" % (msg, user.id))
-            notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, None)
+            customPayload = {'id': strandId}
+            notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, customPayload)
 
 
     def pre_save(self, strand):
