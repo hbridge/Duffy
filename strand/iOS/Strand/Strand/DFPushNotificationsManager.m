@@ -197,6 +197,14 @@
         }
       }
       
+      if (!foundObject) {
+        // if we don't find an object in the feed, we have to fake it so that when the feed
+        // data manager gets the actual object, we sub in the correct data
+        foundObject = [[DFPeanutFeedObject alloc] init];
+        foundObject.id = openedNotif.id.longLongValue;
+        if (pushNotif.type == NOTIFICATIONS_INVITED_TO_STRAND) foundObject.type = DFFeedObjectInviteStrand;
+        else if (pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE) foundObject.type = DFFeedObjectStrandPosts;
+      }
       UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
                                           rootViewController];
       [DFFeedViewController presentFeedObject:foundObject modallyInViewController:rootController];
