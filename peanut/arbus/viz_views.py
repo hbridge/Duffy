@@ -17,7 +17,7 @@ from django.db import connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, Classification, NotificationLog, Strand, Action
+from common.models import Photo, User, Classification, NotificationLog, Strand, Action, StrandInvite
 
 from arbus import image_util, search_util
 from arbus.forms import ManualAddPhoto
@@ -216,10 +216,65 @@ def userbaseSummary(request):
 
 	strandV2List = sorted(strandV2List, key=lambda x: x['lastActionTimestamp'], reverse=True)
 
+	# stats on strands
+	strands = list(Strand.objects.prefetch_related('photos', 'users').filter(private=False))
 
-	context = {	'arbusList': list(),
-				'strandList': list(),
-				'strandV2List': strandV2List}
+	strandBucket1 = strandBucket2 = strandBucket3 = strandBucket4 = 0
+	
+	for strand in strands:
+		if strand.photos.count() == 1:
+			strandBucket1 += 1
+		elif strand.photos.count() < 5:
+			strandBucket2 += 1
+		elif strand.photos.count() < 10:
+			strandBucket3 += 1
+		else:
+			strandBucket4 += 1
+
+	strandCounts = dict()
+	strandCounts['all'] = len(strands)
+	strandCounts['b1'] = strandBucket1
+	strandCounts['b2'] = strandBucket2
+	strandCounts['b3'] = strandBucket3
+	strandCounts['b4'] = strandBucket4
+
+	# stats on strand users
+
+	userBucket1 = userBucket2 = userBucket3 = userBucket4 = 0
+	
+	for strand in strands:
+		if strand.users.count() == 1:
+			userBucket1 += 1
+		elif strand.users.count() == 2:
+			userBucket2 += 1
+		elif strand.photos.count() == 3:
+			userBucket3 += 1
+		else:
+			userBucket4 += 1
+
+	userCounts = dict()
+	userCounts['all'] = len(strands)
+	userCounts['b1'] = userBucket1
+	userCounts['b2'] = userBucket2
+	userCounts['b3'] = userBucket3
+	userCounts['b4'] = userBucket4
+
+
+	# stats on invites
+	invites = StrandInvite.objects.filter(added__gt='2014-09-25 00:50:19')
+	accepted = invites.filter(accepted_user_id__isnull=False)
+
+	inviteCounts = dict()
+	inviteCounts['all'] = invites.count()
+	inviteCounts['accepted'] = accepted.count()
+
+	inviteCounts['swapped'] = Action.objects.select_related().filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND).annotate(strandUsers=Count('strand__users')).filter(strandUsers__gt=1).count()
+
+	context = {	'strandV2List': strandV2List,
+				'strandCounts': strandCounts,
+				'userCounts': userCounts,
+				'inviteCounts': inviteCounts}
+
 	return render(request, 'admin/userbaseSummary.html', context)
 
 # Helper functions

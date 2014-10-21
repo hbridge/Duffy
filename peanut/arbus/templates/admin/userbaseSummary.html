@@ -1,6 +1,6 @@
 <html>
 <head>
-<meta http-equiv="refresh" content="120">
+<meta http-equiv="refresh" content="300">
 	<title>Strand ({{ strandV2List|length }})</title> 
 </head>
 <style>
@@ -66,6 +66,13 @@
 	.ui-server-switch {
 		font-size: 16px
 	}
+	.top-table {
+		float: left;
+		margin-left: 20px;
+	}
+	.bottom-summary {
+		clear:left;
+	}
 
 </style>
 <script src="/static/jquery-1.10.2.min.js"></script>
@@ -74,8 +81,82 @@
 <div class="ui-content">
 	<div class='ui-server-id' id='ui-server-id'>
 	</div>
+	<div class='top-summary'>
+	<div class='top-table'>
+		<div class='ui-header'> Photos </div>
+		<table class='ui-table' cellpadding='3'>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> All </td>
+				<td class='counts'> {{ strandCounts.all }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> 1 photo </td>
+				<td class='counts'> {{ strandCounts.b1 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> 2-4 photos </td>
+				<td class='counts'> {{ strandCounts.b2 }} </td>
+			</tr>			
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> 5-10 photos </td>
+				<td class='counts'> {{ strandCounts.b3 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 b-r'> 10+ photos </td>
+				<td class='counts'> {{ strandCounts.b4 }} </td>
+			</tr>			
+
+		</table>
+	</div>
+
+	<div class='top-table'>
+		<div class='ui-header'> People </div>
+		<table class='ui-table' cellpadding='3'>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> All </td>
+				<td class='counts'> {{ userCounts.all }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> 1 person </td>
+				<td class='counts'> {{ userCounts.b1 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> 2 people </td>
+				<td class='counts'> {{ userCounts.b2 }} </td>
+			</tr>			
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> 3 people </td>
+				<td class='counts'> {{ userCounts.b3 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 b-r'> 3+ people </td>
+				<td class='counts'> {{ userCounts.b4 }} </td>
+			</tr>			
+
+		</table>
+	</div>
+
+	<div class='top-table'>
+		<div class='ui-header'> Invites </div>
+		<table class='ui-table' cellpadding='3'>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> All </td>
+				<td class='counts'> {{ inviteCounts.all }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Accepted </td>
+				<td class='counts'> {{ inviteCounts.accepted }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Swapped </td>
+				<td class='counts'> {{ inviteCounts.swapped }} </td>
+			</tr>
+		</table>
+	</div>	
+</div>
 
 	{% if strandV2List %}
+	<div class='bottom-summary'>
 		<div class='ui-header'> Strand v2 &mdash; {{ strandV2List|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row-header' >
@@ -140,6 +221,7 @@
 		{% endfor %}
 		</table>
 	{% endif %}
+	</div>
 
 
 	<div class="ui-key">
