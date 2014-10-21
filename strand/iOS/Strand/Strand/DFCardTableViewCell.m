@@ -68,6 +68,8 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   if (style & DFCardCellStyleInvite) {
     self.solidBackgroundView.backgroundColor = [DFStrandConstants inviteCellBackgroundColor];
     [self.peoplePrefixLabel removeFromSuperview];
+    self.badgeAccessoryImageView.image = [[UIImage imageNamed:@"Assets/Icons/InboxInviteBadge"] imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];;
+    self.badgeAccessoryImageView.tintColor = [DFStrandConstants defaultBackgroundColor];
   }
   
   if (style & DFCardCellStyleShared) {

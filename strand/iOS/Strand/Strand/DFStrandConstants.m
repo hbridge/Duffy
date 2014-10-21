@@ -7,6 +7,7 @@
 //
 
 #import "DFStrandConstants.h"
+#import "UIColor+DFHelpers.h"
 
 @implementation DFStrandConstants
 
@@ -95,8 +96,8 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)inviteCellBackgroundColor
 {
+  //return [UIColor colorWithRedByte:255 green:216 blue:208 alpha:1.0];
   return [UIColor whiteColor];
-  //return [UIColor colorWithRed:0.95 green:0.95 blue:1.0 alpha:1.0];
 }
 
 + (UIColor *)photoCellBadgeColor

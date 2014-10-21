@@ -136,8 +136,9 @@
 
 - (void)configureTableView
 {
+  self.tableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
   [self.tableView
-   registerNib:[UINib nibWithNibName:@"DFSmallCardTableViewCell" bundle:nil]
+   registerNib:[UINib nibWithNibName:@"DFCardTableViewCell" bundle:nil]
    forCellReuseIdentifier:@"inviteCell"];
   [self.tableView
    registerNib:[UINib nibWithNibName:[[DFCardTableViewCell class] description] bundle:nil]
