@@ -217,7 +217,7 @@ def userbaseSummary(request):
 	strandV2List = sorted(strandV2List, key=lambda x: x['lastActionTimestamp'], reverse=True)
 
 	# stats on strands
-	strands = list(Strand.objects.prefetch_related('photos', 'users').filter(private=False))
+	strands = list(Strand.objects.prefetch_related('photos', 'users').filter(private=False).annotate(userCount=Count('users')).filter(userCount__gt=0))
 
 	strandBucket1 = strandBucket2 = strandBucket3 = strandBucket4 = 0
 	
@@ -240,7 +240,7 @@ def userbaseSummary(request):
 
 	# stats on strand users
 
-	userBucket1 = userBucket2 = userBucket3 = userBucket4 = 0
+	userBucket1 = userBucket2 = userBucket3 = userBucket4 = userBucket5 = 0
 	
 	for strand in strands:
 		if strand.users.count() == 1:
@@ -249,8 +249,10 @@ def userbaseSummary(request):
 			userBucket2 += 1
 		elif strand.photos.count() == 3:
 			userBucket3 += 1
-		else:
+		elif strand.photos.count() < 6:
 			userBucket4 += 1
+		else:
+			userBucket5 += 1
 
 	userCounts = dict()
 	userCounts['all'] = len(strands)
@@ -258,6 +260,7 @@ def userbaseSummary(request):
 	userCounts['b2'] = userBucket2
 	userCounts['b3'] = userBucket3
 	userCounts['b4'] = userBucket4
+	userCounts['b5'] = userBucket5
 
 
 	# stats on invites
