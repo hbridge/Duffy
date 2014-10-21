@@ -217,7 +217,7 @@ def userbaseSummary(request):
 	strandV2List = sorted(strandV2List, key=lambda x: x['lastActionTimestamp'], reverse=True)
 
 	# stats on strands
-	strands = Strand.objects.prefetch_related('photos', 'users').filter(product_id=2).filter(private=False).annotate(userCount=Count('users')).filter(userCount__gt=0)
+	strands = Strand.objects.prefetch_related('photos', 'users').filter(product_id=2).filter(private=False)
 
 	strandBucket1 = strandBucket2 = strandBucket3 = strandBucket4 = 0
 	
@@ -247,9 +247,9 @@ def userbaseSummary(request):
 			userBucket1 += 1
 		elif strand.users.count() == 2:
 			userBucket2 += 1
-		elif strand.photos.count() == 3:
+		elif strand.users.count() == 3:
 			userBucket3 += 1
-		elif strand.photos.count() < 6:
+		elif strand.users.count() < 6:
 			userBucket4 += 1
 		else:
 			userBucket5 += 1
