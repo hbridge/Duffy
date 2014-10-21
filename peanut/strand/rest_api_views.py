@@ -287,8 +287,8 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
         if len(newPhotoIds) == 1:
             msg = "%s added 1 photo from %s" % (userThatJustAdded.display_name, strand.photos.all()[0].location_city)
         else:
-            msg = "%s added %s photos from %s" % (userThatJustAdded.display_name, len(newPhotoIds), strand.photos.all()[0].location_city
-        
+            msg = "%s added %s photos from %s" % (userThatJustAdded.display_name, len(newPhotoIds), strand.photos.all()[0].location_city)
+
         for user in strand.users.all():
             logger.debug("going to send %s to user id %s" % (msg, user.id))
             customPayload = {'id': strandId}
