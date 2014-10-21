@@ -178,18 +178,18 @@ def processUploadedPhoto(photo, origFileName, tempFilepath, bulk=False):
 
 		im = Image.open(photo.getDefaultFullPath())
 
-		for orientation in TAGS.keys() : 
-            if TAGS[orientation]=='Orientation': 
-            	break 
-            	
-        e = im._getexif()
-        if (e is not None):
-        	exif=dict(e.items())
+		for orientation in TAGS.keys():
+			if (TAGS[orientation]=='Orientation'): 
+				break
 
-        	if exif[orientation] == 6 or exif[orientation] == 8: 
-        		photo.full_width = im.size[1]
-        		photo.full_height = im.size[0]
-        	else:
+		e = im._getexif()
+		if (e is not None):
+			exif=dict(e.items())
+
+			if exif[orientation] == 6 or exif[orientation] == 8: 
+				photo.full_width = im.size[1]
+				photo.full_height = im.size[0]
+			else:
 				photo.full_width = im.size[0]
 				photo.full_height = im.size[1]
 		
