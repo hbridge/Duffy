@@ -479,8 +479,8 @@
     [self textNumberRowSelected:object];
     contactSelected = YES;
   } else {
-    if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized) {
-      ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
+    ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
+    if (status != kABAuthorizationStatusAuthorized) {
       if (status == kABAuthorizationStatusNotDetermined) {
         [self askForContactsPermission];
       } else {

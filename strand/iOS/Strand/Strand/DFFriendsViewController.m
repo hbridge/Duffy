@@ -87,6 +87,9 @@
   [super viewDidLoad];
   
   [self configureTableView:self.tableView];
+}
+
+- (void)viewWillAppear:(BOOL)animated {
   [self configureContactsUpsell];
 }
 
