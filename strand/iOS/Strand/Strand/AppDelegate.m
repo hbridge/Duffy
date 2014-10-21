@@ -357,37 +357,10 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
 {
   DDLogInfo(@"App received notification: %@",
                userInfo.description);
-  DFPeanutPushNotification *pushNotif = [[DFPeanutPushNotification alloc] initWithUserInfo:userInfo];
-  if ([application applicationState] == UIApplicationStateBackground){
-    if (pushNotif.contentAvailable && pushNotif.isUpdateLocationRequest)
-    {
-      [[DFBackgroundLocationManager sharedBackgroundLocationManager]
-       backgroundUpdateWithCompletionHandler:completionHandler];
-    }
-  } else if ([application applicationState] == UIApplicationStateInactive) {
-    // This is the state that the note is received in if the user is swiping a notification
-    if (pushNotif.screenToShow == DFScreenNone) return;
-    
-    if (pushNotif.photoID) {
-      //TODO disabled for now
-    } else if (pushNotif.screenToShow == DFScreenCamera) {
-      //[(RootViewController *)self.window.rootViewController showCamera];
-      // TODO disabled for now
-    } else if (pushNotif.screenToShow == DFScreenGallery) {
-      // TODO disabled for now
-    }
-    
-    [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
-  } else if ([application applicationState] == UIApplicationStateActive) {
-    if ([pushNotif.message isNotEmpty]) {
-      [[DFToastNotificationManager sharedInstance] showNotificationForPush:pushNotif];
-    }    
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-     object:self];
-  }
-  
-  if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
+  [[DFPushNotificationsManager sharedManager]
+   handleNotificationForApp:application
+   userInfo:userInfo
+   fetchCompletionHandler:completionHandler];
 }
 
 - (void)backgroundCameraRollSyncFinished

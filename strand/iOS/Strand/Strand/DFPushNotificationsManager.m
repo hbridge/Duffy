@@ -10,6 +10,9 @@
 #import "DFDefaultsStore.h"
 #import "DFAnalytics.h"
 #import "DFPeanutPushTokenAdapter.h"
+#import "DFPeanutPushNotification.h"
+#import "DFBackgroundLocationManager.h"
+#import "DFToastNotificationManager.h"
 
 @implementation DFPushNotificationsManager
 
@@ -140,6 +143,48 @@
   }
   
 }
+
+
+#pragma mark - Handle incoming notification
+
+- (void)handleNotificationForApp:(UIApplication *)application
+                        userInfo:(NSDictionary *)userInfo
+    fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
+{
+  DFPeanutPushNotification *pushNotif = [[DFPeanutPushNotification alloc] initWithUserInfo:userInfo];
+  if ([application applicationState] == UIApplicationStateBackground){
+    if (pushNotif.contentAvailable && pushNotif.isUpdateLocationRequest)
+    {
+      [[DFBackgroundLocationManager sharedBackgroundLocationManager]
+       backgroundUpdateWithCompletionHandler:completionHandler];
+    }
+  } else if ([application applicationState] == UIApplicationStateInactive) {
+    // This is the state that the note is received in if the user is swiping a notification
+    if (pushNotif.screenToShow == DFScreenNone) return;
+    
+    if (pushNotif.photoID) {
+      //TODO disabled for now
+    } else if (pushNotif.screenToShow == DFScreenCamera) {
+      //[(RootViewController *)self.window.rootViewController showCamera];
+      // TODO disabled for now
+    } else if (pushNotif.screenToShow == DFScreenGallery) {
+      // TODO disabled for now
+    }
+    
+    [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
+  } else if ([application applicationState] == UIApplicationStateActive) {
+    if ([pushNotif.message isNotEmpty]) {
+      [[DFToastNotificationManager sharedInstance] showNotificationForPush:pushNotif];
+    }
+    [[NSNotificationCenter defaultCenter]
+     postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+     object:self];
+  }
+  
+  if (completionHandler) completionHandler(UIBackgroundFetchResultNewData);
+}
+
+
 
 
 @end

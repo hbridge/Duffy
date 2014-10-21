@@ -12,11 +12,18 @@
 
 + (DFPushNotificationsManager *)sharedManager;
 
+#pragma mark - Registration
 - (void)promptForPushNotifsIfNecessary;
 + (void)requestPushNotifsPermission;
 + (void)refreshPushToken;
 + (void)registerDeviceToken:(NSData *)data;
 + (void)registerFailedWithError:(NSError *)error;
 + (void)registerUserNotificationSettings:(UIUserNotificationSettings *)settings;
+
+#pragma mark - Handler
+
+- (void)handleNotificationForApp:(UIApplication *)application
+                        userInfo:(NSDictionary *)userInfo
+          fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 
 @end

@@ -27,6 +27,11 @@
 #import <CocoaLumberjack/DDLog.h>
 #import "DFLogConfig.h"
 #import "DFTypedefs.h"
+#import "NSString+DFHelpers.h"
+#import "NSArray+DFHelpers.h"
+#import "UIAlertView+DFHelpers.h"
+#import "DFStrandConstants.h"
+#import "UINib+DFHelpers.h"
 #endif
 
 

@@ -32,6 +32,7 @@
 #import "DFFeedViewController.h"
 #import "DFNoTableItemsView.h"
 #import "UINib+DFHelpers.h"
+#import "DFPushNotificationsManager.h"
 
 
 @interface DFInboxViewController ()
@@ -108,6 +109,14 @@
   if (![self.manager hasData] && ![self.manager isRefreshingInbox]) {
     [self.refreshControl beginRefreshing];
     [self refreshFromServer];
+  }
+  
+  // prompt for push notifs in inbox if there are any accepted invites in the inbox
+  for (DFPeanutFeedObject *object in self.feedObjects) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts]) {
+      [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
+      break;
+    }
   }
 }
 
