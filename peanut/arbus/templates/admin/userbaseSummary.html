@@ -252,7 +252,7 @@ $(document).ready(function() {
 		$(this).addClass("red");
 	}
   });
-  var otherLinks = "<a href='/admin'>admin</a> | <a href='/phpmyadmin'>phpmyadmin</a>";
+  var otherLinks = "<a target=_blank href='/admin'>admin</a> | <a target=_blank href='/phpmyadmin'>phpmyadmin</a>";
 
   if (!(location.hostname.match('prod.strand.duffyapp.com'))){
 	$("#ui-server-id").append('DEV <span class="ui-server-switch">(' + otherLinks +' | <a target=_blank href="http://prod.strand.duffyapp.com/viz/summary">switch to prod</a>)</span>');
