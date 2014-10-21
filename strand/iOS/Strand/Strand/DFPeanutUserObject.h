@@ -23,7 +23,7 @@
 @property (nonatomic, retain) NSString *last_location_point;
 @property (nonatomic, retain) NSNumber *last_location_accuracy;
 @property (nonatomic, retain) NSDate *first_run_sync_timestamp;
-@property (nonatomic, retain) NSNumber *first_run_sync_complete;
+@property (nonatomic, retain) NSNumber *first_run_sync_count;
 @property (nonatomic, retain) NSNumber *invites_remaining;
 @property (nonatomic, retain) NSNumber *invites_sent;
 @property (nonatomic, retain) NSDate *added;

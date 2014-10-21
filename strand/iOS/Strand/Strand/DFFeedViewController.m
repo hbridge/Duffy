@@ -172,15 +172,6 @@ const CGFloat LockedCellHeight = 157.0;
   
   [self configureTableView];
   [self configureUpsell];
-  
-  if ([self.inviteObject.ready isEqual:@(NO)]) {
-    DDLogVerbose(@"Invite not ready, setting up timer...");
-    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
-                                                         target:self
-                                                       selector:@selector(refreshFromServer)
-                                                       userInfo:nil
-                                                        repeats:YES];
-  }
 }
 
 - (void)configureTableView
@@ -243,6 +234,15 @@ const CGFloat LockedCellHeight = 157.0;
   self.isViewTransitioning = YES;
   [super viewWillAppear:animated];
   [self configureUpsell];
+  
+  if (self.inviteObject && [self.inviteObject.ready isEqual:@(NO)]) {
+    DDLogVerbose(@"Invite not ready, setting up timer...");
+    self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
+                                                         target:self
+                                                       selector:@selector(refreshFromServer)
+                                                       userInfo:nil
+                                                        repeats:YES];
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -260,6 +260,11 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.isViewTransitioning = YES;
   [super viewWillDisappear:animated];
+  
+  if (self.refreshTimer) {
+    [self.refreshTimer invalidate];
+    self.refreshTimer = nil;
+  }
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -624,6 +629,8 @@ const CGFloat LockedCellHeight = 157.0;
   [self.swapUpsellView configureActivityWithVisibility:YES];
   
   if ([self.inviteObject.ready isEqual:@(YES)]) {
+    [self.refreshTimer invalidate];
+    self.refreshTimer = nil;
     DDLogVerbose(@"Invite ready, showing in .5 second");
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
       [self showUpsellResult];

@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^DFCameraRollSyncCompletionBlock)(void);
+typedef void (^DFCameraRollSyncCompletionBlock)(NSDictionary *);
 
 @interface DFCameraRollSyncManager : NSObject
 

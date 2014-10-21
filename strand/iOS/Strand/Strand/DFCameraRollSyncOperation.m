@@ -44,6 +44,7 @@
     
     self.knownPhotos = [DFPhotoStore allPhotosCollectionUsingContext:self.managedObjectContext];
     
+    NSDictionary *objectIDsToChanges;
     if (self.targetDate) {
       NSTimeInterval secondsPerDay = 24 * 60 * 60;
       NSDate *dayBefore, *dayAfter;
@@ -52,9 +53,9 @@
       dayAfter = [self.targetDate dateByAddingTimeInterval: secondsPerDay];
       
       DDLogVerbose(@"Doing a camera roll sync between %@ and %@", dayBefore, dayAfter);
-      [self findAssetChangesBetweenTimes:dayBefore beforeEndDate:dayAfter];
+      objectIDsToChanges = [self findAssetChangesBetweenTimes:dayBefore beforeEndDate:dayAfter];
     } else {
-      [self findAssetChanges];
+      objectIDsToChanges = [self findAssetChanges];
     }
     
     
@@ -73,8 +74,8 @@
        object:self];
     });
     
-    if (self.completionBlock) {
-      self.completionBlock();
+    if (self.completionBlockWithChanges) {
+      self.completionBlockWithChanges(objectIDsToChanges);
     }
     DDLogInfo(@"%@ main ended.", self.class);
   }

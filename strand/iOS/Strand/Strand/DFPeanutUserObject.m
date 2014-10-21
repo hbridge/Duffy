@@ -31,7 +31,7 @@
            @"last_location_point",
            @"last_location_accuracy",
            @"first_run_sync_timestamp",
-           @"first_run_sync_complete",
+           @"first_run_sync_count",
            @"invites_remaining",
            @"invites_sent",
            @"added",

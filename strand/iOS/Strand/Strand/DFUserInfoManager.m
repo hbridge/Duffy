@@ -44,22 +44,25 @@ static DFUserInfoManager *defaultManager;
 }
 
 
-- (void)setFirstTimeSyncComplete
+- (void)setFirstTimeSyncCount:(NSNumber *)photoCount
 {
   DFPeanutUserObject *currentUserPeanutObject = [DFPeanutUserObject new];
   currentUserPeanutObject.id = [[DFUser currentUser] userID];
   [self.userAdapter performRequest:RKRequestMethodGET
                     withPeanutUser:currentUserPeanutObject
                            success:^(DFPeanutUserObject *user) {
-                             user.first_run_sync_complete = @(YES);
-                             [self.userAdapter performRequest:RKRequestMethodPATCH
-                                               withPeanutUser:user
-                                                      success:^(DFPeanutUserObject *user) {
-                                                        DDLogVerbose(@"%@: Successfully set first_run_sync_complete for user %llu", self.class, user.id);
-                                                      } failure:^(NSError *error) {
-                                                        DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
-                                                      }];
-                             
+                             // If our first_run_sync_state is 0, that means we haven't told the server we're good yet
+                             //   So update it to a state of 1, and send that back to the server
+                             if (!user.first_run_sync_count) {
+                               user.first_run_sync_count = photoCount;
+                               [self.userAdapter performRequest:RKRequestMethodPATCH
+                                                 withPeanutUser:user
+                                                        success:^(DFPeanutUserObject *user) {
+                                                          DDLogVerbose(@"%@: Successfully set first_run_sync_complete for user %llu", self.class, user.id);
+                                                        } failure:^(NSError *error) {
+                                                          DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
+                                                        }];
+                             }
                            } failure:^(NSError *error) {
                              DDLogError(@"%@: Error in GET for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
                            }];

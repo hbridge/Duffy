@@ -173,13 +173,13 @@ void (^_completionHandler)(UIBackgroundFetchResult);
     // If we don't, just do the sync to a timestamp
     if ([[DFCameraRollSyncManager sharedManager] isSyncInProgress]) {
       [[DFCameraRollSyncManager sharedManager] cancelSyncOperations];
-      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^{
-        [self firstRunSyncComplete];
+      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^(NSDictionary *objectIDsToChanges){
+        [self firstRunSyncComplete:objectIDsToChanges];
       }];
       [[DFCameraRollSyncManager sharedManager] sync];
     } else {
-      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^{
-        [self firstRunSyncComplete];
+      [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^(NSDictionary *objectIDsToChanges){
+        [self firstRunSyncComplete:objectIDsToChanges];
       }];
     }
   }
@@ -196,9 +196,9 @@ void (^_completionHandler)(UIBackgroundFetchResult);
  * that date and time first).
  * This then tells the server that we're good to go.
  */
-- (void)firstRunSyncComplete
+- (void)firstRunSyncComplete:(NSDictionary *)objectsIds
 {
-  [[DFUserInfoManager sharedManager] setFirstTimeSyncComplete];
+  [[DFUserInfoManager sharedManager] setFirstTimeSyncCount:[NSNumber numberWithInteger:objectsIds.allKeys.count]];
 }
 /*
   Put things here that should be kicked off as soon as we have a user ID.

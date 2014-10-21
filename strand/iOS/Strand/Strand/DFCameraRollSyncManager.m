@@ -74,7 +74,7 @@ static DFCameraRollSyncManager *defaultSyncController;
     syncOperation.targetDate = date;
   }
   
-  syncOperation.completionBlock = completionBlock;
+  syncOperation.completionBlockWithChanges = completionBlock;
   
   [self.syncOperationQueue addOperation:syncOperation];
 }
