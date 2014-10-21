@@ -41,7 +41,7 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
     }
     
     self.body = [NSString stringWithFormat:@"Hey! Sent you photos from %@. "
-                 "Try this new app to view them and easily swap your matching photos. %@",
+                 "Let's try this app to swap photos. %@",
                  fromString,
                  appURL];
   }
