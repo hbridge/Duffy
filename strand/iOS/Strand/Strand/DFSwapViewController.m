@@ -64,7 +64,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self reloadData];
+  [self refreshFromServer];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -124,9 +124,21 @@
   }
   
   [self.tableView reloadData];
+  
   [self configureNoResultsView];
+  [self configureTabCount];
   
   [self.refreshControl endRefreshing];
+}
+
+- (void)configureTabCount
+{
+  NSArray *invites = self.sectionTitlesToObjects[@"Invites"];
+  if (invites.count > 0) {
+    self.tabBarItem.badgeValue = [@(invites.count) stringValue];
+  } else {
+    self.tabBarItem.badgeValue = nil;
+  }
 }
 
 - (void)refreshFromServer
