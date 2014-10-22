@@ -383,6 +383,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	for strandNeighbor in strandNeighbors:
 		strandToUserListCache[strandNeighbor.id] = strandNeighbor.users.all()
 
+	rankNum = 1
 	for strand in strands:
 		strandId = strand.id
 		photos = strand.photos.all() # .order_by("-time_taken")
@@ -401,19 +402,26 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 
 		if len(interestedUsers) > 0:
 			title = "might like these photos"
+			rank = rankNum
+			rankNum += 1
 		else:
 			title = ""
+			rank = None
 		
 		suggestible = strand.suggestible
 
 		if suggestible and len(interestedUsers) == 0:
 			suggestible = False
 
+			
 		if not getLocationForStrand(strand):
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
+		if not suggestible:
+			rank = None
+
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible, 'suggestion_rank': rank}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
