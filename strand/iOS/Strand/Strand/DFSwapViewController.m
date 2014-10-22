@@ -17,10 +17,12 @@
 
 @interface DFSwapViewController ()
 
-@property (nonatomic, retain) NSMutableArray *sectionTitles;
+@property (nonatomic, retain) NSMutableOrderedSet *sectionTitles;
 @property (nonatomic, retain) NSMutableDictionary *sectionTitlesToObjects;
 @property (nonatomic, retain) DFNoTableItemsView *noItemsView;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
+@property (nonatomic, retain) NSArray *allSuggestions;
+@property (nonatomic, retain) NSMutableArray *ignoredSuggestions;
 
 @end
 
@@ -34,6 +36,7 @@ const NSUInteger MaxSuggestionsToShow = 3;
   if (self) {
     [self observeNotifications];
     [self configureNavAndTab];
+    self.ignoredSuggestions = [NSMutableArray new];
   }
   return self;
 }
@@ -110,7 +113,7 @@ const NSUInteger MaxSuggestionsToShow = 3;
 
 - (void)reloadData
 {
-  self.sectionTitles = [NSMutableArray new];
+  self.sectionTitles = [NSMutableOrderedSet new];
   self.sectionTitlesToObjects = [NSMutableDictionary new];
   
   NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
@@ -119,12 +122,8 @@ const NSUInteger MaxSuggestionsToShow = 3;
     self.sectionTitlesToObjects[@"Invites"] = invites;
   }
   
-  NSArray *suggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-  if (suggestions.count > 0) {
-    [self.sectionTitles addObject:@"Suggested Swaps"];
-    self.sectionTitlesToObjects[@"Suggested Swaps"] =
-    [suggestions subarrayWithRange:(NSRange){0, MIN(suggestions.count, MaxSuggestionsToShow)}];
-  }
+  self.allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+  [self reloadSuggestionsSection];
   
   [self.tableView reloadData];
   
@@ -132,6 +131,21 @@ const NSUInteger MaxSuggestionsToShow = 3;
   [self configureTabCount];
   
   [self.refreshControl endRefreshing];
+}
+
+- (void)reloadSuggestionsSection
+{
+  /* Reloads the suggestions section from the allSuggestions array, broken out
+   so it can be called from the swipe handler safely */
+  if (self.allSuggestions.count > 0) {
+    [self.sectionTitles addObject:@"Suggested Swaps"];
+    NSMutableArray *filteredSuggestions = [self.allSuggestions mutableCopy];
+    [filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
+    DDLogVerbose(@"allCount:%@ ignoredCount:%@ filteredCount:%@",
+                 @(self.allSuggestions.count), @(self.ignoredSuggestions.count), @(filteredSuggestions.count));
+    self.sectionTitlesToObjects[@"Suggested Swaps"] =
+    [filteredSuggestions subarrayWithRange:(NSRange){0, MIN(filteredSuggestions.count, MaxSuggestionsToShow)}];
+  }
 }
 
 - (void)configureTabCount
@@ -154,6 +168,7 @@ const NSUInteger MaxSuggestionsToShow = 3;
       inboxDone = YES;
       if (inboxDone && privatePhotosDone) {
         [self.refreshControl endRefreshing];
+        [self reloadData];
       }
     });
   }];
@@ -162,11 +177,10 @@ const NSUInteger MaxSuggestionsToShow = 3;
       privatePhotosDone = YES;
       if (inboxDone && privatePhotosDone) {
         [self.refreshControl endRefreshing];
+        [self reloadData];
       }
     });
   }];
-  
-  [self reloadData];
 }
 
 - (void)configureNoResultsView
@@ -336,8 +350,14 @@ const NSUInteger MaxSuggestionsToShow = 3;
       //Update the view locally
       [self.tableView beginUpdates];
       DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
-      [self removeObjectAtIndexPath:indexPath];
+      [self.ignoredSuggestions addObject:feedObject];
+      [self reloadSuggestionsSection];
       [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+      if (self.allSuggestions.count >= MaxSuggestionsToShow) {
+        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(MaxSuggestionsToShow - 1)
+                                                                    inSection:indexPath.section]]
+                              withRowAnimation:UITableViewRowAnimationBottom];
+      }
       [self.tableView endUpdates];
       
       // Mark the strand as no longer suggestible with the server
