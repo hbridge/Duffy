@@ -24,6 +24,7 @@
 #import "DFSeenStateManager.h"
 #import "NSArray+DFHelpers.h"
 #import "DFSettingsViewController.h"
+#import "DFAnalytics.h"
 
 
 @interface DFFriendsViewController ()
@@ -95,7 +96,20 @@
 }
 
 - (void)viewWillAppear:(BOOL)animated {
+  [super viewWillAppear:animated];
   [self configureContactsUpsell];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)configureTableView:(UITableView *)tableView

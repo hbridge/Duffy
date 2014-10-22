@@ -13,6 +13,7 @@
 #import "DFFeedViewController.h"
 #import "DFCreateStrandViewController.h"
 #import "NSAttributedString+DFHelpers.h"
+#import "DFAnalytics.h"
 
 @interface DFSwapViewController ()
 
@@ -58,6 +59,24 @@
     // Do any additional setup after loading the view from its nib.
   [self configureTableView:self.tableView];
   [self configureRefreshControl];
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [self reloadData];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -131,6 +150,8 @@
       }
     });
   }];
+  
+  [self reloadData];
 }
 
 - (void)configureNoResultsView
