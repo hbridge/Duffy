@@ -34,6 +34,7 @@
   self = [self initWithSuggestions:suggestedSections];
   if (self) {
     _inviteObject = invite;
+    self.allowsNilSelection = YES;
     self.swapSuccessful = swapSuccessful;
   }
   return self;

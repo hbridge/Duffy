@@ -142,8 +142,13 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   int selectedCount = (int)self.selectPhotosController.selectedPhotoIDs.count;
   NSString *buttonText;
   if (selectedCount == 0) {
-    if (!self.allowsNilSelection) self.swapButton.enabled = NO;
-    buttonText = @"None Selected";
+    if (self.allowsNilSelection) {
+      self.swapButton.enabled = YES;
+      buttonText = @"Skip";
+    } else {
+      self.swapButton.enabled = NO;
+      buttonText = @"None Selected";
+    }
   } else {
     if (!self.allowsNilSelection) self.swapButton.enabled = YES;
     buttonText = [NSString stringWithFormat:@"Select %d Photos", selectedCount];
