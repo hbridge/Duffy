@@ -33,6 +33,7 @@
 #import "DFNoTableItemsView.h"
 #import "UINib+DFHelpers.h"
 #import "DFPushNotificationsManager.h"
+#import "DFAnalytics.h"
 
 
 @interface DFInboxViewController ()
@@ -118,12 +119,15 @@
       break;
     }
   }
+  
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
   [super viewWillDisappear:animated];
   [self.noItemsPopLabel dismiss];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)configureRefreshControl

@@ -343,7 +343,8 @@ const CGFloat LockedCellHeight = 157.0;
                                                       object:self
                                                     userInfo:nil];
   
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+  NSString *type = self.inviteObject ? @"invite" : @"non-invite";
+  [DFAnalytics logViewController:self appearedWithParameters:@{@"type" : type}];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -361,6 +362,7 @@ const CGFloat LockedCellHeight = 157.0;
 {
   self.isViewTransitioning = NO;
   [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)viewWillLayoutSubviews

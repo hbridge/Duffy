@@ -17,6 +17,7 @@
 #import "DFPushNotificationsManager.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "NSArray+DFHelpers.h"
+#import "DFAnalytics.h"
 
 @interface DFCreateStrandViewController()
 
@@ -66,6 +67,18 @@ NSUInteger const NumPhotosPerRow = 4;
   
   [self.swapButton addTarget:self action:@selector(nextPressed:)
             forControlEvents:UIControlEventTouchUpInside];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 #pragma mark - Actions

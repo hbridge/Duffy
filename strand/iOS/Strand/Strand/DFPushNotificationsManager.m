@@ -167,8 +167,6 @@
       DFNoticationOpenedHandler handler = [self openedHandlerForNotification:pushNotif];
       handler(pushNotif);
     }
-    
-    [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
   } else if ([application applicationState] == UIApplicationStateActive) {
     if ([pushNotif.message isNotEmpty]) {
       [[DFToastNotificationManager sharedInstance]
@@ -208,6 +206,7 @@
       UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
                                           rootViewController];
       [DFFeedViewController presentFeedObject:foundObject modallyInViewController:rootController];
+      [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
     }
     
   };

@@ -9,6 +9,7 @@
 #import "DFInviteStrandViewController.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "SVProgressHUD.h"
+#import "DFAnalytics.h"
 
 @interface DFInviteStrandViewController ()
 
@@ -58,6 +59,19 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view.
 }
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
 
 - (void)didReceiveMemoryWarning
 {

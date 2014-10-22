@@ -14,6 +14,7 @@
 #import "DFStrandConstants.h"
 #import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFAnalytics.h"
 
 @interface DFAddPhotosViewController ()
 
@@ -59,6 +60,19 @@
   [self.swapButton addTarget:self action:@selector(swapPressed:)
             forControlEvents:UIControlEventTouchUpInside];
 }
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
 
 #pragma mark - Actions
 

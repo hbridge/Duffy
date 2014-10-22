@@ -28,6 +28,7 @@
 #import "NSArray+DFHelpers.h"
 #import "UINib+DFHelpers.h"
 #import "DFCreateStrandViewController.h"
+#import "DFAnalytics.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -220,6 +221,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -227,6 +230,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [super viewDidDisappear:animated];
   [self.refreshTimer invalidate];
   self.refreshTimer = nil;
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
