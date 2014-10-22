@@ -1,5 +1,10 @@
 # Swap
 
+## Oct 22nd, 2014 (4762)
+
+- Added a swap tab where you can see incoming swap requests and suggestions
+- Bug fixes and performance improvements
+
 ## Oct 20th, 2014 (4760, 4761)
 
 - Logging changes to track down upload bug
