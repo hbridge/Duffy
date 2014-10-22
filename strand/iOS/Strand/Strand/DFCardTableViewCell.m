@@ -215,8 +215,6 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
      preferredType:imageType
-     thumbnailPath:photoObject.thumb_image_path
-     fullPath:photoObject.full_image_path
      completion:^(UIImage *image) {
        [self setImage:image forObject:@(photoObject.id)];
      }];

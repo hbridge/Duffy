@@ -549,8 +549,6 @@ const CGFloat LockedCellHeight = 157.0;
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
      preferredType:DFImageFull
-     thumbnailPath:photoObject.thumb_image_path
-     fullPath:photoObject.full_image_path
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
          if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
@@ -596,8 +594,6 @@ const CGFloat LockedCellHeight = 157.0;
     [[DFImageStore sharedStore]
      imageForID:subObject.id
      preferredType:DFImageFull
-     thumbnailPath:subObject.thumb_image_path
-     fullPath:subObject.full_image_path
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
          if (![self.tableView.visibleCells containsObject:clusterFeedCell]) return;
@@ -960,14 +956,14 @@ selectedObjectChanged:(id)newObject
 
 - (void)savePhotoToCameraRoll
 {
+  /*
+   TODO(Derek): Put this back, need to figure out metadata
   @autoreleasepool {
-    [self.photoAdapter
-     getPhoto:self.actionSheetPhotoID
-     withImageDataTypes:DFImageFull
-     completionBlock:^(DFPeanutPhoto *peanutPhoto, NSDictionary *imageData, NSError *error) {
-       NSData *fullImageData = imageData[@(DFImageFull)];
-       if (!error && fullImageData) {
-         UIImage *image = [UIImage imageWithData:fullImageData];
+    [[DFImageStore sharedStore]
+     imageForID:self.actionSheetPhotoID
+     preferredType:DFImageFull
+     completion:^(UIImage *image) {
+       if (image) {
          [[DFPhotoStore sharedStore]
           saveImageToCameraRoll:image
           withMetadata:peanutPhoto.metadataDictionary
@@ -988,14 +984,14 @@ selectedObjectChanged:(id)newObject
           }];
        } else {
          dispatch_async(dispatch_get_main_queue(), ^{
-           NSString *errorMessage = error ? error.localizedDescription : @"Could not download photo.";
+           NSString *errorMessage = @"Could not download photo.";
            [UIAlertView showSimpleAlertWithTitle:@"Error" message:errorMessage];
-           DDLogError(@"Failed to save photo.  Error: %@ imageData.length:%lu",
-                      error.description, (unsigned long)fullImageData.length);
+           DDLogError(@"Failed to save photo.");
          });
        }
      }];
   }
+   */
 }
 
 - (void)reloadRowForPhotoID:(DFPhotoIDType)photoID

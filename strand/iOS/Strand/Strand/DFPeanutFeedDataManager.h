@@ -23,10 +23,13 @@
 
 - (NSArray *)publicStrands;
 - (NSArray *)privateStrands;
+- (NSArray *)remotePhotos;
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
+
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;
+- (DFPeanutFeedObject *)photoWithId:(DFPhotoIDType)photoID;
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;

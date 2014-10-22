@@ -43,6 +43,8 @@
 #import "DFAllStrandsGalleryViewController.h"
 #import "DFFriendsViewController.h"
 #import "DFUserInfoManager.h"
+#import "DFImageDownloadManager.h"
+#import "DFImageStore.h"
 
 
 @interface AppDelegate ()
@@ -281,6 +283,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
+      [[DFImageDownloadManager sharedManager] fetchNewImages];
+      [[DFImageStore sharedStore] loadDownloadedImagesCache];
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];

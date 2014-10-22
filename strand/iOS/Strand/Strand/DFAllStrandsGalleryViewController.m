@@ -250,8 +250,6 @@ static const CGFloat ItemSpacing = 2.5;
   [[DFImageStore sharedStore]
    imageForID:object.id
    preferredType:DFImageThumbnail
-   thumbnailPath:object.thumb_image_path
-   fullPath:object.full_image_path
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:lockedCell]) return;
@@ -278,8 +276,6 @@ static const CGFloat ItemSpacing = 2.5;
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
    preferredType:preferredType
-   thumbnailPath:photoObject.thumb_image_path
-   fullPath:photoObject.full_image_path
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:cell]) return;
@@ -313,8 +309,6 @@ static const CGFloat ItemSpacing = 2.5;
   [[DFImageStore sharedStore]
    imageForID:firstObject.id
    preferredType:DFImageThumbnail
-   thumbnailPath:firstObject.thumb_image_path
-   fullPath:firstObject.full_image_path
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![self.collectionView.visibleCells containsObject:cell]) return;

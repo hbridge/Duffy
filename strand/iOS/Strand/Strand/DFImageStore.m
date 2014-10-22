@@ -7,8 +7,13 @@
 //
 
 #import "DFImageStore.h"
-#import "DFPhotoMetadataAdapter.h"
+
+#import <FMDB/FMDB.h>
 #import "NSString+DFHelpers.h"
+
+#import "DFPhotoMetadataAdapter.h"
+#import "DFTypedefs.h"
+#import "DFImageDownloadManager.h"
 
 @interface DFImageStore()
 
@@ -16,7 +21,10 @@
 @property (nonatomic, retain) NSMutableSet *remoteLoadsInProgress;
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
-@property (atomic, retain) NSMutableDictionary *fullImageCache;
+
+@property (atomic, retain) NSMutableDictionary *idsByImageTypeCache;
+
+@property (nonatomic, readonly, retain) FMDatabase *db;
 
 @end
 
@@ -24,6 +32,7 @@
 
 @synthesize photoAdapter = _photoAdapter;
 @synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
+@synthesize db = _db;
 
 static DFImageStore *defaultStore;
 
@@ -46,10 +55,71 @@ static DFImageStore *defaultStore;
   if (self) {
     _deferredCompletionBlocks = [NSMutableDictionary new];
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
-    _fullImageCache = [NSMutableDictionary new];
     self.remoteLoadsInProgress = [[NSMutableSet alloc] init];
+    self.idsByImageTypeCache = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                           @(DFImageThumbnail), [NSMutableSet new],
+                           @(DFImageFull), [NSMutableSet new],
+                           nil];
+    [self loadDownloadedImagesCache];
   }
   return self;
+}
+
+
+- (FMDatabase *)db
+{
+  if (!_db) {
+    _db = [FMDatabase databaseWithPath:[self.class dbPath]];
+    
+    if (![_db open]) {
+      DDLogError(@"Error opening downloadedImages database.");
+      _db = nil;
+    }
+    if (![_db tableExists:@"downloadedImages"]) {
+      [_db executeUpdate:@"CREATE TABLE downloadedImages (image_type NUMBER, photo_id NUMBER)"];
+    }
+  }
+  return _db;
+}
+
++ (NSString *)dbPath
+{
+  NSURL *documentsURL = [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+  NSURL *dbURL = [documentsURL URLByAppendingPathComponent:@"downloaded_images.db"];
+  return [dbURL path];
+}
+
+
+- (NSMutableSet *)imageIdsFromDBForType:(DFImageType)type
+{
+  FMResultSet *results = [self.db executeQuery:@"SELECT photo_id FROM downloadedImages WHERE image_type=(?)", @(type)];
+  NSMutableSet *resultIDs = [NSMutableSet new];
+  while ([results next]) {
+    [resultIDs addObject:@([results longLongIntForColumn:@"photo_id"])];
+  }
+  return resultIDs;
+}
+
+- (void)addToDBImageForType:(DFImageType)type forPhotoID:(DFPhotoIDType)photoID
+{
+  [self.db executeUpdate:@"INSERT INTO downloadedImages VALUES (?, ?)",
+   @(type),
+   @(photoID)];
+  DDLogInfo(@"Saving into downloaded image db: %u %llu", type, photoID);
+}
+
+- (NSMutableSet *)getPhotoIdsForType:(DFImageType)type
+{
+  return self.idsByImageTypeCache[@(type)];
+}
+
+- (void)loadDownloadedImagesCache
+{
+  NSMutableSet *photoIds = [self imageIdsFromDBForType:DFImageThumbnail];
+  [self.idsByImageTypeCache setObject:photoIds forKey:@(DFImageThumbnail)];
+  
+  photoIds = [self imageIdsFromDBForType:DFImageFull];
+  [self.idsByImageTypeCache setObject:photoIds forKey:@(DFImageFull)];
 }
 
 - (void)setImage:(UIImage *)image
@@ -62,28 +132,21 @@ static DFImageStore *defaultStore;
     @autoreleasepool {
       NSData *data = UIImageJPEGRepresentation(image, 0.75);
       [data writeToURL:url atomically:YES];
-      completion(nil);
+      
+      // Record that we've written this file out
+      NSMutableSet *photoIds = self.idsByImageTypeCache[@(type)];
+      [photoIds addObject:@(photoID)];
+      [self addToDBImageForType:type forPhotoID:photoID];
+      
+      [self executeDeferredCompletionsWithImage:image forPhotoID:photoID];
+      
+      if (completion) completion(nil);
     }
   });
 }
-
-- (void)setImageData:(NSData *)imageData
-            type:(DFImageType)type
-           forID:(DFPhotoIDType)photoID
-      completion:(SetImageCompletion)completion
-{
-  NSURL *url = [DFImageStore localURLForPhotoID:photoID type:type];
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    @autoreleasepool {
-      [imageData writeToURL:url atomically:YES];
-      completion(nil);
-    }
-  });
-}
-
 
 - (void)imageForID:(DFPhotoIDType)photoID
-              type:(DFImageType)type
+     preferredType:(DFImageType)type
         completion:(ImageLoadCompletionBlock)completionBlock
 {
   NSURL *localUrl = [DFImageStore localURLForPhotoID:photoID type:type];
@@ -95,26 +158,13 @@ static DFImageStore *defaultStore;
         completionBlock(image);
       } else {
         [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
-        if (![self.remoteLoadsInProgress containsObject:@(photoID)]) {
-          [self.remoteLoadsInProgress addObject:@(photoID)];
-          [self.photoAdapter getPhoto:photoID
-                   withImageDataTypes:type
-                      completionBlock:^(DFPeanutPhoto *peanutPhoto,
-                                                                NSDictionary *imageData,
-                                                                NSError *error) {
-                        // cache the photo locally
-                        NSData *data = imageData[@(type)];
-                        if (data) [data writeToURL:localUrl atomically:YES];
-                        UIImage *image = [UIImage imageWithData:data];
-                        [self executeDefferredCompletionsWithImage:image forPhotoID:photoID];
-          }];
-        }
+        [[DFImageDownloadManager sharedManager] fetchImageDataForImageType:type andPhotoID:photoID];
       }
     }
   });
 }
 
-
+/*
 - (void)imageForID:(DFPhotoIDType)photoID
      preferredType:(DFImageType)preferredType
      thumbnailPath:(NSString *)thumbnailPath
@@ -170,6 +220,7 @@ static DFImageStore *defaultStore;
   });
 }
 
+
 - (void)remoteLoadForPhotoID:(DFPhotoIDType)photoID
                withLoadBlock:(void(^)(ImageLoadCompletionBlock))loadBlock
              completionBlock:(ImageLoadCompletionBlock)completionBlock
@@ -179,10 +230,11 @@ static DFImageStore *defaultStore;
      [self.remoteLoadsInProgress addObject:@(photoID)];
      loadBlock(^(UIImage *image) {
        completionBlock(image);
-       [self executeDefferredCompletionsWithImage:image forPhotoID:photoID];
+       [self executeDeferredCompletionsWithImage:image forPhotoID:photoID];
      });
    }
 }
+*/
 
 - (void)scheduleDeferredCompletion:(ImageLoadCompletionBlock)completion forPhotoID:(DFPhotoIDType)photoID
 {
@@ -197,7 +249,7 @@ static DFImageStore *defaultStore;
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
-- (void)executeDefferredCompletionsWithImage:(UIImage *)image forPhotoID:(DFPhotoIDType)photoID
+- (void)executeDeferredCompletionsWithImage:(UIImage *)image forPhotoID:(DFPhotoIDType)photoID
 {
   dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
   NSMutableArray *deferredForID = self.deferredCompletionBlocks[@(photoID)];
@@ -205,7 +257,6 @@ static DFImageStore *defaultStore;
     completion(image);
   }
   [deferredForID removeAllObjects];
-  [self.remoteLoadsInProgress removeObject:@(photoID)];
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 

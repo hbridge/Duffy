@@ -117,8 +117,6 @@
   [[DFImageStore sharedStore]
    imageForID:photoObject.id
    preferredType:DFImageThumbnail
-   thumbnailPath:photoObject.thumb_image_path
-   fullPath:photoObject.full_image_path
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        cell.imageView.image = image;

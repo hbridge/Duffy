@@ -15,14 +15,9 @@ typedef void (^ImageLoadCompletionBlock)(UIImage *image);
 typedef void (^SetImageCompletion)(NSError *error);
 
 + (DFImageStore *)sharedStore;
-- (void)imageForID:(DFPhotoIDType)photoID
-              type:(DFImageType)type
-        completion:(ImageLoadCompletionBlock)completionBlock;
 
 - (void)imageForID:(DFPhotoIDType)photoID
-              preferredType:(DFImageType)type
-     thumbnailPath:(NSString *)thumbnailPath
-          fullPath:(NSString *)fullPath
+     preferredType:(DFImageType)type
         completion:(ImageLoadCompletionBlock)completionBlock;
 
 - (void)setImage:(UIImage *)image
@@ -36,5 +31,7 @@ typedef void (^SetImageCompletion)(NSError *error);
 + (NSURL *)localFullImagesDirectoryURL;
 + (NSURL *)localThumbnailsDirectoryURL;
 
+- (NSSet *)getPhotoIdsForType:(DFImageType)type;
+- (void)loadDownloadedImagesCache;
 
 @end

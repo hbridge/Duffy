@@ -356,8 +356,6 @@ NSString * binaryStringFromInteger( NSInteger  number )
     [[DFImageStore sharedStore]
      imageForID:photoObject.id
      preferredType:DFImageThumbnail
-     thumbnailPath:photoObject.thumb_image_path
-     fullPath:photoObject.full_image_path
      completion:^(UIImage *image) {
        [cell setImage:image forObject:@(photoObject.id)];
      }];

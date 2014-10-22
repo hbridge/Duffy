@@ -103,8 +103,6 @@
   [[DFImageStore sharedStore]
    imageForID:peanutNotification.photo_id.longLongValue
    preferredType:DFImageThumbnail
-   thumbnailPath:peanutNotification.photo_thumb_path
-   fullPath:nil
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if (![tableView.visibleCells containsObject:cell]) return;

@@ -166,6 +166,26 @@ static DFPeanutFeedDataManager *defaultManager;
   return strands;
 }
 
+- (NSArray *)remotePhotos
+{
+  NSMutableArray *photos = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects)
+  {
+    if ([object.type isEqual:DFFeedObjectPhoto] && object.user != [[DFUser currentUser] userID]) {
+      [photos addObject:object];
+      continue;
+    }
+    for (DFPeanutFeedObject *subObject in object.enumeratorOfDescendents.allObjects) {
+      if ([subObject.type isEqual:DFFeedObjectPhoto] && subObject.user != [[DFUser currentUser] userID]) {
+        [photos addObject:subObject];
+      }
+    }
+  }
+  
+  return photos;
+}
+
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId
 {
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
@@ -176,7 +196,6 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId
 {
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
@@ -184,6 +203,23 @@ static DFPeanutFeedDataManager *defaultManager;
       return object;
     }
   }
+  return nil;
+}
+
+- (DFPeanutFeedObject *)photoWithId:(DFPhotoIDType)photoID
+{
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID) {
+      return object;
+    }
+  }
+  
+  for (DFPeanutFeedObject *object in self.privateStrandsFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID) {
+      return object;
+    }
+  }
+  
   return nil;
 }
 
