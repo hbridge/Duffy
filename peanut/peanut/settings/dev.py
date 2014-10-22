@@ -60,11 +60,11 @@ LOGGING = {
 		#	'level': 'DEBUG',
 		#	'class': 'logging.StreamHandler',
 		#	'formatter': 'simple'
-		#	},
+		#},
 	},
 	'loggers': {
 		'django': {
-			'handlers':['djangofile', 'djangoerror'], #'console'],
+			'handlers':['djangofile', 'djangoerror'],#, 'console'],
 			'propagate': True,
 			'level':'DEBUG',
 		},
