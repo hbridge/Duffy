@@ -760,9 +760,15 @@ const CGFloat LockedCellHeight = 157.0;
 
 #pragma mark - DFPhotoFeedCell Delegates
 
+/* DISABLED FOR NOW*/
+const BOOL favoriteDisabled = YES;
 - (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender
 {
   DDLogVerbose(@"Favorite button pressed");
+  if (favoriteDisabled) return;
+  
+
+  
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
   
   // Figure out the strand the photo is in that we're viewing
