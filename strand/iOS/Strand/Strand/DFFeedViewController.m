@@ -34,11 +34,8 @@
 #import "DFAddPhotosViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
-<<<<<<< HEAD
 #import "DFStrandPeopleBarView.h"
-=======
 #import "SVProgressHUD.h"
->>>>>>> Add in a HUD for notifications
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -177,7 +174,13 @@ const CGFloat LockedCellHeight = 157.0;
       }
     }
   } else {
-    self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+    DFPeanutFeedObject *posts = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+    
+    // We might not have the postsObject in the feed yet (might have come through notification
+    //   So if that happens, don't overwrite our current one which has the id
+    if (posts) {
+      self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+    }
   }
   
   [self.peopleBar configureWithStrandPostsObject:self.postsObject];
