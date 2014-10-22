@@ -179,7 +179,7 @@ const CGFloat LockedCellHeight = 157.0;
     // We might not have the postsObject in the feed yet (might have come through notification
     //   So if that happens, don't overwrite our current one which has the id
     if (posts) {
-      self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
+      self.postsObject = posts;
     }
   }
   
