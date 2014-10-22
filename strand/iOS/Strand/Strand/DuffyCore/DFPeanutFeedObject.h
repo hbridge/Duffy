@@ -43,6 +43,7 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
 @property (nonatomic, retain) NSDate *time_stamp;
 @property (nonatomic, retain) NSNumber *ready;
 @property (nonatomic, retain) NSNumber *suggestible;
+@property (nonatomic, retain) NSNumber *suggestion_rank;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;
 

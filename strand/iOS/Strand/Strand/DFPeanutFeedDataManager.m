@@ -254,8 +254,20 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)suggestedStrands
 {
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"actors.@count > 0 AND suggestible == 1"];
-  return [self.privateStrandsFeedObjects filteredArrayUsingPredicate:predicate];
+  NSPredicate *predicate = [NSPredicate
+                            predicateWithFormat:@"actors.@count > 0"
+                            " AND suggestible == 1"];
+  NSArray *suggestibleStrands = [self.privateStrandsFeedObjects filteredArrayUsingPredicate:predicate];
+  return [suggestibleStrands sortedArrayUsingComparator:
+          ^NSComparisonResult(DFPeanutFeedObject *obj1, DFPeanutFeedObject *obj2) {
+            if (obj1.suggestion_rank && !obj2.suggestion_rank) {
+              return NSOrderedAscending;
+            } else if (obj2.suggestion_rank && !obj2.suggestion_rank) {
+              return NSOrderedDescending;
+            } else {
+              return [obj1.suggestion_rank compare:obj2.suggestion_rank];
+            }
+  }];
 }
 
 - (NSArray *)friendsList

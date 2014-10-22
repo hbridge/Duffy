@@ -24,6 +24,8 @@
 
 @end
 
+const NSUInteger MaxSuggestionsToShow = 3;
+
 @implementation DFSwapViewController
 
 - (instancetype)init
@@ -120,7 +122,8 @@
   NSArray *suggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
   if (suggestions.count > 0) {
     [self.sectionTitles addObject:@"Suggested Swaps"];
-    self.sectionTitlesToObjects[@"Suggested Swaps"] = suggestions;
+    self.sectionTitlesToObjects[@"Suggested Swaps"] =
+    [suggestions subarrayWithRange:(NSRange){0, MIN(suggestions.count, MaxSuggestionsToShow)}];
   }
   
   [self.tableView reloadData];

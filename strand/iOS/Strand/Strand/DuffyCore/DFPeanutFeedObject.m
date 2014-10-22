@@ -78,6 +78,7 @@ static NSArray *FeedObjectTypes;
            @"time_stamp",
            @"ready",
            @"suggestible",
+           @"suggestion_rank",
            @"full_width",
            @"full_height",
            ];
