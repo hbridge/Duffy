@@ -63,6 +63,13 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
 
 + (NSString *)relativeTimeStringSinceDate:(NSDate *)date abbreviate:(BOOL)abbreviate
 {
+  return [self relativeTimeStringSinceDate:date abbreviate:abbreviate inSentence:NO];
+}
+
++ (NSString *)relativeTimeStringSinceDate:(NSDate *)date
+                               abbreviate:(BOOL)abbreviate
+                               inSentence:(BOOL)inSentence
+{
   NSTimeInterval timeSinceDate = [[NSDate date] timeIntervalSinceDate:date];
   if (timeSinceDate < 0) timeSinceDate = 0;
   NSString *result;
@@ -88,11 +95,16 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
       result = [self pluralizedStringWithNumber:days unitString:@"day"];
     }
   } else {
-    result = [[self HumanDateFormatter] stringFromDate:date];
+    if (inSentence) {
+      result = [NSString stringWithFormat:@"on %@", [[self HumanDateFormatter] stringFromDate:date]];
+    } else {
+      result = [[self HumanDateFormatter] stringFromDate:date];
+    }
   }
   
   return result;
 }
+
 
 + (NSString *)pluralizedStringWithNumber:(int)number unitString:(NSString *)unitString
 {

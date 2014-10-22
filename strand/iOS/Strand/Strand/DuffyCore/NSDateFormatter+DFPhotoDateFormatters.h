@@ -14,6 +14,10 @@
 
 + (NSDateFormatter *)DjangoDateFormatter;
 + (NSString *)relativeTimeStringSinceDate:(NSDate *)date abbreviate:(BOOL)abbreviate;
+// if isSentence == YES will append "on" if it's a full date
++ (NSString *)relativeTimeStringSinceDate:(NSDate *)date
+                               abbreviate:(BOOL)abbreviate
+                               inSentence:(BOOL)inSentence;
 + (NSDateFormatter *)HumanDateFormatter;
 
 

@@ -25,6 +25,7 @@
 #import "DFContactsViewController.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFSMSInviteStrandComposeViewController.h"
+#import "DFNavigationController.h"
 
 @interface DFSettingsViewController ()
 
@@ -49,11 +50,18 @@
   return self;
 }
 
++ (void)presentModallyInViewController:(UIViewController *)viewController
+{
+  DFSettingsViewController *vc = [[DFSettingsViewController alloc] init];
+  DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:vc];
+  [viewController presentViewController:navController animated:YES completion:nil];
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
   
-  if (self.isBeingPresented) {
+  if (self.presentingViewController) {
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                              initWithBarButtonSystemItem:UIBarButtonSystemItemDone
                                              target:self

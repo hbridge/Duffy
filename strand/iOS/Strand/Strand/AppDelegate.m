@@ -43,6 +43,8 @@
 #import "DFAllStrandsGalleryViewController.h"
 #import "DFFriendsViewController.h"
 #import "DFUserInfoManager.h"
+#import "DFSwapViewController.h"
+
 
 
 @interface AppDelegate ()
@@ -243,13 +245,13 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [DFPhotoStore sharedStore];
   
   self.inboxViewController = [[DFInboxViewController alloc] init];
+  DFSwapViewController *swapViewController = [[DFSwapViewController alloc] init];
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
-  DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:self.inboxViewController],
+    [[DFNavigationController alloc] initWithRootViewController:swapViewController],
     [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
-    [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   
   for (UINavigationController *vc in self.tabBarController.viewControllers) {
@@ -259,6 +261,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   //self.tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
   self.tabBarController.tabBar.translucent = NO;
   
+  self.tabBarController.selectedIndex = 1;
   self.window.rootViewController = self.tabBarController;
 }
 

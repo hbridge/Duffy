@@ -22,11 +22,15 @@
 - (BOOL)isRefreshingInbox;
 
 - (NSArray *)publicStrands;
+- (NSArray *)inviteStrands;
+- (NSArray *)acceptedStrands;
 - (NSArray *)privateStrands;
+- (NSArray *)suggestedStrands;
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;
+
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
@@ -36,4 +40,6 @@
          addPhotoIDs:(NSArray *)photoIDs
              success:(void(^)(void))success
              failure:(void(^)(NSError *error))failure;
+- (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
+
 @end

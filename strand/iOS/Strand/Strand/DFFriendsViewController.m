@@ -23,6 +23,7 @@
 #import "DFNoTableItemsView.h"
 #import "DFSeenStateManager.h"
 #import "NSArray+DFHelpers.h"
+#import "DFSettingsViewController.h"
 
 
 @interface DFFriendsViewController ()
@@ -67,6 +68,10 @@
                                             initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                             target:self
                                             action:@selector(createButtonPressed:)];
+  self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithImage:[UIImage imageNamed:@"Assets/Icons/SettingsBarButton"]
+                                           style:UIBarButtonItemStylePlain target:self
+                                           action:@selector(settingsPressed:)];
 }
 
 
@@ -242,7 +247,8 @@
 {
   DFPersonSelectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   cell.showsTickMarkWhenSelected = NO;
-  [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel];
+  [cell configureWithCellStyle:(DFPersonSelectionTableViewCellStyleStrandUser
+                                | DFPersonSelectionTableViewCellStyleRightLabel)];
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
   NSArray *unseenPrivateStrands = [self unseenPrivateStrandIDsForUser:peanutUser];
   
@@ -317,6 +323,11 @@
                                             alloc] initWithRootViewController:createController];
   
   [self presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)settingsPressed:(id)sender
+{
+  [DFSettingsViewController presentModallyInViewController:self];
 }
 
 @end

@@ -10,6 +10,7 @@
 #import <Restkit/RestKit.h>
 #import "DFPeanutUserObject.h"
 #import "NSString+DFHelpers.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 @implementation DFPeanutFeedObject
 
@@ -283,6 +284,17 @@ static NSArray *FeedObjectTypes;
   return peopleString;
 }
 
+
+- (NSString *)placeAndRelativeTimeString {
+  NSString *timeString = [NSDateFormatter relativeTimeStringSinceDate:self.time_taken
+                                                           abbreviate:NO
+                                                           inSentence:YES];
+  if (self.location) {
+    return [NSString stringWithFormat:@"%@ %@", self.location, timeString];
+  } else {
+    return timeString;
+  }
+}
 
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type

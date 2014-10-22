@@ -72,4 +72,7 @@ extern DFFeedObjectType DFFeedObjectStrandJoin;
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
 
+/* Time in Location e.g.: "1 week ago in Wiliamsburg" */
+- (NSString *)placeAndRelativeTimeString;
+
 @end
