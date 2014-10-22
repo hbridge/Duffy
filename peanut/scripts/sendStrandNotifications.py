@@ -33,7 +33,7 @@ def sendInviteNotification(strandInvite):
 		doNotification = False
 
 	for photo in strandInvite.strand.photos.all():
-		if not photo.thumb_filename:
+		if not photo.full_filename:
 			doNotification = False
 
 	if doNotification:
@@ -52,7 +52,7 @@ def sendJoinActionNotifications(action):
 	doNotification = True
 
 	for photo in action.photos.all():
-		if not photo.thumb_filename:
+		if not photo.full_filename:
 			doNotification = False
 
 	if doNotification:

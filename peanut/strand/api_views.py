@@ -496,16 +496,16 @@ def getInviteObjectsDataForUser(user):
 
 	for strandInvite in strandInvites:
 		inviteIsReady = True
-		thumbsLoaded = True
+		fullsLoaded = True
 		invitePhotos = strandInvite.strand.photos.all()
 		
 		# Go through all photos and see if there's any that don't belong to this user
 		#  and don't have a thumb.  If a user just created an invite this should be fine
 		for photo in invitePhotos:
-			if photo.user_id != user.id and not photo.thumb_filename:
-				thumbsLoaded = False
+			if photo.user_id != user.id and not photo.full_filename:
+				fullsLoaded = False
 
-		if thumbsLoaded:
+		if fullsLoaded:
 			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
 				inviteIsReady = True
 			else:
@@ -578,15 +578,21 @@ def strand_inbox(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 
+		a = datetime.datetime.now()
 		# First throw in invite objects
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		
+		print "inbox-1 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.select_related().filter(users__in=[user]).filter(private=False))
+		strands = set(Strand.objects.prefetch_related('photos').filter(users__in=[user]).filter(private=False))
+
+		print "inbox-2 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 
 		#nonInviteStrandObjects = list()
 		for strand in strands:
 			responseObjects.append(getObjectsDataForStrand(strand, user))
+
+		print "inbox-3 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
 
 		# sorting by last action on the strand
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
@@ -594,6 +600,9 @@ def strand_inbox(request):
 
 		# Add in the list of all friends at the end
 		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
+
+		print "inbox-4 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+
 		responseObjects.append(entry)
 
 		response['objects'] = responseObjects

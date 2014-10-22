@@ -37,7 +37,9 @@ def shouldUserBeIncluded(userId, evalUser, friends):
 	Return back a list of photos that either belong to a friend or the given user
 """
 def filterStrandPhotosByFriends(userId, friends, strand):
-	return strand.photos.all().order_by("-time_taken")
+	photos = sorted(strand.photos.all(), key=lambda x: x.time_taken, reverse=True)
+
+	return photos
 
 	"""
 	presentUsers = strand.users.all()
