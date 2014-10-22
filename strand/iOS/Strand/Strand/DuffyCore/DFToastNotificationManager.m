@@ -107,7 +107,7 @@ static DFToastNotificationManager *defaultManager;
 {
   NSMutableDictionary *options = [[self defaultNotificationOptions] mutableCopy];
   options[kCRToastTextAlignmentKey] = @(NSTextAlignmentLeft);
-  options[kCRToastTimeIntervalKey] = @(10);
+  options[kCRToastTimeIntervalKey] = @(5.0);
   options[kCRToastTextKey] = pushNotif.message ? pushNotif.message : @"";
   options[kCRToastImageKey] = [UIImage imageNamed:@"Assets/Icons/PhotoNotificationIcon.png"];
   
