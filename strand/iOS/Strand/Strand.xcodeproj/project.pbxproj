@@ -122,6 +122,9 @@
 		5AA36F0219F6ED1B008B37AA /* UIColor+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA36F0119F6ED1B008B37AA /* UIColor+DFHelpers.m */; };
 		5AA36F0519F704E7008B37AA /* DFStrandPeopleBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA36F0419F704E7008B37AA /* DFStrandPeopleBarView.m */; };
 		5AA36F0719F704FB008B37AA /* DFStrandPeopleBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA36F0619F704FB008B37AA /* DFStrandPeopleBarView.xib */; };
+		5AA36F0C19F80ECA008B37AA /* DFSwapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA36F0A19F80ECA008B37AA /* DFSwapViewController.m */; };
+		5AA36F0D19F80ECA008B37AA /* DFSwapViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA36F0B19F80ECA008B37AA /* DFSwapViewController.xib */; };
+		5AA36F1019F82813008B37AA /* NSAttributedString+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA36F0F19F82813008B37AA /* NSAttributedString+DFHelpers.m */; };
 		5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */; };
 		5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA38DF7199D1A4700AD1805 /* DFNotificationTableViewCell.m */; };
 		5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA38DF8199D1A4700AD1805 /* DFNotificationTableViewCell.xib */; };
@@ -455,6 +458,11 @@
 		5AA36F0319F704E7008B37AA /* DFStrandPeopleBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandPeopleBarView.h; sourceTree = "<group>"; };
 		5AA36F0419F704E7008B37AA /* DFStrandPeopleBarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandPeopleBarView.m; sourceTree = "<group>"; };
 		5AA36F0619F704FB008B37AA /* DFStrandPeopleBarView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandPeopleBarView.xib; sourceTree = "<group>"; };
+		5AA36F0919F80ECA008B37AA /* DFSwapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSwapViewController.h; sourceTree = "<group>"; };
+		5AA36F0A19F80ECA008B37AA /* DFSwapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwapViewController.m; sourceTree = "<group>"; };
+		5AA36F0B19F80ECA008B37AA /* DFSwapViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwapViewController.xib; sourceTree = "<group>"; };
+		5AA36F0E19F82813008B37AA /* NSAttributedString+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSAttributedString+DFHelpers.h"; sourceTree = "<group>"; };
+		5AA36F0F19F82813008B37AA /* NSAttributedString+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSAttributedString+DFHelpers.m"; sourceTree = "<group>"; };
 		5AA38DF3199D1A1800AD1805 /* DFNotificationsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationsViewController.h; sourceTree = "<group>"; };
 		5AA38DF4199D1A1800AD1805 /* DFNotificationsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNotificationsViewController.m; sourceTree = "<group>"; };
 		5AA38DF6199D1A4700AD1805 /* DFNotificationTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNotificationTableViewCell.h; sourceTree = "<group>"; };
@@ -844,6 +852,8 @@
 				5A40344C196340A0003D7546 /* DFPhotoResizer.m */,
 				5A3172CC196C442400CA7693 /* NSString+DFHelpers.h */,
 				5A3172CD196C442400CA7693 /* NSString+DFHelpers.m */,
+				5AA36F0E19F82813008B37AA /* NSAttributedString+DFHelpers.h */,
+				5AA36F0F19F82813008B37AA /* NSAttributedString+DFHelpers.m */,
 				5A0E122E1974988700B6FF04 /* UIAlertView+DFHelpers.h */,
 				5A0E122F1974988700B6FF04 /* UIAlertView+DFHelpers.m */,
 				5A7B817019D07AEA00758AC0 /* UIDevice+DFHelpers.h */,
@@ -1116,6 +1126,7 @@
 			children = (
 				65232E9319EC8AF000F3832A /* Table View Cells */,
 				5AF64D0119EC618A00EE1473 /* Friends View */,
+				5AA36F0819F80EA8008B37AA /* Swap tab */,
 				5AAF037819AF865E00EF021C /* Create Strand */,
 				5A56EFB41986CBC10032CA8A /* Inbox Feed */,
 				5A9E9CFD19D5BE92007328AD /* Strand Detail */,
@@ -1177,6 +1188,16 @@
 				5A4C821519EDCBB600C22A12 /* DFAddPhotosViewController.m */,
 			);
 			name = "Strand Detail";
+			sourceTree = "<group>";
+		};
+		5AA36F0819F80EA8008B37AA /* Swap tab */ = {
+			isa = PBXGroup;
+			children = (
+				5AA36F0919F80ECA008B37AA /* DFSwapViewController.h */,
+				5AA36F0A19F80ECA008B37AA /* DFSwapViewController.m */,
+				5AA36F0B19F80ECA008B37AA /* DFSwapViewController.xib */,
+			);
+			name = "Swap tab";
 			sourceTree = "<group>";
 		};
 		5AA38DF2199D19CA00AD1805 /* Notifs Popover */ = {
@@ -1656,6 +1677,7 @@
 				5AA38DFA199D1A4700AD1805 /* DFNotificationTableViewCell.xib in Resources */,
 				5A3172C5196B1C4200CA7693 /* DFSMSAuthViewController.xib in Resources */,
 				5A609A6119F1997000531FEA /* DFNoTableItemsView.xib in Resources */,
+				5AA36F0D19F80ECA008B37AA /* DFSwapViewController.xib in Resources */,
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFStrandSuggestionsViewController.xib in Resources */,
@@ -1779,6 +1801,7 @@
 				5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */,
 				5A9636BE19E44F5700F3B606 /* DFCreateStrandViewController.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
+				5AA36F1019F82813008B37AA /* NSAttributedString+DFHelpers.m in Sources */,
 				5A9115EC19DB7F90003F2A68 /* UINib+DFHelpers.m in Sources */,
 				5AAF03A319B4D5B200EF021C /* DFPeoplePickerViewController.m in Sources */,
 				5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */,
@@ -1795,6 +1818,7 @@
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
 				5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */,
+				5AA36F0C19F80ECA008B37AA /* DFSwapViewController.m in Sources */,
 				5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */,
 				651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */,
 				5A65181E19D62754001FE911 /* DFStrandGalleryTitleView.m in Sources */,

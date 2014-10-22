@@ -33,6 +33,7 @@
 #import "DFNoTableItemsView.h"
 #import "UINib+DFHelpers.h"
 #import "DFPushNotificationsManager.h"
+#import "DFAnalytics.h"
 
 
 @interface DFInboxViewController ()
@@ -118,12 +119,15 @@
       break;
     }
   }
+  
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
   [super viewWillDisappear:animated];
   [self.noItemsPopLabel dismiss];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)configureRefreshControl
@@ -165,7 +169,7 @@
 - (void)reloadData
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    _feedObjects = [self.manager publicStrands];
+    _feedObjects = [self.manager acceptedStrands];
     [self.tableView reloadData];
     [self configureNoResultsView];
   });

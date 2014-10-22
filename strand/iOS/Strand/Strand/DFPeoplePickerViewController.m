@@ -92,6 +92,18 @@
   [self selectionUpdated];
 }
 
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
+}
+
 - (void)configureNav
 {
   self.navigationItem.title = @"Select People";
@@ -435,7 +447,7 @@
     cell = userCell;
   } else {
     DFPersonSelectionTableViewCell *nonUserCell = [self.tableView dequeueReusableCellWithIdentifier:@"nonUser"];
-    [nonUserCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleNonUser];
+    [nonUserCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleSubtitle];
     nonUserCell.nameLabel.text = peanutContact.name;
     nonUserCell.subtitleLabel.text = [NSString stringWithFormat:@"%@ %@",
                           peanutContact.phone_type,

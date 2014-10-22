@@ -28,6 +28,7 @@
 #import "NSArray+DFHelpers.h"
 #import "UINib+DFHelpers.h"
 #import "DFCreateStrandViewController.h"
+#import "DFAnalytics.h"
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -220,6 +221,8 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  [super viewDidAppear:animated];
+  [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -227,6 +230,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
   [super viewDidDisappear:animated];
   [self.refreshTimer invalidate];
   self.refreshTimer = nil;
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)didReceiveMemoryWarning
@@ -312,28 +316,7 @@ NSString *const SuggestionNoPeopleId = @"suggestionNoPeople";
       [tableView endUpdates];
       
       // Mark the strand as no longer suggestiblw with the server
-      DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
-      privateStrand.id = @(feedObject.id);
-      
-      [self.strandAdapter
-       performRequest:RKRequestMethodGET
-       withPeanutStrand:privateStrand
-       success:^(DFPeanutStrand *peanutStrand) {
-         peanutStrand.suggestible = @(NO);
-         
-         // Patch the peanut strand
-         [self.strandAdapter
-          performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
-          success:^(DFPeanutStrand *peanutStrand) {
-            DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
-          } failure:^(NSError *error) {
-            DDLogError(@"%@ failed to patch private strand: %@, error: %@",
-                       self.class, peanutStrand, error);
-          }];
-       } failure:^(NSError *error) {
-         DDLogError(@"%@ failed to get private strand: %@, error: %@",
-                    self.class, privateStrand, error);
-       }];
+      [[DFPeanutFeedDataManager sharedManager] markSuggestion:feedObject visible:NO];
     }
   };
 }

@@ -235,9 +235,27 @@ static DFPeanutFeedDataManager *defaultManager;
   return strands;
 }
 
+- (NSArray *)inviteStrands
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectInviteStrand];
+  return [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
+}
+
+- (NSArray *)acceptedStrands
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectStrandPosts];
+  return [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
+}
+
 - (NSArray *)privateStrands
 {
   return self.privateStrandsFeedObjects;
+}
+
+- (NSArray *)suggestedStrands
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"actors.@count > 0 AND suggestible == 1"];
+  return [self.privateStrandsFeedObjects filteredArrayUsingPredicate:predicate];
 }
 
 - (NSArray *)friendsList
@@ -319,6 +337,32 @@ static DFPeanutFeedDataManager *defaultManager;
    } failure:^(NSError *error) {
      DDLogError(@"%@ failed to get strand: %@, error: %@",
                 self.class, requestStrand, error);
+   }];
+}
+
+- (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible
+{
+  DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];
+  privateStrand.id = @(suggestedSection.id);
+  
+  [self.strandAdapter
+   performRequest:RKRequestMethodGET
+   withPeanutStrand:privateStrand
+   success:^(DFPeanutStrand *peanutStrand) {
+     peanutStrand.suggestible = @(NO);
+     
+     // Patch the peanut strand
+     [self.strandAdapter
+      performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
+      success:^(DFPeanutStrand *peanutStrand) {
+        DDLogInfo(@"%@ successfully updated private strand to set visible false: %@", self.class, peanutStrand);
+      } failure:^(NSError *error) {
+        DDLogError(@"%@ failed to patch private strand: %@, error: %@",
+                   self.class, peanutStrand, error);
+      }];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ failed to get private strand: %@, error: %@",
+                self.class, privateStrand, error);
    }];
 }
 

@@ -7,21 +7,26 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
 #import "Strand-Swift.h"
 
-@interface DFPersonSelectionTableViewCell : UITableViewCell
+
+@interface DFPersonSelectionTableViewCell : MCSwipeTableViewCell
 @property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *rightLabel;
 @property (nonatomic) BOOL showsTickMarkWhenSelected;
 
-typedef enum {
-  DFPersonSelectionTableViewCellStyleStrandUser,
-  DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle,
-  DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel,
-  DFPersonSelectionTableViewCellStyleNonUser,
-} DFPersonSelectionTableViewCellStyle;
+
+extern const CGFloat DFPersonSelectionTableViewCellHeight;
+
+typedef NS_OPTIONS(NSInteger, DFPersonSelectionTableViewCellStyle) {
+  DFPersonSelectionTableViewCellStyleStrandUser = 1 << 1,
+  DFPersonSelectionTableViewCellStyleSubtitle = 1 << 2,
+  DFPersonSelectionTableViewCellStyleRightLabel = 1 << 3,
+};
+
 - (void)configureWithCellStyle:(DFPersonSelectionTableViewCellStyle)style;
 
 @end

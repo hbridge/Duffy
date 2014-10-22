@@ -10,6 +10,8 @@
 
 @implementation DFPersonSelectionTableViewCell
 
+const CGFloat DFPersonSelectionTableViewCellHeight = 54;
+
 - (void)awakeFromNib {
     // Initialization code
   UIView *backgroundColorView = [[UIView alloc] init];
@@ -41,15 +43,18 @@
 }
 
 - (void)configureWithCellStyle:(DFPersonSelectionTableViewCellStyle)style {
-  if (style == DFPersonSelectionTableViewCellStyleStrandUser
-      || style == DFPersonSelectionTableViewCellStyleStrandUserWithSubtitle) {
+  if (style & DFPersonSelectionTableViewCellStyleStrandUser) {
     self.nameLabel.font = [UIFont boldSystemFontOfSize:self.nameLabel.font.pointSize];
-  }
-  if (style == DFPersonSelectionTableViewCellStyleStrandUser
-      || style == DFPersonSelectionTableViewCellStyleStrandUserWithRightLabel) {
-    [self.subtitleLabel removeFromSuperview];
-  } else if (style == DFPersonSelectionTableViewCellStyleNonUser) {
+  } else {
     [self.profilePhotoStackView removeFromSuperview];
+  }
+  
+  if (!(style & DFPersonSelectionTableViewCellStyleSubtitle)) {
+    [self.subtitleLabel removeFromSuperview];
+  }
+  
+  if (!(style & DFPersonSelectionTableViewCellStyleRightLabel)) {
+    [self.rightLabel removeFromSuperview];
   }
 }
 

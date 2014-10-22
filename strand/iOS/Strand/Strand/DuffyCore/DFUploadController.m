@@ -328,14 +328,14 @@ static DFUploadController *defaultUploadController;
       DDLogWarn(@"Warning: local app state appears to be bad.  Askinng for reset.");
       AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
       NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
-      [cancelOperation start];
+      [cancelOperation main];
       [appDelegate resetApplication];
     } else {
       DDLogInfo(@"Retry count exceeded (%d/%d) or error not retryable. Cancelling uploads.  Error:%@",
                 self.currentSessionStats.numConsecutiveRetries, MaxRetryCount, error.description);
       [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
       NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
-      [cancelOperation start];
+      [cancelOperation main];
     }
     
     [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];

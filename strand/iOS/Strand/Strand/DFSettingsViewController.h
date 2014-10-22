@@ -11,4 +11,6 @@
 
 @interface DFSettingsViewController : UITableViewController <MFMessageComposeViewControllerDelegate>
 
++ (void)presentModallyInViewController:(UIViewController *)viewController;
+
 @end

@@ -45,17 +45,16 @@
 #import "DFUserInfoManager.h"
 #import "DFImageDownloadManager.h"
 #import "DFImageStore.h"
+#import "DFSwapViewController.h"
 
 
-@interface AppDelegate ()
+@interface AppDelegate () <BITHockeyManagerDelegate> {}
+
+@property (nonatomic) DDFileLogger *fileLogger;
 
 @property (nonatomic, retain) UITabBarController *tabBarController;
 @property (nonatomic, retain) DFPeanutPushTokenAdapter *pushTokenAdapter;
 @property (nonatomic, retain) DFInboxViewController *inboxViewController;
-@end
-
-@interface AppDelegate () <BITHockeyManagerDelegate> {}
-@property (nonatomic) DDFileLogger *fileLogger;
 
 // These are used to track the state of background fetch signals from the syncer and uploader
 @property (nonatomic, assign) BOOL backgroundSyncHasFinished;
@@ -245,13 +244,13 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [DFPhotoStore sharedStore];
   
   self.inboxViewController = [[DFInboxViewController alloc] init];
+  DFSwapViewController *swapViewController = [[DFSwapViewController alloc] init];
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
-  DFSettingsViewController *settingsController = [[DFSettingsViewController alloc] init];
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:self.inboxViewController],
+    [[DFNavigationController alloc] initWithRootViewController:swapViewController],
     [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
-    [[DFNavigationController alloc] initWithRootViewController:settingsController]
     ];
   
   for (UINavigationController *vc in self.tabBarController.viewControllers) {
@@ -261,6 +260,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   //self.tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
   self.tabBarController.tabBar.translucent = NO;
   
+  self.tabBarController.selectedIndex = 1;
   self.window.rootViewController = self.tabBarController;
 }
 
