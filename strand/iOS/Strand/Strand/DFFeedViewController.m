@@ -34,7 +34,11 @@
 #import "DFAddPhotosViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
+<<<<<<< HEAD
 #import "DFStrandPeopleBarView.h"
+=======
+#import "SVProgressHUD.h"
+>>>>>>> Add in a HUD for notifications
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -102,9 +106,20 @@ const CGFloat LockedCellHeight = 157.0;
       self.inviteObject = feedObject;
       self.postsObject = [[feedObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
       self.suggestionsObject = [[feedObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+      
+      // This is for if we come through a notification
+      if (self.inviteObject.objects.count == 0) {
+        [SVProgressHUD showWithStatus:@"Loading..."];
+        [self reloadData];
+      }
     } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts] || [feedObject.type isEqual:DFFeedObjectSection]) {
       self.inviteObject = nil;
       self.postsObject = feedObject;
+
+      if (self.postsObject.objects.count == 0) {
+        [SVProgressHUD showWithStatus:@"Loading..."];
+        [self reloadData];
+      }
     }
   }
   return self;
@@ -137,18 +152,29 @@ const CGFloat LockedCellHeight = 157.0;
  */
 - (void)reloadData
 {
+  DDLogVerbose(@"Told to reload my data...");
   if (self.inviteObject) {
-    self.inviteObject = [self.dataManager inviteObjectWithId:self.inviteObject.id];
-    self.suggestionsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
-    self.postsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+    DFPeanutFeedObject *invite = [self.dataManager inviteObjectWithId:self.inviteObject.id];
     
-    // If we're currently showing the matching activity but now our invite is ready, then
-    //   turn off the timer and show the upsell result
-    if ([self.inviteObject.ready isEqual:@(YES)] && [self.swapUpsellView isMatchingActivityOn]) {
-      [self.swapUpsellView configureActivityWithVisibility:NO];
-      [self.refreshTimer invalidate];
-      self.refreshTimer = nil;
-      [self showUpsellResult];
+    // We might not have the invite in the feed yet (might have come through notification
+    //   So if that happens, don't overwrite our current one which has the id
+    if (invite) {
+      self.inviteObject = invite;
+      self.suggestionsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+      self.postsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+      
+      if ([self.inviteObject.ready isEqual:@(YES)]) {
+        [SVProgressHUD dismiss];
+        [self.refreshTimer invalidate];
+        self.refreshTimer = nil;
+        
+        // If we're currently showing the matching activity but now our invite is ready, then
+        //   turn off the timer and show the upsell result
+        if ([self.swapUpsellView isMatchingActivityOn]) {
+          [self.swapUpsellView configureActivityWithVisibility:NO];
+          [self showUpsellResult];
+        }
+      }
     }
   } else {
     self.postsObject = [self.dataManager strandPostsObjectWithId:self.postsObject.id];
@@ -189,7 +215,9 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)refreshFromServer
 {
-  [self.dataManager refreshInboxFromServer:nil];
+  [self.dataManager refreshInboxFromServer:^{
+    [self reloadData];
+  }];
 }
 
 - (void)viewDidLoad
@@ -273,6 +301,7 @@ const CGFloat LockedCellHeight = 157.0;
                                            self.view.frame.size.height - swapUpsellHeight,
                                            self.view.frame.size.width,
                                            swapUpsellHeight);
+    [self.swapUpsellView configureActivityWithVisibility:NO];
   } else {
     [self.swapUpsellView removeFromSuperview];
   }
@@ -290,14 +319,17 @@ const CGFloat LockedCellHeight = 157.0;
   [self configureUpsell];
   [self configurePeopleBar];
   
-  if (self.inviteObject && [self.inviteObject.ready isEqual:@(NO)]) {
+  if (self.inviteObject && (!self.inviteObject.ready || [self.inviteObject.ready isEqual:@(NO)])) {
     DDLogVerbose(@"Invite not ready, setting up timer...");
     self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
                                                          target:self
                                                        selector:@selector(refreshFromServer)
                                                        userInfo:nil
                                                         repeats:YES];
+  } else {
+    DDLogVerbose(@"Showing view but I think that I don't need a timer %@   %@", self.inviteObject, self.inviteObject.ready);
   }
+  
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -337,6 +369,8 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)setPostsObject:(DFPeanutFeedObject *)strandPostsObject
 {
+  _postsObject = strandPostsObject;
+  
   dispatch_async(dispatch_get_main_queue(), ^{
     if (!self.titleView) {
       self.titleView =
@@ -346,15 +380,15 @@ const CGFloat LockedCellHeight = 157.0;
        firstObject];
       self.navigationItem.titleView = self.titleView;
     }
-    self.titleView.locationLabel.text = strandPostsObject.location;
-    self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPostsObject.time_taken
-                                                                 abbreviate:NO];
+    self.titleView.locationLabel.text = self.postsObject.location;
+    self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
+                                                                      abbreviate:NO];
     
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
     
-    for (NSUInteger sectionIndex = 0; sectionIndex < strandPostsObject.objects.count; sectionIndex++) {
-      NSArray *objectsForSection = [strandPostsObject.objects[sectionIndex] objects];
+    for (NSUInteger sectionIndex = 0; sectionIndex < self.postsObject.objects.count; sectionIndex++) {
+      NSArray *objectsForSection = [self.postsObject.objects[sectionIndex] objects];
       for (NSUInteger objectIndex = 0; objectIndex < objectsForSection.count; objectIndex++) {
         DFPeanutFeedObject *object = objectsForSection[objectIndex];
         NSIndexPath *indexPath = [NSIndexPath indexPathForRow:objectIndex inSection:sectionIndex];
@@ -372,7 +406,6 @@ const CGFloat LockedCellHeight = 157.0;
     
     _photoObjectsById = objectsByID;
     _photoIndexPathsById = indexPathsByID;
-    _postsObject = strandPostsObject;
     
     [self.tableView reloadData];
   });
