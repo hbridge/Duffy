@@ -179,7 +179,7 @@ static DFContactSyncManager *defaultManager;
     return kABAuthorizationStatusNotDetermined;
   }
 #else
-  return ABAddressBookGetAuthorizationStatus()
+  return ABAddressBookGetAuthorizationStatus();
 #endif
 }
 
