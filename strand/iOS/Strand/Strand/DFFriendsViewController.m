@@ -189,15 +189,18 @@
 {
   _friendPeanutUsers = [self.peanutDataManager friendsList];
   [self.tableView reloadData];
+  [self configureNoResultsView];
+}
+
+- (void)configureTabBadge
+{
   NSUInteger numWithUnseen = [self numPeopleWithUnseenSuggestions];
   if (numWithUnseen > 0) {
     self.tabBarItem.badgeValue = [@(numWithUnseen) stringValue];
   } else {
     self.tabBarItem.badgeValue = nil;
   }
-  
-  
-  [self configureNoResultsView];
+
 }
 
 - (void)configureNoResultsView
