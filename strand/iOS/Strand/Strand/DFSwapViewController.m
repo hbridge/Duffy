@@ -291,6 +291,7 @@ const NSUInteger MaxSuggestionsToShow = 3;
   suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
   
   // the suggestion sections don't include this user in the actors list
+  suggestionCell.nameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Mediume" size:suggestionCell.nameLabel.font.pointSize];
   NSString *nameString = [NSString stringWithFormat:@"%@ and You", [suggestionObject actorsString]];
   UIFont *grayFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:suggestionCell.nameLabel.font.pointSize];
   suggestionCell.nameLabel.attributedText = [NSAttributedString
