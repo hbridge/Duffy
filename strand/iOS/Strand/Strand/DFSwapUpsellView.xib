@@ -12,29 +12,23 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Udl-Nz-hEj" customClass="DFActionButton">
-                    <rect key="frame" x="130" y="306" width="121" height="30"/>
+                    <rect key="frame" x="130" y="237" width="121" height="30"/>
                     <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
                     <state key="normal" title="Match my Photos">
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
                 </button>
-                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+20 Photos" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fi9-5y-xZM">
-                    <rect key="frame" x="100" y="194" width="182" height="43"/>
-                    <fontDescription key="fontDescription" type="system" pointSize="36"/>
-                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                    <nil key="highlightedColor"/>
-                </label>
-                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You Have Matching Photos to Swap" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="72w-fn-JN9">
-                    <rect key="frame" x="49" y="269" width="283" height="21"/>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You Have Matching Photos to Swap" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="72w-fn-JN9">
+                    <rect key="frame" x="49" y="200" width="283" height="21"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TJc-Nh-Bq1" userLabel="Matching activity wrapper">
-                    <rect key="frame" x="147" y="287" width="88" height="77"/>
+                    <rect key="frame" x="147" y="218" width="88" height="77"/>
                     <subviews>
-                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Matching" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bwY-f3-PRj">
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Matching" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="200" translatesAutoresizingMaskIntoConstraints="NO" id="bwY-f3-PRj">
                             <rect key="frame" x="8" y="8" width="72" height="21"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -57,28 +51,18 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstAttribute="bottom" secondItem="Udl-Nz-hEj" secondAttribute="bottom" constant="43" id="Agr-an-GXg"/>
                 <constraint firstAttribute="centerX" secondItem="Udl-Nz-hEj" secondAttribute="centerX" id="BOg-hj-s1H"/>
-                <constraint firstItem="TJc-Nh-Bq1" firstAttribute="leading" secondItem="Udl-Nz-hEj" secondAttribute="trailing" constant="-104" id="LGp-fA-ToS"/>
-                <constraint firstAttribute="centerX" secondItem="fi9-5y-xZM" secondAttribute="centerX" id="Lf4-1o-9eX"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="top" secondItem="72w-fn-JN9" secondAttribute="bottom" constant="16" id="NJQ-Bw-f75"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="centerY" secondItem="TJc-Nh-Bq1" secondAttribute="centerY" constant="-4.5" id="NJu-ZC-keX"/>
-                <constraint firstItem="Udl-Nz-hEj" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="527" id="XUW-86-zlg"/>
-                <constraint firstItem="72w-fn-JN9" firstAttribute="top" secondItem="fi9-5y-xZM" secondAttribute="bottom" constant="32" id="Xne-Fs-6Vd"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Udl-Nz-hEj" secondAttribute="bottom" constant="20" id="TGQ-ij-tih"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="centerX" secondItem="TJc-Nh-Bq1" secondAttribute="centerX" constant="-0.5" id="bid-xe-1gq"/>
+                <constraint firstItem="72w-fn-JN9" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" priority="999" constant="200" id="jFH-iC-UMv"/>
                 <constraint firstAttribute="centerX" secondItem="72w-fn-JN9" secondAttribute="centerX" id="zZA-GC-Tow"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
-            <variation key="default">
-                <mask key="constraints">
-                    <exclude reference="LGp-fA-ToS"/>
-                    <exclude reference="XUW-86-zlg"/>
-                </mask>
-            </variation>
             <connections>
                 <outlet property="activityWrapper" destination="TJc-Nh-Bq1" id="dDq-Kk-mc6"/>
                 <outlet property="matchMyPhotosButton" destination="Udl-Nz-hEj" id="lt8-Ib-KQR"/>
-                <outlet property="sharedPhotosCountLabel" destination="fi9-5y-xZM" id="TDk-yP-Ifx"/>
                 <outlet property="upsellTitleLabel" destination="72w-fn-JN9" id="Bde-B7-AQK"/>
             </connections>
             <point key="canvasLocation" x="30.5" y="264.5"/>

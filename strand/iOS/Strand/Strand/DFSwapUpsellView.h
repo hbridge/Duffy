@@ -8,17 +8,17 @@
 
 #import <UIKit/UIKit.h>
 #import "SAMGradientView.h"
+#import "DFPeanutFeedObject.h"
 
 @interface DFSwapUpsellView : SAMGradientView
 
-@property (weak, nonatomic) IBOutlet UILabel *sharedPhotosCountLabel;
 @property (weak, nonatomic) IBOutlet UIButton *matchMyPhotosButton;
 @property (weak, nonatomic) IBOutlet UILabel *upsellTitleLabel;
 @property (weak, nonatomic) IBOutlet UIView *activityWrapper;
 
-- (void)configureWithSwappablePhotos:(BOOL)arePhotosSwappable
-                        buttonTarget:(id)target
-                            selector:(SEL)selector;
+- (void)configureWithInviteObject:(DFPeanutFeedObject *)inviteObject
+                     buttonTarget:(id)target
+                         selector:(SEL)selector;
 
 - (void)configureForContactsWithError:(BOOL)error
                          buttonTarget:(id)target

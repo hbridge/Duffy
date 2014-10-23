@@ -14,6 +14,8 @@
 #import "DFCreateStrandViewController.h"
 #import "NSAttributedString+DFHelpers.h"
 #import "DFAnalytics.h"
+#import "DFStrandSuggestionsViewController.h"
+#import "DFNavigationController.h"
 
 @interface DFSwapViewController ()
 
@@ -57,6 +59,10 @@ const NSUInteger MaxSuggestionsToShow = 3;
 {
   self.navigationItem.title = @"Swap";
   self.tabBarItem.image = [UIImage imageNamed:@"Assets/Icons/SwapBarButton"];
+  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                            target:self
+                                            action:@selector(createButtonPressed:)];
 }
 
 - (void)viewDidLoad {
@@ -365,5 +371,15 @@ const NSUInteger MaxSuggestionsToShow = 3;
     }
   };
 }
+
+- (void)createButtonPressed:(id)sender
+{
+  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
+  DFNavigationController *navController = [[DFNavigationController
+                                            alloc] initWithRootViewController:createController];
+  
+  [self presentViewController:navController animated:YES completion:nil];
+}
+
 
 @end

@@ -295,11 +295,11 @@ const CGFloat LockedCellHeight = 157.0;
       self.swapUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
       [self.view addSubview:self.swapUpsellView];
       
-      [self.swapUpsellView configureWithSwappablePhotos:(self.suggestionsObject.objects.count > 0)
+      [self.swapUpsellView configureWithInviteObject:self.inviteObject
                                            buttonTarget:self
                                                selector:@selector(upsellButtonPressed:)];
     }
-    CGFloat swapUpsellHeight = self.view.frame.size.height * .66;
+    CGFloat swapUpsellHeight = MIN(self.view.frame.size.height * .7 + self.tableView.contentOffset.y, self.tableView.frame.size.height);
     self.swapUpsellView.frame = CGRectMake(0,
                                            self.view.frame.size.height - swapUpsellHeight,
                                            self.view.frame.size.width,
@@ -684,9 +684,14 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)showUpsellResult
 {
+  DFPeanutFeedObject *postsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
   if (self.suggestionsObject.objects.count == 0) {
-    [UIAlertView showSimpleAlertWithTitle:@"No Matches"
-                            formatMessage:@"You have no matching photos. Enjoy your free photos!"];
+    [UIAlertView
+     showSimpleAlertWithTitle:@"No Matches"
+     formatMessage:@"You have no photos with %@ from %@. Enjoy your free photos!",
+     [self.inviteObject actorsString],
+     [postsObject placeAndRelativeTimeString]
+     ];
     [[DFPeanutFeedDataManager sharedManager]
      acceptInvite:self.inviteObject
      addPhotoIDs:nil
@@ -1056,7 +1061,7 @@ selectedObjectChanged:(id)newObject
   if (scrollOffset <= -scrollView.contentInset.top) {
     [self.topBarController mainScrollViewScrolledToTop:YES dy:dy];
   } else {
-    [self.topBarController mainScrollViewScrolledToTop:NO dy:dy];
+    [self configureUpsell];
   }
   
   // store the scrollOffset for calculations next time around

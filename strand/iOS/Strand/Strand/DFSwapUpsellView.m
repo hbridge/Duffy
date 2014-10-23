@@ -15,11 +15,13 @@
 {
   [super awakeFromNib];
   self.backgroundColor = [UIColor clearColor];
-  self.gradientColors = @[
-                          [UIColor clearColor],
-                          [UIColor colorWithWhite:1.0 alpha:0.9],
-                          [UIColor colorWithWhite:1.0 alpha:0.98],
-                          ];
+  self.gradientColors =
+  @[
+    [UIColor clearColor],
+    [UIColor colorWithWhite:1.0 alpha:0.8],
+    [UIColor colorWithWhite:1.0 alpha:0.95],
+    [UIColor colorWithWhite:1.0 alpha:0.98],
+    ];
 }
 
 
@@ -30,18 +32,18 @@
   return NO;
 }
 
-- (void)configureWithSwappablePhotos:(BOOL)arePhotosSwappable buttonTarget:(id)target selector:(SEL)selector
+- (void)configureWithInviteObject:(DFPeanutFeedObject *)inviteObject
+                     buttonTarget:(id)target
+                         selector:(SEL)selector
 {
-  if (arePhotosSwappable) {
-    self.upsellTitleLabel.text = @"You Have Matching Photos to Swap";
-    [self.matchMyPhotosButton setTitle:@"Match my Photos"
-                              forState:UIControlStateNormal];
-  } else {
-    self.upsellTitleLabel.text = @"You May Have Photos to Swap";
-    [self.matchMyPhotosButton setTitle:@"Match my Photos"
-                              forState:UIControlStateNormal];
+  DFPeanutFeedObject *strandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+  self.upsellTitleLabel.text = [NSString stringWithFormat:@"%@ %@ your photos from\n %@",
+                                inviteObject.actorsString,
+                                inviteObject.actors.count == 1 ? @"wants" : @"want",
+                                strandPosts.placeAndRelativeTimeString];
+  [self.matchMyPhotosButton setTitle:@"Find my Photos"
+                            forState:UIControlStateNormal];
 
-  }
   [self.matchMyPhotosButton addTarget:target
                                 action:selector
                       forControlEvents:UIControlEventTouchUpInside];
@@ -54,7 +56,7 @@
                                     selector:(SEL)selector
 {
   if (!error) {
-    self.upsellTitleLabel.text = @"Find More Friends to Swap With";
+    self.upsellTitleLabel.text = @"Find More Friends to Swap with";
   } else {
     self.upsellTitleLabel.text = @"Contacts Permission Denied";
   }
