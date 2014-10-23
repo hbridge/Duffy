@@ -294,20 +294,25 @@ const CGFloat LockedCellHeight = 157.0;
     if (!self.swapUpsellView) {
       self.swapUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
       [self.view addSubview:self.swapUpsellView];
+      [self configureUpsellHeight];
       
       [self.swapUpsellView configureWithInviteObject:self.inviteObject
                                            buttonTarget:self
                                                selector:@selector(upsellButtonPressed:)];
     }
-    CGFloat swapUpsellHeight = MIN(self.view.frame.size.height * .7 + self.tableView.contentOffset.y, self.tableView.frame.size.height);
-    self.swapUpsellView.frame = CGRectMake(0,
-                                           self.view.frame.size.height - swapUpsellHeight,
-                                           self.view.frame.size.width,
-                                           swapUpsellHeight);
     [self.swapUpsellView configureActivityWithVisibility:NO];
   } else {
     [self.swapUpsellView removeFromSuperview];
   }
+}
+
+- (void)configureUpsellHeight
+{
+  CGFloat swapUpsellHeight = MIN(self.view.frame.size.height * .7 + self.tableView.contentOffset.y, self.tableView.frame.size.height);
+  self.swapUpsellView.frame = CGRectMake(0,
+                                         self.view.frame.size.height - swapUpsellHeight,
+                                         self.view.frame.size.width,
+                                         swapUpsellHeight);
 }
 
 - (NSString *)identifierForCellStyle:(DFPhotoFeedCellStyle)style
@@ -1061,7 +1066,7 @@ selectedObjectChanged:(id)newObject
   if (scrollOffset <= -scrollView.contentInset.top) {
     [self.topBarController mainScrollViewScrolledToTop:YES dy:dy];
   } else {
-    [self configureUpsell];
+    [self configureUpsellHeight];
   }
   
   // store the scrollOffset for calculations next time around
