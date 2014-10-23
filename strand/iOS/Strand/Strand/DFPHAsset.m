@@ -126,7 +126,7 @@
 + (PHImageRequestOptions *)highQualityImageRequestOptions
 {
   PHImageRequestOptions *options = [PHImageRequestOptions new];
-  options.synchronous = NO;
+  options.synchronous = YES;
   options.resizeMode = PHImageRequestOptionsResizeModeExact;
   options.deliveryMode = PHImageRequestOptionsDeliveryModeHighQualityFormat;
   return options;
@@ -144,7 +144,7 @@
 {
   // Cache the asset on the calling thread because self.asset accesses core data
   PHAsset *asset = self.asset;
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
     [[PHImageManager defaultManager]
      requestImageForAsset:asset
      targetSize:size
