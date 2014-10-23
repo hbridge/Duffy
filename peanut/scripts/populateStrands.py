@@ -302,6 +302,9 @@ def main(argv):
 
 				photoToEval = strand.photos.all()[0]
 				for possibleNeighbor in possibleNeighbors:
+					for strand in strandsCache:
+						usersByStrandId[strand.id] = list(strand.users.all())
+
 					if strands_util.photoBelongsInStrand(photoToEval, possibleNeighbor):
 						if possibleNeighbor.id < strand.id:
 							strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
@@ -321,9 +324,8 @@ def main(argv):
 			neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
 			StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
 			
-			#logger.debug("Starting sending notifications...")
-			
-			#sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
+			logger.debug("Starting sending notifications...")
+			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 
 			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(neighborRowsToCreate), (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
 
