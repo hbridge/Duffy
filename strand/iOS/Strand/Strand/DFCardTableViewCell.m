@@ -186,6 +186,8 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
        } failureBlock:^(NSError *error) {
          DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
        }];
+    } else {
+      DDLogError(@"Got back nil data for photo %@", photoID);
     }
   }
 }
