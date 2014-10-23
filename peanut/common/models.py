@@ -175,6 +175,7 @@ class Photo(models.Model):
 	taken_with_strand = models.BooleanField(default=True)
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
+	product_id = models.IntegerField(default=2)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
 
