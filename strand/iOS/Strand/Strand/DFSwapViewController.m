@@ -29,6 +29,8 @@
 @end
 
 const NSUInteger MaxSuggestionsToShow = 3;
+const NSString *InvitesSectionTitle = @"Requested Swaps";
+const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 
 @implementation DFSwapViewController
 
@@ -124,8 +126,8 @@ const NSUInteger MaxSuggestionsToShow = 3;
   
   NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
   if (invites.count > 0) {
-    [self.sectionTitles addObject:@"Invites"];
-    self.sectionTitlesToObjects[@"Invites"] = invites;
+    [self.sectionTitles addObject:InvitesSectionTitle];
+    self.sectionTitlesToObjects[InvitesSectionTitle] = invites;
   }
   
   self.allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
@@ -144,19 +146,19 @@ const NSUInteger MaxSuggestionsToShow = 3;
   /* Reloads the suggestions section from the allSuggestions array, broken out
    so it can be called from the swipe handler safely */
   if (self.allSuggestions.count > 0) {
-    [self.sectionTitles addObject:@"Suggested Swaps"];
+    [self.sectionTitles addObject:SuggestedSectionTitle];
     NSMutableArray *filteredSuggestions = [self.allSuggestions mutableCopy];
     [filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
     DDLogVerbose(@"allCount:%@ ignoredCount:%@ filteredCount:%@",
                  @(self.allSuggestions.count), @(self.ignoredSuggestions.count), @(filteredSuggestions.count));
-    self.sectionTitlesToObjects[@"Suggested Swaps"] =
+    self.sectionTitlesToObjects[SuggestedSectionTitle] =
     [filteredSuggestions subarrayWithRange:(NSRange){0, MIN(filteredSuggestions.count, MaxSuggestionsToShow)}];
   }
 }
 
 - (void)configureTabCount
 {
-  NSArray *invites = self.sectionTitlesToObjects[@"Invites"];
+  NSArray *invites = self.sectionTitlesToObjects[InvitesSectionTitle];
   if (invites.count > 0) {
     self.tabBarItem.badgeValue = [@(invites.count) stringValue];
   } else {
@@ -326,7 +328,7 @@ const NSUInteger MaxSuggestionsToShow = 3;
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-  if ([self.sectionTitles[section] isEqual:@"Suggested Swaps"]) {
+  if ([self.sectionTitles[section] isEqual:SuggestedSectionTitle]) {
     return @"Swipe left to hide Suggested Swaps";
   }
   
