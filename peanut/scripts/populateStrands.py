@@ -22,6 +22,50 @@ import strand.notifications_util as notifications_util
 
 logger = logging.getLogger(__name__)
 
+
+def dealWithDeadStrand(strand, strandsCache):
+	logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
+	# remove from our cache and db
+	strandsCache = filter(lambda a: a.id != strand.id, strandsCache)
+	logger.debug("Deleted strand %s" % strand.id)
+	strand.delete()
+
+	return strandsCache
+	
+def dealWithFirstRun(user):
+	update = False
+	if not user.first_run_sync_complete:
+		if user.first_run_sync_count:
+			# If there are no matching photos from the client, then sync is complete
+			if user.first_run_sync_count == 0:
+				update = True
+			else:
+				# If there are 
+				strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+				if strandInvites.count() == 0:
+					update = True
+				else:
+					lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+					if lastStrandedPhotos[0].time_taken <= strandInvites[0].strand.first_photo_time:
+						update = True
+					else:
+						# This means that we have a count, but we haven't actually reached the right date
+						#   this happens if the client is really fast uploading photos, then we might be stranding
+						#   new photos and the invite was an old one.  We want to wait until we hit the age of the old one
+						#   to make sure we find any matches
+						pass
+		else:
+			# This means the client hasn't given us any information yet.
+			# if this happens, then just see if we've stranded anything, if so, then call things good to go.
+			lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
+			if lastStrandedPhotos.count() > 0:
+				update = True
+
+	if update:
+		user.first_run_sync_complete = True
+		logger.info("Updated first_run_sync_complete for user %s", user)
+		user.save()
+		
 def processWithExisting(existingNeighborRows, newNeighborRows):
 	existing = dict()
 	rowsToCreate = list()
@@ -130,50 +174,11 @@ def sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsFor
 	userIds = set(User.getIds(usersWithoutRecentNot))
 
 	Thread(target=threadedSendNotifications, args=(userIds,)).start()
-	
-	"""
-	Commenting out since we're not notifying people close by anymore
-
-	# For each user, look at all the new photos taken around them and construct a message for them
-	#  With all the names in there
-	for user, otherUsers in usersToNotifyAboutById.iteritems():
-		otherUsers = set(otherUsers)
-
-		# This does two database lookups
-		# TODO(Derek): If we need speed, build this into a cache
-		friendsData = friends_util.getFriendsData(user.id)
-
-		otherUsers = friends_util.filterUsersByFriends(user.id, friendsData, otherUsers)
-
-		names = list()
-		for otherUser in otherUsers:
-			names.append(otherUser.display_name)
-
-		if len(names) > 0:
-			msg = " & ".join(names) + " added new photos!"
-
-			# If the user doesn't show up in the array then they haven't been notified in that time period
-			if user.id not in notificationsById:
-				logger.debug("Sending message '%s' to user %s" % (msg, user))
-				customPayload = {'pid': photosToNotifyAbout[user].id}
-				
-				notifications_util.sendNotification(user, msg, msgType, customPayload)
-			else:
-				logger.debug("Was going to send message '%s' to user %s but they were messaged recently" % (msg, user))
-
-	"""
-
-
 
 """
-	Grab all photos that are not strandEvaluated and grab all strands from the last 24 hours
-	for each photo, go through each strand and see if it fits the requirements
-	If a photo meets requirements for two or more strands, then merge them.
+	1. Put all new photos into private strands.  Keep track of new private Strands
+	2. For each new private Strand, figure out its neighbors
 
-	Requirements right now are that the photo is within 3 hours of any photo in a strand and within 100 meters of a photo
-
-	TODO(Derek): Right now we're using Django's object model to deal with the strand connection mappings.  This is slow since it
-	writes a new row for each loop.  Would be faster to manually write the table entries in a batch call
 """
 def main(argv):
 	maxPhotosAtTime = 50
@@ -183,12 +188,24 @@ def main(argv):
 	
 	logger.info("Starting... ")
 	while True:
-		photos = Photo.objects.all().select_related().filter(strand_evaluated=False).exclude(time_taken=None).filter(user__product_id=2).order_by('-time_taken')[:maxPhotosAtTime]
-		
 		a = datetime.datetime.now()
-		if len(photos) > 0:
+		photos = Photo.objects.all().select_related().filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')[:maxPhotosAtTime]
+		
+		if len(photos) == 0:
+			time.sleep(.1)
+			continue
+
+		# Group photos by users, then iterate through all users one at a time, fetching the cache as we go
+		photosByUser = dict()
+		for photo in photos:
+			if photo.user not in photosByUser:
+				photosByUser[photo.user] = list()
+			photosByUser[photo.user].append(photo)
+
+
+		for user, photos in photosByUser.iteritems():
+			logger.debug("Starting a run with %s photos, took %s milli" % (len(photos), ((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000))
 			b = datetime.datetime.now()
-			logger.debug("Starting a run with %s photos, took %s milli" % (len(photos), ((b-a).microseconds/1000) + (b-a).seconds*1000))
 			strandsCreated = list()
 			strandsAddedTo = list()
 			strandsDeleted = 0
@@ -201,12 +218,10 @@ def main(argv):
 			photoToStrandIdDict = dict()
 			photos = list(photos)
 
-			strandNeighborsToCreate = list()
-
 			timeHigh = photos[0].time_taken + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 			timeLow = photos[-1].time_taken - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-			strandsCache = list(Strand.objects.prefetch_related('users', 'photos').filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2))
+			strandsCache = list(Strand.objects.prefetch_related('users', 'photos').filter(user=user).filter(private=1).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2))
 
 			for strand in strandsCache:
 				photosByStrandId[strand.id] = list(strand.photos.all())
@@ -223,25 +238,12 @@ def main(argv):
 				strandNeighbors = list()
 
 				for strand in strandsCache:		
-					if not strand.private and strand.users.count() == 0:
-						logging.error("populateStrands tried to eval strand %s with 0 users", (strand.id))
-						# remove from our cache and db
-						strandsCache = filter(lambda a: a.id != strand.id, strandsCache)
-						logger.debug("Deleted strand %s" % strand.id)
-						strand.delete()
+					if len(strand.users.all()) == 0:
+						strandsCache = dealWithDeadStrand(strand)
 						continue
 					
 					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
-						# If this is a private strand and the photo doesn't belong to the strand's user
-						#   then create strand neighbor entry
-						if strand.private and photo.user_id != strand.user_id:
-							strandNeighbors.append(strand)
-						# If the photo wasn't taken with strand (is private) and the strand is shared
-						#    then create a strand neighbor entry
-						elif not photo.taken_with_strand and not strand.private:
-							strandNeighbors.append(strand)
-						else:
-							matchingStrands.append(strand)
+						matchingStrands.append(strand)
 				
 				if len(matchingStrands) == 1:
 					strand = matchingStrands[0]
@@ -272,13 +274,7 @@ def main(argv):
 					strandsAddedTo.append(targetStrand)
 					photoToStrandIdDict[photo] = targetStrand.id
 				else:
-					# If we're creating a strand with a photo that wasn't taken with strand, then turn off sharing
-					private = not photo.taken_with_strand
-					
-					newStrand = Strand(first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, private = private)
-					if private:
-						newStrand.user = photo.user
-
+					newStrand = Strand.objects.create(user = user, first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, private = True)
 					newStrand.save()
 					
 					if strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId):
@@ -287,26 +283,30 @@ def main(argv):
 
 						photoToStrandIdDict[photo] = newStrand.id
 
-						logger.debug("Created new Strand %s for photo %s and user %s.  private = %s" % (newStrand.id, photo.id, usersByStrandId[newStrand.id], private))
+						logger.debug("Created new private Strand %s for photo %s and user %s" % (newStrand.id, photo.id, usersByStrandId[newStrand.id]))
 		
-				# If our photo got put into a strand (it might not incase there was a dup already in it)
-				#    Then we figure out which strand it got put in and go through each strand neighbor
-				#    we marked off and create the strandNeighbor row for later
-				if photo in photoToStrandIdDict:
-					finalStrandId = photoToStrandIdDict[photo]
-					strandNeighbors = set(strandNeighbors)
-					# Now create the StrandNeighbor rows
-					for strand in strandNeighbors:
-						
-						if strand.id < finalStrandId:
-							# Add in a tuple because we're going do dedup later
-							strandNeighborsToCreate.append((strand.id, finalStrandId))
-						else:
-							strandNeighborsToCreate.append((finalStrandId, strand.id))
-
 				photo.strand_evaluated = True
 			
 			Photo.bulkUpdate(photos, ["strand_evaluated"])
+
+			dealWithFirstRun(user)
+
+			logger.debug("Created %s new strands, now creating neighbor rows" % len(strandsCreated))
+			# Now go find all the strand neighbor rows we need to create
+			strandNeighborsToCreate = list()
+			for strand in strandsCreated:
+				timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
+				timeLow = strand.first_photo_time - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
+
+				possibleNeighbors = Strand.objects.prefetch_related('users', 'photos').exclude(user=user).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2)
+
+				photoToEval = strand.photos.all()[0]
+				for possibleNeighbor in possibleNeighbors:
+					if strands_util.photoBelongsInStrand(photoToEval, possibleNeighbor):
+						if possibleNeighbor.id < strand.id:
+							strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
+						else:
+							strandNeighborsToCreate.append((strand.id, possibleNeighbor.id))
 
 			# Now deal with strand neighbor rows
 			# Dedup our new neighbor rows and process with existing ones in the database
@@ -319,51 +319,13 @@ def main(argv):
 			allIds = getAllStrandIds(strandNeighbors)
 			existingRows = StrandNeighbor.objects.filter(strand_1__in=allIds).filter(strand_2_id__in=allIds)
 			neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
-			StrandNeighbor.objects.bulk_create(neighborRowsToCreate)	
+			StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
 			
-			logger.debug("Starting sending notifications...")
+			#logger.debug("Starting sending notifications...")
 			
-			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
+			#sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
 
-			# Deal with first run sync scenarios
-			usersToUpdate = list()
-			for user in allUsers:
-				if not user.first_run_sync_complete:
-					if user.first_run_sync_count:
-						# If there are no matching photos from the client, then sync is complete
-						if user.first_run_sync_count == 0:
-							usersToUpdate.append(user)
-						else:
-							# If there are 
-							strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
-							if strandInvites.count() == 0:
-								usersToUpdate.append(user)
-							else:
-								lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-								if lastStrandedPhotos[0].time_taken <= strandInvites[0].strand.first_photo_time:
-									usersToUpdate.append(user)
-								else:
-									# This means that we have a count, but we haven't actually reached the right date
-									#   this happens if the client is really fast uploading photos, then we might be stranding
-									#   new photos and the invite was an old one.  We want to wait until we hit the age of the old one
-									#   to make sure we find any matches
-									pass
-					else:
-						# This means the client hasn't given us any information yet.
-						# if this happens, then just see if we've stranded anything, if so, then call things good to go.
-						lastStrandedPhotos = Photo.objects.filter(user=user, strand_evaluated=True).order_by('time_taken')[:1]
-						if lastStrandedPhotos.count() > 0:
-							usersToUpdate.append(user)
-
-			if len(usersToUpdate) > 0:
-				for user in usersToUpdate:
-					user.first_run_sync_complete = True
-					logger.info("Updated first_run_sync_complete for user %s", user)
-				User.bulkUpdate(usersToUpdate, 'first_run_sync_complete')
-
-			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(strandNeighborsToCreate)))
-		else:
-			time.sleep(.1)
+			logger.info("%s photos evaluated and %s strands created, %s strands added to, %s deleted, %s strand neighbors created.  Total run took: %s milli" % (len(photos), len(strandsCreated), len(strandsAddedTo), strandsDeleted, len(neighborRowsToCreate), (((datetime.datetime.now()-a).microseconds/1000) + (datetime.datetime.now()-a).seconds*1000)))
 
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/stranding.log',
