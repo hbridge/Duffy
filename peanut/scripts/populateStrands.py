@@ -298,14 +298,12 @@ def main(argv):
 				timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 				timeLow = strand.first_photo_time - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-				possibleNeighbors = Strand.objects.prefetch_related('users', 'photos').exclude(user=user).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2)
+				possibleNeighbors = Strand.objects.prefetch_related('users').exclude(user=user).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2)
 
 				photoToEval = strand.photos.all()[0]
 				for possibleNeighbor in possibleNeighbors:
-					for strand in strandsCache:
-						usersByStrandId[strand.id] = list(strand.users.all())
-
 					if strands_util.photoBelongsInStrand(photoToEval, possibleNeighbor):
+						usersByStrandId[possibleNeighbor.id] = list(strand.users.all())
 						if possibleNeighbor.id < strand.id:
 							strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
 						else:
