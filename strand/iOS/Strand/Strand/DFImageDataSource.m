@@ -144,7 +144,9 @@
   [asset
    loadUIImageForThumbnailOfSize:thumbnailSize
    successBlock:^(UIImage *image) {
-     cell.imageView.image = image;
+     dispatch_async(dispatch_get_main_queue(), ^{
+       cell.imageView.image = image;
+     });
    } failureBlock:^(NSError *error) {
      DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
    }];
