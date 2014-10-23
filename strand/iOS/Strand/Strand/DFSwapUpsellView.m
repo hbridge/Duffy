@@ -17,7 +17,7 @@
   self.backgroundColor = [UIColor clearColor];
   self.gradientColors =
   @[
-    [UIColor clearColor],
+    [UIColor colorWithWhite:1.0 alpha:0.0],
     [UIColor colorWithWhite:1.0 alpha:0.8],
     [UIColor colorWithWhite:1.0 alpha:0.95],
     [UIColor colorWithWhite:1.0 alpha:0.98],
