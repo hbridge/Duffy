@@ -1,5 +1,9 @@
 # Swap
 
+## Oct 23rd, 2014 (4763)
+
+- Language tweaks
+
 ## Oct 22nd, 2014 (4762)
 
 - Added a swap tab where you can see incoming swap requests and suggestions
