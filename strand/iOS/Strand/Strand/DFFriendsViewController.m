@@ -216,7 +216,7 @@
       self.noFriendsView.titleLabel.text = @"No Friends Yet";
       [self.noFriendsView.activityIndicator stopAnimating];
       if (!self.contactsUpsellView.superview) {
-        self.noFriendsView.titleLabel.text = @"No Friends Have Swap";
+        self.noFriendsView.titleLabel.text = @"No Friends On Swap Yet";
         self.noFriendsView.subtitleLabel.text = @"Tap + and send someone photos to invite them";
       }
     } else {
