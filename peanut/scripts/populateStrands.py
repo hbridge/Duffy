@@ -228,6 +228,9 @@ def main(argv):
 				usersByStrandId[strand.id] = list(strand.users.all())
 				allUsers.extend(strand.users.all())
 
+				if len(strand.users.all()) == 0 or len(strand.photos.all) == 0:
+					dealWithDeadStrand(strand, strandsCache)
+
 			allUsers = set(allUsers)
 
 			c = datetime.datetime.now()
@@ -238,10 +241,6 @@ def main(argv):
 				strandNeighbors = list()
 
 				for strand in strandsCache:		
-					if len(strand.users.all()) == 0:
-						strandsCache = dealWithDeadStrand(strand)
-						continue
-					
 					if strands_util.photoBelongsInStrand(photo, strand, photosByStrandId):
 						matchingStrands.append(strand)
 				
