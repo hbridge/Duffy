@@ -77,6 +77,8 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
+  [self reloadData];
+  [self.refreshControl endRefreshing];
   [self refreshFromServer];
 }
 
@@ -137,8 +139,6 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
   
   [self configureNoResultsView];
   [self configureTabCount];
-  
-  [self.refreshControl endRefreshing];
 }
 
 - (void)reloadSuggestionsSection

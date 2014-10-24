@@ -46,7 +46,7 @@
 #import "DFImageDownloadManager.h"
 #import "DFImageStore.h"
 #import "DFSwapViewController.h"
-
+#import "DFPeanutFeedDataManager.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 
@@ -189,7 +189,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [self performForegroundOperations];
   
   // Show the Inbox
-  self.tabBarController.selectedIndex = 0;
+  self.tabBarController.selectedIndex = 1;
 }
 
 /*
@@ -216,8 +216,9 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   // Start up the socket server so we can start getting real time updates for when there's new data on the server
   [[DFSocketsManager sharedManager] initNetworkCommunication];
   
-  // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
-  [[DFStrandSuggestionsViewController sharedViewController] refreshFromServer];
+  [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+  
+  [[DFImageDownloadManager sharedManager] fetchNewImages];
 }
 
 - (void)createRootViewController
