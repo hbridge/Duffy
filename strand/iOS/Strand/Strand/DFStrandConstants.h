@@ -32,6 +32,9 @@ extern NSString *const DFStrandNewInboxDataNotificationName;
 extern NSString *const DFStrandNewPrivatePhotosDataNotificationName;
 
 
+extern const CGFloat StrandGalleryItemSpacing;
+extern const CGFloat StrandGalleryHeaderHeight;
+
 + (UIColor *)defaultBackgroundColor;
 + (UIColor *)defaultBarForegroundColor;
 + (UIColor *)strongFeedForegroundTextColor;

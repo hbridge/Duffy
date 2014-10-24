@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "DFPeanutUserObject.h"
 #import "DFPeanutFeedObject.h"
+#import <MessageUI/MessageUI.h>
+#import "DFPeanutStrand.h"
 
 @interface DFPeanutFeedDataManager : NSObject
 
@@ -44,5 +46,12 @@
              success:(void(^)(void))success
              failure:(void(^)(NSError *error))failure;
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
+
+
+- (void)createNewStrandWithPhotos:(NSArray *)feedPhotoObjects
+           createdFromSuggestions:(NSArray *)suggestedSections
+           selectedPeanutContacts:(NSArray *)selectedPeanutContacts
+                          success:(void(^)(DFPeanutStrand *resultStrand))success
+                          failure:(DFFailureBlock)failure;
 
 @end

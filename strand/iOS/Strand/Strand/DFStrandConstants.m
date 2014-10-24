@@ -33,8 +33,10 @@ NSString *const DFStrandReloadRemoteUIRequestedNotificationName = @"com.duffyapp
 NSString *const DFStrandNewInboxDataNotificationName = @"com.duffyapp.Strand.DFStrandNewInboxDataNotificationName";
 NSString *const DFStrandNewPrivatePhotosDataNotificationName = @"com.duffyapp.Strand.DFStrandNewPrivatePhotosDataNotificationName";
 
-
 NSString *const DFStrandCameraPhotoSavedNotificationName = @"com.duffyapp.Strand.DFStrandCameraPhotoSavedNotificationName";
+
+const CGFloat StrandGalleryItemSpacing = 0.5;
+const CGFloat StrandGalleryHeaderHeight = 51;
 
 UIColor *DFStrandMainColor;
 
@@ -102,7 +104,7 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)photoCellBadgeColor
 {
-  return [[self defaultBackgroundColor] colorWithAlphaComponent:0.8];
+  return [[UIColor darkGrayColor] colorWithAlphaComponent:0.8];
 }
 
 static NSArray *colors;

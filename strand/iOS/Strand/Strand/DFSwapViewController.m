@@ -14,8 +14,9 @@
 #import "DFCreateStrandViewController.h"
 #import "NSAttributedString+DFHelpers.h"
 #import "DFAnalytics.h"
-#import "DFStrandSuggestionsViewController.h"
+#import "DFCreateStrandFlowViewController.h"
 #import "DFNavigationController.h"
+#import "DFCreateStrandFlowViewController.h"
 
 @interface DFSwapViewController ()
 
@@ -344,9 +345,10 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
     DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:object];
     [self.navigationController pushViewController:feedViewController animated:YES];
   } else if ([object.type isEqual:DFFeedObjectSection]) {
-    DFCreateStrandViewController *createViewController = [[DFCreateStrandViewController alloc]
-                                                          initWithSuggestions:@[object]];
-    [self.navigationController pushViewController:createViewController animated:YES];
+    DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
+                                                          initWithHighlightedPhotoCollection:object];
+    
+    [self presentViewController:createStrandFlow animated:YES completion:nil];
   }
   [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
@@ -377,11 +379,8 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)createButtonPressed:(id)sender
 {
-  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
-  DFNavigationController *navController = [[DFNavigationController
-                                            alloc] initWithRootViewController:createController];
-  
-  [self presentViewController:navController animated:YES completion:nil];
+  DFCreateStrandFlowViewController *createController = [[DFCreateStrandFlowViewController alloc] init];
+  [self presentViewController:createController animated:YES completion:nil];
 }
 
 

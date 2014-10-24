@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="U6b-Vx-4bR" customClass="DFPhotoPickerHeaderReusableView">
+            <rect key="frame" x="0.0" y="0.0" width="457" height="216"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <view contentMode="scaleToFill" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="AOt-4j-b54" userLabel="headerWrapper">
+                    <rect key="frame" x="0.0" y="174" width="107" height="34"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Location Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KkK-x1-jsc">
+                            <rect key="frame" x="8" y="0.0" width="91" height="16"/>
+                            <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jlt-bN-Khl">
+                            <rect key="frame" x="8" y="18" width="91" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="trailing" secondItem="Jlt-bN-Khl" secondAttribute="trailing" constant="8" id="5Mb-gR-Vca"/>
+                        <constraint firstItem="KkK-x1-jsc" firstAttribute="leading" secondItem="AOt-4j-b54" secondAttribute="leading" constant="8" id="Ctt-WD-Vj9"/>
+                        <constraint firstItem="Jlt-bN-Khl" firstAttribute="leading" secondItem="AOt-4j-b54" secondAttribute="leading" constant="8" id="Gsi-KX-xuA"/>
+                        <constraint firstAttribute="bottom" secondItem="Jlt-bN-Khl" secondAttribute="bottom" id="JGO-rM-uaZ"/>
+                        <constraint firstItem="Jlt-bN-Khl" firstAttribute="top" secondItem="AOt-4j-b54" secondAttribute="top" priority="700" constant="8" id="P1c-77-Q0K"/>
+                        <constraint firstItem="Jlt-bN-Khl" firstAttribute="top" secondItem="KkK-x1-jsc" secondAttribute="bottom" constant="2" id="igu-VV-8iP"/>
+                        <constraint firstItem="KkK-x1-jsc" firstAttribute="top" secondItem="AOt-4j-b54" secondAttribute="top" id="kRz-pV-2i0"/>
+                        <constraint firstAttribute="trailing" secondItem="KkK-x1-jsc" secondAttribute="trailing" constant="8" id="r7O-Iv-OtK"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1l9-Y5-i7R">
+                    <rect key="frame" x="349" y="177" width="100" height="28"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="100" id="oTD-ZJ-vIk"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                    <state key="normal" title="Share Moment">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="shareButtonPressed:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="3q0-gf-hoW"/>
+                    </connections>
+                </button>
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MatchedIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="1eo-hD-Usa">
+                    <rect key="frame" x="8" y="148" width="52" height="18"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="18" id="EuJ-WY-jqG"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Matched with Aseem, Derek" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9iF-TP-ceP">
+                    <rect key="frame" x="68" y="149" width="169" height="16"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <constraints>
+                <constraint firstItem="AOt-4j-b54" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" id="2Sz-yW-BZN"/>
+                <constraint firstItem="1l9-Y5-i7R" firstAttribute="centerY" secondItem="AOt-4j-b54" secondAttribute="centerY" id="8kq-Vu-OHi"/>
+                <constraint firstAttribute="trailing" secondItem="1l9-Y5-i7R" secondAttribute="trailing" constant="8" id="9g2-JN-5qa"/>
+                <constraint firstItem="1eo-hD-Usa" firstAttribute="top" relation="greaterThanOrEqual" secondItem="U6b-Vx-4bR" secondAttribute="top" constant="16" id="EX8-yD-uAv"/>
+                <constraint firstItem="9iF-TP-ceP" firstAttribute="leading" secondItem="1eo-hD-Usa" secondAttribute="trailing" constant="8" id="X9C-vz-oRt"/>
+                <constraint firstItem="AOt-4j-b54" firstAttribute="top" relation="greaterThanOrEqual" secondItem="U6b-Vx-4bR" secondAttribute="top" constant="16" id="XlX-cs-mJM"/>
+                <constraint firstItem="1eo-hD-Usa" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="8" id="e6X-Q5-ad1"/>
+                <constraint firstItem="AOt-4j-b54" firstAttribute="top" secondItem="1eo-hD-Usa" secondAttribute="bottom" constant="8" id="iHp-NK-76V"/>
+                <constraint firstAttribute="bottom" secondItem="AOt-4j-b54" secondAttribute="bottom" constant="8" id="oHN-f1-qQl"/>
+                <constraint firstItem="1eo-hD-Usa" firstAttribute="centerY" secondItem="9iF-TP-ceP" secondAttribute="centerY" constant="0.5" id="yYX-RL-KXl"/>
+            </constraints>
+            <connections>
+                <outlet property="badgeIconText" destination="9iF-TP-ceP" id="GY2-8x-RMK"/>
+                <outlet property="badgeIconView" destination="1eo-hD-Usa" id="q8J-1U-Zwp"/>
+                <outlet property="locationLabel" destination="KkK-x1-jsc" id="L0u-gR-AaG"/>
+                <outlet property="shareButton" destination="1l9-Y5-i7R" id="QNU-10-7Oc"/>
+                <outlet property="timeLabel" destination="Jlt-bN-Khl" id="bbs-wi-1cN"/>
+            </connections>
+            <point key="canvasLocation" x="831.5" y="580"/>
+        </collectionReusableView>
+    </objects>
+    <resources>
+        <image name="MatchedIcon.png" width="52" height="18"/>
+    </resources>
+</document>

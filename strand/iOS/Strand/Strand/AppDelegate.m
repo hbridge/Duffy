@@ -37,7 +37,6 @@
 #import "DFPushNotificationsManager.h"
 #import "DFFeedViewController.h"
 #import "DFSettingsViewController.h"
-#import "DFStrandSuggestionsViewController.h"
 #import "DFTopBarController.h"
 #import "DFInboxViewController.h"
 #import "DFAllStrandsGalleryViewController.h"
@@ -215,9 +214,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
   // Start up the socket server so we can start getting real time updates for when there's new data on the server
   [[DFSocketsManager sharedManager] initNetworkCommunication];
-  
   [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
-  
   [[DFImageDownloadManager sharedManager] fetchNewImages];
 }
 
@@ -289,9 +286,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];
-      
-      // We're doing this because this view isn't necessarily created yet, so create it and have it load up its data
-      [[DFStrandSuggestionsViewController sharedViewController] refreshFromServer];
     }
   } else {
     DDLogInfo(@"%@ performForegroundOperations called but appState = %d",

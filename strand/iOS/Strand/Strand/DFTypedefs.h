@@ -59,3 +59,6 @@ extern DFUIActionType DFUIActionDoubleTap;
 
 typedef UInt64 DFPeanutActionType;
 extern DFPeanutActionType DFPeanutActionFavorite;
+
+typedef void(^DFSuccessBlock)(void);
+typedef void(^DFFailureBlock)(NSError *error);

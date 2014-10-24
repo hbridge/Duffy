@@ -23,9 +23,6 @@
 #import "DFInviteStrandViewController.h"
 #import "DFNavigationController.h"
 
-static const CGFloat StrandGalleryHeaderHeight = 51;
-static const CGFloat StrandGalleryItemSpacing = 0.5;
-
 @interface DFStrandGalleryViewController ()
 
 @end
