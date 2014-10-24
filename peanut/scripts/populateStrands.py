@@ -192,7 +192,7 @@ def main(argv):
 	logger.info("Starting... ")
 	while True:
 		a = datetime.datetime.now()
-		photos = Photo.objects.prefetch_related('user').filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')[:maxPhotosAtTime]
+		photos = Photo.objects.select_related().filter(strand_evaluated=False).filter(product_id=2).exclude(time_taken=None).order_by('-time_taken')[:maxPhotosAtTime]
 		
 		if len(photos) == 0:
 			time.sleep(.1)
@@ -295,14 +295,18 @@ def main(argv):
 
 			logger.debug("Created %s new strands, now creating neighbor rows" % len(strandsCreated))
 
+
 			# Now go find all the strand neighbor rows we need to create
 			neighborRowsToCreate = list()
 			if len(strandsCreated) > 0:
 				strandNeighborsToCreate = list()
+
+				# Doing this to prefetch the photos data...otherwise django is dumb
+				strandsCreated = Strand.objects.prefetch_related('photos').filter(id__in=Strand.getIds(strandsCreated))
 				
 				ab = datetime.datetime.now()
 				#logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
-				query = Strand.objects.prefetch_related('users').exclude(location_point__isnull=True).exclude(user=user).filter(product_id=2)
+				query = Strand.objects.prefetch_related('users', 'photos').exclude(location_point__isnull=True).exclude(user=user).filter(product_id=2)
 				additional = Q()
 				for strand in strandsCreated:
 					timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
@@ -314,6 +318,7 @@ def main(argv):
 						additional = Q(additional | (Q(last_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)))
 
 				query = query.filter(additional)
+
 				possibleNeighbors = list(query)
 
 				logger.debug("Found %s possible neighbors" % len(possibleNeighbors))
@@ -321,12 +326,12 @@ def main(argv):
 				for strand in strandsCreated:
 					for possibleNeighbor in possibleNeighbors:
 						if strands_util.strandsShouldBeNeighbors(strand, possibleNeighbor):
-							usersByStrandId[possibleNeighbor.id] = list(strand.users.all())
+							usersByStrandId[possibleNeighbor.id] = list(possibleNeighbor.users.all())
 							if possibleNeighbor.id < strand.id:
 								strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
 							else:
 								strandNeighborsToCreate.append((strand.id, possibleNeighbor.id))
-				
+
 				logger.debug("Strand neighbor eval for took %s milli" % (((datetime.datetime.now()-ab).microseconds/1000) + (datetime.datetime.now()-ab).seconds*1000))
 
 				# Now deal with strand neighbor rows
