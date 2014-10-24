@@ -803,7 +803,7 @@ def send_sms_code(request):
 		if "555555" not in phoneNumber:
 			accessCode = random.randrange(1000, 10000)
 
-			msg = "Your Strand code is:  %s" % (accessCode)
+			msg = "Your Swap code is:  %s" % (accessCode)
 	
 			notifications_util.sendSMS(phoneNumber, msg)
 			SmsAuth.objects.create(phone_number = phoneNumber, access_code = accessCode)
