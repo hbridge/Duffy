@@ -321,7 +321,7 @@ def main(argv):
 				for strand in strandsCreated:
 					for possibleNeighbor in possibleNeighbors:
 						if strands_util.strandsShouldBeNeighbors(strand, possibleNeighbor):
-								usersByStrandId[possibleNeighbor.id] = list(strand.users.all())
+							usersByStrandId[possibleNeighbor.id] = list(strand.users.all())
 							if possibleNeighbor.id < strand.id:
 								strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
 							else:
