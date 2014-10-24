@@ -30,6 +30,11 @@
   return self;
 }
 
+- (instancetype)init
+{
+  return [super initWithNavigationBarClass:[DFNavigationBar class] toolbarClass:[UIToolbar class]];
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];

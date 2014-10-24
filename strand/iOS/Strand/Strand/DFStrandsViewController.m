@@ -21,7 +21,7 @@
 #import "DFStrandConstants.h"
 #import "DFToastNotificationManager.h"
 #import "DFUploadController.h"
-#import "DFStrandSuggestionsViewController.h"
+#import "DFSelectPhotosViewController.h"
 #import "AppDelegate.h"
 
 
@@ -362,11 +362,11 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 - (void)createButtonPressed:(id)sender
 {
   DDLogInfo(@"Create button pressed");
-  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
-  DFNavigationController *navController = [[DFNavigationController
-                                            alloc] initWithRootViewController:createController];
-  
-  [self presentViewController:navController animated:YES completion:nil];
+//  DFSelectPhotosViewController *createController = [DFSelectPhotosViewController sharedViewController];
+//  DFNavigationController *navController = [[DFNavigationController
+//                                            alloc] initWithRootViewController:createController];
+//  
+//  [self presentViewController:navController animated:YES completion:nil];
 }
 
 - (void)titleButtonPressed:(UIButton *)button
@@ -452,10 +452,10 @@ const NSTimeInterval FeedChangePollFrequency = 60.0;
 }
 
 - (IBAction)createStrandButtonPressed:(id)sender {
-  DFStrandSuggestionsViewController *vc = [DFStrandSuggestionsViewController sharedViewController];
-  
-  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
-                     animated:YES completion:nil];
+//  DFSelectPhotosViewController *vc = [DFSelectPhotosViewController sharedViewController];
+//  
+//  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
+//                     animated:YES completion:nil];
 }
 
 

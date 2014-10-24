@@ -16,7 +16,8 @@
 
 @interface DFImageDataSource()
 
-@property (nonatomic, retain) NSArray *localPhotoAssets;
+@property (nonatomic, retain) NSArray *sectionArrays;
+@property (nonatomic, retain) NSMutableDictionary *localPhotoAssetsBySection;
 
 @end
 
@@ -28,9 +29,48 @@
                         sourceMode:(DFImageDataSourceMode)sourceMode
                          imageType:(DFImageType)imageType
 {
+  DFPeanutFeedObject *dummyObject = [[DFPeanutFeedObject alloc] init];
+  dummyObject.objects = feedObjects;
+  return [self initWithCollectionFeedObjects:@[dummyObject]
+                              collectionView:collectionView
+                                  sourceMode:sourceMode
+                                   imageType:imageType];
+}
+
+- (void)setFeedPhotos:(NSArray *)feedPhotos
+{
+  DFPeanutFeedObject *dummyObject = [[DFPeanutFeedObject alloc] init];
+  dummyObject.objects = feedPhotos;
+  [self setCollectionFeedObjects:@[dummyObject]];
+}
+
+- (void)setCollectionFeedObjects:(NSArray *)collectionFeedObjects
+{
+  dispatch_async(dispatch_get_main_queue(), ^{
+    _collectionFeedObjects = collectionFeedObjects;
+    self.localPhotoAssetsBySection = [NSMutableDictionary new];
+    NSMutableArray *sectionArrays = [NSMutableArray new];
+    for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
+      [sectionArrays addObject:feedObject.objects];
+    }
+    _sectionArrays = sectionArrays;
+    [self.collectionView reloadData];
+  });
+}
+
+- (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
+                               collectionView:(UICollectionView *)collectionView
+                                   sourceMode:(DFImageDataSourceMode)sourceMode
+                                    imageType:(DFImageType)imageType
+{
   self = [super init];
   if (self) {
-    _feedObjects = feedObjects;
+    NSMutableArray *sectionArrays = [NSMutableArray new];
+    for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
+      [sectionArrays addObject:feedObject.objects];
+    }
+    _collectionFeedObjects = collectionFeedObjects;
+    _sectionArrays = sectionArrays;
     _collectionView = collectionView;
     [collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFPhotoViewCell class]) bundle:nil]
      forCellWithReuseIdentifier:@"cell"];
@@ -39,16 +79,18 @@
     _imageType = imageType;
     _sourceMode = sourceMode;
     if (sourceMode == DFImageDataSourceModeLocal) {
-      [self cacheLocalPhotoAssets:feedObjects];
+      [self cacheLocalPhotoAssetsForSection:sectionArrays.count - 1];
     }
   }
   return self;
 }
 
-- (void)cacheLocalPhotoAssets:(NSArray *)feedObjects
+- (void)cacheLocalPhotoAssetsForSection:(NSInteger)section
 {
+  if (section < 0 || section > self.sectionArrays.count - 1) return;
+  if (!self.localPhotoAssetsBySection) self.localPhotoAssetsBySection = [NSMutableDictionary new];
   NSMutableArray *idsToFetch = [NSMutableArray new];
-  for (DFPeanutFeedObject *feedObject in feedObjects) {
+  for (DFPeanutFeedObject *feedObject in self.sectionArrays[section]) {
     if ([feedObject.type isEqualToString:DFFeedObjectCluster]) {
       DFPeanutFeedObject *photoObject = feedObject.objects.firstObject;
       [idsToFetch addObject:@(photoObject.id)];
@@ -63,26 +105,34 @@
     [photoAssets addObject:photo.asset];
   }
   
-  self.localPhotoAssets = photoAssets;
+  self.localPhotoAssetsBySection[@(section)] = photoAssets;
 }
 
 
 
 #pragma mark - Table View
 
+- (NSArray *)feedObjectsForSection:(NSUInteger)section
+{
+  return self.sectionArrays[section];
+}
+
+- (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath
+{
+  NSArray *objects = self.sectionArrays[indexPath.section];
+  DFPeanutFeedObject *feedObject = objects[indexPath.row];
+  return feedObject;
+}
+
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
 {
-  return 1;
+  return self.sectionArrays.count;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-  if (self.sourceMode == DFImageDataSourceModeRemote)
-    return self.feedObjects.count;
-  else if (self.sourceMode == DFImageDataSourceModeLocal)
-    return self.localPhotoAssets.count;
-  
-  return 0;
+  NSArray *objects = self.sectionArrays[section];
+  return objects.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
@@ -91,8 +141,8 @@
   DFPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
   cell.imageView.image = nil;
   
-  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
-  DFPeanutFeedObject *photoObject;
+  DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
+    DFPeanutFeedObject *photoObject;
   if ([feedObject.type isEqual:DFFeedObjectCluster]) {
     photoObject = feedObject.objects.firstObject;
   } else if ([feedObject.type isEqualToString:DFFeedObjectPhoto]) {
@@ -130,7 +180,11 @@
                   photoObject:(DFPeanutFeedObject *)photoObject
                     indexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoAsset *asset = self.localPhotoAssets[indexPath.row];
+  if (![self.localPhotoAssetsBySection.allKeys containsObject:@(indexPath.section)]) {
+    [self cacheLocalPhotoAssetsForSection:indexPath.section];
+  }
+  NSArray *photoAssets = self.localPhotoAssetsBySection[@(indexPath.section)];
+  DFPhotoAsset *asset = photoAssets[indexPath.row];
   
   CGFloat thumbnailSize;
   if ([UIDevice majorVersionNumber] >= 8 || self.imageType == DFImageFull) {
@@ -152,7 +206,16 @@
    }];
 }
 
+#pragma mark - Supplementary views forwarded
 
+/* forward requests for header views to the delegate */
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
+           viewForSupplementaryElementOfKind:(NSString *)kind
+                                 atIndexPath:(NSIndexPath *)indexPath
+{
+  return [self.supplementaryViewDelegate collectionView:collectionView
+                      viewForSupplementaryElementOfKind:kind atIndexPath:indexPath];
+}
 
 
 

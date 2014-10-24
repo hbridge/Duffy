@@ -6,7 +6,6 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFCreateStrandViewController.h"
 #import "DFSingleFriendViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFCardTableViewCell.h"
@@ -16,6 +15,7 @@
 #import "DFStrandConstants.h"
 #import "DFNoTableItemsView.h"
 #import "UINib+DFHelpers.h"
+#import "DFCreateStrandFlowViewController.h"
 
 @interface DFSingleFriendViewController ()
 
@@ -153,10 +153,9 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
     [self.navigationController pushViewController:photoFeedController animated:YES];
   } else {
     DFPeanutFeedObject *sectionObject = self.strandsToShow[indexPath.row];
-    
-    DFCreateStrandViewController *createStrandController = [[DFCreateStrandViewController alloc]
-                                                            initWithSuggestions:@[sectionObject]];
-    [self.navigationController pushViewController:createStrandController animated:YES];
+    DFCreateStrandFlowViewController *createFlowView = [[DFCreateStrandFlowViewController alloc]
+                                                        initWithHighlightedPhotoCollection:sectionObject];
+    [self presentViewController:createFlowView animated:YES completion:nil];
   }
 }
 

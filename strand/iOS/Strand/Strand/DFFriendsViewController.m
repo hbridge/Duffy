@@ -18,13 +18,14 @@
 #import "UINib+DFHelpers.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFContactSyncManager.h"
-#import "DFStrandSuggestionsViewController.h"
+#import "DFSelectPhotosViewController.h"
 #import "DFNavigationController.h"
 #import "DFNoTableItemsView.h"
 #import "DFSeenStateManager.h"
 #import "NSArray+DFHelpers.h"
 #import "DFSettingsViewController.h"
 #import "DFAnalytics.h"
+#import "DFCreateStrandFlowViewController.h"
 
 
 @interface DFFriendsViewController ()
@@ -335,11 +336,8 @@
 
 - (void)createButtonPressed:(id)sender
 {
-  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
-  DFNavigationController *navController = [[DFNavigationController
-                                            alloc] initWithRootViewController:createController];
-  
-  [self presentViewController:navController animated:YES completion:nil];
+  DFCreateStrandFlowViewController *createController = [[DFCreateStrandFlowViewController alloc] init];
+  [self presentViewController:createController animated:YES completion:nil];
 }
 
 - (void)settingsPressed:(id)sender

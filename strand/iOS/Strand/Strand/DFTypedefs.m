@@ -23,3 +23,4 @@ DFUIActionType DFUIActionButtonPress = @"ButtonPress";
 DFUIActionType DFUIActionDoubleTap = @"DoubleTap";
 
 DFPeanutActionType DFPeanutActionFavorite = 0;
+

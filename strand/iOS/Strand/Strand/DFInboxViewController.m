@@ -26,7 +26,7 @@
 #import "DFPeanutUserObject.h"
 #import "DFSelectPhotosController.h"
 #import "DFStrandConstants.h"
-#import "DFStrandSuggestionsViewController.h"
+#import "DFSelectPhotosViewController.h"
 #import "DFStrandGalleryTitleView.h"
 #import "DFStrandGalleryViewController.h"
 #import "DFFeedViewController.h"
@@ -34,6 +34,7 @@
 #import "UINib+DFHelpers.h"
 #import "DFPushNotificationsManager.h"
 #import "DFAnalytics.h"
+#import "DFCreateStrandFlowViewController.h"
 
 
 @interface DFInboxViewController ()
@@ -371,11 +372,8 @@ NSString * binaryStringFromInteger( NSInteger  number )
 
 - (void)createButtonPressed:(id)sender
 {
-  DFStrandSuggestionsViewController *createController = [DFStrandSuggestionsViewController sharedViewController];
-  DFNavigationController *navController = [[DFNavigationController
-                                            alloc] initWithRootViewController:createController];
-  
-  [self presentViewController:navController animated:YES completion:nil];
+  DFCreateStrandFlowViewController *createController = [[DFCreateStrandFlowViewController alloc] init];
+  [self presentViewController:createController animated:YES completion:nil];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

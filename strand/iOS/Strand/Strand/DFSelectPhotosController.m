@@ -13,9 +13,6 @@
 
 @interface DFSelectPhotosController (DFImageDataSource)
 
-@property (nonatomic, retain) NSArray *localPhotoAssets;
-
-
 @end
 
 @implementation DFSelectPhotosController
@@ -34,6 +31,62 @@
   return self;
 }
 
+- (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
+                               collectionView:(UICollectionView *)collectionView
+                                   sourceMode:(DFImageDataSourceMode)sourceMode
+                                    imageType:(DFImageType)imageType
+{
+  self = [super initWithCollectionFeedObjects:collectionFeedObjects
+                               collectionView:collectionView
+                                   sourceMode:sourceMode
+                                    imageType:imageType];
+  _selectedFeedObjects = [NSMutableArray new];
+  [self.collectionView registerNib:[UINib nibForClass:[DFSelectablePhotoViewCell class]]
+        forCellWithReuseIdentifier:@"selectableCell"];
+  
+  return self;
+}
+
+- (void)toggleSectionSelection:(NSUInteger)section
+{
+  NSSet *selectedItemsFromSection = [self selectedItemsFromSection:section];
+  BOOL select;
+  if (selectedItemsFromSection.count > 0) {
+    [self.selectedFeedObjects removeObjectsInArray:selectedItemsFromSection.allObjects];
+    select = NO;
+  } else {
+    [self.selectedFeedObjects addObjectsFromArray:[self feedObjectsForSection:section]];
+    select = YES;
+  }
+
+  for (DFSelectablePhotoViewCell *cell in self.collectionView.visibleCells) {
+    if ([[self.collectionView indexPathForCell:cell] section] == section) {
+      cell.showTickMark = select;
+      [cell setNeedsLayout];
+    }
+  }
+  [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
+}
+
+- (NSSet *)selectedItemsFromSection:(NSUInteger)section
+{
+  NSMutableSet *sectionObjects = [NSMutableSet setWithArray:[self feedObjectsForSection:section]];
+  NSSet *selectedObjects = [NSSet setWithArray:[self selectedFeedObjects]];
+  [sectionObjects intersectSet:selectedObjects];
+  return sectionObjects;
+}
+
+- (NSArray *)collectionFeedObjectsWithSelectedObjects
+{
+  NSMutableArray *feedObjects = [NSMutableArray new];
+  for (NSUInteger i = 0; i < [self numberOfSectionsInCollectionView:self.collectionView]; i++) {
+    if ([[self selectedItemsFromSection:i] count] > 0) {
+      [feedObjects addObject:self.collectionFeedObjects[i]];
+    }
+  }
+  return feedObjects;
+}
+
 
 #pragma mark - UICollectionView Data/Delegate
 
@@ -43,7 +96,7 @@
   DFSelectablePhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"selectableCell"
                                                                               forIndexPath:indexPath];
   cell.delegate = self;
-  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
+  DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
   DFPeanutFeedObject *photoObject;
   if ([feedObject.type isEqual:DFFeedObjectCluster]) {
     photoObject = feedObject.objects.firstObject;
@@ -90,7 +143,7 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
 - (void)cell:(DFSelectablePhotoViewCell *)cell selectPhotoButtonPressed:(UIButton *)selectPhotoButton
 {
   NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
-  DFPeanutFeedObject *object = self.feedObjects[indexPath.row];
+  DFPeanutFeedObject *object = [self feedObjectForIndexPath:indexPath];
   if (selectPhotoButton.selected) {
     [self.selectedFeedObjects removeObject:object];
     selectPhotoButton.selected = NO;
@@ -99,33 +152,8 @@ const NSUInteger MaxSharedPhotosDisplayed = 3;
     selectPhotoButton.selected = YES;
   }
   
-  if (self.delegate) {
-    [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
-  }
+  [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
 }
-
-
-//- (void)collectionView:(UICollectionView *)collectionView
-//didSelectItemAtIndexPath:(NSIndexPath *)indexPath
-//{
-//  DFPeanutFeedObject *sectionObject = [self objectForSection:indexPath.section];
-//  if  (sectionObject != self.suggestedSectionObject) return;
-//  DFPeanutFeedObject *photoObject = [self photosForSection:indexPath.section][indexPath.row];
-//  NSUInteger index = [self.selectedPhotoIDs indexOfObject:@(photoObject.id)];
-//  if (index != NSNotFound) {
-//    [self.selectedPhotoIDs removeObjectAtIndex:index];
-//  } else {
-//    [self.selectedPhotoIDs addObject:@(photoObject.id)];
-//  }
-//  
-//  DDLogVerbose(@"selectedIndex:%@ photoID:%@ selectedPhotoIDs:%@",
-//               indexPath.description,
-//               @(photoObject.id),
-//               self.selectedPhotoIDs);
-//  
-//  [self.collectionView reloadItemsAtIndexPaths:@[indexPath]];
-//  [self.collectionView deselectItemAtIndexPath:indexPath animated:YES];
-//}
 
 
 

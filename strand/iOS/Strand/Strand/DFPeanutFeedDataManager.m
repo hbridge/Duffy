@@ -378,6 +378,65 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
+- (void)createNewStrandWithPhotos:(NSArray *)feedPhotoObjects
+           createdFromSuggestions:(NSArray *)suggestedSections
+                     selectedPeanutContacts:(NSArray *)selectedPeanutContacts
+                          success:(void(^)(DFPeanutStrand *resultStrand))success
+                          failure:(DFFailureBlock)failure
+
+{
+  // Create the strand
+  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
+  requestStrand.users = @[@([[DFUser currentUser] userID])];
+  requestStrand.photos = [feedPhotoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *feedObject) {
+    return @(feedObject.id);
+  }];
+  DFPeanutFeedObject *suggestionSection = [suggestedSections firstObject];
+  requestStrand.created_from_id = @(suggestionSection.id);
+  requestStrand.private = @(NO);
+  [self setTimesForStrand:requestStrand fromPhotoObjects:feedPhotoObjects];
+  
+  [self.strandAdapter
+   performRequest:RKRequestMethodPOST
+   withPeanutStrand:requestStrand
+   success:^(DFPeanutStrand *peanutStrand) {
+     DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
+     
+     [[NSNotificationCenter defaultCenter]
+      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+      object:self];
+     
+     // start uploading the photos
+     [[DFPhotoStore sharedStore] markPhotosForUpload:peanutStrand.photos];
+     [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:peanutStrand.photos];
+     success(peanutStrand);
+   } failure:^(NSError *error) {
+     failure(error);
+     DDLogError(@"%@ failed to create strand: %@, error: %@",
+                self.class, requestStrand, error);
+   }];
+}
+
+- (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
+{
+  NSDate *minDateFound;
+  NSDate *maxDateFound;
+  
+  for (DFPeanutFeedObject *object in objects) {
+    if (!minDateFound || [object.time_taken compare:minDateFound] == NSOrderedAscending) {
+      minDateFound = object.time_taken;
+    }
+    if (!maxDateFound || [object.time_taken compare:maxDateFound] == NSOrderedDescending) {
+      maxDateFound = object.time_taken;
+    }
+  }
+  
+  strand.first_photo_time = minDateFound;
+  strand.last_photo_time = maxDateFound;
+}
+
+
+
 #pragma mark - Network Adapter
 
 - (DFPeanutFeedAdapter *)inboxFeedAdapter
