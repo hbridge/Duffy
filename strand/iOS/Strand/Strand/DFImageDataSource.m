@@ -199,7 +199,8 @@
    loadUIImageForThumbnailOfSize:thumbnailSize
    successBlock:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
-       cell.imageView.image = image;
+       if ([[self.collectionView indexPathForCell:cell] isEqual:indexPath])
+         cell.imageView.image = image;
      });
    } failureBlock:^(NSError *error) {
      DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
