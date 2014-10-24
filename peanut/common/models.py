@@ -579,6 +579,11 @@ class FriendConnection(models.Model):
 class Strand(models.Model):
 	first_photo_time = models.DateTimeField(db_index=True)
 	last_photo_time = models.DateTimeField(db_index=True)
+	
+	# These should come from the first photo
+	location_city =  models.CharField(max_length=1000, null=True)
+	location_point = models.PointField(null=True, db_index=True)
+	
 	photos = models.ManyToManyField(Photo)
 	users = models.ManyToManyField(User)
 	private = models.BooleanField(db_index=True, default=False)
@@ -652,6 +657,18 @@ class Strand(models.Model):
 
 
 	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		for obj in objs:
+			obj.updated = datetime.datetime.now()
+
+		if isinstance(attributesList, list):
+			attributesList.append("updated")
+		else:
+			attributesList = [attributesList, "updated"]
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		
+	@classmethod
 	def getIds(cls, objs):
 		ids = list()
 		for obj in objs:
@@ -661,6 +678,9 @@ class Strand(models.Model):
 
 	class Meta:
 		db_table = 'strand_objects'
+
+	# You MUST use GeoManager to make Geo Queries
+	objects = models.GeoManager()
 
 class StrandInvite(models.Model):
 	strand = models.ForeignKey(Strand, db_index=True)

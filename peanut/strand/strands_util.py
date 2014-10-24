@@ -59,6 +59,20 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None):
 
 	return False
 
+
+def strandsShouldBeNeighbors(strand, possibleNeighbor):
+	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
+		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
+
+		if not strand.location_point and not possibleNeighbor.location_point:
+			return True
+
+		if (strand.location_point and possibleNeighbor.location_point and 
+			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+			return True
+
+	return False
+	
 def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	if photo.time_taken > strand.last_photo_time:
 		strand.last_photo_time = photo.time_taken
@@ -66,6 +80,8 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 
 	if photo.time_taken < strand.first_photo_time:
 		strand.first_photo_time = photo.time_taken
+		strand.location_point = photo.location_point
+		strand.location_city = photo.location_city
 		strand.save()
 	
 	# Add photo to strand

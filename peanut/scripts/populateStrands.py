@@ -6,6 +6,9 @@ import math
 import pytz
 from threading import Thread
 
+from django.contrib.gis.geos import *
+from django.contrib.gis.measure import D
+
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
 	sys.path.insert(0, parentPath)
@@ -228,7 +231,7 @@ def main(argv):
 				usersByStrandId[strand.id] = list(strand.users.all())
 				allUsers.extend(strand.users.all())
 
-				if len(strand.users.all()) == 0 or len(strand.photos.all) == 0:
+				if len(strand.users.all()) == 0 or len(strand.photos.all()) == 0:
 					dealWithDeadStrand(strand, strandsCache)
 
 			allUsers = set(allUsers)
@@ -273,7 +276,7 @@ def main(argv):
 					strandsAddedTo.append(targetStrand)
 					photoToStrandIdDict[photo] = targetStrand.id
 				else:
-					newStrand = Strand.objects.create(user = user, first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, private = True)
+					newStrand = Strand.objects.create(user = user, first_photo_time = photo.time_taken, last_photo_time = photo.time_taken, location_point = photo.location_point, location_city = photo.location_city, private = True)
 					newStrand.save()
 					
 					if strands_util.addPhotoToStrand(newStrand, photo, photosByStrandId, usersByStrandId):
@@ -293,20 +296,27 @@ def main(argv):
 			logger.debug("Created %s new strands, now creating neighbor rows" % len(strandsCreated))
 			# Now go find all the strand neighbor rows we need to create
 			strandNeighborsToCreate = list()
+			
+			#logging.getLogger('django.db.backends').setLevel(logging.DEBUG)
 			for strand in strandsCreated:
+				ab = datetime.datetime.now()
 				timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 				timeLow = strand.first_photo_time - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
 
-				possibleNeighbors = Strand.objects.prefetch_related('users').exclude(user=user).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2)
+				if strand.location_point:
+					possibleNeighbors = Strand.objects.prefetch_related('users').filter(location_point__within=strand.location_point.buffer(1)).exclude(location_point__isnull=True).exclude(user=user).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2)
+				else:
+					possibleNeighbors = Strand.objects.prefetch_related('users').exclude(location_point__isnull=False).exclude(user=user).filter((Q(first_photo_time__gt=timeLow) & Q(first_photo_time__lt=timeHigh)) | (Q(last_photo_time__gt=timeLow) & Q(last_photo_time__lt=timeHigh))).filter(product_id=2)
 
-				photoToEval = strand.photos.all()[0]
 				for possibleNeighbor in possibleNeighbors:
-					if strands_util.photoBelongsInStrand(photoToEval, possibleNeighbor):
+					if strands_util.strandsShouldBeNeighbors(strand, possibleNeighbor):
 						usersByStrandId[possibleNeighbor.id] = list(strand.users.all())
 						if possibleNeighbor.id < strand.id:
 							strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
 						else:
 							strandNeighborsToCreate.append((strand.id, possibleNeighbor.id))
+				logger.debug("Strand neighbor eval for %s took %s milli" % (strand.id, ((datetime.datetime.now()-ab).microseconds/1000) + (datetime.datetime.now()-ab).seconds*1000))
+
 
 			# Now deal with strand neighbor rows
 			# Dedup our new neighbor rows and process with existing ones in the database
@@ -320,6 +330,8 @@ def main(argv):
 			existingRows = StrandNeighbor.objects.filter(strand_1__in=allIds).filter(strand_2_id__in=allIds)
 			neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
 			StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
+			
+			#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 			
 			logger.debug("Starting sending notifications...")
 			sendNotifications(photoToStrandIdDict, usersByStrandId, timeWithinSecondsForNotification)
