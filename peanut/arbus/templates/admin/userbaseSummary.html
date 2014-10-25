@@ -81,7 +81,7 @@
 <div class="ui-content">
 	<div class='ui-server-id' id='ui-server-id'>
 	</div>
-	<div class='top-summary'>
+	<div class='top-summary'>		
 	<div class='top-table'>
 		<div class='ui-header'> Strand.photos </div>
 		<table class='ui-table' cellpadding='3'>
@@ -157,6 +157,38 @@
 			</tr>
 		</table>
 	</div>	
+
+	<div class='top-table'>
+		<div class='ui-header'> Totals </div>
+		<table class='ui-table' cellpadding='3'>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Users </td>
+				<td class='counts'> {{ peopleCounts.all }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Friends </td>
+				<td class='counts'> {{ peopleCounts.friends }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Strands </td>
+				<td class='counts'> {{ strandCounts.all }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Invites </td>
+				<td class='counts'> {{ inviteCounts.all }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Photos (shared) </td>
+				<td class='counts'> {{ peopleCounts.photosShared  }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Photos (metadata) </td>
+				<td class='counts'> {{ peopleCounts.photosMetadata }} </td>
+			</tr>
+
+		</table>
+	</div>	
+
 </div>
 
 	{% if strandV2List %}
