@@ -132,7 +132,7 @@ static DFAnalytics *defaultLogger;
   //  [[LocalyticsSession shared] setLoggingEnabled:YES];
 #else
   [[LocalyticsSession shared]
-   LocalyticsSession:@"66b1e3dfca983d01af7f08d-e84211ee-fe31-11e3-4759-00a426b17dd8"];
+   LocalyticsSession:@"dd0a7a0a4c9c1a5a602904f-285e4dea-5c55-11e4-a3a4-005cf8cbabd8"];
   [[LocalyticsSession shared] setEnableHTTPS:YES];
 #endif
   [[LocalyticsSession shared] enableHTTPS];
