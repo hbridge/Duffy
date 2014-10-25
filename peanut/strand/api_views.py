@@ -314,7 +314,7 @@ def getFormattedGroups(groups):
 	# Fetch all the similarities at once so we can process in memory
 	a = datetime.datetime.now()
 	simCaches = cluster_util.getSimCaches(photoIds)
-	
+
 	# Do same with actions
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
 
@@ -429,10 +429,10 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 	formattedGroups = getFormattedGroups(groups)
-	print "private_strands-1d took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
-	print "private_strands-1e took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+	
 	return objects
 
 
@@ -556,7 +556,7 @@ def private_strands(request):
 
 		a = datetime.datetime.now()
 		
-		strands = list(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=True))
+		strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
 
 		b = datetime.datetime.now()
 
