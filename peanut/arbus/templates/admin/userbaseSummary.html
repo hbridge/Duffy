@@ -1,3 +1,4 @@
+{% load humanize %}
 <html>
 <head>
 <meta http-equiv="refresh" content="300">
@@ -179,11 +180,11 @@
 			</tr>
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> Photos (shared) </td>
-				<td class='counts'> {{ peopleCounts.photosShared  }} </td>
+				<td class='counts'> {{ peopleCounts.photosShared|intcomma  }} </td>
 			</tr>
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> Photos (metadata) </td>
-				<td class='counts'> {{ peopleCounts.photosMetadata }} </td>
+				<td class='counts'> {{ peopleCounts.photosMetadata|intcomma }} </td>
 			</tr>
 
 		</table>

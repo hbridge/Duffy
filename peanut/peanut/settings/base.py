@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'haystack',
     'rest_framework',
     'ios_notifications',
+    'django.contrib.humanize',
 )
 
 MIDDLEWARE_CLASSES = (
