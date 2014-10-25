@@ -49,8 +49,9 @@ def userbaseSummary(request):
 			strandedCount=Count('photo__strand_evaluated'), lastUpdated=Max('photo__updated'), lastAdded=Max('photo__added'))
 
 	# This photo call is taking over a second on the dev database right now.
-	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(weeklyPhotos=Count('user'))
-	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'))	
+	#photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').annotate(weeklyPhotos=Count('user'))
+	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'), weeklyPhotos=Count('photos'))
+
 	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(weeklyActions=Count('user'))
 	lastActionDateRaw = Action.objects.all().exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(lastActionTimestamp=Max('added'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
@@ -82,12 +83,10 @@ def userbaseSummary(request):
 		notificationLastById[notificationData['user']] = notificationData['lastSent']	
 
 	weeklyPhotosById = dict()
-	for photoData in photoDataRaw:
-		weeklyPhotosById[photoData['user']] = photoData['weeklyPhotos']
-
 	weeklyStrandsById = dict()
 	for strandData in strandDataRaw:
 		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
+		weeklyPhotosById[strandData['users']] = strandData['weeklyPhotos']		
 
 	''' # from constants.py
 	ACTION_TYPE_FAVORITE = 0
