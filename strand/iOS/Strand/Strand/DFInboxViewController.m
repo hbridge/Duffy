@@ -108,7 +108,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  if (![self.manager hasData] && ![self.manager isRefreshingInbox]) {
+  if (![self.manager hasInboxData] && ![self.manager isRefreshingInbox]) {
     [self.refreshControl beginRefreshing];
     [self refreshFromServer];
   }
@@ -185,7 +185,7 @@
     }
     
     self.noItemsView.hidden = NO;
-    if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
+    if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
       self.noItemsView.titleLabel.text = @"No Photos Swapped";
       [self.noItemsView.activityIndicator stopAnimating];
       self.noItemsView.subtitleLabel.text = @"Tap the + to get started";

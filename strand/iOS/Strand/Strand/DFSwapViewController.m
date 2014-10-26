@@ -17,6 +17,7 @@
 #import "DFCreateStrandFlowViewController.h"
 #import "DFNavigationController.h"
 #import "DFCreateStrandFlowViewController.h"
+#import "DFNoResultsTableViewCell.h"
 
 @interface DFSwapViewController ()
 
@@ -26,12 +27,13 @@
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 @property (nonatomic, retain) NSArray *allSuggestions;
 @property (nonatomic, retain) NSMutableArray *ignoredSuggestions;
+@property (nonatomic, retain) NSMutableArray *filteredSuggestions;
 
 @end
 
 const NSUInteger MaxSuggestionsToShow = 3;
-const NSString *InvitesSectionTitle = @"Requested Swaps";
-const NSString *SuggestedSectionTitle = @"Suggested Swaps";
+NSString *const InvitesSectionTitle = @"Requested Swaps";
+NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 @implementation DFSwapViewController
 
@@ -103,8 +105,12 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 - (void)configureTableView:(UITableView *)tableView
 {
   self.tableView.rowHeight = DFPersonSelectionTableViewCellHeight;
-  [tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]] forCellReuseIdentifier:@"invite"];
-  [tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]] forCellReuseIdentifier:@"suggestion"];
+  [tableView registerNib:[UINib nibForClass:[DFNoResultsTableViewCell class]]
+  forCellReuseIdentifier:@"noResults"];
+  [tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
+  forCellReuseIdentifier:@"invite"];
+  [tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
+  forCellReuseIdentifier:@"suggestion"];
 }
 
 - (void)configureRefreshControl
@@ -127,9 +133,15 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
   self.sectionTitles = [NSMutableOrderedSet new];
   self.sectionTitlesToObjects = [NSMutableDictionary new];
   
+  if (![[DFPeanutFeedDataManager sharedManager] hasPrivateStrandData]
+      || ![[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
+    [self configureNoResultsView];
+    return;
+  }
+  
   NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
+  [self.sectionTitles addObject:InvitesSectionTitle];
   if (invites.count > 0) {
-    [self.sectionTitles addObject:InvitesSectionTitle];
     self.sectionTitlesToObjects[InvitesSectionTitle] = invites;
   }
   
@@ -146,14 +158,17 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 {
   /* Reloads the suggestions section from the allSuggestions array, broken out
    so it can be called from the swipe handler safely */
+  [self.sectionTitles addObject:SuggestedSectionTitle];
   if (self.allSuggestions.count > 0) {
-    [self.sectionTitles addObject:SuggestedSectionTitle];
-    NSMutableArray *filteredSuggestions = [self.allSuggestions mutableCopy];
-    [filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
+    self.filteredSuggestions = [self.allSuggestions mutableCopy];
+    [self.filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
     DDLogVerbose(@"allCount:%@ ignoredCount:%@ filteredCount:%@",
-                 @(self.allSuggestions.count), @(self.ignoredSuggestions.count), @(filteredSuggestions.count));
-    self.sectionTitlesToObjects[SuggestedSectionTitle] =
-    [filteredSuggestions subarrayWithRange:(NSRange){0, MIN(filteredSuggestions.count, MaxSuggestionsToShow)}];
+                 @(self.allSuggestions.count), @(self.ignoredSuggestions.count), @(self.filteredSuggestions.count));
+    if (self.filteredSuggestions.count > MaxSuggestionsToShow) {
+      [self.filteredSuggestions
+       removeObjectsInRange:(NSRange){MaxSuggestionsToShow, self.filteredSuggestions.count - MaxSuggestionsToShow}];
+    }
+    self.sectionTitlesToObjects[SuggestedSectionTitle] = self.filteredSuggestions;
   }
 }
 
@@ -201,7 +216,8 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
     }
     
     self.noItemsView.hidden = NO;
-    if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
+    if ([[DFPeanutFeedDataManager sharedManager] hasPrivateStrandData]
+        && [[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
       self.noItemsView.titleLabel.text = @"Nothing To Swap";
       [self.noItemsView.activityIndicator stopAnimating];
     } else {
@@ -224,7 +240,12 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 - (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath
 {
   NSArray *objects = [self sectionObjectsForSection:indexPath.section];
-  return objects[indexPath.row];
+  if (objects.count == 0) return nil;
+  
+  if ([objects[indexPath.row] isKindOfClass:[DFPeanutFeedObject class]])
+    return objects[indexPath.row];
+  
+  return nil;
 }
 
 - (void)removeObjectAtIndexPath:(NSIndexPath *)indexPath
@@ -245,7 +266,8 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [[self sectionObjectsForSection:section] count];
+  NSUInteger minCount = 1;
+  return MAX([[self sectionObjectsForSection:section] count], minCount);
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -253,7 +275,9 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
   DFPeanutFeedObject *object = [self feedObjectForIndexPath:indexPath];
   
   UITableViewCell *cell;
-  if ([object.type isEqual:DFFeedObjectInviteStrand]) {
+  if (!object) {
+    cell = [self noResultsCellForIndexPath:indexPath];
+  } else if ([object.type isEqual:DFFeedObjectInviteStrand]) {
     cell = [self cellForInviteObject:object];
   } else if ([object.type isEqual:DFFeedObjectSection]) {
     cell = [self cellForSuggestionObject:object];
@@ -261,6 +285,17 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
   
   if (!cell) [NSException raise:@"unexpected object" format:@""];
   
+  return cell;
+}
+
+- (UITableViewCell *)noResultsCellForIndexPath:(NSIndexPath *)indexPath
+{
+    DFNoResultsTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
+  if ([self.sectionTitles[indexPath.section] isEqualToString:InvitesSectionTitle]) {
+    cell.noResultsLabel.text = @"No Requests";
+  } else {
+    cell.noResultsLabel.text = @"No Suggestions";
+  }
   return cell;
 }
 
@@ -329,8 +364,10 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-  if ([self.sectionTitles[section] isEqual:SuggestedSectionTitle]) {
-    return @"Swipe left to hide Suggested Swaps";
+  if ([self.sectionTitles[section] isEqual:SuggestedSectionTitle]){
+    if (self.filteredSuggestions.count > 0)
+      return @"Swipe left to hide Suggested Swaps";
+    else return @"Invite friends to find more Suggested Swaps";
   }
   
   return nil;
@@ -360,15 +397,25 @@ const NSString *SuggestedSectionTitle = @"Suggested Swaps";
     if (indexPath) {
       //Update the view locally
       [self.tableView beginUpdates];
+      NSUInteger oldSuggestionsCount = self.filteredSuggestions.count;
       DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
       [self.ignoredSuggestions addObject:feedObject];
       [self reloadSuggestionsSection];
       [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-      if (self.allSuggestions.count >= MaxSuggestionsToShow) {
+      if (self.filteredSuggestions.count == oldSuggestionsCount) {
+        // we've deleted a row, if we hav the same number of filtered suggestion rows as before,
+        // we need to now insert one at the end
         [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(MaxSuggestionsToShow - 1)
                                                                     inSection:indexPath.section]]
                               withRowAnimation:UITableViewRowAnimationBottom];
       }
+      if (self.filteredSuggestions.count == 0) {
+        [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:indexPath.section]
+                      withRowAnimation:UITableViewRowAnimationAutomatic];
+        [self.sectionTitles removeObject:SuggestedSectionTitle];
+        [self configureNoResultsView];
+      }
+      
       [self.tableView endUpdates];
       
       // Mark the strand as no longer suggestible with the server

@@ -19,7 +19,8 @@
 - (void)refreshInboxFromServer:(void(^)(void))completion;
 - (void)refreshPrivatePhotosFromServer:(void(^)(void))completion;
 
-- (BOOL)hasData;
+- (BOOL)hasInboxData;
+- (BOOL)hasPrivateStrandData;
 
 - (BOOL)isRefreshingInbox;
 

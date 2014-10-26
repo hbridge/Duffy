@@ -128,7 +128,12 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
-- (BOOL)hasData{
+- (BOOL)hasInboxData{
+  return (self.inboxLastResponseHash != nil);
+}
+
+- (BOOL)hasPrivateStrandData
+{
   return (self.inboxLastResponseHash != nil);
 }
 

@@ -213,7 +213,7 @@
     }
     
     self.noFriendsView.hidden = NO;
-    if ([[DFPeanutFeedDataManager sharedManager] hasData]) {
+    if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
       self.noFriendsView.titleLabel.text = @"No Friends Yet";
       [self.noFriendsView.activityIndicator stopAnimating];
       if (!self.contactsUpsellView.superview) {
