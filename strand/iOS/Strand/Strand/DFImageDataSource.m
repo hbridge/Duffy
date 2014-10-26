@@ -184,7 +184,12 @@
     [self cacheLocalPhotoAssetsForSection:indexPath.section];
   }
   NSArray *photoAssets = self.localPhotoAssetsBySection[@(indexPath.section)];
-  DFPhotoAsset *asset = photoAssets[indexPath.row];
+  DFPhotoAsset *asset = nil;
+  if (indexPath.row < photoAssets.count) {
+    asset = photoAssets[indexPath.row];
+  } else {
+    DDLogWarn(@"%@ warning some local assets in %@ nil", self.class, [self feedObjectsForSection:indexPath.section]);
+  }
   
   CGFloat thumbnailSize;
   if ([UIDevice majorVersionNumber] >= 8 || self.imageType == DFImageFull) {
