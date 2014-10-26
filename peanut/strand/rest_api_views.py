@@ -219,6 +219,10 @@ def updateStrandWithCorrectPhotoTimes(strand):
     Use a custom overload of the create method so we don't double create likes
 """
 class CreateStrandAPI(CreateAPIView):
+    def pre_save(self, strand):
+        self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
+        self.request.DATA['users'] = list(set(self.request.DATA['users']))
+
     def post_save(self, strand, created):
         if created:
             changed = updateStrandWithCorrectPhotoTimes(strand)

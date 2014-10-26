@@ -36,6 +36,7 @@ def userbaseSummary(request):
 	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).values('user').annotate(weeklyPhotos=Count('user'))
 	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'), weeklyPhotos=Count('photos__user'))
 	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(weeklyActions=Count('user'))
+	actionDataWithPhotos = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(totalPhotos=Count('photos'))
 	lastActionDateRaw = Action.objects.all().exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(lastActionTimestamp=Max('added'))
 	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 
@@ -63,9 +64,16 @@ def userbaseSummary(request):
 
 	weeklyPhotosById = dict()
 	weeklyStrandsById = dict()
+	
 	for strandData in strandDataRaw:
 		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
-		weeklyPhotosById[strandData['users']] = strandData['weeklyPhotos']		
+
+	for actionData in actionDataWithPhotos:
+		if (actionData['action_type'] == constants.ACTION_TYPE_CREATE_STRAND or 
+			actionData['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
+			if actionData['user'] not in weeklyPhotosById:
+				weeklyPhotosById[actionData['user']] = 0
+			weeklyPhotosById[actionData['user']] += actionData['totalPhotos']		
 
 	''' # from constants.py
 	ACTION_TYPE_FAVORITE = 0
