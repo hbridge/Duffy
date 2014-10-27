@@ -121,6 +121,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)configureCollectionView
 {
+  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, self.doneWrapper.frame.size.height * 2.0, 0);
   NSArray *styles = @[@(DFPhotoPickerHeaderStyleTimeOnly),
                       @(DFPhotoPickerHeaderStyleLocation),
                       @(DFPhotoPickerHeaderStyleLocation | DFPhotoPickerHeaderStyleBadge),
@@ -167,21 +168,27 @@ const CGFloat CreateCellTitleSpacing = 8;
   [DFAnalytics logViewController:self appearedWithParameters:nil];
   
   if (self.highlightedFeedObject) {
-    NSInteger sectionForObject = [self.selectPhotosController.collectionFeedObjects
-                                  indexOfObject:self.highlightedFeedObject];
-    if (sectionForObject != NSNotFound) {
-      UICollectionViewLayoutAttributes *headerLayoutAttributes =
-      [self.collectionView
-       layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
-       atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionForObject]];
-      CGRect rectToScroll = headerLayoutAttributes.frame;
-      rectToScroll.size.height = self.collectionView.frame.size.height;
-      [self.collectionView scrollRectToVisible:rectToScroll animated:YES];
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self.selectPhotosController toggleSectionSelection:sectionForObject];
-      });
+    [self scrollToHighlightedFeedObject];
+  }
+}
 
-    }
+- (void)scrollToHighlightedFeedObject
+{
+  NSInteger sectionForObject = [self.selectPhotosController.collectionFeedObjects
+                                indexOfObject:self.highlightedFeedObject];
+  if (sectionForObject != NSNotFound) {
+    UICollectionViewLayoutAttributes *headerLayoutAttributes =
+    [self.collectionView
+     layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
+     atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionForObject]];
+    CGRect rectToScroll = headerLayoutAttributes.frame;
+    rectToScroll.size.height = self.collectionView.frame.size.height;
+    rectToScroll.origin.y -= self.collectionView.contentInset.bottom;
+    [self.collectionView scrollRectToVisible:rectToScroll animated:YES];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self.selectPhotosController toggleSectionSelection:sectionForObject];
+    });
+    
   }
 }
 
@@ -204,6 +211,8 @@ const CGFloat CreateCellTitleSpacing = 8;
   self.flowLayout.minimumLineSpacing = StrandGalleryItemSpacing * 1.5; // for some reason the
                                                                        // line spacing sometimes
                                                                        // disapppears at 0.5
+  
+  self.collectionView.contentInset = UIEdgeInsetsMake(0, 0, self.doneWrapper.frame.size.height * 2.0, 0);
 }
 
 #pragma mark - UICollectionView Data/Delegate

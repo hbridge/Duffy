@@ -99,10 +99,16 @@
     }
   }
   
-  NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:idsToFetch retainOrder:YES];
+  NSDictionary *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:idsToFetch];
   NSMutableArray *photoAssets = [NSMutableArray new];
-  for (DFPhoto *photo in photos) {
-    [photoAssets addObject:photo.asset];
+  for (NSNumber *photoID in idsToFetch) {
+    DFPhoto *photo = photos[photoID];
+    if (photo) {
+      [photoAssets addObject:photo.asset];
+    } else {
+      DDLogWarn(@"Missing photo asset for id:%@", photoID);
+      [photoAssets addObject:[NSNull null]];
+    }
   }
   
   self.localPhotoAssetsBySection[@(section)] = photoAssets;
@@ -187,6 +193,10 @@
   DFPhotoAsset *asset = nil;
   if (indexPath.row < photoAssets.count) {
     asset = photoAssets[indexPath.row];
+    if (![[asset class] isSubclassOfClass:[DFPhotoAsset class]]) {
+      DDLogWarn(@"%@ nil local asset. Skipping", self.class);
+      asset = nil;
+    }
   } else {
     DDLogWarn(@"%@ warning some local assets in %@ nil", self.class, [self feedObjectsForSection:indexPath.section]);
   }
@@ -200,16 +210,20 @@
   } else {
     thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
   }
-  [asset
-   loadUIImageForThumbnailOfSize:thumbnailSize
-   successBlock:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       if ([[self.collectionView indexPathForCell:cell] isEqual:indexPath])
-         cell.imageView.image = image;
-     });
-   } failureBlock:^(NSError *error) {
-     DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
-   }];
+  if (asset) {
+    [asset
+     loadUIImageForThumbnailOfSize:thumbnailSize
+     successBlock:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         if ([[self.collectionView indexPathForCell:cell] isEqual:indexPath])
+           cell.imageView.image = image;
+       });
+     } failureBlock:^(NSError *error) {
+       DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
+     }];
+  } else {
+    cell.imageView.image = [UIImage imageNamed:@"Assets/Icons/MissingImage157"];
+  }
 }
 
 #pragma mark - Supplementary views forwarded

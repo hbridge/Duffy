@@ -24,6 +24,17 @@
 @dynamic localIdentifier;
 @synthesize asset = _asset;
 
+static dispatch_queue_t localImageReuestQueue;
+
++ (void)initialize
+{
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    dispatch_queue_attr_t queue_attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+    localImageReuestQueue = dispatch_queue_create("imageRequestQueue", queue_attr);
+  });
+}
+
 + (DFPHAsset *)createWithPHAsset:(PHAsset *)asset
                        inContext:(NSManagedObjectContext *)managedObjectContext
 {
@@ -144,7 +155,7 @@
 {
   // Cache the asset on the calling thread because self.asset accesses core data
   PHAsset *asset = self.asset;
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+  dispatch_async(localImageReuestQueue, ^{
     [[PHImageManager defaultManager]
      requestImageForAsset:asset
      targetSize:size

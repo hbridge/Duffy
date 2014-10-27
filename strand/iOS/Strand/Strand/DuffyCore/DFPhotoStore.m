@@ -204,8 +204,7 @@ static int const FetchStride = 500;
   return [[DFPhotoCollection alloc] initWithPhotos:result];
 }
 
-+ (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs
-                    retainOrder:(BOOL)retainOrder
++ (NSDictionary *)photosWithPhotoIDs:(NSArray *)photoIDs
                       inContext:(NSManagedObjectContext *)context
 {
   NSArray *results = [self photosWithValueStrings:photoIDs
@@ -213,29 +212,17 @@ static int const FetchStride = 500;
                                        entityName:@"DFPhoto"
                                  comparisonString:@"="
                                         inContext:context];
-  if (results == nil || results.count == 0 || !retainOrder) return results;
-  
   NSMutableDictionary *photoIDsToPhotos = [[NSMutableDictionary alloc] init];
   for (DFPhoto *photo in results) {
     photoIDsToPhotos[@(photo.photoID)] = photo;
   }
-  NSMutableArray *sortedResults = [[NSMutableArray alloc] init];
-  for (NSNumber *photoID in photoIDs) {
-    DFPhoto *photo = photoIDsToPhotos[photoID];
-    if (photo) {
-      [sortedResults addObject:photo];
-    } else {
-      DDLogVerbose(@"Requested photo with id not found: %llu", photoID.longLongValue);
-    }
-  }
   
-  return sortedResults;
+  return photoIDsToPhotos;
 }
 
-- (NSArray *)photosWithPhotoIDs:(NSArray *)photoIDs retainOrder:(BOOL)retainOrder
+- (NSDictionary *)photosWithPhotoIDs:(NSArray *)photoIDs
 {
   return [DFPhotoStore photosWithPhotoIDs:photoIDs
-                              retainOrder:retainOrder
                                 inContext:[self managedObjectContext]];
 }
 
@@ -760,8 +747,8 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
 - (void)markPhotosForUpload:(NSArray *)photoIDs
 {
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSArray *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:photoIDs retainOrder:NO];
-    for (DFPhoto *photo in photos) {
+    NSDictionary *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:photoIDs];
+    for (DFPhoto *photo in photos.allValues) {
       photo.shouldUploadImage = YES;
     }
     [[DFPhotoStore sharedStore] saveContext];
@@ -774,8 +761,8 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     @autoreleasepool {
       NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-      NSArray *photos = [DFPhotoStore photosWithPhotoIDs:photoIDs retainOrder:NO inContext:context];
-      for (DFPhoto *photo in photos) {
+      NSDictionary *photos = [DFPhotoStore photosWithPhotoIDs:photoIDs inContext:context];
+      for (DFPhoto *photo in photos.allValues) {
         DFPhotoIDType photoID = photo.photoID;
         [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
           [[DFImageStore sharedStore]
