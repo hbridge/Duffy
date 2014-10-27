@@ -101,9 +101,6 @@ def getLocationForStrand(strand):
 		
 	location = getBestLocationForPhotos(photos)
 
-	if not location:
-		location = "Location Unknown"
-
 	return location
 
 """
