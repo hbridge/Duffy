@@ -28,6 +28,7 @@
 - (NSArray *)inviteStrands;
 - (NSArray *)acceptedStrands;
 - (NSArray *)privateStrands;
+- (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;

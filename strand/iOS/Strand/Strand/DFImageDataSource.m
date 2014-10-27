@@ -69,7 +69,7 @@
     for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
       [sectionArrays addObject:feedObject.objects];
     }
-    _collectionFeedObjects = collectionFeedObjects;
+    _collectionFeedObjects = [collectionFeedObjects copy];
     _sectionArrays = sectionArrays;
     _collectionView = collectionView;
     [collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFPhotoViewCell class]) bundle:nil]
@@ -211,15 +211,16 @@
     thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
   }
   if (asset) {
+    DFImageDataSource __weak *weakSelf = self;
     [asset
      loadUIImageForThumbnailOfSize:thumbnailSize
      successBlock:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
-         if ([[self.collectionView indexPathForCell:cell] isEqual:indexPath])
+         if ([[weakSelf.collectionView indexPathForCell:cell] isEqual:indexPath])
            cell.imageView.image = image;
        });
      } failureBlock:^(NSError *error) {
-       DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
+       DDLogError(@"%@ couldn't load image for asset: %@", weakSelf.class, error);
      }];
   } else {
     cell.imageView.image = [UIImage imageNamed:@"Assets/Icons/MissingImage157"];

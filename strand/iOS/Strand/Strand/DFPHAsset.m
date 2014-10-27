@@ -156,23 +156,25 @@ static dispatch_queue_t localImageReuestQueue;
   // Cache the asset on the calling thread because self.asset accesses core data
   PHAsset *asset = self.asset;
   dispatch_async(localImageReuestQueue, ^{
-    [[PHImageManager defaultManager]
-     requestImageForAsset:asset
-     targetSize:size
-     contentMode:contentMode
-     options:[DFPHAsset defaultImageRequestOptions]
-     resultHandler:^(UIImage *result, NSDictionary *info) {
-       if (result) {
-         DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
-                      @(contentMode),
-                      NSStringFromCGSize(size),
-                      NSStringFromCGSize(result.size));
-         successBlock(result);
-       } else {
-         DDLogError(@"%@: Error in getting image from PHImageManager. Creation date: %@, targetWidth: %f, targetHeight: %f, contentMode: %ld,  info: %@ ", self.class, asset.creationDate, size.width, size.height, contentMode, info);
-         failureBlock(info[PHImageErrorKey]);
-       }
-     }];
+    @autoreleasepool {
+      [[PHImageManager defaultManager]
+       requestImageForAsset:asset
+       targetSize:size
+       contentMode:contentMode
+       options:[DFPHAsset defaultImageRequestOptions]
+       resultHandler:^(UIImage *result, NSDictionary *info) {
+         if (result) {
+           DDLogVerbose(@"Requested aspect:%@ size %@ returned size: %@",
+                        @(contentMode),
+                        NSStringFromCGSize(size),
+                        NSStringFromCGSize(result.size));
+           successBlock(result);
+         } else {
+           DDLogError(@"%@: Error in getting image from PHImageManager. Creation date: %@, targetWidth: %f, targetHeight: %f, contentMode: %ld,  info: %@ ", self.class, asset.creationDate, size.width, size.height, contentMode, info);
+           failureBlock(info[PHImageErrorKey]);
+         }
+       }];
+    }
   });
 }
 

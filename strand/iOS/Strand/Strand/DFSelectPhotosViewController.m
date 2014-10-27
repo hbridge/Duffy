@@ -160,6 +160,19 @@ const CGFloat CreateCellTitleSpacing = 8;
                                              target:self
                                              action:@selector(cancelPressed:)];
   }
+  
+  if (self.isMovingToParentViewController) {
+    NSInteger lastSection = [self.collectionView numberOfSections] - 1;
+    NSInteger lastItem = [self.collectionView numberOfItemsInSection:lastSection] - 1;
+    NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [self.collectionView scrollToItemAtIndexPath:lastIP
+                                  atScrollPosition:UICollectionViewScrollPositionTop
+                                          animated:NO];
+      
+    });
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -350,8 +363,10 @@ referenceSizeForHeaderInSection:(NSInteger)section
 }
 
 - (IBAction)doneButtonPressed:(UIButton *)sender {
-  [self.delegate selectPhotosViewController:self
-              didFinishSelectingFeedObjects:self.selectPhotosController.selectedFeedObjects];
+  DFSelectPhotosViewController __weak *weakSelf = self;
+  DFSelectPhotosController *selectPhotosController = self.selectPhotosController;
+  [self.delegate selectPhotosViewController:weakSelf
+              didFinishSelectingFeedObjects:selectPhotosController.selectedFeedObjects];
 }
 
 @end

@@ -27,7 +27,6 @@
 {
   self = [super init];
   if (self) {
-    [self observeNotifications];
   }
   return self;
 }
@@ -42,7 +41,7 @@
 }
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
+  [super viewDidLoad];
   
   self.selectPhotosController = [[DFSelectPhotosViewController alloc] init];
   self.selectPhotosController.highlightedFeedObject = self.highlightedCollection;
@@ -54,18 +53,20 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  [self refreshFromServer];
-}
-
-
-
-- (void)observeNotifications
-{
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(reloadData)
                                                name:DFStrandNewPrivatePhotosDataNotificationName
                                              object:nil];
+  [self refreshFromServer];
+  
 }
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+  [super viewWillDisappear:animated];
+  [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -75,9 +76,10 @@
 
 - (void)reloadData
 {
+  DFSelectPhotosViewController *selectPhotosController = self.selectPhotosController;
   dispatch_async(dispatch_get_main_queue(), ^{
-    [self.selectPhotosController
-     setCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager] privateStrands]];
+    [selectPhotosController setCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
+                                                      privateStrandsByDateAscending:YES]];
   });
 }
 
@@ -138,18 +140,20 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   NSArray *suggestedObjects = [self.selectPhotosController.selectPhotosController
                                collectionFeedObjectsWithSelectedObjects];
   
+  DFCreateStrandFlowViewController __weak *weakSelf = self;
+  
   [SVProgressHUD show];
   [[DFPeanutFeedDataManager sharedManager]
    createNewStrandWithPhotos:self.selectPhotosController.selectedObjects
    createdFromSuggestions:suggestedObjects
    selectedPeanutContacts:self.peoplePickerController.selectedPeanutContacts
    success:^(DFPeanutStrand *createdStrand){
-     [self sendInvitesForStrand:createdStrand
-               toPeanutContacts:self.peoplePickerController.selectedPeanutContacts
+     [weakSelf sendInvitesForStrand:createdStrand
+               toPeanutContacts:weakSelf.peoplePickerController.selectedPeanutContacts
                      suggestion:suggestedObjects.firstObject];
    } failure:^(NSError *error) {
      [SVProgressHUD showErrorWithStatus:error.localizedDescription];
-     DDLogError(@"%@ create failed: %@", self.class, error);
+     DDLogError(@"%@ create failed: %@", weakSelf.class, error);
    }];
 }
 
@@ -157,6 +161,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
             toPeanutContacts:(NSArray *)peanutContacts
                   suggestion:(DFPeanutFeedObject *)suggestion
 {
+  DFCreateStrandFlowViewController __weak *weakSelf = self;
   [self.inviteAdapter
    sendInvitesForStrand:peanutStrand
    toPeanutContacts:peanutContacts
@@ -167,20 +172,20 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
        DDLogInfo(@"Created strand successfully");
        if (vc && [DFSMSInviteStrandComposeViewController canSendText]) {
          // Some of the invitees aren't Strand users, send them a text
-         vc.messageComposeDelegate = self;
-         [self presentViewController:vc
+         vc.messageComposeDelegate = weakSelf;
+         [weakSelf presentViewController:vc
                             animated:YES
                           completion:^{
                             [SVProgressHUD dismiss];
                           }];
        } else {
-         [self dismissWithErrorString:nil];
+         [weakSelf dismissWithErrorString:nil];
        }
      });
    } failure:^(NSError *error) {
-     [self dismissWithErrorString:@"Invite failed"];
+     [weakSelf dismissWithErrorString:@"Invite failed"];
      DDLogError(@"%@ failed to invite to strand: %@, error: %@",
-                self.class, peanutStrand, error);
+                weakSelf.class, peanutStrand, error);
    }];
 }
 

@@ -269,6 +269,25 @@ static DFPeanutFeedDataManager *defaultManager;
   return self.privateStrandsFeedObjects;
 }
 
+- (NSArray *)privateStrandsByDateAscending:(BOOL)ascending
+{
+  NSArray *strandsByDateAscending =
+  [self.privateStrandsFeedObjects
+   sortedArrayWithOptions:NSSortConcurrent
+   usingComparator:^NSComparisonResult(DFPeanutFeedObject *obj1, DFPeanutFeedObject *obj2) {
+     return [obj1.time_taken compare:obj2.time_taken];
+   }];
+  for (DFPeanutFeedObject *strandObject in strandsByDateAscending) {
+    strandObject.objects = [strandObject.objects
+                            sortedArrayWithOptions:NSSortConcurrent
+                            usingComparator:^NSComparisonResult(DFPeanutFeedObject *obj1, DFPeanutFeedObject *obj2) {
+                              return [obj1.time_taken compare:obj2.time_taken];
+                            }];
+  }
+  
+  return strandsByDateAscending;
+}
+
 - (NSArray *)suggestedStrands
 {
   NSPredicate *predicate = [NSPredicate
