@@ -57,4 +57,18 @@
   self.last_location_accuracy = @(location.horizontalAccuracy);
 }
 
+- (BOOL)isEqual:(id)object
+{
+  if (![[object class] isSubclassOfClass:self.class]) return NO;
+  DFPeanutUserObject *otherUser = (DFPeanutUserObject *)object;
+  if (self.id == otherUser.id) return YES;
+  
+  return NO;
+}
+
+- (NSUInteger)hash
+{
+  return self.id;
+}
+
 @end

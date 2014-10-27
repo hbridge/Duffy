@@ -91,7 +91,8 @@
 
 #pragma mark - View Controller Delegates
 
-- (void)selectPhotosViewController:(DFSelectPhotosViewController *)controller didFinishSelectingFeedObjects:(NSArray *)selectedFeedObjects
+- (void)selectPhotosViewController:(DFSelectPhotosViewController *)controller
+     didFinishSelectingFeedObjects:(NSArray *)selectedFeedObjects
 {
   if (selectedFeedObjects.count == 0) {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
@@ -111,11 +112,11 @@
 {
   NSArray *suggestedObjects = [self.selectPhotosController.selectPhotosController
              collectionFeedObjectsWithSelectedObjects];
-  NSMutableSet *users = [NSMutableSet new];
+  NSMutableOrderedSet *users = [NSMutableOrderedSet new];
   for (DFPeanutFeedObject *object in suggestedObjects) {
     [users addObjectsFromArray:object.actors];
   }
-  NSArray *contacts = [users.allObjects arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
+  NSArray *contacts = [users.array arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
     return [[DFPeanutContact alloc] initWithPeanutUser:user];
   }];
   

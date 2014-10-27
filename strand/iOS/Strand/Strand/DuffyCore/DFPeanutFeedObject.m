@@ -196,6 +196,11 @@ static NSArray *FeedObjectTypes;
   return NO;
 }
 
+- (NSUInteger)hash
+{
+  return self.id;
+}
+
 - (NSArray *)actorAbbreviations
 {
   NSMutableArray *abbreviations = [NSMutableArray new];
