@@ -139,7 +139,7 @@ static DFUploadController *defaultUploadController;
 {
   [self scheduleWithDispatchUploads:YES operation:[NSBlockOperation blockOperationWithBlock:^{
     NSArray *photosWithoutIDs =
-    [[DFPhotoStore photosWithPhotoIDs:@[@(0)] inContext:self.managedObjectContext] allValues];
+    [DFPhotoStore photosWithoutPhotoIDInContext:self.managedObjectContext];
     NSMutableArray *photosWithMetadataToUpload = [NSMutableArray new];
     for (DFPhoto *photo in photosWithoutIDs) {
       [photosWithMetadataToUpload addObject:photo.objectID];

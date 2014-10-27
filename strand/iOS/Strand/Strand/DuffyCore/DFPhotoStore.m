@@ -204,6 +204,15 @@ static int const FetchStride = 500;
   return [[DFPhotoCollection alloc] initWithPhotos:result];
 }
 
++ (NSArray *)photosWithoutPhotoIDInContext:(NSManagedObjectContext *)context
+{
+  return [self photosWithValueStrings:@[@(0)]
+                                           forKey:@"photoID"
+                                       entityName:@"DFPhoto"
+                                 comparisonString:@"="
+                                        inContext:context];
+}
+
 + (NSDictionary *)photosWithPhotoIDs:(NSArray *)photoIDs
                       inContext:(NSManagedObjectContext *)context
 {

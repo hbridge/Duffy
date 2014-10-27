@@ -50,6 +50,7 @@ typedef enum {
 + (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID inContext:(NSManagedObjectContext *)context;
 - (DFPhoto *)photoWithPhotoID:(DFPhotoIDType)photoID;
 - (NSDictionary *)photosWithPhotoIDs:(NSArray *)photoIDs;
++ (NSArray *)photosWithoutPhotoIDInContext:(NSManagedObjectContext *)context;
 
 - (void)clearUploadInfo;
 
