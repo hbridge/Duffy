@@ -167,7 +167,7 @@ const CGFloat CreateCellTitleSpacing = 8;
     NSInteger lastItem = [self.collectionView numberOfItemsInSection:lastSection] - 1;
     NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
     
-    DFSelectPhotosViewController __weak *weakSelf;
+    DFSelectPhotosViewController __weak *weakSelf = self;
     dispatch_async(dispatch_get_main_queue(), ^{
       [weakSelf.collectionView scrollToItemAtIndexPath:lastIP
                                       atScrollPosition:UICollectionViewScrollPositionTop
@@ -191,7 +191,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   NSInteger sectionForObject = [self.selectPhotosController.collectionFeedObjects
                                 indexOfObject:self.highlightedFeedObject];
-  DFSelectPhotosViewController __weak *weakSelf;
+  DFSelectPhotosViewController __weak *weakSelf = self;
   if (sectionForObject != NSNotFound) {
     UICollectionViewLayoutAttributes *headerLayoutAttributes =
     [weakSelf.collectionView
