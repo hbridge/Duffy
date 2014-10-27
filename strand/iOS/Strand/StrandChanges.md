@@ -1,5 +1,11 @@
 # Swap
 
+## Oct 27th, 2014 (4764)
+
+- New '+' button view that looks more like a photo picker
+- Friend profile view now defaults to shared photos
+- Fixes a crash when swiping away suggestions
+
 ## Oct 23rd, 2014 (4763)
 
 - Language tweaks
