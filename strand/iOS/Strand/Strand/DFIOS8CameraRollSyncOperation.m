@@ -111,7 +111,7 @@
   {
     if (self.isCancelled) return;
     
-    BOOL isLocalAsset;
+    BOOL isLocalAsset = NO;
     if ([[[[UIDevice currentDevice] systemVersion] substringToIndex:3] isEqualToString:@"8.0"]) {
       isLocalAsset = [asset canPerformEditOperation:PHAssetEditOperationContent];
     }

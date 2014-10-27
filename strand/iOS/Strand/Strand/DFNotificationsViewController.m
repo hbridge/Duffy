@@ -48,6 +48,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  [super viewDidAppear:animated];
   self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
   self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
   [self.tableView reloadData];

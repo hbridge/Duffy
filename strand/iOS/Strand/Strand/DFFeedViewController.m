@@ -571,7 +571,7 @@ const CGFloat LockedCellHeight = 157.0;
                       image:(UIImage *)image
                 atIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoFeedCellStyle newStyle;
+  DFPhotoFeedCellStyle newStyle = DFPhotoFeedCellStyleSquare;
   if (image.size.height > image.size.width) {
     newStyle = DFPhotoFeedCellStylePortrait;
   } else if (image.size.width > image.size.height) {

@@ -482,7 +482,7 @@
 {
   id object = [self objectForIndexPath:indexPath tableView:tableView];
   DDLogVerbose(@"tapped object:%@", object);
-  BOOL contactSelected;
+  BOOL contactSelected = NO;
   
   if ([[object class] isSubclassOfClass:[DFPeanutContact class]]) {
     [self contactRowSelected:object atIndexPath:indexPath];

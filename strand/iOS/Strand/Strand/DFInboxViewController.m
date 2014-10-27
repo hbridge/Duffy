@@ -241,7 +241,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
-  NSString *cellIdentifier;
+  NSString *cellIdentifier = @"inviteCell";
   DFCardCellStyle style = DFCardCellStyleSuggestionWithPeople;
   if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     cellIdentifier = @"inviteCell";

@@ -182,6 +182,8 @@ static NSMutableArray *idsBeingCached;
   CFUUIDRef newUniqueID = CFUUIDCreate (kCFAllocatorDefault);
   CFStringRef newUniqueIDString = CFUUIDCreateString (kCFAllocatorDefault, newUniqueID);
   NSString *filename = [NSString stringWithFormat:@"%@.jpg", newUniqueIDString];
+  CFRelease(newUniqueIDString);
+  CFRelease(newUniqueID);
   
   return [[self localImagesDirectoryURL]
           URLByAppendingPathComponent:filename];

@@ -38,6 +38,7 @@
 
 - (void)viewDidAppear:(BOOL)animated
 {
+  [super viewDidAppear:animated];
   [self.webView loadRequest:[NSURLRequest requestWithURL:self.initialURL]];
 }
 

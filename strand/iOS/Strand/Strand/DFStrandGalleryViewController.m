@@ -300,7 +300,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoIDType photoID;
+  DFPhotoIDType photoID = 0;
   DFPeanutFeedObject *feedObject = [self photoForIndexPath:indexPath];
   if ([feedObject.type isEqualToString:DFFeedObjectPhoto]) {
     photoID = feedObject.id;

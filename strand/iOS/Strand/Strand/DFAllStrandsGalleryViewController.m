@@ -323,7 +323,7 @@ static const CGFloat ItemSpacing = 2.5;
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPhotoIDType photoID;
+  DFPhotoIDType photoID = 0;
   DFPeanutFeedObject *section = [self sectionObjectForUploadedSection:indexPath.section];
   DFPeanutFeedObject *object = section.objects[indexPath.row];
   if ([object.type isEqualToString:DFFeedObjectPhoto]) {
