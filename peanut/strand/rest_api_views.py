@@ -254,6 +254,7 @@ class CreateStrandAPI(CreateAPIView):
 
                 # Next, add in strand Neighbor entries for all the private strands the created from one had
                 #  to the new public one
+                """
                 strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1 = privateStrand) | Q(strand_2 = privateStrand))
                 for strandNeighbor in strandNeighbors:
                     if strandNeighbor.strand_1_id != privateStrand.id:
@@ -261,7 +262,7 @@ class CreateStrandAPI(CreateAPIView):
                         newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_1, strand_2=strand))
                     else:
                         newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_2, strand_2=strand))
-
+                """
             if len(newStrandNeighbors) > 0:
                 StrandNeighbor.objects.bulk_create(newStrandNeighbors)
                     
