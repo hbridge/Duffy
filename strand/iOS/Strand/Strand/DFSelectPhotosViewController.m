@@ -334,7 +334,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
                                                 valueForKey:@"section"]];
   for (NSNumber *section in visibleSections) {
     DFPhotoPickerHeaderReusableView *headerView = self.sectionsToHeaderViews[section];
-    [self configureHeaderButtonForHeader:headerView section:section.longLongValue];
+    [self configureHeaderButtonForHeader:headerView section:(NSUInteger)section.longLongValue];
   }
   [self configureDoneButtonText];
 }
