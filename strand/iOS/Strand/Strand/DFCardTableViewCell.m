@@ -241,7 +241,11 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   NSMutableString *contextString = [NSMutableString new];
   [contextString appendString:[NSDateFormatter relativeTimeStringSinceDate:strandPosts.time_taken
                                                                 abbreviate:NO]];
-  [contextString appendFormat:@" in %@", strandPosts.location];
+  
+  if (strandPosts.location) {
+    [contextString appendFormat:@" in %@", strandPosts.location];
+  }
+  
   self.contextLabel.text = contextString;
   
   // Bit of a hack.  Sections are private so we go with default text of "Swap with"
