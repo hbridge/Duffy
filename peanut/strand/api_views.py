@@ -101,6 +101,9 @@ def getLocationForStrand(strand):
 		
 	location = getBestLocationForPhotos(photos)
 
+	if not location:
+		location = "Location Unknown"
+
 	return location
 
 """
@@ -213,32 +216,6 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 
 # ------------------------
-
-# Deprecated
-def getObjectsDataForStrands(user, strands, feedObjectType):
-	friends = friends_util.getFriends(user.id)
-
-	# list of list of photos
-	groups = list()
-	for strand in strands:
-		strandId = strand.id
-		photos = friends_util.filterStrandPhotosByFriends(user.id, friends, strand)
-		
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': getTitleForStrand(strand), 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(list(strand.users.all()))}
-		groupEntry = {'photos': photos, 'metadata': metadata}
-
-		if len(photos) > 0:
-			groups.append(groupEntry)
-
-	if len(groups) > 0:
-		# now sort groups by the time_taken of the first photo in each group
-		groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
-
-	formattedGroups = getFormattedGroups(groups)
-		
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 1000)
-	return objects
 
 def getActorsObjectData(users, includePhone = False, invitedUsers = None):
 	if not isinstance(users, list):
