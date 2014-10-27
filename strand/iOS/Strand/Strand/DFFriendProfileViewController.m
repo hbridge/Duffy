@@ -92,7 +92,7 @@
   [self addChildViewController:self.sharedViewController];
   
   /// set shared hidden since it's not selected by default
-  self.sharedViewController.tableView.hidden = YES;
+  self.unsharedViewController.tableView.hidden = YES;
 }
 
 - (NSArray *)tableViews
