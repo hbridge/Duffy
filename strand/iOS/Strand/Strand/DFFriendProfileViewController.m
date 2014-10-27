@@ -54,9 +54,9 @@
   self.nameLabel.text = self.peanutUser.display_name;
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
                              (int)swappedStrands.count];
-  [self.tabSegmentedControl setTitle:[NSString stringWithFormat:@"Unshared (%d)",
+  [self.tabSegmentedControl setTitle:[NSString stringWithFormat:@"Suggestions (%d)",
                                       (int)unswappedStrands.count]
-                   forSegmentAtIndex:0];
+                   forSegmentAtIndex:1];
   
   // add a fancy background blur if iOS8 +
   if ([UIDevice majorVersionNumber] >= 8) {
@@ -157,11 +157,11 @@
 */
 - (IBAction)segmentViewValueChanged:(UISegmentedControl *)sender {
   if (sender.selectedSegmentIndex == 0) {
-    self.unsharedViewController.tableView.hidden = NO;
-    self.sharedViewController.tableView.hidden = YES;
-  } else {
     self.sharedViewController.tableView.hidden = NO;
     self.unsharedViewController.tableView.hidden = YES;
+  } else {
+    self.unsharedViewController.tableView.hidden = NO;
+    self.sharedViewController.tableView.hidden = YES;
   }
 }
 
