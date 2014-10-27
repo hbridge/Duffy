@@ -279,6 +279,7 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             raise ParseError('User not found')
 
         currentPhotoIds = Photo.getIds(strand.photos.all())
+        currentUserIds = User.getIds(strand.users.all())
 
         # Find the photo ids that are in the post data but not in the strand
         newPhotoIds = list()
@@ -286,8 +287,15 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             if photoId not in currentPhotoIds:
                 newPhotoIds.append(photoId)
 
-        self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
-        self.request.DATA['users'] = list(set(self.request.DATA['users']))
+        # Find the photo ids that are in the post data but not in the strand
+        newUserIds = list()
+        for userId in self.request.DATA['users']:
+            if userId not in currentUserIds:
+                newUserIds.append(userId)
+
+
+        self.request.DATA['photos'] = list(set(newPhotoIds))
+        self.request.DATA['users'] = list(set(newUserIds))
 
         if len(newPhotoIds) > 0:
             # Go through all the private strands that have any photos we're contributing
