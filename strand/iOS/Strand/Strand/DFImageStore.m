@@ -157,6 +157,7 @@ static DFImageStore *defaultStore;
         UIImage *image = [UIImage imageWithData:imageData];
         completionBlock(image);
       } else {
+        DDLogVerbose(@"Didn't find image data for photo %lld, downloading...", photoID);
         [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
         [[DFImageDownloadManager sharedManager] fetchImageDataForImageType:type andPhotoID:photoID];
       }
