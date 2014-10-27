@@ -46,15 +46,16 @@
 
 - (void)setCollectionFeedObjects:(NSArray *)collectionFeedObjects
 {
+  DFImageDataSource __weak *weakSelf = self;
   dispatch_async(dispatch_get_main_queue(), ^{
     _collectionFeedObjects = collectionFeedObjects;
-    self.localPhotoAssetsBySection = [NSMutableDictionary new];
+    _localPhotoAssetsBySection = [NSMutableDictionary new];
     NSMutableArray *sectionArrays = [NSMutableArray new];
     for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
       [sectionArrays addObject:feedObject.objects];
     }
     _sectionArrays = sectionArrays;
-    [self.collectionView reloadData];
+    [weakSelf.collectionView reloadData];
   });
 }
 

@@ -62,7 +62,8 @@ const CGFloat CreateCellTitleSpacing = 8;
   return self;
 }
 
-- (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects highlightedFeedObject:(DFPeanutFeedObject *)highlightedObject
+- (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
+                        highlightedFeedObject:(DFPeanutFeedObject *)highlightedObject
 {
   self = [self initWithCollectionFeedObjects:collectionFeedObjects];
   if (self) {
@@ -128,9 +129,9 @@ const CGFloat CreateCellTitleSpacing = 8;
                       @(DFPhotoPickerHeaderStyleBadge),
                       ];
   for (NSNumber *style in styles) {
-  [self.collectionView registerNib:[UINib nibForClass:[DFPhotoPickerHeaderReusableView class]]
-        forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
-               withReuseIdentifier:style.stringValue];
+    [self.collectionView registerNib:[UINib nibForClass:[DFPhotoPickerHeaderReusableView class]]
+          forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+                 withReuseIdentifier:style.stringValue];
   }
   
   self.selectPhotosController = [[DFSelectPhotosController alloc] initWithCollectionFeedObjects:self.collectionFeedObjects
@@ -166,10 +167,11 @@ const CGFloat CreateCellTitleSpacing = 8;
     NSInteger lastItem = [self.collectionView numberOfItemsInSection:lastSection] - 1;
     NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
     
+    DFSelectPhotosViewController __weak *weakSelf;
     dispatch_async(dispatch_get_main_queue(), ^{
-      [self.collectionView scrollToItemAtIndexPath:lastIP
-                                  atScrollPosition:UICollectionViewScrollPositionTop
-                                          animated:NO];
+      [weakSelf.collectionView scrollToItemAtIndexPath:lastIP
+                                      atScrollPosition:UICollectionViewScrollPositionTop
+                                              animated:NO];
       
     });
   }
@@ -189,17 +191,18 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   NSInteger sectionForObject = [self.selectPhotosController.collectionFeedObjects
                                 indexOfObject:self.highlightedFeedObject];
+  DFSelectPhotosViewController __weak *weakSelf;
   if (sectionForObject != NSNotFound) {
     UICollectionViewLayoutAttributes *headerLayoutAttributes =
-    [self.collectionView
+    [weakSelf.collectionView
      layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
      atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionForObject]];
     CGRect rectToScroll = headerLayoutAttributes.frame;
-    rectToScroll.size.height = self.collectionView.frame.size.height;
-    rectToScroll.origin.y -= self.collectionView.contentInset.bottom;
-    [self.collectionView scrollRectToVisible:rectToScroll animated:YES];
+    rectToScroll.size.height = weakSelf.collectionView.frame.size.height;
+    rectToScroll.origin.y -= weakSelf.collectionView.contentInset.bottom;
+    [weakSelf.collectionView scrollRectToVisible:rectToScroll animated:YES];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [self.selectPhotosController toggleSectionSelection:sectionForObject];
+      [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
     });
     
   }
@@ -262,9 +265,10 @@ const CGFloat CreateCellTitleSpacing = 8;
   headerView.badgeIconView.image = [UIImage imageNamed:@"Assets/Icons/MatchedIcon"];
   headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap photos", suggestion.actorsString];
   [self configureHeaderButtonForHeader:headerView section:indexPath.section];
+  DFSelectPhotosViewController __weak *weakSelf = self;
   DFPhotoPickerHeaderReusableView __weak *weakHeader = headerView; // cast to prevent retain cycle
   headerView.shareCallback = ^(void){
-    [self shareButtonPressedForHeaderView:weakHeader
+    [weakSelf shareButtonPressedForHeaderView:weakHeader
                                   section:indexPath.section];
   };
   
