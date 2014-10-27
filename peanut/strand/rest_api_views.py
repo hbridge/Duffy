@@ -242,26 +242,28 @@ class CreateStrandAPI(CreateAPIView):
                 action.photos = strand.photos.all()
 
             # Created from is the private strand of the user.  We now want to hide it from view
-            if strand.created_from_id:
-                createdFromStrand = Strand.objects.get(id=strand.created_from_id)
-                if createdFromStrand and createdFromStrand.user_id == user.id and createdFromStrand.private == True:
-                    createdFromStrand.suggestible = False
-                    createdFromStrand.contributed_to_id = strand.id
-                    createdFromStrand.save()
+
+            # Go through all the private strands that have any photos we're contributing
+            #   and mark them as such
+            privateStrands = Strand.objects.filter(photos__id__in=self.request.DATA['photos'], private=True, user=user)
+            newStrandNeighbors = list()
+            for privateStrand in privateStrands:
+                privateStrand.suggestible = False
+                privateStrand.contributed_to_id = strand.id
+                privateStrand.save()
 
                 # Next, add in strand Neighbor entries for all the private strands the created from one had
                 #  to the new public one
-                strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1 = createdFromStrand) | Q(strand_2 = createdFromStrand))
-                newStrandNeighbors = list()
+                strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1 = privateStrand) | Q(strand_2 = privateStrand))
                 for strandNeighbor in strandNeighbors:
-                    if strandNeighbor.strand_1_id != createdFromStrand.id:
+                    if strandNeighbor.strand_1_id != privateStrand.id:
                         # The newly created strand will always have the higher id since it was just created
                         newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_1, strand_2=strand))
                     else:
                         newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_2, strand_2=strand))
 
-                if len(newStrandNeighbors) > 0:
-                    StrandNeighbor.objects.bulk_create(newStrandNeighbors)
+            if len(newStrandNeighbors) > 0:
+                StrandNeighbor.objects.bulk_create(newStrandNeighbors)
                     
             logger.info("Created new strand %s with users %s and photos %s and neighborRows %s" % (strand.id, strand.users.all(), strand.photos.all(), newStrandNeighbors))
             
