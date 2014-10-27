@@ -167,11 +167,11 @@ const CGFloat CreateCellTitleSpacing = 8;
     NSInteger lastItem = [self.collectionView numberOfItemsInSection:lastSection] - 1;
     NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
     
-    DFSelectPhotosViewController __weak *weakSelf = self;
+    UICollectionView *collectionView = self.collectionView;
     dispatch_async(dispatch_get_main_queue(), ^{
-      [weakSelf.collectionView scrollToItemAtIndexPath:lastIP
-                                      atScrollPosition:UICollectionViewScrollPositionTop
-                                              animated:NO];
+      [collectionView scrollToItemAtIndexPath:lastIP
+                             atScrollPosition:UICollectionViewScrollPositionTop
+                                     animated:NO];
       
     });
   }
@@ -191,18 +191,19 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   NSInteger sectionForObject = [self.selectPhotosController.collectionFeedObjects
                                 indexOfObject:self.highlightedFeedObject];
-  DFSelectPhotosViewController __weak *weakSelf = self;
+  UICollectionView *collectionView = self.collectionView;
+  DFSelectPhotosController *selectPhotosController = self.selectPhotosController;
   if (sectionForObject != NSNotFound) {
     UICollectionViewLayoutAttributes *headerLayoutAttributes =
-    [weakSelf.collectionView
+    [collectionView
      layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
      atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionForObject]];
     CGRect rectToScroll = headerLayoutAttributes.frame;
-    rectToScroll.size.height = weakSelf.collectionView.frame.size.height;
-    rectToScroll.origin.y -= weakSelf.collectionView.contentInset.bottom;
-    [weakSelf.collectionView scrollRectToVisible:rectToScroll animated:YES];
+    rectToScroll.size.height = collectionView.frame.size.height;
+    rectToScroll.origin.y -= collectionView.contentInset.bottom;
+    [collectionView scrollRectToVisible:rectToScroll animated:YES];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
+      [selectPhotosController toggleSectionSelection:sectionForObject];
     });
     
   }
@@ -367,9 +368,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
 }
 
 - (IBAction)doneButtonPressed:(UIButton *)sender {
-  DFSelectPhotosViewController __weak *weakSelf = self;
   DFSelectPhotosController *selectPhotosController = self.selectPhotosController;
-  [self.delegate selectPhotosViewController:weakSelf
+  [self.delegate selectPhotosViewController:self
               didFinishSelectingFeedObjects:selectPhotosController.selectedFeedObjects];
 }
 
