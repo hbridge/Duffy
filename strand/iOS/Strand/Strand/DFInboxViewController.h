@@ -6,7 +6,8 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFStrandsViewController.h"
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface DFInboxViewController : UITableViewController
 

@@ -7,18 +7,16 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DFStrandsViewController.h"
 #import "DFPhotoFeedCell.h"
 #import "DFNavigationBar.h"
 #import "DFTopBarController.h"
-#import "WYPopoverController.h"
 #import "DFNotificationsViewController.h"
 #import "DFFeedSectionHeaderView.h"
 #import "DFPeanutFeedObject.h"
 
 @interface DFFeedViewController : UIViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
-DFPhotoFeedCellDelegate, DFStrandViewControllerDelegate, DFFeedSectionHeaderViewDelegate>
+DFPhotoFeedCellDelegate, DFFeedSectionHeaderViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 - (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;

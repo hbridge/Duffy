@@ -37,7 +37,6 @@
 #import "DFPushNotificationsManager.h"
 #import "DFFeedViewController.h"
 #import "DFSettingsViewController.h"
-#import "DFTopBarController.h"
 #import "DFInboxViewController.h"
 #import "DFAllStrandsGalleryViewController.h"
 #import "DFFriendsViewController.h"

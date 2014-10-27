@@ -170,7 +170,13 @@ static dispatch_queue_t localImageReuestQueue;
                         NSStringFromCGSize(result.size));
            successBlock(result);
          } else {
-           DDLogError(@"%@: Error in getting image from PHImageManager. Creation date: %@, targetWidth: %f, targetHeight: %f, contentMode: %ld,  info: %@ ", self.class, asset.creationDate, size.width, size.height, contentMode, info);
+           DDLogError(@"%@: Error in getting image from PHImageManager. Creation date: %@, targetWidth: %f, targetHeight: %f, contentMode: %d,  info: %@ ",
+                      self.class,
+                      asset.creationDate,
+                      size.width,
+                      size.height,
+                      (int)contentMode,
+                      info);
            failureBlock(info[PHImageErrorKey]);
          }
        }];

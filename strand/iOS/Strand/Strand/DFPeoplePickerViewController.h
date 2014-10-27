@@ -8,7 +8,6 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutContact.h"
-#import "VENTokenField.h"
 
 @class DFPeoplePickerViewController;
 

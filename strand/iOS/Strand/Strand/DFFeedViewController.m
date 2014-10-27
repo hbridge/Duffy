@@ -11,7 +11,6 @@
 #import "DFDefaultsStore.h"
 #import "DFFeedSectionHeaderView.h"
 #import "DFImageStore.h"
-#import "DFLockedStrandCell.h"
 #import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFPeanutActionAdapter.h"
