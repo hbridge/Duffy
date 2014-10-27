@@ -43,6 +43,7 @@ INSTALLED_APPS = (
 MIDDLEWARE_CLASSES = (
     # Added this to record page load time
     'peanut.middlewares.StatsMiddleware',
+    'peanut.middlewares.SqlLogMiddleware',
 
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

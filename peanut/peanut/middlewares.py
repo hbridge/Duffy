@@ -1,7 +1,11 @@
-from django.db import connection
 from time import time
 from operator import add
 import re
+import logging
+
+from django.db import connection
+
+
 
 
 class StatsMiddleware(object):
@@ -60,3 +64,20 @@ class StatsMiddleware(object):
 
         return response
 
+class SqlLogMiddleware(object):
+    logging.basicConfig(filename='/var/log/duffy/requests.log',
+                        level=logging.DEBUG,
+                        format='%(asctime)s %(levelname)s %(message)s')
+    logging.getLogger('django.db.backends').setLevel(logging.ERROR) 
+    logger = logging.getLogger(__name__)
+
+    def process_response(self, request, response):
+        
+        sqltime = 0 # Variable to store execution time
+        for query in connection.queries:
+            sqltime += float(query["time"])  # Add the time that the query took to the total
+ 
+        # len(connection.queries) = total number of queries
+        self.logger.info("Page render for url %s: %s sec with %s queries" % (request.build_absolute_uri(), unicode(sqltime), unicode(len(connection.queries))))
+        
+        return response
