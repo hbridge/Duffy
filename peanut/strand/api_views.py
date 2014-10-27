@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.contrib.gis.geos import Point, fromstr
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from django.http import Http404
-from django.db import IntegrityError
+from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
@@ -274,7 +274,7 @@ def getActorsObjectData(users, includePhone = False, invitedUsers = None):
 		},
 	]
 """
-def getFormattedGroups(groups):
+def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 	if len(groups) == 0:
 		return []
 
@@ -287,10 +287,12 @@ def getFormattedGroups(groups):
 
 	# Fetch all the similarities at once so we can process in memory
 	a = datetime.datetime.now()
-	simCaches = cluster_util.getSimCaches(photoIds)
+	if simCaches == None:
+		simCaches = cluster_util.getSimCaches(photoIds)
 
 	# Do same with actions
-	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
+	if actionsByPhotoIdCache == None:
+		actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
 
 	for group in groups:
 		if len(group['photos']) == 0:
@@ -299,6 +301,7 @@ def getFormattedGroups(groups):
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 		
+
 		location = getBestLocationForPhotos(group['photos'])
 		if not location:
 			location = "Location Unknown"
@@ -332,12 +335,15 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 """
 def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	groups = list()
+	printStats("getObjectsDataForPrivateStrands 0")
 
 
 	friends = friends_util.getFriends(user.id)
 
 	a = datetime.datetime.now()
+	printStats("getObjectsDataForPrivateStrands 1")
 	strandNeighborsCache = getStrandNeighborsCache(strands)
+	printStats("getObjectsDataForPrivateStrands 3")
 
 	# Create a dict of strand id to user list who might be interested in it
 	strandToUserListCache = dict()
@@ -352,6 +358,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 			if strandNeighbor.id not in existingStrandIds:
 				needToFetchStrandUsers.append(strandNeighbor.id)
 	
+	printStats("getObjectsDataForPrivateStrands 4")
 	# Add to the user list cache for each of the strand neighbors
 	strandNeighbors = Strand.objects.prefetch_related('users').filter(id__in=needToFetchStrandUsers)
 	for strandNeighbor in strandNeighbors:
@@ -399,6 +406,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
+		printStats("getObjectsDataForPrivateStrands 4")
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
@@ -407,6 +415,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	
+	printStats("getObjectsDataForPrivateStrands 5")
 	return objects
 
 
@@ -416,70 +425,115 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
 
 	# Get all the unshared strands for the given user that are close to the given strand
-	privateStrands = Strand.objects.select_related().filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
+	privateStrands = Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 	
 	strandsThatMatch = list()
 	for privateStrand in privateStrands:
 		for photo in privateStrand.photos.all():
-			if strands_util.photoBelongsInStrand(photo, strand) and privateStrand not in strandsThatMatch:
+			if strands_util.photoBelongsInStrand(photo, strand, honorLocation=False) and privateStrand not in strandsThatMatch:
 				strandsThatMatch.append(privateStrand)
 
 	return strandsThatMatch
 	
-def getObjectsDataForPost(postAction):
+def getObjectsDataForPost(postAction, simCaches, actionsByPhotoIdCache):
 	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
-	photos = postAction.photos.all().order_by('time_taken')
+	photos = postAction.photos.all()
+	photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
+	
 	metadata['title'] = "added %s photos" % len(photos)
 
 	groupEntry = {'photos': photos, 'metadata': metadata}
 
-	formattedGroups = getFormattedGroups([groupEntry])
-		
+	formattedGroups = getFormattedGroups([groupEntry], simCaches = simCaches, actionsByPhotoIdCache = actionsByPhotoIdCache)
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	return objects
 
-def getObjectsDataForStrand(strand, user):
-	response = dict()
-
-	postActions = strand.action_set.filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
-
-	if len(postActions) == 0:
-		logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
-		recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	else:
-		recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
-		
-	users = strand.users.all()
-
-	invitedUsers = list()
-	for invite in strand.strandinvite_set.select_related().filter(accepted_user__isnull=True).exclude(invited_user=user):
-		if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
-			invitedUsers.append(invite.invited_user)
-		elif not invite.invited_user:
-			contactEntries = ContactEntry.objects.filter(user=user, phone_number=invite.phone_number, skip=False)
-			name = ""
-			for entry in contactEntries:
-				if name == "":
-					name = entry.name.split(" ")[0]
-
-			invitedUsers.append(User(id=0, display_name=name))
+def getObjectsDataForStrands(strands, user):
+	response = list()
+	strandIds = Strand.getIds(strands)
+	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user', 'strand__photos', 'strand__users').filter(strand__in=strandIds).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+	invitesCache =  StrandInvite.objects.prefetch_related('invited_user').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user)
 	
-	response = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
-	response['objects'] = list()
-	for post in postActions:
-		response['objects'].extend(getObjectsDataForPost(post))
+	photoIds = list()
+	for strand in strands:
+		photoIds.extend(Photo.getIds(strand.photos.all()))
+
+	photoIds = set(photoIds)
+
+	simCaches = cluster_util.getSimCaches(photoIds)
+	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
+	
+	actionsCache = list(actionsCache)
+	for strand in strands:
+		entry = dict()
+
+		postActions = list()
+		for action in actionsCache:
+			if action.strand == strand:
+				postActions.append(action)
+
+		if len(postActions) == 0:
+			logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
+			recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		else:
+			recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
+			
+		users = strand.users.all()
+
+		invites = list()
+		for invite in invitesCache:
+			if invite.strand == strand:
+				invites.append(invite)
+
+		invitedUsers = list()
+		for invite in invites:
+			if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
+				invitedUsers.append(invite.invited_user)
+			elif not invite.invited_user:
+				contactEntries = ContactEntry.objects.filter(user=user, phone_number=invite.phone_number, skip=False)
+				name = ""
+				for entry in contactEntries:
+					if name == "":
+						name = entry.name.split(" ")[0]
+
+				invitedUsers.append(User(id=0, display_name=name))
+
+		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
+
+		entry['objects'] = list()
+		for post in postActions:
+			entry['objects'].extend(getObjectsDataForPost(post, simCaches, actionsByPhotoIdCache))
+		response.append(entry)
+		
 	return response
 
 def getInviteObjectsDataForUser(user):
 	responseObjects = list()
 
-	strandInvites = StrandInvite.objects.select_related().filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+	printStats("inbox-1a")
+
+	strandInvites = StrandInvite.objects.prefetch_related('strand', 'strand__photos', 'strand__users').filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
+
+	strands = [x.strand for x in strandInvites]
+
+	printStats("inbox-1b")
+	strandsObjectData = getObjectsDataForStrands(strands, user)
+
+	printStats("inbox-1d")
+
+	strandObjectDataById = dict()
+	for strandObjectData in strandsObjectData:
+		strandObjectDataById[strandObjectData['id']] = strandObjectData
+		
+	printStats("inbox-1e")
 
 	for strandInvite in strandInvites:
+		printStats("inbox-1f1")
 		inviteIsReady = True
 		fullsLoaded = True
 		invitePhotos = strandInvite.strand.photos.all()
+		printStats("inbox-1f2")
 		
 		# Go through all photos and see if there's any that don't belong to this user
 		#  and don't have a thumb.  If a user just created an invite this should be fine
@@ -497,16 +551,24 @@ def getInviteObjectsDataForUser(user):
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
 			entry['ready'] = inviteIsReady
 			entry['objects'] = list()
-			entry['objects'].append(getObjectsDataForStrand(strandInvite.strand, user))
+			entry['objects'].append(strandObjectDataById[strandInvite.strand.id])
+
+			printStats("inbox-1f3")
 
 			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
 
+			printStats("inbox-1f4")
 			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
 			suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND)
+
+			printStats("inbox-1f5")
 
 			entry['objects'].append(suggestionsEntry)
 
 			responseObjects.append(entry)
+
+		printStats("inbox-1f")
+
 	return responseObjects
 
 
@@ -547,6 +609,35 @@ def private_strands(request):
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
+requestStartTime = None
+lastCheckinTime = None
+lastCheckinQueryCount = 0
+
+def startProfiling():
+	global requestStartTime
+	global lastCheckinTime
+	requestStartTime = datetime.datetime.now()
+	lastCheckinTime = requestStartTime
+
+def printStats(title, printQueries = False):
+	global lastCheckinTime
+	global lastCheckinQueryCount
+
+	now = datetime.datetime.now()
+	msTime = ((now-lastCheckinTime).microseconds / 1000 + (now-lastCheckinTime).seconds * 1000)
+	lastCheckinTime = now
+
+	queryCount = len(connection.queries) - lastCheckinQueryCount
+	
+
+	print "%s took %s ms and did %s queries" % (title, msTime, queryCount)
+
+	if printQueries:
+		print "QUERIES for %s" % title
+		for query in connection.queries[lastCheckinQueryCount:]:
+			print query
+
+	lastCheckinQueryCount = len(connection.queries)
 
 """
 	Returns back the invites and strands a user has
@@ -561,20 +652,22 @@ def strand_inbox(request):
 		responseObjects = list()
 
 		a = datetime.datetime.now()
+		startProfiling()
+		
 		# First throw in invite objects
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		
-		print "inbox-1 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+		printStats("inbox-1")
+		
 		# Next throw in the list of existing Strands
-		strands = set(Strand.objects.prefetch_related('photos').filter(users__in=[user]).filter(private=False))
+		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
 
-		print "inbox-2 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+		printStats("inbox-2")
 
 		#nonInviteStrandObjects = list()
-		for strand in strands:
-			responseObjects.append(getObjectsDataForStrand(strand, user))
+		responseObjects.extend(getObjectsDataForStrands(strands, user))
 
-		print "inbox-3 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+		printStats("inbox-3")
 
 		# sorting by last action on the strand
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
@@ -583,7 +676,7 @@ def strand_inbox(request):
 		# Add in the list of all friends at the end
 		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
 
-		print "inbox-4 took %s ms" % ((datetime.datetime.now()-a).microseconds / 1000 + (datetime.datetime.now()-a).seconds * 1000)
+		printStats("inbox-4")
 
 		responseObjects.append(entry)
 

@@ -41,7 +41,7 @@ def getJoinableStrandPhotos(userId, lon, lat, strands, friendsData):
 	return photos
 
 
-def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None):
+def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLocation = True):
 	if photosByStrandId:
 		photosInStrand = photosByStrandId[strand.id]
 	else:
@@ -50,11 +50,15 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None):
 	for photo in photosInStrand:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
 		if ( (abs(timeDiff.total_seconds()) / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
-			if not photo.location_point and not targetPhoto.location_point:
-				return True
 
-			if (photo.location_point and targetPhoto.location_point and 
-				geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+			if honorLocation:
+				if not photo.location_point and not targetPhoto.location_point:
+					return True
+
+				if (photo.location_point and targetPhoto.location_point and 
+					geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
+					return True
+			else:
 				return True
 
 	return False

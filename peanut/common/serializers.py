@@ -4,6 +4,7 @@ from common.models import Photo, User, Action, ContactEntry, StrandInvite, Stran
 from rest_framework import renderers
 from rest_framework.parsers import BaseParser
 
+from django.db import connection
 
 class PhotoSerializer(serializers.ModelSerializer):
 	full_image_path = serializers.Field(source='getFullUrlImagePath')
@@ -54,6 +55,7 @@ def photoDataForApiSerializer(photo):
 	photoData['user'] = photo.user_id
 	photoData['time_taken'] = photo.time_taken
 	photoData['local_time_taken'] = None
+
 	photoData['full_image_path'] = photo.getFullUrlImagePath()
 	photoData['thumb_image_path'] = photo.getThumbUrlImagePath()
 	photoData['user_display_name'] = photo.getUserDisplayName()
