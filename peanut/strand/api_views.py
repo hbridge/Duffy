@@ -109,10 +109,12 @@ def getLocationForStrand(strand):
 
 	returns cache[strandId] = list(neighborStrand1, neighborStrand2...)
 """
-def getStrandNeighborsCache(strands):
+def getStrandNeighborsCache(strands, withUsers = False):
 	strandIds = Strand.getIds(strands)
 
-	strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+	strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+	if withUsers:
+		strandNeighbors = strandNeighbors.prefetch_related('strand_1', 'strand_2', 'strand_1__users', 'strand_2__users')
 
 	strandNeighborsCache = dict()
 	for strand in strands:
@@ -333,41 +335,19 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None):
 	groups = list()
-	printStats("getObjectsDataForPrivateStrands 0")
 
+	if friends == None:
+		friends = friends_util.getFriends(user.id)
 
-	friends = friends_util.getFriends(user.id)
-
-	a = datetime.datetime.now()
-	printStats("getObjectsDataForPrivateStrands 1")
-	strandNeighborsCache = getStrandNeighborsCache(strands)
-	printStats("getObjectsDataForPrivateStrands 3")
-
-	# Create a dict of strand id to user list who might be interested in it
-	strandToUserListCache = dict()
-	for strand in strands:
-		strandToUserListCache[strand.id] = strand.users.all()
-
-	# We have all the users from the first fetch, now need to fetch all the neighbor's users
-	existingStrandIds = Strand.getIds(strands)
-	needToFetchStrandUsers = list()
-	for strandId, strandNeighbors in strandNeighborsCache.iteritems():
-		for strandNeighbor in strandNeighbors:
-			if strandNeighbor.id not in existingStrandIds:
-				needToFetchStrandUsers.append(strandNeighbor.id)
-	
-	printStats("getObjectsDataForPrivateStrands 4")
-	# Add to the user list cache for each of the strand neighbors
-	strandNeighbors = Strand.objects.prefetch_related('users').filter(id__in=needToFetchStrandUsers)
-	for strandNeighbor in strandNeighbors:
-		strandToUserListCache[strandNeighbor.id] = strandNeighbor.users.all()
+	if strandNeighborsCache == None:
+		strandNeighborsCache = getStrandNeighborsCache(strands, withUsers = True)
 
 	rankNum = 1
 	for strand in strands:
 		strandId = strand.id
-		photos = strand.photos.all() # .order_by("-time_taken")
+		photos = strand.photos.all()
 
 		photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
 		if len(photos) == 0:
@@ -377,7 +357,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, strandToUserListCache[neighborStrand.id]))
+				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
 		interestedUsers = list(set(interestedUsers))
 
@@ -406,7 +386,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
-		printStats("getObjectsDataForPrivateStrands 4")
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
@@ -415,7 +394,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType):
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	
-	printStats("getObjectsDataForPrivateStrands 5")
 	return objects
 
 
@@ -425,7 +403,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	timeLow = strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
 
 	# Get all the unshared strands for the given user that are close to the given strand
-	privateStrands = Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
+	privateStrands = Strand.objects.prefetch_related('photos', 'photos__user', 'users').filter(users__in=[user]).filter(private=True).filter(last_photo_time__lt=timeHigh).filter(first_photo_time__gt=timeLow)
 	
 	strandsThatMatch = list()
 	for privateStrand in privateStrands:
@@ -438,7 +416,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 def getObjectsDataForPost(postAction, simCaches, actionsByPhotoIdCache):
 	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
 	photos = postAction.photos.all()
-	photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
+	photos = sorted(photos, key=lambda x: x.time_taken)
 	
 	metadata['title'] = "added %s photos" % len(photos)
 
@@ -452,9 +430,9 @@ def getObjectsDataForPost(postAction, simCaches, actionsByPhotoIdCache):
 def getObjectsDataForStrands(strands, user):
 	response = list()
 	strandIds = Strand.getIds(strands)
-	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user', 'strand__photos', 'strand__users').filter(strand__in=strandIds).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
-	invitesCache =  StrandInvite.objects.prefetch_related('invited_user').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user)
-	
+	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(strand__in=strandIds).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+	invitesCache =  StrandInvite.objects.prefetch_related('invited_user', 'strand').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user)
+
 	photoIds = list()
 	for strand in strands:
 		photoIds.extend(Photo.getIds(strand.photos.all()))
@@ -462,6 +440,7 @@ def getObjectsDataForStrands(strands, user):
 	photoIds = set(photoIds)
 
 	simCaches = cluster_util.getSimCaches(photoIds)
+
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
 	
 	actionsCache = list(actionsCache)
@@ -478,13 +457,12 @@ def getObjectsDataForStrands(strands, user):
 			recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		else:
 			recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
-			
 		users = strand.users.all()
 
 		invites = list()
 		for invite in invitesCache:
 			if invite.strand == strand:
-				invites.append(invite)
+				invites.append(invite)	
 
 		invitedUsers = list()
 		for invite in invites:
@@ -498,7 +476,6 @@ def getObjectsDataForStrands(strands, user):
 						name = entry.name.split(" ")[0]
 
 				invitedUsers.append(User(id=0, display_name=name))
-
 		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
 
 		entry['objects'] = list()
@@ -511,30 +488,24 @@ def getObjectsDataForStrands(strands, user):
 def getInviteObjectsDataForUser(user):
 	responseObjects = list()
 
-	printStats("inbox-1a")
-
 	strandInvites = StrandInvite.objects.prefetch_related('strand', 'strand__photos', 'strand__users').filter(invited_user=user).exclude(skip=True).filter(accepted_user__isnull=True)
-
+	friends = friends_util.getFriends(user.id)
+	
 	strands = [x.strand for x in strandInvites]
 
-	printStats("inbox-1b")
 	strandsObjectData = getObjectsDataForStrands(strands, user)
-
-	printStats("inbox-1d")
+	
+	strandNeighborsCache = getStrandNeighborsCache(strands, withUsers = True)
 
 	strandObjectDataById = dict()
 	for strandObjectData in strandsObjectData:
 		strandObjectDataById[strandObjectData['id']] = strandObjectData
-		
-	printStats("inbox-1e")
 
 	for strandInvite in strandInvites:
-		printStats("inbox-1f1")
 		inviteIsReady = True
 		fullsLoaded = True
 		invitePhotos = strandInvite.strand.photos.all()
-		printStats("inbox-1f2")
-		
+
 		# Go through all photos and see if there's any that don't belong to this user
 		#  and don't have a thumb.  If a user just created an invite this should be fine
 		for photo in invitePhotos:
@@ -553,21 +524,17 @@ def getInviteObjectsDataForUser(user):
 			entry['objects'] = list()
 			entry['objects'].append(strandObjectDataById[strandInvite.strand.id])
 
-			printStats("inbox-1f3")
-
+			# TODO - This can be done in one query instead of being in a loop
 			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
-
-			printStats("inbox-1f4")
+			strandNeighborsCache.update(getStrandNeighborsCache(privateStrands, withUsers = True))
+			
 			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
-			suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND)
 
-			printStats("inbox-1f5")
+			suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, friends = friends, strandNeighborsCache = strandNeighborsCache)
 
 			entry['objects'].append(suggestionsEntry)
 
 			responseObjects.append(entry)
-
-		printStats("inbox-1f")
 
 	return responseObjects
 
@@ -575,38 +542,6 @@ def getInviteObjectsDataForUser(user):
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
-
-
-# ----------------------- FEED ENDPOINTS --------------------
-
-"""
-	Return the Duffy JSON for the strands a user has that are private and unshared
-"""
-def private_strands(request):
-	response = dict({'result': True})
-
-	form = OnlyUserIdForm(api_util.getRequestData(request))
-
-	if (form.is_valid()):
-		user = form.cleaned_data['user']
-
-		a = datetime.datetime.now()
-		
-		strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
-
-		b = datetime.datetime.now()
-
-		print "private_strands-1 took %s ms" % ((b-a).microseconds / 1000 + (b-a).seconds * 1000)
-
-		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
-		c = datetime.datetime.now()
-
-		print "private_strands-2 took %s ms" % ((c-b).microseconds / 1000 + (c-b).seconds * 1000)
-
-		print "private_strands-total took %s ms" % ((c-a).microseconds / 1000 + (c-a).seconds * 1000)
-	else:
-		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
-	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
 requestStartTime = None
@@ -618,6 +553,7 @@ def startProfiling():
 	global lastCheckinTime
 	requestStartTime = datetime.datetime.now()
 	lastCheckinTime = requestStartTime
+	lastCheckinQueryCount = 0
 
 def printStats(title, printQueries = False):
 	global lastCheckinTime
@@ -639,10 +575,40 @@ def printStats(title, printQueries = False):
 
 	lastCheckinQueryCount = len(connection.queries)
 
+
+# ----------------------- FEED ENDPOINTS --------------------
+
+"""
+	Return the Duffy JSON for the strands a user has that are private and unshared
+"""
+def private_strands(request):
+	startProfiling()
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+
+		printStats("private-1")
+		
+		strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
+
+		printStats("private-2")
+
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		
+		printStats("private-3")
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
 """
 	Returns back the invites and strands a user has
 """
 def strand_inbox(request):
+	startProfiling()
 	response = dict({'result': True})
 
 	form = OnlyUserIdForm(api_util.getRequestData(request))
@@ -650,9 +616,6 @@ def strand_inbox(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		responseObjects = list()
-
-		a = datetime.datetime.now()
-		startProfiling()
 		
 		# First throw in invite objects
 		responseObjects.extend(getInviteObjectsDataForUser(user))
@@ -674,11 +637,11 @@ def strand_inbox(request):
 		#responseObjects.extend(nonInviteStrandObjects)
 
 		# Add in the list of all friends at the end
-		entry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
+		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
 
 		printStats("inbox-4")
 
-		responseObjects.append(entry)
+		responseObjects.append(friendsEntry)
 
 		response['objects'] = responseObjects
 	else:

@@ -145,7 +145,7 @@ def getSimCaches(photoIds):
 	simCacheLowHigh = dict()
 	simCacheHighLow = dict()
 
-	simResults = Similarity.objects.select_related().filter(photo_1__in=photoIds).filter(photo_2__in=photoIds).order_by('similarity')
+	simResults = Similarity.objects.filter(photo_1__in=photoIds).filter(photo_2__in=photoIds).order_by('similarity')
 
 	for sim in simResults:
 		id1 = sim.photo_1_id
