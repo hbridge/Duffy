@@ -104,6 +104,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
                                                name:DFUploaderCompleteNotificationName
                                              object:nil];
   
+  [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
+  
   return YES;
 }
 
