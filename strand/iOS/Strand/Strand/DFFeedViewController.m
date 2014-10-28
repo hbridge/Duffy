@@ -362,6 +362,7 @@ const CGFloat LockedCellHeight = 157.0;
     [self.refreshTimer invalidate];
     self.refreshTimer = nil;
   }
+  [SVProgressHUD dismiss];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
