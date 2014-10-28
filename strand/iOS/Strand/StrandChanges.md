@@ -1,6 +1,6 @@
 # Swap
 
-## Oct 28th, 2014 (4770)
+## Oct 28th, 2014 (4770-4771)
 
 - Fix scrolling to the bottom for + button in some cases
 - Visual bug fixes for iPhone 4/4S
