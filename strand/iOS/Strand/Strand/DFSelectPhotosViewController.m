@@ -277,7 +277,13 @@ const CGFloat CreateCellTitleSpacing = 8;
   headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:suggestion.time_taken
                                                                 abbreviate:NO];
   headerView.badgeIconView.image = [UIImage imageNamed:@"Assets/Icons/MatchedIcon"];
-  headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap photos", suggestion.actorsString];
+  
+  if (suggestion.actors.count == 1) {
+    headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ has photos to swap", suggestion.actorsString];
+  } else {
+    headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ have photos to swap", suggestion.actorsString];
+  }
+  
   [self configureHeaderButtonForHeader:headerView section:indexPath.section];
   DFSelectPhotosViewController __weak *weakSelf = self;
   DFPhotoPickerHeaderReusableView __weak *weakHeader = headerView; // cast to prevent retain cycle

@@ -103,7 +103,6 @@ NSUInteger const NumPhotosPerRow = 4;
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
   requestStrand.users = @[@([[DFUser currentUser] userID])];
   requestStrand.photos = self.selectPhotosController.selectedPhotoIDs;
-  requestStrand.created_from_id = [NSNumber numberWithLongLong:self.suggestedSection.id];
   requestStrand.private = @(NO);
   [self setTimesForStrand:requestStrand fromPhotoObjects:self.suggestedSection.enumeratorOfDescendents.allObjects];
   
