@@ -178,15 +178,15 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)scrollToLast
 {
-  UICollectionView *collectionView = self.collectionView;
+  DFSelectPhotosViewController __weak *weakSelf = self;// avoid capture
   
   dispatch_async(dispatch_get_main_queue(), ^{
-    NSInteger lastSection = [collectionView numberOfSections] - 1;
-    NSInteger lastItem =  [collectionView numberOfItemsInSection:lastSection] - 1;
+    NSInteger lastSection = [weakSelf.collectionView numberOfSections] - 1;
+    NSInteger lastItem =  [weakSelf.collectionView numberOfItemsInSection:lastSection] - 1;
     NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
-    if (![self isIndexPathValid:lastIP]) return;
+    if (![weakSelf isIndexPathValid:lastIP]) return;
 
-    [collectionView scrollToItemAtIndexPath:lastIP
+    [weakSelf.collectionView scrollToItemAtIndexPath:lastIP
                            atScrollPosition:UICollectionViewScrollPositionTop
                                    animated:NO];
   });
