@@ -1,5 +1,10 @@
 # Swap
 
+## Oct 28th, 2014 (4770)
+
+- Fix scrolling to the bottom for + button in some cases
+- Visual bug fixes for iPhone 4/4S
+
 ## Oct 27th, 2014 (4764-4769)
 
 - New '+' button view that looks more like a photo picker
