@@ -677,7 +677,7 @@ def swaps(request):
 		ids = Strand.getIds(strands)
 
 		strands = Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=ids).order_by('-first_photo_time')[:20]
-		suggestions = getObjectsDataForPrivateStrands(user, strands, "suggestion")
+		suggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION)
 
 		# These are suggestions filtered
 		suggestibleSuggestions = list()
