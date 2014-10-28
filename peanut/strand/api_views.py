@@ -799,6 +799,17 @@ def register_apns_token(request):
 					device.is_active = True
 				device.save()
 
+		if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
+			# if last_build_info is empty or if either build_id or build_number is not in last_build_info
+			#    update last_build_info
+			buildId = form.cleaned_data['build_id']
+			buildNum = form.cleaned_data['build_number']
+			if ((not user.last_build_info) or 
+				buildId not in user.last_build_info or 
+				str(buildNum) not in user.last_build_info):
+				user.last_build_info = "%s-%s" % (buildId, buildNum)
+				logger.info("Build info updated to %s" % (user.last_build_info))
+
 		user.save()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
