@@ -1,6 +1,6 @@
 # Swap
 
-## Oct 27th, 2014 (4764-4768)
+## Oct 27th, 2014 (4764-4769)
 
 - New '+' button view that looks more like a photo picker
 - Friend profile view now defaults to shared photos
