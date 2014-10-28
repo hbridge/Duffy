@@ -16,7 +16,7 @@
 
 #import "DFAcceptInviteViewController.h"
 #import "DFFeedViewController.h"
-#import "DFImageStore.h"
+#import "DFImageManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFInboxTableViewCell.h"
 #import "DFCardTableViewCell.h"
@@ -358,7 +358,7 @@ NSString * binaryStringFromInteger( NSInteger  number )
   cell.objects = photoIDs;
   for (NSUInteger i = 0; i < MIN(photos.count, maxPhotosToFetch); i++) {
     DFPeanutFeedObject *photoObject = photos[i];
-    [[DFImageStore sharedStore]
+    [[DFImageManager sharedManager]
      imageForID:photoObject.id
      preferredType:DFImageThumbnail
      completion:^(UIImage *image) {

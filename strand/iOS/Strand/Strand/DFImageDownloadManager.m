@@ -63,6 +63,9 @@ static DFImageDownloadManager *defaultManager;
 
 - (void)fetchNewImages
 {
+#ifdef DEBUG
+  return; // TODO  REENABLE
+#endif
   // Get list of photo from feed manager
   NSArray *remotePhotos = [self.dataManager remotePhotos];
   
@@ -99,23 +102,32 @@ static DFImageDownloadManager *defaultManager;
   }
 }
 
-- (void)fetchImageDataForImageType:(DFImageType)type andPhotoID:(DFPhotoIDType)photoID
+- (void)fetchImageDataForImageType:(DFImageType)type
+                        andPhotoID:(DFPhotoIDType)photoID
+                        completion:(ImageLoadCompletionBlock)completionBlock
 {
   DFPeanutFeedObject *photoObject = [self.dataManager photoWithId:photoID];
+  BOOL didDispatchForCompletion = NO;
   
   if (photoObject) {
     if (type == DFImageThumbnail && ![photoObject.thumb_image_path isEqualToString:@""]) {
-      [self getImageDataForPath:photoObject.thumb_image_path withCompletionBlock:^(UIImage *image, NSError *error) {
-        [self.imageStore setImage:image type:DFImageThumbnail forID:photoObject.id completion:nil];
+      didDispatchForCompletion = YES;
+      [self getImageDataForPath:photoObject.thumb_image_path
+            withCompletionBlock:^(UIImage *image, NSError *error) {
+              completionBlock(image);
       }];
     }
     
     if (type == DFImageFull && ![photoObject.full_image_path isEqualToString:@""]) {
-      [self getImageDataForPath:photoObject.full_image_path withCompletionBlock:^(UIImage *image, NSError *error) {
-        [self.imageStore setImage:image type:DFImageFull forID:photoObject.id completion:nil];
+      didDispatchForCompletion = YES;
+      [self getImageDataForPath:photoObject.full_image_path
+            withCompletionBlock:^(UIImage *image, NSError *error) {
+              completionBlock(image);
       }];
     }
   }
+  
+  if (!didDispatchForCompletion) completionBlock(nil);
 }
 
 - (void)getImageDataForPath:(NSString *)path

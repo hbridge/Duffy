@@ -8,7 +8,6 @@
 
 #import "DFPhotoAsset.h"
 #import "DFPhoto.h"
-#import "DFImageStore.h"
 
 @interface DFStrandPhotoAsset : DFPhotoAsset
 

@@ -11,7 +11,7 @@
 #import "DFPeanutNotification.h"
 #import "DFNotificationTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "DFImageStore.h"
+#import "DFImageManager.h"
 #import "DFAnalytics.h"
 
 @interface DFNotificationsViewController ()
@@ -101,7 +101,7 @@
   
   //set the preview image
   cell.previewImageView.image = nil;
-  [[DFImageStore sharedStore]
+  [[DFImageManager sharedManager]
    imageForID:peanutNotification.photo_id.longLongValue
    preferredType:DFImageThumbnail
    completion:^(UIImage *image) {

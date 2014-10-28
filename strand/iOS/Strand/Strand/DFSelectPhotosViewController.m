@@ -18,7 +18,6 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFSelectPhotosController.h"
 #import "DFPeanutFeedDataManager.h"
-#import "DFImageStore.h"
 #import "NSString+DFHelpers.h"
 #import "DFStrandConstants.h"
 #import "DFPeanutUserObject.h"

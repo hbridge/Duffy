@@ -11,7 +11,7 @@
 #import "DFPeanutFeedObject.h"
 #import "DFPhotoStackCell.h"
 #import "DFPhoto.h"
-#import "DFImageStore.h"
+#import "DFImageManager.h"
 #import "DFSettingsViewController.h"
 #import "DFFeedViewController.h"
 #import "DFAnalytics.h"
@@ -246,7 +246,7 @@
   cell.likeIconImageView.hidden = (likeActions.count <= 0);
   DFImageType preferredType = DFImageFull;
   
-  [[DFImageStore sharedStore]
+  [[DFImageManager sharedManager]
    imageForID:photoObject.id
    preferredType:preferredType
    completion:^(UIImage *image) {
@@ -280,7 +280,7 @@
   
   DFPeanutFeedObject *firstObject = (DFPeanutFeedObject *)clusterObject.objects.firstObject;
   
-  [[DFImageStore sharedStore]
+  [[DFImageManager sharedManager]
    imageForID:firstObject.id
    preferredType:DFImageFull
    completion:^(UIImage *image) {

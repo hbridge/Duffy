@@ -269,5 +269,40 @@ static dispatch_queue_t localImageReuestQueue;
 }
 
 
+- (UIImage *)imageForRequest:(DFImageManagerRequest *)request
+{
+  PHAsset *asset = self.asset;
+  PHImageRequestOptions *options = [self.class defaultImageRequestOptions];
+  options.synchronous = YES;
+
+  PHImageContentMode contentMode = PHImageContentModeDefault;
+  if (request.contentMode == DFImageRequestContentModeAspectFit)
+    contentMode = PHImageContentModeAspectFit;
+  else if (request.contentMode == DFImageRequestContentModeAspectFill)
+    contentMode = PHImageContentModeAspectFill;
+  
+  UIImage __block *result;
+  [[PHImageManager defaultManager]
+   requestImageForAsset:asset
+   targetSize:request.size
+   contentMode:contentMode
+   options:[DFPHAsset defaultImageRequestOptions]
+   resultHandler:^(UIImage *image, NSDictionary *info) {
+     result = image;
+     if (!image) {
+       DDLogError(@"%@: Error in getting image from PHImageManager. Creation date: %@, targetWidth: %f, targetHeight: %f, contentMode: %d,  info: %@ ",
+                  self.class,
+                  asset.creationDate,
+                  request.size.width,
+                  request.size.height,
+                  (int)contentMode,
+                  info);
+     }
+   }];
+  
+  return result;
+}
+
+
 
 @end
