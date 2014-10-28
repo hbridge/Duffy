@@ -617,6 +617,11 @@ def strand_inbox(request):
 	if (form.is_valid()):
 		user = form.cleaned_data['user']
 		responseObjects = list()
+
+		# First throw in invite objects
+		# TODO(Derek): Take this out once new client is pushed
+		responseObjects.extend(getInviteObjectsDataForUser(user))
+		printStats("swaps-invites")
 		
 		# Next throw in the list of existing Strands
 		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
