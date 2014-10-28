@@ -171,6 +171,7 @@ const CGFloat LockedCellHeight = 157.0;
           [self showUpsellResult];
         }
       }
+      [self.swapUpsellView reloadDataWithInviteObject:invite];
     }
   } else {
     DFPeanutFeedObject *posts = [self.dataManager strandPostsObjectWithId:self.postsObject.id];

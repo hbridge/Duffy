@@ -7,6 +7,7 @@
 //
 
 #import "DFSwapUpsellView.h"
+#import "DFPeanutFeedDataManager.h"
 
 @implementation DFSwapUpsellView
 
@@ -37,11 +38,7 @@ CGFloat const DFUpsellMinHeight = 200.0;
                      buttonTarget:(id)target
                          selector:(SEL)selector
 {
-  DFPeanutFeedObject *strandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
-  self.upsellTitleLabel.text = [NSString stringWithFormat:@"%@ %@ your photos from\n %@",
-                                inviteObject.actorsString,
-                                inviteObject.actors.count == 1 ? @"wants" : @"want",
-                                strandPosts.placeAndRelativeTimeString];
+  [self configureTextWithInviteObject:inviteObject];
   [self.matchMyPhotosButton setTitle:@"Find my Photos"
                             forState:UIControlStateNormal];
 
@@ -51,6 +48,19 @@ CGFloat const DFUpsellMinHeight = 200.0;
   self.activityWrapper.hidden = YES;
 }
 
+- (void)configureTextWithInviteObject:(DFPeanutFeedObject *)inviteObject
+{
+  DFPeanutFeedObject *strandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+  self.upsellTitleLabel.text = [NSString stringWithFormat:@"%@ %@ your photos from\n %@",
+                                inviteObject.actorsString,
+                                inviteObject.actors.count == 1 ? @"wants" : @"want",
+                                strandPosts.placeAndRelativeTimeString];
+}
+
+- (void)reloadDataWithInviteObject:(DFPeanutFeedObject *)inviteObject
+{
+  [self configureTextWithInviteObject:inviteObject];
+}
 
 - (void)configureForContactsWithError:(BOOL)error
                          buttonTarget:(id)target

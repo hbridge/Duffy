@@ -21,6 +21,7 @@ extern CGFloat const DFUpsellMinHeight;
 - (void)configureWithInviteObject:(DFPeanutFeedObject *)inviteObject
                      buttonTarget:(id)target
                          selector:(SEL)selector;
+- (void)reloadDataWithInviteObject:(DFPeanutFeedObject *)inviteObject;
 
 - (void)configureForContactsWithError:(BOOL)error
                          buttonTarget:(id)target
