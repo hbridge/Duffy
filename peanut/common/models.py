@@ -586,8 +586,8 @@ class Strand(models.Model):
 	location_city =  models.CharField(max_length=1000, null=True)
 	location_point = models.PointField(null=True, db_index=True)
 	
-	photos = models.ManyToManyField(Photo, through='StrandPhotoMembership')
-	users = models.ManyToManyField(User, through='StrandUserMembership')
+	photos = models.ManyToManyField(Photo)
+	users = models.ManyToManyField(User)
 	private = models.BooleanField(db_index=True, default=False)
 	user = models.ForeignKey(User, null=True, related_name="owner", db_index=True)
 	product_id = models.IntegerField(default=2, db_index=True)
@@ -683,23 +683,6 @@ class Strand(models.Model):
 
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
-
-
-class StrandPhotoMembership(models.Model):
-	strand = models.ForeignKey(Strand)
-	photo = models.ForeignKey(Photo)
-
-	class Meta:
-		unique_together = ("strand", "photo")
-		db_table = 'strand_objects_photos'
-
-class StrandUserMembership(models.Model):
-	strand = models.ForeignKey(Strand)
-	user = models.ForeignKey(User)
-
-	class Meta:
-		unique_together = ("strand", "user")
-		db_table = 'strand_objects_users'
 		
 class StrandInvite(models.Model):
 	strand = models.ForeignKey(Strand, db_index=True)
