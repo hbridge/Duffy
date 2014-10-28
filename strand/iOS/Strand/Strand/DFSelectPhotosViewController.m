@@ -169,25 +169,28 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
 {
-  [self scrollToLast];
+  if (self.highlightedFeedObject) {
+    [self scrollToHighlightedFeedObject];
+  } else {
+    [self scrollToLast];
+  }
 }
 
 - (void)scrollToLast
 {
-  NSInteger lastSection = [self.collectionView numberOfSections] - 1;
-  if (lastSection < 0) return;
-  NSInteger lastItem =  [self.collectionView numberOfItemsInSection:lastSection] - 1;
-  if (lastItem < 0) return;
-  NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
-  
   UICollectionView *collectionView = self.collectionView;
+  
   dispatch_async(dispatch_get_main_queue(), ^{
+    NSInteger lastSection = [collectionView numberOfSections] - 1;
+    NSInteger lastItem =  [collectionView numberOfItemsInSection:lastSection] - 1;
+    NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
+    if (![self isIndexPathValid:lastIP]) return;
+
     [collectionView scrollToItemAtIndexPath:lastIP
                            atScrollPosition:UICollectionViewScrollPositionTop
                                    animated:NO];
-    
   });
-
+  
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -202,24 +205,36 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 - (void)scrollToHighlightedFeedObject
 {
-  NSInteger sectionForObject = [self.selectPhotosController.collectionFeedObjects
-                                indexOfObject:self.highlightedFeedObject];
-  UICollectionView *collectionView = self.collectionView;
-  DFSelectPhotosController *selectPhotosController = self.selectPhotosController;
-  if (sectionForObject != NSNotFound) {
-    UICollectionViewLayoutAttributes *headerLayoutAttributes =
-    [collectionView
-     layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
-     atIndexPath:[NSIndexPath indexPathForRow:0 inSection:sectionForObject]];
-    CGRect rectToScroll = headerLayoutAttributes.frame;
-    rectToScroll.size.height = collectionView.frame.size.height;
-    rectToScroll.origin.y -= collectionView.contentInset.bottom;
-    [collectionView scrollRectToVisible:rectToScroll animated:YES];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-      [selectPhotosController toggleSectionSelection:sectionForObject];
-    });
+  DFSelectPhotosViewController __weak *weakSelf = self;// avoid capture
+
+  dispatch_async(dispatch_get_main_queue(), ^{
+    NSInteger sectionForObject = [weakSelf.selectPhotosController.collectionFeedObjects
+                                  indexOfObject:weakSelf.highlightedFeedObject];
+    NSIndexPath *indexPathForObject = [NSIndexPath indexPathForItem:0 inSection:sectionForObject];
     
-  }
+    if ([weakSelf isIndexPathValid:indexPathForObject]) {
+      UICollectionView *collectionView = weakSelf.collectionView;
+      UICollectionViewLayoutAttributes *headerLayoutAttributes =
+      [collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
+                                                        atIndexPath:indexPathForObject];
+      CGRect rectToScroll = headerLayoutAttributes.frame;
+      rectToScroll.size.height = collectionView.frame.size.height;
+      rectToScroll.origin.y -= collectionView.contentInset.bottom;
+      [collectionView scrollRectToVisible:rectToScroll animated:YES];
+      
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
+      });
+    }
+  });
+}
+
+- (BOOL)isIndexPathValid:(NSIndexPath *)indexPath
+{
+  if (indexPath.section == NSNotFound) return NO;
+  if (indexPath.section < 0 || indexPath.section >= self.collectionView.numberOfSections) return NO;
+  if (indexPath.row < 0 || indexPath.row >= [self.collectionView numberOfItemsInSection:indexPath.section]) return NO;
+  return YES;
 }
 
 - (void)viewDidDisappear:(BOOL)animated
