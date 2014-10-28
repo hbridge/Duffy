@@ -373,7 +373,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 
 		if suggestible and len(interestedUsers) == 0:
 			suggestible = False
-
 			
 		if not getLocationForStrand(strand):
 			interestedUsers = list()
@@ -676,7 +675,7 @@ def swaps(request):
 
 		ids = Strand.getIds(strands)
 
-		strands = Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=ids).order_by('-first_photo_time')[:20]
+		strands = Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=ids).order_by('-first_photo_time')
 		suggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION)
 
 		# These are suggestions filtered
@@ -798,17 +797,6 @@ def register_apns_token(request):
 				if (not device.is_active):
 					device.is_active = True
 				device.save()
-
-		if form.cleaned_data['build_id'] and form.cleaned_data['build_number']:
-			# if last_build_info is empty or if either build_id or build_number is not in last_build_info
-			#    update last_build_info
-			buildId = form.cleaned_data['build_id']
-			buildNum = form.cleaned_data['build_number']
-			if ((not user.last_build_info) or 
-				buildId not in user.last_build_info or 
-				str(buildNum) not in user.last_build_info):
-				user.last_build_info = "%s-%s" % (buildId, buildNum)
-				logger.info("Build info updated to %s" % (user.last_build_info))
 
 		user.save()
 	else:
