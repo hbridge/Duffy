@@ -308,6 +308,7 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)configureUpsellHeight
 {
   CGFloat swapUpsellHeight = MIN(self.view.frame.size.height * .7 + self.tableView.contentOffset.y, self.tableView.frame.size.height);
+  swapUpsellHeight = MAX(swapUpsellHeight, DFUpsellMinHeight);
   self.swapUpsellView.frame = CGRectMake(0,
                                          self.view.frame.size.height - swapUpsellHeight,
                                          self.view.frame.size.width,

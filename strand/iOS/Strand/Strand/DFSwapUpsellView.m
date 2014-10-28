@@ -10,6 +10,7 @@
 
 @implementation DFSwapUpsellView
 
+CGFloat const DFUpsellMinHeight = 200.0;
 
 - (void)awakeFromNib
 {

@@ -12,7 +12,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Udl-Nz-hEj" customClass="DFActionButton">
-                    <rect key="frame" x="130" y="237" width="121" height="30"/>
+                    <rect key="frame" x="130" y="216" width="121" height="30"/>
                     <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
                     <state key="normal" title="Match my Photos">
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -20,13 +20,13 @@
                     </state>
                 </button>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You Have Matching Photos to Swap" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="300" translatesAutoresizingMaskIntoConstraints="NO" id="72w-fn-JN9">
-                    <rect key="frame" x="49" y="200" width="283" height="21"/>
+                    <rect key="frame" x="49" y="179" width="283" height="21"/>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <view hidden="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TJc-Nh-Bq1" userLabel="Matching activity wrapper">
-                    <rect key="frame" x="147" y="218" width="88" height="77"/>
+                    <rect key="frame" x="147" y="197" width="88" height="77"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Matching" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="200" translatesAutoresizingMaskIntoConstraints="NO" id="bwY-f3-PRj">
                             <rect key="frame" x="8" y="8" width="72" height="21"/>
@@ -55,8 +55,8 @@
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="top" secondItem="72w-fn-JN9" secondAttribute="bottom" constant="16" id="NJQ-Bw-f75"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="centerY" secondItem="TJc-Nh-Bq1" secondAttribute="centerY" constant="-4.5" id="NJu-ZC-keX"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Udl-Nz-hEj" secondAttribute="bottom" constant="20" id="TGQ-ij-tih"/>
+                <constraint firstAttribute="centerY" secondItem="72w-fn-JN9" secondAttribute="centerY" id="X3r-Vd-qM8"/>
                 <constraint firstItem="Udl-Nz-hEj" firstAttribute="centerX" secondItem="TJc-Nh-Bq1" secondAttribute="centerX" constant="-0.5" id="bid-xe-1gq"/>
-                <constraint firstItem="72w-fn-JN9" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" priority="999" constant="200" id="jFH-iC-UMv"/>
                 <constraint firstAttribute="centerX" secondItem="72w-fn-JN9" secondAttribute="centerX" id="zZA-GC-Tow"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>

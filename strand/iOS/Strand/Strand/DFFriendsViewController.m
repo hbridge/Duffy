@@ -133,6 +133,12 @@
                 forControlEvents:UIControlEventValueChanged];
 }
 
+- (void)viewDidLayoutSubviews
+{
+  [super viewDidLayoutSubviews];
+  [self configureContactsUpsell];
+}
+
 - (void)configureContactsUpsell
 {
   ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
@@ -145,7 +151,7 @@
                                                 buttonTarget:self
                                                     selector:@selector(contactsUpsellButtonPressed:)];
     }
-    CGFloat swapUpsellHeight = self.view.frame.size.height * .66;
+    CGFloat swapUpsellHeight = MAX(self.view.frame.size.height * .66, DFUpsellMinHeight);
     self.contactsUpsellView.frame = CGRectMake(0,
                                            self.view.frame.size.height - swapUpsellHeight,
                                            self.view.frame.size.width,

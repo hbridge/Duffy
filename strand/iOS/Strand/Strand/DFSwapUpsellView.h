@@ -12,6 +12,8 @@
 
 @interface DFSwapUpsellView : SAMGradientView
 
+extern CGFloat const DFUpsellMinHeight;
+
 @property (weak, nonatomic) IBOutlet UIButton *matchMyPhotosButton;
 @property (weak, nonatomic) IBOutlet UILabel *upsellTitleLabel;
 @property (weak, nonatomic) IBOutlet UIView *activityWrapper;
