@@ -46,6 +46,20 @@ def getContactsByUser(contactEntries):
 
 
 	return contactsByUser
+
+
+
+def threadedSendNotifications(userIds):
+	logging.basicConfig(filename='/var/log/duffy/friends.log',
+						level=logging.DEBUG,
+						format='%(asctime)s %(levelname)s %(message)s')
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	logger = logging.getLogger(__name__)
+
+	users = User.objects.filter(id__in=userIds)
+
+	# Send update feed msg to folks who are involved in these photos
+	notifications_util.sendRefreshFeedToUsers(users)
 	
 """
 	Populate the Friends table.  This creates a link between two users
@@ -87,10 +101,13 @@ def main(argv):
 					except IntegrityError:
 						logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, friend.id))
 
-				
-
 			logger.info("Wrote out %s friend entries after evaluating %s contact entries" % (newConnectionCount, len(contactEntries)))
 			ContactEntry.bulkUpdate(contactEntries, ["evaluated"])
+
+			usersIdsToUpdate = [contactEntry.user_id for contactEntry in contactEntries]
+			usersIdsToUpdate = set(usersIdsToUpdate)
+
+			Thread(target=threadedSendNotifications, args=(usersIdsToUpdate,)).start()
 		else:
 			time.sleep(1)
 		
