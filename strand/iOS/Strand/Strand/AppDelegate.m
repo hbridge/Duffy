@@ -391,7 +391,7 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
       self.backgroundSyncReturnTimer = nil;
       
       if (self.backgroundSyncTotalBytes > 0) {
-        DDLogInfo(@"Returning NewData result for background uploader since we uploaded %lul bytes", self.backgroundSyncTotalBytes);
+        DDLogInfo(@"Returning NewData result for background uploader since we uploaded %lul bytes", (unsigned long)self.backgroundSyncTotalBytes);
         _completionHandler(UIBackgroundFetchResultNewData);
       } else {
         DDLogInfo(@"Returning NoData result for background uploader");
