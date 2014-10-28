@@ -427,8 +427,6 @@ static DFPeanutFeedDataManager *defaultManager;
   requestStrand.photos = [feedPhotoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *feedObject) {
     return @(feedObject.id);
   }];
-  DFPeanutFeedObject *suggestionSection = [suggestedSections firstObject];
-  requestStrand.created_from_id = @(suggestionSection.id);
   requestStrand.private = @(NO);
   [self setTimesForStrand:requestStrand fromPhotoObjects:feedPhotoObjects];
   
