@@ -68,7 +68,7 @@
 
 - (NSUInteger)hash
 {
-  return self.id;
+  return (NSUInteger)self.id;
 }
 
 @end
