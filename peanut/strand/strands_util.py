@@ -49,8 +49,8 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLoca
 
 	for photo in photosInStrand:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
-		if ( (abs(timeDiff.total_seconds()) / 60) < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
-
+		timeDiffMin = abs(timeDiff.total_seconds()) / 60
+		if ( timeDiffMin < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
 			if honorLocation:
 				if not photo.location_point and not targetPhoto.location_point:
 					return True
@@ -68,13 +68,20 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor):
 	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
 		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
 
-		if not strand.location_point and not possibleNeighbor.location_point:
-			return True
+		if not strand.location_point or not possibleNeighbor.location_point:
+			for photo1 in strand.photos.all():
+				for photo2 in possibleNeighbor.photos.all():
+					timeDiff = photo1.time_taken - photo2.time_taken
+					timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
-		if (strand.location_point and possibleNeighbor.location_point and 
+					if timeDiffMin < 15:
+						return True
+		elif not strand.location_point and not possibleNeighbor.location_point:
+			return True
+		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
 			return True
-
+		
 	return False
 	
 def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
