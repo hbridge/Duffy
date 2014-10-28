@@ -357,7 +357,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+				if neighborStrand.location_point and strand.location_point:
+					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
 		interestedUsers = list(set(interestedUsers))
 
