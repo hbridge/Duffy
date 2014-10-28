@@ -63,9 +63,6 @@ static DFImageDownloadManager *defaultManager;
 
 - (void)fetchNewImages
 {
-#ifdef DEBUG
-  return; // TODO  REENABLE
-#endif
   // Get list of photo from feed manager
   NSArray *remotePhotos = [self.dataManager remotePhotos];
   
