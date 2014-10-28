@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -35,6 +36,7 @@
                 <constraint firstItem="WH2-z2-97B" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="Ra3-Eh-JGq"/>
                 <constraint firstItem="WH2-z2-97B" firstAttribute="top" secondItem="lU9-hh-vj8" secondAttribute="bottom" constant="8" id="XFP-RL-Fa7"/>
                 <constraint firstAttribute="centerX" secondItem="WH2-z2-97B" secondAttribute="centerX" id="XXH-7L-Yu1"/>
+                <constraint firstItem="WH2-z2-97B" firstAttribute="top" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="top" constant="36" id="ZfZ-PI-A0E"/>
                 <constraint firstAttribute="centerX" secondItem="5o1-IU-s0a" secondAttribute="centerX" id="bjg-7R-AL8"/>
                 <constraint firstAttribute="trailing" secondItem="WH2-z2-97B" secondAttribute="trailing" constant="8" id="eDW-3B-v9d"/>
                 <constraint firstItem="lU9-hh-vj8" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="h5U-Is-Vga"/>
