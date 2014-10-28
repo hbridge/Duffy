@@ -21,7 +21,7 @@
 @end
 
 
-@interface DFSelectPhotosViewController : UIViewController<DFImageDataSourceSupplementaryViewDelegate, DFSelectPhotosControllerDelegate, UICollectionViewDelegateFlowLayout>
+@interface DFSelectPhotosViewController : UIViewController<DFImageDataSourceDelegate, DFSelectPhotosControllerDelegate, UICollectionViewDelegateFlowLayout>
 
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;

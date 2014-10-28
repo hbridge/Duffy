@@ -167,11 +167,17 @@ const CGFloat CreateCellTitleSpacing = 8;
   }
 }
 
+- (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
+{
+  [self scrollToLast];
+}
+
 - (void)scrollToLast
 {
   NSInteger lastSection = [self.collectionView numberOfSections] - 1;
   if (lastSection < 0) return;
   NSInteger lastItem =  [self.collectionView numberOfItemsInSection:lastSection] - 1;
+  if (lastItem < 0) return;
   NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
   
   UICollectionView *collectionView = self.collectionView;

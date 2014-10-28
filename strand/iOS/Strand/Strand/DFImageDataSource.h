@@ -10,11 +10,14 @@
 #import "DFPhotoViewCell.h"
 #import "DFPeanutFeedObject.h"
 
-@protocol DFImageDataSourceSupplementaryViewDelegate <NSObject>
+@class DFImageDataSource;
+@protocol DFImageDataSourceDelegate <NSObject>
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath;
+@optional
+- (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource;
 
 @end
 
@@ -30,7 +33,7 @@ typedef enum {
 @property (nonatomic, weak) UICollectionView *collectionView;
 @property (nonatomic) DFImageDataSourceMode sourceMode;
 @property (nonatomic) DFImageType imageType;
-@property (nonatomic, weak) id<DFImageDataSourceSupplementaryViewDelegate> supplementaryViewDelegate;
+@property (nonatomic, weak) id<DFImageDataSourceDelegate> supplementaryViewDelegate;
 @property (nonatomic, retain) NSArray *collectionFeedObjects;
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedPhotos

@@ -48,6 +48,7 @@
 {
   DFImageDataSource __weak *weakSelf = self;
   dispatch_async(dispatch_get_main_queue(), ^{
+    NSUInteger previousCount = [_collectionFeedObjects count];
     _collectionFeedObjects = collectionFeedObjects;
     _localPhotoAssetsBySection = [NSMutableDictionary new];
     NSMutableArray *sectionArrays = [NSMutableArray new];
@@ -56,6 +57,10 @@
     }
     _sectionArrays = sectionArrays;
     [weakSelf.collectionView reloadData];
+    
+    if (previousCount == 0 && _collectionFeedObjects.count > 0 && [self.supplementaryViewDelegate respondsToSelector:@selector(didFinishFirstLoadForDatasource:)]) {
+      [self.supplementaryViewDelegate didFinishFirstLoadForDatasource:self];
+    }
   });
 }
 
