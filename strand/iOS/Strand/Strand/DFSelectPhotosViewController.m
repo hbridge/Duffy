@@ -163,18 +163,25 @@ const CGFloat CreateCellTitleSpacing = 8;
   }
   
   if (self.isMovingToParentViewController) {
-    NSInteger lastSection = [self.collectionView numberOfSections] - 1;
-    NSInteger lastItem = [self.collectionView numberOfItemsInSection:lastSection] - 1;
-    NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
-    
-    UICollectionView *collectionView = self.collectionView;
-    dispatch_async(dispatch_get_main_queue(), ^{
-      [collectionView scrollToItemAtIndexPath:lastIP
-                             atScrollPosition:UICollectionViewScrollPositionTop
-                                     animated:NO];
-      
-    });
+    [self scrollToLast];
   }
+}
+
+- (void)scrollToLast
+{
+  NSInteger lastSection = [self.collectionView numberOfSections] - 1;
+  if (lastSection < 0) return;
+  NSInteger lastItem =  [self.collectionView numberOfItemsInSection:lastSection] - 1;
+  NSIndexPath *lastIP = [NSIndexPath indexPathForItem:lastItem inSection:lastSection];
+  
+  UICollectionView *collectionView = self.collectionView;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [collectionView scrollToItemAtIndexPath:lastIP
+                           atScrollPosition:UICollectionViewScrollPositionTop
+                                   animated:NO];
+    
+  });
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
