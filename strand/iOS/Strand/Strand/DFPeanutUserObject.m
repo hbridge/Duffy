@@ -30,6 +30,8 @@
            @"device_token",
            @"last_location_point",
            @"last_location_accuracy",
+           @"last_photo_timestamp",
+           @"last_photo_update_timestamp",
            @"first_run_sync_timestamp",
            @"first_run_sync_count",
            @"invites_remaining",

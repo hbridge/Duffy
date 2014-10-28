@@ -401,6 +401,10 @@ static DFUploadController *defaultUploadController;
   NSBlockOperation *operation = [NSBlockOperation blockOperationWithBlock:^{
     DDLogInfo(@"All uploads complete.");
     [self postStatusUpdateWithError:nil];
+    
+    if (self.completionBlock) {
+      self.completionBlock(self.currentSessionStats);
+    }
     _currentSessionStats = nil;
     
     [self endBackgroundUpdateTask];

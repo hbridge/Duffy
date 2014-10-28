@@ -18,4 +18,6 @@
 - (void)cancelUploads:(BOOL)isSilent;
 - (BOOL)isUploadInProgress;
 
+@property (copy)void (^completionBlock)(DFUploadSessionStats *sessionStats);
+
 @end

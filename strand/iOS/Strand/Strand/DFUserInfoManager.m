@@ -68,6 +68,30 @@ static DFUserInfoManager *defaultManager;
                            }];
 }
 
+
+- (void)setLastPhotoTimestamp:(NSDate *)timestamp
+{
+  DFPeanutUserObject *currentUserPeanutObject = [DFPeanutUserObject new];
+  currentUserPeanutObject.id = [[DFUser currentUser] userID];
+  [self.userAdapter performRequest:RKRequestMethodGET
+                    withPeanutUser:currentUserPeanutObject
+                           success:^(DFPeanutUserObject *user) {
+                             user.last_photo_timestamp = timestamp;
+                             user.last_photo_update_timestamp = [[NSDate alloc] init];
+                             [self.userAdapter performRequest:RKRequestMethodPATCH
+                                               withPeanutUser:user
+                                                      success:^(DFPeanutUserObject *user) {
+                                                        DDLogVerbose(@"%@: Successfully set last_photo_timestamp to %@ for user %llu", self.class, timestamp, user.id);
+                                                      } failure:^(NSError *error) {
+                                                        DDLogError(@"%@: Error in PATCH for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
+                                                      }];
+                           } failure:^(NSError *error) {
+                             DDLogError(@"%@: Error in GET for user info with id %llu.  Error: %@", self.class, currentUserPeanutObject.id, error);
+                           }];
+}
+
+
+
 - (DFUserPeanutAdapter *)userAdapter
 {
   if (!_userAdapter) {

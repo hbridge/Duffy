@@ -58,6 +58,7 @@
 @property (nonatomic, assign) BOOL backgroundSyncHasFinished;
 @property (nonatomic, assign) BOOL backgroundSyncAndUploaderHaveFinished;
 @property (nonatomic, assign) BOOL backgroundSyncInProgress;
+@property (nonatomic) NSUInteger backgroundSyncTotalBytes;
 @property (nonatomic, retain) NSDate * firstRunSyncTimestamp;
 @property (nonatomic, retain) NSTimer *backgroundSyncCancelUploadsTimer;
 @property (nonatomic, retain) NSTimer *backgroundSyncReturnTimer;
@@ -389,7 +390,13 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
       [self.backgroundSyncReturnTimer invalidate];
       self.backgroundSyncReturnTimer = nil;
       
-      _completionHandler(UIBackgroundFetchResultNewData);
+      if (self.backgroundSyncTotalBytes > 0) {
+        DDLogInfo(@"Returning NewData result for background uploader since we uploaded %lul bytes", self.backgroundSyncTotalBytes);
+        _completionHandler(UIBackgroundFetchResultNewData);
+      } else {
+        DDLogInfo(@"Returning NoData result for background uploader");
+        _completionHandler(UIBackgroundFetchResultNoData);
+      }
     } else if (self.backgroundSyncAndUploaderHaveFinished == YES) {
       DDLogVerbose(@"Uploader finished but we should have already returned...ignoring");
     } else {
@@ -419,6 +426,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
 {
   NSDate *startDate = [NSDate date];
   DDLogInfo(@"Strand background app refresh called at %@", startDate);
+  self.backgroundSyncTotalBytes = 0;
 
   // Copy the completion handler for use later
   _completionHandler = [completionHandler copy];
@@ -443,9 +451,18 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
                                                                          userInfo:nil
                                                                           repeats:NO];
   
-  // Need to do this to have the class start listening to signals
-  [DFUploadController sharedUploadController];
+  // Have the uploader tell our local variable how many bytes it synced
+  // This is done so we know if to return "NewData" or "NoData"
+  [DFUploadController sharedUploadController].completionBlock = ^(DFUploadSessionStats *sessionStats) {
+    self.backgroundSyncTotalBytes += sessionStats.numBytesUploaded;
+  };
   [[DFCameraRollSyncManager sharedManager] sync];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [DFPhotoStore fetchMostRecentSavedPhotoDate:^(NSDate *timestamp) {
+        DDLogVerbose(@"Setting last photo timestamp to %@", timestamp);
+        [[DFUserInfoManager sharedManager] setLastPhotoTimestamp:timestamp];
+    } promptUserIfNecessary:NO];
+  });
 }
 
 - (void)resetApplication
