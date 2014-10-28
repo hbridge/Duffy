@@ -60,7 +60,6 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLoca
 					return True
 			else:
 				return True
-
 	return False
 
 
