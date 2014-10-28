@@ -9,12 +9,16 @@
 #import "DFPeanutFeedAdapter.h"
 #import "DFObjectManager.h"
 
+// Used
 NSString *const PrivateStrandsPath = @"unshared_strands";
+NSString *const InboxPath = @"strand_inbox";
+NSString *const SwapsPath = @"swaps";
+
+// Not used
 NSString *const GalleryPath = @"strand_feed";
 NSString *const InvitedPath = @"invited_strands";
 NSString *const SuggestedUnsharedPath = @"suggested_unshared_photos";
 NSString *const ActivityPath = @"strand_activity";
-NSString *const InboxPath = @"strand_inbox";
 
 @implementation DFPeanutFeedAdapter
 
@@ -25,7 +29,7 @@ NSString *const InboxPath = @"strand_inbox";
 
 + (NSArray *)responseDescriptors
 {
-  NSArray *paths = @[GalleryPath, PrivateStrandsPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath];
+  NSArray *paths = @[GalleryPath, PrivateStrandsPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath, SwapsPath];
   
   NSMutableArray *responseDescriptors = [NSMutableArray new];
   for (NSString *path in paths) {
@@ -45,14 +49,28 @@ NSString *const InboxPath = @"strand_inbox";
   return nil;
 }
 
-- (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+// Used
+
+- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
-  [super fetchObjectsAtPath:GalleryPath withCompletionBlock:completionBlock];
+  [super fetchObjectsAtPath:InboxPath withCompletionBlock:completionBlock];
 }
 
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
   [super fetchObjectsAtPath:PrivateStrandsPath withCompletionBlock:completionBlock];
+}
+
+- (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+{
+  [super fetchObjectsAtPath:SwapsPath withCompletionBlock:completionBlock];
+}
+
+
+// Not Used
+- (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock
+{
+  [super fetchObjectsAtPath:GalleryPath withCompletionBlock:completionBlock];
 }
 
 - (void)fetchInvitedStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
@@ -73,9 +91,5 @@ NSString *const InboxPath = @"strand_inbox";
   [super fetchObjectsAtPath:ActivityPath withCompletionBlock:completionBlock];
 }
 
-- (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock
-{
-  [super fetchObjectsAtPath:InboxPath withCompletionBlock:completionBlock];
-}
 
 @end

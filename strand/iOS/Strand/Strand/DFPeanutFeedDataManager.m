@@ -20,15 +20,19 @@
 
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *inboxFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *privateStrandsFeedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFeedAdapter *swapsFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
 @property (atomic) BOOL inboxRefreshing;
+@property (atomic) BOOL swapsRefreshing;
 @property (atomic) BOOL privateStrandsRefreshing;
 @property (nonatomic, retain) NSData *inboxLastResponseHash;
+@property (nonatomic, retain) NSData *swapsLastResponseHash;
 @property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
 
 @property (nonatomic, retain) NSArray *inboxFeedObjects;
+@property (nonatomic, retain) NSArray *swapsFeedObjects;
 @property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
 
 @end
@@ -36,6 +40,7 @@
 @implementation DFPeanutFeedDataManager
 
 @synthesize inboxFeedAdapter = _inboxFeedAdapter;
+@synthesize swapsFeedAdapter = _swapsFeedAdapter;
 @synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
@@ -71,6 +76,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)refreshFromServer
 {
   [self refreshInboxFromServer:nil];
+  [self refreshSwapsFromServer:nil];
   [self refreshPrivatePhotosFromServer:nil];
 }
 
@@ -96,6 +102,35 @@ static DFPeanutFeedDataManager *defaultManager;
        }
        if (completion) completion();
        self.inboxRefreshing = NO;
+     }
+     ];
+  }
+}
+
+- (void)refreshSwapsFromServer:(void(^)(void))completion
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  
+  if (!self.swapsRefreshing) {
+    self.swapsRefreshing = YES;
+    [self.swapsFeedAdapter
+     fetchSwapsWithCompletion:^(DFPeanutObjectsResponse *response,
+                                NSData *responseHash,
+                                NSError *error) {
+       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+       
+       if (!error && ![responseHash isEqual:self.swapsLastResponseHash]) {
+         self.swapsLastResponseHash = responseHash;
+         self.swapsFeedObjects = response.objects;
+         
+         DDLogVerbose(@"Got new swaps data, sending notification.");
+         
+         [[NSNotificationCenter defaultCenter]
+          postNotificationName:DFStrandNewSwapsDataNotificationName
+          object:self];
+       }
+       if (completion) completion();
+       self.swapsRefreshing = NO;
      }
      ];
   }
@@ -255,7 +290,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (NSArray *)inviteStrands
 {
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectInviteStrand];
-  return [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
+  return [self.swapsFeedObjects filteredArrayUsingPredicate:predicate];
 }
 
 - (NSArray *)acceptedStrands
@@ -291,9 +326,8 @@ static DFPeanutFeedDataManager *defaultManager;
 - (NSArray *)suggestedStrands
 {
   NSPredicate *predicate = [NSPredicate
-                            predicateWithFormat:@"actors.@count > 0"
-                            " AND suggestible == 1"];
-  NSArray *suggestibleStrands = [self.privateStrandsFeedObjects filteredArrayUsingPredicate:predicate];
+                            predicateWithFormat:@"type == %@", DFFeedObjectSwapSuggestion];
+  NSArray *suggestibleStrands = [self.swapsFeedObjects filteredArrayUsingPredicate:predicate];
   return [suggestibleStrands sortedArrayUsingComparator:
           ^NSComparisonResult(DFPeanutFeedObject *obj1, DFPeanutFeedObject *obj2) {
             if (obj1.suggestion_rank && !obj2.suggestion_rank) {
@@ -483,6 +517,12 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_privateStrandsFeedAdapter) _privateStrandsFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
   return _privateStrandsFeedAdapter;
+}
+
+- (DFPeanutFeedAdapter *)swapsFeedAdapter
+{
+  if (!_swapsFeedAdapter) _swapsFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
+  return _swapsFeedAdapter;
 }
 
 - (DFPeanutStrandAdapter *)strandAdapter

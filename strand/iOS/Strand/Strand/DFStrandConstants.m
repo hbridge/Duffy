@@ -31,6 +31,7 @@ NSString *const DFStrandJoinableStrandsCountKey = @"DFStrandJoinableStrandsCount
 
 NSString *const DFStrandReloadRemoteUIRequestedNotificationName = @"com.duffyapp.Strand.DFStrandRefreshRemoteUIRequestedNotificationName";
 NSString *const DFStrandNewInboxDataNotificationName = @"com.duffyapp.Strand.DFStrandNewInboxDataNotificationName";
+NSString *const DFStrandNewSwapsDataNotificationName = @"com.duffyapp.Strand.DFStrandNewSwapsDataNotificationName";
 NSString *const DFStrandNewPrivatePhotosDataNotificationName = @"com.duffyapp.Strand.DFStrandNewPrivatePhotosDataNotificationName";
 
 NSString *const DFStrandCameraPhotoSavedNotificationName = @"com.duffyapp.Strand.DFStrandCameraPhotoSavedNotificationName";

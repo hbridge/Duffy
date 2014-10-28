@@ -26,6 +26,7 @@ DFFeedObjectType DFFeedObjectStrandPosts = @"strand_posts";
 DFFeedObjectType DFFeedObjectFriendsList = @"friends_list";
 DFFeedObjectType DFFeedObjectSuggestedPhotos = @"suggested_photos";
 DFFeedObjectType DFFeedObjectStrandJoin = @"strand_join";
+DFFeedObjectType DFFeedObjectSwapSuggestion = @"section";
 
 static NSArray *FeedObjectTypes;
 

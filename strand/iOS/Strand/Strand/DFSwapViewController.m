@@ -52,11 +52,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 {
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(reloadData)
-                                               name:DFStrandNewInboxDataNotificationName
-                                             object:nil];
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(reloadData)
-                                               name:DFStrandNewPrivatePhotosDataNotificationName
+                                               name:DFStrandNewSwapsDataNotificationName
                                              object:nil];
 }
 
@@ -185,26 +181,13 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 - (void)refreshFromServer
 {
   // we're getting our data from both feeds, so wait till both are done to call endRefreshing
-  BOOL __block inboxDone = NO;
-  BOOL __block privatePhotosDone = NO;
-  [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:^{
+  [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:^{
     dispatch_async(dispatch_get_main_queue(), ^{
-      inboxDone = YES;
-      if (inboxDone && privatePhotosDone) {
-        [self.refreshControl endRefreshing];
-        [self reloadData];
-      }
+      [self.refreshControl endRefreshing];
+      [self reloadData];
     });
   }];
-  [[DFPeanutFeedDataManager sharedManager] refreshPrivatePhotosFromServer:^{
-    dispatch_async(dispatch_get_main_queue(), ^{
-      privatePhotosDone = YES;
-      if (inboxDone && privatePhotosDone) {
-        [self.refreshControl endRefreshing];
-        [self reloadData];
-      }
-    });
-  }];
+
 }
 
 - (void)configureNoResultsView
@@ -279,7 +262,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     cell = [self noResultsCellForIndexPath:indexPath];
   } else if ([object.type isEqual:DFFeedObjectInviteStrand]) {
     cell = [self cellForInviteObject:object];
-  } else if ([object.type isEqual:DFFeedObjectSection]) {
+  } else if ([object.type isEqual:DFFeedObjectSwapSuggestion]) {
     cell = [self cellForSuggestionObject:object];
   }
   
@@ -381,7 +364,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   if ([object.type isEqual:DFFeedObjectInviteStrand]) {
     DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:object];
     [self.navigationController pushViewController:feedViewController animated:YES];
-  } else if ([object.type isEqual:DFFeedObjectSection]) {
+  } else if ([object.type isEqual:DFFeedObjectSwapSuggestion]) {
     DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
                                                           initWithHighlightedPhotoCollection:object];
     

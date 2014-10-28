@@ -30,6 +30,7 @@ extern NSString *const DFStrandReloadRemoteUIRequestedNotificationName;
 extern NSString *const DFStrandCameraPhotoSavedNotificationName;
 extern NSString *const DFStrandNewInboxDataNotificationName;
 extern NSString *const DFStrandNewPrivatePhotosDataNotificationName;
+extern NSString *const DFStrandNewSwapsDataNotificationName;
 
 
 extern const CGFloat StrandGalleryItemSpacing;

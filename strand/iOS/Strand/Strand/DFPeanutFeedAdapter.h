@@ -13,6 +13,7 @@
 // Used
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 
 // Deprecated
 - (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;

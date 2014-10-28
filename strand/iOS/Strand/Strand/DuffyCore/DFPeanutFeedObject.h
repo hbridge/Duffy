@@ -28,6 +28,7 @@ extern DFFeedObjectType DFFeedObjectStrandPosts;
 extern DFFeedObjectType DFFeedObjectFriendsList;
 extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
 extern DFFeedObjectType DFFeedObjectStrandJoin;
+extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 
 // Simple attribures
 @property (nonatomic) DFPhotoIDType id;
