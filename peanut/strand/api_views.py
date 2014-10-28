@@ -551,6 +551,7 @@ lastCheckinQueryCount = 0
 def startProfiling():
 	global requestStartTime
 	global lastCheckinTime
+	global lastCheckinQueryCount
 	requestStartTime = datetime.datetime.now()
 	lastCheckinTime = requestStartTime
 	lastCheckinQueryCount = 0
@@ -617,28 +618,20 @@ def strand_inbox(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 		
-		# First throw in invite objects
-		responseObjects.extend(getInviteObjectsDataForUser(user))
-		
-		printStats("inbox-1")
-		
 		# Next throw in the list of existing Strands
 		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
-
 		printStats("inbox-2")
 
 		#nonInviteStrandObjects = list()
 		responseObjects.extend(getObjectsDataForStrands(strands, user))
-
 		printStats("inbox-3")
 
 		# sorting by last action on the strand
+		# Do this up here because the next few entries don't have time_stamps
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
-		#responseObjects.extend(nonInviteStrandObjects)
 
 		# Add in the list of all friends at the end
 		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
-
 		printStats("inbox-4")
 
 		responseObjects.append(friendsEntry)
@@ -648,6 +641,52 @@ def strand_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+
+"""
+	Returns back the invites and strands a user has
+"""
+def swaps(request):
+	startProfiling()
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		responseObjects = list()
+
+		# First throw in invite objects
+		responseObjects.extend(getInviteObjectsDataForUser(user))
+		printStats("swaps-invites")
+
+		strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1__user=user) | Q(strand_2__user=user))
+		strands = list()
+		for strandNeighbor in strandNeighbors:
+			if strandNeighbor.strand_1.user_id == user.id:
+				strand = strandNeighbor.strand_1
+			else:
+				strand = strandNeighbor.strand_2
+			if strand.suggestible:
+				strands.append(strand)
+
+		ids = Strand.getIds(strands)
+
+		strands = Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=ids).order_by('-first_photo_time')[:20]
+		suggestions = getObjectsDataForPrivateStrands(user, strands, "suggestion")
+
+		# These are suggestions filtered
+		suggestibleSuggestions = list()
+		for suggestion in suggestions:
+			if suggestion['suggestible']:
+				suggestibleSuggestions.append(suggestion)
+				
+		responseObjects.extend(suggestibleSuggestions)
+		printStats("swaps-suggestions")
+
+		response['objects'] = responseObjects
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 
 # ---------------------------------------------------------------
