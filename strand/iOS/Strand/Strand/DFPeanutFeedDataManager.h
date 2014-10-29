@@ -24,6 +24,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (BOOL)hasInboxData;
 - (BOOL)hasPrivateStrandData;
+- (BOOL)hasSwapsData;
 
 - (BOOL)isRefreshingInbox;
 

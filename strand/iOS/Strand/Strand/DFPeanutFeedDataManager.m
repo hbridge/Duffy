@@ -182,6 +182,11 @@ static DFPeanutFeedDataManager *defaultManager;
   return (self.inboxLastResponseHash != nil);
 }
 
+- (BOOL)hasSwapsData
+{
+  return (self.swapsLastResponseHash != nil);
+}
+
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user
 {
   NSMutableArray *strands = [NSMutableArray new];

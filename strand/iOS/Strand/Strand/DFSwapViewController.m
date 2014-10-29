@@ -131,8 +131,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   self.sectionTitles = [NSMutableOrderedSet new];
   self.sectionTitlesToObjects = [NSMutableDictionary new];
   
-  if (![[DFPeanutFeedDataManager sharedManager] hasPrivateStrandData]
-      || ![[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
+  if (![[DFPeanutFeedDataManager sharedManager] hasSwapsData]) {
     [self configureNoResultsView];
     return;
   }
@@ -202,8 +201,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     }
     
     self.noItemsView.hidden = NO;
-    if ([[DFPeanutFeedDataManager sharedManager] hasPrivateStrandData]
-        && [[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
+    if ([[DFPeanutFeedDataManager sharedManager] hasSwapsData]) {
       self.noItemsView.titleLabel.text = @"Nothing To Swap";
       [self.noItemsView.activityIndicator stopAnimating];
     } else {
