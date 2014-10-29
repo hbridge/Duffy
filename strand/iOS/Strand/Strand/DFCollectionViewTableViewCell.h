@@ -7,9 +7,8 @@
 //
 
 #import <UIKit/UIKit.h>
-#import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
 
-@interface DFCollectionViewTableViewCell : MCSwipeTableViewCell <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface DFCollectionViewTableViewCell : UITableViewCell <UICollectionViewDataSource, UICollectionViewDelegate>
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 
 // Objects that the cell represents
