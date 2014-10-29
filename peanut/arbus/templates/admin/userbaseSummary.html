@@ -203,7 +203,7 @@
 				<th class='actions b-r' colspan='4'> Actions (7d) </th>
 				<th class='notifications b-r' colspan='2'> Notifications </th>
 				<!-- <th class='location b-r' colspan='2'> Location </th> -->
-				<th class='after' colspan='7' > </th>
+				<th class='after' colspan='8' > </th>
 			</tr>
 			<tr class='ui-row-header' >
 				<td class='userid b-r'> ID </td>
@@ -225,6 +225,7 @@
 				<td class='last-build b-r'> Last <br> Build </td>
 				<td class='last-uploaded-timestamp b-r'> Last Upload </td>
 				<td class='last-action-timestamp b-r'> Last Action </td>
+				<td class='last-checkin-timestamp b-r'> Last Checkin </td>
 			</tr>
 		{% for entry in strandV2List %}
 			<tr class='ui-row {% if entry.internal == True %} ui-row-internal {% endif %}'>
@@ -254,6 +255,7 @@
 				<td class='last-build b-r'> {{ entry.build }} </td>
 				<td class='last-uploaded-timestamp timeago b-r' title="{{ entry.lastUploadTime }}"> </td>
 				<td class='last-action-timestamp timeago b-r' title="{{ entry.lastActionTime }}"> </td>
+				<td class='last-checkin-timestamp timeago b-r' title="{{ entry.user.last_photo_update_timestamp }}"> </td>				
 			</tr>
 		{% endfor %}
 		</table>
