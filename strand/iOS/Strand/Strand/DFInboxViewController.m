@@ -330,43 +330,6 @@ NSString * binaryStringFromInteger( NSInteger  number )
   cell.objects = @[];
 }
 
-- (void)setRemotePhotosForCell:(DFInboxTableViewCell *)cell
-                   withStrandPosts:(DFPeanutFeedObject *)strandPosts
-                     maxPhotos:(NSUInteger)maxPhotosToFetch
-{
-  NSMutableArray *photoIDs = [NSMutableArray new];
-  NSMutableArray *photos = [NSMutableArray new];
-  
-  for (NSUInteger i = 0; i < strandPosts.objects.count; i++) {
-    DFPeanutFeedObject *strandPost = strandPosts.objects[i];
-    
-    for (NSUInteger j = 0; j < strandPost.objects.count; j++) {
-      DFPeanutFeedObject *object = strandPost.objects[j];
-      DFPeanutFeedObject *photoObject;
-      if ([object.type isEqual:DFFeedObjectCluster]) {
-        photoObject = object.objects.firstObject;
-      } else if ([object.type isEqual:DFFeedObjectPhoto]) {
-        photoObject = object;
-      }
-      if (photoObject) {
-        [photoIDs addObject:@(photoObject.id)];
-        [photos addObject:photoObject];
-      }
-    }
-  }
-  
-  cell.objects = photoIDs;
-  for (NSUInteger i = 0; i < MIN(photos.count, maxPhotosToFetch); i++) {
-    DFPeanutFeedObject *photoObject = photos[i];
-    [[DFImageManager sharedManager]
-     imageForID:photoObject.id
-     preferredType:DFImageThumbnail
-     completion:^(UIImage *image) {
-       [cell setImage:image forObject:@(photoObject.id)];
-     }];
-  }
-}
-
 
 #pragma mark - Table View delegate
 

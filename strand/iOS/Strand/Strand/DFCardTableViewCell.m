@@ -134,91 +134,49 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
 
   if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
     DFPeanutFeedObject *firstPost = feedObject.objects.firstObject;
-    DFPeanutUserObject *user = firstPost.actors[0];
-    
-    if (user.id == [[DFUser currentUser] userID]) {
-      return [self setLocalPhotosWithStrandPost:firstPost];
-    } else {
-      return [self setRemotePhotosWithStrandPost:firstPost imageType:DFImageFull];
-    }
+    [self setPhotosWithStrandPost:firstPost];
   } else if ([feedObject.type isEqual:DFFeedObjectSection]) {
-    return [self setLocalPhotosWithStrandPost:feedObject];
+    return [self setPhotosWithStrandPost:feedObject];
   } else if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
     // Invite will always have only remote photos
     // Do same as strand posts and use only first post for now
     DFPeanutFeedObject *strandPosts = feedObject.objects.firstObject;
     DFPeanutFeedObject *firstPost = strandPosts.objects.firstObject;
-    return [self setRemotePhotosWithStrandPost:firstPost imageType:DFImageFull];
+    return [self setPhotosWithStrandPost:firstPost];
   }
 }
 
-- (void)setLocalPhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
+
+- (void)setPhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
 {
   // Get the IDs of all the photos we want to show
   NSMutableArray *idsToShow = [NSMutableArray new];
   for (NSUInteger i = 0; i < MIN(self.maxPhotosToShow, strandPost.objects.count); i++) {
     DFPeanutFeedObject *object = strandPost.objects[i];
+    DFPhotoIDType repPhotoID = 0;
     if ([object.type isEqual:DFFeedObjectPhoto]) {
-      [idsToShow addObject:@(object.id)];
-      
+      repPhotoID = object.id;
     } else if ([object.type isEqual:DFFeedObjectCluster]) {
       DFPeanutFeedObject *repObject = object.objects.firstObject;
-      [idsToShow addObject:@(repObject.id)];
+      repPhotoID = repObject.id;
     }
+    [idsToShow addObject:@(repPhotoID)];
   }
-  
-  // Set the images for the collection view
   self.objects = idsToShow;
-  for (NSNumber *photoID in idsToShow) {
-    DFPhoto *photo = [[DFPhotoStore sharedStore] photoWithPhotoID:photoID.longLongValue];
-    if (photo) {
-      CGFloat thumbnailSize;
-      if ([UIDevice majorVersionNumber] >= 8) {
-        // only use the larger thumbnails on iOS 8+, the scaling will kill perf on iOS7
-        thumbnailSize = self.collectionView.frame.size.height * [[UIScreen mainScreen] scale];
-      } else {
-        thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
-      }
-      [photo.asset
-       loadUIImageForThumbnailOfSize:thumbnailSize
-       successBlock:^(UIImage *image) {
-         [self setImage:image forObject:photoID];
-       } failureBlock:^(NSError *error) {
-         DDLogError(@"%@ couldn't load image for asset: %@", self.class, error);
-       }];
-    } else {
-      DDLogError(@"Got back nil data for photo %@", photoID);
-    }
-  }
-}
-
-
-- (void)setRemotePhotosWithStrandPost:(DFPeanutFeedObject *)strandPost
-                            imageType:(DFImageType)imageType
-{
-  NSMutableArray *photoIDs = [NSMutableArray new];
-  NSMutableArray *photos = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *object in strandPost.objects) {
-    DFPeanutFeedObject *photoObject;
-    if ([object.type isEqual:DFFeedObjectCluster]) {
-      photoObject = object.objects.firstObject;
-    } else if ([object.type isEqual:DFFeedObjectPhoto]) {
-      photoObject = object;
-    }
-    if (photoObject) {
-      [photoIDs addObject:@(photoObject.id)];
-      [photos addObject:photoObject];
-    }
-  }
+  for (NSUInteger i = 0; i < self.objects.count; i++) {
+    UICollectionViewLayoutAttributes *attributes =
+    [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+    DFPhotoIDType photoID = [(NSNumber *)self.objects[i] longLongValue];
   
-  self.objects = photoIDs;
-  for (DFPeanutFeedObject *photoObject in photos) {
+    DFCardTableViewCell __weak *weakSelf = self;
     [[DFImageManager sharedManager]
-     imageForID:photoObject.id
-     preferredType:imageType
+     imageForID:photoID
+     size:attributes.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
      completion:^(UIImage *image) {
-       [self setImage:image forObject:@(photoObject.id)];
+       [weakSelf setImage:image forObject:@(photoID)];
      }];
   }
 }
