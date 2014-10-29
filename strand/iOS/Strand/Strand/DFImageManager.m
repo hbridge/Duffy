@@ -97,11 +97,11 @@
   UIImage *cachedImage = [self cachedImageForRequest:request];
   NSString *source;
   if (cachedImage) {
-    source = @"cache";
+    source = @"memcache";
     completionBlock(cachedImage);
   }else if ([[DFImageStore sharedStore] canServeRequest:request]) {
     // opt for the cache first
-    source = @"imageStore";
+    source = @"diskcache";
     [self serveRequestWithDiskCache:request completion:completionBlock];
   } else if ([self isLocalPhotoID:photoID]) {
     // otherwise see if we can get the photo locally
