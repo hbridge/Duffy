@@ -1,5 +1,8 @@
 # Swap
 
+## Oct 29th, 2014 (4773) 
+
+- Performance enhancements
 
 ## Oct 28th, 2014 (4770-4772)
 
