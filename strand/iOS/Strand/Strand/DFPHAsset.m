@@ -15,7 +15,6 @@
 
 @interface DFPHAsset()
 
-@property (nonatomic, retain) PHAsset *asset;
 
 @end
 

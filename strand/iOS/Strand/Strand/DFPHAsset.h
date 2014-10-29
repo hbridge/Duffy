@@ -13,11 +13,14 @@
 @interface DFPHAsset : DFPhotoAsset
 
 @property (nonatomic, retain) NSString * localIdentifier;
+@property (nonatomic, retain) PHAsset *asset;
 
 
 + (DFPHAsset *)createWithPHAsset:(PHAsset *)asset
                        inContext:(NSManagedObjectContext *)managedObjectContext;
 + (NSURL *)URLForPHAssetLocalIdentifier:(NSString *)identifier;
 + (NSString *)localIdentifierFromURL:(NSURL *)url;
++ (PHImageRequestOptions *)highQualityImageRequestOptions;
+
 
 @end

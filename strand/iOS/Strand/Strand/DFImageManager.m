@@ -13,16 +13,23 @@
 #import "DFPhotoStore.h"
 #import "DFPhotoResizer.h"
 #import "UIDevice+DFHelpers.h"
+#import <Photos/Photos.h>
+#import "DFPHAsset.h"
 
 @interface DFImageManager()
 
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (readonly, atomic, retain) NSMutableDictionary *photoIDsToDeferredRequests;
-@property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
+@property (atomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
 @property (readonly, atomic) dispatch_queue_t imageRequestQueue;
 @property (readonly, atomic) dispatch_queue_t cacheRequestQueue;
 @property (readonly, atomic, retain) NSMutableDictionary *imageRequestCache;
-@property (nonatomic) dispatch_semaphore_t imageRequestCacheSemaphore;
+@property (atomic) dispatch_semaphore_t imageRequestCacheSemaphore;
+
+@property (atomic, readonly, retain) NSMutableSet *cacheRequestsInFlight;
+@property (atomic) dispatch_semaphore_t cacheRequestsInFlightSemaphore;
+@property (nonatomic, retain) PHCachingImageManager *cacheImageManager;
+
 
 @end
 
@@ -54,13 +61,14 @@
     _photoIDsToDeferredRequests = [NSMutableDictionary new];
     _deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     
+    
     dispatch_queue_attr_t imageReqAttrs;
     dispatch_queue_attr_t cache_attrs;
     if ([UIDevice majorVersionNumber] >= 8) {
       imageReqAttrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT,
                                                               QOS_CLASS_DEFAULT,
                                                               0);
-      cache_attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT,
+      cache_attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL,
                                                             QOS_CLASS_BACKGROUND,
                                                             0);
       _imageRequestQueue = dispatch_queue_create("ImageReqQueue", imageReqAttrs);
@@ -68,13 +76,18 @@
     } else {
       _imageRequestQueue = dispatch_queue_create("ImageReqQueue", DISPATCH_QUEUE_CONCURRENT);
       dispatch_set_target_queue(_imageRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
-      _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", DISPATCH_QUEUE_CONCURRENT);
-      dispatch_set_target_queue(_imageRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0));
+      _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", DISPATCH_QUEUE_SERIAL);
+      dispatch_set_target_queue(_cacheRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0));
     }
     
     // setup the cache
     _imageRequestCache = [NSMutableDictionary new];
     _imageRequestCacheSemaphore = dispatch_semaphore_create(1);
+    
+    _cacheRequestsInFlight = [NSMutableSet new];
+    _cacheRequestsInFlightSemaphore = dispatch_semaphore_create(1);
+
+    _cacheImageManager = [[PHCachingImageManager alloc] init];
     
     [self observeNotifications];
   }
@@ -169,8 +182,13 @@
     // first see what we can get in mem or disk cache
     DFImageManagerRequest *request = [templateRequest copyWithPhotoID:photoID.longLongValue];
     
+    if ([self checkAndSetCacheRequestInFlight:request]) {
+      //DDLogVerbose(@"dupe cache request, ignoring");
+     continue; //we're already caching this, continue
+    }
     if ([self cachedImageForRequest:request]) {
-      // we already have this in the cache, do nothing
+      // we already have this in the cache or it's in progress, do nothing
+      [self removeCacheRequestInFlight:request];
       continue;
     } else if ([[DFImageStore sharedStore] canServeRequest:request]) {
       // if we can cache from the disk store, load the images from there
@@ -186,6 +204,23 @@
   [self cacheIDsNotInDiskCache:idsNotInDiskCache templateRequest:templateRequest];
 }
 
+- (BOOL)checkAndSetCacheRequestInFlight:(DFImageManagerRequest *)request
+{
+  BOOL result = NO;
+  dispatch_semaphore_wait(self.cacheRequestsInFlightSemaphore, DISPATCH_TIME_FOREVER);
+  if ([self.cacheRequestsInFlight containsObject:request]) result = YES;
+  else ([self.cacheRequestsInFlight addObject:request]);
+  dispatch_semaphore_signal(self.cacheRequestsInFlightSemaphore);
+  return result;
+}
+
+- (void)removeCacheRequestInFlight:(DFImageManagerRequest *)request
+{
+  dispatch_semaphore_wait(self.cacheRequestsInFlightSemaphore, DISPATCH_TIME_FOREVER);
+  [self.cacheRequestsInFlight removeObject:request];
+  dispatch_semaphore_signal(self.cacheRequestsInFlightSemaphore);
+}
+
 - (void)cacheIDsNotInDiskCache:(NSArray *)idsNotInDiskCache
                templateRequest:(DFImageManagerRequest *)templateRequest
 {
@@ -197,9 +232,22 @@
       NSDictionary *localPhotosByID = [DFPhotoStore photosWithPhotoIDs:idsNotInDiskCache inContext:context];
       for (DFPhoto *photo in localPhotosByID.allValues) {
         DFImageManagerRequest *request = [templateRequest copyWithPhotoID:photo.photoID];
-        UIImage *image = [photo.asset imageForRequest:request];
+        UIImage __block *image;
+        if ([[photo.asset class] isSubclassOfClass:[DFPHAsset class]]) {
+          DFPHAsset *dfphAsset = (DFPHAsset *)photo.asset;
+          [self.cacheImageManager requestImageForAsset:dfphAsset.asset
+                                            targetSize:request.size
+                                           contentMode:request.contentMode == DFImageRequestContentModeAspectFill ? PHImageContentModeAspectFill : PHImageContentModeAspectFit
+                                               options:[DFPHAsset highQualityImageRequestOptions]
+                                         resultHandler:^(UIImage *result, NSDictionary *info) {
+                                           image = result;
+                                         }];
+        } else {
+          image = [photo.asset imageForRequest:request];
+        }
+        
+        [self cacheImage:image forRequest:request];
         if (image) {
-          [self cacheImage:image forRequest:request];
           [unfulfilledLocally removeObject:@(photo.photoID)];
         }
       }
@@ -208,6 +256,9 @@
         DFImageManagerRequest *request = [templateRequest copyWithPhotoID:unfulfilledID.longLongValue];
         [self serveRequestFromNetwork:request completion:nil];
       }
+      
+      //DDLogVerbose(@"cached %@ from photoStore, %@ from network.", @(localPhotosByID.count), @(unfulfilledLocally.count));
+      
     });
   }
 }
@@ -276,7 +327,6 @@
 - (void)cacheImage:(UIImage *)image forRequest:(DFImageManagerRequest *)request
 {
   dispatch_semaphore_wait(self.imageRequestCacheSemaphore, DISPATCH_TIME_FOREVER);
-  
   if (image) {
     // normalize the deliveryType since it doesn't matter for cache
     DFImageManagerRequest *cacheRequest = [request
@@ -284,6 +334,7 @@
     self.imageRequestCache[cacheRequest] = image;
   }
   dispatch_semaphore_signal(self.imageRequestCacheSemaphore);
+  [self removeCacheRequestInFlight:request];
 }
 
 - (UIImage *)cachedImageForRequest:(DFImageManagerRequest *)request
