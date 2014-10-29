@@ -452,24 +452,6 @@ const CGFloat LockedCellHeight = 157.0;
   });
 }
 
-#pragma mark - DFStrandsViewControllerDelegate
-
-- (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
-{
-  [self.tableView reloadData];
-}
-
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:(NSError *)error
-{
-  // Turn off spinner since we successfully did a server fetch
-  //[self.refreshControl endRefreshing];
-  
-  if (self.requestedPhotoIDToJumpTo != 0) {
-    [self showPhoto:self.requestedPhotoIDToJumpTo animated:NO];
-    self.requestedPhotoIDToJumpTo = 0;
-  }
-}
-
 #pragma mark - Table view data source: sections
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -1037,14 +1019,6 @@ selectedObjectChanged:(id)newObject
 }
 
 
-#pragma mark - Bar Actions
-
-- (void)backPressed:(id)sender
-{
-  [self.topBarController popViewControllerAnimated:YES];
-}
-
-
 #pragma mark - Adapters
 
 - (DFPhotoMetadataAdapter *)photoAdapter
@@ -1063,11 +1037,8 @@ selectedObjectChanged:(id)newObject
 {
   if (![self shouldHandleScrollChange]) return;
   CGFloat scrollOffset = scrollView.contentOffset.y;
-  CGFloat dy = scrollOffset - self.previousScrollViewYOffset;
   
-  if (scrollOffset <= -scrollView.contentInset.top) {
-    [self.topBarController mainScrollViewScrolledToTop:YES dy:dy];
-  } else {
+  if (scrollOffset > -scrollView.contentInset.top) {
     [self configureUpsellHeight];
   }
   
@@ -1080,28 +1051,6 @@ selectedObjectChanged:(id)newObject
   if (self.isViewTransitioning || !self.view.window) return NO;
   
   return YES;
-}
-
-- (void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView
-{
-  [self.topBarController mainScrollViewStoppedScrolling];
-}
-
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView
-                  willDecelerate:(BOOL)decelerate
-{
-  if (!decelerate) {
-    [self.topBarController mainScrollViewStoppedScrolling];
-  }
-}
-
-- (DFTopBarController *)topBarController
-{
-  if ([[self.parentViewController class] isSubclassOfClass:[DFTopBarController class]]) {
-    return (DFTopBarController *)self.parentViewController;
-  }
-  
-  return nil;
 }
 
 

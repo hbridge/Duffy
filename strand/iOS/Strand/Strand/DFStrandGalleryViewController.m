@@ -121,17 +121,6 @@
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
-- (void)strandsViewControllerUpdatedData:(DFStrandsViewController *)strandsViewController
-{
-  [self.collectionView reloadData];
-}
-
-- (void)strandsViewController:(DFStrandsViewController *)strandsViewController didFinishServerFetchWithError:error
-{
-  [self.refreshControl endRefreshing];
-}
-
-
 
 # pragma mark - Collection View Datasource
 
