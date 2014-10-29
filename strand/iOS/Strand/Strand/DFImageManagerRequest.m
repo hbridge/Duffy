@@ -73,6 +73,14 @@
                                                  DFPhotoAssetDefaultThumbnailSize));
 }
 
+- (DFImageManagerRequest *)copyWithDeliveryMode:(DFImageRequestDeliveryMode)deliveryMode
+{
+  return [[DFImageManagerRequest alloc] initWithPhotoID:self.photoID
+                                                   size:self.size
+                                            contentMode:self.contentMode 
+                                           deliveryMode:deliveryMode];
+}
+
 - (NSString *)description
 {
   return [[self dictionaryWithValuesForKeys:@[@"photoID", @"size", @"contentMode", @"deliveryMode"]]

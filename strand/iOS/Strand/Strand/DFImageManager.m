@@ -202,15 +202,24 @@
 - (void)cacheImage:(UIImage *)image forRequest:(DFImageManagerRequest *)request
 {
   dispatch_semaphore_wait(self.imageRequestCacheSemaphore, DISPATCH_TIME_FOREVER);
-  if (image) self.imageRequestCache[request] = image;
+
+  if (image) {
+    // normalize the deliveryType since it doesn't matter for cache
+    DFImageManagerRequest *cacheRequest = [request
+                                           copyWithDeliveryMode:DFImageRequestOptionsDeliveryModeFastFormat];
+    self.imageRequestCache[cacheRequest] = image;
+  }
   dispatch_semaphore_signal(self.imageRequestCacheSemaphore);
 }
 
 - (UIImage *)cachedImageForRequest:(DFImageManagerRequest *)request
 {
   UIImage *image;
+  // normalize the deliveryType since it doesn't matter for cache
+  DFImageManagerRequest *cacheRequest = [request
+                                         copyWithDeliveryMode:DFImageRequestOptionsDeliveryModeFastFormat];
   dispatch_semaphore_wait(self.imageRequestCacheSemaphore, DISPATCH_TIME_FOREVER);
-  image = self.imageRequestCache[request];
+  image = self.imageRequestCache[cacheRequest];
   dispatch_semaphore_signal(self.imageRequestCacheSemaphore);
   return image;
 }
@@ -251,7 +260,7 @@
   NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
   NSArray *similarRequests = [self.class requestsLike:request inArray:requestsForID.allObjects];
   if (similarRequests.count == 0) callLoadBlock = YES;
-  DDLogVerbose(@"%@ request: %@ has %d similarRequests ahead in queue.", self.class, request, (int)similarRequests.count);
+  //DDLogVerbose(@"%@ request: %@ has %d similarRequests ahead in queue.", self.class, request, (int)similarRequests.count);
   
   // keep track of this request in photoIDstoDeferredRequests
   if (!requestsForID) requestsForID = [NSMutableSet new];
