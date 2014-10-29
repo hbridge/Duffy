@@ -10,7 +10,7 @@
 #import "DFAnalytics.h"
 #import "DFDefaultsStore.h"
 #import "DFFeedSectionHeaderView.h"
-#import "DFImageStore.h"
+#import "DFImageManager.h"
 #import "DFNavigationController.h"
 #import "DFNotificationSharedConstants.h"
 #import "DFPeanutActionAdapter.h"
@@ -555,18 +555,18 @@ const CGFloat LockedCellHeight = 157.0;
   //[photoFeedCell.loadingActivityIndicator startAnimating];
   
   if (photoObject) {
-    [[DFImageStore sharedStore]
+    [[DFImageManager sharedManager]
      imageForID:photoObject.id
      preferredType:DFImageFull
      completion:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
-         [photoFeedCell setImage:image forObject:@(photoObject.id)];
-         [photoFeedCell setNeedsLayout];
-       });
-     }];
+      dispatch_async(dispatch_get_main_queue(), ^{
+        if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
+        [photoFeedCell setImage:image forObject:@(photoObject.id)];
+        [photoFeedCell setNeedsLayout];
+      });
+    }];
   }
-
+  
   return photoFeedCell;
 }
 
@@ -600,7 +600,7 @@ const CGFloat LockedCellHeight = 157.0;
   [DFFeedViewController configureNonImageAttributesForCell:clusterFeedCell
                                                searchObject:[cluster.objects firstObject]];
   for (DFPeanutFeedObject *subObject in cluster.objects) {
-    [[DFImageStore sharedStore]
+    [[DFImageManager sharedManager]
      imageForID:subObject.id
      preferredType:DFImageFull
      completion:^(UIImage *image) {

@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "DFTypedefs.h"
+#import "DFImageManagerRequest.h"
 
 @interface DFImageStore : NSObject
 
@@ -16,16 +17,18 @@ typedef void (^SetImageCompletion)(NSError *error);
 
 + (DFImageStore *)sharedStore;
 
-- (void)imageForID:(DFPhotoIDType)photoID
-     preferredType:(DFImageType)type
-        completion:(ImageLoadCompletionBlock)completionBlock;
+//- (void)imageForID:(DFPhotoIDType)photoID
+//     preferredType:(DFImageType)type
+//        completion:(ImageLoadCompletionBlock)completionBlock;
 
 - (void)setImage:(UIImage *)image
             type:(DFImageType)type
            forID:(DFPhotoIDType)photoID
       completion:(SetImageCompletion)completion;
 
-+ (NSError *)clearCache;
+- (UIImage *)serveImageForRequest:(DFImageManagerRequest *)request;
+
+- (NSError *)clearCache;
 
 + (NSURL *)applicationDocumentsDirectory;
 + (NSURL *)localFullImagesDirectoryURL;
@@ -33,5 +36,6 @@ typedef void (^SetImageCompletion)(NSError *error);
 
 - (NSSet *)getPhotoIdsForType:(DFImageType)type;
 - (void)loadDownloadedImagesCache;
+- (BOOL)canServeRequest:(DFImageManagerRequest *)request;
 
 @end

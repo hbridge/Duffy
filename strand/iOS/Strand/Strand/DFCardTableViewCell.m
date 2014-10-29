@@ -16,7 +16,7 @@
 #import "DFPhotoStore.h"
 #import "DFPhotoViewCell.h"
 #import "DFStrandConstants.h"
-#import "DFImageStore.h"
+#import "DFImageManager.h"
 
 const NSUInteger LargeCardMaxPhotosPerCell = 3;
 
@@ -214,7 +214,7 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   
   self.objects = photoIDs;
   for (DFPeanutFeedObject *photoObject in photos) {
-    [[DFImageStore sharedStore]
+    [[DFImageManager sharedManager]
      imageForID:photoObject.id
      preferredType:imageType
      completion:^(UIImage *image) {

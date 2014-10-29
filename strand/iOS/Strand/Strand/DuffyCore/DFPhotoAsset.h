@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
+#import "DFImageManagerRequest.h"
 
 @class DFPhoto;
 @class CLLocation;
@@ -50,6 +51,8 @@ typedef void (^DFPhotoAssetLoadFailureBlock)(NSError *error);
 - (void)loadImageResizedToLength:(CGFloat)length
                          success:(DFPhotoAssetLoadSuccessBlock)success
                          failure:(DFPhotoAssetLoadFailureBlock)failure;
+
+- (UIImage *)imageForRequest:(DFImageManagerRequest *)request;
 
 // Access image data.  Blocking call, avoid on main thread.
 - (void)loadThubnailJPEGData:(DFPhotoDataLoadSuccessBlock)successBlock

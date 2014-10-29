@@ -7,7 +7,7 @@
 //
 
 #import "DFImageDataSource.h"
-#import "DFImageStore.h"
+#import "DFImageManager.h"
 #import "NSIndexPath+DFHelpers.h"
 #import "DFPhotoViewCell.h"
 #import "DFPeanutFeedObject.h"
@@ -176,7 +176,7 @@
                   photoObject:(DFPeanutFeedObject *)photoObject
                     indexPath:(NSIndexPath *)indexPath
 {
-  [[DFImageStore sharedStore]
+  [[DFImageManager sharedManager]
    imageForID:photoObject.id
    preferredType:DFImageThumbnail
    completion:^(UIImage *image) {

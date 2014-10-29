@@ -312,5 +312,22 @@ NSString *const DFCameraRollCreationDateKey = @"DateTimeCreated";
 }
 
 
+- (UIImage *)imageForRequest:(DFImageManagerRequest *)request
+{
+  UIImage *result;
+  if (request.isDefaultThumbnail) {
+    result = [UIImage imageWithCGImage:self.asset.thumbnail];
+  } else if (request.contentMode == DFImageRequestContentModeAspectFit) {
+    DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
+    result = [resizer aspectImageWithMaxPixelSize:MAX(request.size.height, request.size.width)];
+  } else if (request.contentMode == DFImageRequestContentModeAspectFill) {
+    DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithALAsset:self.asset];
+    result = [resizer aspectFilledImageWithSize:request.size];
+  }
+  
+  return result;
+}
+
+
 
 @end

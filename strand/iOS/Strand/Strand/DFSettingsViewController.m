@@ -213,7 +213,7 @@
   [mapping button:@"Clear Image Cache"
        identifier:@"clearImageCache"
           handler:^(id object) {
-            NSError *error = [DFImageStore clearCache];
+            NSError *error = [[DFImageStore sharedStore] clearCache];
             if (!error) {
               [UIAlertView showSimpleAlertWithTitle:@"Cache cleared." message:@"The image cache has been cleared"];
             } else {

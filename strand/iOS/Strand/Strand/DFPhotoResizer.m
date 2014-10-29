@@ -10,6 +10,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import <ImageIO/ImageIO.h>
 #import "UIImage+Resize.h"
+#import "DFCGRectHelpers.h"
 
 
 @interface DFPhotoResizer()
@@ -68,19 +69,34 @@ static void releaseAssetCallback(void *info) {
 // can be used directly without additional rotation handling.
 // This is done synchronously, so you should call this method on a background queue/thread.
 
-- (CGImageRef)createAspectCGImageWithMaxPixelSize:(NSUInteger)size {
-  NSParameterAssert(self.asset != nil || self.url != nil);
-  NSParameterAssert(size > 0);
-
+- (CGImageSourceRef)createImageSourceRef
+{
   CGImageSourceRef source;
   if (self.asset) {
     source = [self createImageSourceRefForAsset];
   } else {
     source = [self createImageSourceRefForURL];
   }
+  return source;
+}
+
+
+- (CGImageRef)createAspectCGImageWithMaxPixelSize:(NSUInteger)size {
+  NSParameterAssert(self.asset != nil || self.url != nil);
+  NSParameterAssert(size > 0);
   
+  CGImageSourceRef source= [self createImageSourceRef];
   if (!source) return nil;
   
+  CGImageRef imageRef = [self createAspectCGImageWithSource:source maxPixelSize:size];
+  CFRelease(source);
+  
+  
+  return imageRef;
+}
+
+- (CGImageRef)createAspectCGImageWithSource:(CGImageSourceRef)source maxPixelSize:(NSUInteger)size
+{
   NSDictionary *imageOptions =
   @{
     (NSString *)kCGImageSourceCreateThumbnailFromImageAlways : @YES,
@@ -91,9 +107,6 @@ static void releaseAssetCallback(void *info) {
   CGImageRef imageRef = CGImageSourceCreateThumbnailAtIndex(source,
                                                             0,
                                                             (__bridge CFDictionaryRef) imageOptions);
-  CFRelease(source);
-  
-  
   return imageRef;
 }
 
@@ -105,6 +118,47 @@ static void releaseAssetCallback(void *info) {
                          cornerRadius:0
                  interpolationQuality:kCGInterpolationDefault];
   }
+}
+
+- (UIImage *)aspectFilledImageWithSize:(CGSize)size
+{
+  @autoreleasepool {
+    CGImageSourceRef imageSource = [self createImageSourceRef];
+    CGSize imageSize = [self.class sizeForImageSource:imageSource];
+    CGSize fittingAspectSize = [DFCGRectHelpers aspectScaledSize:imageSize fittingSize:size];
+    CGImageRef imageRef = [self createAspectCGImageWithSource:imageSource
+                                                 maxPixelSize:MAX(fittingAspectSize.width,
+                                                                  fittingAspectSize.height)];
+    UIImage *fittingAspectImage = [UIImage imageWithCGImage:imageRef];
+    UIImage *cropped = [fittingAspectImage resizedImageWithContentMode:UIViewContentModeScaleAspectFill
+                                                                bounds:size
+                                                  interpolationQuality:kCGInterpolationDefault];
+    
+    CFRelease(imageRef);
+    CFRelease(imageSource);
+    
+    return cropped;
+  }
+}
+
++ (CGSize)sizeForImageSource:(CGImageSourceRef)imageSource
+{
+  CGFloat width = 0.0f, height = 0.0f;
+  CFDictionaryRef imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, NULL);
+  if (imageProperties != NULL) {
+    CFNumberRef widthNum  = CFDictionaryGetValue(imageProperties, kCGImagePropertyPixelWidth);
+    if (widthNum != NULL) {
+      CFNumberGetValue(widthNum, kCFNumberCGFloatType, &width);
+    }
+    
+    CFNumberRef heightNum = CFDictionaryGetValue(imageProperties, kCGImagePropertyPixelHeight);
+    if (heightNum != NULL) {
+      CFNumberGetValue(heightNum, kCFNumberCGFloatType, &height);
+    }
+    
+    CFRelease(imageProperties);
+  }
+  return CGSizeMake(width, height);
 }
 
 - (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size {

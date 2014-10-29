@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 
+
 typedef void (^DFImageFetchCompletionBlock)(UIImage *image, NSError *error);
 
 @class RKObjectManager;
@@ -17,6 +18,8 @@ typedef void (^DFImageFetchCompletionBlock)(UIImage *image, NSError *error);
 + (DFImageDownloadManager *)sharedManager;
 
 - (void)fetchNewImages;
-- (void)fetchImageDataForImageType:(DFImageType)type andPhotoID:(DFPhotoIDType)photoID;
+- (void)fetchImageDataForImageType:(DFImageType)type
+                        andPhotoID:(DFPhotoIDType)photoID
+                        completion:(ImageLoadCompletionBlock)completionBlock;
 
 @end

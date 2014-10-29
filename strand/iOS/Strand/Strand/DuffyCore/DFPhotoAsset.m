@@ -111,7 +111,11 @@ const CGFloat DFPhotoAssetDefaultJPEGCompressionQuality = 0.8;
   [NSException raise:@"Attempting to call abstract DFPhotoAsset method" format:@"This DFPhotoAsset method is abstract.  You cannot call methods on it directly."];
 }
 
-
+- (UIImage *)imageForRequest:(DFImageManagerRequest *)request
+{
+  [self.class abstractClassException];
+  return nil;
+}
 
 
 @end

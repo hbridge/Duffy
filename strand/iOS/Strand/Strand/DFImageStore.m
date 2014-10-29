@@ -14,6 +14,7 @@
 #import "DFPhotoMetadataAdapter.h"
 #import "DFTypedefs.h"
 #import "DFImageDownloadManager.h"
+#import "DFPhotoResizer.h"
 
 @interface DFImageStore()
 
@@ -159,7 +160,12 @@ static DFImageStore *defaultStore;
       } else {
         DDLogVerbose(@"Didn't find image data for photo %lld, downloading...", photoID);
         [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
-        [[DFImageDownloadManager sharedManager] fetchImageDataForImageType:type andPhotoID:photoID];
+        [[DFImageDownloadManager sharedManager]
+         fetchImageDataForImageType:type
+         andPhotoID:photoID
+         completion:^(UIImage *image) {
+           [self setImage:image type:type forID:photoID completion:nil];
+         }];
       }
     }
   });
@@ -333,24 +339,34 @@ static DFImageStore *defaultStore;
   return [[self userLibraryURL] URLByAppendingPathComponent:@"thumbnails"];
 }
 
-+ (NSError *)clearCache
+- (NSError *)clearCache
 {
   NSFileManager *fm = [NSFileManager defaultManager];
   
-  NSArray *directoriesToDeleteAndCreate = @[[[self localThumbnailsDirectoryURL] path],
-                                   [[self localFullImagesDirectoryURL] path]];
+  NSArray *directoriesToDeleteAndCreate = @[[[self.class localThumbnailsDirectoryURL] path],
+                                   [[self.class localFullImagesDirectoryURL] path]];
   
+  // delete the cache directories
   for (NSString *path in directoriesToDeleteAndCreate) {
     if ([fm fileExistsAtPath:path]) {
       NSError *error;
       [fm removeItemAtPath:path error:&error];
+      DDLogInfo(@"%@ deleting: %@", self.class, path.lastPathComponent);
       if (error) {
         DDLogError(@"Error deleting cache directory: %@, error: %@", path, error.description);
         return error;
       }
     }
   }
-  [self createCacheDirectories];
+
+  // clear the DB table
+  if ([self.db tableExists:@"downloadedImages"]) {
+    DDLogInfo(@"%@ clearing all rows from downloadedImagesTable", self.class);
+    [self.db executeUpdate:@"DELETE FROM downloadedImages"];
+  }
+  
+  
+  [self.class createCacheDirectories];
   return nil;
 }
 
@@ -365,5 +381,30 @@ static DFImageStore *defaultStore;
   return _photoAdapter;
 }
 
+- (BOOL)canServeRequest:(DFImageManagerRequest *)request
+{
+  return [[self imageIdsFromDBForType:[request imageType]] containsObject:@(request.photoID)];
+}
+
+- (UIImage *)serveImageForRequest:(DFImageManagerRequest *)request
+{
+  NSURL *url = [self.class localURLForPhotoID:request.photoID type:request.imageType];
+  if (request.isDefaultThumbnail) {
+    NSData *imageData = [NSData dataWithContentsOfURL:url];
+    if (imageData) {
+      UIImage *image = [UIImage imageWithData:imageData];
+      return image;
+    }
+  }
+  DFPhotoResizer *resizer = [[DFPhotoResizer alloc] initWithURL:url];
+  if (request.contentMode == DFImageRequestContentModeAspectFit) {
+    CGFloat largerDimension = MAX(request.size.width, request.size.height);
+    return [resizer aspectImageWithMaxPixelSize:largerDimension];
+  } else if (request.contentMode == DFImageRequestContentModeAspectFill) {
+    return [resizer aspectFilledImageWithSize:request.size];
+  }
+  
+  return nil;
+}
 
 @end

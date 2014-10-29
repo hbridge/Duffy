@@ -38,7 +38,6 @@
 #import "DFFeedViewController.h"
 #import "DFSettingsViewController.h"
 #import "DFInboxViewController.h"
-#import "DFAllStrandsGalleryViewController.h"
 #import "DFFriendsViewController.h"
 #import "DFUserInfoManager.h"
 #import "DFImageDownloadManager.h"

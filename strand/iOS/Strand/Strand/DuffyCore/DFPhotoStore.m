@@ -16,6 +16,7 @@
 #import "DFCameraRollPhotoAsset.h"
 #import "DFSettings.h"
 #import "DFUploadController.h"
+#import "DFImageStore.h"
 
 @interface DFPhotoStore(){
   NSManagedObjectContext *_managedObjectContext;

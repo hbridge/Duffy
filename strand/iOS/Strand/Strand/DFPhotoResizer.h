@@ -16,6 +16,7 @@
 - (id)initWithURL:(NSURL *)imageURL;
 - (UIImage *)aspectImageWithMaxPixelSize:(NSUInteger)size;
 - (UIImage *)squareImageWithPixelSize:(NSUInteger)size;
+- (UIImage *)aspectFilledImageWithSize:(CGSize)size;
 
 
 @end
