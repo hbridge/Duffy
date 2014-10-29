@@ -24,6 +24,7 @@
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
+
 @property (atomic) BOOL inboxRefreshing;
 @property (atomic) BOOL swapsRefreshing;
 @property (atomic) BOOL privateStrandsRefreshing;
@@ -35,6 +36,9 @@
 @property (nonatomic, retain) NSArray *swapsFeedObjects;
 @property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
 
+@property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
+@property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
+
 @end
 
 @implementation DFPeanutFeedDataManager
@@ -44,12 +48,15 @@
 @synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
+@synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
 
 - (instancetype)init
 {
   self = [super init];
   if (self) {
     [self observeNotifications];
+    _deferredCompletionBlocks = [NSMutableDictionary new];
+    self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     [self refreshFromServer];
   }
   return self;
@@ -80,7 +87,7 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshPrivatePhotosFromServer:nil];
 }
 
-- (void)refreshInboxFromServer:(void(^)(void))completion
+- (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
@@ -107,7 +114,7 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
-- (void)refreshSwapsFromServer:(void(^)(void))completion
+- (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
@@ -136,7 +143,7 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
-- (void)refreshPrivatePhotosFromServer:(void(^)(void))completion
+- (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
   
@@ -501,6 +508,31 @@ static DFPeanutFeedDataManager *defaultManager;
   
   strand.first_photo_time = minDateFound;
   strand.last_photo_time = maxDateFound;
+}
+
+
+- (void)scheduleDeferredCompletion:(RefreshCompleteCompletionBlock)completion forFeedType:(DFFeedType)feedType
+{
+  dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
+  NSMutableArray *deferredForID = self.deferredCompletionBlocks[@(feedType)];
+  if (!deferredForID) {
+    deferredForID = [[NSMutableArray alloc] init];
+    self.deferredCompletionBlocks[@(feedType)] = deferredForID;
+  }
+  
+  [deferredForID addObject:[completion copy]];
+  dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
+}
+
+- (void)executeDeferredCompletionsForFeedType:(DFFeedType)feedType
+{
+  dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
+  NSMutableArray *deferredForID = self.deferredCompletionBlocks[@(feedType)];
+  for (RefreshCompleteCompletionBlock completion in deferredForID) {
+    completion();
+  }
+  [deferredForID removeAllObjects];
+  dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
 

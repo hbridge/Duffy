@@ -14,11 +14,13 @@
 
 @interface DFPeanutFeedDataManager : NSObject
 
+typedef void (^RefreshCompleteCompletionBlock)(void);
+
 + (DFPeanutFeedDataManager *)sharedManager;
 
-- (void)refreshInboxFromServer:(void(^)(void))completion;
-- (void)refreshPrivatePhotosFromServer:(void(^)(void))completion;
-- (void)refreshSwapsFromServer:(void(^)(void))completion;
+- (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion;
+- (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion;
+- (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion;
 
 - (BOOL)hasInboxData;
 - (BOOL)hasPrivateStrandData;

@@ -79,12 +79,14 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   [self reloadData];
   [self.refreshControl endRefreshing];
   [self refreshFromServer];
+  DDLogVerbose(@"view will appear");
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
+  DDLogVerbose(@"View did appear");
 }
 
 - (void)viewDidDisappear:(BOOL)animated
@@ -148,6 +150,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   
   [self configureNoResultsView];
   [self configureTabCount];
+  [self.refreshControl endRefreshing];
 }
 
 - (void)reloadSuggestionsSection
@@ -180,9 +183,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)refreshFromServer
 {
-  // we're getting our data from both feeds, so wait till both are done to call endRefreshing
   [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:^{
     dispatch_async(dispatch_get_main_queue(), ^{
+      DDLogVerbose(@"Killing spinner...");
       [self.refreshControl endRefreshing];
       [self reloadData];
     });

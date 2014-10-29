@@ -13,6 +13,11 @@ typedef NS_OPTIONS(unsigned int, DFImageType) {
 typedef UInt64 DFStrandIDType;
 typedef UInt64 DFInviteIDType;
 
+typedef NS_OPTIONS(unsigned int, DFFeedType) {
+  DFInbox,
+  DFSwaps,
+  DFPrivate,
+};
 
 // Permissions
 typedef NSString *DFPermissionType;
