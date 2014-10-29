@@ -7,6 +7,7 @@
 //
 
 #import "DFPhotoAsset.h"
+#import <Photos/Photos.h>
 
 @class PHAsset;
 

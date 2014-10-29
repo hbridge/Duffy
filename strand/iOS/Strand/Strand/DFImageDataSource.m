@@ -82,12 +82,12 @@
   return self;
 }
 
+NSUInteger const SectionSpread = 5;
 - (void)cacheImagesAroundSection:(NSInteger)targetSection
 {
-  for (NSInteger section = targetSection-1; section <= targetSection +1; section++) {
+  NSMutableArray *idsToFetch = [NSMutableArray new];
+  for (NSInteger section = targetSection - SectionSpread; section <= targetSection + SectionSpread; section++) {
     if (section < 0 || section > self.sectionArrays.count - 1) continue;
-    
-    NSMutableArray *idsToFetch = [NSMutableArray new];
     for (DFPeanutFeedObject *feedObject in self.sectionArrays[section]) {
       if ([feedObject.type isEqualToString:DFFeedObjectCluster]) {
         DFPeanutFeedObject *photoObject = feedObject.objects.firstObject;
@@ -96,12 +96,12 @@
         [idsToFetch addObject:@(feedObject.id)];
       }
     }
-    
-    [[DFImageManager sharedManager]
-     startCachingImagesForPhotoIDs:idsToFetch
-     targetSize:[self cellPhotoSizeForIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]]
-     contentMode:DFImageRequestContentModeAspectFill];
   }
+  
+  [[DFImageManager sharedManager]
+   startCachingImagesForPhotoIDs:idsToFetch
+   targetSize:[self cellPhotoSizeForIndexPath:[NSIndexPath indexPathForItem:0 inSection:targetSection]]
+   contentMode:DFImageRequestContentModeAspectFill];
 }
 
 
