@@ -57,7 +57,7 @@
     
     // setup the cache
     dispatch_queue_attr_t cache_attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_DEFAULT, 0);
-    _imageRequestQueue = dispatch_queue_create("ImageCacheReqQueue", cache_attrs);
+    _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", cache_attrs);
     _imageRequestCache = [NSMutableDictionary new];
     _imageRequestCacheSemaphore = dispatch_semaphore_create(1);
     
@@ -108,8 +108,10 @@
       deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
         completion:(ImageLoadCompletionBlock)completionBlock
 {
-  
-  
+  if (CGSizeEqualToSize(size, CGSizeZero)) {
+    if (completionBlock) completionBlock(nil);
+    return;
+  }
   DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photoID
                                                                              size:size
                                                                       contentMode:contentMode
@@ -133,10 +135,10 @@
     source = @"remote";
     [self serveRequestFromNetwork:request completion:completionBlock];
   }
-  DDLogVerbose(@"%@ routing %@ to %@: %@", self.class,
-               completionBlock ? @"imageReq" : @"cacheReq",
-               source,
-               request);
+//  DDLogVerbose(@"%@ routing %@ to %@: %@", self.class,
+//               completionBlock ? @"imageReq" : @"cacheReq",
+//               source,
+//               request);
 }
 
 - (void)startCachingImagesForPhotoIDs:(NSArray *)photoIDs
@@ -167,13 +169,6 @@
 - (void)serveRequestWithDiskCache:(DFImageManagerRequest *)request
                        completion:(ImageLoadCompletionBlock)completionBlock
 {
-  //if it matches the exact size of the thumbnail, just let the cache handle the request
-  if (request.isDefaultThumbnail) {
-    [[DFImageStore sharedStore] serveImageForRequest:request];
-    return;
-  }
-  
-  // otherwise, we may have to resize, schedule this deferred
   [self scheduleDeferredCompletion:completionBlock
                         forRequest:request
                      withLoadBlock:^{
@@ -249,7 +244,6 @@
                      withLoadBlock:(UIImage *(^)(void))loadBlock
 {
   BOOL callLoadBlock = NO;
-  if (!completion) completion = ^(UIImage *image){}; // if we weren't handed a completion block, create an empty one
   dispatch_semaphore_wait(self.deferredCompletionSchedulerSemaphore, DISPATCH_TIME_FOREVER);
   
   // figure out if there are similar requests ahead in the queue,
@@ -257,6 +251,7 @@
   NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
   NSArray *similarRequests = [self.class requestsLike:request inArray:requestsForID.allObjects];
   if (similarRequests.count == 0) callLoadBlock = YES;
+  DDLogVerbose(@"%@ request: %@ has %d similarRequests ahead in queue.", self.class, request, (int)similarRequests.count);
   
   // keep track of this request in photoIDstoDeferredRequests
   if (!requestsForID) requestsForID = [NSMutableSet new];
@@ -270,17 +265,22 @@
     self.deferredCompletionBlocks[request] = deferredForRequest;
   }
   
-  [deferredForRequest addObject:[completion copy]];
+  if (completion) [deferredForRequest addObject:completion];
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
-  
-  // call the load block, cache the image and execute the deferred completion handlers
-  dispatch_queue_t queue = self.imageRequestQueue;
-  if (!completion) queue = self.cacheRequestQueue;
-  if (callLoadBlock) dispatch_async(self.imageRequestQueue, ^{
-    UIImage *image = loadBlock();
-    [self cacheImage:image forRequest:request];
-    [self executeDeferredCompletionsWithImage:image forRequestsLike:request];
-  });
+
+  if (callLoadBlock) {
+    // call the load block, cache the image and execute the deferred completion handlers
+    dispatch_queue_t queue = self.imageRequestQueue;
+    if (!completion) {
+      queue = self.cacheRequestQueue;
+    }
+    dispatch_async(queue, ^{
+      UIImage *image = loadBlock();
+      //DDLogVerbose(@"loadBlock for request:%@ image:%@", request, image);
+      [self cacheImage:image forRequest:request];
+      [self executeDeferredCompletionsWithImage:image forRequestsLike:request];
+    });
+  }
 }
 
 - (void)executeDeferredCompletionsWithImage:(UIImage *)image forRequestsLike:(DFImageManagerRequest *)request
@@ -289,21 +289,22 @@
 
   NSMutableSet *requestsForID = self.photoIDsToDeferredRequests[@(request.photoID)];
   NSMutableSet *executedRequests = [NSMutableSet new];
-  //DDLogVerbose(@"executeDeferred begin requestsLike:%@ photoIDsToDeferredRequests:%@ requestsForID:%@", request, self.photoIDsToDeferredRequests, requestsForID);
-  for (DFImageManagerRequest *otherRequest in [self.class requestsLike:request inArray:requestsForID.allObjects]) {
-    [executedRequests addObject:otherRequest];
-    NSMutableArray *deferredHandlers = self.deferredCompletionBlocks[request];
-    //DDLogVerbose(@"request:%@ deferred:%@", otherRequest, deferredHandlers);
+  //DDLogVerbose(@"executeDeferred begin requestsFor:%d photoIDsToDeferredRequests:%@ requestsForID:%@", (int)request.photoID, self.photoIDsToDeferredRequests, requestsForID);
+  NSArray *similarRequests = [self.class requestsLike:request inArray:requestsForID.allObjects];
+  for (DFImageManagerRequest *similarRequest in similarRequests) {
+    NSMutableArray *deferredHandlers = self.deferredCompletionBlocks[similarRequest];
     NSMutableArray *executedHandlers = [NSMutableArray new];
     for (ImageLoadCompletionBlock completion in deferredHandlers) {
+      //DDLogVerbose(@"executing deferred completion for %@", similarRequest);
       completion(image);
       [executedHandlers addObject:completion];
     }
     [deferredHandlers removeObjectsInArray:executedHandlers];
+    [executedRequests addObject:similarRequest];
   }
   [requestsForID minusSet:executedRequests];
   
-  //DDLogVerbose(@"executeDeferred end photoIDsToDeferredRequests:%@ requestsForID:%@", self.photoIDsToDeferredRequests, requestsForID);
+  //DDLogVerbose(@"executeDeferred end requestsFor:%d photoIDsToDeferredRequests:%@ requestsForID:%@", (int)request.photoID, self.photoIDsToDeferredRequests, requestsForID);
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 

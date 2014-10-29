@@ -165,7 +165,6 @@
        if ([[collectionView indexPathForCell:cell] isEqual:indexPath]) {
          // make sure we're setting the right image for the cell
          cell.imageView.image = image;
-         if (!image) DDLogWarn(@"nil image");
          [cell setNeedsLayout];
        }
      });
