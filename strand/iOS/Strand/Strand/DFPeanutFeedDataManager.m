@@ -90,6 +90,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFInboxFeed];
   
   if (!self.inboxRefreshing) {
     self.inboxRefreshing = YES;
@@ -107,7 +108,7 @@ static DFPeanutFeedDataManager *defaultManager;
           postNotificationName:DFStrandNewInboxDataNotificationName
           object:self];
        }
-       if (completion) completion();
+       [self executeDeferredCompletionsForFeedType:DFInboxFeed];
        self.inboxRefreshing = NO;
      }
      ];
@@ -117,6 +118,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFSwapsFeed];
   
   if (!self.swapsRefreshing) {
     self.swapsRefreshing = YES;
@@ -136,7 +138,7 @@ static DFPeanutFeedDataManager *defaultManager;
           postNotificationName:DFStrandNewSwapsDataNotificationName
           object:self];
        }
-       if (completion) completion();
+       [self executeDeferredCompletionsForFeedType:DFSwapsFeed];
        self.swapsRefreshing = NO;
      }
      ];
@@ -146,6 +148,7 @@ static DFPeanutFeedDataManager *defaultManager;
 - (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion
 {
   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFPrivateFeed];
   
   if (!self.privateStrandsRefreshing) {
     self.privateStrandsRefreshing = YES;
@@ -163,7 +166,7 @@ static DFPeanutFeedDataManager *defaultManager;
           postNotificationName:DFStrandNewPrivatePhotosDataNotificationName
           object:self];
        }
-       if (completion) completion();
+       [self executeDeferredCompletionsForFeedType:DFPrivateFeed];
        self.privateStrandsRefreshing = NO;
      }
      ];
