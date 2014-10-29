@@ -323,10 +323,13 @@ def main(argv):
 
 				logger.debug("Found %s possible neighbors" % len(possibleNeighbors))
 
+				strandsByStrandId = dict()
 				for strand in strandsCreated:
 					for possibleNeighbor in possibleNeighbors:
 						if strands_util.strandsShouldBeNeighbors(strand, possibleNeighbor):
 							usersByStrandId[possibleNeighbor.id] = list(possibleNeighbor.users.all())
+							strandsByStrandId[strand.id] = strand
+							strandsByStrandId[possibleNeighbor.id] = possibleNeighbor
 							if possibleNeighbor.id < strand.id:
 								strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
 							else:
@@ -340,7 +343,7 @@ def main(argv):
 				strandNeighbors = list()
 				for t in strandNeighborsToCreate:
 					id1, id2 = t
-					strandNeighbors.append(StrandNeighbor(strand_1_id=id1, strand_2_id=id2))
+					strandNeighbors.append(StrandNeighbor(strand_1_id=id1, strand_1_private=strandsByStrandId[id1].private, strand_1_user=strandsByStrandId[id1].user, strand_2_id=id2, strand_2_private=strandsByStrandId[id2].private, strand_2_user=strandsByStrandId[id2].user))
 				
 				allIds = getAllStrandIds(strandNeighbors)
 				existingRows = StrandNeighbor.objects.filter(strand_1__in=allIds).filter(strand_2_id__in=allIds)

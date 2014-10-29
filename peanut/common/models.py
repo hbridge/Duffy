@@ -715,7 +715,13 @@ class StrandInvite(models.Model):
 
 class StrandNeighbor(models.Model):
 	strand_1 = models.ForeignKey(Strand, db_index=True, related_name = "strand_1")
+	strand_1_private = models.BooleanField(db_index=True, default=False)
+	strand_1_user = models.ForeignKey(User, db_index=True, null=True, related_name = "strand_1_user")
+
 	strand_2 = models.ForeignKey(Strand, db_index=True, related_name = "strand_2")
+	strand_2_private = models.BooleanField(db_index=True, default=False)
+	strand_2_user = models.ForeignKey(User, db_index=True, null=True, related_name = "strand_2_user")
+
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
@@ -725,6 +731,19 @@ class StrandNeighbor(models.Model):
 	class Meta:
 		unique_together = ("strand_1", "strand_2")
 		db_table = 'strand_neighbor'
+
+	@classmethod
+	def bulkUpdate(cls, objs, attributesList):
+		for obj in objs:
+			obj.updated = datetime.datetime.now()
+
+		if isinstance(attributesList, list):
+			attributesList.append("updated")
+		else:
+			attributesList = [attributesList, "updated"]
+
+		bulk_updater.bulk_update(objs, update_fields=attributesList)
+
 
 class Action(models.Model):
 	user = models.ForeignKey(User, db_index=True)
