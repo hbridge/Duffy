@@ -26,4 +26,10 @@ typedef void (^SetImageCompletion)(NSError *error);
         completion:(ImageLoadCompletionBlock)completionBlock;
 
 
+- (void)startCachingImagesForPhotoIDs:(NSArray *)photoIDs
+                           targetSize:(CGSize)size
+                          contentMode:(DFImageRequestContentMode)contentMode;
+
+
+
 @end

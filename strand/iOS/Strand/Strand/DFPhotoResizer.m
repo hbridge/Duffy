@@ -124,11 +124,16 @@ static void releaseAssetCallback(void *info) {
 {
   @autoreleasepool {
     CGImageSourceRef imageSource = [self createImageSourceRef];
+    if (!imageSource) return nil;
     CGSize imageSize = [self.class sizeForImageSource:imageSource];
     CGSize fittingAspectSize = [DFCGRectHelpers aspectScaledSize:imageSize fittingSize:size];
     CGImageRef imageRef = [self createAspectCGImageWithSource:imageSource
                                                  maxPixelSize:MAX(fittingAspectSize.width,
                                                                   fittingAspectSize.height)];
+    if (!imageRef) {
+      CFRelease(imageSource);
+      return nil;
+    }
     UIImage *fittingAspectImage = [UIImage imageWithCGImage:imageRef];
     UIImage *cropped = [fittingAspectImage resizedImageWithContentMode:UIViewContentModeScaleAspectFill
                                                                 bounds:size

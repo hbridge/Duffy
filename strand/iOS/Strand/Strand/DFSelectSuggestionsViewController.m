@@ -118,9 +118,7 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 {
   self.selectPhotosController = [[DFSelectPhotosController alloc]
                                  initWithFeedPhotos:self.items
-                                 collectionView:self.collectionView
-                                 sourceMode:DFImageDataSourceModeLocal
-                                 imageType:DFImageThumbnail];
+                                 collectionView:self.collectionView];
   self.selectPhotosController.delegate = self;
   self.collectionView.alwaysBounceVertical = YES;
 }

@@ -133,10 +133,9 @@ const CGFloat CreateCellTitleSpacing = 8;
                  withReuseIdentifier:style.stringValue];
   }
   
-  self.selectPhotosController = [[DFSelectPhotosController alloc] initWithCollectionFeedObjects:self.collectionFeedObjects
-                                                                   collectionView:self.collectionView
-                                                                       sourceMode:DFImageDataSourceModeLocal
-                                                                        imageType:DFImageThumbnail];
+  self.selectPhotosController = [[DFSelectPhotosController alloc]
+                                 initWithCollectionFeedObjects:self.collectionFeedObjects
+                                 collectionView:self.collectionView];
   self.selectPhotosController.supplementaryViewDelegate = self;
   self.selectPhotosController.delegate = self;
 }

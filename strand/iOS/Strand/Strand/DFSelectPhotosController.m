@@ -19,10 +19,8 @@
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedObjects
                     collectionView:(UICollectionView *)collectionView
-                        sourceMode:(DFImageDataSourceMode)sourceMode
-                         imageType:(DFImageType)imageType
 {
-  self = [super initWithFeedPhotos:feedObjects collectionView:collectionView sourceMode:sourceMode imageType:imageType];
+  self = [super initWithFeedPhotos:feedObjects collectionView:collectionView];
   if (self) {
     _selectedFeedObjects = [feedObjects mutableCopy];
     [self.collectionView registerNib:[UINib nibForClass:[DFSelectablePhotoViewCell class]]
@@ -33,13 +31,9 @@
 
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
                                collectionView:(UICollectionView *)collectionView
-                                   sourceMode:(DFImageDataSourceMode)sourceMode
-                                    imageType:(DFImageType)imageType
 {
   self = [super initWithCollectionFeedObjects:collectionFeedObjects
-                               collectionView:collectionView
-                                   sourceMode:sourceMode
-                                    imageType:imageType];
+                               collectionView:collectionView];
   _selectedFeedObjects = [NSMutableArray new];
   [self.collectionView registerNib:[UINib nibForClass:[DFSelectablePhotoViewCell class]]
         forCellWithReuseIdentifier:@"selectableCell"];
@@ -108,11 +102,7 @@
     photoObject = nil;
   }
   
-  if (self.sourceMode == DFImageDataSourceModeRemote) {
-    [self setRemotePhotoForCell:cell photoObject:photoObject indexPath:indexPath];
-  } else if (self.sourceMode == DFImageDataSourceModeLocal){
-    [self setLocalPhotosForCell:cell photoObject:photoObject indexPath:indexPath];
-  }
+  [self setImageForCell:cell photoObject:photoObject indexPath:indexPath];
   
   cell.showTickMark = [self.selectedFeedObjects containsObject:feedObject];
   

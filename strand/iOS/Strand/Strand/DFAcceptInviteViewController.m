@@ -101,9 +101,7 @@
   }
   self.invitedPhotosDatasource = [[DFImageDataSource alloc]
                                   initWithFeedPhotos:allPhotos
-                                  collectionView:self.invitedCollectionView
-                                  sourceMode:DFImageDataSourceModeRemote
-                                  imageType:DFImageThumbnail];
+                                  collectionView:self.invitedCollectionView];
 }
 
 - (void)configureMatchedArea
@@ -135,8 +133,7 @@
     self.suggestedPhotosController = [[DFSelectPhotosController alloc]
                                       initWithFeedPhotos:suggestedPhotos
                                       collectionView:self.matchedCollectionView
-                                      sourceMode:DFImageDataSourceModeLocal
-                                      imageType:DFImageFull];
+                                      ];
     self.suggestedPhotosController.delegate = self;
     self.matchResultsHeader.hidden = NO;
   } else {

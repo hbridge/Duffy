@@ -52,7 +52,7 @@
                         <action selector="shareButtonPressed:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="3q0-gf-hoW"/>
                     </connections>
                 </button>
-                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="MatchedIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="1eo-hD-Usa">
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/MatchedIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="1eo-hD-Usa">
                     <rect key="frame" x="8" y="148" width="52" height="18"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="18" id="EuJ-WY-jqG"/>
@@ -88,6 +88,6 @@
         </collectionReusableView>
     </objects>
     <resources>
-        <image name="MatchedIcon.png" width="52" height="18"/>
+        <image name="Assets/Icons/MatchedIcon.png" width="52" height="18"/>
     </resources>
 </document>

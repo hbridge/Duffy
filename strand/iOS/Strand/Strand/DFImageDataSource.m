@@ -17,7 +17,6 @@
 @interface DFImageDataSource()
 
 @property (nonatomic, retain) NSArray *sectionArrays;
-@property (nonatomic, retain) NSMutableDictionary *localPhotoAssetsBySection;
 
 @end
 
@@ -26,15 +25,12 @@
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedObjects
                         collectionView:(UICollectionView *)collectionView
-                        sourceMode:(DFImageDataSourceMode)sourceMode
-                         imageType:(DFImageType)imageType
 {
   DFPeanutFeedObject *dummyObject = [[DFPeanutFeedObject alloc] init];
   dummyObject.objects = feedObjects;
   return [self initWithCollectionFeedObjects:@[dummyObject]
                               collectionView:collectionView
-                                  sourceMode:sourceMode
-                                   imageType:imageType];
+          ];
 }
 
 - (void)setFeedPhotos:(NSArray *)feedPhotos
@@ -50,7 +46,6 @@
   dispatch_async(dispatch_get_main_queue(), ^{
     NSUInteger previousCount = [_collectionFeedObjects count];
     _collectionFeedObjects = collectionFeedObjects;
-    _localPhotoAssetsBySection = [NSMutableDictionary new];
     NSMutableArray *sectionArrays = [NSMutableArray new];
     for (DFPeanutFeedObject *feedObject in collectionFeedObjects) {
       [sectionArrays addObject:feedObject.objects];
@@ -66,8 +61,6 @@
 
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
                                collectionView:(UICollectionView *)collectionView
-                                   sourceMode:(DFImageDataSourceMode)sourceMode
-                                    imageType:(DFImageType)imageType
 {
   self = [super init];
   if (self) {
@@ -82,42 +75,31 @@
      forCellWithReuseIdentifier:@"cell"];
     _collectionView.dataSource = self;
     
-    _imageType = imageType;
-    _sourceMode = sourceMode;
-    if (sourceMode == DFImageDataSourceModeLocal) {
-      [self cacheLocalPhotoAssetsForSection:sectionArrays.count - 1];
-    }
+    [self cacheImagesAroundSection:sectionArrays.count - 1];
   }
   return self;
 }
 
-- (void)cacheLocalPhotoAssetsForSection:(NSInteger)section
+- (void)cacheImagesAroundSection:(NSInteger)targetSection
 {
-  if (section < 0 || section > self.sectionArrays.count - 1) return;
-  if (!self.localPhotoAssetsBySection) self.localPhotoAssetsBySection = [NSMutableDictionary new];
-  NSMutableArray *idsToFetch = [NSMutableArray new];
-  for (DFPeanutFeedObject *feedObject in self.sectionArrays[section]) {
-    if ([feedObject.type isEqualToString:DFFeedObjectCluster]) {
-      DFPeanutFeedObject *photoObject = feedObject.objects.firstObject;
-      [idsToFetch addObject:@(photoObject.id)];
-    } else if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
-      [idsToFetch addObject:@(feedObject.id)];
+  for (NSInteger section = targetSection-1; section <= targetSection +1; section++) {
+    if (section < 0 || section > self.sectionArrays.count - 1) continue;
+    
+    NSMutableArray *idsToFetch = [NSMutableArray new];
+    for (DFPeanutFeedObject *feedObject in self.sectionArrays[section]) {
+      if ([feedObject.type isEqualToString:DFFeedObjectCluster]) {
+        DFPeanutFeedObject *photoObject = feedObject.objects.firstObject;
+        [idsToFetch addObject:@(photoObject.id)];
+      } else if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
+        [idsToFetch addObject:@(feedObject.id)];
+      }
     }
+    
+    [[DFImageManager sharedManager]
+     startCachingImagesForPhotoIDs:idsToFetch
+     targetSize:[self cellPhotoSizeForIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]]
+     contentMode:DFImageRequestContentModeAspectFill];
   }
-  
-  NSDictionary *photos = [[DFPhotoStore sharedStore] photosWithPhotoIDs:idsToFetch];
-  NSMutableArray *photoAssets = [NSMutableArray new];
-  for (NSNumber *photoID in idsToFetch) {
-    DFPhoto *photo = photos[photoID];
-    if (photo) {
-      [photoAssets addObject:photo.asset];
-    } else {
-      DDLogWarn(@"Missing photo asset for id:%@", photoID);
-      [photoAssets addObject:[NSNull null]];
-    }
-  }
-  
-  self.localPhotoAssetsBySection[@(section)] = photoAssets;
 }
 
 
@@ -150,6 +132,7 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
                   cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
+  
   DFPhotoViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"cell" forIndexPath:indexPath];
   cell.imageView.image = nil;
   
@@ -163,75 +146,52 @@
     photoObject = nil;
   }
   
-  if (_sourceMode == DFImageDataSourceModeRemote) {
-    [self setRemotePhotoForCell:cell photoObject:photoObject indexPath:indexPath];
-  } else if (_sourceMode == DFImageDataSourceModeLocal){
-    [self setLocalPhotosForCell:cell photoObject:photoObject indexPath:indexPath];
-  }
-  
+  [self setImageForCell:cell photoObject:photoObject indexPath:indexPath];
   return cell;
 }
 
-- (void)setRemotePhotoForCell:(DFPhotoViewCell *)cell
+- (void)setImageForCell:(DFPhotoViewCell *)cell
                   photoObject:(DFPeanutFeedObject *)photoObject
                     indexPath:(NSIndexPath *)indexPath
 {
+  UICollectionView *collectionView = self.collectionView;
   [[DFImageManager sharedManager]
    imageForID:photoObject.id
-   preferredType:DFImageThumbnail
+   size:[self cellPhotoSizeForIndexPath:indexPath]
+   contentMode:DFImageRequestContentModeAspectFill
+   deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
-       cell.imageView.image = image;
-       [cell setNeedsLayout];
+       if ([[collectionView indexPathForCell:cell] isEqual:indexPath]) {
+         // make sure we're setting the right image for the cell
+         cell.imageView.image = image;
+         if (!image) DDLogWarn(@"nil image");
+         [cell setNeedsLayout];
+       }
      });
    }];
-
+  
+  if (indexPath.row == 0 ||
+      indexPath.row == ([self.collectionView numberOfItemsInSection:indexPath.section] - 1)) {
+    //if this is the first or last item in the section, cache around it
+    [self cacheImagesAroundSection:indexPath.section];
+  }
 }
 
-- (void)setLocalPhotosForCell:(DFPhotoViewCell *)cell
-                  photoObject:(DFPeanutFeedObject *)photoObject
-                    indexPath:(NSIndexPath *)indexPath
+- (CGSize)cellPhotoSizeForIndexPath:(NSIndexPath *)indexPath
 {
-  if (![self.localPhotoAssetsBySection.allKeys containsObject:@(indexPath.section)]) {
-    [self cacheLocalPhotoAssetsForSection:indexPath.section];
-  }
-  NSArray *photoAssets = self.localPhotoAssetsBySection[@(indexPath.section)];
-  DFPhotoAsset *asset = nil;
-  if (indexPath.row < photoAssets.count) {
-    asset = photoAssets[indexPath.row];
-    if (![[asset class] isSubclassOfClass:[DFPhotoAsset class]]) {
-      DDLogWarn(@"%@ nil local asset. Skipping", self.class);
-      asset = nil;
-    }
-  } else {
-    DDLogWarn(@"%@ warning some local assets in %@ nil", self.class, [self feedObjectsForSection:indexPath.section]);
-  }
-  
+  UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout
+                                                        layoutAttributesForItemAtIndexPath:indexPath];
   CGFloat thumbnailSize;
-  if ([UIDevice majorVersionNumber] >= 8 || self.imageType == DFImageFull) {
+  if ([UIDevice majorVersionNumber] >= 8 || thumbnailSize > DFPhotoAssetDefaultThumbnailSize * 2) {
     // only use the larger thumbnails on iOS 8+, the scaling will kill perf on iOS7
-    UICollectionViewLayoutAttributes *layoutAttributes = [self.collectionView.collectionViewLayout
-                                                          layoutAttributesForItemAtIndexPath:indexPath];
     thumbnailSize = layoutAttributes.size.height * [[UIScreen mainScreen] scale];
   } else {
     thumbnailSize = DFPhotoAssetDefaultThumbnailSize;
   }
-  if (asset) {
-    DFImageDataSource __weak *weakSelf = self;
-    [asset
-     loadUIImageForThumbnailOfSize:thumbnailSize
-     successBlock:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         if ([[weakSelf.collectionView indexPathForCell:cell] isEqual:indexPath])
-           cell.imageView.image = image;
-       });
-     } failureBlock:^(NSError *error) {
-       DDLogError(@"%@ couldn't load image for asset: %@", weakSelf.class, error);
-     }];
-  } else {
-    cell.imageView.image = [UIImage imageNamed:@"Assets/Icons/MissingImage157"];
-  }
+  return CGSizeMake(thumbnailSize, thumbnailSize);
 }
+
 
 #pragma mark - Supplementary views forwarded
 

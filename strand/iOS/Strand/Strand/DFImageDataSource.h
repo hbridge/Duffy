@@ -24,26 +24,14 @@
 
 @interface DFImageDataSource : NSObject <UICollectionViewDataSource>
 
-typedef enum {
-  DFImageDataSourceModeRemote,
-  DFImageDataSourceModeLocal,
-} DFImageDataSourceMode;
-
-
 @property (nonatomic, weak) UICollectionView *collectionView;
-@property (nonatomic) DFImageDataSourceMode sourceMode;
-@property (nonatomic) DFImageType imageType;
 @property (nonatomic, weak) id<DFImageDataSourceDelegate> supplementaryViewDelegate;
 @property (nonatomic, retain) NSArray *collectionFeedObjects;
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedPhotos
-                    collectionView:(UICollectionView *)collectionView
-                        sourceMode:(DFImageDataSourceMode)sourceMode
-                         imageType:(DFImageType)imageType;
+                    collectionView:(UICollectionView *)collectionView;
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
-                               collectionView:(UICollectionView *)collectionView
-                                   sourceMode:(DFImageDataSourceMode)sourceMode
-                                    imageType:(DFImageType)imageType;
+                               collectionView:(UICollectionView *)collectionView;
 
 - (void)setFeedPhotos:(NSArray *)feedPhotos;
 - (void)setCollectionFeedObjects:(NSArray *)collectionFeedObjects;
@@ -53,12 +41,9 @@ typedef enum {
 
 #pragma mark - For use by subclasses only;
 
-- (void)setRemotePhotoForCell:(DFPhotoViewCell *)cell
-                  photoObject:(DFPeanutFeedObject *)photoObject
-                    indexPath:(NSIndexPath *)indexPath;
-- (void)setLocalPhotosForCell:(DFPhotoViewCell *)cell
-                  photoObject:(DFPeanutFeedObject *)photoObject
-                    indexPath:(NSIndexPath *)indexPath;
+- (void)setImageForCell:(DFPhotoViewCell *)cell
+            photoObject:(DFPeanutFeedObject *)photoObject
+              indexPath:(NSIndexPath *)indexPath;
 
 
 @end
