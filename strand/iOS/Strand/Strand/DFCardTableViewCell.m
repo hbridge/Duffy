@@ -165,14 +165,17 @@ const NSUInteger LargeCardMaxPhotosPerCell = 3;
   self.objects = idsToShow;
   
   for (NSUInteger i = 0; i < self.objects.count; i++) {
-    UICollectionViewLayoutAttributes *attributes =
-    [self.collectionView layoutAttributesForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+    CGSize size = [self collectionView:self.collectionView
+                                layout:self.collectionView.collectionViewLayout
+                sizeForItemAtIndexPath:[NSIndexPath indexPathForItem:i inSection:0]];
+    size = CGSizeMake(size.width * [[UIScreen mainScreen] scale],
+                      size.height * [[UIScreen mainScreen] scale]);
+
     DFPhotoIDType photoID = [(NSNumber *)self.objects[i] longLongValue];
-  
     DFCardTableViewCell __weak *weakSelf = self;
     [[DFImageManager sharedManager]
      imageForID:photoID
-     size:attributes.size
+     size:size
      contentMode:DFImageRequestContentModeAspectFill
      deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
      completion:^(UIImage *image) {
