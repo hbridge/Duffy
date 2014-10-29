@@ -58,17 +58,18 @@
     dispatch_queue_attr_t cache_attrs;
     if ([UIDevice majorVersionNumber] >= 8) {
       imageReqAttrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT,
-                                                              QOS_CLASS_USER_INITIATED,
+                                                              QOS_CLASS_DEFAULT,
                                                               0);
       cache_attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT,
-                                                            QOS_CLASS_DEFAULT,
+                                                            QOS_CLASS_BACKGROUND,
                                                             0);
       _imageRequestQueue = dispatch_queue_create("ImageReqQueue", imageReqAttrs);
       _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", cache_attrs);
     } else {
       _imageRequestQueue = dispatch_queue_create("ImageReqQueue", DISPATCH_QUEUE_CONCURRENT);
-      dispatch_set_target_queue(_imageRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+      dispatch_set_target_queue(_imageRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0));
       _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", DISPATCH_QUEUE_CONCURRENT);
+      dispatch_set_target_queue(_imageRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0));
     }
     
     // setup the cache
@@ -136,7 +137,7 @@
   if (cachedImage) {
     source = @"memcache";
     if (completionBlock) completionBlock(cachedImage);
-  }else if ([[DFImageStore sharedStore] canServeRequest:request]) {
+  } else if ([[DFImageStore sharedStore] canServeRequest:request]) {
     // opt for the cache first
     source = @"diskcache";
     [self serveRequestWithDiskCache:request completion:completionBlock];
@@ -159,16 +160,59 @@
                            targetSize:(CGSize)size
                           contentMode:(DFImageRequestContentMode)contentMode
 {
+  NSMutableArray *idsNotInDiskCache = [NSMutableArray new];
+  DFImageManagerRequest *templateRequest = [[DFImageManagerRequest alloc] initWithPhotoID:0
+                                                                                     size:size
+                                                                              contentMode:contentMode
+                                                                             deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat];
   for (NSNumber *photoID in photoIDs) {
-    // simply get all of the images with a nil completion handler
-    // the imageForID call should cache it as it does normally
-    [self imageForID:photoID.longLongValue
-                size:size
-         contentMode:contentMode
-        deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
-          completion:nil];
+    // first see what we can get in mem or disk cache
+    DFImageManagerRequest *request = [templateRequest copyWithPhotoID:photoID.longLongValue];
+    
+    if ([self cachedImageForRequest:request]) {
+      // we already have this in the cache, do nothing
+      continue;
+    } else if ([[DFImageStore sharedStore] canServeRequest:request]) {
+      // if we can cache from the disk store, load the images from there
+      dispatch_async(self.cacheRequestQueue, ^{
+        UIImage *image = [[DFImageStore sharedStore] serveImageForRequest:request];
+        [self cacheImage:image forRequest:request];
+      });
+    } else {
+      [idsNotInDiskCache addObject:photoID];
+    }
+  }
+  
+  [self cacheIDsNotInDiskCache:idsNotInDiskCache templateRequest:templateRequest];
+}
+
+- (void)cacheIDsNotInDiskCache:(NSArray *)idsNotInDiskCache
+               templateRequest:(DFImageManagerRequest *)templateRequest
+{
+  if (idsNotInDiskCache.count > 0) {
+    dispatch_async(self.cacheRequestQueue, ^{
+      // see which photos we have locally, download the rest
+      NSMutableArray *unfulfilledLocally = [idsNotInDiskCache mutableCopy];
+      NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+      NSDictionary *localPhotosByID = [DFPhotoStore photosWithPhotoIDs:idsNotInDiskCache inContext:context];
+      for (DFPhoto *photo in localPhotosByID.allValues) {
+        DFImageManagerRequest *request = [templateRequest copyWithPhotoID:photo.photoID];
+        UIImage *image = [photo.asset imageForRequest:request];
+        if (image) {
+          [self cacheImage:image forRequest:request];
+          [unfulfilledLocally removeObject:@(photo.photoID)];
+        }
+      }
+      
+      for (NSNumber *unfulfilledID in unfulfilledLocally) {
+        DFImageManagerRequest *request = [templateRequest copyWithPhotoID:unfulfilledID.longLongValue];
+        [self serveRequestFromNetwork:request completion:nil];
+      }
+    });
   }
 }
+
+
 
 
 #pragma mark - Logic for serving requests
@@ -213,10 +257,26 @@
   }];
 }
 
+- (void)serveRequestFromPhotoStore:(DFImageManagerRequest *)request
+                        completion:(ImageLoadCompletionBlock)completion
+{
+  [self
+   scheduleDeferredCompletion:completion
+   forRequest:request
+   withLoadBlock:^UIImage *{
+     NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+     DFPhoto *photo = [DFPhotoStore photoWithPhotoID:request.photoID inContext:context];
+     UIImage *image = [photo.asset imageForRequest:request];
+     return image;
+   }];
+}
+
+#pragma mark - Cache Management
+
 - (void)cacheImage:(UIImage *)image forRequest:(DFImageManagerRequest *)request
 {
   dispatch_semaphore_wait(self.imageRequestCacheSemaphore, DISPATCH_TIME_FOREVER);
-
+  
   if (image) {
     // normalize the deliveryType since it doesn't matter for cache
     DFImageManagerRequest *cacheRequest = [request
@@ -245,20 +305,6 @@
   dispatch_semaphore_signal(self.imageRequestCacheSemaphore);
 }
 
-
-- (void)serveRequestFromPhotoStore:(DFImageManagerRequest *)request
-                        completion:(ImageLoadCompletionBlock)completion
-{
-  [self
-   scheduleDeferredCompletion:completion
-   forRequest:request
-   withLoadBlock:^UIImage *{
-     NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-     DFPhoto *photo = [DFPhotoStore photoWithPhotoID:request.photoID inContext:context];
-     UIImage *image = [photo.asset imageForRequest:request];
-     return image;
-   }];
-}
 
 #pragma mark - Deferred completion logic
 

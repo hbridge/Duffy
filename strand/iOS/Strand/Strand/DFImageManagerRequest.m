@@ -73,6 +73,14 @@
                                                  DFPhotoAssetDefaultThumbnailSize));
 }
 
+- (DFImageManagerRequest *)copyWithPhotoID:(DFPhotoIDType)photoID
+{
+  return [[DFImageManagerRequest alloc] initWithPhotoID:photoID
+                                                   size:self.size
+                                            contentMode:self.contentMode
+                                           deliveryMode:self.deliveryMode];
+}
+
 - (DFImageManagerRequest *)copyWithDeliveryMode:(DFImageRequestDeliveryMode)deliveryMode
 {
   return [[DFImageManagerRequest alloc] initWithPhotoID:self.photoID
