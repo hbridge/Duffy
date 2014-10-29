@@ -120,6 +120,9 @@ def userbaseSummary(request):
 		if (user.last_location_timestamp):
 			entry['lastLocationTimestamp'] = user.last_location_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
 
+		if (user.last_photo_update_timestamp):
+			entry['lastCheckinTime'] = user.last_photo_update_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')			
+
 
 		if (user.totalCount > 0):
 			entry['lastUploadTime'] = user.lastUpdated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
