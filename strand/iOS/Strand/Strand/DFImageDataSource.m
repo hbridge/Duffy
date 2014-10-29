@@ -53,8 +53,12 @@
     _sectionArrays = sectionArrays;
     [weakSelf.collectionView reloadData];
     
-    if (previousCount == 0 && _collectionFeedObjects.count > 0 && [self.supplementaryViewDelegate respondsToSelector:@selector(didFinishFirstLoadForDatasource:)]) {
-      [self.supplementaryViewDelegate didFinishFirstLoadForDatasource:self];
+    if (previousCount == 0 && _collectionFeedObjects.count > 0) {
+      // this is the first data we've gotten, cache the bottom and send messages to delegate
+      [self cacheImagesAroundSection:sectionArrays.count - 1];
+      if ([self.supplementaryViewDelegate respondsToSelector:@selector(didFinishFirstLoadForDatasource:)]) {
+        [self.supplementaryViewDelegate didFinishFirstLoadForDatasource:self];
+      }
     }
   });
 }
@@ -74,8 +78,6 @@
     [collectionView registerNib:[UINib nibWithNibName:NSStringFromClass([DFPhotoViewCell class]) bundle:nil]
      forCellWithReuseIdentifier:@"cell"];
     _collectionView.dataSource = self;
-    
-    [self cacheImagesAroundSection:sectionArrays.count - 1];
   }
   return self;
 }

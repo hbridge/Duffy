@@ -12,6 +12,7 @@
 #import "DFImageDownloadManager.h"
 #import "DFPhotoStore.h"
 #import "DFPhotoResizer.h"
+#import "UIDevice+DFHelpers.h"
 
 @interface DFImageManager()
 
@@ -52,12 +53,25 @@
     _deferredCompletionBlocks = [NSMutableDictionary new];
     _photoIDsToDeferredRequests = [NSMutableDictionary new];
     _deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
-    dispatch_queue_attr_t attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_USER_INITIATED, 0);
-    _imageRequestQueue = dispatch_queue_create("ImageReqQueue", attrs);
+    
+    dispatch_queue_attr_t imageReqAttrs;
+    dispatch_queue_attr_t cache_attrs;
+    if ([UIDevice majorVersionNumber] >= 8) {
+      imageReqAttrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT,
+                                                              QOS_CLASS_USER_INITIATED,
+                                                              0);
+      cache_attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT,
+                                                            QOS_CLASS_DEFAULT,
+                                                            0);
+      _imageRequestQueue = dispatch_queue_create("ImageReqQueue", imageReqAttrs);
+      _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", cache_attrs);
+    } else {
+      _imageRequestQueue = dispatch_queue_create("ImageReqQueue", DISPATCH_QUEUE_CONCURRENT);
+      dispatch_set_target_queue(_imageRequestQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));
+      _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", DISPATCH_QUEUE_CONCURRENT);
+    }
     
     // setup the cache
-    dispatch_queue_attr_t cache_attrs = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_CONCURRENT, QOS_CLASS_DEFAULT, 0);
-    _cacheRequestQueue = dispatch_queue_create("ImageCacheReqQueue", cache_attrs);
     _imageRequestCache = [NSMutableDictionary new];
     _imageRequestCacheSemaphore = dispatch_semaphore_create(1);
     
