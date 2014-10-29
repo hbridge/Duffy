@@ -109,12 +109,16 @@ def getLocationForStrand(strand):
 
 	returns cache[strandId] = list(neighborStrand1, neighborStrand2...)
 """
-def getStrandNeighborsCache(strands, withUsers = False):
+def getStrandNeighborsCache(strands, friends, withUsers = False):
 	strandIds = Strand.getIds(strands)
+	friendIds = [x.id for x in friends]
 
-	strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1__in=strandIds) | Q(strand_2__in=strandIds))
+	strandNeighbors = StrandNeighbor.objects.prefetch_related('strand_1', 'strand_2').filter((Q(strand_1_id__in=strandIds) & Q(strand_2_user_id__in=friendIds)) | (Q(strand_1_user_id__in=friendIds) & Q(strand_2_id__in=strandIds)))
+
 	if withUsers:
-		strandNeighbors = strandNeighbors.prefetch_related('strand_1', 'strand_2', 'strand_1__users', 'strand_2__users')
+		strandNeighbors = strandNeighbors.prefetch_related('strand_1__users', 'strand_2__users')
+
+	strandNeighbors = list(strandNeighbors)
 
 	strandNeighborsCache = dict()
 	for strand in strands:
@@ -130,7 +134,6 @@ def getStrandNeighborsCache(strands, withUsers = False):
 					strandNeighborsCache[strand.id] = list()
 				if strandNeighbor.strand_1 not in strandNeighborsCache[strand.id]:
 					strandNeighborsCache[strand.id].append(strandNeighbor.strand_1)
-					
 	return strandNeighborsCache
 
 """
@@ -335,57 +338,59 @@ def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None, suggestionCount = 100000):
 	groups = list()
 
 	if friends == None:
 		friends = friends_util.getFriends(user.id)
 
 	if strandNeighborsCache == None:
-		strandNeighborsCache = getStrandNeighborsCache(strands, withUsers = True)
+		strandNeighborsCache = getStrandNeighborsCache(strands, friends)
+		printStats("neighbor-cache")
 
-	rankNum = 1
+	rankNum = 0
 	for strand in strands:
-		strandId = strand.id
-		photos = strand.photos.all()
+		if rankNum < suggestionCount:
+			strandId = strand.id
+			photos = strand.photos.all()
 
-		photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
-		if len(photos) == 0:
-			logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
-			continue
-		
-		interestedUsers = list()
-		if strand.id in strandNeighborsCache:
-			for neighborStrand in strandNeighborsCache[strand.id]:
-				if neighborStrand.location_point and strand.location_point:
-					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
-
-		interestedUsers = list(set(interestedUsers))
-
-		if len(interestedUsers) > 0:
-			title = "might like these photos"
-			rank = rankNum
-			rankNum += 1
-		else:
-			title = ""
-			rank = None
-		
-		suggestible = strand.suggestible
-
-		if suggestible and len(interestedUsers) == 0:
-			suggestible = False
+			photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
+			if len(photos) == 0:
+				logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
+				continue
 			
-		if not getLocationForStrand(strand):
 			interestedUsers = list()
-			suggestible = False
+			if strand.id in strandNeighborsCache:
+				for neighborStrand in strandNeighborsCache[strand.id]:
+					if neighborStrand.location_point and strand.location_point:
+						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
-		if not suggestible:
-			rank = None
+			interestedUsers = list(set(interestedUsers))
 
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible, 'suggestion_rank': rank}
-		entry = {'photos': photos, 'metadata': metadata}
+			if len(interestedUsers) > 0:
+				title = "might like these photos"
+				rank = rankNum
+				rankNum += 1
+			else:
+				title = ""
+				rank = None
+			
+			suggestible = strand.suggestible
 
-		groups.append(entry)
+			if suggestible and len(interestedUsers) == 0:
+				suggestible = False
+				
+			if not getLocationForStrand(strand):
+				interestedUsers = list()
+				suggestible = False
+
+			if not suggestible:
+				rank = None
+
+			metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible, 'suggestion_rank': rank}
+			entry = {'photos': photos, 'metadata': metadata}
+
+			groups.append(entry)
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
@@ -393,7 +398,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
-	
+	printStats("private-strands")
 	return objects
 
 
@@ -495,7 +500,7 @@ def getInviteObjectsDataForUser(user):
 
 	strandsObjectData = getObjectsDataForStrands(strands, user)
 	
-	strandNeighborsCache = getStrandNeighborsCache(strands, withUsers = True)
+	strandNeighborsCache = getStrandNeighborsCache(strands, friends, withUsers = True)
 
 	strandObjectDataById = dict()
 	for strandObjectData in strandsObjectData:
@@ -526,7 +531,7 @@ def getInviteObjectsDataForUser(user):
 
 			# TODO - This can be done in one query instead of being in a loop
 			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
-			strandNeighborsCache.update(getStrandNeighborsCache(privateStrands, withUsers = True))
+			strandNeighborsCache.update(getStrandNeighborsCache(privateStrands, friends, withUsers = True))
 			
 			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
 
@@ -597,7 +602,12 @@ def private_strands(request):
 
 		printStats("private-2")
 
-		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND)
+		friends = friends_util.getFriends(user.id)
+
+		strandNeighborsCache = getStrandNeighborsCache(strands, friends, withUsers=True)
+		printStats("neighbors-cache")
+		
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, strandNeighborsCache=strandNeighborsCache)
 		
 		printStats("private-3")
 	else:
@@ -646,7 +656,6 @@ def strand_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-
 """
 	Returns back the invites and strands a user has
 """
@@ -664,28 +673,42 @@ def swaps(request):
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		printStats("swaps-invites")
 
-		strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1__user=user) | Q(strand_2__user=user))
-		strands = list()
+		neighborIdList = friends_util.getFriendsIds(user.id)
+
+		strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=neighborIdList)) | (Q(strand_1_user_id__in=neighborIdList) & Q(strand_2_user_id=user.id)))
+		strandIds = list()
 		for strandNeighbor in strandNeighbors:
-			if strandNeighbor.strand_1.user_id == user.id:
-				strand = strandNeighbor.strand_1
+			if strandNeighbor.strand_1_user_id == user.id:
+				strandIds.append(strandNeighbor.strand_1_id)
 			else:
-				strand = strandNeighbor.strand_2
-			if strand.suggestible:
-				strands.append(strand)
+				strandIds.append(strandNeighbor.strand_2_id)
 
-		ids = Strand.getIds(strands)
+		strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
 
-		strands = Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=ids).order_by('-first_photo_time')[:20]
-		suggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION)
+		for strand in strands:
+			for photo in strand.photos.all():
+				photo.user = user
+				
+		strands = list(strands)
+		printStats("strands-fetch")
+
+
+		# Want to filter somehow
+
+
+
+		strandNeighborsCache = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
+		printStats("neighbors-cache")
+
+		suggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache)
 
 		# These are suggestions filtered
 		suggestibleSuggestions = list()
 		for suggestion in suggestions:
 			if suggestion['suggestible']:
 				suggestibleSuggestions.append(suggestion)
-				
 		responseObjects.extend(suggestibleSuggestions)
+		
 		printStats("swaps-suggestions")
 
 		response['objects'] = responseObjects

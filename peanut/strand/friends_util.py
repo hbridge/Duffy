@@ -18,6 +18,22 @@ def getFriends(userId):
 	friends = sorted(friends, key=lambda x: x.display_name)
 	return friends
 
+
+"""
+	Return friends and friends of friends ids for the given user
+"""
+def getFriendsIds(userId):
+	friendConnections = FriendConnection.objects.filter(Q(user_1=userId) | Q(user_2=userId))
+
+	friendsIds = list()
+	for friendConnection in friendConnections:
+		if (friendConnection.user_1_id != userId):
+			friendsIds.append(friendConnection.user_1_id)
+		else:
+			friendsIds.append(friendConnection.user_2_id)
+
+	return friendsIds
+
 """
 	For a given userId, should they be included as a "friend"
 	This is defined by the fact that they have a direct connection to our user
