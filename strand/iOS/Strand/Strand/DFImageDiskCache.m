@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFImageStore.h"
+#import "DFImageDiskCache.h"
 
 #import <FMDB/FMDB.h>
 #import "NSString+DFHelpers.h"
@@ -16,7 +16,7 @@
 #import "DFImageDownloadManager.h"
 #import "DFPhotoResizer.h"
 
-@interface DFImageStore()
+@interface DFImageDiskCache()
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 @property (nonatomic, retain) NSMutableSet *remoteLoadsInProgress;
@@ -30,15 +30,15 @@
 
 @end
 
-@implementation DFImageStore
+@implementation DFImageDiskCache
 
 @synthesize photoAdapter = _photoAdapter;
 @synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
 @synthesize db = _db;
 
-static DFImageStore *defaultStore;
+static DFImageDiskCache *defaultStore;
 
-+ (DFImageStore *)sharedStore {
++ (DFImageDiskCache *)sharedStore {
   if (!defaultStore) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -134,7 +134,7 @@ static DFImageStore *defaultStore;
            forID:(DFPhotoIDType)photoID
       completion:(SetImageCompletion)completion
 {
-  NSURL *url = [DFImageStore localURLForPhotoID:photoID type:type];
+  NSURL *url = [DFImageDiskCache localURLForPhotoID:photoID type:type];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     @autoreleasepool {
       NSData *data = UIImageJPEGRepresentation(image, 0.75);
@@ -156,7 +156,7 @@ static DFImageStore *defaultStore;
      preferredType:(DFImageType)type
         completion:(ImageLoadCompletionBlock)completionBlock
 {
-  NSURL *localUrl = [DFImageStore localURLForPhotoID:photoID type:type];
+  NSURL *localUrl = [DFImageDiskCache localURLForPhotoID:photoID type:type];
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     @autoreleasepool {
       NSData *imageData = [NSData dataWithContentsOfURL:localUrl];
@@ -243,9 +243,9 @@ static DFImageStore *defaultStore;
   filename = [NSString stringWithFormat:@"%llu.jpg", photoID];
 
   if (type == DFImageFull) {
-    return [[DFImageStore localFullImagesDirectoryURL] URLByAppendingPathComponent:filename];
+    return [[DFImageDiskCache localFullImagesDirectoryURL] URLByAppendingPathComponent:filename];
   } else if (type == DFImageThumbnail) {
-    return [[DFImageStore localThumbnailsDirectoryURL] URLByAppendingPathComponent:filename];
+    return [[DFImageDiskCache localThumbnailsDirectoryURL] URLByAppendingPathComponent:filename];
   }
   
   return nil;

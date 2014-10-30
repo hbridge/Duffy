@@ -220,7 +220,7 @@
 		5AED01E019E348DF001F075D /* NSIndexPath+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AED01DF19E348DF001F075D /* NSIndexPath+DFHelpers.m */; };
 		5AEFA25A19D607150027BC5E /* DFStrandGallerySectionHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AEFA25819D607150027BC5E /* DFStrandGallerySectionHeaderView.m */; };
 		5AEFA25B19D607150027BC5E /* DFStrandGallerySectionHeaderView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AEFA25919D607150027BC5E /* DFStrandGallerySectionHeaderView.xib */; };
-		5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */; };
+		5AF32EBF197C42CE004B5CC4 /* DFImageDiskCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EBE197C42CE004B5CC4 /* DFImageDiskCache.m */; };
 		5AF32EC3197C6444004B5CC4 /* DFPhotoFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */; };
 		5AF32EC4197C6444004B5CC4 /* DFPhotoFeedCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */; };
 		5AF32EC7197C9DCE004B5CC4 /* DFRoundedButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AF32EC6197C9DCE004B5CC4 /* DFRoundedButton.m */; };
@@ -635,8 +635,8 @@
 		5AEFA25719D607150027BC5E /* DFStrandGallerySectionHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGallerySectionHeaderView.h; sourceTree = "<group>"; };
 		5AEFA25819D607150027BC5E /* DFStrandGallerySectionHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGallerySectionHeaderView.m; sourceTree = "<group>"; };
 		5AEFA25919D607150027BC5E /* DFStrandGallerySectionHeaderView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandGallerySectionHeaderView.xib; sourceTree = "<group>"; };
-		5AF32EBD197C42CE004B5CC4 /* DFImageStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageStore.h; sourceTree = "<group>"; };
-		5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageStore.m; sourceTree = "<group>"; };
+		5AF32EBD197C42CE004B5CC4 /* DFImageDiskCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageDiskCache.h; sourceTree = "<group>"; };
+		5AF32EBE197C42CE004B5CC4 /* DFImageDiskCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageDiskCache.m; sourceTree = "<group>"; };
 		5AF32EC0197C6444004B5CC4 /* DFPhotoFeedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoFeedCell.h; sourceTree = "<group>"; };
 		5AF32EC1197C6444004B5CC4 /* DFPhotoFeedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoFeedCell.m; sourceTree = "<group>"; };
 		5AF32EC2197C6444004B5CC4 /* DFPhotoFeedCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoFeedCell.xib; sourceTree = "<group>"; };
@@ -939,8 +939,8 @@
 				5AC4A9021947C30800862D9C /* DFPhotoStore+IntegrityCheck.h */,
 				5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */,
 				5A40343219607B92003D7546 /* PhotoAsset */,
-				5AF32EBD197C42CE004B5CC4 /* DFImageStore.h */,
-				5AF32EBE197C42CE004B5CC4 /* DFImageStore.m */,
+				5AF32EBD197C42CE004B5CC4 /* DFImageDiskCache.h */,
+				5AF32EBE197C42CE004B5CC4 /* DFImageDiskCache.m */,
 				5AB7BEB819FFF71D000BEB67 /* DFImageManager.h */,
 				5AB7BEB919FFF71D000BEB67 /* DFImageManager.m */,
 				5AB7BEBB19FFF72C000BEB67 /* DFImageManagerRequest.h */,
@@ -1781,7 +1781,7 @@
 				5AC4A92B1947C30800862D9C /* DFPhotoCollection.m in Sources */,
 				5A7B184D19707C7200E5A1D1 /* DFPeanutActionAdapter.m in Sources */,
 				5AC4A9211947C30800862D9C /* DFAnalytics.m in Sources */,
-				5AF32EBF197C42CE004B5CC4 /* DFImageStore.m in Sources */,
+				5AF32EBF197C42CE004B5CC4 /* DFImageDiskCache.m in Sources */,
 				5AA36F0C19F80ECA008B37AA /* DFSwapViewController.m in Sources */,
 				5A3172C4196B1C4200CA7693 /* DFSMSAuthViewController.m in Sources */,
 				651E9A89199D190F00678D16 /* DFPeanutNotificationsAdapter.m in Sources */,

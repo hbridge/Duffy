@@ -10,12 +10,12 @@
 #import "DFTypedefs.h"
 #import "DFImageManagerRequest.h"
 
-@interface DFImageStore : NSObject
+@interface DFImageDiskCache : NSObject
 
 typedef void (^ImageLoadCompletionBlock)(UIImage *image);
 typedef void (^SetImageCompletion)(NSError *error);
 
-+ (DFImageStore *)sharedStore;
++ (DFImageDiskCache *)sharedStore;
 
 //- (void)imageForID:(DFPhotoIDType)photoID
 //     preferredType:(DFImageType)type

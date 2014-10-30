@@ -18,7 +18,7 @@
 #import "DFAnalytics.h"
 #import "DFStrandConstants.h"
 #import "DFUser.h"
-#import "DFImageStore.h"
+#import "DFImageDiskCache.h"
 #import "UIAlertView+DFHelpers.h"
 #import "DFNetworkingConstants.h"
 #import "AppDelegate.h"
@@ -213,7 +213,7 @@
   [mapping button:@"Clear Image Cache"
        identifier:@"clearImageCache"
           handler:^(id object) {
-            NSError *error = [[DFImageStore sharedStore] clearCache];
+            NSError *error = [[DFImageDiskCache sharedStore] clearCache];
             if (!error) {
               [UIAlertView showSimpleAlertWithTitle:@"Cache cleared." message:@"The image cache has been cleared"];
             } else {

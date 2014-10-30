@@ -8,7 +8,7 @@
 
 #import "DFImageManager.h"
 #import "DFPhotoAsset.h"
-#import "DFImageStore.h"
+#import "DFImageDiskCache.h"
 #import "DFImageDownloadManager.h"
 #import "DFPhotoStore.h"
 #import "DFPhotoResizer.h"
@@ -150,7 +150,7 @@
   if (cachedImage) {
     source = @"memcache";
     if (completionBlock) completionBlock(cachedImage);
-  } else if ([[DFImageStore sharedStore] canServeRequest:request]) {
+  } else if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
     // opt for the cache first
     source = @"diskcache";
     [self serveRequestWithDiskCache:request completion:completionBlock];
@@ -190,10 +190,10 @@
       // we already have this in the cache or it's in progress, do nothing
       [self removeCacheRequestInFlight:request];
       continue;
-    } else if ([[DFImageStore sharedStore] canServeRequest:request]) {
+    } else if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
       // if we can cache from the disk store, load the images from there
       dispatch_async(self.cacheRequestQueue, ^{
-        UIImage *image = [[DFImageStore sharedStore] serveImageForRequest:request];
+        UIImage *image = [[DFImageDiskCache sharedStore] serveImageForRequest:request];
         [self cacheImage:image forRequest:request];
       });
     } else {
@@ -281,7 +281,7 @@
   [self scheduleDeferredCompletion:completionBlock
                         forRequest:request
                      withLoadBlock:^{
-                       return [[DFImageStore sharedStore] serveImageForRequest:request];
+                       return [[DFImageDiskCache sharedStore] serveImageForRequest:request];
                      }];
 }
 
@@ -296,7 +296,7 @@
      andPhotoID:request.photoID
      completion:^(UIImage *image) {
        result = image;
-       [[DFImageStore sharedStore] setImage:image
+       [[DFImageDiskCache sharedStore] setImage:image
                                        type:request.imageType
                                       forID:request.photoID
                                  completion:nil];

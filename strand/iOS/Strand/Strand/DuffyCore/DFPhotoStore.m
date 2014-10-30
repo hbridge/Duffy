@@ -16,7 +16,7 @@
 #import "DFCameraRollPhotoAsset.h"
 #import "DFSettings.h"
 #import "DFUploadController.h"
-#import "DFImageStore.h"
+#import "DFImageDiskCache.h"
 
 @interface DFPhotoStore(){
   NSManagedObjectContext *_managedObjectContext;
@@ -775,7 +775,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
       for (DFPhoto *photo in photos.allValues) {
         DFPhotoIDType photoID = photo.photoID;
         [photo.asset loadUIImageForThumbnail:^(UIImage *image) {
-          [[DFImageStore sharedStore]
+          [[DFImageDiskCache sharedStore]
            setImage:image
            type:DFImageThumbnail
            forID:photoID
@@ -789,7 +789,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
           DDLogError(@"%@ failed code 1B to cache thumbnail for photo id %@.  error: %@", self.class, @(photoID), error);
         }];
         [photo.asset loadHighResImage:^(UIImage *image) {
-          [[DFImageStore sharedStore]
+          [[DFImageDiskCache sharedStore]
            setImage:image
            type:DFImageFull
            forID:photoID

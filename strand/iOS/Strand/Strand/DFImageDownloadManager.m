@@ -10,7 +10,7 @@
 
 #import <AFNetworking.h>
 
-#import "DFImageStore.h"
+#import "DFImageDiskCache.h"
 #import "DFObjectManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFUser.h"
@@ -20,7 +20,7 @@
 
 @property (nonatomic, retain) RKObjectManager *objectManager;
 @property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
-@property (nonatomic, retain) DFImageStore *imageStore;
+@property (nonatomic, retain) DFImageDiskCache *imageStore;
 
 @end
 
@@ -47,7 +47,7 @@ static DFImageDownloadManager *defaultManager;
     [self observeNotifications];
     self.objectManager = [DFObjectManager sharedManager];
     self.dataManager = [DFPeanutFeedDataManager sharedManager];
-    self.imageStore = [DFImageStore sharedStore];
+    self.imageStore = [DFImageDiskCache sharedStore];
   }
   return self;
 }

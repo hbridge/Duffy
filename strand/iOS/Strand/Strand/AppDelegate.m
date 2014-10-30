@@ -41,7 +41,7 @@
 #import "DFFriendsViewController.h"
 #import "DFUserInfoManager.h"
 #import "DFImageDownloadManager.h"
-#import "DFImageStore.h"
+#import "DFImageDiskCache.h"
 #import "DFSwapViewController.h"
 #import "DFPeanutFeedDataManager.h"
 
@@ -283,7 +283,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
       [[DFImageDownloadManager sharedManager] fetchNewImages];
-      [[DFImageStore sharedStore] loadDownloadedImagesCache];
+      [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];
