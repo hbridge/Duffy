@@ -47,7 +47,7 @@
 - (void)configureHeader
 {
   NSArray *swappedStrands = [[DFPeanutFeedDataManager sharedManager]
-                             publicStrandsWithUser:self.peanutUser];
+                             publicStrandsWithUser:self.peanutUser includeInvites:NO];
   NSArray *unswappedStrands = [[DFPeanutFeedDataManager sharedManager]
                                privateStrandsWithUser:self.peanutUser];
   self.profilePhotoStackView.names = @[self.peanutUser.display_name];

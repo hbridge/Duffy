@@ -35,7 +35,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;
-- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user;
+- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user includeInvites:(BOOL)includeInvites;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;

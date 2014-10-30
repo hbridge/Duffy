@@ -187,12 +187,13 @@ static DFPeanutFeedDataManager *defaultManager;
   return (self.swapsLastResponseHash != nil);
 }
 
-- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user
+- (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user includeInvites:(BOOL)includeInvites
 {
   NSMutableArray *strands = [NSMutableArray new];
   
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts] || [object.type isEqual:DFFeedObjectInviteStrand]) {
+    if ([object.type isEqual:DFFeedObjectStrandPosts] ||
+        ([object.type isEqual:DFFeedObjectInviteStrand] && includeInvites)) {
       for (NSUInteger i = 0; i < object.actors.count; i++) {
         DFPeanutUserObject *actor = object.actors[i];
         if (user.id == actor.id) {

@@ -102,7 +102,7 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
 - (void)reloadData
 {
   if (self.useSharedPhotos) {
-    self.strandsToShow = [self.dataManager publicStrandsWithUser:self.userToView];
+    self.strandsToShow = [self.dataManager publicStrandsWithUser:self.userToView includeInvites:NO];
   } else {
     self.strandsToShow = [self.dataManager privateStrandsWithUser:self.userToView];
   }
