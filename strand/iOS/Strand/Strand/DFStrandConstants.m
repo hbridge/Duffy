@@ -140,6 +140,7 @@ static NSArray *colors;
                NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Medium" size:11],
                NSForegroundColorAttributeName : [UIColor lightGrayColor],
                },
+           @"gray"    : @{NSForegroundColorAttributeName : [UIColor lightGrayColor]},
            };
 }
 

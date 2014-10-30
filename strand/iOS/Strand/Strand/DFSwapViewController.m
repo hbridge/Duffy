@@ -382,7 +382,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   DFSwapTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
   suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
     // the suggestion sections don't include this user in the actors list
-  NSString *titleMarkup = [NSString stringWithFormat:@"With <name>%@ and You</name>", [suggestionObject actorsString]];
+  NSString *titleMarkup = [NSString stringWithFormat:@"With <name>%@</name>", [suggestionObject actorsString]];
   
   [self configureCell:suggestionCell
             indexPath:indexPath
