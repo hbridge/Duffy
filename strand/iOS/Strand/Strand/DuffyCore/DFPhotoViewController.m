@@ -361,31 +361,7 @@ NSString *const SaveButtonTitle = @"Save to Camera Roll";
 
 - (void)deletePhoto
 {
-  DFPhotoMetadataAdapter *metadataAdapter = [[DFPhotoMetadataAdapter alloc] init];
-  [metadataAdapter deletePhoto:self.photoID completionBlock:^(NSError *error) {
-    if (!error) {
-      // tell the multi photo view controller to select another
-      DFMultiPhotoViewController *parentMPVC = (DFMultiPhotoViewController *)self.parentViewController;
-      [parentMPVC activePhotoDeleted];
-      
-      // remove it from the db
-      [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.photoID];
-      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess
-                      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
-    } else {
-      UIAlertView *alertView = [[UIAlertView alloc]
-                                initWithTitle:@"Error"
-                                message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
-                                         error.localizedRecoverySuggestion ?
-                                          error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]
-                                delegate:nil
-                                cancelButtonTitle:@"OK"
-                                otherButtonTitles:nil];
-      [alertView show];
-      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure
-       timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:self.photo.utcCreationDate]];
-    }
-  }];
+  [UIAlertView showSimpleAlertWithTitle:@"Not implemented" formatMessage:@"Later."];
 }
 
 - (void)addOrientationToMetadata:(NSMutableDictionary *)metadata forImage:(UIImage *)image

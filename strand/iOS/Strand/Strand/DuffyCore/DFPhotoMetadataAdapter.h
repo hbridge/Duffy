@@ -44,9 +44,6 @@ withImageDataTypes:(DFImageType)imageTypes
 - (void)getImageDataForTypesWithPaths:(NSDictionary *)dict
        withCompletionBlock:(DFImageDataFetchCompletionBlock)completion;
 
-- (void)deletePhoto:(DFPhotoIDType)photoID
-    completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock;
-
 + (NSURL *)urlForPhotoID:(DFPhotoIDType)photoID;
 
 @end

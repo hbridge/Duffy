@@ -911,26 +911,23 @@ selectedObjectChanged:(id)newObject
 
 - (void)deletePhoto
 {
-  DFPeanutFeedObject *object = self.photoObjectsById[@(self.actionSheetPhotoID)];
-  [self.photoAdapter deletePhoto:self.actionSheetPhotoID completionBlock:^(NSError *error) {
-    if (!error) {
-      [self removePhotoObjectFromView:object];
-      
-      // remove it from the db
-      [[DFPhotoStore sharedStore] deletePhotoWithPhotoID:self.actionSheetPhotoID];
-      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess
-                      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
-    } else {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        [UIAlertView
-         showSimpleAlertWithTitle:@"Error"
-         message:[[NSString stringWithFormat:@"Sorry, an error occurred: %@",
-                   error.localizedRecoverySuggestion ?
-                   error.localizedRecoverySuggestion : error.localizedDescription] substringToIndex:200]];
-        [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure
-                        timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
-      });
-    }
+  DFPeanutFeedObject *photoObject = self.photoObjectsById[@(self.actionSheetPhotoID)];
+  [[DFPeanutFeedDataManager sharedManager] removePhoto:photoObject fromStrandPosts:self.postsObject success:^{
+    [self removePhotoObjectFromView:photoObject];
+    [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultSuccess
+                    timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:photoObject.time_taken]];
+  } failure:^(NSError *error) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+      NSString *message = [NSString stringWithFormat:@"Sorry, an error occurred: %@",
+                            error.localizedRecoverySuggestion ?
+                            error.localizedRecoverySuggestion : error.localizedDescription];
+      message = [message substringToIndex:MIN(200, message.length)];
+      [UIAlertView
+       showSimpleAlertWithTitle:@"Error"
+       message:message];
+      [DFAnalytics logPhotoDeletedWithResult:DFAnalyticsValueResultFailure
+                      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:photoObject.time_taken]];
+    });
   }];
 }
 

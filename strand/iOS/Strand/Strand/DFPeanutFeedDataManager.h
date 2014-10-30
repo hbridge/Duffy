@@ -60,4 +60,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
                           success:(void(^)(DFPeanutStrand *resultStrand))success
                           failure:(DFFailureBlock)failure;
 
+- (void)removePhoto:(DFPeanutFeedObject *)photoObject
+     fromStrandPosts:(DFPeanutFeedObject *)strandPosts
+            success:(DFSuccessBlock)success
+            failure:(DFFailureBlock)failure;
+
 @end

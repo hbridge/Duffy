@@ -513,6 +513,39 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
+- (void)removePhoto:(DFPeanutFeedObject *)photoObject
+     fromStrandPosts:(DFPeanutFeedObject *)strandPosts
+            success:(DFSuccessBlock)success
+            failure:(DFFailureBlock)failure
+{
+  DFPeanutStrand *reqStrand = [[DFPeanutStrand alloc] init];
+  reqStrand.id = @(strandPosts.id);
+  
+  // first get the strand
+  [self.strandAdapter
+   performRequest:RKRequestMethodGET
+   withPeanutStrand:reqStrand success:^(DFPeanutStrand *peanutStrand) {
+     //remove the photo from the strand's list of photos
+     NSMutableArray *newPhotosList = [peanutStrand.photos mutableCopy];
+     [newPhotosList removeObject:@(photoObject.id)];
+     
+     // patch the strand with the new list
+     [self.strandAdapter
+      performRequest:RKRequestMethodPATCH
+      withPeanutStrand:peanutStrand success:^(DFPeanutStrand *peanutStrand) {
+        DDLogInfo(@"%@ removed photo %@ from %@", self.class, photoObject, peanutStrand);
+        success();
+      } failure:^(NSError *error) {
+        DDLogError(@"%@ couldn't patch strand: %@", self.class, error);
+        failure(error);
+      }];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ couldn't get strand: %@", self.class, error);
+     failure(error);
+   }];
+  
+}
+
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects
 {
   NSDate *minDateFound;
@@ -555,6 +588,7 @@ static DFPeanutFeedDataManager *defaultManager;
   [deferredForID removeAllObjects];
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
+
 
 
 

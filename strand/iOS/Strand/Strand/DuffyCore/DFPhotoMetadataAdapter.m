@@ -480,36 +480,6 @@ const BOOL UseNetworkingQueue = YES;
 }
 
 
-
-- (void)deletePhoto:(DFPhotoIDType)photoID
-    completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock
-{
-  DFPeanutPhoto *requestPhoto = [[DFPeanutPhoto alloc] init];
-  requestPhoto.id = @(photoID);
-  
-  NSMutableURLRequest *request =
-  [self.objectManager
-   requestWithObject:requestPhoto
-   method:RKRequestMethodDELETE
-   path:[NSString stringWithFormat:@"photos/%llu", photoID]
-   parameters:nil];
-  
-  DDLogInfo(@"DFPhotoMetadataAdapter getting endpoint: %@", request.URL.absoluteString);
-  
-  RKObjectRequestOperation *requestOperation =
-  [self.objectManager
-   objectRequestOperationWithRequest:request
-   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
-     DDLogVerbose(@"Delete server response: %@", mappingResult.firstObject);
-     completionBlock(nil);
-   } failure:^(RKObjectRequestOperation *operation, NSError *error) {
-     DDLogWarn(@"DFPhotoMetadataAdapter delete failed: %@", error.description);
-     completionBlock(error);
-   }];
-  
-  [self.objectManager enqueueObjectRequestOperation:requestOperation];
-}
-
 - (NSError *)verifyResultPhotos:(NSArray *)resultPeanutPhotos
 {
   NSError *error;
