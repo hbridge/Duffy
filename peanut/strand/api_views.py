@@ -27,24 +27,6 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def getBestLocation(photo):
-	if photo.twofishes_data:
-		twoFishesData = json.loads(photo.twofishes_data)
-		bestLocationName = None
-		bestWoeType = 100
-		if "interpretations" in twoFishesData:
-			for data in twoFishesData["interpretations"]:
-				if "woeType" in data["feature"]:
-					# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
-					if data["feature"]["woeType"] < bestWoeType:
-						bestLocationName = data["feature"]["displayName"]
-						bestWoeType = data["feature"]["woeType"]
-						if bestLocationName:
-							return bestLocationName
-						else:
-							return photo.location_city
-	return None
-
 def getActionsByPhotoIdCache(photoIds):
 	actions = Action.objects.select_related().filter(photo_id__in=photoIds)
 	actionsByPhotoId = dict()
@@ -63,45 +45,6 @@ def addActionsToClusters(clusters, actionsByPhotoIdCache):
 				entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
 
 	return clusters
-
-def getBestLocationForPhotos(photos):
-	# Grab title from the location_city of a photo...but find the first one that has
-	#   a valid location_city
-	bestLocation = None
-	i = 0
-	while (not bestLocation) and i < len(photos):
-		bestLocation = getBestLocation(photos[i])
-		i += 1
-
-	return bestLocation
-
-def getTitleForStrand(strand):
-	photos = strand.photos.all()
-	if len(photos) == 0:
-		photos = strand.getPostPhotos()
-		
-	location = getBestLocationForPhotos(photos)
-
-	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
-
-	if strand.first_photo_time.year != datetime.datetime.now().year:
-		dateStr += ", " + strand.first_photo_time.strftime("%Y")
-
-	title = dateStr
-
-	if location:
-		title = location + " on " + dateStr
-
-	return title
-
-def getLocationForStrand(strand):
-	photos = strand.photos.all()
-	if len(photos) == 0:
-		photos = strand.getPostPhotos()
-		
-	location = getBestLocationForPhotos(photos)
-
-	return location
 
 """
 	Creates a cache which is a dictionary with the key being the strandId and the value
@@ -307,7 +250,7 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
 		
 
-		location = getBestLocationForPhotos(group['photos'])
+		location = strands_util.getBestLocationForPhotos(group['photos'])
 		if not location:
 			location = "Location Unknown"
 
@@ -380,7 +323,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			if suggestible and len(interestedUsers) == 0:
 				suggestible = False
 				
-			if not getLocationForStrand(strand):
+			if not strands_util.getLocationForStrand(strand):
 				interestedUsers = list()
 				suggestible = False
 
@@ -481,7 +424,7 @@ def getObjectsDataForStrands(strands, user):
 						name = entry.name.split(" ")[0]
 
 				invitedUsers.append(User(id=0, display_name=name))
-		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': getLocationForStrand(strand)}
+		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
 
 		entry['objects'] = list()
 		for post in postActions:
@@ -506,6 +449,12 @@ def getInviteObjectsDataForUser(user):
 	for strandObjectData in strandsObjectData:
 		strandObjectDataById[strandObjectData['id']] = strandObjectData
 
+	lastStrandedPhoto = Photo.objects.filter(user=user, strand_evaluated=True).order_by("-time_taken")[:1]
+	if len(lastStrandedPhoto) > 0:
+		lastStrandedPhoto = lastStrandedPhoto[0]
+	else:
+		lastStrandedPhoto = None
+		
 	for strandInvite in strandInvites:
 		inviteIsReady = True
 		fullsLoaded = True
@@ -522,6 +471,13 @@ def getInviteObjectsDataForUser(user):
 				inviteIsReady = True
 			else:
 				inviteIsReady = False
+
+			# If the invite's timeframe is within the last photo in the camera roll
+			#   then look at the last stranded photo
+			if (invite.strand.first_photo_time - constants.TIMEDELTA_FOR_STRANDING < user.last_photo_timestamp and
+				invite.strand.last_photo_time + constants.TIMEDELTA_FOR_STRANDING > user.last_photo_timestamp):
+				if lastStrandedPhoto and lastStrandedPhoto.time_taken <= user.last_photo_timestamp:
+					inviteIsReady = False
 
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}

@@ -3,6 +3,7 @@ import sys, os
 import time, datetime
 import pytz
 import logging
+import json
 
 from peanut.settings import constants
 
@@ -131,3 +132,61 @@ def mergeStrands(strand1, strand2, photosByStrandId, usersByStrandId):
 		if user not in usersByStrandId[strand1.id]:
 			strand1.users.add(user)
 			usersByStrandId[strand1.id].append(user)
+
+
+def getBestLocation(photo):
+	if photo.twofishes_data:
+		twoFishesData = json.loads(photo.twofishes_data)
+		bestLocationName = None
+		bestWoeType = 100
+		if "interpretations" in twoFishesData:
+			for data in twoFishesData["interpretations"]:
+				if "woeType" in data["feature"]:
+					# https://github.com/foursquare/twofishes/blob/master/interface/src/main/thrift/geocoder.thrift
+					if data["feature"]["woeType"] < bestWoeType:
+						bestLocationName = data["feature"]["displayName"]
+						bestWoeType = data["feature"]["woeType"]
+						if bestLocationName:
+							return bestLocationName
+						else:
+							return photo.location_city
+	return None
+	
+def getBestLocationForPhotos(photos):
+	# Grab title from the location_city of a photo...but find the first one that has
+	#   a valid location_city
+	bestLocation = None
+	i = 0
+	while (not bestLocation) and i < len(photos):
+		bestLocation = getBestLocation(photos[i])
+		i += 1
+
+	return bestLocation
+
+def getTitleForStrand(strand):
+	photos = strand.photos.all()
+	if len(photos) == 0:
+		photos = strand.getPostPhotos()
+		
+	location = getBestLocationForPhotos(photos)
+
+	dateStr = "%s %s" % (strand.first_photo_time.strftime("%b"), strand.first_photo_time.strftime("%d").lstrip('0'))
+
+	if strand.first_photo_time.year != datetime.datetime.now().year:
+		dateStr += ", " + strand.first_photo_time.strftime("%Y")
+
+	title = dateStr
+
+	if location:
+		title = location + " on " + dateStr
+
+	return title
+
+def getLocationForStrand(strand):
+	photos = strand.photos.all()
+	if len(photos) == 0:
+		photos = strand.getPostPhotos()
+		
+	location = getBestLocationForPhotos(photos)
+
+	return location
