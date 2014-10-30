@@ -277,6 +277,13 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
     DDLogInfo(@"%@ became active", [DFAppInfo appInfoString]);
     if ([self isAppSetupComplete]) {
+      // Tell the server what the last photo in our camera roll is
+      dispatch_async(dispatch_get_main_queue(), ^{
+        [DFPhotoStore fetchMostRecentSavedPhotoDate:^(NSDate *timestamp) {
+          DDLogVerbose(@"Setting last photo timestamp to %@", timestamp);
+          [[DFUserInfoManager sharedManager] setLastPhotoTimestamp:timestamp];
+        } promptUserIfNecessary:NO];
+      });
       [[DFCameraRollSyncManager sharedManager] sync];
       [[DFContactSyncManager sharedManager] sync];
       [[DFUploadController sharedUploadController] uploadPhotos];

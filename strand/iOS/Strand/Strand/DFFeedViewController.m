@@ -150,10 +150,10 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"Told to reload my data...");
   if (self.inviteObject) {
-    DFPeanutFeedObject *invite = [self.dataManager inviteObjectWithId:self.inviteObject.id];
-    
     // We might not have the invite in the feed yet (might have come through notification
     //   So if that happens, don't overwrite our current one which has the id
+    DFPeanutFeedObject *invite = [self.dataManager inviteObjectWithId:self.inviteObject.id];
+  
     if (invite) {
       self.inviteObject = invite;
       self.suggestionsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
@@ -300,7 +300,10 @@ const CGFloat LockedCellHeight = 157.0;
                                            buttonTarget:self
                                                selector:@selector(upsellButtonPressed:)];
     }
-    [self.swapUpsellView configureActivityWithVisibility:NO];
+    
+    if ([self.inviteObject.ready isEqual:@(YES)]) {
+      [self.swapUpsellView configureActivityWithVisibility:NO];
+    }
   } else {
     [self.swapUpsellView removeFromSuperview];
   }
