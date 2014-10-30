@@ -219,4 +219,29 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   return _inviteAdapter;
 }
 
+
+/*
+ * This is the same code as in DFFeedViewController, might want to abstract if we do this more
+ */
++ (void)presentFeedObject:(DFPeanutFeedObject *)feedObject
+  modallyInViewController:(UIViewController *)viewController
+{
+  DFCreateStrandFlowViewController *createStrandController = [[DFCreateStrandFlowViewController alloc]
+                                                              initWithHighlightedPhotoCollection:feedObject];
+  
+  createStrandController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
+                                                              initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:createStrandController
+                                                              action:@selector(dismissWhenPresented)];
+  
+  
+  [viewController presentViewController:createStrandController animated:YES completion:nil];
+  
+}
+
+- (void)dismissWhenPresented
+{
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+
 @end

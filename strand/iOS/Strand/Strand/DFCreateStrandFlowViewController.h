@@ -19,5 +19,5 @@
 
 - (instancetype)initWithHighlightedPhotoCollection:(DFPeanutFeedObject *)highlightedCollection;
 - (void)refreshFromServer;
-
++ (void)presentFeedObject:(DFPeanutFeedObject *)feedObject modallyInViewController:(UIViewController *)viewController;
 @end

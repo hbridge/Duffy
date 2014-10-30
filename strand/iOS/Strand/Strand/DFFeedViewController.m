@@ -123,6 +123,9 @@ const CGFloat LockedCellHeight = 157.0;
 }
 
 
+/*
+ * This is the same code as in DFCreateStrandFlowViewController, might want to abstract if we do this more
+ */
 + (void)presentFeedObject:(DFPeanutFeedObject *)feedObject
   modallyInViewController:(UIViewController *)viewController
 {

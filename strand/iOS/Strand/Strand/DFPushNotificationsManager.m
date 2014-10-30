@@ -6,15 +6,17 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFPushNotificationsManager.h"
-#import "DFDefaultsStore.h"
 #import "DFAnalytics.h"
-#import "DFPeanutPushTokenAdapter.h"
-#import "DFPeanutPushNotification.h"
 #import "DFBackgroundLocationManager.h"
-#import "DFToastNotificationManager.h"
-#import "DFPeanutFeedDataManager.h"
+#import "DFCreateStrandFlowViewController.h"
+#import "DFDefaultsStore.h"
 #import "DFFeedViewController.h"
+#import "DFPeanutFeedDataManager.h"
+#import "DFPeanutPushNotification.h"
+#import "DFPeanutPushTokenAdapter.h"
+#import "DFPushNotificationsManager.h"
+#import "DFToastNotificationManager.h"
+
 
 @implementation DFPushNotificationsManager
 
@@ -162,7 +164,8 @@
     }
   } else if ([application applicationState] == UIApplicationStateInactive) {
     if (pushNotif.type == NOTIFICATIONS_INVITED_TO_STRAND
-        || pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE)
+        || pushNotif.type == NOTIFICATIONS_ACCEPTED_INVITE
+        || pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER)
     {
       DFNoticationOpenedHandler handler = [self openedHandlerForNotification:pushNotif];
       handler(pushNotif);
@@ -206,6 +209,30 @@
       UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
                                           rootViewController];
       [DFFeedViewController presentFeedObject:foundObject modallyInViewController:rootController];
+      [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
+    } else if (pushNotif.type == NOTIFICATIONS_RETRO_FIRESTARTER) {
+      
+      // This is very similar code to above, if we change this, might want to pull together
+      NSArray *suggestedStrands = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+      DFPeanutFeedObject *foundObject;
+      for (DFPeanutFeedObject *object in suggestedStrands) {
+        if (object.id == openedNotif.id.longLongValue) {
+          foundObject = object;
+          break;
+        }
+      }
+      
+      if (!foundObject) {
+        // if we don't find an object in the feed, we have to fake it so that when the feed
+        // data manager gets the actual object, we sub in the correct data
+        foundObject = [[DFPeanutFeedObject alloc] init];
+        foundObject.id = openedNotif.id.longLongValue;
+        foundObject.type = DFFeedObjectSwapSuggestion;
+      }
+      UIViewController *rootController = [[[[UIApplication sharedApplication] delegate] window]
+                                          rootViewController];
+      
+      [DFCreateStrandFlowViewController presentFeedObject:foundObject modallyInViewController:rootController];
       [DFAnalytics logNotificationOpenedWithType:pushNotif.type];
     }
     
