@@ -26,6 +26,7 @@
 @property (atomic, retain) NSMutableDictionary *idsByImageTypeCache;
 
 @property (nonatomic, readonly, retain) FMDatabase *db;
+@property (nonatomic, readonly, retain) FMDatabaseQueue *dbQueue;
 
 @end
 
@@ -39,8 +40,11 @@ static DFImageStore *defaultStore;
 
 + (DFImageStore *)sharedStore {
   if (!defaultStore) {
-    [self createCacheDirectories];
-    defaultStore = [[super allocWithZone:nil] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      [self createCacheDirectories];
+      defaultStore = [[super allocWithZone:nil] init];
+    });
   }
   return defaultStore;
 }
@@ -54,6 +58,7 @@ static DFImageStore *defaultStore;
 {
   self = [super init];
   if (self) {
+    [self initDB];
     _deferredCompletionBlocks = [NSMutableDictionary new];
     self.deferredCompletionSchedulerSemaphore = dispatch_semaphore_create(1);
     self.remoteLoadsInProgress = [[NSMutableSet alloc] init];
@@ -67,20 +72,19 @@ static DFImageStore *defaultStore;
 }
 
 
-- (FMDatabase *)db
+- (void)initDB
 {
-  if (!_db) {
-    _db = [FMDatabase databaseWithPath:[self.class dbPath]];
-    
-    if (![_db open]) {
-      DDLogError(@"Error opening downloadedImages database.");
-      _db = nil;
-    }
-    if (![_db tableExists:@"downloadedImages"]) {
-      [_db executeUpdate:@"CREATE TABLE downloadedImages (image_type NUMBER, photo_id NUMBER)"];
-    }
+  _db = [FMDatabase databaseWithPath:[self.class dbPath]];
+  
+  if (![_db open]) {
+    DDLogError(@"Error opening downloadedImages database.");
+    _db = nil;
   }
-  return _db;
+  if (![_db tableExists:@"downloadedImages"]) {
+    [_db executeUpdate:@"CREATE TABLE downloadedImages (image_type NUMBER, photo_id NUMBER)"];
+  }
+  
+  _dbQueue = [FMDatabaseQueue databaseQueueWithPath:[self.class dbPath]];
 }
 
 + (NSString *)dbPath
@@ -103,10 +107,12 @@ static DFImageStore *defaultStore;
 
 - (void)addToDBImageForType:(DFImageType)type forPhotoID:(DFPhotoIDType)photoID
 {
-  [self.db executeUpdate:@"INSERT INTO downloadedImages VALUES (?, ?)",
-   @(type),
-   @(photoID)];
-  DDLogInfo(@"Saving into downloaded image db: %u %llu", type, photoID);
+  [self.dbQueue inDatabase:^(FMDatabase *db) {
+    [db executeUpdate:@"INSERT INTO downloadedImages VALUES (?, ?)",
+     @(type),
+     @(photoID)];
+    DDLogInfo(@"Saving into downloaded image db: %u %llu", type, photoID);
+  }];
 }
 
 - (NSMutableSet *)getPhotoIdsForType:(DFImageType)type
@@ -170,78 +176,6 @@ static DFImageStore *defaultStore;
     }
   });
 }
-
-/*
-- (void)imageForID:(DFPhotoIDType)photoID
-     preferredType:(DFImageType)preferredType
-     thumbnailPath:(NSString *)thumbnailPath
-          fullPath:(NSString *)fullPath
-        completion:(ImageLoadCompletionBlock)completionBlock
-{
-  if (![thumbnailPath isNotEmpty] && ![fullPath isNotEmpty]) {
-    DDLogWarn(@"%@ imageForID withPaths requested but both paths are empty.", [self.class description]);
-    completionBlock(nil);
-  }
-  
-  NSURL *preferredLocalURL = [DFImageStore localURLForPhotoID:photoID type:preferredType];
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-    @autoreleasepool {
-      NSData *imageData = [NSData dataWithContentsOfURL:preferredLocalURL];
-      if (imageData) {
-        UIImage *image = [UIImage imageWithData:imageData];
-        completionBlock(image);
-        [self executeDefferredCompletionsWithImage:image forPhotoID:photoID];
-      } else {
-        [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
-        if ([self.remoteLoadsInProgress containsObject:@(photoID)]) return;
-        
-        [self.remoteLoadsInProgress addObject:@(photoID)];
-        NSDictionary *imageTypesToPaths;
-        if (preferredType & DFImageFull && [fullPath isNotEmpty]) {
-          imageTypesToPaths = @{@(DFImageFull) : fullPath};
-        } else if ([thumbnailPath isNotEmpty]) {
-          imageTypesToPaths = @{@(DFImageThumbnail) : thumbnailPath};
-        }
-        
-        [self.photoAdapter
-         getImageDataForTypesWithPaths:imageTypesToPaths
-         withCompletionBlock:^(NSDictionary *imageDataDict, NSError *error) {
-           UIImage *resultImage;
-           DFImageStore __weak *weakSelf = self;
-           DFImageType resultType = [(NSNumber *)imageDataDict.allKeys.firstObject intValue];
-           NSData *imageData = imageDataDict.allValues.firstObject;
-           if (imageData) {
-             resultImage = [UIImage imageWithData:imageData];
-             [self setImageData:imageData type:resultType forID:photoID completion:^(NSError *error) {
-               [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
-             }];
-           } else {
-             DDLogWarn(@"%@ image data for %@ nil", [self.class description],
-                       imageTypesToPaths.description);
-             [weakSelf executeDefferredCompletionsWithImage:resultImage forPhotoID:photoID];
-           }
-           completionBlock(resultImage);
-         }];
-      }
-    }
-  });
-}
-
-
-- (void)remoteLoadForPhotoID:(DFPhotoIDType)photoID
-               withLoadBlock:(void(^)(ImageLoadCompletionBlock))loadBlock
-             completionBlock:(ImageLoadCompletionBlock)completionBlock
-{
-  [self scheduleDeferredCompletion:completionBlock forPhotoID:photoID];
-   if (![self.remoteLoadsInProgress containsObject:@(photoID)]) {
-     [self.remoteLoadsInProgress addObject:@(photoID)];
-     loadBlock(^(UIImage *image) {
-       completionBlock(image);
-       [self executeDeferredCompletionsWithImage:image forPhotoID:photoID];
-     });
-   }
-}
-*/
 
 - (void)scheduleDeferredCompletion:(ImageLoadCompletionBlock)completion forPhotoID:(DFPhotoIDType)photoID
 {
