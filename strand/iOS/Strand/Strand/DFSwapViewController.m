@@ -112,6 +112,8 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   forCellReuseIdentifier:@"invite"];
   [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
   forCellReuseIdentifier:@"suggestion"];
+  
+  self.tableView.separatorInset = [DFSwapTableViewCell edgeInsets];
 }
 
 - (void)configureRefreshControl

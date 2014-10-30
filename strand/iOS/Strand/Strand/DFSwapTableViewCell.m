@@ -28,4 +28,9 @@
   return 69.0;
 }
 
++ (UIEdgeInsets)edgeInsets
+{
+  return UIEdgeInsetsMake(0, 15, 0, 15);
+}
+
 @end

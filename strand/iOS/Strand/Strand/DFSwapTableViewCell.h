@@ -17,5 +17,6 @@
 @property (weak, nonatomic) IBOutlet UIImageView *previewImageView;
 
 + (CGFloat)height;
++ (UIEdgeInsets)edgeInsets;
 
 @end
