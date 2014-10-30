@@ -12,6 +12,7 @@
 #import "DFDataHasher.h"
 #import "DFCGRectHelpers.h"
 #import "DFAssetCache.h"
+#import "UIDevice+DFHelpers.h"
 
 @interface DFPHAsset()
 
@@ -29,8 +30,10 @@ static dispatch_queue_t localImageReuestQueue;
 {
   static dispatch_once_t onceToken;
   dispatch_once(&onceToken, ^{
-    dispatch_queue_attr_t queue_attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
-    localImageReuestQueue = dispatch_queue_create("imageRequestQueue", queue_attr);
+    if ([UIDevice majorVersionNumber] >= 8) {
+      dispatch_queue_attr_t queue_attr = dispatch_queue_attr_make_with_qos_class(DISPATCH_QUEUE_SERIAL, QOS_CLASS_USER_INITIATED, 0);
+      localImageReuestQueue = dispatch_queue_create("imageRequestQueue", queue_attr);
+    }
   });
 }
 
