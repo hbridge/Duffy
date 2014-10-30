@@ -1,5 +1,9 @@
 # Swap
 
+## Oct 30th, 2014 (4776)
+
+- Fix iOS7
+
 ## Oct 29th, 2014 (4773-4775) 
 
 - Performance enhancements
