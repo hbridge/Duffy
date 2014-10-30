@@ -1,8 +1,10 @@
 # Swap
 
-## Oct 30th, 2014 (4776)
+## Oct 30th, 2014 (4776-4777)
 
 - Fix iOS7
+- More consistent unswapped tab for people
+- Other bug fixes
 
 ## Oct 29th, 2014 (4773-4775) 
 
