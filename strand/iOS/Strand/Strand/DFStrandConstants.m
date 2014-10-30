@@ -129,5 +129,19 @@ static NSArray *colors;
   return colors;
 }
 
++ (NSDictionary *)defaultTextStyle
+{
+  return @{
+           @"$default" : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue" size:13]},
+           @"strong"   : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Bold" size:13]},
+           @"em"       : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Italic" size:13]},
+           @"name"    : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Bold" size:13]},
+           @"subtitle" : @{
+               NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Medium" size:11],
+               NSForegroundColorAttributeName : [UIColor lightGrayColor],
+               },
+           };
+}
+
 
 @end

@@ -50,4 +50,7 @@ extern const CGFloat StrandGalleryHeaderHeight;
 + (UIColor *)photoCellBadgeColor;
 + (NSArray *)profilePhotoStackColors;
 
+// for use with Slash
++ (NSDictionary *)defaultTextStyle;
+
 @end

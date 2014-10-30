@@ -8,9 +8,9 @@
 
 import UIKit
 
-class DFProfilePhotoStackView: UIView {
-  let MaxProfilePhotos = 4;
-  let profilePhotoWidth:CGFloat = 35.0;
+@IBDesignable class DFProfilePhotoStackView: UIView {
+  @IBInspectable var MaxProfilePhotos = 4;
+  @IBInspectable var profilePhotoWidth:CGFloat = 35.0;
   var expandedNameLabel: UILabel = UILabel()
   var shouldShowNameLabel = false
   var fillColors: [UIColor] = []

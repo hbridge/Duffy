@@ -10,6 +10,9 @@
 
 @interface UIView (DFExtensions)
 
+@property (nonatomic, readonly) CGSize pixelSize;
+
 - (UIImage *) imageRepresentation;
+
 
 @end

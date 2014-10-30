@@ -7,7 +7,8 @@
 //
 
 #import "DFSwapViewController.h"
-#import "DFPersonSelectionTableViewCell.h"
+#import <Slash/Slash.h>
+#import "DFSwapTableViewCell.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNoTableItemsView.h"
 #import "DFFeedViewController.h"
@@ -18,6 +19,8 @@
 #import "DFNavigationController.h"
 #import "DFCreateStrandFlowViewController.h"
 #import "DFNoResultsTableViewCell.h"
+#import "DFImageManager.h"
+#import "UIView+DFExtensions.h"
 
 @interface DFSwapViewController ()
 
@@ -102,12 +105,12 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)configureTableView:(UITableView *)tableView
 {
-  self.tableView.rowHeight = DFPersonSelectionTableViewCellHeight;
+  self.tableView.rowHeight = [DFSwapTableViewCell height];
   [tableView registerNib:[UINib nibForClass:[DFNoResultsTableViewCell class]]
   forCellReuseIdentifier:@"noResults"];
-  [tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
+  [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
   forCellReuseIdentifier:@"invite"];
-  [tableView registerNib:[UINib nibForClass:[DFPersonSelectionTableViewCell class]]
+  [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
   forCellReuseIdentifier:@"suggestion"];
 }
 
@@ -262,9 +265,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   if (!object) {
     cell = [self noResultsCellForIndexPath:indexPath];
   } else if ([object.type isEqual:DFFeedObjectInviteStrand]) {
-    cell = [self cellForInviteObject:object];
+    cell = [self cellForInviteObject:object indexPath:indexPath];
   } else if ([object.type isEqual:DFFeedObjectSwapSuggestion]) {
-    cell = [self cellForSuggestionObject:object];
+    cell = [self cellForSuggestionObject:object indexPath:indexPath];
   }
   
   if (!cell) [NSException raise:@"unexpected object" format:@""];
@@ -283,44 +286,78 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   return cell;
 }
 
-- (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject
+- (UITableViewCell *)cellForInviteObject:(DFPeanutFeedObject *)inviteObject indexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *strandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
-  DFPersonSelectionTableViewCell *inviteCell = [self.tableView dequeueReusableCellWithIdentifier:@"invite"];
-
-  [inviteCell configureWithCellStyle:(DFPersonSelectionTableViewCellStyleStrandUser
-                                      | DFPersonSelectionTableViewCellStyleSubtitle)];
-  inviteCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+  DFSwapTableViewCell *inviteCell = [self.tableView dequeueReusableCellWithIdentifier:@"invite"];
   
-  inviteCell.profilePhotoStackView.names = inviteObject.actorNames;
-  UIFont *grayFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:inviteCell.nameLabel.font.pointSize];
-  inviteCell.nameLabel.attributedText = [NSAttributedString
-                                          attributedStringWithBlackText:inviteObject.actorsString
-                                          grayText:@" wants to swap photos"
-                                         grayFont:grayFont];
-  inviteCell.subtitleLabel.text = strandPosts.title;
+  NSString *titleLabelMarkup = [NSString stringWithFormat:@"From <name>%@</name>",
+                                inviteObject.actorsString];
+  [self configureCell:inviteCell
+            indexPath:indexPath
+            withNames:inviteObject.actorNames
+          titleMarkup:titleLabelMarkup
+           feedObject:strandPosts];
+  
   
   return inviteCell;
 }
 
-- (UITableViewCell *)cellForSuggestionObject:(DFPeanutFeedObject *)suggestionObject
+- (void)configureCell:(DFSwapTableViewCell *)cell
+            indexPath:(NSIndexPath *)indexPath
+            withNames:(NSArray *)names
+          titleMarkup:(NSString *)titleMarkup
+           feedObject:(DFPeanutFeedObject *)feedObject
 {
-  DFPersonSelectionTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
-  // Setup cell attrbutes
-  [suggestionCell configureWithCellStyle:(DFPersonSelectionTableViewCellStyleStrandUser
-                                          | DFPersonSelectionTableViewCellStyleSubtitle)];
-  suggestionCell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-  suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
   
-  // the suggestion sections don't include this user in the actors list
-  suggestionCell.nameLabel.font = [UIFont fontWithName:@"HelveticaNeue-Mediume" size:suggestionCell.nameLabel.font.pointSize];
-  NSString *nameString = [NSString stringWithFormat:@"%@ and You", [suggestionObject actorsString]];
-  UIFont *grayFont = [UIFont fontWithName:@"HelveticaNeue-Light" size:suggestionCell.nameLabel.font.pointSize];
-  suggestionCell.nameLabel.attributedText = [NSAttributedString
-                                             attributedStringWithBlackText:nameString
-                                             grayText:@" have photos"
-                                             grayFont:grayFont];
-  suggestionCell.subtitleLabel.text = [suggestionObject placeAndRelativeTimeString];
+  cell.profilePhotoStackView.names = names;
+  NSError *error;
+  cell.peopleLabel.attributedText = [SLSMarkupParser
+                                     attributedStringWithMarkup:titleMarkup
+                                     style:[DFStrandConstants defaultTextStyle]
+                                     error:&error];
+  cell.subTitleLabel.text = [feedObject placeAndRelativeTimeString];
+  
+  DFPeanutFeedObject *photoObject;
+  if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
+     photoObject = [[[feedObject.objects firstObject]
+                                        subobjectsOfType:DFFeedObjectPhoto]
+                                       firstObject];
+  } else {
+    for (DFPeanutFeedObject *descendent in
+         feedObject.enumeratorOfDescendents.allObjects.reverseObjectEnumerator.allObjects) {
+      if ([descendent.type isEqualToString:DFFeedObjectPhoto]) {
+        photoObject = descendent;
+        break;
+      }
+    }
+  }
+  [[DFImageManager sharedManager]
+   imageForID:photoObject.id
+   size:cell.previewImageView.pixelSize
+   contentMode:DFImageRequestContentModeAspectFill
+   deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
+   completion:^(UIImage *image) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       if ([[self.tableView indexPathForCell:cell] isEqual:indexPath]) {
+         cell.previewImageView.image = image;
+       }
+     });
+   }];
+}
+
+- (UITableViewCell *)cellForSuggestionObject:(DFPeanutFeedObject *)suggestionObject indexPath:(NSIndexPath *)indexPath
+{
+  DFSwapTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
+  suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
+    // the suggestion sections don't include this user in the actors list
+  NSString *titleMarkup = [NSString stringWithFormat:@"With <name>%@ and You</name>", [suggestionObject actorsString]];
+  
+  [self configureCell:suggestionCell
+            indexPath:indexPath
+            withNames:suggestionObject.actorNames
+          titleMarkup:titleMarkup
+           feedObject:suggestionObject];
   
   // Setup the swipe action
   UILabel *hideLabel = [[UILabel alloc] init];
@@ -336,7 +373,6 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   // we set to the group tableview background color to blend in
   suggestionCell.defaultColor = [UIColor groupTableViewBackgroundColor];
 
-  
   return suggestionCell;
 }
 
