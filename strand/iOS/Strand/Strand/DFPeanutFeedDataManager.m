@@ -287,6 +287,18 @@ static DFPeanutFeedDataManager *defaultManager;
     }
   }
   
+  for (DFPeanutFeedObject *object in self.swapsFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID) {
+      return object;
+    } else {
+      for (DFPeanutFeedObject *subObject in [object enumeratorOfDescendents]) {
+        if ([subObject.type isEqual:DFFeedObjectPhoto] && subObject.id == photoID) {
+          return subObject;
+        }
+      }
+    }
+  }
+  
   return nil;
 }
 
