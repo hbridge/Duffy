@@ -170,19 +170,25 @@ void (^_completionHandler)(UIBackgroundFetchResult);
 {
   // If we got a timestamp to sync to, then lets sync to that first
   if (self.firstRunSyncTimestamp) {
+    
     // If we already have a sync going, cancel and do the one with the timestamp.
     // If we don't, just do the sync to a timestamp
     if ([[DFCameraRollSyncManager sharedManager] isSyncInProgress]) {
+      DDLogInfo(@"First run complete with sync in progress for targeted search");
       [[DFCameraRollSyncManager sharedManager] cancelSyncOperations];
       [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^(NSDictionary *objectIDsToChanges){
         [self firstRunSyncComplete:objectIDsToChanges];
       }];
       [[DFCameraRollSyncManager sharedManager] sync];
     } else {
+      DDLogInfo(@"First run complete with no sync in progress for targeted search");
       [[DFCameraRollSyncManager sharedManager] syncAroundDate:self.firstRunSyncTimestamp withCompletionBlock:^(NSDictionary *objectIDsToChanges){
+        
         [self firstRunSyncComplete:objectIDsToChanges];
       }];
     }
+  } else {
+     DDLogInfo(@"First run complete with no first run sync timestamp.");
   }
   
   [self showMainView];
@@ -199,6 +205,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
  */
 - (void)firstRunSyncComplete:(NSDictionary *)objectsIds
 {
+  DDLogInfo(@"Setting first_run_sync_count with %@ assets", objectIDsToChanges.count);
   [[DFUserInfoManager sharedManager] setFirstTimeSyncCount:[NSNumber numberWithInteger:objectsIds.allKeys.count]];
 }
 /*
@@ -228,7 +235,6 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   } else {
     [self showMainView];
   }
-
 }
 
 - (void)showMainView
