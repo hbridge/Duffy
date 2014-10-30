@@ -90,8 +90,11 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
 #if TARGET_IPHONE_SIMULATOR
   NSLog(@"Simulator build running from: %@", [ [NSBundle mainBundle] bundleURL] );
+  NSLog(@"Simulator User Docs: %@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
+                                                                            inDomains:NSUserDomainMask]
+                                     lastObject]);
 #endif
-
+  
   // These are used for background syncs
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(backgroundCameraRollSyncFinished)
