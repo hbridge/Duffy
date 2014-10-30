@@ -205,7 +205,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
  */
 - (void)firstRunSyncComplete:(NSDictionary *)objectsIds
 {
-  DDLogInfo(@"Setting first_run_sync_count with %@ assets", objectIDsToChanges.count);
+  DDLogInfo(@"Setting first_run_sync_count with %lu assets", objectsIds.allKeys.count);
   [[DFUserInfoManager sharedManager] setFirstTimeSyncCount:[NSNumber numberWithInteger:objectsIds.allKeys.count]];
 }
 /*
