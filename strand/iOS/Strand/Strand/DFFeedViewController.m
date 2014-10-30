@@ -35,6 +35,7 @@
 #import "NSArray+DFHelpers.h"
 #import "DFStrandPeopleBarView.h"
 #import "SVProgressHUD.h"
+#import "DFImageManager.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -961,31 +962,34 @@ selectedObjectChanged:(id)newObject
 
 - (void)savePhotoToCameraRoll
 {
-  /*
-   TODO(Derek): Put this back, need to figure out metadata
   @autoreleasepool {
-    [[DFImageStore sharedStore]
+    [[DFImageManager sharedManager]
      imageForID:self.actionSheetPhotoID
      preferredType:DFImageFull
      completion:^(UIImage *image) {
        if (image) {
-         [[DFPhotoStore sharedStore]
-          saveImageToCameraRoll:image
-          withMetadata:peanutPhoto.metadataDictionary
-          completion:^(NSURL *assetURL, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-              if (error) {
-                [UIAlertView showSimpleAlertWithTitle:@"Error"
-                                              message:error.localizedDescription];
-                DDLogError(@"Saving photo to camera roll failed: %@", error.description);
-                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
-              } else {
-                DDLogInfo(@"Photo saved.");
-                
-                [UIAlertView showSimpleAlertWithTitle:nil
-                                              message:@"Photo saved to your camera roll"];
-                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
-              }});
+         [self.photoAdapter
+          getPhoto:self.actionSheetPhotoID
+          withImageDataTypes:DFImageFull
+          completionBlock:^(DFPeanutPhoto *peanutPhoto, NSDictionary *imageData, NSError *error) {
+            [[DFPhotoStore sharedStore]
+             saveImageToCameraRoll:image
+             withMetadata:peanutPhoto.metadataDictionary
+             completion:^(NSURL *assetURL, NSError *error) {
+               dispatch_async(dispatch_get_main_queue(), ^{
+                 if (error) {
+                   [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                                 message:error.localizedDescription];
+                   DDLogError(@"Saving photo to camera roll failed: %@", error.description);
+                   [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
+                 } else {
+                   DDLogInfo(@"Photo saved.");
+                   
+                   [UIAlertView showSimpleAlertWithTitle:nil
+                                                 message:@"Photo saved to your camera roll"];
+                   [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
+                 }});
+             }];
           }];
        } else {
          dispatch_async(dispatch_get_main_queue(), ^{
@@ -996,7 +1000,6 @@ selectedObjectChanged:(id)newObject
        }
      }];
   }
-   */
 }
 
 - (void)reloadRowForPhotoID:(DFPhotoIDType)photoID

@@ -33,6 +33,17 @@ typedef void (^DFPhotoDeleteCompletionBlock)(NSError *error);
 - (void)getPhotoMetadata:(DFPhotoIDType)photoID
          completionBlock:(DFMetadataFetchCompletionBlock)completionBlock;
 
+- (void)getPhoto:(DFPhotoIDType)photoID
+withImageDataTypes:(DFImageType)imageTypes
+ completionBlock:(DFPhotoFetchCompletionBlock)completionBlock;
+
+/*
+   takes a dictionary of format {DFImageType type : NSString *imagePath} and calls
+   a completion with a dict of format {DFImageType type : NSData *imageData}
+   */
+- (void)getImageDataForTypesWithPaths:(NSDictionary *)dict
+       withCompletionBlock:(DFImageDataFetchCompletionBlock)completion;
+
 - (void)deletePhoto:(DFPhotoIDType)photoID
     completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock;
 
