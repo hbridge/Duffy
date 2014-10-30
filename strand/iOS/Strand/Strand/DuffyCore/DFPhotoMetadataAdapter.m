@@ -378,6 +378,109 @@
   [self.objectManager enqueueObjectRequestOperation:requestOperation];
 }
 
+- (void)getPhoto:(DFPhotoIDType)photoID
+withImageDataTypes:(DFImageType)imageTypes
+ completionBlock:(DFPhotoFetchCompletionBlock)completionBlock
+{
+  [self getPeanutPhoto:photoID completion:^(DFPeanutPhoto *peanutPhoto, NSError *error) {
+    if (!error){
+      if (imageTypes == DFImageNone) {
+        completionBlock(peanutPhoto, nil, nil);
+        return ;
+      }
+      
+      NSMutableDictionary *imageDataPaths = [NSMutableDictionary new];
+      if (imageTypes & DFImageThumbnail && [peanutPhoto.thumbnail_image_path isNotEmpty]) {
+        imageDataPaths[@(DFImageThumbnail)] = peanutPhoto.thumbnail_image_path;
+      }
+      if (imageTypes & DFImageFull && [peanutPhoto.full_image_path isNotEmpty]) {
+        imageDataPaths[@(DFImageFull)] = peanutPhoto.full_image_path;
+      }
+      
+      [self getImageDataForTypesWithPaths:imageDataPaths
+                      withCompletionBlock:^(NSDictionary *imageData, NSError *error) {
+                        completionBlock(peanutPhoto, imageData, error);
+                      }];
+      
+    } else {
+      completionBlock(nil, nil, error);
+    }
+  }];
+}
+
+- (void)getPeanutPhoto:(DFPhotoIDType)photoID
+            completion:(void(^)(DFPeanutPhoto *, NSError *error))completion
+{
+  DFPeanutPhoto *requestPhoto = [[DFPeanutPhoto alloc] init];
+  requestPhoto.id = @(photoID);
+  
+  NSMutableURLRequest *request =
+  [self.objectManager
+   requestWithObject:requestPhoto
+   method:RKRequestMethodGET
+   path:[NSString stringWithFormat:@"photos/%llu", photoID]
+   parameters:nil];
+  
+  DDLogInfo(@"%@ getting endpoint: %@", [self.class description], request.URL.absoluteString);
+  
+  RKObjectRequestOperation *requestOperation =
+  [self.objectManager
+   objectRequestOperationWithRequest:request
+   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult) {
+     DFPeanutPhoto *resultPeanutPhoto = mappingResult.firstObject;
+     completion(resultPeanutPhoto, nil);
+     
+   } failure:^(RKObjectRequestOperation *operation, NSError *error) {
+     DDLogWarn(@"%@ photo fetch failed: %@", [self.class description], error.description);
+     completion(nil, error);
+   }];
+  
+  [self.objectManager enqueueObjectRequestOperation:requestOperation];
+}
+
+const BOOL UseNetworkingQueue = YES;
+
+- (void)getImageDataForTypesWithPaths:(NSDictionary *)pathsDict
+                  withCompletionBlock:(DFImageDataFetchCompletionBlock)completion
+{
+  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
+    @autoreleasepool {
+      NSMutableDictionary *result = [NSMutableDictionary new];
+      for (NSNumber *imageType in pathsDict.allKeys) {
+        NSURL *url = [[[DFUser currentUser] serverURL]
+                      URLByAppendingPathComponent:pathsDict[imageType]];
+        DDLogVerbose(@"Getting image data at: %@", url);
+        if (!UseNetworkingQueue) {
+          NSData *data= [NSData dataWithContentsOfURL:url];
+          if (data) {
+            result[imageType] = data;
+          }
+          completion(result, nil);
+        } else {
+          NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
+                                                  initWithURL:url
+                                                  cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                  timeoutInterval:30.0];
+          AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
+          requestOperation.queuePriority = NSOperationQueuePriorityHigh; // image downloads are high pri
+          
+          [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+            // Use my success callback with the binary data and MIME type string
+            if (operation.responseData) result[imageType] = operation.responseData;
+            completion(result, nil);
+          } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+            // Error callback
+            completion(nil, error);
+          }];
+          [self.objectManager.HTTPClient enqueueHTTPRequestOperation:requestOperation];
+        }
+      }
+    }
+  });
+}
+
+
+
 - (void)deletePhoto:(DFPhotoIDType)photoID
     completionBlock:(DFPhotoDeleteCompletionBlock)completionBlock
 {

@@ -35,6 +35,7 @@
 #import "NSArray+DFHelpers.h"
 #import "DFStrandPeopleBarView.h"
 #import "SVProgressHUD.h"
+#import "DFImageManager.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -150,10 +151,10 @@ const CGFloat LockedCellHeight = 157.0;
 {
   DDLogVerbose(@"Told to reload my data...");
   if (self.inviteObject) {
-    DFPeanutFeedObject *invite = [self.dataManager inviteObjectWithId:self.inviteObject.id];
-    
     // We might not have the invite in the feed yet (might have come through notification
     //   So if that happens, don't overwrite our current one which has the id
+    DFPeanutFeedObject *invite = [self.dataManager inviteObjectWithId:self.inviteObject.id];
+  
     if (invite) {
       self.inviteObject = invite;
       self.suggestionsObject = [[self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
@@ -300,7 +301,10 @@ const CGFloat LockedCellHeight = 157.0;
                                            buttonTarget:self
                                                selector:@selector(upsellButtonPressed:)];
     }
-    [self.swapUpsellView configureActivityWithVisibility:NO];
+    
+    if ([self.inviteObject.ready isEqual:@(YES)]) {
+      [self.swapUpsellView configureActivityWithVisibility:NO];
+    }
   } else {
     [self.swapUpsellView removeFromSuperview];
   }
@@ -958,31 +962,34 @@ selectedObjectChanged:(id)newObject
 
 - (void)savePhotoToCameraRoll
 {
-  /*
-   TODO(Derek): Put this back, need to figure out metadata
   @autoreleasepool {
-    [[DFImageStore sharedStore]
+    [[DFImageManager sharedManager]
      imageForID:self.actionSheetPhotoID
      preferredType:DFImageFull
      completion:^(UIImage *image) {
        if (image) {
-         [[DFPhotoStore sharedStore]
-          saveImageToCameraRoll:image
-          withMetadata:peanutPhoto.metadataDictionary
-          completion:^(NSURL *assetURL, NSError *error) {
-            dispatch_async(dispatch_get_main_queue(), ^{
-              if (error) {
-                [UIAlertView showSimpleAlertWithTitle:@"Error"
-                                              message:error.localizedDescription];
-                DDLogError(@"Saving photo to camera roll failed: %@", error.description);
-                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
-              } else {
-                DDLogInfo(@"Photo saved.");
-                
-                [UIAlertView showSimpleAlertWithTitle:nil
-                                              message:@"Photo saved to your camera roll"];
-                [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
-              }});
+         [self.photoAdapter
+          getPhoto:self.actionSheetPhotoID
+          withImageDataTypes:DFImageFull
+          completionBlock:^(DFPeanutPhoto *peanutPhoto, NSDictionary *imageData, NSError *error) {
+            [[DFPhotoStore sharedStore]
+             saveImageToCameraRoll:image
+             withMetadata:peanutPhoto.metadataDictionary
+             completion:^(NSURL *assetURL, NSError *error) {
+               dispatch_async(dispatch_get_main_queue(), ^{
+                 if (error) {
+                   [UIAlertView showSimpleAlertWithTitle:@"Error"
+                                                 message:error.localizedDescription];
+                   DDLogError(@"Saving photo to camera roll failed: %@", error.description);
+                   [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultFailure];
+                 } else {
+                   DDLogInfo(@"Photo saved.");
+                   
+                   [UIAlertView showSimpleAlertWithTitle:nil
+                                                 message:@"Photo saved to your camera roll"];
+                   [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
+                 }});
+             }];
           }];
        } else {
          dispatch_async(dispatch_get_main_queue(), ^{
@@ -993,7 +1000,6 @@ selectedObjectChanged:(id)newObject
        }
      }];
   }
-   */
 }
 
 - (void)reloadRowForPhotoID:(DFPhotoIDType)photoID

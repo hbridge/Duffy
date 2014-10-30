@@ -52,13 +52,12 @@
       dayBefore = [self.targetDate dateByAddingTimeInterval: -secondsPerDay];
       dayAfter = [self.targetDate dateByAddingTimeInterval: secondsPerDay];
       
-      DDLogVerbose(@"Doing a camera roll sync between %@ and %@", dayBefore, dayAfter);
+      DDLogInfo(@"Doing a camera roll sync between %@ and %@", dayBefore, dayAfter);
       objectIDsToChanges = [self findAssetChangesBetweenTimes:dayBefore beforeEndDate:dayAfter];
     } else {
       objectIDsToChanges = [self findAssetChanges];
     }
-    
-    
+
     if (self.isCancelled) {
       [self cancelled];
       return;

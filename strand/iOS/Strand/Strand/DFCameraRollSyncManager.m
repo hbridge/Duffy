@@ -70,7 +70,7 @@ static DFCameraRollSyncManager *defaultSyncController;
   }
   
   if (date) {
-    DDLogVerbose(@"Sync targeting date: %@", date);
+    DDLogInfo(@"Sync targeting date: %@", date);
     syncOperation.targetDate = date;
   }
   
@@ -86,7 +86,7 @@ static DFCameraRollSyncManager *defaultSyncController;
 
 - (void)cancelSyncOperations
 {
-  DDLogVerbose(@"Canceling all camera roll sync operations");
+  DDLogInfo(@"Canceling all camera roll sync operations");
   [self.syncOperationQueue cancelAllOperations];
 }
 
