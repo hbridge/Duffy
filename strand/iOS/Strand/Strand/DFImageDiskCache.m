@@ -12,6 +12,7 @@
 #import "DFTypedefs.h"
 #import "DFImageDownloadManager.h"
 #import "DFPhotoResizer.h"
+#import "DFImageManager.h"
 
 @interface DFImageDiskCache()
 
@@ -293,6 +294,7 @@ static DFImageDiskCache *defaultStore;
   
   [self.class createCacheDirectories];
   [self loadDownloadedImagesCache];
+  [[DFImageManager sharedManager] clearCache];
   
   return nil;
 }

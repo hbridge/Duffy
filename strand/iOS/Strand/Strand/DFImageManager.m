@@ -265,7 +265,6 @@
 
 
 
-
 #pragma mark - Logic for serving requests
 
 - (BOOL)isLocalPhotoID:(DFPhotoIDType)photoID

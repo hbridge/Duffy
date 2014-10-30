@@ -29,7 +29,7 @@ typedef void (^SetImageCompletion)(NSError *error);
 - (void)startCachingImagesForPhotoIDs:(NSArray *)photoIDs
                            targetSize:(CGSize)size
                           contentMode:(DFImageRequestContentMode)contentMode;
-
+- (void)clearCache;
 
 
 @end
