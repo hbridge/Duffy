@@ -10,10 +10,11 @@
 #import "DFSingleFriendViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "UIDevice+DFHelpers.h"
+#import "DFSwapViewController.h"
 
 @interface DFFriendProfileViewController ()
 
-@property (nonatomic, retain) DFSingleFriendViewController *unsharedViewController;
+@property (nonatomic, retain) DFSwapViewController *unsharedViewController;
 @property (nonatomic, retain) DFSingleFriendViewController *sharedViewController;
 
 @end
@@ -26,21 +27,21 @@
   self = [super init];
   if (self) {
     _peanutUser = peanutUser;
-    _unsharedViewController = [[DFSingleFriendViewController alloc]
-                               initWithUser:peanutUser
-                               withSharedPhotos:NO];
+    _unsharedViewController = [[DFSwapViewController alloc]
+                               initWithUserToFilter:peanutUser];
     _sharedViewController = [[DFSingleFriendViewController alloc]
                                initWithUser:peanutUser
                                withSharedPhotos:YES];
+    
+    // set their parent view controller so they inherit the nav controller etc
+    [self displayContentController:_sharedViewController];
   }
   return self;
 }
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  
   [self configureHeader];
-  [self configureTableViews];
 }
 
 - (void)configureHeader
@@ -72,48 +73,41 @@
     self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
     self.tabSegmentedControlWrapper.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
   }
-
-  
 }
 
-- (void)configureTableViews
+- (void) displayContentController: (UIViewController*) contentController;
 {
-  // add the two table views
-  [self.view insertSubview:self.unsharedViewController.tableView atIndex:0];
-  [self.view insertSubview:self.sharedViewController.tableView atIndex:0];
-  
-  // configure the tableviews
-  for (UITableView *tableView in [self tableViews]) {
-    tableView.frame = self.view.frame;
-  }
-  
-  // set their parent view controller so they inherit the nav controller etc
-  [self addChildViewController:self.unsharedViewController];
-  [self addChildViewController:self.sharedViewController];
-  
-  /// set shared hidden since it's not selected by default
-  self.unsharedViewController.tableView.hidden = YES;
+  [self addChildViewController:contentController];
+  contentController.view.frame = self.view.frame;
+  [self configureContentControllerTableView:(UITableViewController *)contentController];
+  [self.view insertSubview:contentController.view atIndex:0];
+  [contentController didMoveToParentViewController:self];
 }
 
-- (NSArray *)tableViews
+- (void) hideContentController: (UIViewController*) contentController
 {
-  return @[self.unsharedViewController.tableView,
-    self.sharedViewController.tableView];
+  [contentController willMoveToParentViewController:nil];
+  [contentController.view removeFromSuperview];
+  [contentController removeFromParentViewController];
 }
+
+- (void)configureContentControllerTableView:(UITableViewController *)tableViewController
+{
+  tableViewController.tableView.frame = self.view.frame;
+}
+
 
 - (void)viewDidLayoutSubviews
 {
   //set insets etc
-  for (UITableView *tableView in [self tableViews]) {
-    CGFloat contentTop = self.tabSegmentedControlWrapper.frame.origin.y
-    + self.tabSegmentedControlWrapper.frame.size.height;
-    UIEdgeInsets insets = UIEdgeInsetsMake(contentTop, 0, 0, 0);
-    tableView.contentInset = insets;
-    tableView.contentOffset = CGPointMake(0, -contentTop);
-    tableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
-  }
-  
-
+  UITableViewController *currentContoller = self.childViewControllers.firstObject;
+  UITableView *tableView = currentContoller.tableView;
+  CGFloat contentTop = self.tabSegmentedControlWrapper.frame.origin.y
+  + self.tabSegmentedControlWrapper.frame.size.height;
+  UIEdgeInsets insets = UIEdgeInsetsMake(contentTop, 0, 0, 0);
+  tableView.contentInset = insets;
+  tableView.contentOffset = CGPointMake(0, -contentTop);
+  tableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -157,11 +151,11 @@
 */
 - (IBAction)segmentViewValueChanged:(UISegmentedControl *)sender {
   if (sender.selectedSegmentIndex == 0) {
-    self.sharedViewController.tableView.hidden = NO;
-    self.unsharedViewController.tableView.hidden = YES;
+    [self hideContentController:self.unsharedViewController];
+    [self displayContentController:self.sharedViewController];
   } else {
-    self.unsharedViewController.tableView.hidden = NO;
-    self.sharedViewController.tableView.hidden = YES;
+    [self hideContentController:self.sharedViewController];
+    [self displayContentController:self.unsharedViewController];
   }
 }
 

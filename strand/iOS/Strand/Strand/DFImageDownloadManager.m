@@ -122,6 +122,9 @@ static DFImageDownloadManager *defaultManager;
               completionBlock(image);
       }];
     }
+  } else {
+    DDLogWarn(@"%@ asked to fetch photoID:%@ but dataManager returned nil.",
+              self.class, @(photoID));
   }
   
   if (!didDispatchForCompletion) completionBlock(nil);
@@ -153,6 +156,7 @@ static DFImageDownloadManager *defaultManager;
         }
       } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
         // Error callback
+        DDLogError(@"Error downloading image: %@", url);
         completion(nil, error);
       }];
       [self.objectManager.HTTPClient enqueueHTTPRequestOperation:requestOperation];

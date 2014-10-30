@@ -7,9 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFPeanutUserObject.h"
 
 @interface DFSwapViewController : UIViewController
   <UITableViewDataSource, UITableViewDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic) DFPeanutUserObject *userToFilter;
+
+- (instancetype)initWithUserToFilter:(DFPeanutUserObject *)user;
 
 @end

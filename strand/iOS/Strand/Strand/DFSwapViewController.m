@@ -40,6 +40,15 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 @implementation DFSwapViewController
 
+- (instancetype)initWithUserToFilter:(DFPeanutUserObject *)user
+{
+  self = [self init];
+  if (self) {
+    _userToFilter = user;
+  }
+  return self;
+}
+
 - (instancetype)init
 {
   self = [super init];
@@ -70,7 +79,8 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 }
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
+  [super viewDidLoad];
+  DDLogVerbose(@"%@ viewDidLoad", self.class);
     // Do any additional setup after loading the view from its nib.
   [self configureTableView:self.tableView];
   [self configureRefreshControl];
@@ -142,12 +152,31 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   }
   
   NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
+  if (self.userToFilter) {
+    NSMutableArray *filteredInvites = [NSMutableArray new];
+    for (DFPeanutFeedObject *invite in invites) {
+      if ([invite.actors containsObject:self.userToFilter]) {
+        [filteredInvites addObject:invite];
+      }
+    }
+    invites = filteredInvites;
+  }
   [self.sectionTitles addObject:InvitesSectionTitle];
   if (invites.count > 0) {
     self.sectionTitlesToObjects[InvitesSectionTitle] = invites;
   }
   
   self.allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+  if (self.userToFilter) {
+    NSMutableArray *filteredSuggestions = [NSMutableArray new];
+    for (DFPeanutFeedObject *suggestion in self.allSuggestions) {
+      if ([suggestion.actors containsObject:self.userToFilter]) {
+        [filteredSuggestions addObject:suggestion];
+      }
+    }
+    self.allSuggestions = filteredSuggestions;
+  }
+  
   [self reloadSuggestionsSection];
   
   [self.tableView reloadData];
