@@ -85,6 +85,7 @@
 
 - (void)acceptInvite
 {
+  [SVProgressHUD showWithStatus:@"Swapping..."];
   [[DFPeanutFeedDataManager sharedManager]
    acceptInvite:self.inviteObject
    addPhotoIDs:self.selectPhotosController.selectedPhotoIDs
