@@ -53,6 +53,10 @@
                                                               subpredicates:photoPredicates];
   }
   
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
+  }
+  
   // enumerate all the photo asets, scanning for changes as we go
   [self enumerateAssetsUsingCollectionsWithAssetOptions:photoFetchOptions assetBlock:^(PHAsset *asset) {
     assetCount++;
@@ -72,6 +76,9 @@
     [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
   }
   
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
+  }
   [self flushChanges];
   DDLogInfo(@"Scan complete.  Took %.02f Change summary for %@ assets: \n%@",
             [[NSDate date]
@@ -126,6 +133,9 @@
 - (void)scanPHAssetForChange:(PHAsset *)asset
 {
   if (self.unsavedObjectIDsToChanges.count > NumChangesFlushThreshold) {
+    if (self.isCancelled) {
+      return;
+    }
     [self flushChanges];
   }
   

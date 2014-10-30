@@ -45,6 +45,10 @@
    usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:nil startingAfter:startDate beforeEndDate:endDate]
    failureBlock:[self libraryAccessFailureBlock]];
   dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
+  
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
+  }
   [self flushChanges];
   
   // scan other items
@@ -53,11 +57,11 @@
    usingBlock:[self enumerateGroupsBlockSkippingGroupsNamed:@[@"Camera Roll"] startingAfter:startDate beforeEndDate:endDate]
    failureBlock:[self libraryAccessFailureBlock]];
   
-  dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
-  
   if (self.isCancelled) {
     return self.allObjectIDsToChanges;
   }
+  
+  dispatch_semaphore_wait(self.enumerationCompleteSemaphore, DISPATCH_TIME_FOREVER);
   
   // Only look for deletions if we were scanning the entire camera roll!
   // if you look for deletions but are only scanning a subset, it will delete everything else
@@ -65,6 +69,10 @@
     NSDictionary *removeChanges = [self removePhotosNotFound:self.knownNotFoundURLs];
     [self.allObjectIDsToChanges addEntriesFromDictionary:removeChanges];
     [self.unsavedObjectIDsToChanges addEntriesFromDictionary:removeChanges];
+  }
+  
+  if (self.isCancelled) {
+    return self.allObjectIDsToChanges;
   }
   [self flushChanges];
   DDLogInfo(@"Scan complete.  Took %.02f Change summary for all groups: \n%@", [[NSDate date] timeIntervalSinceDate:timerStartDate], [self changeTypesToCountsForChanges:self.allObjectIDsToChanges]);
@@ -109,6 +117,9 @@
       }
       if (self.unsavedObjectIDsToChanges.count > NumChangesFlushThreshold) {
         [groupObjectIDsToChanges addEntriesFromDictionary:self.unsavedObjectIDsToChanges];
+        if (self.isCancelled) {
+          return;
+        }
         [self flushChanges];
       }
       NSDate *assetDate = [photoAsset valueForProperty:ALAssetPropertyDate];

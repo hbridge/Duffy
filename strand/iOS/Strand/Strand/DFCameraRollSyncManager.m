@@ -63,10 +63,18 @@ static DFCameraRollSyncManager *defaultSyncController;
   
   if ([UIDevice majorVersionNumber] >= 8) {
     syncOperation = [[DFIOS8CameraRollSyncOperation alloc] init];
-    syncOperation.qualityOfService = NSOperationQualityOfServiceBackground;
+    if (date) {
+      syncOperation.qualityOfService = NSOperationQualityOfServiceUserInitiated;
+    } else {
+      syncOperation.qualityOfService = NSOperationQualityOfServiceBackground;
+    }
   } else {
     syncOperation = [[DFIOS7CameraRollSyncOperation alloc] init];
-    syncOperation.threadPriority = 0.2; //low, 0.5 is default
+    if (date) {
+      syncOperation.threadPriority = 0.5; //0.5 is default
+    } else {
+      syncOperation.threadPriority = 0.2; //low, 0.5 is default
+    }
   }
   
   if (date) {
