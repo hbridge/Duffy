@@ -127,12 +127,15 @@
     [mapping button:@"Report Issue" identifier:@"reportIssue" handler:^(id object) {
       DFDiagnosticInfoMailComposeController *mailComposer =
       [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeIssue];
-      [self presentViewController:mailComposer animated:YES completion:nil];
-    } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+      if (mailComposer) { // if the user hasn't setup email, this will come back nil
+        [self presentViewController:mailComposer animated:YES completion:nil];
+      }     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Send Feedback" identifier:@"sendFeedback" handler:^(id object) {
       DFDiagnosticInfoMailComposeController *mailComposer =
       [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeFeedback];
-      [self presentViewController:mailComposer animated:YES completion:nil];
+      if (mailComposer) {
+        [self presentViewController:mailComposer animated:YES completion:nil];
+      }
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Location Map" identifier:@"locationMap" handler:^(id object) {
       CLLocation *location = [[DFBackgroundLocationManager sharedBackgroundLocationManager] lastLocation];
