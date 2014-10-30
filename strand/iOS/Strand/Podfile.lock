@@ -41,6 +41,11 @@ PODS:
     - TransitionKit (= 1.1.1)
   - RHAddressBook (1.1.1)
   - SAMGradientView (0.2.1)
+  - Slash (0.1.2):
+    - Slash/arc
+    - Slash/no-arc
+  - Slash/arc (0.1.2)
+  - Slash/no-arc (0.1.2)
   - SOCKit (1.1)
   - SVProgressHUD (1.0)
   - TransitionKit (1.1.1)
@@ -60,6 +65,7 @@ DEPENDENCIES:
   - RestKit (~> 0.20.0)
   - RHAddressBook (~> 1.1.1)
   - SAMGradientView (~> 0.2.1)
+  - Slash (~> 0.1.2)
   - SVProgressHUD (from `https://github.com/samvermette/SVProgressHUD.git`)
   - WYPopoverController (~> 0.2.2)
 
@@ -89,6 +95,7 @@ SPEC CHECKSUMS:
   RestKit: 7f9490e709ee745e166c4d2aa7a8d132831275b0
   RHAddressBook: 0cad9d33b9494d1e28323b62e5c7afc109cc4294
   SAMGradientView: 37ef027b0da8b5fd85bfdfef49801b5262160998
+  Slash: d98d6ff27ece4297d8d65fb49fc1ce4307a75f46
   SOCKit: d8d0dd3688ae1026c12367570da8fa8e1a6980fb
   SVProgressHUD: 5e10939a296debf5fe5a5895eda9539b8b2114f1
   TransitionKit: b573f93c422f6aedf7d40e93e7c2f202d1295063

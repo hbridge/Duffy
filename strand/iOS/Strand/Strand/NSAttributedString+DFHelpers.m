@@ -28,5 +28,4 @@
   return result;
 }
 
-
 @end

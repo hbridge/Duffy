@@ -23,4 +23,13 @@
 }
 
 
+- (CGSize)pixelSize
+{
+  CGSize unscaled = self.frame.size;
+  CGSize scaled = CGSizeMake(unscaled.width * [[UIScreen mainScreen] scale],
+                             unscaled.height * [[UIScreen mainScreen] scale]);
+  return scaled;
+}
+
+
 @end
