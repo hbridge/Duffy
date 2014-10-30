@@ -17,9 +17,9 @@ typedef void (^SetImageCompletion)(NSError *error);
 
 + (DFImageDiskCache *)sharedStore;
 
-//- (void)imageForID:(DFPhotoIDType)photoID
-//     preferredType:(DFImageType)type
-//        completion:(ImageLoadCompletionBlock)completionBlock;
+- (void)imageForID:(DFPhotoIDType)photoID
+     preferredType:(DFImageType)type
+        completion:(ImageLoadCompletionBlock)completionBlock;
 
 - (void)setImage:(UIImage *)image
             type:(DFImageType)type
