@@ -31,7 +31,6 @@ static DFImageDiskCache *defaultStore;
   if (!defaultStore) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-      [self createCacheDirectories];
       defaultStore = [[super allocWithZone:nil] init];
     });
   }
@@ -47,12 +46,10 @@ static DFImageDiskCache *defaultStore;
 {
   self = [super init];
   if (self) {
+    [DFImageDiskCache createCacheDirectories];
     [self initDB];
-    self.idsByImageTypeCache = [NSMutableDictionary dictionaryWithObjectsAndKeys:
-                           @(DFImageThumbnail), [NSMutableSet new],
-                           @(DFImageFull), [NSMutableSet new],
-                           nil];
     [self loadDownloadedImagesCache];
+    [self integrityCheck];
   }
   return self;
 }
@@ -107,11 +104,43 @@ static DFImageDiskCache *defaultStore;
 
 - (void)loadDownloadedImagesCache
 {
+  _idsByImageTypeCache = [NSMutableDictionary dictionaryWithObjectsAndKeys:
+                          @(DFImageThumbnail), [NSMutableSet new],
+                          @(DFImageFull), [NSMutableSet new],
+                          nil];
+
   NSMutableSet *photoIds = [self imageIdsFromDBForType:DFImageThumbnail];
   [self.idsByImageTypeCache setObject:photoIds forKey:@(DFImageThumbnail)];
   
   photoIds = [self imageIdsFromDBForType:DFImageFull];
   [self.idsByImageTypeCache setObject:photoIds forKey:@(DFImageFull)];
+}
+
+- (void)integrityCheck
+{
+  NSError *error;
+  NSArray *thumnbailFiles = [[NSFileManager defaultManager]
+                             contentsOfDirectoryAtURL:[DFImageDiskCache localThumbnailsDirectoryURL]
+                             includingPropertiesForKeys:nil
+                             options:NSDirectoryEnumerationSkipsSubdirectoryDescendants
+                             error:&error];
+  NSArray *fullFiles = [[NSFileManager defaultManager]
+                        contentsOfDirectoryAtURL:[DFImageDiskCache localFullImagesDirectoryURL]
+                        includingPropertiesForKeys:nil
+                        options:NSDirectoryEnumerationSkipsSubdirectoryDescendants
+                        error:&error];
+  NSSet *thumbnailsInDB = self.idsByImageTypeCache[@(DFImageThumbnail)];
+  NSSet *fullsInDB = self.idsByImageTypeCache[@(DFImageFull)];
+  
+  DDLogInfo(@"%@ thumbnailFiles: %@ thumbnailsInDB: %@ fullFiles: %@ fulsInDB: %@",
+            self.class, @(thumnbailFiles.count), @(thumbnailsInDB.count), @(fullFiles.count), @(fullsInDB.count));
+  
+  if (thumbnailsInDB.count != thumnbailFiles.count
+      || fullsInDB.count != fullFiles.count) {
+    DDLogWarn(@"%@ count mismatch. Clearing disk cache.", self.class);
+    [self clearCache];
+  }
+  
 }
 
 - (void)setImage:(UIImage *)image
@@ -124,7 +153,7 @@ static DFImageDiskCache *defaultStore;
     @autoreleasepool {
       BOOL writeSuccessful = NO;
       NSData *data = UIImageJPEGRepresentation(image, 0.75);
-      if (!data) {
+      if (data) {
         writeSuccessful = [data writeToURL:url atomically:YES];
       }
       
@@ -263,6 +292,8 @@ static DFImageDiskCache *defaultStore;
   
   
   [self.class createCacheDirectories];
+  [self loadDownloadedImagesCache];
+  
   return nil;
 }
 
