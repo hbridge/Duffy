@@ -202,7 +202,9 @@ static void releaseAssetCallback(void *info) {
 
 - (CGImageSourceRef)createImageSourceRefForURL
 {
-  return CGImageSourceCreateWithURL((__bridge CFURLRef) self.url, NULL);
+  CGImageSourceRef ref = CGImageSourceCreateWithURL((__bridge CFURLRef) self.url, NULL);
+  if (!ref) DDLogWarn(@"%@ failed to create imagesource for %@", self.class, self.url);
+  return ref;
 }
 
 @end
