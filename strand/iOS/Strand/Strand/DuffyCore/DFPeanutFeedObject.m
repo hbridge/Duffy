@@ -310,4 +310,20 @@ static NSArray *FeedObjectTypes;
   return [self.objects filteredArrayUsingPredicate:predicate];
 }
 
+
+- (NSArray *)descendentdsOfType:(DFFeedObjectType)type
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
+  NSArray *allDescendents = self.enumeratorOfDescendents.allObjects;
+  return [allDescendents filteredArrayUsingPredicate:predicate];
+}
+
+
+- (DFPeanutFeedObject *)strandPostsObject
+{
+  if ([self.type isEqual:DFFeedObjectStrandPosts]) return self;
+  else return [[self subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+}
+
+
 @end

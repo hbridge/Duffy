@@ -73,8 +73,11 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 - (NSAttributedString *)peopleSummaryString;
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
+- (NSArray *)descendentdsOfType:(DFFeedObjectType)type;
+- (DFPeanutFeedObject *)strandPostsObject;
 
 /* Time in Location e.g.: "1 week ago in Wiliamsburg" */
 - (NSString *)placeAndRelativeTimeString;
+
 
 @end

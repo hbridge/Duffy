@@ -350,19 +350,15 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   cell.subTitleLabel.text = [feedObject placeAndRelativeTimeString];
   
   DFPeanutFeedObject *photoObject;
-  if ([feedObject.type isEqual:DFFeedObjectStrandPosts]) {
-     photoObject = [[[feedObject.objects firstObject]
-                                        subobjectsOfType:DFFeedObjectPhoto]
-                                       firstObject];
-  } else {
-    for (DFPeanutFeedObject *descendent in
-         feedObject.enumeratorOfDescendents.allObjects.reverseObjectEnumerator.allObjects) {
-      if ([descendent.type isEqualToString:DFFeedObjectPhoto]) {
-        photoObject = descendent;
-        break;
-      }
-    }
+  DFPeanutFeedObject *strandPosts = [feedObject strandPostsObject];
+  photoObject = [[[strandPosts.objects firstObject]
+                  descendentdsOfType:DFFeedObjectPhoto]
+                 firstObject];
+
+  if (!photoObject) {
+    DDLogInfo(@"%@ couldn't get photoObject for %@", self.class, feedObject);
   }
+  
   [[DFImageManager sharedManager]
    imageForID:photoObject.id
    size:cell.previewImageView.pixelSize
@@ -382,7 +378,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   DFSwapTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
   suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
     // the suggestion sections don't include this user in the actors list
-  NSString *titleMarkup = [NSString stringWithFormat:@"With <name>%@</name>", [suggestionObject actorsString]];
+  NSString *titleMarkup = [NSString stringWithFormat:@"with <name>%@</name>", [suggestionObject actorsString]];
   
   [self configureCell:suggestionCell
             indexPath:indexPath
