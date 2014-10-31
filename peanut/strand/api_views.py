@@ -465,6 +465,7 @@ def getInviteObjectsDataForUser(user):
 		for photo in invitePhotos:
 			if photo.user_id != user.id and not photo.full_filename:
 				fullsLoaded = False
+				logging.info("Not showing invite %s because photo %s doesn't have a full" % (invite.id, photo.id))
 
 		if fullsLoaded:
 			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
