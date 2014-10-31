@@ -95,15 +95,10 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	try:
 		user = User.objects.get(Q(phone_number=phoneNumber) & Q(product_id=2))
 		
-		if returnIfExist or phoneNumber in constants.DEV_PHONE_NUMBERS:
-			return user
-		else:
-			# User exists, so need to archive
-			# To do that, re-do the phone number, adding in an archive code
-			archiveCode = random.randrange(1000, 10000)
-			
-			user.phone_number = "%s%s" %(archiveCode, phoneNumber)
-			user.save()
+		# This increments the install number, which we use to track which photos were uploaded when
+		user.install_num = user.install_num + 1
+		user.save()
+		
 	except User.DoesNotExist:
 		pass
 
@@ -477,11 +472,12 @@ def getInviteObjectsDataForUser(user):
 
 			# If the invite's timeframe is within the last photo in the camera roll
 			#   then look at the last stranded photo
-			if (invite.strand.first_photo_time - constants.TIMEDELTA_FOR_STRANDING < user.last_photo_timestamp and
-				invite.strand.last_photo_time + constants.TIMEDELTA_FOR_STRANDING > user.last_photo_timestamp):
-				if lastStrandedPhoto and lastStrandedPhoto.time_taken <= user.last_photo_timestamp:
-					inviteIsReady = False
-					logging.info("Marking invite %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
+			if user.last_photo_timestamp:
+				if (invite.strand.first_photo_time - constants.TIMEDELTA_FOR_STRANDING < user.last_photo_timestamp and
+					invite.strand.last_photo_time + constants.TIMEDELTA_FOR_STRANDING > user.last_photo_timestamp):
+					if lastStrandedPhoto and lastStrandedPhoto.time_taken <= user.last_photo_timestamp:
+						inviteIsReady = False
+						logging.info("Marking invite %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
 
 			title = "shared %s photos with you" % invite.strand.photos.count()
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(list(invite.strand.users.all())), 'time_stamp': invite.added}

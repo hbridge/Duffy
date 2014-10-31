@@ -42,6 +42,7 @@ class User(models.Model):
 	invites_sent = models.IntegerField(default=0)
 	api_cache_private_strands_dirty = models.BooleanField(default=True)
 	last_build_info = models.CharField(max_length=100, null=True)
+	install_num = models.IntegerField(default=0)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
@@ -178,6 +179,7 @@ class Photo(models.Model):
 	file_key = models.CharField(max_length=100, null=True)
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	product_id = models.IntegerField(default=2, null=True, db_index=True)
+	install_num = models.IntegerField(default=0)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
 
@@ -186,6 +188,7 @@ class Photo(models.Model):
 
 	class Meta:
 		db_table = 'photos_photo'
+		index_together = ('iphone_hash', 'user_id')
 
 	def __unicode__(self):
 		return str(self.id)

@@ -250,17 +250,36 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			batchKey = randint(1,10000)
 
+			# fetch hashes for these photos to check for dups if this is a new install
+			if request.DATA['user_id']:
+				try:
+					user = User.objects.get(id=request.DATA['user_id'])
+				except User.DoesNotExist:
+					return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+				hashes = list()
+				existingPhotosByHash = dict()
+				if user.install_num > 0:
+					for photoData in photosData:
+						hashes.append(photoData['iphone_hash'])
+					existingPhotos = Photo.objects.filter(user = user, hashes__in=hashes)
+					for photo in existingPhotos:
+						existingPhotosByHash[photo.iphone_hash] = photo
+
 			for photoData in photosData:
 				photoData = self.jsonDictToSimple(photoData)
 				photoData["bulk_batch_key"] = batchKey
 
 				photo = self.simplePhotoSerializer(photoData)
 
-				userId = photo.user_id
-
 				self.populateExtraData(photo)
 
-				if photo.id:
+				if photo.iphone_hash in existingPhotosByHash:
+					existingPhoto = existingPhotosByHash[photo.iphone_hash]
+					existingPhoto.file_key = photo.file_key
+
+					objsToUpdate.append(existingPhoto)
+				elif photo.id:
 					objsToUpdate.append(photo)
 				else:
 					objsToCreate.append(photo)
