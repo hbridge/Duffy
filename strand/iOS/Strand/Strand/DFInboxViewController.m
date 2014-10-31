@@ -74,7 +74,7 @@
 
 - (void)initTabBarItemAndNav
 {
-  self.navigationItem.title = @"Swap";
+  self.navigationItem.title = @"Photos";
   self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/FeedBarButton"]
