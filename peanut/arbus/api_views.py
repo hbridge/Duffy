@@ -252,7 +252,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			# fetch hashes for these photos to check for dups if this is a new install
 			try:
-				user = User.objects.get(id=photosData[0]['user']])
+				user = User.objects.get(id=photosData[0]['user'])
 			except User.DoesNotExist:
 				return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 			"""
