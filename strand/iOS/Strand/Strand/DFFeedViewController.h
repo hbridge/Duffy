@@ -12,10 +12,12 @@
 #import "DFNotificationsViewController.h"
 #import "DFFeedSectionHeaderView.h"
 #import "DFPeanutFeedObject.h"
+#import "DFSelectPhotosViewController.h"
+
 
 @interface DFFeedViewController : UIViewController
 <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
-DFPhotoFeedCellDelegate, DFFeedSectionHeaderViewDelegate>
+DFPhotoFeedCellDelegate, DFFeedSectionHeaderViewDelegate, DFSelectPhotosViewControllerDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 - (void)showPhoto:(DFPhotoIDType)photoId animated:(BOOL)animated;

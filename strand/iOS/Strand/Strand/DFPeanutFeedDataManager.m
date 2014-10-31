@@ -463,6 +463,60 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
+- (void)addFeedObjects:(NSArray *)feedObjects
+         toStrandPosts:(DFPeanutFeedObject *)strandPosts
+               success:(DFSuccessBlock)success
+               failure:(DFFailureBlock)failure
+{
+  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
+  requestStrand.id = @(strandPosts.id);
+  
+  NSMutableArray *photoIDs = [NSMutableArray new];
+  for (DFPeanutFeedObject *feedObject in feedObjects) {
+    if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
+      [photoIDs addObject:@(feedObject.id)];
+    } else {
+      NSArray *photoObjects = [feedObject descendentdsOfType:DFFeedObjectPhoto];
+      [photoIDs addObjectsFromArray:[photoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photoObject) {
+        return @(photoObject.id);
+      }]];
+    }
+  }
+  
+  [self.strandAdapter
+   performRequest:RKRequestMethodGET
+   withPeanutStrand:requestStrand
+   success:^(DFPeanutStrand *peanutStrand) {
+     // add any selected photos to the list of shared photos
+     NSMutableSet *newPhotoIDs = [[NSMutableSet alloc] initWithArray:peanutStrand.photos];
+     [newPhotoIDs addObjectsFromArray:photoIDs];
+     peanutStrand.photos = [newPhotoIDs allObjects];
+     
+     // Patch the new peanut strand
+     [self.strandAdapter
+      performRequest:RKRequestMethodPATCH withPeanutStrand:peanutStrand
+      success:^(DFPeanutStrand *peanutStrand) {
+        DDLogInfo(@"%@ successfully added photos to strand: %@", self.class, peanutStrand);
+        // cache the photos locally
+        [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:photoIDs];
+        
+        // even if there is an invite, you've been joined to the strand, so we count
+        //  either result of the invite marking as success
+        success();
+        [[NSNotificationCenter defaultCenter]
+         postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+         object:self];
+        [[DFPhotoStore sharedStore] markPhotosForUpload:photoIDs];
+      } failure:^(NSError *error) {
+        DDLogError(@"%@ failed to patch strand: %@, error: %@",
+                   self.class, peanutStrand, error);
+      }];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ failed to get strand: %@, error: %@",
+                self.class, requestStrand, error);
+   }];
+}
+
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible
 {
   DFPeanutStrand *privateStrand = [[DFPeanutStrand alloc] init];

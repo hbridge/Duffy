@@ -30,7 +30,7 @@
 #import "NSIndexPath+DFHelpers.h"
 #import "DFSwapUpsellView.h"
 #import "UINib+DFHelpers.h"
-#import "DFAddPhotosViewController.h"
+#import "DFReviewSwapViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
 #import "DFStrandPeopleBarView.h"
@@ -208,11 +208,21 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)initNavItem
 {
-  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
-                                            style:UIBarButtonItemStylePlain
-                                            target:self
-                                            action:@selector(inviteButtonPressed:)];
+  self.navigationItem.leftBarButtonItems =
+  [self.navigationItem.leftBarButtonItems arrayByAddingObject:
+   [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil]];
+  self.navigationItem.rightBarButtonItems =
+  @[[[UIBarButtonItem alloc]
+     initWithImage:[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(addPhotosButtonPressed:)],
+    [[UIBarButtonItem alloc]
+     initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(inviteButtonPressed:)],
+    ];
 }
 
 - (BOOL)hidesBottomBarWhenPushed
@@ -266,29 +276,28 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)configurePeopleBar
 {
-  
-  if (!self.peopleBar) {
-    self.peopleBar = [UINib instantiateViewWithClass:[DFStrandPeopleBarView class]];
-    [self.view addSubview:self.peopleBar];
-    [self.view addConstraints:[NSLayoutConstraint
-                               constraintsWithVisualFormat:@"|-0-[peopleBar]-0-|"
-                               options:NSLayoutFormatDirectionLeftToRight
-                               metrics:nil
-                               views:@{@"peopleBar" : self.peopleBar}]];
-    [self.view addConstraints:[NSLayoutConstraint
-                               constraintsWithVisualFormat:@"V:|-0-[peopleBar]-0-[tableView]"
-                               options:NSLayoutFormatDirectionLeftToRight
-                               metrics:nil
-                               views:@{@"peopleBar" : self.peopleBar,
-                                       @"tableView" : self.tableView
-                                       }]];
-  }
-  self.peopleBar.frame = CGRectMake(0,
-                                    0,
-                                    [[UIScreen mainScreen] bounds].size.width ,
-                                    20);
-  
-    [self.peopleBar configureWithStrandPostsObject:self.postsObject];
+//  if (!self.peopleBar) {
+//    self.peopleBar = [UINib instantiateViewWithClass:[DFStrandPeopleBarView class]];
+//    [self.view addSubview:self.peopleBar];
+//    [self.view addConstraints:[NSLayoutConstraint
+//                               constraintsWithVisualFormat:@"|-0-[peopleBar]-0-|"
+//                               options:NSLayoutFormatDirectionLeftToRight
+//                               metrics:nil
+//                               views:@{@"peopleBar" : self.peopleBar}]];
+//    [self.view addConstraints:[NSLayoutConstraint
+//                               constraintsWithVisualFormat:@"V:|-0-[peopleBar]-0-[tableView]"
+//                               options:NSLayoutFormatDirectionLeftToRight
+//                               metrics:nil
+//                               views:@{@"peopleBar" : self.peopleBar,
+//                                       @"tableView" : self.tableView
+//                                       }]];
+//  }
+//  self.peopleBar.frame = CGRectMake(0,
+//                                    0,
+//                                    [[UIScreen mainScreen] bounds].size.width ,
+//                                    20);
+//  
+//    [self.peopleBar configureWithStrandPostsObject:self.postsObject];
 }
 
 - (void)configureUpsell
@@ -698,7 +707,7 @@ const CGFloat LockedCellHeight = 157.0;
      } failure:^(NSError *error) {
      }];
   } else {
-    DFAddPhotosViewController *addPhotosController = [[DFAddPhotosViewController alloc]
+    DFReviewSwapViewController *addPhotosController = [[DFReviewSwapViewController alloc]
                                                       initWithSuggestions:self.suggestionsObject.objects
                                                       invite:self.inviteObject
                                                       swapSuccessful:^{
@@ -1024,6 +1033,40 @@ selectedObjectChanged:(id)newObject
   
 }
 
+- (void)addPhotosButtonPressed:(id)sender
+{
+  NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrandsByDateAscending:YES];
+  DFSelectPhotosViewController *selectPhotosViewController = [[DFSelectPhotosViewController alloc]
+                                                              initWithCollectionFeedObjects:privateStrands];
+  selectPhotosViewController.delegate = self;
+  DFNavigationController *navController = [[DFNavigationController alloc]
+                                           initWithRootViewController:selectPhotosViewController];
+  
+  [self presentViewController:navController animated:YES completion:nil];
+  
+}
+
+- (void)selectPhotosViewController:(DFSelectPhotosViewController *)controller didFinishSelectingFeedObjects:(NSArray *)selectedFeedObjects
+{
+  if (selectedFeedObjects.count == 0) {
+    [self dismissViewControllerAnimated:YES completion:nil];
+    return;
+  }
+  
+  DFFeedViewController __weak *weakSelf = self;
+  [SVProgressHUD show];
+  [[DFPeanutFeedDataManager sharedManager]
+   addFeedObjects:selectedFeedObjects
+   toStrandPosts:self.postsObject success:^{
+     NSString *status = [NSString stringWithFormat:@"Added %@ photos", @(selectedFeedObjects.count)];
+     [SVProgressHUD showSuccessWithStatus:status];
+     DDLogInfo(@"%@ adding %@ photos succeeded.", self.class, @(selectedFeedObjects.count));
+     [weakSelf dismissViewControllerAnimated:YES completion:nil];
+   } failure:^(NSError *error) {
+     [SVProgressHUD showErrorWithStatus:@"Failed."];
+     DDLogError(@"%@ adding photos failed: %@", self.class, error);
+   }];
+}
 
 #pragma mark - Adapters
 

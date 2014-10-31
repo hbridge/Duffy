@@ -14,6 +14,8 @@
 {
   [super awakeFromNib];
   self.backgroundColor = [UIColor clearColor];
+  self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin;
+  self.autoresizesSubviews = YES;
 }
 
 @end

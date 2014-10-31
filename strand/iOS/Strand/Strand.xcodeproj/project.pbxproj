@@ -66,7 +66,7 @@
 		5A4C820E19EDC11800C22A12 /* DFActionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C820D19EDC11800C22A12 /* DFActionButton.m */; };
 		5A4C821219EDC82100C22A12 /* DFSelectSuggestionsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C821019EDC82100C22A12 /* DFSelectSuggestionsViewController.m */; };
 		5A4C821319EDC82100C22A12 /* DFSelectSuggestionsViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A4C821119EDC82100C22A12 /* DFSelectSuggestionsViewController.xib */; };
-		5A4C821619EDCBB600C22A12 /* DFAddPhotosViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C821519EDCBB600C22A12 /* DFAddPhotosViewController.m */; };
+		5A4C821619EDCBB600C22A12 /* DFReviewSwapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C821519EDCBB600C22A12 /* DFReviewSwapViewController.m */; };
 		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
 		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
 		5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */; };
@@ -358,8 +358,8 @@
 		5A4C820F19EDC82100C22A12 /* DFSelectSuggestionsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSelectSuggestionsViewController.h; sourceTree = "<group>"; };
 		5A4C821019EDC82100C22A12 /* DFSelectSuggestionsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSelectSuggestionsViewController.m; sourceTree = "<group>"; };
 		5A4C821119EDC82100C22A12 /* DFSelectSuggestionsViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSelectSuggestionsViewController.xib; sourceTree = "<group>"; };
-		5A4C821419EDCBB600C22A12 /* DFAddPhotosViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAddPhotosViewController.h; sourceTree = "<group>"; };
-		5A4C821519EDCBB600C22A12 /* DFAddPhotosViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAddPhotosViewController.m; sourceTree = "<group>"; };
+		5A4C821419EDCBB600C22A12 /* DFReviewSwapViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFReviewSwapViewController.h; sourceTree = "<group>"; };
+		5A4C821519EDCBB600C22A12 /* DFReviewSwapViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFReviewSwapViewController.m; sourceTree = "<group>"; };
 		5A56EFAB19857CEB0032CA8A /* DFOverlayViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFOverlayViewController.h; sourceTree = "<group>"; };
 		5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayViewController.m; sourceTree = "<group>"; };
 		5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationBar.h; sourceTree = "<group>"; };
@@ -1163,8 +1163,8 @@
 				5AEFA25919D607150027BC5E /* DFStrandGallerySectionHeaderView.xib */,
 				5AAF03A419B509B400EF021C /* DFInviteStrandViewController.h */,
 				5AAF03A519B509B400EF021C /* DFInviteStrandViewController.m */,
-				5A4C821419EDCBB600C22A12 /* DFAddPhotosViewController.h */,
-				5A4C821519EDCBB600C22A12 /* DFAddPhotosViewController.m */,
+				5A4C821419EDCBB600C22A12 /* DFReviewSwapViewController.h */,
+				5A4C821519EDCBB600C22A12 /* DFReviewSwapViewController.m */,
 			);
 			name = "Strand Detail";
 			sourceTree = "<group>";
@@ -1741,7 +1741,7 @@
 				5AC4A9261947C30800862D9C /* DFNetworkingConstants.m in Sources */,
 				5A9115DB19DA08D3003F2A68 /* DFLabelCollectionViewCell.m in Sources */,
 				5A13E09719BF61FE005357D2 /* DFInboxViewController.m in Sources */,
-				5A4C821619EDCBB600C22A12 /* DFAddPhotosViewController.m in Sources */,
+				5A4C821619EDCBB600C22A12 /* DFReviewSwapViewController.m in Sources */,
 				5A36816319FAD41F008EE2A7 /* DFCreateStrandFlowViewController.m in Sources */,
 				5AB7BEBD19FFF72C000BEB67 /* DFImageManagerRequest.m in Sources */,
 				5AAF03A619B509B400EF021C /* DFInviteStrandViewController.m in Sources */,

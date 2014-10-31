@@ -8,7 +8,7 @@
 
 #import "DFSelectSuggestionsViewController.h"
 
-@interface DFAddPhotosViewController : DFSelectSuggestionsViewController
+@interface DFReviewSwapViewController : DFSelectSuggestionsViewController
 
 @property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
 
