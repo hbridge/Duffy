@@ -28,7 +28,8 @@
 
 - (void)configure
 {
-  self.layer.cornerRadius = 3.0;
+  if (_cornerRadius == 0) self.cornerRadius = 3.0;
+  self.layer.cornerRadius = _cornerRadius;
   self.layer.masksToBounds = YES;
   self.backgroundColor = [DFStrandConstants defaultBackgroundColor];
   [self setTitleColor:[DFStrandConstants defaultBarForegroundColor] forState:UIControlStateNormal];

@@ -27,6 +27,7 @@
 #import "DFAnalytics.h"
 #import "DFCreateStrandFlowViewController.h"
 #import "DFInviteFriendViewController.h"
+#import "DFActionButtonTableViewCell.h"
 
 
 @interface DFFriendsViewController ()
@@ -118,6 +119,8 @@
 {
   [tableView registerNib:[UINib nibWithNibName:@"DFPersonSelectionTableViewCell" bundle:nil]
   forCellReuseIdentifier:@"cell"];
+  [tableView registerNib:[UINib nibForClass:[DFActionButtonTableViewCell class]]
+  forCellReuseIdentifier:@"addFriendCell"];
   
   [self configureRefreshControl];
   
@@ -263,13 +266,19 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return self.friendPeanutUsers.count;
+  return self.friendPeanutUsers.count + 1;
 }
 
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  if (indexPath.row >= self.friendPeanutUsers.count) {
+    DFActionButtonTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"addFriendCell"];
+    [cell.actionButton setTitle:@"Invite Friends" forState:UIControlStateNormal];
+    return cell;
+  }
+  
   DFPersonSelectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   cell.showsTickMarkWhenSelected = NO;
   [cell configureWithCellStyle:(DFPersonSelectionTableViewCellStyleStrandUser
@@ -309,6 +318,12 @@
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  if (indexPath.row >= self.friendPeanutUsers.count) {
+    [self createButtonPressed:self];
+    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
+    return;
+  }
+  
   DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
   self.actionSheetUserSelected = user;
   
