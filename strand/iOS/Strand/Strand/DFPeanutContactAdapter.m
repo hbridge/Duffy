@@ -42,8 +42,14 @@ NSString *const RestPostPath = @"contacts/";
                                           pathPattern:RestContactPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
+  RKResponseDescriptor *restPostErrorResponse =
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutInvalidField objectMapping]
+                                               method:RKRequestMethodAny
+                                          pathPattern:RestPostPath
+                                              keyPath:nil
+                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
   
-  return @[restSuccessResponse, restPostSuccessResponse, restErrorResponse];
+  return @[restSuccessResponse, restPostSuccessResponse, restErrorResponse, restPostErrorResponse];
 }
 
 + (NSArray *)requestDescriptors

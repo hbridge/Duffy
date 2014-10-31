@@ -14,10 +14,12 @@
 + (DFContactSyncManager *)sharedManager;
 - (void)sync;
 - (void)forceSync;
+- (void)uploadInvitedContacts:(NSArray *)peanutContacts;
 
 + (ABAuthorizationStatus)contactsPermissionStatus;
 + (void)askForContactsPermissionWithSuccess:(void (^)(void))success
                                     failure:(void (^)(NSError *error))failure;
 + (void)showContactsDeniedAlert;
+
 
 @end

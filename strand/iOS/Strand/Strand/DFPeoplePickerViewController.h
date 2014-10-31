@@ -28,18 +28,27 @@
 
 @interface DFPeoplePickerViewController : UIViewController <UITableViewDataSource, UITableViewDelegate,UISearchBarDelegate, UISearchDisplayDelegate>
 
-@property (nonatomic, weak) NSObject<DFPeoplePickerDelegate>* delegate;
-@property (nonatomic, retain) NSString *textNumberString;
-@property (nonatomic) BOOL allowsMultipleSelection;
-@property (nonatomic, retain) NSArray *suggestedPeanutContacts;
-@property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
+
 @property (nonatomic, weak) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet UIView *doneButtonWrapper;
 @property (weak, nonatomic) IBOutlet UIButton *doneButton;
+@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
 
+#pragma mark - Delegate
+
+@property (nonatomic, weak) NSObject<DFPeoplePickerDelegate>* delegate;
+
+#pragma mark - Configuration
+
+@property (nonatomic) BOOL allowsMultipleSelection;
+@property (nonatomic, retain) NSArray *suggestedPeanutContacts;
+@property (readonly, nonatomic, retain) NSArray *selectedPeanutContacts;
 @property (nonatomic, retain) NSArray *notSelectableContacts;
 @property (nonatomic, retain) NSString *notSelectableReason;
-@property (weak, nonatomic) IBOutlet UISearchBar *searchBar;
+@property (nonatomic) BOOL hideFriendsSection;
+
+@property (nonatomic, retain) NSString *textNumberString;
+
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts

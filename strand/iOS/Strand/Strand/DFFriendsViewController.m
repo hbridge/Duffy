@@ -26,6 +26,7 @@
 #import "DFSettingsViewController.h"
 #import "DFAnalytics.h"
 #import "DFCreateStrandFlowViewController.h"
+#import "DFInviteFriendViewController.h"
 
 
 @interface DFFriendsViewController ()
@@ -342,8 +343,8 @@
 
 - (void)createButtonPressed:(id)sender
 {
-  DFCreateStrandFlowViewController *createController = [[DFCreateStrandFlowViewController alloc] init];
-  [self presentViewController:createController animated:YES completion:nil];
+  DFInviteFriendViewController *inviteController = [[DFInviteFriendViewController alloc] init];
+  [self presentViewController:inviteController animated:YES completion:nil];
 }
 
 - (void)settingsPressed:(id)sender

@@ -48,6 +48,16 @@ const NSTimeInterval DaysMultiplier = 60 * 60 * 24;
   return self;
 }
 
+- (instancetype)initWithRecipients:(NSArray *)recipients
+{
+  self = [super init];
+  if (self) {
+    self.recipients = recipients;
+    self.body = [NSString stringWithFormat:@"Hey! Let's try this app to swap photos. %@", appURL];
+  }
+  return self;
+}
+
 - (NSString *)getDayOfTheWeek:(NSDate *)date{
   NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
   

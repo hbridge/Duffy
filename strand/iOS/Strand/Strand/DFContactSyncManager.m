@@ -20,10 +20,13 @@
 
 @property (atomic) BOOL isABSyncInProgress;
 @property (atomic) BOOL isDFContactsSyncInProgress;
+@property (readonly, nonatomic, retain) DFPeanutContactAdapter *contactAdapter;
 
 @end
 
 @implementation DFContactSyncManager
+
+@synthesize contactAdapter = _contactAdapter;
 
 // We want the upload controller to be a singleton
 static DFContactSyncManager *defaultManager;
@@ -91,7 +94,6 @@ static DFContactSyncManager *defaultManager;
   if (self.isDFContactsSyncInProgress) return;
   self.isDFContactsSyncInProgress = YES;
   
-  DFPeanutContactAdapter *contactAdapter = [DFPeanutContactAdapter new];
   NSArray *manualContacts = [[DFContactsStore sharedStore] contactsModifiedAfterDate:lastSync];
   if (manualContacts.count == 0) {
     DDLogInfo(@"%@ no new manual contacts found.", [self.class description]);
@@ -107,7 +109,7 @@ static DFContactSyncManager *defaultManager;
     peanutContact.user = @([[DFUser currentUser] userID]);
     [manualPeanutContacts addObject:peanutContact];
   }
-  [contactAdapter postPeanutContacts:manualPeanutContacts success:^(NSArray *peanutContacts) {
+  [self.contactAdapter postPeanutContacts:manualPeanutContacts success:^(NSArray *peanutContacts) {
     DDLogInfo(@"%@ posting %d manual contacts succeeded.", [self.class description], (int)manualPeanutContacts.count);
     [DFDefaultsStore setLastDate:[NSDate date] forAction:DFUserActionSyncManualContacts];
     self.isDFContactsSyncInProgress = NO;
@@ -215,7 +217,24 @@ static DFContactSyncManager *defaultManager;
                           formatMessage:@"Please go to Settings > Privacy > Contacts and change Strand to on."];
 }
 
+- (void)uploadInvitedContacts:(NSArray *)peanutContacts
+{
+  for (DFPeanutContact *contact in peanutContacts) {
+    contact.contact_type = DFPeanutContactInvited;
+    contact.user = @([[DFUser currentUser] userID]);
+  }
+  [self.contactAdapter postPeanutContacts:peanutContacts success:^(NSArray *peanutContacts) {
+    DDLogInfo(@"%@ posting %d invited contacts succeeded.", [self.class description], (int)peanutContacts.count);
+  } failure:^(NSError *error) {
+    DDLogError(@"%@ posting manual contacts failed: %@", [self.class description], error.description);
+  }];
+}
 
 
+- (DFPeanutContactAdapter *)contactAdapter
+{
+  if (!_contactAdapter) _contactAdapter = [[DFPeanutContactAdapter alloc] init];
+  return _contactAdapter;
+}
 
 @end

@@ -152,7 +152,7 @@
       [onStrandContacts addObject:contact];
     }
   }
-  if (onStrandContacts.count > 0) {// TODO fill in when available from server
+  if (onStrandContacts.count > 0 && !self.hideFriendsSection) {
     [unfilteredSectionTitles addObject:@"On Strand"];
     self.onStrandList = onStrandContacts;
     [unfilteredSections addObject:self.onStrandList];
