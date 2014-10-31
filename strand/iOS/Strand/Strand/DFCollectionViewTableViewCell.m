@@ -74,7 +74,13 @@
                            forIndexPath:indexPath];
   
   id object = self.objects[indexPath.row];
-  cell.imageView.image = self.imagesForObjects[object];
+  UIImage *image = self.imagesForObjects[object];
+  cell.imageView.image = image;
+  if (image) {
+    [cell.loadingActivityIndicator stopAnimating];
+  } else {
+    [cell.loadingActivityIndicator startAnimating];
+  }
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
   cell.imageView.backgroundColor = [UIColor grayColor];

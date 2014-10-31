@@ -10,7 +10,6 @@
 
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UIDevice+DFHelpers.h"
-
 #import "DFPeanutFeedObject.h"
 #import "DFPeanutUserObject.h"
 #import "DFPhotoStore.h"
