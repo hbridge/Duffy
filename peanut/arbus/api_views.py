@@ -251,12 +251,10 @@ class PhotoBulkAPI(BasePhotoAPI):
 			batchKey = randint(1,10000)
 
 			# fetch hashes for these photos to check for dups if this is a new install
-			
-			if 'user_id' in request.DATA:
-				try:
-					user = User.objects.get(id=request.DATA['user_id'])
-				except User.DoesNotExist:
-					return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+			try:
+				user = User.objects.get(id=photosData[0]['user']])
+			except User.DoesNotExist:
+				return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 			"""
 				hashes = list()
 				existingPhotosByHash = dict()
