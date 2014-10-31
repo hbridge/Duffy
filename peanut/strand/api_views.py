@@ -455,10 +455,10 @@ def getInviteObjectsDataForUser(user):
 	else:
 		lastStrandedPhoto = None
 		
-	for strandInvite in strandInvites:
+	for invite in strandInvites:
 		inviteIsReady = True
 		fullsLoaded = True
-		invitePhotos = strandInvite.strand.photos.all()
+		invitePhotos = invite.strand.photos.all()
 
 		# Go through all photos and see if there's any that don't belong to this user
 		#  and don't have a thumb.  If a user just created an invite this should be fine
@@ -466,7 +466,8 @@ def getInviteObjectsDataForUser(user):
 			if photo.user_id != user.id and not photo.full_filename:
 				fullsLoaded = False
 				logging.info("Not showing invite %s because photo %s doesn't have a full" % (invite.id, photo.id))
-
+				print "here"
+				
 		if fullsLoaded:
 			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
 				inviteIsReady = True
@@ -482,14 +483,14 @@ def getInviteObjectsDataForUser(user):
 					inviteIsReady = False
 					logging.info("Marking invite %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
 
-			title = "shared %s photos with you" % strandInvite.strand.photos.count()
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
+			title = "shared %s photos with you" % invite.strand.photos.count()
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(list(invite.strand.users.all())), 'time_stamp': invite.added}
 			entry['ready'] = inviteIsReady
 			entry['objects'] = list()
-			entry['objects'].append(strandObjectDataById[strandInvite.strand.id])
+			entry['objects'].append(strandObjectDataById[invite.strand.id])
 
 			# TODO - This can be done in one query instead of being in a loop
-			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strandInvite.strand)
+			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, invite.strand)
 			strandNeighborsCache.update(getStrandNeighborsCache(privateStrands, friends, withUsers = True))
 			
 			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
