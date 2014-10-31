@@ -251,13 +251,13 @@ class PhotoBulkAPI(BasePhotoAPI):
 			batchKey = randint(1,10000)
 
 			# fetch hashes for these photos to check for dups if this is a new install
-			"""
+			
 			if request.DATA['user_id']:
 				try:
 					user = User.objects.get(id=request.DATA['user_id'])
 				except User.DoesNotExist:
 					return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
-
+			"""
 				hashes = list()
 				existingPhotosByHash = dict()
 				if user.install_num > 0:
@@ -318,7 +318,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 			
 			response = [model_to_dict(photo) for photo in allPhotos]
 
-			logger.info("Successfully processed %s photos for user %s" % (len(response), userId))
+			logger.info("Successfully processed %s photos for user %s" % (len(response), user.id))
 			return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json", status=201)
 		else:
 			logger.error("Got request with no bulk_photos, returning 400")
