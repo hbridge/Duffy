@@ -252,7 +252,7 @@ class PhotoBulkAPI(BasePhotoAPI):
 
 			# fetch hashes for these photos to check for dups if this is a new install
 			
-			if request.DATA['user_id']:
+			if 'user_id' in request.DATA:
 				try:
 					user = User.objects.get(id=request.DATA['user_id'])
 				except User.DoesNotExist:
