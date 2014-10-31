@@ -239,6 +239,19 @@ static DFPeanutFeedDataManager *defaultManager;
     }
   }
   
+  for (DFPeanutFeedObject *object in self.swapsFeedObjects)
+  {
+    if ([object.type isEqual:DFFeedObjectPhoto] && object.user != [[DFUser currentUser] userID]) {
+      [photos addObject:object];
+      continue;
+    }
+    for (DFPeanutFeedObject *subObject in object.enumeratorOfDescendents.allObjects) {
+      if ([subObject.type isEqual:DFFeedObjectPhoto] && subObject.user != [[DFUser currentUser] userID]) {
+        [photos addObject:subObject];
+      }
+    }
+  }
+  
   return photos;
 }
 
