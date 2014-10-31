@@ -85,7 +85,8 @@ static DFImageDownloadManager *defaultManager;
         // if there's an image path for and it hasn't been fulfilled, queue it for download
         [self
          getImageDataForPath:imagePath
-         withCompletionBlock:^(UIImage *image, NSError *error) {
+         priority:NSOperationQueuePriorityLow // cache requests are low pri
+         completionBlock:^(UIImage *image, NSError *error) {
            [self.imageStore
             setImage:image
             type:imageType
@@ -131,35 +132,42 @@ static DFImageDownloadManager *defaultManager;
 - (void)getImageDataForPath:(NSString *)path
         withCompletionBlock:(DFImageFetchCompletionBlock)completion
 {
-  dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0), ^{
-    @autoreleasepool {
-      NSURL *url = [[[DFUser currentUser] serverURL]
-                    URLByAppendingPathComponent:path];
-      DDLogVerbose(@"Getting image data at: %@", url);
-      
-      NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
-                                              initWithURL:url
-                                              cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                              timeoutInterval:30.0];
-      AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
-      requestOperation.queuePriority = NSOperationQueuePriorityHigh; // image downloads are high priority
-      
-      [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-        // Use my success callback with the binary data and MIME type string
-        if (operation.responseData) {
-          completion([UIImage imageWithData:operation.responseData], nil);
-        } else {
-          DDLogError(@"Error downloading image: %@", url);
-          completion(nil, nil);
-        }
-      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-        // Error callback
-        DDLogError(@"Error downloading image: %@", url);
-        completion(nil, error);
-      }];
-      [self.objectManager.HTTPClient enqueueHTTPRequestOperation:requestOperation];
-    }
-  });
+  [self getImageDataForPath:path
+                   priority:NSOperationQueuePriorityHigh // interactive downloads are high priority
+            completionBlock:completion];
 }
+
+- (void)getImageDataForPath:(NSString *)path
+                   priority:(NSOperationQueuePriority)queuePriority
+            completionBlock:(DFImageFetchCompletionBlock)completion
+{
+  
+  NSURL *url = [[[DFUser currentUser] serverURL]
+                URLByAppendingPathComponent:path];
+  DDLogVerbose(@"Getting image data at: %@", url);
+  
+  NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
+                                          initWithURL:url
+                                          cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                          timeoutInterval:30.0];
+  AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
+  requestOperation.queuePriority = queuePriority;
+  
+  [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
+    // Use my success callback with the binary data and MIME type string
+    if (operation.responseData) {
+      completion([UIImage imageWithData:operation.responseData], nil);
+    } else {
+      DDLogError(@"Error downloading image: %@", url);
+      completion(nil, nil);
+    }
+  } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+    // Error callback
+    DDLogError(@"Error downloading image: %@", url);
+    completion(nil, error);
+  }];
+  [self.objectManager.HTTPClient enqueueHTTPRequestOperation:requestOperation];
+}
+
 
 @end
