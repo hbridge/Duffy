@@ -75,30 +75,24 @@ def sendRetroFirestarterNotification():
 			
 			usersNames = [u.display_name for u in users]
 			usersStr = ', '.join(usersNames)
-			msg = "To %s:  You have %s photos to swap with %s from %s" % (user.display_name, len(winningStrand.photos.all()), usersStr, strands_util.getLocationForStrand(winningStrand))
+			msg = "You have %s photos to swap with %s from %s" % (len(winningStrand.photos.all()), usersStr, strands_util.getLocationForStrand(winningStrand))
 			
 			customPayload = {'id': myStrand.id}
-			print "%s %s" % (msg, myStrand.id)
+			print "to %s: %s   id: %s" % (user.display_name, msg, myStrand.id)
 			
 			#if user.id == 901:	
-			#	notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_RETRO_FIRESTARTER, customPayload)
+			#notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_RETRO_FIRESTARTER, customPayload)
 
 
 
 def main(argv):
 	logger.info("Starting... ")
 	
-	while True:
-		sentCount = 0
 
-		#sentCount += sendActionNotifications()
-
-		sendRetroFirestarterNotification()
+	sendRetroFirestarterNotification()
 		
-		print "Done"
-		if sentCount == 0:
-			time.sleep(100)
-
+	print "Done"
+		
 if __name__ == "__main__":
 	logging.basicConfig(filename='/var/log/duffy/strand-notifications.log',
 						level=logging.DEBUG,

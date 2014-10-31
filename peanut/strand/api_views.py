@@ -471,6 +471,7 @@ def getInviteObjectsDataForUser(user):
 				inviteIsReady = True
 			else:
 				inviteIsReady = False
+				logging.info("Marking invite %s not ready because I don't think we've stranded first run yet  %s  %s" % (invite.id, user.first_run_sync_count, user.first_run_sync_complete))
 
 			# If the invite's timeframe is within the last photo in the camera roll
 			#   then look at the last stranded photo
@@ -478,6 +479,7 @@ def getInviteObjectsDataForUser(user):
 				invite.strand.last_photo_time + constants.TIMEDELTA_FOR_STRANDING > user.last_photo_timestamp):
 				if lastStrandedPhoto and lastStrandedPhoto.time_taken <= user.last_photo_timestamp:
 					inviteIsReady = False
+					logging.info("Marking invite %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
 
 			title = "shared %s photos with you" % strandInvite.strand.photos.count()
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': strandInvite.id, 'title': title, 'actors': getActorsObjectData(list(strandInvite.strand.users.all())), 'time_stamp': strandInvite.added}
