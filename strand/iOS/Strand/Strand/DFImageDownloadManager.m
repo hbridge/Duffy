@@ -21,6 +21,7 @@
 @property (nonatomic, retain) RKObjectManager *objectManager;
 @property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 @property (nonatomic, retain) DFImageDiskCache *imageStore;
+@property (nonatomic, retain) NSOperationQueue *downloadQueue;
 
 @end
 
@@ -30,7 +31,10 @@ static DFImageDownloadManager *defaultManager;
 
 + (DFImageDownloadManager *)sharedManager {
   if (!defaultManager) {
-    defaultManager = [[super allocWithZone:nil] init];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      defaultManager = [[super allocWithZone:nil] init];
+    });
   }
   return defaultManager;
 }
@@ -45,6 +49,7 @@ static DFImageDownloadManager *defaultManager;
   self = [super init];
   if (self) {
     [self observeNotifications];
+    self.downloadQueue = [[NSOperationQueue alloc] init];
     self.objectManager = [DFObjectManager sharedManager];
     self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.imageStore = [DFImageDiskCache sharedStore];
@@ -66,36 +71,29 @@ static DFImageDownloadManager *defaultManager;
   // Get list of photo from feed manager
   NSArray *remotePhotos = [self.dataManager remotePhotos];
   
-  // Get list of photo from image store
-  NSSet *fulfilledThumbs = [self.imageStore getPhotoIdsForType:DFImageThumbnail];
-
-  NSSet *fulfilledFulls = [self.imageStore getPhotoIdsForType:DFImageThumbnail];
-
-  NSMutableArray *thumbsToDownload = [NSMutableArray new];
-  NSMutableArray *fullsToDownload = [NSMutableArray new];
-  
-  // Figure out what we need to download
-  for (DFPeanutFeedObject *photoObject in remotePhotos) {
-    if (![fulfilledThumbs containsObject:@(photoObject.id)] && ![photoObject.thumb_image_path isEqualToString:@""]) {
-      [thumbsToDownload addObject:photoObject];
+  DFImageType imageTypes[2] = {DFImageThumbnail, DFImageFull};
+  for (int i = 0; i < 2; i++) {
+    //figure out which have already been download for the type
+    DFImageType imageType = imageTypes[i];
+    NSSet *fulfilledForType = [self.imageStore getPhotoIdsForType:imageType];
+    for (DFPeanutFeedObject *photoObject in remotePhotos) {
+      NSString *imagePath;
+      if (imageType == DFImageThumbnail) imagePath = photoObject.thumb_image_path;
+      else if (imageType == DFImageFull) imagePath = photoObject.full_image_path;
+      if (![fulfilledForType containsObject:@(photoObject.id)]
+          && [imagePath isNotEmpty]) {
+        // if there's an image path for and it hasn't been fulfilled, queue it for download
+        [self
+         getImageDataForPath:imagePath
+         withCompletionBlock:^(UIImage *image, NSError *error) {
+           [self.imageStore
+            setImage:image
+            type:imageType
+            forID:photoObject.id
+            completion:nil];
+         }];
+      }
     }
-    
-    if (![fulfilledFulls containsObject:@(photoObject.id)] && ![photoObject.full_image_path isEqualToString:@""]) {
-      [fullsToDownload addObject:photoObject];
-    }
-  }
-  
-  // Put in http requets for each image
-  for (DFPeanutFeedObject *photoObject in thumbsToDownload) {
-    [self getImageDataForPath:photoObject.thumb_image_path withCompletionBlock:^(UIImage *image, NSError *error) {
-      [self.imageStore setImage:image type:DFImageThumbnail forID:photoObject.id completion:nil];
-    }];
-  }
-  
-  for (DFPeanutFeedObject *photoObject in fullsToDownload) {
-    [self getImageDataForPath:photoObject.full_image_path withCompletionBlock:^(UIImage *image, NSError *error) {
-      [self.imageStore setImage:image type:DFImageFull forID:photoObject.id completion:nil];
-    }];
   }
 }
 
