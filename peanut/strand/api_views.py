@@ -98,7 +98,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		# This increments the install number, which we use to track which photos were uploaded when
 		user.install_num = user.install_num + 1
 		user.save()
-		
+
+		return user
 	except User.DoesNotExist:
 		pass
 
