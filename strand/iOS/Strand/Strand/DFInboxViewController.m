@@ -11,10 +11,7 @@
 #import "MMPopLabel.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "SVProgressHUD.h"
-
 #import "NSString+DFHelpers.h"
-
-#import "DFAcceptInviteViewController.h"
 #import "DFFeedViewController.h"
 #import "DFImageManager.h"
 #import "DFPeanutFeedDataManager.h"

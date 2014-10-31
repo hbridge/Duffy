@@ -51,6 +51,12 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
          addPhotoIDs:(NSArray *)photoIDs
              success:(void(^)(void))success
              failure:(void(^)(NSError *error))failure;
+
+- (void)addFeedObjects:(NSArray *)photos
+         toStrandPosts:(DFPeanutFeedObject *)strandPosts
+               success:(DFSuccessBlock)success
+               failure:(DFFailureBlock)failure;
+
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
 
 
@@ -61,7 +67,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
                           failure:(DFFailureBlock)failure;
 
 - (void)removePhoto:(DFPeanutFeedObject *)photoObject
-     fromStrandPosts:(DFPeanutFeedObject *)strandPosts
+    fromStrandPosts:(DFPeanutFeedObject *)strandPosts
             success:(DFSuccessBlock)success
             failure:(DFFailureBlock)failure;
 

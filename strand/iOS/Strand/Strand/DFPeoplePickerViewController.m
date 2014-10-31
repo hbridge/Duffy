@@ -50,6 +50,11 @@
 @synthesize addressBook = _addressBook;
 
 
+NSString *const UserSectionTitle = @"Swap Friends";
+NSString *const SuggestedSecitonTitle = @"Suggested";
+NSString *const ContactsSectionTitle = @"Contacts";
+
+
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
 {
   self = [self init];
@@ -138,7 +143,7 @@
   NSMutableArray *unfilteredSections = [NSMutableArray new];
   
   if (self.suggestedPeanutContacts.count > 0) {
-    [unfilteredSectionTitles addObject:@"Suggestions"];
+    [unfilteredSectionTitles addObject:SuggestedSecitonTitle];
     self.suggestedList = self.suggestedPeanutContacts;
     [unfilteredSections addObject:self.suggestedList];
     [self.selectedContacts addObjectsFromArray:self.suggestedList];
@@ -153,13 +158,13 @@
     }
   }
   if (onStrandContacts.count > 0 && !self.hideFriendsSection) {
-    [unfilteredSectionTitles addObject:@"On Strand"];
+    [unfilteredSectionTitles addObject:UserSectionTitle];
     self.onStrandList = onStrandContacts;
     [unfilteredSections addObject:self.onStrandList];
   }
 
   if ([DFContactSyncManager contactsPermissionStatus] == kABAuthorizationStatusAuthorized) {
-    [unfilteredSectionTitles addObject:@"Contacts"];
+    [unfilteredSectionTitles addObject:ContactsSectionTitle];
     self.ABList = [[self abSearchResultsForString:nil] mutableCopy];
     [unfilteredSections addObject:self.ABList];
   }
@@ -441,7 +446,7 @@
   DFPersonSelectionTableViewCell *cell;
   if (peanutContact.user) {
     DFPersonSelectionTableViewCell *userCell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
-    [userCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser];
+    [userCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser | DFPersonSelectionTableViewCellStyleRightLabel];
     userCell.nameLabel.text = peanutContact.name;
     userCell.profilePhotoStackView.names = @[peanutContact.name];
     cell = userCell;
@@ -530,7 +535,7 @@
     [self.ABList removeObject:contact];
     if (self.onStrandList.count == 0) {
       [self.unfilteredSections removeObject:self.onStrandList];
-      [self.unfilteredSectionTitles removeObject:@"On Strand"];
+      [self.unfilteredSectionTitles removeObject:UserSectionTitle];
     }
     
     [self addContactToSelectedSection:contact];

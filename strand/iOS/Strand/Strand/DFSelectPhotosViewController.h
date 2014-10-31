@@ -34,8 +34,6 @@
 @property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
 @property (nonatomic, retain) DFPeanutFeedObject *highlightedFeedObject;
 
-
-
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects;
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects
                         highlightedFeedObject:(DFPeanutFeedObject *)highlightedObject;

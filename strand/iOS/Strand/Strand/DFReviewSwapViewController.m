@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFAddPhotosViewController.h"
+#import "DFReviewSwapViewController.h"
 #import "DFPeanutStrandAdapter.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFPhotoStore.h"
@@ -16,7 +16,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFAnalytics.h"
 
-@interface DFAddPhotosViewController ()
+@interface DFReviewSwapViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
@@ -24,7 +24,7 @@
 
 @end
 
-@implementation DFAddPhotosViewController
+@implementation DFReviewSwapViewController
 
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
