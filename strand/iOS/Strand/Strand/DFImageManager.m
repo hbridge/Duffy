@@ -351,6 +351,7 @@
 - (void)clearCache
 {
   dispatch_semaphore_wait(self.imageRequestCacheSemaphore, DISPATCH_TIME_FOREVER);
+  DDLogInfo(@"%@ clearing cache", self.class);
   _imageRequestCache = [NSMutableDictionary new];
   dispatch_semaphore_signal(self.imageRequestCacheSemaphore);
 }
