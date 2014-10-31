@@ -240,10 +240,23 @@ const CGFloat LockedCellHeight = 157.0;
 - (void)viewDidLoad
 {
   [super viewDidLoad];
-  
+
+  [self configureTitleView];
   [self configureTableView];
   [self configureUpsell];
   [self configurePeopleBar];
+}
+
+- (void)configureTitleView
+{
+  if (!self.titleView) {
+    self.titleView =
+    [[[UINib nibWithNibName:NSStringFromClass([DFStrandGalleryTitleView class])
+                     bundle:nil]
+      instantiateWithOwner:nil options:nil]
+     firstObject];
+    self.navigationItem.titleView = self.titleView;
+  }
 }
 
 - (void)configureTableView
@@ -400,15 +413,11 @@ const CGFloat LockedCellHeight = 157.0;
   _postsObject = strandPostsObject;
   
   dispatch_async(dispatch_get_main_queue(), ^{
-    if (!self.titleView) {
-      self.titleView =
-      [[[UINib nibWithNibName:NSStringFromClass([DFStrandGalleryTitleView class])
-                       bundle:nil]
-        instantiateWithOwner:nil options:nil]
-       firstObject];
-      self.navigationItem.titleView = self.titleView;
+    if (self.postsObject.location) {
+      self.titleView.locationLabel.text = self.postsObject.location;
+    } else {
+      [self.titleView.locationLabel removeFromSuperview];
     }
-    self.titleView.locationLabel.text = self.postsObject.location;
     self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
                                                                       abbreviate:NO];
     
