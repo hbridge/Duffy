@@ -1057,7 +1057,7 @@ selectedObjectChanged:(id)newObject
 
 - (void)addPhotosButtonPressed:(id)sender
 {
-  NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrandsByDateAscending:YES];
+  NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrands];
   DFSelectPhotosViewController *selectPhotosViewController = [[DFSelectPhotosViewController alloc]
                                                               initWithCollectionFeedObjects:privateStrands];
   selectPhotosViewController.navigationItem.title = @"Add Photos";

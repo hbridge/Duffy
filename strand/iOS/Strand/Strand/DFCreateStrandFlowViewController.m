@@ -79,7 +79,7 @@
   DFSelectPhotosViewController *selectPhotosController = self.selectPhotosController;
   dispatch_async(dispatch_get_main_queue(), ^{
     [selectPhotosController setCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
-                                                      privateStrandsByDateAscending:YES]];
+                                                      privateStrands]];
   });
 }
 
