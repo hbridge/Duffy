@@ -109,6 +109,8 @@ const CGFloat LockedCellHeight = 157.0;
         [SVProgressHUD showWithStatus:@"Loading..."];
         [self reloadData];
       }
+      
+      [self setStrandActionsEnabled:NO];
     } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts] || [feedObject.type isEqual:DFFeedObjectSection]) {
       self.inviteObject = nil;
       self.postsObject = feedObject;
@@ -223,6 +225,13 @@ const CGFloat LockedCellHeight = 157.0;
      target:self
      action:@selector(inviteButtonPressed:)],
     ];
+}
+
+- (void)setStrandActionsEnabled:(BOOL)enabled
+{
+  for (UIBarButtonItem *item in self.navigationItem.rightBarButtonItems) {
+    item.enabled = enabled;
+  }
 }
 
 - (BOOL)hidesBottomBarWhenPushed
@@ -713,6 +722,7 @@ const CGFloat LockedCellHeight = 157.0;
        self.swapUpsellView.hidden = YES;
        [self.swapUpsellView removeFromSuperview];
        self.inviteObject = nil;
+       [self setStrandActionsEnabled:YES];
      } failure:^(NSError *error) {
      }];
   } else {
@@ -723,6 +733,7 @@ const CGFloat LockedCellHeight = 157.0;
                                                         // Now that we've successfull swapped...turn our view
                                                         //   into a regular view from an invite
                                                         self.inviteObject = nil;
+                                                        [self setStrandActionsEnabled:YES];
                                                       }];
     DFNavigationController *navController = [[DFNavigationController alloc]
                                              initWithRootViewController:addPhotosController];
