@@ -1,5 +1,9 @@
 # Swap
 
+## Nov 1, 2014 (4779)
+
+- Fix creating a new Swap thread with clustered photos
+
 ## Oct 30th, 2014 (4776-4778)
 
 - Fix iOS7
