@@ -87,22 +87,47 @@
 
 + (void)refreshPushToken
 {
+  BOOL notifsEnabled = NO;
   if ([[UIApplication sharedApplication]
        respondsToSelector:@selector(currentUserNotificationSettings)]) {
     // iOS 8
     UIUserNotificationSettings *settings = [[UIApplication sharedApplication]
                                             currentUserNotificationSettings];
     [DFDefaultsStore setLastUserNotificationType:settings.types];
+    if (settings != UIUserNotificationTypeNone) notifsEnabled = YES;
   } else {
-    [DFDefaultsStore setLastNotificationType:[[UIApplication sharedApplication] enabledRemoteNotificationTypes]];
+    UIRemoteNotificationType notifTypes = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
+    [DFDefaultsStore setLastNotificationType:notifTypes];
+    if (notifTypes != UIRemoteNotificationTypeNone) notifsEnabled = YES;
   }
   
   DFPermissionStateType pushPermState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
+  if (notifsEnabled && ![pushPermState isEqual:DFPermissionStateGranted]) {
+    DDLogWarn(@"%@ remoteNotifsEnabled but pushPermState:%@.  Changing pushPermState to %@",
+              self.class, pushPermState, DFPermissionStateGranted);
+    pushPermState = DFPermissionStateGranted;
+    [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionRemoteNotifications];
+  }
   DDLogInfo(@"%@ refreshPushToken permissionState: %@", self, pushPermState);
   if ([pushPermState isEqual:DFPermissionStateGranted]
       || [pushPermState isEqual:DFPermissionStatePreRequestedYes]) {
     [self requestPushNotifsPermission];
   }
+}
+
+- (BOOL)pushNotificationsEnabled
+{
+  if ([[UIApplication sharedApplication]
+       respondsToSelector:@selector(currentUserNotificationSettings)]) {
+    // iOS 8
+    UIUserNotificationSettings *settings = [[UIApplication sharedApplication]
+                                            currentUserNotificationSettings];
+    return settings.types != UIUserNotificationTypeNone;
+  } else {
+    return [[UIApplication sharedApplication] enabledRemoteNotificationTypes] != UIRemoteNotificationTypeNone;
+  }
+  
+  return NO;
 }
 
 // in iOS7, this is the callback we get after registerRemoteNotificationTypes

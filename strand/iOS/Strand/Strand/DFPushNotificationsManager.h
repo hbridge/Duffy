@@ -20,6 +20,7 @@
 + (void)registerDeviceToken:(NSData *)data;
 + (void)registerFailedWithError:(NSError *)error;
 + (void)registerUserNotificationSettings:(UIUserNotificationSettings *)settings;
+- (BOOL)pushNotificationsEnabled;
 
 #pragma mark - Handler
 
