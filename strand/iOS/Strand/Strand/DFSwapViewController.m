@@ -76,6 +76,11 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
                                             initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                             target:self
                                             action:@selector(createButtonPressed:)];
+  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithTitle:@""
+                                           style:UIBarButtonItemStylePlain
+                                            target:self
+                                            action:nil];
 }
 
 - (void)viewDidLoad {
