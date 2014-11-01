@@ -125,6 +125,10 @@ def turnFormattedGroupsIntoFeedObjects(formattedGroups, num):
 					mostRecentPhotoDate = photoData['time_taken']
 			else:
 				clusterObj = {'type': 'cluster', 'objects': list()}
+
+				# now put in the time_taken for the first photo
+				firstPhoto = getPhotoObject(cluster[0])
+				clusterObj['time_taken'] = firstPhoto['time_taken']
 				for entry in cluster:
 					photoData = getPhotoObject(entry)
 					clusterObj['objects'].append(photoData)
