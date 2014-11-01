@@ -22,6 +22,9 @@ class UserIdMixin():
 		try:
 			user = User.objects.get(id=userId)
 			self.cleaned_data['user'] = user
+
+			if user.id < 500:
+				raise forms.ValidationError("User not found")
 		except User.DoesNotExist:
 			raise forms.ValidationError("User not found")
 	
