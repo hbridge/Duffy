@@ -97,8 +97,10 @@
     [DFDefaultsStore setLastNotificationType:[[UIApplication sharedApplication] enabledRemoteNotificationTypes]];
   }
   
-  if ([[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStateGranted]
-      || [[DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications] isEqual:DFPermissionStatePreRequestedYes]) {
+  DFPermissionStateType pushPermState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
+  DDLogInfo(@"%@ refreshPushToken permissionState: %@", self, pushPermState);
+  if ([pushPermState isEqual:DFPermissionStateGranted]
+      || [pushPermState isEqual:DFPermissionStatePreRequestedYes]) {
     [self requestPushNotifsPermission];
   }
 }
