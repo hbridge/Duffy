@@ -134,8 +134,10 @@ const CGFloat LockedCellHeight = 157.0;
   DFFeedViewController *feedViewController = [[DFFeedViewController alloc]
                                               initWithFeedObject:feedObject];
   DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:feedViewController];
-  feedViewController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                                          initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:feedViewController
+  feedViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                          initWithImage:[UIImage imageNamed:@"Assets/Icons/BackNavButton"]
+                                                         style:UIBarButtonItemStylePlain
+                                                         target:feedViewController
                                                           action:@selector(dismissWhenPresented)];
   
   
