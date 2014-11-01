@@ -144,7 +144,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   
   [SVProgressHUD show];
   [[DFPeanutFeedDataManager sharedManager]
-   createNewStrandWithPhotos:self.selectPhotosController.selectedObjects
+   createNewStrandWithFeedObjects:self.selectPhotosController.selectedObjects
    createdFromSuggestions:suggestedObjects
    selectedPeanutContacts:self.peoplePickerController.selectedPeanutContacts
    success:^(DFPeanutStrand *createdStrand){

@@ -60,7 +60,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (void)markSuggestion:(DFPeanutFeedObject *)suggestedSection visible:(BOOL)visible;
 
 
-- (void)createNewStrandWithPhotos:(NSArray *)feedPhotoObjects
+- (void)createNewStrandWithFeedObjects:(NSArray *)feedObjects
            createdFromSuggestions:(NSArray *)suggestedSections
            selectedPeanutContacts:(NSArray *)selectedPeanutContacts
                           success:(void(^)(DFPeanutStrand *resultStrand))success

@@ -318,6 +318,12 @@ static NSArray *FeedObjectTypes;
   return [allDescendents filteredArrayUsingPredicate:predicate];
 }
 
+- (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type
+{
+  if (self.objects.count == 0 && [self.type isEqualToString:type]) return @[self];
+  return [self descendentdsOfType:type];
+}
+
 
 - (DFPeanutFeedObject *)strandPostsObject
 {

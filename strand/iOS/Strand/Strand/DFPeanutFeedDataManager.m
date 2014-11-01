@@ -543,7 +543,7 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
-- (void)createNewStrandWithPhotos:(NSArray *)feedPhotoObjects
+- (void)createNewStrandWithFeedObjects:(NSArray *)feedObjects
            createdFromSuggestions:(NSArray *)suggestedSections
                      selectedPeanutContacts:(NSArray *)selectedPeanutContacts
                           success:(void(^)(DFPeanutStrand *resultStrand))success
@@ -553,11 +553,16 @@ static DFPeanutFeedDataManager *defaultManager;
   // Create the strand
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
   requestStrand.users = @[@([[DFUser currentUser] userID])];
-  requestStrand.photos = [feedPhotoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *feedObject) {
-    return @(feedObject.id);
+  NSMutableArray *photoObjects = [NSMutableArray new];
+  for (DFPeanutFeedObject *feedObject in feedObjects) {
+    [photoObjects addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+  }
+  
+  requestStrand.photos = [photoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photoObject) {
+    return @(photoObject.id);
   }];
   requestStrand.private = @(NO);
-  [self setTimesForStrand:requestStrand fromPhotoObjects:feedPhotoObjects];
+  [self setTimesForStrand:requestStrand fromPhotoObjects:photoObjects];
   
   [self.strandAdapter
    performRequest:RKRequestMethodPOST

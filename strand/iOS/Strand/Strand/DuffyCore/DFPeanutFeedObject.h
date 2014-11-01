@@ -74,6 +74,7 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
 - (NSArray *)descendentdsOfType:(DFFeedObjectType)type;
+- (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type;
 - (DFPeanutFeedObject *)strandPostsObject;
 
 /* Time in Location e.g.: "1 week ago in Wiliamsburg" */
