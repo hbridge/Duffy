@@ -12,13 +12,13 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="999" verticalHuggingPriority="251" text="Time Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Sy-97-6b8">
-                    <rect key="frame" x="0.0" y="22" width="325" height="16"/>
+                    <rect key="frame" x="6" y="22" width="319" height="16"/>
                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="999" text="Location Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="006-2i-JNe">
-                    <rect key="frame" x="0.0" y="6" width="325" height="16"/>
+                    <rect key="frame" x="6" y="6" width="319" height="16"/>
                     <fontDescription key="fontDescription" type="system" pointSize="13"/>
                     <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
@@ -27,13 +27,12 @@
             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="0Sy-97-6b8" secondAttribute="trailing" id="1J2-oD-Mop"/>
-                <constraint firstItem="006-2i-JNe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="DVr-33-cP2"/>
+                <constraint firstItem="006-2i-JNe" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="6" id="DVr-33-cP2"/>
                 <constraint firstItem="0Sy-97-6b8" firstAttribute="top" secondItem="006-2i-JNe" secondAttribute="bottom" id="KtA-bz-ILh"/>
                 <constraint firstAttribute="centerY" secondItem="006-2i-JNe" secondAttribute="centerY" constant="8" id="UbN-QS-dmF"/>
-                <constraint firstItem="0Sy-97-6b8" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="ZZb-b2-aQe"/>
+                <constraint firstItem="0Sy-97-6b8" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="6" id="ZZb-b2-aQe"/>
                 <constraint firstAttribute="centerY" secondItem="0Sy-97-6b8" secondAttribute="centerY" priority="700" id="e8a-X6-E9h"/>
                 <constraint firstAttribute="trailing" secondItem="006-2i-JNe" secondAttribute="trailing" id="g6S-e1-lu0"/>
-                <constraint firstAttribute="centerX" secondItem="0Sy-97-6b8" secondAttribute="centerX" id="nzq-Eq-BHA"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
