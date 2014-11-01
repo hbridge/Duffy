@@ -1048,6 +1048,7 @@ selectedObjectChanged:(id)newObject
   DFSelectPhotosViewController *selectPhotosViewController = [[DFSelectPhotosViewController alloc]
                                                               initWithCollectionFeedObjects:privateStrands];
   selectPhotosViewController.navigationItem.title = @"Add Photos";
+  selectPhotosViewController.actionButtonVerb = @"Add";
   selectPhotosViewController.delegate = self;
   DFNavigationController *navController = [[DFNavigationController alloc]
                                            initWithRootViewController:selectPhotosViewController];

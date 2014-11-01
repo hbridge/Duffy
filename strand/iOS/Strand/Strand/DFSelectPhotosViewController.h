@@ -33,6 +33,7 @@
 @property (nonatomic) BOOL allowsNilSelection;
 @property (nonatomic, retain) DFSelectPhotosController *selectPhotosController;
 @property (nonatomic, retain) DFPeanutFeedObject *highlightedFeedObject;
+@property (nonatomic, retain) NSString *actionButtonVerb; /* Defaults to "Select" */
 
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects;
 - (instancetype)initWithCollectionFeedObjects:(NSArray *)collectionFeedObjects

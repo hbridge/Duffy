@@ -75,6 +75,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   self = [super initWithNibName:[self.class description] bundle:nil];
   if (self) {
+    _actionButtonVerb = @"Select";
     _sectionsToHeaderViews = [NSMutableDictionary new];
     _stylesToHeaderHeights = [NSMutableDictionary new];
     [self configureNavAndTab];
@@ -386,7 +387,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
     }
   } else {
     if (!self.allowsNilSelection) self.doneButton.enabled = YES;
-    buttonText = [NSString stringWithFormat:@"Select %d Photos", selectedCount];
+    buttonText = [NSString stringWithFormat:@"%@ %d Photos", self.actionButtonVerb, selectedCount];
   }
   
   [self.doneButton setTitle:buttonText forState:UIControlStateNormal];
