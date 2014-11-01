@@ -293,7 +293,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			strandId = strand.id
 			photos = strand.photos.all()
 
-			photos = sorted(photos, key=lambda x: x.time_taken)
+			photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
 			if len(photos) == 0:
 				logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
 				continue
@@ -331,7 +331,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 
 			groups.append(entry)
 	
-	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken)
+	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 	formattedGroups = getFormattedGroups(groups)
 	
