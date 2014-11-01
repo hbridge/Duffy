@@ -12,6 +12,7 @@
 #import "DFUserPeanutAdapter.h"
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIAlertView+DFHelpers.h"
+#import "DFPushNotificationsManager.h"
 
 NSString *const AutosaveToCameraRollDefaultsKey = @"DFSettingsAutosaveToCameraRoll";
 
@@ -166,6 +167,19 @@ static DFSettings *defaultSettings;
 - (NSString *)userID
 {
   return [@([[DFUser currentUser] userID]) stringValue];
+}
+
+
+- (BOOL)pushNotificationsEnabled
+{
+  return [[DFPushNotificationsManager sharedManager] pushNotificationsEnabled];
+}
+
+- (void)setPushNotificationsEnabled:(BOOL)pushNotifications
+{
+  if (pushNotifications) {
+    [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
+  }
 }
 
 @end

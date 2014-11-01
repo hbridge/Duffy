@@ -112,8 +112,12 @@
 //                                                   animated:YES];
 //            }
 //       accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
+    [mapping mapAttribute:@"pushNotificationsEnabled"
+                    title:@"Push Notifications"
+                     type:FKFormAttributeMappingTypeBoolean];
     
     
     // Support
