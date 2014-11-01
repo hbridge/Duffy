@@ -1047,6 +1047,7 @@ selectedObjectChanged:(id)newObject
   NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrandsByDateAscending:YES];
   DFSelectPhotosViewController *selectPhotosViewController = [[DFSelectPhotosViewController alloc]
                                                               initWithCollectionFeedObjects:privateStrands];
+  selectPhotosViewController.navigationItem.title = @"Add Photos";
   selectPhotosViewController.delegate = self;
   DFNavigationController *navController = [[DFNavigationController alloc]
                                            initWithRootViewController:selectPhotosViewController];
