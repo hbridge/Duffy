@@ -408,7 +408,8 @@ referenceSizeForHeaderInSection:(NSInteger)section
               didFinishSelectingFeedObjects:selectPhotosController.selectedFeedObjects];
 }
 
-- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController feedObjectLongpressed:(DFPeanutFeedObject *)feedObject inSection:(NSUInteger)section
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
+         feedObjectLongpressed:(DFPeanutFeedObject *)feedObject inSection:(NSUInteger)section
 {
   DFPeanutFeedObject *photoObject = [[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]
                                      firstObject];

@@ -17,6 +17,7 @@
 #import "DFPushNotificationsManager.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "NSArray+DFHelpers.h"
+#import "DFSelectableMultiPhotoViewController.h"
 
 @interface DFSelectSuggestionsViewController ()
 
@@ -123,13 +124,6 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   self.collectionView.alwaysBounceVertical = YES;
 }
 
-- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
-    selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
-{
-  [self configureNavTitle];
-  [self configureDoneButtonText];
-}
-
 - (void)configureNavTitle
 {
   self.navigationItem.title = @"Select Photos";
@@ -153,6 +147,28 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
   }
   
   [self.swapButton setTitle:buttonText forState:UIControlStateNormal];
+}
+
+#pragma mark - SelectPhotosController Delegate
+
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
+    selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
+{
+  [self configureNavTitle];
+  [self configureDoneButtonText];
+}
+
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
+         feedObjectLongpressed:(DFPeanutFeedObject *)feedObject inSection:(NSUInteger)section
+{
+  DFPeanutFeedObject *photoObject = [[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]
+                                     firstObject];
+  
+  DFSelectableMultiPhotoViewController *mpvc = [[DFSelectableMultiPhotoViewController alloc]
+                                                initWithActivePhoto:photoObject
+                                                inSection:section
+                                                ofSelectPhotosController:self.selectPhotosController];
+  [self presentViewController:mpvc animated:YES completion:nil];
 }
 
 

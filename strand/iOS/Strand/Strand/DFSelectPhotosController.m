@@ -64,11 +64,23 @@
 
 - (void)toggleObjectSelected:(DFPeanutFeedObject *)object
 {
+  BOOL select = NO;
   if ([self.selectedFeedObjects containsObject:object]) {
     [self.selectedFeedObjects removeObject:object];
   } else {
     [self.selectedFeedObjects addObject:object];
+    select = YES;
   }
+  
+  for (DFSelectablePhotoViewCell *cell in self.collectionView.visibleCells) {
+    NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+    DFPeanutFeedObject *visibleObject = [self feedObjectForIndexPath:indexPath];
+    if ([visibleObject isEqual:object]){
+      cell.showTickMark = select;
+      [cell setNeedsLayout];
+    }
+  }
+  
   [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
 }
 
