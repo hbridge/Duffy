@@ -261,9 +261,9 @@ void (^_completionHandler)(UIBackgroundFetchResult);
     [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
     ];
   
-  for (UINavigationController *vc in self.tabBarController.viewControllers) {
-    vc.tabBarItem.imageInsets = vc.tabBarItem.imageInsets = UIEdgeInsetsMake(5.5, 0, -5.5, 0);
-  }
+//  for (UINavigationController *vc in self.tabBarController.viewControllers) {
+//    vc.tabBarItem.imageInsets = vc.tabBarItem.imageInsets = UIEdgeInsetsMake(5.5, 0, -5.5, 0);
+//  }
   self.tabBarController.tabBar.selectedImageTintColor = [DFStrandConstants strandRed];
   //self.tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
   self.tabBarController.tabBar.translucent = NO;

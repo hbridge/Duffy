@@ -63,7 +63,8 @@
                                            style:UIBarButtonItemStylePlain
                                            target:nil
                                            action:nil];
-  self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/PeopleBarButton"]
+  self.tabBarItem.title = @"Friends";
+  self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/PeopleBarButtonSelected"]
                                    imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
   self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/PeopleBarButton"]
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];

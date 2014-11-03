@@ -71,7 +71,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 - (void)configureNavAndTab
 {
   self.navigationItem.title = @"Swaps";
+  self.tabBarItem.title = @"Swaps";
   self.tabBarItem.image = [UIImage imageNamed:@"Assets/Icons/SwapBarButton"];
+  self.tabBarItem.selectedImage = [UIImage imageNamed:@"Assets/Icons/SwapBarButtonSelected"];
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
                                             initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
                                             target:self
