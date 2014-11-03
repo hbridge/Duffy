@@ -1,9 +1,10 @@
 #!/bin/bash
-
+sudo su ubuntu <<'EOF'
 cd /home/ubuntu/dev/Duffy
 git fetch
 git rebase origin/master
 sudo apachectl -k restart
+EOF
 
 echo "Restarting scripts..."
 sudo stop duffy-friends
