@@ -1,6 +1,6 @@
 # Swap
 
-## Nov 1, 2014 (4779-4780)
+## Nov 1, 2014 (4779-4781)
 
 - Fix creating a new Swap thread with clustered photos
 - Fix push notifs not working in some instances
