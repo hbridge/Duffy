@@ -462,7 +462,6 @@ def getInviteObjectsDataForUser(user):
 			if photo.user_id != user.id and not photo.full_filename:
 				fullsLoaded = False
 				logger.info("Not showing invite %s because photo %s doesn't have a full" % (invite.id, photo.id))
-				print "here"
 				
 		if fullsLoaded:
 			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
@@ -497,6 +496,8 @@ def getInviteObjectsDataForUser(user):
 			entry['objects'].append(suggestionsEntry)
 
 			responseObjects.append(entry)
+
+	responseObjects = sorted(responseObjects, key=lambda x:x['time_stamp'], reverse=True)
 
 	return responseObjects
 
