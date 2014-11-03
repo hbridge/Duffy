@@ -562,7 +562,7 @@ def private_strands(request):
 
 		deletedSomething = False
 		for strand in strands:
-			if len(strand.photos.all) == 0:
+			if len(strand.photos.all()) == 0:
 				logging.error("Found strand %s with no photos in private strands, deleting.  users are %s" % (strand.id, strand.users.all()))
 				strand.delete()
 				deletedSomething = True
@@ -608,7 +608,7 @@ def strand_inbox(request):
 
 		deletedSomething = False
 		for strand in strands:
-			if len(strand.photos.all) == 0:
+			if len(strand.photos.all()) == 0:
 				logging.error("Found strand %s with no photos in inbox, deleting.  users are %s" % (strand.id, strand.users.all()))
 				strand.delete()
 				deletedSomething = True
