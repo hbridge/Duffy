@@ -312,7 +312,7 @@ static DFUploadController *defaultUploadController;
     
     DDLogVerbose(@"Upload failed for %lu objects", (unsigned long)peanutPhotos.count);
     if ([self isErrorRetryable:error] && self.currentSessionStats.numConsecutiveRetries < MaxRetryCount) {
-      DDLogVerbose(@"Error retryable.  Moving objects to back of queue.");
+      DDLogError(@"Retryable upload error. Moving objects to back of queue. Error: %@", error);
       if (uploadType == DFPhotoUploadOperationMetadata) {
         [self.metadataQueue moveInProgressObjectsBackToQueue:objectIDs];
       } else if (uploadType == DFPhotoUploadOperationThumbnailData) {
@@ -325,13 +325,13 @@ static DFUploadController *defaultUploadController;
       self.currentSessionStats.numConsecutiveRetries++;
       self.currentSessionStats.numTotalRetries++;
     } else if ([self isErrorBadLocalData:error]) {
-      DDLogWarn(@"Warning: local app state appears to be bad.  Askinng for reset.");
+      DDLogError(@"Warning: local app state appears to be bad.  Asking for reset.");
       AppDelegate *appDelegate = (AppDelegate *)[[UIApplication sharedApplication] delegate];
       NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
       [cancelOperation start];
       [appDelegate resetApplication];
     } else {
-      DDLogInfo(@"Retry count exceeded (%d/%d) or error not retryable. Cancelling uploads.  Error:%@",
+      DDLogError(@"Retry count exceeded (%d/%d) or error not retryable. Cancelling uploads.  Error:%@",
                 self.currentSessionStats.numConsecutiveRetries, MaxRetryCount, error.description);
       [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
       NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
