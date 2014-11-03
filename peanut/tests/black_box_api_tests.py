@@ -5,8 +5,6 @@ import json
 import sys
 import os
 import requests
-from werkzeug.datastructures import MultiDict
-
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -93,11 +91,10 @@ class SwapTests(unittest.TestCase):
 
 	@classmethod
 	def tearDownClass(self):
-
 		# delete the three new user accounts and all associated data will go away
-		userList = User.objects.filter(id__in=self.userList)
-		if len(userList) > 0:
-			userList.delete()
+		usersToDelete = User.objects.filter(id__in=self.userList)
+		if len(usersToDelete) > 0:
+			usersToDelete.delete()
 
 		# display results
 		print ""
@@ -115,22 +112,22 @@ class SwapTests(unittest.TestCase):
 
 	# Loads Inbox page
 	def testStrandInbox(self):
-		userList = self.getRandomUsers()
-		for userId in userList:
+		realUsersList = self.getRandomUsers()
+		for userId in realUsersList:
 			result = self.getStrandInbox(userId)
 			self.assertTrue("objects" in result)
 
 	# Load Swaps tab
 	def testSwapsCall(self):
-		userList = self.getRandomUsers()		
-		for userId in userList:
+		realUsersList = self.getRandomUsers()		
+		for userId in realUsersList:
 			result = self.getSwaps(userId)
 			self.assertTrue("objects" in result)
 
 	# Load private strands
 	def testPrivateStrandsCall(self):
-		userList = self.getRandomUsers()		
-		for userId in userList:
+		realUsersList = self.getRandomUsers()		
+		for userId in realUsersList:
 			result = self.getUnsharedStrands(userId)
 			self.assertTrue("objects" in result)
 
