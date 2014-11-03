@@ -560,6 +560,17 @@ def private_strands(request):
 
 		printStats("private-2")
 
+		deletedSomething = False
+		for strand in strands:
+			if len(strand.photos.all) == 0:
+				logging.error("Found strand %s with no photos in private strands, deleting.  users are %s" % (strand.id, strand.users.all()))
+				strand.delete()
+				deletedSomething = True
+
+		if deletedSomething:
+			strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
+
+
 		friends = friends_util.getFriends(user.id)
 
 		strandNeighborsCache = getStrandNeighborsCache(strands, friends, withUsers=True)
@@ -594,6 +605,16 @@ def strand_inbox(request):
 		# Next throw in the list of existing Strands
 		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
 		printStats("inbox-2")
+
+		deletedSomething = False
+		for strand in strands:
+			if len(strand.photos.all) == 0:
+				logging.error("Found strand %s with no photos in inbox, deleting.  users are %s" % (strand.id, strand.users.all()))
+				strand.delete()
+				deletedSomething = True
+
+		if deletedSomething:
+			strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
 
 		#nonInviteStrandObjects = list()
 		responseObjects.extend(getObjectsDataForStrands(strands, user))
