@@ -131,17 +131,33 @@ static NSArray *colors;
 
 + (NSDictionary *)defaultTextStyle
 {
-  return @{
-           @"$default" : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue" size:13]},
-           @"strong"   : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Bold" size:13]},
-           @"em"       : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Italic" size:13]},
-           @"name"    : @{NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Bold" size:13]},
-           @"subtitle" : @{
-               NSFontAttributeName  : [UIFont fontWithName:@"HelveticaNeue-Medium" size:11],
-               NSForegroundColorAttributeName : [UIColor lightGrayColor],
-               },
-           @"gray"    : @{NSForegroundColorAttributeName : [UIColor lightGrayColor]},
-           };
+  static NSMutableDictionary *defaultStyle = nil;
+  if (!defaultStyle) {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      // we do this whole song and dance of checking whether the fonts exist because we hit
+      // a crash in iOS 7.0.4 where HelveticaNeue-Italic was missing and the dict crashed
+      defaultStyle = [NSMutableDictionary new];
+      UIFont *helveticaNeue = [UIFont fontWithName:@"HelveticaNeue" size:13];
+      UIFont *helveticaNeueBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
+      UIFont *helveticaNeueItalic = [UIFont fontWithName:@"HelveticaNeue-Italic" size:13];
+      if (helveticaNeue) {
+        defaultStyle[@"$default"] = @{NSFontAttributeName : helveticaNeue};
+        defaultStyle[@"subtitle"] = @{NSFontAttributeName : [helveticaNeue fontWithSize:11.0],
+                                      NSForegroundColorAttributeName : [UIColor lightGrayColor]};
+      }
+      if (helveticaNeueBold) {
+        defaultStyle[@"strong"] = @{NSFontAttributeName : helveticaNeueBold};
+        defaultStyle[@"name"] = @{NSFontAttributeName : helveticaNeueBold};
+      }
+      if (helveticaNeueItalic) {
+        defaultStyle[@"em"] = @{NSFontAttributeName : helveticaNeueItalic};
+      }
+      defaultStyle[@"gray"] = [UIColor lightGrayColor];
+    });
+  }
+  
+  return defaultStyle;
 }
 
 

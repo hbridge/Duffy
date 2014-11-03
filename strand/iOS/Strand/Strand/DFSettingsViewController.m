@@ -26,6 +26,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "DFSMSInviteStrandComposeViewController.h"
 #import "DFNavigationController.h"
+#import <Slash/Slash.h>
 
 @interface DFSettingsViewController ()
 
@@ -260,14 +261,16 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            int numDays = rand() % 8;
-            DFSMSInviteStrandComposeViewController *vc =
-            [[DFSMSInviteStrandComposeViewController alloc]
-             initWithRecipients:@[[@(numDays) stringValue]]
-             locationString:@"Croatia"
-             date:[NSDate dateWithTimeIntervalSinceNow:(60 * 60 * 24 * numDays + 100) * -1]];
-            [self presentViewController:vc animated:YES completion:nil];
-            vc.messageComposeDelegate = self;
+            NSString *titleLabelMarkup = [NSString stringWithFormat:@"From <name>%@</name>",
+                                          nil];
+            NSError *error;
+            NSAttributedString *string = [SLSMarkupParser
+             attributedStringWithMarkup:titleLabelMarkup
+             style:[DFStrandConstants defaultTextStyle]
+             error:&error];
+            DDLogVerbose(@"%@", string);
+            
+            
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
