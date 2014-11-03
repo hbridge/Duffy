@@ -17,12 +17,6 @@ sleep 1
 
 sleep 5
 
-/sbin/initctl stop duffy-classifier
-sleep 1
-/sbin/initctl start duffy-classifier
-
-sleep 5
-
 /sbin/initctl stop duffy-similarity
 sleep 1
 /sbin/initctl start duffy-similarity
@@ -38,4 +32,17 @@ sleep 5
 /sbin/initctl stop duffy-friends
 sleep 1
 /sbin/initctl start duffy-friends
+
+sleep 5
+
+/sbin/initctl stop duffy-timezoner
+sleep 1
+/sbin/initctl start duffy-timezoner
+
+sleep 5
+
+/sbin/initctl stop duffy-strand-notifications
+sleep 1
+/sbin/initctl start duffy-strand-notifications
+
 
