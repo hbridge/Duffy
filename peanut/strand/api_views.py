@@ -476,7 +476,7 @@ def getInviteObjectsDataForUser(user):
 			if user.last_photo_timestamp:
 				if (invite.strand.first_photo_time - constants.TIMEDELTA_FOR_STRANDING < user.last_photo_timestamp and
 					invite.strand.last_photo_time + constants.TIMEDELTA_FOR_STRANDING > user.last_photo_timestamp):
-					if lastStrandedPhoto and lastStrandedPhoto.time_taken <= user.last_photo_timestamp:
+					if lastStrandedPhoto and lastStrandedPhoto.time_taken < user.last_photo_timestamp:
 						inviteIsReady = False
 						logger.info("Marking invite %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
 
