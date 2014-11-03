@@ -37,6 +37,7 @@
 - (void)setCollectionFeedObjects:(NSArray *)collectionFeedObjects;
 - (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath;
 - (NSArray *)feedObjectsForSection:(NSUInteger)section;
+- (NSArray *)photosForSection:(NSUInteger)section;
 
 
 #pragma mark - For use by subclasses only;

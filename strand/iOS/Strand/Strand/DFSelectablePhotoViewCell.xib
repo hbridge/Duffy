@@ -19,6 +19,7 @@
                     </imageView>
                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="top" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GLf-nM-dzo">
                         <rect key="frame" x="0.0" y="0.0" width="60" height="60"/>
+                        <gestureRecognizers/>
                         <state key="normal" image="Assets/Icons/PhotoNotSelectedIcon">
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
@@ -39,6 +40,7 @@
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             </view>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+            <gestureRecognizers/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="GLf-nM-dzo" secondAttribute="trailing" id="2TS-dN-5Jc"/>
                 <constraint firstAttribute="trailing" secondItem="6M1-To-d3U" secondAttribute="trailing" constant="8" id="8WM-Rl-Ql5"/>

@@ -113,6 +113,16 @@ NSUInteger const SectionSpread = 5;
   return self.sectionArrays[section];
 }
 
+- (NSArray *)photosForSection:(NSUInteger)section
+{
+  NSMutableArray *photoObjectsForSection = [NSMutableArray new];
+  NSArray *objectsForSection = [self feedObjectsForSection:section];
+  for (DFPeanutFeedObject *feedObject in objectsForSection) {
+    [photoObjectsForSection addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+  }
+  return photoObjectsForSection;
+}
+
 - (DFPeanutFeedObject *)feedObjectForIndexPath:(NSIndexPath *)indexPath
 {
   NSArray *objects = self.sectionArrays[indexPath.section];

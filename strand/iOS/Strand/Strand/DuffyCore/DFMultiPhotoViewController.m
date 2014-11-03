@@ -8,13 +8,13 @@
 
 #import "DFMultiPhotoViewController.h"
 #import "DFAnalytics.h"
-#import "DFPhoto.h"
 #import "DFPhotoViewController.h"
 
 @interface DFMultiPhotoViewController ()
 
 @property (nonatomic) NSUInteger currentPhotoIndex;
 @property (nonatomic, retain) NSArray *photos;
+
 @property (nonatomic) BOOL hideStatusBar;
 
 @end
@@ -24,38 +24,39 @@
 
 - (id)init
 {
-    self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
-                    navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
-                                  options:@{UIPageViewControllerOptionInterPageSpacingKey:[NSNumber numberWithFloat:40.0]}];
-    if (self) {
-        self.delegate = self;
-        self.automaticallyAdjustsScrollViewInsets = NO;
-        self.hidesBottomBarWhenPushed = YES;
-    }
-    return self;
-}
-
-- (void)setActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos
-{
-  self.dataSource = self;
-  self.photos = photos;
-  DFPhotoViewController *viewController = [[DFPhotoViewController alloc] init];
-  viewController.photo = photo;
-  [self setViewControllers:@[viewController]
-                 direction:UIPageViewControllerNavigationDirectionForward
-                  animated:NO
-                completion:nil];
+  self = [super init];
+  if (self) {
+    self.hidesBottomBarWhenPushed = YES;
+  }
+  return self;
 }
 
 - (void)viewDidLoad
 {
-    [super viewDidLoad];
+  [super viewDidLoad];
   
-  UIBarButtonItem *actionItem = [[UIBarButtonItem alloc]
-                                 initWithBarButtonSystemItem:UIBarButtonSystemItemAction
-                                 target:self
-                                 action:@selector(actionButtonClicked:)];
-  self.navigationItem.rightBarButtonItem = actionItem;
+  [self setupPVC];
+  [self setTheatreModeEnabled:NO];
+}
+
+- (void)setupPVC
+{
+  _pageViewController = [[UIPageViewController alloc] initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
+                                                        navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+                                                                      options:@{UIPageViewControllerOptionInterPageSpacingKey:[NSNumber numberWithFloat:40.0]}];
+  _pageViewController.delegate = self;
+  _pageViewController.dataSource = self;
+  _pageViewController.automaticallyAdjustsScrollViewInsets = NO;
+  
+  _pageViewController.navigationItem.title = @"Preview";
+  _pageViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/BackNavButton"]
+                                                            style:UIBarButtonItemStylePlain
+                                                            target:self
+                                                            action:@selector(backPressed:)];
+  
+  [self showPhoto:self.activePhoto];
+  [self pushViewController:_pageViewController animated:NO];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -71,24 +72,28 @@
 
 - (void)didReceiveMemoryWarning
 {
-    [super didReceiveMemoryWarning];
+  [super didReceiveMemoryWarning];
 }
 
-- (DFPhotoViewController *)currentPhotoViewController
+
+- (void)setActivePhoto:(DFPeanutFeedObject *)photo inPhotos:(NSArray *)photos
 {
-    return self.viewControllers.firstObject;
+  self.activePhoto = photo;
+  self.photos = photos;
+  [self showPhoto:photo];
 }
 
-- (void)pageViewController:(UIPageViewController *)pageViewController
-        didFinishAnimating:(BOOL)finished
-   previousViewControllers:(NSArray *)previousViewControllers
-       transitionCompleted:(BOOL)completed
+- (void)showPhoto:(DFPeanutFeedObject *)photo
 {
-  if (completed) {
-    [DFAnalytics logSwitchBetweenPhotos:DFAnalyticsActionTypeSwipe];
+  if (self.pageViewController) {
+    DFPhotoViewController *viewController = [[DFPhotoViewController alloc] init];
+    viewController.photo = photo;
+    [self.pageViewController setViewControllers:@[viewController]
+                                      direction:UIPageViewControllerNavigationDirectionForward
+                                       animated:NO
+                                     completion:nil];
   }
 }
-
 
 #pragma mark - DFMultiPhotoPageView datasource
 
@@ -99,7 +104,7 @@
     NSInteger currentPhotoIndex = [self photoIndexForViewController:viewController];
     if (currentPhotoIndex <= 0 || currentPhotoIndex == NSNotFound) return nil;
     
-    DFPhoto *photoBefore = self.photos[currentPhotoIndex - 1];
+    DFPeanutFeedObject *photoBefore = self.photos[currentPhotoIndex - 1];
     DFPhotoViewController *beforePVC = [[DFPhotoViewController alloc] init];
     beforePVC.photo = photoBefore;
     return beforePVC;
@@ -115,7 +120,7 @@
     NSInteger currentPhotoIndex = [self photoIndexForViewController:viewController];
     if (currentPhotoIndex >= self.photos.count - 1 || currentPhotoIndex == NSNotFound) return nil;
     
-    DFPhoto *photoAfter = self.photos[currentPhotoIndex + 1];
+    DFPeanutFeedObject *photoAfter = self.photos[currentPhotoIndex + 1];
     DFPhotoViewController *PVCAfter = [[DFPhotoViewController alloc] init];
     PVCAfter.photo = photoAfter;
     return PVCAfter;
@@ -128,13 +133,44 @@
 {
   if (self.photos) {
     DFPhotoViewController *currentPVC = (DFPhotoViewController *)viewController;
-    DFPhoto *photo = currentPVC.photo;
+    DFPeanutFeedObject *photo = currentPVC.photo;
     NSUInteger index = [self.photos indexOfObject:photo];
     return index;
   }
   
   return NSNotFound;
 }
+
+- (DFPhotoViewController *)currentPhotoViewController
+{
+  return self.pageViewController.viewControllers.firstObject;
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+willTransitionToViewControllers:(NSArray *)pendingViewControllers
+{
+  if (pendingViewControllers.count > 0) {
+    DFPhotoViewController *pvc = [pendingViewControllers firstObject];
+    self.view.backgroundColor = [DFMultiPhotoViewController
+                                 colorForTheatreModeEnabled:self.theatreModeEnabled];
+    pvc.view.backgroundColor = [DFMultiPhotoViewController
+                                colorForTheatreModeEnabled:self.theatreModeEnabled];
+  }
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+        didFinishAnimating:(BOOL)finished
+   previousViewControllers:(NSArray *)previousViewControllers
+       transitionCompleted:(BOOL)completed
+{
+  if (completed) {
+    [DFAnalytics logSwitchBetweenPhotos:DFAnalyticsActionTypeSwipe];
+    self.activePhoto =
+    self.photos[[self photoIndexForViewController:self.pageViewController.viewControllers.firstObject]];
+  }
+}
+
+#pragma mark - Support for Theatre Mode
 
 - (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled
 {
@@ -159,16 +195,8 @@
     [self.navigationController setNavigationBarHidden:theatreModeEnabled animated:animated];
     self.currentPhotoViewController.theatreModeEnabled = theatreModeEnabled;
     self.view.backgroundColor = [DFMultiPhotoViewController colorForTheatreModeEnabled:theatreModeEnabled];
+    self.pageViewController.view.backgroundColor = [DFMultiPhotoViewController colorForTheatreModeEnabled:theatreModeEnabled];
   }];
-}
-
-- (void)pageViewController:(UIPageViewController *)pageViewController willTransitionToViewControllers:(NSArray *)pendingViewControllers
-{
-  if (pendingViewControllers.count > 0) {
-    DFPhotoViewController *pvc = [pendingViewControllers firstObject];
-    pvc.view.backgroundColor = [DFMultiPhotoViewController
-                                colorForTheatreModeEnabled:self.theatreModeEnabled];
-  }
 }
 
 + (UIColor *)colorForTheatreModeEnabled:(BOOL)theatreModeEnabled
@@ -180,6 +208,17 @@
   }
 }
 
+#pragma mark - Actions
+
+- (void)backPressed:(id)sender
+{
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+#pragma mark - Status Bar Hiding
+
+
 - (BOOL)prefersStatusBarHidden
 {
   return self.hideStatusBar;
@@ -190,46 +229,6 @@
   if (hideStatusBar != _hideStatusBar) {
     _hideStatusBar = hideStatusBar;
     [self setNeedsStatusBarAppearanceUpdate];
-  }
-}
-
-- (void)actionButtonClicked:(id)sender
-{
-  [self.currentPhotoViewController showPhotoActions:sender];
-}
-
-- (void)activePhotoDeleted
-{
-  // If the root view contorller is the gallery, pop back to the gallery
-  //UIViewController *rootViewController = self.navigationController.viewControllers.firstObject;
-  
-  
-  // Otherwise, if the root view controller is the multi photo view controller, this is
-  // The last photo view, so move the the most recent other photo taken or pop back to camera.
-  
-  DFPhoto *photo = self.currentPhotoViewController.photo;
-  UIViewController *previousViewController = [self.dataSource pageViewController:self viewControllerBeforeViewController:self.currentPhotoViewController];
-  UIViewController *nextViewController = [self.dataSource
-                                          pageViewController:self
-                                          viewControllerAfterViewController:self.currentPhotoViewController];
-  if (previousViewController) {
-    [self setViewControllers:@[previousViewController]
-                   direction:UIPageViewControllerNavigationDirectionReverse
-                    animated:YES
-                  completion:nil];
-  } else if (nextViewController) {
-    [self setViewControllers:@[nextViewController]
-                   direction:UIPageViewControllerNavigationDirectionForward
-                    animated:YES
-                  completion:nil];
-  } else {
-      [self.navigationController dismissViewControllerAnimated:YES completion:nil];
-  }
-  
-  if (self.photos) {
-    NSMutableArray *mutablePhotos = self.photos.mutableCopy;
-    [mutablePhotos removeObject:photo];
-    self.photos = mutablePhotos;
   }
 }
 

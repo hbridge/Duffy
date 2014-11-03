@@ -16,6 +16,9 @@
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
     selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects;
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
+         feedObjectLongpressed:(DFPeanutFeedObject *)feedObject
+                     inSection:(NSUInteger)section;
 
 @end
 
@@ -29,6 +32,7 @@
 
 - (NSArray *)selectedPhotoIDs;
 - (void)toggleSectionSelection:(NSUInteger)section;
+- (void)toggleObjectSelected:(DFPeanutFeedObject *)object;
 - (NSSet *)selectedItemsFromSection:(NSUInteger)section;
 - (NSArray *)collectionFeedObjectsWithSelectedObjects;
 

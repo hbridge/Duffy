@@ -8,31 +8,16 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPhotoView.h"
-#import "DFPhoto.h"
-
-@class DFPhoto;
+#import "DFPeanutFeedObject.h"
 
 @interface DFPhotoViewController : UIViewController <UIActionSheetDelegate, UIAlertViewDelegate>
 
-@property (strong, nonatomic) DFPhoto *photo;
-@property (strong, nonatomic) NSURL *photoURL;
-@property (readonly) DFPhotoIDType photoID;
+@property (strong, nonatomic) DFPeanutFeedObject *photo;
 @property (strong, nonatomic) NSIndexPath *indexPathInParent;
-@property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
-@property (readonly, nonatomic) BOOL isUserFavorited;
-@property (nonatomic, retain) NSMutableArray *favoritedOtherUserNames;
-@property (strong, nonatomic) UIButton *favoriteButton;
-@property (strong, nonatomic)  UIBarButtonItem *trashButton;
-
 @property (weak, nonatomic) IBOutlet DFPhotoView *photoView;
-@property (nonatomic, retain) NSArray *photoActions;
 
 @property (nonatomic) BOOL theatreModeEnabled;
 
 - (IBAction)imageTapped:(id)sender;
-- (void)showShareActivity;
-- (void)showPhotoActions:(id)sender;
-- (IBAction)deleteButtonPressed:(UIBarButtonItem *)sender;
-- (IBAction)favoriteButtonPressed:(UIBarButtonItem *)sender;
 
 @end

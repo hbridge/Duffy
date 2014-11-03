@@ -19,6 +19,15 @@
   self.contentView.translatesAutoresizingMaskIntoConstraints = YES;
   
   self.countView.backgroundColor = [DFStrandConstants photoCellBadgeColor];
+  [self setupLongPress];
+}
+
+- (void)setupLongPress
+{
+  UILongPressGestureRecognizer *longpressRecognizer
+  = [[UILongPressGestureRecognizer alloc]
+     initWithTarget:self action:@selector(selectPhotoCellLongPressed:)];
+  [self.selectPhotoButton addGestureRecognizer:longpressRecognizer];
 }
 
 - (void)setCount:(NSUInteger)count
@@ -47,5 +56,16 @@
   if (self.delegate)
     [self.delegate cell:self selectPhotoButtonPressed:sender];
 }
+
+- (void)selectPhotoCellLongPressed:(UILongPressGestureRecognizer *)sender {
+  if (sender.state == UIGestureRecognizerStateBegan) {
+    DDLogVerbose(@"Cell longpressed");
+    if ([self.delegate respondsToSelector:@selector(cellLongpressed:)]) {
+      [self.delegate cellLongpressed:self];
+    }
+  }
+  
+}
+
 
 @end

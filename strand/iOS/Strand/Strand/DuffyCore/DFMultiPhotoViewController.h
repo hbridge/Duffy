@@ -7,19 +7,23 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFPeanutFeedObject.h"
+#import "DFNavigationController.h"
 
 @class DFPhotoViewController;
-@class DFPhoto;
 
-@interface DFMultiPhotoViewController : UIPageViewController <UIPageViewControllerDelegate,
+
+@interface DFMultiPhotoViewController : DFNavigationController <UIPageViewControllerDelegate,
 UIPageViewControllerDataSource>
 
+@property (nonatomic, retain) UIPageViewController *pageViewController;
+@property (nonatomic, retain) DFPeanutFeedObject *activePhoto;
 @property (readonly, nonatomic, retain) DFPhotoViewController *currentPhotoViewController;
 @property (nonatomic) BOOL theatreModeEnabled;
 
 
-- (void)setActivePhoto:(DFPhoto *)photo inPhotos:(NSArray *)photos;
-- (void)activePhotoDeleted;
+
+- (void)setActivePhoto:(DFPeanutFeedObject *)photo inPhotos:(NSArray *)photos;
 
 - (void)setTheatreModeEnabled:(BOOL)theatreModeEnabled animated:(BOOL)animated;
 + (UIColor *)colorForTheatreModeEnabled:(BOOL)theatreModeEnabled;

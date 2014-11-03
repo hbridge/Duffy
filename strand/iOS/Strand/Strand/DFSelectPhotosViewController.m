@@ -28,6 +28,8 @@
 #import "DFAnalytics.h"
 #import "DFPhotoViewCell.h"
 #import "DFPhotoPickerHeaderReusableView.h"
+#import "DFSelectableMultiPhotoViewController.h"
+
 
 const CGFloat CreateCellWithTitleHeight = 192;
 const CGFloat CreateCellTitleHeight = 20;
@@ -405,5 +407,18 @@ referenceSizeForHeaderInSection:(NSInteger)section
   [self.delegate selectPhotosViewController:self
               didFinishSelectingFeedObjects:selectPhotosController.selectedFeedObjects];
 }
+
+- (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController feedObjectLongpressed:(DFPeanutFeedObject *)feedObject inSection:(NSUInteger)section
+{
+  DFPeanutFeedObject *photoObject = [[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]
+                                     firstObject];
+  
+  DFSelectableMultiPhotoViewController *mpvc = [[DFSelectableMultiPhotoViewController alloc]
+                                                initWithActivePhoto:photoObject
+                                                inSection:section
+                                                ofSelectPhotosController:self.selectPhotosController];
+  [self presentViewController:mpvc animated:YES completion:nil];
+}
+
 
 @end

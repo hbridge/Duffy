@@ -15,6 +15,7 @@
 @protocol DFSelectablePhotoViewCellDelegate <NSObject>
 
 - (void)cell:(DFSelectablePhotoViewCell *)cell selectPhotoButtonPressed:(UIButton *)selectPhotoButton;
+- (void)cellLongpressed:(DFSelectablePhotoViewCell *)cell;
 
 @end
 
@@ -29,5 +30,6 @@
 
 
 - (IBAction)selectPhotoButtonPressed:(UIButton *)sender;
+- (void)selectPhotoCellLongPressed:(UILongPressGestureRecognizer *)sender;
 
 @end

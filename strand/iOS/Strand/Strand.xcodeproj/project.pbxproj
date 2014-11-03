@@ -163,6 +163,7 @@
 		5AB7BEC51A042081000BEB67 /* DFInviteFriendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB7BEC41A042081000BEB67 /* DFInviteFriendViewController.m */; };
 		5AB7BEC91A042A41000BEB67 /* DFActionButtonTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB7BEC71A042A41000BEB67 /* DFActionButtonTableViewCell.m */; };
 		5AB7BECA1A042A41000BEB67 /* DFActionButtonTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AB7BEC81A042A41000BEB67 /* DFActionButtonTableViewCell.xib */; };
+		5AB7CB051A0820690047F72B /* DFSelectableMultiPhotoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB7CB041A0820690047F72B /* DFSelectableMultiPhotoViewController.m */; };
 		5ABE5E9A19F570CC009BADC4 /* DFSeenStateManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ABE5E9919F570CC009BADC4 /* DFSeenStateManager.m */; };
 		5AC4A8D119476F9000862D9C /* Assets in Resources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D019476F9000862D9C /* Assets */; };
 		5AC4A8D91947B01100862D9C /* DFLogConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AC4A8D81947B01100862D9C /* DFLogConfig.m */; };
@@ -525,6 +526,8 @@
 		5AB7BEC61A042A41000BEB67 /* DFActionButtonTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFActionButtonTableViewCell.h; sourceTree = "<group>"; };
 		5AB7BEC71A042A41000BEB67 /* DFActionButtonTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFActionButtonTableViewCell.m; sourceTree = "<group>"; };
 		5AB7BEC81A042A41000BEB67 /* DFActionButtonTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFActionButtonTableViewCell.xib; sourceTree = "<group>"; };
+		5AB7CB031A0820690047F72B /* DFSelectableMultiPhotoViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSelectableMultiPhotoViewController.h; sourceTree = "<group>"; };
+		5AB7CB041A0820690047F72B /* DFSelectableMultiPhotoViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSelectableMultiPhotoViewController.m; sourceTree = "<group>"; };
 		5ABE5E9819F570CC009BADC4 /* DFSeenStateManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSeenStateManager.h; sourceTree = "<group>"; };
 		5ABE5E9919F570CC009BADC4 /* DFSeenStateManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSeenStateManager.m; sourceTree = "<group>"; };
 		5AC4A8D019476F9000862D9C /* Assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Assets; sourceTree = "<group>"; };
@@ -882,6 +885,8 @@
 			children = (
 				5A02CE9C194F70E200C4EBA6 /* DFMultiPhotoViewController.h */,
 				5A02CE9D194F70E200C4EBA6 /* DFMultiPhotoViewController.m */,
+				5AB7CB031A0820690047F72B /* DFSelectableMultiPhotoViewController.h */,
+				5AB7CB041A0820690047F72B /* DFSelectableMultiPhotoViewController.m */,
 				5A02CEA4194F711700C4EBA6 /* DFPhotoView.h */,
 				5A02CEA5194F711700C4EBA6 /* DFPhotoView.m */,
 				5A02CE9F194F70FE00C4EBA6 /* DFPhotoViewController.h */,
@@ -1882,6 +1887,7 @@
 				5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */,
 				5A4C821219EDC82100C22A12 /* DFSelectSuggestionsViewController.m in Sources */,
 				5A9BC31F19A2A77F002D1CD7 /* DFContactsStore.m in Sources */,
+				5AB7CB051A0820690047F72B /* DFSelectableMultiPhotoViewController.m in Sources */,
 				5AA45297196708D00099CBD2 /* DFPhotoStackCell.m in Sources */,
 				5AB7BEC11A028C20000BEB67 /* DFSwapTableViewCell.m in Sources */,
 				5A9BC32219A2AA64002D1CD7 /* DFContactsModel.xcdatamodeld in Sources */,

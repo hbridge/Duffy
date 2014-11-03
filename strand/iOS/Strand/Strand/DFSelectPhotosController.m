@@ -62,6 +62,16 @@
   [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
 }
 
+- (void)toggleObjectSelected:(DFPeanutFeedObject *)object
+{
+  if ([self.selectedFeedObjects containsObject:object]) {
+    [self.selectedFeedObjects removeObject:object];
+  } else {
+    [self.selectedFeedObjects addObject:object];
+  }
+  [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
+}
+
 - (NSSet *)selectedItemsFromSection:(NSUInteger)section
 {
   NSMutableSet *sectionObjects = [NSMutableSet setWithArray:[self feedObjectsForSection:section]];
@@ -92,19 +102,13 @@
   cell.delegate = self;
   DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
   DFPeanutFeedObject *photoObject;
-  if ([feedObject.type isEqual:DFFeedObjectCluster]) {
-    photoObject = feedObject.objects.firstObject;
-    cell.count = feedObject.objects.count;
-  } else if ([feedObject.type isEqualToString:DFFeedObjectPhoto]) {
-    photoObject = feedObject;
-    cell.count = 0;
-  } else {
-    photoObject = nil;
-  }
+  NSArray *photos = [feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  photoObject = [photos firstObject];
+  cell.count = (photos.count > 1) ? photos.count : 0;
   
   [self setImageForCell:cell photoObject:photoObject indexPath:indexPath];
-  
-  cell.showTickMark = [self.selectedFeedObjects containsObject:feedObject];
+  NSSet *selectedSet = [NSSet setWithArray:self.selectedFeedObjects];
+  cell.showTickMark = [selectedSet intersectsSet:[NSSet setWithArray:photos]];
   
   return cell;
 }
@@ -129,23 +133,33 @@
 
 const NSUInteger MaxSharedPhotosDisplayed = 3;
 
+#pragma mark - DFSelectablePhotoViewCell Delegate
 
 - (void)cell:(DFSelectablePhotoViewCell *)cell selectPhotoButtonPressed:(UIButton *)selectPhotoButton
 {
   NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
   DFPeanutFeedObject *object = [self feedObjectForIndexPath:indexPath];
+  NSArray *objectsToSelect = [object leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  
   if (selectPhotoButton.selected) {
-    [self.selectedFeedObjects removeObject:object];
+    [self.selectedFeedObjects removeObjectsInArray:objectsToSelect];
     selectPhotoButton.selected = NO;
   } else {
-    [self.selectedFeedObjects addObject:object];
+    [self.selectedFeedObjects addObjectsFromArray:objectsToSelect];
     selectPhotoButton.selected = YES;
   }
   
   [self.delegate selectPhotosController:self selectedFeedObjectsChanged:self.selectedFeedObjects];
 }
 
-
+- (void)cellLongpressed:(DFSelectablePhotoViewCell *)cell
+{
+  NSIndexPath *indexPath = [self.collectionView indexPathForCell:cell];
+  DFPeanutFeedObject *object = [self feedObjectForIndexPath:indexPath];
+  
+  if ([self.delegate respondsToSelector:@selector(selectPhotosController:feedObjectLongpressed:inSection:)])
+    [self.delegate selectPhotosController:self feedObjectLongpressed:object inSection:indexPath.section];
+}
 
 
 @end
