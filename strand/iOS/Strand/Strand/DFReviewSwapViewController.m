@@ -29,7 +29,9 @@
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
 
-- (instancetype)initWithSuggestions:(NSArray *)suggestedSections invite:(DFPeanutFeedObject *)invite swapSuccessful:(void(^)(void))swapSuccessful
+- (instancetype)initWithSuggestions:(NSArray *)suggestedSections
+                             invite:(DFPeanutFeedObject *)invite
+                     swapSuccessful:(void(^)(void))swapSuccessful
 {
   self = [self initWithSuggestions:suggestedSections];
   if (self) {

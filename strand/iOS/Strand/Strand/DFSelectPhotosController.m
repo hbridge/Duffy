@@ -22,7 +22,11 @@
 {
   self = [super initWithFeedPhotos:feedObjects collectionView:collectionView];
   if (self) {
-    _selectedFeedObjects = [feedObjects mutableCopy];
+    
+    _selectedFeedObjects = [NSMutableArray new];
+    for (DFPeanutFeedObject *feedObject in feedObjects) {
+      [_selectedFeedObjects addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+    }
     [self.collectionView registerNib:[UINib nibForClass:[DFSelectablePhotoViewCell class]]
           forCellWithReuseIdentifier:@"selectableCell"];
   }

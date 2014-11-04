@@ -56,27 +56,8 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 
 - (IBAction)selectAllButtonPressed:(UIButton *)sender {
   // if everything's selected, deselect all
-  NSString *newTitle;
-  BOOL showTickMark;
-  
-  if (self.selectPhotosController.selectedFeedObjects.count == self.items.count) {
-    [self.selectPhotosController.selectedFeedObjects removeAllObjects];
-    newTitle = @"Select All";
-    showTickMark = NO;
-  } else {
-    [self.selectPhotosController.selectedFeedObjects removeAllObjects];
-    newTitle = @"Deselect All";
-    showTickMark = YES;
-    [self.selectPhotosController.selectedFeedObjects addObjectsFromArray:self.items];
-  }
-  
-  for (DFSelectablePhotoViewCell *cell in self.collectionView.visibleCells) {
-    cell.showTickMark = showTickMark;
-    [cell setNeedsLayout];
-  }
-  [self.selectAllButton setTitle:newTitle forState:UIControlStateNormal];
-  [self configureNavTitle];
-  [self configureDoneButtonText];
+
+  [self.selectPhotosController toggleSectionSelection:0];
 }
 
 - (BOOL)hidesBottomBarWhenPushed
@@ -154,8 +135,21 @@ NSUInteger const DefaultNumSuggestedPhotosPerRow = 4;
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
     selectedFeedObjectsChanged:(NSArray *)newSelectedFeedObjects
 {
+  [self configureSelectAllButtonText];
   [self configureNavTitle];
   [self configureDoneButtonText];
+  if (self.presentedViewController) {
+    [self.collectionView reloadData];
+  }
+}
+
+- (void)configureSelectAllButtonText
+{
+  if (self.selectPhotosController.selectedFeedObjects.count == 0) {
+    [self.selectAllButton setTitle:@"Select All" forState:UIControlStateNormal];
+  } else {
+    [self.selectAllButton setTitle:@"Deselect All" forState:UIControlStateNormal];
+  }
 }
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController
