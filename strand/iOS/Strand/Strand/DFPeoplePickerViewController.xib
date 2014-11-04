@@ -32,7 +32,8 @@
                     <rect key="frame" x="0.0" y="546" width="600" height="54"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T24-ju-et9" customClass="DFActionButton">
-                            <rect key="frame" x="150" y="12" width="300" height="30"/>
+                            <rect key="frame" x="150" y="8" width="300" height="38"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             <state key="normal" title="Done">
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>

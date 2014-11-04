@@ -36,6 +36,7 @@
 #import "DFStrandPeopleBarView.h"
 #import "SVProgressHUD.h"
 #import "DFImageManager.h"
+#import "DFStrandPeopleViewController.h"
 
 // Uploading cell
 const CGFloat UploadingCellVerticalMargin = 10.0;
@@ -156,7 +157,7 @@ const CGFloat LockedCellHeight = 157.0;
  */
 - (void)reloadData
 {
-  DDLogVerbose(@"Told to reload my data...");
+  DDLogVerbose(@"%@ told to reload my data...", self.class);
   if (self.inviteObject) {
     // We might not have the invite in the feed yet (might have come through notification
     //   So if that happens, don't overwrite our current one which has the id
@@ -225,7 +226,7 @@ const CGFloat LockedCellHeight = 157.0;
      initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
      style:UIBarButtonItemStylePlain
      target:self
-     action:@selector(inviteButtonPressed:)],
+     action:@selector(peopleButtonPressed:)],
     ];
 }
 
@@ -255,7 +256,6 @@ const CGFloat LockedCellHeight = 157.0;
   [self configureTitleView];
   [self configureTableView];
   [self configureUpsell];
-  [self configurePeopleBar];
 }
 
 - (void)configureTitleView
@@ -297,33 +297,6 @@ const CGFloat LockedCellHeight = 157.0;
   self.tableView.rowHeight = MinRowHeight;
 
 }
-
-- (void)configurePeopleBar
-{
-//  if (!self.peopleBar) {
-//    self.peopleBar = [UINib instantiateViewWithClass:[DFStrandPeopleBarView class]];
-//    [self.view addSubview:self.peopleBar];
-//    [self.view addConstraints:[NSLayoutConstraint
-//                               constraintsWithVisualFormat:@"|-0-[peopleBar]-0-|"
-//                               options:NSLayoutFormatDirectionLeftToRight
-//                               metrics:nil
-//                               views:@{@"peopleBar" : self.peopleBar}]];
-//    [self.view addConstraints:[NSLayoutConstraint
-//                               constraintsWithVisualFormat:@"V:|-0-[peopleBar]-0-[tableView]"
-//                               options:NSLayoutFormatDirectionLeftToRight
-//                               metrics:nil
-//                               views:@{@"peopleBar" : self.peopleBar,
-//                                       @"tableView" : self.tableView
-//                                       }]];
-//  }
-//  self.peopleBar.frame = CGRectMake(0,
-//                                    0,
-//                                    [[UIScreen mainScreen] bounds].size.width ,
-//                                    20);
-//  
-//    [self.peopleBar configureWithStrandPostsObject:self.postsObject];
-}
-
 - (void)configureUpsell
 {
   if (self.inviteObject) {
@@ -348,7 +321,8 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (void)configureUpsellHeight
 {
-  CGFloat swapUpsellHeight = MIN(self.view.frame.size.height * .7 + self.tableView.contentOffset.y, self.tableView.frame.size.height);
+  CGFloat swapUpsellHeight = MIN(self.view.frame.size.height * .7 + self.tableView.contentOffset.y,
+                                 self.tableView.frame.size.height);
   swapUpsellHeight = MAX(swapUpsellHeight, DFUpsellMinHeight);
   self.swapUpsellView.frame = CGRectMake(0,
                                          self.view.frame.size.height - swapUpsellHeight,
@@ -366,19 +340,20 @@ const CGFloat LockedCellHeight = 157.0;
   self.isViewTransitioning = YES;
   [super viewWillAppear:animated];
   [self configureUpsell];
-  [self configurePeopleBar];
   
   if (self.inviteObject && (!self.inviteObject.ready || [self.inviteObject.ready isEqual:@(NO)])) {
-    DDLogVerbose(@"Invite not ready, setting up timer...");
+    DDLogVerbose(@"%@ Invite not ready, setting up timer...", self.class);
     self.refreshTimer = [NSTimer scheduledTimerWithTimeInterval:.5
                                                          target:self
                                                        selector:@selector(refreshFromServer)
                                                        userInfo:nil
                                                         repeats:YES];
   } else {
-    DDLogVerbose(@"Showing view but I think that I don't need a timer %@   %@", self.inviteObject, self.inviteObject.ready);
+    DDLogVerbose(@"%@ showing view but I think that I don't need a timer %@  %@",
+                 self.class,
+                 self.inviteObject,
+                 self.inviteObject.ready);
   }
-  
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -416,7 +391,6 @@ const CGFloat LockedCellHeight = 157.0;
 {
   [super viewDidLayoutSubviews];
   [self configureUpsell];
-  [self configurePeopleBar];
 }
 
 - (void)setPostsObject:(DFPeanutFeedObject *)strandPostsObject
@@ -431,6 +405,10 @@ const CGFloat LockedCellHeight = 157.0;
     }
     self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
                                                                       abbreviate:NO];
+    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                             initWithTitle:@""
+                                             style:UIBarButtonItemStylePlain target:nil action:nil];
+
     
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
@@ -1039,20 +1017,11 @@ selectedObjectChanged:(id)newObject
 }
 
 
-- (void)inviteButtonPressed:(id)sender
+- (void)peopleButtonPressed:(id)sender
 {
-  NSArray *contactsArray = [self.postsObject.actors arrayByMappingObjectsWithBlock:^id(DFPeanutUserObject *user) {
-    return [[DFPeanutContact alloc] initWithPeanutUser:user];
-  }];
-  DFInviteStrandViewController *vc = [[DFInviteStrandViewController alloc]
-                                      initWithSuggestedPeanutContacts:nil
-                                      notSelectablePeanutContacts:contactsArray
-                                      notSelectableReason:@"Already Member"];
-  vc.sectionObject = self.postsObject;
-  [self presentViewController:[[DFNavigationController alloc] initWithRootViewController:vc]
-                     animated:YES
-                   completion:nil];
-  
+  DFStrandPeopleViewController *peopleViewController = [[DFStrandPeopleViewController alloc]
+                                                        initWithStrandPostsObject:self.postsObject];
+  [self.navigationController pushViewController:peopleViewController animated:YES];
 }
 
 - (void)addPhotosButtonPressed:(id)sender

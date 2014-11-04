@@ -31,6 +31,13 @@
   return self;
 }
 
+- (void)setDelegate:(NSObject<DFPeoplePickerDelegate> *)delegate
+{
+  if (delegate != self) [NSException raise:@"Not supported"
+                                    format:@"DFInviteStrandViewController must be its own peoplePickerDelegate"];
+  [super setDelegate:delegate];
+}
+
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
