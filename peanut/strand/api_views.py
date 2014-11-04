@@ -297,7 +297,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			photos = filter(lambda x: x.install_num >= 0, photos)
 			
 			if len(photos) == 0:
-				logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
+				logger.warning("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
+				strand.delete()
 				continue
 			
 			interestedUsers = list()
