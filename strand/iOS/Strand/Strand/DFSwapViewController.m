@@ -21,6 +21,7 @@
 #import "DFNoResultsTableViewCell.h"
 #import "DFImageManager.h"
 #import "UIView+DFExtensions.h"
+#import "DFPushNotificationsManager.h"
 
 @interface DFSwapViewController ()
 
@@ -87,7 +88,6 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)viewDidLoad {
   [super viewDidLoad];
-  DDLogVerbose(@"%@ viewDidLoad", self.class);
     // Do any additional setup after loading the view from its nib.
   [self configureTableView:self.tableView];
   [self configureRefreshControl];
@@ -99,14 +99,16 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   [self reloadData];
   [self.refreshControl endRefreshing];
   [self refreshFromServer];
-  DDLogVerbose(@"view will appear");
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
-  DDLogVerbose(@"View did appear");
+  if ([[[DFPeanutFeedDataManager sharedManager] acceptedStrands] count] > 0) {
+    // if user has any accepted strands and we haven't prompted for push notifs, do so now
+    [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
+  }
 }
 
 - (void)viewDidDisappear:(BOOL)animated

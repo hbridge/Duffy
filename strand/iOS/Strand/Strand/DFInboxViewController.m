@@ -111,14 +111,6 @@
     [self refreshFromServer];
   }
   
-  // prompt for push notifs in inbox if there are any accepted invites in the inbox
-  for (DFPeanutFeedObject *object in self.feedObjects) {
-    if ([object.type isEqual:DFFeedObjectStrandPosts]) {
-      [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
-      break;
-    }
-  }
-  
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
