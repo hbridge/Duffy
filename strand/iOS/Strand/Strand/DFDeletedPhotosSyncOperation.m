@@ -10,9 +10,9 @@
 
 #import "DFPeanutPhotoAdapter.h"
 
-#import "DFImageManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutPhoto.h"
+#import "DFPhotoStore.h"
 
 @interface DFDeletedPhotosSyncOperation ()
 @property (readonly, nonatomic, retain) DFPeanutPhotoAdapter *photoAdapter;
@@ -31,22 +31,25 @@
       [self cancelled];
       return;
     }
+    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
     
-    DFImageManager *imageManager = [DFImageManager sharedManager];
     // Grab list of private images the server has handed us
     NSArray *privatePhotos = [[DFPeanutFeedDataManager sharedManager] privatePhotos];
+    NSMutableArray *photoIds = [NSMutableArray new];
     NSMutableArray *photoIdsToRemove = [NSMutableArray new];
     
     DDLogInfo(@"For delete sync, evaling %lu photos", (unsigned long)privatePhotos.count);
     // For each image, see if we can get bytes for it from the ImageManager
     for (DFPeanutFeedObject *photo in privatePhotos) {
-      [imageManager imageForID:photo.id preferredType:DFImageThumbnail completion:^(UIImage *image) {
-        if (!image) {
-          DDLogInfo(@"For delete sync, did not find photo data for photo id %llu", photo.id);
-          
-          [photoIdsToRemove addObject:@(photo.id)];
-        }
-      }];
+      [photoIds addObject:@(photo.id)];
+    }
+    
+    NSDictionary *photosThatExist = [DFPhotoStore photosWithPhotoIDs:photoIds inContext:context];
+    
+    for (NSNumber *photoId in photoIds) {
+      if (![photosThatExist objectForKey:photoId]) {
+        [photoIdsToRemove addObject:photoId];
+      }
     }
     
     if (self.isCancelled) {
@@ -65,6 +68,7 @@
         DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
       }];
     }
+    DDLogInfo(@"Delete sync completed");
   }
 }
 

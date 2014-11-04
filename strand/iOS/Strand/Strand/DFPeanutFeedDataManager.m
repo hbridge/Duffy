@@ -82,6 +82,7 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (void)refreshFromServer
 {
+  DDLogVerbose(@"Refreshing all my feeds...");
   [self refreshInboxFromServer:nil];
   [self refreshSwapsFromServer:nil];
   [self refreshPrivatePhotosFromServer:nil];
@@ -103,6 +104,8 @@ static DFPeanutFeedDataManager *defaultManager;
        if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
          self.inboxLastResponseHash = responseHash;
          self.inboxFeedObjects = response.objects;
+         
+         DDLogInfo(@"Got new inbox data, sending notification.");
          
          [[NSNotificationCenter defaultCenter]
           postNotificationName:DFStrandNewInboxDataNotificationName
@@ -132,7 +135,7 @@ static DFPeanutFeedDataManager *defaultManager;
          self.swapsLastResponseHash = responseHash;
          self.swapsFeedObjects = response.objects;
          
-         DDLogVerbose(@"Got new swaps data, sending notification.");
+         DDLogInfo(@"Got new swaps data, sending notification.");
          
          [[NSNotificationCenter defaultCenter]
           postNotificationName:DFStrandNewSwapsDataNotificationName
@@ -162,6 +165,7 @@ static DFPeanutFeedDataManager *defaultManager;
          self.privateStrandsLastResponseHash = responseHash;
          self.privateStrandsFeedObjects = response.objects;
          
+         DDLogVerbose(@"Got new private data, sending notification.");
          [[NSNotificationCenter defaultCenter]
           postNotificationName:DFStrandNewPrivatePhotosDataNotificationName
           object:self];

@@ -58,6 +58,7 @@
                                                name:DFStrandNewPrivatePhotosDataNotificationName
                                              object:nil];
   [self refreshFromServer];
+  [self reloadData];
   
 }
 
