@@ -85,7 +85,7 @@
 	<div class='top-summary'>
 
 	<div class='top-table'>
-		<div class='ui-header center'> Totals </div>
+		<div class='ui-header center'> Counts </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row' >
 				<td class='col1 right b-r'> Users </td>
@@ -114,6 +114,36 @@
 
 		</table>
 	</div>				
+	<div class='top-table'>
+		<div class='ui-header center'> Stats </div>
+		<table class='ui-table' cellpadding='3'>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Friends/User </td>
+				<td class='counts'> {{ statsCounts.friendsPerUser|floatformat:1 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Strands/User </td>
+				<td class='counts'> {{ statsCounts.strandsPerUser|floatformat:1 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Requests/User </td>
+				<td class='counts'> {{ statsCounts.invitesPerUser|floatformat:1 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Photos (shared)/User </td>
+				<td class='counts'> {{ statsCounts.photosSharedPerUser|floatformat:1 }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Photos (metadata)/user </td>
+				<td class='counts'> {{ statsCounts.photosMetadataPerUser|floatformat:0  }} </td>
+			</tr>
+			<tr class='ui-row' >
+				<td class='col1 right b-r'> Shared </td>
+				<td class='counts'> {{ statsCounts.percentPhotosShared|floatformat:1 }}% </td>
+			</tr>
+
+		</table>
+	</div>					
 	<div class='top-table'>
 		<div class='ui-header center'> Strand.photos </div>
 		<table class='ui-table' cellpadding='3'>

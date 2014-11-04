@@ -267,11 +267,20 @@ def userbaseSummary(request):
 	peopleCounts['friends'] = peopleCounts['friends']/2 #dividing by two to count relationships
 	peopleCounts['all'] = len(strandV2List)
 
+	statsCounts = dict()
+	statsCounts['friendsPerUser'] = float(peopleCounts['friends'])/float(peopleCounts['all'])
+	statsCounts['strandsPerUser'] = float(strandCounts['all'])/float(peopleCounts['all'])
+	statsCounts['invitesPerUser'] = float(inviteCounts['all'])/float(peopleCounts['all'])
+	statsCounts['photosSharedPerUser'] = float(peopleCounts['photosShared'])/float(peopleCounts['all'])
+	statsCounts['photosMetadataPerUser'] = float(peopleCounts['photosMetadata'])/float(peopleCounts['all'])
+	statsCounts['percentPhotosShared'] = float(peopleCounts['photosShared'])/float(peopleCounts['photosMetadata'])*100.0
+
 	context = {	'strandV2List': strandV2List,
 				'strandCounts': strandCounts,
 				'userCounts': userCounts,
 				'inviteCounts': inviteCounts,
-				'peopleCounts': peopleCounts}
+				'peopleCounts': peopleCounts,
+				'statsCounts': statsCounts}
 
 	return render(request, 'admin/userbaseSummary.html', context)
 
