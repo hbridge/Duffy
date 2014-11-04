@@ -1,5 +1,9 @@
 # Swap
 
+## Nov 4, 2014 (4783)
+
+- Fix asking for push notifs on startup
+
 ## Nov 3, 2014 (4782)
 
 - When you're selecting photos to share, long-press on a photo to see a larger version of it
