@@ -61,9 +61,10 @@
         for (DFPeanutPhoto *photo in resultObjects) {
           DDLogInfo(@"Successfully marked photo %@ as not in the system", photo.id);
         }
-        [[NSNotificationCenter defaultCenter]
-         postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
-         object:self];
+        // Lastly, we want to refresh our private data.
+        [[DFPeanutFeedDataManager sharedManager] refreshPrivatePhotosFromServer:^{
+          DDLogVerbose(@"Refreshed private photos data after successful delete");
+        }];
       } failure:^(NSError *error){
         DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
       }];
