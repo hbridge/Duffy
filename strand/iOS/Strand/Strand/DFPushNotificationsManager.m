@@ -94,7 +94,7 @@
     UIUserNotificationSettings *settings = [[UIApplication sharedApplication]
                                             currentUserNotificationSettings];
     [DFDefaultsStore setLastUserNotificationType:settings.types];
-    if (settings != UIUserNotificationTypeNone) notifsEnabled = YES;
+    if (settings.types != UIUserNotificationTypeNone) notifsEnabled = YES;
   } else {
     UIRemoteNotificationType notifTypes = [[UIApplication sharedApplication] enabledRemoteNotificationTypes];
     [DFDefaultsStore setLastNotificationType:notifTypes];
