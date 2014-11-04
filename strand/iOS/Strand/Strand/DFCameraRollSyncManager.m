@@ -13,12 +13,13 @@
 #import "DFCameraRollSyncOperation.h"
 #import "DFIOS7CameraRollSyncOperation.h"
 #import "DFIOS8CameraRollSyncOperation.h"
-
+#import "DFDeletedPhotosSyncOperation.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFCameraRollSyncManager()
 
 @property (nonatomic, retain) NSOperationQueue *syncOperationQueue;
-
+@property (nonatomic) BOOL shouldRunDeleteSync;
 @end
 
 @implementation DFCameraRollSyncManager
@@ -46,8 +47,38 @@ static DFCameraRollSyncManager *defaultSyncController;
     if (self) {
       self.syncOperationQueue = [[NSOperationQueue alloc] init];
       self.syncOperationQueue.maxConcurrentOperationCount = 1;
+      [self observeNotifications];
     }
     return self;
+}
+
+
+- (void)observeNotifications
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(deletedPhotoSync)
+                                               name:DFStrandNewPrivatePhotosDataNotificationName
+                                             object:nil];
+}
+
+/*
+ * This is called when we come into the app and there now could be photos missing from our camera roll.
+ * Maybe the user left the app and deleted something.
+ * So run the deleted photo sync code.  But, we also might not have private data loaded up yet.  If thats the case
+ * say that things haven't run yet and it should, and the listener should kick it off
+ */
+- (void)deletedPhotoSync
+{
+  DDLogVerbose(@"Starting deleted photo sync");
+  
+  if ([[DFPeanutFeedDataManager sharedManager] hasPrivateStrandData]) {
+    DFDeletedPhotosSyncOperation *operation = [DFDeletedPhotosSyncOperation new];
+    operation.threadPriority = 0.1; // very low, .5 is default
+    [self.syncOperationQueue addOperation:operation];
+    self.shouldRunDeleteSync = NO;
+  } else {
+    self.shouldRunDeleteSync = YES;
+  }
 }
 
 - (void)sync

@@ -32,6 +32,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)inviteStrands;
 - (NSArray *)acceptedStrands;
 - (NSArray *)privateStrands;
+- (NSArray *)privatePhotos;
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
 - (NSArray *)remotePhotos;
 - (NSArray *)suggestedStrands;

@@ -294,12 +294,14 @@ void (^_completionHandler)(UIBackgroundFetchResult);
         } promptUserIfNecessary:NO];
       });
       [[DFCameraRollSyncManager sharedManager] sync];
+      [[DFCameraRollSyncManager sharedManager] deletedPhotoSync];
       [[DFContactSyncManager sharedManager] sync];
       [[DFUploadController sharedUploadController] uploadPhotos];
       [[DFStrandsManager sharedStrandsManager] performFetch:nil];
       [[DFSocketsManager sharedManager] initNetworkCommunication];
       [[DFImageDownloadManager sharedManager] fetchNewImages];
       [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];
+      
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
        object:self];

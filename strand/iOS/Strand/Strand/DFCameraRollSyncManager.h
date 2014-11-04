@@ -17,5 +17,6 @@ typedef void (^DFCameraRollSyncCompletionBlock)(NSDictionary *);
 - (void)syncAroundDate:(NSDate *)date withCompletionBlock:(DFCameraRollSyncCompletionBlock)completionBlock;
 - (void)cancelSyncOperations;
 - (BOOL)isSyncInProgress;
+- (void)deletedPhotoSync;
 
 @end

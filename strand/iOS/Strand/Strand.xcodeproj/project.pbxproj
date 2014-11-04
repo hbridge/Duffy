@@ -239,6 +239,8 @@
 		65232E9219EC66A400F3832A /* DFPeanutFeedDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65232E9119EC66A400F3832A /* DFPeanutFeedDataManager.m */; };
 		65232E9919EC90CD00F3832A /* DFSingleFriendViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65232E9819EC90CD00F3832A /* DFSingleFriendViewController.m */; };
 		6523FF40199E67BE00FA8C59 /* DFSocketsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */; };
+		652D9B9B1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 652D9B9A1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m */; };
+		652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */; };
 		65437DE419F810AA00D57F9D /* DFImageDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */; };
 		65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */; };
 		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
@@ -673,6 +675,10 @@
 		65232E9819EC90CD00F3832A /* DFSingleFriendViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSingleFriendViewController.m; sourceTree = "<group>"; };
 		6523FF3E199E67BE00FA8C59 /* DFSocketsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSocketsManager.h; sourceTree = "<group>"; };
 		6523FF3F199E67BE00FA8C59 /* DFSocketsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSocketsManager.m; sourceTree = "<group>"; };
+		652D9B991A0417D100018B1C /* DFDeletedPhotosSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDeletedPhotosSyncOperation.h; sourceTree = "<group>"; };
+		652D9B9A1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDeletedPhotosSyncOperation.m; sourceTree = "<group>"; };
+		652D9B9C1A04258700018B1C /* DFPeanutPhotoAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutPhotoAdapter.h; sourceTree = "<group>"; };
+		652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutPhotoAdapter.m; sourceTree = "<group>"; };
 		65437DE219F810AA00D57F9D /* DFImageDownloadManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFImageDownloadManager.h; sourceTree = "<group>"; };
 		65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFImageDownloadManager.m; sourceTree = "<group>"; };
 		65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS7CameraRollSyncOperation.m; sourceTree = "<group>"; };
@@ -971,6 +977,8 @@
 				65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */,
 				65437DE219F810AA00D57F9D /* DFImageDownloadManager.h */,
 				65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */,
+				652D9B991A0417D100018B1C /* DFDeletedPhotosSyncOperation.h */,
+				652D9B9A1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m */,
 			);
 			name = "Photo DB";
 			sourceTree = "<group>";
@@ -1031,6 +1039,8 @@
 				5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */,
 				5A4BBD2919B7D55500359299 /* DFPeanutFeedAdapter.h */,
 				5A4BBD2A19B7D55500359299 /* DFPeanutFeedAdapter.m */,
+				652D9B9C1A04258700018B1C /* DFPeanutPhotoAdapter.h */,
+				652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -1775,6 +1785,7 @@
 				5AC4A960194A25A300862D9C /* DFStrandsManager.m in Sources */,
 				5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */,
 				5A9636BE19E44F5700F3B606 /* DFCreateStrandViewController.m in Sources */,
+				652D9B9B1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m in Sources */,
 				5AC4A967194A403D00862D9C /* DFPeanutJoinableStrandsAdapter.m in Sources */,
 				5AA36F1019F82813008B37AA /* NSAttributedString+DFHelpers.m in Sources */,
 				5A9115EC19DB7F90003F2A68 /* UINib+DFHelpers.m in Sources */,
@@ -1814,6 +1825,7 @@
 				5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */,
 				65232E9919EC90CD00F3832A /* DFSingleFriendViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
+				652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,

@@ -345,6 +345,25 @@ static DFPeanutFeedDataManager *defaultManager;
   return self.privateStrandsFeedObjects;
 }
 
+- (NSArray *)privatePhotos
+{
+  NSMutableDictionary *photos = [NSMutableDictionary new];
+  
+  for (DFPeanutFeedObject *object in self.privateStrandsFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
+      [photos setObject:object forKey:@(object.id)];
+    } else {
+      for (DFPeanutFeedObject *subObject in [object enumeratorOfDescendents]) {
+        if ([subObject.type isEqual:DFFeedObjectPhoto]) {
+          [photos setObject:subObject forKey:@(subObject.id)];
+        }
+      }
+    }
+  }
+
+  return photos.allValues;
+}
+
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending
 {
   NSArray *strandsByDateAscending =
@@ -615,7 +634,6 @@ static DFPeanutFeedDataManager *defaultManager;
      DDLogError(@"%@ couldn't get strand: %@", self.class, error);
      failure(error);
    }];
-  
 }
 
 - (void)setTimesForStrand:(DFPeanutStrand *)strand fromPhotoObjects:(NSArray *)objects

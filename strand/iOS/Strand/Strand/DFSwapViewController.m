@@ -225,7 +225,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 {
   [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:^{
     dispatch_async(dispatch_get_main_queue(), ^{
-      DDLogVerbose(@"Killing spinner...");
+      DDLogVerbose(@"Killing spinner in swap view...");
       [self.refreshControl endRefreshing];
       [self reloadData];
     });

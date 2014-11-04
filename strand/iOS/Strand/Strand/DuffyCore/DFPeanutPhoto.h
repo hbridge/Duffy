@@ -7,11 +7,12 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFPeanutObject.h"
 
 @class RKObjectMapping;
 @class DFPhoto;
 
-@interface DFPeanutPhoto : NSObject
+@interface DFPeanutPhoto : NSObject <DFPeanutObject>
 
 @property (nonatomic, retain) NSNumber *user; //unsigned long long
 @property (nonatomic, retain) NSNumber *id; //unsigned long long
@@ -27,6 +28,7 @@
 @property (nonatomic, retain) NSString *full_image_path;
 @property (nonatomic, retain) NSString *thumbnail_image_path;
 @property (nonatomic, retain) NSNumber *taken_with_strand;
+@property (nonatomic, retain) NSNumber *install_num;
 
 /* Not Sync'ed with server */
 @property (readonly, nonatomic, retain) NSString *filename;
