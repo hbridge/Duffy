@@ -377,7 +377,7 @@ def getObjectsDataForStrands(strands, user):
 	response = list()
 	strandIds = Strand.getIds(strands)
 	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(strand__in=strandIds).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
-	invitesCache =  StrandInvite.objects.prefetch_related('invited_user', 'strand').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user)
+	invitesCache =  StrandInvite.objects.prefetch_related('invited_user', 'strand').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user).filter(skip=False)
 
 	photoIds = list()
 	for strand in strands:
