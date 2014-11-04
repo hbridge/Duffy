@@ -199,7 +199,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   [super viewDidAppear:animated];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
   
-  if (self.highlightedFeedObject) {
+  if (self.highlightedFeedObject && self.isMovingToParentViewController) {
     [self scrollToHighlightedFeedObject];
   }
 }
@@ -220,7 +220,6 @@ const CGFloat CreateCellTitleSpacing = 8;
                                                         atIndexPath:indexPathForObject];
       CGRect rectToScroll = headerLayoutAttributes.frame;
       rectToScroll.size.height = collectionView.frame.size.height;
-      rectToScroll.origin.y -= collectionView.contentInset.bottom;
       [collectionView scrollRectToVisible:rectToScroll animated:YES];
       
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
