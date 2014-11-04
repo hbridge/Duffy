@@ -22,9 +22,9 @@ urlpatterns = patterns('',
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
 	# REST
-	url(r'^photos/$', arbus_api_views.PhotoAPI.as_view()),
-	url(r'^photos/(?P<photoId>[0-9]+)/$', arbus_api_views.PhotoAPI.as_view()),
-	url(r'^photos/bulk/$', arbus_api_views.PhotoBulkAPI.as_view()),
+	url(r'^photos/$', strand_rest_api_views.PhotoAPI.as_view()),
+	url(r'^photos/(?P<photoId>[0-9]+)/$', strand_rest_api_views.PhotoAPI.as_view()),
+	url(r'^photos/bulk/$', strand_rest_api_views.PhotoBulkAPI.as_view()),
 	
 	url(r'^actions/$', strand_rest_api_views.CreateActionAPI.as_view(model=Action, lookup_field='id')),
 	url(r'^actions/(?P<id>[0-9]+)/$', RetrieveUpdateDestroyAPIView.as_view(model=Action, lookup_field='id')),

@@ -294,6 +294,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			photos = strand.photos.all()
 
 			photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
+			photos = filter(lambda x: x.install_num >= 0, photos)
+			
 			if len(photos) == 0:
 				logger.error("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
 				continue

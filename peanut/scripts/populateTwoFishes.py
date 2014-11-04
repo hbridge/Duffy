@@ -16,7 +16,7 @@ django.setup()
 from django.db.models import Q
 
 from common.models import Photo
-from arbus import location_util
+from common import location_util
 
 logger = logging.getLogger(__name__)
 

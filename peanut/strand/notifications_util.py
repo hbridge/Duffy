@@ -137,3 +137,12 @@ def getNotificationLogsForType(timeWithinCutoff, msgType):
 	notificationLogs = NotificationLog.objects.filter(msg_type=msgType).filter(added__gt=timeWithinCutoff).filter(Q(apns__in=[-2,-1,1]) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_SENT) | Q(result=constants.IOS_NOTIFICATIONS_RESULT_ERROR))
 	return notificationLogs
 
+def threadedSendNotifications(userIds):
+	logging.getLogger('django.db.backends').setLevel(logging.ERROR)
+	logger = logging.getLogger(__name__)
+
+	users = User.objects.filter(id__in=userIds)
+
+	# Send update feed msg to folks who are involved in these photos
+	notifications_util.sendRefreshFeedToUsers(users)
+

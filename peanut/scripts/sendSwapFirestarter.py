@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 def sendRetroFirestarterNotification():
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
-	timeWithin = now - datetime.timedelta(days=3)
+	timeWithin = now - datetime.timedelta(days=4)
 
 	notificationLogs = notifications_util.getNotificationLogs(timeWithin)
 	notificationsById = notifications_util.getNotificationsForTypeByIds(notificationLogs, [constants.NOTIFICATIONS_RETRO_FIRESTARTER])
