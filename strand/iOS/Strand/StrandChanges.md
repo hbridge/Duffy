@@ -1,5 +1,10 @@
 # Swap
 
+## Nov 3, 2014 (4782)
+
+- When you're selecting photos to share, long-press on a photo to see a larger version of it
+- Fix crash on iOS 7.0.3/4
+
 ## Nov 1, 2014 (4779-4781)
 
 - Fix creating a new Swap thread with clustered photos
