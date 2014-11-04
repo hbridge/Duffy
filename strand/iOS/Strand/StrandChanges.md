@@ -1,8 +1,10 @@
 # Swap
 
-## Nov 4, 2014 (4783)
+## Nov 4, 2014 (4783-4)
 
-- Fix asking for push notifs on startup
+- Handle photos you deleted from your iPhone Camera Roll properly (finally!)
+- People view from swap group now shows people in and invited to the strand clearly
+- Fix asking for push notifs on startup (4783)
 
 ## Nov 3, 2014 (4782)
 
