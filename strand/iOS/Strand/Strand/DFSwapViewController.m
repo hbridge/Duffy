@@ -433,6 +433,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     suggestionCell.profileReplacementImageView.image = [UIImage imageNamed:@"Assets/Icons/PhotosSuggestionIcon"];
   } else {
     titleMarkup = [NSString stringWithFormat:@"with <name>%@</name>", [suggestionObject actorsString]];
+    suggestionCell.profileReplacementImageView.image = nil;
   }
   
   [self configureCell:suggestionCell
