@@ -71,7 +71,21 @@ NSString *const PhotoBasePath = @"photos/bulk/";
    } failure:^(NSError *error) {
      failure(error);
    }];
-  
+}
+
+- (void)patchPhotos:(NSArray *)peanutPhotos success:(DFPeanutRestFetchSuccess)success failure:(DFPeanutRestFetchFailure)failure
+{
+  [super
+   performRequest:RKRequestMethodPOST
+   withPath:PhotoBasePath
+   objects:peanutPhotos
+   parameters:nil
+   forceCollection:YES
+   success:^(NSArray *resultObjects) {
+     success(resultObjects);
+   } failure:^(NSError *error) {
+     failure(error);
+   }];
 }
 
 

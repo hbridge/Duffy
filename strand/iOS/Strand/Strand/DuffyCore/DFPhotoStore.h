@@ -52,12 +52,20 @@ typedef enum {
 - (NSDictionary *)photosWithPhotoIDs:(NSArray *)photoIDs;
 + (NSArray *)photosWithoutPhotoIDInContext:(NSManagedObjectContext *)context;
 
++ (NSArray *)photosWithValueStrings:(NSArray *)values
+                             forKey:(NSString *)key
+                         entityName:(NSString *)entityName
+                   comparisonString:(NSString *)comparisonString
+                          inContext:(NSManagedObjectContext *)context;
+
 - (void)clearUploadInfo;
 
 - (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID;
 - (void)saveImage:(UIImage *)image
      withMetadata:(NSDictionary *)metadata
   completionBlock:(void (^)(DFPhoto *newPhoto))completion;
++ (NSArray *)photosWithFaceDetectPassBelow:(NSNumber *)faceDetectPass
+                                 inContext:(NSManagedObjectContext *)context;
 
 // Core data stack
 + (NSManagedObjectModel *)managedObjectModel;

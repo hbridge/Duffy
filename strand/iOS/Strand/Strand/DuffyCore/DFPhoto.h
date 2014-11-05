@@ -18,6 +18,9 @@
 @property (nonatomic) DFPhotoIDType photoID;
 @property (nonatomic, retain) DFPhotoAsset *asset;
 
+@property (nonatomic, retain) NSNumber *faceDetectPass;
+@property (nonatomic, retain) NSNumber *faceDetectPassUploaded;
+@property (nonatomic, retain) NSSet *faceFeatures;
 @property (nonatomic, retain) NSDate *utcCreationDate;
 @property (nonatomic, retain) NSDate *uploadThumbDate;
 @property (nonatomic, retain) NSDate *uploadLargeDate;

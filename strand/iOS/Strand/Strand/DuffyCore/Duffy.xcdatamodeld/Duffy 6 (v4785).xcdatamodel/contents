@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="6252" systemVersion="14A389" minimumToolsVersion="Automatic" macOSVersion="Automatic" iOSVersion="Automatic">
+    <entity name="DFCameraRollPhotoAsset" representedClassName="DFCameraRollPhotoAsset" parentEntity="DFPhotoAsset" syncable="YES">
+        <attribute name="alAssetURLString" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="DFFaceFeature" representedClassName="DFFaceFeature" syncable="YES">
+        <attribute name="bounds" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <attribute name="faceRotation" optional="YES" attributeType="Float" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="hasBlink" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="hasSmile" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <relationship name="photo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DFPhoto" inverseName="faceFeatures" inverseEntity="DFPhoto" syncable="YES"/>
+    </entity>
+    <entity name="DFPHAsset" representedClassName="DFPHAsset" parentEntity="DFPhotoAsset" syncable="YES">
+        <attribute name="localIdentifier" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <entity name="DFPhoto" representedClassName="DFPhoto" syncable="YES">
+        <attribute name="faceDetectPass" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="faceDetectPassUploaded" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="isUploadProcessed" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="localCreationDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="photoID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="shouldUploadImage" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="sourceString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="uploadLargeDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="uploadThumbDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="userID" optional="YES" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="utcCreationDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <relationship name="asset" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="DFPhotoAsset" inverseName="photo" inverseEntity="DFPhotoAsset" syncable="YES"/>
+        <relationship name="faceFeatures" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="DFFaceFeature" inverseName="photo" inverseEntity="DFFaceFeature" syncable="YES"/>
+    </entity>
+    <entity name="DFPhotoAsset" isAbstract="YES" syncable="YES">
+        <attribute name="storedMetadata" optional="YES" attributeType="Transformable" syncable="YES"/>
+        <relationship name="photo" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="DFPhoto" inverseName="asset" inverseEntity="DFPhoto" syncable="YES"/>
+    </entity>
+    <entity name="DFStrandPhotoAsset" representedClassName="DFStrandPhotoAsset" parentEntity="DFPhotoAsset" syncable="YES">
+        <attribute name="creationDate" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="localURLString" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="storedLocation" optional="YES" attributeType="Transformable" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="DFCameraRollPhotoAsset" positionX="45" positionY="117" width="128" height="58"/>
+        <element name="DFFaceFeature" positionX="45" positionY="90" width="128" height="28"/>
+        <element name="DFPHAsset" positionX="45" positionY="90" width="128" height="58"/>
+        <element name="DFPhoto" positionX="0" positionY="0" width="128" height="240"/>
+        <element name="DFPhotoAsset" positionX="63" positionY="126" width="128" height="73"/>
+        <element name="DFStrandPhotoAsset" positionX="81" positionY="126" width="128" height="88"/>
+    </elements>
+</model>

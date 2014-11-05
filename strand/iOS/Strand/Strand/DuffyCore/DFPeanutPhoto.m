@@ -12,6 +12,7 @@
 #import "NSDictionary+DFJSON.h"
 #import <RestKit/RestKit.h>
 #import "DFUser.h"
+#import "DFPeanutFaceFeature.h"
 
 const int MaxUserCommentLength = 200;
 
@@ -122,6 +123,11 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 {
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[DFPeanutPhoto class]];
   [objectMapping addAttributeMappingsFromArray:[DFPeanutPhoto attributes]];
+  
+  [objectMapping addPropertyMapping:
+   [RKRelationshipMapping relationshipMappingFromKeyPath:@"iphone_faceboxes_topleft"
+                                               toKeyPath:@"iphone_faceboxes_topleft"
+                                             withMapping:[DFPeanutFaceFeature objectMapping]]];
   
   return objectMapping;
 }
