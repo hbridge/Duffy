@@ -222,6 +222,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   /* Reloads the suggestions section from the allSuggestions array, broken out
    so it can be called from the swipe handler safely */
   [self.sectionTitles addObject:SuggestedSectionTitle];
+  self.sectionTitlesToObjects[SuggestedSectionTitle] = [NSMutableArray new];
   if (self.allSuggestions.count > 0) {
     self.filteredSuggestions = [self.allSuggestions mutableCopy];
     [self.filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
