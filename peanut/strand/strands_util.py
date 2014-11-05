@@ -74,7 +74,7 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 					timeDiff = photo1.time_taken - photo2.time_taken
 					timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
-					if timeDiffMin < noLocationTimeLimitMin:
+					if timeDiffMin < noLocationTimeLimitMin and abs(timeDiff.total_seconds()) > 1:
 						return True
 		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
