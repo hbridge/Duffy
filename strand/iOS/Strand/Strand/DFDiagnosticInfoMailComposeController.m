@@ -7,22 +7,17 @@
 //
 
 #import "DFDiagnosticInfoMailComposeController.h"
-#import <CocoaLumberjack/DDFileLogger.h>
 #import "DFAppInfo.h"
+#import "DFLogs.h"
 
 @implementation DFDiagnosticInfoMailComposeController
-
-static const int MaxLogFiles = 10;
 
 - (instancetype)initWithMailType:(DFMailType)mailType
 {
   self = [super init];
   if (self) {
     if (mailType == DFMailTypeIssue) {
-      NSMutableData *errorLogData = [NSMutableData data];
-      for (NSData *errorLogFileData in [self errorLogData]) {
-        [errorLogData appendData:errorLogFileData];
-      }
+      NSData *errorLogData = [DFLogs aggregatedLogData];
       [self addAttachmentData:errorLogData mimeType:@"text/plain" fileName:@"StrandLog.txt"];
       [self setSubject:[NSString stringWithFormat:@"Issue report for %@", [DFAppInfo appInfoString]]];
       [self setToRecipients:[NSArray arrayWithObject:@"strand-support@duffytech.co"]];
@@ -36,21 +31,7 @@ static const int MaxLogFiles = 10;
   return self;
 }
 
-- (NSMutableArray *)errorLogData
-{
-  DDFileLogger *fileLogger = [[DDFileLogger alloc] init];
-  NSArray *sortedLogFileInfos = [[[fileLogger.logFileManager sortedLogFileInfos] reverseObjectEnumerator] allObjects];
-  int numFilesToUpload = MIN((unsigned int)sortedLogFileInfos.count, MaxLogFiles);
-  
-  NSMutableArray *errorLogFiles = [NSMutableArray arrayWithCapacity:numFilesToUpload];
-  for (int i = 0; i < numFilesToUpload; i++) {
-    DDLogFileInfo *logFileInfo = [sortedLogFileInfos objectAtIndex:i];
-    NSData *fileData = [NSData dataWithContentsOfFile:logFileInfo.filePath];
-    [errorLogFiles addObject:fileData];
-  }
-  
-  return errorLogFiles;
-}
+
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller
           didFinishWithResult:(MFMailComposeResult)result

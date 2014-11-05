@@ -130,17 +130,22 @@
                      navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Report Issue" identifier:@"reportIssue" handler:^(id object) {
+      
       DFDiagnosticInfoMailComposeController *mailComposer =
       [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeIssue];
       if (mailComposer) { // if the user hasn't setup email, this will come back nil
         [self presentViewController:mailComposer animated:YES completion:nil];
       }     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Send Feedback" identifier:@"sendFeedback" handler:^(id object) {
-      DFDiagnosticInfoMailComposeController *mailComposer =
-      [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeFeedback];
-      if (mailComposer) {
-        [self presentViewController:mailComposer animated:YES completion:nil];
-      }
+      #ifndef TARGET_IPHONE_SIMULATOR
+        DFDiagnosticInfoMailComposeController *mailComposer =
+        [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeFeedback];
+        if (mailComposer) {
+          [self presentViewController:mailComposer animated:YES completion:nil];
+        }
+     #else
+      
+     #endif
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Location Map" identifier:@"locationMap" handler:^(id object) {
       CLLocation *location = [[DFBackgroundLocationManager sharedBackgroundLocationManager] lastLocation];
