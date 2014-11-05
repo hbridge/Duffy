@@ -490,6 +490,7 @@ def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 
 	for suggestion in objects:
 		suggestion['suggestible'] = True
+		suggestion['suggestion_type'] = "timed-%s" % (title)
 		suggestion['title'] = title
 		suggestion['suggestion_rank'] = rankNum
 		rankNum += 1
@@ -677,6 +678,7 @@ def swaps(request):
 		rankNum = 0
 		for suggestion in neighborBasedSuggestions:
 			suggestion['suggestion_rank'] = rankNum
+			suggestion['suggestion_type'] = "friend-location"
 			rankNum += 1
 		responseObjects.extend(neighborBasedSuggestions)
 		printStats("swaps-neighbor-suggestions")
