@@ -102,6 +102,7 @@
 - (void)viewWillAppear:(BOOL)animated {
   [super viewWillAppear:animated];
   [self configureContactsUpsell];
+  [self reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
