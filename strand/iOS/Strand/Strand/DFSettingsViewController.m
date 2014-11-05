@@ -131,13 +131,7 @@
                      navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Report Issue" identifier:@"reportIssue" handler:^(id object) {
-      #ifndef TARGET_IPHONE_SIMULATOR
-      DFDiagnosticInfoMailComposeController *mailComposer =
-      [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeIssue];
-      if (mailComposer) { // if the user hasn't setup email, this will come back nil
-        [self presentViewController:mailComposer animated:YES completion:nil];
-      }
-      #else
+      #if TARGET_IPHONE_SIMULATOR
       NSData *logData = [DFLogs aggregatedLogData];
       NSString *filePath;
       NSArray * paths = NSSearchPathForDirectoriesInDomains (NSDesktopDirectory, NSUserDomainMask, YES);
@@ -152,7 +146,15 @@
       [logData writeToFile:filePath atomically:NO];
        [UIAlertView showSimpleAlertWithTitle:@"Copied To Desktop"
                             formatMessage:@"Log data has been copied to your desktop."];
-       #endif
+
+      #else
+      DFDiagnosticInfoMailComposeController *mailComposer =
+      [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeIssue];
+      if (mailComposer) { // if the user hasn't setup email, this will come back nil
+        [self presentViewController:mailComposer animated:YES completion:nil];
+      }
+
+      #endif
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Send Feedback" identifier:@"sendFeedback" handler:^(id object) {
       DFDiagnosticInfoMailComposeController *mailComposer =
