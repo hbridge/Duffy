@@ -501,6 +501,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
       [self presentViewController:createStrandFlow animated:YES completion:nil];
       createStrandFlow.extraAnalyticsInfo =
        @{
+         @"suggestionType" : @"actors",
         @"suggestionActorsCount" : [DFAnalytics bucketStringForObjectCount:feedObject.actors.count]
         };
     }
