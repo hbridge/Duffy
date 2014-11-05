@@ -67,6 +67,10 @@ public class MessageProcessor extends Thread {
 				else {
 					timeWithin.setSeconds(0);
 				}
+				if (!dbConnection.isValid(1)){
+					logger.info("Connection lost");
+					System.exit(0);
+				}
 
 				// Fetch and process entries from database
 				sqlFetch = "SELECT * FROM strand_notification_log WHERE result is null and msg_type=8 and added >='" + dft.format(timeWithin) + "'";
@@ -79,6 +83,7 @@ public class MessageProcessor extends Thread {
 				while (logEntry.next()) {
 					int userId = logEntry.getInt("user_id");
 					int logEntryId = logEntry.getInt("id");
+
 					if (clients.containsKey(userId)) {
 						logger.info("Sending refresh message to " + userId);
 						clients.get(userId).sendMessage("refresh:" + logEntry.getInt("id"));
