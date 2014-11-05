@@ -13,7 +13,7 @@ from django.contrib.gis.geos import Point, fromstr
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
 
-from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import CreateAPIView, GenericAPIView, RetrieveUpdateDestroyAPIView, RetrieveUpdateAPIView
 from rest_framework.response import Response
 from rest_framework.mixins import CreateModelMixin, ListModelMixin
 from rest_framework import status
@@ -525,6 +525,19 @@ class CreateActionAPI(CreateAPIView):
                 return super(CreateActionAPI, self).post(request)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
+    def pre_save(self, user):
+        if self.request.DATA['build_id'] and self.request.DATA['build_number']:
+            # if last_build_info is empty or if either build_id or build_number is not in last_build_info
+            #    update last_build_info
+            buildId = self.request.DATA['build_id']
+            buildNum = self.request.DATA['build_number']
+            if ((not user.last_build_info) or 
+                buildId not in user.last_build_info or 
+                str(buildNum) not in user.last_build_info):
+                user.last_build_info = "%s-%s" % (buildId, buildNum)
+                logger.info("Build info updated to %s for user %s" % (user.last_build_info, user.id))
 
 def updateStrandWithCorrectPhotoTimes(strand):
     changed = False
