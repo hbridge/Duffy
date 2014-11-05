@@ -246,9 +246,6 @@ static DFUploadController *defaultUploadController;
     [self saveUploadedPhotosWithPeanutPhotos:peanutPhotos uploadOperationType:resultDictionary[DFUploadResultOperationType]];
     self.currentSessionStats.numConsecutiveRetries = 0;
     self.currentSessionStats.numBytesUploaded += [resultDictionary[DFUploadResultNumBytes] unsignedLongValue];
-    [DFAnalytics logUploadEndedWithResult:DFAnalyticsValueResultSuccess
-                                numPhotos:peanutPhotos.count
-                 sessionAvgThroughputKBPS:self.currentSessionStats.throughPutKBPS];
     [self.syncOperationQueue addOperation:[self dispatchUploadsOperation]];
     [self postStatusUpdateWithError:nil];
   };
@@ -333,7 +330,6 @@ static DFUploadController *defaultUploadController;
     } else {
       DDLogError(@"Retry count exceeded (%d/%d) or error not retryable. Cancelling uploads.  Error:%@",
                 self.currentSessionStats.numConsecutiveRetries, MaxRetryCount, error.description);
-      [DFAnalytics logUploadRetryCountExceededWithCount:self.currentSessionStats.numConsecutiveRetries];
       NSOperation *cancelOperation = [self cancelAllUploadsOperationWithIsError:YES silent:NO];
       [cancelOperation start];
     }
@@ -390,7 +386,6 @@ static DFUploadController *defaultUploadController;
         [[DFToastNotificationManager sharedInstance]
          showNotificationWithType:DFStatusUploadError];
       }
-      [DFAnalytics logUploadCancelledWithIsError:isError];
     }
     [self endBackgroundUpdateTask];
   }];

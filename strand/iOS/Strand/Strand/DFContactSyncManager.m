@@ -192,7 +192,6 @@ static DFContactSyncManager *defaultManager;
   CFErrorRef error;
   ABAddressBookRef addressBook = ABAddressBookCreateWithOptions(NULL, &error);
   
-  ABAuthorizationStatus oldStatus = [self contactsPermissionStatus];
   ABAddressBookRequestAccessWithCompletion(addressBook, ^(bool granted, CFErrorRef error) {
     if (granted) {
       [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionContacts];
@@ -202,12 +201,6 @@ static DFContactSyncManager *defaultManager;
       [DFDefaultsStore setState:DFPermissionStateDenied forPermission:DFPermissionContacts];
       failure((__bridge NSError *)error);
     }
-    
-    [DFAnalytics logInviteAskContactsWithParameters:@{
-                                                      @"oldValue": @(oldStatus),
-                                                      @"newValue": @([self contactsPermissionStatus])
-                                                      }];
-    
   });
 }
 

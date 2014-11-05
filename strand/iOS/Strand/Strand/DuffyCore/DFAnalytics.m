@@ -37,7 +37,9 @@ NSString* const ResultKey = @"result";
 NSString* const DFAnalyticsValueResultSuccess = @"success";
 NSString* const DFAnalyticsValueResultFailure = @"failure";
 NSString* const DFAnalyticsValueResultInvalidInput = @"invalidInput";
+NSString* const DFAnalyticsValueResultAborted = @"aborted";
 NSString* const ParentViewControllerKey = @"parentView";
+NSString* const SLatencyKey = @"SecondsLatency";
 
 
 NSString* const DFAnalyticsIsErrorKey = @"isError";
@@ -52,54 +54,15 @@ NSString* const NewValueKey = @"newValue";
 NSString* const ControllerViewedEventSuffix = @"Viewed";
 NSString* const ControllerClassKey = @"controllerClass";
 
-//Camera roll scan
-NSString* const CameraRollScannedEvent = @"CameraRollScanned";
-NSString* const PhotosTotalKey = @"numPhotosTotal";
-NSString* const PhotosAddedKey = @"numPhotosAdded";
-
-//Photo viewing
-NSString* const SwitchedPhotoToPhotoEvent = @"SwitchedPhotoToPhoto";
-
-//Searches
-NSString* const SearchExecutedEvent = @"SearchExecuted";
-NSString* const QueryKey = @"query";
-NSString* const SuggestionsKey = @"searchSuggestions";
-NSString* const SLatencyKey = @"SecondsLatency";
-NSString* const SearchAbortedEvent = @"SearchExecuted";
-
-NSString* const SearchPageLoaded = @"SearchResultPageLoaded";
-
 // Create Strand
 NSString* const CreateStrandEvent = @"CreateStrand";
-
-
-// Uploads
-NSString* const UploadPhotoEvent = @"UploadPhoto";
-NSString* const DebugStringKey = @"debug";
-
-NSString* const UploadPhotoCancelled = @"UploadCancelled";
-NSString* const UploadRetriesExceeded = @"UploadRetriesExceeded";
-NSString* const SessionAvgKBPSKey = @"sessionAvgKBPS";
-
-// Individual photo loads
-NSString* const PhotoLoadEvent = @"PhotoLoad";
-NSString* const DFAnalyticsValueResultAborted = @"aborted";
-
-// Take picture
-NSString* const PhotoTakenEvent = @"PhotoTaken";
-NSString* const FlashModeKey = @"flashMode";
-NSString* const CameraDeviceKey = @"cameraDevice";
 
 // Photo actions
 NSString* const PhotoSavedEvent = @"PhotoSaved";
 NSString* const PhotoDeletedEvent = @"PhotoDeleted";
 NSString* const PhotoLikedEvent = @"PhotoLiked";
 
-// App refresh
-NSString* const BackgroundRefreshEvent = @"BackgroundRefresh";
-NSString* const LocationUpdateEvent = @"LocationUpdated";
-NSString* const AppInBackgroundKey = @"appInBackground";
-
+// Notifications
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
 NSString* const NotificationTypeKey = @"notificationType";
 NSString* const NotificationsViewItemOpened = @"NotificationsViewItemOpened";
@@ -111,10 +74,8 @@ NSString* const SetupLocationCompleted = @"SetupLocationCompleted";
 NSString* const SetupContactsCompleted = @"SetupContactsCompleted";
 NSString* const SetupPhotosCompleted = @"SetupPhotosCompleted";
 
-
 // Invites
 NSString* const InviteUserFinshed = @"InviteUserFinished";
-NSString* const InviteContactsPrompt = @"InviteContactsPrompt";
 
 //Push notifs
 NSString* const PermissionChangedEvent = @"PermissionChanged";
@@ -210,97 +171,6 @@ static DFAnalytics *defaultLogger;
   [self logEvent:CreateStrandEvent withParameters:parameters];
 }
 
-
-+ (void)logSwitchBetweenPhotos:(NSString *)actionType
-{
-    [DFAnalytics logEvent:SwitchedPhotoToPhotoEvent withParameters:@{ActionTypeKey: actionType}];
-}
-
-+ (void)logUploadEndedWithResult:(NSString *)resultValue
-{
-    [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
-                                                            ResultKey: resultValue,
-                                                            }];
-}
-
-
-+ (void)logUploadEndedWithResult:(NSString *)resultValue numPhotos:(unsigned long)numPhotos sessionAvgThroughputKBPS:(double)KBPS;
-{
-    [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
-                                                            ResultKey: resultValue,
-                                                            NumberKey: [self bucketStringForObjectCount:numPhotos],
-                                                            SessionAvgKBPSKey: [DFAnalytics bucketStringForKBPS:KBPS]
-                                                            }];
-}
-
-+ (NSString *)bucketStringForObjectCount:(NSUInteger)numPhotos
-{
-  if (numPhotos == 0) return @"0";
-  if (numPhotos == 1) return @"1";
-  if (numPhotos == 2) return @"2";
-  if (numPhotos <= 5) return @"3-5";
-  if (numPhotos <= 10) return @"6-10";
-  if (numPhotos <= 20) return @"11-20";
-  if (numPhotos <= 50) return @"21-50";
-  if (numPhotos <= 100) return @"51-100";
-  if (numPhotos <= 500) return @"101-500";
-  if (numPhotos <= 1000) return @"501-1000";
-  if (numPhotos <= 2000) return @"1001-2000";
-  if (numPhotos <= 4000) return @"2001-4000";
-  if (numPhotos <= 8000) return @"4001-8000";
-  return @">8000";
-}
-
-+ (NSString *)bucketStringForKBPS:(double)KBPS
-{
-  if (KBPS < 0.1) return @"<0.1";
-  if (KBPS <= 1.0) return @"0.1-1";
-  if (KBPS <= 10.0) return @"1-10";
-  if (KBPS <= 50.0) return @"10-50";
-  if (KBPS <= 100.0) return @"50-100";
-  if (KBPS <= 200.0) return @"100-200";
-  if (KBPS <= 500.0) return @"200-500";
-  if (KBPS <= 1000.0) return @"500-1000";
-  return @">1000.0";
-}
-
-
-+ (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug
-{
-  [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
-                                                          ResultKey: resultValue,
-                                                          DebugStringKey: debug
-                                                          }];
-}
-
-
-+ (void)logUploadCancelledWithIsError:(BOOL)isError
-{
-    [DFAnalytics logEvent:UploadPhotoCancelled withParameters:@{DFAnalyticsIsErrorKey: [NSNumber numberWithBool:isError]}];
-}
-
-
-
-+ (void)logUploadRetryCountExceededWithCount:(unsigned int)count
-{
-    [DFAnalytics logEvent:UploadRetriesExceeded withParameters:@{NumberKey: [NSNumber numberWithUnsignedInt:count]}];
-}
-
-
-+ (void)logPhotoLoadWithResult:(NSString *)result
-{
-  [DFAnalytics logEvent:PhotoLoadEvent withParameters:@{ResultKey: result}];
-}
-
-+ (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
-                      flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
-{
-  [DFAnalytics logEvent:PhotoTakenEvent withParameters:@{
-                                                    CameraDeviceKey: @(camera),
-                                                    FlashModeKey: @(flashMode)
-                                                    }];
-}
-
 + (void)logPhotoSavedWithResult:(NSString *)result
 {
   [DFAnalytics logEvent:PhotoSavedEvent withParameters:@{ResultKey: result}];
@@ -346,36 +216,7 @@ static DFAnalytics *defaultLogger;
                                                          }];
 }
 
-+ (NSString *)bucketStringForTimeInternval:(NSTimeInterval)timeInterval
-{
-  if (timeInterval < 60) {
-    return @"< 1m";
-  } else if (timeInterval < 60 * 5) {
-    return @"1-5m";
-  } else if (timeInterval < 60 * 10) {
-    return @"5-10m";
-  } else if (timeInterval < 60 * 30) {
-    return @"10-30m";
-  } else if (timeInterval < 60 * 60) {
-    return @"30m-1h";
-  } else if (timeInterval < 60 * 60 * 2) {
-    return @"1-2h";
-  } else if (timeInterval < 60 * 60 * 12) {
-    return @"2-12h";
-  } else if (timeInterval < 60 * 60 * 24) {
-    return @"12-24h";
-  } else if (timeInterval < 60 * 60 * 24 * 3) {
-    return @"1-3d";
-  } else if (timeInterval < 60 * 60 * 24 * 7) {
-    return @"3d-1w";
-  } else if (timeInterval < 60 * 60 * 24 * 30) {
-    return @"1w-1M";
-  } else if (timeInterval < 60 * 60 * 24 * 60) {
-    return @"1-2M";
-  }
-  
-  return @">2M";
-}
+
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result
 {
@@ -446,12 +287,6 @@ static DFAnalytics *defaultLogger;
                                                            }];
 }
 
-+ (void)logInviteAskContactsWithParameters:(NSDictionary *)parameters
-{
-  [DFAnalytics logEvent:InviteContactsPrompt withParameters:parameters];
-}
-
-
 + (void)logRemoteNotifsChangedFromOldNotificationType:(UIRemoteNotificationType)oldType
                                                   newType:(UIRemoteNotificationType)newType
 {
@@ -487,7 +322,6 @@ static DFAnalytics *defaultLogger;
           newState ? newState : @"None"
           ];
 }
-
 
 + (NSString *)stringForUIRemoteNotifType:(UIRemoteNotificationType)type;
 {
@@ -592,5 +426,71 @@ static DFAnalytics *defaultLogger;
 {
   [self logEvent:@"AddManualContact" withParameters:@{ResultKey: result}];
 }
+
+#pragma mark - Bucket Value helpers
+
++ (NSString *)bucketStringForTimeInternval:(NSTimeInterval)timeInterval
+{
+  if (timeInterval < 60) {
+    return @"< 1m";
+  } else if (timeInterval < 60 * 5) {
+    return @"1-5m";
+  } else if (timeInterval < 60 * 10) {
+    return @"5-10m";
+  } else if (timeInterval < 60 * 30) {
+    return @"10-30m";
+  } else if (timeInterval < 60 * 60) {
+    return @"30m-1h";
+  } else if (timeInterval < 60 * 60 * 2) {
+    return @"1-2h";
+  } else if (timeInterval < 60 * 60 * 12) {
+    return @"2-12h";
+  } else if (timeInterval < 60 * 60 * 24) {
+    return @"12-24h";
+  } else if (timeInterval < 60 * 60 * 24 * 3) {
+    return @"1-3d";
+  } else if (timeInterval < 60 * 60 * 24 * 7) {
+    return @"3d-1w";
+  } else if (timeInterval < 60 * 60 * 24 * 30) {
+    return @"1w-1M";
+  } else if (timeInterval < 60 * 60 * 24 * 60) {
+    return @"1-2M";
+  }
+  
+  return @">2M";
+}
+
++ (NSString *)bucketStringForObjectCount:(NSUInteger)numPhotos
+{
+  if (numPhotos == 0) return @"0";
+  if (numPhotos == 1) return @"1";
+  if (numPhotos == 2) return @"2";
+  if (numPhotos <= 5) return @"3-5";
+  if (numPhotos <= 10) return @"6-10";
+  if (numPhotos <= 20) return @"11-20";
+  if (numPhotos <= 50) return @"21-50";
+  if (numPhotos <= 100) return @"51-100";
+  if (numPhotos <= 500) return @"101-500";
+  if (numPhotos <= 1000) return @"501-1000";
+  if (numPhotos <= 2000) return @"1001-2000";
+  if (numPhotos <= 4000) return @"2001-4000";
+  if (numPhotos <= 8000) return @"4001-8000";
+  return @">8000";
+}
+
++ (NSString *)bucketStringForKBPS:(double)KBPS
+{
+  if (KBPS < 0.1) return @"<0.1";
+  if (KBPS <= 1.0) return @"0.1-1";
+  if (KBPS <= 10.0) return @"1-10";
+  if (KBPS <= 50.0) return @"10-50";
+  if (KBPS <= 100.0) return @"50-100";
+  if (KBPS <= 200.0) return @"100-200";
+  if (KBPS <= 500.0) return @"200-500";
+  if (KBPS <= 1000.0) return @"500-1000";
+  return @">1000.0";
+}
+
+
 
 @end

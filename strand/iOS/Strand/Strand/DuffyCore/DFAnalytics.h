@@ -57,21 +57,8 @@ disappearedWithParameters:(NSDictionary *)params;
                              numPeopleSelected:(NSUInteger)numPeople
                                      extraInfo:(NSDictionary *)extraInfo;
 
-/* Uploads */
-+ (void)logUploadEndedWithResult:(NSString *)resultValue;
-+ (void)logUploadEndedWithResult:(NSString *)resultValue
-                       numPhotos:(unsigned long)numPhotos
-        sessionAvgThroughputKBPS:(double)KBPS;
-+ (void)logUploadEndedWithResult:(NSString *)resultValue debug:(NSString *)debug;
-+ (void)logUploadCancelledWithIsError:(BOOL)isError;
-+ (void)logUploadRetryCountExceededWithCount:(unsigned int)count;
-
 /* Log camera and photo actions */
-+ (void)logPhotoTakenWithCamera:(UIImagePickerControllerCameraDevice)camera
-                      flashMode:(UIImagePickerControllerCameraFlashMode)flashMode;
 + (void)logPhotoSavedWithResult:(NSString *)result;
-+ (void)logSwitchBetweenPhotos:(NSString *)actionType;
-+ (void)logPhotoLoadWithResult:(NSString *)result;
 + (void)logPhotoDeletedWithResult:(NSString *)result
            timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
 + (void)logPhotoLikePressedWithNewValue:(BOOL)isOn
@@ -87,7 +74,6 @@ disappearedWithParameters:(NSDictionary *)params;
 
 + (void)logInviteComposeFinishedWithResult:(MessageComposeResult)result
                   presentingViewController:(UIViewController *)presentingViewController;
-+ (void)logInviteAskContactsWithParameters:(NSDictionary *)parameters;
 
 /* Contacts */
 + (void)logAddContactCompletedWithResult:(NSString *)result;

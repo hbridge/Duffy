@@ -164,7 +164,6 @@ willTransitionToViewControllers:(NSArray *)pendingViewControllers
        transitionCompleted:(BOOL)completed
 {
   if (completed) {
-    [DFAnalytics logSwitchBetweenPhotos:DFAnalyticsActionTypeSwipe];
     self.activePhoto =
     self.photos[[self photoIndexForViewController:self.pageViewController.viewControllers.firstObject]];
   }
