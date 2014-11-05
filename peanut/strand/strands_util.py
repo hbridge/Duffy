@@ -64,7 +64,7 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLoca
 	return False
 
 
-def strandsShouldBeNeighbors(strand, possibleNeighbor):
+def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = constants.MINUTES_FOR_NOLOC_NEIGHBORING):
 	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
 		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
 
@@ -74,10 +74,8 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor):
 					timeDiff = photo1.time_taken - photo2.time_taken
 					timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
-					if timeDiffMin < 2:
+					if timeDiffMin < noLocationTimeLimitMin:
 						return True
-		elif not strand.location_point and not possibleNeighbor.location_point:
-			return True
 		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING):
 			return True
