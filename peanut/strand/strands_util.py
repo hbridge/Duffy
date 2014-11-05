@@ -74,7 +74,7 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor):
 					timeDiff = photo1.time_taken - photo2.time_taken
 					timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
-					if timeDiffMin < 15:
+					if timeDiffMin < 2:
 						return True
 		elif not strand.location_point and not possibleNeighbor.location_point:
 			return True
