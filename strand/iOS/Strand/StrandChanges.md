@@ -1,5 +1,10 @@
 # Swap
 
+## Nov 5, 2014 (4785)
+
+- Show suggestions for Halloween, last night and add more friends
+- Make it clearer to give contacts access when you're searching for people
+
 ## Nov 4, 2014 (4783-4)
 
 - Handle photos you deleted from your iPhone Camera Roll properly (finally!)
