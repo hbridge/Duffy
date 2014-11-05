@@ -195,6 +195,7 @@ static BOOL showContactsUpsell = NO;
 {
   [self.peanutDataManager refreshInboxFromServer:^{
     [self.refreshControl endRefreshing];
+    [self reloadData];
   }];
 }
 
