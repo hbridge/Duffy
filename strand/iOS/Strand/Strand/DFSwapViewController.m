@@ -22,6 +22,8 @@
 #import "DFImageManager.h"
 #import "UIView+DFExtensions.h"
 #import "DFPushNotificationsManager.h"
+#import "DFSwapUpsell.h"
+#import "DFInviteFriendViewController.h"
 
 @interface DFSwapViewController ()
 
@@ -32,6 +34,7 @@
 @property (nonatomic, retain) NSArray *allSuggestions;
 @property (nonatomic, retain) NSMutableArray *ignoredSuggestions;
 @property (nonatomic, retain) NSMutableArray *filteredSuggestions;
+@property (nonatomic, retain) NSArray *systemUpsells;
 
 @end
 
@@ -131,6 +134,8 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   forCellReuseIdentifier:@"invite"];
   [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
   forCellReuseIdentifier:@"suggestion"];
+  [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
+  forCellReuseIdentifier:@"upsell"];
   
   self.tableView.separatorInset = [DFSwapTableViewCell edgeInsets];
 }
@@ -160,6 +165,21 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     return;
   }
   
+  [self reloadInvites];
+  [self reloadSuggestions];
+  [self reloadUpsells];
+  
+  [self reloadSuggestionsSection];
+  
+  [self.tableView reloadData];
+  
+  [self configureNoResultsView];
+  [self configureTabCount];
+  [self.refreshControl endRefreshing];
+}
+
+- (void)reloadInvites
+{
   NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
   if (self.userToFilter) {
     NSMutableArray *filteredInvites = [NSMutableArray new];
@@ -174,7 +194,10 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   if (invites.count > 0) {
     self.sectionTitlesToObjects[InvitesSectionTitle] = invites;
   }
-  
+}
+
+- (void)reloadSuggestions
+{
   self.allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
   if (self.userToFilter) {
     NSMutableArray *filteredSuggestions = [NSMutableArray new];
@@ -185,14 +208,13 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     }
     self.allSuggestions = filteredSuggestions;
   }
-  
-  [self reloadSuggestionsSection];
-  
-  [self.tableView reloadData];
-  
-  [self configureNoResultsView];
-  [self configureTabCount];
-  [self.refreshControl endRefreshing];
+}
+
+- (void)reloadUpsells
+{
+  DFSwapUpsell *upsell = [[DFSwapUpsell alloc] init];
+  upsell.type = DFSwapUpsellInviteFriends;
+  self.systemUpsells = @[upsell];
 }
 
 - (void)reloadSuggestionsSection
@@ -210,6 +232,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
        removeObjectsInRange:(NSRange){MaxSuggestionsToShow, self.filteredSuggestions.count - MaxSuggestionsToShow}];
     }
     self.sectionTitlesToObjects[SuggestedSectionTitle] = self.filteredSuggestions;
+  }
+  if (!self.userToFilter) {
+    [self.sectionTitlesToObjects[SuggestedSectionTitle] addObjectsFromArray:self.systemUpsells];
   }
 }
 
@@ -269,10 +294,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   NSArray *objects = [self sectionObjectsForSection:indexPath.section];
   if (objects.count == 0) return nil;
   
-  if ([objects[indexPath.row] isKindOfClass:[DFPeanutFeedObject class]])
-    return objects[indexPath.row];
-  
-  return nil;
+  return objects[indexPath.row];
 }
 
 - (void)removeObjectAtIndexPath:(NSIndexPath *)indexPath
@@ -299,17 +321,22 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *object = [self feedObjectForIndexPath:indexPath];
+  id object = [self feedObjectForIndexPath:indexPath];
   
   UITableViewCell *cell;
-  if (!object) {
+  if ([[object class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
+    DFPeanutFeedObject *feedObject = (DFPeanutFeedObject *)object;
+    if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+      cell = [self cellForInviteObject:object indexPath:indexPath];
+    } else if ([feedObject.type isEqual:DFFeedObjectSwapSuggestion]) {
+      cell = [self cellForSuggestionObject:object indexPath:indexPath];
+    }
+  } else if ([[object class] isSubclassOfClass:[DFSwapUpsell class]]) {
+    cell = [self cellForUpsell:object indexPath:indexPath];
+  } else {
     cell = [self noResultsCellForIndexPath:indexPath];
-  } else if ([object.type isEqual:DFFeedObjectInviteStrand]) {
-    cell = [self cellForInviteObject:object indexPath:indexPath];
-  } else if ([object.type isEqual:DFFeedObjectSwapSuggestion]) {
-    cell = [self cellForSuggestionObject:object indexPath:indexPath];
   }
-  
+
   if (!cell) [NSException raise:@"unexpected object" format:@""];
   
   return cell;
@@ -420,6 +447,16 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   return suggestionCell;
 }
 
+- (UITableViewCell *)cellForUpsell:(DFSwapUpsell *)upsell indexPath:(NSIndexPath *)indexPath
+{
+  DFSwapTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"upsell"];
+  cell.profileReplacementImageView.image = upsell.image;
+  cell.peopleLabel.text = upsell.title;
+  cell.subTitleLabel.text = upsell.subtitle;
+  
+  return cell;
+}
+
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
   return self.sectionTitles[section];
@@ -441,15 +478,23 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *object = [self feedObjectForIndexPath:indexPath];
-  if ([object.type isEqual:DFFeedObjectInviteStrand]) {
-    DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:object];
-    [self.navigationController pushViewController:feedViewController animated:YES];
-  } else if ([object.type isEqual:DFFeedObjectSwapSuggestion]) {
-    DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
-                                                          initWithHighlightedPhotoCollection:object];
-    
-    [self presentViewController:createStrandFlow animated:YES completion:nil];
+  id object = [self feedObjectForIndexPath:indexPath];
+  if ([[object class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
+    DFPeanutFeedObject *feedObject;
+    if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
+      DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:object];
+      [self.navigationController pushViewController:feedViewController animated:YES];
+    } else if ([feedObject.type isEqual:DFFeedObjectSwapSuggestion]) {
+      DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
+                                                            initWithHighlightedPhotoCollection:object];
+      [self presentViewController:createStrandFlow animated:YES completion:nil];
+    }
+  } else if ([[object class] isSubclassOfClass:[DFSwapUpsell class]]) {
+    DFSwapUpsell *upsell = (DFSwapUpsell *)object;
+    if ([upsell.type isEqual:DFSwapUpsellInviteFriends]) {
+      DFInviteFriendViewController *inviteFriendViewController = [[DFInviteFriendViewController alloc] init];
+      [self presentViewController:inviteFriendViewController animated:YES completion:nil];
+    }
   }
   [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }

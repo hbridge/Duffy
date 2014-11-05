@@ -15,6 +15,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subTitleLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *previewImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *profileReplacementImageView;
 
 + (CGFloat)height;
 + (UIEdgeInsets)edgeInsets;

@@ -97,6 +97,7 @@
 		5A83A3E019F04A6F0068F08B /* DFFeedViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */; };
 		5A883BE21A09653900355C1D /* DFStrandPeopleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BE01A09653900355C1D /* DFStrandPeopleViewController.m */; };
 		5A883BE31A09653900355C1D /* DFStrandPeopleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A883BE11A09653900355C1D /* DFStrandPeopleViewController.xib */; };
+		5A883BE61A09ACD400355C1D /* DFSwapUpsell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BE51A09ACD400355C1D /* DFSwapUpsell.m */; };
 		5A9115DB19DA08D3003F2A68 /* DFLabelCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */; };
 		5A9115DC19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */; };
 		5A9115DF19DA0F6B003F2A68 /* DFCircleBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115DE19DA0F6B003F2A68 /* DFCircleBadge.m */; };
@@ -417,6 +418,8 @@
 		5A883BDF1A09653900355C1D /* DFStrandPeopleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandPeopleViewController.h; sourceTree = "<group>"; };
 		5A883BE01A09653900355C1D /* DFStrandPeopleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandPeopleViewController.m; sourceTree = "<group>"; };
 		5A883BE11A09653900355C1D /* DFStrandPeopleViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandPeopleViewController.xib; sourceTree = "<group>"; };
+		5A883BE41A09ACD400355C1D /* DFSwapUpsell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSwapUpsell.h; sourceTree = "<group>"; };
+		5A883BE51A09ACD400355C1D /* DFSwapUpsell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwapUpsell.m; sourceTree = "<group>"; };
 		5A9115D819DA08D3003F2A68 /* DFLabelCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLabelCollectionViewCell.h; sourceTree = "<group>"; };
 		5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLabelCollectionViewCell.m; sourceTree = "<group>"; };
 		5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLabelCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -1206,6 +1209,8 @@
 				5AA36F0919F80ECA008B37AA /* DFSwapViewController.h */,
 				5AA36F0A19F80ECA008B37AA /* DFSwapViewController.m */,
 				5AA36F0B19F80ECA008B37AA /* DFSwapViewController.xib */,
+				5A883BE41A09ACD400355C1D /* DFSwapUpsell.h */,
+				5A883BE51A09ACD400355C1D /* DFSwapUpsell.m */,
 				5AB7BEBE1A028C20000BEB67 /* DFSwapTableViewCell.h */,
 				5AB7BEBF1A028C20000BEB67 /* DFSwapTableViewCell.m */,
 				5AB7BEC01A028C20000BEB67 /* DFSwapTableViewCell.xib */,
@@ -1866,6 +1871,7 @@
 				5A4C820519ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m in Sources */,
 				5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
+				5A883BE61A09ACD400355C1D /* DFSwapUpsell.m in Sources */,
 				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
 				65437DE419F810AA00D57F9D /* DFImageDownloadManager.m in Sources */,

@@ -27,6 +27,9 @@
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                     </view>
+                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="RXS-hD-KOp">
+                        <rect key="frame" x="15" y="12" width="45" height="45"/>
+                    </imageView>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TP8-fd-0ug">
                         <rect key="frame" x="70" y="18" width="182" height="33"/>
                         <subviews>
@@ -66,8 +69,12 @@
                     <constraint firstItem="Vcm-E6-ho6" firstAttribute="centerY" secondItem="TP8-fd-0ug" secondAttribute="centerY" id="1d5-qP-adv"/>
                     <constraint firstItem="Vcm-E6-ho6" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="7HS-Su-lfg"/>
                     <constraint firstAttribute="trailing" secondItem="tdG-RI-gL3" secondAttribute="trailing" constant="15" id="CCL-1w-Wg6"/>
+                    <constraint firstItem="RXS-hD-KOp" firstAttribute="height" secondItem="Vcm-E6-ho6" secondAttribute="height" id="Tb6-uU-h3Y"/>
+                    <constraint firstItem="RXS-hD-KOp" firstAttribute="centerY" secondItem="Vcm-E6-ho6" secondAttribute="centerY" id="WC7-qB-Vew"/>
+                    <constraint firstItem="RXS-hD-KOp" firstAttribute="centerX" secondItem="Vcm-E6-ho6" secondAttribute="centerX" id="ZxE-SH-pQF"/>
                     <constraint firstItem="TP8-fd-0ug" firstAttribute="leading" secondItem="Vcm-E6-ho6" secondAttribute="trailing" constant="10" id="cgz-wm-2Eu"/>
                     <constraint firstAttribute="centerY" secondItem="Vcm-E6-ho6" secondAttribute="centerY" id="dEt-jO-uie"/>
+                    <constraint firstItem="RXS-hD-KOp" firstAttribute="width" secondItem="Vcm-E6-ho6" secondAttribute="width" id="kec-kY-QcT"/>
                     <constraint firstAttribute="centerY" secondItem="tdG-RI-gL3" secondAttribute="centerY" id="snz-7J-v4T"/>
                     <constraint firstItem="tdG-RI-gL3" firstAttribute="leading" secondItem="TP8-fd-0ug" secondAttribute="trailing" constant="8" id="tu6-eN-O17"/>
                 </constraints>
@@ -76,6 +83,7 @@
                 <outlet property="peopleLabel" destination="DX7-Ic-BZM" id="njX-bZ-T0n"/>
                 <outlet property="previewImageView" destination="tdG-RI-gL3" id="UQS-em-gho"/>
                 <outlet property="profilePhotoStackView" destination="Vcm-E6-ho6" id="DD9-Su-RCU"/>
+                <outlet property="profileReplacementImageView" destination="RXS-hD-KOp" id="dCg-qB-GQH"/>
                 <outlet property="subTitleLabel" destination="4CT-1K-HwU" id="WzC-Tr-5RM"/>
             </connections>
             <point key="canvasLocation" x="531" y="367.5"/>
