@@ -480,7 +480,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 {
   id object = [self feedObjectForIndexPath:indexPath];
   if ([[object class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
-    DFPeanutFeedObject *feedObject;
+    DFPeanutFeedObject *feedObject = (DFPeanutFeedObject *)object;
     if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
       DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:object];
       [self.navigationController pushViewController:feedViewController animated:YES];
