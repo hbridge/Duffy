@@ -23,6 +23,11 @@ static const int MaxLogFiles = 10;
   return errorLogData;
 }
 
++ (NSString *)aggregatedLogString
+{
+  return [[NSString alloc] initWithData:[self aggregatedLogData] encoding:NSUTF8StringEncoding];
+}
+
 + (NSMutableArray *)errorLogData
 {
   DDFileLogger *fileLogger = [[DDFileLogger alloc] init];

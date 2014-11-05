@@ -139,9 +139,19 @@
       }
       #else
       NSData *logData = [DFLogs aggregatedLogData];
-       [[UIPasteboard generalPasteboard] setData:logData forPasteboardType:@"text/plain"];
-       [UIAlertView showSimpleAlertWithTitle:@"Copied To Clipboard"
-                            formatMessage:@"Log data has been copied to clipboard."];
+      NSString *filePath;
+      NSArray * paths = NSSearchPathForDirectoriesInDomains (NSDesktopDirectory, NSUserDomainMask, YES);
+      if (paths.firstObject) {
+        NSArray *pathComponents = [(NSString *)paths.firstObject pathComponents];
+        if ([pathComponents[1] isEqualToString:@"Users"]) {
+          filePath = [NSString stringWithFormat:@"/Users/%@/Desktop/%@.log",
+                                     pathComponents[2], [NSDate date]];
+          
+        }
+      }
+      [logData writeToFile:filePath atomically:NO];
+       [UIAlertView showSimpleAlertWithTitle:@"Copied To Desktop"
+                            formatMessage:@"Log data has been copied to your desktop."];
        #endif
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Send Feedback" identifier:@"sendFeedback" handler:^(id object) {

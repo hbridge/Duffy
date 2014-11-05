@@ -11,5 +11,6 @@
 @interface DFLogs : NSObject
 
 + (NSData *)aggregatedLogData;
++ (NSString *)aggregatedLogString;
 
 @end
