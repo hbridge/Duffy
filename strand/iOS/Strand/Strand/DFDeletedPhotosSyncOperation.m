@@ -31,6 +31,7 @@
       [self cancelled];
       return;
     }
+    dispatch_semaphore_t completionSemaphore = dispatch_semaphore_create(0);
     NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
     
     // Grab list of private images the server has handed us
@@ -65,10 +66,13 @@
         [[DFPeanutFeedDataManager sharedManager] refreshPrivatePhotosFromServer:^{
           DDLogVerbose(@"Refreshed private photos data after successful delete");
         }];
+        dispatch_semaphore_signal(completionSemaphore);
       } failure:^(NSError *error){
         DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
+        dispatch_semaphore_signal(completionSemaphore);
       }];
     }
+    dispatch_semaphore_wait(completionSemaphore, DISPATCH_TIME_FOREVER);
     DDLogInfo(@"Delete sync completed");
   }
 }
