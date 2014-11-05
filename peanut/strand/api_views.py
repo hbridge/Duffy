@@ -483,7 +483,7 @@ def getInviteObjectsDataForUser(user):
 
 
 def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
-	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
+	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
 
 	objects = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=dict())
 	objects = sorted(objects, key=lambda x: x['time_taken'])
