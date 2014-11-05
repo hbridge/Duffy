@@ -257,27 +257,11 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 
 	return output
 
-def getObjectsDataForPhotos(user, photos, feedObjectType, strand = None):
-	metadata = {'type': feedObjectType, 'title': ""}
-
-	# We are looking at this variable as a temp fix so that a strand id is passed
-	# to the client who can then hand it back.
-	if strand:
-		metadata['id'] = strand.id
-		
-	groups = [{'photos': photos, 'metadata': metadata}]
-
-	formattedGroups = getFormattedGroups(groups)
-		
-	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
-	return objects
-
 """
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None, suggestionCount = 100000):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None):
 	groups = list()
 
 	if friends == None:
@@ -287,59 +271,52 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		strandNeighborsCache = getStrandNeighborsCache(strands, friends)
 		printStats("neighbor-cache")
 
-	rankNum = 0
 	for strand in strands:
-		if rankNum < suggestionCount:
-			strandId = strand.id
-			photos = strand.photos.all()
+		strandId = strand.id
+		photos = strand.photos.all()
 
-			photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
-			photos = filter(lambda x: x.install_num >= 0, photos)
+		photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
+		photos = filter(lambda x: x.install_num >= 0, photos)
+		
+		if len(photos) == 0:
+			logger.warning("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
+			strand.delete()
+			continue
+		
+		interestedUsers = list()
+		if strand.id in strandNeighborsCache:
+			for neighborStrand in strandNeighborsCache[strand.id]:
+				if neighborStrand.location_point and strand.location_point:
+					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+
+		interestedUsers = list(set(interestedUsers))
+
+		if len(interestedUsers) > 0:
+			title = "might like these photos"
+		else:
+			title = ""
+
+		
+		suggestible = strand.suggestible
+
+		if suggestible and len(interestedUsers) == 0:
+			suggestible = False
 			
-			if len(photos) == 0:
-				logger.warning("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
-				strand.delete()
-				continue
-			
+		if not strands_util.getLocationForStrand(strand):
 			interestedUsers = list()
-			if strand.id in strandNeighborsCache:
-				for neighborStrand in strandNeighborsCache[strand.id]:
-					if neighborStrand.location_point and strand.location_point:
-						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+			suggestible = False
 
-			interestedUsers = list(set(interestedUsers))
+		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
+		entry = {'photos': photos, 'metadata': metadata}
 
-			if len(interestedUsers) > 0:
-				title = "might like these photos"
-				rank = rankNum
-				rankNum += 1
-			else:
-				title = ""
-				rank = None
-			
-			suggestible = strand.suggestible
-
-			if suggestible and len(interestedUsers) == 0:
-				suggestible = False
-				
-			if not strands_util.getLocationForStrand(strand):
-				interestedUsers = list()
-				suggestible = False
-
-			if not suggestible:
-				rank = None
-
-			metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible, 'suggestion_rank': rank}
-			entry = {'photos': photos, 'metadata': metadata}
-
-			groups.append(entry)
+		groups.append(entry)
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
 	formattedGroups = getFormattedGroups(groups)
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 500)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	printStats("private-strands")
 	return objects
 
@@ -505,6 +482,20 @@ def getInviteObjectsDataForUser(user):
 	return responseObjects
 
 
+def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
+	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
+
+	objects = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=dict())
+	objects = sorted(objects, key=lambda x: x['time_taken'])
+
+	for suggestion in objects:
+		suggestion['suggestible'] = True
+		suggestion['title'] = title
+		suggestion['suggestion_rank'] = rankNum
+		rankNum += 1
+	return objects
+
+
 #####################################################################################
 #################################  EXTERNAL METHODS  ################################
 #####################################################################################
@@ -655,6 +646,7 @@ def swaps(request):
 		responseObjects.extend(getInviteObjectsDataForUser(user))
 		printStats("swaps-invites")
 
+		# Now do neighbor suggestions
 		neighborIdList = friends_util.getFriendsIds(user.id)
 
 		strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=neighborIdList)) | (Q(strand_1_user_id__in=neighborIdList) & Q(strand_2_user_id=user.id)))
@@ -667,32 +659,47 @@ def swaps(request):
 
 		strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
 
+		# The prefetch for 'user' took a while here so just do it manually
 		for strand in strands:
 			for photo in strand.photos.all():
 				photo.user = user
 				
 		strands = list(strands)
-		printStats("strands-fetch")
-
-
-		# Want to filter somehow
-
-
+		printStats("swaps-strands-fetch")
 
 		strandNeighborsCache = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
-		printStats("neighbors-cache")
+		printStats("swaps-neighbors-cache")
 
-		suggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache)
+		neighborBasedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache)
+		neighborBasedSuggestions = filter(lambda x: x['suggestible'], neighborBasedSuggestions)
+		neighborBasedSuggestions = sorted(neighborBasedSuggestions, key=lambda x: x['time_taken'])
 
-		# These are suggestions filtered
-		suggestibleSuggestions = list()
-		for suggestion in suggestions:
-			if suggestion['suggestible']:
-				suggestibleSuggestions.append(suggestion)
-		responseObjects.extend(suggestibleSuggestions)
+		rankNum = 0
+		for suggestion in neighborBasedSuggestions:
+			suggestion['suggestion_rank'] = rankNum
+			rankNum += 1
+		responseObjects.extend(neighborBasedSuggestions)
+		printStats("swaps-neighbor-suggestions")
 		
-		printStats("swaps-suggestions")
+		# Now do halloween suggestions
+		halloweenNight = pytz.timezone("US/Eastern").localize(datetime.datetime(2014,10,31,21,0,0,0)).astimezone(pytz.timezone("UTC"))
+		lower = halloweenNight - datetime.timedelta(hours=3)
+		upper = halloweenNight + datetime.timedelta(hours=7)
+		halloweenObjects = getObjectsDataForSpecificTime(user, lower, upper, "Halloween", rankNum)
+		rankNum += len(halloweenObjects)
+		responseObjects.extend(halloweenObjects)
 
+		# Now do last night suggestions
+		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		yesterday = now - datetime.timedelta(days=1)
+		lastNight = yesterday.replace(hour=21, minute=0)
+		lower = lastNight - datetime.timedelta(hours=3)
+		upper = lastNight + datetime.timedelta(hours=7)
+		lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
+		responseObjects.extend(lastNightObjects)
+
+		printStats("swaps-time-suggestions")
+		
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
@@ -920,7 +927,7 @@ def auth_phone(request):
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['phone_number'])
 		accessCode = form.cleaned_data['sms_access_code']
-		displayName = form.cleaned_data['display_name'].strip()
+		displayName = form.cleaned_data['display_name']
 		phoneId = form.cleaned_data['phone_id']
 
 		if "555555" not in phoneNumber:
