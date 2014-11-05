@@ -31,7 +31,7 @@
       [self cancelled];
       return;
     }
-    dispatch_semaphore_t completionSemaphore = dispatch_semaphore_create(0);
+    
     NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
     
     // Grab list of private images the server has handed us
@@ -58,6 +58,7 @@
       return;
     }
     if (photoIdsToRemove.count > 0) {
+      dispatch_semaphore_t completionSemaphore = dispatch_semaphore_create(0);
       [self.photoAdapter markPhotosAsNotOnSystem:photoIdsToRemove success:^(NSArray *resultObjects){
         for (DFPeanutPhoto *photo in resultObjects) {
           DDLogInfo(@"Successfully marked photo %@ as not in the system", photo.id);
@@ -71,8 +72,10 @@
         DDLogError(@"Unable to mark photos as not in the system: %@", error.description);
         dispatch_semaphore_signal(completionSemaphore);
       }];
+      dispatch_semaphore_wait(completionSemaphore,
+                              dispatch_time(DISPATCH_TIME_NOW, (int64_t)(15 * NSEC_PER_SEC)));
     }
-    dispatch_semaphore_wait(completionSemaphore, DISPATCH_TIME_FOREVER);
+    
     DDLogInfo(@"Delete sync completed");
   }
 }
