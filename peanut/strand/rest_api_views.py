@@ -262,7 +262,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                 photo = self.simplePhotoSerializer(photoData)
                 objsToUpdate.append(photo)
                 
-            Photo.bulkUpdate(objsToUpdate, ['install_num'])
+            Photo.bulkUpdate(objsToUpdate, ['install_num', 'iphone_faceboxes_topleft'])
             objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
 
             response['patch_photos'] = [model_to_dict(photo) for photo in objsToUpdate]
