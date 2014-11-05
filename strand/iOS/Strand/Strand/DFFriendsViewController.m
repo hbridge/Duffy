@@ -144,10 +144,11 @@
   [self configureContactsUpsell];
 }
 
+static BOOL showContactsUpsell = NO;
 - (void)configureContactsUpsell
 {
   ABAuthorizationStatus status = [DFContactSyncManager contactsPermissionStatus];
-  if (status != kABAuthorizationStatusAuthorized) {
+  if (status != kABAuthorizationStatusAuthorized && showContactsUpsell) {
     // ask for contacts
     if (!self.contactsUpsellView) {
       self.contactsUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
