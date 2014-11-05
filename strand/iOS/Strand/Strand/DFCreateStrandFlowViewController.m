@@ -11,6 +11,7 @@
 
 #import "SVProgressHUD.h"
 #import "DFPeanutStrandInviteAdapter.h"
+#import "DFAnalytics.h"
 
 @interface DFCreateStrandFlowViewController ()
 
@@ -99,6 +100,13 @@
 {
   if (selectedFeedObjects.count == 0) {
     [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+    NSString *furthestReached = self.peoplePickerController ? @"peoplePicker" : @"photoPicker";
+    NSMutableDictionary *parameters = [@{@"furthestControllerReached" : furthestReached} mutableCopy];
+    [parameters addEntriesFromDictionary:self.extraAnalyticsInfo];
+    [DFAnalytics logCreateStrandFlowCompletedWithResult:DFAnalyticsValueResultAborted
+                                      numPhotosSelected:self.selectPhotosController.selectedObjects.count
+                                      numPeopleSelected:self.peoplePickerController.selectedPeanutContacts.count
+                                              extraInfo:parameters];
     return;
   }
   
@@ -199,15 +207,26 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 
 - (void)dismissWithErrorString:(NSString *)errorString
 {
+  DFCreateStrandFlowViewController __weak *weakSelf = self;
   void (^completion)(void) = ^{
     if (!errorString) {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [SVProgressHUD showSuccessWithStatus:@"Sent!"];
       });
+      [DFAnalytics logCreateStrandFlowCompletedWithResult:DFAnalyticsValueResultSuccess
+                                        numPhotosSelected:weakSelf.selectPhotosController.selectedObjects.count
+                                        numPeopleSelected:weakSelf.peoplePickerController.selectedPeanutContacts.count
+                                                extraInfo:weakSelf.extraAnalyticsInfo];
     } else {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [SVProgressHUD showErrorWithStatus:errorString];
       });
+      NSMutableDictionary *params = [@{@"errorString" : errorString} mutableCopy];
+      [params addEntriesFromDictionary:self.extraAnalyticsInfo];
+      [DFAnalytics logCreateStrandFlowCompletedWithResult:DFAnalyticsValueResultFailure
+                                        numPhotosSelected:weakSelf.selectPhotosController.selectedObjects.count
+                                        numPeopleSelected:weakSelf.peoplePickerController.selectedPeanutContacts.count
+                                                extraInfo:params];
     }
   };
   

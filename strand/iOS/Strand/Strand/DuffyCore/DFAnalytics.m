@@ -69,6 +69,9 @@ NSString* const SearchAbortedEvent = @"SearchExecuted";
 
 NSString* const SearchPageLoaded = @"SearchResultPageLoaded";
 
+// Create Strand
+NSString* const CreateStrandEvent = @"CreateStrand";
+
 
 // Uploads
 NSString* const UploadPhotoEvent = @"UploadPhoto";
@@ -129,7 +132,7 @@ static DFAnalytics *defaultLogger;
 #ifdef DEBUG
   [[LocalyticsSession shared]
    LocalyticsSession:@"7790abca456e78bb24ebdbb-8e7455f6-fe36-11e3-9fb0-009c5fda0a25"];
-  //  [[LocalyticsSession shared] setLoggingEnabled:YES];
+    [[LocalyticsSession shared] setLoggingEnabled:YES];
 #else
   [[LocalyticsSession shared]
    LocalyticsSession:@"dd0a7a0a4c9c1a5a602904f-285e4dea-5c55-11e4-a3a4-005cf8cbabd8"];
@@ -193,6 +196,21 @@ static DFAnalytics *defaultLogger;
   return className ? className : @"";
 }
 
++ (void)logCreateStrandFlowCompletedWithResult:(NSString *)result
+                             numPhotosSelected:(NSUInteger)numPhotos
+                             numPeopleSelected:(NSUInteger)numPeople
+                                     extraInfo:(NSDictionary *)extraInfo
+{
+  NSMutableDictionary *parameters = [@{ResultKey : result,
+                                       @"photosSelected" : [self bucketStringForObjectCount:numPhotos],
+                                       @"peopleSelected" : [self bucketStringForObjectCount:numPeople],
+                                       } mutableCopy];
+  [parameters addEntriesFromDictionary:extraInfo];
+  DDLogVerbose(@"%@ create strand attrs: %@", self.class, parameters);
+  [self logEvent:CreateStrandEvent withParameters:parameters];
+}
+
+
 + (void)logSwitchBetweenPhotos:(NSString *)actionType
 {
     [DFAnalytics logEvent:SwitchedPhotoToPhotoEvent withParameters:@{ActionTypeKey: actionType}];
@@ -210,12 +228,12 @@ static DFAnalytics *defaultLogger;
 {
     [DFAnalytics logEvent:UploadPhotoEvent withParameters:@{
                                                             ResultKey: resultValue,
-                                                            NumberKey: [self bucketStringForNumPhotos:numPhotos],
+                                                            NumberKey: [self bucketStringForObjectCount:numPhotos],
                                                             SessionAvgKBPSKey: [DFAnalytics bucketStringForKBPS:KBPS]
                                                             }];
 }
 
-+ (NSString *)bucketStringForNumPhotos:(NSUInteger)numPhotos
++ (NSString *)bucketStringForObjectCount:(NSUInteger)numPhotos
 {
   if (numPhotos == 0) return @"0";
   if (numPhotos == 1) return @"1";

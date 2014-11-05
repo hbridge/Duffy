@@ -16,6 +16,7 @@
 @property (nonatomic, retain) DFSelectPhotosViewController *selectPhotosController;
 @property (nonatomic, retain) DFPeoplePickerViewController *peoplePickerController;
 @property (nonatomic, retain) DFPeanutFeedObject *highlightedCollection;
+@property (nonatomic, retain) NSDictionary *extraAnalyticsInfo;
 
 - (instancetype)initWithHighlightedPhotoCollection:(DFPeanutFeedObject *)highlightedCollection;
 - (void)refreshFromServer;

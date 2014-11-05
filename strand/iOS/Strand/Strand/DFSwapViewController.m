@@ -499,6 +499,10 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
       DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
                                                             initWithHighlightedPhotoCollection:object];
       [self presentViewController:createStrandFlow animated:YES completion:nil];
+      createStrandFlow.extraAnalyticsInfo =
+       @{
+        @"suggestionActorsCount" : [DFAnalytics bucketStringForObjectCount:feedObject.actors.count]
+        };
     }
   } else if ([[object class] isSubclassOfClass:[DFSwapUpsell class]]) {
     DFSwapUpsell *upsell = (DFSwapUpsell *)object;

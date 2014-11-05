@@ -51,6 +51,12 @@ extern NSString* const DFAnalyticsValueResultInvalidInput;
 + (void)logViewController:(UIViewController *)viewController
 disappearedWithParameters:(NSDictionary *)params;
 
+/* Create strand */
++ (void)logCreateStrandFlowCompletedWithResult:(NSString *)result
+                             numPhotosSelected:(NSUInteger)numPhotos
+                             numPeopleSelected:(NSUInteger)numPeople
+                                     extraInfo:(NSDictionary *)extraInfo;
+
 /* Uploads */
 + (void)logUploadEndedWithResult:(NSString *)resultValue;
 + (void)logUploadEndedWithResult:(NSString *)resultValue
@@ -86,5 +92,9 @@ disappearedWithParameters:(NSDictionary *)params;
 /* Contacts */
 + (void)logAddContactCompletedWithResult:(NSString *)result;
 
+
+#pragma mark - Utiltiies
+
++ (NSString *)bucketStringForObjectCount:(NSUInteger)objectCount;
 
 @end
