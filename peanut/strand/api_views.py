@@ -920,7 +920,7 @@ def auth_phone(request):
 	if (form.is_valid()):
 		phoneNumber = str(form.cleaned_data['phone_number'])
 		accessCode = form.cleaned_data['sms_access_code']
-		displayName = form.cleaned_data['display_name']
+		displayName = form.cleaned_data['display_name'].strip()
 		phoneId = form.cleaned_data['phone_id']
 
 		if "555555" not in phoneNumber:
