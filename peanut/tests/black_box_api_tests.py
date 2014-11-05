@@ -222,8 +222,7 @@ if __name__ == '__main__':
 	else:
 		sys.exit("You need to pass in a base url and a unittest account")
 
-	unittest.main()
-	#ExistingUsersAccountsSuite = unittest.TestLoader().loadTestsFromTestCase(ExistingUsersAccountsTests)
-	#OneOffMethodsSuite = unittest.TestLoader().loadTestsFromTestCase(OneOffMethodsTests)
-	#unittest.TextTestRunner(verbosity=2).run(ExistingUsersAccountsSuite)	
+	#unittest.main()
+	SwapTestsSuite = unittest.TestLoader().loadTestsFromTestCase(SwapTests)
+	unittest.TextTestRunner(verbosity=2).run(SwapTestsSuite)	
 	#unittest.TextTestRunner(verbosity=2).run(OneOffMethodsSuite)
