@@ -71,7 +71,8 @@
   DFPhotoViewController __weak *weakSelf = self;
   [[DFImageManager sharedManager]
    imageForID:photo.id
-   size:self.photoView.frame.size
+   size:CGSizeMake(self.photoView.frame.size.width * [[UIScreen mainScreen] scale],
+                   self.photoView.frame.size.height * [[UIScreen mainScreen] scale])
    contentMode:DFImageRequestContentModeAspectFit
    deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
    completion:^(UIImage *image) {
