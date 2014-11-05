@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="refresh" content="300">
-	<title>Strand ({{ strandV2List|length }})</title> 
+	<title>{{ strandV2List|length }} Swap Accounts</title> 
 </head>
 <style>
 	html, body { padding: 0; margin: 0; font-family: arial; font-size: 12px;}
@@ -96,7 +96,7 @@
 				<td class='counts'> {{ peopleCounts.friends }} </td>
 			</tr>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> Strands </td>
+				<td class='col1 right b-r'> Swaps </td>
 				<td class='counts'> {{ strandCounts.all }} </td>
 			</tr>
 			<tr class='ui-row' >
@@ -122,7 +122,7 @@
 				<td class='counts'> {{ statsCounts.friendsPerUser|floatformat:1 }} </td>
 			</tr>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> Strands/User </td>
+				<td class='col1 right b-r'> Swaps/User </td>
 				<td class='counts'> {{ statsCounts.strandsPerUser|floatformat:1 }} </td>
 			</tr>
 			<tr class='ui-row' >
@@ -145,10 +145,10 @@
 		</table>
 	</div>					
 	<div class='top-table'>
-		<div class='ui-header center'> Strand.photos </div>
+		<div class='ui-header center'> Swap Photos </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> All Strands </td>
+				<td class='col1 right b-r'> All Swaps </td>
 				<td class='counts'> {{ strandCounts.all }} </td>
 			</tr>
 			<tr class='ui-row' >
@@ -172,10 +172,10 @@
 	</div>
 
 	<div class='top-table'>
-		<div class='ui-header center'> Strand.users </div>
+		<div class='ui-header center'> Swap Users </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row' >
-				<td class='col1 right b-r'> All Strands </td>
+				<td class='col1 right b-r'> All Swaps </td>
 				<td class='counts'> {{ userCounts.all }} </td>
 			</tr>
 			<tr class='ui-row' >
@@ -224,7 +224,7 @@
 
 	{% if strandV2List %}
 	<div class='bottom-summary'>
-		<div class='ui-header'> Strand v2 &mdash; {{ strandV2List|length }} accounts </div>
+		<div class='ui-header'> Swap &mdash; {{ strandV2List|length }} accounts </div>
 		<table class='ui-table' cellpadding='3'>
 			<tr class='ui-row-header' >
 				<th class='before b-r' colspan='3' > </th>
@@ -243,8 +243,8 @@
 				<td class='gps-count center b-r'> with GPS <br> (%)</td>
 				<td class='thumbs center b-r'> Shared <br> (7d | all) </td>
 				<td class='requests center b-r'> Requests <br> Sent </td>
-				<td class='strands_created center b-r'> Strands <br> Created </td>
-				<td class='strands_joined center b-r'> Strands <br> Joined </td>
+				<td class='strands_created center b-r'> Swaps <br> Created </td>
+				<td class='strands_joined center b-r'> Swaps <br> Joined </td>
 				<td class='photos_added center b-r'> Photos <br> Added  </td>
 				<td class='favs center b-r'> Favs </td>
 				<td class='notifications center b-r'> Sent <br> (7d)</td>
