@@ -486,7 +486,7 @@ def getObjectsDataForSpecificTime(user, lower, upper, title, rankNum):
 	strands = Strand.objects.prefetch_related('photos', 'user').filter(user=user).filter(private=True).filter(suggestible=True).filter(contributed_to_id__isnull=True).filter(Q(first_photo_time__gt=lower) & Q(first_photo_time__lt=upper))
 
 	objects = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=dict())
-	objects = sorted(objects, key=lambda x: x['time_taken'])
+	objects = sorted(objects, key=lambda x: x['time_taken'], reverse=True)
 
 	for suggestion in objects:
 		suggestion['suggestible'] = True
@@ -672,7 +672,7 @@ def swaps(request):
 
 		neighborBasedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache)
 		neighborBasedSuggestions = filter(lambda x: x['suggestible'], neighborBasedSuggestions)
-		neighborBasedSuggestions = sorted(neighborBasedSuggestions, key=lambda x: x['time_taken'])
+		neighborBasedSuggestions = sorted(neighborBasedSuggestions, key=lambda x: x['time_taken'], reverse=True)
 
 		rankNum = 0
 		for suggestion in neighborBasedSuggestions:
