@@ -261,7 +261,7 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, strandNeighborsCache = None, locationRequired = True):
 	groups = list()
 
 	if friends == None:
@@ -302,8 +302,10 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		if suggestible and len(interestedUsers) == 0:
 			suggestible = False
 			
-		if not strands_util.getLocationForStrand(strand):
+		if not strands_util.getLocationForStrand(strand) and locationRequired:
 			interestedUsers = list()
+			suggestible = False
+		elif not locationRequired and strands_util.getLocationForStrand(strand):
 			suggestible = False
 
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
@@ -681,7 +683,7 @@ def swaps(request):
 			suggestion['suggestion_type'] = "friend-location"
 			rankNum += 1
 		responseObjects.extend(neighborBasedSuggestions)
-		printStats("swaps-neighbor-suggestions")
+		printStats("swaps-location-suggestions")
 		
 		# Now do halloween suggestions
 		halloweenNight = pytz.timezone("US/Eastern").localize(datetime.datetime(2014,10,31,21,0,0,0)).astimezone(pytz.timezone("UTC"))
@@ -701,6 +703,18 @@ def swaps(request):
 		responseObjects.extend(lastNightObjects)
 
 		printStats("swaps-time-suggestions")
+
+		if len(responseObjects) < 20:
+			noLocationSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache, locationRequired=False)
+			noLocationSuggestions = filter(lambda x: x['suggestible'], noLocationSuggestions)
+			noLocationSuggestions = sorted(noLocationSuggestions, key=lambda x: x['time_taken'], reverse=True)
+
+			for suggestion in noLocationSuggestions:
+				suggestion['suggestion_rank'] = rankNum
+				suggestion['suggestion_type'] = "friend-nolocation"
+				rankNum += 1
+			responseObjects.extend(noLocationSuggestions)
+			printStats("swaps-nolocation-suggestions")
 		
 		response['objects'] = responseObjects
 	else:
