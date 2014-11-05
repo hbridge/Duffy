@@ -422,7 +422,18 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   DFSwapTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
   suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
     // the suggestion sections don't include this user in the actors list
-  NSString *titleMarkup = [NSString stringWithFormat:@"with <name>%@</name>", [suggestionObject actorsString]];
+  
+  NSString *titleMarkup;
+  
+  // If we have no actors for a suggestion, right now that means its time based ("Last Night")
+  // For now, simply replace the title and image.
+  // Later on, we might want to pull this out to its own type
+  if (suggestionObject.actorNames.count == 0) {
+    titleMarkup = suggestionObject.title;
+    suggestionCell.profileReplacementImageView.image = [UIImage imageNamed:@"Assets/Icons/PhotosSuggestionIcon"];
+  } else {
+    titleMarkup = [NSString stringWithFormat:@"with <name>%@</name>", [suggestionObject actorsString]];
+  }
   
   [self configureCell:suggestionCell
             indexPath:indexPath
