@@ -528,44 +528,44 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
     return _persistentStoreCoordinator;
   }
   
-  NSURL *storeURL = [[DFPhotoStore applicationDocumentsDirectory] URLByAppendingPathComponent:@"Duffy.sqlite"];
-  
   NSError *error = nil;
-  _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:[self managedObjectModel]];
-  if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
-                                                 configuration:nil
-                                                           URL:storeURL
-                                                       options:nil//@{NSMigratePersistentStoresAutomaticallyOption:@YES, NSInferMappingModelAutomaticallyOption:@YES}
-                                                         error:&error]) {
+  _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc]
+                                 initWithManagedObjectModel:[self managedObjectModel]];
+  if (![_persistentStoreCoordinator
+        addPersistentStoreWithType:NSSQLiteStoreType
+        configuration:nil
+        URL:[self storeURL]
+        options: @{
+                   NSMigratePersistentStoresAutomaticallyOption:@YES,
+                   NSInferMappingModelAutomaticallyOption:@YES
+                   }
+        error:&error]) {
     
     DDLogError(@"Error loading persistent store %@, %@", error, [error userInfo]);
     error = nil;
-    [[NSFileManager defaultManager] removeItemAtURL:storeURL error:nil];
-    DDLogWarn(@"Deleted persistent store %@, error: %@", storeURL, error);
-    error = nil;
-    NSURL *storeShm = [[storeURL URLByDeletingPathExtension]
-                       URLByAppendingPathComponent:@"sqlite-shm"];
-    [[NSFileManager defaultManager] removeItemAtURL:storeShm
-                                              error:&error];
-    DDLogWarn(@"Deleted store shm %@, error: %@", storeShm, error);
-    error = nil;
-    NSURL *storeWal = [[storeURL URLByDeletingPathExtension]
-                       URLByAppendingPathComponent:@"sqlite-wal"];
-    [[NSFileManager defaultManager] removeItemAtURL:storeWal
-                                              error:&error];
-    DDLogWarn(@"Deleted store wal %@, error: %@", storeWal, error);
-    
-    if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType
-                                                   configuration:nil
-                                                             URL:storeURL
-                                                         options:nil
-                                                           error:&error]) {
-      DDLogError(@"Still got error loading persistent store after deleting: %@, %@", error, error.userInfo);
-      abort();
-    }
   }
   
   return _persistentStoreCoordinator;
+}
+
+- (void)deleteLocalDB
+{
+  NSURL *storeURL = [self.class storeURL];
+  NSError *error;
+  [[NSFileManager defaultManager] removeItemAtURL:storeURL error:&error];
+  DDLogWarn(@"Deleted persistent store %@, error: %@", storeURL, error);
+  error = nil;
+  NSURL *storeShm = [[storeURL URLByDeletingPathExtension]
+                     URLByAppendingPathComponent:@"sqlite-shm"];
+  [[NSFileManager defaultManager] removeItemAtURL:storeShm
+                                            error:&error];
+  DDLogWarn(@"Deleted store shm %@, error: %@", storeShm, error);
+  error = nil;
+  NSURL *storeWal = [[storeURL URLByDeletingPathExtension]
+                     URLByAppendingPathComponent:@"sqlite-wal"];
+  [[NSFileManager defaultManager] removeItemAtURL:storeWal
+                                            error:&error];
+  DDLogWarn(@"Deleted store wal %@, error: %@", storeWal, error);
 }
 
 - (void)saveContext
@@ -646,8 +646,12 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   }
 }
 
-
 #pragma mark - Application's Documents directory
+
++ (NSURL *) storeURL
+{
+  return [[DFPhotoStore applicationDocumentsDirectory] URLByAppendingPathComponent:@"Duffy.sqlite"];
+}
 
 // Returns the URL to the application's Documents directory.
 + (NSURL *)applicationDocumentsDirectory
