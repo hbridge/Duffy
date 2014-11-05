@@ -97,3 +97,19 @@ STATICFILES_DIRS = (
 	# Don't forget to use absolute paths, not relative paths.
    '/home/aseem/repos/Duffy/peanut/static',
 )
+
+DEFAULT_FROM_EMAIL = 'swap-stats@duffytech.co'
+
+EMAIL_HOST = 'email-smtp.us-east-1.amazonaws.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'AKIAJHHJPIGXPBWBGSKQ'
+EMAIL_HOST_PASSWORD = 'AiAvYbMDxI7DbOlS9wWrsvbyVuykMNwIMnPkefsFH++O'
+EMAIL_USE_TLS = True
+
+SERVER_EMAIL = 'dev@duffyapp.com'
+
+ADMINS = (
+	('Admins', 'server-errors@duffytech.co'),
+)
+
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "prod.strand.duffyapp.com", "dev.duffyapp.com"]
