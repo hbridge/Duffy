@@ -234,6 +234,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     self.sectionTitlesToObjects[SuggestedSectionTitle] = self.filteredSuggestions;
   }
   if (!self.userToFilter) {
+    if (!self.sectionTitlesToObjects[SuggestedSectionTitle]) {
+      self.sectionTitlesToObjects[SuggestedSectionTitle] = [NSMutableArray new];
+    }
     [self.sectionTitlesToObjects[SuggestedSectionTitle] addObjectsFromArray:self.systemUpsells];
   }
 }
