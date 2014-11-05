@@ -45,6 +45,7 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 @property (nonatomic, retain) NSNumber *ready;
 @property (nonatomic, retain) NSNumber *suggestible;
 @property (nonatomic, retain) NSNumber *suggestion_rank;
+@property (nonatomic, retain) NSString *suggestion_type;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;
 

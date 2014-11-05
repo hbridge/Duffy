@@ -80,6 +80,7 @@ static NSArray *FeedObjectTypes;
            @"ready",
            @"suggestible",
            @"suggestion_rank",
+           @"suggestion_type",
            @"full_width",
            @"full_height",
            ];
