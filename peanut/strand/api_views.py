@@ -286,7 +286,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		interestedUsers = list()
 		if strand.id in strandNeighborsCache:
 			for neighborStrand in strandNeighborsCache[strand.id]:
-				if neighborStrand.location_point and strand.location_point and locationRequired:
+				if neighborStrand.location_point and strand.location_point:
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
@@ -306,8 +306,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			
 		if not strands_util.getLocationForStrand(strand) and locationRequired:
 			interestedUsers = list()
-			suggestible = False
-		elif not locationRequired and strands_util.getLocationForStrand(strand):
 			suggestible = False
 
 		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
@@ -575,7 +573,7 @@ def private_strands(request):
 		strandNeighborsCache = getStrandNeighborsCache(strands, friends, withUsers=True)
 		printStats("neighbors-cache")
 		
-		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, strandNeighborsCache=strandNeighborsCache)
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, strandNeighborsCache=strandNeighborsCache, locationRequired = False)
 		
 		printStats("private-3")
 	else:
@@ -675,16 +673,19 @@ def swaps(request):
 		strandNeighborsCache = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
 		printStats("swaps-neighbors-cache")
 
-		neighborBasedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache)
-		neighborBasedSuggestions = filter(lambda x: x['suggestible'], neighborBasedSuggestions)
-		neighborBasedSuggestions = sorted(neighborBasedSuggestions, key=lambda x: x['time_taken'], reverse=True)
+		locationBasedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache)
+		locationBasedSuggestions = filter(lambda x: x['suggestible'], locationBasedSuggestions)
+		locationBasedSuggestions = sorted(locationBasedSuggestions, key=lambda x: x['time_taken'], reverse=True)
 
 		rankNum = 0
-		for suggestion in neighborBasedSuggestions:
+		locationBasedIds = list()
+		for suggestion in locationBasedSuggestions:
 			suggestion['suggestion_rank'] = rankNum
 			suggestion['suggestion_type'] = "friend-location"
 			rankNum += 1
-		responseObjects.extend(neighborBasedSuggestions)
+			locationBasedIds.append(suggestion['id'])
+
+		responseObjects.extend(locationBasedSuggestions)
 		printStats("swaps-location-suggestions")
 		
 		# Now do halloween suggestions
@@ -711,6 +712,8 @@ def swaps(request):
 			noLocationSuggestions = filter(lambda x: x['suggestible'], noLocationSuggestions)
 			noLocationSuggestions = sorted(noLocationSuggestions, key=lambda x: x['time_taken'], reverse=True)
 
+			# Filter out the location based suggestions we got before
+			noLocationSuggestions = filter(lambda x: x['id'] not in locationBasedIds, noLocationSuggestions)
 			for suggestion in noLocationSuggestions:
 				suggestion['suggestion_rank'] = rankNum
 				suggestion['suggestion_type'] = "friend-nolocation"
