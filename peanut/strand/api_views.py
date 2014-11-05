@@ -158,7 +158,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 # ------------------------
 
-def getActorsObjectData(users, includePhone = False, invitedUsers = None):
+def getActorsObjectData(users, includePhone = True, invitedUsers = None):
 	if not isinstance(users, list):
 		users = [users]
 
@@ -696,11 +696,11 @@ def swaps(request):
 		responseObjects.extend(halloweenObjects)
 
 		# Now do last night suggestions
-		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
+		now = pytz.timezone("US/Eastern").localize(datetime.datetime.now())
 		yesterday = now - datetime.timedelta(days=1)
 		lastNight = yesterday.replace(hour=21, minute=0)
 		lower = lastNight - datetime.timedelta(hours=3)
-		upper = lastNight + datetime.timedelta(hours=7)
+		upper = lastNight + datetime.timedelta(hours=3)
 		lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
 		responseObjects.extend(lastNightObjects)
 
