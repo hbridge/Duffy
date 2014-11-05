@@ -1,39 +1,54 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6245" systemVersion="13F34" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <deployment defaultVersion="1792" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6238"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="91" id="Aiu-ea-22s">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="91"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="105" id="Aiu-ea-22s">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="105"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Aiu-ea-22s" id="d1B-S6-HfG">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="90"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Results" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CIj-dN-CMy">
-                        <rect key="frame" x="118" y="20" width="84" height="21"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Add Results from Contacts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Ulb-15-I7H">
-                        <rect key="frame" x="56" y="49" width="208" height="21"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                        <color key="textColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
-                        <nil key="highlightedColor"/>
-                    </label>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="XCN-Ig-5Oi" userLabel="Centering Wrapper">
+                        <rect key="frame" x="8" y="15" width="304" height="74"/>
+                        <subviews>
+                            <button opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="21E-2a-bnk" customClass="DFActionButton">
+                                <rect key="frame" x="40" y="36" width="225" height="38"/>
+                                <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <state key="normal" title="Add Results from Contacts">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                            </button>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="No Results" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CIj-dN-CMy">
+                                <rect key="frame" x="110" y="0.0" width="84" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="CIj-dN-CMy" firstAttribute="top" secondItem="XCN-Ig-5Oi" secondAttribute="top" id="3XE-aF-OkI"/>
+                            <constraint firstAttribute="bottom" secondItem="21E-2a-bnk" secondAttribute="bottom" id="BJB-oR-mbl"/>
+                            <constraint firstItem="21E-2a-bnk" firstAttribute="top" secondItem="CIj-dN-CMy" secondAttribute="bottom" constant="15" id="Db6-Vl-qdg"/>
+                            <constraint firstAttribute="centerX" secondItem="21E-2a-bnk" secondAttribute="centerX" id="R2t-iQ-E9t"/>
+                            <constraint firstAttribute="centerX" secondItem="CIj-dN-CMy" secondAttribute="centerX" id="UqO-ib-kAb"/>
+                        </constraints>
+                    </view>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="centerY" secondItem="CIj-dN-CMy" secondAttribute="centerY" constant="14.5" id="6zz-t6-qid"/>
-                    <constraint firstAttribute="centerY" secondItem="Ulb-15-I7H" secondAttribute="centerY" constant="-14.5" id="FAS-y6-0LK"/>
-                    <constraint firstAttribute="centerX" secondItem="Ulb-15-I7H" secondAttribute="centerX" id="S9v-c6-B4V"/>
-                    <constraint firstAttribute="centerX" secondItem="CIj-dN-CMy" secondAttribute="centerX" id="jnp-kr-4Lh"/>
+                    <constraint firstAttribute="centerY" secondItem="XCN-Ig-5Oi" secondAttribute="centerY" id="Zzx-dL-zd3"/>
+                    <constraint firstItem="XCN-Ig-5Oi" firstAttribute="leading" secondItem="d1B-S6-HfG" secondAttribute="leadingMargin" id="lTM-gD-uzv"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="XCN-Ig-5Oi" secondAttribute="trailing" id="mwK-j6-Dn4"/>
                 </constraints>
             </tableViewCellContentView>
+            <point key="canvasLocation" x="212" y="457.5"/>
         </tableViewCell>
     </objects>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">

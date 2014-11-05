@@ -479,7 +479,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
   id object = [self objectForIndexPath:indexPath tableView:tableView];
   if (object) return 54.0;
   
-  return 91.0;
+  return 105;
 }
 
 #pragma mark - Action Responses
