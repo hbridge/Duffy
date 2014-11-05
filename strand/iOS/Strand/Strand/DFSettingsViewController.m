@@ -27,6 +27,7 @@
 #import "DFSMSInviteStrandComposeViewController.h"
 #import "DFNavigationController.h"
 #import <Slash/Slash.h>
+#import "DFLogs.h"
 
 @interface DFSettingsViewController ()
 
@@ -130,22 +131,25 @@
                      navigationController:self.navigationController]
        accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Report Issue" identifier:@"reportIssue" handler:^(id object) {
-      
+      #ifndef TARGET_IPHONE_SIMULATOR
       DFDiagnosticInfoMailComposeController *mailComposer =
       [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeIssue];
       if (mailComposer) { // if the user hasn't setup email, this will come back nil
         [self presentViewController:mailComposer animated:YES completion:nil];
-      }     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+      }
+      #else
+      NSData *logData = [DFLogs aggregatedLogData];
+       [[UIPasteboard generalPasteboard] setData:logData forPasteboardType:@"text/plain"];
+       [UIAlertView showSimpleAlertWithTitle:@"Copied To Clipboard"
+                            formatMessage:@"Log data has been copied to clipboard."];
+       #endif
+    } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Send Feedback" identifier:@"sendFeedback" handler:^(id object) {
-      #ifndef TARGET_IPHONE_SIMULATOR
-        DFDiagnosticInfoMailComposeController *mailComposer =
-        [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeFeedback];
-        if (mailComposer) {
-          [self presentViewController:mailComposer animated:YES completion:nil];
-        }
-     #else
-      
-     #endif
+      DFDiagnosticInfoMailComposeController *mailComposer =
+      [[DFDiagnosticInfoMailComposeController alloc] initWithMailType:DFMailTypeFeedback];
+      if (mailComposer) {
+        [self presentViewController:mailComposer animated:YES completion:nil];
+      }
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Location Map" identifier:@"locationMap" handler:^(id object) {
       CLLocation *location = [[DFBackgroundLocationManager sharedBackgroundLocationManager] lastLocation];
