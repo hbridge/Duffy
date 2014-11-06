@@ -130,7 +130,9 @@ static DFUploadController *defaultUploadController;
 
 - (BOOL)isUploadInProgress
 {
-  return self.thumbnailsObjectIDQueue.numObjectsIncomplete + self.fullImageObjectIDQueue.numObjectsIncomplete > 0;
+  return (self.thumbnailsObjectIDQueue.numObjectsIncomplete +
+          self.fullImageObjectIDQueue.numObjectsIncomplete +
+          self.metadataQueue.numObjectsIncomplete) > 0;
 }
 
 #pragma mark - Upload scheduling

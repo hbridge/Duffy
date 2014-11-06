@@ -13,6 +13,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutPhoto.h"
 #import "DFPhotoStore.h"
+#import "DFUploadController.h"
 
 @interface DFDeletedPhotosSyncOperation ()
 @property (readonly, nonatomic, retain) DFPeanutPhotoAdapter *photoAdapter;
@@ -29,6 +30,12 @@
     DDLogInfo(@"%@ main beginning.", self.class);
     if (self.isCancelled) {
       [self cancelled];
+      return;
+    }
+    
+    // If we're currently uploading stuff, then don't go deleting anything.
+    if ([[DFUploadController sharedUploadController] isUploadInProgress]) {
+      DDLogInfo(@"Leaving delete sync because upload is in progress");
       return;
     }
     
