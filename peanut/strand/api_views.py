@@ -652,7 +652,9 @@ def swaps(request):
 		inviteObjectIds = list()
 		for objects in inviteObjects:
 			# This grabs the id of the suggestions post object, which is the private strand id
-			inviteObjectIds.append(objects['objects'][1]['objects'][0]['id'])
+			suggestedStrands = objects['objects'][1]['objects']
+			for suggestedStrand in suggestedStrands:
+				inviteObjectIds.append(suggestedStrand['id'])
 		printStats("swaps-invites")
 
 		# Now do neighbor suggestions
