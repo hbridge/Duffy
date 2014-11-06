@@ -787,6 +787,19 @@ class ApiCache(models.Model):
 	class Meta:
 		db_table = 'strand_api_cache'
 
+
+class LocationRecord(models.Model):
+	user = models.ForeignKey(User, db_index=True)
+	point = models.PointField(db_index=True)
+	accuracy = models.IntegerField(null=True)
+	timestamp = models.DateTimeField(null=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'strand_location_records'
+
+
 @receiver(post_save, sender=Action)
 def sendNotificationsUponActions(sender, **kwargs):
 	action = kwargs.get('instance')
