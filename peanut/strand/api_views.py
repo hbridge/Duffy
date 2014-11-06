@@ -648,6 +648,11 @@ def swaps(request):
 		# First throw in invite objects
 		inviteObjects = getInviteObjectsDataForUser(user)
 		responseObjects.extend(inviteObjects)
+
+		inviteObjectIds = list()
+		for objects in inviteObjects:
+			# This grabs the id of the suggestions post object, which is the private strand id
+			inviteObjectIds.append(objects['objects'][1]['objects'][0]['id'])
 		printStats("swaps-invites")
 
 		# Now do neighbor suggestions
@@ -686,7 +691,9 @@ def swaps(request):
 			rankNum += 1
 			locationBasedIds.append(suggestion['id'])
 
-		responseObjects.extend(locationBasedSuggestions)
+		for objects in locationBasedSuggestions:
+			if objects['id'] not in inviteObjectIds:
+				responseObjects.append(objects)
 		printStats("swaps-location-suggestions")
 
 		if len(inviteObjects) == 0:
@@ -696,7 +703,10 @@ def swaps(request):
 			upper = halloweenNight + datetime.timedelta(hours=7)
 			halloweenObjects = getObjectsDataForSpecificTime(user, lower, upper, "Halloween", rankNum)
 			rankNum += len(halloweenObjects)
-			responseObjects.extend(halloweenObjects)
+
+			for objects in halloweenObjects:
+				if objects['id'] not in inviteObjectIds:
+					responseObjects.append(objects)
 			
 			# Now do last night suggestions
 			now = datetime.datetime.utcnow()
@@ -710,7 +720,11 @@ def swaps(request):
 			upper = lower + datetime.timedelta(hours=8) # So this now means 3 am
 
 			lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
-			responseObjects.extend(lastNightObjects)
+			rankNum += len(lastNightObjects)
+			
+			for objects in lastNightObjects:
+				if objects['id'] not in inviteObjectIds:
+					responseObjects.append(objects)
 
 			printStats("swaps-time-suggestions")
 
@@ -725,6 +739,11 @@ def swaps(request):
 					suggestion['suggestion_rank'] = rankNum
 					suggestion['suggestion_type'] = "friend-nolocation"
 					rankNum += 1
+
+				for objects in noLocationSuggestions:
+					if objects['id'] not in inviteObjectIds:
+						responseObjects.append(objects)
+
 				responseObjects.extend(noLocationSuggestions)
 				printStats("swaps-nolocation-suggestions")
 		
