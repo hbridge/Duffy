@@ -15,8 +15,15 @@
 #import "DFPeanutPhoto.h"
 #import "DFPeanutFaceFeature.h"
 
+@interface DFFaceDetectionSyncOperation()
+
+@property (readonly, nonatomic, retain) NSManagedObjectContext *context;
+
+@end
 
 @implementation DFFaceDetectionSyncOperation
+
+@synthesize context = _context;
 
 const int CurrentPassValue = 1;
 
@@ -29,19 +36,21 @@ const int CurrentPassValue = 1;
       [self cancelled];
       return;
     }
-    NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
-    NSArray *photosToScan = [DFPhotoStore photosWithFaceDetectPassBelow:@(1) inContext:context];
+    
+    [self setupContext];
+    
+    NSArray *photosToScan = [DFPhotoStore photosWithFaceDetectPassBelow:@(1) inContext:self.context];
     DDLogInfo(@"%@ found %@ photos needingFaceDetection", self.class, @(photosToScan.count));
     
     CIDetector *detector = [self.class faceDetectorWithHighQuality:NO];
     for (DFPhoto *photo in photosToScan) {
       // PhotoStore returns photos if we've already done a pass but haven't uploaded, don't redo work
       if (photo.faceDetectPass.intValue >= CurrentPassValue) continue;
-      [self.class generateFaceFeaturesWithDetector:detector photo:photo inContext:context];
+      [self generateFaceFeaturesWithDetector:detector photo:photo];
       photo.faceDetectPass = @(CurrentPassValue);
       if (self.isCancelled) {
         [self cancelled];
-        [self saveContext:context];
+        [self saveContext];
         return;
       }
     }
@@ -49,7 +58,7 @@ const int CurrentPassValue = 1;
     NSDate *scanEnd = [NSDate date];
     [self patchServerForPhotos:photosToScan];
     
-    [self saveContext:context];
+    [self saveContext];
     DDLogInfo(@"%@ main exit after scanning %@ photos in %.02fs.",
               self.class,
               @(photosToScan.count),
@@ -57,16 +66,23 @@ const int CurrentPassValue = 1;
   }
 }
 
+- (void)setupContext
+{
+  _context = [DFPhotoStore createBackgroundManagedObjectContext];
+  [_context setMergePolicy:[[NSMergePolicy alloc]
+                            initWithMergeType:NSMergeByPropertyStoreTrumpMergePolicyType]];
+}
+
 - (void)cancelled
 {
   DDLogInfo(@"%@ cancelled.  Stopping.", self.class);
 }
 
-- (void)saveContext:(NSManagedObjectContext *)context
+- (void)saveContext
 {
   NSError *error;
-  if (context.hasChanges) {
-    [context save:&error];
+  if (self.context.hasChanges) {
+    [self.context save:&error];
   }
   if (error) {
     DDLogError(@"%@ failed to save context", error);
@@ -88,9 +104,8 @@ const int CurrentPassValue = 1;
                             options:detectorOpts];
 }
 
-+ (void)generateFaceFeaturesWithDetector:(CIDetector *)detector
+- (void)generateFaceFeaturesWithDetector:(CIDetector *)detector
                                    photo:(DFPhoto *)photo
-                               inContext:(NSManagedObjectContext *)context
 {
   @autoreleasepool {
     dispatch_semaphore_t loadSemaphore = dispatch_semaphore_create(0);
@@ -122,7 +137,7 @@ const int CurrentPassValue = 1;
     DDLogVerbose(@"Found %@ faceFeatures for photo: %@.", @(CIFaceFeatures.count), @(photo.photoID));
     for (CIFaceFeature *ciFaceFeature in CIFaceFeatures) {
       DFFaceFeature *faceFeature = [DFFaceFeature createWithCIFaceFeature:ciFaceFeature
-                                                                inContext:context];
+                                                                inContext:self.context];
       faceFeature.photo = photo;
       DDLogVerbose(@"created DFaceFeature: %@", faceFeature);
     }
@@ -134,9 +149,15 @@ const int CurrentPassValue = 1;
 {
   if (photos.count == 0) return;
   
+  NSMutableArray *processedPhotos = [NSMutableArray new];
   NSMutableArray *peanutPhotos = [NSMutableArray new];
   for (DFPhoto *photo in photos) {
+    if (photo.photoID == 0) {
+      continue; // if we don't have a photo ID, we can't process the photo
+    }
+    [processedPhotos addObject:photo];
     if (photo.faceFeatures.count == 0) continue;
+    
     DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] init];
     peanutPhoto.id = @(photo.photoID);
     peanutPhoto.user = @(photo.userID);
@@ -164,7 +185,7 @@ const int CurrentPassValue = 1;
   }
   
   if (success) {
-    for (DFPhoto *photo in photos) {
+    for (DFPhoto *photo in processedPhotos) {
       photo.faceDetectPassUploaded = photo.faceDetectPass;
     }
   }
