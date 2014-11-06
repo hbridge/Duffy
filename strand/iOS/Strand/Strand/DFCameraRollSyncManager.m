@@ -15,6 +15,7 @@
 #import "DFIOS8CameraRollSyncOperation.h"
 #import "DFDeletedPhotosSyncOperation.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFFaceDetectionSyncOperation.h"
 
 @interface DFCameraRollSyncManager()
 
@@ -73,6 +74,7 @@ static DFCameraRollSyncManager *defaultSyncController;
   
   if ([[DFPeanutFeedDataManager sharedManager] hasPrivateStrandData]) {
     DFDeletedPhotosSyncOperation *operation = [DFDeletedPhotosSyncOperation new];
+    operation.queuePriority = NSOperationQueuePriorityLow;
     operation.threadPriority = 0.1; // very low, .5 is default
     [self.syncOperationQueue addOperation:operation];
     self.shouldRunDeleteSync = NO;
@@ -81,9 +83,25 @@ static DFCameraRollSyncManager *defaultSyncController;
   }
 }
 
+- (void)facesSync
+{
+  #ifdef DEBUG
+  DFFaceDetectionSyncOperation *operation = [DFFaceDetectionSyncOperation new];
+  operation.queuePriority = NSOperationQueuePriorityLow;
+  if ([UIDevice majorVersionNumber] >= 8) {
+    operation.qualityOfService = NSOperationQualityOfServiceBackground;
+  } else {
+    operation.threadPriority = 0.2; //low, 0.5 is default
+  }
+
+  [self.syncOperationQueue addOperation:operation];
+  #endif
+}
+
 - (void)sync
 {
   [self syncAroundDate:nil withCompletionBlock:nil];
+  [self facesSync];
 }
 
 - (void)syncAroundDate:(NSDate *)date withCompletionBlock:(DFCameraRollSyncCompletionBlock)completionBlock

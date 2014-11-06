@@ -20,6 +20,9 @@
 @implementation DFPhoto
 
 @dynamic asset;
+@dynamic faceDetectPass;
+@dynamic faceDetectPassUploaded;
+@dynamic faceFeatures;
 @dynamic utcCreationDate;
 @dynamic photoID;
 @dynamic uploadThumbDate;

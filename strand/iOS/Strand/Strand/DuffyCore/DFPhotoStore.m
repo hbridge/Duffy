@@ -152,6 +152,34 @@ static int const FetchStride = 500;
   return allObjects;
 }
 
++ (NSArray *)photosWithFaceDetectPassBelow:(NSNumber *)faceDetectPass
+                                 inContext:(NSManagedObjectContext *)context
+{
+  NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] init];
+  NSEntityDescription *entity = [NSEntityDescription entityForName:@"DFPhoto" inManagedObjectContext:context];
+  [fetchRequest setEntity:entity];
+
+  NSPredicate *lessThanPredicate = [NSPredicate predicateWithFormat:@"faceDetectPass < %@", faceDetectPass];
+  NSPredicate *nilPredicate = [NSPredicate predicateWithFormat:@"faceDetectPass = nil"];
+  NSPredicate *uploadLessThanPredicate = [NSPredicate predicateWithFormat:@"faceDetectPassUploaded < %@", faceDetectPass];
+  NSPredicate *uploadNilPredicate = [NSPredicate predicateWithFormat:@"faceDetectPassUploaded = nil"];
+  
+  
+  NSCompoundPredicate *predicate = [NSCompoundPredicate
+                                    orPredicateWithSubpredicates:@[lessThanPredicate,
+                                                                   nilPredicate,
+                                                                   uploadLessThanPredicate,
+                                                                   uploadNilPredicate]];
+  [fetchRequest setPredicate:predicate];
+  
+  NSError *error = nil;
+  NSArray *fetchedObjects = [context executeFetchRequest:fetchRequest error:&error];
+  if (fetchedObjects == nil) {
+    DDLogError(@"%@ error fetching photosWithFaceDetectionPassBelow: %@", self, error);
+  }
+  return fetchedObjects;
+}
+
 
 + (NSArray *)photosWithALAssetURLStrings:(NSArray *)assetURLStrings context:(NSManagedObjectContext *)context;
 {
@@ -542,6 +570,9 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
         error:&error]) {
     
     DDLogError(@"Error loading persistent store %@, %@", error, [error userInfo]);
+    #ifdef DEBUG
+    [NSException raise:@"Couldn't load DFPhotoStore" format:@"Error: %@", error];
+    #endif
     error = nil;
   }
   

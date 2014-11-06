@@ -28,6 +28,7 @@
 #import "DFNavigationController.h"
 #import <Slash/Slash.h>
 #import "DFLogs.h"
+#import "DFCameraRollSyncManager.h"
 
 @interface DFSettingsViewController ()
 
@@ -282,15 +283,7 @@
   [mapping button:@"Test Something..."
        identifier:@"testSomething"
           handler:^(id object) {
-            NSString *titleLabelMarkup = [NSString stringWithFormat:@"From <name>%@</name>",
-                                          nil];
-            NSError *error;
-            NSAttributedString *string = [SLSMarkupParser
-             attributedStringWithMarkup:titleLabelMarkup
-             style:[DFStrandConstants defaultTextStyle]
-             error:&error];
-            DDLogVerbose(@"%@", string);
-            
+            [[DFCameraRollSyncManager sharedManager] facesSync];
             
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];

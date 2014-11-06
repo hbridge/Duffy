@@ -18,5 +18,6 @@ typedef void (^DFCameraRollSyncCompletionBlock)(NSDictionary *);
 - (void)cancelSyncOperations;
 - (BOOL)isSyncInProgress;
 - (void)deletedPhotoSync;
+- (void)facesSync;
 
 @end

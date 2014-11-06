@@ -99,6 +99,9 @@
 		5A883BE31A09653900355C1D /* DFStrandPeopleViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A883BE11A09653900355C1D /* DFStrandPeopleViewController.xib */; };
 		5A883BE61A09ACD400355C1D /* DFSwapUpsell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BE51A09ACD400355C1D /* DFSwapUpsell.m */; };
 		5A883BE91A0A7D9000355C1D /* DFLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BE81A0A7D9000355C1D /* DFLogs.m */; };
+		5A883BEE1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BED1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.m */; };
+		5A883BF21A0AC6EE00355C1D /* DFFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BF11A0AC6EE00355C1D /* DFFaceFeature.m */; };
+		5A883BF51A0AD63800355C1D /* DFPeanutFaceFeature.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A883BF41A0AD63800355C1D /* DFPeanutFaceFeature.m */; };
 		5A9115DB19DA08D3003F2A68 /* DFLabelCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */; };
 		5A9115DC19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */; };
 		5A9115DF19DA0F6B003F2A68 /* DFCircleBadge.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9115DE19DA0F6B003F2A68 /* DFCircleBadge.m */; };
@@ -423,6 +426,13 @@
 		5A883BE51A09ACD400355C1D /* DFSwapUpsell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwapUpsell.m; sourceTree = "<group>"; };
 		5A883BE71A0A7D9000355C1D /* DFLogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLogs.h; sourceTree = "<group>"; };
 		5A883BE81A0A7D9000355C1D /* DFLogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLogs.m; sourceTree = "<group>"; };
+		5A883BEC1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFaceDetectionSyncOperation.h; sourceTree = "<group>"; };
+		5A883BED1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFaceDetectionSyncOperation.m; sourceTree = "<group>"; };
+		5A883BEF1A0AB4A200355C1D /* Duffy 6 (v4785).xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 6 (v4785).xcdatamodel"; sourceTree = "<group>"; };
+		5A883BF01A0AC6EE00355C1D /* DFFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFFaceFeature.h; sourceTree = "<group>"; };
+		5A883BF11A0AC6EE00355C1D /* DFFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFFaceFeature.m; sourceTree = "<group>"; };
+		5A883BF31A0AD63800355C1D /* DFPeanutFaceFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutFaceFeature.h; sourceTree = "<group>"; };
+		5A883BF41A0AD63800355C1D /* DFPeanutFaceFeature.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutFaceFeature.m; sourceTree = "<group>"; };
 		5A9115D819DA08D3003F2A68 /* DFLabelCollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLabelCollectionViewCell.h; sourceTree = "<group>"; };
 		5A9115D919DA08D3003F2A68 /* DFLabelCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFLabelCollectionViewCell.m; sourceTree = "<group>"; };
 		5A9115DA19DA08D3003F2A68 /* DFLabelCollectionViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFLabelCollectionViewCell.xib; sourceTree = "<group>"; };
@@ -963,6 +973,8 @@
 			isa = PBXGroup;
 			children = (
 				5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */,
+				5A883BF01A0AC6EE00355C1D /* DFFaceFeature.h */,
+				5A883BF11A0AC6EE00355C1D /* DFFaceFeature.m */,
 				5AC4A8F81947C30800862D9C /* DFPhoto.h */,
 				5AC4A8F91947C30800862D9C /* DFPhoto.m */,
 				5AC4A8FA1947C30800862D9C /* DFPhotoCollection.h */,
@@ -972,24 +984,7 @@
 				5AC4A9021947C30800862D9C /* DFPhotoStore+IntegrityCheck.h */,
 				5AC4A9031947C30800862D9C /* DFPhotoStore+IntegrityCheck.m */,
 				5A40343219607B92003D7546 /* PhotoAsset */,
-				5AF32EBD197C42CE004B5CC4 /* DFImageDiskCache.h */,
-				5AF32EBE197C42CE004B5CC4 /* DFImageDiskCache.m */,
-				5AB7BEB819FFF71D000BEB67 /* DFImageManager.h */,
-				5AB7BEB919FFF71D000BEB67 /* DFImageManager.m */,
-				5AB7BEBB19FFF72C000BEB67 /* DFImageManagerRequest.h */,
-				5AB7BEBC19FFF72C000BEB67 /* DFImageManagerRequest.m */,
-				5AAF037219AE888500EF021C /* DFCameraRollSyncManager.h */,
-				5AAF037319AE888500EF021C /* DFCameraRollSyncManager.m */,
-				5AAF037419AE888500EF021C /* DFCameraRollSyncOperation.h */,
-				5AAF037519AE888500EF021C /* DFCameraRollSyncOperation.m */,
-				65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */,
-				65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */,
-				65BEA79D19E351310087930F /* DFIOS8CameraRollSyncOperation.h */,
-				65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */,
-				65437DE219F810AA00D57F9D /* DFImageDownloadManager.h */,
-				65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */,
-				652D9B991A0417D100018B1C /* DFDeletedPhotosSyncOperation.h */,
-				652D9B9A1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m */,
+				5A883BEB1A0AAE8000355C1D /* Camera roll sync */,
 			);
 			name = "Photo DB";
 			sourceTree = "<group>";
@@ -1083,6 +1078,8 @@
 				5AAF039919B112F700EF021C /* DFPeanutStrand.m */,
 				5AAF03A719B50F2D00EF021C /* DFPeanutStrandInvite.h */,
 				5AAF03A819B50F2D00EF021C /* DFPeanutStrandInvite.m */,
+				5A883BF31A0AD63800355C1D /* DFPeanutFaceFeature.h */,
+				5A883BF41A0AD63800355C1D /* DFPeanutFaceFeature.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -1133,6 +1130,40 @@
 				5AEFA25919D607150027BC5E /* DFStrandGallerySectionHeaderView.xib */,
 			);
 			name = "Strand Gallery";
+			sourceTree = "<group>";
+		};
+		5A883BEA1A0AAE5B00355C1D /* Image Manager */ = {
+			isa = PBXGroup;
+			children = (
+				5AF32EBD197C42CE004B5CC4 /* DFImageDiskCache.h */,
+				5AF32EBE197C42CE004B5CC4 /* DFImageDiskCache.m */,
+				5AB7BEB819FFF71D000BEB67 /* DFImageManager.h */,
+				5AB7BEB919FFF71D000BEB67 /* DFImageManager.m */,
+				5AB7BEBB19FFF72C000BEB67 /* DFImageManagerRequest.h */,
+				5AB7BEBC19FFF72C000BEB67 /* DFImageManagerRequest.m */,
+				65437DE219F810AA00D57F9D /* DFImageDownloadManager.h */,
+				65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */,
+			);
+			name = "Image Manager";
+			sourceTree = "<group>";
+		};
+		5A883BEB1A0AAE8000355C1D /* Camera roll sync */ = {
+			isa = PBXGroup;
+			children = (
+				5AAF037219AE888500EF021C /* DFCameraRollSyncManager.h */,
+				5AAF037319AE888500EF021C /* DFCameraRollSyncManager.m */,
+				5AAF037419AE888500EF021C /* DFCameraRollSyncOperation.h */,
+				5AAF037519AE888500EF021C /* DFCameraRollSyncOperation.m */,
+				65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */,
+				65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */,
+				65BEA79D19E351310087930F /* DFIOS8CameraRollSyncOperation.h */,
+				65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */,
+				652D9B991A0417D100018B1C /* DFDeletedPhotosSyncOperation.h */,
+				652D9B9A1A0417D100018B1C /* DFDeletedPhotosSyncOperation.m */,
+				5A883BEC1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.h */,
+				5A883BED1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.m */,
+			);
+			name = "Camera roll sync";
 			sourceTree = "<group>";
 		};
 		5A9636C019E47C2E00F3B606 /* Strand v1 */ = {
@@ -1462,6 +1493,7 @@
 				5AC4A9501947C75700862D9C /* First Time Setup */,
 				5A9636C119E47C8300F3B606 /* Main Views */,
 				5A0E123A1976DCC300B6FF04 /* Common Views */,
+				5A883BEA1A0AAE5B00355C1D /* Image Manager */,
 				5AC4A8DC1947B61900862D9C /* Database */,
 				5AC4A95D194A257E00862D9C /* Managers */,
 				5AB4CBFC1982AF2500EFB3E3 /* People Picker */,
@@ -1776,6 +1808,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5AAF038019AFCC9A00EF021C /* DFPeanutObjectsAdapter.m in Sources */,
+				5A883BEE1A0AAEB300355C1D /* DFFaceDetectionSyncOperation.m in Sources */,
 				5A9BC31C19A2A34B002D1CD7 /* DFAddContactViewController.m in Sources */,
 				5A7B1841196DFEB300E5A1D1 /* DFNearbyFriendsManager.m in Sources */,
 				5AC4A92E1947C30800862D9C /* DFPhotoStore.m in Sources */,
@@ -1825,6 +1858,7 @@
 				5AA38DF9199D1A4700AD1805 /* DFNotificationTableViewCell.m in Sources */,
 				5A02CEA6194F711700C4EBA6 /* DFPhotoView.m in Sources */,
 				5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */,
+				5A883BF51A0AD63800355C1D /* DFPeanutFaceFeature.m in Sources */,
 				5A113B1219C0F647004CA85B /* DFProfilePhotoStackView.swift in Sources */,
 				5AED01E019E348DF001F075D /* NSIndexPath+DFHelpers.m in Sources */,
 				5A4C820919EDBACE00C22A12 /* DFSwapUpsellView.m in Sources */,
@@ -1917,6 +1951,7 @@
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
 				65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */,
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
+				5A883BF21A0AC6EE00355C1D /* DFFaceFeature.m in Sources */,
 				65232E9219EC66A400F3832A /* DFPeanutFeedDataManager.m in Sources */,
 				5A9BC31019A26A22002D1CD7 /* DFGallerySectionHeader.m in Sources */,
 				5AC4A9351947C30800862D9C /* DFUploadSessionStats.m in Sources */,
@@ -2345,13 +2380,14 @@
 		5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
+				5A883BEF1A0AB4A200355C1D /* Duffy 6 (v4785).xcdatamodel */,
 				5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */,
 				5A40343A19607E6E003D7546 /* Duffy 4.xcdatamodel */,
 				5AC4A94C1947C54C00862D9C /* Duffy 2.xcdatamodel */,
 				5AC4A94D1947C54C00862D9C /* Duffy 3.xcdatamodel */,
 				5AC4A94E1947C54C00862D9C /* Duffy.xcdatamodel */,
 			);
-			currentVersion = 5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */;
+			currentVersion = 5A883BEF1A0AB4A200355C1D /* Duffy 6 (v4785).xcdatamodel */;
 			name = Duffy.xcdatamodeld;
 			path = DuffyCore/Duffy.xcdatamodeld;
 			sourceTree = "<group>";
