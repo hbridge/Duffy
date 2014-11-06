@@ -15,7 +15,7 @@ from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util, serializers
@@ -791,6 +791,9 @@ def update_user_location(request):
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 		
 		if ((not lon == 0) or (not lat == 0)):
+			record = LocationRecord(user = user, point = fromstr("POINT(%s %s)" % (lon, lat)), timestamp = timestamp, accuracy = accuracy)
+			record.save()
+			
 			if ((user.last_location_timestamp and timestamp and timestamp > user.last_location_timestamp) or not user.last_location_timestamp):
 				user.last_location_point = fromstr("POINT(%s %s)" % (lon, lat))
 
