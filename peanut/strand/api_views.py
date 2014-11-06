@@ -646,7 +646,8 @@ def swaps(request):
 		responseObjects = list()
 
 		# First throw in invite objects
-		responseObjects.extend(getInviteObjectsDataForUser(user))
+		inviteObjects = getInviteObjectsDataForUser(user)
+		responseObjects.extend(inviteObjects)
 		printStats("swaps-invites")
 
 		# Now do neighbor suggestions
@@ -687,39 +688,46 @@ def swaps(request):
 
 		responseObjects.extend(locationBasedSuggestions)
 		printStats("swaps-location-suggestions")
-		
-		# Now do halloween suggestions
-		halloweenNight = pytz.timezone("US/Eastern").localize(datetime.datetime(2014,10,31,21,0,0,0)).astimezone(pytz.timezone("UTC"))
-		lower = halloweenNight - datetime.timedelta(hours=3)
-		upper = halloweenNight + datetime.timedelta(hours=7)
-		halloweenObjects = getObjectsDataForSpecificTime(user, lower, upper, "Halloween", rankNum)
-		rankNum += len(halloweenObjects)
-		responseObjects.extend(halloweenObjects)
 
-		# Now do last night suggestions
-		now = pytz.timezone("US/Eastern").localize(datetime.datetime.now())
-		yesterday = now - datetime.timedelta(days=1)
-		lastNight = yesterday.replace(hour=21, minute=0)
-		lower = lastNight - datetime.timedelta(hours=6)
-		upper = lastNight + datetime.timedelta(hours=6)
-		lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
-		responseObjects.extend(lastNightObjects)
+		if len(inviteObjects) == 0:
+			# Now do halloween suggestions
+			halloweenNight = pytz.timezone("US/Eastern").localize(datetime.datetime(2014,10,31,21,0,0,0)).astimezone(pytz.timezone("UTC"))
+			lower = halloweenNight - datetime.timedelta(hours=3)
+			upper = halloweenNight + datetime.timedelta(hours=7)
+			halloweenObjects = getObjectsDataForSpecificTime(user, lower, upper, "Halloween", rankNum)
+			rankNum += len(halloweenObjects)
+			responseObjects.extend(halloweenObjects)
+			
+			# Now do last night suggestions
+			eastern = pytz.timezone('America/New_York')
+			now = eastern.localize(datetime.datetime.utcnow())
 
-		printStats("swaps-time-suggestions")
+			if (now.hour < 5):
+				lower = now - datetime.timedelta(days=1)
+			else:
+				lower = now
+				
+			lower = lower.replace(hour=0, minute=0)
+			upper = lower + datetime.timedelta(hours=8) # So this now means 3 am
 
-		if len(responseObjects) < 20:
-			noLocationSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache, locationRequired=False)
-			noLocationSuggestions = filter(lambda x: x['suggestible'], noLocationSuggestions)
-			noLocationSuggestions = sorted(noLocationSuggestions, key=lambda x: x['time_taken'], reverse=True)
+			lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
+			responseObjects.extend(lastNightObjects)
 
-			# Filter out the location based suggestions we got before
-			noLocationSuggestions = filter(lambda x: x['id'] not in locationBasedIds, noLocationSuggestions)
-			for suggestion in noLocationSuggestions:
-				suggestion['suggestion_rank'] = rankNum
-				suggestion['suggestion_type'] = "friend-nolocation"
-				rankNum += 1
-			responseObjects.extend(noLocationSuggestions)
-			printStats("swaps-nolocation-suggestions")
+			printStats("swaps-time-suggestions")
+
+			if len(responseObjects) < 20:
+				noLocationSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, strandNeighborsCache=strandNeighborsCache, locationRequired=False)
+				noLocationSuggestions = filter(lambda x: x['suggestible'], noLocationSuggestions)
+				noLocationSuggestions = sorted(noLocationSuggestions, key=lambda x: x['time_taken'], reverse=True)
+
+				# Filter out the location based suggestions we got before
+				noLocationSuggestions = filter(lambda x: x['id'] not in locationBasedIds, noLocationSuggestions)
+				for suggestion in noLocationSuggestions:
+					suggestion['suggestion_rank'] = rankNum
+					suggestion['suggestion_type'] = "friend-nolocation"
+					rankNum += 1
+				responseObjects.extend(noLocationSuggestions)
+				printStats("swaps-nolocation-suggestions")
 		
 		response['objects'] = responseObjects
 	else:
