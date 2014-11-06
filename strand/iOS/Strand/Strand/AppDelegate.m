@@ -72,43 +72,33 @@ const NSUInteger MinValidAccountId = 650;
 void (^_completionHandler)(UIBackgroundFetchResult);
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+  [self printSimulatorInfo];
   [self configureLogs];
   [self configureHockey];
-
-  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-  [self.window makeKeyAndVisible];
-  
-  if ([application applicationState] != UIApplicationStateBackground) {
-    // only create views etc if we're not being launched in the background
-    [self createRootViewController];
-  }
+  [self configureUI];
   
   if (launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]) {
     [self application:application didReceiveRemoteNotification:
      launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey]];
   }
   
+  if (launchOptions[UIApplicationLaunchOptionsLocationKey]) {
+    [[DFBackgroundLocationManager sharedManager] startUpdatingOnSignificantLocationChange];
+  }
+  
+  [self configureBackgroundAppRefresh];
+  
+  return YES;
+}
+
+- (void)printSimulatorInfo
+{
 #if TARGET_IPHONE_SIMULATOR
   NSLog(@"Simulator build running from: %@", [ [NSBundle mainBundle] bundleURL] );
   NSLog(@"Simulator User Docs: %@", [[[NSFileManager defaultManager] URLsForDirectory:NSDocumentDirectory
                                                                             inDomains:NSUserDomainMask]
                                      lastObject]);
 #endif
-  
-  // These are used for background syncs
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(backgroundCameraRollSyncFinished)
-                                               name:DFCameraRollSyncCompleteNotificationName
-                                             object:nil];
-  
-  [[NSNotificationCenter defaultCenter] addObserver:self
-                                           selector:@selector(backgroundUploaderFinished)
-                                               name:DFUploaderCompleteNotificationName
-                                             object:nil];
-  
-  [[UIApplication sharedApplication] setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
-  
-  return YES;
 }
 
 - (void)configureLogs
@@ -145,6 +135,33 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [[BITHockeyManager sharedHockeyManager] startManager];
   [[BITHockeyManager sharedHockeyManager].authenticator
    authenticateInstallation];
+}
+
+- (void)configureUI
+{
+  self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  [self.window makeKeyAndVisible];
+  
+  if ([[UIApplication sharedApplication] applicationState] != UIApplicationStateBackground) {
+    // only create views etc if we're not being launched in the background
+    [self createRootViewController];
+  }
+}
+
+- (void)configureBackgroundAppRefresh
+{
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(backgroundCameraRollSyncFinished)
+                                               name:DFCameraRollSyncCompleteNotificationName
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(backgroundUploaderFinished)
+                                               name:DFUploaderCompleteNotificationName
+                                             object:nil];
+  
+  [[UIApplication sharedApplication]
+   setMinimumBackgroundFetchInterval:UIApplicationBackgroundFetchIntervalMinimum];
 }
 
 - (BOOL)isAppSetupComplete
@@ -301,6 +318,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFSocketsManager sharedManager] initNetworkCommunication];
       [[DFImageDownloadManager sharedManager] fetchNewImages];
       [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];
+      [[DFBackgroundLocationManager sharedManager] startUpdatingOnSignificantLocationChange];
       
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName

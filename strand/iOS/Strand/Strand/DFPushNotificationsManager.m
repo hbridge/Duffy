@@ -102,12 +102,14 @@
   }
   
   DFPermissionStateType pushPermState = [DFDefaultsStore stateForPermission:DFPermissionRemoteNotifications];
-  if (notifsEnabled && ![pushPermState isEqual:DFPermissionStateGranted]) {
-    DDLogWarn(@"%@ remoteNotifsEnabled but pushPermState:%@.  Changing pushPermState to %@",
-              self.class, pushPermState, DFPermissionStateGranted);
-    pushPermState = DFPermissionStateGranted;
-    [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionRemoteNotifications];
-  }
+  if (notifsEnabled
+      && !([pushPermState isEqual:DFPermissionStateGranted]
+           || [pushPermState isEqual:DFPermissionStateUnavailable])) {
+        DDLogWarn(@"%@ remoteNotifsEnabled but pushPermState:%@.  Changing pushPermState to %@",
+                  self.class, pushPermState, DFPermissionStateGranted);
+        pushPermState = DFPermissionStateGranted;
+        [DFDefaultsStore setState:DFPermissionStateGranted forPermission:DFPermissionRemoteNotifications];
+      }
   DDLogInfo(@"%@ refreshPushToken permissionState: %@", self, pushPermState);
   if ([pushPermState isEqual:DFPermissionStateGranted]
       || [pushPermState isEqual:DFPermissionStatePreRequestedYes]) {
@@ -186,7 +188,7 @@
   if ([application applicationState] == UIApplicationStateBackground){
     if (pushNotif.contentAvailable && pushNotif.isUpdateLocationRequest)
     {
-      [[DFBackgroundLocationManager sharedBackgroundLocationManager]
+      [[DFBackgroundLocationManager sharedManager]
        backgroundUpdateWithCompletionHandler:completionHandler];
     }
   } else if ([application applicationState] == UIApplicationStateInactive) {

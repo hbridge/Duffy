@@ -52,7 +52,7 @@ static DFNearbyFriendsManager *defaultManager;
   self.isUpdatingNearbyFriends = YES;
   [self.nearbyFriendsAdapter
    fetchNearbyFriendsMessageForLocation:[[DFBackgroundLocationManager
-                                          sharedBackgroundLocationManager] lastLocation]
+                                          sharedManager] lastLocation]
    completionBlock:^(DFPeanutMessageResponse *response, NSError *error) {
      self.isUpdatingNearbyFriends = NO;
      if (!error) {

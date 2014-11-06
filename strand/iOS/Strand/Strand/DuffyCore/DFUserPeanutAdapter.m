@@ -91,10 +91,10 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
                               parameters:nil];
   
   
-  DDLogVerbose(@"%@ getting endpoint: %@ \n  body:%@ \n",
-            [[self class] description],
-            request.URL.absoluteString,
-            [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
+//  DDLogVerbose(@"%@ getting endpoint: %@ \n  body:%@ \n",
+//            [[self class] description],
+//            request.URL.absoluteString,
+//            [[NSString alloc] initWithData:request.HTTPBody encoding:NSUTF8StringEncoding]);
   
   RKObjectRequestOperation *operation =
   [[DFObjectManager sharedManager]
@@ -102,7 +102,7 @@ NSString *const SMSAccessCodeKey = @"sms_access_code";
    success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
    {
      DFPeanutUserObject *user = [mappingResult firstObject];
-     DDLogInfo(@"%@ response received: %@", [self.class description], user);
+     //DDLogInfo(@"%@ response received: %@", [self.class description], user);
      success(user);
    }
    failure:^(RKObjectRequestOperation *operation, NSError *error)

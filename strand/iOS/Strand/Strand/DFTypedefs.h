@@ -30,6 +30,7 @@ extern DFPermissionType const DFPermissionContacts;
 typedef NSString *DFPermissionStateType;
 
 extern DFPermissionStateType const DFPermissionStateNotRequested;
+extern DFPermissionStateType const DFPermissionStateRequested;
 extern DFPermissionStateType const DFPermissionStatePreRequestedNotNow;
 extern DFPermissionStateType const DFPermissionStatePreRequestedYes;
 extern DFPermissionStateType const DFPermissionStateGranted;

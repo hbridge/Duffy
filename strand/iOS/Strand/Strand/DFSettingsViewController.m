@@ -165,7 +165,7 @@
       }
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];
     [mapping button:@"Location Map" identifier:@"locationMap" handler:^(id object) {
-      CLLocation *location = [[DFBackgroundLocationManager sharedBackgroundLocationManager] lastLocation];
+      CLLocation *location = [[DFBackgroundLocationManager sharedManager] lastLocation];
       DFMapViewController *mapViewController = [[DFMapViewController alloc] initWithLocation:location];
       [self.navigationController pushViewController:mapViewController animated:YES];
     } accesoryType:UITableViewCellAccessoryDisclosureIndicator];

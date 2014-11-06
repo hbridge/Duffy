@@ -12,6 +12,7 @@
 
 typedef NSString *const DFSwapUpsellType;
 extern DFSwapUpsellType DFSwapUpsellInviteFriends;
+extern DFSwapUpsellType DFSwapUpsellLocation;
 
 @property (nonatomic, retain) DFSwapUpsellType type;
 @property (readonly, nonatomic, retain) NSString *title;

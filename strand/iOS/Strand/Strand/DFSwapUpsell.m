@@ -17,14 +17,21 @@
 @implementation DFSwapUpsell
 
 DFSwapUpsellType DFSwapUpsellInviteFriends = @"DFSwapUpsellInviteFriends";
+DFSwapUpsellType DFSwapUpsellLocation = @"DFSwapUpsellLocation";
+
 
 static NSDictionary *upsellAttrs;
 + (void)initialize {
   upsellAttrs = @{
                     DFSwapUpsellInviteFriends : @ {
                       @"title" : @"Invite Friends",
-                      @"subtitle" : @"More friends = more suggestions!",
+                      @"subtitle" : @"More friends = more suggestions",
                       @"imagePath" : @"Assets/Icons/FriendsUpsellIcon",
+                    },
+                    DFSwapUpsellLocation : @ {
+                      @"title" : @"Grant Location Access",
+                      @"subtitle" : @"Get suggestions without taking a photo",
+                      @"imagePath" : @"Assets/Icons/LocationUpsellIcon",
                     }
                     };
 }

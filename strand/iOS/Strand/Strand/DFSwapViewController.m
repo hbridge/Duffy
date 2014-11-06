@@ -24,6 +24,7 @@
 #import "DFPushNotificationsManager.h"
 #import "DFSwapUpsell.h"
 #import "DFInviteFriendViewController.h"
+#import "DFBackgroundLocationManager.h"
 
 @interface DFSwapViewController ()
 
@@ -69,6 +70,10 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(reloadData)
                                                name:DFStrandNewSwapsDataNotificationName
+                                             object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFPermissionStateChangedNotificationName
                                              object:nil];
 }
 
@@ -212,9 +217,17 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)reloadUpsells
 {
-  DFSwapUpsell *upsell = [[DFSwapUpsell alloc] init];
-  upsell.type = DFSwapUpsellInviteFriends;
-  self.systemUpsells = @[upsell];
+  NSMutableArray *upsells = [NSMutableArray new];
+  if (self.allSuggestions.count == 0
+      && [[DFBackgroundLocationManager sharedManager] canPromptForAuthorization]) {
+    DFSwapUpsell *locationUpsell = [[DFSwapUpsell alloc] init];
+    locationUpsell.type = DFSwapUpsellLocation;
+    [upsells addObject:locationUpsell];
+  }
+  DFSwapUpsell *inviteUpsell = [[DFSwapUpsell alloc] init];
+  inviteUpsell.type = DFSwapUpsellInviteFriends;
+  [upsells addObject:inviteUpsell];
+  self.systemUpsells = upsells;
 }
 
 - (void)reloadSuggestionsSection
@@ -466,6 +479,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 - (UITableViewCell *)cellForUpsell:(DFSwapUpsell *)upsell indexPath:(NSIndexPath *)indexPath
 {
   DFSwapTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"upsell"];
+  [cell.previewImageView removeFromSuperview];
   cell.profileReplacementImageView.image = upsell.image;
   cell.peopleLabel.text = upsell.title;
   cell.subTitleLabel.text = upsell.subtitle;
@@ -516,6 +530,8 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     if ([upsell.type isEqual:DFSwapUpsellInviteFriends]) {
       DFInviteFriendViewController *inviteFriendViewController = [[DFInviteFriendViewController alloc] init];
       [self presentViewController:inviteFriendViewController animated:YES completion:nil];
+    } else if ([upsell.type isEqualToString:DFSwapUpsellLocation]) {
+      [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
     }
   }
   [tableView deselectRowAtIndexPath:indexPath animated:NO];

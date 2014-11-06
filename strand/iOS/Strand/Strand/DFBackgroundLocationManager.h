@@ -11,9 +11,11 @@
 
 @interface DFBackgroundLocationManager : NSObject <CLLocationManagerDelegate>
 
-+ (DFBackgroundLocationManager *)sharedBackgroundLocationManager;
++ (DFBackgroundLocationManager *)sharedManager;
 - (void)startUpdatingOnSignificantLocationChange;
 - (CLLocation *)lastLocation;
 - (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
+- (BOOL)canPromptForAuthorization;
+- (void)promptForAuthorization;
 
 @end

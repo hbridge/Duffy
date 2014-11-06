@@ -52,9 +52,19 @@ NSString *const DFDefaultsUserNotifsTypeKey = @"DFStrandLastUserNotifTypes";
 + (void)setState:(DFPermissionStateType)state forPermission:(DFPermissionType)permission
 {
   DFPermissionStateType oldState = [self stateForPermission:permission];
-  if (![state isEqual:oldState]) {
+  if (!state) state = DFPermissionStateNotRequested;
+  if (!oldState) oldState = DFPermissionStateNotRequested;
+  if (![state isEqual:oldState] && state != oldState) {
     [DFAnalytics logPermission:permission
            changedWithOldState:oldState newState:state];
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [[NSNotificationCenter defaultCenter]
+       postNotificationName:DFPermissionStateChangedNotificationName
+       object:nil
+       userInfo:@{DFPermissionTypeKey : permission,
+                  DFPermissionOldStateKey: oldState,
+                  DFPermissionNewStateKey: state}];
+    });
     [[NSUserDefaults standardUserDefaults] setObject:state forKey:[self keyForPermission:permission]];
   }
 }

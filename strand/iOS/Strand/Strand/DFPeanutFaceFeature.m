@@ -33,8 +33,8 @@
   if (self) {
     CGRect bounds = [faceFeature.bounds CGRectValue];
     self.bounds = NSStringFromCGRect(bounds);
-    self.has_smile = faceFeature.hasSmile;
-    self.has_blink = faceFeature.hasBlink;
+    self.has_smile = faceFeature.hasSmile.boolValue;
+    self.has_blink = faceFeature.hasBlink.boolValue;
   }
   return self;
 }

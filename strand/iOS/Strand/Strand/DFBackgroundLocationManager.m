@@ -10,6 +10,7 @@
 #import "DFLocationStore.h"
 #import "DFPeanutLocationAdapter.h"
 #import "DFAnalytics.h"
+#import "DFDefaultsStore.h"
 
 @interface DFBackgroundLocationManager()
 
@@ -28,7 +29,7 @@
 
 // We want the upload controller to be a singleton
 static DFBackgroundLocationManager *defaultManager;
-+ (DFBackgroundLocationManager *)sharedBackgroundLocationManager {
++ (DFBackgroundLocationManager *)sharedManager {
   if (!defaultManager) {
     defaultManager = [[super allocWithZone:nil] init];
   }
@@ -37,7 +38,7 @@ static DFBackgroundLocationManager *defaultManager;
 
 + (id)allocWithZone:(NSZone *)zone
 {
-  return [self sharedBackgroundLocationManager];
+  return [self sharedManager];
 }
 
 - (instancetype)init
@@ -56,9 +57,7 @@ static DFBackgroundLocationManager *defaultManager;
                                              selector:@selector(appResignedActive)
                                                  name:UIApplicationWillResignActiveNotification
                                                object:nil];
-    if ([[UIApplication sharedApplication] applicationState] == UIApplicationStateActive) {
-      [self.locationManager startUpdatingLocation];
-    }
+    [self syncLocationPermission];
   }
   return self;
 }
@@ -77,11 +76,12 @@ static DFBackgroundLocationManager *defaultManager;
 
 - (void)startUpdatingOnSignificantLocationChange
 {
-  if ([CLLocationManager locationServicesEnabled]) {
-    DDLogInfo(@"Starting to monitor for significant location change.");
+  if ([CLLocationManager locationServicesEnabled]
+      && [[DFDefaultsStore stateForPermission:DFPermissionLocation] isEqual:DFPermissionStateGranted]) {
+    DDLogInfo(@"%@ starting to monitor for significant location change.", self.class);
     [self.locationManager startMonitoringSignificantLocationChanges];
   } else {
-    DDLogWarn(@"DFBackgroundLocationManager location services not enabled.");
+    DDLogWarn(@"%@ location services not enabled or permission not granted.", self.class);
   }
 }
 
@@ -152,11 +152,10 @@ static DFBackgroundLocationManager *defaultManager;
 
 - (void)locationManager:(CLLocationManager *)manager didFailWithError:(NSError *)error
 {
-  NSLog(@"Location manager failed with error: %@", error);
-  if ([error.domain isEqualToString:kCLErrorDomain] && error.code == kCLErrorDenied) {
-    //user denied location services so stop updating manager
-    [manager stopUpdatingLocation];
-    DDLogWarn(@"DFBackgroundLocationManager couldn't start updating location:%@", error.description);
+  NSLog(@"%@ failed with error: %@", self.class, error);
+  if (error.code == kCLErrorDenied) {
+    [self locationManager:manager didChangeAuthorizationStatus:kCLAuthorizationStatusDenied];
+    [manager stopMonitoringSignificantLocationChanges];
   }
 }
 
@@ -196,20 +195,90 @@ static DFBackgroundLocationManager *defaultManager;
 
 - (void)appEnteredForeground
 {
-  DDLogVerbose(@"DFBackgroundLocationManager starting continuous updates.");
-  [self.locationManager startUpdatingLocation];
+ 
 }
 
 - (void)appEnteredBackground
 {
-  DDLogVerbose(@"DFBackgroundLocationManager stopping continuous updates.");
-  [self.locationManager stopUpdatingLocation];
+
 }
 
 - (void)appResignedActive
 {
-  DDLogVerbose(@"DFBackgroundLocationManager stopping continuous updates.");
-  [self.locationManager stopUpdatingLocation];
+
 }
+
+
+#pragma mark - Requesting permissions
+
+- (void)syncLocationPermission
+{
+  CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+  DFPermissionStateType currentState = [self permissionStateForCLAuthStatus:status];
+  DFPermissionStateType recordedState = [DFDefaultsStore stateForPermission:DFPermissionLocation];
+  DDLogInfo(@"%@ currentPermState:%@ ", self.class, currentState);
+  if (![recordedState isEqual:currentState]) {
+    DDLogInfo(@"%@ recordedState:%@. Changing to %@", self.class, recordedState, currentState);
+    [DFDefaultsStore setState:currentState forPermission:DFPermissionLocation];
+  }
+}
+
+- (BOOL)canPromptForAuthorization
+{
+  CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+  return (status == kCLAuthorizationStatusNotDetermined);
+}
+
+- (void)promptForAuthorization
+{
+  CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+  if (status != kCLAuthorizationStatusNotDetermined) {
+    DDLogInfo(@"%@ promprtForAuth but authStatus = %@", self.class,
+              [self permissionStateForCLAuthStatus:status]);
+    return;
+  }
+  
+  [DFDefaultsStore setState:DFPermissionStateRequested forPermission:DFPermissionLocation];
+  if ([self.locationManager respondsToSelector:@selector(requestAlwaysAuthorization)]) {
+    // iOS 8 method, the actual text displayed is kept in Info.plist
+    [self.locationManager requestAlwaysAuthorization];
+  } else {
+    // iOS 7 method
+    [self.locationManager startMonitoringSignificantLocationChanges];
+  }
+}
+
+- (void)locationManager:(CLLocationManager *)manager didChangeAuthorizationStatus:(CLAuthorizationStatus)status
+{
+  if (status == kCLAuthorizationStatusNotDetermined) {
+    // as soon as you request access, iOS 8 calls back with this
+    // return immediately since we don't have the results yet
+    return;
+  }
+  
+  DFPermissionStateType dfPermissionState = [self permissionStateForCLAuthStatus:status];
+  [DFDefaultsStore setState:dfPermissionState forPermission:DFPermissionLocation];
+  
+  if (status == kCLAuthorizationStatusAuthorizedAlways) {
+    [self startUpdatingOnSignificantLocationChange];
+  }
+}
+                                        
+- (DFPermissionStateType)permissionStateForCLAuthStatus:(CLAuthorizationStatus)status
+{
+  DFPermissionStateType dfPermissionState;
+  if (status == kCLAuthorizationStatusNotDetermined) {
+    return nil;
+  } else if (status == kCLAuthorizationStatusAuthorized || status == kCLAuthorizationStatusAuthorizedAlways) {
+    dfPermissionState = DFPermissionStateGranted;
+  } else if (status == kCLAuthorizationStatusDenied) {
+    dfPermissionState = DFPermissionStateDenied;
+  } else if (status == kCLAuthorizationStatusRestricted) {
+    dfPermissionState = DFPermissionStateRestricted;
+  }
+  return dfPermissionState;
+}
+
+
 
 @end
