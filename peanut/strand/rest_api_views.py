@@ -282,6 +282,15 @@ class PhotoBulkAPI(BasePhotoAPI):
 
             logger.info("Got request for bulk photo update with %s photos and %s files from user %s" % (len(photosData), len(request.FILES), user.id))
             
+            existingPhotosByHash = dict()
+            if user.install_num > 0:
+                logger.debug("It appears user %s has a new install, fetching existing photos" % (user.id))
+                existingPhotos = Photo.objects.filter(user = user, install_num__lt=user.install_num)
+                for photo in existingPhotos:
+                    if photo.iphone_hash not in existingPhotosByHash:
+                        existingPhotosByHash[photo.iphone_hash] = list()
+                    existingPhotosByHash[photo.iphone_hash].append(photo)
+                    
             for photoData in photosData:
                 photoData = self.jsonDictToSimple(photoData)
                 photoData["bulk_batch_key"] = batchKey
@@ -290,26 +299,23 @@ class PhotoBulkAPI(BasePhotoAPI):
 
                 self.populateExtraData(photo)
 
-                #if photo.iphone_hash in existingPhotosByHash:
-                #   existingPhoto = existingPhotosByHash[photo.iphone_hash]
-                #   existingPhoto.file_key = photo.file_key
+                # If we see that this photo's hash already exists then 
+                if photo.iphone_hash in existingPhotosByHash:
 
-                #   objsToUpdate.append(existingPhoto)
-                if photo.id:
+                    if len(existingPhotosByHash[photo.iphone_hash]) == 0:
+                        logger.error("Trying to deal with a dup for photo with hash %s but my list is 0" % photo.iphone_hash)
+                    else:
+                        existingPhoto = existingPhotosByHash[photo.iphone_hash][0]
+                        existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
+                        existingPhoto.file_key = photo.file_key
+                        existingPhoto.install_num = user.install_num
+
+                        logger.debug("Uploaded photo found with same hash as existing, setting to id %s and filekey %s" % (existingPhoto.id, existingPhoto.file_key))
+                        objsToUpdate.append(existingPhoto)
+                elif photo.id:
                     objsToUpdate.append(photo)
                 else:
                     objsToCreate.append(photo)
-
-            """
-                hashes = list()
-                existingPhotosByHash = dict()
-                if user.install_num > 0:
-                    for photoData in photosData:
-                        hashes.append(photoData['iphone_hash'])
-                    existingPhotos = Photo.objects.filter(user = user, hashes__in=hashes)
-                    for photo in existingPhotos:
-                        existingPhotosByHash[photo.iphone_hash] = photo
-            """
                 
             Photo.objects.bulk_create(objsToCreate)
 
@@ -322,6 +328,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             
             # Fetch real db objects instead of using the serialized ones.  Only doing this with things
             #   that are already created
+            Photo.bulkUpdate(objsToUpdate, ['file_key', 'install_num'])
             objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
 
             allPhotos.extend(objsToUpdate)
