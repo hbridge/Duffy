@@ -42,7 +42,6 @@
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) NSMutableDictionary *cellTemplatesByIdentifier;
 @property (nonatomic, retain) DFNoTableItemsView *noItemsView;
-@property (nonatomic, retain) NSMutableDictionary *cellHeightsByIdentifier;
 
 @end
 
@@ -139,6 +138,10 @@
    registerNib:[UINib nibWithNibName:[[DFCardTableViewCell class] description] bundle:nil]
    forCellReuseIdentifier:@"strandCell"];
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"unknown"];
+  
+  DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:DFCardCellStyleShared];
+  CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
+  self.tableView.rowHeight = height;
 }
 
 - (void)configurePopLabel
@@ -226,28 +229,6 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
   return self.feedObjects.count;
-}
-
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
-{
-  DFPeanutFeedObject *feedObject = self.feedObjects[indexPath.row];
-  NSString *cellIdentifier = @"inviteCell";
-  DFCardCellStyle style = DFCardCellStyleSuggestionWithPeople;
-  if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-    cellIdentifier = @"inviteCell";
-    style = DFCardCellStyleInvite;
-  } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]){
-    style = DFCardCellStyleShared;
-    cellIdentifier = @"strandCell";
-  }
-
-  NSNumber *cachedHeight = self.cellHeightsByIdentifier[cellIdentifier];
-  if (!cachedHeight) {
-    DFCardTableViewCell *templateCell = [DFCardTableViewCell cellWithStyle:style];
-    CGFloat height = [templateCell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-    self.cellHeightsByIdentifier[cellIdentifier] = cachedHeight = @(height);
-  }
-  return cachedHeight.floatValue;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
