@@ -87,7 +87,7 @@ static DFCameraRollSyncManager *defaultSyncController;
 {
   #ifdef DEBUG
   DFFaceDetectionSyncOperation *operation = [DFFaceDetectionSyncOperation new];
-  operation.queuePriority = NSOperationQueuePriorityLow;
+  operation.queuePriority = NSOperationQueuePriorityVeryLow;
   if ([UIDevice majorVersionNumber] >= 8) {
     operation.qualityOfService = NSOperationQualityOfServiceBackground;
   } else {
