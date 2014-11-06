@@ -140,8 +140,9 @@ const int CurrentPassValue = 1;
     DFPeanutPhoto *peanutPhoto = [[DFPeanutPhoto alloc] init];
     peanutPhoto.id = @(photo.photoID);
     peanutPhoto.user = @(photo.userID);
-    peanutPhoto.iphone_faceboxes_topleft = [DFPeanutFaceFeature
-                                            peanutFaceFeaturesFromDFFaceFeatures:photo.faceFeatures];
+    NSArray *peanutFaceFeatures = [[DFPeanutFaceFeature
+                                   peanutFaceFeaturesFromDFFaceFeatures:photo.faceFeatures] allObjects];
+    [peanutPhoto setIPhoneFaceboxesWithDFPeanutFaceFeatures:peanutFaceFeatures];
     [peanutPhotos addObject:peanutPhoto];
   }
   

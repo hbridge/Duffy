@@ -16,6 +16,10 @@
 
 const int MaxUserCommentLength = 200;
 
+@interface DFPeanutPhoto()
+
+@end
+
 @implementation DFPeanutPhoto
 
 NSString const *DFPeanutPhotoImageDimensionsKey = @"DFPeanutPhotoImageDimensionsKey";
@@ -63,7 +67,8 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 + (NSArray *)attributes
 {
   return @[@"user", @"id", @"time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
-           @"full_filename", @"full_width", @"full_height", @"full_image_path", @"taken_with_strand", @"install_num"];
+           @"full_filename", @"full_width", @"full_height", @"full_image_path", @"taken_with_strand", @"install_num",
+           @"iphone_faceboxes_topleft"];
 }
 
 - (NSDictionary *)dictionaryForAttributes:(NSArray *)attributes
@@ -124,11 +129,6 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
   RKObjectMapping *objectMapping = [RKObjectMapping mappingForClass:[DFPeanutPhoto class]];
   [objectMapping addAttributeMappingsFromArray:[DFPeanutPhoto attributes]];
   
-  [objectMapping addPropertyMapping:
-   [RKRelationshipMapping relationshipMappingFromKeyPath:@"iphone_faceboxes_topleft"
-                                               toKeyPath:@"iphone_faceboxes_topleft"
-                                             withMapping:[DFPeanutFaceFeature objectMapping]]];
-  
   return objectMapping;
 }
 
@@ -162,5 +162,16 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
   
   return _thumbnail_image_path;
 }
+
+
+- (void)setIPhoneFaceboxesWithDFPeanutFaceFeatures:(NSArray *)faceFeatures
+{
+  NSArray *jsonDicts = [faceFeatures arrayByMappingObjectsWithBlock:^id(DFPeanutFaceFeature *faceFeature) {
+    return [faceFeature JSONDictionary];
+  }];
+  NSDictionary *dict = @{@"faceFeaturesString" : jsonDicts};
+  self.iphone_faceboxes_topleft = [dict JSONString];
+}
+
 
 @end

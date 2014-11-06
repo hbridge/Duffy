@@ -7,10 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "DFJSONConvertible.h"
 
 @class RKObjectMapping;
 
-@interface DFPeanutFaceFeature : NSObject
+@interface DFPeanutFaceFeature : NSObject <DFJSONConvertible>
 
 @property (nonatomic, retain) NSString *bounds;
 @property (nonatomic) BOOL has_smile;

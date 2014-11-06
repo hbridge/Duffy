@@ -39,6 +39,18 @@
   return self;
 }
 
+- (instancetype)initWithJSONDict:(NSDictionary *)jsonDict
+{
+  self = [super init];
+  if (self) {
+    self.bounds = jsonDict[@"bounds"];
+    self.has_smile = [jsonDict[@"has_smile"] boolValue];
+    self.has_blink = [jsonDict[@"has_blink"] boolValue];
+  }
+  return self;
+}
+
+
 - (NSDictionary *)dictionary
 {
   return [self dictionaryWithValuesForKeys:[DFPeanutFaceFeature attributes]];
@@ -60,5 +72,11 @@
   return [NSString stringWithFormat:@"DFPeanutFaceFeature: %@", [[self dictionary]
                                                                  JSONStringPrettyPrinted:YES]];
 }
+
+- (NSDictionary *)JSONDictionary
+{
+  return [self dictionary];
+}
+
 
 @end
