@@ -58,6 +58,10 @@ const int CurrentPassValue = 1;
     NSDate *scanEnd = [NSDate date];
     [self patchServerForPhotos:photosToScan];
     
+    if (self.isCancelled) {
+      [self cancelled];
+      return;
+    }
     [self saveContext];
     DDLogInfo(@"%@ main exit after scanning %@ photos in %.02fs.",
               self.class,
@@ -80,12 +84,17 @@ const int CurrentPassValue = 1;
 
 - (void)saveContext
 {
-  NSError *error;
-  if (self.context.hasChanges) {
-    [self.context save:&error];
+  @try {
+    NSError *error;
+    if (self.context.hasChanges) {
+      [self.context save:&error];
+    }
+    if (error) {
+      DDLogError(@"%@ failed to save context", error);
+    }
   }
-  if (error) {
-    DDLogError(@"%@ failed to save context", error);
+  @catch (NSException *exception) {
+    DDLogError(@"Exception saving context: %@", exception);
   }
 }
 
