@@ -700,8 +700,8 @@ def swaps(request):
 		now = pytz.timezone("US/Eastern").localize(datetime.datetime.now())
 		yesterday = now - datetime.timedelta(days=1)
 		lastNight = yesterday.replace(hour=21, minute=0)
-		lower = lastNight - datetime.timedelta(hours=3)
-		upper = lastNight + datetime.timedelta(hours=3)
+		lower = lastNight - datetime.timedelta(hours=6)
+		upper = lastNight + datetime.timedelta(hours=6)
 		lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
 		responseObjects.extend(lastNightObjects)
 
