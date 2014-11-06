@@ -101,7 +101,7 @@ def compilePhotosStats(date, length=1, newUsers=None):
 	newPhotosUploaded = Photo.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).count()
 	msg += "Photos Uploaded: " + format(newPhotosUploaded, ",d") + "\n"
 
-	newPhotosShared = Action.objects.prefetch_related('photos').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))
+	newPhotosShared = Action.objects.prefetch_related('photos').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))
 	msg += "Photos Shared: " + format(newPhotosShared['totalPhotos__sum'], ",d") + "\n"
 
 
