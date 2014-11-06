@@ -1,5 +1,10 @@
 # Swap
 
+## Nov 6, 2014 (4786)
+
+- Support location updates to improve suggestion
+- Performance enhancements
+
 ## Nov 5, 2014 (4785)
 
 - Show suggestions for Halloween, last night and add more friends

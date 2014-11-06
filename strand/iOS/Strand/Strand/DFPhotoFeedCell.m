@@ -191,14 +191,22 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   [super layoutSubviews];
   self.imageView.clipsToBounds = YES;
-  if (self.style & DFPhotoFeedCellStyleSquare) {
-    self.imageViewHeightConstraint.constant = self.frame.size.width;
-  } else if (self.style & DFPhotoFeedCellStylePortrait) {
-    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (4.0/3.0);
-  } else if (self.style & DFPhotoFeedCellStyleLandscape) {
-    self.imageViewHeightConstraint.constant = self.contentView.frame.size.width * (3.0/4.0);
-  }
   
+  self.imageViewHeightConstraint.constant =
+    [self imageViewHeightForReferenceWidth:self.frame.size.width];
+}
+
+- (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
+{
+  CGFloat height = 0.0;
+  if (self.style & DFPhotoFeedCellStyleSquare) {
+    height = referenceWidth;
+  } else if (self.style & DFPhotoFeedCellStylePortrait) {
+    height = referenceWidth * (4.0/3.0);
+  } else if (self.style & DFPhotoFeedCellStyleLandscape) {
+    height = referenceWidth * (3.0/4.0);
+  }
+  return height;
 }
 
 + (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style

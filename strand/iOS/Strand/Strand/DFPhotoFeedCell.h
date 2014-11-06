@@ -57,5 +57,7 @@ typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
 + (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style;
 
 
+- (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth;
+
 
 @end

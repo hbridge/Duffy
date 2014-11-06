@@ -30,8 +30,9 @@
 @property (atomic) dispatch_semaphore_t cacheRequestsInFlightSemaphore;
 @property (nonatomic, retain) PHCachingImageManager *cacheImageManager;
 
-
 @end
+
+static BOOL logRouting = YES;
 
 @implementation DFImageManager
 
@@ -163,10 +164,12 @@
     source = @"remote";
     [self serveRequestFromNetwork:request completion:completionBlock];
   }
-//  DDLogVerbose(@"%@ routing %@ to %@: %@", self.class,
-//               completionBlock ? @"imageReq" : @"cacheReq",
-//               source,
-//               request);
+  if (logRouting) {
+    DDLogVerbose(@"%@ routing %@ to %@: %@", self.class,
+                 completionBlock ? @"imageReq" : @"cacheReq",
+                 source,
+                 request);
+  }
 }
 
 - (void)startCachingImagesForPhotoIDs:(NSArray *)photoIDs
@@ -257,7 +260,11 @@
         [self serveRequestFromNetwork:request completion:nil];
       }
       
-      //DDLogVerbose(@"cached %@ from photoStore, %@ from network.", @(localPhotosByID.count), @(unfulfilledLocally.count));
+      if (logRouting) {
+        DDLogVerbose(@"cached %@ from photoStore, %@ from network.",
+                     @(localPhotosByID.count),
+                     @(unfulfilledLocally.count));
+      }
       
     });
   }

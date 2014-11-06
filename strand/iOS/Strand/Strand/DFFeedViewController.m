@@ -37,25 +37,9 @@
 #import "SVProgressHUD.h"
 #import "DFImageManager.h"
 #import "DFStrandPeopleViewController.h"
+;
 
-// Uploading cell
-const CGFloat UploadingCellVerticalMargin = 10.0;
-const CGFloat UploadingCellTitleArea = 21 + 8;
-const CGFloat UploadingCellImageRowHeight = 45.0;
-const CGFloat UploadingCellImageRowSpacing = 6.0;
-const int UploadingCellImagesPerRow = 6;
-// Section Header
 const CGFloat SectionHeaderHeight = 51.0;
-// constants used for row height calculations
-const CGFloat TitleAreaHeight = 32; // height plus spacing around
-const CGFloat ImageViewHeight = 320; // height plus spacing around
-const CGFloat CollectionViewHeight = 79;
-const CGFloat FavoritersListHeight = 17 + 8; //height + spacing to collection view or image view
-const CGFloat ActionBarHeight = 29 + 8; // height + spacing
-const CGFloat FooterPadding = 2;
-const CGFloat MinRowHeight = TitleAreaHeight + ImageViewHeight + ActionBarHeight + FavoritersListHeight + FooterPadding;
-
-const CGFloat LockedCellHeight = 157.0;
 
 @interface DFFeedViewController ()
 
@@ -294,7 +278,9 @@ const CGFloat LockedCellHeight = 157.0;
                               bundle:nil]
    forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-  self.tableView.rowHeight = MinRowHeight;
+  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStyleLandscape];
+  self.tableView.rowHeight = [templateCell.contentView
+                              systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
 
 }
 - (void)configureUpsell
@@ -387,7 +373,7 @@ const CGFloat LockedCellHeight = 157.0;
   [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
-- (void)viewWillLayoutSubviews
+- (void)viewDidLayoutSubviews
 {
   [super viewDidLayoutSubviews];
   [self configureUpsell];
@@ -516,7 +502,9 @@ const CGFloat LockedCellHeight = 157.0;
 - (DFPeanutFeedObject *)objectAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:indexPath.section];
-  return strandPost.objects[indexPath.row];
+  if (indexPath.row >= 0 && indexPath.row < strandPost.objects.count)
+    return strandPost.objects[indexPath.row];
+  return nil;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -530,9 +518,42 @@ const CGFloat LockedCellHeight = 157.0;
     cell = [self cellForCluster:object indexPath:indexPath];
   }
   
+  if (!cell) {
+    [NSException raise:@"nil cell" format:@"nil cell for object: %@", object];
+  }
+  
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
   [cell setNeedsLayout];
+  
+  [self prefetchImagesAroundIndexPath:indexPath];
   return cell;
+}
+
+static int PrefetchRange = 2;
+
+- (void)prefetchImagesAroundIndexPath:(NSIndexPath *)indexPath
+{
+  NSMutableArray *idsToFetch = [NSMutableArray new];
+  for (NSInteger i = indexPath.row + PrefetchRange; i >= indexPath.row - PrefetchRange; i--){
+    DFPeanutFeedObject *object = [self objectAtIndexPath:[NSIndexPath
+                                                          indexPathForRow:i
+                                                          inSection:indexPath.section]];
+    if ([object.type isEqual:DFFeedObjectCluster]) object = object.objects.firstObject;
+    [idsToFetch addObject:@(object.id)];
+  }
+  
+  [[DFImageManager sharedManager] startCachingImagesForPhotoIDs:idsToFetch
+                                                     targetSize:[self imageSizeToFetch]
+                                                    contentMode:DFImageRequestContentModeAspectFit];
+}
+
+- (CGSize)imageSizeToFetch
+{
+  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStylePortrait];
+  CGFloat imageViewHeight = [templateCell imageViewHeightForReferenceWidth:[[UIScreen mainScreen]
+                                                                            bounds].size.width];
+  CGFloat scale = [[UIScreen mainScreen] scale];
+  return CGSizeMake(imageViewHeight * scale, imageViewHeight * scale);
 }
 
 - (DFPhotoFeedCell *)cellForPhoto:(DFPeanutFeedObject *)photoObject
@@ -553,7 +574,9 @@ const CGFloat LockedCellHeight = 157.0;
   if (photoObject) {
     [[DFImageManager sharedManager]
      imageForID:photoObject.id
-     preferredType:DFImageFull
+     size:[self imageSizeToFetch]
+     contentMode:DFImageRequestContentModeAspectFit
+     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
      completion:^(UIImage *image) {
       dispatch_async(dispatch_get_main_queue(), ^{
         if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
@@ -564,23 +587,6 @@ const CGFloat LockedCellHeight = 157.0;
   }
   
   return photoFeedCell;
-}
-
-- (void)updateHeightForCell:(DFPhotoFeedCell *)cell
-                      image:(UIImage *)image
-                atIndexPath:(NSIndexPath *)indexPath
-{
-  DFPhotoFeedCellStyle newStyle = DFPhotoFeedCellStyleSquare;
-  if (image.size.height > image.size.width) {
-    newStyle = DFPhotoFeedCellStylePortrait;
-  } else if (image.size.width > image.size.height) {
-    newStyle = DFPhotoFeedCellStyleLandscape;
-  }
-  [cell configureWithStyle:newStyle];
-  CGFloat height = [cell systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
-  [self setHeight:height forRowAtIndexPath:indexPath];
-  [self.tableView beginUpdates];
-  [self.tableView endUpdates];
 }
 
 - (DFPhotoFeedCell *)cellForCluster:(DFPeanutFeedObject *)cluster
@@ -598,7 +604,9 @@ const CGFloat LockedCellHeight = 157.0;
   for (DFPeanutFeedObject *subObject in cluster.objects) {
     [[DFImageManager sharedManager]
      imageForID:subObject.id
-     preferredType:DFImageFull
+     size:[self imageSizeToFetch]
+     contentMode:DFImageRequestContentModeAspectFit
+     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
      completion:^(UIImage *image) {
        dispatch_async(dispatch_get_main_queue(), ^{
          if (![self.tableView.visibleCells containsObject:clusterFeedCell]) return;
@@ -643,7 +651,20 @@ const CGFloat LockedCellHeight = 157.0;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  NSNumber *cachedHeight = self.rowHeights[[indexPath dictKey]];
+  if (cachedHeight) return cachedHeight.floatValue;
+  
   DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
+  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:style];
+  CGFloat rowHeight = [templateCell.contentView
+                       systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
+  
+  [self setHeight:rowHeight forRowAtIndexPath:indexPath];
+  return rowHeight;
+}
+
+- (DFPhotoFeedCell *)templateCellWithStyle:(DFPhotoFeedCellStyle)style
+{
   DFPhotoFeedCell *cell = self.templateCellsByStyle[@(style)];
   if (!cell) {
     cell = [DFPhotoFeedCell createCellWithStyle:style];
@@ -652,9 +673,7 @@ const CGFloat LockedCellHeight = 157.0;
     cell.frame = frame;
     [cell layoutSubviews];
   }
-  
-  CGFloat rowHeight = [cell.contentView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
-  return rowHeight;
+  return cell;
 }
 
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
