@@ -744,9 +744,9 @@ def swaps(request):
 
 				for objects in noLocationSuggestions:
 					if objects['id'] not in inviteObjectIds:
+						print "here"
 						responseObjects.append(objects)
 
-				responseObjects.extend(noLocationSuggestions)
 				printStats("swaps-nolocation-suggestions")
 		
 		response['objects'] = responseObjects
