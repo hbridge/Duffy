@@ -328,10 +328,13 @@ class PhotoBulkAPI(BasePhotoAPI):
             
             # Fetch real db objects instead of using the serialized ones.  Only doing this with things
             #   that are already created
-            Photo.bulkUpdate(objsToUpdate, ['file_key', 'install_num'])
-            objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
+            if len(objsToUpdate) > 0:
+                Photo.bulkUpdate(objsToUpdate, ['file_key', 'install_num'])
+                objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
 
-            allPhotos.extend(objsToUpdate)
+                allPhotos.extend(objsToUpdate)
+
+
             # Now that we've created the images in the db, we need to deal with any uploaded images
             #   and fill in any EXIF data (time_taken, gps, etc)
             if len(allPhotos) > 0:
