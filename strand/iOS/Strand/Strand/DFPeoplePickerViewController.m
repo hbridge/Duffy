@@ -608,6 +608,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
   DFPeoplePickerViewController __weak *weakSelf = self;
   [DFContactSyncManager askForContactsPermissionWithSuccess:^{
     dispatch_async(dispatch_get_main_queue(), ^{
+      [weakSelf loadUnfilteredArrays];
       [weakSelf updateSearchResults];
       [weakSelf.tableView reloadData];
       [weakSelf.sdc.searchResultsTableView reloadData];
