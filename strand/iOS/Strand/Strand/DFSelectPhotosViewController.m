@@ -48,6 +48,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 
 @property (nonatomic, retain) NSMutableDictionary *sectionsToHeaderViews;
 @property (nonatomic, retain) NSMutableDictionary *stylesToHeaderHeights;
+@property (nonatomic) BOOL didAppear;
 
 
 @end
@@ -164,7 +165,11 @@ const CGFloat CreateCellTitleSpacing = 8;
   }
   
   if (self.isMovingToParentViewController) {
-    [self scrollToLast];
+    if (self.highlightedFeedObject) {
+      [self scrollToHighlightedFeedObject];
+    } else {
+      [self scrollToLast];
+    }
   }
 }
 
@@ -198,10 +203,7 @@ const CGFloat CreateCellTitleSpacing = 8;
 {
   [super viewDidAppear:animated];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
-  
-  if (self.highlightedFeedObject && self.isMovingToParentViewController) {
-    [self scrollToHighlightedFeedObject];
-  }
+  self.didAppear = YES;
 }
 
 - (void)scrollToHighlightedFeedObject
@@ -219,12 +221,14 @@ const CGFloat CreateCellTitleSpacing = 8;
       [collectionView layoutAttributesForSupplementaryElementOfKind:UICollectionElementKindSectionHeader
                                                         atIndexPath:indexPathForObject];
       CGRect rectToScroll = headerLayoutAttributes.frame;
+      if (!self.didAppear) {
+        // for some reason, the origin calculation for layout is off before viewDidAppear
+        rectToScroll.origin.y -= collectionView.contentInset.bottom;
+      }
       rectToScroll.size.height = collectionView.frame.size.height;
-      [collectionView scrollRectToVisible:rectToScroll animated:YES];
+      [collectionView scrollRectToVisible:rectToScroll animated:NO];
       
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.6 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
-      });
+      [weakSelf.selectPhotosController toggleSectionSelection:sectionForObject];
     }
   });
 }
