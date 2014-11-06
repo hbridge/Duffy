@@ -699,8 +699,7 @@ def swaps(request):
 			responseObjects.extend(halloweenObjects)
 			
 			# Now do last night suggestions
-			eastern = pytz.timezone('America/New_York')
-			now = eastern.localize(datetime.datetime.utcnow())
+			now = datetime.datetime.utcnow()
 
 			if (now.hour < 5):
 				lower = now - datetime.timedelta(days=1)
