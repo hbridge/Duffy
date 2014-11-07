@@ -79,6 +79,7 @@
 		5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A65181F19D6277C001FE911 /* DFStrandGalleryTitleView.xib */; };
 		5A6E4D7B19D20A51002CB0A2 /* NSArray+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */; };
 		5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */; };
+		5A7233B71A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel in Sources */ = {isa = PBXBuildFile; fileRef = 5A7233B61A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel */; };
 		5A7B183B196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */; };
 		5A7B183E196DF8D400E5A1D1 /* DFPeanutMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B183D196DF8D400E5A1D1 /* DFPeanutMessageResponse.m */; };
 		5A7B1841196DFEB300E5A1D1 /* DFNearbyFriendsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A7B1840196DFEB300E5A1D1 /* DFNearbyFriendsManager.m */; };
@@ -392,6 +393,7 @@
 		5A6E4D7A19D20A51002CB0A2 /* NSArray+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSArray+DFHelpers.m"; sourceTree = "<group>"; };
 		5A6E8B6C19CA323500870423 /* DFSMSInviteStrandComposeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSMSInviteStrandComposeViewController.h; sourceTree = "<group>"; };
 		5A6E8B6D19CA323500870423 /* DFSMSInviteStrandComposeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSMSInviteStrandComposeViewController.m; sourceTree = "<group>"; };
+		5A7233B61A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcmappingmodel; path = "Duffy-5-6-Model.xcmappingmodel"; sourceTree = "<group>"; };
 		5A7B1839196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNearbyFriendsAdapter.h; sourceTree = "<group>"; };
 		5A7B183A196DF7D500E5A1D1 /* DFNearbyFriendsAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNearbyFriendsAdapter.m; sourceTree = "<group>"; };
 		5A7B183C196DF8D400E5A1D1 /* DFPeanutMessageResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutMessageResponse.h; sourceTree = "<group>"; };
@@ -973,6 +975,7 @@
 			isa = PBXGroup;
 			children = (
 				5AC4A94B1947C54C00862D9C /* Duffy.xcdatamodeld */,
+				5A7233B61A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel */,
 				5A883BF01A0AC6EE00355C1D /* DFFaceFeature.h */,
 				5A883BF11A0AC6EE00355C1D /* DFFaceFeature.m */,
 				5AC4A8F81947C30800862D9C /* DFPhoto.h */,
@@ -1984,6 +1987,7 @@
 				5AC4A9481947C3A700862D9C /* UIImage+Alpha.m in Sources */,
 				5AEFA25A19D607150027BC5E /* DFStrandGallerySectionHeaderView.m in Sources */,
 				5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */,
+				5A7233B71A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
 				5A83A3DE19F046390068F08B /* DFNoTableItemsView.m in Sources */,
 				5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */,

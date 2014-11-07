@@ -567,18 +567,18 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
         URL:[self storeURL]
         options: @{
                    NSMigratePersistentStoresAutomaticallyOption:@YES,
-                   NSInferMappingModelAutomaticallyOption:@YES
                    }
         error:&error]) {
     
     DDLogError(@"%@ error loading persistent store %@, %@", self, error, [error userInfo]);
+    [self deleteLocalDB];
     [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
   }
   
   return _persistentStoreCoordinator;
 }
 
-- (void)deleteLocalDB
++ (void)deleteLocalDB
 {
   NSURL *storeURL = [self.class storeURL];
   NSError *error;
@@ -625,9 +625,15 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   
   context.mergePolicy = NSMergeByPropertyObjectTrumpMergePolicy;
   NSError *error;
-  [context save:&error];
-  if (error) {
-    DDLogError(@"%@ error resetting store: %@", self, error);
+  @try {
+    [context save:&error];
+    if (error) {
+      DDLogError(@"%@ error resetting store: %@", self, error);
+    }
+  } @catch (NSException *exception) {
+    DDLogError(@"%@ exception saving store during reset store: %@", self, exception);
+        [self deleteLocalDB];
+    _persistentStoreCoordinator = nil;
   }
 }
 
