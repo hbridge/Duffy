@@ -26,6 +26,7 @@
 @synthesize context = _context;
 
 const int CurrentPassValue = 1;
+const NSUInteger PhotosToDetectPerSave = 100;
 
 - (void)main
 {
@@ -42,12 +43,15 @@ const int CurrentPassValue = 1;
     NSArray *photosToScan = [DFPhotoStore photosWithFaceDetectPassBelow:@(1) inContext:self.context];
     DDLogInfo(@"%@ found %@ photos needingFaceDetection", self.class, @(photosToScan.count));
     
+    NSUInteger photosScanned = 0;
     CIDetector *detector = [self.class faceDetectorWithHighQuality:NO];
     for (DFPhoto *photo in photosToScan) {
       // PhotoStore returns photos if we've already done a pass but haven't uploaded, don't redo work
       if (photo.faceDetectPass.intValue >= CurrentPassValue) continue;
       [self generateFaceFeaturesWithDetector:detector photo:photo];
       photo.faceDetectPass = @(CurrentPassValue);
+      photosScanned++;
+      if (photosScanned > PhotosToDetectPerSave) [self saveContext];
       if (self.isCancelled) {
         [self cancelled];
         [self saveContext];
