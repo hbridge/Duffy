@@ -280,7 +280,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		
 		if len(photos) == 0:
 			logger.warning("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
-			strand.delete()
 			continue
 		
 		interestedUsers = list()
@@ -658,9 +657,9 @@ def swaps(request):
 		printStats("swaps-invites")
 
 		# Now do neighbor suggestions
-		neighborIdList = friends_util.getFriendsIds(user.id)
+		friendsIdList = friends_util.getFriendsIds(user.id)
 
-		strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=neighborIdList)) | (Q(strand_1_user_id__in=neighborIdList) & Q(strand_2_user_id=user.id)))
+		strandNeighbors = StrandNeighbor.objects.filter((Q(strand_1_user_id=user.id) & Q(strand_2_user_id__in=friendsIdList)) | (Q(strand_1_user_id__in=friendsIdList) & Q(strand_2_user_id=user.id)))
 		strandIds = list()
 		for strandNeighbor in strandNeighbors:
 			if strandNeighbor.strand_1_user_id == user.id:

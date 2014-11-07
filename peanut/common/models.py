@@ -721,7 +721,7 @@ class StrandNeighbor(models.Model):
 	strand_1_private = models.BooleanField(db_index=True, default=False)
 	strand_1_user = models.ForeignKey(User, db_index=True, null=True, related_name = "strand_1_user")
 
-	strand_2 = models.ForeignKey(Strand, db_index=True, related_name = "strand_2")
+	strand_2 = models.ForeignKey(Strand, db_index=True, null=True, related_name = "strand_2")
 	strand_2_private = models.BooleanField(db_index=True, default=False)
 	strand_2_user = models.ForeignKey(User, db_index=True, null=True, related_name = "strand_2_user")
 
