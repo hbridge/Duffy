@@ -21,6 +21,10 @@ typedef void (^DFPhotoPickerHeaderShareCallback)(void);
 @property (nonatomic, copy) DFPhotoPickerHeaderShareCallback shareCallback;
 - (IBAction)shareButtonPressed:(id)sender;
 
+@property (nonatomic, copy) DFVoidBlock removeSuggestionCallback;
+- (IBAction)removeSuggestionButtonPressed:(UIButton *)sender;
+@property (weak, nonatomic) IBOutlet UIButton *removeSuggestionButton;
+
 
 typedef NS_OPTIONS(NSInteger, DFPhotoPickerHeaderStyle) {
   DFPhotoPickerHeaderStyleTimeOnly = 0,

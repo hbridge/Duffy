@@ -306,9 +306,13 @@ const CGFloat CreateCellTitleSpacing = 8;
   [self configureHeaderButtonForHeader:headerView section:indexPath.section];
   DFSelectPhotosViewController __weak *weakSelf = self;
   DFPhotoPickerHeaderReusableView __weak *weakHeader = headerView; // cast to prevent retain cycle
-  headerView.shareCallback = ^(void){
+  headerView.shareCallback = ^{
     [weakSelf shareButtonPressedForHeaderView:weakHeader
                                   section:indexPath.section];
+  };
+  headerView.removeSuggestionCallback = ^{
+    [weakSelf removeSuggestionPressedForHeaderView:weakHeader
+                                           section:indexPath.section];
   };
   
   self.sectionsToHeaderViews[@(indexPath.section)] = headerView;
@@ -319,8 +323,10 @@ const CGFloat CreateCellTitleSpacing = 8;
 - (DFPhotoPickerHeaderStyle)styleForSuggestion:(DFPeanutFeedObject *)suggestion
 {
   DFPhotoPickerHeaderStyle style = DFPhotoPickerHeaderStyleTimeOnly;
-  if (suggestion.location) style |= DFPhotoPickerHeaderStyleLocation;
-  if (suggestion.actors.count > 0) style |= DFPhotoPickerHeaderStyleBadge;
+  if (suggestion.suggestible.boolValue) {
+    if (suggestion.location) style |= DFPhotoPickerHeaderStyleLocation;
+    if (suggestion.actors.count > 0) style |= DFPhotoPickerHeaderStyleBadge;
+  }
   
   return style;
 }
@@ -364,6 +370,15 @@ referenceSizeForHeaderInSection:(NSInteger)section
 {
   [self.selectPhotosController toggleSectionSelection:section];
   [self configureHeaderButtonForHeader:headerView section:section];
+}
+
+- (void)removeSuggestionPressedForHeaderView:(DFPhotoPickerHeaderReusableView *)headerView
+                                           section:(NSUInteger)section
+{
+  DFPeanutFeedObject *suggestion = self.selectPhotosController.collectionFeedObjects[section];
+  [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
+  suggestion.suggestible = @NO;
+  [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:section]];
 }
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController

@@ -1,8 +1,12 @@
 # Swap
 
+## Nov 7, 2014 (4787)
+
+- Fix crash on startup for people upgrading from old builds
+
 ## Nov 6, 2014 (4786)
 
-- Support location updates to improve suggestion
+- Support location updates to improve suggestions
 - Performance enhancements
 
 ## Nov 5, 2014 (4785)

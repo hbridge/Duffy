@@ -69,6 +69,7 @@ extern DFPeanutActionType DFPeanutActionFavorite;
 
 
 // common block type
+typedef void(^DFVoidBlock)(void);
 typedef void(^DFSuccessBlock)(void);
 typedef void(^DFFailureBlock)(NSError *error);
 typedef void (^ImageLoadCompletionBlock)(UIImage *image);

@@ -52,7 +52,7 @@
                         <action selector="shareButtonPressed:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="3q0-gf-hoW"/>
                     </connections>
                 </button>
-                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/MatchedIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="1eo-hD-Usa">
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/XIcon.png" translatesAutoresizingMaskIntoConstraints="NO" id="1eo-hD-Usa">
                     <rect key="frame" x="8" y="148" width="52" height="18"/>
                     <constraints>
                         <constraint firstAttribute="height" constant="18" id="EuJ-WY-jqG"/>
@@ -64,6 +64,15 @@
                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2dn-xX-Haw">
+                    <rect key="frame" x="239" y="146" width="52" height="22"/>
+                    <state key="normal" image="Assets/Icons/XIcon.png">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="removeSuggestionButtonPressed:" destination="U6b-Vx-4bR" eventType="touchUpInside" id="y04-PZ-vHf"/>
+                    </connections>
+                </button>
             </subviews>
             <constraints>
                 <constraint firstItem="AOt-4j-b54" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" id="2Sz-yW-BZN"/>
@@ -73,6 +82,8 @@
                 <constraint firstItem="9iF-TP-ceP" firstAttribute="leading" secondItem="1eo-hD-Usa" secondAttribute="trailing" constant="8" id="X9C-vz-oRt"/>
                 <constraint firstItem="AOt-4j-b54" firstAttribute="top" relation="greaterThanOrEqual" secondItem="U6b-Vx-4bR" secondAttribute="top" constant="16" id="XlX-cs-mJM"/>
                 <constraint firstItem="1eo-hD-Usa" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="8" id="e6X-Q5-ad1"/>
+                <constraint firstItem="2dn-xX-Haw" firstAttribute="centerY" secondItem="9iF-TP-ceP" secondAttribute="centerY" id="hGp-fJ-VuT"/>
+                <constraint firstItem="2dn-xX-Haw" firstAttribute="leading" secondItem="9iF-TP-ceP" secondAttribute="trailing" constant="2" id="i3g-Te-8b3"/>
                 <constraint firstItem="AOt-4j-b54" firstAttribute="top" secondItem="1eo-hD-Usa" secondAttribute="bottom" constant="8" id="iHp-NK-76V"/>
                 <constraint firstAttribute="bottom" secondItem="AOt-4j-b54" secondAttribute="bottom" constant="8" id="oHN-f1-qQl"/>
                 <constraint firstItem="1eo-hD-Usa" firstAttribute="centerY" secondItem="9iF-TP-ceP" secondAttribute="centerY" constant="0.5" id="yYX-RL-KXl"/>
@@ -81,6 +92,7 @@
                 <outlet property="badgeIconText" destination="9iF-TP-ceP" id="GY2-8x-RMK"/>
                 <outlet property="badgeIconView" destination="1eo-hD-Usa" id="q8J-1U-Zwp"/>
                 <outlet property="locationLabel" destination="KkK-x1-jsc" id="L0u-gR-AaG"/>
+                <outlet property="removeSuggestionButton" destination="2dn-xX-Haw" id="IUk-ta-e0g"/>
                 <outlet property="shareButton" destination="1l9-Y5-i7R" id="QNU-10-7Oc"/>
                 <outlet property="timeLabel" destination="Jlt-bN-Khl" id="bbs-wi-1cN"/>
             </connections>
@@ -88,6 +100,6 @@
         </collectionReusableView>
     </objects>
     <resources>
-        <image name="Assets/Icons/MatchedIcon.png" width="52" height="18"/>
+        <image name="Assets/Icons/XIcon.png" width="52" height="18"/>
     </resources>
 </document>

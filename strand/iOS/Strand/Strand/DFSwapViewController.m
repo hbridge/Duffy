@@ -459,20 +459,6 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
           titleMarkup:titleMarkup
            feedObject:suggestionObject];
   
-  // Setup the swipe action
-  UILabel *hideLabel = [[UILabel alloc] init];
-  hideLabel.text = @"Hide";
-  hideLabel.textColor = [UIColor whiteColor];
-  [hideLabel sizeToFit];
-  [suggestionCell setSwipeGestureWithView:hideLabel
-                          color:[UIColor lightGrayColor]
-                           mode:MCSwipeTableViewCellModeExit
-                          state:MCSwipeTableViewCellState3
-                completionBlock:[self hideCompletionBlock]];
-  // the default color is the color that appears before you swipe far enough for the action
-  // we set to the group tableview background color to blend in
-  suggestionCell.defaultColor = [UIColor groupTableViewBackgroundColor];
-
   return suggestionCell;
 }
 
@@ -490,18 +476,6 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
   return self.sectionTitles[section];
-}
-
-
-- (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
-{
-  if ([self.sectionTitles[section] isEqual:SuggestedSectionTitle]){
-    if (self.filteredSuggestions.count > 0)
-      return @"Swipe left to hide Suggested Swaps";
-    else return @"Invite friends to find more Suggested Swaps";
-  }
-  
-  return nil;
 }
 
 #pragma mark - Actions
@@ -537,39 +511,6 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
-- (MCSwipeCompletionBlock)hideCompletionBlock
-{
-  return ^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-    NSIndexPath *indexPath = [self.tableView indexPathForCell:cell];
-    if (indexPath) {
-      //Update the view locally
-      [self.tableView beginUpdates];
-      NSUInteger oldSuggestionsCount = self.filteredSuggestions.count;
-      DFPeanutFeedObject *feedObject = [self feedObjectForIndexPath:indexPath];
-      [self.ignoredSuggestions addObject:feedObject];
-      [self reloadSuggestionsSection];
-      [self.tableView deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
-      if (self.filteredSuggestions.count == oldSuggestionsCount) {
-        // we've deleted a row, if we hav the same number of filtered suggestion rows as before,
-        // we need to now insert one at the end
-        [self.tableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:(MaxSuggestionsToShow - 1)
-                                                                    inSection:indexPath.section]]
-                              withRowAnimation:UITableViewRowAnimationBottom];
-      }
-      if (self.filteredSuggestions.count == 0) {
-        [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:indexPath.section]
-                      withRowAnimation:UITableViewRowAnimationAutomatic];
-        [self.sectionTitles removeObject:SuggestedSectionTitle];
-        [self configureNoResultsView];
-      }
-      
-      [self.tableView endUpdates];
-      
-      // Mark the strand as no longer suggestible with the server
-      [[DFPeanutFeedDataManager sharedManager] markSuggestion:feedObject visible:NO];
-    }
-  };
-}
 
 - (void)createButtonPressed:(id)sender
 {

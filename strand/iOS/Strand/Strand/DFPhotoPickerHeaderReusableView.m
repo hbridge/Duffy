@@ -18,6 +18,10 @@
   self.shareCallback();
 }
 
+- (IBAction)removeSuggestionButtonPressed:(UIButton *)sender {
+  self.removeSuggestionCallback();
+}
+
 - (void)configureWithStyle:(DFPhotoPickerHeaderStyle)style
 {
   if (!(style & DFPhotoPickerHeaderStyleLocation)) {
@@ -27,6 +31,7 @@
   if (!(style & DFPhotoPickerHeaderStyleBadge)) {
     [self.badgeIconText removeFromSuperview];
     [self.badgeIconView removeFromSuperview];
+    [self.removeSuggestionButton removeFromSuperview];
   }
 }
 
