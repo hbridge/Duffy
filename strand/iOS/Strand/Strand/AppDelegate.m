@@ -512,7 +512,7 @@ performFetchWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionH
                           delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
     
-    
+    [[DFCameraRollSyncManager sharedManager] cancelSyncOperations];
     [[DFUploadController sharedUploadController] cancelUploads:NO];
     [DFPhotoStore resetStore];
     [[DFContactsStore sharedStore] resetStore];

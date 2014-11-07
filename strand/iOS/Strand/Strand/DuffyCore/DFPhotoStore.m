@@ -17,6 +17,7 @@
 #import "DFSettings.h"
 #import "DFUploadController.h"
 #import "DFImageDiskCache.h"
+#import "AppDelegate.h"
 
 @interface DFPhotoStore(){
   NSManagedObjectContext *_managedObjectContext;
@@ -72,7 +73,12 @@ static DFPhotoStore *defaultStore;
 + (NSManagedObjectContext *)createBackgroundManagedObjectContext
 {
   NSManagedObjectContext *managedObjectContext = [[NSManagedObjectContext alloc] init];
-  managedObjectContext.persistentStoreCoordinator = [DFPhotoStore persistentStoreCoordinator];
+  NSPersistentStoreCoordinator *coordinator = [DFPhotoStore persistentStoreCoordinator];
+  if (coordinator) {
+    managedObjectContext.persistentStoreCoordinator = coordinator;
+  } else {
+    DDLogWarn(@"%@ persistent createManagedObjectContext store coordinator nil", self);
+  }
   return managedObjectContext;
 }
 
@@ -525,11 +531,7 @@ static int const FetchStride = 500;
     return _managedObjectContext;
   }
   
-  NSPersistentStoreCoordinator *coordinator = [DFPhotoStore persistentStoreCoordinator];
-  if (coordinator != nil) {
-    _managedObjectContext = [[NSManagedObjectContext alloc] init];
-    [_managedObjectContext setPersistentStoreCoordinator:coordinator];
-  }
+  _managedObjectContext = [self.class createBackgroundManagedObjectContext];
   return _managedObjectContext;
 }
 
@@ -569,11 +571,8 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                    }
         error:&error]) {
     
-    DDLogError(@"Error loading persistent store %@, %@", error, [error userInfo]);
-    #ifdef DEBUG
-    [NSException raise:@"Couldn't load DFPhotoStore" format:@"Error: %@", error];
-    #endif
-    error = nil;
+    DDLogError(@"%@ error loading persistent store %@, %@", self, error, [error userInfo]);
+    [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
   }
   
   return _persistentStoreCoordinator;
