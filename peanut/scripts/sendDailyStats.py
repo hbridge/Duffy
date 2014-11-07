@@ -28,6 +28,7 @@ def compileStats(date, length):
 		Active users:
 		New Users:
 		New Friends: 
+		Check-ins:
 		
 		--- PHOTOS (OLD USERS) ---
 		Photos Uploaded:		
@@ -51,8 +52,7 @@ def compileStats(date, length):
 
 	'''
 
-	#generate emailBody
-	msg = "\nStats for " + date.strftime('%m/%d/%Y') + "\n"
+	msg = "\n" + str(length) + "-day stats for " + (date+relativedelta(days=length-1)).strftime('%m/%d/%Y') + "\n"
 
 	newUsers = getNewUsers(date, length)
 
@@ -79,6 +79,9 @@ def compileUserStats(date, length, newUsers=None):
 
 	newFriends = FriendConnection.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).count()
 	msg += "New Friends: " + str(newFriends) + "\n"
+
+	checkIns = User.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).count()
+	msg += "Check-ins: " + str(checkIns) + "\n"
 
 	return msg
 
@@ -143,13 +146,14 @@ def compileActionStats(date, length=1, newUsers=None):
 def main(argv):
 	logger.info("Starting... ")
 
-	# figure out time window
+	# figure out time window for 1-day and 7-day
 	tzinfo = pytz.timezone('US/Eastern')
-	date = datetime.today().replace(tzinfo=tzinfo, hour=0, minute=0, second=0)-relativedelta(days=1)
-	length = 1
+	date = datetime.today().replace(tzinfo=tzinfo, hour=0, minute=0, second=0)
 
 	emailSubj = 'Daily Stats'
-	emailBody = compileStats(date, length)
+	emailBody = compileStats(date-relativedelta(days=7), 7) # 7-days
+	emailBody += "\n"
+	emailBody += compileStats(date-relativedelta(days=1), 1) # 1-day
 
 	print emailBody
 
