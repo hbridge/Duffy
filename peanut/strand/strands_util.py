@@ -102,7 +102,8 @@ def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	elif photo not in photosByStrandId[strand.id]:
 		for p in photosByStrandId[strand.id]:
 			if p.iphone_hash == photo.iphone_hash:
-				logger.debug("Found a hash conflict in strand %s for photo %s" % (strand.id, photo.id))
+				logger.debug("Found a hash conflict in strand %s for photo %s...marking as is_dup" % (strand.id, photo.id))
+				photo.is_dup = True
 				return False
 
 		Strand.photos.through.objects.create(strand=strand, photo=photo)

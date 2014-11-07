@@ -305,7 +305,7 @@ class PhotoBulkAPI(BasePhotoAPI):
                     if len(existingPhotosByHash[photo.iphone_hash]) == 0:
                         logger.error("Trying to deal with a dup for photo with hash %s but my list is 0" % photo.iphone_hash)
                     else:
-                        existingPhoto = existingPhotosByHash[photo.iphone_hash][0]
+                        existingPhoto = existingPhotosByHash[photo.iphone_hash][-1]
                         existingPhotosByHash[photo.iphone_hash].remove(existingPhoto)
                         existingPhoto.file_key = photo.file_key
                         existingPhoto.install_num = user.install_num

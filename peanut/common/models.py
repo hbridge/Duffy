@@ -180,6 +180,7 @@ class Photo(models.Model):
 	bulk_batch_key = models.IntegerField(null=True, db_index=True)
 	product_id = models.IntegerField(default=2, null=True, db_index=True)
 	install_num = models.IntegerField(default=0)
+	is_dup = models.BooleanField(default=False)
 	added = models.DateTimeField(auto_now_add=True, db_index=True)
 	updated = models.DateTimeField(auto_now=True, db_index=True)
 

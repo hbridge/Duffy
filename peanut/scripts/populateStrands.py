@@ -289,7 +289,7 @@ def main(argv):
 		
 				photo.strand_evaluated = True
 			
-			Photo.bulkUpdate(photos, ["strand_evaluated"])
+			Photo.bulkUpdate(photos, ["strand_evaluated", "is_dup"])
 
 			dealWithFirstRun(user)
 
