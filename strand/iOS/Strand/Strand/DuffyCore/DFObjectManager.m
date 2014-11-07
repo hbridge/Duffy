@@ -28,7 +28,7 @@ NSString *const BuildIDKey = @"build_id";
   [RKObjectManager setSharedManager:objectManager];
   [[objectManager HTTPClient] setDefaultHeader:@"Accept-Encoding" value:@"gzip, deflate"];
   [[RKObjectManager sharedManager] setRequestSerializationMIMEType:RKMIMETypeJSON];
-  [[[[RKObjectManager sharedManager] HTTPClient] operationQueue] setMaxConcurrentOperationCount:1];
+  //[[[[RKObjectManager sharedManager] HTTPClient] operationQueue] setMaxConcurrentOperationCount:5];
   DDLogDebug(@"HTTP client max ops: %d", (int)[[[[RKObjectManager sharedManager] HTTPClient] operationQueue] maxConcurrentOperationCount]);
   //  [RKObjectMapping setPreferredDateFormatter:[NSDateFormatter DjangoDateFormatter]];
   
