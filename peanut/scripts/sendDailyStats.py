@@ -80,7 +80,7 @@ def compileUserStats(date, length, newUsers=None):
 	newFriends = FriendConnection.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).count()
 	msg += "New Friends: " + str(newFriends) + "\n"
 
-	checkIns = User.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).count()
+	checkIns = User.objects.filter(last_photo_update_timestamp__gt=date).filter(last_photo_update_timestamp__lt=date+relativedelta(days=length)).count()
 	msg += "Check-ins: " + str(checkIns) + "\n"
 
 	return msg
