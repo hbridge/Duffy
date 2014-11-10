@@ -39,12 +39,21 @@ def getActionsByPhotoIdCache(photoIds):
 	return actionsByPhotoId
 
 def addActionsToClusters(clusters, actionsByPhotoIdCache):
+	finalClusters = list()
+
 	for cluster in clusters:
 		for entry in cluster:
 			if entry["photo"].id in actionsByPhotoIdCache:
+				# We want to pull the photo out of the cluster now and have it on its own
+				if len(cluster) > 1:
+					finalClusters.append([entry])
+					cluster.remove(entry)
+
 				entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
 
-	return clusters
+		finalClusters.append(cluster)
+
+	return finalClusters
 
 """
 	Creates a cache which is a dictionary with the key being the strandId and the value
