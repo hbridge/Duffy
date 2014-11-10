@@ -11,7 +11,7 @@ if parentPath not in sys.path:
 import django
 django.setup()
 
-from django.core.mail import send_mail
+from django.core.mail import EmailMessage
 from django.db.models import Count, Sum
 from django.db.models import Q
 
@@ -150,6 +150,7 @@ def main(argv):
 	tzinfo = pytz.timezone('US/Eastern')
 	date = datetime.today().replace(tzinfo=tzinfo, hour=0, minute=0, second=0)
 
+	emailTo = ['aseem@duffytech.co']
 	emailSubj = 'Daily Stats'
 	emailBody = compileStats(date-relativedelta(days=7), 7) # 7-days
 	emailBody += "\n"
@@ -158,10 +159,12 @@ def main(argv):
 	print emailBody
 
 	if (len(argv) > 0 and argv[0]=='send'):
-		send_mail(emailSubj, emailBody, 'prod@duffyapp.com', ['swap-stats@duffytech.co'], fail_silently=False)
+		email = EmailMessage(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
+			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
+		email.send(fail_silently=False)
+		print 'Email Sent to: ' + emailTo
 	else:
 		print 'TEST RUN: EMAIL NOT SENT'
-
 
 		
 		
