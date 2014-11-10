@@ -30,8 +30,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *moreOptionsButton;
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
-@property (weak, nonatomic) IBOutlet UILabel *photoDateLabel;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *commentsLabel;
 
 // Delegate
 @property (nonatomic, weak) NSObject <DFPhotoFeedCellDelegate> *delegate;
@@ -47,11 +47,12 @@
 
 
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
-  DFPhotoFeedCellStyleNone = 0,
-  DFPhotoFeedCellStyleSquare = 1 << 1,
-  DFPhotoFeedCellStylePortrait = 1 << 2,
-  DFPhotoFeedCellStyleLandscape = 1 << 3,
+  DFPhotoFeedCellStyleNone =              0,
+  DFPhotoFeedCellStyleSquare =            1 << 1,
+  DFPhotoFeedCellStylePortrait =          1 << 2,
+  DFPhotoFeedCellStyleLandscape =         1 << 3,
   DFPhotoFeedCellStyleCollectionVisible = 1 << 4,
+  DFPhotoFeedCellStyleHasComments =       1 << 5,
 };
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style;

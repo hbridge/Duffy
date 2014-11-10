@@ -100,17 +100,19 @@
                     <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="700" constant="10" id="d6m-M6-kfK"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="fDr-AQ-CiI"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="mPc-8w-nGX"/>
+                    <constraint firstItem="TQm-Ad-3iq" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="690" constant="8" id="p9m-3R-d0z"/>
                     <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" secondItem="h07-n4-DgV" secondAttribute="bottom" constant="10" id="zee-VV-RPM"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="collectionView" destination="h07-n4-DgV" id="l03-i2-iAq"/>
+                <outlet property="commentsLabel" destination="DCN-Jd-BMd" id="maL-qq-8zv"/>
                 <outlet property="imageViewHeightConstraint" destination="5rH-Iu-Kcd" id="u0I-7j-hbS"/>
                 <outlet property="loadingActivityIndicator" destination="6Gw-h8-Can" id="e70-WN-aaJ"/>
                 <outlet property="moreOptionsButton" destination="B5M-0I-S31" id="vGA-wj-gj8"/>
                 <outlet property="photoImageView" destination="EPr-aP-pSV" id="f4q-6k-aBD"/>
             </connections>
-            <point key="canvasLocation" x="502" y="570"/>
+            <point key="canvasLocation" x="640" y="426"/>
         </tableViewCell>
     </objects>
 </document>

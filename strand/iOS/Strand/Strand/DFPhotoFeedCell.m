@@ -46,6 +46,19 @@
   self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
+- (void)configureWithStyle:(DFPhotoFeedCellStyle)style
+{
+  _style = style;
+  
+  if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
+    [self.collectionView removeFromSuperview];
+  }
+  
+  if (!(style & DFPhotoFeedCellStyleHasComments)) {
+    [self.commentsLabel removeFromSuperview];
+  }
+}
+
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
 {
     [super setSelected:selected animated:animated];
@@ -176,16 +189,6 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     [self.delegate moreOptionsButtonPressedForObject:self.selectedObject sender:sender];
   }
 }
-
-- (void)configureWithStyle:(DFPhotoFeedCellStyle)style
-{
-  _style = style;
-  
-  if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
-    [self.collectionView removeFromSuperview];
-  }
-}
-
 
 - (void)layoutSubviews
 {
