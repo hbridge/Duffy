@@ -414,6 +414,33 @@ static DFPeanutFeedDataManager *defaultManager;
   return [NSArray new];
 }
 
+- (NSArray *)actionsList
+{
+  NSMutableArray *photos = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+    if ([object.type isEqual:DFFeedObjectPhoto]) {
+      [photos addObject:object];
+    } else {
+      for (DFPeanutFeedObject *subObject in [object enumeratorOfDescendents]) {
+        if ([subObject.type isEqual:DFFeedObjectPhoto]) {
+          [photos addObject:subObject];
+        }
+      }
+    }
+  }
+  
+  NSMutableArray *actions = [NSMutableArray new];
+  for (DFPeanutFeedObject *photo in photos) {
+    [actions addObjectsFromArray:[photo actions]];
+  }
+  
+  NSSortDescriptor* sortByDate = [NSSortDescriptor sortDescriptorWithKey:@"time_stamp" ascending:NO];
+  [actions sortUsingDescriptors:[NSArray arrayWithObject:sortByDate]];
+ 
+  return actions;
+}
+
 - (BOOL)isRefreshingInbox
 {
   return self.inboxRefreshing;
