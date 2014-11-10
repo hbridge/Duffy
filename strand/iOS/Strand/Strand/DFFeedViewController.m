@@ -37,7 +37,7 @@
 #import "SVProgressHUD.h"
 #import "DFImageManager.h"
 #import "DFStrandPeopleViewController.h"
-;
+#import "DFCommentViewController.h"
 
 const CGFloat SectionHeaderHeight = 51.0;
 
@@ -512,11 +512,7 @@ const CGFloat SectionHeaderHeight = 51.0;
   UITableViewCell *cell;
   
   DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
-  if ([object.type isEqual:DFFeedObjectPhoto]) {
-    cell = [self cellForPhoto:object indexPath:indexPath];
-  } else if ([object.type isEqual:DFFeedObjectCluster]) {
-    cell = [self cellForCluster:object indexPath:indexPath];
-  }
+  cell = [self cellForFeedObject:object indexPath:indexPath];
   
   if (!cell) {
     [NSException raise:@"nil cell" format:@"nil cell for object: %@", object];
@@ -524,7 +520,7 @@ const CGFloat SectionHeaderHeight = 51.0;
   
   cell.selectionStyle = UITableViewCellSelectionStyleNone;
   [cell setNeedsLayout];
-  
+
   [self prefetchImagesAroundIndexPath:indexPath];
   return cell;
 }
@@ -556,7 +552,7 @@ static int PrefetchRange = 2;
   return CGSizeMake(imageViewHeight * scale, imageViewHeight * scale);
 }
 
-- (DFPhotoFeedCell *)cellForPhoto:(DFPeanutFeedObject *)photoObject
+- (DFPhotoFeedCell *)cellForFeedObject:(DFPeanutFeedObject *)feedObject
                            indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
@@ -565,87 +561,35 @@ static int PrefetchRange = 2;
                                     forIndexPath:indexPath];
   [photoFeedCell configureWithStyle:style];
   photoFeedCell.delegate = self;
-  [photoFeedCell setObjects:@[@(photoObject.id)]];
-  [DFFeedViewController configureNonImageAttributesForCell:photoFeedCell
-                                               searchObject:photoObject];
-  photoFeedCell.imageView.image = nil;
-  //[photoFeedCell.loadingActivityIndicator startAnimating];
   
-  if (photoObject) {
-    [[DFImageManager sharedManager]
-     imageForID:photoObject.id
-     size:[self imageSizeToFetch]
-     contentMode:DFImageRequestContentModeAspectFit
-     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
-     completion:^(UIImage *image) {
-      dispatch_async(dispatch_get_main_queue(), ^{
-        if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
-        [photoFeedCell setImage:image forObject:@(photoObject.id)];
-        [photoFeedCell setNeedsLayout];
-      });
+  NSArray *photoIDs;
+  if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
+    photoIDs = @[@(feedObject.id)];
+  } else {
+    photoIDs = [feedObject.objects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *object) {
+      return @(object.id);
     }];
+  }
+  [photoFeedCell setObjects:photoIDs];
+  
+  if (feedObject) {
+    for (NSNumber *photoID in photoIDs) {
+      [[DFImageManager sharedManager]
+       imageForID:photoID.longLongValue
+       size:[self imageSizeToFetch]
+       contentMode:DFImageRequestContentModeAspectFit
+       deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
+       completion:^(UIImage *image) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
+           [photoFeedCell setImage:image forObject:photoID];
+           [photoFeedCell setNeedsLayout];
+         });
+       }];
+    }
   }
   
   return photoFeedCell;
-}
-
-- (DFPhotoFeedCell *)cellForCluster:(DFPeanutFeedObject *)cluster
-                        indexPath:(NSIndexPath *)indexPath
-{
-  DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
-  DFPhotoFeedCell *clusterFeedCell = [self.tableView
-                                      dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style]
-                                      forIndexPath:indexPath];
-  [clusterFeedCell configureWithStyle:style];
-  clusterFeedCell.delegate = self;
-  [clusterFeedCell setObjects:[DFFeedViewController objectIDNumbers:cluster.objects]];
-  [DFFeedViewController configureNonImageAttributesForCell:clusterFeedCell
-                                               searchObject:[cluster.objects firstObject]];
-  for (DFPeanutFeedObject *subObject in cluster.objects) {
-    [[DFImageManager sharedManager]
-     imageForID:subObject.id
-     size:[self imageSizeToFetch]
-     contentMode:DFImageRequestContentModeAspectFit
-     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
-     completion:^(UIImage *image) {
-       dispatch_async(dispatch_get_main_queue(), ^{
-         if (![self.tableView.visibleCells containsObject:clusterFeedCell]) return;
-         [clusterFeedCell setImage:image forObject:@(subObject.id)];
-         [clusterFeedCell setNeedsLayout];
-       });
-     }];
-  }
-
-  return clusterFeedCell;
-}
-
-+ (NSArray *)objectIDNumbers:(NSArray *)objects
-{
-  NSMutableArray *result = [NSMutableArray new];
-  for (DFPeanutFeedObject *object in objects) {
-    [result addObject:@(object.id)];
-  }
-  return result;
-}
-
-+ (void)configureNonImageAttributesForCell:(DFPhotoFeedCell *)cell
-                              searchObject:(DFPeanutFeedObject *)searchObject
-{
-  cell.titleLabel.text = searchObject.user == [[DFUser currentUser] userID] ?
-    @"You" : searchObject.user_display_name;
-  cell.photoDateLabel.text = [NSDateFormatter relativeTimeStringSinceDate:searchObject.time_taken
-                              abbreviate:YES];
-  
-  if (searchObject.actions.count > 0) {
-    [cell setFavoritersListHidden:NO];
-    NSArray *likerNames = [DFPeanutAction arrayOfLikerNamesFromActions:searchObject.actions];
-    NSString *likerNamesString = [NSString stringWithCommaSeparatedStrings:likerNames];
-    [cell.favoritersButton setTitle:likerNamesString forState:UIControlStateNormal];
-    cell.favoriteButton.selected = (searchObject.userFavoriteAction != nil);
-  } else {
-    cell.favoriteButton.selected = NO;
-    [cell setFavoritersListHidden:YES];
-  }
 }
 
 
@@ -678,20 +622,23 @@ static int PrefetchRange = 2;
 
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
-
-  DFPhotoFeedCellStyle style;
-  if (object.full_height.intValue > object.full_width.intValue) {
-    style = DFPhotoFeedCellStylePortrait;
-  } else if (object.full_height.intValue < object.full_width.intValue) {
-    style = DFPhotoFeedCellStyleLandscape;
-  } else {
-    style = DFPhotoFeedCellStyleSquare;
-  }
+  DFPhotoFeedCellStyle style = DFPhotoFeedCellStyleNone;
   
+  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
+  DFPeanutFeedObject *photoObject = object;
   if ([object.type isEqual:DFFeedObjectCluster]) {
+    photoObject = object.objects.firstObject;
     style |= DFPhotoFeedCellStyleCollectionVisible;
   }
+  
+  if (photoObject.full_height.intValue > photoObject.full_width.intValue) {
+    style |= DFPhotoFeedCellStylePortrait;
+  } else if (photoObject.full_height.intValue < photoObject.full_width.intValue) {
+    style |= DFPhotoFeedCellStyleLandscape;
+  } else {
+    style |= DFPhotoFeedCellStyleSquare;
+  }
+  
   
   return style;
 }
@@ -790,11 +737,19 @@ static int PrefetchRange = 2;
 #pragma mark - DFPhotoFeedCell Delegates
 
 
+
+- (void)commentButtonPressedForObject:(id)object sender:(id)sender
+{
+  DDLogVerbose(@"Comment button for %@ pressed", object);
+  DFCommentViewController *cvc = [[DFCommentViewController alloc] initWithPhotoObject:object];
+  [self.navigationController pushViewController:cvc animated:YES];
+}
+
 - (void)addComment:(NSNumber *)objectIDNumber commentString:(NSString *)commentString sender:(id)sender
 {
   DDLogVerbose(@"Comment added");
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
-
+  
   DFPeanutAction *commentAction;
   commentAction = [[DFPeanutAction alloc] init];
   commentAction.user = [[DFUser currentUser] userID];
@@ -802,10 +757,11 @@ static int PrefetchRange = 2;
   commentAction.photo = photoID;
   commentAction.strand = self.postsObject.id;
   commentAction.text = commentString;
-
+  
   DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
   [adapter addAction:commentAction success:nil failure:nil];
 }
+
 
 /* DISABLED FOR NOW*/
 const BOOL favoriteDisabled = YES;
@@ -909,11 +865,10 @@ selectedObjectChanged:(id)newObject
       fromObject:(id)oldObject
 {
   DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
-  DFPeanutFeedObject *photoObject = self.photoObjectsById[newObject];
-  
-  [DFFeedViewController configureNonImageAttributesForCell:feedCell searchObject:photoObject];
   [feedCell setNeedsLayout];
 }
+
+
 
 
 #pragma mark - Action Handler Helpers

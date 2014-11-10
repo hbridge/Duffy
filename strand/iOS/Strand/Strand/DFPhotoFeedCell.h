@@ -14,6 +14,7 @@
 @required
 
 - (void)favoriteButtonPressedForObject:(id)object sender:(id)sender;
+- (void)commentButtonPressedForObject:(id)object sender:(id)sender;
 - (void)moreOptionsButtonPressedForObject:(id)object sender:(id)sender;
 - (void)feedCell:(DFPhotoFeedCell *)feedCell selectedObjectChanged:(id)newObject fromObject:(id)oldObject;
 
@@ -30,8 +31,8 @@
 @property (weak, nonatomic) IBOutlet UIButton *moreOptionsButton;
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
-@property (weak, nonatomic) IBOutlet UILabel *photoDateLabel;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageViewHeightConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *commentsLabel;
 
 // Delegate
 @property (nonatomic, weak) NSObject <DFPhotoFeedCellDelegate> *delegate;
@@ -47,10 +48,12 @@
 
 
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
-  DFPhotoFeedCellStyleSquare = 1 << 0,
-  DFPhotoFeedCellStylePortrait = 1 << 1,
-  DFPhotoFeedCellStyleLandscape = 1 << 2,
-  DFPhotoFeedCellStyleCollectionVisible = 1 << 3,
+  DFPhotoFeedCellStyleNone =              0,
+  DFPhotoFeedCellStyleSquare =            1 << 1,
+  DFPhotoFeedCellStylePortrait =          1 << 2,
+  DFPhotoFeedCellStyleLandscape =         1 << 3,
+  DFPhotoFeedCellStyleCollectionVisible = 1 << 4,
+  DFPhotoFeedCellStyleHasComments =       1 << 5,
 };
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style;

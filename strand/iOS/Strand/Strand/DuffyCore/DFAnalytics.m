@@ -131,7 +131,7 @@ static DFAnalytics *defaultLogger;
 {
   NSString *screenName = [self screenNameForControllerViewed:viewController];
   [[LocalyticsSession shared] tagScreen:screenName];
-  [DFAnalytics logEvent:[NSString stringWithFormat:@"%@Viewed",screenName]];
+  [DFAnalytics logEvent:[NSString stringWithFormat:@"%@Viewed",screenName] withParameters:params];
 }
 
 + (void)logViewController:(UIViewController *)viewController disappearedWithParameters:(NSDictionary *)params

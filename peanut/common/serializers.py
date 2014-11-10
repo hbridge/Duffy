@@ -70,4 +70,7 @@ def actionDataForApiSerializer(action):
 	actionData['action_type'] = action.action_type
 	actionData['text'] = action.text
 
+	# TODO(Derek): remove this once we don't need it
+	actionData['user_display_name'] = action.getUserDisplayName()
+
 	return actionData
