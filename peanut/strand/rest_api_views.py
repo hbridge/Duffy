@@ -527,13 +527,17 @@ class CreateActionAPI(CreateAPIView):
         if serializer.is_valid():
             obj = serializer.object
 
-            results = Action.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
-
-            if len(results) > 0:
-                serializer = self.get_serializer(results[0])
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
+            # if it's a comment, then allow multiple on the same photo
+            if (obj.action_type == constants.ACTION_TYPE_COMMENT):
                 return super(CreateActionAPI, self).post(request)
+            else:
+                results = Action.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
+
+                if len(results) > 0:
+                    serializer = self.get_serializer(results[0])
+                    return Response(serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    return super(CreateActionAPI, self).post(request)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
