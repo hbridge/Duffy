@@ -38,18 +38,22 @@ def getActionsByPhotoIdCache(photoIds):
 
 	return actionsByPhotoId
 
-def addActionsToClusters(clusters, actionsByPhotoIdCache):
+def addActionsToClusters(clusters, strandId, actionsByPhotoIdCache):
 	finalClusters = list()
 
 	for cluster in clusters:
 		for entry in cluster:
 			if entry["photo"].id in actionsByPhotoIdCache:
-				# We want to pull the photo out of the cluster now and have it on its own
-				if len(cluster) > 1:
-					finalClusters.append([entry])
-					cluster.remove(entry)
+				actions = actionsByPhotoIdCache[entry["photo"].id]
 
-				entry["actions"] = actionsByPhotoIdCache[entry["photo"].id]
+				actionsForThisStrand = filter(lambda x: x.strand_id == strandId, actions)
+				if len(actionsForThisStrand) > 0:
+					# We want to pull the photo out of the cluster now and have it on its own
+					if len(cluster) > 1:
+						finalClusters.append([entry])
+						cluster.remove(entry)
+
+					entry["actions"] = actionsForThisStrand
 
 		finalClusters.append(cluster)
 
@@ -252,9 +256,8 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 			continue
 
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
-		clusters = addActionsToClusters(clusters, actionsByPhotoIdCache)
+		clusters = addActionsToClusters(clusters, group['metadata']['strand_id'], actionsByPhotoIdCache)
 		
-
 		location = strands_util.getBestLocationForPhotos(group['photos'])
 		if not location:
 			location = "Location Unknown"
@@ -281,7 +284,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		printStats("neighbor-cache")
 
 	for strand in strands:
-		strandId = strand.id
 		photos = strand.photos.all()
 
 		photos = sorted(photos, key=lambda x: x.time_taken, reverse=True)
@@ -316,7 +318,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strandId, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
+		metadata = {'type': feedObjectType, 'id': strand.id, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
@@ -348,7 +350,7 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	return strandsThatMatch
 	
 def getObjectsDataForPost(postAction, simCaches, actionsByPhotoIdCache):
-	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
+	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
 	photos = postAction.photos.all()
 	photos = sorted(photos, key=lambda x: x.time_taken)
 	
