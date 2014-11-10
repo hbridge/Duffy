@@ -15,6 +15,8 @@ extern NSString *const ActionBasePath;
 
 @interface DFPeanutActionAdapter : DFPeanutRestEndpointAdapter <DFNetworkAdapter>
 
-typedef void (^DFPeanutActionResponseBlock)(DFPeanutAction *action, NSError *error);
+- (void)addAction:(DFPeanutAction *)action
+          success:(DFPeanutRestFetchSuccess)success
+          failure:(DFPeanutRestFetchFailure)failure;
 
 @end

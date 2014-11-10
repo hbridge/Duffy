@@ -111,6 +111,14 @@ static NSArray *FeedObjectTypes;
   return resultDict;
 }
 
+
+- (NSArray *)commentActions
+{
+  return [self actionsOfType:DFPeanutActionComment
+                      forUser:0];
+}
+
+
 - (DFPeanutAction *)userFavoriteAction
 {
   return [[self actionsOfType:DFPeanutActionFavorite

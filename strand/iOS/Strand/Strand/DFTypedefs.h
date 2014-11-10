@@ -66,6 +66,7 @@ extern DFUIActionType DFUIActionDoubleTap;
 
 typedef UInt64 DFPeanutActionType;
 extern DFPeanutActionType DFPeanutActionFavorite;
+extern DFPeanutActionType DFPeanutActionComment;
 
 
 // common block type

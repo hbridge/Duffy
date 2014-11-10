@@ -789,14 +789,30 @@ static int PrefetchRange = 2;
 
 #pragma mark - DFPhotoFeedCell Delegates
 
+
+- (void)addComment:(NSNumber *)objectIDNumber commentString:(NSString *)commentString sender:(id)sender
+{
+  DDLogVerbose(@"Comment added");
+  DFPhotoIDType photoID = [objectIDNumber longLongValue];
+
+  DFPeanutAction *commentAction;
+  commentAction = [[DFPeanutAction alloc] init];
+  commentAction.user = [[DFUser currentUser] userID];
+  commentAction.action_type = DFPeanutActionComment;
+  commentAction.photo = photoID;
+  commentAction.strand = self.postsObject.id;
+  commentAction.text = commentString;
+
+  DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
+  [adapter addAction:commentAction success:nil failure:nil];
+}
+
 /* DISABLED FOR NOW*/
 const BOOL favoriteDisabled = YES;
 - (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender
 {
   DDLogVerbose(@"Favorite button pressed");
   if (favoriteDisabled) return;
-  
-
   
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
   
@@ -884,7 +900,6 @@ const BOOL favoriteDisabled = YES;
                                              destructiveButtonTitle:deleteTitle
                                                   otherButtonTitles:@"Save", nil];
   
- 
   [actionSheet showInView:self.tableView];
 }
 
@@ -894,8 +909,9 @@ selectedObjectChanged:(id)newObject
       fromObject:(id)oldObject
 {
   DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
-  DFPeanutFeedObject *searchObject = self.photoObjectsById[newObject];
-  [DFFeedViewController configureNonImageAttributesForCell:feedCell searchObject:searchObject];
+  DFPeanutFeedObject *photoObject = self.photoObjectsById[newObject];
+  
+  [DFFeedViewController configureNonImageAttributesForCell:feedCell searchObject:photoObject];
   [feedCell setNeedsLayout];
 }
 

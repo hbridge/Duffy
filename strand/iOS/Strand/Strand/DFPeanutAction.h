@@ -14,9 +14,19 @@
 /*
 {
  "id": 324,
- "action_type": "favorite",
+ "action_type": 0, // Favorite
         "photo": 295249,
  "user": 290,
+ "time_stamp": 125235235235,
+ "user_display_name": "Dan"
+}
+{
+ "id": 325,
+ "action_type": 4, // Comment
+ "photo": 295249,
+ "user": 290,
+ "text": "Comment here...",
+ "time_stamp": 125235235235,
  "user_display_name": "Dan"
 }
  */
@@ -31,6 +41,7 @@ typedef UInt64 DFActionID;
 @property (nonatomic) DFStrandIDType strand;
 @property (nonatomic) DFUserIDType user;
 @property (nonatomic, retain) NSString *user_display_name;
+@property (nonatomic, retain) NSString *text;
 
 + (NSArray *)simpleAttributeKeys;
 

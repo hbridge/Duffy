@@ -57,6 +57,9 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 
 - (DFPeanutAction *)userFavoriteAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
+
+- (NSArray *)commentActions;
+
 - (NSArray *)actionsOfType:(DFPeanutActionType)type forUser:(DFUserIDType)user;
 - (NSEnumerator *)enumeratorOfDescendents;
 

@@ -10,6 +10,7 @@
 #import "DFObjectManager.h"
 #import "RestKit/RestKit.h"
 #import "DFPeanutInvalidField.h"
+#import "DFPeanutAction.h"
 
 NSString *const ActionBasePath = @"actions/";
 
@@ -32,5 +33,26 @@ NSString *const ActionBasePath = @"actions/";
   return [super requestDescriptorsForPeanutObjectClass:[DFPeanutAction class]
                                        bulkPostKeyPath:nil];
 }
+
+
+
+- (void)addAction:(DFPeanutAction *)action
+                        success:(DFPeanutRestFetchSuccess)success
+                        failure:(DFPeanutRestFetchFailure)failure
+{
+  
+  [super
+   performRequest:RKRequestMethodPOST
+   withPath:ActionBasePath
+   objects:@[action]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     if (success) success(resultObjects);
+   } failure:^(NSError *error) {
+     if (failure) failure(error);
+   }];
+}
+
 
 @end
