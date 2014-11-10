@@ -29,11 +29,8 @@ def userbaseSummary(request):
 
 	# database calls to fetch the data needed for the big user table
 	userStats = User.objects.filter(product_id=2).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
-			photosWithGPS=Count('photo__location_point'), twofishCount=Count('photo__twofishes_data'), 
-			fullImagesCount=Count('photo__full_filename'), clusteredCount=Count('photo__clustered_time'), 
-			strandedCount=Count('photo__strand_evaluated'), lastUpdated=Max('photo__updated'), lastAdded=Max('photo__added'))
+		photosWithGPS=Count('photo__location_point'), lastUpdated=Max('photo__updated'), lastAdded=Max('photo__added'))
 
-	photoDataRaw = Photo.objects.filter(thumb_filename__isnull=False).values('user').annotate(weeklyPhotos=Count('user'))
 	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'), weeklyPhotos=Count('photos__user'))
 	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(weeklyActions=Count('user'))
 	actionDataWithPhotos = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(totalPhotos=Count('photos'))
