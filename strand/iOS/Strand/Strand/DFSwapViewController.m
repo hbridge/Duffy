@@ -112,7 +112,18 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+  NSDictionary *parameters;
+  if ([[DFPeanutFeedDataManager sharedManager] hasSwapsData]) {
+    NSInteger numInvites = [[[DFPeanutFeedDataManager sharedManager] inviteStrands] count];
+    NSInteger numSuggestions = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
+    parameters = @{
+                   @"numInvites" : [DFAnalytics bucketStringForObjectCount:numInvites],
+                   @"numSuggestions" : [DFAnalytics bucketStringForObjectCount:numSuggestions],
+                   @"context" : (self.userToFilter != nil) ? @"userFilter" : @"allSwaps",
+                   };
+  }
+  
+  [DFAnalytics logViewController:self appearedWithParameters:parameters];
   if ([[[DFPeanutFeedDataManager sharedManager] acceptedStrands] count] > 0) {
     // if user has any accepted strands and we haven't prompted for push notifs, do so now
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
