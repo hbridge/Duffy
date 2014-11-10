@@ -8,8 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFRoundedButton : UIButton
-@property (readonly, weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (readonly, weak, nonatomic) IBOutlet UILabel *titleLabel;
+IB_DESIGNABLE @interface DFRoundedButton : UIButton
+
+@property (nonatomic) IBInspectable CGFloat cornerRadius;
 
 @end

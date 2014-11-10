@@ -47,10 +47,11 @@
 
 
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
-  DFPhotoFeedCellStyleSquare = 1 << 0,
-  DFPhotoFeedCellStylePortrait = 1 << 1,
-  DFPhotoFeedCellStyleLandscape = 1 << 2,
-  DFPhotoFeedCellStyleCollectionVisible = 1 << 3,
+  DFPhotoFeedCellStyleNone = 0,
+  DFPhotoFeedCellStyleSquare = 1 << 1,
+  DFPhotoFeedCellStylePortrait = 1 << 2,
+  DFPhotoFeedCellStyleLandscape = 1 << 3,
+  DFPhotoFeedCellStyleCollectionVisible = 1 << 4,
 };
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style;

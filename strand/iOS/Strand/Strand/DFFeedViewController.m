@@ -678,20 +678,23 @@ static int PrefetchRange = 2;
 
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
-
-  DFPhotoFeedCellStyle style;
-  if (object.full_height.intValue > object.full_width.intValue) {
-    style = DFPhotoFeedCellStylePortrait;
-  } else if (object.full_height.intValue < object.full_width.intValue) {
-    style = DFPhotoFeedCellStyleLandscape;
-  } else {
-    style = DFPhotoFeedCellStyleSquare;
-  }
+  DFPhotoFeedCellStyle style = DFPhotoFeedCellStyleNone;
   
+  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
+  DFPeanutFeedObject *photoObject = object;
   if ([object.type isEqual:DFFeedObjectCluster]) {
+    photoObject = object.objects.firstObject;
     style |= DFPhotoFeedCellStyleCollectionVisible;
   }
+  
+  if (photoObject.full_height.intValue > photoObject.full_width.intValue) {
+    style |= DFPhotoFeedCellStylePortrait;
+  } else if (photoObject.full_height.intValue < photoObject.full_width.intValue) {
+    style |= DFPhotoFeedCellStyleLandscape;
+  } else {
+    style |= DFPhotoFeedCellStyleSquare;
+  }
+  
   
   return style;
 }
