@@ -20,11 +20,11 @@ class UserSerializer(serializers.ModelSerializer):
 		model = User
 
 class ActionWithUserNameSerializer(serializers.ModelSerializer):
-	user_display_name = serializers.Field('getUserDisplayName')
+	#user_display_name = serializers.Field('getUserDisplayName')
 	
 	class Meta:
 		model = Action
-		fields = ('id', 'photo', 'user', 'user_display_name', 'action_type')
+		fields = ('id', 'photo', 'user', 'action_type', 'text')
 	
 class ContactEntrySerializer(serializers.ModelSerializer):
 	phone_number = serializers.CharField()
@@ -61,3 +61,13 @@ def photoDataForApiSerializer(photo):
 	photoData['full_height'] = photo.full_height
 
 	return photoData
+
+def actionDataForApiSerializer(action):
+	actionData = dict()
+	actionData['id'] = action.id
+	actionData['user'] = action.user_id
+	actionData['time_stamp'] = action.added
+	actionData['action_type'] = action.action_type
+	actionData['text'] = action.text
+
+	return actionData

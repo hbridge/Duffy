@@ -70,7 +70,7 @@ def getPhotoObject(entry):
 		photoData['dist'] = entry['dist']
 	
 	if 'actions' in entry:
-		photoData['actions'] = [ActionWithUserNameSerializer(action).data for action in entry['actions']]
+		photoData['actions'] = [serializers.actionDataForApiSerializer(action) for action in entry['actions']]
 	
 	return photoData
 

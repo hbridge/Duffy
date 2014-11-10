@@ -756,6 +756,7 @@ class Action(models.Model):
 	photos = models.ManyToManyField(Photo, related_name = "action_photos")
 	strand = models.ForeignKey(Strand, db_index=True, null=True)
 	notification_sent = models.DateTimeField(null=True)
+	text = models.TextField(null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
