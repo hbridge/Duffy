@@ -35,10 +35,11 @@
                         <cells/>
                     </collectionView>
                     <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="6Gw-h8-Can">
-                        <rect key="frame" x="150" y="188" width="20" height="20"/>
+                        <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
                     </activityIndicatorView>
-                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Comments Label" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="304" translatesAutoresizingMaskIntoConstraints="NO" id="DCN-Jd-BMd">
+                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="304" translatesAutoresizingMaskIntoConstraints="NO" id="DCN-Jd-BMd">
                         <rect key="frame" x="8" y="410" width="304" height="16"/>
+                        <string key="text">Comments Label this is a very very long string and I'm hoping it will wrap to a newline so I can see how the contraints handle it</string>
                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
@@ -100,7 +101,7 @@
                     <constraint firstAttribute="bottom" secondItem="TQm-Ad-3iq" secondAttribute="bottom" constant="27" id="Usn-Zp-9Mr"/>
                     <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="W57-RD-aTX"/>
                     <constraint firstAttribute="trailing" secondItem="EPr-aP-pSV" secondAttribute="trailing" id="a0s-oA-S46"/>
-                    <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="700" constant="10" id="d6m-M6-kfK"/>
+                    <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="999" constant="10" id="d6m-M6-kfK"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="fDr-AQ-CiI"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="mPc-8w-nGX"/>
                     <constraint firstItem="TQm-Ad-3iq" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="690" constant="8" id="p9m-3R-d0z"/>
@@ -115,7 +116,7 @@
                 <outlet property="moreOptionsButton" destination="B5M-0I-S31" id="vGA-wj-gj8"/>
                 <outlet property="photoImageView" destination="EPr-aP-pSV" id="f4q-6k-aBD"/>
             </connections>
-            <point key="canvasLocation" x="640" y="426"/>
+            <point key="canvasLocation" x="640" y="425"/>
         </tableViewCell>
     </objects>
 </document>

@@ -144,6 +144,9 @@ static NSArray *colors;
       // we do this whole song and dance of checking whether the fonts exist because we hit
       // a crash in iOS 7.0.4 where HelveticaNeue-Italic was missing and the dict crashed
       defaultStyle = [NSMutableDictionary new];
+      
+      NSMutableParagraphStyle *feedParagraphStyle = [NSMutableParagraphStyle new];
+      feedParagraphStyle.lineSpacing = 5;
       UIFont *helveticaNeue = [UIFont fontWithName:@"HelveticaNeue" size:13];
       UIFont *helveticaNeueBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
       UIFont *helveticaNeueItalic = [UIFont fontWithName:@"HelveticaNeue-Italic" size:13];
@@ -160,6 +163,7 @@ static NSArray *colors;
         defaultStyle[@"em"] = @{NSFontAttributeName : helveticaNeueItalic};
       }
       defaultStyle[@"gray"] = [UIColor lightGrayColor];
+      defaultStyle[@"feedText"] = @{NSParagraphStyleAttributeName : feedParagraphStyle};
     });
   }
   

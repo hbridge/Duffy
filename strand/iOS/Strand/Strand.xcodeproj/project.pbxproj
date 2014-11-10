@@ -17,6 +17,8 @@
 		5A02CEB51950D53300C4EBA6 /* DFLocationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A02CEB41950D53300C4EBA6 /* DFLocationStore.m */; };
 		5A05AD331A114D12003AAE1C /* DFCommentViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A05AD311A114D12003AAE1C /* DFCommentViewController.m */; };
 		5A05AD341A114D12003AAE1C /* DFCommentViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */; };
+		5A05AD3D1A115B65003AAE1C /* DFCommentTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A05AD3B1A115B65003AAE1C /* DFCommentTableViewCell.m */; };
+		5A05AD3E1A115B65003AAE1C /* DFCommentTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A05AD3C1A115B65003AAE1C /* DFCommentTableViewCell.xib */; };
 		5A0BC49C19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0BC49A19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.m */; };
 		5A0BC49D19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A0BC49B19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib */; };
 		5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A0E122419747BD800B6FF04 /* DFPeanutInviteMessageResponse.m */; };
@@ -285,6 +287,9 @@
 		5A05AD301A114D12003AAE1C /* DFCommentViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCommentViewController.h; sourceTree = "<group>"; };
 		5A05AD311A114D12003AAE1C /* DFCommentViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCommentViewController.m; sourceTree = "<group>"; };
 		5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCommentViewController.xib; sourceTree = "<group>"; };
+		5A05AD3A1A115B65003AAE1C /* DFCommentTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCommentTableViewCell.h; sourceTree = "<group>"; };
+		5A05AD3B1A115B65003AAE1C /* DFCommentTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCommentTableViewCell.m; sourceTree = "<group>"; };
+		5A05AD3C1A115B65003AAE1C /* DFCommentTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCommentTableViewCell.xib; sourceTree = "<group>"; };
 		5A0BC49919F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhotoPickerHeaderReusableView.h; sourceTree = "<group>"; };
 		5A0BC49A19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhotoPickerHeaderReusableView.m; sourceTree = "<group>"; };
 		5A0BC49B19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFPhotoPickerHeaderReusableView.xib; sourceTree = "<group>"; };
@@ -744,6 +749,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		5A05AD3F1A11603B003AAE1C /* Commenting */ = {
+			isa = PBXGroup;
+			children = (
+				5A05AD301A114D12003AAE1C /* DFCommentViewController.h */,
+				5A05AD311A114D12003AAE1C /* DFCommentViewController.m */,
+				5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */,
+				5A05AD3A1A115B65003AAE1C /* DFCommentTableViewCell.h */,
+				5A05AD3B1A115B65003AAE1C /* DFCommentTableViewCell.m */,
+				5A05AD3C1A115B65003AAE1C /* DFCommentTableViewCell.xib */,
+			);
+			name = Commenting;
+			sourceTree = "<group>";
+		};
 		5A0E123A1976DCC300B6FF04 /* Common Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -1290,9 +1308,7 @@
 				5A56EFB51986CC0E0032CA8A /* DFUploadingFeedCell.h */,
 				5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */,
 				5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */,
-				5A05AD301A114D12003AAE1C /* DFCommentViewController.h */,
-				5A05AD311A114D12003AAE1C /* DFCommentViewController.m */,
-				5A05AD321A114D12003AAE1C /* DFCommentViewController.xib */,
+				5A05AD3F1A11603B003AAE1C /* Commenting */,
 			);
 			name = "Photo Feed";
 			sourceTree = "<group>";
@@ -1712,6 +1728,7 @@
 				5AEFA25B19D607150027BC5E /* DFStrandGallerySectionHeaderView.xib in Resources */,
 				5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */,
 				5A9115E419DB2B2F003F2A68 /* LaunchScreen.xib in Resources */,
+				5A05AD3E1A115B65003AAE1C /* DFCommentTableViewCell.xib in Resources */,
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
 				5A4BBD4019BA4F9600359299 /* DFPhotosPermissionViewController.xib in Resources */,
 				5AFDEBDE19782C8C005DDA7D /* DFLocationRoadblockViewController.xib in Resources */,
@@ -1982,6 +1999,7 @@
 				5AB7BEC11A028C20000BEB67 /* DFSwapTableViewCell.m in Sources */,
 				5A9BC32219A2AA64002D1CD7 /* DFContactsModel.xcdatamodeld in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,
+				5A05AD3D1A115B65003AAE1C /* DFCommentTableViewCell.m in Sources */,
 				5A3172D5196C85F800CA7693 /* DFSettings.m in Sources */,
 				5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */,
 				5A7B185319707DE300E5A1D1 /* DFPeanutAction.m in Sources */,

@@ -9,6 +9,7 @@
             <connections>
                 <outlet property="tableView" destination="Idt-Bp-Mrh" id="k0b-2j-HLv"/>
                 <outlet property="textField" destination="Pfw-9f-UHS" id="1Zc-VB-1uS"/>
+                <outlet property="toolbar" destination="OZb-rB-V1d" id="8eI-uq-pQl"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -21,12 +22,12 @@
                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </tableView>
-                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OZb-rB-V1d">
+                <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OZb-rB-V1d">
                     <rect key="frame" x="0.0" y="556" width="600" height="44"/>
                     <items>
                         <barButtonItem style="plain" id="SBf-XN-PUW">
                             <textField key="customView" opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Add a comment" minimumFontSize="17" id="Pfw-9f-UHS">
-                                <rect key="frame" x="16" y="7" width="527" height="30"/>
+                                <rect key="frame" x="16" y="7" width="507" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -35,7 +36,7 @@
                                 </connections>
                             </textField>
                         </barButtonItem>
-                        <barButtonItem title="Send" id="QrE-bK-fZK">
+                        <barButtonItem title="Send" width="38" id="QrE-bK-fZK">
                             <connections>
                                 <action selector="sendButtonPressed:" destination="-1" id="pUY-5u-r5w"/>
                             </connections>
@@ -44,6 +45,11 @@
                 </toolbar>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="OZb-rB-V1d" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="34M-ud-nFh"/>
+                <constraint firstAttribute="trailing" secondItem="OZb-rB-V1d" secondAttribute="trailing" id="4KT-ES-yee"/>
+                <constraint firstAttribute="bottom" secondItem="OZb-rB-V1d" secondAttribute="bottom" id="JUe-gy-xrn"/>
+            </constraints>
         </view>
     </objects>
 </document>

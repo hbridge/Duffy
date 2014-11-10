@@ -142,6 +142,7 @@ const CGFloat SectionHeaderHeight = 51.0;
 - (void)reloadData
 {
   DDLogVerbose(@"%@ told to reload my data...", self.class);
+  _rowHeights = [NSMutableDictionary new];
   if (self.inviteObject) {
     // We might not have the invite in the feed yet (might have come through notification
     //   So if that happens, don't overwrite our current one which has the id
@@ -259,18 +260,18 @@ const CGFloat SectionHeaderHeight = 51.0;
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
 
+  NSMutableArray *styles = [NSMutableArray new];
+  for (DFPhotoFeedCellAspect aspect = DFPhotoFeedCellAspectSquare; aspect <= DFPhotoFeedCellAspectLandscape; aspect++) {
+    for (DFPhotoFeedCellStyle style = DFPhotoFeedCellStyleNone;
+         style <= (DFPhotoFeedCellStyleCollectionVisible | DFPhotoFeedCellStyleHasComments);
+         style++) {
+      [styles addObject:[self identifierForCellStyle:style aspect:aspect]];
+    }
+  }
   
-  NSArray *cellStyles = @[[self identifierForCellStyle:DFPhotoFeedCellStyleSquare],
-                          [self identifierForCellStyle:DFPhotoFeedCellStyleSquare | DFPhotoFeedCellStyleCollectionVisible],
-                          [self identifierForCellStyle:DFPhotoFeedCellStyleLandscape],
-                          [self identifierForCellStyle:DFPhotoFeedCellStyleLandscape | DFPhotoFeedCellStyleCollectionVisible],
-                          [self identifierForCellStyle:DFPhotoFeedCellStylePortrait],
-                          [self identifierForCellStyle:DFPhotoFeedCellStylePortrait | DFPhotoFeedCellStyleCollectionVisible],
-                          ];
-
-  for (NSNumber *styleNumber in cellStyles) {
+  for (NSString *style in styles) {
     [self.tableView registerNib:[UINib nibWithNibName:@"DFPhotoFeedCell" bundle:nil]
-         forCellReuseIdentifier:[self identifierForCellStyle:styleNumber.intValue]];
+         forCellReuseIdentifier:style];
   }
   
   [self.tableView
@@ -278,7 +279,8 @@ const CGFloat SectionHeaderHeight = 51.0;
                               bundle:nil]
    forHeaderFooterViewReuseIdentifier:@"sectionHeader"];
   self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
-  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStyleLandscape];
+  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStyleNone
+                                                       aspect:DFPhotoFeedCellAspectLandscape];
   self.tableView.rowHeight = [templateCell.contentView
                               systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
 
@@ -317,8 +319,9 @@ const CGFloat SectionHeaderHeight = 51.0;
 }
 
 - (NSString *)identifierForCellStyle:(DFPhotoFeedCellStyle)style
+                              aspect:(DFPhotoFeedCellAspect)aspect
 {
-  return [@(style) stringValue];
+  return [NSString stringWithFormat:@"%d%d", (int)style, (int)aspect];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -545,7 +548,8 @@ static int PrefetchRange = 2;
 
 - (CGSize)imageSizeToFetch
 {
-  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStylePortrait];
+  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStyleNone
+                                                       aspect:DFPhotoFeedCellAspectPortrait];
   CGFloat imageViewHeight = [templateCell imageViewHeightForReferenceWidth:[[UIScreen mainScreen]
                                                                             bounds].size.width];
   CGFloat scale = [[UIScreen mainScreen] scale];
@@ -556,11 +560,14 @@ static int PrefetchRange = 2;
                            indexPath:(NSIndexPath *)indexPath
 {
   DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
+  DFPhotoFeedCellAspect aspect = [self aspectForIndexPath:indexPath];
   DFPhotoFeedCell *photoFeedCell = [self.tableView
-                                    dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style]
+                                    dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style
+                                                                                            aspect:aspect]
                                     forIndexPath:indexPath];
-  [photoFeedCell configureWithStyle:style];
+  [photoFeedCell configureWithStyle:style aspect:aspect];
   photoFeedCell.delegate = self;
+  [photoFeedCell setComments:[feedObject actionsOfType:DFPeanutActionComment forUser:0]];
   
   NSArray *photoIDs;
   if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
@@ -592,6 +599,10 @@ static int PrefetchRange = 2;
   return photoFeedCell;
 }
 
+//- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
+//{
+//  return self.tableView.rowHeight;
+//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -599,19 +610,25 @@ static int PrefetchRange = 2;
   if (cachedHeight) return cachedHeight.floatValue;
   
   DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
-  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:style];
-  CGFloat rowHeight = [templateCell.contentView
-                       systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
+  DFPhotoFeedCellAspect aspect = [self aspectForIndexPath:indexPath];
+  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:style aspect:aspect];
+  if (style & DFPhotoFeedCellStyleHasComments) {
+    //to get an accurate height for cells with comments, we have to actually set the data
+    DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
+    [templateCell setComments:[object actionsOfType:DFPeanutActionComment forUser:0]];
+  }
+  
+  CGFloat rowHeight = [templateCell rowHeight];
   
   [self setHeight:rowHeight forRowAtIndexPath:indexPath];
   return rowHeight;
 }
 
-- (DFPhotoFeedCell *)templateCellWithStyle:(DFPhotoFeedCellStyle)style
+- (DFPhotoFeedCell *)templateCellWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect)aspect
 {
   DFPhotoFeedCell *cell = self.templateCellsByStyle[@(style)];
   if (!cell) {
-    cell = [DFPhotoFeedCell createCellWithStyle:style];
+    cell = [DFPhotoFeedCell createCellWithStyle:style aspect:aspect];
     CGRect frame = cell.frame;
     frame.size.width = self.view.frame.size.width;
     cell.frame = frame;
@@ -623,7 +640,6 @@ static int PrefetchRange = 2;
 - (DFPhotoFeedCellStyle)cellStyleForIndexPath:(NSIndexPath *)indexPath
 {
   DFPhotoFeedCellStyle style = DFPhotoFeedCellStyleNone;
-  
   DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
   DFPeanutFeedObject *photoObject = object;
   if ([object.type isEqual:DFFeedObjectCluster]) {
@@ -631,16 +647,26 @@ static int PrefetchRange = 2;
     style |= DFPhotoFeedCellStyleCollectionVisible;
   }
   
-  if (photoObject.full_height.intValue > photoObject.full_width.intValue) {
-    style |= DFPhotoFeedCellStylePortrait;
-  } else if (photoObject.full_height.intValue < photoObject.full_width.intValue) {
-    style |= DFPhotoFeedCellStyleLandscape;
-  } else {
-    style |= DFPhotoFeedCellStyleSquare;
+  if ([[photoObject actionsOfType:DFPeanutActionComment forUser:0] count] > 0) {
+    style |= DFPhotoFeedCellStyleHasComments;
   }
   
-  
   return style;
+}
+
+- (DFPhotoFeedCellAspect)aspectForIndexPath:(NSIndexPath *)indexPath
+{
+  DFPhotoFeedCellAspect aspect = DFPhotoFeedCellAspectSquare;
+  DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
+  DFPeanutFeedObject *photoObject = object;
+  if (photoObject.full_height.intValue > photoObject.full_width.intValue) {
+    aspect = DFPhotoFeedCellAspectPortrait;
+  } else if (photoObject.full_height.intValue < photoObject.full_width.intValue) {
+    aspect = DFPhotoFeedCellAspectLandscape;
+  } else {
+    aspect = DFPhotoFeedCellAspectSquare;
+  }
+  return aspect;
 }
 
 - (void)setHeight:(CGFloat)height forRowAtIndexPath:(NSIndexPath *)indexPath
@@ -740,8 +766,12 @@ static int PrefetchRange = 2;
 
 - (void)commentButtonPressedForObject:(id)object sender:(id)sender
 {
-  DDLogVerbose(@"Comment button for %@ pressed", object);
-  DFCommentViewController *cvc = [[DFCommentViewController alloc] initWithPhotoObject:object];
+  NSNumber *photoID = (NSNumber *)object;
+  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithId:photoID.longLongValue];
+  DDLogVerbose(@"Comment button for %@ pressed", photoObject);
+  DFCommentViewController *cvc = [[DFCommentViewController alloc]
+                                  initWithPhotoObject:photoObject
+                                  inPostsObject:self.postsObject];
   [self.navigationController pushViewController:cvc animated:YES];
 }
 

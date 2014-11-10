@@ -7,8 +7,11 @@
 //
 
 #import "DFPhotoFeedCell.h"
+#import <Slash/Slash.h>
 #import "DFPhotoViewCell.h"
 #import "DFStrandConstants.h"
+#import "DFPeanutAction.h"
+
 
 @interface DFPhotoFeedCell()
 
@@ -16,6 +19,7 @@
 @property (nonatomic, retain) NSMutableDictionary *imagesForObjects;
 @property (nonatomic, retain) id selectedObject;
 @property (nonatomic) DFPhotoFeedCellStyle style;
+@property (nonatomic) DFPhotoFeedCellAspect aspect;
 
 @end
 
@@ -23,6 +27,7 @@
 
 - (void)awakeFromNib
 {
+  [super awakeFromNib];
   [self configureView];
   UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
                                                 initWithTarget:self
@@ -46,9 +51,10 @@
   self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
-- (void)configureWithStyle:(DFPhotoFeedCellStyle)style
+- (void)configureWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect)aspect
 {
   _style = style;
+  _aspect = aspect;
   
   if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
     [self.collectionView removeFromSuperview];
@@ -59,42 +65,23 @@
   }
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
++ (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style
+                                  aspect:(DFPhotoFeedCellAspect)aspect
 {
-    [super setSelected:selected animated:animated];
-
-    // Configure the view for the selected state
+  DFPhotoFeedCell *cell =
+  [[[UINib nibWithNibName:NSStringFromClass([DFPhotoFeedCell class]) bundle:nil]
+    instantiateWithOwner:nil options:nil]
+   firstObject];
+  [cell configureWithStyle:style aspect:aspect];
+  return cell;
 }
 
-
-
-- (void)setFavoritersListHidden:(BOOL)hidden
-{
-  if (hidden) {
-    [self.favoritersButton removeFromSuperview];
-  } else {
-    if (!self.favoritersButton.superview || !self.favoritersButton) {
-      DDLogVerbose(@"Re adding favoriters button: %@", self.favoritersButton);
-      [self.contentView addSubview:self.favoritersButton];
-    }
-  }
-}
-
-- (void)setClusterViewHidden:(BOOL)hidden
-{
-  if (hidden) {
-    [self.collectionView removeFromSuperview];
-  } else {
-    [self.contentView addSubview:self.collectionView];
-  }
-}
+#pragma mark - Set Cell Properties
 
 - (void)setObjects:(NSArray *)objects
 {
-  _objects = objects;
-  self.imagesForObjects = [NSMutableDictionary new];
+  [super setObjects:objects];
   self.selectedObject = [objects firstObject];
-  [self.collectionView reloadData];
 }
 
 - (void)setSelectedObject:(id)selectedObject
@@ -105,12 +92,7 @@
 
 - (void)setImage:(UIImage *)image forObject:(id)object
 {
-  if (image == nil) {
-    image = [UIImage imageNamed:@"Assets/Icons/MissingImage320"];
-  }
-  
-  self.imagesForObjects[object] = image;
-  [self.collectionView reloadData];
+  [super setImage:image forObject:object];
   if ([object isEqual:self.selectedObject]) [self setLargeImage:image];
 }
 
@@ -124,43 +106,32 @@
     [self.loadingActivityIndicator stopAnimating];
     self.photoImageView.alpha = 1.0;
   }
-
 }
 
-- (UIImageView *)imageView
+- (void)setComments:(NSArray *)comments
 {
-  return self.photoImageView;
-}
-
-
-#pragma mark - UICollectionView methods
-
-- (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
-{
-  return 1;
-}
-
-- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
-{
-  return self.objects.count;
-}
-
-- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
-                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
-{
-  DFPhotoViewCell *cell = [self.collectionView
-                           dequeueReusableCellWithReuseIdentifier:@"cell"
-                           forIndexPath:indexPath];
+  NSMutableString *slashFormat = [NSMutableString new];
+  [slashFormat appendString:@"<feedText>"];
+  for (DFPeanutAction *action in comments) {
+    [slashFormat appendFormat:@"<name>%@</name> %@", action.user_display_name, action.text];
+    if (action != comments.lastObject) [slashFormat appendString:@"\n"];
+  }
+  [slashFormat appendString:@"</feedText>"];
   
-  id object = self.objects[indexPath.row];
-  UIImage *image = self.imagesForObjects[object];
-  cell.imageView.image = image;
-  cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
-  cell.imageView.clipsToBounds = YES;
-  cell.imageView.backgroundColor = [UIColor grayColor];
+  NSError *error;
+  NSAttributedString *commentsString = [SLSMarkupParser attributedStringWithMarkup:slashFormat
+                                                                             style:[DFStrandConstants defaultTextStyle]
+                                                                             error:&error];
+  if (error) {
+    DDLogError(@"Error parsing format:%@", error);
+  }
+
+
   
-  return cell;
+  self.commentsLabel.attributedText = commentsString;
 }
+
+#pragma mark - UICollectionView Delegate
 
 - (void)collectionView:(UICollectionView *)collectionView
 didSelectItemAtIndexPath:(NSIndexPath *)indexPath
@@ -205,25 +176,28 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 - (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
 {
   CGFloat height = 0.0;
-  if (self.style & DFPhotoFeedCellStyleSquare) {
+  if (self.aspect == DFPhotoFeedCellAspectSquare) {
     height = referenceWidth;
-  } else if (self.style & DFPhotoFeedCellStylePortrait) {
+  } else if (self.aspect == DFPhotoFeedCellAspectPortrait) {
     height = referenceWidth * (4.0/3.0);
-  } else if (self.style & DFPhotoFeedCellStyleLandscape) {
+  } else if (self.aspect == DFPhotoFeedCellAspectLandscape) {
     height = referenceWidth * (3.0/4.0);
   }
   return height;
 }
 
-+ (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style
+- (CGSize)commentAreaSize
 {
-  DFPhotoFeedCell *cell =
-  [[[UINib nibWithNibName:NSStringFromClass([DFPhotoFeedCell class]) bundle:nil]
-    instantiateWithOwner:nil options:nil]
-   firstObject];
-  [cell configureWithStyle:style];
-  return cell;
+  CGSize size = [self.commentsLabel sizeThatFits:self.commentsLabel.frame.size];
+  return size;
 }
 
+- (CGFloat)rowHeight
+{
+  CGFloat height = [self.contentView
+                    systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
+  
+  return height;
+}
 
 @end

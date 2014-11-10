@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFCollectionViewTableViewCell.h"
 
 @class DFPhotoFeedCell;
 
@@ -21,7 +22,7 @@
 @end
 
 
-@interface DFPhotoFeedCell : UITableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface DFPhotoFeedCell : DFCollectionViewTableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
 
 // Views
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
@@ -30,18 +31,13 @@
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
 @property (weak, nonatomic) IBOutlet UIButton *moreOptionsButton;
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
-@property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet UILabel *commentsLabel;
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *commentsLabelHeightConstraint;
 
 // Delegate
 @property (nonatomic, weak) NSObject <DFPhotoFeedCellDelegate> *delegate;
-
-// Objects that the cell represents
-@property (strong, nonatomic) NSArray *objects;
-- (void)setImage:(UIImage *)image forObject:(id)clusterObject;
-
-- (void)setFavoritersListHidden:(BOOL)hidden;
 
 - (IBAction)favoriteButtonPressed:(id)sender;
 - (IBAction)moreOptionsButtonPressed:(id)sender;
@@ -49,18 +45,22 @@
 
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
   DFPhotoFeedCellStyleNone =              0,
-  DFPhotoFeedCellStyleSquare =            1 << 1,
-  DFPhotoFeedCellStylePortrait =          1 << 2,
-  DFPhotoFeedCellStyleLandscape =         1 << 3,
-  DFPhotoFeedCellStyleCollectionVisible = 1 << 4,
-  DFPhotoFeedCellStyleHasComments =       1 << 5,
+  DFPhotoFeedCellStyleCollectionVisible = 1 << 1,
+  DFPhotoFeedCellStyleHasComments =       1 << 2,
 };
 
-- (void)configureWithStyle:(DFPhotoFeedCellStyle)style;
-+ (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style;
+typedef NS_ENUM(NSInteger, DFPhotoFeedCellAspect) {
+  DFPhotoFeedCellAspectSquare,
+  DFPhotoFeedCellAspectPortrait,
+  DFPhotoFeedCellAspectLandscape,
+};
 
+- (void)configureWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect)aspect;
++ (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect) aspect;
+- (void)setComments:(NSArray *)comments;
 
 - (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth;
+- (CGFloat)rowHeight;
 
 
 @end

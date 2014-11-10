@@ -38,5 +38,9 @@
   return result;
 }
 
+- (NSString *)description
+{
+  return [[self dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]] description];
+}
 
 @end
