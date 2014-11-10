@@ -182,6 +182,9 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
     [self.delegate favoriteButtonPressedForObject:self.selectedObject sender:sender];
   }
 }
+- (IBAction)commentButtonPressed:(UIButton *)sender {
+  [self.delegate commentButtonPressedForObject:self.selectedObject sender:self];
+}
 
 - (IBAction)moreOptionsButtonPressed:(id)sender
 {

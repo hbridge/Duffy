@@ -37,7 +37,7 @@
 #import "SVProgressHUD.h"
 #import "DFImageManager.h"
 #import "DFStrandPeopleViewController.h"
-;
+#import "DFCommentViewController.h"
 
 const CGFloat SectionHeaderHeight = 51.0;
 
@@ -736,6 +736,15 @@ static int PrefetchRange = 2;
 
 #pragma mark - DFPhotoFeedCell Delegates
 
+- (void)commentButtonPressedForObject:(id)object sender:(id)sender
+{
+  DDLogVerbose(@"Comment button for %@ pressed", object);
+  DFCommentViewController *cvc = [[DFCommentViewController alloc] initWithPhotoObject:object];
+  [self.navigationController pushViewController:cvc animated:YES];
+}
+
+
+
 /* DISABLED FOR NOW*/
 const BOOL favoriteDisabled = YES;
 - (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender
@@ -843,6 +852,8 @@ selectedObjectChanged:(id)newObject
   DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
   [feedCell setNeedsLayout];
 }
+
+
 
 
 #pragma mark - Action Handler Helpers

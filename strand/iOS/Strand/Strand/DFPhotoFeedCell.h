@@ -14,6 +14,7 @@
 @required
 
 - (void)favoriteButtonPressedForObject:(id)object sender:(id)sender;
+- (void)commentButtonPressedForObject:(id)object sender:(id)sender;
 - (void)moreOptionsButtonPressedForObject:(id)object sender:(id)sender;
 - (void)feedCell:(DFPhotoFeedCell *)feedCell selectedObjectChanged:(id)newObject fromObject:(id)oldObject;
 
