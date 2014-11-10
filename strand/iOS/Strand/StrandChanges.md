@@ -1,5 +1,10 @@
 # Swap
 
+## Nov 10, 2014 (4788)
+
+- Remove suggestions from your camera roll screen intead of swiping
+- Performance improvements
+
 ## Nov 7, 2014 (4787)
 
 - Fix crash on startup for people upgrading from old builds
