@@ -49,7 +49,6 @@
   UIBarButtonItem *textBarButton = [self.toolbar.items firstObject];
   UIBarButtonItem *sendBarButton = [self.toolbar.items objectAtIndex:1];
   textBarButton.width = self.toolbar.frame.size.width - sendBarButton.width - 36;
-  
 }
 
 - (void)configureTableView:(UITableView *)tableView
@@ -74,6 +73,26 @@
   
   [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
   [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  [self scrollToLast];
+}
+
+- (void)scrollToLast
+{
+  if (self.comments.count > 0) {
+    DFCommentViewController __weak *weakSelf = self;
+    dispatch_async(dispatch_get_main_queue(), ^{
+      [weakSelf.tableView
+       scrollToRowAtIndexPath:[NSIndexPath
+                               indexPathForRow:weakSelf.comments.count-1 inSection:0]
+       atScrollPosition:UITableViewScrollPositionTop
+       animated:YES];
+    });
+  }
 }
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -134,6 +153,7 @@
   action.user_display_name = [[DFUser currentUser] displayName];
   
   [self addComment:action];
+  self.textField.text = @"";
   DFCommentViewController __weak *weakSelf = self;
   [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
     DDLogInfo(@"%@ adding comment succeeded:%@", [DFCommentViewController class], resultObjects);
@@ -154,14 +174,7 @@
   [self.comments addObject:action];
   [self.tableView endUpdates];
   
-  DFCommentViewController __weak *weakSelf = self;
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [weakSelf.tableView
-     scrollToRowAtIndexPath:[NSIndexPath
-                             indexPathForRow:weakSelf.comments.count-1 inSection:0]
-     atScrollPosition:UITableViewScrollPositionTop
-     animated:YES];
-  });
+  [self scrollToLast];
 }
 
 - (void)showCommentError:(DFPeanutAction *)action
