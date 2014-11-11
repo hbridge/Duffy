@@ -643,6 +643,8 @@ static DFPeanutFeedDataManager *defaultManager;
   DFPeanutStrand *reqStrand = [[DFPeanutStrand alloc] init];
   reqStrand.id = @(strandPosts.id);
   
+  DDLogInfo(@"Going to delete photo %llu", photoObject.id);
+  
   // first get the strand
   [self.strandAdapter
    performRequest:RKRequestMethodGET
@@ -650,7 +652,8 @@ static DFPeanutFeedDataManager *defaultManager;
      //remove the photo from the strand's list of photos
      NSMutableArray *newPhotosList = [peanutStrand.photos mutableCopy];
      [newPhotosList removeObject:@(photoObject.id)];
-     
+     peanutStrand.photos = newPhotosList;
+
      // patch the strand with the new list
      [self.strandAdapter
       performRequest:RKRequestMethodPATCH
