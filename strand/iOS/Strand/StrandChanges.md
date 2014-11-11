@@ -1,5 +1,11 @@
 # Swap
 
+## Nov 11, 2014 (4789)
+
+- Add comments to photos!  Now you can respond to photos that people send you in the app!
+- Better colors for the people circle thingies
+
+
 ## Nov 10, 2014 (4788)
 
 - Remove suggestions from your camera roll screen intead of swiping
