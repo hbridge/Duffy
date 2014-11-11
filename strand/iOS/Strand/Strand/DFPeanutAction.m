@@ -20,7 +20,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"id", @"action_type", @"photo", @"user", @"strand", @"user_display_name", @"text"];
+  return @[@"id", @"action_type", @"photo", @"user", @"strand", @"user_display_name", @"text", @"time_stamp"];
 }
 
 + (NSArray *)arrayOfLikerNamesFromActions:(NSArray *)actionArray

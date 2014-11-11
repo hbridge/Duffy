@@ -42,6 +42,7 @@ typedef UInt64 DFActionID;
 @property (nonatomic) DFUserIDType user;
 @property (nonatomic, retain) NSString *user_display_name;
 @property (nonatomic, retain) NSString *text;
+@property (nonatomic, retain) NSDate *time_stamp;
 
 + (NSArray *)simpleAttributeKeys;
 
