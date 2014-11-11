@@ -60,8 +60,14 @@
     [self.collectionView removeFromSuperview];
   }
   
+  if (!(style & DFPhotoFeedCellStyleHasLikes)) {
+    [self.likesLabel removeFromSuperview];
+    [self.likesIconImageView removeFromSuperview];
+  }
+  
   if (!(style & DFPhotoFeedCellStyleHasComments)) {
     [self.commentsLabel removeFromSuperview];
+    [self.commentsIconImageView removeFromSuperview];
   }
 }
 
@@ -125,11 +131,29 @@
   if (error) {
     DDLogError(@"Error parsing format:%@", error);
   }
-
-
   
   self.commentsLabel.attributedText = commentsString;
 }
+
+- (void)setLikes:(NSArray *)likes
+{
+  NSMutableString *slashFormat = [NSMutableString new];
+  for (DFPeanutAction *action in likes) {
+    [slashFormat appendFormat:@"<name>%@</name>", action.user_display_name];
+    if (action != likes.lastObject) [slashFormat appendString:@","];
+  }
+  
+  NSError *error;
+  NSAttributedString *likesString = [SLSMarkupParser attributedStringWithMarkup:slashFormat
+                                                                             style:[DFStrandConstants defaultTextStyle]
+                                                                             error:&error];
+  if (error) {
+    DDLogError(@"Error parsing format:%@", error);
+  }
+  
+  self.likesLabel.attributedText = likesString;
+}
+
 
 #pragma mark - UICollectionView Delegate
 

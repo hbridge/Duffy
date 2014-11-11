@@ -25,7 +25,6 @@
 @interface DFPhotoFeedCell : DFCollectionViewTableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
 
 // Views
-@property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (strong, nonatomic) IBOutlet UIButton *favoritersButton;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingActivityIndicator;
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
@@ -34,7 +33,9 @@
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *imageViewHeightConstraint;
 @property (weak, nonatomic) IBOutlet UILabel *commentsLabel;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *commentsLabelHeightConstraint;
+@property (weak, nonatomic) IBOutlet UILabel *likesLabel;
+@property (weak, nonatomic) IBOutlet UIImageView *likesIconImageView;
+@property (weak, nonatomic) IBOutlet UIImageView *commentsIconImageView;
 
 // Delegate
 @property (nonatomic, weak) NSObject <DFPhotoFeedCellDelegate> *delegate;
@@ -46,7 +47,8 @@
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
   DFPhotoFeedCellStyleNone =              0,
   DFPhotoFeedCellStyleCollectionVisible = 1 << 1,
-  DFPhotoFeedCellStyleHasComments =       1 << 2,
+  DFPhotoFeedCellStyleHasLikes    =       1 << 2,
+  DFPhotoFeedCellStyleHasComments =       1 << 3,
 };
 
 typedef NS_ENUM(NSInteger, DFPhotoFeedCellAspect) {
@@ -58,6 +60,7 @@ typedef NS_ENUM(NSInteger, DFPhotoFeedCellAspect) {
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect)aspect;
 + (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect) aspect;
 - (void)setComments:(NSArray *)comments;
+- (void)setLikes:(NSArray *)likes;
 
 - (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth;
 - (CGFloat)rowHeight;

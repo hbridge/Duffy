@@ -40,6 +40,7 @@
 #import "DFCommentViewController.h"
 
 const CGFloat SectionHeaderHeight = 51.0;
+static int ImagePrefetchRange = 3;
 
 @interface DFFeedViewController ()
 
@@ -263,7 +264,9 @@ const CGFloat SectionHeaderHeight = 51.0;
   NSMutableArray *styles = [NSMutableArray new];
   for (DFPhotoFeedCellAspect aspect = DFPhotoFeedCellAspectSquare; aspect <= DFPhotoFeedCellAspectLandscape; aspect++) {
     for (DFPhotoFeedCellStyle style = DFPhotoFeedCellStyleNone;
-         style <= (DFPhotoFeedCellStyleCollectionVisible | DFPhotoFeedCellStyleHasComments);
+         style <= (DFPhotoFeedCellStyleCollectionVisible
+                   | DFPhotoFeedCellStyleHasComments
+                   | DFPhotoFeedCellStyleHasLikes);
          style++) {
       [styles addObject:[self identifierForCellStyle:style aspect:aspect]];
     }
@@ -528,12 +531,60 @@ const CGFloat SectionHeaderHeight = 51.0;
   return cell;
 }
 
-static int PrefetchRange = 2;
+- (DFPhotoFeedCell *)cellForFeedObject:(DFPeanutFeedObject *)feedObject
+                           indexPath:(NSIndexPath *)indexPath
+{
+  DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
+  DFPhotoFeedCellAspect aspect = [self aspectForIndexPath:indexPath];
+  DFPhotoFeedCell *photoFeedCell = [self.tableView
+                                    dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style
+                                                                                            aspect:aspect]
+                                    forIndexPath:indexPath];
+  [photoFeedCell configureWithStyle:style aspect:aspect];
+  photoFeedCell.delegate = self;
+  [photoFeedCell setComments:[feedObject actionsOfType:DFPeanutActionComment forUser:0]];
+  [photoFeedCell setLikes:[feedObject actionsOfType:DFPeanutActionFavorite forUser:0]];
+  
+  NSArray *photoIDs;
+  if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
+    photoIDs = @[@(feedObject.id)];
+  } else {
+    photoIDs = [feedObject.objects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *object) {
+      return @(object.id);
+    }];
+  }
+  
+  if ([photoIDs isEqualToArray:photoFeedCell.objects]) {
+    // if the objects on the cell were the same as previous, no need to do further work
+    // this helps reduce flashing
+    return photoFeedCell;
+  }
+  [photoFeedCell setObjects:photoIDs];
+  if (photoIDs.count > 0) {
+    for (NSNumber *photoID in photoIDs) {
+      [[DFImageManager sharedManager]
+       imageForID:photoID.longLongValue
+       size:[self imageSizeToFetch]
+       contentMode:DFImageRequestContentModeAspectFit
+       deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
+       completion:^(UIImage *image) {
+         dispatch_async(dispatch_get_main_queue(), ^{
+           if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
+           [photoFeedCell setImage:image forObject:photoID];
+           [photoFeedCell setNeedsLayout];
+         });
+       }];
+    }
+  }
+  
+  return photoFeedCell;
+}
+
 
 - (void)prefetchImagesAroundIndexPath:(NSIndexPath *)indexPath
 {
   NSMutableArray *idsToFetch = [NSMutableArray new];
-  for (NSInteger i = indexPath.row + PrefetchRange; i >= indexPath.row - PrefetchRange; i--){
+  for (NSInteger i = indexPath.row + ImagePrefetchRange; i >= indexPath.row - ImagePrefetchRange; i--){
     DFPeanutFeedObject *object = [self objectAtIndexPath:[NSIndexPath
                                                           indexPathForRow:i
                                                           inSection:indexPath.section]];
@@ -557,53 +608,6 @@ static int PrefetchRange = 2;
   return CGSizeMake(imageViewHeight * scale, imageViewHeight * scale);
 }
 
-- (DFPhotoFeedCell *)cellForFeedObject:(DFPeanutFeedObject *)feedObject
-                           indexPath:(NSIndexPath *)indexPath
-{
-  DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
-  DFPhotoFeedCellAspect aspect = [self aspectForIndexPath:indexPath];
-  DFPhotoFeedCell *photoFeedCell = [self.tableView
-                                    dequeueReusableCellWithIdentifier:[self identifierForCellStyle:style
-                                                                                            aspect:aspect]
-                                    forIndexPath:indexPath];
-  [photoFeedCell configureWithStyle:style aspect:aspect];
-  photoFeedCell.delegate = self;
-  [photoFeedCell setComments:[feedObject actionsOfType:DFPeanutActionComment forUser:0]];
-  
-  NSArray *photoIDs;
-  if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
-    photoIDs = @[@(feedObject.id)];
-  } else {
-    photoIDs = [feedObject.objects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *object) {
-      return @(object.id);
-    }];
-  }
-  [photoFeedCell setObjects:photoIDs];
-  
-  if (feedObject) {
-    for (NSNumber *photoID in photoIDs) {
-      [[DFImageManager sharedManager]
-       imageForID:photoID.longLongValue
-       size:[self imageSizeToFetch]
-       contentMode:DFImageRequestContentModeAspectFit
-       deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
-       completion:^(UIImage *image) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-           if (![self.tableView.visibleCells containsObject:photoFeedCell]) return;
-           [photoFeedCell setImage:image forObject:photoID];
-           [photoFeedCell setNeedsLayout];
-         });
-       }];
-    }
-  }
-  
-  return photoFeedCell;
-}
-
-//- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//  return self.tableView.rowHeight;
-//}
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
@@ -613,10 +617,11 @@ static int PrefetchRange = 2;
   DFPhotoFeedCellStyle style = [self cellStyleForIndexPath:indexPath];
   DFPhotoFeedCellAspect aspect = [self aspectForIndexPath:indexPath];
   DFPhotoFeedCell *templateCell = [self templateCellWithStyle:style aspect:aspect];
-  if (style & DFPhotoFeedCellStyleHasComments) {
-    //to get an accurate height for cells with comments, we have to actually set the data
+  if (style & DFPhotoFeedCellStyleHasComments || style & DFPhotoFeedCellStyleHasLikes) {
+    //to get an accurate height for cells with comments/likes, we have to actually set the data
     DFPeanutFeedObject *object = [self objectAtIndexPath:indexPath];
     [templateCell setComments:[object actionsOfType:DFPeanutActionComment forUser:0]];
+    [templateCell setLikes:[object actionsOfType:DFPeanutActionFavorite forUser:0]];
   }
   
   CGFloat rowHeight = [templateCell rowHeight];
@@ -647,9 +652,11 @@ static int PrefetchRange = 2;
     photoObject = object.objects.firstObject;
     style |= DFPhotoFeedCellStyleCollectionVisible;
   }
-  
   if ([[photoObject actionsOfType:DFPeanutActionComment forUser:0] count] > 0) {
     style |= DFPhotoFeedCellStyleHasComments;
+  }
+  if ([[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
+    style |= DFPhotoFeedCellStyleHasLikes;
   }
   
   return style;
@@ -795,38 +802,32 @@ static int PrefetchRange = 2;
 
 
 /* DISABLED FOR NOW*/
-const BOOL favoriteDisabled = YES;
 - (void)favoriteButtonPressedForObject:(NSNumber *)objectIDNumber sender:(id)sender
 {
   DDLogVerbose(@"Favorite button pressed");
-  if (favoriteDisabled) return;
-  
   DFPhotoIDType photoID = [objectIDNumber longLongValue];
-  
-  // Figure out the strand the photo is in that we're viewing
   NSIndexPath *indexPath = self.photoIndexPathsById[@(photoID)];
-  DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:indexPath.section];
-  DFStrandIDType strandID = strandPost.id;
-
-  DFPeanutFeedObject *object = self.photoObjectsById[objectIDNumber];
-  DFPeanutAction *oldFavoriteAction = [[object actionsOfType:DFPeanutActionFavorite
+  DFPeanutFeedObject *photoObject = self.photoObjectsById[objectIDNumber];
+  DFPeanutAction *oldFavoriteAction = [[photoObject actionsOfType:DFPeanutActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
                                firstObject];
-  BOOL wasGesture = [sender isKindOfClass:[UIGestureRecognizer class]];
+  //BOOL wasGesture = [sender isKindOfClass:[UIGestureRecognizer class]];
   DFPeanutAction *newAction;
   if (!oldFavoriteAction) {
     newAction = [[DFPeanutAction alloc] init];
     newAction.user = [[DFUser currentUser] userID];
     newAction.action_type = DFPeanutActionFavorite;
     newAction.photo = photoID;
-    newAction.strand = strandID;
+    newAction.strand = self.postsObject.id;
+    newAction.user_display_name = [[DFUser currentUser] displayName];
   } else {
     newAction = nil;
   }
   
-  [object setUserFavoriteAction:newAction];
+  [photoObject setUserFavoriteAction:newAction];
   
-  [self reloadRowForPhotoID:photoID];
+  [self.rowHeights removeObjectForKey:[indexPath dictKey]];
+  [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationNone];
   
   RKRequestMethod method;
   DFPeanutAction *action;
@@ -840,23 +841,25 @@ const BOOL favoriteDisabled = YES;
   
   DFPeanutActionAdapter *adapter = [[DFPeanutActionAdapter alloc] init];
   [adapter
-   performRequest:method withPath:ActionBasePath
+   performRequest:method
+   withPath:ActionBasePath
    objects:@[action]
    parameters:nil
    forceCollection:NO
    success:^(NSArray *resultObjects) {
      DFPeanutAction *action = resultObjects.firstObject;
      if (action) {
-       [object setUserFavoriteAction:action];
+       [photoObject setUserFavoriteAction:action];
      } // no need for the else case, it was already removed optimistically
      
      [DFAnalytics
-      logPhotoLikePressedWithNewValue:(newAction != nil)
+      logPhotoActionTaken:DFPeanutActionFavorite
       result:DFAnalyticsValueResultSuccess
-      actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
-      timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
+      photoObject:photoObject
+      postsObject:self.postsObject
+      ];
    } failure:^(NSError *error) {
-     [object setUserFavoriteAction:oldFavoriteAction];
+     [photoObject setUserFavoriteAction:oldFavoriteAction];
      [self reloadRowForPhotoID:photoID];
      UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
                                                      message:error.localizedDescription
@@ -864,10 +867,12 @@ const BOOL favoriteDisabled = YES;
                                            cancelButtonTitle:@"OK"
                                            otherButtonTitles:nil];
      [alert show];
-     [DFAnalytics logPhotoLikePressedWithNewValue:(newAction != nil)
-                                           result:DFAnalyticsValueResultFailure
-                                       actionType:wasGesture ? DFUIActionDoubleTap : DFUIActionButtonPress
-                           timeIntervalSinceTaken:[[NSDate date] timeIntervalSinceDate:object.time_taken]];
+     [DFAnalytics
+      logPhotoActionTaken:DFPeanutActionFavorite
+      result:DFAnalyticsValueResultFailure
+      photoObject:photoObject
+      postsObject:self.postsObject
+      ];
    }];
 
 }
