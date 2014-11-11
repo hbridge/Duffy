@@ -175,6 +175,26 @@ static DFAnalytics *defaultLogger;
   [self logEvent:CreateStrandEvent withParameters:parameters];
 }
 
++ (void)logMatchPhotos:(DFPeanutFeedObject *)inviteObject
+     withMatchedPhotos:(NSArray *)matchedPhotos
+        selectedPhotos:(NSArray *)selectedPhotos
+                result:(NSString *)result
+{
+  NSArray *photosReceived = [inviteObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  
+  NSDictionary *params =
+  @{
+    @"receivedPhotos" : [DFAnalytics bucketStringForObjectCount:photosReceived.count],
+    @"matchedPhotos" : [DFAnalytics bucketStringForObjectCount:matchedPhotos.count],
+    @"selectedPhotos" : [DFAnalytics bucketStringForObjectCount:selectedPhotos.count],
+    ResultKey : result
+    };
+  
+  DDLogVerbose(@"MatchInvitePhotos: %@", params);
+  [self logEvent:@"MatchInvitePhotos" withParameters:params];
+}
+
+
 + (void)logPhotoSavedWithResult:(NSString *)result
 {
   [DFAnalytics logEvent:PhotoSavedEvent withParameters:@{ResultKey: result}];

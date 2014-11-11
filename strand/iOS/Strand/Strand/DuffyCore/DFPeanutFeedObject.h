@@ -84,5 +84,6 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 /* Time in Location e.g.: "1 week ago in Wiliamsburg" */
 - (NSString *)placeAndRelativeTimeString;
 
++ (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects;
 
 @end

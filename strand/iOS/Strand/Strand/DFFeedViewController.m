@@ -713,6 +713,11 @@ static int ImagePrefetchRange = 3;
        [self setStrandActionsEnabled:YES];
      } failure:^(NSError *error) {
      }];
+    [DFAnalytics
+     logMatchPhotos:self.inviteObject
+     withMatchedPhotos:nil
+     selectedPhotos:nil
+     result:DFAnalyticsValueResultSuccess];
   } else {
     DFReviewSwapViewController *addPhotosController = [[DFReviewSwapViewController alloc]
                                                       initWithSuggestions:self.suggestionsObject.objects
@@ -753,6 +758,13 @@ static int ImagePrefetchRange = 3;
 - (void)dismissMatch:(id)sender
 {
   [self dismissViewControllerAnimated:YES completion:nil];
+  NSArray *suggestions = [self.inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos];
+  [DFAnalytics
+   logMatchPhotos:self.inviteObject
+   withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+                                      inArrayOfFeedObjects:suggestions]
+   selectedPhotos:nil
+   result:DFAnalyticsValueResultAborted];
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath

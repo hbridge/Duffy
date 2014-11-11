@@ -340,5 +340,14 @@ static NSArray *FeedObjectTypes;
   else return [[self subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
 }
 
++ (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutFeedObject *feedObject in feedObjects) {
+    [result addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+  }
+  return result;
+}
+
 
 @end

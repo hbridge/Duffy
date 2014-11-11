@@ -88,16 +88,29 @@
 - (void)acceptInvite
 {
   [SVProgressHUD showWithStatus:@"Swapping..."];
+  DFReviewSwapViewController __weak *weakSelf = self;
   [[DFPeanutFeedDataManager sharedManager]
    acceptInvite:self.inviteObject
    addPhotoIDs:self.selectPhotosController.selectedPhotoIDs
    success:^{
-     if (self.swapSuccessful) self.swapSuccessful();
-     [self dismissViewControllerAnimated:YES completion:^{
+     if (weakSelf.swapSuccessful) weakSelf.swapSuccessful();
+     [weakSelf dismissViewControllerAnimated:YES completion:^{
        [SVProgressHUD showSuccessWithStatus:@"Swapped!"];
      }];
+     [DFAnalytics
+      logMatchPhotos:weakSelf.inviteObject
+      withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+                                         inArrayOfFeedObjects:weakSelf.suggestedSections]
+      selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
+      result:DFAnalyticsValueResultSuccess];
   } failure:^(NSError *error) {
     [SVProgressHUD showErrorWithStatus:@"Error."];
+    [DFAnalytics
+     logMatchPhotos:weakSelf.inviteObject
+     withMatchedPhotos:[DFPeanutFeedObject leafObjectsOfType:DFFeedObjectPhoto
+                                        inArrayOfFeedObjects:weakSelf.suggestedSections]
+     selectedPhotos:weakSelf.selectPhotosController.selectedFeedObjects
+     result:DFAnalyticsValueResultFailure];
   }];
 }
 
