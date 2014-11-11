@@ -59,6 +59,7 @@
   [tableView registerNib:[UINib nibForClass:[DFCommentTableViewCell class]]
   forCellReuseIdentifier:@"cell"];
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.toolbar.frame.size.height * 2.0, 0);
+  self.tableView.separatorInset = [DFCommentTableViewCell edgeInsets];
 }
 
 - (void)viewWillAppear:(BOOL)animated {

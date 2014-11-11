@@ -27,4 +27,9 @@
   return [UINib instantiateViewWithClass:[self class]];
 }
 
++ (UIEdgeInsets)edgeInsets
+{
+  return UIEdgeInsetsMake(0, 15, 0, 15);
+}
+
 @end

@@ -17,5 +17,5 @@
 
 + (DFCommentTableViewCell *)templateCell;
 - (CGFloat)rowHeight;
-
++ (UIEdgeInsets)edgeInsets;
 @end
