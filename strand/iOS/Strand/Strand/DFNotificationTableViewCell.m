@@ -14,6 +14,8 @@
 {
   [super awakeFromNib];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
+  self.previewImageView.layer.cornerRadius = 3.0;
+  self.previewImageView.layer.masksToBounds = YES;
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated
