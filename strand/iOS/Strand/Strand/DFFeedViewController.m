@@ -537,6 +537,7 @@ static int PrefetchRange = 2;
     DFPeanutFeedObject *object = [self objectAtIndexPath:[NSIndexPath
                                                           indexPathForRow:i
                                                           inSection:indexPath.section]];
+    if (!object) continue;
     if ([object.type isEqual:DFFeedObjectCluster]) object = object.objects.firstObject;
     [idsToFetch addObject:@(object.id)];
   }
