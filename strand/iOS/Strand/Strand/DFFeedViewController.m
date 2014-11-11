@@ -254,6 +254,14 @@ static int ImagePrefetchRange = 3;
      firstObject];
     self.navigationItem.titleView = self.titleView;
   }
+  
+  if (self.postsObject.location) {
+    self.titleView.locationLabel.text = self.postsObject.location;
+  } else {
+    [self.titleView.locationLabel removeFromSuperview];
+  }
+  self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
+                                                                    abbreviate:NO];
 }
 
 - (void)configureTableView
@@ -396,13 +404,7 @@ static int ImagePrefetchRange = 3;
   _postsObject = strandPostsObject;
   
   dispatch_async(dispatch_get_main_queue(), ^{
-    if (self.postsObject.location) {
-      self.titleView.locationLabel.text = self.postsObject.location;
-    } else {
-      [self.titleView.locationLabel removeFromSuperview];
-    }
-    self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
-                                                                      abbreviate:NO];
+    [self configureTitleView];
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
                                              initWithTitle:@""
                                              style:UIBarButtonItemStylePlain target:nil action:nil];
