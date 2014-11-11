@@ -27,15 +27,16 @@ logger = logging.getLogger(__name__)
 def userbaseSummary(request):
 
 
-	# database calls to fetch the data needed for the big user table
-	userStats = User.objects.filter(product_id=2).annotate(totalCount=Count('photo'), thumbsCount=Count('photo__thumb_filename'), 
-		photosWithGPS=Count('photo__location_point'), lastUpdated=Max('photo__updated'), lastAdded=Max('photo__added'))
+	# database calls
+	userStats = list(User.objects.filter(product_id=2))
+	photoDataRaw = list(Photo.objects.exclude(id__lt=7463).exclude(Q(install_num=-1) & Q(thumb_filename = None)).values('user').annotate(
+		totalPhotos=Count('user'), thumbsCount=Count('thumb_filename'), 
+		photosWithGPS=Count('location_point'), lastUpdated=Max('updated')))
 
 	strandDataRaw = Strand.objects.filter(private=False).exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('users').annotate(weeklyStrands=Count('users'), weeklyPhotos=Count('photos__user'))
 	actionDataRaw = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(weeklyActions=Count('user'))
 	actionDataWithPhotos = Action.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(totalPhotos=Count('photos'))
 	lastActionDateRaw = Action.objects.all().exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user', 'action_type').annotate(lastActionTimestamp=Max('added'))
-	#friendsDataRaw = FriendConnection.objects.exclude(added__lt=(datetime.now()-timedelta(hours=168))).values('user').order_by().annotate(totalFriends=Count('user'))
 
 	inviteCount = list(User.objects.filter(product_id=2).annotate(totalInvites=Count('inviting_user')).order_by('-id'))
 	contactCount = list(User.objects.filter(product_id=2).annotate(totalContacts=Count('contactentry')).order_by('-id'))
@@ -61,7 +62,11 @@ def userbaseSummary(request):
 
 	weeklyPhotosById = dict()
 	weeklyStrandsById = dict()
+	PhotosDataById = dict()
 	
+	for photosData in photoDataRaw:
+		PhotosDataById[photosData['user']] = photosData
+
 	for strandData in strandDataRaw:
 		weeklyStrandsById[strandData['users']] = strandData['weeklyStrands']
 
@@ -120,10 +125,20 @@ def userbaseSummary(request):
 		if (user.last_photo_update_timestamp):
 			entry['lastCheckinTime'] = user.last_photo_update_timestamp.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')			
 
+		if (user.id in PhotosDataById):
+			user.totalCount = PhotosDataById[user.id]['totalPhotos']
+			user.thumbsCount = PhotosDataById[user.id]['thumbsCount']
+			user.photosWithGPS = PhotosDataById[user.id]['photosWithGPS']
+			user.lastUpdated = PhotosDataById[user.id]['lastUpdated']
+		else:
+			user.totalCount = 0
+			user.thumbsCount = 0
+			user.photoWithGPS = 0
+			user.lastUpdated = 0
 
 		if (user.totalCount > 0):
 			entry['lastUploadTime'] = user.lastUpdated.astimezone(to_zone).strftime('%Y/%m/%d %H:%M:%S')
-			entry['metadataCount'] = user.totalCount - user.thumbsCount
+			entry['metadataCount'] = user.totalCount
 			entry['photosWithGPS'] = 100.0*float(user.photosWithGPS)/float(user.totalCount)
 
 
