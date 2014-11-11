@@ -13,6 +13,7 @@
 #import "LocalyticsSession.h"
 #import "DFDefaultsStore.h"
 #import "DFPeanutPushNotification.h"
+#import "DFPeanutFeedObject.h"
 
 
 
@@ -61,6 +62,7 @@ NSString* const CreateStrandEvent = @"CreateStrand";
 NSString* const PhotoSavedEvent = @"PhotoSaved";
 NSString* const PhotoDeletedEvent = @"PhotoDeleted";
 NSString* const PhotoLikedEvent = @"PhotoLiked";
+NSString* const PhotoActionEvent = @"PhotoAction";
 
 // Notifications
 NSString* const NotificationOpenedEvent = @"NotificationOpened";
@@ -85,6 +87,8 @@ NSString* const StateChangeKey = @"stateChange";
 NSString* const ValueChangeKey = @"valueChange";
 
 NSString* const PhotoAgeKey = @"photoAge";
+NSString* const PostAge = @"postAge";
+
 
 static DFAnalytics *defaultLogger;
 
@@ -216,6 +220,40 @@ static DFAnalytics *defaultLogger;
                                                          }];
 }
 
+
++ (void)logPhotoActionTaken:(DFPeanutActionType)action
+                     result:(NSString *)result
+                photoObject:(DFPeanutFeedObject *)photo
+                postsObject:(DFPeanutFeedObject *)postsObject
+{
+  NSTimeInterval takenInterval = [[NSDate date] timeIntervalSinceDate:photo.time_taken];
+  NSTimeInterval postedInterval = [[NSDate date] timeIntervalSinceDate:postsObject.time_stamp];
+  NSArray *photosInPosts = [postsObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  NSArray *comments = [photo actionsOfType:DFPeanutActionComment forUser:0];
+  NSArray *likes = [photo actionsOfType:DFPeanutActionFavorite forUser:0];
+  
+  [DFAnalytics logEvent:PhotoActionEvent
+         withParameters:@{
+                          ResultKey: result,
+                          @"ActionType" : [self actionStringForType:action],
+                          PhotoAgeKey : [self bucketStringForTimeInternval:takenInterval],
+                          PostAge : [self bucketStringForTimeInternval:postedInterval],
+                          @"PhotosInThread" : [self bucketStringForObjectCount:photosInPosts.count],
+                          @"NumComments" : [self bucketStringForObjectCount:comments.count],
+                          @"NumLikes" : [self bucketStringForObjectCount:likes.count],
+                          }];
+}
+
++ (NSString *)actionStringForType:(DFPeanutActionType)action
+{
+  if (action == DFPeanutActionFavorite) {
+    return @"Favorite";
+  } else if (action == DFPeanutActionComment) {
+    return @"Comment";
+  } else {
+    return [@(action) stringValue];
+  }
+}
 
 
 + (void)logSetupPhoneNumberEnteredWithResult:(NSString *)result

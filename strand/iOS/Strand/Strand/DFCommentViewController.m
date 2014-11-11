@@ -11,6 +11,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutActionAdapter.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "DFAnalytics.h"
 
 @interface DFCommentViewController ()
 
@@ -79,6 +80,10 @@
 {
   [super viewDidAppear:animated];
   [self scrollToLast];
+  [DFAnalytics logViewController:self
+          appearedWithParameters:@{
+                                   @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count]
+                                   }];
 }
 
 - (void)scrollToLast
@@ -157,9 +162,17 @@
   DFCommentViewController __weak *weakSelf = self;
   [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
     DDLogInfo(@"%@ adding comment succeeded:%@", [DFCommentViewController class], resultObjects);
+    [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
+                              result:DFAnalyticsValueResultSuccess
+                         photoObject:weakSelf.photoObject
+                         postsObject:weakSelf.postsObject];
   } failure:^(NSError *error) {
     DDLogError(@"%@ adding comment error:%@", [DFCommentViewController class], error);
     [weakSelf showCommentError:action];
+    [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
+                              result:DFAnalyticsValueResultFailure
+                         photoObject:weakSelf.photoObject
+                         postsObject:weakSelf.postsObject];
   }];
 }
 

@@ -10,6 +10,8 @@
 #import <MessageUI/MFMessageComposeViewController.h>
 #import "DFTypedefs.h"
 
+@class DFPeanutFeedObject;
+
 @interface DFAnalytics : NSObject
 
 extern NSString * const DFAnalyticsActionTypeSwipe;
@@ -58,6 +60,10 @@ disappearedWithParameters:(NSDictionary *)params;
                                      extraInfo:(NSDictionary *)extraInfo;
 
 /* Log camera and photo actions */
++ (void)logPhotoActionTaken:(DFPeanutActionType)action
+                     result:(NSString *)result
+                photoObject:(DFPeanutFeedObject *)photo
+                postsObject:(DFPeanutFeedObject *)postsObject;
 + (void)logPhotoSavedWithResult:(NSString *)result;
 + (void)logPhotoDeletedWithResult:(NSString *)result
            timeIntervalSinceTaken:(NSTimeInterval)timeInterval;
