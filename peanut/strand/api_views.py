@@ -42,6 +42,7 @@ def addActionsToClusters(clusters, strandId, actionsByPhotoIdCache):
 	finalClusters = list()
 
 	for cluster in clusters:
+		entriesToRemove = list()
 		for entry in cluster:
 			if entry["photo"].id in actionsByPhotoIdCache:
 				actions = actionsByPhotoIdCache[entry["photo"].id]
@@ -51,10 +52,12 @@ def addActionsToClusters(clusters, strandId, actionsByPhotoIdCache):
 					# We want to pull the photo out of the cluster now and have it on its own
 					if len(cluster) > 1:
 						finalClusters.append([entry])
-						cluster.remove(entry)
+						entriesToRemove.append(entry)
 
 					entry["actions"] = actionsForThisStrand
 
+		for entry in entriesToRemove:
+			cluster.remove(entry)
 		finalClusters.append(cluster)
 
 	return finalClusters
