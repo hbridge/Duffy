@@ -58,6 +58,7 @@
   self.tableView.delegate = self;
   [tableView registerNib:[UINib nibForClass:[DFCommentTableViewCell class]]
   forCellReuseIdentifier:@"cell"];
+  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.toolbar.frame.size.height * 2.0, 0);
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -150,8 +151,16 @@
    insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.comments.count inSection:0]]
    withRowAnimation:UITableViewRowAnimationFade];
   [self.comments addObject:action];
-  
   [self.tableView endUpdates];
+  
+  DFCommentViewController __weak *weakSelf = self;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [weakSelf.tableView
+     scrollToRowAtIndexPath:[NSIndexPath
+                             indexPathForRow:weakSelf.comments.count-1 inSection:0]
+     atScrollPosition:UITableViewScrollPositionTop
+     animated:YES];
+  });
 }
 
 - (void)showCommentError:(DFPeanutAction *)action
