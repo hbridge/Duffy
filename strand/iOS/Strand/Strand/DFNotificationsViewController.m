@@ -14,6 +14,8 @@
 #import "DFImageManager.h"
 #import "DFAnalytics.h"
 #import <Slash/Slash.h>
+#import "DFFeedViewController.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFNotificationsViewController ()
 
@@ -164,10 +166,12 @@
   [DFAnalytics logNotificationViewItemOpened:[DFAnalytics actionStringForType:action.action_type]
                                    notifDate:action.time_stamp];
   
-  if (self.delegate) {
-//    [self.delegate notificationViewController:self
-//             didSelectNotificationWithPhotoID:notification.photo_id.longLongValue];
-  }
+  DFPeanutFeedObject *strandPostsObject = [[DFPeanutFeedDataManager sharedManager]
+                                           strandPostsObjectWithId:action.strand];
+  DFFeedViewController *fvc = [DFFeedViewController
+                               presentFeedObject:strandPostsObject
+                               modallyInViewController:self];
+  fvc.onViewScrollToPhotoId = action.photo;
 }
 
 
