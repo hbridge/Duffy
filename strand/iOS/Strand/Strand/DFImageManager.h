@@ -19,6 +19,13 @@ typedef void (^SetImageCompletion)(NSError *error);
      preferredType:(DFImageType)type
         completion:(ImageLoadCompletionBlock)completionBlock;
 
+// convenience method, converts points (logical size) to screen pixel size
+- (void)imageForID:(DFPhotoIDType)photoID
+         pointSize:(CGSize)size
+       contentMode:(DFImageRequestContentMode)contentMode
+      deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
+        completion:(ImageLoadCompletionBlock)completionBlock;
+
 - (void)imageForID:(DFPhotoIDType)photoID
               size:(CGSize)size
        contentMode:(DFImageRequestContentMode)contentMode

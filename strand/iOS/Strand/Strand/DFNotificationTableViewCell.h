@@ -7,11 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "Strand-Swift.h"
 
 @interface DFNotificationTableViewCell : UITableViewCell
+@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UIImageView *previewImageView;
-@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
-@property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
-@property (weak, nonatomic) IBOutlet UILabel *timeLabel;
+@property (weak, nonatomic) IBOutlet UILabel *detailLabel;
+
+
++ (DFNotificationTableViewCell *)templateCell;
+- (CGFloat)rowHeight;
 
 @end

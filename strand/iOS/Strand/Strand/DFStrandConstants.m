@@ -166,7 +166,7 @@ static NSArray *colors;
       if (helveticaNeueItalic) {
         defaultStyle[@"em"] = @{NSFontAttributeName : helveticaNeueItalic};
       }
-      defaultStyle[@"gray"] = [UIColor lightGrayColor];
+      defaultStyle[@"gray"] = @{NSForegroundColorAttributeName : [UIColor lightGrayColor]};
       defaultStyle[@"feedText"] = @{NSParagraphStyleAttributeName : feedParagraphStyle};
     });
   }

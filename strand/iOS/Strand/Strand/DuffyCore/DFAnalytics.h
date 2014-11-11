@@ -85,8 +85,10 @@ disappearedWithParameters:(NSDictionary *)params;
 + (void)logAddContactCompletedWithResult:(NSString *)result;
 
 
-#pragma mark - Utiltiies
+#pragma mark - Utilities
 
 + (NSString *)bucketStringForObjectCount:(NSUInteger)objectCount;
++ (NSString *)actionStringForType:(DFPeanutActionType)action;
+
 
 @end

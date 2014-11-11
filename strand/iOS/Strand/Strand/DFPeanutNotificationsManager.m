@@ -7,7 +7,7 @@
 //
 
 #import "DFPeanutNotificationsManager.h"
-#import "DFPeanutNotificationsAdapter.h"
+#import "DFPeanutFeedDataManager.h"
 #import "DFStrandConstants.h"
 #import "DFDefaultsStore.h"
 
@@ -15,8 +15,7 @@ NSTimeInterval const DFNotificationsMinFetchInterval = 2.0;
 
 @interface DFPeanutNotificationsManager ()
 
-@property (nonatomic, retain) DFPeanutNotificationsAdapter *notificationsAdapter;
-@property (nonatomic, retain) NSArray *peanutNotifications;
+@property (nonatomic, retain) NSArray *peanutActions;
 @property (nonatomic, retain) NSDate *lastFetchDate;
 @property (atomic) BOOL isUpdatingNotifications;
 
@@ -49,25 +48,11 @@ static DFPeanutNotificationsManager *defaultManager;
 
 - (void)updateNotifications
 {
-  if (self.isUpdatingNotifications) return;
-  
-  self.isUpdatingNotifications = YES;
-  
-  [self.notificationsAdapter fetchNotifications:^(NSArray *peanutNotifications) {
-    self.peanutNotifications = peanutNotifications;
-    DDLogInfo(@"Fetching %d notifications succeeded.", (int)peanutNotifications.count);
-    self.isUpdatingNotifications = NO;
-    self.lastFetchDate = [NSDate date];
-    
-    
-    [[NSNotificationCenter defaultCenter]
-     postNotificationName:DFStrandNotificationsUpdatedNotification
-     object:self
-     userInfo:@{DFStrandNotificationsUnseenCountKey: @(self.unreadNotifications.count)}];
-  } failure:^(NSError *error) {
-    DDLogError(@"%@ fetching contacts failed: %@", [self.class description], error.description);
-    self.isUpdatingNotifications = NO;
-  }];
+  self.peanutActions = [[DFPeanutFeedDataManager sharedManager] actionsList];
+  [[NSNotificationCenter defaultCenter]
+   postNotificationName:DFStrandNotificationsUpdatedNotification
+   object:self
+   userInfo:@{DFStrandNotificationsUnseenCountKey: @(self.unreadNotifications.count)}];
 }
 
 /*
@@ -75,21 +60,11 @@ static DFPeanutNotificationsManager *defaultManager;
  */
 - (NSArray *)notifications
 {
-  if (!self.peanutNotifications ||
-      [[NSDate date] timeIntervalSinceDate:self.lastFetchDate] > DFNotificationsMinFetchInterval) {
+  if (!self.peanutActions) {
     [self updateNotifications];
   }
 
-  return self.peanutNotifications;
-}
-
-- (DFPeanutNotificationsAdapter *)notificationsAdapter
-{
-  if (!_notificationsAdapter) {
-    _notificationsAdapter = [DFPeanutNotificationsAdapter new];
-  }
-  
-  return _notificationsAdapter;
+  return self.peanutActions;
 }
 
 /*
@@ -101,7 +76,8 @@ static DFPeanutNotificationsManager *defaultManager;
   NSMutableArray *unreadNotifications = [NSMutableArray new];
   
   for (int x=0; x < self.notifications.count; x++) {
-    if ([self.lastViewDate compare: ((DFPeanutNotification *)self.notifications[x]).time] == NSOrderedAscending) {
+    DFPeanutAction *action = (DFPeanutAction *)self.notifications[x];
+    if ([self.lastViewDate compare:action.time_stamp] == NSOrderedAscending) {
       [unreadNotifications addObject:self.notifications[x]];
     }
   }
@@ -117,7 +93,8 @@ static DFPeanutNotificationsManager *defaultManager;
   NSMutableArray *readNotifications = [NSMutableArray new];
   
   for (int x=0; x < self.notifications.count; x++) {
-    if ([self.lastViewDate compare: ((DFPeanutNotification *)self.notifications[x]).time] == NSOrderedDescending) {
+    DFPeanutAction *action = (DFPeanutAction *)self.notifications[x];
+    if ([self.lastViewDate compare:action.time_stamp] == NSOrderedDescending) {
       [readNotifications addObject:self.notifications[x]];
     }
   }

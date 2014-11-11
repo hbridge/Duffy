@@ -38,6 +38,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)suggestedStrands;
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user includeInvites:(BOOL)includeInvites;
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
+- (NSArray *)actionsList;
 
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;

@@ -8,16 +8,18 @@
 
 #import "DFNotificationsViewController.h"
 #import "DFPeanutNotificationsManager.h"
-#import "DFPeanutNotification.h"
+#import "DFPeanutAction.h"
 #import "DFNotificationTableViewCell.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFImageManager.h"
 #import "DFAnalytics.h"
+#import <Slash/Slash.h>
 
 @interface DFNotificationsViewController ()
 
 @property (nonatomic, retain) NSArray *unreadNotifications;
 @property (nonatomic, retain) NSArray *readNotifications;
+@property (nonatomic, retain) DFNotificationTableViewCell *templateCell;
 
 @end
 
@@ -28,11 +30,12 @@
   self = [super initWithStyle:style];
   if (self) {
     self.navigationItem.title = @"Notifications";
+    self.tabBarItem.title = @"Notifications";
     self.tabBarItem.image = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
                              imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
-    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButton"]
+    self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButtonSelected"]
                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-
+    self.templateCell = [DFNotificationTableViewCell templateCell];
   }
   return self;
 }
@@ -43,7 +46,8 @@
   
   [self.tableView registerNib:[UINib nibWithNibName:@"DFNotificationTableViewCell" bundle:nil]
        forCellReuseIdentifier:@"cell"];
-  self.tableView.separatorInset = UIEdgeInsetsMake(0, 50, 0, 0);
+  self.tableView.separatorInset = UIEdgeInsetsMake(0, 15, 0, 15);
+  self.tableView.rowHeight = 56.0;
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -75,41 +79,63 @@
   return self.unreadNotifications.count + self.readNotifications.count;
 }
 
-- (DFPeanutNotification *)peanutNotificationForIndexPath:(NSIndexPath *)indexPath
+- (DFPeanutAction *)peanutActionForIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutNotification *peanutNotification;
+  DFPeanutAction *peanutAction;
   if (indexPath.row < self.unreadNotifications.count) {
-    peanutNotification = self.unreadNotifications[indexPath.row];
+    peanutAction = self.unreadNotifications[indexPath.row];
   } else {
-    peanutNotification = self.readNotifications[indexPath.row - self.unreadNotifications.count];
+    peanutAction = self.readNotifications[indexPath.row - self.unreadNotifications.count];
   }
 
-  return peanutNotification;
+  return peanutAction;
+}
+
+- (NSAttributedString *)attributedStringForAction:(DFPeanutAction *)action
+{
+  NSString *markup =
+  [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@ ago</gray>",
+   action.user_display_name,
+   action.action_type == DFPeanutActionFavorite ? @"liked your photo." : @"commented: ",
+   action.action_type == DFPeanutActionComment ? action.text : @"",
+   [NSDateFormatter relativeTimeStringSinceDate:action.time_stamp abbreviate:YES]
+   ];
+  
+  
+  NSError *parseError;
+  NSAttributedString *attributedString = [SLSMarkupParser
+                                     attributedStringWithMarkup:markup
+                                     style:[DFStrandConstants defaultTextStyle]
+                                     error:&parseError];
+  if (parseError) DDLogError(@"%@ parse error:%@", self.class, parseError);
+  return attributedString;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFNotificationTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell" forIndexPath:indexPath];
   
-  DFPeanutNotification *peanutNotification = [self peanutNotificationForIndexPath:indexPath];
+  DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
   
   // set cell basic data
-  cell.nameLabel.text = peanutNotification.actor_display_name;
-  cell.descriptionLabel.text = peanutNotification.action_text;
-  cell.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:peanutNotification.time
-                         abbreviate:YES];
+  cell.profilePhotoStackView.names = @[action.user_display_name];
+  cell.detailLabel.attributedText = [self attributedStringForAction:action];
   
   //set the preview image
   cell.previewImageView.image = nil;
-  [[DFImageManager sharedManager]
-   imageForID:peanutNotification.photo_id.longLongValue
-   preferredType:DFImageThumbnail
-   completion:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       if (![tableView.visibleCells containsObject:cell]) return;
-       cell.previewImageView.image = image;
-     });
-   }];
+  if (action.photo > 0) {
+    [[DFImageManager sharedManager]
+     imageForID:action.photo
+     pointSize:cell.previewImageView.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         if (![tableView.visibleCells containsObject:cell]) return;
+         cell.previewImageView.image = image;
+       });
+     }];
+  }
   
   //decide whether to highlight
   if (indexPath.row < self.unreadNotifications.count) {
@@ -119,17 +145,33 @@
   return cell;
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
+  self.templateCell.detailLabel.attributedText = [self attributedStringForAction:action];
+  return self.templateCell.rowHeight;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  return 57;
+}
+
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  DFPeanutNotification *notification = [self peanutNotificationForIndexPath:indexPath];
-  DDLogVerbose(@"%@ notif tapped for notif:%@", [self.class description], notification);
-  [DFAnalytics logNotificationViewItemOpened:notification.action_text notifDate:notification.time];
+  DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
+  DDLogVerbose(@"%@ notif tapped for notif:%@", [self.class description], action);
+  [DFAnalytics logNotificationViewItemOpened:[DFAnalytics actionStringForType:action.action_type]
+                                   notifDate:action.time_stamp];
   
   if (self.delegate) {
-    [self.delegate notificationViewController:self
-             didSelectNotificationWithPhotoID:notification.photo_id.longLongValue];
+//    [self.delegate notificationViewController:self
+//             didSelectNotificationWithPhotoID:notification.photo_id.longLongValue];
   }
 }
+
+
+
 
 
 

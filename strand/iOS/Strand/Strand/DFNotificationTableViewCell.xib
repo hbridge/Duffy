@@ -1,67 +1,64 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="5056" systemVersion="13E28" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="KGk-i7-Jjw" customClass="DFNotificationTableViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="74" id="KGk-i7-Jjw" customClass="DFNotificationTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="74"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Henry" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zbZ-Mo-ouN">
-                        <rect key="frame" x="50" y="13" width="39" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
-                        <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="liked your photo" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="105" translatesAutoresizingMaskIntoConstraints="NO" id="Hut-qw-Arg">
-                        <rect key="frame" x="93" y="13" width="105" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Time" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tYt-vb-EcO">
-                        <rect key="frame" x="278" y="13" width="38" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                    <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OPm-BO-0DI">
+                        <rect key="frame" x="260" y="14" width="45" height="45"/>
                         <constraints>
-                            <constraint firstAttribute="width" constant="38" id="YAL-dq-sNh"/>
-                        </constraints>
-                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                        <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
-                        <nil key="highlightedColor"/>
-                    </label>
-                    <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="OPm-BO-0DI">
-                        <rect key="frame" x="0.0" y="1" width="42" height="42"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <constraints>
-                            <constraint firstAttribute="width" constant="42" id="Yzh-ym-gOH"/>
+                            <constraint firstAttribute="height" constant="45" id="Jda-Mx-FG3"/>
+                            <constraint firstAttribute="width" constant="45" id="Yzh-ym-gOH"/>
                         </constraints>
                     </imageView>
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMd-0b-oeH" customClass="DFProfilePhotoStackView" customModule="Strand" customModuleProvider="target">
+                        <rect key="frame" x="15" y="14" width="45" height="45"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="45" id="nYJ-Fb-VGP"/>
+                            <constraint firstAttribute="height" constant="45" id="xMX-J0-ILX"/>
+                        </constraints>
+                    </view>
+                    <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Details label" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="1000" translatesAutoresizingMaskIntoConstraints="NO" id="Hut-qw-Arg">
+                        <rect key="frame" x="64" y="13" width="188" height="16"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <nil key="highlightedColor"/>
+                    </label>
                 </subviews>
                 <constraints>
-                    <constraint firstAttribute="trailing" secondItem="tYt-vb-EcO" secondAttribute="trailing" constant="4" id="Dbi-yK-zF7"/>
-                    <constraint firstAttribute="centerY" secondItem="tYt-vb-EcO" secondAttribute="centerY" id="G9K-4F-dzw"/>
-                    <constraint firstItem="zbZ-Mo-ouN" firstAttribute="leading" secondItem="OPm-BO-0DI" secondAttribute="trailing" constant="8" id="JfT-YA-A9C"/>
-                    <constraint firstAttribute="centerY" secondItem="Hut-qw-Arg" secondAttribute="centerY" id="OpA-iZ-rVh"/>
-                    <constraint firstItem="Hut-qw-Arg" firstAttribute="leading" secondItem="zbZ-Mo-ouN" secondAttribute="trailing" constant="4" id="PKc-lh-tvt"/>
-                    <constraint firstItem="OPm-BO-0DI" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="Rev-6f-AMb"/>
-                    <constraint firstItem="OPm-BO-0DI" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="1" id="YZW-uX-hWU"/>
-                    <constraint firstAttribute="bottom" secondItem="OPm-BO-0DI" secondAttribute="bottom" id="ZtW-eb-9tM"/>
-                    <constraint firstAttribute="centerY" secondItem="zbZ-Mo-ouN" secondAttribute="centerY" id="jBo-nS-rs7"/>
+                    <constraint firstItem="Hut-qw-Arg" firstAttribute="leading" secondItem="JMd-0b-oeH" secondAttribute="trailing" constant="4" id="2Mm-fD-EBa"/>
+                    <constraint firstItem="OPm-BO-0DI" firstAttribute="top" relation="greaterThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="6" id="8Qk-as-0ms"/>
+                    <constraint firstItem="Hut-qw-Arg" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="topMargin" constant="5" id="9qz-Zq-zo7"/>
+                    <constraint firstItem="OPm-BO-0DI" firstAttribute="leading" secondItem="Hut-qw-Arg" secondAttribute="trailing" constant="8" id="9ur-wH-Isd"/>
+                    <constraint firstAttribute="centerY" secondItem="JMd-0b-oeH" secondAttribute="centerY" id="GLr-y4-PX8"/>
+                    <constraint firstAttribute="trailing" secondItem="OPm-BO-0DI" secondAttribute="trailing" constant="15" id="aii-3e-bwf"/>
+                    <constraint firstItem="JMd-0b-oeH" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="bCw-kj-aK3"/>
+                    <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="OPm-BO-0DI" secondAttribute="bottom" constant="6" id="fBr-aq-P9n"/>
+                    <constraint firstAttribute="centerY" secondItem="OPm-BO-0DI" secondAttribute="centerY" id="g9D-4x-vX9"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="descriptionLabel" destination="Hut-qw-Arg" id="D0A-bd-fRD"/>
-                <outlet property="nameLabel" destination="zbZ-Mo-ouN" id="Hdv-tB-Ogv"/>
+                <outlet property="detailLabel" destination="Hut-qw-Arg" id="1x2-oU-CWe"/>
                 <outlet property="previewImageView" destination="OPm-BO-0DI" id="XpH-dC-rab"/>
-                <outlet property="timeLabel" destination="tYt-vb-EcO" id="fBS-ko-tJ4"/>
+                <outlet property="profilePhotoStackView" destination="JMd-0b-oeH" id="BY0-7f-TMn"/>
             </connections>
+            <point key="canvasLocation" x="191" y="406"/>
         </tableViewCell>
     </objects>
+    <simulatedMetricsContainer key="defaultSimulatedMetrics">
+        <simulatedStatusBarMetrics key="statusBar"/>
+        <simulatedOrientationMetrics key="orientation"/>
+        <simulatedScreenMetrics key="destination" type="retina4"/>
+    </simulatedMetricsContainer>
 </document>

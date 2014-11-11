@@ -132,6 +132,21 @@ static BOOL logRouting = NO;
 }
 
 - (void)imageForID:(DFPhotoIDType)photoID
+         pointSize:(CGSize)size
+       contentMode:(DFImageRequestContentMode)contentMode
+      deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
+        completion:(ImageLoadCompletionBlock)completionBlock
+{
+  CGSize imageSize = CGSizeMake(size.width * [[UIScreen mainScreen] scale],
+                                size.height * [[UIScreen mainScreen] scale]);
+  [self imageForID:photoID
+              size:imageSize
+       contentMode:contentMode
+      deliveryMode:deliveryMode
+        completion:completionBlock];
+}
+
+- (void)imageForID:(DFPhotoIDType)photoID
               size:(CGSize)size
        contentMode:(DFImageRequestContentMode)contentMode
       deliveryMode:(DFImageRequestDeliveryMode)deliveryMode
