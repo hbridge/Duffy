@@ -283,7 +283,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             logger.info("Got request for bulk photo update with %s photos and %s files from user %s" % (len(photosData), len(request.FILES), user.id))
             
             existingPhotosByHash = dict()
-            if user.install_num > 0:
+            if user.install_num > 0 and len(request.FILES) == 0:
                 logger.debug("It appears user %s has a new install, fetching existing photos" % (user.id))
                 existingPhotos = Photo.objects.filter(user = user, install_num__lt=user.install_num)
                 for photo in existingPhotos:
