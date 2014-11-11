@@ -38,6 +38,9 @@
     self.tabBarItem.selectedImage = [[UIImage imageNamed:@"Assets/Icons/NotificationsBarButtonSelected"]
                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     self.templateCell = [DFNotificationTableViewCell templateCell];
+
+    [self observeNotifications];
+    [self reloadData];
   }
   return self;
 }
@@ -52,22 +55,43 @@
   self.tableView.rowHeight = 56.0;
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [self reloadData];
+}
+
 - (void)viewDidAppear:(BOOL)animated
 {
   [super viewDidAppear:animated];
-  self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
-  self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
-  [self.tableView reloadData];
   
+  self.tabBarItem.badgeValue = nil;
   [[DFPeanutNotificationsManager sharedManager] markNotificationsAsRead];
   [DFAnalytics logViewController:self appearedWithParameters:nil];
 }
 
-- (void)didReceiveMemoryWarning
+- (void)observeNotifications
 {
-  [super didReceiveMemoryWarning];
-  // Dispose of any resources that can be recreated.
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNotificationsUpdatedNotification
+                                             object:nil];
 }
+
+- (void)reloadData
+{
+  self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
+  self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
+  [self.tableView reloadData];
+  
+  if (self.unreadNotifications.count == 0) {
+    self.tabBarItem.badgeValue = nil;
+  } else {
+    self.tabBarItem.badgeValue = [@(self.unreadNotifications.count) stringValue];
+  }
+
+}
+
 
 #pragma mark - Table view data source
 
@@ -142,6 +166,8 @@
   //decide whether to highlight
   if (indexPath.row < self.unreadNotifications.count) {
     cell.backgroundColor = [UIColor colorWithRed:229/255.0 green:239/255.0 blue:251/255.0 alpha:1.0];
+  } else {
+    cell.backgroundColor = [UIColor whiteColor];
   }
   
   return cell;
@@ -173,10 +199,5 @@
                                modallyInViewController:self];
   fvc.onViewScrollToPhotoId = action.photo;
 }
-
-
-
-
-
 
 @end
