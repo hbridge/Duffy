@@ -641,15 +641,10 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             if photoId not in currentPhotoIds:
                 newPhotoIds.append(photoId)
 
-        # Find the photo ids that are in the post data but not in the strand
-        newUserIds = list()
-        for userId in self.request.DATA['users']:
-            if userId not in currentUserIds:
-                newUserIds.append(userId)
+        newPhotoIds = list(set(newPhotoIds))
 
-
-        self.request.DATA['photos'] = list(set(newPhotoIds))
-        self.request.DATA['users'] = list(set(newUserIds))
+        self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
+        self.request.DATA['users'] = list(set(self.request.DATA['users']))
 
         if len(newPhotoIds) > 0:
             # Go through all the private strands that have any photos we're contributing
@@ -663,6 +658,18 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
 
             action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
             action.save()
-            action.photos = newPhotoIds 
+            action.photos = newPhotoIds
+
+        # go through all action posts from this user and make sure they're up to date
+        addPhotoActions = Action.objects.filter(user=user, strand=strand).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
+
+        for action in addPhotoActions:
+            cleanPhotoIds = list()
+            for photo in action.photos.all():
+                if photo.id in self.request.DATA['photos']:
+                    cleanPhotoIds.append(photo.id)
+
+            action.photos = cleanPhotoIds
+            action.save()
 
 
