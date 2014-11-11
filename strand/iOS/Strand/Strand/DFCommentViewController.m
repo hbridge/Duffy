@@ -80,6 +80,7 @@
 {
   [super viewDidAppear:animated];
   [self scrollToLast];
+  [self.textField becomeFirstResponder];
   [DFAnalytics logViewController:self
           appearedWithParameters:@{
                                    @"numComments" : [DFAnalytics bucketStringForObjectCount:self.comments.count]

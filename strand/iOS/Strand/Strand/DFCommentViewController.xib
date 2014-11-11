@@ -30,7 +30,7 @@
                                 <rect key="frame" x="16" y="7" width="507" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <connections>
                                     <action selector="textDidChange:" destination="-1" eventType="valueChanged" id="9Ny-cb-mqM"/>
                                 </connections>
