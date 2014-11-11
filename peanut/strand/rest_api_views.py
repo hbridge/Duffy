@@ -530,7 +530,7 @@ class CreateActionAPI(CreateAPIView):
             # if it's a comment, then allow multiple on the same photo
             if (obj.action_type == constants.ACTION_TYPE_COMMENT):
                 for user in obj.strand.users.all():
-                    if user.id != obj.photo.user_id:
+                    if user.id != obj.user_id:
                         msg = "%s: %s" % (obj.user.display_name, obj.text)
                         logger.debug("going to send %s to user id %s" % (msg, user.id))
                         customPayload = {'strand_id': obj.strand_id, 'id': obj.photo_id}
