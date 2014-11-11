@@ -670,6 +670,10 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
                     cleanPhotoIds.append(photo.id)
 
             action.photos = cleanPhotoIds
-            action.save()
+
+            if len(cleanPhotoIds) == 0:
+                action.delete()
+            else:
+                action.save()
 
 
