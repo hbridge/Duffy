@@ -247,7 +247,7 @@ static DFAnalytics *defaultLogger;
 + (NSString *)actionStringForType:(DFPeanutActionType)action
 {
   if (action == DFPeanutActionFavorite) {
-    return @"Favorite";
+    return @"Like";
   } else if (action == DFPeanutActionComment) {
     return @"Comment";
   } else {

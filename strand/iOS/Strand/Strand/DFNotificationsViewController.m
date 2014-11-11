@@ -65,9 +65,23 @@
 {
   [super viewDidAppear:animated];
   
+  [DFAnalytics
+   logViewController:self
+   appearedWithParameters:
+   @{
+     @"unreadNotifs" : [DFAnalytics bucketStringForObjectCount:self.unreadNotifications.count],
+     @"readNotifs" : [DFAnalytics bucketStringForObjectCount:self.readNotifications.count],
+     @"badgeValue" : [DFAnalytics bucketStringForObjectCount:self.tabBarItem.badgeValue.integerValue]
+     }];
   self.tabBarItem.badgeValue = nil;
   [[DFPeanutNotificationsManager sharedManager] markNotificationsAsRead];
-  [DFAnalytics logViewController:self appearedWithParameters:nil];
+  
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+  [super viewDidDisappear:animated];
+  [DFAnalytics logViewController:self disappearedWithParameters:nil];
 }
 
 - (void)observeNotifications
@@ -89,7 +103,6 @@
   } else {
     self.tabBarItem.badgeValue = [@(self.unreadNotifications.count) stringValue];
   }
-
 }
 
 
@@ -188,7 +201,6 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
-  DDLogVerbose(@"%@ notif tapped for notif:%@", [self.class description], action);
   [DFAnalytics logNotificationViewItemOpened:[DFAnalytics actionStringForType:action.action_type]
                                    notifDate:action.time_stamp];
   
