@@ -18,7 +18,7 @@
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Idt-Bp-Mrh">
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="Idt-Bp-Mrh">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                 </tableView>
@@ -46,9 +46,13 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstItem="Idt-Bp-Mrh" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="2cP-kB-W2M"/>
                 <constraint firstItem="OZb-rB-V1d" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="34M-ud-nFh"/>
                 <constraint firstAttribute="trailing" secondItem="OZb-rB-V1d" secondAttribute="trailing" id="4KT-ES-yee"/>
                 <constraint firstAttribute="bottom" secondItem="OZb-rB-V1d" secondAttribute="bottom" id="JUe-gy-xrn"/>
+                <constraint firstAttribute="bottom" secondItem="Idt-Bp-Mrh" secondAttribute="bottom" id="QdD-CO-C6a"/>
+                <constraint firstAttribute="trailing" secondItem="Idt-Bp-Mrh" secondAttribute="trailing" id="ia8-wO-38Y"/>
+                <constraint firstItem="Idt-Bp-Mrh" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="qCs-Hx-l5f"/>
             </constraints>
         </view>
     </objects>

@@ -10,11 +10,13 @@
 #import "DFCommentTableViewCell.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFPeanutActionAdapter.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
 
 @interface DFCommentViewController ()
 
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (nonatomic, retain) NSMutableArray *comments;
+@property (nonatomic, retain) DFCommentTableViewCell *templateCell;
 
 @end
 
@@ -29,6 +31,7 @@
   if (self) {
     _photoObject = photoObject;
     _postsObject = postsObject;
+    _templateCell = [DFCommentTableViewCell templateCell];
   }
   return self;
 }
@@ -94,12 +97,30 @@
   DFCommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
+  [cell.profilePhotoStackView setNames:@[comment.user_display_name]];
   cell.nameLabel.text = comment.user_display_name;
   cell.commentLabel.text = comment.text;
+  cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:[NSDate date] abbreviate:YES];
   
   if (!cell) [NSException raise:@"nil cell" format:@"nil cell"];
   return cell;
 }
+
+- (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  return 69.0;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
+  self.templateCell.commentLabel.text = comment.text;
+  return self.templateCell.rowHeight;
+}
+
+
+#pragma mark - Actions
+
 
 - (IBAction)sendButtonPressed:(id)sender {
   DFPeanutAction *action = [[DFPeanutAction alloc] init];
@@ -108,6 +129,7 @@
   action.text = self.textField.text;
   action.photo = self.photoObject.id;
   action.strand = self.postsObject.id;
+  action.user_display_name = [[DFUser currentUser] displayName];
   
   [self addComment:action];
   DFCommentViewController __weak *weakSelf = self;
@@ -123,10 +145,10 @@
 - (void)addComment:(DFPeanutAction *)action
 {
   [self.tableView beginUpdates];
-
-    [self.tableView
-     insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.comments.count inSection:0]]
-     withRowAnimation:UITableViewRowAnimationFade];
+  
+  [self.tableView
+   insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:self.comments.count inSection:0]]
+   withRowAnimation:UITableViewRowAnimationFade];
   [self.comments addObject:action];
   
   [self.tableView endUpdates];
@@ -139,8 +161,6 @@
 
 - (IBAction)textDidChange:(UITextField *)sender {
 }
-
-
 
 
 - (void)keyboardWillShow:(NSNotification *)notification {

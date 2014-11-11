@@ -8,8 +8,8 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="69" id="HA9-i9-fhm" customClass="DFCommentTableViewCell">
-            <rect key="frame" x="0.0" y="0.0" width="320" height="69"/>
+        <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" rowHeight="70" id="HA9-i9-fhm" customClass="DFCommentTableViewCell">
+            <rect key="frame" x="0.0" y="0.0" width="320" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="HA9-i9-fhm" id="ZtS-q5-bRW">
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -29,7 +29,7 @@
                         </userDefinedRuntimeAttributes>
                     </view>
                     <view contentMode="scaleToFill" horizontalHuggingPriority="248" verticalCompressionResistancePriority="999" translatesAutoresizingMaskIntoConstraints="NO" id="2Ja-DB-Ryu" userLabel="Title/subtitle wrapper">
-                        <rect key="frame" x="70" y="17" width="217" height="35"/>
+                        <rect key="frame" x="70" y="16" width="217" height="37"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Name" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Fp9-d0-Lr5">
                                 <rect key="frame" x="0.0" y="0.0" width="217" height="16"/>
@@ -37,8 +37,8 @@
                                 <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Comment" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="217" translatesAutoresizingMaskIntoConstraints="NO" id="ghb-B9-xdz">
-                                <rect key="frame" x="0.0" y="19" width="217" height="16"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Comment" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="217" translatesAutoresizingMaskIntoConstraints="NO" id="ghb-B9-xdz">
+                                <rect key="frame" x="0.0" y="19" width="217" height="18"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -55,19 +55,20 @@
                         </constraints>
                     </view>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="255" verticalHuggingPriority="251" text="ts" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IiT-g7-vfu">
-                        <rect key="frame" x="295" y="17" width="10" height="14"/>
+                        <rect key="frame" x="295" y="16" width="10" height="14"/>
                         <fontDescription key="fontDescription" type="system" pointSize="11"/>
                         <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <nil key="highlightedColor"/>
                     </label>
                 </subviews>
                 <constraints>
-                    <constraint firstItem="NDY-xA-Xex" firstAttribute="centerY" secondItem="2Ja-DB-Ryu" secondAttribute="centerY" id="3gl-yL-eR3"/>
                     <constraint firstItem="2Ja-DB-Ryu" firstAttribute="leading" secondItem="NDY-xA-Xex" secondAttribute="trailing" constant="10" id="8mA-RW-QBW"/>
                     <constraint firstItem="IiT-g7-vfu" firstAttribute="leading" secondItem="2Ja-DB-Ryu" secondAttribute="trailing" constant="8" id="BHB-4p-itI"/>
                     <constraint firstItem="NDY-xA-Xex" firstAttribute="leading" secondItem="ZtS-q5-bRW" secondAttribute="leading" constant="15" id="G7O-eu-562"/>
                     <constraint firstItem="NDY-xA-Xex" firstAttribute="top" secondItem="ZtS-q5-bRW" secondAttribute="topMargin" constant="4" id="WAE-6C-g6I"/>
-                    <constraint firstItem="2Ja-DB-Ryu" firstAttribute="top" secondItem="IiT-g7-vfu" secondAttribute="top" id="cLg-vE-Ir1"/>
+                    <constraint firstAttribute="bottom" secondItem="2Ja-DB-Ryu" secondAttribute="bottom" constant="16" id="mCs-Rk-1gF"/>
+                    <constraint firstItem="2Ja-DB-Ryu" firstAttribute="top" secondItem="ZtS-q5-bRW" secondAttribute="top" constant="16" id="qpk-jY-uoQ"/>
+                    <constraint firstItem="IiT-g7-vfu" firstAttribute="top" secondItem="ZtS-q5-bRW" secondAttribute="topMargin" constant="8" id="wbF-p6-G39"/>
                     <constraint firstAttribute="trailing" secondItem="IiT-g7-vfu" secondAttribute="trailing" constant="15" id="zYW-EP-Wqd"/>
                 </constraints>
             </tableViewCellContentView>
@@ -77,7 +78,7 @@
                 <outlet property="profilePhotoStackView" destination="NDY-xA-Xex" id="YUO-H3-for"/>
                 <outlet property="timestampLabel" destination="IiT-g7-vfu" id="3Ja-Cc-xDv"/>
             </connections>
-            <point key="canvasLocation" x="349" y="371.5"/>
+            <point key="canvasLocation" x="349" y="372"/>
         </tableViewCell>
     </objects>
 </document>

@@ -11,13 +11,20 @@
 @implementation DFCommentTableViewCell
 
 - (void)awakeFromNib {
-    // Initialization code
+  self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
 }
 
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated {
-    [super setSelected:selected animated:animated];
+- (CGFloat)rowHeight
+{
+  CGFloat height = [self.contentView
+                    systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
+  
+  return height;
+}
 
-    // Configure the view for the selected state
++ (DFCommentTableViewCell *)templateCell
+{
+  return [UINib instantiateViewWithClass:[self class]];
 }
 
 @end

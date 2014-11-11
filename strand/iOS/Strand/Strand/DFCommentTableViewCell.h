@@ -15,4 +15,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *commentLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timestampLabel;
 
++ (DFCommentTableViewCell *)templateCell;
+- (CGFloat)rowHeight;
+
 @end
