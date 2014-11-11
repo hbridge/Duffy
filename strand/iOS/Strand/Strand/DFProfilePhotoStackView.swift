@@ -40,17 +40,13 @@ import UIKit
   
   func numberForName(name: NSString) -> NSInteger
   {
-    var resultString = ""
+    var result = 0;
     for var i = 0; i < name.length; i++ {
       var char:unichar = name.characterAtIndex(i)
-      resultString = NSString(format: "%@%d", resultString, char)
+      result += Int(char)
     }
     
-    if let number = resultString.toInt() {
-      return resultString.toInt()!
-    } else {
-      return resultString.hash
-    }
+    return result
   }
   
   func setProfilePhotoViews() {
@@ -85,7 +81,10 @@ import UIKit
     
     for (i, name) in enumerate(names) {
       var fillColor = self.fillColors[i].CGColor
-      var abbreviation = name.substringToIndex(name.startIndex.successor()).capitalizedString
+      var abbreviation = ""
+      if name.utf16Count > 0 {
+        abbreviation = name.substringToIndex(name.startIndex.successor()).capitalizedString
+      }
       var abbreviationRect = self.rectForIndex(i)
       CGContextSetFillColorWithColor(context, fillColor)
       CGContextFillEllipseInRect(context, abbreviationRect)

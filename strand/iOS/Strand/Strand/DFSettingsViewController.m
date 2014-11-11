@@ -29,6 +29,7 @@
 #import <Slash/Slash.h>
 #import "DFLogs.h"
 #import "DFCameraRollSyncManager.h"
+#import "DFColorPreviewController.h"
 
 @interface DFSettingsViewController ()
 
@@ -269,6 +270,13 @@
        identifier:@"crash"
           handler:^(id object) {
             [NSException raise:@"Intentional Crash" format:@"Hit crash button in Dev settings"];
+          }
+     accesoryType:UITableViewCellAccessoryDisclosureIndicator];
+  [mapping button:@"Preview Colors"
+       identifier:@"colorPreview"
+          handler:^(id object) {
+            DFColorPreviewController *cpc = [[DFColorPreviewController alloc] init];
+            [self.navigationController pushViewController:cpc animated:YES];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   [mapping button:@"Log Out"

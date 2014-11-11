@@ -36,6 +36,7 @@
 @property (readonly, nonatomic, retain) NSString *logOut;
 @property (readonly, nonatomic, retain) NSString *crash;
 @property (readonly, nonatomic, retain) NSString *userID;
+@property (readonly, nonatomic, retain) NSString *colorPreview;
 
 
 

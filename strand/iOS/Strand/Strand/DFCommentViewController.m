@@ -135,7 +135,8 @@
   [cell.profilePhotoStackView setNames:@[comment.user_display_name]];
   cell.nameLabel.text = comment.user_display_name;
   cell.commentLabel.text = comment.text;
-  cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:[NSDate date] abbreviate:YES];
+  cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:comment.time_stamp
+                                                               abbreviate:YES];
   
   if (!cell) [NSException raise:@"nil cell" format:@"nil cell"];
   return cell;
@@ -167,6 +168,7 @@
   action.text = self.textField.text;
   action.photo = self.photoObject.id;
   action.strand = self.postsObject.id;
+  action.time_stamp = [NSDate date]; 
   action.user_display_name = [[DFUser currentUser] displayName];
   
   [self addComment:action];

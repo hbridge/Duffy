@@ -8,6 +8,7 @@
 
 #import "DFStrandConstants.h"
 #import "UIColor+DFHelpers.h"
+#import <UIColor+BFPaperColors/UIColor+BFPaperColors.h>
 
 @implementation DFStrandConstants
 
@@ -120,16 +121,19 @@ static NSArray *colors;
 {
   if (!colors) {
     colors = @[
-               [self strandBlue],
-               [self strandGreen],
-               [self strandOrange],
-               [self strandRed],
-               [self strandSalmon],
-               [self strandYellow],
-               [UIColor purpleColor],
-               [UIColor brownColor],
-               [UIColor cyanColor],
-               [UIColor magentaColor],
+               [UIColor paperColorRed],
+               [UIColor paperColorPink],
+               [UIColor paperColorPurple],
+               [UIColor paperColorDeepPurple],
+               [UIColor paperColorIndigo],
+               [UIColor paperColorBlue],
+               [UIColor paperColorLightBlue],
+               [UIColor paperColorTeal],
+               [UIColor paperColorGreen],
+               [UIColor paperColorLightGreen],
+               [UIColor paperColorOrange800],
+               [UIColor paperColorBlueGray],
+               [UIColor paperColorBrown],
                ];
   }
   return colors;
