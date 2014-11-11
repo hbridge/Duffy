@@ -532,7 +532,7 @@ class CreateActionAPI(CreateAPIView):
                 msg = "%s just said %s about your photo" % (obj.user.display_name, obj.text)
                 logger.debug("going to send %s to user id %s" % (msg, obj.photo.user_id))
                 customPayload = {'strand_id': obj.strand_id, 'id': obj.photo_id}
-                notifications_util.sendNotification(obj.photo.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, customPayload)
+                notifications_util.sendNotification(obj.photo.user, msg, constants.NOTIFICATIONS_PHOTO_COMMENT, customPayload)
 
                 return super(CreateActionAPI, self).post(request)
             else:
