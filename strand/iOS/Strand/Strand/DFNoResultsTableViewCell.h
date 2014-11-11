@@ -11,4 +11,6 @@
 @interface DFNoResultsTableViewCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UILabel *noResultsLabel;
 
++ (CGFloat)desiredHeight;
+
 @end

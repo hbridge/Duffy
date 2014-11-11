@@ -12,6 +12,7 @@
 #import "DFPeanutActionAdapter.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFAnalytics.h"
+#import "DFNoResultsTableViewCell.h"
 
 @interface DFCommentViewController ()
 
@@ -58,6 +59,8 @@
   self.tableView.delegate = self;
   [tableView registerNib:[UINib nibForClass:[DFCommentTableViewCell class]]
   forCellReuseIdentifier:@"cell"];
+  [tableView registerNib:[UINib nibForClass:[DFNoResultsTableViewCell class]]
+  forCellReuseIdentifier:@"noResults"];
   self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.toolbar.frame.size.height * 2.0, 0);
   self.tableView.separatorInset = [DFCommentTableViewCell edgeInsets];
 }
@@ -108,7 +111,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return [[self comments] count];
+  return MAX([[self comments] count], 1);
 }
 
 - (NSArray *)comments
@@ -123,6 +126,11 @@
 {
   DFCommentTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   
+  if ([[self comments] count] == 0) {
+    DFNoResultsTableViewCell *noResults = [self.tableView dequeueReusableCellWithIdentifier:@"noResults"];
+    noResults.noResultsLabel.text = @"No Comments";
+    return noResults;
+  }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
   [cell.profilePhotoStackView setNames:@[comment.user_display_name]];
   cell.nameLabel.text = comment.user_display_name;
@@ -140,6 +148,9 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  if ([[self comments] count] == 0) {
+    return [DFNoResultsTableViewCell desiredHeight];
+  }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
   self.templateCell.commentLabel.text = comment.text;
   return self.templateCell.rowHeight;
