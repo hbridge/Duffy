@@ -416,6 +416,11 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)actionsList
 {
+  return [self actionsListFilterUser:nil];
+}
+
+- (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user
+{
   NSMutableArray *photos = [NSMutableArray new];
   
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
@@ -432,12 +437,15 @@ static DFPeanutFeedDataManager *defaultManager;
   
   NSMutableArray *actions = [NSMutableArray new];
   for (DFPeanutFeedObject *photo in photos) {
-    [actions addObjectsFromArray:[photo actions]];
+    for (DFPeanutAction *action in photo.actions) {
+      if (action.user == user.id) continue;
+      [actions addObject:action];
+    }
   }
   
   NSSortDescriptor* sortByDate = [NSSortDescriptor sortDescriptorWithKey:@"time_stamp" ascending:NO];
   [actions sortUsingDescriptors:[NSArray arrayWithObject:sortByDate]];
- 
+  
   return actions;
 }
 

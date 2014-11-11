@@ -47,7 +47,9 @@ static DFPeanutNotificationsManager *defaultManager;
 
 - (void)updateNotifications
 {
-  self.peanutActions = [[DFPeanutFeedDataManager sharedManager] actionsList];
+  DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
+  user.id = [[DFUser currentUser] userID];
+  self.peanutActions = [[DFPeanutFeedDataManager sharedManager] actionsListFilterUser:user];
   [[NSNotificationCenter defaultCenter]
    postNotificationName:DFStrandNotificationsUpdatedNotification
    object:self
