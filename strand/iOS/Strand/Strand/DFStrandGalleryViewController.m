@@ -299,9 +299,7 @@
   
   DFFeedViewController *photoFeedController = [[DFFeedViewController alloc] initWithFeedObject:self.strandPosts];
   [self.navigationController pushViewController:photoFeedController animated:YES];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    [photoFeedController showPhoto:photoID animated:NO];
-  });
+  photoFeedController.onViewScrollToPhotoId = photoID;
 }
 
 - (void)inviteButtonPressed:(id)sender

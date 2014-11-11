@@ -65,6 +65,10 @@
   return self.userInfo[@"id"];
 }
 
+- (NSNumber *)strandId
+{
+  return self.userInfo[@"strand_id"];
+}
 - (BOOL)isUpdateLocationRequest
 {
   if (!self.userInfo[@"fgps"]) return NO;
@@ -102,6 +106,8 @@ static NSArray *typeStrings = nil;
                     @"NOTIFICATIONS_SOCKET_REFRESH_FEED",
                     @"NOTIFICATIONS_INVITED_TO_STRAND",
                     @"NOTIFICATIONS_ACCEPTED_INVITE",
+                    @"NOTIFICATIONS_RETRO_FIRESTARTER",
+                    @"NOTIFICATIONS_PHOTO_COMMENT",
                     ];
   }
   

@@ -114,7 +114,7 @@ static int ImagePrefetchRange = 3;
 /*
  * This is the same code as in DFCreateStrandFlowViewController, might want to abstract if we do this more
  */
-+ (void)presentFeedObject:(DFPeanutFeedObject *)feedObject
++ (DFFeedViewController *)presentFeedObject:(DFPeanutFeedObject *)feedObject
   modallyInViewController:(UIViewController *)viewController
 {
   DFFeedViewController *feedViewController = [[DFFeedViewController alloc]
@@ -128,7 +128,7 @@ static int ImagePrefetchRange = 3;
   
   
   [viewController presentViewController:navController animated:YES completion:nil];
-
+  return feedViewController;
 }
 
 - (void)dismissWhenPresented
@@ -345,6 +345,12 @@ static int ImagePrefetchRange = 3;
                  self.class,
                  self.inviteObject,
                  self.inviteObject.ready);
+  }
+  
+  if (self.onViewScrollToPhotoId) {
+    DDLogVerbose(@"Scrolling to photo %llu", self.onViewScrollToPhotoId);
+    [self showPhoto:self.onViewScrollToPhotoId animated:NO];
+    self.onViewScrollToPhotoId = 0;
   }
 }
 
