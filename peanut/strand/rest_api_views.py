@@ -529,6 +529,11 @@ class CreateActionAPI(CreateAPIView):
 
             # if it's a comment, then allow multiple on the same photo
             if (obj.action_type == constants.ACTION_TYPE_COMMENT):
+                msg = "%s just said %s about your photo" % (obj.user.display_name, obj.text)
+                logger.debug("going to send %s to user id %s" % (msg, obj.photo.user_id))
+                customPayload = {'strand_id': obj.strand_id, 'id': obj.photo_id}
+                notifications_util.sendNotification(obj.photo.user, msg, constants.NOTIFICATIONS_ACCEPTED_INVITE, customPayload)
+
                 return super(CreateActionAPI, self).post(request)
             else:
                 results = Action.objects.filter(photo_id=obj.photo_id, strand_id=obj.strand_id, user_id=obj.user_id, action_type=obj.action_type)

@@ -68,6 +68,8 @@ def actionDataForApiSerializer(action):
 	actionData['user'] = action.user_id
 	actionData['time_stamp'] = action.added
 	actionData['action_type'] = action.action_type
+	actionData['strand'] = action.strand.id
+	actionData['photo'] = action.photo.id
 	actionData['text'] = action.text
 
 	# TODO(Derek): remove this once we don't need it
