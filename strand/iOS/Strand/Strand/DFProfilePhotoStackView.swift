@@ -30,6 +30,7 @@ import UIKit
 
   func setNameColors()
   {
+    self.fillColors = []
     for (i, name) in enumerate(names) {
       var numberForName = self.numberForName(name)
       var colorIndex = abs(numberForName % DFStrandConstants.profilePhotoStackColors().count)

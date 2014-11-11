@@ -8,6 +8,7 @@
 
 #import "DFColorPreviewController.h"
 #import "DFPersonSelectionTableViewCell.h"
+#import "Strand-Swift.h"
 
 @interface DFColorPreviewController ()
 
@@ -34,7 +35,7 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return 26;
+  return 29;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -42,6 +43,15 @@
   DFPersonSelectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   int value = (65 + (int)indexPath.row);
   NSString *name = [NSString stringWithFormat:@"%c", (char)value];
+  if (indexPath.row > 25) {
+    NSUInteger index = indexPath.row - 26;
+    name = @[@"Aseem", @"Derek", @"Henry"][index];
+    value = 0;
+    for (NSUInteger i = 0; i < name.length; i++) {
+      value += [name characterAtIndex:i];
+    }
+  }
+
   cell.profilePhotoStackView.names = @[name];
   cell.nameLabel.text = name;
   cell.subtitleLabel.text = [NSString stringWithFormat:@"Color: %d",
