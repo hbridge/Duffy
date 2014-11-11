@@ -531,7 +531,7 @@ class CreateActionAPI(CreateAPIView):
             if (obj.action_type == constants.ACTION_TYPE_COMMENT):
                 return super(CreateActionAPI, self).post(request)
             else:
-                results = Action.objects.filter(photo_id=obj.photo_id, user_id=obj.user_id, action_type=obj.action_type)
+                results = Action.objects.filter(photo_id=obj.photo_id, strand_id=obj.strand_id, user_id=obj.user_id, action_type=obj.action_type)
 
                 if len(results) > 0:
                     serializer = self.get_serializer(results[0])
