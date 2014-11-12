@@ -452,9 +452,6 @@ static int ImagePrefetchRange = 3;
                             atScrollPosition:UITableViewScrollPositionTop
                                     animated:animated];
       
-      // this tweak is gross but makes for less text from the last section overlapped under the header
-      self.tableView.contentOffset = CGPointMake(self.tableView.contentOffset.x,
-                                                 self.tableView.contentOffset.y + 10);
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         self.isViewTransitioning = NO;
       });
