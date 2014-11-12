@@ -3,6 +3,11 @@ from peanut.settings.base import *
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# Used to support utf8 4 byte encoding in mysql.  Don't ask
+# http://stackoverflow.com/questions/21517358/django-mysql-unknown-encoding-utf8mb4
+import codecs
+codecs.register(lambda name: codecs.lookup('utf8') if name == 'utf8mb4' else None)
+
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.contrib.gis.db.backends.mysql', 
