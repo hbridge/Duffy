@@ -92,10 +92,10 @@ class BasePhotoAPI(APIView):
         if "taken_with_strand" in photoData:
             photoData["taken_with_strand"] = int(photoData["taken_with_strand"])
 
-        if "time_taken" in photoData:
+        if "time_taken" in photoData and photoData["time_taken"]:
             photoData["time_taken"] = dateutil.parser.parse(photoData["time_taken"])
 
-        if "local_time_taken" in photoData:
+        if "local_time_taken" in photoData and photoData["local_time_taken"]:
             photoData["local_time_taken"] = dateutil.parser.parse(photoData["local_time_taken"])
 
         if "id" in photoData:
