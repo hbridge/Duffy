@@ -401,6 +401,14 @@ fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler
    fetchCompletionHandler:completionHandler];
 }
 
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url {
+  DDLogInfo(@"App handleOpenURL: %@", url);
+  [DFAnalytics logURLOpenedAppWithURL:url otherParams:nil];
+  
+  return YES;
+}
+
 - (void)backgroundCameraRollSyncFinished
 {
   if (self.backgroundSyncInProgress == YES) {

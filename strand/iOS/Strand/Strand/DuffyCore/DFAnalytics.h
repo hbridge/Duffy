@@ -90,6 +90,9 @@ disappearedWithParameters:(NSDictionary *)params;
 /* Contacts */
 + (void)logAddContactCompletedWithResult:(NSString *)result;
 
+/* external urls */
++ (void)logURLOpenedAppWithURL:(NSURL *)url
+                   otherParams:(NSDictionary *)otherParams;
 
 #pragma mark - Utilities
 

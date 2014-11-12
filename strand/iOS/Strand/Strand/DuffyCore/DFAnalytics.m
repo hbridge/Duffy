@@ -485,6 +485,19 @@ static DFAnalytics *defaultLogger;
   [self logEvent:@"AddManualContact" withParameters:@{ResultKey: result}];
 }
 
+
++ (void)logURLOpenedAppWithURL:(NSURL *)url
+                   otherParams:(NSDictionary *)otherParams
+{
+  NSMutableDictionary *params = [NSMutableDictionary new];
+  [params addEntriesFromDictionary:otherParams];
+  [params addEntriesFromDictionary:@{
+                                     @"urlScheme" : url.scheme,
+                                     @"urlHost" : url.host,
+                                     }];
+  [self logEvent:@"URLOpenedApp" withParameters:params];
+}
+
 #pragma mark - Bucket Value helpers
 
 + (NSString *)bucketStringForTimeInternval:(NSTimeInterval)timeInterval
