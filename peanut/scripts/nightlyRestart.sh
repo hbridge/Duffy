@@ -35,12 +35,6 @@ sleep 1
 
 sleep 5
 
-/sbin/initctl stop duffy-timezoner
-sleep 1
-/sbin/initctl start duffy-timezoner
-
-sleep 5
-
 /sbin/initctl stop duffy-strand-notifications
 sleep 1
 /sbin/initctl start duffy-strand-notifications
