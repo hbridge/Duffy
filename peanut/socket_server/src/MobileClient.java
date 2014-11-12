@@ -6,24 +6,32 @@
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.Date;
 import java.util.logging.Logger;
  
 public class MobileClient extends Thread {
     private Socket socket = null;
     private PrintWriter out = null;
+    private Date timeStarted;
     private Hashtable<Integer, MobileClient> clients = null;
-    private Logger logger = Logger.getLogger("SocketServerLog"); 
+    private Logger logger = Logger.getLogger("SocketServerLog");
+
  
     public MobileClient(Socket socket, Hashtable clients) {
         super("MobileClient");
         this.socket = socket;
         this.clients = (Hashtable<Integer,MobileClient>)clients;
+        this.timeStarted = new Date();
     }
     
     public void sendMessage(String msg){
         if (out != null) {
             out.println(msg + "\n");
         }
+    }
+
+    public Date getTimeStarted(){
+        return timeStarted;
     }
 
     public void run() {
