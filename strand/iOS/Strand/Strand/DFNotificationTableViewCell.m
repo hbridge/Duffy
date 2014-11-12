@@ -38,5 +38,11 @@
   return height;
 }
 
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  self.detailLabel.preferredMaxLayoutWidth = self.detailLabel.frame.size.width;
+}
+
 
 @end

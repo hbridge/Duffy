@@ -195,6 +195,16 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   
   self.imageViewHeightConstraint.constant =
     [self imageViewHeightForReferenceWidth:self.frame.size.width];
+  
+  if (self.commentsLabel.preferredMaxLayoutWidth != self.commentsLabel.frame.size.width) {
+    self.commentsLabel.preferredMaxLayoutWidth = self.commentsLabel.frame.size.width;
+    [self setNeedsLayout];
+  }
+  
+  if (self.likesLabel.preferredMaxLayoutWidth != self.likesLabel.frame.size.width) {
+    self.likesLabel.preferredMaxLayoutWidth = self.likesLabel.frame.size.width;
+    [self setNeedsLayout];
+  }
 }
 
 - (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
