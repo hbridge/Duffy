@@ -369,7 +369,7 @@ def main(argv):
 				for strand in strandsCreated:
 					for locationRecord in possibleLocationRecords:
 						if strands_util.userShouldBeNeighborToStrand(strand, locationRecord):
-							if (strand.id, locationRecord.user_id) not in idsCreated:
+							if (strand.id, locationRecord.user_id) not in idsCreated and strand.user_id != locationRecord.user_id:
 								idsCreated.append((strand.id, locationRecord.user_id))
 								strandNeighbors.append(StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user))
 
