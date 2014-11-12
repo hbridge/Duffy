@@ -97,7 +97,8 @@ static int ImagePrefetchRange = 3;
       }
       
       [self setStrandActionsEnabled:NO];
-    } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts] || [feedObject.type isEqual:DFFeedObjectSection]) {
+    } else if ([feedObject.type isEqual:DFFeedObjectStrandPosts]
+               || [feedObject.type isEqual:DFFeedObjectSection]) {
       self.inviteObject = nil;
       self.postsObject = feedObject;
 
@@ -105,6 +106,12 @@ static int ImagePrefetchRange = 3;
         [SVProgressHUD showWithStatus:@"Loading..."];
         [self reloadData];
       }
+    } else if ([feedObject.type isEqual:DFFeedObjectStrand]) {
+      self.inviteObject = nil;
+      DFPeanutFeedObject *postsObject = [feedObject copy];
+      postsObject.actors = feedObject.actors;
+      postsObject.objects = @[feedObject];
+      self.postsObject = postsObject;
     }
   }
   return self;

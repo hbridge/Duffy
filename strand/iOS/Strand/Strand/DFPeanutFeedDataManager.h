@@ -31,6 +31,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)publicStrands;
 - (NSArray *)inviteStrands;
 - (NSArray *)acceptedStrands;
+- (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
+                             feedObjectSortKey:(NSString *)sortKey
+                                     ascending:(BOOL)ascending;
 - (NSArray *)privateStrands;
 - (NSArray *)privatePhotos;
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;

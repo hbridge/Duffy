@@ -25,7 +25,7 @@
 @interface DFImageDataSource : NSObject <UICollectionViewDataSource>
 
 @property (nonatomic, weak) UICollectionView *collectionView;
-@property (nonatomic, weak) id<DFImageDataSourceDelegate> supplementaryViewDelegate;
+@property (nonatomic, weak) id<DFImageDataSourceDelegate> imageDataSourceDelegate;
 @property (nonatomic, retain) NSArray *collectionFeedObjects;
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedPhotos

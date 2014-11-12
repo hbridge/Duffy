@@ -56,8 +56,8 @@
     if (previousCount == 0 && _collectionFeedObjects.count > 0) {
       // this is the first data we've gotten, cache the bottom and send messages to delegate
       [self cacheImagesAroundSection:sectionArrays.count - 1];
-      if ([self.supplementaryViewDelegate respondsToSelector:@selector(didFinishFirstLoadForDatasource:)]) {
-        [self.supplementaryViewDelegate didFinishFirstLoadForDatasource:self];
+      if ([self.imageDataSourceDelegate respondsToSelector:@selector(didFinishFirstLoadForDatasource:)]) {
+        [self.imageDataSourceDelegate didFinishFirstLoadForDatasource:self];
       }
     }
   });
@@ -211,7 +211,7 @@ NSUInteger const SectionSpread = 5;
            viewForSupplementaryElementOfKind:(NSString *)kind
                                  atIndexPath:(NSIndexPath *)indexPath
 {
-  return [self.supplementaryViewDelegate collectionView:collectionView
+  return [self.imageDataSourceDelegate collectionView:collectionView
                       viewForSupplementaryElementOfKind:kind atIndexPath:indexPath];
 }
 
