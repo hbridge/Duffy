@@ -82,19 +82,8 @@
 {
   [super viewWillAppear:animated];
   if (self.isMovingToParentViewController) {
-    [self scrollToBottom];
+    [self.collectionView scrollToBottom];
   }
-}
-
-- (void)scrollToBottom
-{
-  dispatch_async(dispatch_get_main_queue(), ^{
-    NSIndexPath *ip = [self.collectionView indexPathForLastCell];
-    [self.collectionView scrollToItemAtIndexPath:ip
-                                atScrollPosition:UICollectionViewScrollPositionTop
-                                        animated:NO];
-    
-  });
 }
 
 - (void)viewDidLayoutSubviews
@@ -142,7 +131,7 @@
 
 - (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
 {
-  [self scrollToBottom];
+  [self.collectionView scrollToBottom];
 }
 
 #pragma mark - Actions
