@@ -1,6 +1,6 @@
 # Swap
 
-## Nov 11, 2014 (4789-4790)
+## Nov 11, 2014 (4789-4791)
 
 - Like/comment on photos!  Now you can respond to photos that people send you in the app!  Double-tap to like.
 - Notifications tab where you can see recent likes/comments on your photos

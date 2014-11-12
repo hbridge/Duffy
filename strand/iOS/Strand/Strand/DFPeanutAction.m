@@ -43,4 +43,13 @@
   return [[self dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]] description];
 }
 
+
+- (NSString *)displayNameOrYou
+{
+  if (self.user == [[DFUser currentUser] userID]) {
+    return @"You";
+  }
+  
+  return self.user_display_name;
+}
 @end

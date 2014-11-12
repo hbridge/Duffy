@@ -45,7 +45,8 @@ typedef UInt64 DFActionID;
 @property (nonatomic, retain) NSDate *time_stamp;
 
 + (NSArray *)simpleAttributeKeys;
-
 + (NSArray *)arrayOfLikerNamesFromActions:(NSArray *)actionArray;
+
+- (NSString *)displayNameOrYou;
 
 @end

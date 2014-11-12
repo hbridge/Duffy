@@ -119,7 +119,7 @@
   NSMutableString *slashFormat = [NSMutableString new];
   [slashFormat appendString:@"<feedText>"];
   for (DFPeanutAction *action in comments) {
-    [slashFormat appendFormat:@"<name>%@</name> %@", action.user_display_name, action.text];
+    [slashFormat appendFormat:@"<name>%@</name> %@", action.displayNameOrYou, action.text];
     if (action != comments.lastObject) [slashFormat appendString:@"\n"];
   }
   [slashFormat appendString:@"</feedText>"];
@@ -139,7 +139,7 @@
 {
   NSMutableString *slashFormat = [NSMutableString new];
   for (DFPeanutAction *action in likes) {
-    [slashFormat appendFormat:@"<name>%@</name>", action.user_display_name];
+    [slashFormat appendFormat:@"<name>%@</name>", action.displayNameOrYou];
     if (action != likes.lastObject) [slashFormat appendString:@", "];
   }
   
