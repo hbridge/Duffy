@@ -117,7 +117,9 @@ def turnFormattedGroupsIntoFeedObjects(formattedGroups, num):
 			
 		mostRecentPhotoDate = None
 		for cluster in group['clusters']:
-			if len(cluster) == 1:
+			if len(cluster) == 0:
+				continue
+			elif len(cluster) == 1:
 				photoData = getPhotoObject(cluster[0])
 				feedObject['objects'].append(photoData)
 
