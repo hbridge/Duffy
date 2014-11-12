@@ -33,5 +33,6 @@
 
 - (NSDictionary *)requestParameters;
 - (void)setLocation:(CLLocation *)location;
+- (NSString *)displayName;
 
 @end

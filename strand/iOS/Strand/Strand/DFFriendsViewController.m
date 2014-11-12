@@ -290,8 +290,8 @@ static BOOL showContactsUpsell = NO;
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
   NSArray *unseenPrivateStrands = [self unseenPrivateStrandIDsForUser:peanutUser];
   
-  cell.profilePhotoStackView.names = @[peanutUser.display_name];
-  cell.nameLabel.text = peanutUser.display_name;
+  cell.profilePhotoStackView.names = @[[peanutUser displayName]];
+  cell.nameLabel.text = [peanutUser displayName];
   int newUnswappedCount = (int)[unseenPrivateStrands count];
   if (newUnswappedCount > 0) {
     cell.rightLabel.text = [NSString stringWithFormat:@"%d new", (int)unseenPrivateStrands.count];
