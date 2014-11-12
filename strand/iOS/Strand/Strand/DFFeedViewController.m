@@ -562,12 +562,11 @@ static int ImagePrefetchRange = 3;
     }];
   }
   
-  if ([photoIDs isEqualToArray:photoFeedCell.objects]) {
-    // if the objects on the cell were the same as previous, no need to do further work
-    // this helps reduce flashing
-    return photoFeedCell;
+  if (![photoIDs isEqualToArray:photoFeedCell.objects]) {
+    // if the objects on the cell were the same as previous, no need to reset the objects
+    // which will cause it to clear the images and flicker
+    [photoFeedCell setObjects:photoIDs];
   }
-  [photoFeedCell setObjects:photoIDs];
   if (photoIDs.count > 0) {
     for (NSNumber *photoID in photoIDs) {
       [[DFImageManager sharedManager]
