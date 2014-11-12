@@ -11,6 +11,7 @@ DATABASES = {
 		'PASSWORD': 'djangopass',
 		'HOST': 'ec2-54-88-151-106.compute-1.amazonaws.com',   # Or an IP Address that your DB is hosted on
 		'PORT': '3306',
+		'OPTIONS': {'charset': 'utf8mb4'},
 	}
 }
 
