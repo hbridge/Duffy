@@ -184,7 +184,8 @@ static NSArray *FeedObjectTypes;
   DFPeanutFeedObject *newObject = [[DFPeanutFeedObject allocWithZone:zone] init];
   newObject.id = self.id;
   newObject.title = [self.title copyWithZone:zone];
-  newObject.subtitle = [self.title copyWithZone:zone];
+  newObject.subtitle = [self.subtitle copyWithZone:zone];
+  newObject.location = [self.location copyWithZone:zone];
   newObject.thumb_image_path = [self.thumb_image_path copyWithZone:zone];
   newObject.full_image_path = [self.full_image_path copyWithZone:zone];
   newObject.time_taken = [self.time_taken copyWithZone:zone];
@@ -335,5 +336,16 @@ static NSArray *FeedObjectTypes;
   return result;
 }
 
+- (DFPeanutUserObject *)actorWithID:(DFUserIDType)userID
+{
+  DFPeanutFeedObject *photoObject = self;
+  if ([self.type isEqual:DFFeedObjectCluster]) {
+    photoObject = [[self leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+  }
+  for (DFPeanutUserObject *user in photoObject.actors) {
+    if (user.id == userID) return user;
+  }
+  return nil;
+}
 
 @end

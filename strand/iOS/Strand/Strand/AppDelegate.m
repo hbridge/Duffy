@@ -44,6 +44,7 @@
 #import "DFImageDiskCache.h"
 #import "DFSwapViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFGalleryViewController.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 
@@ -268,13 +269,14 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
   [DFPhotoStore sharedStore];
   
-  self.inboxViewController = [[DFInboxViewController alloc] init];
+  //self.inboxViewController = [[DFInboxViewController alloc] init];
+  DFGalleryViewController *gallery = [[DFGalleryViewController alloc] init];
   DFSwapViewController *swapViewController = [[DFSwapViewController alloc] init];
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
-  @[[[DFNavigationController alloc] initWithRootViewController:self.inboxViewController],
+  @[[[DFNavigationController alloc] initWithRootViewController:gallery],
     [[DFNavigationController alloc] initWithRootViewController:swapViewController],
         [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
     [[DFNavigationController alloc] initWithRootViewController:friendsViewController],

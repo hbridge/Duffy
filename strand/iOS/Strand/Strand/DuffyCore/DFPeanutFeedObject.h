@@ -11,6 +11,7 @@
 #import "DFJSONConvertible.h"
 #import "DFPhoto.h"
 #import "DFPeanutAction.h"
+#import "DFPeanutUserObject.h"
 
 @interface DFPeanutFeedObject : NSObject<DFPeanutObject, DFJSONConvertible, NSCopying>
 
@@ -84,5 +85,6 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 - (NSString *)placeAndRelativeTimeString;
 
 + (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects;
+- (DFPeanutUserObject *)actorWithID:(DFUserIDType)userID;
 
 @end

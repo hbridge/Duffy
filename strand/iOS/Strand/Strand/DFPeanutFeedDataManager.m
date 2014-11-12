@@ -340,8 +340,33 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)acceptedStrands
 {
+  return [self acceptedStrandsWithPostsCollapsed:NO
+                               feedObjectSortKey:@"time_stamp"
+                                       ascending:NO];
+}
+
+- (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
+                             feedObjectSortKey:(NSString *)sortKey
+                                     ascending:(BOOL)ascending
+{
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectStrandPosts];
-  return [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
+  NSArray *postsObjects = [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
+  if (!collapsed)return postsObjects;
+  
+  NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sortKey ascending:ascending];
+  NSMutableArray *collapsedResult = [NSMutableArray new];
+  for (DFPeanutFeedObject *strandPosts in postsObjects) {
+    DFPeanutFeedObject *collapsedObj = [strandPosts copy];
+    collapsedObj.type = DFFeedObjectStrand;
+    collapsedObj.actors = [strandPosts.actors copy];
+    NSMutableArray *collapsedSubObjects = [NSMutableArray new];
+    for (DFPeanutFeedObject *strandPost in strandPosts.objects) {
+      [collapsedSubObjects addObjectsFromArray:strandPost.objects];
+    }
+    collapsedObj.objects = [collapsedSubObjects sortedArrayUsingDescriptors:@[sortDescriptor]];
+    [collapsedResult addObject:collapsedObj];
+  }
+  return [collapsedResult sortedArrayUsingDescriptors:@[sortDescriptor]];
 }
 
 - (NSArray *)privateStrands

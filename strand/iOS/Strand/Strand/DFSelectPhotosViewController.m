@@ -140,7 +140,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   self.selectPhotosController = [[DFSelectPhotosController alloc]
                                  initWithCollectionFeedObjects:self.collectionFeedObjects
                                  collectionView:self.collectionView];
-  self.selectPhotosController.supplementaryViewDelegate = self;
+  self.selectPhotosController.imageDataSourceDelegate = self;
   self.selectPhotosController.delegate = self;
 }
 

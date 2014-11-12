@@ -71,9 +71,9 @@ import UIKit
       profilePhotoWidth,
       profilePhotoWidth)
     if index > 0 {
-      rect.origin.x += 2
+      rect.origin.x = rect.origin.x + (CGFloat(index) * 2.0)
     }
-
+    
     return rect
   }
   
