@@ -64,7 +64,6 @@ extern DFFeedObjectType DFFeedObjectSwapSuggestion;
 - (NSEnumerator *)enumeratorOfDescendents;
 
 - (BOOL)isLockedSection;
-- (NSArray *)actorAbbreviations;
 - (NSArray *)actorNames;
 
 /* 

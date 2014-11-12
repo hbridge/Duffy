@@ -134,7 +134,7 @@
 {
   NSString *markup =
   [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@ ago</gray>",
-   action.user_display_name,
+   [action firstNameOrYou],
    action.action_type == DFPeanutActionFavorite ? @"liked a photo." : @"commented: ",
    action.action_type == DFPeanutActionComment ? [action.text stringByEscapingCharsInString:@"<>"] : @"",
    [NSDateFormatter relativeTimeStringSinceDate:action.time_stamp abbreviate:YES]
@@ -157,7 +157,7 @@
   DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
   
   // set cell basic data
-  cell.profilePhotoStackView.names = @[action.user_display_name];
+  cell.profilePhotoStackView.names = @[[action firstName]];
   cell.detailLabel.attributedText = [self attributedStringForAction:action];
   
   //set the preview image

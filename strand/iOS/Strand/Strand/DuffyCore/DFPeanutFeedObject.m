@@ -211,26 +211,12 @@ static NSArray *FeedObjectTypes;
   return (NSUInteger)self.id;
 }
 
-- (NSArray *)actorAbbreviations
-{
-  NSMutableArray *abbreviations = [NSMutableArray new];
-  for (DFPeanutUserObject *actor in self.actors) {
-    if ([actor.display_name isNotEmpty]) {
-      NSString *abbreviation = [[actor.display_name substringToIndex:1] uppercaseString];
-      if ([abbreviations indexOfObject:abbreviation] == NSNotFound) {
-        [abbreviations addObject:abbreviation];
-      }
-    }
-  }
-  return abbreviations;
-}
-
 - (NSArray *)actorNames
 {
   NSMutableOrderedSet *names = [NSMutableOrderedSet new];
   for (DFPeanutUserObject *actor in self.actors) {
-    if ([actor.display_name isNotEmpty]) {
-      [names addObject:actor.display_name];
+    if ([[actor firstName] isNotEmpty]) {
+      [names addObject:[actor firstName]];
     }
   }
   return names.array;
@@ -251,11 +237,11 @@ static NSArray *FeedObjectTypes;
   for (NSUInteger i = 0; i < self.actors.count; i++) {
     DFPeanutUserObject *actor = self.actors[i];
     if (actor.invited.boolValue != invited) continue;
-    if (![actor.display_name isNotEmpty]) {
+    if (![[actor firstName] isNotEmpty]) {
       numUnnamed++;
     } else if (actor.id != [[DFUser currentUser] userID]) {
       if (actorsText.length > 0) [actorsText appendString:@", "];
-      [actorsText appendString:[actor display_name]];
+      [actorsText appendString:[actor firstName]];
       numOtherMembers++;
     } else {
       includeYou = true;

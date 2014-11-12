@@ -20,7 +20,7 @@
 
 + (NSArray *)simpleAttributeKeys
 {
-  return @[@"id", @"action_type", @"photo", @"user", @"strand", @"user_display_name", @"text", @"time_stamp"];
+  return @[@"id", @"action_type", @"photo", @"user", @"strand", @"user_display_name", @"user_phone_number", @"text", @"time_stamp"];
 }
 
 + (NSArray *)arrayOfLikerNamesFromActions:(NSArray *)actionArray
@@ -28,11 +28,7 @@
   NSMutableArray *result = [[NSMutableArray alloc] init];
   for (DFPeanutAction *action in actionArray) {
     if (action.action_type == DFPeanutActionFavorite) {
-      if (action.user == [[DFUser currentUser] userID]) {
-        [result addObject:@"You"];
-      } else {
-        [result addObject:action.user_display_name];
-      }
+      [result addObject:[action firstNameOrYou]];
     }
   }
   return result;
@@ -43,13 +39,44 @@
   return [[self dictionaryWithValuesForKeys:[DFPeanutAction simpleAttributeKeys]] description];
 }
 
+- (NSString *)firstName
+{
+  if (self.user == [[DFUser currentUser] userID]) {
+    return  [[DFUser currentUser] displayName];
+  } else {
+    return [self firstNameOrYou];
+  }
+}
 
-- (NSString *)displayNameOrYou
+- (NSString *)firstNameOrYou
 {
   if (self.user == [[DFUser currentUser] userID]) {
     return @"You";
   }
   
-  return self.user_display_name;
+  return [[[self fullName] componentsSeparatedByString:@" "] firstObject];
+}
+
+- (NSString *)fullNameOrYou
+{
+  if (self.user == [[DFUser currentUser] userID]) {
+    return @"You";
+  }
+  
+  NSString *localName = [DFPeanutUserObject localNameFromPhoneNumber:self.user_phone_number];
+  if (localName) {
+    return localName;
+  } else {
+    return self.user_display_name;
+  }
+}
+
+- (NSString *)fullName
+{
+  if (self.user == [[DFUser currentUser] userID]) {
+    return  [[DFUser currentUser] displayName];
+  } else {
+    return [self fullNameOrYou];
+  }
 }
 @end

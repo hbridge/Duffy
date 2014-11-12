@@ -321,6 +321,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFImageDownloadManager sharedManager] fetchNewImages];
       [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];
       [[DFBackgroundLocationManager sharedManager] startUpdatingOnSignificantLocationChange];
+      // Clearing out our phone number to name cache incase the contact list changed
+      [DFPeanutUserObject clearCaches];
       
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName

@@ -35,7 +35,7 @@ DFPeanutContactType DFPeanutContactInvited = @"invited";
     if (user.id) {
       self.user = @(user.id);
     }
-    self.name = [user displayName];
+    self.name = [user fullName];
     self.phone_number = user.phone_number;
   }
   return self;

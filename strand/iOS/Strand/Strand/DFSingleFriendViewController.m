@@ -113,7 +113,7 @@ NSString *const PrivatePhotosCellId = @"privatePhotosCell";
 
 - (void)configureNavBar
 {
-  self.navigationItem.title = self.userToView.display_name;
+  self.navigationItem.title = [self.userToView fullName];
 }
 
 #pragma mark - Table view data source

@@ -50,9 +50,9 @@
                              publicStrandsWithUser:self.peanutUser includeInvites:NO];
   NSArray *unswappedStrands = [[DFPeanutFeedDataManager sharedManager]
                                privateStrandsWithUser:self.peanutUser];
-  self.profilePhotoStackView.names = @[self.peanutUser.display_name];
+  self.profilePhotoStackView.names = @[[self.peanutUser fullName]];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
-  self.nameLabel.text = self.peanutUser.display_name;
+  self.nameLabel.text = [self.peanutUser fullName];
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
                              (int)swappedStrands.count];
   [self.tabSegmentedControl setTitle:[NSString stringWithFormat:@"Suggestions (%d)",

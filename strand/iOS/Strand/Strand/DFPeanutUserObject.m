@@ -13,7 +13,6 @@
 
 @implementation DFPeanutUserObject
 
-// We want the upload controller to be a singleton
 static RHAddressBook *defaultAddressBook;
 + (RHAddressBook *)sharedAddressBook {
   if (!defaultAddressBook) {
@@ -22,6 +21,27 @@ static RHAddressBook *defaultAddressBook;
   return defaultAddressBook;
 }
 
+static NSMutableDictionary *defaultPhoneNumberToNameCache;
++ (NSMutableDictionary *)phoneNumberToNameCache {
+  if (!defaultPhoneNumberToNameCache) {
+    defaultPhoneNumberToNameCache = [[NSMutableDictionary alloc] init];
+  }
+  return defaultPhoneNumberToNameCache;
+}
+
+static NSArray *defaultPeopleList;
++ (NSArray *)sharedPeopleList {
+  if (!defaultPeopleList) {
+    defaultPeopleList = [[DFPeanutUserObject sharedAddressBook] people];
+  }
+  return defaultPeopleList;
+}
+
++ (void)clearCaches
+{
+  [[DFPeanutUserObject phoneNumberToNameCache] removeAllObjects];
+  defaultPeopleList = nil;
+}
 
 + (RKObjectMapping *)objectMapping
 {
@@ -79,9 +99,17 @@ static RHAddressBook *defaultAddressBook;
   return NO;
 }
 
-- (NSString *)displayName
+/*
+ * Code to get local names from phone numbers.
+ * This code is pretty general and could be pulled out to somewhere else, just here for simplicity
+ */
++ (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber
 {
-  NSArray *people = [[DFPeanutUserObject sharedAddressBook] peopleWithName:self.display_name];
+  if ([[DFPeanutUserObject phoneNumberToNameCache] objectForKey:phoneNumber]) {
+    return [[DFPeanutUserObject phoneNumberToNameCache] objectForKey:phoneNumber];
+  }
+  
+  NSArray *people = [DFPeanutUserObject sharedPeopleList];
   
   for (RHPerson *person in people) {
     RHMultiStringValue *phoneMultiValue = [person phoneNumbers];
@@ -95,13 +123,29 @@ static RHAddressBook *defaultAddressBook;
       }
       phoneNum = [NSString stringWithFormat:@"+%@", phoneNum];
       
-      if ([phoneNum isEqualToString:self.phone_number]) {
+      if ([phoneNum isEqualToString:phoneNumber]) {
+        [[DFPeanutUserObject phoneNumberToNameCache] setObject:[person name] forKey:phoneNumber];
         return [person name];
       }
     }
   }
+  return nil;
+}
+
+- (NSString *)firstName
+{
+  return [[[self fullName] componentsSeparatedByString:@" "] firstObject];
+}
+
+- (NSString *)fullName
+{
+  NSString *localName = [DFPeanutUserObject localNameFromPhoneNumber:self.phone_number];
   
-  return self.display_name;
+  if (localName) {
+    return localName;
+  } else {
+    return self.display_name;
+  }
 }
 
 - (NSUInteger)hash

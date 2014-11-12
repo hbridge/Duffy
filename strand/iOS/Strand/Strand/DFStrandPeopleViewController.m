@@ -118,8 +118,8 @@
   [cell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser
    | DFPersonSelectionTableViewCellStyleRightLabel];
   
-  cell.nameLabel.text = user.display_name;
-  cell.profilePhotoStackView.names = @[user.display_name];
+  cell.nameLabel.text = [user fullName];
+  cell.profilePhotoStackView.names = @[[user fullName]];
   cell.rightLabel.text = user.invited.boolValue ? @"Swap Requested" : @"Joined";
   
   return cell;
@@ -130,7 +130,7 @@
   DFPersonSelectionTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
   [cell configureWithCellStyle: DFPersonSelectionTableViewCellStyleRightLabel | DFPersonSelectionTableViewCellStyleSubtitle];
   
-  cell.nameLabel.text = user.display_name;
+  cell.nameLabel.text = [user fullName];
   cell.subtitleLabel.text = user.phone_number;
   cell.rightLabel.text = @"Swap Requested";
   

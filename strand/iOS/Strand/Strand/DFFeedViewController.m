@@ -838,7 +838,6 @@ static int ImagePrefetchRange = 3;
     newAction.action_type = DFPeanutActionFavorite;
     newAction.photo = photoID;
     newAction.strand = self.postsObject.id;
-    newAction.user_display_name = [[DFUser currentUser] displayName];
   } else {
     newAction = nil;
   }

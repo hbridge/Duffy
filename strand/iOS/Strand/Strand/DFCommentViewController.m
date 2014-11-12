@@ -132,8 +132,8 @@
     return noResults;
   }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
-  [cell.profilePhotoStackView setNames:@[comment.user_display_name]];
-  cell.nameLabel.text = comment.user_display_name;
+  [cell.profilePhotoStackView setNames:@[[comment fullName]]];
+  cell.nameLabel.text = [comment fullNameOrYou];
   cell.commentLabel.text = comment.text;
   cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:comment.time_stamp
                                                                abbreviate:YES];
@@ -168,8 +168,7 @@
   action.text = self.textField.text;
   action.photo = self.photoObject.id;
   action.strand = self.postsObject.id;
-  action.time_stamp = [NSDate date]; 
-  action.user_display_name = [[DFUser currentUser] displayName];
+  action.time_stamp = [NSDate date];
   
   [self addComment:action];
   self.textField.text = @"";

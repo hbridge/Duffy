@@ -33,6 +33,9 @@
 
 - (NSDictionary *)requestParameters;
 - (void)setLocation:(CLLocation *)location;
-- (NSString *)displayName;
+- (NSString *)fullName;
+- (NSString *)firstName;
 
++ (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber;
++ (void)clearCaches;
 @end
