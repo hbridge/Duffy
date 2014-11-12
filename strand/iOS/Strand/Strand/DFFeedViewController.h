@@ -20,6 +20,7 @@
 DFPhotoFeedCellDelegate, DFFeedSectionHeaderViewDelegate, DFSelectPhotosViewControllerDelegate>
 
 @property (nonatomic) DFPhotoIDType onViewScrollToPhotoId;
+@property (nonatomic) BOOL showPersonPerPhoto;
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 - (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject;

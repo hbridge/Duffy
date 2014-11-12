@@ -482,6 +482,7 @@ static int ImagePrefetchRange = 3;
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section
 {
+  if (self.showPersonPerPhoto) return nil;
   DFFeedSectionHeaderView *headerView =
   [self.tableView dequeueReusableHeaderFooterViewWithIdentifier:@"sectionHeader"];
  
@@ -498,8 +499,8 @@ static int ImagePrefetchRange = 3;
 
 - (CGFloat)tableView:(UITableView *)tableView heightForHeaderInSection:(NSInteger)section
 {
+  if (self.showPersonPerPhoto) return 0;
   return SectionHeaderHeight;
-
 }
 
 
@@ -557,6 +558,8 @@ static int ImagePrefetchRange = 3;
                                     forIndexPath:indexPath];
   [photoFeedCell configureWithStyle:style aspect:aspect];
   photoFeedCell.delegate = self;
+  
+  [photoFeedCell setAuthor:[self.postsObject actorWithID:feedObject.user]];
   [photoFeedCell setComments:[feedObject actionsOfType:DFPeanutActionComment forUser:0]];
   [photoFeedCell setLikes:[feedObject actionsOfType:DFPeanutActionFavorite forUser:0]];
   
@@ -671,6 +674,10 @@ static int ImagePrefetchRange = 3;
   }
   if ([[photoObject actionsOfType:DFPeanutActionFavorite forUser:0] count] > 0) {
     style |= DFPhotoFeedCellStyleHasLikes;
+  }
+  
+  if (self.showPersonPerPhoto) {
+    style |= DFPhotoFeedCellStyleShowAuthor;
   }
   
   return style;

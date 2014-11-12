@@ -38,6 +38,7 @@
 
 - (void)configureView
 {
+  self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.imageView.contentMode = UIViewContentModeScaleAspectFill;
   self.favoritersButton.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
   [self.favoritersButton setTitleColor:[DFStrandConstants weakFeedForegroundTextColor]
@@ -68,6 +69,11 @@
   if (!(style & DFPhotoFeedCellStyleHasComments)) {
     [self.commentsLabel removeFromSuperview];
     [self.commentsIconImageView removeFromSuperview];
+  }
+  
+  if (!(style & DFPhotoFeedCellStyleShowAuthor)) {
+    [self.profilePhotoStackView removeFromSuperview];
+    [self.nameLabel removeFromSuperview];
   }
 }
 
@@ -111,6 +117,17 @@
   } else {
     [self.loadingActivityIndicator stopAnimating];
     self.photoImageView.alpha = 1.0;
+  }
+}
+
+- (void)setAuthor:(DFPeanutUserObject *)author
+{
+  if (author) {
+    self.nameLabel.text = author.display_name;
+    self.profilePhotoStackView.names = @[author.display_name];
+  } else {
+    self.nameLabel.text = @"";
+    self.profilePhotoStackView.names = @[];
   }
 }
 

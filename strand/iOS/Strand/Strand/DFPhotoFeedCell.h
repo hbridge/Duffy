@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "DFCollectionViewTableViewCell.h"
+#import "DFProfileStackView.h"
+#import "DFPeanutUserObject.h"
 
 @class DFPhotoFeedCell;
 
@@ -25,6 +27,8 @@
 @interface DFPhotoFeedCell : DFCollectionViewTableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
 
 // Views
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (strong, nonatomic) IBOutlet UIButton *favoritersButton;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingActivityIndicator;
 @property (weak, nonatomic) IBOutlet UIButton *favoriteButton;
@@ -46,9 +50,10 @@
 
 typedef NS_OPTIONS(NSInteger, DFPhotoFeedCellStyle) {
   DFPhotoFeedCellStyleNone =              0,
-  DFPhotoFeedCellStyleCollectionVisible = 1 << 1,
-  DFPhotoFeedCellStyleHasLikes    =       1 << 2,
-  DFPhotoFeedCellStyleHasComments =       1 << 3,
+  DFPhotoFeedCellStyleShowAuthor =        1 << 1,
+  DFPhotoFeedCellStyleCollectionVisible = 1 << 2,
+  DFPhotoFeedCellStyleHasLikes    =       1 << 3,
+  DFPhotoFeedCellStyleHasComments =       1 << 4,
 };
 
 typedef NS_ENUM(NSInteger, DFPhotoFeedCellAspect) {
@@ -59,6 +64,7 @@ typedef NS_ENUM(NSInteger, DFPhotoFeedCellAspect) {
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect)aspect;
 + (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect) aspect;
+- (void)setAuthor:(DFPeanutUserObject *)author;
 - (void)setComments:(NSArray *)comments;
 - (void)setLikes:(NSArray *)likes;
 

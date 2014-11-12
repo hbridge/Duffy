@@ -128,6 +128,7 @@
 		5A9BC32819A3E299002D1CD7 /* DFPushNotificationsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9BC32719A3E299002D1CD7 /* DFPushNotificationsManager.m */; };
 		5A9E9CFB19D5BE85007328AD /* DFStrandGalleryViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9E9CF919D5BE85007328AD /* DFStrandGalleryViewController.m */; };
 		5A9E9CFC19D5BE85007328AD /* DFStrandGalleryViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A9E9CFA19D5BE85007328AD /* DFStrandGalleryViewController.xib */; };
+		5A9F792D1A14168C00875E38 /* DFProfileStackView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9F792C1A14168C00875E38 /* DFProfileStackView.m */; };
 		5AA36F0219F6ED1B008B37AA /* UIColor+DFHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA36F0119F6ED1B008B37AA /* UIColor+DFHelpers.m */; };
 		5AA36F0519F704E7008B37AA /* DFStrandPeopleBarView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AA36F0419F704E7008B37AA /* DFStrandPeopleBarView.m */; };
 		5AA36F0719F704FB008B37AA /* DFStrandPeopleBarView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AA36F0619F704FB008B37AA /* DFStrandPeopleBarView.xib */; };
@@ -485,6 +486,8 @@
 		5A9E9CF819D5BE85007328AD /* DFStrandGalleryViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandGalleryViewController.h; sourceTree = "<group>"; };
 		5A9E9CF919D5BE85007328AD /* DFStrandGalleryViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandGalleryViewController.m; sourceTree = "<group>"; };
 		5A9E9CFA19D5BE85007328AD /* DFStrandGalleryViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFStrandGalleryViewController.xib; sourceTree = "<group>"; };
+		5A9F792B1A14168C00875E38 /* DFProfileStackView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFProfileStackView.h; sourceTree = "<group>"; };
+		5A9F792C1A14168C00875E38 /* DFProfileStackView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFProfileStackView.m; sourceTree = "<group>"; };
 		5AA36F0019F6ED1B008B37AA /* UIColor+DFHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+DFHelpers.h"; sourceTree = "<group>"; };
 		5AA36F0119F6ED1B008B37AA /* UIColor+DFHelpers.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+DFHelpers.m"; sourceTree = "<group>"; };
 		5AA36F0319F704E7008B37AA /* DFStrandPeopleBarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandPeopleBarView.h; sourceTree = "<group>"; };
@@ -790,6 +793,8 @@
 				5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */,
 				5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */,
 				5A113B1119C0F647004CA85B /* DFProfilePhotoStackView.swift */,
+				5A9F792B1A14168C00875E38 /* DFProfileStackView.h */,
+				5A9F792C1A14168C00875E38 /* DFProfileStackView.m */,
 				5A4C820C19EDC11800C22A12 /* DFActionButton.h */,
 				5A4C820D19EDC11800C22A12 /* DFActionButton.m */,
 				5A83A3DC19F046390068F08B /* DFNoTableItemsView.h */,
@@ -1981,6 +1986,7 @@
 				5A6E8B6E19CA323500870423 /* DFSMSInviteStrandComposeViewController.m in Sources */,
 				5A3172D2196C84E400CA7693 /* DFSettingsViewController.m in Sources */,
 				651E9A86199D170800678D16 /* DFPeanutNotification.m in Sources */,
+				5A9F792D1A14168C00875E38 /* DFProfileStackView.m in Sources */,
 				5AC4A9231947C30800862D9C /* DFCGRectHelpers.m in Sources */,
 				5AED01DD19E34722001F075D /* DFImageDataSource.m in Sources */,
 				5A14A3A9198C2B4600A4F032 /* DFUserInfoManager.m in Sources */,

@@ -154,6 +154,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath] leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   DFFeedViewController *fvc = [[DFFeedViewController alloc] initWithFeedObject:strandObject];
   fvc.onViewScrollToPhotoId = photo.id;
+  fvc.showPersonPerPhoto = YES;
   [self.navigationController pushViewController:fvc animated:YES];
 }
 
