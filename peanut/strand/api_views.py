@@ -100,7 +100,6 @@ def getStrandNeighborsCache(strands, friends, withUsers = False):
 				if strandNeighbor.strand_1 not in neighborStrandsByStrandId[strand.id]:
 					neighborStrandsByStrandId[strand.id].append(strandNeighbor.strand_1)
 
-	print neighborUsersByStrandId
 	return (neighborStrandsByStrandId, neighborUsersByStrandId)
 
 """
@@ -311,7 +310,10 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
-
+			
+			if strand.id in neighborUsersByStrandId:
+				interestedUsers.extend(neighborUsersByStrandId[strand.id])
+				
 		interestedUsers = list(set(interestedUsers))
 
 		if len(interestedUsers) > 0:
