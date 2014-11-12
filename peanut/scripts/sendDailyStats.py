@@ -43,12 +43,14 @@ def compileStats(date, length):
 		Swaps Joined:
 		Photos Added:
 		Favorites:
+		Comments:
 
 		--- ACTIONS (NEW USERS) ---
 		Swaps Created: 
 		Swaps Joined:
 		Photos Added:
 		Favorites:
+		Comments:
 
 	'''
 
@@ -105,7 +107,10 @@ def compilePhotosStats(date, length=1, newUsers=None):
 	msg += "Photos Uploaded: " + format(newPhotosUploaded, ",d") + "\n"
 
 	newPhotosShared = Action.objects.prefetch_related('photos').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))
-	msg += "Photos Shared: " + format(newPhotosShared['totalPhotos__sum'], ",d") + "\n"
+	if (newPhotosShared['totalPhotos__sum'] != None):
+		msg += "Photos Shared: " + format(newPhotosShared['totalPhotos__sum'], ",d") + "\n"
+	else:
+		msg += "Photos Shared: 0\n"
 
 
 	return msg
@@ -114,7 +119,7 @@ def compileActionStats(date, length=1, newUsers=None):
 
 	msg = "\n--- ACTIONS (OLD USERS) ---\n"
 
-	actionTypeCounts = Action.objects.values('action_type').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).exclude(user__in=newUsers).annotate(totals=Sum('action_type'))
+	actionTypeCounts = Action.objects.values('action_type').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).exclude(user__in=newUsers).annotate(totals=Count('action_type'))
 
 	for entry in actionTypeCounts:
 		if (entry['action_type'] == constants.ACTION_TYPE_CREATE_STRAND):
@@ -124,11 +129,16 @@ def compileActionStats(date, length=1, newUsers=None):
 		elif (entry['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
 			msg += "Photos Added: " + str(entry['totals']) + '\n'	
 		elif (entry['action_type'] == constants.ACTION_TYPE_FAVORITE):
-			msg += "Favorites: " + str(entry['totals']) + '\n'	
+			msg += "Favorites: " + str(entry['totals']) + '\n'
+		elif (entry['action_type'] == constants.ACTION_TYPE_COMMENT):
+			msg += "Comments: " + str(entry['totals']) + '\n'
+		else:
+			msg += "Other: " + str(entry['totals'])	
 
 	msg += "\n--- ACTIONS (NEW USERS) ---\n"
 
-	actionTypeCounts = Action.objects.values('action_type').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Sum('action_type'))
+	actionTypeCounts = Action.objects.values('action_type').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Count('action_type'))
+	print actionTypeCounts.query
 
 	for entry in actionTypeCounts:
 		if (entry['action_type'] == constants.ACTION_TYPE_CREATE_STRAND):
@@ -138,8 +148,11 @@ def compileActionStats(date, length=1, newUsers=None):
 		elif (entry['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
 			msg += "Photos Added: " + str(entry['totals']) + '\n'	
 		elif (entry['action_type'] == constants.ACTION_TYPE_FAVORITE):
-			msg += "Favorites: " + str(entry['totals']) + '\n'	
-
+			msg += "Favorites: " + str(entry['totals']) + '\n'
+		elif (entry['action_type'] == constants.ACTION_TYPE_COMMENT):
+			msg += "Comments: " + str(entry['totals']) + '\n'
+		else:
+			msg += "Other: " + str(entry['totals'])
 	return msg
 
 
@@ -158,13 +171,14 @@ def main(argv):
 
 	print emailBody
 
-	if (len(argv) > 0 and argv[0]=='send'):
+	if (len(argv) > 0 and argv[0]=='sendnow'):
 		email = EmailMessage(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
 			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
 		email.send(fail_silently=False)
 		print 'Email Sent to: ' + ' '.join(emailTo)
 	else:
 		print 'TEST RUN: EMAIL NOT SENT'
+		print "Use 'python scripts/sendDailyStats.py sendnow' to send for real!\n"
 
 		
 		
