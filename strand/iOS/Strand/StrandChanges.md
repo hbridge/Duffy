@@ -1,5 +1,9 @@
 # Swap
 
+## Nov 12, 2014 (4794)
+
+- Replace inbox view with a gallery of photos
+
 ## Nov 11, 2014 (4789-4793)
 
 - Like/comment on photos!  Now you can respond to photos that people send you in the app!  Double-tap to like.
