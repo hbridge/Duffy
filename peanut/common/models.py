@@ -763,6 +763,9 @@ class Action(models.Model):
 	def getUserDisplayName(self):
 		return self.user.display_name
 	
+	def getUserPhoneNumber(self):
+		return self.user.phone_number
+
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.user.id, self.action_type, self.strand, self.added)
 

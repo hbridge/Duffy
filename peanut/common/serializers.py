@@ -72,7 +72,10 @@ def actionDataForApiSerializer(action):
 	actionData['photo'] = action.photo.id
 	actionData['text'] = action.text
 
-	# TODO(Derek): remove this once we don't need it
+	# TODO(Derek): remove this once we don't need it.
+	#   That happens if we are caching this somewhere else and can add in or the client
+	#   uses some other mapping than in the action itself
 	actionData['user_display_name'] = action.getUserDisplayName()
+	actionData['user_phone_number'] = action.getUserPhoneNumber()
 
 	return actionData
