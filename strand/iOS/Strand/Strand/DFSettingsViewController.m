@@ -119,11 +119,16 @@
 
     [mapping mapAttribute:@"phoneNumber" title:@"Phone Number" type:FKFormAttributeMappingTypeLabel];
     [mapping mapAttribute:@"displayName" title:@"Display Name" type:FKFormAttributeMappingTypeText];
+    [mapping sectionWithTitle:@"Preferences"
+                       footer:@"Turn on Location-only Suggestions to get swap suggestions even when you didn't take a photo."
+                   identifier:@"preferences"];
     [mapping mapAttribute:@"pushNotificationsEnabled"
                     title:@"Push Notifications"
                      type:FKFormAttributeMappingTypeBoolean];
-    
-    
+    [mapping mapAttribute:@"locationEnabled"
+                    title:@"Location-only Suggestions"
+                     type:FKFormAttributeMappingTypeBoolean];
+
     // Support
     [mapping sectionWithTitle:@"Support" identifier:@"support"];
     [mapping button:@"Help"

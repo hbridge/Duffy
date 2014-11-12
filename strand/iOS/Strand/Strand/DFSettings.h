@@ -19,6 +19,7 @@
 @property (nonatomic, retain) NSString *serverURL;
 @property (nonatomic, retain) NSString *serverPort;
 @property (nonatomic) BOOL pushNotificationsEnabled;
+@property (nonatomic) BOOL locationEnabled;
 
 // dummy properties that are required to map the settings form
 @property (readonly, nonatomic, retain) NSDictionary *helpInfo;

@@ -13,6 +13,7 @@
 #import <AssetsLibrary/AssetsLibrary.h>
 #import "UIAlertView+DFHelpers.h"
 #import "DFPushNotificationsManager.h"
+#import "DFBackgroundLocationManager.h"
 
 NSString *const AutosaveToCameraRollDefaultsKey = @"DFSettingsAutosaveToCameraRoll";
 
@@ -179,6 +180,13 @@ static DFSettings *defaultSettings;
 {
   if (pushNotifications) {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
+  }
+}
+
+- (void)setLocationEnabled:(BOOL)locationEnabled
+{
+  if (locationEnabled) {
+    [[DFBackgroundLocationManager sharedManager] promptForAuthorization];
   }
 }
 
