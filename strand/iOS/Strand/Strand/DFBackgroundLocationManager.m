@@ -229,6 +229,13 @@ static DFBackgroundLocationManager *defaultManager;
   return (status == kCLAuthorizationStatusNotDetermined);
 }
 
+- (BOOL)isPermssionGranted
+{
+  CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+  return (status == kCLAuthorizationStatusAuthorizedAlways
+          || status == kCLAuthorizationStatusAuthorized);
+}
+
 - (void)promptForAuthorization
 {
   CLAuthorizationStatus status = [CLLocationManager authorizationStatus];

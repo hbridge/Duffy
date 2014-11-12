@@ -190,4 +190,9 @@ static DFSettings *defaultSettings;
   }
 }
 
+- (BOOL)locationEnabled
+{
+  return [[DFBackgroundLocationManager sharedManager] isPermssionGranted];
+}
+
 @end

@@ -17,5 +17,6 @@
 - (void)backgroundUpdateWithCompletionHandler:(void (^)(UIBackgroundFetchResult))completionHandler;
 - (BOOL)canPromptForAuthorization;
 - (void)promptForAuthorization;
+- (BOOL)isPermssionGranted;
 
 @end
