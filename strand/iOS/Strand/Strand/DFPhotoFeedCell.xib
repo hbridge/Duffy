@@ -124,7 +124,7 @@
                     <constraint firstItem="B5M-0I-S31" firstAttribute="top" secondItem="TQm-Ad-3iq" secondAttribute="top" id="R5S-My-bez"/>
                     <constraint firstItem="d5e-Qd-WoU" firstAttribute="leading" secondItem="4ef-R4-bae" secondAttribute="trailing" constant="6" id="RKC-mG-NzC"/>
                     <constraint firstItem="TQm-Ad-3iq" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="Tc5-MX-qVf"/>
-                    <constraint firstAttribute="bottom" secondItem="TQm-Ad-3iq" secondAttribute="bottom" constant="27" id="Usn-Zp-9Mr"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="TQm-Ad-3iq" secondAttribute="bottom" constant="27" id="Usn-Zp-9Mr"/>
                     <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" secondItem="d5e-Qd-WoU" secondAttribute="bottom" constant="4" id="VMZ-MO-o5V"/>
                     <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="W57-RD-aTX"/>
                     <constraint firstAttribute="trailing" secondItem="EPr-aP-pSV" secondAttribute="trailing" id="a0s-oA-S46"/>
