@@ -5,6 +5,7 @@ import re
 import phonenumbers
 import json
 from threading import Thread
+import dateutil.parser
 
 from django.shortcuts import get_list_or_404
 from django.db import IntegrityError
@@ -92,10 +93,10 @@ class BasePhotoAPI(APIView):
             photoData["taken_with_strand"] = int(photoData["taken_with_strand"])
 
         if "time_taken" in photoData:
-            photoData["time_taken"] = datetime.datetime.strptime(photoData["time_taken"], "%Y-%m-%dT%H:%M:%SZ")
+            photoData["time_taken"] = dateutil.parser.parse(photoData["time_taken"])
 
         if "local_time_taken" in photoData:
-            photoData["local_time_taken"] = datetime.datetime.strptime(photoData["local_time_taken"], "%Y-%m-%dT%H:%M:%SZ")
+            photoData["local_time_taken"] = dateutil.parser.parse(photoData["local_time_taken"])
 
         if "id" in photoData:
             photoId = int(photoData["id"])
