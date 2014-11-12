@@ -104,9 +104,13 @@
   CGFloat usableWidth = self.collectionView.frame.size.width -
   ((CGFloat)(self.numPhotosPerRow - 1)  * self.flowLayout.minimumInteritemSpacing);
   CGFloat itemSize = usableWidth / (CGFloat)self.numPhotosPerRow;
+  CGSize oldSize = self.flowLayout.itemSize;
   CGSize newSize =  CGSizeMake(itemSize, itemSize);
-  self.flowLayout.itemSize = newSize;
-  [self.collectionView reloadData];
+  if (!CGSizeEqualToSize(oldSize, newSize)) {
+    self.flowLayout.itemSize = newSize;
+    [self.collectionView reloadData];
+  }
+  [self.flowLayout invalidateLayout];
 }
 
 - (void)reloadData
@@ -115,6 +119,7 @@
                                            acceptedStrandsWithPostsCollapsed:YES
                                            feedObjectSortKey:@"time_taken"
                                            ascending:YES];
+  [self.collectionView reloadData];
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
