@@ -3,6 +3,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -38,7 +39,7 @@
                         <rect key="frame" x="150" y="150" width="20" height="20"/>
                     </activityIndicatorView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" verticalCompressionResistancePriority="999" text="Likes label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="304" translatesAutoresizingMaskIntoConstraints="NO" id="d5e-Qd-WoU">
-                        <rect key="frame" x="31" y="410" width="64" height="16"/>
+                        <rect key="frame" x="31" y="410" width="273" height="16"/>
                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
@@ -110,6 +111,7 @@
                     <constraint firstAttribute="trailing" secondItem="h07-n4-DgV" secondAttribute="trailing" id="07M-SB-Mi0"/>
                     <constraint firstItem="4ef-R4-bae" firstAttribute="top" secondItem="d5e-Qd-WoU" secondAttribute="top" id="1pQ-rF-h4E"/>
                     <constraint firstItem="4ef-R4-bae" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="32q-Jf-EXj"/>
+                    <constraint firstAttribute="trailingMargin" secondItem="d5e-Qd-WoU" secondAttribute="trailing" constant="8" id="3ca-KG-oIT"/>
                     <constraint firstItem="TQm-Ad-3iq" firstAttribute="top" secondItem="DCN-Jd-BMd" secondAttribute="bottom" constant="10" id="7gb-D6-ngh"/>
                     <constraint firstItem="6Gw-h8-Can" firstAttribute="centerY" secondItem="EPr-aP-pSV" secondAttribute="centerY" id="BlS-qF-TGN"/>
                     <constraint firstItem="TQm-Ad-3iq" firstAttribute="top" secondItem="d5e-Qd-WoU" secondAttribute="bottom" priority="900" constant="10" id="Jat-fO-ZRg"/>
