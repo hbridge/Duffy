@@ -15,10 +15,10 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFUser.h"
 
+const NSUInteger maxConcurrentImageDownloads = 2;
 
 @interface DFImageDownloadManager()
 
-@property (nonatomic, retain) RKObjectManager *objectManager;
 @property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 @property (nonatomic, retain) DFImageDiskCache *imageStore;
 @property (nonatomic, retain) NSOperationQueue *downloadQueue;
@@ -50,7 +50,8 @@ static DFImageDownloadManager *defaultManager;
   if (self) {
     [self observeNotifications];
     self.downloadQueue = [[NSOperationQueue alloc] init];
-    self.objectManager = [DFObjectManager sharedManager];
+    //only download 2 things at a time to prevent swamping the network
+    self.downloadQueue.maxConcurrentOperationCount = maxConcurrentImageDownloads;
     self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.imageStore = [DFImageDiskCache sharedStore];
   }
@@ -166,7 +167,16 @@ static DFImageDownloadManager *defaultManager;
     DDLogError(@"Error downloading image: %@", url);
     completion(nil, error);
   }];
-  [self.objectManager.HTTPClient enqueueHTTPRequestOperation:requestOperation];
+  
+  // add the operation to our local download queue so we don't swamp the network with download
+  // requests and prevent others from getting scheduled
+  NSOperation *downloadOperation = [NSBlockOperation blockOperationWithBlock:^{
+    [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];
+    [requestOperation waitUntilFinished];
+  }];
+  downloadOperation.queuePriority = queuePriority;
+  
+  [self.downloadQueue addOperation:downloadOperation];
 }
 
 
