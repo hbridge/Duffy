@@ -18,7 +18,7 @@ django.setup()
 from django.db.models import Count, Q
 
 from peanut.settings import constants
-from common.models import Photo, Strand, User, StrandNeighbor, StrandInvite
+from common.models import Photo, Strand, User, StrandNeighbor, StrandInvite, LocationRecord
 
 from strand import geo_util, friends_util, strands_util
 import strand.notifications_util as notifications_util
@@ -75,7 +75,11 @@ def processWithExisting(existingNeighborRows, newNeighborRows):
 
 	for row in existingNeighborRows:
 		id1 = row.strand_1_id
-		id2 = row.strand_2_id
+
+		if row.strand_2_id:
+			id2 = row.strand_2_id
+		else:
+			id2 = row.strand_2_user_id
 
 		if id1 not in existing:
 			existing[id1] = dict()
@@ -83,7 +87,10 @@ def processWithExisting(existingNeighborRows, newNeighborRows):
 
 	for newRow in newNeighborRows:
 		id1 = newRow.strand_1_id
-		id2 = newRow.strand_2_id
+		if newRow.strand_2_id:
+			id2 = newRow.strand_2_id
+		else:
+			id2 = newRow.strand_2_user_id
 
 		if id1 in existing and id2 in existing[id1]:
 			pass
@@ -319,34 +326,55 @@ def main(argv):
 
 				query = query.filter(additional)
 
-				possibleNeighbors = list(query)
+				possibleStrandNeighbors = list(query)
 
-				logger.debug("Found %s possible neighbors" % len(possibleNeighbors))
+				logger.debug("Found %s possible strand neighbors" % len(possibleStrandNeighbors))
 
 				strandsByStrandId = dict()
+				idsCreated = list()
 				for strand in strandsCreated:
-					for possibleNeighbor in possibleNeighbors:
-						if strands_util.strandsShouldBeNeighbors(strand, possibleNeighbor):
-							usersByStrandId[possibleNeighbor.id] = list(possibleNeighbor.users.all())
+					for possibleStrandNeighbor in possibleStrandNeighbors:
+						if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor):
+							usersByStrandId[possibleStrandNeighbor.id] = list(possibleStrandNeighbor.users.all())
 							strandsByStrandId[strand.id] = strand
-							strandsByStrandId[possibleNeighbor.id] = possibleNeighbor
-							if possibleNeighbor.id < strand.id:
-								strandNeighborsToCreate.append((possibleNeighbor.id, strand.id))
+							strandsByStrandId[possibleStrandNeighbor.id] = possibleStrandNeighbor
+							if possibleStrandNeighbor.id < strand.id:
+								s1 = possibleStrandNeighbor
+								s2 = strand
 							else:
-								strandNeighborsToCreate.append((strand.id, possibleNeighbor.id))
+								s1 = strand
+								s2 = possibleStrandNeighbor
+							# This deals de-duping
+							if (s1.id, s2.id) not in idsCreated:
+								idsCreated.append((s1.id, s2.id))
+								strandNeighbors.append(StrandNeighbor(strand_1_id=s1.id, strand_1_private=s1.private, strand_1_user=s1.user, strand_2_id=s2.id, strand_2_private=s2.private, strand_2_user=s2.user))
 
-				logger.debug("Strand neighbor eval for took %s milli" % (((datetime.datetime.now()-ab).microseconds/1000) + (datetime.datetime.now()-ab).seconds*1000))
-
-				# Now deal with strand neighbor rows
-				# Dedup our new neighbor rows and process with existing ones in the database
-				strandNeighborsToCreate = set(strandNeighborsToCreate)
-				strandNeighbors = list()
-				for t in strandNeighborsToCreate:
-					id1, id2 = t
-					strandNeighbors.append(StrandNeighbor(strand_1_id=id1, strand_1_private=strandsByStrandId[id1].private, strand_1_user=strandsByStrandId[id1].user, strand_2_id=id2, strand_2_private=strandsByStrandId[id2].private, strand_2_user=strandsByStrandId[id2].user))
 				
+				# Now try to find all users who were around this time
+				query = LocationRecord.objects.filter(accuracy__lt=1000)
+				additional = Q()
+				for strand in strandsCreated:
+					timeHigh = strand.last_photo_time + datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
+					timeLow = strand.first_photo_time - datetime.timedelta(minutes=timeWithinMinutesForNeighboring)
+
+					if strand.location_point:
+						additional = Q(additional | (Q(timestamp__gt=timeLow) & Q(timestamp__lt=timeHigh) & Q(point__within=strand.location_point.buffer(1))))
+				query = query.filter(additional)
+
+				idsCreated = list()
+				possibleLocationRecords = list(query)
+
+				logger.debug("Found %s possible user neighbors" % len(possibleLocationRecords))
+
+				for strand in strandsCreated:
+					for locationRecord in possibleLocationRecords:
+						if strands_util.userShouldBeNeighborToStrand(strand, locationRecord):
+							if (strand.id, locationRecord.user_id) not in idsCreated:
+								idsCreated.append((strand.id, locationRecord.user_id))
+								strandNeighbors.append(StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user))
+
 				allIds = getAllStrandIds(strandNeighbors)
-				existingRows = StrandNeighbor.objects.filter(strand_1__in=allIds).filter(strand_2_id__in=allIds)
+				existingRows = StrandNeighbor.objects.filter(strand_1_id__in=allIds).filter(Q(strand_2_id__in=allIds) | Q(strand_2_id__isnull=True))
 				neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
 				StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
 			

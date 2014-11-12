@@ -27,6 +27,10 @@ def getDistanceBetweenStrands(strand1, strand2):
 	geoDistance = int(haversine(strand1.location_point.x, strand1.location_point.y, strand2.location_point.x, strand2.location_point.y) * 1000)
 	return geoDistance
 
+def getDistanceBetweenStrandAndLocationRecord(strand, locationRecord):
+	geoDistance = int(haversine(strand.location_point.x, strand.location_point.y, locationRecord.point.x, locationRecord.point.y) * 1000)
+	return geoDistance
+
 def getDistanceToPhoto(lon, lat, photo):
 	geoDistance = int(haversine(lon, lat, photo.location_point.x, photo.location_point.y) * 1000)
 	return geoDistance

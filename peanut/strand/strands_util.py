@@ -81,6 +81,13 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 			return True
 		
 	return False
+
+def userShouldBeNeighborToStrand(strand, locationRecord):
+	if strand.location_point:
+		if geo_util.getDistanceBetweenStrandAndLocationRecord(strand, locationRecord) < constants.DISTANCE_WITHIN_METERS_FOR_NEIGHBORING:
+			return True
+			
+	return False
 	
 def addPhotoToStrand(strand, photo, photosByStrandId, usersByStrandId):
 	if photo.time_taken > strand.last_photo_time:
