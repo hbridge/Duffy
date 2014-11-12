@@ -135,8 +135,8 @@
   NSString *markup =
   [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@ ago</gray>",
    action.user_display_name,
-   action.action_type == DFPeanutActionFavorite ? @"liked your photo." : @"commented: ",
-   action.action_type == DFPeanutActionComment ? action.text : @"",
+   action.action_type == DFPeanutActionFavorite ? @"liked a photo." : @"commented: ",
+   action.action_type == DFPeanutActionComment ? [action.text stringByEscapingCharsInString:@"<>"] : @"",
    [NSDateFormatter relativeTimeStringSinceDate:action.time_stamp abbreviate:YES]
    ];
   

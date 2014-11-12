@@ -119,18 +119,9 @@
   NSMutableString *slashFormat = [NSMutableString new];
   [slashFormat appendString:@"<feedText>"];
   for (DFPeanutAction *action in comments) {
-    NSMutableString *actionText = [action.text mutableCopy];
-    // escape <> characters so Slash doesn't get confused
-    [actionText replaceOccurrencesOfString:@"<"
-                                withString:@"\\<"
-                                   options:0
-                                     range:actionText.fullRange];
-    [actionText replaceOccurrencesOfString:@">"
-                                withString:@"\\>"
-                                   options:0
-                                     range:actionText.fullRange];
-    
-    [slashFormat appendFormat:@"<name>%@</name> %@", action.displayNameOrYou, actionText];
+    [slashFormat appendFormat:@"<name>%@</name> %@",
+     action.displayNameOrYou,
+     [action.text stringByEscapingCharsInString:@"<>"]];
     if (action != comments.lastObject) [slashFormat appendString:@"\n"];
   }
   [slashFormat appendString:@"</feedText>"];

@@ -32,4 +32,16 @@
   return result;
 }
 
+- (NSString *)stringByEscapingCharsInString:(NSString *)charString;
+{
+  NSMutableString *result = [self mutableCopy];
+  for (NSUInteger i = 0; i < charString.length; i++) {
+    NSString *charToReplace = [charString substringWithRange:(NSRange){i, 1}];
+    NSString *replacement = [@"\\" stringByAppendingString:charToReplace];
+    [result replaceOccurrencesOfString:charToReplace
+                            withString:replacement options:0 range:result.fullRange];
+  }
+  return result;
+}
+
 @end

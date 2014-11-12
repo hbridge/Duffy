@@ -13,5 +13,6 @@
 - (NSRange)fullRange;
 - (BOOL)isNotEmpty;
 + (NSString *)stringWithCommaSeparatedStrings:(NSArray *)strings;
+- (NSString *)stringByEscapingCharsInString:(NSString *)charString;
 
 @end
