@@ -140,7 +140,7 @@
   NSMutableString *slashFormat = [NSMutableString new];
   for (DFPeanutAction *action in likes) {
     [slashFormat appendFormat:@"<name>%@</name>", action.user_display_name];
-    if (action != likes.lastObject) [slashFormat appendString:@","];
+    if (action != likes.lastObject) [slashFormat appendString:@", "];
   }
   
   NSError *error;
