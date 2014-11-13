@@ -120,7 +120,6 @@
                                               withReuseIdentifier:@"header"
                                               forIndexPath:indexPath];
   
-  
   DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
   header.titleLabel.text = strandObject.title;
   header.profilePhotoStackView.peanutUsers = strandObject.actors;

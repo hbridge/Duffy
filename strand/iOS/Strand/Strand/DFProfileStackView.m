@@ -45,7 +45,7 @@
     
     //name
     NSString *abbreviation = @"";
-    if (user.fullName.length > 0) {
+    if (user.display_name.length > 0) {
       abbreviation = [user.display_name substringToIndex:1];
     }
     [abbreviations addObject:abbreviation];
