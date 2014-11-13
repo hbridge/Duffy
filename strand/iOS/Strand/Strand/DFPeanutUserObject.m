@@ -21,12 +21,12 @@ static RHAddressBook *defaultAddressBook;
   return defaultAddressBook;
 }
 
-static NSMutableDictionary *defaultPhoneNumberToNameCache;
-+ (NSMutableDictionary *)phoneNumberToNameCache {
-  if (!defaultPhoneNumberToNameCache) {
-    defaultPhoneNumberToNameCache = [[NSMutableDictionary alloc] init];
+static NSMutableDictionary *defaultPhoneNumberToPersonCache;
++ (NSMutableDictionary *)phoneNumberToPersonCache {
+  if (!defaultPhoneNumberToPersonCache) {
+    defaultPhoneNumberToPersonCache = [[NSMutableDictionary alloc] init];
   }
-  return defaultPhoneNumberToNameCache;
+  return defaultPhoneNumberToPersonCache;
 }
 
 static NSArray *defaultPeopleList;
@@ -39,7 +39,7 @@ static NSArray *defaultPeopleList;
 
 + (void)clearCaches
 {
-  [[DFPeanutUserObject phoneNumberToNameCache] removeAllObjects];
+  [[DFPeanutUserObject phoneNumberToPersonCache] removeAllObjects];
   defaultPeopleList = nil;
 }
 
@@ -105,8 +105,13 @@ static NSArray *defaultPeopleList;
  */
 + (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber
 {
-  if ([[DFPeanutUserObject phoneNumberToNameCache] objectForKey:phoneNumber]) {
-    return [[DFPeanutUserObject phoneNumberToNameCache] objectForKey:phoneNumber];
+  return [[self personFromPhoneNumber:phoneNumber] name];
+}
+
++ (RHPerson *)personFromPhoneNumber:(NSString *)phoneNumber
+{
+  if ([[DFPeanutUserObject phoneNumberToPersonCache] objectForKey:phoneNumber]) {
+    return [[DFPeanutUserObject phoneNumberToPersonCache] objectForKey:phoneNumber];
   }
   
   NSArray *people = [DFPeanutUserObject sharedPeopleList];
@@ -124,8 +129,8 @@ static NSArray *defaultPeopleList;
       phoneNum = [NSString stringWithFormat:@"+%@", phoneNum];
       
       if ([phoneNum isEqualToString:phoneNumber]) {
-        [[DFPeanutUserObject phoneNumberToNameCache] setObject:[person name] forKey:phoneNumber];
-        return [person name];
+        [[DFPeanutUserObject phoneNumberToPersonCache] setObject:person forKey:phoneNumber];
+        return person;
       }
     }
   }
@@ -151,6 +156,16 @@ static NSArray *defaultPeopleList;
 - (NSUInteger)hash
 {
   return (NSUInteger)self.id;
+}
+
+- (UIImage *)thumbnail
+{
+  return [DFPeanutUserObject UIImageForThumbnailFromPhoneNumber:self.phone_number];
+}
+
++ (UIImage *)UIImageForThumbnailFromPhoneNumber:(NSString *)phoneNumber
+{
+  return [[self personFromPhoneNumber:phoneNumber] thumbnail];
 }
 
 @end

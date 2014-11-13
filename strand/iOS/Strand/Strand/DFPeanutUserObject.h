@@ -35,7 +35,10 @@
 - (void)setLocation:(CLLocation *)location;
 - (NSString *)fullName;
 - (NSString *)firstName;
+- (UIImage *)thumbnail;
 
 + (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber;
 + (void)clearCaches;
+
+
 @end
