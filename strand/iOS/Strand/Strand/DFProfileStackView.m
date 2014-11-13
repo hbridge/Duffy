@@ -11,8 +11,9 @@
 
 @interface DFProfileStackView()
 
-@property (nonatomic, retain) NSArray *fillColors;
-@property (nonatomic, retain) NSArray *abbreviations;
+@property (nonatomic, retain) NSDictionary *fillColorsById;
+@property (nonatomic, retain) NSDictionary *abbreviationsById;
+@property (nonatomic, retain) NSDictionary *imagesById;
 
 @end
 
@@ -32,8 +33,8 @@
 {
   _peanutUsers = users;
 
-  NSMutableArray *fillColors = [[NSMutableArray alloc] initWithCapacity:users.count];
-  NSMutableArray *abbreviations = [[NSMutableArray alloc] initWithCapacity:users.count];
+  NSMutableDictionary *fillColors = [[NSMutableDictionary alloc] initWithCapacity:users.count];
+  NSMutableDictionary *abbreviations = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
   for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
     //fill color
@@ -41,17 +42,17 @@
     NSInteger numberForUser = [self numberForUser:user];
     NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);
     UIColor *color = allColors[colorIndex];
-    [fillColors addObject:color];
+    fillColors[@(user.id)] = color;
     
     //name
     NSString *abbreviation = @"";
     if (user.display_name.length > 0) {
       abbreviation = [[user.display_name substringToIndex:1] uppercaseString];
     }
-    [abbreviations addObject:abbreviation];
+    abbreviations[@(user.id)] = abbreviation;
   }
-  _fillColors = fillColors;
-  _abbreviations = abbreviations;
+  _fillColorsById = fillColors;
+  _abbreviationsById = abbreviations;
   
   [self setNeedsDisplay];
 }
@@ -97,8 +98,9 @@
   CGContextRef context = UIGraphicsGetCurrentContext();
   
   for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
-    UIColor *fillColor = self.fillColors[i];
-    NSString *abbreviation = self.abbreviations[i];
+    DFPeanutUserObject *user = self.peanutUsers[i];
+    UIColor *fillColor = self.fillColorsById[@(user.id)];
+    NSString *abbreviation = self.abbreviationsById[@(user.id)];
     
     CGRect abbreviationRect = [self rectForIndex:i];
     CGContextSetFillColorWithColor(context, fillColor.CGColor);
