@@ -654,6 +654,41 @@ def strand_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
+def actions(request):
+	startProfiling()
+	response = dict({'result': True})
+
+	form = OnlyUserIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		responseObjects = list()
+
+		strands = Strand.objects.filter(users__in=[user]).filter(private=False)
+
+		strandIds = Strand.getIds(strands)
+		strandPhotos = Strand.photos.through.objects.filter(strand_id__in=strandIds)
+
+		photoIds = list()
+		for strandPhoto in strandPhotos:
+			photoIds.append(strandPhoto.photo_id)
+		
+		actions = Action.objects.prefetch_related('user').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(Q(photo_id__in=photoIds) | Q(strand_id__in=strandIds)).order_by("-added")[:40]
+
+		actionsData = list()
+		for action in actions:
+			actionsData.append(serializers.actionDataForApiSerializer(action))
+
+		response['objects'] = actionsData
+
+
+
+		printStats("actions-end")
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+
 """
 	Returns back the invites and strands a user has
 """
