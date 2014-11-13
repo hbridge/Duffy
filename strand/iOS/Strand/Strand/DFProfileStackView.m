@@ -8,6 +8,8 @@
 
 #import "DFProfileStackView.h"
 #import "DFPeanutUserObject.h"
+#import "UIImage+RoundedCorner.h"
+#import "UIImage+Resize.h"
 
 @interface DFProfileStackView()
 
@@ -35,6 +37,7 @@
 
   NSMutableDictionary *fillColors = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *abbreviations = [[NSMutableDictionary alloc] initWithCapacity:users.count];
+  NSMutableDictionary *images = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
   for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
     //fill color
@@ -50,9 +53,16 @@
       abbreviation = [[user.display_name substringToIndex:1] uppercaseString];
     }
     abbreviations[@(user.id)] = abbreviation;
+    
+    //image
+    UIImage *image = user.thumbnail;
+    if (image)
+      images[@(user.id)] = image;
+    
   }
   _fillColorsById = fillColors;
   _abbreviationsById = abbreviations;
+  _imagesById = images;
   
   [self setNeedsDisplay];
 }
@@ -101,17 +111,26 @@
     DFPeanutUserObject *user = self.peanutUsers[i];
     UIColor *fillColor = self.fillColorsById[@(user.id)];
     NSString *abbreviation = self.abbreviationsById[@(user.id)];
+    UIImage *image = self.imagesById[@(user.id)];
     
     CGRect abbreviationRect = [self rectForIndex:i];
-    CGContextSetFillColorWithColor(context, fillColor.CGColor);
-    CGContextFillEllipseInRect(context, abbreviationRect);
-    
-    UILabel *label = [[UILabel alloc] initWithFrame:abbreviationRect];
-    label.textColor = [UIColor whiteColor];
-    label.textAlignment = NSTextAlignmentCenter;
-    label.text = abbreviation;
-    label.font = [UIFont fontWithName:@"HelveticaNeue" size:ceil(abbreviationRect.size.height)/2.0];
-    [label drawTextInRect:abbreviationRect];
+    if (!image) {
+      CGContextSetFillColorWithColor(context, fillColor.CGColor);
+      CGContextFillEllipseInRect(context, abbreviationRect);
+      UILabel *label = [[UILabel alloc] initWithFrame:abbreviationRect];
+      label.textColor = [UIColor whiteColor];
+      label.textAlignment = NSTextAlignmentCenter;
+      label.text = abbreviation;
+      label.font = [UIFont fontWithName:@"HelveticaNeue" size:ceil(abbreviationRect.size.height)/2.0];
+      [label drawTextInRect:abbreviationRect];
+    } else {
+      CGSize imageSize = CGSizeMake(abbreviationRect.size.width * [[UIScreen mainScreen] scale],
+                                     abbreviationRect.size.height * [[UIScreen mainScreen] scale]);
+      UIImage *resizedImage = [image resizedImage:imageSize
+                             interpolationQuality:kCGInterpolationDefault];
+      UIImage *roundedImage = [resizedImage roundedCornerImage:imageSize.width/2.0 borderSize:0];
+      [roundedImage drawInRect:abbreviationRect];
+    }
   }
 }
 
