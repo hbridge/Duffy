@@ -13,6 +13,7 @@
 NSString *const PrivateStrandsPath = @"unshared_strands";
 NSString *const InboxPath = @"strand_inbox";
 NSString *const SwapsPath = @"swaps";
+NSString *const ActionsListPath = @"actions_list";
 
 // Not used
 NSString *const GalleryPath = @"strand_feed";
@@ -29,7 +30,7 @@ NSString *const ActivityPath = @"strand_activity";
 
 + (NSArray *)responseDescriptors
 {
-  NSArray *paths = @[GalleryPath, PrivateStrandsPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath, SwapsPath];
+  NSArray *paths = @[GalleryPath, PrivateStrandsPath, InvitedPath, SuggestedUnsharedPath, ActivityPath, InboxPath, SwapsPath, ActionsListPath];
   
   NSMutableArray *responseDescriptors = [NSMutableArray new];
   for (NSString *path in paths) {
@@ -64,6 +65,11 @@ NSString *const ActivityPath = @"strand_activity";
 - (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock
 {
   [super fetchObjectsAtPath:SwapsPath withCompletionBlock:completionBlock];
+}
+
+- (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock
+{
+  [super fetchObjectsAtPath:ActionsListPath withCompletionBlock:completionBlock];
 }
 
 

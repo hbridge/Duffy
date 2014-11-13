@@ -38,7 +38,7 @@ static DFPeanutNotificationsManager *defaultManager;
   if (self) {
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(updateNotifications)
-                                                 name:DFStrandNewInboxDataNotificationName
+                                                 name:DFStrandNewActionsDataNotificationName
                                                object:nil];
 
   }

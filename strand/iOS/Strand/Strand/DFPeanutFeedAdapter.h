@@ -14,6 +14,7 @@
 - (void)fetchAllPrivateStrandsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchInboxWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 - (void)fetchSwapsWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
+- (void)fetchActionsListWithCompletion:(DFPeanutObjectsCompletion)completionBlock;
 
 // Deprecated
 - (void)fetchGalleryWithCompletionBlock:(DFPeanutObjectsCompletion)completionBlock;

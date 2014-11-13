@@ -21,10 +21,12 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshPrivatePhotosFromServer:(RefreshCompleteCompletionBlock)completion;
 - (void)refreshSwapsFromServer:(RefreshCompleteCompletionBlock)completion;
+- (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion;
 
 - (BOOL)hasInboxData;
 - (BOOL)hasPrivateStrandData;
 - (BOOL)hasSwapsData;
+- (BOOL)hasActionsData;
 
 - (BOOL)isRefreshingInbox;
 

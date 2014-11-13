@@ -20,19 +20,19 @@ DFFeedObjectType DFFeedObjectCluster = @"cluster";
 DFFeedObjectType DFFeedObjectDocstack = @"docstack";
 DFFeedObjectType DFFeedObjectInviteStrand = @"invite_strand";
 DFFeedObjectType DFFeedObjectStrand = @"strand";
-DFFeedObjectType DFFeedObjectLikeAction = @"like_action";
 DFFeedObjectType DFFeedObjectStrandPost = @"strand_post";
 DFFeedObjectType DFFeedObjectStrandPosts = @"strand_posts";
 DFFeedObjectType DFFeedObjectFriendsList = @"friends_list";
 DFFeedObjectType DFFeedObjectSuggestedPhotos = @"suggested_photos";
 DFFeedObjectType DFFeedObjectStrandJoin = @"strand_join";
 DFFeedObjectType DFFeedObjectSwapSuggestion = @"section";
+DFFeedObjectType DFFeedObjectActionsList = @"actions_list";
 
 static NSArray *FeedObjectTypes;
 
 + (void)initialize
 {
-  FeedObjectTypes = @[DFFeedObjectSection, DFFeedObjectPhoto, DFFeedObjectCluster, DFFeedObjectDocstack, DFFeedObjectInviteStrand, DFFeedObjectStrand];
+  FeedObjectTypes = @[DFFeedObjectSection, DFFeedObjectPhoto, DFFeedObjectCluster, DFFeedObjectDocstack, DFFeedObjectInviteStrand, DFFeedObjectStrand, DFFeedObjectActionsList];
 }
 
 - (id)initWithJSONDict:(NSDictionary *)jsonDict

@@ -23,13 +23,13 @@ extern DFFeedObjectType DFFeedObjectCluster;
 extern DFFeedObjectType DFFeedObjectDocstack;
 extern DFFeedObjectType DFFeedObjectInviteStrand;
 extern DFFeedObjectType DFFeedObjectStrand;
-extern DFFeedObjectType DFFeedObjectLikeAction;
 extern DFFeedObjectType DFFeedObjectStrandPost;
 extern DFFeedObjectType DFFeedObjectStrandPosts;
 extern DFFeedObjectType DFFeedObjectFriendsList;
 extern DFFeedObjectType DFFeedObjectSuggestedPhotos;
 extern DFFeedObjectType DFFeedObjectStrandJoin;
 extern DFFeedObjectType DFFeedObjectSwapSuggestion;
+extern DFFeedObjectType DFFeedObjectActionsList;
 
 // Simple attribures
 @property (nonatomic) DFPhotoIDType id;

@@ -17,6 +17,7 @@ typedef NS_OPTIONS(unsigned int, DFFeedType) {
   DFInboxFeed,
   DFSwapsFeed,
   DFPrivateFeed,
+  DFActionsFeed,
 };
 
 // Permissions
@@ -69,6 +70,7 @@ extern DFUIActionType DFUIActionDoubleTap;
 typedef UInt64 DFPeanutActionType;
 extern DFPeanutActionType DFPeanutActionFavorite;
 extern DFPeanutActionType DFPeanutActionComment;
+extern DFPeanutActionType DFPeanutActionAddedPhotos;
 
 
 // common block type

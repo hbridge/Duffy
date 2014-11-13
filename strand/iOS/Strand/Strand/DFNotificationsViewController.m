@@ -22,6 +22,7 @@
 @property (nonatomic, retain) NSArray *unreadNotifications;
 @property (nonatomic, retain) NSArray *readNotifications;
 @property (nonatomic, retain) DFNotificationTableViewCell *templateCell;
+@property (nonatomic, retain) UIRefreshControl *refreshControl;
 
 @end
 
@@ -53,12 +54,15 @@
        forCellReuseIdentifier:@"cell"];
   self.tableView.separatorInset = UIEdgeInsetsMake(0, 15, 0, 15);
   self.tableView.rowHeight = 56.0;
+  [self configureRefreshControl];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
   [self reloadData];
+  [self.refreshControl endRefreshing];
+  [self refreshFromServer];
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -92,6 +96,16 @@
                                              object:nil];
 }
 
+
+- (void)configureRefreshControl
+{
+  self.refreshControl = [[UIRefreshControl alloc] init];
+  
+  [self.refreshControl addTarget:self
+                          action:@selector(refreshFromServer)
+                forControlEvents:UIControlEventValueChanged];
+}
+
 - (void)reloadData
 {
   self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
@@ -103,6 +117,13 @@
   } else {
     self.tabBarItem.badgeValue = [@(self.unreadNotifications.count) stringValue];
   }
+}
+
+- (void)refreshFromServer
+{
+  [[DFPeanutFeedDataManager sharedManager] refreshActionsFromServer:^{
+    [self.refreshControl endRefreshing];
+  }];
 }
 
 

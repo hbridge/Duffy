@@ -21,6 +21,7 @@
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *inboxFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *privateStrandsFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *swapsFeedAdapter;
+@property (readonly, nonatomic, retain) DFPeanutFeedAdapter *actionsFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
@@ -28,13 +29,16 @@
 @property (atomic) BOOL inboxRefreshing;
 @property (atomic) BOOL swapsRefreshing;
 @property (atomic) BOOL privateStrandsRefreshing;
+@property (atomic) BOOL actionsRefreshing;
 @property (nonatomic, retain) NSData *inboxLastResponseHash;
 @property (nonatomic, retain) NSData *swapsLastResponseHash;
 @property (nonatomic, retain) NSData *privateStrandsLastResponseHash;
+@property (nonatomic, retain) NSData *actionsLastResponseHash;
 
 @property (nonatomic, retain) NSArray *inboxFeedObjects;
 @property (nonatomic, retain) NSArray *swapsFeedObjects;
 @property (nonatomic, retain) NSArray *privateStrandsFeedObjects;
+@property (nonatomic, retain) NSArray *actionsFeedObjects;
 
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
@@ -46,6 +50,8 @@
 @synthesize inboxFeedAdapter = _inboxFeedAdapter;
 @synthesize swapsFeedAdapter = _swapsFeedAdapter;
 @synthesize privateStrandsFeedAdapter = _privateStrandsFeedAdapter;
+@synthesize actionsFeedAdapter = _actionsFeedAdapter;
+
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
 @synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
@@ -86,6 +92,7 @@ static DFPeanutFeedDataManager *defaultManager;
   [self refreshInboxFromServer:nil];
   [self refreshSwapsFromServer:nil];
   [self refreshPrivatePhotosFromServer:nil];
+  [self refreshActionsFromServer:nil];
 }
 
 - (void)refreshInboxFromServer:(RefreshCompleteCompletionBlock)completion
@@ -177,6 +184,36 @@ static DFPeanutFeedDataManager *defaultManager;
   }
 }
 
+// TODO(Derek): Take all this common code and put into one method
+- (void)refreshActionsFromServer:(RefreshCompleteCompletionBlock)completion
+{
+  [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+  if (completion) [self scheduleDeferredCompletion:completion forFeedType:DFActionsFeed];
+  
+  if (!self.actionsRefreshing) {
+    self.actionsRefreshing = YES;
+    [self.actionsFeedAdapter
+     fetchActionsListWithCompletion:^(DFPeanutObjectsResponse *response,
+                                            NSData *responseHash,
+                                            NSError *error) {
+       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+       
+       if (!error && ![responseHash isEqual:self.actionsLastResponseHash]) {
+         self.actionsLastResponseHash = responseHash;
+         self.actionsFeedObjects = response.objects;
+         
+         DDLogVerbose(@"Got new actions data, sending notification.");
+         [[NSNotificationCenter defaultCenter]
+          postNotificationName:DFStrandNewActionsDataNotificationName
+          object:self];
+       }
+       [self executeDeferredCompletionsForFeedType:DFActionsFeed];
+       self.actionsRefreshing = NO;
+     }
+     ];
+  }
+}
+
 - (BOOL)hasInboxData{
   return (self.inboxLastResponseHash != nil);
 }
@@ -190,6 +227,12 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   return (self.swapsLastResponseHash != nil);
 }
+
+- (BOOL)hasActionsData
+{
+  return (self.actionsLastResponseHash != nil);
+}
+
 
 - (NSArray *)publicStrandsWithUser:(DFPeanutUserObject *)user includeInvites:(BOOL)includeInvites
 {
@@ -446,30 +489,13 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user
 {
-  NSMutableArray *photos = [NSMutableArray new];
-  
-  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectPhoto]) {
-      [photos addObject:object];
-    } else {
-      for (DFPeanutFeedObject *subObject in [object enumeratorOfDescendents]) {
-        if ([subObject.type isEqual:DFFeedObjectPhoto]) {
-          [photos addObject:subObject];
-        }
-      }
-    }
-  }
-  
+  DFPeanutFeedObject *actionsList = [self.actionsFeedObjects firstObject];
   NSMutableArray *actions = [NSMutableArray new];
-  for (DFPeanutFeedObject *photo in photos) {
-    for (DFPeanutAction *action in photo.actions) {
-      if (action.user == user.id) continue;
-      [actions addObject:action];
-    }
-  }
   
-  NSSortDescriptor* sortByDate = [NSSortDescriptor sortDescriptorWithKey:@"time_stamp" ascending:NO];
-  [actions sortUsingDescriptors:[NSArray arrayWithObject:sortByDate]];
+  for (DFPeanutAction *action in actionsList.actions) {
+    if (action.user == user.id) continue;
+    [actions addObject:action];
+  }
   
   return actions;
 }
@@ -767,6 +793,12 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_swapsFeedAdapter) _swapsFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
   return _swapsFeedAdapter;
+}
+
+- (DFPeanutFeedAdapter *)actionsFeedAdapter
+{
+  if (!_actionsFeedAdapter) _actionsFeedAdapter = [[DFPeanutFeedAdapter alloc] init];
+  return _actionsFeedAdapter;
 }
 
 - (DFPeanutStrandAdapter *)strandAdapter
