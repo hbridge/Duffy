@@ -158,7 +158,6 @@
 - (NSAttributedString *)attributedStringForAction:(DFPeanutAction *)action
 {
   NSString *actionString;
-  DDLogVerbose(@"Here: %llu", action.action_type);
   if (action.action_type == DFPeanutActionFavorite) {
     actionString = @"liked a photo.";
   } else if (action.action_type == DFPeanutActionComment) {
