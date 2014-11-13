@@ -10,6 +10,8 @@
 #import "RestKit/Restkit.h"
 #import <CoreLocation/CoreLocation.h>
 #import <RHAddressBook/AddressBook.h>
+#import "UIImage+Resize.h"
+#import "UIImage+RoundedCorner.h"
 
 @implementation DFPeanutUserObject
 
@@ -161,6 +163,16 @@ static NSArray *defaultPeopleList;
 - (UIImage *)thumbnail
 {
   return [DFPeanutUserObject UIImageForThumbnailFromPhoneNumber:self.phone_number];
+}
+
+- (UIImage *)roundedThumbnailOfPointSize:(CGSize)size
+{
+  CGSize imageSize = CGSizeMake(size.width * [[UIScreen mainScreen] scale],
+                                size.height * [[UIScreen mainScreen] scale]);
+  UIImage *resizedImage = [[self thumbnail] resizedImage:imageSize
+                         interpolationQuality:kCGInterpolationDefault];
+  UIImage *roundedImage = [resizedImage roundedCornerImage:imageSize.width/2.0 borderSize:0];
+  return roundedImage;
 }
 
 + (UIImage *)UIImageForThumbnailFromPhoneNumber:(NSString *)phoneNumber

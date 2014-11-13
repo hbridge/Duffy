@@ -84,7 +84,6 @@
   if (self.isMovingToParentViewController) {
     [self.collectionView scrollToBottom];
   }
-  [self.flowLayout invalidateLayout];
 }
 
 - (void)viewDidLayoutSubviews
@@ -101,6 +100,7 @@
     [self.flowLayout invalidateLayout];
     [self.collectionView reloadData];
   }
+  [self.flowLayout invalidateLayout];
 }
 
 - (void)reloadData

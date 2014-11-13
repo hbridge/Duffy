@@ -55,7 +55,8 @@
     abbreviations[@(user.id)] = abbreviation;
     
     //image
-    UIImage *image = user.thumbnail;
+    UIImage *image = [user roundedThumbnailOfPointSize:CGSizeMake(self.profilePhotoWidth,
+                                                                  self.profilePhotoWidth)];
     if (image)
       images[@(user.id)] = image;
     
@@ -67,6 +68,18 @@
   [self setNeedsDisplay];
 }
 
+- (void)reloadImages
+{
+  NSMutableDictionary *images = [NSMutableDictionary new];
+  for (DFPeanutUserObject *user in self.peanutUsers) {
+    UIImage *image = [user roundedThumbnailOfPointSize:CGSizeMake(self.profilePhotoWidth,
+                                                                  self.profilePhotoWidth)];
+    if (image)
+      images[@(user.id)] = image;
+  }
+  self.imagesById = images;
+}
+
 - (void)setMaxProfilePhotos:(NSUInteger)maxProfilePhotos
 {
   _maxProfilePhotos = maxProfilePhotos;
@@ -75,8 +88,11 @@
 
 - (void)setProfilePhotoWidth:(CGFloat)profilePhotoWidth
 {
+  if (profilePhotoWidth != _profilePhotoWidth) {
   _profilePhotoWidth = profilePhotoWidth;
-  [self setNeedsDisplay];
+    [self reloadImages];
+    [self setNeedsDisplay];
+  }
 }
 
 - (NSInteger)numberForUser:(DFPeanutUserObject *)user {
@@ -124,12 +140,7 @@
       label.font = [UIFont fontWithName:@"HelveticaNeue" size:ceil(abbreviationRect.size.height)/2.0];
       [label drawTextInRect:abbreviationRect];
     } else {
-      CGSize imageSize = CGSizeMake(abbreviationRect.size.width * [[UIScreen mainScreen] scale],
-                                     abbreviationRect.size.height * [[UIScreen mainScreen] scale]);
-      UIImage *resizedImage = [image resizedImage:imageSize
-                             interpolationQuality:kCGInterpolationDefault];
-      UIImage *roundedImage = [resizedImage roundedCornerImage:imageSize.width/2.0 borderSize:0];
-      [roundedImage drawInRect:abbreviationRect];
+      [image drawInRect:abbreviationRect];
     }
   }
 }

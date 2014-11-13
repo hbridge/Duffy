@@ -36,6 +36,7 @@
 - (NSString *)fullName;
 - (NSString *)firstName;
 - (UIImage *)thumbnail;
+- (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
 
 + (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber;
 + (void)clearCaches;
