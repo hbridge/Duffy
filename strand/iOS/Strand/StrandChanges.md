@@ -1,5 +1,9 @@
 # Swap
 
+## Nov 13, 2014 (4795)
+
+- Performance improvements
+
 ## Nov 12, 2014 (4794)
 
 - Replace inbox view with a gallery of photos
