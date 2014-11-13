@@ -304,7 +304,8 @@ static DFImageDiskCache *defaultStore;
 
 - (BOOL)canServeRequest:(DFImageManagerRequest *)request
 {
-  return [[self imageIdsFromDBForType:[request imageType]] containsObject:@(request.photoID)];
+  NSSet *imageIDsForType = [self getPhotoIdsForType:[request imageType]];
+  return [imageIDsForType containsObject:@(request.photoID)];
 }
 
 - (UIImage *)serveImageForRequest:(DFImageManagerRequest *)request
