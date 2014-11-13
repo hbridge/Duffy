@@ -6,6 +6,8 @@ from rest_framework.parsers import BaseParser
 
 from django.db import connection
 
+from peanut.settings import constants
+
 class PhotoSerializer(serializers.ModelSerializer):
 	full_image_path = serializers.Field(source='getFullUrlImagePath')
 
@@ -69,7 +71,12 @@ def actionDataForApiSerializer(action):
 	actionData['time_stamp'] = action.added
 	actionData['action_type'] = action.action_type
 	actionData['strand'] = action.strand_id
-	actionData['photo'] = action.photo_id
+
+	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and not action.photo:
+		actionData['photo'] = action.photos.all()[0].id
+	else:
+		actionData['photo'] = action.photo_id
+		
 	actionData['text'] = action.text
 
 	# TODO(Derek): remove this once we don't need it.

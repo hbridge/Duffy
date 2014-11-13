@@ -673,7 +673,9 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
                 privateStrand.contributed_to_id = strand.id
                 privateStrand.save()
 
-            action = Action(user=user, strand=strand, photo_id=newPhotoIds[-1], action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+            newPhotos = Photo.objects.filter(id__in=newPhotoIds).order_by('time_taken')
+
+            action = Action(user=user, strand=strand, photo_id=newPhotos[0].id, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
             action.save()
             action.photos = newPhotoIds
 
