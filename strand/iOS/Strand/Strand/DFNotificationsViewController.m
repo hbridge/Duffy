@@ -157,10 +157,20 @@
 
 - (NSAttributedString *)attributedStringForAction:(DFPeanutAction *)action
 {
+  NSString *actionString;
+  DDLogVerbose(@"Here: %llu", action.action_type);
+  if (action.action_type == DFPeanutActionFavorite) {
+    actionString = @"liked a photo.";
+  } else if (action.action_type == DFPeanutActionComment) {
+    actionString = @"commented: ";
+  } else if (action.action_type == DFPeanutActionAddedPhotos) {
+    actionString = @"added photos.";
+  }
+  
   NSString *markup =
   [NSString stringWithFormat:@"<name>%@</name> %@%@ <gray>%@ ago</gray>",
    [action firstNameOrYou],
-   action.action_type == DFPeanutActionFavorite ? @"liked a photo." : @"commented: ",
+   actionString,
    action.action_type == DFPeanutActionComment ? [action.text stringByEscapingCharsInString:@"<>"] : @"",
    [NSDateFormatter relativeTimeStringSinceDate:action.time_stamp abbreviate:YES]
    ];
@@ -184,6 +194,7 @@
   // set cell basic data
   DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
   peanutUser.id = action.user;
+  // TODO(Derek) need to replace this use of display_name
   peanutUser.display_name = action.user_display_name;
   cell.profilePhotoStackView.peanutUsers = @[peanutUser];
   cell.detailLabel.attributedText = [self attributedStringForAction:action];
