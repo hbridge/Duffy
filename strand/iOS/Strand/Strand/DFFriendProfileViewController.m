@@ -43,6 +43,11 @@
   [self configureHeader];
 }
 
+- (BOOL)hidesBottomBarWhenPushed
+{
+  return YES;
+}
+
 - (void)configureHeader
 {
   NSArray *swappedStrands = [[DFPeanutFeedDataManager sharedManager]
