@@ -27,6 +27,7 @@
 @property (nonatomic, weak) UICollectionView *collectionView;
 @property (nonatomic, weak) id<DFImageDataSourceDelegate> imageDataSourceDelegate;
 @property (nonatomic, retain) NSArray *collectionFeedObjects;
+@property (nonatomic) BOOL showActionsBadge;
 
 - (instancetype)initWithFeedPhotos:(NSArray *)feedPhotos
                     collectionView:(UICollectionView *)collectionView;

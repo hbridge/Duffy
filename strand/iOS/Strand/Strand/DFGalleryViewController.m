@@ -76,6 +76,7 @@
                withReuseIdentifier:@"header"];
   self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, 70);
   self.collectionView.delegate = self;
+  self.datasource.showActionsBadge = YES;
 }
 
 - (void)viewWillAppear:(BOOL)animated

@@ -11,7 +11,9 @@
 @interface DFPhotoViewCell : UICollectionViewCell
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (weak, nonatomic) IBOutlet UIImageView *likeIconImageView;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *loadingActivityIndicator;
+@property (weak, nonatomic) IBOutlet UILabel *badgeLabel;
+
+- (void)setNumLikes:(NSUInteger)numLikes numComments:(NSUInteger)numComments;
 
 @end
