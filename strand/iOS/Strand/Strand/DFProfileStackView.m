@@ -40,7 +40,6 @@
     DFPeanutUserObject *user = _peanutUsers[i];
     NSInteger numberForUser = [self numberForUser:user];
     NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);
-    DDLogVerbose(@"User: %@ colorIndex:%@", user, @(colorIndex));
     UIColor *color = allColors[colorIndex];
     [fillColors addObject:color];
     
