@@ -48,12 +48,12 @@ def sendRetroFirestarterNotification():
 				otherStrand = neighbor.strand_1
 				myStrand = neighbor.strand_2
 
-
-			if (not myStrand.contributed_to_id and myStrand.suggestible and myStrand.location_point and 
-				not otherStrand.contributed_to_id and otherStrand.suggestible and otherStrand.location_point):
-				if myStrand not in neighborsByStrand:
-					neighborsByStrand[myStrand] = list()
-				neighborsByStrand[myStrand].append(otherStrand)
+			if myStrand and otherStrand:
+				if (not myStrand.contributed_to_id and myStrand.suggestible and myStrand.location_point and 
+					not otherStrand.contributed_to_id and otherStrand.suggestible and otherStrand.location_point):
+					if myStrand not in neighborsByStrand:
+						neighborsByStrand[myStrand] = list()
+					neighborsByStrand[myStrand].append(otherStrand)
 
 		winningStrand = None
 		winningCount = 0

@@ -28,7 +28,7 @@ from ios_notifications.models import APNService, Device, Notification
 logger = logging.getLogger(__name__)
 
 def getActionsByPhotoIdCache(photoIds):
-	actions = Action.objects.select_related().filter(photo_id__in=photoIds)
+	actions = Action.objects.prefetch_related('user').filter(photo_id__in=photoIds)
 	actionsByPhotoId = dict()
 
 	for action in actions:
