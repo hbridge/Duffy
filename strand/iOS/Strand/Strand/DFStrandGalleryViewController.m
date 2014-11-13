@@ -159,7 +159,7 @@
   headerView.actionLabel.text = postObject.title;
   headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:postObject.time_taken
                                                                 abbreviate:YES];
-  headerView.profilePhotoView.names = postObject.actorNames;
+  headerView.profilePhotoView.peanutUsers = postObject.actors;
   headerView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:postObject.time_stamp
                                                                 abbreviate:NO];
   return headerView;

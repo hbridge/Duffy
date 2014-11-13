@@ -7,11 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 #import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
 
 @interface DFSwapTableViewCell : MCSwipeTableViewCell
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subTitleLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *previewImageView;

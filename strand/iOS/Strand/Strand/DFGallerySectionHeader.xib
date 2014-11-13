@@ -20,19 +20,13 @@
                             <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                             <nil key="highlightedColor"/>
                         </label>
-                        <view contentMode="scaleToFill" horizontalCompressionResistancePriority="753" translatesAutoresizingMaskIntoConstraints="NO" id="VvB-T1-SD0" customClass="DFProfilePhotoStackView" customModule="Strand" customModuleProvider="target">
-                            <rect key="frame" x="8" y="27" width="274" height="35"/>
+                        <view contentMode="scaleToFill" horizontalCompressionResistancePriority="753" translatesAutoresizingMaskIntoConstraints="NO" id="VvB-T1-SD0" customClass="DFProfileStackView">
+                            <rect key="frame" x="8" y="27" width="304" height="35"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="height" priority="900" constant="35" id="Fd5-O8-AMA"/>
                             </constraints>
                         </view>
-                        <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="contactAdd" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="T2b-ur-GJN">
-                            <rect key="frame" x="290" y="34" width="22" height="22"/>
-                            <constraints>
-                                <constraint firstAttribute="width" constant="22" id="w3V-qZ-Frs"/>
-                            </constraints>
-                        </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aug 14th 2014" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qsG-Uz-y5G">
                             <rect key="frame" x="222" y="9" width="90" height="16"/>
                             <constraints>
@@ -50,11 +44,9 @@
                         <constraint firstItem="VvB-T1-SD0" firstAttribute="leading" secondItem="PJQ-PA-sUn" secondAttribute="leading" constant="8" id="5TB-Za-fgO"/>
                         <constraint firstItem="6R4-fp-YjS" firstAttribute="top" secondItem="PJQ-PA-sUn" secondAttribute="top" constant="8" id="5vO-cO-3Ad"/>
                         <constraint firstItem="VvB-T1-SD0" firstAttribute="top" secondItem="qsG-Uz-y5G" secondAttribute="bottom" constant="2" id="Jpd-eX-NvT"/>
-                        <constraint firstItem="T2b-ur-GJN" firstAttribute="centerY" secondItem="VvB-T1-SD0" secondAttribute="centerY" constant="0.5" id="NWH-ij-teC"/>
                         <constraint firstItem="6R4-fp-YjS" firstAttribute="leading" secondItem="PJQ-PA-sUn" secondAttribute="leading" constant="8" id="RgH-0l-D1P"/>
                         <constraint firstAttribute="trailing" secondItem="qsG-Uz-y5G" secondAttribute="trailing" constant="8" id="SkO-OD-CxY"/>
-                        <constraint firstItem="T2b-ur-GJN" firstAttribute="leading" secondItem="VvB-T1-SD0" secondAttribute="trailing" constant="8" id="Ylu-CF-vJN"/>
-                        <constraint firstAttribute="trailing" secondItem="T2b-ur-GJN" secondAttribute="trailing" constant="8" id="gbk-8h-BTG"/>
+                        <constraint firstAttribute="trailing" secondItem="VvB-T1-SD0" secondAttribute="trailing" constant="8" id="ftR-VW-1WP"/>
                     </constraints>
                 </view>
             </subviews>

@@ -132,7 +132,7 @@
     return noResults;
   }
   DFPeanutAction *comment = [[self comments] objectAtIndex:indexPath.row];
-  [cell.profilePhotoStackView setNames:@[[comment fullName]]];
+  [cell.profilePhotoStackView setPeanutUsers:@[[self.postsObject actorWithID:comment.user]]];
   cell.nameLabel.text = [comment fullNameOrYou];
   cell.commentLabel.text = comment.text;
   cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:comment.time_stamp

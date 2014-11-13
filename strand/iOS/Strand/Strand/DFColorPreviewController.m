@@ -8,7 +8,8 @@
 
 #import "DFColorPreviewController.h"
 #import "DFPersonSelectionTableViewCell.h"
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
+#import "DFPeanutUserObject.h"
 
 @interface DFColorPreviewController ()
 
@@ -52,7 +53,10 @@
     }
   }
 
-  cell.profilePhotoStackView.names = @[name];
+  DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
+  peanutUser.display_name = name;
+  peanutUser.id = indexPath.row;
+  cell.profilePhotoStackView.peanutUsers = @[peanutUser];
   cell.nameLabel.text = name;
   cell.subtitleLabel.text = [NSString stringWithFormat:@"Color: %d",
                              (int)(value % [[DFStrandConstants profilePhotoStackColors] count])];

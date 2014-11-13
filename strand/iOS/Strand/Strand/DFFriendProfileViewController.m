@@ -50,7 +50,7 @@
                              publicStrandsWithUser:self.peanutUser includeInvites:NO];
   NSArray *unswappedStrands = [[DFPeanutFeedDataManager sharedManager]
                                privateStrandsWithUser:self.peanutUser];
-  self.profilePhotoStackView.names = @[[self.peanutUser fullName]];
+  self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.nameLabel.text = [self.peanutUser fullName];
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",

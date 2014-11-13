@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFPeanutUserObject.h"
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 
 @interface DFFriendProfileViewController : UIViewController
 
@@ -18,7 +18,7 @@
 @property (nonatomic, retain) DFPeanutUserObject *peanutUser;
 @property (weak, nonatomic) IBOutlet UIView *tabSegmentedControlWrapper;
 @property (weak, nonatomic) IBOutlet UISegmentedControl *tabSegmentedControl;
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 
 - (instancetype)initWithPeanutUser:(DFPeanutUserObject *)peanutUser;
 

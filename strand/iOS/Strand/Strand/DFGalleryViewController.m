@@ -122,7 +122,7 @@
   
   DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
   header.titleLabel.text = strandObject.title;
-  header.profilePhotoStackView.names = [strandObject actorNames];
+  header.profilePhotoStackView.peanutUsers = strandObject.actors;
   header.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:strandObject.time_taken];
 
   

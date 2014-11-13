@@ -390,7 +390,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
                                 inviteObject.actorsString];
   [self configureCell:inviteCell
             indexPath:indexPath
-            withNames:inviteObject.actorNames
+      withPeanutUsers:inviteObject.actors
           titleMarkup:titleLabelMarkup
            feedObject:strandPosts];
   
@@ -400,12 +400,12 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)configureCell:(DFSwapTableViewCell *)cell
             indexPath:(NSIndexPath *)indexPath
-            withNames:(NSArray *)names
+      withPeanutUsers:(NSArray *)peanutUsers
           titleMarkup:(NSString *)titleMarkup
            feedObject:(DFPeanutFeedObject *)feedObject
 {
   
-  cell.profilePhotoStackView.names = names;
+  cell.profilePhotoStackView.peanutUsers = peanutUsers;
   NSError *error;
   cell.peopleLabel.attributedText = [SLSMarkupParser
                                      attributedStringWithMarkup:titleMarkup
@@ -448,7 +448,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 - (UITableViewCell *)cellForSuggestionObject:(DFPeanutFeedObject *)suggestionObject indexPath:(NSIndexPath *)indexPath
 {
   DFSwapTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
-  suggestionCell.profilePhotoStackView.names = suggestionObject.actorNames;
+  suggestionCell.profilePhotoStackView.peanutUsers = suggestionObject.actors;
     // the suggestion sections don't include this user in the actors list
   
   NSString *titleMarkup;
@@ -466,7 +466,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   
   [self configureCell:suggestionCell
             indexPath:indexPath
-            withNames:suggestionObject.actorNames
+      withPeanutUsers:suggestionObject.actors
           titleMarkup:titleMarkup
            feedObject:suggestionObject];
   

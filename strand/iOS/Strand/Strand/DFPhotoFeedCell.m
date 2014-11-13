@@ -124,10 +124,10 @@
 {
   if (author) {
     self.nameLabel.text = author.display_name;
-    self.profilePhotoStackView.names = @[author.display_name];
+    self.profilePhotoStackView.peanutUsers = @[author];
   } else {
     self.nameLabel.text = @"";
-    self.profilePhotoStackView.names = @[];
+    self.profilePhotoStackView.peanutUsers = @[];
   }
 }
 

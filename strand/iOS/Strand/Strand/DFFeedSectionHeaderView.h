@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 
 @class DFFeedSectionHeaderView;
 
@@ -19,7 +19,7 @@
 @end
 
 @interface DFFeedSectionHeaderView : UITableViewHeaderFooterView
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *actionTextLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;

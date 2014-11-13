@@ -7,7 +7,7 @@
 //
 
 #import "DFCollectionViewTableViewCell.h"
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 
 extern CGFloat const ActivityFeedTableViewCellHeight;
 extern CGFloat const ActivityFeedTableViewCellNoCollectionViewHeight;

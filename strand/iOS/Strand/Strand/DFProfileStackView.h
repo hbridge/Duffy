@@ -12,7 +12,8 @@
 
 @property (nonatomic) NSUInteger maxProfilePhotos;
 @property (nonatomic) CGFloat profilePhotoWidth;
-@property (nonatomic, retain) NSArray *names;
+@property (nonatomic, retain) NSArray *peanutUsers;
+@property (nonatomic) BOOL shouldShowNameLabel;
 
 
 @end

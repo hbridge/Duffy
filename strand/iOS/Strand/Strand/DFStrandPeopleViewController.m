@@ -119,7 +119,7 @@
    | DFPersonSelectionTableViewCellStyleRightLabel];
   
   cell.nameLabel.text = [user fullName];
-  cell.profilePhotoStackView.names = @[[user fullName]];
+  cell.profilePhotoStackView.peanutUsers = @[user];
   cell.rightLabel.text = user.invited.boolValue ? @"Swap Requested" : @"Joined";
   
   return cell;

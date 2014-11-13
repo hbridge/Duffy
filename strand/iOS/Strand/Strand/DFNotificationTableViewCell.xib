@@ -22,7 +22,7 @@
                             <constraint firstAttribute="width" constant="45" id="Yzh-ym-gOH"/>
                         </constraints>
                     </imageView>
-                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMd-0b-oeH" customClass="DFProfilePhotoStackView" customModule="Strand" customModuleProvider="target">
+                    <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="JMd-0b-oeH" customClass="DFProfileStackView">
                         <rect key="frame" x="15" y="14" width="45" height="45"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>

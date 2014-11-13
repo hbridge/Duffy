@@ -8,11 +8,11 @@
 
 #import <UIKit/UIKit.h>
 #import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 
 
 @interface DFPersonSelectionTableViewCell : MCSwipeTableViewCell
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *rightLabel;

@@ -7,6 +7,7 @@
 //
 
 #import "DFProfileStackView.h"
+#import "DFPeanutUserObject.h"
 
 @interface DFProfileStackView()
 
@@ -20,14 +21,28 @@
 {
   [super awakeFromNib];
   
-  self.maxProfilePhotos = 4;
-  self.profilePhotoWidth = 35.0;
+  if (self.maxProfilePhotos == 0)
+    self.maxProfilePhotos = 4;
+  if (self.profilePhotoWidth == 0.0)
+    self.profilePhotoWidth = 35.0;
 }
 
-- (void)setNames:(NSArray *)names
+- (void)setPeanutUsers:(NSArray *)users
 {
-  _names = names;
+  _peanutUsers = users;
   [self setNameColors];
+  [self setNeedsDisplay];
+}
+
+- (void)setMaxProfilePhotos:(NSUInteger)maxProfilePhotos
+{
+  _maxProfilePhotos = maxProfilePhotos;
+  [self setNeedsDisplay];
+}
+
+- (void)setProfilePhotoWidth:(CGFloat)profilePhotoWidth
+{
+  _profilePhotoWidth = profilePhotoWidth;
   [self setNeedsDisplay];
 }
 
@@ -35,30 +50,26 @@
 {
   NSMutableArray *fillColors = [NSMutableArray new];
   NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
-  for (NSUInteger i = 0; i < self.names.count; i++) {
-    NSInteger numberForName = [self numberForName:self.names[i]];
+  for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
+    NSInteger numberForName = [self numberForUser:self.peanutUsers[i]];
     NSUInteger colorIndex = abs((int)numberForName % (int)[allColors count]);
+    DDLogVerbose(@"User: %@ colorIndex:%@", self.peanutUsers[i], @(colorIndex));
     UIColor *color = allColors[colorIndex];
     [fillColors addObject:color];
   }
   _fillColors = fillColors;
 }
 
-- (NSInteger)numberForName:(NSString *)name {
-  NSInteger result;
-  for (NSUInteger i = 0; i < name.length; i++) {
-    char c = [name characterAtIndex:i];
-    result += (NSUInteger)c;
-  }
-  return result;
+- (NSInteger)numberForUser:(DFPeanutUserObject *)user {
+  return (NSInteger)user.id;
 }
 
 - (CGSize)sizeThatFits:(CGSize)size
 {
   CGSize newSize = size;
   newSize.height = self.profilePhotoWidth;
-  newSize.width = (CGFloat)MIN(self.maxProfilePhotos + 1, self.names.count) * self.profilePhotoWidth
-  + MAX(self.names.count - 1, 0) * 2.0;
+  newSize.width = (CGFloat)MIN(self.maxProfilePhotos + 1, self.peanutUsers.count) * self.profilePhotoWidth
+  + MAX(self.peanutUsers.count - 1, 0) * 2.0;
   return newSize;
 }
 
@@ -77,12 +88,12 @@
 - (void)drawRect:(CGRect)rect {
   CGContextRef context = UIGraphicsGetCurrentContext();
   
-  for (NSUInteger i = 0; i< self.names.count; i++) {
-    NSString *name = self.names[i];
+  for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
+    DFPeanutUserObject *user = self.peanutUsers[i];
     UIColor *fillColor = self.fillColors[i];
     NSString *abbreviation = @"";
-    if (name.length > 0) {
-      abbreviation = [name substringToIndex:1];
+    if (user.fullName.length > 0) {
+      abbreviation = [user.fullName substringToIndex:1];
     }
     
     CGRect abbreviationRect = [self rectForIndex:i];

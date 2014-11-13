@@ -485,7 +485,7 @@ static int ImagePrefetchRange = 3;
  
   DFPeanutFeedObject *strandPost = [self strandPostObjectForSection:section];
   headerView.actorLabel.text = [strandPost actorsString];
-  headerView.profilePhotoStackView.names = [strandPost actorNames];
+  headerView.profilePhotoStackView.peanutUsers = strandPost.actors;
   headerView.actionTextLabel.text = strandPost.title;
   headerView.subtitleLabel.text = [NSDateFormatter relativeTimeStringSinceDate:strandPost.time_stamp abbreviate:NO];
   headerView.representativeObject = strandPost;

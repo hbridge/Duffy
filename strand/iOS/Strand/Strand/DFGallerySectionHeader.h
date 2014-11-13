@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 
 static const CGFloat SectionHeaderWidth = 320;
 static const CGFloat SectionHeaderHeight = 70;
@@ -16,6 +16,6 @@ static const CGFloat SectionFooterHeight = 25;
 @interface DFGallerySectionHeader : UICollectionReusableView
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 
 @end

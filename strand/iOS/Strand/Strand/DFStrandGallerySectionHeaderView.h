@@ -7,10 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "Strand-Swift.h"
+#import "DFProfileStackView.h"
 
 @interface DFStrandGallerySectionHeaderView : UICollectionReusableView
-@property (weak, nonatomic) IBOutlet DFProfilePhotoStackView *profilePhotoView;
+@property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoView;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;
 @property (weak, nonatomic) IBOutlet UILabel *actionLabel;
 @property (weak, nonatomic) IBOutlet UILabel *timeLabel;

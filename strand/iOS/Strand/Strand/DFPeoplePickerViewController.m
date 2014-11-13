@@ -448,7 +448,10 @@ NSString *const ContactsSectionTitle = @"Contacts";
     DFPersonSelectionTableViewCell *userCell = [self.tableView dequeueReusableCellWithIdentifier:@"user"];
     [userCell configureWithCellStyle:DFPersonSelectionTableViewCellStyleStrandUser | DFPersonSelectionTableViewCellStyleRightLabel];
     userCell.nameLabel.text = peanutContact.name;
-    userCell.profilePhotoStackView.names = @[peanutContact.name];
+    DFPeanutUserObject *userObj = [[DFPeanutUserObject alloc] init];
+    userObj.display_name = peanutContact.name;
+    userObj.id = peanutContact.user.longLongValue;
+    userCell.profilePhotoStackView.peanutUsers = @[userObj];
     cell = userCell;
   } else {
     DFPersonSelectionTableViewCell *nonUserCell = [self.tableView dequeueReusableCellWithIdentifier:@"nonUser"];

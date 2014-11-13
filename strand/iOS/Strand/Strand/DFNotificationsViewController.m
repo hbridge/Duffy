@@ -157,7 +157,10 @@
   DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
   
   // set cell basic data
-  cell.profilePhotoStackView.names = @[[action firstName]];
+  DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
+  peanutUser.id = action.user;
+  peanutUser.display_name = action.user_display_name;
+  cell.profilePhotoStackView.peanutUsers = @[peanutUser];
   cell.detailLabel.attributedText = [self attributedStringForAction:action];
   
   //set the preview image
