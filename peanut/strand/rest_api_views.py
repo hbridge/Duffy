@@ -554,6 +554,7 @@ class CreateActionAPI(CreateAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return super(CreateActionAPI, self).post(request)
+
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -672,7 +673,7 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
                 privateStrand.contributed_to_id = strand.id
                 privateStrand.save()
 
-            action = Action(user=user, strand=strand, action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+            action = Action(user=user, strand=strand, photo_id=newPhotoIds[0], action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
             action.save()
             action.photos = newPhotoIds
 
