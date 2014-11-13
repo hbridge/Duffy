@@ -12,6 +12,7 @@
 @interface DFProfileStackView()
 
 @property (nonatomic, retain) NSArray *fillColors;
+@property (nonatomic, retain) NSArray *abbreviations;
 
 @end
 
@@ -30,7 +31,29 @@
 - (void)setPeanutUsers:(NSArray *)users
 {
   _peanutUsers = users;
-  [self setNameColors];
+
+  NSMutableArray *fillColors = [[NSMutableArray alloc] initWithCapacity:users.count];
+  NSMutableArray *abbreviations = [[NSMutableArray alloc] initWithCapacity:users.count];
+  NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
+  for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
+    //fill color
+    DFPeanutUserObject *user = _peanutUsers[i];
+    NSInteger numberForUser = [self numberForUser:user];
+    NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);
+    DDLogVerbose(@"User: %@ colorIndex:%@", user, @(colorIndex));
+    UIColor *color = allColors[colorIndex];
+    [fillColors addObject:color];
+    
+    //name
+    NSString *abbreviation = @"";
+    if (user.fullName.length > 0) {
+      abbreviation = [user.display_name substringToIndex:1];
+    }
+    [abbreviations addObject:abbreviation];
+  }
+  _fillColors = fillColors;
+  _abbreviations = abbreviations;
+  
   [self setNeedsDisplay];
 }
 
@@ -44,20 +67,6 @@
 {
   _profilePhotoWidth = profilePhotoWidth;
   [self setNeedsDisplay];
-}
-
-- (void)setNameColors
-{
-  NSMutableArray *fillColors = [NSMutableArray new];
-  NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
-  for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
-    NSInteger numberForName = [self numberForUser:self.peanutUsers[i]];
-    NSUInteger colorIndex = abs((int)numberForName % (int)[allColors count]);
-    DDLogVerbose(@"User: %@ colorIndex:%@", self.peanutUsers[i], @(colorIndex));
-    UIColor *color = allColors[colorIndex];
-    [fillColors addObject:color];
-  }
-  _fillColors = fillColors;
 }
 
 - (NSInteger)numberForUser:(DFPeanutUserObject *)user {
@@ -89,12 +98,8 @@
   CGContextRef context = UIGraphicsGetCurrentContext();
   
   for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
-    DFPeanutUserObject *user = self.peanutUsers[i];
     UIColor *fillColor = self.fillColors[i];
-    NSString *abbreviation = @"";
-    if (user.fullName.length > 0) {
-      abbreviation = [user.fullName substringToIndex:1];
-    }
+    NSString *abbreviation = self.abbreviations[i];
     
     CGRect abbreviationRect = [self rectForIndex:i];
     CGContextSetFillColorWithColor(context, fillColor.CGColor);
