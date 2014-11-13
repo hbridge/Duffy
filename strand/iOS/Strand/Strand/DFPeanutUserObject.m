@@ -112,6 +112,7 @@ static NSArray *defaultPeopleList;
 
 + (RHPerson *)personFromPhoneNumber:(NSString *)phoneNumber
 {
+  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) return nil;
   if ([[DFPeanutUserObject phoneNumberToPersonCache] objectForKey:phoneNumber]) {
     return [[DFPeanutUserObject phoneNumberToPersonCache] objectForKey:phoneNumber];
   }
