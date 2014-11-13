@@ -1,7 +1,8 @@
 # Swap
 
-## Nov 13, 2014 (4795-4799)
+## Nov 13, 2014 (4795-4800)
 
+- Badge photos with likes and comments in gallery
 - Show profile photos for people from your AddressBook if available
 - Performance improvements
 

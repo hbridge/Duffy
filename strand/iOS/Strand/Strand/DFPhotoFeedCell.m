@@ -123,7 +123,7 @@
 - (void)setAuthor:(DFPeanutUserObject *)author
 {
   if (author) {
-    self.nameLabel.text = author.display_name;
+    self.nameLabel.text = author.fullName;
     self.profilePhotoStackView.peanutUsers = @[author];
   } else {
     self.nameLabel.text = @"";
