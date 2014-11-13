@@ -654,7 +654,7 @@ def strand_inbox(request):
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
-def actions(request):
+def actions_list(request):
 	startProfiling()
 	response = dict({'result': True})
 
@@ -679,10 +679,9 @@ def actions(request):
 		for action in actions:
 			actionsData.append(serializers.actionDataForApiSerializer(action))
 
-		response['objects'] = actionsData
+		actionsData = {'type': 'actions_list', 'actions': actionsData}
 
-
-
+		response['objects'] = [actionsData]
 		printStats("actions-end")
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
