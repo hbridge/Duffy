@@ -673,7 +673,7 @@ def actions_list(request):
 		for strandPhoto in strandPhotos:
 			photoIds.append(strandPhoto.photo_id)
 		
-		actions = Action.objects.prefetch_related('user').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(Q(photo_id__in=photoIds) | Q(strand_id__in=strandIds)).order_by("-added")[:40]
+		actions = Action.objects.prefetch_related('user').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) |  Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(Q(photo_id__in=photoIds) | Q(strand_id__in=strandIds)).order_by("-added")[:40]
 
 		actionsData = list()
 		for action in actions:
