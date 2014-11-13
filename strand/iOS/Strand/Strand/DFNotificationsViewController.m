@@ -16,6 +16,7 @@
 #import <Slash/Slash.h>
 #import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
+#import "NSIndexPath+DFHelpers.h"
 
 @interface DFNotificationsViewController ()
 
@@ -23,6 +24,7 @@
 @property (nonatomic, retain) NSArray *readNotifications;
 @property (nonatomic, retain) DFNotificationTableViewCell *templateCell;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
+@property (nonatomic, retain) NSMutableDictionary *rowHeightCache;
 
 @end
 
@@ -40,6 +42,7 @@
                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
     self.templateCell = [DFNotificationTableViewCell templateCell];
 
+    self.rowHeightCache = [NSMutableDictionary new];
     [self observeNotifications];
     [self reloadData];
   }
@@ -110,6 +113,7 @@
 {
   self.unreadNotifications = [[DFPeanutNotificationsManager sharedManager] unreadNotifications];
   self.readNotifications = [[DFPeanutNotificationsManager sharedManager] readNotifications];
+  self.rowHeightCache = [NSMutableDictionary new];
   [self.tableView reloadData];
   
   if (self.unreadNotifications.count == 0) {
@@ -212,9 +216,14 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+  NSNumber *cachedHeight = self.rowHeightCache[[indexPath dictKey]];
+  if (cachedHeight) return cachedHeight.floatValue;
+  
   DFPeanutAction *action = [self peanutActionForIndexPath:indexPath];
   self.templateCell.detailLabel.attributedText = [self attributedStringForAction:action];
-  return self.templateCell.rowHeight;
+  CGFloat rowHeight = self.templateCell.rowHeight;
+  self.rowHeightCache[[indexPath dictKey]] = @(rowHeight);
+  return rowHeight;
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath

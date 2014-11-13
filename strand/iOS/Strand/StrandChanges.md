@@ -1,6 +1,6 @@
 # Swap
 
-## Nov 13, 2014 (4795-4798)
+## Nov 13, 2014 (4795-4799)
 
 - Show profile photos for people from your AddressBook if available
 - Performance improvements
