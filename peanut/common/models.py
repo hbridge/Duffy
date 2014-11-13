@@ -451,6 +451,7 @@ class Similarity(models.Model):
 
 class NotificationLog(models.Model):
 	user = models.ForeignKey(User)
+	phone_number = PhoneNumberField(null=True, db_index=True)
 	device_token = models.TextField(null=True)
 	msg = models.TextField(null=True)
 	msg_type = models.IntegerField(db_index=True)
