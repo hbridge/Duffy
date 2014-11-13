@@ -384,13 +384,15 @@ static DFPeanutFeedDataManager *defaultManager;
 - (NSArray *)acceptedStrands
 {
   return [self acceptedStrandsWithPostsCollapsed:NO
+                                    filterToUser:0
                                feedObjectSortKey:@"time_stamp"
                                        ascending:NO];
 }
 
 - (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
+                                  filterToUser:(DFUserIDType)filterToUserID
                              feedObjectSortKey:(NSString *)sortKey
-                                     ascending:(BOOL)ascending
+                                     ascending:(BOOL)ascending;
 {
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectStrandPosts];
   NSArray *postsObjects = [self.inboxFeedObjects filteredArrayUsingPredicate:predicate];
@@ -399,6 +401,16 @@ static DFPeanutFeedDataManager *defaultManager;
   NSSortDescriptor *sortDescriptor = [NSSortDescriptor sortDescriptorWithKey:sortKey ascending:ascending];
   NSMutableArray *collapsedResult = [NSMutableArray new];
   for (DFPeanutFeedObject *strandPosts in postsObjects) {
+    if (filterToUserID > 0) {
+      BOOL foundUser = NO;
+      for (DFPeanutUserObject *user in strandPosts.actors) {
+        if (user.id == filterToUserID) {
+          foundUser = YES;
+          break;
+        }
+      }
+      if (!foundUser) continue;
+    }
     DFPeanutFeedObject *collapsedObj = [strandPosts copy];
     collapsedObj.type = DFFeedObjectStrand;
     collapsedObj.actors = [strandPosts.actors copy];

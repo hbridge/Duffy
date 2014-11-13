@@ -33,6 +33,15 @@
   return self;
 }
 
+- (instancetype)initWithFilterUser:(DFPeanutUserObject *)user
+{
+  self = [self init];
+  if (self) {
+    _userToFilterTo = user;
+  }
+  return self;
+}
+
 - (void)observeNotifications
 {
   [[NSNotificationCenter defaultCenter] addObserver:self
@@ -67,6 +76,7 @@
   self.datasource = [[DFImageDataSource alloc]
                      initWithCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
                                                     acceptedStrandsWithPostsCollapsed:YES
+                                                    filterToUser:self.userToFilterTo.id
                                                     feedObjectSortKey:@"time_taken"
                                                     ascending:YES]
                      collectionView:self.collectionView];
@@ -82,7 +92,8 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  if (self.isMovingToParentViewController) {
+  if (self.isMovingToParentViewController && !self.userToFilterTo) {
+    // we have to check usertofilter to or it jumps in the friend profile view
     [self.collectionView scrollToBottom];
   }
 }
@@ -108,6 +119,7 @@
 {
   self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
                                            acceptedStrandsWithPostsCollapsed:YES
+                                           filterToUser:0
                                            feedObjectSortKey:@"time_taken"
                                            ascending:YES];
   [self.collectionView reloadData];

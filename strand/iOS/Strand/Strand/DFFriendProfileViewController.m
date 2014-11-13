@@ -7,7 +7,7 @@
 //
 
 #import "DFFriendProfileViewController.h"
-#import "DFSingleFriendViewController.h"
+#import "DFGalleryViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "UIDevice+DFHelpers.h"
 #import "DFSwapViewController.h"
@@ -15,7 +15,7 @@
 @interface DFFriendProfileViewController ()
 
 @property (nonatomic, retain) DFSwapViewController *unsharedViewController;
-@property (nonatomic, retain) DFSingleFriendViewController *sharedViewController;
+@property (nonatomic, retain) DFGalleryViewController *sharedGalleryViewController;
 
 @end
 
@@ -29,12 +29,11 @@
     _peanutUser = peanutUser;
     _unsharedViewController = [[DFSwapViewController alloc]
                                initWithUserToFilter:peanutUser];
-    _sharedViewController = [[DFSingleFriendViewController alloc]
-                               initWithUser:peanutUser
-                               withSharedPhotos:YES];
+    _sharedGalleryViewController = [[DFGalleryViewController alloc]
+                                    initWithFilterUser:peanutUser];
     
     // set their parent view controller so they inherit the nav controller etc
-    [self displayContentController:_sharedViewController];
+    [self displayContentController:_sharedGalleryViewController];
   }
   return self;
 }
@@ -47,16 +46,16 @@
 - (void)configureHeader
 {
   NSArray *swappedStrands = [[DFPeanutFeedDataManager sharedManager]
-                             publicStrandsWithUser:self.peanutUser includeInvites:NO];
-  NSArray *unswappedStrands = [[DFPeanutFeedDataManager sharedManager]
-                               privateStrandsWithUser:self.peanutUser];
+                             acceptedStrandsWithPostsCollapsed:YES
+                             filterToUser:self.peanutUser.id
+                             feedObjectSortKey:@"time_taken"
+                             ascending:YES];
   self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.nameLabel.text = [self.peanutUser fullName];
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
                              (int)swappedStrands.count];
-  [self.tabSegmentedControl setTitle:[NSString stringWithFormat:@"Suggestions (%d)",
-                                      (int)unswappedStrands.count]
+  [self.tabSegmentedControl setTitle:[NSString stringWithFormat:@"Suggestions"]
                    forSegmentAtIndex:1];
   
   // add a fancy background blur if iOS8 +
@@ -79,7 +78,7 @@
 {
   [self addChildViewController:contentController];
   contentController.view.frame = self.view.frame;
-  [self configureContentControllerTableView:(UITableViewController *)contentController];
+  //[self configureContentControllerView:contentController];
   [self.view insertSubview:contentController.view atIndex:0];
   [contentController didMoveToParentViewController:self];
 }
@@ -91,9 +90,25 @@
   [contentController removeFromParentViewController];
 }
 
-- (void)configureContentControllerTableView:(UITableViewController *)tableViewController
+- (void)configureContentControllerView:(UIViewController *)viewController
 {
-  tableViewController.tableView.frame = self.view.frame;
+  UIScrollView *mainView = [self mainScrollViewForViewController:viewController];
+  mainView.frame = self.view.frame;
+  CGFloat contentTop = self.tabSegmentedControlWrapper.frame.origin.y
+  + self.tabSegmentedControlWrapper.frame.size.height;
+  UIEdgeInsets insets = UIEdgeInsetsMake(contentTop, 0, 0, 0);
+  mainView.contentInset = insets;
+  mainView.contentOffset = CGPointMake(0, -contentTop);
+}
+
+- (UIScrollView *)mainScrollViewForViewController:(UIViewController *)viewController
+{
+  if ([viewController respondsToSelector:@selector(tableView)]) {
+    return [(UITableViewController *)viewController tableView];
+  } else if ([viewController respondsToSelector:@selector(collectionView)]) {
+    return [(UICollectionViewController *)viewController collectionView];
+  }
+  return nil;
 }
 
 
@@ -101,13 +116,7 @@
 {
   //set insets etc
   UITableViewController *currentContoller = self.childViewControllers.firstObject;
-  UITableView *tableView = currentContoller.tableView;
-  CGFloat contentTop = self.tabSegmentedControlWrapper.frame.origin.y
-  + self.tabSegmentedControlWrapper.frame.size.height;
-  UIEdgeInsets insets = UIEdgeInsetsMake(contentTop, 0, 0, 0);
-  tableView.contentInset = insets;
-  tableView.contentOffset = CGPointMake(0, -contentTop);
-  tableView.backgroundColor = [UIColor groupTableViewBackgroundColor];
+  [self configureContentControllerView:currentContoller];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -152,9 +161,9 @@
 - (IBAction)segmentViewValueChanged:(UISegmentedControl *)sender {
   if (sender.selectedSegmentIndex == 0) {
     [self hideContentController:self.unsharedViewController];
-    [self displayContentController:self.sharedViewController];
+    [self displayContentController:self.sharedGalleryViewController];
   } else {
-    [self hideContentController:self.sharedViewController];
+    [self hideContentController:self.sharedGalleryViewController];
     [self displayContentController:self.unsharedViewController];
   }
 }

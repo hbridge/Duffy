@@ -34,6 +34,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)inviteStrands;
 - (NSArray *)acceptedStrands;
 - (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
+                                  filterToUser:(DFUserIDType)userID
                              feedObjectSortKey:(NSString *)sortKey
                                      ascending:(BOOL)ascending;
 - (NSArray *)privateStrands;
