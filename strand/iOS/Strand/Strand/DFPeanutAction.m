@@ -81,4 +81,16 @@
     return [self fullNameOrYou];
   }
 }
+
+- (DFPeanutUserObject *)peanutUser
+{
+  DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
+  peanutUser.id = self.user;
+  peanutUser.phone_number = self.user_phone_number;
+  peanutUser.display_name = self.user_display_name;
+  return peanutUser;
+}
+
+
+
 @end

@@ -10,6 +10,7 @@
 #import "DFPeanutObject.h"
 #import "DFUser.h"
 #import "DFPhoto.h"
+#import "DFPeanutUserObject.h"
 
 /*
 {
@@ -52,5 +53,6 @@ typedef UInt64 DFActionID;
 - (NSString *)firstName;
 - (NSString *)fullNameOrYou;
 - (NSString *)fullName;
+- (DFPeanutUserObject *)peanutUser;
 
 @end
