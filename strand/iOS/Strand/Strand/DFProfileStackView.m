@@ -49,8 +49,8 @@
     
     //name
     NSString *abbreviation = @"";
-    if (user.display_name.length > 0) {
-      abbreviation = [[user.display_name substringToIndex:1] uppercaseString];
+    if ([user firstName].length > 0) {
+      abbreviation = [[[user firstName] substringToIndex:1] uppercaseString];
     }
     abbreviations[@(user.id)] = abbreviation;
     
