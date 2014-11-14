@@ -179,6 +179,12 @@ static NSArray *FeedObjectTypes;
   }
 }
 
+- (DFUserIDType)user
+{
+  if (_user > 0 || self.objects.count == 0) return _user;
+  return [(DFPeanutFeedObject *)self.objects.firstObject user];
+}
+
 #pragma mark - Action Accessors
 
 - (NSArray *)commentActions
