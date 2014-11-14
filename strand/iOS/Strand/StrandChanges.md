@@ -1,8 +1,10 @@
 # Swap
 
-## Nov 13, 2014 (4795-4799)
+## Nov 13, 2014 (4795-4801)
 
+- Badge photos with likes and comments in gallery
 - Show profile photos for people from your AddressBook if available
+- Change friend profile Swapped tab to gallery
 - Performance improvements
 
 ## Nov 12, 2014 (4794)

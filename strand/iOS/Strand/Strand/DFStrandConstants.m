@@ -160,6 +160,16 @@ static NSArray *colors;
         defaultStyle[@"$default"] = @{NSFontAttributeName : helveticaNeue};
         defaultStyle[@"subtitle"] = @{NSFontAttributeName : [helveticaNeue fontWithSize:11.0],
                                       NSForegroundColorAttributeName : [UIColor lightGrayColor]};
+        NSShadow *badgeShadow = [[NSShadow alloc] init];
+        badgeShadow.shadowOffset = CGSizeMake(0, 0);
+        badgeShadow.shadowBlurRadius = 4.0;
+        
+        
+        defaultStyle[@"photoBadge"] = @{
+                                        NSFontAttributeName : [helveticaNeue fontWithSize:11.0],
+                                        NSForegroundColorAttributeName : [UIColor whiteColor],
+                                        NSShadowAttributeName : badgeShadow
+                                        };
       }
       if (helveticaNeueBold) {
         defaultStyle[@"strong"] = @{NSFontAttributeName : helveticaNeueBold};

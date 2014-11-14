@@ -231,8 +231,6 @@
   cell.imageView.contentMode = UIViewContentModeScaleAspectFill;
   cell.imageView.clipsToBounds = YES;
   
-  NSArray *likeActions = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
-  cell.likeIconImageView.hidden = (likeActions.count <= 0);
   DFImageType preferredType = DFImageFull;
   
   [[DFImageManager sharedManager]

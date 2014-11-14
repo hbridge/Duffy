@@ -159,6 +159,12 @@ NSUInteger const SectionSpread = 5;
   }
   
   [self setImageForCell:cell photoObject:photoObject indexPath:indexPath];
+  if (self.showActionsBadge) {
+    NSArray *likes = [photoObject actionsOfType:DFPeanutActionFavorite forUser:0];
+        NSArray *comments = [photoObject actionsOfType:DFPeanutActionComment forUser:0];
+    [cell setNumLikes:likes.count numComments:comments.count];
+    cell.badgeLabel.hidden = NO;
+  }
   return cell;
 }
 

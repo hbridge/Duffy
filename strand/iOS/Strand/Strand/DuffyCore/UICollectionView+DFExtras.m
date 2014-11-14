@@ -14,7 +14,7 @@
 {
   NSInteger sectionIndex = self.numberOfSections - 1;
   NSInteger itemIndex = [self numberOfItemsInSection:sectionIndex] - 1;
-  if (sectionIndex > 0 && itemIndex > 0)
+  if (sectionIndex >= 0 && itemIndex >= 0)
     return [NSIndexPath indexPathForItem:itemIndex inSection:sectionIndex];
   return nil;
 }

@@ -14,22 +14,21 @@
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="2gT-dn-UU6">
                     <rect key="frame" x="0.0" y="0.0" width="120" height="123"/>
                 </imageView>
-                <imageView hidden="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/LikeOnGalleryIcon" translatesAutoresizingMaskIntoConstraints="NO" id="TUZ-FC-zJG">
-                    <rect key="frame" x="4" y="104" width="15" height="15"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="15" id="8RO-Vo-VJC"/>
-                        <constraint firstAttribute="height" constant="15" id="mXG-pu-npc"/>
-                    </constraints>
-                </imageView>
                 <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="white" translatesAutoresizingMaskIntoConstraints="NO" id="h88-b8-2wa" userLabel="Loading indicator">
                     <rect key="frame" x="50" y="52" width="20" height="20"/>
                 </activityIndicatorView>
+                <label hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Badges Label" lineBreakMode="tailTruncation" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hZx-IC-zZX">
+                    <rect key="frame" x="4" y="103" width="83" height="16"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <constraints>
+                <constraint firstItem="hZx-IC-zZX" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="4" id="Cuk-8i-yjv"/>
                 <constraint firstAttribute="centerX" secondItem="h88-b8-2wa" secondAttribute="centerX" id="EiX-RP-7kZ"/>
                 <constraint firstAttribute="trailing" secondItem="2gT-dn-UU6" secondAttribute="trailing" id="P3Z-Ut-YxP"/>
-                <constraint firstAttribute="bottom" secondItem="TUZ-FC-zJG" secondAttribute="bottom" constant="4" id="XjO-je-3AU"/>
-                <constraint firstItem="TUZ-FC-zJG" firstAttribute="leading" secondItem="1" secondAttribute="leading" constant="4" id="mcK-kD-M62"/>
+                <constraint firstAttribute="bottom" secondItem="hZx-IC-zZX" secondAttribute="bottom" constant="4" id="mKA-Pk-OSO"/>
                 <constraint firstAttribute="bottom" secondItem="2gT-dn-UU6" secondAttribute="bottom" id="qgQ-L9-sD2"/>
                 <constraint firstItem="2gT-dn-UU6" firstAttribute="leading" secondItem="1" secondAttribute="leading" id="wIE-LC-HI3"/>
                 <constraint firstAttribute="centerY" secondItem="h88-b8-2wa" secondAttribute="centerY" id="wwz-Se-zjA"/>
@@ -38,16 +37,13 @@
             <nil key="simulatedStatusBarMetrics"/>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <connections>
+                <outlet property="badgeLabel" destination="hZx-IC-zZX" id="JwI-L4-3MF"/>
                 <outlet property="imageView" destination="2gT-dn-UU6" id="nAC-fk-qaT"/>
-                <outlet property="likeIconImageView" destination="TUZ-FC-zJG" id="Yrm-ue-9Ax"/>
                 <outlet property="loadingActivityIndicator" destination="h88-b8-2wa" id="3y9-X2-3eS"/>
             </connections>
             <point key="canvasLocation" x="397" y="367.5"/>
         </view>
     </objects>
-    <resources>
-        <image name="Assets/Icons/LikeOnGalleryIcon" width="16" height="16"/>
-    </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
         <simulatedOrientationMetrics key="orientation"/>
