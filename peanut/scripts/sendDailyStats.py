@@ -188,7 +188,7 @@ def writeToSpreadsheet(dataDict, length):
 		idParts = feed.entry[1].id.text.split('/')
 		worksheetId = idParts[len(idParts) - 1]
 	else:
-		print "FAILED: Invalid length field. Not writing to spreadsheet!"
+		print "...FAILED: Invalid length field. Not writing to spreadsheet!"
 		return False
 
 	# convert all keys to lowercase (Gdata requirement) and all values to string
@@ -199,7 +199,7 @@ def writeToSpreadsheet(dataDict, length):
 	if isinstance(result, gdata.spreadsheet.SpreadsheetsList):
 		return True
 	else:
-		print "FAILED worksheet for %s-day stats" % (length)
+		print "...FAILED worksheet for %s-day stats" % (length)
 		return False	
 
 
@@ -234,12 +234,13 @@ def main(argv):
 
 	# Send to spreadsheet
 	if publishToSpreadSheet:
+		print "Publishing to spreadsheet..."
 		writeSeven = writeToSpreadsheet(dataDict7day, 7) # second param is length of stats like 7-day
 		writeOne = writeToSpreadsheet(dataDict1day, 1) # second param is useful for figuring out which worksheet
 		if writeSeven:
-			print 'Published %s-day stats' % (7)
+			print '...Published %s-day stats' % (7)
 		if writeOne:
-			print 'Published %s-day stats' % (1)
+			print '...Published %s-day stats' % (1)
 
 	# Send to email
 	if sendEmail:
