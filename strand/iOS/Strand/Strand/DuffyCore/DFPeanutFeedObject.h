@@ -64,7 +64,6 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 - (NSArray *)actionsOfType:(DFPeanutActionType)type forUser:(DFUserIDType)user;
 - (NSEnumerator *)enumeratorOfDescendents;
 
-- (BOOL)isLockedSection;
 - (NSArray *)actorNames;
 
 /* 

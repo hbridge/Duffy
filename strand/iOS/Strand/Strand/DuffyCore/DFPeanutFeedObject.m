@@ -35,6 +35,8 @@ static NSArray *FeedObjectTypes;
   FeedObjectTypes = @[DFFeedObjectSection, DFFeedObjectPhoto, DFFeedObjectCluster, DFFeedObjectDocstack, DFFeedObjectInviteStrand, DFFeedObjectStrand, DFFeedObjectActionsList];
 }
 
+#pragma mark - Object Mappings
+
 - (id)initWithJSONDict:(NSDictionary *)jsonDict
 {
   self = [super init];
@@ -111,6 +113,73 @@ static NSArray *FeedObjectTypes;
   return resultDict;
 }
 
+#pragma mark - Custom Accessors
+
+
+- (NSArray *)subobjectsOfType:(DFFeedObjectType)type
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
+  return [self.objects filteredArrayUsingPredicate:predicate];
+}
+
+- (NSEnumerator *)enumeratorOfDescendents
+{
+  if (self.objects.count == 0) {
+    return [@[] objectEnumerator];
+  }
+  
+  NSMutableArray *allDescendendents = [NSMutableArray new];
+  for (DFPeanutFeedObject *object in self.objects) {
+    if (object.objects) {
+      [allDescendendents addObjectsFromArray:[[object enumeratorOfDescendents] allObjects]];
+    } else {
+      [allDescendendents addObject:object];
+    }
+  }
+  
+  return [allDescendendents objectEnumerator];
+}
+
+- (NSArray *)descendentdsOfType:(DFFeedObjectType)type
+{
+  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
+  NSArray *allDescendents = self.enumeratorOfDescendents.allObjects;
+  return [allDescendents filteredArrayUsingPredicate:predicate];
+}
+
+- (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type
+{
+  if (self.objects.count == 0 && [self.type isEqualToString:type]) return @[self];
+  return [self descendentdsOfType:type];
+}
+
++ (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutFeedObject *feedObject in feedObjects) {
+    [result addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+  }
+  return result;
+}
+
+- (DFPeanutFeedObject *)strandPostsObject
+{
+  if ([self.type isEqual:DFFeedObjectStrandPosts]) return self;
+  else return [[self subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
+}
+
+- (NSString *)placeAndRelativeTimeString {
+  NSString *timeString = [NSDateFormatter relativeTimeStringSinceDate:self.time_taken
+                                                           abbreviate:NO
+                                                           inSentence:YES];
+  if (self.location) {
+    return [NSString stringWithFormat:@"%@ %@", self.location, timeString];
+  } else {
+    return timeString;
+  }
+}
+
+#pragma mark - Action Accessors
 
 - (NSArray *)commentActions
 {
@@ -150,67 +219,7 @@ static NSArray *FeedObjectTypes;
   return result;
 }
 
-- (NSString *)description
-{
-  return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];
-}
-
-- (NSEnumerator *)enumeratorOfDescendents
-{
-  if (self.objects.count == 0) {
-    return [@[] objectEnumerator];
-  }
-  
-  NSMutableArray *allDescendendents = [NSMutableArray new];
-  for (DFPeanutFeedObject *object in self.objects) {
-    if (object.objects) {
-      [allDescendendents addObjectsFromArray:[[object enumeratorOfDescendents] allObjects]];
-    } else {
-      [allDescendendents addObject:object];
-    }
-  }
-  
-  return [allDescendendents objectEnumerator];
-}
-
-- (BOOL)isLockedSection
-{
-  return ([self.type isEqual:DFFeedObjectSection] && [self.title isEqual:@"Locked"]);
-}
-
-/* Creates a shallow copy of the SearchObject */
-- (id)copyWithZone:(NSZone *)zone
-{
-  DFPeanutFeedObject *newObject = [[DFPeanutFeedObject allocWithZone:zone] init];
-  newObject.id = self.id;
-  newObject.title = [self.title copyWithZone:zone];
-  newObject.subtitle = [self.subtitle copyWithZone:zone];
-  newObject.location = [self.location copyWithZone:zone];
-  newObject.thumb_image_path = [self.thumb_image_path copyWithZone:zone];
-  newObject.full_image_path = [self.full_image_path copyWithZone:zone];
-  newObject.time_taken = [self.time_taken copyWithZone:zone];
-  newObject.user = self.user;
-  newObject.user_display_name =[self.user_display_name copy];
-  newObject.ready = self.ready;
-  newObject.suggestible = self.suggestible;
-  
-  return newObject;
-}
-
-/* Compares equality by looking at the object IDs */
-- (BOOL)isEqual:(id)object
-{
-  DFPeanutFeedObject *otherObject = object;
-  if (![[otherObject class] isSubclassOfClass:[self class]]) return NO;
-  
-  if (otherObject.id == self.id && [otherObject.type isEqual:self.type]) return YES;
-  return NO;
-}
-
-- (NSUInteger)hash
-{
-  return (NSUInteger)self.id;
-}
+#pragma mark - Actor Accessors
 
 - (NSArray *)actorNames
 {
@@ -287,55 +296,6 @@ static NSArray *FeedObjectTypes;
   return peopleString;
 }
 
-
-- (NSString *)placeAndRelativeTimeString {
-  NSString *timeString = [NSDateFormatter relativeTimeStringSinceDate:self.time_taken
-                                                           abbreviate:NO
-                                                           inSentence:YES];
-  if (self.location) {
-    return [NSString stringWithFormat:@"%@ %@", self.location, timeString];
-  } else {
-    return timeString;
-  }
-}
-
-
-- (NSArray *)subobjectsOfType:(DFFeedObjectType)type
-{
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
-  return [self.objects filteredArrayUsingPredicate:predicate];
-}
-
-
-- (NSArray *)descendentdsOfType:(DFFeedObjectType)type
-{
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
-  NSArray *allDescendents = self.enumeratorOfDescendents.allObjects;
-  return [allDescendents filteredArrayUsingPredicate:predicate];
-}
-
-- (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type
-{
-  if (self.objects.count == 0 && [self.type isEqualToString:type]) return @[self];
-  return [self descendentdsOfType:type];
-}
-
-
-- (DFPeanutFeedObject *)strandPostsObject
-{
-  if ([self.type isEqual:DFFeedObjectStrandPosts]) return self;
-  else return [[self subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
-}
-
-+ (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects
-{
-  NSMutableArray *result = [NSMutableArray new];
-  for (DFPeanutFeedObject *feedObject in feedObjects) {
-    [result addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
-  }
-  return result;
-}
-
 - (DFPeanutUserObject *)actorWithID:(DFUserIDType)userID
 {
   DFPeanutFeedObject *photoObject = self;
@@ -346,6 +306,48 @@ static NSArray *FeedObjectTypes;
     if (user.id == userID) return user;
   }
   return nil;
+}
+
+#pragma mark - NSObject Copying and Equality
+
+/* Creates a shallow copy of the SearchObject */
+- (id)copyWithZone:(NSZone *)zone
+{
+  DFPeanutFeedObject *newObject = [[DFPeanutFeedObject allocWithZone:zone] init];
+  newObject.id = self.id;
+  newObject.title = [self.title copyWithZone:zone];
+  newObject.subtitle = [self.subtitle copyWithZone:zone];
+  newObject.location = [self.location copyWithZone:zone];
+  newObject.thumb_image_path = [self.thumb_image_path copyWithZone:zone];
+  newObject.full_image_path = [self.full_image_path copyWithZone:zone];
+  newObject.time_taken = [self.time_taken copyWithZone:zone];
+  newObject.user = self.user;
+  newObject.user_display_name =[self.user_display_name copy];
+  newObject.ready = self.ready;
+  newObject.suggestible = self.suggestible;
+  
+  return newObject;
+}
+
+/* Compares equality by looking at the object IDs */
+- (BOOL)isEqual:(id)object
+{
+  DFPeanutFeedObject *otherObject = object;
+  if (![[otherObject class] isSubclassOfClass:[self class]]) return NO;
+  
+  if (otherObject.id == self.id && [otherObject.type isEqual:self.type]) return YES;
+  return NO;
+}
+
+- (NSUInteger)hash
+{
+  return (NSUInteger)self.id;
+}
+
+
+- (NSString *)description
+{
+  return [[self dictionaryWithValuesForKeys:[self.class simpleAttributeKeys]] description];
 }
 
 @end
