@@ -8,6 +8,8 @@ from django.db import connection
 
 from peanut.settings import constants
 
+logger = logging.getLogger(__name__)
+
 class PhotoSerializer(serializers.ModelSerializer):
 	full_image_path = serializers.Field(source='getFullUrlImagePath')
 
@@ -74,8 +76,11 @@ def actionDataForApiSerializer(action):
 
 	# TODO(Derek): This fetching of photos.all() can be removed in December once we've gone through a couple weeks of writing
 	#   out the photo element for Add actions
-	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and not action.photo and len(action.photos.all()) > 0:
-		actionData['photo'] = action.photos.all()[0].id
+	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and not action.photo:
+		if len(action.photos.all()) == 0:
+			logger.error("Found action %s that is an add action with no photos.  Please delete this." % action.id)
+		else:
+			actionData['photo'] = action.photos.all()[0].id
 	else:
 		actionData['photo'] = action.photo_id
 		
