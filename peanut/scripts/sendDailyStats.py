@@ -4,6 +4,7 @@ import pytz
 import logging
 from datetime import datetime, date, timedelta
 from dateutil.relativedelta import relativedelta
+import gdata.spreadsheet.service
 
 parentPath = os.path.join(os.path.split(os.path.abspath(__file__))[0], "..")
 if parentPath not in sys.path:
@@ -20,7 +21,8 @@ from common.models import User, FriendConnection, Action, StrandInvite, Photo, S
 
 logger = logging.getLogger(__name__)
 
-def compileStats(date, length):
+def compileData(date, length):
+
 	'''
 		Subject: Daily Stats
 		
@@ -54,131 +56,203 @@ def compileStats(date, length):
 
 	'''
 
-	msg = "\n" + str(length) + "-day stats for " + (date+relativedelta(days=length-1)).strftime('%m/%d/%Y') + "\n"
-
 	newUsers = getNewUsers(date, length)
+	dataDictDate = {'date': (date-relativedelta(days=1)).strftime('%m/%d/%Y')}
+	dataDictUsers = getUserStats(date, length, newUsers)
+	dataDictPhotos = getPhotoStats(date, length, newUsers)
+	dataDictActions = getActionStats(date, length, newUsers)
 
-	msg += compileUserStats(date, length, newUsers)
-	msg += compilePhotosStats(date, length, newUsers)
-	msg += compileActionStats(date, length, newUsers)	
-
-	return msg
+	return dict(dataDictDate.items() + dataDictUsers.items() + dataDictPhotos.items() + dataDictActions.items())
 
 def getNewUsers(date, length):
-	newUsers = User.objects.filter(product_id=2).filter(added__gt=date).filter(added__lt=date+relativedelta(days=length))
+	newUsers = User.objects.filter(product_id=2).filter(added__lt=date).filter(added__gt=date-relativedelta(days=length))
 	return newUsers
 
+def getUserStats(date, length, newUsers):
 
-def compileUserStats(date, length, newUsers=None):
-
-	msg = "\n--- USERS ---\n"
-
-	activeUsers = Action.objects.values('user').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).distinct().count()
-	msg += "Active Users: " + str(activeUsers) + "\n"
-
+	activeUsers = Action.objects.values('user').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).distinct().count()
 	newUsers = newUsers.count()
-	msg += "New Users: " + str(newUsers) + "\n"
+	newFriends = FriendConnection.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).count()
+	checkIns = User.objects.filter(last_photo_update_timestamp__lt=date).filter(last_photo_update_timestamp__gt=date-relativedelta(days=length)).count()
 
-	newFriends = FriendConnection.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).count()
-	msg += "New Friends: " + str(newFriends) + "\n"
-
-	checkIns = User.objects.filter(last_photo_update_timestamp__gt=date).filter(last_photo_update_timestamp__lt=date+relativedelta(days=length)).count()
-	msg += "Check-ins: " + str(checkIns) + "\n"
-
-	return msg
-
-def compilePhotosStats(date, length=1, newUsers=None):
-
-	msg = "\n--- PHOTOS (OLD USERS) ---\n"
-
-	newPhotosUploaded = Photo.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).exclude(user__in=newUsers).count()
-	msg += "Photos Uploaded: " + format(newPhotosUploaded, ",d") + "\n"
-
-	newPhotosShared = Action.objects.prefetch_related('photos').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).exclude(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))
-	if (newPhotosShared['totalPhotos__sum'] != None):
-		msg += "Photos Shared: " + format(newPhotosShared['totalPhotos__sum'], ",d") + "\n"
-	else:
-		msg += "Photos Shared: 0\n"
+	# note that gdata api requires that dictionary keys be all lowercase and no spaces
+	return {'ActiveUsers': activeUsers,
+			'NewUsers': newUsers, 
+			'NewFriends': newFriends, 
+			'CheckIns': checkIns}
 
 
+def getPhotoStats(date, length, newUsers):
+
+	# Old users
+	newPhotosUploadedOldUsers = Photo.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).count()
+	newPhotosSharedOldUsers = Action.objects.prefetch_related('photos').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
+	if newPhotosSharedOldUsers == None:
+		newPhotosSharedOldUsers = 0
+
+	# new users
+	newPhotosUploadedNewUsers = Photo.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).count()
+	newPhotosSharedNewUsers = Action.objects.prefetch_related('photos').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))['totalPhotos__sum']
+	if newPhotosSharedNewUsers == None:
+		newPhotosSharedNewUsers = 0
+
+	# note that gdata api requires that dictionary keys be all lowercase and no spaces
+	return {'PhotosUploadedOldUsers': newPhotosUploadedOldUsers,
+			'PhotosSharedOldUsers': newPhotosSharedOldUsers,
+			'PhotosUploadedNewUsers': newPhotosUploadedNewUsers,
+			'PhotosSharedNewUsers': newPhotosSharedNewUsers}
+
+
+def getActionStats(date, length, newUsers):
+
+	dataDict = {}
+
+	# old users
+	actionTypeCounts = Action.objects.values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).exclude(user__in=newUsers).annotate(totals=Count('action_type'))
+
+	dataDict['SwapsCreatedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_CREATE_STRAND)
+	dataDict['SwapsJoinedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_JOIN_STRAND)
+	dataDict['PhotosAddedOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+	dataDict['FavsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_FAVORITE)
+	dataDict['CommentsOldUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_COMMENT)
+
+	# new users
+	actionTypeCounts = Action.objects.values('action_type').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Count('action_type'))
+
+	dataDict['SwapsCreatedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_CREATE_STRAND)
+	dataDict['SwapsJoinedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_JOIN_STRAND)
+	dataDict['PhotosAddedNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+	dataDict['FavsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_FAVORITE)
+	dataDict['CommentsNewUsers'] = actionStatsHelper(actionTypeCounts, constants.ACTION_TYPE_COMMENT)
+
+
+	return dataDict
+
+def actionStatsHelper(actionTypeCounts, actionType):
+	for entry in actionTypeCounts:
+		if (entry['action_type'] == actionType):
+			return entry['totals']
+	return 0
+
+def dataDictToString(dataDict, length):
+
+	msg = "\n" + str(length) + "-day stats for " + dataDict['date'] + "\n"
+
+	# users	
+	msg += "\n--- USERS ---\n"
+	msg += "Active Users: " + str(dataDict['ActiveUsers']) + "\n"
+	msg += "New Users: " + str(dataDict['NewUsers']) + "\n"
+	msg += "New Friends: " + str(dataDict['NewFriends']) + "\n"
+	msg += "Check-ins: " + str(dataDict['CheckIns']) + "\n"
+
+	# photos, old users
+	msg += "\n--- PHOTOS (OLD USERS) ---\n"
+	msg += "Photos Uploaded: " + format(dataDict['PhotosUploadedOldUsers'], ",d") + "\n"
+	msg += "Photos Shared: " + format(dataDict['PhotosSharedOldUsers'], ",d") + "\n"
+
+	# photos, new users
 	msg += "\n--- PHOTOS (NEW USERS) ---\n"
+	msg += "Photos Uploaded: " + format(dataDict['PhotosUploadedNewUsers'], ",d") + "\n"
+	msg += "Photos Shared: " + format(dataDict['PhotosSharedNewUsers'], ",d") + "\n"
 
-	newPhotosUploaded = Photo.objects.filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).count()
-	msg += "Photos Uploaded: " + format(newPhotosUploaded, ",d") + "\n"
+	# actions, old users
+	msg += "\n--- ACTIONS (OLD USERS) ---\n"	
+	msg += "Swaps Created: " + str(dataDict['SwapsCreatedOldUsers']) + '\n'
+	msg += "Swaps Joined: " + str(dataDict['SwapsJoinedOldUsers']) + '\n'	
+	msg += "Photos Added: " + str(dataDict['PhotosAddedOldUsers']) + '\n'	
+	msg += "Favorites: " + str(dataDict['FavsOldUsers']) + '\n'
+	msg += "Comments: " + str(dataDict['CommentsOldUsers']) + '\n'
 
-	newPhotosShared = Action.objects.prefetch_related('photos').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).annotate(totalPhotos=Count('photos')).aggregate(Sum('totalPhotos'))
-	if (newPhotosShared['totalPhotos__sum'] != None):
-		msg += "Photos Shared: " + format(newPhotosShared['totalPhotos__sum'], ",d") + "\n"
+	# actions, new users
+	msg += "\n--- ACTIONS (NEW USERS) ---\n"	
+	msg += "Swaps Created: " + str(dataDict['SwapsCreatedNewUsers']) + '\n'
+	msg += "Swaps Joined: " + str(dataDict['SwapsJoinedNewUsers']) + '\n'	
+	msg += "Photos Added: " + str(dataDict['PhotosAddedNewUsers']) + '\n'	
+	msg += "Favorites: " + str(dataDict['FavsNewUsers']) + '\n'
+	msg += "Comments: " + str(dataDict['CommentsNewUsers']) + '\n'	
+	return msg
+
+
+def writeToSpreadsheet(dataDict, length):
+	gdClient = gdata.spreadsheet.service.SpreadsheetsService()
+	# Authenticate using your Google Docs email address and password.
+	gdClient.ClientLogin('stats.master@duffytech.co', 'bich3toc8ar7ogg3uv6o')
+	gdClient.ProgrammaticLogin()
+	key = '1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys'
+
+	feed = gdClient.GetWorksheetsFeed(key)
+	if length == 7:
+		idParts = feed.entry[0].id.text.split('/')
+		worksheetId = idParts[len(idParts) - 1]
+	elif length == 1:
+		idParts = feed.entry[1].id.text.split('/')
+		worksheetId = idParts[len(idParts) - 1]
 	else:
-		msg += "Photos Shared: 0\n"
+		print "FAILED: Invalid length field. Not writing to spreadsheet!"
+		return False
 
+	# convert all keys to lowercase (Gdata requirement) and all values to string
+	cleanedUpDict = dict((k.lower(), str(v)) for k,v in dataDict.iteritems())
 
-	return msg
+	result = gdClient.InsertRow(cleanedUpDict, key, worksheetId)
 
-def compileActionStats(date, length=1, newUsers=None):
-
-	msg = "\n--- ACTIONS (OLD USERS) ---\n"
-
-	actionTypeCounts = Action.objects.values('action_type').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).exclude(user__in=newUsers).annotate(totals=Count('action_type'))
-
-	for entry in actionTypeCounts:
-		if (entry['action_type'] == constants.ACTION_TYPE_CREATE_STRAND):
-			msg += "Swaps Created: " + str(entry['totals']) + '\n'
-		elif (entry['action_type'] == constants.ACTION_TYPE_JOIN_STRAND):
-			msg += "Swaps Joined: " + str(entry['totals']) + '\n'	
-		elif (entry['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
-			msg += "Photos Added: " + str(entry['totals']) + '\n'	
-		elif (entry['action_type'] == constants.ACTION_TYPE_FAVORITE):
-			msg += "Favorites: " + str(entry['totals']) + '\n'
-		elif (entry['action_type'] == constants.ACTION_TYPE_COMMENT):
-			msg += "Comments: " + str(entry['totals']) + '\n'
-		else:
-			msg += "Other: " + str(entry['totals'])	
-
-	msg += "\n--- ACTIONS (NEW USERS) ---\n"
-
-	actionTypeCounts = Action.objects.values('action_type').filter(added__gt=date).filter(added__lt=date+relativedelta(days=length)).filter(user__in=newUsers).annotate(totals=Count('action_type'))
-	print actionTypeCounts.query
-
-	for entry in actionTypeCounts:
-		if (entry['action_type'] == constants.ACTION_TYPE_CREATE_STRAND):
-			msg += "Swaps Created: " + str(entry['totals']) + '\n'
-		elif (entry['action_type'] == constants.ACTION_TYPE_JOIN_STRAND):
-			msg += "Swaps Joined: " + str(entry['totals']) + '\n'	
-		elif (entry['action_type'] == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
-			msg += "Photos Added: " + str(entry['totals']) + '\n'	
-		elif (entry['action_type'] == constants.ACTION_TYPE_FAVORITE):
-			msg += "Favorites: " + str(entry['totals']) + '\n'
-		elif (entry['action_type'] == constants.ACTION_TYPE_COMMENT):
-			msg += "Comments: " + str(entry['totals']) + '\n'
-		else:
-			msg += "Other: " + str(entry['totals'])
-	return msg
+	if isinstance(result, gdata.spreadsheet.SpreadsheetsList):
+		return True
+	else:
+		print "FAILED worksheet for %s-day stats" % (length)
+		return False	
 
 
 def main(argv):
 	logger.info("Starting... ")
 
-	# figure out time window for 1-day and 7-day
+	# parse inputs
+	sendEmail = publishToSpreadSheet = False
 	tzinfo = pytz.timezone('US/Eastern')
-	date = datetime.today().replace(tzinfo=tzinfo, hour=0, minute=0, second=0)
+	date = datetime.today().replace(tzinfo=tzinfo, hour=0, minute=0, second=0)	
+	date = date - relativedelta(days=0) #modify the 0 in this row to get past data
 
-	emailTo = ['swap-stats@duffytech.co']
-	emailSubj = 'Daily Stats'
-	emailBody = compileStats(date-relativedelta(days=7), 7) # 7-days
-	emailBody += "\n"
-	emailBody += compileStats(date-relativedelta(days=1), 1) # 1-day
+	if (len(argv) > 0):
+		if ("sendall" in argv):
+			sendEmail = publishToSpreadSheet = True
+		elif ("sendemail" in argv):
+			sendEmail = True
+		elif ("publish" in argv):
+			publishToSpreadSheet = True
+
+	print "Generating stats for %s " % (date-relativedelta(days=1)).strftime('%m/%d/%Y')
+
+	# Compile data
+	dataDict1day = compileData(date, 1)
+	dataDict7day = compileData(date, 7)
+
+	# compile string to publish to console and/or email
+	emailBody = dataDictToString(dataDict7day, 7)
+	emailBody += dataDictToString(dataDict1day, 1)
 
 	print emailBody
 
-	if (len(argv) > 0 and argv[0]=='sendnow'):
+	# Send to spreadsheet
+	if publishToSpreadSheet:
+		writeSeven = writeToSpreadsheet(dataDict7day, 7) # second param is length of stats like 7-day
+		writeOne = writeToSpreadsheet(dataDict1day, 1) # second param is useful for figuring out which worksheet
+		if writeSeven:
+			print 'Published %s-day stats' % (7)
+		if writeOne:
+			print 'Published %s-day stats' % (1)
+
+	# Send to email
+	if sendEmail:
+		emailTo = ['swap-stats@duffytech.co']
+		emailSubj = 'Daily Stats'
 		email = EmailMessage(emailSubj, emailBody, 'prod@duffyapp.com',emailTo, 
 			[], headers = {'Reply-To': 'swap-stats@duffytech.co'})	
 		email.send(fail_silently=False)
-		print 'Email Sent to: ' + ' '.join(emailTo)
-	else:
-		print 'TEST RUN: EMAIL NOT SENT'
-		print "Use 'python scripts/sendDailyStats.py sendnow' to send for real!\n"
+		print 'Email Sent to: ' + ' '.join(emailTo)	
+
+	if not publishToSpreadSheet and not sendEmail:
+		print 'TEST RUN: Email not sent and nothing published.'
+		print "Use 'python scripts/sendDailyStats.py [sendall|sendemail|publish] '!\n"
 
 		
 		
