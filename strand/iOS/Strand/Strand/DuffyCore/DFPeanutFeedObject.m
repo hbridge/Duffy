@@ -185,6 +185,12 @@ static NSArray *FeedObjectTypes;
   return [(DFPeanutFeedObject *)self.objects.firstObject user];
 }
 
+- (DFPhotoIDType)id
+{
+  if (_id > 0 || self.objects.count == 0) return _id;
+  return [(DFPeanutFeedObject *)self.objects.firstObject id];
+}
+
 #pragma mark - Action Accessors
 
 - (NSArray *)commentActions
