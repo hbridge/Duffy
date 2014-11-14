@@ -331,7 +331,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strand.id, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers, True), 'suggestible': suggestible}
+		metadata = {'type': feedObjectType, 'id': strand.id, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
@@ -424,7 +424,7 @@ def getObjectsDataForStrands(strands, user):
 					if name == "":
 						name = entry.name.split(" ")[0]
 
-				invitedUsers.append(User(id=0, display_name=name))
+				invitedUsers.append(User(id=0, display_name=name, phone_number=invite.phone_number))
 		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
 
 		entry['objects'] = list()
