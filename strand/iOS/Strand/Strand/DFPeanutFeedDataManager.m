@@ -494,7 +494,10 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectFriendsList]) {
-      return object.actors;
+      // This grabs the local first name which we want to sort by
+      NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
+      NSArray* friends =  [object.actors sortedArrayUsingDescriptors:@[sort]];
+      return friends;
     }
   }
   return [NSArray new];
