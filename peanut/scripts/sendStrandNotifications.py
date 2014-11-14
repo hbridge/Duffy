@@ -98,7 +98,7 @@ def main(argv):
 		if len(actionNotificationsSent) > 0:
 			Action.bulkUpdate(actionNotificationsSent, ['notification_sent'])
 			
-		if invites.count() == 0:
+		if len(inviteNotificationsSent) == 0 and len(actionNotificationsSent) == 0:
 			time.sleep(1)
 
 if __name__ == "__main__":
