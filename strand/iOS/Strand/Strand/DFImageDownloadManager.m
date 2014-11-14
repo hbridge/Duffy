@@ -111,7 +111,8 @@ static DFImageDownloadManager *defaultManager;
     if (type == DFImageThumbnail && ![photoObject.thumb_image_path isEqualToString:@""]) {
       didDispatchForCompletion = YES;
       [self getImageDataForPath:photoObject.thumb_image_path
-            withCompletionBlock:^(UIImage *image, NSError *error) {
+                       priority:NSOperationQueuePriorityVeryHigh // thumbnails are highest pri
+            completionBlock:^(UIImage *image, NSError *error) {
               completionBlock(image);
       }];
     }
@@ -119,7 +120,8 @@ static DFImageDownloadManager *defaultManager;
     if (type == DFImageFull && ![photoObject.full_image_path isEqualToString:@""]) {
       didDispatchForCompletion = YES;
       [self getImageDataForPath:photoObject.full_image_path
-            withCompletionBlock:^(UIImage *image, NSError *error) {
+                       priority:NSOperationQueuePriorityHigh
+                completionBlock:^(UIImage *image, NSError *error) {
               completionBlock(image);
       }];
     }
@@ -157,7 +159,7 @@ static DFImageDownloadManager *defaultManager;
        NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
                                                initWithURL:url
                                                cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                               timeoutInterval:30.0];
+                                               timeoutInterval:15.0];
        AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
        requestOperation.queuePriority = queuePriority;
        [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];

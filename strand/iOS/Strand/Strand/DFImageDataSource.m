@@ -177,7 +177,7 @@ NSUInteger const SectionSpread = 5;
    imageForID:photoObject.id
    size:[self cellPhotoSizeForIndexPath:indexPath]
    contentMode:DFImageRequestContentModeAspectFill
-   deliveryMode:DFImageRequestOptionsDeliveryModeFastFormat
+   deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
    completion:^(UIImage *image) {
      dispatch_async(dispatch_get_main_queue(), ^{
        if ([[collectionView indexPathForCell:cell] isEqual:indexPath]) {

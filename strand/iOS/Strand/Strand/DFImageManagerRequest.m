@@ -89,6 +89,14 @@
                                            deliveryMode:deliveryMode];
 }
 
+- (DFImageManagerRequest *)copyWithSize:(CGSize)size
+{
+  return [[DFImageManagerRequest alloc] initWithPhotoID:self.photoID
+                                                   size:size
+                                            contentMode:self.contentMode
+                                           deliveryMode:self.deliveryMode];
+}
+
 - (NSString *)description
 {
   return [[self dictionaryWithValuesForKeys:@[@"photoID", @"size", @"contentMode", @"deliveryMode"]]

@@ -309,6 +309,19 @@ static BOOL logRouting = NO;
 - (void)serveRequestFromNetwork:(DFImageManagerRequest *)request
                 completion:(ImageLoadCompletionBlock)completionBlock
 {
+  if (request.deliveryMode == DFImageRequestOptionsDeliveryModeOpportunistic
+      && request.imageType == DFImageFull) {
+    // if this is an opportunistic request for a full image, try to serve a thumb first
+    DFImageManagerRequest *thumbRequest = [request
+                                           copyWithSize:CGSizeMake(DFPhotoAssetDefaultThumbnailSize,
+                                                                   DFPhotoAssetDefaultThumbnailSize)];
+    if ([[DFImageDiskCache sharedStore] canServeRequest:thumbRequest]) {
+      [self serveRequestWithDiskCache:thumbRequest completion:completionBlock];
+    } else {
+      [self serveRequestFromNetwork:thumbRequest completion:completionBlock];
+    }
+  }
+  
   [self scheduleDeferredCompletion:completionBlock forRequest:request withLoadBlock:^UIImage *{
     UIImage __block *result = nil;
     dispatch_semaphore_t downloadSema = dispatch_semaphore_create(0);

@@ -37,5 +37,6 @@ typedef NS_ENUM(NSInteger, DFImageRequestContentMode) {
 - (BOOL)isDefaultThumbnail;
 - (DFImageManagerRequest *)copyWithPhotoID:(DFPhotoIDType)photoID;
 - (DFImageManagerRequest *)copyWithDeliveryMode:(DFImageRequestDeliveryMode)deliveryMode;
+- (DFImageManagerRequest *)copyWithSize:(CGSize)size;
 
 @end
