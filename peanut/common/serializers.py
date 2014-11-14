@@ -72,7 +72,9 @@ def actionDataForApiSerializer(action):
 	actionData['action_type'] = action.action_type
 	actionData['strand'] = action.strand_id
 
-	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and not action.photo:
+	# TODO(Derek): This fetching of photos.all() can be removed in December once we've gone through a couple weeks of writing
+	#   out the photo element for Add actions
+	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and not action.photo and len(action.photos.all()) > 0:
 		actionData['photo'] = action.photos.all()[0].id
 	else:
 		actionData['photo'] = action.photo_id
