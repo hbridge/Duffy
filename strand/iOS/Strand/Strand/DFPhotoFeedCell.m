@@ -213,7 +213,8 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   self.imageView.clipsToBounds = YES;
   
   self.imageViewHeightConstraint.constant =
-    [self imageViewHeightForReferenceWidth:self.frame.size.width];
+    [self.class imageViewHeightForReferenceWidth:self.frame.size.width
+                                          aspect:self.aspect];
   
   if (self.commentsLabel.preferredMaxLayoutWidth != self.commentsLabel.frame.size.width) {
     self.commentsLabel.preferredMaxLayoutWidth = self.commentsLabel.frame.size.width;
@@ -226,14 +227,15 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   }
 }
 
-- (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
++ (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
+                                     aspect:(DFPhotoFeedCellAspect)aspect
 {
   CGFloat height = 0.0;
-  if (self.aspect == DFPhotoFeedCellAspectSquare) {
+  if (aspect == DFPhotoFeedCellAspectSquare) {
     height = referenceWidth;
-  } else if (self.aspect == DFPhotoFeedCellAspectPortrait) {
+  } else if (aspect == DFPhotoFeedCellAspectPortrait) {
     height = referenceWidth * (4.0/3.0);
-  } else if (self.aspect == DFPhotoFeedCellAspectLandscape) {
+  } else if (aspect == DFPhotoFeedCellAspectLandscape) {
     height = referenceWidth * (3.0/4.0);
   }
   return height;

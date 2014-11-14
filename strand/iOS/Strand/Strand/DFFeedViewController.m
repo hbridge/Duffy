@@ -614,10 +614,9 @@ static int ImagePrefetchRange = 3;
 
 - (CGSize)imageSizeToFetch
 {
-  DFPhotoFeedCell *templateCell = [self templateCellWithStyle:DFPhotoFeedCellStyleNone
-                                                       aspect:DFPhotoFeedCellAspectPortrait];
-  CGFloat imageViewHeight = [templateCell imageViewHeightForReferenceWidth:[[UIScreen mainScreen]
-                                                                            bounds].size.width];
+  CGFloat imageViewHeight = [DFPhotoFeedCell
+                             imageViewHeightForReferenceWidth:[[UIScreen mainScreen] bounds].size.width
+                             aspect:DFPhotoFeedCellAspectPortrait];
   CGFloat scale = [[UIScreen mainScreen] scale];
   return CGSizeMake(imageViewHeight * scale, imageViewHeight * scale);
 }

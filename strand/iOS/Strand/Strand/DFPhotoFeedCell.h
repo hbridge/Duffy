@@ -68,7 +68,8 @@ typedef NS_ENUM(NSInteger, DFPhotoFeedCellAspect) {
 - (void)setComments:(NSArray *)comments;
 - (void)setLikes:(NSArray *)likes;
 
-- (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth;
++ (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
+                                     aspect:(DFPhotoFeedCellAspect)aspect;
 - (CGFloat)rowHeight;
 
 
