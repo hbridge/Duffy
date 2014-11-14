@@ -10,4 +10,5 @@ export DJANGO_SETTINGS_MODULE=peanut.settings.dev
 echo "Restarting scripts..."
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo restart duffy-friends"
 ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo restart duffy-stranding" 
+ssh -i ~derek/derek-key-pair-east.pem ubuntu@prod.strand.duffyapp.com "sudo restart duffy-strand-notifications" 
 
