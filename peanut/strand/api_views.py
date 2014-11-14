@@ -341,7 +341,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	formattedGroups = getFormattedGroups(groups)
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
-	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
+	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 500)
 	printStats("private-strands")
 	return objects
 
