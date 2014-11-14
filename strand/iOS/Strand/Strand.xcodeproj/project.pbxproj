@@ -260,6 +260,7 @@
 		65437DE419F810AA00D57F9D /* DFImageDownloadManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */; };
 		65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79619E34FF90087930F /* DFIOS7CameraRollSyncOperation.m */; };
 		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
+		65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EF6C601A1563E300E0533F /* DFContactDataManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -729,6 +730,8 @@
 		65BEA79B19E350A20087930F /* DFIOS7CameraRollSyncOperation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DFIOS7CameraRollSyncOperation.h; sourceTree = "<group>"; };
 		65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIOS8CameraRollSyncOperation.m; sourceTree = "<group>"; };
 		65BEA79D19E351310087930F /* DFIOS8CameraRollSyncOperation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIOS8CameraRollSyncOperation.h; sourceTree = "<group>"; };
+		65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactDataManager.h; sourceTree = "<group>"; };
+		65EF6C601A1563E300E0533F /* DFContactDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactDataManager.m; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
 		9CFF5D7C92B449CB884517E2 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -1493,6 +1496,8 @@
 				5A14A3A8198C2B4600A4F032 /* DFUserInfoManager.m */,
 				65232E9019EC66A400F3832A /* DFPeanutFeedDataManager.h */,
 				65232E9119EC66A400F3832A /* DFPeanutFeedDataManager.m */,
+				65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */,
+				65EF6C601A1563E300E0533F /* DFContactDataManager.m */,
 			);
 			name = Managers;
 			sourceTree = "<group>";
@@ -1938,6 +1943,7 @@
 				5A05AD331A114D12003AAE1C /* DFCommentViewController.m in Sources */,
 				5AC4A9221947C30800862D9C /* DFAppInfo.m in Sources */,
 				652D9B9E1A04258700018B1C /* DFPeanutPhotoAdapter.m in Sources */,
+				65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */,
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,

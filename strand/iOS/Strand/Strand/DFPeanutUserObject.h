@@ -38,8 +38,4 @@
 - (UIImage *)thumbnail;
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
 
-+ (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber;
-+ (void)clearCaches;
-
-
 @end

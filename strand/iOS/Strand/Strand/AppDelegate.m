@@ -45,6 +45,7 @@
 #import "DFSwapViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFGalleryViewController.h"
+#import "DFContactDataManager.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 
@@ -324,7 +325,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
       [[DFImageDiskCache sharedStore] loadDownloadedImagesCache];
       [[DFBackgroundLocationManager sharedManager] startUpdatingOnSignificantLocationChange];
       // Clearing out our phone number to name cache incase the contact list changed
-      [DFPeanutUserObject clearCaches];
+      [[DFContactDataManager sharedManager] refreshCache];
       
       [[NSNotificationCenter defaultCenter]
        postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName

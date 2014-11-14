@@ -9,41 +9,12 @@
 #import "DFPeanutUserObject.h"
 #import "RestKit/Restkit.h"
 #import <CoreLocation/CoreLocation.h>
-#import <RHAddressBook/AddressBook.h>
 #import "UIImage+Resize.h"
 #import "UIImage+RoundedCorner.h"
 
+#import "DFContactDataManager.h"
+
 @implementation DFPeanutUserObject
-
-static RHAddressBook *defaultAddressBook;
-+ (RHAddressBook *)sharedAddressBook {
-  if (!defaultAddressBook) {
-    defaultAddressBook = [[RHAddressBook alloc] init];
-  }
-  return defaultAddressBook;
-}
-
-static NSMutableDictionary *defaultPhoneNumberToPersonCache;
-+ (NSMutableDictionary *)phoneNumberToPersonCache {
-  if (!defaultPhoneNumberToPersonCache) {
-    defaultPhoneNumberToPersonCache = [[NSMutableDictionary alloc] init];
-  }
-  return defaultPhoneNumberToPersonCache;
-}
-
-static NSArray *defaultPeopleList;
-+ (NSArray *)sharedPeopleList {
-  if (!defaultPeopleList) {
-    defaultPeopleList = [[DFPeanutUserObject sharedAddressBook] people];
-  }
-  return defaultPeopleList;
-}
-
-+ (void)clearCaches
-{
-  [[DFPeanutUserObject phoneNumberToPersonCache] removeAllObjects];
-  defaultPeopleList = nil;
-}
 
 + (RKObjectMapping *)objectMapping
 {
@@ -101,44 +72,6 @@ static NSArray *defaultPeopleList;
   return NO;
 }
 
-/*
- * Code to get local names from phone numbers.
- * This code is pretty general and could be pulled out to somewhere else, just here for simplicity
- */
-+ (NSString *)localNameFromPhoneNumber:(NSString *)phoneNumber
-{
-  return [[self personFromPhoneNumber:phoneNumber] name];
-}
-
-+ (RHPerson *)personFromPhoneNumber:(NSString *)phoneNumber
-{
-  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) return nil;
-  if ([[DFPeanutUserObject phoneNumberToPersonCache] objectForKey:phoneNumber]) {
-    return [[DFPeanutUserObject phoneNumberToPersonCache] objectForKey:phoneNumber];
-  }
-  
-  NSArray *people = [DFPeanutUserObject sharedPeopleList];
-  
-  for (RHPerson *person in people) {
-    RHMultiStringValue *phoneMultiValue = [person phoneNumbers];
-    for (int x = 0; x < phoneMultiValue.count; x++) {
-      NSString *rawPhoneNumber = [[phoneMultiValue valueAtIndex:x] description];
-      
-      // Get phone number into the format of +15551234567
-      NSString *phoneNum = [[rawPhoneNumber componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]] componentsJoinedByString:@""];
-      if (![phoneNum hasPrefix:@"1"]) {
-        phoneNum = [NSString stringWithFormat:@"1%@", phoneNum];
-      }
-      phoneNum = [NSString stringWithFormat:@"+%@", phoneNum];
-      
-      if ([phoneNum isEqualToString:phoneNumber]) {
-        [[DFPeanutUserObject phoneNumberToPersonCache] setObject:person forKey:phoneNumber];
-        return person;
-      }
-    }
-  }
-  return nil;
-}
 
 - (NSString *)firstName
 {
@@ -147,7 +80,7 @@ static NSArray *defaultPeopleList;
 
 - (NSString *)fullName
 {
-  NSString *localName = [DFPeanutUserObject localNameFromPhoneNumber:self.phone_number];
+  NSString *localName = [[DFContactDataManager sharedManager] localNameFromPhoneNumber:self.phone_number];
   
   if (localName) {
     return localName;
@@ -178,7 +111,7 @@ static NSArray *defaultPeopleList;
 
 + (UIImage *)UIImageForThumbnailFromPhoneNumber:(NSString *)phoneNumber
 {
-  return [[self personFromPhoneNumber:phoneNumber] thumbnail];
+  return [[[DFContactDataManager sharedManager] personFromPhoneNumber:phoneNumber] thumbnail];
 }
 
 @end

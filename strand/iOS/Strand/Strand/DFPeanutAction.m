@@ -10,6 +10,8 @@
 #import "RestKit/RestKit.h"
 #import "DFPeanutUserObject.h"
 
+#import "DFContactDataManager.h"
+
 @implementation DFPeanutAction
 
 + (RKObjectMapping *)objectMapping {
@@ -63,7 +65,7 @@
     return @"You";
   }
   
-  NSString *localName = [DFPeanutUserObject localNameFromPhoneNumber:self.user_phone_number];
+  NSString *localName = [[DFContactDataManager sharedManager] localNameFromPhoneNumber:self.user_phone_number];
   if (localName) {
     return localName;
   } else {

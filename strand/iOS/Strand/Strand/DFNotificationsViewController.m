@@ -193,8 +193,7 @@
   // set cell basic data
   DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
   peanutUser.id = action.user;
-  // TODO(Derek) need to replace this use of display_name
-  peanutUser.display_name = action.user_display_name;
+  peanutUser.display_name = [action firstName];
   cell.profilePhotoStackView.peanutUsers = @[peanutUser];
   cell.detailLabel.attributedText = [self attributedStringForAction:action];
   
