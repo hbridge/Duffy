@@ -71,7 +71,7 @@ def sendJoinActionNotifications(action):
 
 def main(argv):
 	logger.info("Starting... ")
-	notificationTimedelta = datetime.timedelta(seconds=300)
+	notificationTimedelta = datetime.timedelta(seconds=5)
 	
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
