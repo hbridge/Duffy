@@ -9,6 +9,7 @@
 #import "DFUser.h"
 #import <AdSupport/ASIdentifierManager.h>
 #import "DFNetworkingConstants.h"
+#import "DFPeanutUserObject.h"
 
 @implementation DFUser
 
@@ -213,6 +214,13 @@ static DFUser *currentUser;
           self.userID, self.deviceID, self.displayName, self.authToken];
 }
 
-
+- (DFPeanutUserObject *)peanutUser
+{
+  DFPeanutUserObject *peanutUser = [[DFPeanutUserObject alloc] init];
+  peanutUser.id = self.userID;
+  peanutUser.phone_number = self.phoneNumberString;
+  peanutUser.display_name = self.displayName;
+  return peanutUser;
+}
 
 @end

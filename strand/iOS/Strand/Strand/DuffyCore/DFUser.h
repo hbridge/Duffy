@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+@class DFPeanutUserObject;
+
 @interface DFUser : NSObject <NSCoding>
 
 @property (nonatomic) DFUserIDType userID;
@@ -27,5 +29,6 @@
 
 + (NSString *)deviceName;
 + (NSString *)deviceNameBasedUserName;
+- (DFPeanutUserObject *)peanutUser;
 
 @end

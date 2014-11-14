@@ -377,8 +377,14 @@ static DFPeanutFeedDataManager *defaultManager;
 
 - (NSArray *)inviteStrands
 {
-  NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", DFFeedObjectInviteStrand];
-  return [self.swapsFeedObjects filteredArrayUsingPredicate:predicate];
+  NSMutableArray *inviteStrands = [NSMutableArray new];
+  for (DFPeanutFeedObject *strand in self.swapsFeedObjects) {
+    if ([strand.type isEqual:DFFeedObjectInviteStrand]
+        && ![strand.actors containsObject:[[DFUser currentUser] peanutUser]]) {
+      [inviteStrands addObject:strand];
+    }
+  }
+  return inviteStrands;
 }
 
 - (NSArray *)acceptedStrands
