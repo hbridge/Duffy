@@ -14,6 +14,7 @@
 #import "DFObjectManager.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFUser.h"
+#import "DFDeferredCompletionScheduler.h"
 
 const NSUInteger maxConcurrentImageDownloads = 2;
 
@@ -21,7 +22,7 @@ const NSUInteger maxConcurrentImageDownloads = 2;
 
 @property (nonatomic, retain) DFPeanutFeedDataManager *dataManager;
 @property (nonatomic, retain) DFImageDiskCache *imageStore;
-@property (nonatomic, retain) NSOperationQueue *downloadQueue;
+@property (nonatomic, retain) DFDeferredCompletionScheduler *downloadScheduler;
 
 @end
 
@@ -49,9 +50,9 @@ static DFImageDownloadManager *defaultManager;
   self = [super init];
   if (self) {
     [self observeNotifications];
-    self.downloadQueue = [[NSOperationQueue alloc] init];
-    //only download 2 things at a time to prevent swamping the network
-    self.downloadQueue.maxConcurrentOperationCount = maxConcurrentImageDownloads;
+    self.downloadScheduler = [[DFDeferredCompletionScheduler alloc]
+                              initWithMaxOperations:maxConcurrentImageDownloads
+                              executionPriority:DISPATCH_QUEUE_PRIORITY_DEFAULT];
     self.dataManager = [DFPeanutFeedDataManager sharedManager];
     self.imageStore = [DFImageDiskCache sharedStore];
   }
@@ -142,41 +143,38 @@ static DFImageDownloadManager *defaultManager;
                    priority:(NSOperationQueuePriority)queuePriority
             completionBlock:(DFImageFetchCompletionBlock)completion
 {
-  
   NSURL *url = [[[DFUser currentUser] serverURL]
                 URLByAppendingPathComponent:path];
-  DDLogVerbose(@"Getting image data at: %@", url);
-  
-  NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
-                                          initWithURL:url
-                                          cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                          timeoutInterval:30.0];
-  AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
-  requestOperation.queuePriority = queuePriority;
-  
-  [requestOperation setCompletionBlockWithSuccess:^(AFHTTPRequestOperation *operation, id responseObject) {
-    // Use my success callback with the binary data and MIME type string
-    if (operation.responseData) {
-      completion([UIImage imageWithData:operation.responseData], nil);
-    } else {
-      DDLogError(@"Error downloading image: %@", url);
-      completion(nil, nil);
-    }
-  } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-    // Error callback
-    DDLogError(@"Error downloading image: %@", url);
-    completion(nil, error);
-  }];
   
   // add the operation to our local download queue so we don't swamp the network with download
   // requests and prevent others from getting scheduled
-  NSOperation *downloadOperation = [NSBlockOperation blockOperationWithBlock:^{
-    [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];
-    [requestOperation waitUntilFinished];
-  }];
-  downloadOperation.queuePriority = queuePriority;
-  
-  [self.downloadQueue addOperation:downloadOperation];
+  [self.downloadScheduler
+   enqueueRequestForObject:url
+   withPriority:queuePriority
+   executeBlockOnce:^id{
+     @autoreleasepool {
+       DDLogVerbose(@"Getting image data at: %@", url);
+       NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
+                                               initWithURL:url
+                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                               timeoutInterval:30.0];
+       AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
+       requestOperation.queuePriority = queuePriority;
+       [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];
+       [requestOperation waitUntilFinished];
+       
+       NSMutableDictionary *result = [NSMutableDictionary new];
+       if (requestOperation.responseData) {
+         result[@"image"] = [UIImage imageWithData:requestOperation.responseData];
+       }
+       if (requestOperation.error) {
+         result[@"error"] = requestOperation.error;
+       }
+       return result;
+     }
+   } completionHandler:^(NSDictionary *resultDict) {
+     completion(resultDict[@"image"], resultDict[@"error"]);
+   }];
 }
 
 

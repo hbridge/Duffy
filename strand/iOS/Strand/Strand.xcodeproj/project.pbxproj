@@ -228,6 +228,7 @@
 		5ACA38FF1947A6B200834D86 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */; };
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
 		5ACA39031947A71700834D86 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39021947A71700834D86 /* CFNetwork.framework */; };
+		5ACE175F1A168D7E00DE998A /* DFDeferredCompletionScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */; };
 		5AD8589219785FCC00BFDC4E /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589119785FCC00BFDC4E /* DFTypedefs.m */; };
 		5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */; };
 		5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589719797E6000BFDC4E /* DFPermissionsHelpers.m */; };
@@ -669,6 +670,8 @@
 		5ACA38FE1947A6B200834D86 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5ACA39001947A6F100834D86 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		5ACA39021947A71700834D86 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		5ACE175D1A168D7E00DE998A /* DFDeferredCompletionScheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDeferredCompletionScheduler.h; sourceTree = "<group>"; };
+		5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDeferredCompletionScheduler.m; sourceTree = "<group>"; };
 		5AD8589019785F3600BFDC4E /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTypedefs.h; sourceTree = "<group>"; };
 		5AD8589119785FCC00BFDC4E /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTypedefs.m; sourceTree = "<group>"; };
 		5AD858931978700500BFDC4E /* DFLocationRoadblockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationRoadblockViewController.h; sourceTree = "<group>"; };
@@ -1172,6 +1175,8 @@
 				5AB7BEBC19FFF72C000BEB67 /* DFImageManagerRequest.m */,
 				65437DE219F810AA00D57F9D /* DFImageDownloadManager.h */,
 				65437DE319F810AA00D57F9D /* DFImageDownloadManager.m */,
+				5ACE175D1A168D7E00DE998A /* DFDeferredCompletionScheduler.h */,
+				5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */,
 			);
 			name = "Image Manager";
 			sourceTree = "<group>";
@@ -2019,6 +2024,7 @@
 				5AC4A973194A434700862D9C /* DFPeanutSuggestion.m in Sources */,
 				5A05AD431A127EEA003AAE1C /* DFColorPreviewController.m in Sources */,
 				5AB7BEBA19FFF71D000BEB67 /* DFImageManager.m in Sources */,
+				5ACE175F1A168D7E00DE998A /* DFDeferredCompletionScheduler.m in Sources */,
 				5AA38DF5199D1A1800AD1805 /* DFNotificationsViewController.m in Sources */,
 				5A4C821219EDC82100C22A12 /* DFSelectSuggestionsViewController.m in Sources */,
 				5A9BC31F19A2A77F002D1CD7 /* DFContactsStore.m in Sources */,

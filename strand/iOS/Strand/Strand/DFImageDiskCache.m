@@ -94,7 +94,7 @@ static DFImageDiskCache *defaultStore;
     [db executeUpdate:@"INSERT INTO downloadedImages VALUES (?, ?)",
      @(type),
      @(photoID)];
-    DDLogInfo(@"Saving into downloaded image db: %u %llu", type, photoID);
+    DDLogInfo(@"Saving into downloaded image db: %@ %llu", type == DFImageFull ? @"full" : @"thumbnail", photoID);
   }];
 }
 
