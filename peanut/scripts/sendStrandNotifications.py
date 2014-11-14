@@ -44,7 +44,11 @@ def sendInviteNotification(strandInvite):
 	return False
 
 def sendJoinActionNotifications(action):
-	if action.strand.photos.count() == 1:
+	count = action.photos.count()
+	if count == 0:
+		# Just say we sent it when we really didn't
+		return True
+	elif count == 1:
 		msg = "%s added 1 photo from %s" % (action.user.display_name, action.strand.photos.all()[0].location_city)
 	else:
 		msg = "%s added %s photos from %s" % (action.user.display_name, action.photos.count(), action.strand.photos.all()[0].location_city)
