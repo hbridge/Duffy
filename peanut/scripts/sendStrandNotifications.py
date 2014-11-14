@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 def sendInviteNotification(strandInvite):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	logger.debug("in sendInviteNotification for invite id %s" % strandInvite.id)
-	msg = "%s wants to swap photos from %s" % (strandInvite.user.display_name, strandInvite.strand.photos.all()[0].location_city)
+	msg = "%s wants to swap photos from %s" % (strandInvite.user.display_name, strands_util.getLocationForStrand(strandInvite.strand))
 	
 	doNotification = True
 
@@ -49,9 +49,9 @@ def sendJoinActionNotifications(action):
 		# Just say we sent it when we really didn't
 		return True
 	elif count == 1:
-		msg = "%s added 1 photo from %s" % (action.user.display_name, action.strand.photos.all()[0].location_city)
+		msg = "%s added 1 photo from %s" % (action.user.display_name, strands_util.getLocationForStrand(action.strand))
 	else:
-		msg = "%s added %s photos from %s" % (action.user.display_name, action.photos.count(), action.strand.photos.all()[0].location_city)
+		msg = "%s added %s photos from %s" % (action.user.display_name, action.photos.count(), strands_util.getLocationForStrand(action.strand))
 		
 	doNotification = True
 
