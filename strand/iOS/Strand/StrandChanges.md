@@ -1,5 +1,9 @@
 # Swap
 
+## Nov 14th, 2014 (4802)
+
+- Performance improvements
+
 ## Nov 13, 2014 (4795-4801)
 
 - Badge photos with likes and comments in gallery
