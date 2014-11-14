@@ -71,7 +71,7 @@ def sendJoinActionNotifications(action):
 
 def main(argv):
 	logger.info("Starting... ")
-	notificationTimedelta = datetime.timedelta(seconds=5)
+	notificationTimedelta = datetime.timedelta(seconds=300)
 	
 	while True:
 		now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -85,7 +85,7 @@ def main(argv):
 				action.notification_sent = now
 				actionNotificationsSent.append(action)
 
-		invites = StrandInvite.objects.select_related().filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(skip=False)
+		invites = StrandInvite.objects.select_related().filter(accepted_user_id__isnull=True).exclude(invited_user_id__isnull=True).filter(notification_sent__isnull=True).filter(added__gt=now-notificationTimedelta).filter(skip=False)
 
 		for invite in invites:
 			if sendInviteNotification(invite):
