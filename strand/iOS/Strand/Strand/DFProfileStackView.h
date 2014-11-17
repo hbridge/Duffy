@@ -7,10 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MMPopLabel/MMPopLabel.h>
 
 @class DFPeanutUserObject;
 
-@interface DFProfileStackView : UIView
+@interface DFProfileStackView : UIView <MMPopLabelDelegate>
 
 @property (nonatomic) NSUInteger maxProfilePhotos;
 @property (nonatomic) CGFloat profilePhotoWidth;

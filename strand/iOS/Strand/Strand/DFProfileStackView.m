@@ -16,6 +16,8 @@
 @property (nonatomic, retain) NSDictionary *fillColorsById;
 @property (nonatomic, retain) NSDictionary *abbreviationsById;
 @property (nonatomic, retain) NSDictionary *imagesById;
+@property (nonatomic, retain) UIView *popTargetView;
+@property (nonatomic, retain) MMPopLabel *popLabel;
 
 @end
 
@@ -29,6 +31,11 @@
     self.maxProfilePhotos = 4;
   if (self.profilePhotoWidth == 0.0)
     self.profilePhotoWidth = 35.0;
+  
+  UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
+                                           initWithTarget:self
+                                           action:@selector(tapped:)];
+  [self addGestureRecognizer:tapRecognizer];
 }
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user
@@ -44,6 +51,10 @@
 {
   _peanutUsers = users;
 
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self.popLabel removeFromSuperview];
+    [self.popTargetView removeFromSuperview];
+  });
   NSMutableDictionary *fillColors = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *abbreviations = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *images = [[NSMutableDictionary alloc] initWithCapacity:users.count];
@@ -154,5 +165,48 @@
   }
 }
 
+
+#pragma mark - Actions
+
+- (void)tapped:(UITapGestureRecognizer *)sender
+{
+  if (!self.shouldShowNameLabel) return;
+  
+  for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
+    CGRect rectForName = [self rectForIndex:i];
+    CGPoint tapPoint = [sender locationInView:self];
+    if (CGRectContainsPoint(rectForName, tapPoint)) {
+      [self iconTappedForPeanutUser:self.peanutUsers[i] inRect:rectForName];
+    }
+  }
+}
+
+- (void)iconTappedForPeanutUser:(DFPeanutUserObject *)peanutUser inRect:(CGRect)rect
+{
+  CGRect rectInSuper = [self.superview convertRect:rect fromView:self];
+  self.popTargetView = [[UIView alloc] initWithFrame:rectInSuper];
+  self.popTargetView.backgroundColor = [UIColor clearColor];
+  self.popTargetView.userInteractionEnabled = NO;
+  [self.superview addSubview:self.popTargetView];
+  
+  [self.popLabel dismiss];
+  self.popLabel = [MMPopLabel popLabelWithText:peanutUser.fullName];
+  [self.superview addSubview:self.popLabel];
+  [self.popLabel setNeedsLayout];
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(.05 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self.popLabel popAtView:self.popTargetView animatePopLabel:YES animateTargetView:NO];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+      [self.popLabel dismiss];
+    });
+  });
+  self.popLabel.delegate = self;
+  
+}
+
+- (void)dismissedPopLabel:(MMPopLabel *)popLabel
+{
+  [popLabel removeFromSuperview];
+  [self.popTargetView removeFromSuperview];
+}
 
 @end
