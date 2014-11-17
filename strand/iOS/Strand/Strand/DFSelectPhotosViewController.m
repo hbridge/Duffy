@@ -300,7 +300,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   if (suggestion.actors.count == 1) {
     headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ has photos to swap", suggestion.actorsString];
   } else {
-    headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ have photos to swap", suggestion.actorsString];
+    headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap", suggestion.actorsString];
   }
   
   [self configureHeaderButtonForHeader:headerView section:indexPath.section];
