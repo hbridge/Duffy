@@ -38,26 +38,22 @@ static DFUser *currentUser;
 + (DFUser *)currentUser
 {
   if (!currentUser) {
-    [[NSUserDefaults standardUserDefaults] synchronize]; // ensure we get what's on disk
-    NSData *userData = [[NSUserDefaults standardUserDefaults] valueForKey:userObjectDefaultsKey];
-    if (userData) {
-      currentUser = [NSKeyedUnarchiver unarchiveObjectWithData:userData];
-      DDLogInfo(@"%@ unarchiving user data: %@",
-                [self.class description],
-                currentUser.description);
-    } else {
-      currentUser = [[DFUser alloc] init];
-      DDLogInfo(@"%@ no user data found.", [self.class description]);
-    }
-    
-    [self checkUserDefaults];
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+      [[NSUserDefaults standardUserDefaults] synchronize]; // ensure we get what's on disk
+      NSData *userData = [[NSUserDefaults standardUserDefaults] valueForKey:userObjectDefaultsKey];
+      if (userData) {
+        currentUser = [NSKeyedUnarchiver unarchiveObjectWithData:userData];
+        DDLogInfo(@"%@ unarchiving user data: %@",
+                  [self.class description],
+                  currentUser.description);
+      } else {
+        currentUser = [[DFUser alloc] init];
+        DDLogInfo(@"%@ no user data found.", [self.class description]);
+      }
+    });
   }
   return currentUser;
-}
-
-+ (void)checkUserDefaults
-{
-  
 }
 
 + (void)setCurrentUser:(DFUser *)user
