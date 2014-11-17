@@ -322,7 +322,11 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
-- (DFPeanutFeedObject *)photoWithId:(DFPhotoIDType)photoID
+
+/* BE CAREFUL WITH THIS FUNCITON
+ It does not take into account strand ID so it can leak data across strands
+ */
+- (DFPeanutFeedObject *)firstPhotoInAllStrandsWithId:(DFPhotoIDType)photoID
 {
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
     if ([object.type isEqual:DFFeedObjectPhoto] && object.id == photoID) {
@@ -361,6 +365,16 @@ static DFPeanutFeedDataManager *defaultManager;
   }
   
   return nil;
+}
+
+- (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
+{
+  DFPeanutFeedObject *photo = [self firstPhotoInAllStrandsWithId:photoID];
+  if (type == DFImageFull) {
+    return photo.full_image_path;
+  } else {
+    return photo.thumb_image_path;
+  }
 }
 
 - (NSArray *)publicStrands

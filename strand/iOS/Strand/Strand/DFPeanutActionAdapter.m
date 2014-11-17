@@ -54,5 +54,21 @@ NSString *const ActionBasePath = @"actions/";
    }];
 }
 
+- (void)removeAction:(DFPeanutAction *)action
+             success:(DFPeanutRestFetchSuccess)success
+             failure:(DFPeanutRestFetchFailure)failure
+{
+  [super
+   performRequest:RKRequestMethodDELETE
+   withPath:ActionBasePath
+   objects:@[action]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     if (success) success(resultObjects);
+   } failure:^(NSError *error) {
+     if (failure) failure(error);
+   }];
+}
 
 @end

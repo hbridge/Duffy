@@ -7,9 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <MCSwipeTableViewCell/MCSwipeTableViewCell.h>
 #import "DFProfileStackView.h"
 
-@interface DFCommentTableViewCell : UITableViewCell
+@interface DFCommentTableViewCell : MCSwipeTableViewCell
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *commentLabel;

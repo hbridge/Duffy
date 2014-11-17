@@ -49,7 +49,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;
-- (DFPeanutFeedObject *)photoWithId:(DFPhotoIDType)photoID;
+- (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
 
 
 /* returns a list of PeanutUsers */

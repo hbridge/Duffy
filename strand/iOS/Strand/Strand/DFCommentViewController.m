@@ -13,6 +13,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "DFAnalytics.h"
 #import "DFNoResultsTableViewCell.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface DFCommentViewController ()
 
@@ -139,8 +140,55 @@
   cell.timestampLabel.text = [NSDateFormatter relativeTimeStringSinceDate:comment.time_stamp
                                                                abbreviate:YES];
   
+  
+  if (comment.user == [[DFUser currentUser] userID]) {
+    [self addDeleteActionForCell:cell
+                         comment:comment
+                       indexPath:indexPath];
+  }
+  
   if (!cell) [NSException raise:@"nil cell" format:@"nil cell"];
   return cell;
+}
+
+- (void)addDeleteActionForCell:(DFCommentTableViewCell *)cell
+                       comment:(DFPeanutAction *)comment
+                     indexPath:(NSIndexPath *)indexPath
+{
+  UILabel *hideLabel = [[UILabel alloc] init];
+  hideLabel.text = @"Delete";
+  hideLabel.textColor = [UIColor whiteColor];
+  [hideLabel sizeToFit];
+  [cell
+   setSwipeGestureWithView:hideLabel
+   color:[UIColor redColor]
+   mode:MCSwipeTableViewCellModeExit
+   state:MCSwipeTableViewCellState3
+   completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+     UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:@"Delete Comment"
+                                                              delegate:self
+                                                     cancelButtonTitle:@"Cancel"
+                                                destructiveButtonTitle:@"Delete"
+                                                     otherButtonTitles:nil];
+     dispatch_async(dispatch_get_main_queue(), ^{
+       [self.tableView beginUpdates];
+       [self.comments removeObject:comment];
+       [self.tableView deleteRowsAtIndexPaths:@[indexPath]
+                             withRowAnimation:UITableViewRowAnimationLeft];
+       [self.tableView endUpdates];
+     });
+     
+     [self.actionAdapter removeAction:comment success:^(NSArray *resultObjects) {
+       DDLogInfo(@"%@ successfully removed action: %@", self.class, comment);
+       [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+     } failure:^(NSError *error) {
+       DDLogError(@"%@ failed to remove action: %@", self.class, error);
+       [SVProgressHUD showErrorWithStatus:@"Failed to delete comment"];
+     }];
+   }];
+  // the default color is the color that appears before you swipe far enough for the action
+  // we set to the group tableview background color to blend in
+  cell.defaultColor = [UIColor lightGrayColor];
 }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -212,7 +260,7 @@
 
 - (void)showCommentError:(DFPeanutAction *)action
 {
-  
+  [SVProgressHUD showErrorWithStatus:@"Posting comment failed."];
 }
 
 - (IBAction)textDidChange:(UITextField *)sender {

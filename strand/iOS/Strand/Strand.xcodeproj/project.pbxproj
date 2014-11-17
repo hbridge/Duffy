@@ -229,6 +229,7 @@
 		5ACA39011947A6F100834D86 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39001947A6F100834D86 /* Foundation.framework */; };
 		5ACA39031947A71700834D86 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39021947A71700834D86 /* CFNetwork.framework */; };
 		5ACE175F1A168D7E00DE998A /* DFDeferredCompletionScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */; };
+		5ACE17621A1AB96C00DE998A /* DFAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE17611A1AB96C00DE998A /* DFAlertController.m */; };
 		5AD8589219785FCC00BFDC4E /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589119785FCC00BFDC4E /* DFTypedefs.m */; };
 		5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */; };
 		5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589719797E6000BFDC4E /* DFPermissionsHelpers.m */; };
@@ -672,6 +673,8 @@
 		5ACA39021947A71700834D86 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		5ACE175D1A168D7E00DE998A /* DFDeferredCompletionScheduler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFDeferredCompletionScheduler.h; sourceTree = "<group>"; };
 		5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDeferredCompletionScheduler.m; sourceTree = "<group>"; };
+		5ACE17601A1AB96C00DE998A /* DFAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAlertController.h; sourceTree = "<group>"; };
+		5ACE17611A1AB96C00DE998A /* DFAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAlertController.m; sourceTree = "<group>"; };
 		5AD8589019785F3600BFDC4E /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTypedefs.h; sourceTree = "<group>"; };
 		5AD8589119785FCC00BFDC4E /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTypedefs.m; sourceTree = "<group>"; };
 		5AD858931978700500BFDC4E /* DFLocationRoadblockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationRoadblockViewController.h; sourceTree = "<group>"; };
@@ -782,6 +785,8 @@
 		5A0E123A1976DCC300B6FF04 /* Common Views */ = {
 			isa = PBXGroup;
 			children = (
+				5ACE17601A1AB96C00DE998A /* DFAlertController.h */,
+				5ACE17611A1AB96C00DE998A /* DFAlertController.m */,
 				5A4C820F19EDC82100C22A12 /* DFSelectSuggestionsViewController.h */,
 				5A4C821019EDC82100C22A12 /* DFSelectSuggestionsViewController.m */,
 				5A4C821119EDC82100C22A12 /* DFSelectSuggestionsViewController.xib */,
@@ -1960,6 +1965,7 @@
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
 				5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */,
 				5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */,
+				5ACE17621A1AB96C00DE998A /* DFAlertController.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
 				5A02CEAF194FA73500C4EBA6 /* DFPeanutPushTokenAdapter.m in Sources */,
 				5AC4A9301947C30800862D9C /* DFToastNotificationManager.m in Sources */,

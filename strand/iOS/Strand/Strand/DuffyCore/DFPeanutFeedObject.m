@@ -153,6 +153,14 @@ static NSArray *FeedObjectTypes;
   return [self descendentdsOfType:type];
 }
 
+- (DFPeanutFeedObject *)firstPhotoWithID:(DFPhotoIDType)photoID;
+{
+  for (DFPeanutFeedObject *photo in [self leafNodesFromObjectOfType:DFFeedObjectPhoto]) {
+    if (photo.id == photoID) return photo;
+  }
+  return nil;
+}
+
 + (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects
 {
   NSMutableArray *result = [NSMutableArray new];

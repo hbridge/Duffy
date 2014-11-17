@@ -105,27 +105,18 @@ static DFImageDownloadManager *defaultManager;
                         andPhotoID:(DFPhotoIDType)photoID
                         completion:(ImageLoadCompletionBlock)completionBlock
 {
-  DFPeanutFeedObject *photoObject = [self.dataManager photoWithId:photoID];
+  NSString *path = [self.dataManager imagePathForPhotoWithID:photoID ofType:type];
+  NSOperationQueuePriority priority = type == DFImageThumbnail ?
+    NSOperationQueuePriorityVeryHigh : NSOperationQueuePriorityHigh; // thumbnails are highest
   BOOL didDispatchForCompletion = NO;
   
-  if (photoObject) {
-    if (type == DFImageThumbnail && ![photoObject.thumb_image_path isEqualToString:@""]) {
-      didDispatchForCompletion = YES;
-      [self getImageDataForPath:photoObject.thumb_image_path
-                       priority:NSOperationQueuePriorityVeryHigh // thumbnails are highest pri
-            completionBlock:^(UIImage *image, NSError *error) {
-              completionBlock(image);
-      }];
-    }
-    
-    if (type == DFImageFull && ![photoObject.full_image_path isEqualToString:@""]) {
-      didDispatchForCompletion = YES;
-      [self getImageDataForPath:photoObject.full_image_path
-                       priority:NSOperationQueuePriorityHigh
-                completionBlock:^(UIImage *image, NSError *error) {
-              completionBlock(image);
-      }];
-    }
+  if (path) {
+    didDispatchForCompletion = YES;
+    [self getImageDataForPath:path
+                     priority:priority
+              completionBlock:^(UIImage *image, NSError *error) {
+                completionBlock(image);
+              }];
   } else {
     DDLogWarn(@"%@ asked to fetch photoID:%@ but dataManager returned nil.",
               self.class, @(photoID));

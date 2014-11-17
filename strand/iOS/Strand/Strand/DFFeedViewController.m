@@ -221,6 +221,12 @@ static int ImagePrefetchRange = 3;
      target:self
      action:@selector(peopleButtonPressed:)],
     ];
+  
+  self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
+                                           initWithTitle:@"Back"
+                                           style:UIBarButtonItemStylePlain
+                                           target:self
+                                           action:nil];
 }
 
 - (void)setStrandActionsEnabled:(BOOL)enabled
@@ -803,7 +809,8 @@ static int ImagePrefetchRange = 3;
 - (void)commentButtonPressedForObject:(id)object sender:(id)sender
 {
   NSNumber *photoID = (NSNumber *)object;
-  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithId:photoID.longLongValue];
+  
+  DFPeanutFeedObject *photoObject = [self.postsObject firstPhotoWithID:photoID.longLongValue];
   DDLogVerbose(@"Comment button for %@ pressed", photoObject);
   DFCommentViewController *cvc = [[DFCommentViewController alloc]
                                   initWithPhotoObject:photoObject

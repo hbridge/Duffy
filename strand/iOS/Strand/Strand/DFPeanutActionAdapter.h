@@ -18,5 +18,8 @@ extern NSString *const ActionBasePath;
 - (void)addAction:(DFPeanutAction *)action
           success:(DFPeanutRestFetchSuccess)success
           failure:(DFPeanutRestFetchFailure)failure;
+- (void)removeAction:(DFPeanutAction *)action
+             success:(DFPeanutRestFetchSuccess)success
+             failure:(DFPeanutRestFetchFailure)failure;
 
 @end
