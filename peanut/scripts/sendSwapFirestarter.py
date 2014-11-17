@@ -75,15 +75,12 @@ def sendRetroFirestarterNotification():
 			
 			usersNames = [u.display_name for u in users]
 			usersStr = ', '.join(usersNames)
-			msg = "You have %s photos to swap with %s from %s" % (len(winningStrand.photos.all()), usersStr, strands_util.getLocationForStrand(winningStrand))
+			msg = "You have %s photos to swap with %s from this weekend" % (len(winningStrand.photos.all()), usersStr)
 			
 			customPayload = {'id': myStrand.id}
 			print "to %s: %s   id: %s" % (user.display_name, msg, myStrand.id)
 			
-			#if user.id == 901:	
 			#notifications_util.sendNotification(user, msg, constants.NOTIFICATIONS_RETRO_FIRESTARTER, customPayload)
-
-
 
 def main(argv):
 	logger.info("Starting... ")
