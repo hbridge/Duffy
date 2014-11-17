@@ -29,8 +29,7 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	timeWithin = now - datetime.timedelta(days=7)
 
-	# fetch all the users who have been sent this type of notification in the last week
-	#logEntries = NotificationLog.objects.filter(added__gt=timeWithin).filter(msg_type=constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS).values('user__phone_number', 'phone_number').distinct()
+	# fetch all the users who have been sent an invite in the last week 
 	logEntries = NotificationLog.objects.prefetch_related('user').filter(added__gt=timeWithin).filter(msg_type=constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS)
 
 	# Convert that into a list
@@ -41,11 +40,14 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 		else:
 			phoneNumList.append(str(logEntry.user.phone_number))
 
-	invites = StrandInvite.objects.prefetch_related('strand', 'user', 'invited_user').filter(accepted_user_id=None).filter(added__gt=timeWithin)
+	invites = StrandInvite.objects.prefetch_related('strand', 'user', 'invited_user').filter(accepted_user_id=None).filter(added__gt=timeWithin).filter(added__lt=now-datetime.timedelta(days=1))
 
 	userToInvitesDict = dict()
 	for invite in invites:
-		if (invite.phone_number in phoneNumList or (invite.invited_user and invite.invited_user.added > now - datetime.timedelta(days=1))):
+		# if the user joined in the last 24 hours, don't send them anything
+		if (invite.phone_number in phoneNumList or 
+			(invite.invited_user == None) or # skipping non-signed up users for now
+			(invite.invited_user and invite.invited_user.added > now - datetime.timedelta(days=1))):
 			continue
 		if invite.phone_number in userToInvitesDict:
 			userToInvitesDict[invite.phone_number].append(invite)
