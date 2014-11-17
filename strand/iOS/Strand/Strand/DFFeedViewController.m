@@ -273,7 +273,6 @@ static int ImagePrefetchRange = 3;
 
 - (void)configureTableView
 {
-  self.tableView.contentInset = UIEdgeInsetsMake(0, 0, self.tabBarController.tabBar.frame.size.height * 2.0, 0);
   self.tableView.scrollsToTop = YES;
 
   NSMutableArray *styles = [NSMutableArray new];
@@ -651,7 +650,7 @@ static int ImagePrefetchRange = 3;
     CGRect frame = cell.frame;
     frame.size.width = self.view.frame.size.width;
     cell.frame = frame;
-    [cell layoutSubviews];
+    [cell layoutIfNeeded];
   }
   return cell;
 }

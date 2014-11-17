@@ -19,19 +19,12 @@
 
 - (void)awakeFromNib
 {
+  [super awakeFromNib];
   self.imagesForObjects = [NSMutableDictionary new];
   [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
         forCellWithReuseIdentifier:@"DFPhotoViewCell"];
   self.collectionView.scrollsToTop = NO;
-  self.collectionView.delegate = self;
   self.collectionView.dataSource = self;
-}
-
-- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-{
-  [super setSelected:selected animated:animated];
-  
-  // Configure the view for the selected state
 }
 
 - (void)setObjects:(NSArray *)objects

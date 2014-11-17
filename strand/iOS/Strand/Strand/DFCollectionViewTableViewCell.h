@@ -8,7 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface DFCollectionViewTableViewCell : UITableViewCell <UICollectionViewDataSource, UICollectionViewDelegate>
+@interface DFCollectionViewTableViewCell : UITableViewCell <UICollectionViewDataSource>
 @property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
 
 // Objects that the cell represents

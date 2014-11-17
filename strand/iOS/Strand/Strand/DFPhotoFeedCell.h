@@ -24,7 +24,7 @@
 @end
 
 
-@interface DFPhotoFeedCell : DFCollectionViewTableViewCell <UICollectionViewDelegate, UICollectionViewDataSource>
+@interface DFPhotoFeedCell : DFCollectionViewTableViewCell <UICollectionViewDelegate>
 
 // Views
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;

@@ -17,6 +17,7 @@
 #import "DFDeferredCompletionScheduler.h"
 
 const NSUInteger maxConcurrentImageDownloads = 2;
+const NSUInteger maxDownloadRetries = 3;
 
 @interface DFImageDownloadManager()
 
@@ -162,8 +163,17 @@ static DFImageDownloadManager *defaultManager;
                                                timeoutInterval:15.0];
        AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
        requestOperation.queuePriority = queuePriority;
-       [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];
-       [requestOperation waitUntilFinished];
+       
+       for (int retryCount = 0; retryCount <= maxDownloadRetries; retryCount++) {
+         [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];
+         [requestOperation waitUntilFinished];
+         if (!requestOperation.error) {
+           break;
+         } else {
+           DDLogError(@"%@ attempt %d image download failed: %@",
+                      self.class, retryCount, requestOperation.error);
+         }
+       }
        
        NSMutableDictionary *result = [NSMutableDictionary new];
        if (requestOperation.responseData) {

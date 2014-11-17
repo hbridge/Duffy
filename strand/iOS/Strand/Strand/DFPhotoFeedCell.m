@@ -44,12 +44,7 @@
   [self.favoritersButton setTitleColor:[DFStrandConstants weakFeedForegroundTextColor]
                               forState:UIControlStateNormal];
   
-  self.collectionView.scrollsToTop = NO;
   self.collectionView.delegate = self;
-  self.collectionView.dataSource = self;
-  [self.collectionView registerNib:[UINib nibWithNibName:@"DFPhotoViewCell" bundle:nil]
-        forCellWithReuseIdentifier:@"cell"];
-  self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)configureWithStyle:(DFPhotoFeedCellStyle)style aspect:(DFPhotoFeedCellAspect)aspect
@@ -59,6 +54,7 @@
   
   if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
     [self.collectionView removeFromSuperview];
+    self.collectionView = nil;
   }
   
   if (!(style & DFPhotoFeedCellStyleHasLikes)) {
@@ -80,10 +76,7 @@
 + (DFPhotoFeedCell *)createCellWithStyle:(DFPhotoFeedCellStyle)style
                                   aspect:(DFPhotoFeedCellAspect)aspect
 {
-  DFPhotoFeedCell *cell =
-  [[[UINib nibWithNibName:NSStringFromClass([DFPhotoFeedCell class]) bundle:nil]
-    instantiateWithOwner:nil options:nil]
-   firstObject];
+  DFPhotoFeedCell *cell = [UINib instantiateViewWithClass:[DFPhotoFeedCell class]];
   [cell configureWithStyle:style aspect:aspect];
   return cell;
 }
