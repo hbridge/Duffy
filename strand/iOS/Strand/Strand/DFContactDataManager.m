@@ -60,7 +60,6 @@ static DFContactDataManager *defaultManager;
 
 - (RHPerson *)personFromPhoneNumber:(NSString *)phoneNumber
 {
-  if (ABAddressBookGetAuthorizationStatus() != kABAuthorizationStatusAuthorized) return nil;
   if ([self.phoneNumberToPersonCache objectForKey:phoneNumber]) {
     return [[self.phoneNumberToPersonCache objectForKey:phoneNumber] firstObject];
   }
