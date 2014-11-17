@@ -31,6 +31,15 @@
     self.profilePhotoWidth = 35.0;
 }
 
+- (void)setPeanutUser:(DFPeanutUserObject *)user
+{
+  NSArray *users = user ? @[user] : @[];
+  [self setPeanutUsers:users];
+  if (users.count == 0) {
+    DDLogWarn(@"%@ asked to show a nil user", self.class);
+  }
+}
+
 - (void)setPeanutUsers:(NSArray *)users
 {
   _peanutUsers = users;

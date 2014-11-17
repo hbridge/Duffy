@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
+@class DFPeanutUserObject;
+
 @interface DFProfileStackView : UIView
 
 @property (nonatomic) NSUInteger maxProfilePhotos;
@@ -15,5 +17,6 @@
 @property (nonatomic, retain) NSArray *peanutUsers;
 @property (nonatomic) BOOL shouldShowNameLabel;
 
+- (void)setPeanutUser:(DFPeanutUserObject *)user;
 
 @end

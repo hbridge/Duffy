@@ -310,6 +310,10 @@ static NSArray *FeedObjectTypes;
 
 - (DFPeanutUserObject *)actorWithID:(DFUserIDType)userID
 {
+  if (userID == [[DFUser currentUser] userID]) {
+    return [[DFUser currentUser] peanutUser];
+  }  
+  
   DFPeanutFeedObject *photoObject = self;
   if ([self.type isEqual:DFFeedObjectCluster]) {
     photoObject = [[self leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
@@ -317,6 +321,7 @@ static NSArray *FeedObjectTypes;
   for (DFPeanutUserObject *user in photoObject.actors) {
     if (user.id == userID) return user;
   }
+  
   return nil;
 }
 
