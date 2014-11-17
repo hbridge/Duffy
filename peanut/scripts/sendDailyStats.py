@@ -57,7 +57,7 @@ def compileData(date, length):
 	'''
 
 	newUsers = getNewUsers(date, length)
-	dataDictDate = {'date': (date-relativedelta(days=1)).strftime('%m/%d/%Y')}
+	dataDictDate = {'date': (date-relativedelta(days=1)).strftime('%m/%d/%y')}
 	dataDictUsers = getUserStats(date, length, newUsers)
 	dataDictPhotos = getPhotoStats(date, length, newUsers)
 	dataDictActions = getActionStats(date, length, newUsers)
@@ -66,12 +66,12 @@ def compileData(date, length):
 
 def getNewUsers(date, length):
 	newUsers = User.objects.filter(product_id=2).filter(added__lt=date).filter(added__gt=date-relativedelta(days=length))
-	return newUsers
+	return list(newUsers)
 
 def getUserStats(date, length, newUsers):
 
 	activeUsers = Action.objects.values('user').filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).distinct().count()
-	newUsers = newUsers.count()
+	newUsers = len(newUsers)
 	newFriends = FriendConnection.objects.filter(added__lt=date).filter(added__gt=date-relativedelta(days=length)).count()
 	checkIns = User.objects.filter(last_photo_update_timestamp__lt=date).filter(last_photo_update_timestamp__gt=date-relativedelta(days=length)).count()
 
@@ -174,6 +174,7 @@ def dataDictToString(dataDict, length):
 
 
 def writeToSpreadsheet(dataDict, length):
+
 	gdClient = gdata.spreadsheet.service.SpreadsheetsService()
 	# Authenticate using your Google Docs email address and password.
 	gdClient.ClientLogin('stats.master@duffytech.co', 'bich3toc8ar7ogg3uv6o')
@@ -192,15 +193,27 @@ def writeToSpreadsheet(dataDict, length):
 		return False
 
 	# convert all keys to lowercase (Gdata requirement) and all values to string
-	cleanedUpDict = dict((k.lower(), str(v)) for k,v in dataDict.iteritems())
+	cleanedUpDict = dict((k.lower(), str(v)) for k,v in dataDict.iteritems())		
 
-	result = gdClient.InsertRow(cleanedUpDict, key, worksheetId)
+	# get the existing feed, so we can upate right entry
+	# Note: we need to updateRow, instead of InsertRow. GData graphing quirks
+	listFeed = gdClient.GetListFeed(key, worksheetId)
+	rowIndex = None
+	for i, listEntry in enumerate(listFeed.entry):
+		if (listEntry.title.text == dataDict['date']):
+			rowIndex = i
 
-	if isinstance(result, gdata.spreadsheet.SpreadsheetsList):
-		return True
+	if rowIndex != None:
+		result = gdClient.UpdateRow(listFeed.entry[rowIndex], cleanedUpDict)
+		if isinstance(result, gdata.spreadsheet.SpreadsheetsList):
+			return True
+		else:
+			print "...FAILED worksheet for %s-day stats" % (length)
+			return False
 	else:
-		print "...FAILED worksheet for %s-day stats" % (length)
-		return False	
+		print 'Error: date not found in spreadsheet. Please update first!'
+
+	return False
 
 
 def main(argv):
@@ -220,14 +233,15 @@ def main(argv):
 		elif ("publish" in argv):
 			publishToSpreadSheet = True
 
-	print "Generating stats for %s " % (date-relativedelta(days=1)).strftime('%m/%d/%Y')
+	print "Generating stats for %s " % (date-relativedelta(days=1)).strftime('%m/%d/%y')
 
 	# Compile data
 	dataDict1day = compileData(date, 1)
 	dataDict7day = compileData(date, 7)
 
 	# compile string to publish to console and/or email
-	emailBody = dataDictToString(dataDict7day, 7)
+	emailBody = '\nGraphs: https://docs.google.com/a/duffytech.co/spreadsheets/d/1qAXGN3-1mxutctXGQQsDP-CNR9IGGhjAGt61RTpAkys/edit#gid=1659973534\n'
+	emailBody += dataDictToString(dataDict7day, 7)
 	emailBody += dataDictToString(dataDict1day, 1)
 
 	print emailBody
