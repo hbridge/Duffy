@@ -1,5 +1,10 @@
 # Swap
 
+## Nov 17th, 2014 (4804)
+
+- Support tapping on profile photos in gallery to see the person's name
+- Bug fixes: no more extra white space at bottom of photos view, crashes etc
+
 ## Nov 14th, 2014 (4802-4803)
 
 - Performance improvements
