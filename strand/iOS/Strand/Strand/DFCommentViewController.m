@@ -42,6 +42,7 @@
   [super viewDidLoad];
   
   [self configureTableView:self.tableView];
+  [self textDidChange:self.textField];
 }
 
 - (void)viewWillLayoutSubviews
@@ -215,6 +216,11 @@
 }
 
 - (IBAction)textDidChange:(UITextField *)sender {
+  if (sender.text.length > 0) {
+    self.sendButton.enabled = YES;
+  } else {
+    self.sendButton.enabled = NO;
+  }
 }
 
 

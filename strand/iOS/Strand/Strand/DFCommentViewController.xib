@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFCommentViewController">
             <connections>
+                <outlet property="sendButton" destination="QrE-bK-fZK" id="sXl-cH-CwY"/>
                 <outlet property="tableView" destination="Idt-Bp-Mrh" id="k0b-2j-HLv"/>
                 <outlet property="textField" destination="Pfw-9f-UHS" id="1Zc-VB-1uS"/>
                 <outlet property="toolbar" destination="OZb-rB-V1d" id="8eI-uq-pQl"/>
@@ -32,7 +33,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                 <connections>
-                                    <action selector="textDidChange:" destination="-1" eventType="valueChanged" id="9Ny-cb-mqM"/>
+                                    <action selector="textDidChange:" destination="-1" eventType="editingChanged" id="2uJ-Ve-FEh"/>
                                 </connections>
                             </textField>
                         </barButtonItem>
