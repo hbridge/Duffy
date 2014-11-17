@@ -298,7 +298,7 @@ const CGFloat CreateCellTitleSpacing = 8;
   headerView.badgeIconView.image = [UIImage imageNamed:@"Assets/Icons/MatchedIcon"];
   
   if (suggestion.actors.count == 1) {
-    headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ has photos to swap", suggestion.actorsString];
+    headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap", suggestion.actorsString];
   } else {
     headerView.badgeIconText.text = [NSString stringWithFormat:@"%@ can swap", suggestion.actorsString];
   }
@@ -379,6 +379,7 @@ referenceSizeForHeaderInSection:(NSInteger)section
   [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
   suggestion.suggestible = @NO;
   [self.collectionView reloadSections:[NSIndexSet indexSetWithIndex:section]];
+  [DFAnalytics logSuggestionActionTaken:suggestion action:@"hide"];
 }
 
 - (void)selectPhotosController:(DFSelectPhotosController *)selectPhotosController

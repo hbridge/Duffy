@@ -86,4 +86,8 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 + (NSArray *)leafObjectsOfType:(DFFeedObjectType)type inArrayOfFeedObjects:(NSArray *)feedObjects;
 - (DFPeanutUserObject *)actorWithID:(DFUserIDType)userID;
 
+
+#pragma mark - Analytics helpers
+- (NSDictionary *)suggestionAnalyticsSummary;
+
 @end

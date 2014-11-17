@@ -325,6 +325,17 @@ static NSArray *FeedObjectTypes;
   return nil;
 }
 
+#pragma mark - Analytics helpers
+
+- (NSDictionary *)suggestionAnalyticsSummary
+{
+  return @{
+           @"suggestionType" : self.suggestion_type ? self.suggestion_type : @"",
+           @"suggestionRank" : self.suggestion_rank? self.suggestion_rank : @(0),
+           @"suggestionActorsCount" : @(self.actors.count),
+           };
+}
+
 #pragma mark - NSObject Copying and Equality
 
 /* Creates a shallow copy of the SearchObject */

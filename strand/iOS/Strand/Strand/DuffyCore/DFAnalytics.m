@@ -175,6 +175,15 @@ static DFAnalytics *defaultLogger;
   [self logEvent:CreateStrandEvent withParameters:parameters];
 }
 
+
++ (void)logSuggestionActionTaken:(DFPeanutFeedObject *)suggestion
+                          action:(NSString *)action
+{
+  NSMutableDictionary *accumulated = [suggestion.suggestionAnalyticsSummary mutableCopy];
+  accumulated[@"action"] = action;
+  [self logEvent:@"SuggestionActionTaken" withParameters:accumulated];
+}
+
 + (void)logMatchPhotos:(DFPeanutFeedObject *)inviteObject
      withMatchedPhotos:(NSArray *)matchedPhotos
         selectedPhotos:(NSArray *)selectedPhotos

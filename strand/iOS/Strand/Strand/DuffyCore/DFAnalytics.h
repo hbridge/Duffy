@@ -58,6 +58,8 @@ disappearedWithParameters:(NSDictionary *)params;
                              numPhotosSelected:(NSUInteger)numPhotos
                              numPeopleSelected:(NSUInteger)numPeople
                                      extraInfo:(NSDictionary *)extraInfo;
++ (void)logSuggestionActionTaken:(DFPeanutFeedObject *)suggestion
+                          action:(NSString *)action;
 
 /* Match photos */
 + (void)logMatchPhotos:(DFPeanutFeedObject *)inviteObject
