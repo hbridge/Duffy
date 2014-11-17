@@ -15,8 +15,6 @@
 
 @interface DFPhotoFeedCell()
 
-@property (nonatomic, retain) NSMutableDictionary *savedConstraints;
-@property (nonatomic, retain) NSMutableDictionary *imagesForObjects;
 @property (nonatomic, retain) id selectedObject;
 @property (nonatomic) DFPhotoFeedCellStyle style;
 @property (nonatomic) DFPhotoFeedCellAspect aspect;
@@ -27,6 +25,10 @@
 
 - (void)awakeFromNib
 {
+  // we can't just use the self.collectionView with InterfaceBuilder
+  // as removing it from the superview will cause memory management issues (it gets over-released)
+  // so we use clusterCollectionView as the IBOutlet and then set self.collecitonView
+  self.collectionView = self.clusterCollectionView;
   [super awakeFromNib];
   [self configureView];
   UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
@@ -39,7 +41,7 @@
 - (void)configureView
 {
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
-  self.imageView.contentMode = UIViewContentModeScaleAspectFill;
+  self.photoImageView.contentMode = UIViewContentModeScaleAspectFill;
   self.favoritersButton.titleEdgeInsets = UIEdgeInsetsMake(0, 4, 0, 0);
   [self.favoritersButton setTitleColor:[DFStrandConstants weakFeedForegroundTextColor]
                               forState:UIControlStateNormal];
@@ -53,6 +55,8 @@
   _aspect = aspect;
   
   if (!(style & DFPhotoFeedCellStyleCollectionVisible)) {
+    self.collectionView.delegate = nil;
+    self.collectionView.dataSource = nil;
     [self.collectionView removeFromSuperview];
     self.collectionView = nil;
   }
@@ -92,7 +96,7 @@
 - (void)setSelectedObject:(id)selectedObject
 {
   _selectedObject = selectedObject;
-  [self setLargeImage:self.imagesForObjects[selectedObject]];
+  [self setLargeImage:[self imageForObject:selectedObject]];
 }
 
 - (void)setImage:(UIImage *)image forObject:(id)object
@@ -174,7 +178,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   id oldObject = self.selectedObject;
   id object = self.objects[indexPath.row];
-  [self setLargeImage:self.imagesForObjects[object]];
+  [self setLargeImage:[self imageForObject:object]];
   self.selectedObject = object;
   if (self.delegate) {
     [self.delegate feedCell:self selectedObjectChanged:object fromObject:oldObject];

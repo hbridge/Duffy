@@ -14,5 +14,6 @@
 // Objects that the cell represents
 @property (nonatomic, retain) NSArray *objects;
 - (void)setImage:(UIImage *)image forObject:(id)object;
+- (UIImage *)imageForObject:(id)object;
 
 @end

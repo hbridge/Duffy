@@ -172,7 +172,7 @@
                 </variation>
             </tableViewCellContentView>
             <connections>
-                <outlet property="collectionView" destination="h07-n4-DgV" id="l03-i2-iAq"/>
+                <outlet property="clusterCollectionView" destination="h07-n4-DgV" id="r4d-PB-3cu"/>
                 <outlet property="commentsIconImageView" destination="7Bw-IQ-tbp" id="7jb-JN-pbQ"/>
                 <outlet property="commentsLabel" destination="DCN-Jd-BMd" id="maL-qq-8zv"/>
                 <outlet property="imageViewHeightConstraint" destination="5rH-Iu-Kcd" id="u0I-7j-hbS"/>

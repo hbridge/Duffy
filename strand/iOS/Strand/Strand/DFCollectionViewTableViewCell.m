@@ -25,6 +25,7 @@
         forCellWithReuseIdentifier:@"DFPhotoViewCell"];
   self.collectionView.scrollsToTop = NO;
   self.collectionView.dataSource = self;
+  self.collectionView.backgroundColor = [UIColor clearColor];
 }
 
 - (void)setObjects:(NSArray *)objects
@@ -47,6 +48,11 @@
   } else {
     DDLogVerbose(@"Attempting to set nil image for %@", self.class);
   }
+}
+
+- (UIImage *)imageForObject:(id)object
+{
+  return self.imagesForObjects[object];
 }
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
