@@ -133,7 +133,6 @@ static int ImagePrefetchRange = 3;
                                                          target:feedViewController
                                                           action:@selector(dismissWhenPresented)];
   
-  
   [viewController presentViewController:navController animated:YES completion:nil];
   return feedViewController;
 }
@@ -206,9 +205,6 @@ static int ImagePrefetchRange = 3;
 
 - (void)initNavItem
 {
-  self.navigationItem.leftBarButtonItems =
-  [self.navigationItem.leftBarButtonItems arrayByAddingObject:
-   [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:self action:nil]];
   self.navigationItem.rightBarButtonItems =
   @[[[UIBarButtonItem alloc]
      initWithImage:[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
@@ -417,11 +413,6 @@ static int ImagePrefetchRange = 3;
   
   dispatch_async(dispatch_get_main_queue(), ^{
     [self configureTitleView];
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
-                                             initWithTitle:@""
-                                             style:UIBarButtonItemStylePlain target:nil action:nil];
-
-    
     NSMutableDictionary *objectsByID = [NSMutableDictionary new];
     NSMutableDictionary *indexPathsByID = [NSMutableDictionary new];
     
