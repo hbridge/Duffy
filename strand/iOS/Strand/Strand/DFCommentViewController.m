@@ -21,6 +21,7 @@
 @property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
 @property (nonatomic, retain) NSMutableArray *comments;
 @property (nonatomic, retain) DFCommentTableViewCell *templateCell;
+@property (nonatomic, retain) DFAlertController *alertController;
 
 @end
 
@@ -166,22 +167,23 @@
    mode:MCSwipeTableViewCellModeExit
    state:MCSwipeTableViewCellState3
    completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-     DFAlertController *alertController = [DFAlertController alertControllerWithTitle:@"Delete Photos?"
+     [self.textField resignFirstResponder];
+     self.alertController = [DFAlertController alertControllerWithTitle:@"Delete Photos?"
                                                                               message:nil
                                                                        preferredStyle:DFAlertControllerStyleActionSheet];
-     [alertController addAction:[DFAlertAction
+     [self.alertController addAction:[DFAlertAction
                                  actionWithTitle:@"Delete"
                                  style:DFAlertActionStyleDestructive
                                  handler:^(DFAlertAction *action) {
                                    [self deleteCommentAtIndexPath:indexPath];
                                  }]];
-     [alertController addAction:[DFAlertAction
+     [self.alertController addAction:[DFAlertAction
                                  actionWithTitle:@"Cancel"
                                  style:DFAlertActionStyleCancel
                                  handler:^(DFAlertAction *action) {
                                    [cell swipeToOriginWithCompletion:nil];
                                  }]];
-     [alertController showWithParentViewController:self animated:YES completion:nil];
+     [self.alertController showWithParentViewController:self animated:YES completion:nil];
    }];
   // the default color is the color that appears before you swipe far enough for the action
   // we set to the group tableview background color to blend in

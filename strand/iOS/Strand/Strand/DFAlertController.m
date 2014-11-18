@@ -110,7 +110,7 @@
   return actionSheet;
 }
 
-- (void)actionSheet:(UIActionSheet *)actionSheet didDismissWithButtonIndex:(NSInteger)buttonIndex
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
   DFAlertAction *action = self.actions[buttonIndex];
   action.handler(action);
