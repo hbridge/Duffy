@@ -293,6 +293,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends)
 		printStats("neighbor-cache")
 
+	strandsToDelete = list()
 	for strand in strands:
 		photos = strand.photos.all()
 
@@ -301,6 +302,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		
 		if len(photos) == 0:
 			logger.warning("in getObjectsDataForPrivateStrands found strand with no photos: %s" % (strand.id))
+			strandsToDelete.append(strand)
 			continue
 		
 		interestedUsers = list()
@@ -343,6 +345,13 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
 	printStats("private-strands")
+
+	# These are strands that are found to have no valid photos.  So maybe they were all deleted photos
+	# Can remove them here since they're private strands so something with no valid photos shouldn't exist
+	for strand in strandsToDelete:
+		logger.info("Deleting private strand %s for user %s" % (strand.id, user.id))
+		strand.delete()
+
 	return objects
 
 
@@ -591,7 +600,6 @@ def private_strands(request):
 
 		if deletedSomething:
 			strands = list(Strand.objects.prefetch_related('photos', 'users', 'photos__user').filter(user=user).filter(private=True))
-
 
 		friends = friends_util.getFriends(user.id)
 		
