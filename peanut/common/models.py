@@ -190,6 +190,7 @@ class Photo(models.Model):
 	class Meta:
 		db_table = 'photos_photo'
 		index_together = ('iphone_hash', 'user')
+		unique_together = ('user', 'iphone_hash', 'file_key')
 
 	def __unicode__(self):
 		return str(self.id)
