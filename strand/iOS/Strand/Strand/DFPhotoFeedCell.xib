@@ -149,12 +149,12 @@
                     <constraint firstItem="h07-n4-DgV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="W57-RD-aTX"/>
                     <constraint firstAttribute="trailing" secondItem="EPr-aP-pSV" secondAttribute="trailing" id="a0s-oA-S46"/>
                     <constraint firstItem="d5e-Qd-WoU" firstAttribute="top" secondItem="h07-n4-DgV" secondAttribute="bottom" constant="10" id="bye-Un-Ku8"/>
-                    <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="997" constant="10" id="d6m-M6-kfK"/>
-                    <constraint firstItem="d5e-Qd-WoU" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="999" constant="10" id="evO-bK-1MN"/>
+                    <constraint firstItem="DCN-Jd-BMd" firstAttribute="top" relation="greaterThanOrEqual" secondItem="EPr-aP-pSV" secondAttribute="bottom" constant="10" id="d6m-M6-kfK"/>
+                    <constraint firstItem="d5e-Qd-WoU" firstAttribute="top" relation="greaterThanOrEqual" secondItem="EPr-aP-pSV" secondAttribute="bottom" constant="10" id="evO-bK-1MN"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" priority="999" id="fDr-AQ-CiI"/>
                     <constraint firstItem="DCN-Jd-BMd" firstAttribute="centerY" secondItem="7Bw-IQ-tbp" secondAttribute="centerY" id="kOI-qM-gfa"/>
                     <constraint firstItem="EPr-aP-pSV" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="mPc-8w-nGX"/>
-                    <constraint firstItem="TQm-Ad-3iq" firstAttribute="top" secondItem="EPr-aP-pSV" secondAttribute="bottom" priority="690" constant="10" id="p9m-3R-d0z"/>
+                    <constraint firstItem="TQm-Ad-3iq" firstAttribute="top" relation="greaterThanOrEqual" secondItem="EPr-aP-pSV" secondAttribute="bottom" constant="10" id="p9m-3R-d0z"/>
                     <constraint firstItem="7Bw-IQ-tbp" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="qL7-Ga-5cf"/>
                     <constraint firstItem="1gY-Re-IGJ" firstAttribute="centerY" secondItem="RQX-cM-UG4" secondAttribute="centerY" id="uPr-QT-QO2"/>
                     <constraint firstItem="d5e-Qd-WoU" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="vQX-wx-Xf5"/>
