@@ -287,7 +287,7 @@ class PhotoBulkAPI(BasePhotoAPI):
             
             existingPhotosByHash = dict()
             if user.install_num > 0 and len(request.FILES) == 0:
-                logger.debug("It appears user %s has a new install, fetching existing photos" % (user.id))
+                logger.info("It appears user %s has a new install, fetching existing photos" % (user.id))
                 existingPhotos = Photo.objects.filter(user = user, install_num__lt=user.install_num)
                 for photo in existingPhotos:
                     if photo.iphone_hash not in existingPhotosByHash:
@@ -318,29 +318,61 @@ class PhotoBulkAPI(BasePhotoAPI):
                     objsToUpdate.append(photo)
                 else:
                     objsToCreate.append(photo)
-                
-            Photo.objects.bulk_create(objsToCreate)
+            
+            # These are all the photos we're going to return back to the client, all should have ids
+            allPhotos = list()
+
+            # These are used to deal with dups that occur with photos to be created
+            objsToCreateAgain = list()
+            objsFoundToMatchExisting = list()
+
+            try:
+                Photo.objects.bulk_create(objsToCreate)
+            except IntegrityError:
+                logger.info("Got IntegrityError on bulk upload for user %s on %s photos" % (user.id, len(objsToCreate)))
+                # At this point, we tried created some rows that have the same user_id - hash - file_key
+                # This probably means we're dealing with a request the server already processed
+                # but the client didn't get back.  So for each photo we think we should create, see if the
+                # exact record (hash, file_key) exists and return that id.
+                hashes = [obj.iphone_hash for obj in objsToCreate]
+
+                existingPhotos = Photo.objects.filter(user = user, iphone_hash__in=hashes)
+
+
+                for objToCreate in objsToCreate:
+                    foundMatch = False
+                    for photo in existingPhotos:
+                        if photo.iphone_hash == objToCreate.iphone_hash and photo.file_key == objToCreate.file_key:
+                            # We found an exact photo match, so just make sure we return this entry to the client
+                            allPhotos.append(photo)
+                            objsFoundToMatchExisting.append(photo)
+                            foundMatch = True
+                            logger.debug("Found match on photo %s, going to return that" % (photo.id))
+                    if not foundMatch:
+                        objsToCreateAgain.append(objToCreate)
+                        logger.debug("Didn't find match on photo with hash %s and file_key %s, going to try to create again" % (objToCreate.iphone_hash, objToCreate.file_key))
+
+                # This call should now not barf because we've filtered out all the existing photos
+                Photo.objects.bulk_create(objsToCreateAgain)
 
             # Only want to grab stuff from the last 60 seconds since bulk_batch_key could repeat
             dt = datetime.datetime.now() - datetime.timedelta(seconds=60)
             createdPhotos = list(Photo.objects.filter(bulk_batch_key = batchKey).filter(updated__gt=dt))
 
-            allPhotos = list()
             allPhotos.extend(createdPhotos)
             
-            # Fetch real db objects instead of using the serialized ones.  Only doing this with things
-            #   that are already created
+            # Now bulk update photos that already exist, this could happen during re-install
             if len(objsToUpdate) > 0:
                 Photo.bulkUpdate(objsToUpdate, ['file_key', 'install_num'])
+                # Best to just do a fresh fetch from the db
                 objsToUpdate = Photo.objects.filter(id__in=Photo.getIds(objsToUpdate))
-
                 allPhotos.extend(objsToUpdate)
 
 
             # Now that we've created the images in the db, we need to deal with any uploaded images
             #   and fill in any EXIF data (time_taken, gps, etc)
             if len(allPhotos) > 0:
-                logger.info("Successfully created %s entries in db, and had %s existing ... now processing photos" % (len(createdPhotos), len(objsToUpdate)))
+                logger.info("Successfully created %s entries in db, had %s existing, matched up %s and had to create a second time %s ... now processing photos" % (len(createdPhotos), len(objsToUpdate), len(objsFoundToMatchExisting), len(objsToCreateAgain)))
 
                 # This will move the uploaded image over to the filesystem, and create needed thumbs
                 numImagesProcessed = image_util.handleUploadedImagesBulk(request, allPhotos)
