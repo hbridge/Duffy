@@ -12,6 +12,7 @@
 
 - (void)awakeFromNib {
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
+  self.selectionStyle = UITableViewCellSelectionStyleNone;
 }
 
 - (CGFloat)rowHeight

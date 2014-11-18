@@ -14,6 +14,7 @@
 #import "DFAnalytics.h"
 #import "DFNoResultsTableViewCell.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFAlertController.h"
 
 @interface DFCommentViewController ()
 
@@ -165,16 +166,39 @@
    mode:MCSwipeTableViewCellModeExit
    state:MCSwipeTableViewCellState3
    completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
-     UIActionSheet *deleteSheet = [[UIActionSheet alloc] initWithTitle:@"Delete Comment"
-                                                              delegate:self
-                                                     cancelButtonTitle:@"Cancel"
-                                                destructiveButtonTitle:@"Delete"
-                                                     otherButtonTitles:nil];
+     DFAlertController *alertController = [DFAlertController alertControllerWithTitle:@"Delete Photos?"
+                                                                              message:nil
+                                                                       preferredStyle:DFAlertControllerStyleActionSheet];
+     [alertController addAction:[DFAlertAction
+                                 actionWithTitle:@"Delete"
+                                 style:DFAlertActionStyleDestructive
+                                 handler:^(DFAlertAction *action) {
+                                   [self deleteComment:comment indexPath:indexPath];
+                                 }]];
+     [alertController addAction:[DFAlertAction
+                                 actionWithTitle:@"Cancel"
+                                 style:DFAlertActionStyleCancel
+                                 handler:^(DFAlertAction *action) {
+                                   [cell swipeToOriginWithCompletion:nil];
+                                 }]];
+     [alertController showWithParentViewController:self animated:YES completion:nil];
+   }];
+  // the default color is the color that appears before you swipe far enough for the action
+  // we set to the group tableview background color to blend in
+  cell.defaultColor = [UIColor lightGrayColor];
+}
+   
+   - (void)deleteComment:(DFPeanutAction *)comment indexPath:(NSIndexPath *)indexPath
+   {
      dispatch_async(dispatch_get_main_queue(), ^{
        [self.tableView beginUpdates];
        [self.comments removeObject:comment];
-       [self.tableView deleteRowsAtIndexPaths:@[indexPath]
-                             withRowAnimation:UITableViewRowAnimationLeft];
+       if (indexPath.row > 0) {
+         [self.tableView deleteRowsAtIndexPaths:@[indexPath]
+                               withRowAnimation:UITableViewRowAnimationFade];
+       } else {
+         [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+       }
        [self.tableView endUpdates];
      });
      
@@ -185,11 +209,8 @@
        DDLogError(@"%@ failed to remove action: %@", self.class, error);
        [SVProgressHUD showErrorWithStatus:@"Failed to delete comment"];
      }];
-   }];
-  // the default color is the color that appears before you swipe far enough for the action
-  // we set to the group tableview background color to blend in
-  cell.defaultColor = [UIColor lightGrayColor];
-}
+
+   }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
 {

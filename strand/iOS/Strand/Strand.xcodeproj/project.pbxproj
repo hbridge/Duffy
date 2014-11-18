@@ -230,6 +230,7 @@
 		5ACA39031947A71700834D86 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5ACA39021947A71700834D86 /* CFNetwork.framework */; };
 		5ACE175F1A168D7E00DE998A /* DFDeferredCompletionScheduler.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */; };
 		5ACE17621A1AB96C00DE998A /* DFAlertController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE17611A1AB96C00DE998A /* DFAlertController.m */; };
+		5ACE17651A1ABD4300DE998A /* DFAlertAction.m in Sources */ = {isa = PBXBuildFile; fileRef = 5ACE17641A1ABD4300DE998A /* DFAlertAction.m */; };
 		5AD8589219785FCC00BFDC4E /* DFTypedefs.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589119785FCC00BFDC4E /* DFTypedefs.m */; };
 		5AD858951978700500BFDC4E /* DFLocationRoadblockViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD858941978700500BFDC4E /* DFLocationRoadblockViewController.m */; };
 		5AD8589819797E6000BFDC4E /* DFPermissionsHelpers.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AD8589719797E6000BFDC4E /* DFPermissionsHelpers.m */; };
@@ -675,6 +676,8 @@
 		5ACE175E1A168D7E00DE998A /* DFDeferredCompletionScheduler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFDeferredCompletionScheduler.m; sourceTree = "<group>"; };
 		5ACE17601A1AB96C00DE998A /* DFAlertController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAlertController.h; sourceTree = "<group>"; };
 		5ACE17611A1AB96C00DE998A /* DFAlertController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAlertController.m; sourceTree = "<group>"; };
+		5ACE17631A1ABD4300DE998A /* DFAlertAction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFAlertAction.h; sourceTree = "<group>"; };
+		5ACE17641A1ABD4300DE998A /* DFAlertAction.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFAlertAction.m; sourceTree = "<group>"; };
 		5AD8589019785F3600BFDC4E /* DFTypedefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTypedefs.h; sourceTree = "<group>"; };
 		5AD8589119785FCC00BFDC4E /* DFTypedefs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTypedefs.m; sourceTree = "<group>"; };
 		5AD858931978700500BFDC4E /* DFLocationRoadblockViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFLocationRoadblockViewController.h; sourceTree = "<group>"; };
@@ -787,6 +790,8 @@
 			children = (
 				5ACE17601A1AB96C00DE998A /* DFAlertController.h */,
 				5ACE17611A1AB96C00DE998A /* DFAlertController.m */,
+				5ACE17631A1ABD4300DE998A /* DFAlertAction.h */,
+				5ACE17641A1ABD4300DE998A /* DFAlertAction.m */,
 				5A4C820F19EDC82100C22A12 /* DFSelectSuggestionsViewController.h */,
 				5A4C821019EDC82100C22A12 /* DFSelectSuggestionsViewController.m */,
 				5A4C821119EDC82100C22A12 /* DFSelectSuggestionsViewController.xib */,
@@ -2057,6 +2062,7 @@
 				5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */,
 				5A7233B71A0D57B80023BB88 /* Duffy-5-6-Model.xcmappingmodel in Sources */,
 				5A188D671980366C009D3244 /* DFErrorScreen.m in Sources */,
+				5ACE17651A1ABD4300DE998A /* DFAlertAction.m in Sources */,
 				5A83A3DE19F046390068F08B /* DFNoTableItemsView.m in Sources */,
 				5A9BC32519A2AA9C002D1CD7 /* DFContact.m in Sources */,
 				5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */,
