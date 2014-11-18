@@ -168,7 +168,7 @@
    state:MCSwipeTableViewCellState3
    completionBlock:^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
      [self.textField resignFirstResponder];
-     self.alertController = [DFAlertController alertControllerWithTitle:@"Delete Photos?"
+     self.alertController = [DFAlertController alertControllerWithTitle:@"Delete this comment?"
                                                                               message:nil
                                                                        preferredStyle:DFAlertControllerStyleActionSheet];
      [self.alertController addAction:[DFAlertAction
@@ -196,7 +196,7 @@
      dispatch_async(dispatch_get_main_queue(), ^{
        [self.tableView beginUpdates];
        [self.comments removeObject:comment];
-       if (indexPath.row > 0) {
+       if (self.comments.count > 0) {
          [self.tableView deleteRowsAtIndexPaths:@[indexPath]
                                withRowAnimation:UITableViewRowAnimationFade];
        } else {
