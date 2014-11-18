@@ -173,7 +173,7 @@
                                  actionWithTitle:@"Delete"
                                  style:DFAlertActionStyleDestructive
                                  handler:^(DFAlertAction *action) {
-                                   [self deleteComment:comment indexPath:indexPath];
+                                   [self deleteCommentAtIndexPath:indexPath];
                                  }]];
      [alertController addAction:[DFAlertAction
                                  actionWithTitle:@"Cancel"
@@ -188,8 +188,9 @@
   cell.defaultColor = [UIColor lightGrayColor];
 }
    
-   - (void)deleteComment:(DFPeanutAction *)comment indexPath:(NSIndexPath *)indexPath
+- (void)deleteCommentAtIndexPath:(NSIndexPath *)indexPath
    {
+     DFPeanutAction *comment = self.comments[indexPath.row];
      dispatch_async(dispatch_get_main_queue(), ^{
        [self.tableView beginUpdates];
        [self.comments removeObject:comment];
@@ -209,7 +210,6 @@
        DDLogError(@"%@ failed to remove action: %@", self.class, error);
        [SVProgressHUD showErrorWithStatus:@"Failed to delete comment"];
      }];
-
    }
 
 - (CGFloat)tableView:(UITableView *)tableView estimatedHeightForRowAtIndexPath:(NSIndexPath *)indexPath
@@ -245,6 +245,8 @@
   DFCommentViewController __weak *weakSelf = self;
   [self.actionAdapter addAction:action success:^(NSArray *resultObjects) {
     DDLogInfo(@"%@ adding comment succeeded:%@", [DFCommentViewController class], resultObjects);
+    NSInteger commentWithNoIDIndex = [weakSelf.comments indexOfObject:action];
+    [weakSelf.comments replaceObjectAtIndex:commentWithNoIDIndex withObject:[resultObjects firstObject]];
     [DFAnalytics logPhotoActionTaken:DFPeanutActionComment
                               result:DFAnalyticsValueResultSuccess
                          photoObject:weakSelf.photoObject

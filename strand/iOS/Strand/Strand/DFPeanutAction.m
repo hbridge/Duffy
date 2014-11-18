@@ -92,5 +92,24 @@
 }
 
 
+- (BOOL)isEqual:(id)object
+{
+  if (![[object class] isSubclassOfClass:[self class]]) return NO;
+  DFPeanutAction *otherAction = (DFPeanutAction *)object;
+  
+  if ([self.id isEqual:otherAction.id]
+      && self.user == otherAction.user
+      && [self.text isEqualToString:otherAction.text]) {
+    return YES;
+  }
+  
+  return NO;
+}
+
+- (NSUInteger)hash
+{
+  return self.id.integerValue;
+}
+
 
 @end
