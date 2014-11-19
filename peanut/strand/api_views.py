@@ -795,6 +795,10 @@ def swaps(request):
 			printStats("swaps-time-suggestions")
 
 			if len(responseObjects) < 20:
+				# repeat the last request because we might have deleted some before.
+				# TODO(Derek): find a way to avoid this
+				strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).filter(id__in=strandIds).order_by('-first_photo_time')[:20]
+
 				noLocationSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=neighborStrandsByStrandId,  neighborUsersByStrandId = neighborUsersByStrandId, locationRequired=False)
 				noLocationSuggestions = filter(lambda x: x['suggestible'], noLocationSuggestions)
 				noLocationSuggestions = sorted(noLocationSuggestions, key=lambda x: x['time_taken'], reverse=True)
