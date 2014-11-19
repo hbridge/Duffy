@@ -205,7 +205,6 @@ static int ImagePrefetchRange = 3;
   } else if (cellClass == [DFPhotoFeedFooterCell class]) {
     cell = [self footerForObject:object indexPath:indexPath];
   }
-  DDLogVerbose(@"indexPath:[%@, %@] class:%@", @(indexPath.section), @(indexPath.row), cellClass);
   
   if (!cell) {
     [NSException raise:@"nil cell" format:@"nil cell for object: %@", object];
@@ -373,14 +372,15 @@ static int ImagePrefetchRange = 3;
   } else if (cellClass == [DFCollectionViewTableViewCell class]) {
     height = 78 + 2 + 2;
   } else if (cellClass == [DFPhotoFeedActionCell class]) {
+    CGRect frame = self.actionTemplateCell.frame;
+    frame.size.width = self.tableView.frame.size.width;
+    self.actionTemplateCell.frame = frame;
     [self configureActionCell:self.actionTemplateCell forObject:object indexPath:indexPath];
-    [self.actionTemplateCell layoutIfNeeded];
     height = [self.actionTemplateCell rowHeight];
   } else if (cellClass == [DFPhotoFeedFooterCell class]) {
     return [DFPhotoFeedFooterCell height];
   }
   
-  DDLogVerbose(@"indexPath:[%@, %@] height:%@", @(indexPath.section), @(indexPath.row), @(height));
   return height;
 }
 

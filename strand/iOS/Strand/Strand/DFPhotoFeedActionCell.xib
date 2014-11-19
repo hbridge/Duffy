@@ -22,7 +22,7 @@
                         </constraints>
                     </imageView>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="999" verticalCompressionResistancePriority="999" text="Label" lineBreakMode="wordWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="279" translatesAutoresizingMaskIntoConstraints="NO" id="oWQ-of-ghH">
-                        <rect key="frame" x="33" y="2" width="279" height="26"/>
+                        <rect key="frame" x="33" y="2" width="279" height="16"/>
                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                         <nil key="highlightedColor"/>
@@ -31,7 +31,7 @@
                 <constraints>
                     <constraint firstItem="oWQ-of-ghH" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="2" id="1QA-zf-Qdc"/>
                     <constraint firstItem="EcW-at-C4b" firstAttribute="top" secondItem="oWQ-of-ghH" secondAttribute="top" id="RV1-VR-Zxz"/>
-                    <constraint firstAttribute="bottom" secondItem="oWQ-of-ghH" secondAttribute="bottom" constant="2" id="WlN-fp-dBZ"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="oWQ-of-ghH" secondAttribute="bottom" constant="2" id="WlN-fp-dBZ"/>
                     <constraint firstItem="EcW-at-C4b" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="8" id="osd-MM-ueO"/>
                     <constraint firstAttribute="trailing" secondItem="oWQ-of-ghH" secondAttribute="trailing" constant="8" id="p1t-OK-3qr"/>
                     <constraint firstItem="oWQ-of-ghH" firstAttribute="leading" secondItem="EcW-at-C4b" secondAttribute="trailing" constant="8" id="pol-zw-Yrc"/>
