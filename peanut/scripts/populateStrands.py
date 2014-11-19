@@ -72,7 +72,9 @@ def dealWithFirstRun(user):
 def processWithExisting(existingNeighborRows, newNeighborRows):
 	existing = dict()
 	rowsToCreate = list()
+	rowsToUpdate = list()
 
+	# Create a double dict of [id1][id2] for lookup in the next phase
 	for row in existingNeighborRows:
 		id1 = row.strand_1_id
 
@@ -83,7 +85,7 @@ def processWithExisting(existingNeighborRows, newNeighborRows):
 
 		if id1 not in existing:
 			existing[id1] = dict()
-		existing[id1][id2] = True
+		existing[id1][id2] = row
 
 	for newRow in newNeighborRows:
 		id1 = newRow.strand_1_id
@@ -93,17 +95,25 @@ def processWithExisting(existingNeighborRows, newNeighborRows):
 			id2 = newRow.strand_2_user_id
 
 		if id1 in existing and id2 in existing[id1]:
-			pass
+			existingRow = existing[id1][id2]
+			# If we have a new row with a smaller distance_in_meters, update the db with that one
+			if (newRow.distance_in_meters and
+				existingRow.distance_in_meters and 
+				existingRow.distance_in_meters > newRow.distance_in_meters):
+				existingRow.distance_in_meters = newRow.distance_in_meters
+				rowsToUpdate.append(existingRow)
 		else:
 			rowsToCreate.append(newRow)
-	return rowsToCreate
+	return rowsToCreate, rowsToUpdate
 
 
 def getAllStrandIds(neighborRows):
 	strandIds = list()
 	for row in neighborRows:
-		strandIds.append(row.strand_1_id)
-		strandIds.append(row.strand_2_id)
+		if row.strand_1_id:
+			strandIds.append(row.strand_1_id)
+		if row.strand_2_id:
+			strandIds.append(row.strand_2_id)
 
 	return set(strandIds)
 
@@ -347,7 +357,7 @@ def main(argv):
 							# This deals de-duping
 							if (s1.id, s2.id) not in idsCreated:
 								idsCreated.append((s1.id, s2.id))
-								strandNeighbors.append(StrandNeighbor(strand_1_id=s1.id, strand_1_private=s1.private, strand_1_user=s1.user, strand_2_id=s2.id, strand_2_private=s2.private, strand_2_user=s2.user))
+								strandNeighbors.append(StrandNeighbor(strand_1_id=s1.id, strand_1_private=s1.private, strand_1_user=s1.user, strand_2_id=s2.id, strand_2_private=s2.private, strand_2_user=s2.user, distance_in_meters=geo_util.getDistanceBetweenStrands(s1, s2)))
 
 				
 				# Now try to find all users who were around this time
@@ -363,20 +373,32 @@ def main(argv):
 
 				idsCreated = list()
 				possibleLocationRecords = list(query)
-
+				userBasedNeighborEntries = dict()
 				logger.debug("Found %s possible user neighbors" % len(possibleLocationRecords))
 
 				for strand in strandsCreated:
 					for locationRecord in possibleLocationRecords:
 						if strands_util.userShouldBeNeighborToStrand(strand, locationRecord):
-							if (strand.id, locationRecord.user_id) not in idsCreated and strand.user_id != locationRecord.user_id:
-								idsCreated.append((strand.id, locationRecord.user_id))
-								strandNeighbors.append(StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user))
+							distance = geo_util.getDistanceBetweenStrandAndLocationRecord(strand, locationRecord) 
 
+							# If we've already found a record, then see if this new one has a shorter distance.
+							# If so, swap in the new one
+							if (strand.id, locationRecord.user_id) in idsCreated:
+								strandNeighbor = userBasedNeighborEntries[(strand.id, locationRecord.user_id)]
+								if strandNeighbor.distance_in_meters > distance:
+									userBasedNeighborEntries[(strand.id, locationRecord.user_id)] = StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user, distance_in_meters=distance)
+
+							elif strand.user_id != locationRecord.user_id:
+								idsCreated.append((strand.id, locationRecord.user_id))
+								userBasedNeighborEntries[(strand.id, locationRecord.user_id)] = StrandNeighbor(strand_1_id=strand.id, strand_1_private=strand.private, strand_1_user=strand.user, strand_2_user=locationRecord.user, distance_in_meters=distance)
+
+				strandNeighbors.extend(userBasedNeighborEntries.values())
 				allIds = getAllStrandIds(strandNeighbors)
 				existingRows = StrandNeighbor.objects.filter(strand_1_id__in=allIds).filter(Q(strand_2_id__in=allIds) | Q(strand_2_id__isnull=True))
-				neighborRowsToCreate = processWithExisting(existingRows, strandNeighbors)
+				neighborRowsToCreate, neighborRowsToUpdate = processWithExisting(existingRows, strandNeighbors)
 				StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
+
+				StrandNeighbor.bulkUpdate(neighborRowsToUpdate, ["distance_in_meters"])
 			
 			#logging.getLogger('django.db.backends').setLevel(logging.ERROR)
 			

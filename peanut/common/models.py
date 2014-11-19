@@ -20,7 +20,7 @@ from common import bulk_updater
 from ios_notifications.models import Notification
 
 logger = logging.getLogger(__name__)
-
+		
 # Create your models here.
 class User(models.Model):
 	uuid = UUIDField(auto=True)
@@ -116,18 +116,7 @@ class User(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		if not isinstance(objs, list):
-			objs = [objs]
-
-		if not isinstance(attributesList, list):
-			attributesList = [attributesList]
-			
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		attributesList.append("updated")
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 
 	def __unicode__(self):
 		if self.product_id == 0:
@@ -351,15 +340,7 @@ class Photo(models.Model):
 		
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		if not isinstance(objs, list):
-			objs = [objs]
-
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		attributesList.append("updated")
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 
 	@classmethod
 	def getPhotosIds(cls, photos):
@@ -472,13 +453,7 @@ class NotificationLog(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		now = datetime.datetime.utcnow()
-		for obj in objs:
-			obj.updated = now
-
-		attributesList.append("updated")
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 		
 	def __unicode__(self):
 		return "%s %s %s %s" % (self.user_id, self.id, self.device_token, self.apns)
@@ -541,15 +516,7 @@ class ContactEntry(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		if isinstance(attributesList, list):
-			attributesList.append("updated")
-		else:
-			attributesList = [attributesList, "updated"]
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 
 class FriendConnection(models.Model):
 	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
@@ -667,15 +634,7 @@ class Strand(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		if isinstance(attributesList, list):
-			attributesList.append("updated")
-		else:
-			attributesList = [attributesList, "updated"]
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 		
 	@classmethod
 	def getIds(cls, objs):
@@ -709,15 +668,7 @@ class StrandInvite(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		if isinstance(attributesList, list):
-			attributesList.append("updated")
-		else:
-			attributesList = [attributesList, "updated"]
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 
 
 class StrandNeighbor(models.Model):
@@ -729,6 +680,8 @@ class StrandNeighbor(models.Model):
 	strand_2_private = models.BooleanField(db_index=True, default=False)
 	strand_2_user = models.ForeignKey(User, db_index=True, null=True, related_name = "strand_2_user")
 
+	distance_in_meters = models.IntegerField(null=True)
+	
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)	
 
@@ -741,15 +694,7 @@ class StrandNeighbor(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		if isinstance(attributesList, list):
-			attributesList.append("updated")
-		else:
-			attributesList = [attributesList, "updated"]
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 
 
 class Action(models.Model):
@@ -777,15 +722,7 @@ class Action(models.Model):
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
-		for obj in objs:
-			obj.updated = datetime.datetime.now()
-
-		if isinstance(attributesList, list):
-			attributesList.append("updated")
-		else:
-			attributesList = [attributesList, "updated"]
-
-		bulk_updater.bulk_update(objs, update_fields=attributesList)
+		doBulkUpdate(cls, objs, attributesList)
 
 
 class ApiCache(models.Model):
@@ -828,4 +765,23 @@ def sendNotificationsUponActions(sender, **kwargs):
 		logger.debug("Sending refresh feed to user %s from action_save" % (user.id))
 		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
 
+
+
+
+def doBulkUpdate(cls, objs, attributesList):
+	if len(objs) == 0:
+		return
+
+	if not isinstance(objs, list):
+		objs = [objs]
+		
+	for obj in objs:
+		obj.updated = datetime.datetime.now()
+
+	if isinstance(attributesList, list):
+		attributesList.append("updated")
+	else:
+		attributesList = [attributesList, "updated"]
+
+	bulk_updater.bulk_update(objs, update_fields=attributesList)
 

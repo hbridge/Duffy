@@ -90,6 +90,9 @@ def getStrandNeighborsCache(strands, friends, withUsers = False):
 				if strandNeighbor.strand_2 and strandNeighbor.strand_2 not in neighborStrandsByStrandId[strand.id]:
 					neighborStrandsByStrandId[strand.id].append(strandNeighbor.strand_2)
 				if not strandNeighbor.strand_2:
+					if strandNeighbor.distance_in_meters:
+						if strandNeighbor.distance_in_meters > constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING:
+							continue
 					if strand.id not in neighborUsersByStrandId:
 						neighborUsersByStrandId[strand.id] = list()
 					neighborUsersByStrandId[strand.id].append(strandNeighbor.strand_2_user)
@@ -308,9 +311,9 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		interestedUsers = list()
 		if strand.id in neighborStrandsByStrandId:
 			for neighborStrand in neighborStrandsByStrandId[strand.id]:
-				if neighborStrand.location_point and strand.location_point:
+				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
-				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3):
+				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 			
 			if strand.id in neighborUsersByStrandId:
