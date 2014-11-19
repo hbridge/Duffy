@@ -33,7 +33,8 @@ typedef void (^DFPhotoReverseGeocodeCompletionBlock)(NSDictionary *locationDict)
 
 // Create a new DFPhoto in a context
 + (DFPhoto *)createWithAsset:(DFPhotoAsset *)asset
-                        userID:(DFUserIDType)userID
+                      userID:(DFUserIDType)userID
+               savedFromSwap:(BOOL)savedFromSwap
                    inContext:(NSManagedObjectContext *)context;
 
 - (BOOL)isDeleteableByUser:(DFUserIDType)userID;

@@ -27,8 +27,8 @@
 @property (nonatomic, retain) NSString *iphone_faceboxes_topleft; //array of DFPeanutFaceFeatures
 @property (nonatomic, retain) NSString *full_image_path;
 @property (nonatomic, retain) NSString *thumbnail_image_path;
-@property (nonatomic, retain) NSNumber *taken_with_strand;
 @property (nonatomic, retain) NSNumber *install_num;
+@property (nonatomic, retain) NSNumber *saved_with_swap;
 
 /* Not Sync'ed with server */
 @property (readonly, nonatomic, retain) NSString *filename;

@@ -16,6 +16,7 @@
 #import "DFNotificationSharedConstants.h"
 #import "DFPhoto.h"
 #import "DFPhotoStore.h"
+#import "DFStrandConstants.h"
 
 @implementation DFIOS7CameraRollSyncOperation
 
@@ -97,7 +98,7 @@
       
       [group setAssetsFilter:[ALAssetsFilter allPhotos]]; // only want photos for now
       DDLogInfo(@"Enumerating %d assets in %@", (int)[group numberOfAssets], [group valueForProperty:ALAssetsGroupPropertyName]);
-      [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:[self photosEnumerationBlock:startDate beforeEndDate:endDate]];
+      [group enumerateAssetsWithOptions:NSEnumerationReverse usingBlock:[self photosEnumerationBlock:startDate beforeEndDate:endDate groupName:groupName]];
     } else {
       dispatch_semaphore_signal(self.enumerationCompleteSemaphore);
     }
@@ -106,7 +107,7 @@
 
 
 
-- (ALAssetsGroupEnumerationResultsBlock)photosEnumerationBlock:(NSDate *)startDate beforeEndDate:(NSDate *)endDate
+- (ALAssetsGroupEnumerationResultsBlock)photosEnumerationBlock:(NSDate *)startDate beforeEndDate:(NSDate *)endDate groupName:(NSString *)groupName
 {
   NSMutableDictionary __block *groupObjectIDsToChanges = [[NSMutableDictionary alloc] init];
   return ^(ALAsset *photoAsset, NSUInteger index, BOOL *stop) {
@@ -132,23 +133,28 @@
       NSURL *assetURL = [photoAsset valueForProperty: ALAssetPropertyAssetURL];
       [self.knownNotFoundURLs removeObject:assetURL];
       
+      BOOL savedFromSwap = [groupName isEqualToString:DFPhotosSaveLocationName];
+      
       // We have this asset in our DB, see if it matches what we expect
       if ([self.knownPhotos.photoURLSet containsObject:assetURL]) {
         // Check the actual asset hash against our stored date, if it doesn't match,
         // delete and recreate the DFPhoto with new info.
         if (![assetDate isEqual:self.knownAndFoundURLsToDates[assetURL]]){
-          NSDictionary *changes = [self assetDataChangedForALAsset:photoAsset];
+          NSDictionary *changes = [self assetDataChangedForALAsset:photoAsset savedFromSwap:savedFromSwap];
           [self.unsavedObjectIDsToChanges addEntriesFromDictionary:changes];
           // set to the new known date
           self.knownAndFoundURLsToDates[assetURL] = assetDate;
         }
       } else {//(![knownAndFoundURLs containsObject:assetURLString])
+        
         DFCameraRollPhotoAsset *asset = [DFCameraRollPhotoAsset
                                          createWithALAsset:photoAsset
                                          inContext:self.managedObjectContext];
         DFPhoto *newPhoto = [DFPhoto createWithAsset:asset
                                               userID:[[DFUser currentUser] userID]
+                                       savedFromSwap:savedFromSwap
                                            inContext:self.managedObjectContext];
+        
         
         // store information about the new photo to notify
         self.unsavedObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
@@ -169,7 +175,7 @@
 
 
 
-- (NSDictionary *)assetDataChangedForALAsset:(ALAsset *)asset
+- (NSDictionary *)assetDataChangedForALAsset:(ALAsset *)asset savedFromSwap:(BOOL)savedFromSwap
 {
   NSMutableDictionary *objectIDsToChanges = [[NSMutableDictionary alloc] init];
   
@@ -182,6 +188,7 @@
   DFCameraRollPhotoAsset *photoAsset = [DFCameraRollPhotoAsset createWithALAsset:asset inContext:self.managedObjectContext];
   DFPhoto *newPhoto = [DFPhoto createWithAsset:photoAsset
                                         userID:[[DFUser currentUser] userID]
+                                 savedFromSwap:savedFromSwap
                                      inContext:self.managedObjectContext];
   objectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;
   

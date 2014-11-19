@@ -38,6 +38,8 @@ extern NSString *const DFPermissionOldStateKey;
 extern NSString *const DFPermissionNewStateKey;
 extern NSString *const DFPermissionTypeKey;
 
+extern NSString *const DFPhotosSaveLocationName;
+
 
 extern const CGFloat StrandGalleryItemSpacing;
 extern const CGFloat StrandGalleryHeaderHeight;

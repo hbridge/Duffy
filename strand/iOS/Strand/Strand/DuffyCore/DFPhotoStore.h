@@ -61,9 +61,6 @@ typedef enum {
 - (void)clearUploadInfo;
 
 - (void)deletePhotoWithPhotoID:(DFPhotoIDType)photoID;
-- (void)saveImage:(UIImage *)image
-     withMetadata:(NSDictionary *)metadata
-  completionBlock:(void (^)(DFPhoto *newPhoto))completion;
 + (NSArray *)photosWithFaceDetectPassBelow:(NSNumber *)faceDetectPass
                                  inContext:(NSManagedObjectContext *)context;
 

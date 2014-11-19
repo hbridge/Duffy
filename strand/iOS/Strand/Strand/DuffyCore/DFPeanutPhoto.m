@@ -41,7 +41,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
       self.metadata = [[self trimmedMetadataDict:photo.asset.metadata] JSONString];
       self.iphone_hash = photo.asset.hashString;
       self.file_key = photo.objectID.URIRepresentation;
-      self.taken_with_strand = @((int)[photo.sourceString isEqualToString:@"strand"]);
+      self.saved_with_swap = @((int)[photo.sourceString isEqualToString:DFPhotosSaveLocationName]);
     }
   }
   return self;
@@ -67,7 +67,7 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 + (NSArray *)attributes
 {
   return @[@"user", @"id", @"time_taken", @"metadata", @"iphone_hash", @"file_key", @"thumb_filename",
-           @"full_filename", @"full_width", @"full_height", @"full_image_path", @"taken_with_strand", @"install_num",
+           @"full_filename", @"full_width", @"full_height", @"full_image_path", @"saved_with_swap", @"install_num",
            @"iphone_faceboxes_topleft"];
 }
 
@@ -95,7 +95,27 @@ NSString const *DFPeanutPhotoImageBytesKey = @"DFPeanutPhotoImageBytesKey";
 
 - (NSDictionary *)metadataDictionary
 {
-  return [NSDictionary dictionaryWithJSONString:self.metadata];
+  NSMutableDictionary *dict = [[NSDictionary dictionaryWithJSONString:self.metadata] mutableCopy];
+  
+  // Add in Exif info for the photo, namely the time taken if it doesn't exist
+  //   We need to convert the time from the server into the exif date format
+  //   Might be able to clean this up and not tranlate from a string to a NSDate to a NSString
+  // TODO(Derek): Eventually this should exist in the self.metadata above.
+  if (![dict valueForKey:@"{Exif}"]) {
+    NSMutableDictionary *exifDict = [NSMutableDictionary new];
+    NSDateFormatter *djangoDateFormatter = [NSDateFormatter DjangoDateFormatter];
+    NSDateFormatter *exifFormatter = [NSDateFormatter EXIFDateFormatter];
+    
+    // This is very confusing why we need this, but apparently iOS wants things stored in local timezone
+    exifFormatter.timeZone = [NSTimeZone localTimeZone];
+    
+    NSDate *myDate = [djangoDateFormatter dateFromString:self.time_taken];
+
+    [exifDict setValue:[exifFormatter stringFromDate:myDate] forKey:@"DateTimeOriginal"];
+    [dict setValue:exifDict forKey:@"{Exif}"];
+  }
+  
+  return dict;
 }
 
 - (NSString *)JSONString

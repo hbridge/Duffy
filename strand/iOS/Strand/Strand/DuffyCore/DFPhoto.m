@@ -35,6 +35,7 @@
 // Create a new DFPhoto in a context
 + (DFPhoto *)createWithAsset:(DFPhotoAsset *)asset
                       userID:(DFUserIDType)userID
+               savedFromSwap:(BOOL)savedFromSwap
                    inContext:(NSManagedObjectContext *)context
 {
   DFPhoto *newPhoto = [NSEntityDescription
@@ -42,6 +43,9 @@
                        inManagedObjectContext:context];
   newPhoto.asset = asset;
   newPhoto.utcCreationDate = [asset creationDateInUTC];
+  if (savedFromSwap) {
+    newPhoto.sourceString = DFPhotosSaveLocationName;
+  }
   
   newPhoto.userID = userID;
   

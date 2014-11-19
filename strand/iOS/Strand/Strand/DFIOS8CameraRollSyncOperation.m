@@ -58,10 +58,10 @@
   }
   
   // enumerate all the photo asets, scanning for changes as we go
-  [self enumerateAssetsUsingCollectionsWithAssetOptions:photoFetchOptions assetBlock:^(PHAsset *asset) {
+  [self enumerateAssetsUsingCollectionsWithAssetOptions:photoFetchOptions assetBlock:^(PHAsset *asset, BOOL savedFromSwap) {
     assetCount++;
     [[DFAssetCache sharedCache] setAsset:asset forIdentifier:asset.localIdentifier];
-    [self scanPHAssetForChange:asset];
+    [self scanPHAssetForChange:asset savedFromSwap:savedFromSwap];
   }];
 
   if (self.isCancelled) {
@@ -90,8 +90,23 @@
 }
 
 - (void)enumerateAssetsUsingCollectionsWithAssetOptions:(PHFetchOptions *)assetOptions
-                                             assetBlock:(void(^)(PHAsset *asset))assetBlock
+                                             assetBlock:(void(^)(PHAsset *asset, BOOL savedFromSwap))assetBlock
 {
+  // First we want to go through all Albums the user has, in particular 
+  PHFetchOptions *userAlbumsOptions = [PHFetchOptions new];
+  userAlbumsOptions.predicate = [NSPredicate predicateWithFormat:@"estimatedAssetCount > 0"];
+  PHFetchResult *userAlbums = [PHAssetCollection fetchAssetCollectionsWithType:PHAssetCollectionTypeAlbum subtype:PHAssetCollectionSubtypeAlbumRegular options:userAlbumsOptions];
+
+  [userAlbums enumerateObjectsUsingBlock:^(PHAssetCollection *assetCollection, NSUInteger idx, BOOL *stop) {
+    if ([assetCollection.localizedTitle isEqualToString:DFPhotosSaveLocationName]) {
+      PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:assetOptions];
+      for (PHAsset *asset in assets) {
+        assetBlock(asset, YES);
+      }
+    }
+  }];
+ 
+  // Now we go through all the Moments.  Note, we might want to move this over to albums at some point, this still picks up dups
   PHFetchOptions *collectionOptions = [PHFetchOptions new];
   collectionOptions.sortDescriptors = @[
                                         [NSSortDescriptor sortDescriptorWithKey:@"endDate" ascending:NO],
@@ -105,32 +120,13 @@
     for (PHAssetCollection *assetCollection in collections) {
       PHFetchResult *assets = [PHAsset fetchAssetsInAssetCollection:assetCollection options:assetOptions];
       for (PHAsset *asset in assets) {
-        assetBlock(asset);
+        assetBlock(asset, NO);
       }
     }
   }
 }
 
-- (void)enumerateAssetsUsingFetchAssetOptions:(PHFetchOptions *)assetOptions
-                                             assetBlock:(void(^)(PHAsset *asset))assetBlock
-{
-  for (PHAsset *asset in [PHAsset fetchAssetsWithMediaType:PHAssetMediaTypeImage options:assetOptions])
-  {
-    if (self.isCancelled) return;
-    
-    BOOL isLocalAsset = NO;
-    if ([[[[UIDevice currentDevice] systemVersion] substringToIndex:3] isEqualToString:@"8.0"]) {
-      isLocalAsset = [asset canPerformEditOperation:PHAssetEditOperationContent];
-    }
-    if (!isLocalAsset) {
-      continue;
-    }
-    
-    assetBlock(asset);
-  }
-}
-
-- (void)scanPHAssetForChange:(PHAsset *)asset
+- (void)scanPHAssetForChange:(PHAsset *)asset savedFromSwap:(BOOL)savedFromSwap
 {
   if (self.unsavedObjectIDsToChanges.count > NumChangesFlushThreshold) {
     if (self.isCancelled) {
@@ -143,11 +139,13 @@
   [self.knownNotFoundURLs removeObject:assetURL];
   
   // We have this asset in our DB, see if it matches what we expect
-  if (![self.knownPhotos.photoURLSet containsObject:assetURL]) {
+  if (![self.knownPhotos.photoURLSet containsObject:assetURL] && ![self.foundURLs containsObject:assetURL]) {
     DFPHAsset *dfphAsset = [DFPHAsset createWithPHAsset:asset inContext:self.managedObjectContext];
     DFPhoto *newPhoto = [DFPhoto createWithAsset:dfphAsset
                                           userID:[[DFUser currentUser] userID]
+                                   savedFromSwap:savedFromSwap
                                        inContext:self.managedObjectContext];
+
     
     // store information about the new photo to notify
     self.unsavedObjectIDsToChanges[newPhoto.objectID] = DFPhotoChangeTypeAdded;

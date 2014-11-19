@@ -646,42 +646,6 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   }
 }
 
-- (void)saveImage:(UIImage *)image
-     withMetadata:(NSDictionary *)metadata
-  completionBlock:(void (^)(DFPhoto *newPhoto))completion
-{
-  @autoreleasepool {
-    DFPhotoStore *photoStore = [DFPhotoStore sharedStore];
-    
-    [photoStore
-     saveImageToCameraRoll:image
-     withMetadata:metadata
-     completion:^(NSURL *assetURL, NSError *error) {
-       [self.assetsLibrary assetForURL:assetURL resultBlock:^(ALAsset *asset) {
-         dispatch_async(dispatch_get_main_queue(), ^{
-           DFCameraRollPhotoAsset *dfAsset = [DFCameraRollPhotoAsset createWithALAsset:asset
-                                                                           inContext:self.managedObjectContext];
-           
-           DFPhoto *newPhoto = [DFPhoto createWithAsset:dfAsset
-                                                 userID:[[DFUser currentUser] userID]
-                                              inContext:self.managedObjectContext];
-           NSError *error;
-           [self.managedObjectContext save:&error];
-           if (error) {
-             [NSException raise:@"Couldn't save database after creating DFStrandPhotoAsset"
-                         format:@"Error: %@", error.description];
-           }
-           
-           if (completion) completion(newPhoto);
-           
-         });
-       } failureBlock:^(NSError *error) {
-         if (completion) completion(nil);
-       }];
-    }];
-  }
-}
-
 #pragma mark - Application's Documents directory
 
 + (NSURL *) storeURL
@@ -738,6 +702,8 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
   NSMutableDictionary *mutableMetadata = metadata.mutableCopy;
   [self addOrientationToMetadata:mutableMetadata forImage:image];
   
+  DDLogVerbose(@"Saving image with metadata: %@", mutableMetadata);
+  
   dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
     [self.assetsLibrary writeImageToSavedPhotosAlbum:image.CGImage
                                             metadata:mutableMetadata
@@ -747,7 +713,7 @@ static NSPersistentStoreCoordinator *_persistentStoreCoordinator = nil;
                                                     [self.class description],
                                                     error.description);
                                        } else {
-                                         [self addAssetWithURL:assetURL toPhotoAlbum:@"Strand"];
+                                         [self addAssetWithURL:assetURL toPhotoAlbum:DFPhotosSaveLocationName];
                                        }
                                        completion(assetURL, error);
                                      }];

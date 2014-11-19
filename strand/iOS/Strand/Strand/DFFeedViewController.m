@@ -1047,6 +1047,11 @@ selectedObjectChanged:(id)newObject
                    
                    [UIAlertView showSimpleAlertWithTitle:nil
                                                  message:@"Photo saved to your camera roll"];
+                   
+
+                   [[NSNotificationCenter defaultCenter]
+                    postNotificationName:DFStrandCameraPhotoSavedNotificationName
+                    object:self];
                    [DFAnalytics logPhotoSavedWithResult:DFAnalyticsValueResultSuccess];
                  }});
              }];

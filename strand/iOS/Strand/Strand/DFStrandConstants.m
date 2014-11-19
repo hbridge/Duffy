@@ -44,6 +44,7 @@ NSString *const DFPermissionOldStateKey = @"DFPermissionOldStateKey";
 NSString *const DFPermissionNewStateKey = @"DFPermissionNewStateKey";
 NSString *const DFPermissionTypeKey = @"DFPermissionNameKey";
 
+NSString *const DFPhotosSaveLocationName = @"Swap";
 
 const CGFloat StrandGalleryItemSpacing = 0.5;
 const CGFloat StrandGalleryHeaderHeight = 51;

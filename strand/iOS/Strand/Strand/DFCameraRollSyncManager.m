@@ -60,6 +60,10 @@ static DFCameraRollSyncManager *defaultSyncController;
                                            selector:@selector(deletedPhotoSync)
                                                name:DFStrandNewPrivatePhotosDataNotificationName
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(sync)
+                                               name:DFStrandCameraPhotoSavedNotificationName
+                                             object:nil];
 }
 
 /*

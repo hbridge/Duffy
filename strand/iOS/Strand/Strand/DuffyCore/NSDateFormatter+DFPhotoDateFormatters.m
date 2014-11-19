@@ -25,7 +25,7 @@ static dispatch_semaphore_t DateFormmaterCreateSemaphore;
   if (!exifFormatter) {
     exifFormatter = [[NSDateFormatter alloc] init];
     exifFormatter.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
-    [exifFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ss"];
+    [exifFormatter setDateFormat:@"yyyy:MM:dd HH:mm:ssZZZ"];
   }
   
   dispatch_semaphore_signal(DateFormmaterCreateSemaphore);
