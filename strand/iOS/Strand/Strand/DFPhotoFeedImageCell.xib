@@ -15,7 +15,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="goR-mr-Ewj">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="187"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="183"/>
                         <gestureRecognizers/>
                     </imageView>
                 </subviews>
@@ -23,10 +23,11 @@
                     <constraint firstItem="goR-mr-Ewj" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" id="B0r-Wa-oVe"/>
                     <constraint firstItem="goR-mr-Ewj" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" id="D5Z-q9-rj9"/>
                     <constraint firstAttribute="trailing" secondItem="goR-mr-Ewj" secondAttribute="trailing" id="NOl-vj-2WX"/>
-                    <constraint firstAttribute="bottom" secondItem="goR-mr-Ewj" secondAttribute="bottom" id="o2p-g9-QGT"/>
+                    <constraint firstAttribute="bottom" secondItem="goR-mr-Ewj" secondAttribute="bottom" constant="4" id="o2p-g9-QGT"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
+                <outlet property="bottomPaddingConstraint" destination="o2p-g9-QGT" id="C9U-Yz-7Km"/>
                 <outlet property="photoImageView" destination="goR-mr-Ewj" id="i2X-5b-Inu"/>
             </connections>
             <point key="canvasLocation" x="147" y="236"/>

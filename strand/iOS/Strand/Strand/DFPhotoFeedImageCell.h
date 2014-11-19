@@ -11,6 +11,7 @@
 @interface DFPhotoFeedImageCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UIImageView *photoImageView;
 @property (nonatomic, copy) void (^doubleTapBlock)(void);
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottomPaddingConstraint;
 
 typedef NS_ENUM(NSInteger, DFPhotoFeedImageCellAspect) {
   DFPhotoFeedImageCellAspectSquare,

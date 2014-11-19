@@ -10,6 +10,8 @@
 
 @implementation DFPhotoFeedImageCell
 
+const NSInteger bottomPadding = 4;
+
 - (void)awakeFromNib {
   [super awakeFromNib];
   UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc]
@@ -17,6 +19,7 @@
                                                  action:@selector(doubleTapped:)];
   doubleTapRecognizer.numberOfTapsRequired = 2;
   [self.photoImageView addGestureRecognizer:doubleTapRecognizer];
+  self.bottomPaddingConstraint.constant = bottomPadding;
 }
 
 + (CGFloat)imageViewHeightForReferenceWidth:(CGFloat)referenceWidth
@@ -30,7 +33,7 @@
   } else if (aspect == DFPhotoFeedImageCellAspectLandscape) {
     height = referenceWidth * (3.0/4.0);
   }
-  return height;
+  return height + bottomPadding;
 }
 
 - (void)doubleTapped:(UITapGestureRecognizer *)sender {
