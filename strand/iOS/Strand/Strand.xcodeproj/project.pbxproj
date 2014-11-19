@@ -74,8 +74,6 @@
 		5A4C821619EDCBB600C22A12 /* DFReviewSwapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C821519EDCBB600C22A12 /* DFReviewSwapViewController.m */; };
 		5A56EFAD19857CEB0032CA8A /* DFOverlayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */; };
 		5A56EFB019857FA00032CA8A /* DFNavigationBar.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */; };
-		5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */; };
-		5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */; };
 		5A56EFC4198AD42C0032CA8A /* DFPeanutContact.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */; };
 		5A56EFC7198AD5870032CA8A /* DFPeanutContactAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC6198AD5870032CA8A /* DFPeanutContactAdapter.m */; };
 		5A56EFCA198AF5C60032CA8A /* DFContactSyncManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A56EFC9198AF5C60032CA8A /* DFContactSyncManager.m */; };
@@ -400,9 +398,6 @@
 		5A56EFAC19857CEB0032CA8A /* DFOverlayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFOverlayViewController.m; sourceTree = "<group>"; };
 		5A56EFAE19857FA00032CA8A /* DFNavigationBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFNavigationBar.h; sourceTree = "<group>"; };
 		5A56EFAF19857FA00032CA8A /* DFNavigationBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFNavigationBar.m; sourceTree = "<group>"; };
-		5A56EFB51986CC0E0032CA8A /* DFUploadingFeedCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFUploadingFeedCell.h; sourceTree = "<group>"; };
-		5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFUploadingFeedCell.m; sourceTree = "<group>"; };
-		5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFUploadingFeedCell.xib; sourceTree = "<group>"; };
 		5A56EFBA1987F3FF0032CA8A /* Duffy 5.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = "Duffy 5.xcdatamodel"; sourceTree = "<group>"; };
 		5A56EFC2198AD42C0032CA8A /* DFPeanutContact.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutContact.h; sourceTree = "<group>"; };
 		5A56EFC3198AD42C0032CA8A /* DFPeanutContact.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutContact.m; sourceTree = "<group>"; };
@@ -1171,6 +1166,25 @@
 			name = CollectionViewCells;
 			sourceTree = "<group>";
 		};
+		5A854B391A1D54F900E2DA47 /* Feed Cells */ = {
+			isa = PBXGroup;
+			children = (
+				5AA8FA4E197DD0CE00421513 /* DFFeedSectionHeaderView.xib */,
+				5AA8FA50197DD0E200421513 /* DFFeedSectionHeaderView.h */,
+				5AA8FA51197DD0E200421513 /* DFFeedSectionHeaderView.m */,
+				5ACE17661A1BF54800DE998A /* DFPhotoFeedImageCell.h */,
+				5ACE17671A1BF54800DE998A /* DFPhotoFeedImageCell.m */,
+				5ACE17681A1BF54800DE998A /* DFPhotoFeedImageCell.xib */,
+				5ACE176E1A1D20E700DE998A /* DFPhotoFeedActionCell.h */,
+				5ACE176F1A1D20E700DE998A /* DFPhotoFeedActionCell.m */,
+				5ACE17701A1D20E700DE998A /* DFPhotoFeedActionCell.xib */,
+				5A854B341A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.h */,
+				5A854B351A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.m */,
+				5A854B361A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.xib */,
+			);
+			name = "Feed Cells";
+			sourceTree = "<group>";
+		};
 		5A883BDE1A09651D00355C1D /* Strand Gallery */ = {
 			isa = PBXGroup;
 			children = (
@@ -1334,21 +1348,7 @@
 				5A4C820719EDBACE00C22A12 /* DFSwapUpsellView.h */,
 				5A4C820819EDBACE00C22A12 /* DFSwapUpsellView.m */,
 				5A4C820A19EDBADC00C22A12 /* DFSwapUpsellView.xib */,
-				5AA8FA4E197DD0CE00421513 /* DFFeedSectionHeaderView.xib */,
-				5AA8FA50197DD0E200421513 /* DFFeedSectionHeaderView.h */,
-				5AA8FA51197DD0E200421513 /* DFFeedSectionHeaderView.m */,
-				5ACE17661A1BF54800DE998A /* DFPhotoFeedImageCell.h */,
-				5ACE17671A1BF54800DE998A /* DFPhotoFeedImageCell.m */,
-				5ACE17681A1BF54800DE998A /* DFPhotoFeedImageCell.xib */,
-				5ACE176E1A1D20E700DE998A /* DFPhotoFeedActionCell.h */,
-				5ACE176F1A1D20E700DE998A /* DFPhotoFeedActionCell.m */,
-				5ACE17701A1D20E700DE998A /* DFPhotoFeedActionCell.xib */,
-				5A854B341A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.h */,
-				5A854B351A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.m */,
-				5A854B361A1D3BC200E2DA47 /* DFPhotoFeedFooterCell.xib */,
-				5A56EFB51986CC0E0032CA8A /* DFUploadingFeedCell.h */,
-				5A56EFB61986CC0E0032CA8A /* DFUploadingFeedCell.m */,
-				5A56EFB71986CC0E0032CA8A /* DFUploadingFeedCell.xib */,
+				5A854B391A1D54F900E2DA47 /* Feed Cells */,
 				5A05AD3F1A11603B003AAE1C /* Commenting */,
 			);
 			name = "Photo Feed";
@@ -1785,7 +1785,6 @@
 				5A65182019D6277C001FE911 /* DFStrandGalleryTitleView.xib in Resources */,
 				5AA9292B19A6502200032A3F /* DFPeoplePickerViewController.xib in Resources */,
 				5AEFA25B19D607150027BC5E /* DFStrandGallerySectionHeaderView.xib in Resources */,
-				5A56EFB91986CC0E0032CA8A /* DFUploadingFeedCell.xib in Resources */,
 				5A9115E419DB2B2F003F2A68 /* LaunchScreen.xib in Resources */,
 				5A05AD3E1A115B65003AAE1C /* DFCommentTableViewCell.xib in Resources */,
 				5AA8FA4F197DD0CE00421513 /* DFFeedSectionHeaderView.xib in Resources */,
@@ -2009,7 +2008,6 @@
 				5A83A3DA19F019CE0068F08B /* DFFriendProfileViewController.m in Sources */,
 				5AC4A92A1947C30800862D9C /* DFPhoto.m in Sources */,
 				5A883BE61A09ACD400355C1D /* DFSwapUpsell.m in Sources */,
-				5A56EFB81986CC0E0032CA8A /* DFUploadingFeedCell.m in Sources */,
 				5AA452A01967092F0099CBD2 /* UICollectionView+DFExtras.m in Sources */,
 				65437DE419F810AA00D57F9D /* DFImageDownloadManager.m in Sources */,
 				5A36816619FD6D3C008EE2A7 /* DFNoResultsTableViewCell.m in Sources */,
