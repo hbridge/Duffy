@@ -89,8 +89,8 @@ class BasePhotoAPI(APIView):
         photoData["user_id"] = photoData["user"]
         del photoData["user"]
 
-        if "taken_with_strand" in photoData:
-            photoData["taken_with_strand"] = int(photoData["taken_with_strand"])
+        if "saved_with_swap" in photoData:
+            photoData["saved_with_swap"] = int(photoData["saved_with_swap"])
 
         if "time_taken" in photoData:
             timeStr = photoData["time_taken"].translate(None, 'apm ')
