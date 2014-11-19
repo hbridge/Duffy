@@ -71,6 +71,7 @@
 
 - (CGFloat)rowHeight
 {
+  [self layoutIfNeeded];
   CGFloat height = [self.contentView
                     systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
   
