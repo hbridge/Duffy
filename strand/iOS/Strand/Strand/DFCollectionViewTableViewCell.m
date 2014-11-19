@@ -12,6 +12,7 @@
 @interface DFCollectionViewTableViewCell()
 
 @property (atomic, retain) NSMutableDictionary *imagesForObjects;
+@property (nonatomic, retain) NSMutableDictionary *tapHandlers;
 
 @end
 
@@ -32,12 +33,13 @@
 {
   _objects = objects;
   self.imagesForObjects = [NSMutableDictionary new];
+  self.tapHandlers = [NSMutableDictionary new];
   dispatch_async(dispatch_get_main_queue(), ^{
     [self.collectionView reloadData];
   });
 }
 
-- (void)setImage:(UIImage *)image forObject:(id)object
+- (void)setImage:(UIImage *)image forObject:(id<NSCopying>)object
 {
   if (image) {
     dispatch_async(dispatch_get_main_queue(), ^{
@@ -50,7 +52,7 @@
   }
 }
 
-- (UIImage *)imageForObject:(id)object
+- (UIImage *)imageForObject:(id<NSCopying>)object
 {
   return self.imagesForObjects[object];
 }
@@ -85,6 +87,20 @@
   cell.imageView.backgroundColor = [UIColor grayColor];
   
   return cell;
+}
+
+- (void)setObject:(id<NSCopying>)object tappedHandler:(DFCollectionTableViewCellObjectTappedBlock)handler
+{
+  self.tapHandlers[object] = handler;
+  self.collectionView.delegate = self;
+}
+
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+  [collectionView deselectItemAtIndexPath:indexPath animated:NO];
+  id tappedObject = self.objects[indexPath.row];
+  DFCollectionTableViewCellObjectTappedBlock handler = self.tapHandlers[tappedObject];
+  handler(tappedObject);
 }
 
 @end

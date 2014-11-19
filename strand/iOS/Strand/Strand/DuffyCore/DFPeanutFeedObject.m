@@ -130,10 +130,9 @@ static NSArray *FeedObjectTypes;
   
   NSMutableArray *allDescendendents = [NSMutableArray new];
   for (DFPeanutFeedObject *object in self.objects) {
+    [allDescendendents addObject:object];
     if (object.objects) {
       [allDescendendents addObjectsFromArray:[[object enumeratorOfDescendents] allObjects]];
-    } else {
-      [allDescendendents addObject:object];
     }
   }
   
@@ -145,6 +144,15 @@ static NSArray *FeedObjectTypes;
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
   NSArray *allDescendents = self.enumeratorOfDescendents.allObjects;
   return [allDescendents filteredArrayUsingPredicate:predicate];
+}
+
++ (NSArray *)descendentsOfType:(DFFeedObjectType)type inFeedObjects:(NSArray *)feedObjects
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutFeedObject *feedObject in feedObjects) {
+    [result addObjectsFromArray:[feedObject descendentdsOfType:type]];
+  }
+  return result;
 }
 
 - (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type

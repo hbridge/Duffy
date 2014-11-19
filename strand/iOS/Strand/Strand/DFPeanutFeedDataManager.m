@@ -522,6 +522,22 @@ static DFPeanutFeedDataManager *defaultManager;
   return [NSArray new];
 }
 
+- (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
+{
+  if (userID == [[DFUser currentUser] userID]) {
+    return [[DFUser currentUser] peanutUser];
+  }
+  for (DFPeanutFeedObject *strandPosts in self.inboxFeedObjects) {
+    if (![strandPosts.type isEqual:DFFeedObjectStrandPosts]) continue;
+    for (DFPeanutUserObject *actor in strandPosts.actors) {
+      if (actor.id == userID) {
+        return actor;
+      }
+    }
+  }
+  return nil;
+}
+
 - (NSArray *)actionsList
 {
   return [self actionsListFilterUser:nil];

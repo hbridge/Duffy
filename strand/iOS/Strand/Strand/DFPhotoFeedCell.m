@@ -246,8 +246,9 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 
 - (CGFloat)rowHeight
 {
+  [self layoutIfNeeded];
   CGFloat height = [self.contentView
-                    systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height + 1.0;
+                    systemLayoutSizeFittingSize:UILayoutFittingCompressedSize].height;
   
   return height;
 }

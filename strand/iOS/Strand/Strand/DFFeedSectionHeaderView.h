@@ -11,24 +11,13 @@
 
 @class DFFeedSectionHeaderView;
 
-@protocol DFFeedSectionHeaderViewDelegate <NSObject>
-
-@optional
-- (void)inviteButtonPressedForHeaderView:(DFFeedSectionHeaderView *)headerView;
-
-@end
-
 @interface DFFeedSectionHeaderView : UITableViewHeaderFooterView
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 @property (weak, nonatomic) IBOutlet UILabel *actorLabel;
-@property (weak, nonatomic) IBOutlet UILabel *actionTextLabel;
-@property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 @property (strong, nonatomic) IBOutlet UIView *backgroundView;
-
-@property (weak, nonatomic) id<DFFeedSectionHeaderViewDelegate> delegate;
 
 @property (nonatomic, retain) NSObject *representativeObject;
 
-- (IBAction)inviteButtonPressed:(id)sender;
++ (CGFloat)height;
 
 @end

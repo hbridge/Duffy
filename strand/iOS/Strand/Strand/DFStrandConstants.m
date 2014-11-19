@@ -153,7 +153,9 @@ static NSArray *colors;
       defaultStyle = [NSMutableDictionary new];
       
       NSMutableParagraphStyle *feedParagraphStyle = [NSMutableParagraphStyle new];
-      feedParagraphStyle.lineSpacing = 5;
+      //feedParagraphStyle.lineSpacing = 5;
+      feedParagraphStyle.paragraphSpacing = 0;
+      feedParagraphStyle.paragraphSpacingBefore = 0;
       UIFont *helveticaNeue = [UIFont fontWithName:@"HelveticaNeue" size:13];
       UIFont *helveticaNeueBold = [UIFont fontWithName:@"HelveticaNeue-Bold" size:13];
       UIFont *helveticaNeueItalic = [UIFont fontWithName:@"HelveticaNeue-Italic" size:13];

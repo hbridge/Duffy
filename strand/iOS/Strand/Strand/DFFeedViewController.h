@@ -13,11 +13,12 @@
 #import "DFFeedSectionHeaderView.h"
 #import "DFPeanutFeedObject.h"
 #import "DFSelectPhotosViewController.h"
+#import "DFFeedDataSource.h"
+
 
 
 @interface DFFeedViewController : UIViewController
-<UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate,
-DFPhotoFeedCellDelegate, DFFeedSectionHeaderViewDelegate, DFSelectPhotosViewControllerDelegate>
+<DFFeedDataSourceDelegate, DFSelectPhotosViewControllerDelegate, UIActionSheetDelegate>
 
 @property (nonatomic) DFPhotoIDType onViewScrollToPhotoId;
 @property (nonatomic) BOOL showPersonPerPhoto;
@@ -29,7 +30,7 @@ DFPhotoFeedCellDelegate, DFFeedSectionHeaderViewDelegate, DFSelectPhotosViewCont
  Use this to present a feed view controller modally for a given feed object, for example
  when responding to a tap on a push notification
  */
-+ (DFFeedViewController *)presentFeedObject:(DFPeanutFeedObject *)feedObject
++ (DFFeedViewController *)presentFeedObject:(DFPeanutFeedObject *)postsObject
   modallyInViewController:(UIViewController *)viewController;
 
 @end

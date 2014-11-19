@@ -24,18 +24,8 @@
   [super awakeFromNib];
 }
 
-/*
-// Only override drawRect: if you perform custom drawing.
-// An empty implementation adversely affects performance during animation.
-- (void)drawRect:(CGRect)rect
++ (CGFloat)height
 {
-    // Drawing code
-}
-*/
-
-- (IBAction)inviteButtonPressed:(id)sender {
-  if ([self.delegate respondsToSelector:@selector(inviteButtonPressedForHeaderView:)]) {
-    [self.delegate inviteButtonPressedForHeaderView:self];
-  }
+  return 51.0;
 }
 @end

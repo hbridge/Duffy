@@ -54,6 +54,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
+- (DFPeanutUserObject *)userWithID:(DFUserIDType)userID;
 
 
 - (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
