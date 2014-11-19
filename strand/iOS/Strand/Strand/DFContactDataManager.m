@@ -45,7 +45,9 @@ static DFContactDataManager *defaultManager;
 - (void)refreshCache
 {
   _phoneNumberToPersonCache = nil;
-  [self phoneNumberToPersonCache];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [self phoneNumberToPersonCache];
+  });
 }
 
 
