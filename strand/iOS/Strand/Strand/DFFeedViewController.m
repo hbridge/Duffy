@@ -143,7 +143,7 @@
           [self showUpsellResult];
         }
       }
-      [self.swapUpsellView reloadDataWithInviteObject:invite];
+      [self configureUpsell];
     }
   } else {
     DFPeanutFeedObject *posts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:self.postsObject.id];
@@ -776,7 +776,7 @@ selectedObjectChanged:(id)newObject
 {
   if (self.inviteObject) {
     // if this is an invite create an upsell if necessary and add it
-    if (!self.swapUpsellView) {
+    if (!self.swapUpsellView && [self.inviteObject.ready isEqual:@YES]) {
       self.swapUpsellView = [UINib instantiateViewWithClass:[DFSwapUpsellView class]];
       [self.view addSubview:self.swapUpsellView];
       [self configureUpsellHeight];
