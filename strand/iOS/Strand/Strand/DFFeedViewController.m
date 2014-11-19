@@ -760,9 +760,6 @@ selectedObjectChanged:(id)newObject
   if (scrollOffset > -scrollView.contentInset.top) {
     [self configureUpsellHeight];
   }
-  
-  // store the scrollOffset for calculations next time around
-  self.previousScrollViewYOffset = scrollOffset;
 }
 
 - (BOOL)shouldHandleScrollChange
