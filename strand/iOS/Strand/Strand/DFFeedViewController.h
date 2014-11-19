@@ -7,7 +7,6 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "DFPhotoFeedCell.h"
 #import "DFNavigationBar.h"
 #import "DFNotificationsViewController.h"
 #import "DFFeedSectionHeaderView.h"

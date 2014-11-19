@@ -570,18 +570,6 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
   [actionSheet showInView:self.tableView];
 }
 
-
-- (void)feedCell:(DFPhotoFeedCell *)feedCell
-selectedObjectChanged:(id)newObject
-      fromObject:(id)oldObject
-{
-  DDLogVerbose(@"feedCell object changed from: %@ to %@", oldObject, newObject);
-  [feedCell setNeedsLayout];
-}
-
-
-
-
 #pragma mark - Action Handler Helpers
 
 - (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
