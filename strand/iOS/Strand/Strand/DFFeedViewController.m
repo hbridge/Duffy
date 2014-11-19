@@ -8,38 +8,22 @@
 
 #import "DFFeedViewController.h"
 #import "DFAnalytics.h"
-#import "DFDefaultsStore.h"
-#import "DFFeedSectionHeaderView.h"
+#import "DFCommentViewController.h"
 #import "DFImageManager.h"
+#import "DFInviteStrandViewController.h"
 #import "DFNavigationController.h"
-#import "DFNotificationSharedConstants.h"
 #import "DFPeanutActionAdapter.h"
-#import "DFPeanutPhoto.h"
+#import "DFPeanutFeedDataManager.h"
 #import "DFPeanutFeedObject.h"
+#import "DFPeanutPhoto.h"
 #import "DFPhotoMetadataAdapter.h"
 #import "DFPhotoStore.h"
-#import "DFStrandConstants.h"
-#import "DFUploadController.h"
-#import "DFUploadingFeedCell.h"
-#import "NSDateFormatter+DFPhotoDateFormatters.h"
-#import "NSString+DFHelpers.h"
-#import "UIAlertView+DFHelpers.h"
-#import "DFInviteStrandViewController.h"
-#import "DFStrandGalleryTitleView.h"
-#import "NSIndexPath+DFHelpers.h"
-#import "DFSwapUpsellView.h"
-#import "UINib+DFHelpers.h"
 #import "DFReviewSwapViewController.h"
-#import "DFPeanutFeedDataManager.h"
-#import "NSArray+DFHelpers.h"
-#import "DFStrandPeopleBarView.h"
-#import "SVProgressHUD.h"
-#import "DFImageManager.h"
+#import "DFStrandGalleryTitleView.h"
 #import "DFStrandPeopleViewController.h"
-#import "DFCommentViewController.h"
-#import "DFPhotoFeedImageCell.h"
-
-
+#import "DFSwapUpsellView.h"
+#import "NSDateFormatter+DFPhotoDateFormatters.h"
+#import "SVProgressHUD.h"
 
 @interface DFFeedViewController ()
 
@@ -59,7 +43,6 @@
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
 @property (nonatomic, retain) NSTimer *refreshTimer;
-@property (nonatomic, retain) DFStrandPeopleBarView *peopleBar;
 @property (nonatomic, retain) DFStrandGalleryTitleView *titleView;
 
 @end
@@ -174,8 +157,6 @@
       self.postsObject = posts;
     }
   }
-  
-  [self.peopleBar configureWithStrandPostsObject:self.postsObject];
 }
 
 - (void)observeNotifications
