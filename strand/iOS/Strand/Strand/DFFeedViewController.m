@@ -29,21 +29,18 @@
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 
-@property (nonatomic) DFPhotoIDType actionSheetPhotoID;
-@property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
-
-@property (nonatomic) CGFloat previousScrollViewYOffset;
-@property (nonatomic) BOOL isViewTransitioning;
-
-@property (nonatomic, retain) DFSwapUpsellView *swapUpsellView;
-
 @property (nonatomic, retain) DFFeedDataSource *feedDataSource;
 @property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
 @property (nonatomic, retain) DFPeanutFeedObject *postsObject;
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
-@property (nonatomic, retain) NSTimer *refreshTimer;
+@property (nonatomic) DFPhotoIDType actionSheetPhotoID;
+@property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
+@property (nonatomic) BOOL isViewTransitioning;
+
 @property (nonatomic, retain) DFStrandGalleryTitleView *titleView;
+@property (nonatomic, retain) DFSwapUpsellView *swapUpsellView;
+@property (nonatomic, retain) NSTimer *refreshTimer;
 
 @end
 
