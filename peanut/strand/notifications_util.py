@@ -41,7 +41,7 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 		logEntries = list()	
 		for device in devices:
 			notification = DuffyNotification()
-			notification.message = msg
+			notification.message = (msg[:200] + '...') if len(msg) > 200 else msg
 			notification.service = device.service
 
 			payload = constants.NOTIFICATIONS_CUSTOM_DICT[msgTypeId]
