@@ -46,6 +46,7 @@
                     <constraint firstItem="JMd-0b-oeH" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="15" id="bCw-kj-aK3"/>
                     <constraint firstAttribute="bottomMargin" relation="greaterThanOrEqual" secondItem="OPm-BO-0DI" secondAttribute="bottom" constant="6" id="fBr-aq-P9n"/>
                     <constraint firstAttribute="centerY" secondItem="OPm-BO-0DI" secondAttribute="centerY" id="g9D-4x-vX9"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="Hut-qw-Arg" secondAttribute="bottom" constant="5" id="ojr-sA-rse"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
