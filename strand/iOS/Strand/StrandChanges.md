@@ -1,5 +1,12 @@
 # Swap
 
+## Nov 19th, 2014 (4805)
+
+- Fix issues when viewing full photos on small screens (4S and below)
+- Improved performance for viewing full photos
+- Minor layout bug fixes
+- Fix invites showing as NULL
+
 ## Nov 17th, 2014 (4804)
 
 - Support tapping on profile photos in gallery to see the person's name
