@@ -110,7 +110,7 @@ static DFImageDownloadManager *defaultManager;
     NSOperationQueuePriorityVeryHigh : NSOperationQueuePriorityHigh; // thumbnails are highest
   BOOL didDispatchForCompletion = NO;
   
-  if (path) {
+  if (path && [path length] > 0) {
     didDispatchForCompletion = YES;
     [self getImageDataForPath:path
                      priority:priority

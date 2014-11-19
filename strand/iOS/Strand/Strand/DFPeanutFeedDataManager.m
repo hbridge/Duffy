@@ -370,10 +370,15 @@ static DFPeanutFeedDataManager *defaultManager;
 - (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
 {
   DFPeanutFeedObject *photo = [self firstPhotoInAllStrandsWithId:photoID];
-  if (type == DFImageFull) {
-    return photo.full_image_path;
+  
+  if (photo) {
+    if (type == DFImageFull) {
+      return photo.full_image_path;
+    } else {
+      return photo.thumb_image_path;
+    }
   } else {
-    return photo.thumb_image_path;
+    return nil;
   }
 }
 
