@@ -298,8 +298,10 @@ static int ImagePrefetchRange = 3;
   cell.flowLayout.itemSize = CGSizeMake(78, 78);
   cell.flowLayout.minimumInteritemSpacing = 0.5;
   cell.flowLayout.minimumLineSpacing = 0.5;
-  cell.flowLayout.sectionInset = UIEdgeInsetsMake(2, 0, 2, 0);
   cell.collectionView.delegate = self;
+  cell.collectionView.bounces = YES;
+  cell.collectionView.alwaysBounceHorizontal = YES;
+  cell.flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
   cell.objects = [feedObject.objects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photo) {
     return @(photo.id);
   }];
