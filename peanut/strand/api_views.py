@@ -636,18 +636,12 @@ def strand_inbox(request):
 		strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
 		printStats("inbox-2")
 
-		deletedSomething = False
+		strandsWithPhotos = list()
 		for strand in strands:
-			if len(strand.photos.all()) == 0:
-				logging.error("Found strand %s with no photos in inbox, deleting.  users are %s" % (strand.id, strand.users.all()))
-				strand.delete()
-				deletedSomething = True
+			if len(strand.photos.all()) > 0:
+				strandsWithPhotos.append(strand)
 
-		if deletedSomething:
-			strands = set(Strand.objects.prefetch_related('photos', 'users').filter(users__in=[user]).filter(private=False))
-
-		#nonInviteStrandObjects = list()
-		responseObjects.extend(getObjectsDataForStrands(strands, user))
+		responseObjects.extend(getObjectsDataForStrands(strandsWithPhotos, user))
 		printStats("inbox-3")
 
 		# sorting by last action on the strand

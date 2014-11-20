@@ -725,4 +725,8 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
             else:
                 action.save()
 
+    def post_save(self, strand, created):
+        if len(strand.photos.all()) == 0:
+            strand.delete()
+
 
