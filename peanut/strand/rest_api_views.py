@@ -601,9 +601,10 @@ class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
                 user.last_build_info = "%s-%s" % (buildId, buildNum)
                 logger.info("Build info updated to %s for user %s" % (user.last_build_info, user.id))
 
-def updateStrandWithCorrectPhotoTimes(strand):
+def updateStrandWithCorrectMetadata(strand, created):
     changed = False
-    for photo in strand.photos.all():
+    photos = strand.photos.all()
+    for photo in photos:
         if photo.time_taken > strand.last_photo_time:
             strand.last_photo_time = photo.time_taken
             changed = True
@@ -611,7 +612,46 @@ def updateStrandWithCorrectPhotoTimes(strand):
         if photo.time_taken < strand.first_photo_time:
             strand.first_photo_time = photo.time_taken
             changed = True
+
+    if len(photos) == 0 and created:
+        if strand.created_from_id:
+            createdFromStrand = Strand.objects.get(id=strand.created_from_id)
+            strand.first_photo_time = createdFromStrand.first_photo_time
+            strand.last_photo_time = createdFromStrand.last_photo_time
+            strand.location_point = createdFromStrand.location_point
+            strand.location_city = createdFromStrand.location_city
+
+            createNeighborRowsToNewStrand(strand, createdFromStrand)
+
+            changed = True
+        else:
+            logger.error("Tried to update a strand with 0 photos and not times set but didn't have created_from_id")
     return changed
+
+# Add in strand Neighbor entries for all the private strands the created from one had
+#  to the new public one
+def createNeighborRowsToNewStrand(strand, privateStrand):
+    newNeighbors = list()
+    
+    strandNeighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1 = privateStrand) | Q(strand_2 = privateStrand))
+    for strandNeighbor in strandNeighbors:
+        if strandNeighbor.strand_2_id == privateStrand.id:
+            # This means that the strand_1 in the neighbor is the one we want to use in the new Neighbor
+
+            # The newly created strand will always have the higher id since it was just created
+            newNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_1, strand_1_user=strandNeighbor.strand_1_user, strand_1_private=strandNeighbor.strand_1_private, strand_2=strand, strand_2_user=strand.user, strand_2_private=strand.private))
+        else:
+            # This means that strand_2 is the entry we want to copy...but it could be a strand neighbor or a user neighbor
+            if strandNeighbor.strand_2:
+                newNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_2, strand_1_user=strandNeighbor.strand_2_user, strand_1_private=strandNeighbor.strand_2_private, strand_2=strand, strand_2_user=strand.user, strand_2_private=strand.private))
+            else:
+                # This is a user neighbor so 
+                newNeighbors.append(StrandNeighbor(strand_1=strand, strand_1_user=strand.user, strand_1_private=strand.private, strand_2_user=strandNeighbor.strand_2_user))
+
+    if len(newNeighbors) > 0:
+        StrandNeighbor.objects.bulk_create(newNeighbors)
+        logger.info("Wrote out %s strand neighbor rows connecting neighbors of %s to new strand %s" % (len(newNeighbors), privateStrand.id, strand.id))
+
 
 """
     REST interface for creating and editing strands
@@ -620,12 +660,13 @@ def updateStrandWithCorrectPhotoTimes(strand):
 """
 class CreateStrandAPI(CreateAPIView):
     def pre_save(self, strand):
-        self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
+        if 'photos' in self.request.DATA:
+            self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
         self.request.DATA['users'] = list(set(self.request.DATA['users']))
 
     def post_save(self, strand, created):
         if created:
-            changed = updateStrandWithCorrectPhotoTimes(strand)
+            changed = updateStrandWithCorrectMetadata(strand, created)
             if changed:
                 logger.debug("Updated strand %d with new times" % (strand.id))
                 strand.save()
@@ -645,33 +686,21 @@ class CreateStrandAPI(CreateAPIView):
 
             # Go through all the private strands that have any photos we're contributing
             #   and mark them as such
-            privateStrands = Strand.objects.filter(photos__id__in=self.request.DATA['photos'], private=True, user=user)
-            newStrandNeighbors = list()
-            for privateStrand in privateStrands:
-                privateStrand.suggestible = False
-                privateStrand.contributed_to_id = strand.id
-                privateStrand.save()
+            if 'photos' in self.request.DATA:
+                privateStrands = Strand.objects.filter(photos__id__in=self.request.DATA['photos'], private=True, user=user)
+                for privateStrand in privateStrands:
+                    privateStrand.suggestible = False
+                    privateStrand.contributed_to_id = strand.id
+                    privateStrand.save()
 
-                # Next, add in strand Neighbor entries for all the private strands the created from one had
-                #  to the new public one
-                """
-                strandNeighbors = StrandNeighbor.objects.filter(Q(strand_1 = privateStrand) | Q(strand_2 = privateStrand))
-                for strandNeighbor in strandNeighbors:
-                    if strandNeighbor.strand_1_id != privateStrand.id:
-                        # The newly created strand will always have the higher id since it was just created
-                        newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_1, strand_2=strand))
-                    else:
-                        newStrandNeighbors.append(StrandNeighbor(strand_1=strandNeighbor.strand_2, strand_2=strand))
-                """
-            if len(newStrandNeighbors) > 0:
-                StrandNeighbor.objects.bulk_create(newStrandNeighbors)
+                    createNeighborRowsToNewStrand(strand, privateStrand)
                     
-            logger.info("Created new strand %s with users %s and photos %s and neighborRows %s" % (strand.id, strand.users.all(), strand.photos.all(), newStrandNeighbors))
+            logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
             
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
     def pre_save(self, strand):
         # Don't need to explicity save here since this is pre_save
-        updateStrandWithCorrectPhotoTimes(strand)
+        updateStrandWithCorrectMetadata(strand, False)
 
         # Now we want to create the "Added photos to a strand" Action
         try:
@@ -682,15 +711,16 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
         currentPhotoIds = Photo.getIds(strand.photos.all())
         currentUserIds = User.getIds(strand.users.all())
 
-        # Find the photo ids that are in the post data but not in the strand
-        newPhotoIds = list()
-        for photoId in self.request.DATA['photos']:
-            if photoId not in currentPhotoIds:
-                newPhotoIds.append(photoId)
+        if 'photos' in self.request.DATA:
+            # Find the photo ids that are in the post data but not in the strand
+            newPhotoIds = list()
+            for photoId in self.request.DATA['photos']:
+                if photoId not in currentPhotoIds:
+                    newPhotoIds.append(photoId)
 
-        newPhotoIds = list(set(newPhotoIds))
+            newPhotoIds = list(set(newPhotoIds))
 
-        self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
+            self.request.DATA['photos'] = list(set(self.request.DATA['photos']))
         self.request.DATA['users'] = list(set(self.request.DATA['users']))
 
         if len(newPhotoIds) > 0:

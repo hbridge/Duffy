@@ -165,6 +165,9 @@ def getLocationForStrand(strand):
 	if len(photos) == 0:
 		photos = strand.getPostPhotos()
 		
-	location = getBestLocationForPhotos(photos)
+	if len(photos) == 0:
+		location = strand.location_city
+	else:
+		location = getBestLocationForPhotos(photos)
 
 	return location
