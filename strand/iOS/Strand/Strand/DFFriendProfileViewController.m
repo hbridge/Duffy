@@ -83,7 +83,6 @@
 {
   [self addChildViewController:contentController];
   contentController.view.frame = self.view.frame;
-  //[self configureContentControllerView:contentController];
   [self.view insertSubview:contentController.view atIndex:0];
   [contentController didMoveToParentViewController:self];
 }
@@ -103,7 +102,6 @@
   + self.tabSegmentedControlWrapper.frame.size.height;
   UIEdgeInsets insets = UIEdgeInsetsMake(contentTop, 0, 0, 0);
   mainView.contentInset = insets;
-  mainView.contentOffset = CGPointMake(0, -contentTop);
 }
 
 - (UIScrollView *)mainScrollViewForViewController:(UIViewController *)viewController

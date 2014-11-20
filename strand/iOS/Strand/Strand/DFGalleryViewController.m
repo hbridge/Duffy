@@ -95,11 +95,13 @@
 - (void)viewWillAppear:(BOOL)animated
 {
   [super viewWillAppear:animated];
-  if (self.isMovingToParentViewController && !self.userToFilterTo) {
-    // we have to check usertofilter to or it jumps in the friend profile view
-    [self.collectionView scrollToBottom];
-  }
   [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
+}
+
+- (void)didMoveToParentViewController:(UIViewController *)parent
+{
+  [super didMoveToParentViewController:parent];
+  [self.collectionView scrollToBottom];
 }
 
 - (void)viewDidLayoutSubviews
@@ -123,7 +125,7 @@
 {
   self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
                                            acceptedStrandsWithPostsCollapsed:YES
-                                           filterToUser:0
+                                           filterToUser:self.userToFilterTo.id
                                            feedObjectSortKey:@"time_taken"
                                            ascending:YES];
   [self.collectionView reloadData];
@@ -147,7 +149,6 @@
     if (self.noResultsView) [self.noResultsView removeFromSuperview];
     self.noResultsView = nil;
   }
-
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
