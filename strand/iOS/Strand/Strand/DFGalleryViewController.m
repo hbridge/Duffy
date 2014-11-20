@@ -13,10 +13,12 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "UICollectionView+DFExtras.h"
 #import "DFFeedViewController.h"
+#import "DFNoTableItemsView.h"
 
 @interface DFGalleryViewController ()
 
 @property (nonatomic, retain) DFImageDataSource *datasource;
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
 @end
 
@@ -87,6 +89,7 @@
   self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, 70);
   self.collectionView.delegate = self;
   self.datasource.showActionsBadge = YES;
+  [self configureNoResultsView];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -96,6 +99,7 @@
     // we have to check usertofilter to or it jumps in the friend profile view
     [self.collectionView scrollToBottom];
   }
+  [[DFPeanutFeedDataManager sharedManager] refreshInboxFromServer:nil];
 }
 
 - (void)viewDidLayoutSubviews
@@ -123,6 +127,27 @@
                                            feedObjectSortKey:@"time_taken"
                                            ascending:YES];
   [self.collectionView reloadData];
+  
+  [self configureNoResultsView];
+}
+
+- (void)configureNoResultsView
+{
+  if (self.datasource.collectionFeedObjects.count == 0) {
+    if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    [self.noResultsView setSuperView:self.collectionView];
+    if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
+      self.noResultsView.titleLabel.text = @"No Photos";
+      [self.noResultsView.activityIndicator stopAnimating];
+    } else {
+      self.noResultsView.titleLabel.text = @"Loading...";
+      [self.noResultsView.activityIndicator startAnimating];
+    }
+  } else {
+    if (self.noResultsView) [self.noResultsView removeFromSuperview];
+    self.noResultsView = nil;
+  }
+
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
