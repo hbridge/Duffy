@@ -769,11 +769,11 @@ def sendNotificationsUponActions(sender, **kwargs):
 
 
 def doBulkUpdate(cls, objs, attributesList):
-	if len(objs) == 0:
-		return
-
 	if not isinstance(objs, list):
 		objs = [objs]
+
+	if len(objs) == 0:
+		return
 		
 	for obj in objs:
 		obj.updated = datetime.datetime.now()
