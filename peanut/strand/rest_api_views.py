@@ -620,8 +620,13 @@ def updateStrandWithCorrectMetadata(strand, created):
             strand.last_photo_time = createdFromStrand.last_photo_time
             strand.location_point = createdFromStrand.location_point
             strand.location_city = createdFromStrand.location_city
-
+            
             createNeighborRowsToNewStrand(strand, createdFromStrand)
+
+            # This is used to mark the private strand that we've evaluated it and created a request/invite
+            # from it
+            createdFromStrand.suggestible = False
+            createdFromStrand.save()
 
             changed = True
         else:
