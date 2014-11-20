@@ -357,7 +357,6 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 
 	return objects
 
-
 def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	# Look above and below 10x the number of minutes to strand
 	timeHigh = strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING*5)
@@ -368,9 +367,9 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	
 	strandsThatMatch = list()
 	for privateStrand in privateStrands:
-		for photo in privateStrand.photos.all():
-			if strands_util.photoBelongsInStrand(photo, strand, honorLocation=False) and privateStrand not in strandsThatMatch:
-				strandsThatMatch.append(privateStrand)
+		if (strands_util.strandsShouldBeNeighbors(strand, privateStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING):
+			and privateStrand not in strandsThatMatch):
+			strandsThatMatch.append(privateStrand)
 
 	return strandsThatMatch
 	

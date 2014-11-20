@@ -14,7 +14,7 @@ from common.models import Strand
 logger = logging.getLogger(__name__)
 
 
-def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLocation = True):
+def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLocation = True, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING):
 	if photosByStrandId:
 		photosInStrand = photosByStrandId[strand.id]
 	else:
@@ -23,18 +23,17 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLoca
 	for photo in photosInStrand:
 		timeDiff = photo.time_taken - targetPhoto.time_taken
 		timeDiffMin = abs(timeDiff.total_seconds()) / 60
-		if ( timeDiffMin < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING ):
+		if (timeDiffMin < constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING):
 			if honorLocation:
 				if not photo.location_point and not targetPhoto.location_point:
 					return True
 
 				if (photo.location_point and targetPhoto.location_point and 
-					geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING):
+					geo_util.getDistanceBetweenPhotos(photo, targetPhoto) < distanceLimit):
 					return True
 			else:
 				return True
 	return False
-
 
 def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = constants.MINUTES_FOR_NOLOC_NEIGHBORING, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING):
 	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
