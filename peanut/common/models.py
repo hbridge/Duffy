@@ -9,6 +9,7 @@ from django.db.models import Q
 from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
+from django.db.models.query import QuerySet
 
 from phonenumber_field.modelfields import PhoneNumberField
 from uuidfield import UUIDField
@@ -769,7 +770,7 @@ def sendNotificationsUponActions(sender, **kwargs):
 
 
 def doBulkUpdate(cls, objs, attributesList):
-	if not isinstance(objs, list):
+	if not isinstance(objs, list) and not isinstance(objs, QuerySet):
 		objs = [objs]
 
 	if len(objs) == 0:
