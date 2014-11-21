@@ -355,11 +355,12 @@ def main(argv):
 								s1 = strand
 								s2 = possibleStrandNeighbor
 							# This deals de-duping
-							if s2: # We might not have s2 due to a user neighbor
-								if (s1.id, s2.id) not in idsCreated:
-									idsCreated.append((s1.id, s2.id))
+							if (s1.id, s2.id) not in idsCreated:
+								idsCreated.append((s1.id, s2.id))
+								distance = None
+								if (s1.location_point and s2.location_point):
 									distance = geo_util.getDistanceBetweenStrands(s1, s2)
-									strandNeighbors.append(StrandNeighbor(strand_1_id=s1.id, strand_1_private=s1.private, strand_1_user=s1.user, strand_2_id=s2.id, strand_2_private=s2.private, strand_2_user=s2.user, distance_in_meters=distance))
+								strandNeighbors.append(StrandNeighbor(strand_1_id=s1.id, strand_1_private=s1.private, strand_1_user=s1.user, strand_2_id=s2.id, strand_2_private=s2.private, strand_2_user=s2.user, distance_in_meters=distance))
 
 				
 				# Now try to find all users who were around this time
