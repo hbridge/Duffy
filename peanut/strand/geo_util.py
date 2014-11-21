@@ -20,7 +20,7 @@ def haversine(lon1, lat1, lon2, lat2):
 
 def getDistanceBetweenPhotos(photo1, photo2):
 	if photo1.location_point and photo2.location_point:
-		return geoDistance = int(haversine(photo1.location_point.x, photo1.location_point.y, photo2.location_point.x, photo2.location_point.y) * 1000)
+		return int(haversine(photo1.location_point.x, photo1.location_point.y, photo2.location_point.x, photo2.location_point.y) * 1000)
 	return None
 
 def getDistanceBetweenStrands(strand1, strand2):
