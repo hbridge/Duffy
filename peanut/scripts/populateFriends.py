@@ -16,6 +16,8 @@ from django.db import IntegrityError
 from common.models import User, ContactEntry, FriendConnection
 from arbus import similarity_util
 
+from strand import notifications_util
+
 """
 	Returns a dictionary keyed by phone number and value is user
 """
