@@ -215,6 +215,15 @@ def writeToSpreadsheet(dataDict, length):
 
 	return False
 
+def genHTML(emailBody):
+	html = "<html><body>"
+
+	html += emailBody
+
+	html +="</body></html>"
+
+	return html
+
 
 def main(argv):
 	logger.info("Starting... ")
@@ -245,6 +254,8 @@ def main(argv):
 	emailBody += dataDictToString(dataDict1day, 1)
 
 	print emailBody
+
+	#html = genHTML(emailBody)
 
 	# Send to spreadsheet
 	if publishToSpreadSheet:
