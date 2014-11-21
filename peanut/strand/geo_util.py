@@ -19,17 +19,19 @@ def haversine(lon1, lat1, lon2, lat2):
 	return km
 
 def getDistanceBetweenPhotos(photo1, photo2):
-	geoDistance = int(haversine(photo1.location_point.x, photo1.location_point.y, photo2.location_point.x, photo2.location_point.y) * 1000)
-	return geoDistance
-
+	if photo1.location_point and photo2.location_point:
+		return geoDistance = int(haversine(photo1.location_point.x, photo1.location_point.y, photo2.location_point.x, photo2.location_point.y) * 1000)
+	return None
 
 def getDistanceBetweenStrands(strand1, strand2):
-	geoDistance = int(haversine(strand1.location_point.x, strand1.location_point.y, strand2.location_point.x, strand2.location_point.y) * 1000)
-	return geoDistance
+	if strand1.location_point and strand2.location_point:
+		return int(haversine(strand1.location_point.x, strand1.location_point.y, strand2.location_point.x, strand2.location_point.y) * 1000)
+	return None
 
 def getDistanceBetweenStrandAndLocationRecord(strand, locationRecord):
-	geoDistance = int(haversine(strand.location_point.x, strand.location_point.y, locationRecord.point.x, locationRecord.point.y) * 1000)
-	return geoDistance
+	if strand.location_point:
+		return int(haversine(strand.location_point.x, strand.location_point.y, locationRecord.point.x, locationRecord.point.y) * 1000)
+	return None
 
 def getDistanceToPhoto(lon, lat, photo):
 	geoDistance = int(haversine(lon, lat, photo.location_point.x, photo.location_point.y) * 1000)
