@@ -654,8 +654,8 @@ def createNeighborRowsToNewStrand(strand, privateStrand):
                 newNeighbors.append(StrandNeighbor(strand_1=strand, strand_1_user=strand.user, strand_1_private=strand.private, strand_2_user=strandNeighbor.strand_2_user))
 
     if len(newNeighbors) > 0:
-        StrandNeighbor.objects.bulk_create(newNeighbors)
-        logger.info("Wrote out %s strand neighbor rows connecting neighbors of %s to new strand %s" % (len(newNeighbors), privateStrand.id, strand.id))
+        strands_util.updateOrCreateStrandNeighbors(newNeighbors)
+        logger.info("Wrote out or updated %s strand neighbor rows connecting neighbors of %s to new strand %s" % (len(newNeighbors), privateStrand.id, strand.id))
 
 
 """

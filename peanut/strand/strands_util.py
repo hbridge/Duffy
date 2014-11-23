@@ -171,3 +171,64 @@ def getLocationForStrand(strand):
 		location = getBestLocationForPhotos(photos)
 
 	return location
+
+
+
+def getAllStrandIds(neighborRows):
+	strandIds = list()
+	for row in neighborRows:
+		if row.strand_1_id:
+			strandIds.append(row.strand_1_id)
+		if row.strand_2_id:
+			strandIds.append(row.strand_2_id)
+
+	return set(strandIds)
+
+
+def processWithExisting(existingNeighborRows, newNeighborRows):
+	existing = dict()
+	rowsToCreate = list()
+	rowsToUpdate = list()
+
+	# Create a double dict of [id1][id2] for lookup in the next phase
+	for row in existingNeighborRows:
+		id1 = row.strand_1_id
+
+		if row.strand_2_id:
+			id2 = row.strand_2_id
+		else:
+			id2 = row.strand_2_user_id
+
+		if id1 not in existing:
+			existing[id1] = dict()
+		existing[id1][id2] = row
+
+	for newRow in newNeighborRows:
+		id1 = newRow.strand_1_id
+		if newRow.strand_2_id:
+			id2 = newRow.strand_2_id
+		else:
+			id2 = newRow.strand_2_user_id
+
+		if id1 in existing and id2 in existing[id1]:
+			existingRow = existing[id1][id2]
+			# If we have a new row with a smaller distance_in_meters, update the db with that one
+			if (newRow.distance_in_meters and
+				existingRow.distance_in_meters and 
+				existingRow.distance_in_meters > newRow.distance_in_meters):
+				existingRow.distance_in_meters = newRow.distance_in_meters
+				rowsToUpdate.append(existingRow)
+		else:
+			rowsToCreate.append(newRow)
+	return rowsToCreate, rowsToUpdate
+
+def updateOrCreateStrandNeighbors(strandNeighbors):
+	allIds = strands_util.getAllStrandIds(strandNeighbors)
+	existingRows = StrandNeighbor.objects.filter(strand_1_id__in=allIds).filter(Q(strand_2_id__in=allIds) | Q(strand_2_id__isnull=True))
+	neighborRowsToCreate, neighborRowsToUpdate = strands_util.processWithExisting(existingRows, strandNeighbors)
+	StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
+
+	StrandNeighbor.bulkUpdate(neighborRowsToUpdate, ["distance_in_meters"])
+
+	return
+
