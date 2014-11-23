@@ -5,11 +5,13 @@ import pytz
 import logging
 import json
 
+from django.db.models import Q
+
 from peanut.settings import constants
 
 from strand import geo_util, friends_util
 
-from common.models import Strand
+from common.models import Strand, StrandNeighbor
 
 logger = logging.getLogger(__name__)
 
@@ -223,9 +225,9 @@ def processWithExisting(existingNeighborRows, newNeighborRows):
 	return rowsToCreate, rowsToUpdate
 
 def updateOrCreateStrandNeighbors(strandNeighbors):
-	allIds = strands_util.getAllStrandIds(strandNeighbors)
+	allIds = getAllStrandIds(strandNeighbors)
 	existingRows = StrandNeighbor.objects.filter(strand_1_id__in=allIds).filter(Q(strand_2_id__in=allIds) | Q(strand_2_id__isnull=True))
-	neighborRowsToCreate, neighborRowsToUpdate = strands_util.processWithExisting(existingRows, strandNeighbors)
+	neighborRowsToCreate, neighborRowsToUpdate = processWithExisting(existingRows, strandNeighbors)
 	StrandNeighbor.objects.bulk_create(neighborRowsToCreate)
 
 	StrandNeighbor.bulkUpdate(neighborRowsToUpdate, ["distance_in_meters"])

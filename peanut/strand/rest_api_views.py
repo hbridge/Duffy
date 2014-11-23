@@ -30,7 +30,7 @@ from common import location_util, api_util
 # TODO(Derek): move this to common
 from arbus import image_util
 
-from strand import notifications_util
+from strand import notifications_util, strands_util
 
 logger = logging.getLogger(__name__)
 
