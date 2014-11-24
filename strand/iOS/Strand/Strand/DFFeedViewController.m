@@ -715,7 +715,8 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
   [SVProgressHUD show];
   [[DFPeanutFeedDataManager sharedManager]
    addFeedObjects:selectedFeedObjects
-   toStrandPosts:self.postsObject success:^{
+   toStrandWithID:self.postsObject.id
+   success:^{
      NSString *status = [NSString stringWithFormat:@"Added %@ photos", @(selectedFeedObjects.count)];
      [SVProgressHUD showSuccessWithStatus:status];
      DDLogInfo(@"%@ adding %@ photos succeeded.", self.class, @(selectedFeedObjects.count));

@@ -62,8 +62,8 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
              success:(void(^)(void))success
              failure:(void(^)(NSError *error))failure;
 
-- (void)addFeedObjects:(NSArray *)photos
-         toStrandPosts:(DFPeanutFeedObject *)strandPosts
+- (void)addFeedObjects:(NSArray *)feedObjects
+        toStrandWithID:(DFStrandIDType)strandID
                success:(DFSuccessBlock)success
                failure:(DFFailureBlock)failure;
 
@@ -75,6 +75,10 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
            selectedPeanutContacts:(NSArray *)selectedPeanutContacts
                           success:(void(^)(DFPeanutStrand *resultStrand))success
                           failure:(DFFailureBlock)failure;
+- (void)createRequestFromSuggestion:(DFPeanutFeedObject *)suggestion
+                           contacts:(NSArray *)peanutContacts
+                            success:(void(^)(DFPeanutStrand *resultStrand))success
+                            failure:(DFFailureBlock)failure;
 
 - (void)removePhoto:(DFPeanutFeedObject *)photoObject
     fromStrandPosts:(DFPeanutFeedObject *)strandPosts

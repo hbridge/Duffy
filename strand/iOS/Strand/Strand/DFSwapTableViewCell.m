@@ -36,4 +36,13 @@
   return UIEdgeInsetsMake(0, 15, 0, 15);
 }
 
+- (void)layoutSubviews
+{
+  [super layoutSubviews];
+  if (self.peopleLabel.preferredMaxLayoutWidth != self.peopleLabel.frame.size.width) {
+    self.peopleLabel.preferredMaxLayoutWidth = self.peopleLabel.frame.size.width;
+    [self setNeedsLayout];
+  }
+}
+
 @end

@@ -25,6 +25,12 @@
 #import "DFSwapUpsell.h"
 #import "DFInviteFriendViewController.h"
 #import "DFBackgroundLocationManager.h"
+#import "DFPeanutStrandInviteAdapter.h"
+#import "DFReviewSwapViewController.h"
+#import "DFSwapAddPhotosCell.h"
+#import <MMPopLabel/MMPopLabel.h>
+#import <SVProgressHUD/SVProgressHUD.h>
+#import "DFSwapSuggestionTableViewCell.h"
 
 @interface DFSwapViewController ()
 
@@ -35,13 +41,17 @@
 @property (nonatomic, retain) NSArray *allSuggestions;
 @property (nonatomic, retain) NSMutableArray *ignoredSuggestions;
 @property (nonatomic, retain) NSMutableArray *filteredSuggestions;
+@property (nonatomic, retain) NSMutableArray *notNowedSuggestions;
 @property (nonatomic, retain) NSArray *systemUpsells;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestionToUpsellAdd;
+@property (nonatomic, retain) MMPopLabel *popLabel;
+@property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
 
 @end
 
-const NSUInteger MaxSuggestionsToShow = 3;
-NSString *const InvitesSectionTitle = @"Requested Swaps";
-NSString *const SuggestedSectionTitle = @"Suggested Swaps";
+const NSUInteger MaxSuggestionsToShow = 1;
+NSString *const InvitesSectionTitle = @"Send Back Photos";
+NSString *const SuggestedSectionTitle = @"Get Photos";
 
 @implementation DFSwapViewController
 
@@ -61,6 +71,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     [self observeNotifications];
     [self configureNavAndTab];
     self.ignoredSuggestions = [NSMutableArray new];
+    self.notNowedSuggestions = [NSMutableArray new];
   }
   return self;
 }
@@ -99,6 +110,8 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     // Do any additional setup after loading the view from its nib.
   [self configureTableView:self.tableView];
   [self configureRefreshControl];
+  self.popLabel = [MMPopLabel popLabelWithText:@"Swipe right to request, left to hide"];
+  [self.view addSubview:self.popLabel];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -150,8 +163,11 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   forCellReuseIdentifier:@"invite"];
   [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
   forCellReuseIdentifier:@"suggestion"];
-  [tableView registerNib:[UINib nibForClass:[DFSwapTableViewCell class]]
+  [tableView registerNib:[UINib nibForClass:[DFSwapSuggestionTableViewCell class]]
   forCellReuseIdentifier:@"upsell"];
+  [tableView registerNib:[UINib nibForClass:[DFSwapAddPhotosCell class]]
+  forCellReuseIdentifier:@"addPhotosUpsell"];
+  
   
   self.tableView.separatorInset = [DFSwapTableViewCell edgeInsets];
 }
@@ -206,8 +222,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     }
     invites = filteredInvites;
   }
-  [self.sectionTitles addObject:InvitesSectionTitle];
+  
   if (invites.count > 0) {
+    [self.sectionTitles addObject:InvitesSectionTitle];
     self.sectionTitlesToObjects[InvitesSectionTitle] = invites;
   }
 }
@@ -228,17 +245,17 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (void)reloadUpsells
 {
-  NSMutableArray *upsells = [NSMutableArray new];
-  if (self.allSuggestions.count == 0
-      && [[DFBackgroundLocationManager sharedManager] canPromptForAuthorization]) {
-    DFSwapUpsell *locationUpsell = [[DFSwapUpsell alloc] init];
-    locationUpsell.type = DFSwapUpsellLocation;
-    [upsells addObject:locationUpsell];
-  }
-  DFSwapUpsell *inviteUpsell = [[DFSwapUpsell alloc] init];
-  inviteUpsell.type = DFSwapUpsellInviteFriends;
-  [upsells addObject:inviteUpsell];
-  self.systemUpsells = upsells;
+//  NSMutableArray *upsells = [NSMutableArray new];
+//  if (self.allSuggestions.count == 0
+//      && [[DFBackgroundLocationManager sharedManager] canPromptForAuthorization]) {
+//    DFSwapUpsell *locationUpsell = [[DFSwapUpsell alloc] init];
+//    locationUpsell.type = DFSwapUpsellLocation;
+//    [upsells addObject:locationUpsell];
+//  }
+//  DFSwapUpsell *inviteUpsell = [[DFSwapUpsell alloc] init];
+//  inviteUpsell.type = DFSwapUpsellInviteFriends;
+//  [upsells addObject:inviteUpsell];
+  self.systemUpsells = @[];
 }
 
 - (void)reloadSuggestionsSection
@@ -246,10 +263,16 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   /* Reloads the suggestions section from the allSuggestions array, broken out
    so it can be called from the swipe handler safely */
   [self.sectionTitles addObject:SuggestedSectionTitle];
+  if (self.suggestionToUpsellAdd) {
+    self.sectionTitlesToObjects[SuggestedSectionTitle] = @[self.suggestionToUpsellAdd];
+    return;
+  }
+
   self.sectionTitlesToObjects[SuggestedSectionTitle] = [NSMutableArray new];
   if (self.allSuggestions.count > 0) {
     self.filteredSuggestions = [self.allSuggestions mutableCopy];
     [self.filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
+    [self.filteredSuggestions removeObjectsInArray:self.notNowedSuggestions];
     DDLogVerbose(@"allCount:%@ ignoredCount:%@ filteredCount:%@",
                  @(self.allSuggestions.count), @(self.ignoredSuggestions.count), @(self.filteredSuggestions.count));
     if (self.filteredSuggestions.count > MaxSuggestionsToShow) {
@@ -343,7 +366,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  NSUInteger minCount = 1;
+  NSUInteger minCount = 0;
+  if ([self.sectionTitles[section] isEqualToString:InvitesSectionTitle]) minCount = 0;
+  if ([self.sectionTitles[section] isEqualToString:SuggestedSectionTitle]) minCount = 1;
   return MAX([[self sectionObjectsForSection:section] count], minCount);
 }
 
@@ -357,7 +382,11 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
       cell = [self cellForInviteObject:object indexPath:indexPath];
     } else if ([feedObject.type isEqual:DFFeedObjectSwapSuggestion]) {
-      cell = [self cellForSuggestionObject:object indexPath:indexPath];
+      if ([object isEqual:self.suggestionToUpsellAdd]) {
+        cell = [self addPhotosUpsellCellForSuggestion:object indexPath:indexPath];
+      } else {
+        cell = [self cellForSuggestionObject:object indexPath:indexPath];
+      }
     }
   } else if ([[object class] isSubclassOfClass:[DFSwapUpsell class]]) {
     cell = [self cellForUpsell:object indexPath:indexPath];
@@ -386,7 +415,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   DFPeanutFeedObject *strandPosts = [[inviteObject subobjectsOfType:DFFeedObjectStrandPosts] firstObject];
   DFSwapTableViewCell *inviteCell = [self.tableView dequeueReusableCellWithIdentifier:@"invite"];
   
-  NSString *titleLabelMarkup = [NSString stringWithFormat:@"From <name>%@</name>",
+  NSString *titleLabelMarkup = [NSString stringWithFormat:@"<name>%@</name> wants your photos",
                                 inviteObject.actorsString];
   [self configureCell:inviteCell
             indexPath:indexPath
@@ -447,7 +476,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
 
 - (UITableViewCell *)cellForSuggestionObject:(DFPeanutFeedObject *)suggestionObject indexPath:(NSIndexPath *)indexPath
 {
-  DFSwapTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
+  DFSwapSuggestionTableViewCell *suggestionCell = [self.tableView dequeueReusableCellWithIdentifier:@"suggestion"];
   suggestionCell.profilePhotoStackView.peanutUsers = suggestionObject.actors;
     // the suggestion sections don't include this user in the actors list
   
@@ -460,7 +489,7 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     titleMarkup = suggestionObject.title;
     suggestionCell.profileReplacementImageView.image = [UIImage imageNamed:@"Assets/Icons/PhotosSuggestionIcon"];
   } else {
-    titleMarkup = [NSString stringWithFormat:@"with <name>%@</name>", [suggestionObject actorsString]];
+    titleMarkup = [NSString stringWithFormat:@"<name>%@</name> have photos from when you took this photo", [suggestionObject actorsString]];
     suggestionCell.profileReplacementImageView.image = nil;
   }
   
@@ -469,8 +498,55 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
       withPeanutUsers:suggestionObject.actors
           titleMarkup:titleMarkup
            feedObject:suggestionObject];
+  [self configureActionsForSuggestion:suggestionObject
+                                 cell:suggestionCell
+                            indexPath:indexPath];
   
   return suggestionCell;
+}
+
+- (void)configureActionsForSuggestion:(DFPeanutFeedObject *)sugestion
+                                 cell:(DFSwapTableViewCell *)cell
+                                indexPath:(NSIndexPath *)indexPath
+{
+  UILabel *hideLabel = [[UILabel alloc] init];
+  hideLabel.text = @"Not Now";
+  hideLabel.textColor = [UIColor whiteColor];
+  [hideLabel sizeToFit];
+  [cell
+   setSwipeGestureWithView:hideLabel
+   color:[DFStrandConstants strandYellow]
+   mode:MCSwipeTableViewCellModeExit
+   state:MCSwipeTableViewCellState3
+   completionBlock:[self notNowSwipeBlockForSuggestion:sugestion indexPath:indexPath]];
+  
+  
+  UILabel *requestLabel = [[UILabel alloc] init];
+  requestLabel.text = @"Request";
+  requestLabel.textColor = [UIColor whiteColor];
+  [requestLabel sizeToFit];
+  [cell
+   setSwipeGestureWithView:requestLabel
+   color:[DFStrandConstants strandGreen]
+   mode:MCSwipeTableViewCellModeExit
+   state:MCSwipeTableViewCellState1
+   completionBlock:[self requestSwipeBlockForSuggestion:sugestion indexPath:indexPath]];
+  
+  // the default color is the color that appears before you swipe far enough for the action
+  // we set to the group tableview background color to blend in
+  cell.defaultColor = [UIColor lightGrayColor];
+
+}
+
+- (UITableViewCell *)addPhotosUpsellCellForSuggestion:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
+{
+  DFSwapAddPhotosCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"addPhotosUpsell"];
+  
+  cell.cancelBlock = [self cancelBlockForAddPhotosForSuggestion:suggestion indexPath:indexPath];
+  
+  cell.okBlock = [self okBlockForAddPhotosForSuggestion:suggestion indexPath:indexPath];
+  
+  return cell;
 }
 
 - (UITableViewCell *)cellForUpsell:(DFSwapUpsell *)upsell indexPath:(NSIndexPath *)indexPath
@@ -489,6 +565,17 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   return self.sectionTitles[section];
 }
 
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+  if ([self.sectionTitles[indexPath.section] isEqualToString:InvitesSectionTitle]) {
+    return 69.0;
+  } else if ([self.sectionTitles[indexPath.section] isEqualToString:SuggestedSectionTitle]){
+    return 102.0;
+  }
+  
+  return 69.0;
+}
+
 #pragma mark - Actions
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
@@ -497,13 +584,9 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   if ([[object class] isSubclassOfClass:[DFPeanutFeedObject class]]) {
     DFPeanutFeedObject *feedObject = (DFPeanutFeedObject *)object;
     if ([feedObject.type isEqual:DFFeedObjectInviteStrand]) {
-      DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:object];
-      [self.navigationController pushViewController:feedViewController animated:YES];
+      [self inviteTapped:feedObject];
     } else if ([feedObject.type isEqual:DFFeedObjectSwapSuggestion]) {
-      DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
-                                                            initWithHighlightedPhotoCollection:object];
-      [self presentViewController:createStrandFlow animated:YES completion:nil];
-      createStrandFlow.extraAnalyticsInfo = feedObject.suggestionAnalyticsSummary;
+      [self suggestionTapped:feedObject indexPath:indexPath];
     }
   } else if ([[object class] isSubclassOfClass:[DFSwapUpsell class]]) {
     DFSwapUpsell *upsell = (DFSwapUpsell *)object;
@@ -515,6 +598,155 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
     }
   }
   [tableView deselectRowAtIndexPath:indexPath animated:NO];
+}
+
+- (void)inviteTapped:(DFPeanutFeedObject *)invite
+{
+  if (invite.strandPostsObject.objects.count > 0) {
+    DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:invite];
+    [self.navigationController pushViewController:feedViewController animated:YES];
+  } else {
+    // this is a request for photos
+    DFPeanutFeedObject *suggestionsObject = [[invite subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+    NSArray *suggestions = suggestionsObject.objects;
+    DFReviewSwapViewController *addPhotosController =
+    [[DFReviewSwapViewController alloc]
+     initWithSuggestions:suggestions
+     invite:invite
+     swapSuccessful:^{
+       
+     }];
+    DFNavigationController *navController = [[DFNavigationController alloc]
+                                             initWithRootViewController:addPhotosController];
+    addPhotosController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                            initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                            target:self
+                                                            action:@selector(dismissReviewSwap:)];
+    [self presentViewController:navController animated:YES completion:nil];
+
+  }
+}
+
+- (void)dismissReviewSwap:(id)sender
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (void)suggestionTapped:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
+{
+  DFSwapTableViewCell *cell = (DFSwapTableViewCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+  [self.popLabel popAtView:cell animatePopLabel:YES animateTargetView:NO];
+  [UIView animateWithDuration:0.2 delay:0 usingSpringWithDamping:cell.damping initialSpringVelocity:cell.velocity options:UIViewAnimationOptionCurveEaseInOut | UIViewAnimationOptionAutoreverse animations:^{
+    CGRect frame = cell.frame;
+    frame.origin.x = 20;
+    cell.frame = frame;
+  } completion:^(BOOL finished) {
+    CGRect frame = cell.frame;
+    frame.origin.x = 0;
+    cell.frame = frame;
+  }];
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [self.popLabel dismiss];
+  });
+  
+}
+
+- (MCSwipeCompletionBlock)requestSwipeBlockForSuggestion:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
+{
+  return ^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+    [self requestPhotosForSuggestion:suggestion];
+    
+  };
+}
+
+- (void)requestPhotosForSuggestion:(DFPeanutFeedObject *)suggestion
+{
+  [[DFPeanutFeedDataManager sharedManager]
+   createRequestFromSuggestion:suggestion
+   contacts:suggestion.actors
+   success:^(DFPeanutStrand *resultStrand) {
+     DDLogInfo(@"%@ created empty strand", self.class);
+     self.suggestionToUpsellAdd = suggestion;
+     [self.notNowedSuggestions addObject:suggestion];
+     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:self.sectionTitles.count - 1]]
+                           withRowAnimation:UITableViewRowAnimationFade];
+     
+     self.lastCreatedStrand = resultStrand;
+     
+     DFPeanutStrandInviteAdapter *adapter = [[DFPeanutStrandInviteAdapter alloc] init];
+     [adapter
+      sendInvitesForStrand:resultStrand
+      toPeanutContacts:suggestion.actors
+      inviteLocationString:suggestion.location
+      invitedPhotosDate:resultStrand.first_photo_time
+      success:^(DFSMSInviteStrandComposeViewController *composeView) {
+        DDLogInfo(@"%@ created empty strand and invite successful", self.class);
+        
+      } failure:^(NSError *error) {
+        DDLogError(@"%@ invite failed: %@", self.class, error);
+      }];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ creating empty strand failed: %@", self.class, error);
+   }];
+}
+
+- (MCSwipeCompletionBlock)notNowSwipeBlockForSuggestion:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
+{
+  return ^(MCSwipeTableViewCell *cell, MCSwipeTableViewCellState state, MCSwipeTableViewCellMode mode) {
+    [self.ignoredSuggestions addObject:suggestion];
+    [self reloadSuggestionsSection];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+  };
+}
+
+- (DFVoidBlock)cancelBlockForAddPhotosForSuggestion:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
+{
+  return ^{
+    self.suggestionToUpsellAdd = nil;
+    [self reloadSuggestionsSection];
+    [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationFade];
+  };
+}
+
+- (DFVoidBlock)okBlockForAddPhotosForSuggestion:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
+{
+  return ^{
+    NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrandsByDateAscending:YES];
+    DFSelectPhotosViewController *selectPhotosViewController = [[DFSelectPhotosViewController alloc]
+                                                                initWithCollectionFeedObjects:privateStrands
+                                                                highlightedFeedObject:suggestion];
+    
+    selectPhotosViewController.highlightedFeedObject = suggestion;
+    selectPhotosViewController.navigationItem.title = @"Add Photos";
+    selectPhotosViewController.actionButtonVerb = @"Add";
+    selectPhotosViewController.delegate = self;
+    DFNavigationController *navController = [[DFNavigationController alloc]
+                                             initWithRootViewController:selectPhotosViewController];
+    
+    [self presentViewController:navController animated:YES completion:nil];
+  };
+}
+
+- (void)selectPhotosViewController:(DFSelectPhotosViewController *)controller
+     didFinishSelectingFeedObjects:(NSArray *)selectedFeedObjects
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+  [[DFPeanutFeedDataManager sharedManager]
+   addFeedObjects:selectedFeedObjects
+   toStrandWithID:self.lastCreatedStrand.id.longLongValue
+   success:^{
+     DDLogInfo(@"%@ added photos to %@ after sending request", self.class, self.lastCreatedStrand.id);
+     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+       [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+     });
+     self.suggestionToUpsellAdd = nil;
+     [self reloadSuggestionsSection];
+     [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:1]]
+                           withRowAnimation:UITableViewRowAnimationFade];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ failed to addPhotos after sending request: %@", self.class, error);
+     [SVProgressHUD showErrorWithStatus:@"Failed."];
+   }];
 }
 
 

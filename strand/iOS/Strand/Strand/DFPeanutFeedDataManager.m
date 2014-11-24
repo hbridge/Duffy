@@ -629,12 +629,12 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (void)addFeedObjects:(NSArray *)feedObjects
-         toStrandPosts:(DFPeanutFeedObject *)strandPosts
+        toStrandWithID:(DFStrandIDType)strandID
                success:(DFSuccessBlock)success
                failure:(DFFailureBlock)failure
 {
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
-  requestStrand.id = @(strandPosts.id);
+  requestStrand.id = @(strandID);
   
   NSMutableArray *photoIDs = [NSMutableArray new];
   for (DFPeanutFeedObject *feedObject in feedObjects) {
@@ -713,7 +713,6 @@ static DFPeanutFeedDataManager *defaultManager;
                      selectedPeanutContacts:(NSArray *)selectedPeanutContacts
                           success:(void(^)(DFPeanutStrand *resultStrand))success
                           failure:(DFFailureBlock)failure
-
 {
   // Create the strand
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
@@ -742,6 +741,34 @@ static DFPeanutFeedDataManager *defaultManager;
      // start uploading the photos
      [[DFPhotoStore sharedStore] markPhotosForUpload:peanutStrand.photos];
      [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:peanutStrand.photos];
+     success(peanutStrand);
+   } failure:^(NSError *error) {
+     failure(error);
+     DDLogError(@"%@ failed to create strand: %@, error: %@",
+                self.class, requestStrand, error);
+   }];
+}
+
+- (void)createRequestFromSuggestion:(DFPeanutFeedObject *)suggestion
+                           contacts:(NSArray *)peanutContacts
+                            success:(void(^)(DFPeanutStrand *resultStrand))success
+                            failure:(DFFailureBlock)failure
+{
+  // Create the strand
+  DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
+  requestStrand.users = @[@([[DFUser currentUser] userID])];
+  requestStrand.created_from_id = @(suggestion.id);
+  requestStrand.private = @(NO);
+  [self setTimesForStrand:requestStrand fromPhotoObjects:[suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto]];
+  
+  [self.strandAdapter
+   performRequest:RKRequestMethodPOST
+   withPeanutStrand:requestStrand
+   success:^(DFPeanutStrand *peanutStrand) {
+     DDLogInfo(@"%@ successfully created strand: %@", self.class, peanutStrand);
+     [[NSNotificationCenter defaultCenter]
+      postNotificationName:DFStrandReloadRemoteUIRequestedNotificationName
+      object:self];
      success(peanutStrand);
    } failure:^(NSError *error) {
      failure(error);
