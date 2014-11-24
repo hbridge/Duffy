@@ -411,10 +411,11 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
   DFPeanutFeedObject *suggestions = [[inviteObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
   DFSwapTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"invite"];
   
-  NSString *titleLabelMarkup = [NSString stringWithFormat:@"<name>%@</name> wants your photos",
-                                inviteObject.actorsString];
+  NSString *titleLabelMarkup = [NSString stringWithFormat:@"<name>%@</name> %@ your photos",
+                                inviteObject.actorsString,
+                                inviteObject.actors.count == 1 ? @"wants" : @"want"];
   if (inviteObject.location) {
-    titleLabelMarkup = [titleLabelMarkup stringByAppendingFormat:@"from %@", inviteObject.location];
+    titleLabelMarkup = [titleLabelMarkup stringByAppendingFormat:@" from %@", inviteObject.location];
   }
   cell.profilePhotoStackView.peanutUsers = inviteObject.actors;
   NSError *error;
