@@ -2383,7 +2383,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "1951a244-2738-4845-b0e4-a2ae2952606c";
+				PROVISIONING_PROFILE = "dffcd1c9-78f6-4db5-8fd4-846c427b82fa";
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Strand/Strand-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
