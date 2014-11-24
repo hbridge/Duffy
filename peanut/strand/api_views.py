@@ -477,7 +477,7 @@ def getInviteObjectsDataForUser(user):
 		for photo in invitePhotos:
 			if photo.user_id != user.id and not photo.full_filename:
 				fullsLoaded = False
-				logger.info("Not showing invite %s because photo %s doesn't have a full" % (invite.id, photo.id))
+				logger.info("Not showing invite %s for user %s because photo %s doesn't have a full" % (invite.id, user.id, photo.id))
 				
 		if fullsLoaded:
 			if user.first_run_sync_count == 0 or user.first_run_sync_complete:
@@ -495,7 +495,12 @@ def getInviteObjectsDataForUser(user):
 						inviteIsReady = False
 						logger.info("Marking invite %s for user %s not ready because I don't think we've stranded everything yet  %s  %s" % (invite.id, user.id, lastStrandedPhoto.time_taken, user.last_photo_timestamp))
 
-			title = "shared %s photos with you" % invite.strand.photos.count()
+			invitePhotoCount = len(invite.strand.photos.all())
+			if invitePhotoCount > 0:
+				title = "shared %s photos with you" % invitePhotoCount
+			else:
+				title = "would like your photos"
+				
 			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(list(invite.strand.users.all())), 'time_stamp': invite.added}
 			entry['ready'] = inviteIsReady
 			entry['objects'] = list()
@@ -510,8 +515,14 @@ def getInviteObjectsDataForUser(user):
 			suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
 
 			suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, friends = friends, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId)
-
+				
 			entry['objects'].append(suggestionsEntry)
+
+			if invitePhotoCount > 0:
+				entry['location'] = strands_util.getLocationForStrand(invite.strand)
+			elif len(suggestionsEntry['objects']) > 0:
+				entry['location'] = suggestionsEntry['objects'][0]['location']
+
 
 			responseObjects.append(entry)
 
