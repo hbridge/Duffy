@@ -21,7 +21,7 @@ class PhotoAdmin(admin.ModelAdmin):
 admin.site.register(Photo, PhotoAdmin)
 
 class StrandAdmin(admin.ModelAdmin):
-	readonly_fields = ('users_link', 'photos_link')
+	readonly_fields = ('users_link', 'photos_link', 'strand_neighbors_link', 'user_neighbors_link')
 	exclude = ('photos', 'users')
 	list_display = ['id', 'sharing_info', 'user_info', 'photo_info', 'photo_posts_info', 'first_photo_time', 'last_photo_time', 'added', 'updated']
 admin.site.register(Strand, StrandAdmin)

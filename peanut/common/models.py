@@ -623,6 +623,36 @@ class Strand(models.Model):
 
 	users_link.allow_tags = True
 	users_link.short_description = "Users"
+
+	def strand_neighbors_link(self):
+		neighbors = StrandNeighbor.objects.filter(Q(strand_1_id=self.id) | Q(strand_2_id=self.id))
+		links = list()
+		for neighbor in neighbors:
+			strand = None
+			if neighbor.strand_1_id == self.id:
+				strand = neighbor.strand_2
+			if neighbor.strand_2:
+				if neighbor.strand_2_id == self.id:
+					strand = neighbor.strand_1
+
+			if strand:
+				links.append('<a href="%s">%s</a>' % (reverse("admin:common_strand_change", args=(strand.id,)) , escape(strand)))
+			
+		return ', '.join(links)		
+	strand_neighbors_link.allow_tags = True
+	strand_neighbors_link.short_description = "Strand Neighbors"
+
+	def user_neighbors_link(self):
+		neighbors = StrandNeighbor.objects.select_related().filter(Q(strand_1_id=self.id) & Q(strand_2_id__isnull=True))
+		links = list()
+		for neighbor in neighbors:
+			user = neighbor.strand_2_user
+			if user.id != self.user_id:
+				links.append('<a href="%s">%s</a>' % (reverse("admin:common_user_change", args=(user.id,)) , escape(user)))
+			
+		return ', '.join(links)		
+	user_neighbors_link.allow_tags = True
+	user_neighbors_link.short_description = "User Neighbors"
 	
 	def getPostPhotos(self):
 		postActions = self.action_set.filter(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
