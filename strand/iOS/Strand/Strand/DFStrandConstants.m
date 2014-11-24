@@ -173,6 +173,16 @@ static NSArray *colors;
                                         NSForegroundColorAttributeName : [UIColor whiteColor],
                                         NSShadowAttributeName : badgeShadow
                                         };
+        
+        
+        NSShadow *suggestionShadow = [[NSShadow alloc] init];
+        suggestionShadow.shadowOffset = CGSizeMake(0, 2);
+        suggestionShadow.shadowBlurRadius = 4.0;
+        defaultStyle[@"suggestiontitle"] = @{
+                                        NSFontAttributeName : [helveticaNeue fontWithSize:18.0],
+                                        NSForegroundColorAttributeName : [UIColor whiteColor],
+                                        NSShadowAttributeName : suggestionShadow
+                                        };
       }
       if (helveticaNeueBold) {
         defaultStyle[@"strong"] = @{NSFontAttributeName : helveticaNeueBold};

@@ -20,6 +20,7 @@ UIPageViewControllerDataSource>
 @property (nonatomic, retain) DFPeanutFeedObject *activePhoto;
 @property (readonly, nonatomic, retain) DFPhotoViewController *currentPhotoViewController;
 @property (nonatomic) BOOL theatreModeEnabled;
+@property (nonatomic, retain) NSString *navigationTitle;
 
 
 

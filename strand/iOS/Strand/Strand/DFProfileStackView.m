@@ -85,6 +85,7 @@
   _abbreviationsById = abbreviations;
   _imagesById = images;
   
+  [self sizeToFit];
   [self setNeedsDisplay];
 }
 
@@ -123,9 +124,9 @@
 {
   CGSize newSize = size;
   newSize.height = self.profilePhotoWidth;
-  newSize.width = (CGFloat)MIN(self.maxProfilePhotos + 1, self.peanutUsers.count) * self.profilePhotoWidth
-  + MAX(self.peanutUsers.count - 1, 0) * 2.0;
-  return newSize;
+  NSUInteger lastIndex = MIN(self.peanutUsers.count, self.maxProfilePhotos) - 1;
+  CGRect lastFrame = [self rectForIndex:lastIndex];
+  return CGSizeMake(CGRectGetMaxX(lastFrame), lastFrame.size.height);
 }
 
 - (CGRect)rectForIndex:(NSUInteger)index

@@ -75,6 +75,15 @@
   [super didReceiveMemoryWarning];
 }
 
+- (void)setNavigationTitle:(NSString *)navigationTitle
+{
+  self.pageViewController.navigationItem.title = navigationTitle;
+}
+
+- (NSString *)navigationTitle
+{
+  return self.pageViewController.navigationItem.title;
+}
 
 - (void)setActivePhoto:(DFPeanutFeedObject *)photo inPhotos:(NSArray *)photos
 {

@@ -9,9 +9,10 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutUserObject.h"
 #import "DFSelectPhotosViewController.h"
+#import "DFPeoplePickerViewController.h"
 
 @interface DFSwapViewController : UIViewController
-  <UITableViewDataSource, UITableViewDelegate, DFSelectPhotosViewControllerDelegate>
+  <UITableViewDataSource, UITableViewDelegate, DFSelectPhotosViewControllerDelegate, DFPeoplePickerDelegate>
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (nonatomic) DFPeanutUserObject *userToFilter;
 

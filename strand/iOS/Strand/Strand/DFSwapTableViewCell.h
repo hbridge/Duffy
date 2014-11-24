@@ -12,7 +12,7 @@
 
 @interface DFSwapTableViewCell : MCSwipeTableViewCell
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
-@property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
+@property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subTitleLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *previewImageView;
 @property (weak, nonatomic) IBOutlet UIImageView *profileReplacementImageView;

@@ -39,8 +39,8 @@
 - (void)layoutSubviews
 {
   [super layoutSubviews];
-  if (self.peopleLabel.preferredMaxLayoutWidth != self.peopleLabel.frame.size.width) {
-    self.peopleLabel.preferredMaxLayoutWidth = self.peopleLabel.frame.size.width;
+  if (self.topLabel.preferredMaxLayoutWidth != self.topLabel.frame.size.width) {
+    self.topLabel.preferredMaxLayoutWidth = self.topLabel.frame.size.width;
     [self setNeedsLayout];
   }
 }

@@ -87,6 +87,19 @@ NSString *const ContactsSectionTitle = @"Contacts";
   return self;
 }
 
+- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers
+{
+  NSArray *peanutContacts = [suggestedPeanutedUsers arrayByMappingObjectsWithBlock:^id(id input) {
+    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
+    return contact;
+  }];
+  self = [self initWithSuggestedPeanutContacts:peanutContacts];
+  if (self) {
+    
+  }
+  return self;
+}
+
 - (void)viewDidLoad
 {
   [super viewDidLoad];
