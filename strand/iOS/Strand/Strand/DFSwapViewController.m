@@ -465,7 +465,7 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
     cell.profileReplacementImageView.image = [UIImage imageNamed:@"Assets/Icons/PhotosSuggestionIcon"];
   } else {
     if (suggestionObject.location) {
-      title = [NSString stringWithFormat:@"Get photos from %@", suggestionObject.location];
+      title = [NSString stringWithFormat:@"Get more photos from %@", suggestionObject.location];
       subtitle = [NSDateFormatter
                   relativeTimeStringSinceDate:suggestionObject.time_taken
                   abbreviate:NO];
@@ -476,7 +476,9 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
       subtitle = nil;
     }
     cell.profileReplacementImageView.image = nil;
-    cell.explanationLabel.text = [NSString stringWithFormat:@"%@ have photos", suggestionObject.actorsString];
+    cell.explanationLabel.text = [NSString stringWithFormat:@"%@ %@ photos",
+                                  suggestionObject.actorsString,
+                                  suggestionObject.actors.count == 1 ? @"has" : @"have"];
   }
   
   titleMarkup = [NSString stringWithFormat:@"<suggestiontitle>%@</suggestiontitle>", title];

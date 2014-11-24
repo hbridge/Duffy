@@ -21,6 +21,8 @@
 
 @implementation DFMultiPhotoViewController
 
+@synthesize navigationTitle = _navigationTitle;
+
 
 - (id)init
 {
@@ -48,7 +50,7 @@
   _pageViewController.dataSource = self;
   _pageViewController.automaticallyAdjustsScrollViewInsets = NO;
   
-  _pageViewController.navigationItem.title = @"Preview";
+  _pageViewController.navigationItem.title = self.navigationTitle ? self.navigationTitle : @"Preview";
   _pageViewController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
                                                             initWithImage:[UIImage imageNamed:@"Assets/Icons/BackNavButton"]
                                                             style:UIBarButtonItemStylePlain
@@ -77,12 +79,8 @@
 
 - (void)setNavigationTitle:(NSString *)navigationTitle
 {
+  _navigationTitle = navigationTitle;
   self.pageViewController.navigationItem.title = navigationTitle;
-}
-
-- (NSString *)navigationTitle
-{
-  return self.pageViewController.navigationItem.title;
 }
 
 - (void)setActivePhoto:(DFPeanutFeedObject *)photo inPhotos:(NSArray *)photos
