@@ -462,8 +462,9 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
   NSString *subtitle;
   NSString *titleMarkup;
   if (suggestionObject.actorNames.count == 0) {
-    titleMarkup = suggestionObject.title;
+    title = [NSString stringWithFormat:@"Get photos from %@", suggestionObject.title];
     cell.profileReplacementImageView.image = [UIImage imageNamed:@"Assets/Icons/PhotosSuggestionIcon"];
+    cell.explanationLabel.text = @"Get photos from friends";
   } else {
     if (suggestionObject.location) {
       title = [NSString stringWithFormat:@"Get more photos from %@", suggestionObject.location];
