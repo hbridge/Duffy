@@ -759,17 +759,6 @@ def swaps(request):
 		printStats("swaps-location-suggestions")
 
 		if len(inviteObjects) == 0:
-			# Now do halloween suggestions
-			halloweenNight = pytz.timezone("US/Eastern").localize(datetime.datetime(2014,10,31,21,0,0,0)).astimezone(pytz.timezone("UTC"))
-			lower = halloweenNight - datetime.timedelta(hours=3)
-			upper = halloweenNight + datetime.timedelta(hours=7)
-			halloweenObjects = getObjectsDataForSpecificTime(user, lower, upper, "Halloween", rankNum)
-			rankNum += len(halloweenObjects)
-
-			for objects in halloweenObjects:
-				if objects['id'] not in inviteObjectIds:
-					responseObjects.append(objects)
-			
 			# Now do last night suggestions
 			now = datetime.datetime.utcnow()
 
