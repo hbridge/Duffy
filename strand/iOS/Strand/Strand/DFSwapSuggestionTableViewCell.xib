@@ -67,7 +67,7 @@
                         <rect key="frame" x="0.0" y="181" width="320" height="40"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VuU-a6-XCb">
-                                <rect key="frame" x="161" y="11" width="159" height="18"/>
+                                <rect key="frame" x="161" y="0.0" width="159" height="40"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="0.0"/>
@@ -79,7 +79,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fEi-YX-4Rq">
-                                <rect key="frame" x="0.0" y="11" width="159" height="18"/>
+                                <rect key="frame" x="0.0" y="0.0" width="159" height="40"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="0.0"/>
@@ -94,11 +94,15 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="centerY" secondItem="VuU-a6-XCb" secondAttribute="centerY" id="0m1-hE-WDL"/>
+                            <constraint firstAttribute="bottom" secondItem="VuU-a6-XCb" secondAttribute="bottom" id="Yrv-cP-Y1P"/>
+                            <constraint firstAttribute="bottom" secondItem="fEi-YX-4Rq" secondAttribute="bottom" id="ZQi-eC-IXC"/>
                             <constraint firstAttribute="centerY" secondItem="fEi-YX-4Rq" secondAttribute="centerY" id="aZS-dw-9fi"/>
                             <constraint firstAttribute="trailing" secondItem="VuU-a6-XCb" secondAttribute="trailing" id="dtl-lF-fjY"/>
                             <constraint firstItem="VuU-a6-XCb" firstAttribute="leading" secondItem="fEi-YX-4Rq" secondAttribute="trailing" constant="2" id="g0r-wa-bRt"/>
                             <constraint firstItem="fEi-YX-4Rq" firstAttribute="leading" secondItem="gDU-vm-gRh" secondAttribute="leading" id="jHP-pd-Dsy"/>
                             <constraint firstAttribute="height" constant="40" id="oPw-3d-ciZ"/>
+                            <constraint firstItem="fEi-YX-4Rq" firstAttribute="top" secondItem="gDU-vm-gRh" secondAttribute="top" id="ois-KP-d72"/>
+                            <constraint firstItem="VuU-a6-XCb" firstAttribute="top" secondItem="gDU-vm-gRh" secondAttribute="top" id="rRV-2o-mhn"/>
                             <constraint firstItem="fEi-YX-4Rq" firstAttribute="width" secondItem="VuU-a6-XCb" secondAttribute="width" id="xsH-iO-py9"/>
                         </constraints>
                     </view>
