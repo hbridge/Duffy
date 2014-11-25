@@ -12,6 +12,8 @@
 
 @interface DFRequestsViewController ()
 
+@property (nonatomic, retain) UIPageControl *pageControl;
+
 @end
 
 @implementation DFRequestsViewController
@@ -35,6 +37,40 @@
   [super viewDidLoad];
   
   self.height = self.height;
+  [self configurePageControl];
+}
+
+- (void)configurePageControl
+{
+  if (!self.pageControl) {
+    self.pageControl = [[UIPageControl alloc] init];
+    [self.view addSubview:self.pageControl];
+    self.pageControl.translatesAutoresizingMaskIntoConstraints = NO;
+    [self.view addConstraints:[NSLayoutConstraint
+                              constraintsWithVisualFormat:@"V:[pageControl]-(5)-|"
+                               options:0//NSLayoutFormatDirectionRightToLeft
+                              metrics:nil
+                              views:@{@"pageControl" : self.pageControl}]];
+    [self.view addConstraint:[NSLayoutConstraint constraintWithItem:self.view
+                                                          attribute:NSLayoutAttributeCenterX
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:self.pageControl
+                                                          attribute:NSLayoutAttributeCenterX
+                                                         multiplier:1.0
+                                                           constant:0]];
+    [self.pageControl addConstraint:[NSLayoutConstraint constraintWithItem:self.pageControl
+                                                          attribute:NSLayoutAttributeHeight
+                                                          relatedBy:NSLayoutRelationEqual
+                                                             toItem:nil
+                                                          attribute:NSLayoutAttributeHeight
+                                                         multiplier:1.0
+                                                           constant:10]];
+    self.pageControl.currentPage = 0;
+  }
+  self.pageControl.numberOfPages = self.inviteFeedObjects.count;
+  UIViewController *currentController = self.viewControllers.firstObject;
+  self.pageControl.currentPage = [self indexOfViewController:currentController];
+  [self.pageControl sizeToFit];
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -46,6 +82,7 @@
                    direction:UIPageViewControllerNavigationDirectionForward
                     animated:NO
                   completion:nil];
+    [self configurePageControl];
   }
 }
 
@@ -65,7 +102,13 @@
 - (void)setInviteFeedObjects:(NSArray *)inviteFeedObjects
 {
   _inviteFeedObjects = inviteFeedObjects;
-  
+}
+
+- (NSUInteger)indexOfViewController:(UIViewController *)viewController
+{
+  DFRequestViewController *referenceRequestVC = (DFRequestViewController *)viewController;
+  NSInteger currentIndex = [self.inviteFeedObjects indexOfObject:referenceRequestVC.inviteFeedObject];
+  return currentIndex;
 }
 
 - (DFRequestViewController *)viewControllerForIndex:(NSInteger)index
@@ -85,8 +128,8 @@
       viewControllerBeforeViewController:(UIViewController *)viewController
 {
   if (self.inviteFeedObjects.count < 2) return nil;
-  DFRequestViewController *referenceRequestVC = (DFRequestViewController *)viewController;
-  NSInteger currentIndex = [self.inviteFeedObjects indexOfObject:referenceRequestVC.inviteFeedObject];
+  
+  NSUInteger currentIndex = [self indexOfViewController:viewController];
   NSInteger beforeIndex = currentIndex - 1;
   if (beforeIndex < 0) beforeIndex = self.inviteFeedObjects.count - 1; // wrap around
   return [self viewControllerForIndex:beforeIndex];
@@ -96,11 +139,20 @@
        viewControllerAfterViewController:(UIViewController *)viewController
 {
   if (self.inviteFeedObjects.count < 2) return nil;
-  DFRequestViewController *referenceRequestVC = (DFRequestViewController *)viewController;
-  NSInteger currentIndex = [self.inviteFeedObjects indexOfObject:referenceRequestVC.inviteFeedObject];
+  NSInteger currentIndex = [self indexOfViewController:viewController];
   NSInteger afterIndex = currentIndex + 1;
   if (afterIndex >= self.inviteFeedObjects.count) afterIndex = 0; // wrap around
   return [self viewControllerForIndex:afterIndex];
+}
+
+- (void)pageViewController:(UIPageViewController *)pageViewController
+        didFinishAnimating:(BOOL)finished
+   previousViewControllers:(NSArray *)previousViewControllers
+       transitionCompleted:(BOOL)completed
+{
+  UIViewController *newVC = pageViewController.viewControllers.firstObject;
+  NSUInteger newIndex = [self indexOfViewController:newVC];
+  self.pageControl.currentPage = newIndex;
 }
 
 
