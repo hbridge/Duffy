@@ -46,6 +46,7 @@
 #import "DFPeanutFeedDataManager.h"
 #import "DFGalleryViewController.h"
 #import "DFContactDataManager.h"
+#import "DFSuggestionsPageViewController.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 
@@ -272,13 +273,13 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
   //self.inboxViewController = [[DFInboxViewController alloc] init];
   DFGalleryViewController *gallery = [[DFGalleryViewController alloc] init];
-  DFSwapViewController *swapViewController = [[DFSwapViewController alloc] init];
+  DFSuggestionsPageViewController *suggestionsController = [[DFSuggestionsPageViewController alloc] init];
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
   @[[[DFNavigationController alloc] initWithRootViewController:gallery],
-    [[DFNavigationController alloc] initWithRootViewController:swapViewController],
+    [[DFNavigationController alloc] initWithRootViewController:suggestionsController],
         [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
     [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
     ];

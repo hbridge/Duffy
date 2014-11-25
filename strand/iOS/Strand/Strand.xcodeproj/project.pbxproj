@@ -106,6 +106,9 @@
 		5A87DDFD1A2406620058EB38 /* DFProfileWithContextView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DDFC1A2406620058EB38 /* DFProfileWithContextView.m */; };
 		5A87DDFF1A2406740058EB38 /* DFProfileWithContextView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A87DDFE1A2406740058EB38 /* DFProfileWithContextView.xib */; };
 		5A87DE031A24EEBC0058EB38 /* DFRequestsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DE011A24EEBC0058EB38 /* DFRequestsViewController.m */; };
+		5A87DE081A2507E40058EB38 /* DFSuggestionsPageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DE071A2507E40058EB38 /* DFSuggestionsPageViewController.m */; };
+		5A87DE0C1A2508450058EB38 /* DFSuggestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A87DE0A1A2508450058EB38 /* DFSuggestionViewController.m */; };
+		5A87DE0D1A2508450058EB38 /* DFSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A87DE0B1A2508450058EB38 /* DFSuggestionViewController.xib */; };
 		5A882FAE1A1EAEB4001B123F /* DFSwapAddPhotosCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A882FAC1A1EAEB4001B123F /* DFSwapAddPhotosCell.m */; };
 		5A882FAF1A1EAEB4001B123F /* DFSwapAddPhotosCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A882FAD1A1EAEB4001B123F /* DFSwapAddPhotosCell.xib */; };
 		5A882FB31A1FD32A001B123F /* DFSwapSuggestionTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A882FB11A1FD32A001B123F /* DFSwapSuggestionTableViewCell.m */; };
@@ -461,6 +464,11 @@
 		5A87DDFE1A2406740058EB38 /* DFProfileWithContextView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFProfileWithContextView.xib; sourceTree = "<group>"; };
 		5A87DE001A24EEBC0058EB38 /* DFRequestsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFRequestsViewController.h; sourceTree = "<group>"; };
 		5A87DE011A24EEBC0058EB38 /* DFRequestsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFRequestsViewController.m; sourceTree = "<group>"; };
+		5A87DE061A2507E40058EB38 /* DFSuggestionsPageViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionsPageViewController.h; sourceTree = "<group>"; };
+		5A87DE071A2507E40058EB38 /* DFSuggestionsPageViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionsPageViewController.m; sourceTree = "<group>"; };
+		5A87DE091A2508450058EB38 /* DFSuggestionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSuggestionViewController.h; sourceTree = "<group>"; };
+		5A87DE0A1A2508450058EB38 /* DFSuggestionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSuggestionViewController.m; sourceTree = "<group>"; };
+		5A87DE0B1A2508450058EB38 /* DFSuggestionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSuggestionViewController.xib; sourceTree = "<group>"; };
 		5A882FAB1A1EAEB4001B123F /* DFSwapAddPhotosCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSwapAddPhotosCell.h; sourceTree = "<group>"; };
 		5A882FAC1A1EAEB4001B123F /* DFSwapAddPhotosCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwapAddPhotosCell.m; sourceTree = "<group>"; };
 		5A882FAD1A1EAEB4001B123F /* DFSwapAddPhotosCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwapAddPhotosCell.xib; sourceTree = "<group>"; };
@@ -1208,6 +1216,18 @@
 			name = "Feed Cells";
 			sourceTree = "<group>";
 		};
+		5A87DE051A2507060058EB38 /* Suggestions Tab */ = {
+			isa = PBXGroup;
+			children = (
+				5A87DE061A2507E40058EB38 /* DFSuggestionsPageViewController.h */,
+				5A87DE071A2507E40058EB38 /* DFSuggestionsPageViewController.m */,
+				5A87DE091A2508450058EB38 /* DFSuggestionViewController.h */,
+				5A87DE0A1A2508450058EB38 /* DFSuggestionViewController.m */,
+				5A87DE0B1A2508450058EB38 /* DFSuggestionViewController.xib */,
+			);
+			name = "Suggestions Tab";
+			sourceTree = "<group>";
+		};
 		5A883BDE1A09651D00355C1D /* Strand Gallery */ = {
 			isa = PBXGroup;
 			children = (
@@ -1271,6 +1291,7 @@
 			isa = PBXGroup;
 			children = (
 				5AF64D0119EC618A00EE1473 /* Friends View */,
+				5A87DE051A2507060058EB38 /* Suggestions Tab */,
 				5AA36F0819F80EA8008B37AA /* Swap tab */,
 				5AAF037819AF865E00EF021C /* Create Strand */,
 				5AA38DF2199D19CA00AD1805 /* Notifications */,
@@ -1860,6 +1881,7 @@
 				5AA9293419A66AB700032A3F /* DFNoResultsTableViewCell.xib in Resources */,
 				5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */,
 				5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */,
+				5A87DE0D1A2508450058EB38 /* DFSuggestionViewController.xib in Resources */,
 				5A4C820619ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib in Resources */,
 				5AA9293819A67CC500032A3F /* DFABResultTableViewCell.xib in Resources */,
 				5A249C5A19C3349F0047AE91 /* DFInboxTableViewCell.xib in Resources */,
@@ -2028,6 +2050,7 @@
 				5A7B1859197097AC00E5A1D1 /* DFPeanutInvalidField.m in Sources */,
 				5AC4A9331947C30800862D9C /* DFUploadOperation.m in Sources */,
 				5AAF037719AE888500EF021C /* DFCameraRollSyncOperation.m in Sources */,
+				5A87DE081A2507E40058EB38 /* DFSuggestionsPageViewController.m in Sources */,
 				5A4BBD2B19B7D55500359299 /* DFPeanutFeedAdapter.m in Sources */,
 				5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */,
 				5AC4A93D1947C30800862D9C /* UIImage+DFHelpers.m in Sources */,
@@ -2093,6 +2116,7 @@
 				5AA36F0519F704E7008B37AA /* DFStrandPeopleBarView.m in Sources */,
 				5A40344D196340A0003D7546 /* DFPhotoResizer.m in Sources */,
 				65BEA79719E34FF90087930F /* DFIOS7CameraRollSyncOperation.m in Sources */,
+				5A87DE0C1A2508450058EB38 /* DFSuggestionViewController.m in Sources */,
 				5AC4A93B1947C30800862D9C /* NSDictionary+DFJSON.m in Sources */,
 				5A883BF21A0AC6EE00355C1D /* DFFaceFeature.m in Sources */,
 				65232E9219EC66A400F3832A /* DFPeanutFeedDataManager.m in Sources */,
