@@ -43,7 +43,7 @@
 @property (nonatomic, retain) NSArray *allSuggestions;
 @property (nonatomic, retain) NSMutableArray *ignoredSuggestions;
 @property (nonatomic, retain) NSMutableArray *filteredSuggestions;
-@property (nonatomic, retain) DFPeanutFeedObject *currentSuggestion;
+@property (nonatomic) DFStrandIDType currentSuggestionID;
 @property (nonatomic, retain) NSArray *systemUpsells;
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionToUpsellAdd;
 @property (nonatomic, retain) MMPopLabel *popLabel;
@@ -269,19 +269,23 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
     self.filteredSuggestions = [self.allSuggestions mutableCopy];
     [self.filteredSuggestions removeObjectsInArray:self.ignoredSuggestions];
     
-    if (self.currentSuggestion) {
-      self.currentSuggestion = self.currentSuggestion;
+    if (self.currentSuggestionID) {
+      self.currentSuggestionID = self.currentSuggestionID;
     } else {
-      self.currentSuggestion = self.filteredSuggestions.firstObject;
+      DFPeanutFeedObject *firstSuggestion = self.filteredSuggestions.firstObject;
+      self.currentSuggestionID = firstSuggestion.id;
     }
   }
 }
 
-- (void)setCurrentSuggestion:(DFPeanutFeedObject *)currentSuggestion
+- (void)setCurrentSuggestionID:(DFStrandIDType)currentSuggestionID
 {
-  _currentSuggestion = currentSuggestion;
-  if (currentSuggestion)
+  _currentSuggestionID = currentSuggestionID;
+  if (currentSuggestionID) {
+    NSUInteger suggestionIndex = [self indexOfSuggestionWithID:currentSuggestionID];
+    DFPeanutFeedObject *currentSuggestion = self.filteredSuggestions[suggestionIndex];
     self.sectionTitlesToObjects[SuggestedSectionTitle] = @[currentSuggestion];
+  }
 }
 
 - (void)configureTabCount
@@ -553,7 +557,7 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
   if ([self.sectionTitles[indexPath.section] isEqualToString:InvitesSectionTitle]) {
     return 69.0;
   } else if ([self.sectionTitles[indexPath.section] isEqualToString:SuggestedSectionTitle]){
-    return 222.0;
+    return 300.0;
   }
   
   return 69.0;
@@ -644,7 +648,7 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
    success:^(DFPeanutStrand *resultStrand) {
      DDLogInfo(@"%@ created empty strand", self.class);
      //self.suggestionToUpsellAdd = suggestion;
-     self.currentSuggestion = [self nextSuggestion];
+     self.currentSuggestionID = [self nextSuggestionID];
      [self.tableView reloadRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:self.sectionTitles.count - 1]]
                            withRowAnimation:UITableViewRowAnimationFade];
      
@@ -668,21 +672,35 @@ NSString *const SuggestedSectionTitle = @"Get Photos";
    }];
 }
 
-- (DFPeanutFeedObject *)nextSuggestion
+- (NSUInteger)indexOfSuggestionWithID:(DFStrandIDType)suggestionID
 {
-  if (!self.currentSuggestion) return self.filteredSuggestions.firstObject;
-  NSUInteger indexOfSuggestion = [self.filteredSuggestions indexOfObject:self.currentSuggestion];
+  for (NSUInteger i = 0; i < self.filteredSuggestions.count; i++) {
+    DFPeanutFeedObject *suggestion = self.filteredSuggestions[i];
+    if (suggestion.id == suggestionID) return i;
+  }
+  return NSNotFound;
+}
+
+- (DFStrandIDType)nextSuggestionID
+{
+  DFPeanutFeedObject *firstObject = self.filteredSuggestions.firstObject;
+  if (!self.currentSuggestionID) {
+    return firstObject.id;
+  }
+  NSUInteger indexOfSuggestion = [self indexOfSuggestionWithID:self.currentSuggestionID];
   NSUInteger nextIndex = ++indexOfSuggestion;
   if (nextIndex >= self.filteredSuggestions.count) {
-    return self.filteredSuggestions.firstObject;
+    return firstObject.id;
   }
-  return self.filteredSuggestions[nextIndex];
+  
+  DFPeanutFeedObject *nextObject = self.filteredSuggestions[nextIndex];
+  return nextObject.id;
 }
 
 - (DFVoidBlock)skipBlockForSuggestion:(DFPeanutFeedObject *)suggestion indexPath:(NSIndexPath *)indexPath
 {
   return ^{
-    self.currentSuggestion = [self nextSuggestion];
+    self.currentSuggestionID = [self nextSuggestionID];
     [self reloadSuggestionsSection];
     [self.tableView reloadRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationRight];
   };

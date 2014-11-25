@@ -15,7 +15,7 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="cec-qq-DwM" userLabel="Photo Preview Image View">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="181"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="175"/>
                     </imageView>
                     <view hidden="YES" contentMode="scaleToFill" horizontalHuggingPriority="999" translatesAutoresizingMaskIntoConstraints="NO" id="HXc-tQ-T0d" customClass="DFProfileStackView">
                         <rect key="frame" x="15" y="61" width="25" height="25"/>
@@ -64,10 +64,10 @@
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gDU-vm-gRh" userLabel="ButtonBar">
-                        <rect key="frame" x="0.0" y="181" width="320" height="40"/>
+                        <rect key="frame" x="0.0" y="175" width="320" height="46"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VuU-a6-XCb">
-                                <rect key="frame" x="161" y="0.0" width="159" height="40"/>
+                                <rect key="frame" x="161" y="0.0" width="159" height="46"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="0.0"/>
@@ -79,7 +79,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fEi-YX-4Rq">
-                                <rect key="frame" x="0.0" y="0.0" width="159" height="40"/>
+                                <rect key="frame" x="0.0" y="0.0" width="159" height="46"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2" maxY="0.0"/>
@@ -100,14 +100,14 @@
                             <constraint firstAttribute="trailing" secondItem="VuU-a6-XCb" secondAttribute="trailing" id="dtl-lF-fjY"/>
                             <constraint firstItem="VuU-a6-XCb" firstAttribute="leading" secondItem="fEi-YX-4Rq" secondAttribute="trailing" constant="2" id="g0r-wa-bRt"/>
                             <constraint firstItem="fEi-YX-4Rq" firstAttribute="leading" secondItem="gDU-vm-gRh" secondAttribute="leading" id="jHP-pd-Dsy"/>
-                            <constraint firstAttribute="height" constant="40" id="oPw-3d-ciZ"/>
+                            <constraint firstAttribute="height" constant="46" id="oPw-3d-ciZ"/>
                             <constraint firstItem="fEi-YX-4Rq" firstAttribute="top" secondItem="gDU-vm-gRh" secondAttribute="top" id="ois-KP-d72"/>
                             <constraint firstItem="VuU-a6-XCb" firstAttribute="top" secondItem="gDU-vm-gRh" secondAttribute="top" id="rRV-2o-mhn"/>
                             <constraint firstItem="fEi-YX-4Rq" firstAttribute="width" secondItem="VuU-a6-XCb" secondAttribute="width" id="xsH-iO-py9"/>
                         </constraints>
                     </view>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eSz-bL-5gV" customClass="SAMGradientView">
-                        <rect key="frame" x="0.0" y="130" width="320" height="51"/>
+                        <rect key="frame" x="0.0" y="124" width="320" height="51"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Get photos from friends" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="DYa-5Z-XUJ">
                                 <rect key="frame" x="89" y="21" width="143" height="16"/>
