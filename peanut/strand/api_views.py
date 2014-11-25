@@ -286,7 +286,7 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True):
 	groups = list()
 
 	if friends == None:
@@ -329,7 +329,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		
 		suggestible = strand.suggestible
 
-		if suggestible and len(interestedUsers) == 0:
+		if suggestible and len(interestedUsers) == 0 and requireInterestedUsers:
 			suggestible = False
 			
 		if not strands_util.getLocationForStrand(strand) and locationRequired:
@@ -784,9 +784,9 @@ def swaps(request):
 			lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
 			rankNum += len(lastNightObjects)
 			
-			for objects in lastNightObjects:
-				if objects['id'] not in inviteObjectIds:
-					responseObjects.append(objects)
+			#for objects in lastNightObjects:
+			#	if objects['id'] not in inviteObjectIds:
+			#		responseObjects.append(objects)
 
 			printStats("swaps-time-suggestions")
 
@@ -806,11 +806,25 @@ def swaps(request):
 					suggestion['suggestion_type'] = "friend-nolocation"
 					rankNum += 1
 
-				for objects in noLocationSuggestions:
-					if objects['id'] not in inviteObjectIds:
-						responseObjects.append(objects)
+				for suggestion in noLocationSuggestions:
+					if suggestion['id'] not in inviteObjectIds:
+						responseObjects.append(suggestion)
 
 				printStats("swaps-nolocation-suggestions")
+
+			# Last resort, try throwing in recent photos
+			if len(responseObjects) < 3:
+				# Grab all the latest strands
+				strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).order_by('-first_photo_time')[:20]
+
+				timedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId=neighborStrandsByStrandId,  neighborUsersByStrandId = neighborUsersByStrandId, locationRequired=False, requireInterestedUsers=False)
+				timedSuggestions = sorted(timedSuggestions, key=lambda x: x['time_taken'], reverse=True)
+
+				for suggestion in timedSuggestions:
+					suggestion['suggestion_rank'] = rankNum
+					suggestion['suggestion_type'] = "recent-photos"
+					rankNum += 1
+					responseObjects.append(suggestion)
 		
 		response['objects'] = responseObjects
 	else:
