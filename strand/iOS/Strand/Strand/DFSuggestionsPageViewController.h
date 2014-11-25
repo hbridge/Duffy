@@ -9,10 +9,11 @@
 #import <UIKit/UIKit.h>
 #import "DFPeanutUserObject.h"
 #import "DFPeoplePickerViewController.h"
+#import <MessageUI/MessageUI.h>
 
 
 @interface DFSuggestionsPageViewController : UIPageViewController
-<UIPageViewControllerDataSource, UIPageViewControllerDelegate, DFPeoplePickerDelegate>
+<UIPageViewControllerDataSource, UIPageViewControllerDelegate, DFPeoplePickerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutUserObject *userToFilter;
 

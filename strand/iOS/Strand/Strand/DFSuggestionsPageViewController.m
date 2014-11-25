@@ -12,6 +12,8 @@
 #import "DFNavigationController.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import <SVProgressHUD/SVProgressHUD.h>
+#import "DFNoTableItemsView.h"
+#import "DFUploadController.h"
 
 @interface DFSuggestionsPageViewController ()
 
@@ -20,6 +22,7 @@
 @property (nonatomic, retain) DFPeanutFeedObject *pickedSuggestion;
 @property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
 @property (nonatomic, retain) NSMutableArray *suggestionsToRemove;
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
 @end
 
@@ -73,6 +76,13 @@
   self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 }
 
+- (void)viewWillAppear:(BOOL)animated
+{
+  [super viewWillAppear:animated];
+  [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
+  [self configureNoResultsView];
+}
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -99,6 +109,26 @@
                    direction:UIPageViewControllerNavigationDirectionForward
                     animated:NO
                   completion:nil];
+  }
+  [self configureNoResultsView];
+}
+
+- (void)configureNoResultsView
+{
+  if (self.filteredSuggestions.count == 0) {
+    if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    [self.noResultsView setSuperView:self.view];
+    if ([[DFPeanutFeedDataManager sharedManager] hasSwapsData]
+        && ![[DFUploadController sharedUploadController] isUploadInProgress]) {
+      self.noResultsView.titleLabel.text = @"No Suggestions";
+      [self.noResultsView.activityIndicator stopAnimating];
+    } else {
+      self.noResultsView.titleLabel.text = @"Loading...";
+      [self.noResultsView.activityIndicator startAnimating];
+    }
+  } else {
+    if (self.noResultsView) [self.noResultsView removeFromSuperview];
+    self.noResultsView = nil;
   }
 }
 
@@ -194,14 +224,50 @@
       invitedPhotosDate:resultStrand.first_photo_time
       success:^(DFSMSInviteStrandComposeViewController *composeView) {
         DDLogInfo(@"%@ created empty strand and invite successful", self.class);
-        [SVProgressHUD showSuccessWithStatus:@"Request Sent"];
+
+        if (composeView) {
+          composeView.messageComposeDelegate = self;
+          [self presentViewController:composeView
+                               animated:YES
+                             completion:^{
+                               [SVProgressHUD dismiss];
+                             }];
+        } else {
+          [SVProgressHUD showSuccessWithStatus:@"Request Sent"];
+          [self dismissViewControllerAnimated:YES completion:nil];
+        }
       } failure:^(NSError *error) {
         DDLogError(@"%@ invite failed: %@", self.class, error);
+        [SVProgressHUD showErrorWithStatus:@"Failed"];
       }];
-     [self dismissViewControllerAnimated:YES completion:nil];
+     
    } failure:^(NSError *error) {
      DDLogError(@"%@ creating empty strand failed: %@", self.class, error);
    }];
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+                 didFinishWithResult:(MessageComposeResult)result
+{
+  [self dismissWithErrorString:(result == MessageComposeResultSent ? nil : @"Some invites not sent")];
+}
+
+
+- (void)dismissWithErrorString:(NSString *)errorString
+{
+  void (^completion)(void) = ^{
+    if (!errorString) {
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+      });
+        } else {
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [SVProgressHUD showErrorWithStatus:errorString];
+      });
+    }
+  };
+  
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:completion];
 }
 
 
