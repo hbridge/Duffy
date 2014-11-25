@@ -9,11 +9,19 @@
 #import <UIKit/UIKit.h>
 #import <GBFlatButton/GBFlatButton.h>
 #import "DFProfileWithContextView.h"
+#import "DFPeanutFeedObject.h"
+#import <SAMGradientView/SAMGradientView.h>
 
-@interface DFRequestNotificationView : UIView
+@interface DFRequestViewController : UIViewController
 @property (weak, nonatomic) IBOutlet DFProfileWithContextView *profileWithContextView;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet GBFlatButton *selectPhotosButton;
+@property (weak, nonatomic) IBOutlet SAMGradientView *gradientView;
+@property (nonatomic, retain) DFPeanutFeedObject *inviteFeedObject;
+@property (nonatomic) CGRect frame;
 
+
+@property (nonatomic, copy) DFVoidBlock selectButtonHandler;
+- (IBAction)selectButtonPressed:(id)sender;
 
 @end

@@ -5,15 +5,27 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
     </dependencies>
     <objects>
-        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFRequestViewController">
+            <connections>
+                <outlet property="gradientView" destination="wjt-XJ-ls2" id="UVf-44-0U4"/>
+                <outlet property="imageView" destination="KI5-mP-Wwn" id="nFG-WC-moD"/>
+                <outlet property="profileWithContextView" destination="VwA-ua-9ep" id="ss4-5F-PkV"/>
+                <outlet property="selectPhotosButton" destination="YrP-3q-wej" id="iHk-5z-kmB"/>
+                <outlet property="view" destination="iN0-l3-epB" id="wxR-Z2-lvb"/>
+            </connections>
+        </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
-        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFRequestNotificationView">
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB">
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="KI5-mP-Wwn">
                     <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                 </imageView>
+                <view alpha="0.40000000000000002" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="wjt-XJ-ls2" customClass="SAMGradientView">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
+                </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VwA-ua-9ep" customClass="DFProfileWithContextView">
                     <rect key="frame" x="8" y="8" width="584" height="51"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -35,14 +47,21 @@
                         <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                     </state>
+                    <connections>
+                        <action selector="selectButtonPressed:" destination="-1" eventType="touchUpInside" id="VXo-mb-wAZ"/>
+                    </connections>
                 </button>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstItem="wjt-XJ-ls2" firstAttribute="top" secondItem="KI5-mP-Wwn" secondAttribute="top" id="1JL-No-kIa"/>
                 <constraint firstAttribute="bottom" secondItem="KI5-mP-Wwn" secondAttribute="bottom" id="8VF-bB-Rb5"/>
+                <constraint firstItem="wjt-XJ-ls2" firstAttribute="leading" secondItem="KI5-mP-Wwn" secondAttribute="leading" id="ANI-29-0yQ"/>
                 <constraint firstItem="VwA-ua-9ep" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="BSn-Hu-t63"/>
                 <constraint firstAttribute="trailing" secondItem="KI5-mP-Wwn" secondAttribute="trailing" id="Igy-oN-hWu"/>
                 <constraint firstAttribute="bottom" secondItem="YrP-3q-wej" secondAttribute="bottom" constant="20" id="LeG-5U-tss"/>
+                <constraint firstItem="wjt-XJ-ls2" firstAttribute="trailing" secondItem="KI5-mP-Wwn" secondAttribute="trailing" id="Rhv-eZ-fJD"/>
+                <constraint firstItem="wjt-XJ-ls2" firstAttribute="bottom" secondItem="KI5-mP-Wwn" secondAttribute="bottom" id="Ri7-mO-qsY"/>
                 <constraint firstItem="KI5-mP-Wwn" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Uh4-fE-UAu"/>
                 <constraint firstItem="VwA-ua-9ep" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="Yet-V7-jKA"/>
                 <constraint firstAttribute="centerX" secondItem="YrP-3q-wej" secondAttribute="centerX" id="d0q-wl-8Xb"/>
@@ -50,12 +69,7 @@
                 <constraint firstItem="KI5-mP-Wwn" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="jVW-IJ-xlG"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
-            <connections>
-                <outlet property="imageView" destination="KI5-mP-Wwn" id="T8P-iA-sAA"/>
-                <outlet property="profileWithContextView" destination="VwA-ua-9ep" id="o2Z-Hk-9iU"/>
-                <outlet property="selectPhotosButton" destination="YrP-3q-wej" id="FXD-fa-qF5"/>
-            </connections>
-            <point key="canvasLocation" x="404" y="349"/>
+            <point key="canvasLocation" x="430" y="317"/>
         </view>
     </objects>
 </document>

@@ -7,6 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFRequestsViewController.h"
 
 @class DFNotificationsViewController;
 
@@ -18,7 +19,7 @@
 
 @end
 
-@interface DFNotificationsViewController : UITableViewController
+@interface DFNotificationsViewController : UITableViewController <DFRequestsViewControllerActionDelegate>
 
 @property (nonatomic, retain) id<DFNotificationsViewControllerDelegate> delegate;
 

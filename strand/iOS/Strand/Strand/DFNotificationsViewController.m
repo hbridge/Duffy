@@ -17,7 +17,8 @@
 #import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSIndexPath+DFHelpers.h"
-#import "DFRequestNotificationView.h"
+#import "DFReviewSwapViewController.h"
+#import "DFNavigationController.h"
 
 @interface DFNotificationsViewController ()
 
@@ -26,6 +27,7 @@
 @property (nonatomic, retain) DFNotificationTableViewCell *templateCell;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
 @property (nonatomic, retain) NSMutableDictionary *rowHeightCache;
+@property (nonatomic, retain) DFRequestsViewController *requestsViewController;
 
 @end
 
@@ -143,37 +145,52 @@
 {
   NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
   if (invites.count > 0) {
-    DFPeanutFeedObject *firstInvite = invites.firstObject;
-    DFRequestNotificationView *requestNotifView = [UINib instantiateViewWithClass:[DFRequestNotificationView class]];
-    requestNotifView.profileWithContextView.profileStackView.peanutUsers = firstInvite.actors;
-    requestNotifView.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ requested photos",
-                                                               firstInvite.actorNames.firstObject];
-    requestNotifView.profileWithContextView.subtitleLabel.text = firstInvite.placeAndRelativeTimeString;
-    CGRect frame = requestNotifView.frame;
-    frame.size.height = 200;
-    requestNotifView.frame = frame;
-    [self.tableView setTableHeaderView:requestNotifView];
+    if (!self.requestsViewController) {
+      self.requestsViewController = [[DFRequestsViewController alloc] init];
+      [self addChildViewController:self.requestsViewController];
+      self.requestsViewController.actionDelegate = self;
+    }
     
-    DFPeanutFeedObject *suggestionsObject = [[firstInvite subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
-    DFPeanutFeedObject *firstPhoto = [[suggestionsObject leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-    [[DFImageManager sharedManager]
-     imageForID:firstPhoto.id
-     pointSize:requestNotifView.imageView.frame.size
-     contentMode:DFImageRequestContentModeAspectFill
-     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
-     completion:^(UIImage *image) {
-       requestNotifView.imageView.image = image;
-     }];
-
-    
+    self.requestsViewController.inviteFeedObjects = invites;
+    self.requestsViewController.height = 200;
+    [self.tableView setTableHeaderView:self.requestsViewController.view];
   } else {
     self.tableView.tableHeaderView = nil;
+    [self.requestsViewController removeFromParentViewController];
+    self.requestsViewController = nil;
   }
-
-  
-  
 }
 
+- (void)requestsViewController:(DFRequestsViewController *)requestsViewController
+                inviteSelected:(DFPeanutFeedObject *)invite
+{
+  if (invite.strandPostsObject.objects.count > 0) {
+    DFFeedViewController *feedViewController = [[DFFeedViewController alloc] initWithFeedObject:invite];
+    [self.navigationController pushViewController:feedViewController animated:YES];
+  } else {
+    // this is a request for photos
+    DFPeanutFeedObject *suggestionsObject = [[invite subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+    NSArray *suggestions = suggestionsObject.objects;
+    DFReviewSwapViewController *reviewSwapController =
+    [[DFReviewSwapViewController alloc]
+     initWithSuggestions:suggestions
+     invite:invite
+     swapSuccessful:^{}];
+    DFNavigationController *navController = [[DFNavigationController alloc]
+                                             initWithRootViewController:reviewSwapController];
+    reviewSwapController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                             initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                             target:self
+                                                             action:@selector(dismissReviewSwap:)];
+    [self presentViewController:navController animated:YES completion:nil];
+    
+  }
+}
+
+- (void)dismissReviewSwap:(id)sender
+{
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
 
 #pragma mark - Table view data source
 
