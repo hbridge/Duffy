@@ -823,6 +823,7 @@ def swaps(request):
 				for suggestion in timedSuggestions:
 					suggestion['suggestion_rank'] = rankNum
 					suggestion['suggestion_type'] = "recent-photos"
+					suggestion['title'] = "%s" % (api_util.prettyDate(suggestion['time_taken']))
 					rankNum += 1
 					responseObjects.append(suggestion)
 		
