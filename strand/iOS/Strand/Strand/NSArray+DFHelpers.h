@@ -11,5 +11,6 @@
 @interface NSArray (DFHelpers)
 
 - (NSArray *)arrayByMappingObjectsWithBlock:(id(^)(id input))mappingBlock;
+- (NSArray *)arrayByRemovingObject:(id)object;
 
 @end

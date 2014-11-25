@@ -58,21 +58,30 @@
   self.profileWithContextView.profileStackView.peanutUsers = inviteFeedObject.actors;
   self.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ requested photos",
                                                  inviteFeedObject.actorNames.firstObject];
-  self.profileWithContextView.subtitleLabel.text = sectionObject.placeAndRelativeTimeString;
+  if (sectionObject) {
+    self.profileWithContextView.subtitleLabel.text = sectionObject.placeAndRelativeTimeString;
+  } else {
+    self.profileWithContextView.subtitleLabel.text = inviteFeedObject.strandPostsObject.placeAndRelativeTimeString;
+    [self.selectPhotosButton setTitle:@"No Photos" forState:UIControlStateNormal];
+  }
   DFPeanutFeedObject *suggestionsObject = [[inviteFeedObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
   DFPeanutFeedObject *firstPhoto = [[suggestionsObject leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  [[DFImageManager sharedManager]
-   imageForID:firstPhoto.id
-   pointSize:self.imageView.frame.size
-   contentMode:DFImageRequestContentModeAspectFill
-   deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
-   completion:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       self.imageView.image = image;
-       [self.imageView setNeedsLayout];
-     });
-   }];
-
+  if (firstPhoto) {
+    [[DFImageManager sharedManager]
+     imageForID:firstPhoto.id
+     pointSize:self.imageView.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         self.imageView.image = image;
+         [self.imageView setNeedsLayout];
+       });
+     }];
+  } else {
+    self.view.backgroundColor = [UIColor blackColor];
+  }
+  
 }
 
 

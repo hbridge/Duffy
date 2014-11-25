@@ -102,6 +102,36 @@
 - (void)setInviteFeedObjects:(NSArray *)inviteFeedObjects
 {
   _inviteFeedObjects = inviteFeedObjects;
+  NSUInteger currentIndex = [self indexOfViewController:self.viewControllers.firstObject];
+  [self setViewControllerWithIndex:currentIndex];
+  [self configurePageControl];
+}
+
+- (void)removeInviteFeedObject:(DFPeanutFeedObject *)inviteFeedObject
+{
+  DFPeanutFeedObject *currentInvite = [[self currentViewController] inviteFeedObject];
+  if ([currentInvite isEqual:inviteFeedObject]) {
+    UIViewController *nextVC = [self pageViewController:self viewControllerAfterViewController:[self currentViewController]];
+    if (nextVC)
+      [self setViewControllers:@[nextVC]
+                     direction:UIPageViewControllerNavigationDirectionForward
+                      animated:NO
+                    completion:nil];
+  }
+  self.inviteFeedObjects = [self.inviteFeedObjects arrayByRemovingObject:inviteFeedObject];
+}
+
+- (void)setViewControllerWithIndex:(NSUInteger)index
+{
+  if (index >= self.inviteFeedObjects.count) return;
+  [self setViewControllers:@[[self viewControllerForIndex:index]]
+                 direction:UIPageViewControllerNavigationDirectionForward
+                  animated:NO completion:nil];
+}
+
+- (DFRequestViewController *)currentViewController
+{
+  return (DFRequestViewController *)self.viewControllers.firstObject;
 }
 
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController

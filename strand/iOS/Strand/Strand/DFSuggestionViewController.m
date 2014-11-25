@@ -50,6 +50,7 @@
 
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion
 {
+  if (suggestion.actors.count == 0) self.profileWithContextView.hidden = YES;
   self.profileWithContextView.profileStackView.peanutUsers = suggestion.actors;
   self.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ %@ photos",
                                                  suggestion.actorsString,

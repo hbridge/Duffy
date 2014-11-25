@@ -138,6 +138,9 @@
   [[DFPeanutFeedDataManager sharedManager] refreshActionsFromServer:^{
     [self.refreshControl endRefreshing];
   }];
+  [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:^{
+    
+  }];
 }
 
 
@@ -171,18 +174,30 @@
     // this is a request for photos
     DFPeanutFeedObject *suggestionsObject = [[invite subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
     NSArray *suggestions = suggestionsObject.objects;
-    DFReviewSwapViewController *reviewSwapController =
-    [[DFReviewSwapViewController alloc]
-     initWithSuggestions:suggestions
-     invite:invite
-     swapSuccessful:^{}];
-    DFNavigationController *navController = [[DFNavigationController alloc]
-                                             initWithRootViewController:reviewSwapController];
-    reviewSwapController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                                             initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
-                                                             target:self
-                                                             action:@selector(dismissReviewSwap:)];
-    [self presentViewController:navController animated:YES completion:nil];
+    if (suggestions.count > 0) {
+      DFReviewSwapViewController *reviewSwapController =
+      [[DFReviewSwapViewController alloc]
+       initWithSuggestions:suggestions
+       invite:invite
+       swapSuccessful:^{
+         [self.requestsViewController removeInviteFeedObject:invite];
+       }];
+      DFNavigationController *navController = [[DFNavigationController alloc]
+                                               initWithRootViewController:reviewSwapController];
+      reviewSwapController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                               initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                               target:self
+                                                               action:@selector(dismissReviewSwap:)];
+      [self presentViewController:navController animated:YES completion:nil];
+    } else {
+      [[DFPeanutFeedDataManager sharedManager]
+       acceptInvite:invite
+       addPhotoIDs:@[] success:^{
+         [self.requestsViewController removeInviteFeedObject:invite];
+      } failure:^(NSError *error) {
+        
+      }];
+    }
     
   }
 }

@@ -25,4 +25,6 @@
 @property (nonatomic) CGFloat height;
 @property (nonatomic, weak) id<DFRequestsViewControllerActionDelegate> actionDelegate;
 
+- (void)removeInviteFeedObject:(DFPeanutFeedObject *)inviteFeedObject;
+
 @end
