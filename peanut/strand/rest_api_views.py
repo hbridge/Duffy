@@ -623,7 +623,7 @@ def updateStrandWithCorrectMetadata(strand, created):
             strand.first_photo_time = createdFromStrand.first_photo_time
             strand.last_photo_time = createdFromStrand.last_photo_time
             strand.location_point = createdFromStrand.location_point
-            strand.location_city = createdFromStrand.location_city
+            strand.location_city = strands_util.getLocationForStrand(createdFromStrand)
             
             createNeighborRowsToNewStrand(strand, createdFromStrand)
 

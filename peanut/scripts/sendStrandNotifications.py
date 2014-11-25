@@ -16,6 +16,8 @@ from django.db.models import Q
 from peanut.settings import constants
 from common.models import Action, StrandInvite
 
+from common import api_util
+
 from strand import notifications_util, geo_util, strands_util, friends_util
 
 logger = logging.getLogger(__name__)
@@ -25,8 +27,16 @@ logger = logging.getLogger(__name__)
 def sendInviteNotification(strandInvite):
 	now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
 	logger.debug("in sendInviteNotification for invite id %s" % strandInvite.id)
-	msg = "%s wants to swap photos from %s" % (strandInvite.user.display_name, strands_util.getLocationForStrand(strandInvite.strand))
-	
+	location = strands_util.getLocationForStrand(strandInvite.strand)
+	prettyDate = api_util.prettyDate(strandInvite.strand.first_photo_time)
+
+	if not location:
+		msg = "%s wants your photos from %s" % (strandInvite.user.display_name, prettyDate)
+	elif now - strandInvite.strand.first_photo_time > datetime.timedelta(days=3):
+		msg = "%s wants your photos from %s in %s" % (strandInvite.user.display_name, prettyDate, location)
+	else:
+		msg = "%s wants your photos from %s" % (strandInvite.user.display_name, location)
+
 	doNotification = True
 
 	if not strandInvite.invited_user:
