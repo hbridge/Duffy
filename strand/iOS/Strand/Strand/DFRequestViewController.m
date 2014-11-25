@@ -54,10 +54,11 @@
 - (void)configureWithInviteFeedObject:(DFPeanutFeedObject *)inviteFeedObject
 {
   if (!self.view) return;
+  DFPeanutFeedObject *sectionObject = [[inviteFeedObject descendentdsOfType:DFFeedObjectSection]firstObject];
   self.profileWithContextView.profileStackView.peanutUsers = inviteFeedObject.actors;
   self.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ requested photos",
                                                  inviteFeedObject.actorNames.firstObject];
-  self.profileWithContextView.subtitleLabel.text = inviteFeedObject.placeAndRelativeTimeString;
+  self.profileWithContextView.subtitleLabel.text = sectionObject.placeAndRelativeTimeString;
   DFPeanutFeedObject *suggestionsObject = [[inviteFeedObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
   DFPeanutFeedObject *firstPhoto = [[suggestionsObject leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   [[DFImageManager sharedManager]
