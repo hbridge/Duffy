@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clipsSubviews="YES" contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFRequestNotificationView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="KI5-mP-Wwn">
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                </imageView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VwA-ua-9ep" customClass="DFProfileWithContextView">
+                    <rect key="frame" x="8" y="8" width="584" height="51"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="51" id="EW5-Xp-XZn"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="string" keyPath="title" value="Title"/>
+                        <userDefinedRuntimeAttribute type="string" keyPath="subTitle" value="Subtitle"/>
+                    </userDefinedRuntimeAttributes>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YrP-3q-wej" customClass="GBFlatButton">
+                    <rect key="frame" x="252" y="535" width="96" height="45"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="45" id="LAX-55-NfH"/>
+                    </constraints>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <state key="normal" title="Select Photos">
+                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="KI5-mP-Wwn" secondAttribute="bottom" id="8VF-bB-Rb5"/>
+                <constraint firstItem="VwA-ua-9ep" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="BSn-Hu-t63"/>
+                <constraint firstAttribute="trailing" secondItem="KI5-mP-Wwn" secondAttribute="trailing" id="Igy-oN-hWu"/>
+                <constraint firstAttribute="bottom" secondItem="YrP-3q-wej" secondAttribute="bottom" constant="20" id="LeG-5U-tss"/>
+                <constraint firstItem="KI5-mP-Wwn" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="Uh4-fE-UAu"/>
+                <constraint firstItem="VwA-ua-9ep" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="Yet-V7-jKA"/>
+                <constraint firstAttribute="centerX" secondItem="YrP-3q-wej" secondAttribute="centerX" id="d0q-wl-8Xb"/>
+                <constraint firstAttribute="trailing" secondItem="VwA-ua-9ep" secondAttribute="trailing" constant="8" id="gIM-z1-lDN"/>
+                <constraint firstItem="KI5-mP-Wwn" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="jVW-IJ-xlG"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <connections>
+                <outlet property="imageView" destination="KI5-mP-Wwn" id="T8P-iA-sAA"/>
+                <outlet property="profileWithContextView" destination="VwA-ua-9ep" id="o2Z-Hk-9iU"/>
+                <outlet property="selectPhotosButton" destination="YrP-3q-wej" id="FXD-fa-qF5"/>
+            </connections>
+            <point key="canvasLocation" x="404" y="349"/>
+        </view>
+    </objects>
+</document>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFProfileWithContextView">
+            <rect key="frame" x="0.0" y="0.0" width="334" height="109"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R2H-s3-OE1" customClass="DFProfileStackView">
+                    <rect key="frame" x="0.0" y="0.0" width="35" height="35"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="35" id="d2j-pO-Ddo"/>
+                        <constraint firstAttribute="width" constant="35" id="ieJ-yu-O9a"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u1l-uL-1qm" userLabel="Label wrapper">
+                    <rect key="frame" x="43" y="3" width="33" height="30"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tch-aT-LmY">
+                            <rect key="frame" x="0.0" y="0.0" width="33" height="16"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Yky-Qy-Ffh">
+                            <rect key="frame" x="0.0" y="16" width="33" height="14"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="tch-aT-LmY" firstAttribute="leading" secondItem="u1l-uL-1qm" secondAttribute="leading" id="Aiz-0J-7xp"/>
+                        <constraint firstItem="Yky-Qy-Ffh" firstAttribute="top" secondItem="tch-aT-LmY" secondAttribute="bottom" id="GQ6-uW-3bY"/>
+                        <constraint firstAttribute="bottom" secondItem="Yky-Qy-Ffh" secondAttribute="bottom" id="JXO-uc-Zw5"/>
+                        <constraint firstItem="tch-aT-LmY" firstAttribute="top" secondItem="u1l-uL-1qm" secondAttribute="top" id="OlZ-hz-LPZ"/>
+                        <constraint firstAttribute="trailing" secondItem="tch-aT-LmY" secondAttribute="trailing" id="f0v-ds-tP7"/>
+                        <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="tch-aT-LmY" secondAttribute="bottom" id="uZS-7d-vyL"/>
+                        <constraint firstItem="Yky-Qy-Ffh" firstAttribute="leading" secondItem="u1l-uL-1qm" secondAttribute="leading" id="ujO-rv-FS2"/>
+                        <constraint firstAttribute="trailing" secondItem="Yky-Qy-Ffh" secondAttribute="trailing" id="v52-1S-BqQ"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="R2H-s3-OE1" firstAttribute="centerY" secondItem="u1l-uL-1qm" secondAttribute="centerY" id="LWi-VI-1Wg"/>
+                <constraint firstItem="R2H-s3-OE1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="YYR-aR-58z"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="u1l-uL-1qm" secondAttribute="trailing" id="e6e-uF-9nl"/>
+                <constraint firstItem="u1l-uL-1qm" firstAttribute="leading" secondItem="R2H-s3-OE1" secondAttribute="trailing" constant="8" id="swa-F3-jDV"/>
+                <constraint firstItem="R2H-s3-OE1" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="ufD-Jk-1BV"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="profileStackView" destination="R2H-s3-OE1" id="Jr8-m4-k41"/>
+                <outlet property="subtitleLabel" destination="Yky-Qy-Ffh" id="R2d-6e-uuO"/>
+                <outlet property="titleLabel" destination="tch-aT-LmY" id="luy-er-nm4"/>
+            </connections>
+            <point key="canvasLocation" x="271" y="103.5"/>
+        </view>
+    </objects>
+</document>

@@ -17,6 +17,7 @@
 #import "DFFeedViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSIndexPath+DFHelpers.h"
+#import "DFRequestNotificationView.h"
 
 @interface DFNotificationsViewController ()
 
@@ -57,6 +58,7 @@
        forCellReuseIdentifier:@"cell"];
   self.tableView.separatorInset = UIEdgeInsetsMake(0, 15, 0, 15);
   self.tableView.rowHeight = 56.0;
+  
   [self configureRefreshControl];
 }
 
@@ -97,6 +99,10 @@
                                            selector:@selector(reloadData)
                                                name:DFStrandNotificationsUpdatedNotification
                                              object:nil];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewSwapsDataNotificationName
+                                             object:nil];
 }
 
 
@@ -121,6 +127,8 @@
   } else {
     self.tabBarItem.badgeValue = [@(self.unreadNotifications.count) stringValue];
   }
+  
+  [self configureRequestsView];
 }
 
 - (void)refreshFromServer
@@ -128,6 +136,42 @@
   [[DFPeanutFeedDataManager sharedManager] refreshActionsFromServer:^{
     [self.refreshControl endRefreshing];
   }];
+}
+
+
+- (void)configureRequestsView
+{
+  NSArray *invites = [[DFPeanutFeedDataManager sharedManager] inviteStrands];
+  if (invites.count > 0) {
+    DFPeanutFeedObject *firstInvite = invites.firstObject;
+    DFRequestNotificationView *requestNotifView = [UINib instantiateViewWithClass:[DFRequestNotificationView class]];
+    requestNotifView.profileWithContextView.profileStackView.peanutUsers = firstInvite.actors;
+    requestNotifView.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ requested photos",
+                                                               firstInvite.actorNames.firstObject];
+    requestNotifView.profileWithContextView.subtitleLabel.text = firstInvite.placeAndRelativeTimeString;
+    CGRect frame = requestNotifView.frame;
+    frame.size.height = 200;
+    requestNotifView.frame = frame;
+    [self.tableView setTableHeaderView:requestNotifView];
+    
+    DFPeanutFeedObject *suggestionsObject = [[firstInvite subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+    DFPeanutFeedObject *firstPhoto = [[suggestionsObject leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
+    [[DFImageManager sharedManager]
+     imageForID:firstPhoto.id
+     pointSize:requestNotifView.imageView.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeHighQualityFormat
+     completion:^(UIImage *image) {
+       requestNotifView.imageView.image = image;
+     }];
+
+    
+  } else {
+    self.tableView.tableHeaderView = nil;
+  }
+
+  
+  
 }
 
 
