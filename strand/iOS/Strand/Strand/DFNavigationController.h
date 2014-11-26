@@ -10,4 +10,6 @@
 
 @interface DFNavigationController : UINavigationController
 
++ (void)presentWithRootController:(UIViewController *)rootController inParent:(UIViewController *)parent;
+
 @end

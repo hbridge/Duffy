@@ -54,6 +54,18 @@ NSString *const UserSectionTitle = @"Swap Friends";
 NSString *const SuggestedSecitonTitle = @"Suggested";
 NSString *const ContactsSectionTitle = @"Contacts";
 
+- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers
+{
+  NSArray *peanutContacts = [suggestedPeanutedUsers arrayByMappingObjectsWithBlock:^id(id input) {
+    DFPeanutContact *contact = [[DFPeanutContact alloc] initWithPeanutUser:input];
+    return contact;
+  }];
+  self = [self initWithSuggestedPeanutContacts:peanutContacts];
+  if (self) {
+    
+  }
+  return self;
+}
 
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
 {

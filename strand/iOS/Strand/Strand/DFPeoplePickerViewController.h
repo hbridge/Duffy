@@ -49,7 +49,7 @@
 
 @property (nonatomic, retain) NSString *textNumberString;
 
-
+- (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers;
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
                     notSelectablePeanutContacts:(NSArray *)notSelectableContacts

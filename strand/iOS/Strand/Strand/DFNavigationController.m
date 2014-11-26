@@ -49,6 +49,20 @@
   return UIStatusBarStyleLightContent;
 }
 
++ (void)presentWithRootController:(UIViewController *)rootController inParent:(UIViewController *)parent
+{
+  DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:rootController];
+  rootController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
+                                                     initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                     target:navController
+                                                     action:@selector(dismissWhenPresented)];
+  [parent presentViewController:navController animated:YES completion:nil];
+}
+
+- (void)dismissWhenPresented
+{
+  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
+}
 
 
 @end
