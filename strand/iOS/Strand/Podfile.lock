@@ -18,6 +18,7 @@ PODS:
     - ActionSheetPicker2 (~> 0.1)
     - BWLongTextViewController (~> 1.0)
     - BWSelectViewController
+  - GBFlatButton (2.1.0)
   - HockeySDK (3.6.1)
   - JDStatusBarNotification (1.4.9)
   - LKbadgeView (1.1.0)
@@ -57,6 +58,7 @@ DEPENDENCIES:
   - CRToast (~> 0.0.7)
   - FMDB/FTS (~> 2.4)
   - FormKit.m (~> 0.4.0)
+  - GBFlatButton (~> 2.1.0)
   - HockeySDK (from `https://github.com/bitstadium/HockeySDK-iOS.git`)
   - JDStatusBarNotification (~> 1.4.7)
   - LKbadgeView (~> 1.1.0)
@@ -88,6 +90,7 @@ SPEC CHECKSUMS:
   CRToast: f9f2c4b29776d68ba24c4d621cba59a83fea921b
   FMDB: 0b2fa25e5264ef177973c0cb8c02c711107979aa
   FormKit.m: 68e35d2e70558109fa9ce5935e0f16a65c8b2b51
+  GBFlatButton: 30bf30c2594129ffeac1e6dce531022a4759c904
   HockeySDK: bf1964134fa6ef0c4c207c329e9aa6b866cee8f4
   JDStatusBarNotification: 9d833032d343e9a7abe0ec219c415dc115ba67a8
   LKbadgeView: 8e14044ee22c6d570c07e69e1ce73a3f91061730
