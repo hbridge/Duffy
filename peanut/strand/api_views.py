@@ -786,9 +786,9 @@ def swaps(request):
 			lastNightObjects = getObjectsDataForSpecificTime(user, lower, upper, "Last Night", rankNum)
 			rankNum += len(lastNightObjects)
 			
-			#for objects in lastNightObjects:
-			#	if objects['id'] not in inviteObjectIds:
-			#		responseObjects.append(objects)
+			for objects in lastNightObjects:
+				if objects['id'] not in inviteObjectIds:
+					responseObjects.append(objects)
 
 			printStats("swaps-time-suggestions")
 
@@ -815,6 +815,7 @@ def swaps(request):
 				printStats("swaps-nolocation-suggestions")
 
 			# Last resort, try throwing in recent photos
+			"""
 			if len(responseObjects) < 3:
 				# Grab all the latest strands
 				strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).order_by('-first_photo_time')[:20]
@@ -828,7 +829,7 @@ def swaps(request):
 					suggestion['title'] = "%s" % (api_util.prettyDate(suggestion['time_taken']))
 					rankNum += 1
 					responseObjects.append(suggestion)
-		
+			"""
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
