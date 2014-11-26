@@ -31,11 +31,11 @@ def sendInviteNotification(strandInvite):
 	prettyDate = api_util.prettyDate(strandInvite.strand.first_photo_time)
 
 	if not location:
-		msg = "%s wants your photos from %s" % (strandInvite.user.display_name, prettyDate)
+		msg = "%s sent you photos from %s" % (strandInvite.user.display_name, prettyDate)
 	elif now - strandInvite.strand.first_photo_time > datetime.timedelta(days=3):
-		msg = "%s wants your photos from %s in %s" % (strandInvite.user.display_name, prettyDate, location)
+		msg = "%s sent you photos from %s in %s" % (strandInvite.user.display_name, prettyDate, location)
 	else:
-		msg = "%s wants your photos from %s" % (strandInvite.user.display_name, location)
+		msg = "%s sent you photos from %s" % (strandInvite.user.display_name, location)
 
 	doNotification = True
 
