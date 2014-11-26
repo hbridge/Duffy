@@ -227,7 +227,7 @@
 
         if (composeView) {
           composeView.messageComposeDelegate = self;
-          [self presentViewController:composeView
+          [pickerController presentViewController:composeView
                                animated:YES
                              completion:^{
                                [SVProgressHUD dismiss];
@@ -267,7 +267,7 @@
     }
   };
   
-  [self.presentingViewController dismissViewControllerAnimated:YES completion:completion];
+  [self dismissViewControllerAnimated:YES completion:completion];
 }
 
 
