@@ -98,7 +98,7 @@ class BasePhotoAPI(APIView):
                 photoData["time_taken"] = dateutil.parser.parse(timeStr)
             except ValueError:
                 logger.error("Caught a ValueError in the REST photos api.  %s date was invalid.  Setting to Sept 2007 for photo %s and user %s.  You might want to manually edit it and set strand_evaluated to False" % (timeStr, photoData["id"], photoData["user_id"]))
-                photoData["time_taken"] = datetime.date(2007, 9, 1)
+                photoData["time_taken"] = datetime.datetime(2007, 9, 1)
 
         if "local_time_taken" in photoData:
             timeStr = photoData["time_taken"].translate(None, 'apm ')
