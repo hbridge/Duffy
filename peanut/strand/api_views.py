@@ -792,6 +792,7 @@ def swaps(request):
 
 			printStats("swaps-time-suggestions")
 
+			"""
 			if len(responseObjects) < 20:
 				# repeat the last request because we might have deleted some before.
 				# TODO(Derek): find a way to avoid this
@@ -815,7 +816,6 @@ def swaps(request):
 				printStats("swaps-nolocation-suggestions")
 
 			# Last resort, try throwing in recent photos
-			"""
 			if len(responseObjects) < 3:
 				# Grab all the latest strands
 				strands = Strand.objects.prefetch_related('photos').filter(user=user).filter(private=True).filter(suggestible=True).order_by('-first_photo_time')[:20]
