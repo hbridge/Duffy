@@ -78,11 +78,13 @@ def actionDataForApiSerializer(action):
 
 	# TODO(Derek): This fetching of photos.all() can be removed in December once we've gone through a couple weeks of writing
 	#   out the photo element for Add actions
-	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND and not action.photo:
-		if len(action.photos.all()) == 0:
+	if action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND or action.action_type == constants.ACTION_TYPE_CREATE_STRAND and not action.photo:
+		if len(action.photos.all()) == 0 and action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND:
 			logger.error("Found action %s that is an add action with no photos.  Please delete this." % action.id)
 		else:
 			actionData['photo'] = action.photos.all()[0].id
+			# Always make the client think this is add photos action
+			actionData['action_type'] = constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND
 	else:
 		actionData['photo'] = action.photo_id
 		

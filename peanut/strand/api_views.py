@@ -709,10 +709,14 @@ def actions_list(request):
 		for strandPhoto in strandPhotos:
 			photoIds.append(strandPhoto.photo_id)
 		
-		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(Q(photo_id__in=photoIds) & Q(strand_id__in=strandIds)).order_by("-added")[:40]
+		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter((Q(photo_id__in=photoIds) & Q(strand_id__in=strandIds)) | Q(strand_id__in=strandIds)).order_by("-added")[:40]
 
 		actionsData = list()
 		for action in actions:
+			# This filters out creates or requests with 0 photos
+			if len(action.photos.all()) == 0 and (action.action_type == constants.ACTION_TYPE_CREATE_STRAND or action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND):
+				continue
+				
 			actionsData.append(serializers.actionDataForApiSerializer(action))
 
 		actionsData = {'type': 'actions_list', 'actions': actionsData}
