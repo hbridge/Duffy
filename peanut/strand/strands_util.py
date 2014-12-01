@@ -41,8 +41,8 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
 		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
 
-		if len(strand.photos.all()) == 0 or len(possibleNeighbor.photos.all()):
-			return True
+		if len(strand.photos.all()) == 0 or len(possibleNeighbor.photos.all()) == 0:
+			return True, "0 photos %s %s" % ()
 
 		if (not locationRequired and (not strand.location_point or not possibleNeighbor.location_point)):
 			for photo1 in strand.photos.all():
@@ -51,11 +51,11 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 					timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
 					if timeDiffMin < noLocationTimeLimitMin and abs(timeDiff.total_seconds()) > 1:
-						return True
+						return True, "noloc-%s" % timeDiff.total_seconds()
 					
 		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < distanceLimit):
-			return True
+			return True, "location-%s" % geo_util.getDistanceBetweenStrands(strand, possibleNeighbor)
 	return False
 
 def userShouldBeNeighborToStrand(strand, locationRecord):
