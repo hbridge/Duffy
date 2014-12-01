@@ -311,9 +311,9 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 		interestedUsers = list()
 		if strand.id in neighborStrandsByStrandId:
 			for neighborStrand in neighborStrandsByStrandId[strand.id]:
-				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING):
+				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
-				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING):
+				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 			
 			if strand.id in neighborUsersByStrandId:
@@ -368,8 +368,8 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 	print privateStrands
 	strandsThatMatch = list()
 	for privateStrand in privateStrands:
-		print "%s %s %s" % (strand.id, privateStrand.id, strands_util.strandsShouldBeNeighbors(strand, privateStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING))
-		if (strands_util.strandsShouldBeNeighbors(strand, privateStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING)
+		print "%s %s %s" % (strand.id, privateStrand.id, strands_util.strandsShouldBeNeighbors(strand, privateStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired=False))
+		if (strands_util.strandsShouldBeNeighbors(strand, privateStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = False)
 			and privateStrand not in strandsThatMatch):
 			strandsThatMatch.append(privateStrand)
 

@@ -297,7 +297,7 @@ def main(argv):
 				idsCreated = list()
 				for strand in strandsCreated:
 					for possibleStrandNeighbor in possibleStrandNeighbors:
-						if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor):
+						if strands_util.strandsShouldBeNeighbors(strand, possibleStrandNeighbor, locationRequired = False):
 							usersByStrandId[possibleStrandNeighbor.id] = list(possibleStrandNeighbor.users.all())
 							strandsByStrandId[strand.id] = strand
 							strandsByStrandId[possibleStrandNeighbor.id] = possibleStrandNeighbor

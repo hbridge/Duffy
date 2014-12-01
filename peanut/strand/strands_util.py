@@ -37,26 +37,16 @@ def photoBelongsInStrand(targetPhoto, strand, photosByStrandId = None, honorLoca
 				return True
 	return False
 
-def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = constants.MINUTES_FOR_NOLOC_NEIGHBORING, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING):
-	print strand.last_photo_time
-	print strand.first_photo_time
-	print possibleNeighbor.first_photo_time
-	print possibleNeighbor.last_photo_time
+def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = constants.MINUTES_FOR_NOLOC_NEIGHBORING, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_ROUGH_NEIGHBORING, locationRequired = True):
 	if ((strand.last_photo_time + datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) > possibleNeighbor.first_photo_time) and
 		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
 
 		if len(strand.photos.all()) == 0 or len(possibleNeighbor.photos.all()):
-			print "here3"
 			return True
-		
-		print strand.location_point
-		print possibleNeighbor.location_point
-		if not strand.location_point or not possibleNeighbor.location_point:
-			print "here4"
+
+		if (locationRequired and (not strand.location_point or not possibleNeighbor.location_point)):
 			for photo1 in strand.photos.all():
-				print "here5"
 				for photo2 in possibleNeighbor.photos.all():
-					print "here6"
 					timeDiff = photo1.time_taken - photo2.time_taken
 					timeDiffMin = abs(timeDiff.total_seconds()) / 60
 
@@ -65,9 +55,7 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 					
 		elif (strand.location_point and possibleNeighbor.location_point and 
 			geo_util.getDistanceBetweenStrands(strand, possibleNeighbor) < distanceLimit):
-			print "here7"
 			return True
-	print "here8"
 	return False
 
 def userShouldBeNeighborToStrand(strand, locationRecord):
