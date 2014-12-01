@@ -323,8 +323,8 @@ const CGFloat CreateCellTitleSpacing = 8;
 - (DFPhotoPickerHeaderStyle)styleForSuggestion:(DFPeanutFeedObject *)suggestion
 {
   DFPhotoPickerHeaderStyle style = DFPhotoPickerHeaderStyleTimeOnly;
+  if (suggestion.location) style |= DFPhotoPickerHeaderStyleLocation;
   if (suggestion.suggestible.boolValue) {
-    if (suggestion.location) style |= DFPhotoPickerHeaderStyleLocation;
     if (suggestion.actors.count > 0) style |= DFPhotoPickerHeaderStyleBadge;
   }
   
