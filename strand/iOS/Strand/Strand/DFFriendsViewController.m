@@ -228,7 +228,7 @@ static BOOL showContactsUpsell = NO;
       [self.noFriendsView.activityIndicator stopAnimating];
       if (!self.contactsUpsellView.superview) {
         self.noFriendsView.titleLabel.text = @"No Friends On Swap Yet";
-        self.noFriendsView.subtitleLabel.text = @"Tap + and send someone photos to invite them";
+        self.noFriendsView.subtitleLabel.text = @"Tap + to invite friends";
       }
     } else {
       self.noFriendsView.titleLabel.text = @"Loading...";

@@ -227,18 +227,34 @@ NSString *const ContactsSectionTitle = @"Contacts";
     self.navigationItem.rightBarButtonItem.enabled = YES;
     buttonTitle = [NSString stringWithFormat:@"Send to %d People", count];
     self.doneButton.enabled = YES;
+    self.doneButtonWrapper.hidden = NO;
   } else if (count == 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
     buttonTitle = @"Send to 1 Person";
     self.doneButton.enabled = YES;
+    self.doneButtonWrapper.hidden = NO;
   } else {
+    if ([self hasUnfilteredResults]) {
+      self.doneButtonWrapper.hidden = NO;
+    } else {
+      self.doneButtonWrapper.hidden = YES;
+    }
     buttonTitle = @"No One Selected";
     self.navigationItem.rightBarButtonItem.enabled = NO;
     self.doneButton.enabled = NO;
   }
   
   [self.doneButton setTitle:buttonTitle forState:UIControlStateNormal];
+}
+
+- (BOOL)hasUnfilteredResults
+{
+  for (NSArray *sectionArray in self.unfilteredSections) {
+    if (sectionArray.count > 0) return YES;
+  }
+  
+  return NO;
 }
 
 - (NSArray *)selectedPeanutContacts
@@ -336,7 +352,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
   static NSRegularExpression *phoneNumberRegex = nil;
   if (!phoneNumberRegex) {
     NSError *error;
-    phoneNumberRegex = [NSRegularExpression regularExpressionWithPattern:@"^[2-9][0-9]{9}$" options:0 error:&error];
+    phoneNumberRegex = [NSRegularExpression regularExpressionWithPattern:@"^[0-9]+$" options:0 error:&error];
     if (error) {
       [NSException raise:@"Bad regex" format:@"Error: %@", error];
     }
@@ -383,15 +399,15 @@ NSString *const ContactsSectionTitle = @"Contacts";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  NSArray *sectionArray;
-  
   if (tableView == self.tableView && section  < self.unfilteredSections.count) {
-    sectionArray = self.unfilteredSections[section];
+    NSArray *sectionArray = self.unfilteredSections[section];
+    return sectionArray.count;
   } else if (tableView == self.sdc.searchResultsTableView && section < self.filteredSections.count) {
-    sectionArray = self.filteredSections[section];
+    NSArray *sectionArray = self.filteredSections[section];
+    return MAX(1, sectionArray.count);
   }
   
-  return MAX(1, sectionArray.count);
+  return 0;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
