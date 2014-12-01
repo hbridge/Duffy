@@ -308,16 +308,28 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			strandsToDelete.append(strand)
 			continue
 		
+		matchReasons = dict()
+		
 		interestedUsers = list()
 		if strand.id in neighborStrandsByStrandId:
 			for neighborStrand in neighborStrandsByStrandId[strand.id]:
 				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+
+					for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+						matchReasons[user.id] = "location-strand"
+
+
 				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
-			
+					
+					for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+						matchReasons[user.id] = "nolocation-strand"
+
 			if strand.id in neighborUsersByStrandId:
 				interestedUsers.extend(neighborUsersByStrandId[strand.id])
+				for user in neighborUsersByStrandId[strand.id]:
+					matchReasons[user.id] = "location-user"
 				
 		interestedUsers = list(set(interestedUsers))
 
@@ -336,7 +348,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strand.id, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers), 'suggestible': suggestible}
+		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
@@ -752,7 +764,7 @@ def swaps(request):
 		neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends_util.getFriends(user.id))
 		printStats("swaps-neighbors-cache")
 
-		locationBasedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId)
+		locationBasedSuggestions = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_SWAP_SUGGESTION, neighborStrandsByStrandId = neighborStrandsByStrandId, neighborUsersByStrandId = neighborUsersByStrandId, locationRequired = True)
 		locationBasedSuggestions = filter(lambda x: x['suggestible'], locationBasedSuggestions)
 		locationBasedSuggestions = sorted(locationBasedSuggestions, key=lambda x: x['time_taken'], reverse=True)
 
