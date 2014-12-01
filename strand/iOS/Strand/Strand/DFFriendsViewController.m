@@ -35,8 +35,6 @@
 @property (nonatomic, retain) DFPeanutFeedDataManager *peanutDataManager;
 @property (nonatomic, strong) NSArray *friendPeanutUsers;
 @property (nonatomic, retain) UIRefreshControl *refreshControl;
-
-@property (nonatomic, retain) DFPeanutUserObject *actionSheetUserSelected;
 @property (nonatomic, retain) DFSwapUpsellView *contactsUpsellView;
 @property (nonatomic, retain) DFNoTableItemsView *noFriendsView;
 
@@ -121,8 +119,6 @@
 {
   [tableView registerNib:[UINib nibWithNibName:@"DFPersonSelectionTableViewCell" bundle:nil]
   forCellReuseIdentifier:@"cell"];
-  [tableView registerNib:[UINib nibForClass:[DFActionButtonTableViewCell class]]
-  forCellReuseIdentifier:@"addFriendCell"];
   
   [self configureRefreshControl];
   
@@ -270,19 +266,13 @@ static BOOL showContactsUpsell = NO;
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-  return self.friendPeanutUsers.count + 1;
+  return self.friendPeanutUsers.count;
 }
 
 
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (indexPath.row >= self.friendPeanutUsers.count) {
-    DFActionButtonTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"addFriendCell"];
-    [cell.actionButton setTitle:@"Invite Friends" forState:UIControlStateNormal];
-    return cell;
-  }
-  
   DFPersonSelectionTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"cell"];
   cell.showsTickMarkWhenSelected = NO;
   [cell configureWithCellStyle:(DFPersonSelectionTableViewCellStyleStrandUser
@@ -322,14 +312,7 @@ static BOOL showContactsUpsell = NO;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-  if (indexPath.row >= self.friendPeanutUsers.count) {
-    [self createButtonPressed:self];
-    [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
-    return;
-  }
-  
   DFPeanutUserObject *user = self.friendPeanutUsers[indexPath.row];
-  self.actionSheetUserSelected = user;
   
   DFFriendProfileViewController *profileView = [[DFFriendProfileViewController alloc] initWithPeanutUser:user];
   [self.navigationController pushViewController:profileView animated:YES];
@@ -344,21 +327,6 @@ static BOOL showContactsUpsell = NO;
   }
 }
 
-
-
-- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
-{
-  NSString *buttonTitle = [actionSheet buttonTitleAtIndex:buttonIndex];
-  DDLogVerbose(@"The %@ button was tapped.", buttonTitle);
-
-  if (buttonIndex == 0) {
-    DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:self.actionSheetUserSelected withSharedPhotos:YES];
-    [self.navigationController pushViewController:vc animated:YES];
-  } else if (buttonIndex == 1) {
-    DFSingleFriendViewController *vc = [[DFSingleFriendViewController alloc] initWithUser:self.actionSheetUserSelected withSharedPhotos: NO];
-    [self.navigationController pushViewController:vc animated:YES];
-  }
-}
 
 - (void)createButtonPressed:(id)sender
 {
