@@ -278,18 +278,11 @@ static BOOL showContactsUpsell = NO;
   [cell configureWithCellStyle:(DFPersonSelectionTableViewCellStyleStrandUser
                                 | DFPersonSelectionTableViewCellStyleRightLabel)];
   DFPeanutUserObject *peanutUser = self.friendPeanutUsers[indexPath.row];
-  NSArray *unseenPrivateStrands = [self unseenPrivateStrandIDsForUser:peanutUser];
   
   cell.profilePhotoStackView.peanutUsers = @[peanutUser];
   cell.nameLabel.text = [peanutUser fullName];
-  int newUnswappedCount = (int)[unseenPrivateStrands count];
-  if (newUnswappedCount > 0) {
-    cell.rightLabel.text = [NSString stringWithFormat:@"%d new", (int)unseenPrivateStrands.count];
-    cell.nameLabel.font = [UIFont boldSystemFontOfSize:cell.nameLabel.font.pointSize];
-  } else {
-    cell.nameLabel.font = [UIFont systemFontOfSize:cell.nameLabel.font.pointSize];
-    cell.rightLabel.text = @"";
-  }
+  cell.nameLabel.font = [UIFont systemFontOfSize:cell.nameLabel.font.pointSize];
+  cell.rightLabel.text = @"";
   cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
   
   return cell;
