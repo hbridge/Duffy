@@ -618,7 +618,7 @@ def private_strands(request):
 
 		friends = friends_util.getFriends(user.id)
 		
-		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, locationRequired = False)
+		response['objects'] = getObjectsDataForPrivateStrands(user, strands, constants.FEED_OBJECT_TYPE_STRAND, friends=friends, locationRequired = True)
 		
 		printStats("private-3")
 	else:
