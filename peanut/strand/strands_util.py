@@ -44,7 +44,7 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 		if len(strand.photos.all()) == 0 or len(possibleNeighbor.photos.all()):
 			return True
 
-		if (locationRequired and (not strand.location_point or not possibleNeighbor.location_point)):
+		if (not locationRequired and (not strand.location_point or not possibleNeighbor.location_point)):
 			for photo1 in strand.photos.all():
 				for photo2 in possibleNeighbor.photos.all():
 					timeDiff = photo1.time_taken - photo2.time_taken
