@@ -42,7 +42,7 @@ def strandsShouldBeNeighbors(strand, possibleNeighbor, noLocationTimeLimitMin = 
 		(strand.first_photo_time - datetime.timedelta(minutes=constants.TIME_WITHIN_MINUTES_FOR_NEIGHBORING) < possibleNeighbor.last_photo_time)):
 
 		if len(strand.photos.all()) == 0 or len(possibleNeighbor.photos.all()) == 0:
-			return True, "0 photos %s %s" % ()
+			return True, "0 photos"
 
 		if (not locationRequired and (not strand.location_point or not possibleNeighbor.location_point)):
 			for photo1 in strand.photos.all():
