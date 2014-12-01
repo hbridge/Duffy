@@ -190,6 +190,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
   // account for the gap caused by not having a navbar shadow image
   UIEdgeInsets insets = self.tableView.contentInset;
   insets.top = insets.top - 1;
+  insets.bottom = self.doneButtonWrapper.frame.size.height;
   self.tableView.contentInset = insets;
   
   [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:@"cell"];
