@@ -317,7 +317,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
 					for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
-						matchReasons[user.id] = "location-strand"
+						dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
+						matchReasons[user.id] = "location-strand %s" % dist
 
 
 				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
