@@ -24,6 +24,16 @@
     self.view.frame = self.frame;
     [self.view layoutIfNeeded];
   }
+  
+  self.imageView.layer.cornerRadius = 4.0;
+  self.imageView.layer.masksToBounds = YES;
+  
+  self.footerView.backgroundColor = [UIColor clearColor];
+  self.footerView.gradientColors = @[
+                                     [[UIColor whiteColor] colorWithAlphaComponent:0],
+                                     [UIColor whiteColor]
+                                       ];
+  
   // Do any additional setup after loading the view from its nib.
   [self configureWithSuggestion:self.suggestionFeedObject];
 }
@@ -50,12 +60,10 @@
 
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion
 {
-  if (suggestion.actors.count == 0) self.profileWithContextView.hidden = YES;
-  self.profileWithContextView.profileStackView.peanutUsers = suggestion.actors;
-  self.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ %@ photos",
+  if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
+  self.bottomLabel.text = [NSString stringWithFormat:@"%@ %@ photos",
                                                  suggestion.actorsString,
                                                  suggestion.actors.count > 1 ? @"have" : @"has"];
-  [self.profileWithContextView.subtitleLabel removeFromSuperview];
   self.topLabel.text = suggestion.placeAndRelativeTimeString;
   
   DFPeanutFeedObject *firstSuggestedPhoto = [[suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
@@ -74,4 +82,11 @@
 - (IBAction)requestButtonPressed:(id)sender {
   if (self.requestButtonHandler) self.requestButtonHandler();
 }
+
+- (IBAction)noButtonPressed:(id)sender {
+  if (self.noButtonHandler) self.noButtonHandler();
+}
+
+
+
 @end

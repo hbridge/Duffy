@@ -99,14 +99,7 @@
      didFinishSelectingFeedObjects:(NSArray *)selectedFeedObjects
 {
   if (selectedFeedObjects.count == 0) {
-    [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
-    NSString *furthestReached = self.peoplePickerController ? @"peoplePicker" : @"photoPicker";
-    NSMutableDictionary *parameters = [@{@"furthestControllerReached" : furthestReached} mutableCopy];
-    [parameters addEntriesFromDictionary:self.extraAnalyticsInfo];
-    [DFAnalytics logCreateStrandFlowCompletedWithResult:DFAnalyticsValueResultAborted
-                                      numPhotosSelected:self.selectPhotosController.selectedObjects.count
-                                      numPeopleSelected:self.peoplePickerController.selectedPeanutContacts.count
-                                              extraInfo:parameters];
+    [self dismissWithResult:DFCreateStrandResultAborted errorString:nil];
     return;
   }
   
@@ -117,7 +110,6 @@
   self.peoplePickerController.allowsMultipleSelection = YES;
   [self pushViewController:self.peoplePickerController animated:YES];
 }
-
 
 - (NSArray *)suggestedContactsForFeedObjects:(NSArray *)feedObjects
 {
@@ -188,11 +180,11 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
                             [SVProgressHUD dismiss];
                           }];
        } else {
-         [weakSelf dismissWithErrorString:nil];
+         [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:nil];
        }
      });
    } failure:^(NSError *error) {
-     [weakSelf dismissWithErrorString:@"Invite failed"];
+     [weakSelf dismissWithResult:DFCreateStrandResultSuccess errorString:@"Invite failed"];
      DDLogError(@"%@ failed to invite to strand: %@, error: %@",
                 weakSelf.class, peanutStrand, error);
    }];
@@ -201,37 +193,62 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller
                  didFinishWithResult:(MessageComposeResult)result
 {
-  [self dismissWithErrorString:(result == MessageComposeResultSent ? nil : @"Some invites not sent")];
+  
+  [self dismissWithResult:DFCreateStrandResultSuccess
+              errorString:(result == MessageComposeResultSent ? nil : @"Some invites not sent")];
 }
 
 
-- (void)dismissWithErrorString:(NSString *)errorString
+- (void)dismissWithResult:(DFCreateStrandResult)result errorString:(NSString *)errorString
 {
-  DFCreateStrandFlowViewController __weak *weakSelf = self;
+  [self logAnalyticsForResult:result errorString:errorString];
+  [self.delegate createStrandFlowController:self
+                        completedWithResult:result
+                                     photos:self.selectPhotosController.selectedObjects
+                                   contacts:self.peoplePickerController.selectedPeanutContacts];
+  
   void (^completion)(void) = ^{
-    if (!errorString) {
+    if (result == DFCreateStrandResultSuccess) {
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [SVProgressHUD showSuccessWithStatus:@"Sent!"];
+        if (result == DFCreateStrandResultSuccess)
+          [SVProgressHUD showSuccessWithStatus:errorString ? errorString : @"Sent!"];
+        else if (result == DFCreateStrandResultFailure)
+          [SVProgressHUD showErrorWithStatus:errorString];
       });
-      [DFAnalytics logCreateStrandFlowCompletedWithResult:DFAnalyticsValueResultSuccess
-                                        numPhotosSelected:weakSelf.selectPhotosController.selectedObjects.count
-                                        numPeopleSelected:weakSelf.peoplePickerController.selectedPeanutContacts.count
-                                                extraInfo:weakSelf.extraAnalyticsInfo];
-    } else {
-      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [SVProgressHUD showErrorWithStatus:errorString];
-      });
-      NSMutableDictionary *params = [@{@"errorString" : errorString} mutableCopy];
-      [params addEntriesFromDictionary:self.extraAnalyticsInfo];
-      [DFAnalytics logCreateStrandFlowCompletedWithResult:DFAnalyticsValueResultFailure
-                                        numPhotosSelected:weakSelf.selectPhotosController.selectedObjects.count
-                                        numPeopleSelected:weakSelf.peoplePickerController.selectedPeanutContacts.count
-                                                extraInfo:params];
     }
   };
   
   [self.presentingViewController dismissViewControllerAnimated:YES completion:completion];
 }
+
+- (void)logAnalyticsForResult:(DFCreateStrandResult)result errorString:(NSString *)errorString
+{
+  NSMutableDictionary *analyticsInfo = [NSMutableDictionary new];
+  [analyticsInfo addEntriesFromDictionary:self.extraAnalyticsInfo];
+  
+  if (errorString) {
+    analyticsInfo[@"errorString"] = errorString;
+  }
+  
+  NSString *analyticsResult;
+  if (result == DFCreateStrandResultAborted) {
+    analyticsResult = DFAnalyticsValueResultAborted;
+    NSString *furthestReached = self.peoplePickerController ? @"peoplePicker" : @"photoPicker";
+    analyticsInfo[@"furthestControllerReached"] = furthestReached;
+  } else if (result == DFCreateStrandResultFailure) {
+    analyticsResult = DFAnalyticsValueResultFailure;
+  } else if (result == DFCreateStrandResultSuccess) {
+    analyticsResult = DFAnalyticsValueResultSuccess;
+  }
+  NSUInteger numPhotos = self.selectPhotosController.selectedObjects.count;
+  NSUInteger numPeople = self.peoplePickerController.selectedPeanutContacts.count;
+  
+  [DFAnalytics logCreateStrandFlowCompletedWithResult:analyticsResult
+                                    numPhotosSelected:numPhotos
+                                    numPeopleSelected:numPeople
+                                            extraInfo:analyticsInfo];
+}
+
 
 - (DFPeanutStrandInviteAdapter *)inviteAdapter
 {
@@ -249,18 +266,7 @@ didFinishWithPickedContacts:(NSArray *)peanutContacts
   DFCreateStrandFlowViewController *createStrandController = [[DFCreateStrandFlowViewController alloc]
                                                               initWithHighlightedPhotoCollection:feedObject];
   
-  createStrandController.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                                              initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:createStrandController
-                                                              action:@selector(dismissWhenPresented)];
-  
-  
   [viewController presentViewController:createStrandController animated:YES completion:nil];
-  
-}
-
-- (void)dismissWhenPresented
-{
-  [self.presentingViewController dismissViewControllerAnimated:YES completion:nil];
 }
 
 

@@ -36,7 +36,6 @@
                                 options:nil];
   if (self) {
     self.delegate = self;
-    self.dataSource = self;
     [self observeNotifications];
     [self configureNavAndTab];
     self.suggestionsToRemove = [NSMutableArray new];
@@ -71,8 +70,8 @@
 
 
 - (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view.
+  [super viewDidLoad];
+  // Do any additional setup after loading the view.
   self.view.backgroundColor = [UIColor groupTableViewBackgroundColor];
 }
 
@@ -103,13 +102,10 @@
   
   [self.filteredSuggestions removeObjectsInArray:self.suggestionsToRemove];
   
-  if (self.viewControllers.count == 0 && self.filteredSuggestions.count > 0) {
-    DFSuggestionViewController *svc = [self viewControllerForIndex:0];
-    [self setViewControllers:@[svc]
-                   direction:UIPageViewControllerNavigationDirectionForward
-                    animated:NO
-                  completion:nil];
-  }
+  if (self.viewControllers.count == 0
+      || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
+           isSubclassOfClass:[DFSuggestionViewController class]])
+    [self gotoNextController];
   [self configureNoResultsView];
 }
 
@@ -120,7 +116,7 @@
     [self.noResultsView setSuperView:self.view];
     if ([[DFPeanutFeedDataManager sharedManager] hasSwapsData]
         && ![[DFUploadController sharedUploadController] isUploadInProgress]) {
-      self.noResultsView.titleLabel.text = @"No Suggestions";
+      self.noResultsView.titleLabel.text = @"";
       [self.noResultsView.activityIndicator stopAnimating];
     } else {
       self.noResultsView.titleLabel.text = @"Loading...";
@@ -135,8 +131,8 @@
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController
 {
   DFSuggestionViewController *suggestionVC = (DFSuggestionViewController *)viewController;
-  NSInteger currentIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
-  return currentIndex;
+  NSUInteger currentIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
+  return currentIndex != NSNotFound ? currentIndex : -1;
 }
 
 
@@ -146,9 +142,17 @@
   return  [self indexOfViewController:currentController];
 }
 
-
 - (DFSuggestionViewController *)viewControllerForIndex:(NSInteger)index
 {
+  if (index < 0 || index >= self.filteredSuggestions.count) {
+    if (self.filteredSuggestions.count > 0) {
+      DDLogWarn(@"%@ viewControllerForIndex: %@ filteredSuggestions.count: %@",
+                self.class,
+                @(index),
+                @(self.filteredSuggestions.count));
+      return nil;
+    }
+  }
   DFPeanutFeedObject *suggestion = self.filteredSuggestions[index];
   DFSuggestionViewController *svc = [[DFSuggestionViewController alloc] init];
   svc.suggestionFeedObject = suggestion;
@@ -157,7 +161,22 @@
   svc.requestButtonHandler = ^{
     [weakSelf suggestionSelected:suggestion];
   };
+  svc.noButtonHandler = ^{
+    [weakSelf suggestionHidden:suggestion];
+  };
+  
+  
   return svc;
+}
+
+- (UIViewController *)noSuggestionsViewController
+{
+  UIViewController *noSuggestionVC = [[UIViewController alloc] init];
+  DFNoTableItemsView *noSuggestionsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+  noSuggestionsView.titleLabel.text = @"No More Suggestions";
+  noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends!";
+  noSuggestionsView.superView = noSuggestionVC.view;
+  return noSuggestionVC;
 }
 
 
@@ -170,7 +189,7 @@
   
   NSUInteger currentIndex = [self indexOfViewController:viewController];
   NSInteger beforeIndex = currentIndex - 1;
-  if (beforeIndex < 0) beforeIndex = self.filteredSuggestions.count - 1; // wrap around
+  if (beforeIndex < 0) return nil;
   return [self viewControllerForIndex:beforeIndex];
 }
 
@@ -180,13 +199,58 @@
   if (self.filteredSuggestions.count < 2) return nil;
   NSInteger currentIndex = [self indexOfViewController:viewController];
   NSInteger afterIndex = currentIndex + 1;
-  if (afterIndex >= self.filteredSuggestions.count) afterIndex = 0; // wrap around
+  if (afterIndex >= self.filteredSuggestions.count) return nil;
   return [self viewControllerForIndex:afterIndex];
 }
 
 - (void)suggestionSelected:(DFPeanutFeedObject *)suggestion
 {
- 
+  DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
+                                                        initWithHighlightedPhotoCollection:suggestion];
+  createStrandFlow.delegate = self;
+  [self presentViewController:createStrandFlow animated:YES completion:nil];
+  createStrandFlow.extraAnalyticsInfo = suggestion.suggestionAnalyticsSummary;
+}
+
+- (void)suggestionHidden:(DFPeanutFeedObject *)suggestion
+{
+  [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
+  [self gotoNextController];
+}
+
+- (void)gotoNextController
+{
+  UIViewController *nextController;
+  if (self.viewControllers.count == 0 && self.filteredSuggestions.count > 0) {
+   nextController = [self viewControllerForIndex:0];
+  } else {
+    UIViewController *currentController = self.viewControllers.firstObject;
+    nextController = [self pageViewController:self
+            viewControllerAfterViewController:currentController];
+  }
+  
+  if (!nextController) {
+    nextController = [self noSuggestionsViewController];
+  }
+
+  NSArray *newControllers = nextController ? @[nextController] : @[];
+  [self setViewControllers:newControllers
+                 direction:UIPageViewControllerNavigationDirectionForward
+                  animated:YES
+                completion:nil];
+
+}
+
+#pragma mark - DFCreateStrandFlowController delegate
+
+- (void)createStrandFlowController:(DFCreateStrandFlowViewController *)controller
+               completedWithResult:(DFCreateStrandResult)result
+                            photos:(NSArray *)photos
+                          contacts:(NSArray *)contacts
+{
+  if (result == DFCreateStrandResultSuccess) {
+    [self gotoNextController];
+  }
 }
 
 
