@@ -38,8 +38,8 @@ static DFUser *currentUser;
 + (DFUser *)currentUser
 {
   if (!currentUser) {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
+    static NSString *syncObj = @"syncObj";
+    @synchronized(syncObj) {
       [[NSUserDefaults standardUserDefaults] synchronize]; // ensure we get what's on disk
       NSData *userData = [[NSUserDefaults standardUserDefaults] valueForKey:userObjectDefaultsKey];
       if (userData) {
@@ -51,7 +51,8 @@ static DFUser *currentUser;
         currentUser = [[DFUser alloc] init];
         DDLogInfo(@"%@ no user data found.", [self.class description]);
       }
-    });
+    }
+
   }
   return currentUser;
 }
