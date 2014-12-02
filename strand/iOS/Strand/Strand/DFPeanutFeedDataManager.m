@@ -431,6 +431,25 @@ static DFPeanutFeedDataManager *defaultManager;
                                        ascending:NO];
 }
 
+- (NSArray *)acceptedStrandsWithPostsCollapsedAndFilteredToUser:(DFUserIDType)userID
+{
+  return [self acceptedStrandsWithPostsCollapsed:YES
+                                    filterToUser:userID
+                               feedObjectSortKey:@"time_stamp"
+                                       ascending:YES];
+}
+
+- (NSArray *)getStrandPostListFromStrandPosts:(DFPeanutFeedObject *)strandPosts
+{
+  NSMutableArray *strandPostList = [NSMutableArray new];
+  for (DFPeanutFeedObject *object in strandPosts.objects) {
+    if ([object.type isEqual:DFFeedObjectStrandPost]) {
+      [strandPostList addObject:object];
+    }
+  }
+  return strandPostList;
+}
+
 - (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
                                   filterToUser:(DFUserIDType)filterToUserID
                              feedObjectSortKey:(NSString *)sortKey
@@ -454,10 +473,10 @@ static DFPeanutFeedDataManager *defaultManager;
       if (!foundUser) continue;
     }
     DFPeanutFeedObject *collapsedObj = [strandPosts copy];
-    collapsedObj.type = DFFeedObjectStrand;
+    collapsedObj.type = DFFeedObjectStrandPosts;
     collapsedObj.actors = [strandPosts.actors copy];
     NSMutableArray *collapsedSubObjects = [NSMutableArray new];
-    for (DFPeanutFeedObject *strandPost in strandPosts.objects) {
+    for (DFPeanutFeedObject *strandPost in [self getStrandPostListFromStrandPosts:strandPosts]) {
       [collapsedSubObjects addObjectsFromArray:strandPost.objects];
     }
     collapsedObj.objects = [collapsedSubObjects sortedArrayUsingDescriptors:@[sortDescriptor]];

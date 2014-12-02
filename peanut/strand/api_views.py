@@ -27,11 +27,11 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
-def getActionsByPhotoIdCache(photoIds):
-	actions = Action.objects.prefetch_related('user').filter(photo_id__in=photoIds)
+
+def getActionsByPhotoIdCache(actionsCache):
 	actionsByPhotoId = dict()
 
-	for action in actions:
+	for action in actionsCache:
 		if action.photo_id not in actionsByPhotoId:
 			actionsByPhotoId[action.photo_id] = list()
 		actionsByPhotoId[action.photo_id].append(action)
@@ -104,6 +104,13 @@ def getStrandNeighborsCache(strands, friends, withUsers = False):
 					neighborStrandsByStrandId[strand.id].append(strandNeighbor.strand_1)
 
 	return (neighborStrandsByStrandId, neighborUsersByStrandId)
+
+def userHasPostedPhotosToStrand(user, strand, actionsCache):
+	hasPostedPhotos = False
+	for action in actionsCache:
+		if action.strand == strand and action.user_id == user.id and (action.action_type == constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND or action.action_type == constants.ACTION_TYPE_CREATE_STRAND):
+			hasPostedPhotos = True
+	return hasPostedPhotos
 
 """
 	Helper Method for auth_phone
@@ -267,16 +274,14 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 	if simCaches == None:
 		simCaches = cluster_util.getSimCaches(photoIds)
 
-	# Do same with actions
-	if actionsByPhotoIdCache == None:
-		actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
-
 	for group in groups:
 		if len(group['photos']) == 0:
 			continue
 
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
-		clusters = addActionsToClusters(clusters, group['metadata']['strand_id'], actionsByPhotoIdCache)
+
+		if actionsByPhotoIdCache:
+			clusters = addActionsToClusters(clusters, group['metadata']['strand_id'], actionsByPhotoIdCache)
 		
 		location = strands_util.getBestLocationForPhotos(group['photos'])
 		if not location:
@@ -293,13 +298,13 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 	Returns back the objects data for private strands which includes neighbor_users.
 	This gets the Strand Neighbors (two strands which are possible to strand together)
 """
-def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True):
+def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = None, neighborStrandsByStrandId = None, neighborUsersByStrandId = None, locationRequired = True, requireInterestedUsers = True, findInterestedUsers = True):
 	groups = list()
 
 	if friends == None:
 		friends = friends_util.getFriends(user.id)
 
-	if neighborStrandsByStrandId == None or neighborUsersByStrandId == None:
+	if (neighborStrandsByStrandId == None or neighborUsersByStrandId == None) and findInterestedUsers:
 		neighborStrandsByStrandId, neighborUsersByStrandId = getStrandNeighborsCache(strands, friends)
 		printStats("neighbor-cache")
 
@@ -315,38 +320,36 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			strandsToDelete.append(strand)
 			continue
 		
+		title = ""
 		matchReasons = dict()
-		
 		interestedUsers = list()
-		if strand.id in neighborStrandsByStrandId:
-			for neighborStrand in neighborStrandsByStrandId[strand.id]:
-				if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
-					val, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
-					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+		if findInterestedUsers:
+			if strand.id in neighborStrandsByStrandId:
+				for neighborStrand in neighborStrandsByStrandId[strand.id]:
+					if neighborStrand.location_point and strand.location_point and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
+						val, reason = strands_util.strandsShouldBeNeighbors(strand, neighborStrand, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired)
+						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
 
-					for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
-						dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
-						matchReasons[user.id] = "location-strand %s" % reason
+						for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+							dist = geo_util.getDistanceBetweenStrands(strand, neighborStrand)
+							matchReasons[user.id] = "location-strand %s" % reason
 
 
-				elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
-					interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+					elif not locationRequired and strands_util.strandsShouldBeNeighbors(strand, neighborStrand, noLocationTimeLimitMin=3, distanceLimit = constants.DISTANCE_WITHIN_METERS_FOR_FINE_NEIGHBORING, locationRequired = locationRequired):
+						interestedUsers.extend(friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()))
+						
+						for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
+							matchReasons[user.id] = "nolocation-strand"
+
+				if strand.id in neighborUsersByStrandId:
+					interestedUsers.extend(neighborUsersByStrandId[strand.id])
+					for user in neighborUsersByStrandId[strand.id]:
+						matchReasons[user.id] = "location-user"
 					
-					for user in friends_util.filterUsersByFriends(user.id, friends, neighborStrand.users.all()):
-						matchReasons[user.id] = "nolocation-strand"
+			interestedUsers = list(set(interestedUsers))
 
-			if strand.id in neighborUsersByStrandId:
-				interestedUsers.extend(neighborUsersByStrandId[strand.id])
-				for user in neighborUsersByStrandId[strand.id]:
-					matchReasons[user.id] = "location-user"
-				
-		interestedUsers = list(set(interestedUsers))
-
-		if len(interestedUsers) > 0:
-			title = "might like these photos"
-		else:
-			title = ""
-
+			if len(interestedUsers) > 0:
+				title = "might like these photos"
 		
 		suggestible = strand.suggestible
 
@@ -364,7 +367,8 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
-	formattedGroups = getFormattedGroups(groups)
+	# Pass in none for actions because there are no actions on private photos so don't use anything
+	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = None)
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
@@ -408,23 +412,29 @@ def getObjectsDataForPost(postAction, simCaches, actionsByPhotoIdCache):
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	return objects
 
+
+
 def getObjectsDataForStrands(strands, user):
 	response = list()
 	strandIds = Strand.getIds(strands)
-	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(strand__in=strandIds).filter(Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND))
 	invitesCache =  StrandInvite.objects.prefetch_related('invited_user', 'strand').filter(strand__in=strandIds).filter(accepted_user__isnull=True).exclude(invited_user=user).filter(skip=False)
 
 	photoIds = list()
 	for strand in strands:
 		photoIds.extend(Photo.getIds(strand.photos.all()))
-
 	photoIds = set(photoIds)
+	
+	# Grab all actions for any strand or photo we're looking at
+	# We use this to look for:
+	# Grabbing all the post actions for a strand
+	# Getting the likes and comments for a photo
+	# See if the user has done a post, and if not...put in suggested photos
+	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=strandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=strandIds)))
+	actionsCache = list(actionsCache)
 
 	simCaches = cluster_util.getSimCaches(photoIds)
 
-	actionsByPhotoIdCache = getActionsByPhotoIdCache(photoIds)
-	
-	actionsCache = list(actionsCache)
+	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	for strand in strands:
 		entry = dict()
 
@@ -433,6 +443,7 @@ def getObjectsDataForStrands(strands, user):
 			if action.strand == strand:
 				postActions.append(action)
 
+		# Find the timestamp of the most recent post
 		if len(postActions) == 0:
 			logger.error("in getObjectsDataForStrand found no actions for strand %s and user %s" % (strand.id, user.id))
 			recentTimeStamp = datetime.datetime.utcnow().replace(tzinfo=pytz.utc)
@@ -440,6 +451,7 @@ def getObjectsDataForStrands(strands, user):
 			recentTimeStamp = sorted(postActions, key=lambda x:x.added, reverse=True)[0].added
 		users = strand.users.all()
 
+		# Create a list of all the invited users
 		invites = list()
 		for invite in invitesCache:
 			if invite.strand == strand:
@@ -450,18 +462,21 @@ def getObjectsDataForStrands(strands, user):
 			if invite.invited_user and invite.invited_user not in users and invite.invited_user not in invitedUsers:
 				invitedUsers.append(invite.invited_user)
 			elif not invite.invited_user:
-				contactEntries = ContactEntry.objects.filter(user=user, phone_number=invite.phone_number, skip=False)
-				name = ""
-				for entry in contactEntries:
-					if name == "":
-						name = entry.name.split(" ")[0]
-
-				invitedUsers.append(User(id=0, display_name=name, phone_number=invite.phone_number))
+				invitedUsers.append(User(id=0, display_name="", phone_number=invite.phone_number))
 		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
 
+		# Add the individual posts to the list
 		entry['objects'] = list()
 		for post in postActions:
 			entry['objects'].extend(getObjectsDataForPost(post, simCaches, actionsByPhotoIdCache))
+
+		# Add in the suggested private photos if the user hasn't done a post yet and has photos that match
+		if not userHasPostedPhotosToStrand(user, strand, actionsCache):
+			privateStrands = getPrivateStrandSuggestionsForSharedStrand(user, strand)
+			if len(privateStrands) > 0:
+				suggestionsEntry = {'type': constants.FEED_OBJECT_TYPE_SUGGESTED_PHOTOS}
+				suggestionsEntry['objects'] = getObjectsDataForPrivateStrands(user, privateStrands, constants.FEED_OBJECT_TYPE_STRAND, requireInterestedUsers = False, findInterestedUsers = False)
+				entry['objects'].append(suggestionsEntry)
 		response.append(entry)
 		
 	return response

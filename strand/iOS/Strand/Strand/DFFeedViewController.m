@@ -25,6 +25,7 @@
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "SVProgressHUD.h"
 #import "DFTopBannerView.h"
+#import "UIBarButtonItem+Badge.h"
 
 @interface DFFeedViewController ()
 
@@ -43,6 +44,8 @@
 @property (nonatomic, retain) DFSwapUpsellView *swapUpsellView;
 @property (nonatomic, retain) NSTimer *refreshTimer;
 @property (nonatomic, retain) DFTopBannerView *topBannerView;
+
+@property (nonatomic, retain) UIBarButtonItem *addPhotosButtomItem;
 
 @end
 
@@ -75,7 +78,10 @@
                || [feedObject.type isEqual:DFFeedObjectSection]) {
       self.inviteObject = nil;
       self.postsObject = feedObject;
-
+      
+      // A posts object has both individual posts and a suggestions object
+      self.suggestionsObject = [[self.postsObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+      
       if (self.postsObject.objects.count == 0) {
         [SVProgressHUD showWithStatus:@"Loading..."];
         [self reloadData];
@@ -91,6 +97,11 @@
   return self;
 }
 
+- (instancetype)initWithStrandPostsId:(DFStrandIDType)strandID
+{
+  DFPeanutFeedObject *postsObject = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strandID];
+  return [self initWithFeedObject:postsObject];
+}
 
 /*
  * This is the same code as in DFCreateStrandFlowViewController, might want to abstract if we do this more
@@ -154,8 +165,14 @@
     //   So if that happens, don't overwrite our current one which has the id
     if (posts) {
       self.postsObject = posts;
+      
+      // A posts object has both individual posts and a suggestions object
+      self.suggestionsObject = [[self.postsObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
+      [self configureAddPhotosBadgeCount];
     }
   }
+  
+  
 }
 
 - (void)observeNotifications
@@ -176,17 +193,22 @@
 
 - (void)initNavItem
 {
+  
+  UIImage *image = [UIImage imageNamed:@"Assets/Icons/PhotosBarButton"];
+  UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+  button.frame = CGRectMake(0,0,image.size.width, image.size.height);
+  [button addTarget:self action:@selector(addPhotosButtonPressed:) forControlEvents:UIControlEventTouchDown];
+  [button setBackgroundImage:image forState:UIControlStateNormal];
+  self.addPhotosButtomItem = [[UIBarButtonItem alloc] initWithCustomView:button];
+  self.addPhotosButtomItem.badgeBGColor = [UIColor blueColor];
+  
   self.navigationItem.rightBarButtonItems =
   @[[[UIBarButtonItem alloc]
      initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
      style:UIBarButtonItemStylePlain
      target:self
      action:@selector(peopleButtonPressed:)],
-    [[UIBarButtonItem alloc]
-     initWithImage:[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(addPhotosButtonPressed:)],
+    self.addPhotosButtomItem,
     ];
   
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
@@ -243,6 +265,19 @@
   }
   self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
                                                                     abbreviate:NO];
+  [self configureAddPhotosBadgeCount];
+}
+
+- (void)configureAddPhotosBadgeCount
+{
+  if (self.suggestionsObject) {
+    self.addPhotosButtomItem.badgeBGColor = [UIColor blueColor];
+    
+    NSArray *photoObjects = [self.suggestionsObject descendentdsOfType:DFFeedObjectPhoto];
+    self.addPhotosButtomItem.badgeValue = [NSString stringWithFormat:@"%lu", (unsigned long)photoObjects.count];
+  } else {
+    self.addPhotosButtomItem.badgeValue = @"";
+  }
 }
 
 - (void)configureTableView
@@ -265,11 +300,6 @@
                                                        selector:@selector(refreshFromServer)
                                                        userInfo:nil
                                                         repeats:YES];
-  } else {
-    DDLogVerbose(@"%@ showing view but I think that I don't need a timer %@  %@",
-                 self.class,
-                 self.inviteObject,
-                 self.inviteObject.ready);
   }
   
   if (self.onViewScrollToPhotoId) {
@@ -324,7 +354,7 @@
     [self configureTitleView];
     
     NSMutableArray *photosAndClusters = [NSMutableArray new];
-    for (DFPeanutFeedObject *strandPost in strandPostsObject.objects) {
+    for (DFPeanutFeedObject *strandPost in [[DFPeanutFeedDataManager sharedManager] getStrandPostListFromStrandPosts:strandPostsObject]) {
       [photosAndClusters addObjectsFromArray:strandPost.objects];
     }
     self.feedDataSource.photosAndClusters = photosAndClusters;
@@ -695,8 +725,19 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
 - (void)addPhotosButtonPressed:(id)sender
 {
   NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrandsByDateAscending:YES];
-  DFSelectPhotosViewController *selectPhotosViewController = [[DFSelectPhotosViewController alloc]
-                                                              initWithCollectionFeedObjects:privateStrands];
+  
+  DFSelectPhotosViewController *selectPhotosViewController;
+  if (self.suggestionsObject) {
+    // Note:  Right now we're only selecting the first section, there could be more in the suggestions.
+    // TODO(Derek): Possibly look at this if its a big deal
+    selectPhotosViewController = [[DFSelectPhotosViewController alloc]
+                                  initWithCollectionFeedObjects:privateStrands
+                                  highlightedFeedObject:[[self.suggestionsObject subobjectsOfType:DFFeedObjectSection] firstObject]];
+  } else {
+    selectPhotosViewController = [[DFSelectPhotosViewController alloc]
+                                  initWithCollectionFeedObjects:privateStrands];
+  }
+  
   selectPhotosViewController.navigationItem.title = @"Add Photos";
   selectPhotosViewController.actionButtonVerb = @"Add";
   selectPhotosViewController.delegate = self;
