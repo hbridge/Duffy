@@ -810,6 +810,7 @@ def swaps(request):
 		printStats("swaps-location-suggestions")
 
 		if len(inviteObjects) == 0:
+			"""
 			# Now do last night suggestions
 			now = datetime.datetime.utcnow()
 
@@ -829,7 +830,7 @@ def swaps(request):
 					responseObjects.append(objects)
 
 			printStats("swaps-time-suggestions")
-
+			"""
 			"""
 			if len(responseObjects) < 20:
 				# repeat the last request because we might have deleted some before.
@@ -852,7 +853,7 @@ def swaps(request):
 						responseObjects.append(suggestion)
 
 				printStats("swaps-nolocation-suggestions")
-
+			"""
 			# Last resort, try throwing in recent photos
 			if len(responseObjects) < 3:
 				# Grab all the latest strands
@@ -867,7 +868,7 @@ def swaps(request):
 					suggestion['title'] = "%s" % (api_util.prettyDate(suggestion['time_taken']))
 					rankNum += 1
 					responseObjects.append(suggestion)
-			"""
+				printStats("swaps-recent-photos")
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
