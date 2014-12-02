@@ -168,11 +168,9 @@
       
       // A posts object has both individual posts and a suggestions object
       self.suggestionsObject = [[self.postsObject subobjectsOfType:DFFeedObjectSuggestedPhotos] firstObject];
-      [self configureAddPhotosBadgeCount];
+      [self configureTopBanner];
     }
   }
-  
-  
 }
 
 - (void)observeNotifications
@@ -265,20 +263,8 @@
   }
   self.titleView.timeLabel.text = [NSDateFormatter relativeTimeStringSinceDate:self.postsObject.time_taken
                                                                     abbreviate:NO];
-  [self configureAddPhotosBadgeCount];
 }
 
-- (void)configureAddPhotosBadgeCount
-{
-  if (self.suggestionsObject) {
-    self.addPhotosButtomItem.badgeBGColor = [UIColor blueColor];
-    
-    NSArray *photoObjects = [self.suggestionsObject descendentdsOfType:DFFeedObjectPhoto];
-    self.addPhotosButtomItem.badgeValue = [NSString stringWithFormat:@"%lu", (unsigned long)photoObjects.count];
-  } else {
-    self.addPhotosButtomItem.badgeValue = @"";
-  }
-}
 
 - (void)configureTableView
 {
@@ -722,12 +708,12 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
   [self.navigationController pushViewController:peopleViewController animated:YES];
 }
 
-- (void)addPhotosButtonPressed:(id)sender
+- (void)showAddPhotosView:(BOOL)selectSuggestedPhotos
 {
   NSArray *privateStrands = [[DFPeanutFeedDataManager sharedManager] privateStrandsByDateAscending:YES];
-  
   DFSelectPhotosViewController *selectPhotosViewController;
-  if (self.suggestionsObject) {
+  
+  if (selectSuggestedPhotos && self.suggestionsObject) {
     // Note:  Right now we're only selecting the first section, there could be more in the suggestions.
     // TODO(Derek): Possibly look at this if its a big deal
     selectPhotosViewController = [[DFSelectPhotosViewController alloc]
@@ -738,6 +724,7 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
                                   initWithCollectionFeedObjects:privateStrands];
   }
   
+  
   selectPhotosViewController.navigationItem.title = @"Add Photos";
   selectPhotosViewController.actionButtonVerb = @"Add";
   selectPhotosViewController.delegate = self;
@@ -745,7 +732,11 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
                                            initWithRootViewController:selectPhotosViewController];
   
   [self presentViewController:navController animated:YES completion:nil];
-  
+}
+
+- (void)addPhotosButtonPressed:(id)sender
+{
+  [self showAddPhotosView:NO];
 }
 
 - (void)selectPhotosViewController:(DFSelectPhotosViewController *)controller didFinishSelectingFeedObjects:(NSArray *)selectedFeedObjects
@@ -863,15 +854,20 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
     self.topBannerView.tintColor = [UIColor darkGrayColor];
     self.topBannerView.leftImageView.image = [[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
                                               imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ photos to contribute",
-                                         @(10)];
     self.topBannerView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    __weak typeof(self) weakSelf = self;
+    self.topBannerView.actionButtonHandler = ^{
+      [weakSelf showAddPhotosView:YES];
+    };
   }
-  
-  BOOL show = YES;
-  if (show) {
+
+  if (self.suggestionsObject) {
     self.topBannerView.hidden = NO;
     self.tableView.contentInset = UIEdgeInsetsMake(43.0, 0, 0, 0);
+    NSArray *photoObjects = [self.suggestionsObject descendentdsOfType:DFFeedObjectPhoto];
+    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ photos to contribute",
+                                         @(photoObjects.count)];
   } else {
     self.topBannerView.hidden = YES;
     self.tableView.contentInset = UIEdgeInsetsZero;
