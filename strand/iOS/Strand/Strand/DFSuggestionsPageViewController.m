@@ -130,6 +130,7 @@
 
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController
 {
+  if (![[viewController class] isSubclassOfClass:[DFSuggestionViewController class]]) return -1;
   DFSuggestionViewController *suggestionVC = (DFSuggestionViewController *)viewController;
   NSUInteger currentIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
   return currentIndex != NSNotFound ? currentIndex : -1;
@@ -174,7 +175,7 @@
   UIViewController *noSuggestionVC = [[UIViewController alloc] init];
   DFNoTableItemsView *noSuggestionsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
   noSuggestionsView.titleLabel.text = @"No More Suggestions";
-  noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends!";
+  noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends.";
   noSuggestionsView.superView = noSuggestionVC.view;
   return noSuggestionVC;
 }
@@ -221,20 +222,20 @@
 - (void)gotoNextController
 {
   UIViewController *nextController;
-  if (self.viewControllers.count == 0 && self.filteredSuggestions.count > 0) {
-   nextController = [self viewControllerForIndex:0];
-  } else {
-    UIViewController *currentController = self.viewControllers.firstObject;
-    nextController = [self pageViewController:self
-            viewControllerAfterViewController:currentController];
+  if (self.filteredSuggestions.count > 0) {
+    if (self.viewControllers.count == 0) {
+      nextController = [self viewControllerForIndex:0];
+    } else {
+      UIViewController *currentController = self.viewControllers.firstObject;
+      nextController = [self pageViewController:self
+              viewControllerAfterViewController:currentController];
+    }
   }
   
-  if (!nextController) {
+  if (!nextController)
     nextController = [self noSuggestionsViewController];
-  }
 
-  NSArray *newControllers = nextController ? @[nextController] : @[];
-  [self setViewControllers:newControllers
+  [self setViewControllers:@[nextController]
                  direction:UIPageViewControllerNavigationDirectionForward
                   animated:YES
                 completion:nil];
