@@ -147,15 +147,15 @@ static DFImageDownloadManager *defaultManager;
    withPriority:queuePriority
    executeBlockOnce:^id{
      @autoreleasepool {
-       DDLogVerbose(@"Getting image data at: %@", url);
-       NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
-                                               initWithURL:url
-                                               cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                               timeoutInterval:15.0];
-       AFHTTPRequestOperation *requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
-       requestOperation.queuePriority = queuePriority;
-       
+       AFHTTPRequestOperation *requestOperation = nil;
        for (int retryCount = 0; retryCount <= maxDownloadRetries; retryCount++) {
+         DDLogVerbose(@"Getting image data at: %@", url);
+         NSMutableURLRequest *downloadRequest = [[NSMutableURLRequest alloc]
+                                                 initWithURL:url
+                                                 cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                 timeoutInterval:15.0];
+         requestOperation = [[AFImageRequestOperation alloc] initWithRequest:downloadRequest];
+         requestOperation.queuePriority = queuePriority;
          [[[DFObjectManager sharedManager] HTTPClient] enqueueHTTPRequestOperation:requestOperation];
          [requestOperation waitUntilFinished];
          if (!requestOperation.error) {
