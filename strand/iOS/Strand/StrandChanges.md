@@ -1,5 +1,11 @@
 # Swap
 
+## Dec 1st, 2014 (4806)
+
+- New suggestions tab to see suggested swaps better
+- Like button in feed
+- Bug fixes (no more wrong counts in the friends tab)
+
 ## Nov 19th, 2014 (4805)
 
 - Fix issues when viewing full photos on small screens (4S and below)
