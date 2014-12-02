@@ -120,29 +120,30 @@
 
 - (void)reloadData
 {
-  self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
-                                           acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id];
-  [self.collectionView reloadData];
-  
-  [self configureNoResultsView];
+    self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
+                                             acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id];
+    [self.collectionView reloadData];
+    [self configureNoResultsView];
 }
 
 - (void)configureNoResultsView
 {
-  if (self.datasource.collectionFeedObjects.count == 0) {
-    if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-    [self.noResultsView setSuperView:self.collectionView];
-    if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
-      self.noResultsView.titleLabel.text = @"No Photos";
-      [self.noResultsView.activityIndicator stopAnimating];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    if (self.datasource.collectionFeedObjects.count == 0) {
+      if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+      [self.noResultsView setSuperView:self.collectionView];
+      if ([[DFPeanutFeedDataManager sharedManager] hasInboxData]) {
+        self.noResultsView.titleLabel.text = @"No Photos";
+        [self.noResultsView.activityIndicator stopAnimating];
+      } else {
+        self.noResultsView.titleLabel.text = @"Loading...";
+        [self.noResultsView.activityIndicator startAnimating];
+      }
     } else {
-      self.noResultsView.titleLabel.text = @"Loading...";
-      [self.noResultsView.activityIndicator startAnimating];
+      if (self.noResultsView) [self.noResultsView removeFromSuperview];
+      self.noResultsView = nil;
     }
-  } else {
-    if (self.noResultsView) [self.noResultsView removeFromSuperview];
-    self.noResultsView = nil;
-  }
+  });
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView
