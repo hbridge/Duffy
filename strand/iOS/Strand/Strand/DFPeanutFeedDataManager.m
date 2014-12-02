@@ -142,7 +142,7 @@ static DFPeanutFeedDataManager *defaultManager;
          self.swapsLastResponseHash = responseHash;
          self.swapsFeedObjects = response.objects;
          
-         DDLogInfo(@"Got new swaps data, sending notification.");
+         DDLogInfo(@"Got new swaps data for %@ objects, sending notification.", @(response.objects.count));
          
          [[NSNotificationCenter defaultCenter]
           postNotificationName:DFStrandNewSwapsDataNotificationName
@@ -226,6 +226,23 @@ static DFPeanutFeedDataManager *defaultManager;
 - (BOOL)hasSwapsData
 {
   return (self.swapsLastResponseHash != nil);
+}
+
+- (BOOL)areSuggestionsReady
+{
+  NSManagedObjectContext *context = [DFPhotoStore createBackgroundManagedObjectContext];
+  DFPhotoCollection *allPhotos = [DFPhotoStore allPhotosCollectionUsingContext:context];
+  NSArray *photosWithoutIDs =
+   [DFPhotoStore photosWithoutPhotoIDInContext:[DFPhotoStore createBackgroundManagedObjectContext]];
+  BOOL result =
+  // if there are no photos to upload and we have swaps data, or there are suggestions, suggestions should be ready
+  ((allPhotos.photoSet.count > 0 && photosWithoutIDs.count == 0 && self.hasSwapsData)
+   || self.suggestedStrands.count > 0);
+
+  
+  DDLogVerbose(@"areSuggestionsReady: %@, allPhotos:%@ photosWithoutIDs:%@ hasSwapsData:%@ suggestedStrands:%@",
+               @(result), @(allPhotos.photoSet.count), @(photosWithoutIDs.count), @(self.hasSwapsData), @(self.suggestedStrands.count));
+  return result;
 }
 
 - (BOOL)hasActionsData

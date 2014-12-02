@@ -79,7 +79,7 @@
 {
   [super viewWillAppear:animated];
   [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
-  [self configureNoResultsView];
+  [self configureLoadingView];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -102,20 +102,20 @@
   
   [self.filteredSuggestions removeObjectsInArray:self.suggestionsToRemove];
   
-  if (self.viewControllers.count == 0
+  if ((self.viewControllers.count == 0
       || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
            isSubclassOfClass:[DFSuggestionViewController class]])
+      && [[DFPeanutFeedDataManager sharedManager] areSuggestionsReady])
     [self gotoNextController];
-  [self configureNoResultsView];
+  [self configureLoadingView];
 }
 
-- (void)configureNoResultsView
+- (void)configureLoadingView
 {
   if (self.filteredSuggestions.count == 0) {
     if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
     [self.noResultsView setSuperView:self.view];
-    if ([[DFPeanutFeedDataManager sharedManager] hasSwapsData]
-        && ![[DFUploadController sharedUploadController] isUploadInProgress]) {
+    if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
       self.noResultsView.titleLabel.text = @"";
       [self.noResultsView.activityIndicator stopAnimating];
     } else {
