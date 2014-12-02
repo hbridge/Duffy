@@ -399,6 +399,12 @@ static int ImagePrefetchRange = 3;
 {
   DFPhotoFeedFooterCell *footer = [self.tableView dequeueReusableCellWithIdentifier:@"footer"];
   DFFeedDataSource __weak *weakSelf = self;
+  
+  DFPeanutAction *likeAction = [feedObject userFavoriteAction];
+  [footer setLiked:(likeAction != nil)];
+  footer.likeBlock = ^{
+    [weakSelf.delegate feedDataSource:weakSelf likeButtonPressedForPhoto:feedObject];
+  };
   footer.commentBlock = ^{
     [weakSelf.delegate feedDataSource:weakSelf commentButtonPressedForPhoto:feedObject];
   };

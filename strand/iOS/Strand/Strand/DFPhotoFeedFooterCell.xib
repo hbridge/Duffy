@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14A389" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
@@ -14,29 +14,31 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YrJ-Q5-cVn" customClass="DFRoundedButton">
-                        <rect key="frame" x="4" y="4" width="75" height="24"/>
+                    <button opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YrJ-Q5-cVn" userLabel="Like" customClass="DFRoundedButton">
+                        <rect key="frame" x="4" y="4" width="45" height="24"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstAttribute="height" constant="24" id="whe-rP-uMC"/>
                         </constraints>
                         <fontDescription key="fontDescription" type="system" pointSize="13"/>
                         <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                        <inset key="contentEdgeInsets" minX="8" minY="4" maxX="8" maxY="4"/>
-                        <state key="normal" title="Comment">
+                        <inset key="contentEdgeInsets" minX="8" minY="4" maxX="12" maxY="4"/>
+                        <inset key="titleEdgeInsets" minX="4" minY="0.0" maxX="-4" maxY="0.0"/>
+                        <state key="normal" title="Like">
                             <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                         </state>
+                        <state key="selected" title="Liked"/>
                         <userDefinedRuntimeAttributes>
                             <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
                                 <real key="value" value="3"/>
                             </userDefinedRuntimeAttribute>
                         </userDefinedRuntimeAttributes>
                         <connections>
-                            <action selector="commentButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="uSZ-bA-pvY"/>
+                            <action selector="likeButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="hfa-Nv-Ji6"/>
                         </connections>
                     </button>
-                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="WYx-je-qmB" userLabel="moreOptionsButton" customClass="DFRoundedButton">
-                        <rect key="frame" x="286" y="4" width="30" height="24"/>
+                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="WYx-je-qmB" userLabel="moreOptionsButton" customClass="DFRoundedButton">
+                        <rect key="frame" x="286" y="5" width="30" height="24"/>
                         <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                         <fontDescription key="fontDescription" type="system" pointSize="26"/>
                         <state key="normal" title="...">
@@ -55,8 +57,30 @@
                             <action selector="moreButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="fXV-Zo-yte"/>
                         </connections>
                     </button>
+                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="lxu-yw-75x" customClass="DFRoundedButton">
+                        <rect key="frame" x="57" y="4" width="79" height="24"/>
+                        <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                        <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <inset key="contentEdgeInsets" minX="8" minY="4" maxX="12" maxY="4"/>
+                        <inset key="titleEdgeInsets" minX="4" minY="0.0" maxX="-4" maxY="0.0"/>
+                        <state key="normal" title="Comment">
+                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                        </state>
+                        <userDefinedRuntimeAttributes>
+                            <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                                <real key="value" value="3"/>
+                            </userDefinedRuntimeAttribute>
+                        </userDefinedRuntimeAttributes>
+                        <connections>
+                            <action selector="commentButtonPressed:" destination="KGk-i7-Jjw" eventType="touchUpInside" id="1e4-Aw-Qps"/>
+                        </connections>
+                    </button>
                 </subviews>
                 <constraints>
+                    <constraint firstItem="lxu-yw-75x" firstAttribute="leading" secondItem="YrJ-Q5-cVn" secondAttribute="trailing" constant="8" id="Meo-q7-qvF"/>
+                    <constraint firstItem="YrJ-Q5-cVn" firstAttribute="bottom" secondItem="lxu-yw-75x" secondAttribute="bottom" id="P8g-bG-ROo"/>
+                    <constraint firstItem="YrJ-Q5-cVn" firstAttribute="top" secondItem="lxu-yw-75x" secondAttribute="top" id="e1o-Ko-2YX"/>
                     <constraint firstItem="YrJ-Q5-cVn" firstAttribute="leading" secondItem="H2p-sc-9uM" secondAttribute="leading" constant="4" id="hHJ-0P-8uu"/>
                     <constraint firstItem="YrJ-Q5-cVn" firstAttribute="top" secondItem="H2p-sc-9uM" secondAttribute="top" constant="4" id="mwp-0J-lH3"/>
                     <constraint firstItem="WYx-je-qmB" firstAttribute="bottom" secondItem="YrJ-Q5-cVn" secondAttribute="bottom" id="seo-HS-Hwf"/>
@@ -66,10 +90,11 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="commentButton" destination="YrJ-Q5-cVn" id="5h9-M9-Kjl"/>
+                <outlet property="commentButton" destination="lxu-yw-75x" id="T1v-gL-L0c"/>
+                <outlet property="likeButton" destination="YrJ-Q5-cVn" id="hn7-BH-Kvv"/>
                 <outlet property="moreButton" destination="WYx-je-qmB" id="wn0-Uc-MhI"/>
             </connections>
-            <point key="canvasLocation" x="403" y="427.5"/>
+            <point key="canvasLocation" x="403" y="426.5"/>
         </tableViewCell>
     </objects>
 </document>

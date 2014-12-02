@@ -11,7 +11,9 @@
 @implementation DFPhotoFeedFooterCell
 
 - (void)awakeFromNib {
-    // Initialization code
+  [super awakeFromNib];
+  [self.commentButton setImage:[UIImage imageNamed:@"Assets/Icons/CommentButtonIcon"]
+                      forState:UIControlStateNormal];
 }
 
 - (void)setSelected:(BOOL)selected animated:(BOOL)animated {
@@ -27,11 +29,32 @@
 
 
 - (IBAction)commentButtonPressed:(id)sender {
-  self.commentBlock();
+  if (self.commentBlock) self.commentBlock();
 }
 
 - (IBAction)moreButtonPressed:(id)sender {
-  self.moreBlock();
+  if (self.moreBlock) self.moreBlock();
+}
+
+- (IBAction)likeButtonPressed:(id)sender {
+  if (self.likeBlock) self.likeBlock();
+}
+
+- (void)setLiked:(BOOL)liked
+{
+  if (liked) {
+    [self.likeButton setTitle:@"Liked" forState:UIControlStateNormal];
+    [self.likeButton setBackgroundColor:[UIColor darkGrayColor]];
+    [self.likeButton setImage:[[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal]
+                               forState:UIControlStateNormal];
+  } else {
+    [self.likeButton setTitle:@"Like" forState:UIControlStateNormal];
+    [self.likeButton setBackgroundColor:[UIColor lightGrayColor]];
+    [self.likeButton setImage:[UIImage imageNamed:@"Assets/Icons/LikeOffButtonIcon"]
+                               forState:UIControlStateNormal];
+  }
+  [self.likeButton sizeToFit];
+  [self setNeedsLayout];
 }
 
 

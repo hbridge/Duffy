@@ -487,7 +487,7 @@ commentButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
 - (void)feedDataSource:(DFFeedDataSource *)datasource
 likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
 {
-  DDLogVerbose(@"Favorite button pressed");
+  DDLogVerbose(@"Like button pressed");
   DFPeanutAction *oldFavoriteAction = [[photoObject actionsOfType:DFPeanutActionFavorite
                                              forUser:[[DFUser currentUser] userID]]
                                firstObject];
