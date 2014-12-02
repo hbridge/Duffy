@@ -2409,7 +2409,11 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+<<<<<<< HEAD
 				PROVISIONING_PROFILE = "86d3988a-1b53-42ba-b3ee-3e13c2f6c9be";
+=======
+				PROVISIONING_PROFILE = "";
+>>>>>>> Add in UIBarButtomItem-Badge classes
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "Strand/Strand-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
