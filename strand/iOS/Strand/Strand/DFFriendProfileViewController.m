@@ -51,10 +51,7 @@
 - (void)configureHeader
 {
   NSArray *swappedStrands = [[DFPeanutFeedDataManager sharedManager]
-                             acceptedStrandsWithPostsCollapsed:YES
-                             filterToUser:self.peanutUser.id
-                             feedObjectSortKey:@"time_taken"
-                             ascending:YES];
+                             acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.peanutUser.id];
   self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.nameLabel.text = [self.peanutUser fullName];

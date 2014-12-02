@@ -34,10 +34,7 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)publicStrands;
 - (NSArray *)inviteStrands;
 - (NSArray *)acceptedStrands;
-- (NSArray *)acceptedStrandsWithPostsCollapsed:(BOOL)collapsed
-                                  filterToUser:(DFUserIDType)userID
-                             feedObjectSortKey:(NSString *)sortKey
-                                     ascending:(BOOL)ascending;
+- (NSArray *)acceptedStrandsWithPostsCollapsedAndFilteredToUser:(DFUserIDType)userID;
 - (NSArray *)privateStrands;
 - (NSArray *)privatePhotos;
 - (NSArray *)privateStrandsByDateAscending:(BOOL)ascending;
@@ -47,6 +44,8 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)privateStrandsWithUser:(DFPeanutUserObject *)user;
 - (NSArray *)actionsList;
 - (NSArray *)actionsListFilterUser:(DFPeanutUserObject *)user;
+
+- (NSArray *)getStrandPostListFromStrandPosts:(DFPeanutFeedObject *)strandPosts;
 
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;

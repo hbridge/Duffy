@@ -77,10 +77,7 @@
   
   self.datasource = [[DFImageDataSource alloc]
                      initWithCollectionFeedObjects:[[DFPeanutFeedDataManager sharedManager]
-                                                    acceptedStrandsWithPostsCollapsed:YES
-                                                    filterToUser:self.userToFilterTo.id
-                                                    feedObjectSortKey:@"time_taken"
-                                                    ascending:YES]
+                                                    acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id]
                      collectionView:self.collectionView];
   self.datasource.imageDataSourceDelegate = self;
   [self.collectionView registerNib:[UINib nibForClass:[DFGallerySectionHeader class]]
@@ -124,10 +121,7 @@
 - (void)reloadData
 {
   self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
-                                           acceptedStrandsWithPostsCollapsed:YES
-                                           filterToUser:self.userToFilterTo.id
-                                           feedObjectSortKey:@"time_taken"
-                                           ascending:YES];
+                                           acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.userToFilterTo.id];
   [self.collectionView reloadData];
   
   [self configureNoResultsView];
@@ -163,7 +157,6 @@
   header.titleLabel.text = strandObject.title;
   header.profilePhotoStackView.peanutUsers = strandObject.actors;
   header.timeLabel.text = [[NSDateFormatter HumanDateFormatter] stringFromDate:strandObject.time_taken];
-
   
   return header;
 }
@@ -180,7 +173,7 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
   DFPeanutFeedObject *strandObject = self.datasource.collectionFeedObjects[indexPath.section];
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath] leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  DFFeedViewController *fvc = [[DFFeedViewController alloc] initWithFeedObject:strandObject];
+  DFFeedViewController *fvc = [[DFFeedViewController alloc] initWithStrandPostsId:strandObject.id];
   fvc.onViewScrollToPhotoId = photo.id;
   fvc.showPersonPerPhoto = YES;
   [self.navigationController pushViewController:fvc animated:YES];

@@ -24,6 +24,7 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 - (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject;
+- (instancetype)initWithStrandPostsId:(DFStrandIDType)strandID;
 
 /* 
  Use this to present a feed view controller modally for a given feed object, for example
