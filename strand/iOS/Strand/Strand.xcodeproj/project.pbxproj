@@ -173,6 +173,8 @@
 		5AAF03A919B50F2D00EF021C /* DFPeanutStrandInvite.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03A819B50F2D00EF021C /* DFPeanutStrandInvite.m */; };
 		5AAF03AC19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03AB19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m */; };
 		5AAF03AF19B5145200EF021C /* DFPeanutStrandInviteAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */; };
+		5AB0E6331A2E36CB00B8C08E /* DFTopBannerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB0E6321A2E36CB00B8C08E /* DFTopBannerView.m */; };
+		5AB0E6351A2E36D800B8C08E /* DFTopBannerView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5AB0E6341A2E36D800B8C08E /* DFTopBannerView.xib */; };
 		5AB32B5C19537A610082F716 /* DFStrandStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB32B5B19537A610082F716 /* DFStrandStore.m */; };
 		5AB4CBFB19816EB200EFB3E3 /* DFBadgeButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB4CBFA19816EB200EFB3E3 /* DFBadgeButton.m */; };
 		5AB7BEBA19FFF71D000BEB67 /* DFImageManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 5AB7BEB919FFF71D000BEB67 /* DFImageManager.m */; };
@@ -573,6 +575,9 @@
 		5AAF03AB19B5105D00EF021C /* DFPeanutRestEndpointAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutRestEndpointAdapter.m; sourceTree = "<group>"; };
 		5AAF03AD19B5145200EF021C /* DFPeanutStrandInviteAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutStrandInviteAdapter.h; sourceTree = "<group>"; };
 		5AAF03AE19B5145200EF021C /* DFPeanutStrandInviteAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutStrandInviteAdapter.m; sourceTree = "<group>"; };
+		5AB0E6311A2E36CB00B8C08E /* DFTopBannerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFTopBannerView.h; sourceTree = "<group>"; };
+		5AB0E6321A2E36CB00B8C08E /* DFTopBannerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFTopBannerView.m; sourceTree = "<group>"; };
+		5AB0E6341A2E36D800B8C08E /* DFTopBannerView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFTopBannerView.xib; sourceTree = "<group>"; };
 		5AB32B5A19537A610082F716 /* DFStrandStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFStrandStore.h; sourceTree = "<group>"; };
 		5AB32B5B19537A610082F716 /* DFStrandStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFStrandStore.m; sourceTree = "<group>"; };
 		5AB4CBF919816EB200EFB3E3 /* DFBadgeButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFBadgeButton.h; sourceTree = "<group>"; };
@@ -1372,6 +1377,9 @@
 				5AA452A4196739900099CBD2 /* DFFeedViewController.h */,
 				5AA452A5196739900099CBD2 /* DFFeedViewController.m */,
 				5A83A3DF19F04A6F0068F08B /* DFFeedViewController.xib */,
+				5AB0E6311A2E36CB00B8C08E /* DFTopBannerView.h */,
+				5AB0E6321A2E36CB00B8C08E /* DFTopBannerView.m */,
+				5AB0E6341A2E36D800B8C08E /* DFTopBannerView.xib */,
 				5ACE176B1A1CF45D00DE998A /* DFFeedDataSource.h */,
 				5ACE176C1A1CF45D00DE998A /* DFFeedDataSource.m */,
 				5A4C820719EDBACE00C22A12 /* DFSwapUpsellView.h */,
@@ -1847,6 +1855,7 @@
 				5AAF037D19AF86BF00EF021C /* DFSelectPhotosViewController.xib in Resources */,
 				5A83A3D619EED9ED0068F08B /* DFSmallCardTableViewCell.xib in Resources */,
 				5ACE17721A1D20E700DE998A /* DFPhotoFeedActionCell.xib in Resources */,
+				5AB0E6351A2E36D800B8C08E /* DFTopBannerView.xib in Resources */,
 				5AA9293419A66AB700032A3F /* DFNoResultsTableViewCell.xib in Resources */,
 				5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */,
 				5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */,
@@ -2099,6 +2108,7 @@
 				5A9BC31F19A2A77F002D1CD7 /* DFContactsStore.m in Sources */,
 				5AB7CB051A0820690047F72B /* DFSelectableMultiPhotoViewController.m in Sources */,
 				5AA45297196708D00099CBD2 /* DFPhotoStackCell.m in Sources */,
+				5AB0E6331A2E36CB00B8C08E /* DFTopBannerView.m in Sources */,
 				5AB7BEC11A028C20000BEB67 /* DFSwapTableViewCell.m in Sources */,
 				5A9BC32219A2AA64002D1CD7 /* DFContactsModel.xcdatamodeld in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,

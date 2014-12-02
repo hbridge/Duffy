@@ -11,5 +11,7 @@
 IB_DESIGNABLE @interface DFRoundedButton : UIButton
 
 @property (nonatomic) IBInspectable CGFloat cornerRadius;
+@property (nonatomic) IBInspectable CGFloat borderWidth;
+@property (nonatomic) IBInspectable UIColor *borderColor;
 
 @end

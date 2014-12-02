@@ -24,6 +24,7 @@
 #import "DFSwapUpsellView.h"
 #import "NSDateFormatter+DFPhotoDateFormatters.h"
 #import "SVProgressHUD.h"
+#import "DFTopBannerView.h"
 
 @interface DFFeedViewController ()
 
@@ -41,6 +42,7 @@
 @property (nonatomic, retain) DFStrandGalleryTitleView *titleView;
 @property (nonatomic, retain) DFSwapUpsellView *swapUpsellView;
 @property (nonatomic, retain) NSTimer *refreshTimer;
+@property (nonatomic, retain) DFTopBannerView *topBannerView;
 
 @end
 
@@ -176,15 +178,15 @@
 {
   self.navigationItem.rightBarButtonItems =
   @[[[UIBarButtonItem alloc]
-     initWithImage:[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
-     style:UIBarButtonItemStylePlain
-     target:self
-     action:@selector(addPhotosButtonPressed:)],
-    [[UIBarButtonItem alloc]
      initWithImage:[UIImage imageNamed:@"Assets/Icons/PeopleNavBarButton"]
      style:UIBarButtonItemStylePlain
      target:self
      action:@selector(peopleButtonPressed:)],
+    [[UIBarButtonItem alloc]
+     initWithImage:[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
+     style:UIBarButtonItemStylePlain
+     target:self
+     action:@selector(addPhotosButtonPressed:)],
     ];
   
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
@@ -220,6 +222,7 @@
   [self configureTitleView];
   [self configureTableView];
   [self configureUpsell];
+  [self configureTopBanner];
 }
 
 - (void)configureTitleView
@@ -758,7 +761,7 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
 }
 
 
-#pragma mark - Upsell Methods
+#pragma mark - Top Banner
 
 - (void)configureUpsell
 {
@@ -791,6 +794,47 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
                                          self.view.frame.size.height - swapUpsellHeight,
                                          self.view.frame.size.width,
                                          swapUpsellHeight);
+}
+
+- (void)configureTopBanner
+{
+  if (!self.topBannerView) {
+    self.topBannerView = [UINib instantiateViewWithClass:[DFTopBannerView class]];
+    [self.view addSubview:self.topBannerView];
+    [self.view addConstraints:[NSLayoutConstraint
+                               constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
+                               options:0
+                               metrics:nil
+                               views:@{@"banner" : self.topBannerView}]];
+    [self.view addConstraints:[NSLayoutConstraint
+                               constraintsWithVisualFormat:@"V:|-(0)-[banner]"
+                               options:0
+                               metrics:nil
+                               views:@{@"banner" : self.topBannerView}]];
+    [self.topBannerView addConstraint:[NSLayoutConstraint constraintWithItem:self.topBannerView
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                   relatedBy:NSLayoutRelationEqual
+                                                                      toItem:nil
+                                                                   attribute:NSLayoutAttributeHeight
+                                                                  multiplier:1.0
+                                                                    constant:43.0]];
+    
+    self.topBannerView.tintColor = [UIColor darkGrayColor];
+    self.topBannerView.leftImageView.image = [[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
+                                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ photos to contribute",
+                                         @(10)];
+    self.topBannerView.translatesAutoresizingMaskIntoConstraints = NO;
+  }
+  
+  BOOL show = YES;
+  if (show) {
+    self.topBannerView.hidden = NO;
+    self.tableView.contentInset = UIEdgeInsetsMake(43.0, 0, 0, 0);
+  } else {
+    self.topBannerView.hidden = YES;
+    self.tableView.contentInset = UIEdgeInsetsZero;
+  }
 }
 
 @end

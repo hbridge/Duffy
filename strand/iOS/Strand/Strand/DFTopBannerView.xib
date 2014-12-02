@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFTopBannerView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="43"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="DJ2-n1-xNY">
+                    <rect key="frame" x="4" y="0.0" width="43" height="43"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="43" id="yfS-mh-dhA"/>
+                    </constraints>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WYm-Wf-j72">
+                    <rect key="frame" x="51" y="15" width="29" height="14"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                    <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="right" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="TWa-pT-wQI" customClass="DFRoundedButton">
+                    <rect key="frame" x="537" y="11" width="55" height="22"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                    <inset key="contentEdgeInsets" minX="6" minY="4" maxX="6" maxY="4"/>
+                    <state key="normal" title="REVIEW">
+                        <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="number" keyPath="cornerRadius">
+                            <real key="value" value="3"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="number" keyPath="borderWidth">
+                            <real key="value" value="1"/>
+                        </userDefinedRuntimeAttribute>
+                        <userDefinedRuntimeAttribute type="color" keyPath="borderColor">
+                            <color key="value" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                    <connections>
+                        <action selector="actionButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="isW-dK-OVD"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="centerY" secondItem="TWa-pT-wQI" secondAttribute="centerY" id="5cL-Dv-qpL"/>
+                <constraint firstItem="WYm-Wf-j72" firstAttribute="leading" secondItem="DJ2-n1-xNY" secondAttribute="trailing" constant="4" id="BrP-1h-9U3"/>
+                <constraint firstAttribute="bottom" secondItem="DJ2-n1-xNY" secondAttribute="bottom" id="Phu-gu-wtI"/>
+                <constraint firstItem="DJ2-n1-xNY" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="4" id="aGV-Oc-KR2"/>
+                <constraint firstItem="DJ2-n1-xNY" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="eZf-Fs-eD6"/>
+                <constraint firstAttribute="trailing" secondItem="TWa-pT-wQI" secondAttribute="trailing" constant="8" id="pTy-mb-j7l"/>
+                <constraint firstItem="WYm-Wf-j72" firstAttribute="centerY" secondItem="DJ2-n1-xNY" secondAttribute="centerY" id="tYk-11-EfH"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="actionButton" destination="TWa-pT-wQI" id="rY1-n6-xcd"/>
+                <outlet property="leftImageView" destination="DJ2-n1-xNY" id="EOO-yp-uIh"/>
+                <outlet property="textLabel" destination="WYm-Wf-j72" id="uDJ-sO-qtf"/>
+            </connections>
+            <point key="canvasLocation" x="324" y="249.5"/>
+        </view>
+    </objects>
+</document>

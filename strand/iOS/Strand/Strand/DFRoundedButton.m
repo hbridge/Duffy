@@ -16,6 +16,11 @@
   [super layoutSubviews];
   self.layer.cornerRadius = self.cornerRadius;
   self.layer.masksToBounds = YES;
+  if (self.borderColor) {
+    self.layer.borderColor = self.borderColor.CGColor;
+    self.layer.borderWidth = self.borderWidth;
+  }
+  
 }
 
 
