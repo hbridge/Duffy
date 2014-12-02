@@ -866,8 +866,9 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
     self.topBannerView.hidden = NO;
     self.tableView.contentInset = UIEdgeInsetsMake(43.0, 0, 0, 0);
     NSArray *photoObjects = [self.suggestionsObject descendentdsOfType:DFFeedObjectPhoto];
-    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ photos to contribute",
-                                         @(photoObjects.count)];
+    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ %@ to contribute",
+                                         @(photoObjects.count),
+                                         photoObjects.count > 1 ? @"photos" : @"photo"];
   } else {
     self.topBannerView.hidden = YES;
     self.tableView.contentInset = UIEdgeInsetsZero;
