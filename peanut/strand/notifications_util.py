@@ -1,11 +1,14 @@
 import datetime
 import json
 import logging
+from threading import Thread
 
 from django.db.models import Q
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 from peanut.settings import constants
-from common.models import NotificationLog, DuffyNotification
+from common.models import NotificationLog, DuffyNotification, Action, User, Strand
 from common.api_util import DuffyJsonEncoder
 
 from ios_notifications.models import APNService, Device
@@ -59,6 +62,9 @@ def sendNotification(user, msg, msgTypeId, customPayload, metadata = None):
 				notification.message = ""
 				notification.content_available = 1
 
+			if "badge" in customPayload:
+				notification.badge = customPayload["badge"]
+
 			apns = APNService.objects.get(id=device.service_id)
 
 			# This sends
@@ -78,11 +84,6 @@ def sendRefreshFeedToUsers(users):
 	for user in users:
 		logger.debug("Sending refresh feed to user %s" % (user.id))
 		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
-
-	# Next send through push notifications
-	# TODO(Derek) Maybe put this back in if we don't want to use socket server
-	#for user in users:
-	#	sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, dict())
 
 def sendSMS(phoneNumber, msg):
 	twilioclient = TwilioRestClient(constants.TWILIO_ACCOUNT, constants.TWILIO_TOKEN)
@@ -142,7 +143,61 @@ def threadedSendNotifications(userIds):
 	logger = logging.getLogger(__name__)
 
 	users = User.objects.filter(id__in=userIds)
+	
+	# This does only db writes so is fast.  This uses the socket server
+	sendRefreshFeedToUsers(users)
 
-	# Send update feed msg to folks who are involved in these photos
-	notifications_util.sendRefreshFeedToUsers(users)
+	actionsByUserId = getActionsByUserId(users)
+	print actionsByUserId
+	
+	# Next send through push notifications
+	# This might take a while since we have to hit apple's api.  Ok since we're in a new thread.
+	for user in users:
+		customPayload = dict()
+
+		if user.id in actionsByUserId:
+			customPayload["badge"] = len(actionsByUserId[user.id])
+		sendNotification(user, "", constants.NOTIFICATIONS_REFRESH_FEED, customPayload)
+
+
+def getActionsByUserId(users):
+	actionsByUserId = dict()
+	strands = Strand.objects.prefetch_related('user').filter(users__in=User.getIds(users)).filter(private=False)
+
+	strandsById = dict()
+	for strand in strands:
+		strandsById[strand.id] = strand
+
+	actions = Action.objects.filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(strand_id__in=Strand.getIds(strands)).order_by("-added")[:40]
+
+	for user in users:
+		for action in actions:
+			if (action.user_id != user.id and 
+				user in strandsById[action.strand_id].users.all() and
+				action.added > user.last_actions_list_request_timestamp):
+
+				if user.id not in actionsByUserId:
+					actionsByUserId[user.id] = list()
+				actionsByUserId[user.id].append(action)
+	return actionsByUserId
+
+
+@receiver(post_save, sender=Action)
+def sendNotificationsUponActions(sender, **kwargs):
+	action = kwargs.get('instance')
+
+	users = list()
+
+	if action.strand:
+		users = list(action.strand.users.all())
+		
+	if action.user and action.user not in users:
+		users.append(action.user)
+
+	userIds = User.getIds(users)
+	
+	Thread(target=threadedSendNotifications, args=(userIds,)).start()
+
+
+
 

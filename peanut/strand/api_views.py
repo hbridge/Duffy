@@ -715,16 +715,13 @@ def actions_list(request):
 		user = form.cleaned_data['user']
 		responseObjects = list()
 
+		# This code is duplicated in notifications_util
+		# TODO(Derek): possibly refactor if we do stuff with this
 		strands = Strand.objects.filter(users__in=[user]).filter(private=False)
 
 		strandIds = Strand.getIds(strands)
-		strandPhotos = Strand.photos.through.objects.filter(strand_id__in=strandIds)
-
-		photoIds = list()
-		for strandPhoto in strandPhotos:
-			photoIds.append(strandPhoto.photo_id)
 		
-		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter((Q(photo_id__in=photoIds) & Q(strand_id__in=strandIds)) | Q(strand_id__in=strandIds)).order_by("-added")[:40]
+		actions = Action.objects.prefetch_related('user', 'strand').exclude(user=user).filter(Q(action_type=constants.ACTION_TYPE_FAVORITE) | Q(action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND) | Q(action_type=constants.ACTION_TYPE_CREATE_STRAND) | Q(action_type=constants.ACTION_TYPE_COMMENT)).filter(strand_id__in=strandIds).order_by("-added")[:40]
 
 		actionsData = list()
 		for action in actions:
@@ -738,6 +735,9 @@ def actions_list(request):
 
 		response['objects'] = [actionsData]
 		printStats("actions-end")
+
+		user.last_actions_list_request_timestamp = datetime.datetime.utcnow()
+		user.save()
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")

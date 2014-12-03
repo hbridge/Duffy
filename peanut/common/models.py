@@ -43,6 +43,7 @@ class User(models.Model):
 	invites_sent = models.IntegerField(default=0)
 	api_cache_private_strands_dirty = models.BooleanField(default=True)
 	last_build_info = models.CharField(max_length=100, null=True)
+	last_actions_list_request_timestamp = models.DateTimeField(null=True)
 	install_num = models.IntegerField(default=0)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
@@ -777,26 +778,6 @@ class LocationRecord(models.Model):
 
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
-
-
-@receiver(post_save, sender=Action)
-def sendNotificationsUponActions(sender, **kwargs):
-	action = kwargs.get('instance')
-
-	users = list()
-
-	if action.strand:
-		users = list(action.strand.users.all())
-		
-	if action.user and action.user not in users:
-		users.append(action.user)
-
-	# First send to sockets
-	for user in users:
-		logger.debug("Sending refresh feed to user %s from action_save" % (user.id))
-		logEntry = NotificationLog.objects.create(user=user, msg_type=constants.NOTIFICATIONS_SOCKET_REFRESH_FEED)
-
-
 
 
 def doBulkUpdate(cls, objs, attributesList):
