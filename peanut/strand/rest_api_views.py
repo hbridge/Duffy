@@ -23,7 +23,7 @@ from rest_framework.views import APIView
 
 from peanut.settings import constants
 
-from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor
+from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, SharedStrand
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer
 from common import location_util, api_util
 
@@ -473,7 +473,19 @@ class BulkCreateAPIView(BulkCreateModelMixin,
     def post(self, request, *args, **kwargs):
         return self.create(request, *args, **kwargs)
 
+class KeyedCreateAPIView(CreateModelMixin,
+                         GenericAPIView):
+    key = None
+    def post(self, request, *args, **kwargs):
+        if isinstance(request.DATA[self.key], list):
+            dataEntry = request.DATA[self.key][0]
+        else:
+            dataEntry = request.DATA[self.key]
 
+        for key, value in dataEntry.iteritems():
+            request.DATA[key] = value
+
+        return self.create(request, *args, **kwargs)
 
 class ContactEntryBulkAPI(BulkCreateAPIView):
     model = ContactEntry
@@ -600,6 +612,38 @@ class CreateActionAPI(CreateAPIView):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+"""
+class CreatePhotoSuggestionBulkAPI(BulkCreateAPIView):
+    model = PhotoSuggestion
+    lookup_field = 'id'
+    serializer_class = BulkPhotoSuggestionSerializer
+
+        After we create a photo suggestion then see if all the photos in the strand have a suggestion row.
+        If so, update the strand itself to say its not suggestible
+    def post_save(self, photoSuggestion, created, first=None):
+        if created and first and photoSuggestion.id == first.id:
+            photoRelations = Strand.photos.through.objects.filter(strand_id=photoSuggestion.strand_id)
+            photoIds = list()
+
+            for photoRelation in photoRelations:
+                photoIds.append(photoRelation.photo_id)
+
+            photos = PhotoSuggestion.objects.filter(photo_id__in=photoIds)
+
+            notSeenPhotoIds = photoIds
+            for photo in photos:
+                if photo.id in notSeenPhotoIds:
+                    notSeenPhotoIds.remove(photo.id)
+
+            if len(notSeenPhotoIds) == 0:
+                logger.debug("All photos have been seen for strand %s, marking as suggestible = False" % photoSuggestion.strand_id)
+                strand = Strand.objects.get(id=photoSuggestion.strand_id)
+                strand.suggestible = False
+                strand.save()
+            else:
+                logger.debug("Created photoSuggestion %s %s %s %s and had %s photos till not seen in the strand" % (photoSuggestion, photoSuggestion.photo_id, photoSuggestion.user_id, photoSuggestion.strand_id, len(notSeenPhotoIds)))
+"""
+            
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def pre_save(self, user):
         if self.request.DATA['build_id'] and self.request.DATA['build_number']:

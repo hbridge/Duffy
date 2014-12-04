@@ -148,7 +148,6 @@ def threadedSendNotifications(userIds):
 	sendRefreshFeedToUsers(users)
 
 	actionsByUserId = getActionsByUserId(users)
-	print actionsByUserId
 	
 	# Next send through push notifications
 	# This might take a while since we have to hit apple's api.  Ok since we're in a new thread.
