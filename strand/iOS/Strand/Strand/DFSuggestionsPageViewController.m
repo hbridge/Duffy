@@ -159,11 +159,16 @@
   svc.suggestionFeedObject = suggestion;
   svc.frame = self.view.bounds;
   DFSuggestionsPageViewController __weak *weakSelf = self;
+  /*
   svc.requestButtonHandler = ^{
     [weakSelf suggestionSelected:suggestion];
   };
   svc.noButtonHandler = ^{
     [weakSelf suggestionHidden:suggestion];
+  };*/
+  
+  svc.suggestionsOutHandler = ^{
+    [weakSelf suggestionsOut:suggestion];
   };
   
   
@@ -214,6 +219,12 @@
 }
 
 - (void)suggestionHidden:(DFPeanutFeedObject *)suggestion
+{
+  [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
+  [self gotoNextController];
+}
+
+- (void)suggestionsOut:(DFPeanutFeedObject *)suggestion
 {
   [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
   [self gotoNextController];

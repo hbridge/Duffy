@@ -22,10 +22,13 @@
 @property (nonatomic) CGRect frame;
 @property (nonatomic, copy) DFVoidBlock requestButtonHandler;
 @property (nonatomic, copy) DFVoidBlock noButtonHandler;
+@property (nonatomic, copy) DFVoidBlock suggestionsOutHandler;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 - (IBAction)requestButtonPressed:(id)sender;
 - (IBAction)noButtonPressed:(id)sender;
+
+
 
 
 @end

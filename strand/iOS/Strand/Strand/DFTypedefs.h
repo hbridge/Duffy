@@ -71,6 +71,7 @@ typedef UInt64 DFPeanutActionType;
 extern DFPeanutActionType DFPeanutActionFavorite;
 extern DFPeanutActionType DFPeanutActionComment;
 extern DFPeanutActionType DFPeanutActionAddedPhotos;
+extern DFPeanutActionType DFPeanutActionEvalPhoto;
 
 
 // common block type

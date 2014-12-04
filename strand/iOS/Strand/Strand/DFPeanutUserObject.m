@@ -40,6 +40,7 @@
            @"first_run_sync_count",
            @"invites_remaining",
            @"invites_sent",
+           @"shared_strand",
            @"added",
            @"invited",
            ];

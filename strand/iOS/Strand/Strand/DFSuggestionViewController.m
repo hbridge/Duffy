@@ -9,8 +9,12 @@
 #import "DFSuggestionViewController.h"
 #import "DFPeanutFeedObject.h"
 #import "DFImageManager.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFSuggestionViewController ()
+
+@property (nonatomic) NSInteger photoIndex;
+@property (retain, nonatomic) NSArray *photos;
 
 @end
 
@@ -61,13 +65,41 @@
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion
 {
   if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
-  self.bottomLabel.text = [NSString stringWithFormat:@"%@ %@ photos",
-                                                 suggestion.actorsString,
-                                                 suggestion.actors.count > 1 ? @"have" : @"has"];
+  self.bottomLabel.text = [NSString stringWithFormat:@"Send %@ this photo?",
+                                                 suggestion.actorsString];
   self.topLabel.text = suggestion.placeAndRelativeTimeString;
   
-  DFPeanutFeedObject *firstSuggestedPhoto = [[suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
-  [[DFImageManager sharedManager] imageForID:firstSuggestedPhoto.id
+  self.photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  // Start at -1 since the goto method increments
+  self.photoIndex = -1;
+  [self gotoNextPhoto];
+
+  [self.view setNeedsLayout];
+}
+
+- (IBAction)requestButtonPressed:(id)sender {
+  [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:self.photos[self.photoIndex] users:self.suggestionFeedObject.actors];
+  if(![self gotoNextPhoto]) {
+    if (self.suggestionsOutHandler) self.suggestionsOutHandler();
+  }
+}
+
+- (IBAction)noButtonPressed:(id)sender {
+  if(![self gotoNextPhoto]) {
+    if (self.suggestionsOutHandler) self.suggestionsOutHandler();
+  }
+}
+
+- (BOOL)gotoNextPhoto
+{
+  self.photoIndex++;
+
+  if (self.photoIndex >= self.photos.count) {
+    return NO;
+  }
+  
+  DFPeanutFeedObject *nextPhoto = self.photos[self.photoIndex];
+  [[DFImageManager sharedManager] imageForID:nextPhoto.id
                                    pointSize:self.imageView.frame.size
                                  contentMode:DFImageRequestContentModeAspectFill
                                 deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
@@ -76,17 +108,7 @@
                                     [self.imageView setNeedsDisplay];
                                   });
                                 }];
-  [self.view setNeedsLayout];
+  return YES;
 }
-
-- (IBAction)requestButtonPressed:(id)sender {
-  if (self.requestButtonHandler) self.requestButtonHandler();
-}
-
-- (IBAction)noButtonPressed:(id)sender {
-  if (self.noButtonHandler) self.noButtonHandler();
-}
-
-
 
 @end

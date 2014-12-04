@@ -10,6 +10,7 @@
 #import <RKHTTPUtilities.h>
 #import "DFPeanutStrand.h"
 #import "DFNetworkAdapter.h"
+#import "DFPeanutFeedObject.h"
 
 typedef void (^DFPeanutStrandFetchSuccess)(DFPeanutStrand *peanutStrand);
 typedef void (^DFPeanutStrandFetchFailure)(NSError *error);
@@ -20,5 +21,11 @@ typedef void (^DFPeanutStrandFetchFailure)(NSError *error);
         withPeanutStrand:(DFPeanutStrand *)peanutStrand
                success:(DFPeanutStrandFetchSuccess)success
                failure:(DFPeanutStrandFetchFailure)failure;
+
+
+- (void)addPhoto:(DFPeanutFeedObject *)photoObject
+      toStrandID:(DFStrandIDType)strandID
+         success:(DFSuccessBlock)success
+         failure:(DFFailureBlock)failure;
 
 @end

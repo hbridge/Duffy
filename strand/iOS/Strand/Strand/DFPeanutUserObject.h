@@ -28,6 +28,7 @@
 @property (nonatomic, retain) NSNumber *first_run_sync_count;
 @property (nonatomic, retain) NSNumber *invites_remaining;
 @property (nonatomic, retain) NSNumber *invites_sent;
+@property (nonatomic, retain) NSNumber *shared_strand;
 @property (nonatomic, retain) NSDate *added;
 @property (nonatomic, retain) NSNumber *invited;
 

@@ -26,4 +26,5 @@ DFUIActionType DFUIActionDoubleTap = @"DoubleTap";
 DFPeanutActionType DFPeanutActionFavorite = 0;
 DFPeanutActionType DFPeanutActionAddedPhotos = 2;
 DFPeanutActionType DFPeanutActionComment = 4;
+DFPeanutActionType DFPeanutActionEvalPhoto = 5;
 

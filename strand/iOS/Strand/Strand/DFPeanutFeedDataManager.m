@@ -14,6 +14,8 @@
 #import "DFPeanutStrand.h"
 #import "DFPeanutStrandAdapter.h"
 #import "DFPeanutStrandInviteAdapter.h"
+#import "DFPeanutSharedStrandAdapter.h"
+#import "DFPeanutActionAdapter.h"
 #import "DFPhotoStore.h"
 
 @interface DFPeanutFeedDataManager ()
@@ -24,6 +26,8 @@
 @property (readonly, nonatomic, retain) DFPeanutFeedAdapter *actionsFeedAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandAdapter *strandAdapter;
 @property (readonly, nonatomic, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (readonly, nonatomic, retain) DFPeanutActionAdapter *actionAdapter;
+@property (readonly, nonatomic, retain) DFPeanutSharedStrandAdapter *sharedStrandAdapter;
 
 
 @property (atomic) BOOL inboxRefreshing;
@@ -43,6 +47,7 @@
 @property (readonly, atomic, retain) NSMutableDictionary *deferredCompletionBlocks;
 @property (nonatomic) dispatch_semaphore_t deferredCompletionSchedulerSemaphore;
 
+@property (nonatomic, retain) NSArray *cachedFriendsList;
 @end
 
 @implementation DFPeanutFeedDataManager
@@ -54,6 +59,11 @@
 
 @synthesize strandAdapter = _strandAdapter;
 @synthesize inviteAdapter = _inviteAdapter;
+@synthesize actionAdapter = _actionAdapter;
+@synthesize sharedStrandAdapter = _sharedStrandAdapter;
+
+@synthesize cachedFriendsList = _cachedFriendsList;
+
 @synthesize deferredCompletionBlocks = _deferredCompletionBlocks;
 
 - (instancetype)init
@@ -111,6 +121,16 @@ static DFPeanutFeedDataManager *defaultManager;
        if (!error && ![responseHash isEqual:self.inboxLastResponseHash]) {
          self.inboxLastResponseHash = responseHash;
          self.inboxFeedObjects = response.objects;
+         
+         // For inbox only, we update our local cache of friends
+         // If we refactor these methods to be common this will need to be pulled out
+         for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
+           if ([object.type isEqual:DFFeedObjectFriendsList]) {
+             // This grabs the local first name which we want to sort by
+             NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
+             _cachedFriendsList = [NSMutableArray arrayWithArray:[object.actors sortedArrayUsingDescriptors:@[sort]]];
+           }
+         }
          
          DDLogInfo(@"Got new inbox data, sending notification.");
          
@@ -545,19 +565,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
-- (NSArray *)friendsList
-{
-  for (DFPeanutFeedObject *object in self.inboxFeedObjects) {
-    if ([object.type isEqual:DFFeedObjectFriendsList]) {
-      // This grabs the local first name which we want to sort by
-      NSSortDescriptor *sort = [NSSortDescriptor sortDescriptorWithKey:@"firstName" ascending:YES];
-      NSArray* friends =  [object.actors sortedArrayUsingDescriptors:@[sort]];
-      return friends;
-    }
-  }
-  return [NSArray new];
-}
-
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
 {
   if (userID == [[DFUser currentUser] userID]) {
@@ -597,7 +604,20 @@ static DFPeanutFeedDataManager *defaultManager;
   return self.inboxRefreshing;
 }
 
+- (NSArray *)friendsList
+{
+  return self.cachedFriendsList;
+}
 
+- (DFPeanutUserObject *)getUserWithId:(DFUserIDType)userID
+{
+  for (DFPeanutUserObject *user in self.cachedFriendsList) {
+    if (user.id == userID) {
+      return user;
+    }
+  }
+  return nil;
+}
 
 - (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
          addPhotoIDs:(NSArray *)photoIDs
@@ -745,15 +765,18 @@ static DFPeanutFeedDataManager *defaultManager;
 }
 
 - (void)createNewStrandWithFeedObjects:(NSArray *)feedObjects
-           createdFromSuggestions:(NSArray *)suggestedSections
-                     selectedPeanutContacts:(NSArray *)selectedPeanutContacts
+                     additionalUserIds:(NSArray *)additionalUserIds
                           success:(void(^)(DFPeanutStrand *resultStrand))success
                           failure:(DFFailureBlock)failure
 
 {
   // Create the strand
   DFPeanutStrand *requestStrand = [[DFPeanutStrand alloc] init];
-  requestStrand.users = @[@([[DFUser currentUser] userID])];
+  NSMutableArray *userIds = [NSMutableArray arrayWithObject:@([[DFUser currentUser] userID])];
+  if (additionalUserIds) {
+    [userIds addObjectsFromArray:additionalUserIds];
+  }
+  requestStrand.users = userIds;
   NSMutableArray *photoObjects = [NSMutableArray new];
   for (DFPeanutFeedObject *feedObject in feedObjects) {
     [photoObjects addObjectsFromArray:[feedObject leafNodesFromObjectOfType:DFFeedObjectPhoto]];
@@ -778,13 +801,63 @@ static DFPeanutFeedDataManager *defaultManager;
      // start uploading the photos
      [[DFPhotoStore sharedStore] markPhotosForUpload:peanutStrand.photos];
      [[DFPhotoStore sharedStore] cachePhotoIDsInImageStore:peanutStrand.photos];
-     success(peanutStrand);
+     if (success) success(peanutStrand);
    } failure:^(NSError *error) {
-     failure(error);
+     if (failure) failure(error);
      DDLogError(@"%@ failed to create strand: %@, error: %@",
                 self.class, requestStrand, error);
    }];
 }
+
+
+- (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users
+{
+  for (DFPeanutUserObject *user in users) {
+    DFPeanutUserObject *cachedFriend = [self getUserWithId:user.id];
+    // If we don't have a shared_strand for this set of users yet, we need to create it.
+    if (cachedFriend.shared_strand == nil) {
+      // So first create a strand
+      // Then we'll create a record saying for this set of users, we're using this shared strand
+      [self createNewStrandWithFeedObjects:[NSArray arrayWithObject:photo]
+                         additionalUserIds:[NSArray arrayWithObject:@(cachedFriend.id)]
+                                   success:^(DFPeanutStrand *resultStrand) {
+                                     
+                                     // We successfully created the strand, not create the shared strand object and save that
+                                     cachedFriend.shared_strand = resultStrand.id;
+                                     
+                                     DFPeanutSharedStrand *sharedStrand = [DFPeanutSharedStrand new];
+                                     sharedStrand.users = resultStrand.users;
+                                     sharedStrand.strand = resultStrand.id;
+                                     [self.sharedStrandAdapter createSharedStrand:sharedStrand
+                                                                          success:^(NSArray *resultObjects){
+                                                                            // Lastly, we add the photo to the strand
+                                                                            [self.strandAdapter addPhoto:photo toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
+                                                                          }
+                                                                          failure:^(NSError *error) {
+                                                                            DDLogError(@"Unable to create shared strand");
+                                                                          }];
+                                     
+                                   }
+                                   failure:nil
+       ];
+    } else {
+      [self.strandAdapter addPhoto:photo toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
+    }
+  }
+}
+
+- (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
+{
+  DFPeanutAction *evalAction;
+  evalAction = [[DFPeanutAction alloc] init];
+  evalAction.user = [[DFUser currentUser] userID];
+  evalAction.action_type = DFPeanutActionEvalPhoto;
+  evalAction.photo = photoID;
+  evalAction.strand = privateStrandID;
+  
+  [self.actionAdapter addAction:evalAction success:nil failure:nil];
+}
+
 
 - (void)removePhoto:(DFPeanutFeedObject *)photoObject
      fromStrandPosts:(DFPeanutFeedObject *)strandPosts
@@ -903,6 +976,24 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   if (!_inviteAdapter) _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
   return _inviteAdapter;
+}
+
+- (DFPeanutActionAdapter *)actionAdapter
+{
+  if (!_actionAdapter) _actionAdapter = [[DFPeanutActionAdapter alloc] init];
+  return _actionAdapter;
+}
+
+- (DFPeanutSharedStrandAdapter *)sharedStrandAdapter
+{
+  if (!_sharedStrandAdapter) _sharedStrandAdapter = [[DFPeanutSharedStrandAdapter alloc] init];
+  return _sharedStrandAdapter;
+}
+
+- (NSArray *)cachedFriendsList
+{
+  if (!_cachedFriendsList) _cachedFriendsList = [[NSArray alloc] init];
+  return _cachedFriendsList;
 }
 
 @end

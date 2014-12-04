@@ -275,6 +275,8 @@
 		65BEA79E19E351310087930F /* DFIOS8CameraRollSyncOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 65BEA79C19E351310087930F /* DFIOS8CameraRollSyncOperation.m */; };
 		65D1C2CD1A2D0930007E7300 /* UIBarButtonItem+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2CC1A2D0930007E7300 /* UIBarButtonItem+Badge.m */; };
 		65D1C2D01A2D095E007E7300 /* UIButton+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2CF1A2D095E007E7300 /* UIButton+Badge.m */; };
+		65D1C2D91A30C1AA007E7300 /* DFPeanutSharedStrand.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */; };
+		65D1C2DC1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */; };
 		65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EF6C601A1563E300E0533F /* DFContactDataManager.m */; };
 /* End PBXBuildFile section */
 
@@ -771,6 +773,10 @@
 		65D1C2CC1A2D0930007E7300 /* UIBarButtonItem+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIBarButtonItem+Badge.m"; sourceTree = "<group>"; };
 		65D1C2CE1A2D095E007E7300 /* UIButton+Badge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIButton+Badge.h"; sourceTree = "<group>"; };
 		65D1C2CF1A2D095E007E7300 /* UIButton+Badge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIButton+Badge.m"; sourceTree = "<group>"; };
+		65D1C2D71A30C1AA007E7300 /* DFPeanutSharedStrand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSharedStrand.h; sourceTree = "<group>"; };
+		65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSharedStrand.m; sourceTree = "<group>"; };
+		65D1C2DA1A30C246007E7300 /* DFPeanutSharedStrandAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSharedStrandAdapter.h; sourceTree = "<group>"; };
+		65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSharedStrandAdapter.m; sourceTree = "<group>"; };
 		65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactDataManager.h; sourceTree = "<group>"; };
 		65EF6C601A1563E300E0533F /* DFContactDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactDataManager.m; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
@@ -1137,6 +1143,8 @@
 				5A4BBD2A19B7D55500359299 /* DFPeanutFeedAdapter.m */,
 				652D9B9C1A04258700018B1C /* DFPeanutPhotoAdapter.h */,
 				652D9B9D1A04258700018B1C /* DFPeanutPhotoAdapter.m */,
+				65D1C2DA1A30C246007E7300 /* DFPeanutSharedStrandAdapter.h */,
+				65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */,
 			);
 			name = Adapters;
 			sourceTree = "<group>";
@@ -1170,6 +1178,8 @@
 				5AAF03A819B50F2D00EF021C /* DFPeanutStrandInvite.m */,
 				5A883BF31A0AD63800355C1D /* DFPeanutFaceFeature.h */,
 				5A883BF41A0AD63800355C1D /* DFPeanutFaceFeature.m */,
+				65D1C2D71A30C1AA007E7300 /* DFPeanutSharedStrand.h */,
+				65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */,
 			);
 			name = "Peanut Objects";
 			sourceTree = "<group>";
@@ -2043,6 +2053,7 @@
 				5A9BC32819A3E299002D1CD7 /* DFPushNotificationsManager.m in Sources */,
 				5AC4A963194A295700862D9C /* DFStrandConstants.m in Sources */,
 				5A3172CE196C442400CA7693 /* NSString+DFHelpers.m in Sources */,
+				65D1C2DC1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m in Sources */,
 				5A0E12301974988700B6FF04 /* UIAlertView+DFHelpers.m in Sources */,
 				5ACE17621A1AB96C00DE998A /* DFAlertController.m in Sources */,
 				5AC4A9241947C30800862D9C /* DFDataHasher.m in Sources */,
@@ -2125,6 +2136,7 @@
 				5A9BC32219A2AA64002D1CD7 /* DFContactsModel.xcdatamodeld in Sources */,
 				5AC4A9271947C30800862D9C /* DFNotificationSharedConstants.m in Sources */,
 				5A05AD3D1A115B65003AAE1C /* DFCommentTableViewCell.m in Sources */,
+				65D1C2D91A30C1AA007E7300 /* DFPeanutSharedStrand.m in Sources */,
 				5A3172D5196C85F800CA7693 /* DFSettings.m in Sources */,
 				5A403440196083A9003D7546 /* DFCameraRollPhotoAsset.m in Sources */,
 				5A7B185319707DE300E5A1D1 /* DFPeanutAction.m in Sources */,

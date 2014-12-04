@@ -12,6 +12,7 @@
 #import "DFUser.h"
 #import "DFObjectManager.h"
 #import "DFPeanutInvalidField.h"
+#import "DFPeanutFeedObject.h"
 
 NSString *const RestStrandPath = @"strands/:id/";
 NSString *const CreateStrandPath = @"strands/";
@@ -111,5 +112,40 @@ NSString *const CreateStrandPath = @"strands/";
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
 }
 
+
+- (void)addPhoto:(DFPeanutFeedObject *)photoObject
+      toStrandID:(DFStrandIDType)strandID
+         success:(DFSuccessBlock)success
+         failure:(DFFailureBlock)failure
+{
+  DFPeanutStrand *reqStrand = [[DFPeanutStrand alloc] init];
+  reqStrand.id = @(strandID);
+  
+  DDLogInfo(@"Going to add photo %llu to strand %llu", photoObject.id, strandID);
+  
+  // first get the strand
+  [self
+   performRequest:RKRequestMethodGET
+   withPeanutStrand:reqStrand success:^(DFPeanutStrand *peanutStrand) {
+     //remove the photo from the strand's list of photos
+     NSMutableArray *newPhotosList = [peanutStrand.photos mutableCopy];
+     [newPhotosList addObject:@(photoObject.id)];
+     peanutStrand.photos = newPhotosList;
+     
+     // patch the strand with the new list
+     [self
+      performRequest:RKRequestMethodPATCH
+      withPeanutStrand:peanutStrand success:^(DFPeanutStrand *peanutStrand) {
+        DDLogInfo(@"%@ added photo %@ to %@", self.class, photoObject, peanutStrand);
+        if (success) success();
+      } failure:^(NSError *error) {
+        DDLogError(@"%@ couldn't patch strand: %@", self.class, error);
+        if (failure) failure(error);
+      }];
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ couldn't get strand: %@", self.class, error);
+     failure(error);
+   }];
+}
 
 @end

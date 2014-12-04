@@ -51,6 +51,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;
 - (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
 
+// Methods used for dealing with swap page
+- (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID;
+- (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users;
 
 /* returns a list of PeanutUsers */
 - (NSArray *)friendsList;
@@ -71,10 +74,9 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 
 
 - (void)createNewStrandWithFeedObjects:(NSArray *)feedObjects
-           createdFromSuggestions:(NSArray *)suggestedSections
-           selectedPeanutContacts:(NSArray *)selectedPeanutContacts
-                          success:(void(^)(DFPeanutStrand *resultStrand))success
-                          failure:(DFFailureBlock)failure;
+                     additionalUserIds:(NSArray *)additionalUserIds
+                               success:(void(^)(DFPeanutStrand *resultStrand))success
+                               failure:(DFFailureBlock)failure;
 
 - (void)removePhoto:(DFPeanutFeedObject *)photoObject
     fromStrandPosts:(DFPeanutFeedObject *)strandPosts
