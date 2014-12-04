@@ -730,8 +730,8 @@ class FriendConnection(models.Model):
 				u1 = user2
 				u2 = user1
 
-			FriendConnection.objects.create(user_1=u1, user_2=u2, shared_strand=newStrand)
-			logger.debug("Created friend entry for user %s with user %s with new strand %s" % (u1.id, u2.id, newStrand))
+			FriendConnection.objects.create(user_1=u1, user_2=u2)
+			logger.debug("Created friend entry for user %s with user %s" % (u1.id, u2.id))
 			return True
 		except IntegrityError:
 			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (u1.id, u2.id))
