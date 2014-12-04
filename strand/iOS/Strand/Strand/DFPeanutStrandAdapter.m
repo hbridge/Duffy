@@ -13,9 +13,12 @@
 #import "DFObjectManager.h"
 #import "DFPeanutInvalidField.h"
 #import "DFPeanutFeedObject.h"
+#import "DFPeanutTrueFalseResponse.h"
 
 NSString *const RestStrandPath = @"strands/:id/";
 NSString *const CreateStrandPath = @"strands/";
+
+NSString *const AddPhotosPath = @"add_photos_to_strand";
 
 @implementation DFPeanutStrandAdapter
 
@@ -112,8 +115,43 @@ NSString *const CreateStrandPath = @"strands/";
   [[DFObjectManager sharedManager] enqueueObjectRequestOperation:operation];
 }
 
+/*
+ 
+ This is old code to patch a strand with new photos.  Leaving here incase we need it, but if here after Dec 10th, 2014, delete
+ TODO(Derek): Look at this if needed
+ 
+ // first get the strand
+ [self
+ performRequest:RKRequestMethodGET
+ withPeanutStrand:reqStrand success:^(DFPeanutStrand *peanutStrand) {
+ //remove the photo from the strand's list of photos
+ NSMutableArray *newPhotosList = [peanutStrand.photos mutableCopy];
+ [newPhotosList addObjectsFromArray:photoIDs];
+ peanutStrand.photos = newPhotosList;
+ 
+ // patch the strand with the new list
+ [self
+ performRequest:RKRequestMethodPATCH
+ withPeanutStrand:peanutStrand success:^(DFPeanutStrand *peanutStrand) {
+ DDLogInfo(@"%@ added photos %@ to %@", self.class, photoIDs, peanutStrand);
+ if (success) success();
+ } failure:^(NSError *error) {
+ DDLogError(@"%@ couldn't patch strand: %@", self.class, error);
+ if (failure) failure(error);
+ }];
+ } failure:^(NSError *error) {
+ DDLogError(@"%@ couldn't get strand: %@", self.class, error);
+ failure(error);
+ }];
+ }
+ 
+ 
+ - (void)fetchNewPhotosAfterDate:(NSDate *)date
+ completionBlock:(DFPeanutNewPhotosCompletionBlock)completionBlock
+ {*/
 
-- (void)addPhoto:(DFPeanutFeedObject *)photoObject
+
+- (void)addPhotos:(NSArray *)photoObjects
       toStrandID:(DFStrandIDType)strandID
          success:(DFSuccessBlock)success
          failure:(DFFailureBlock)failure
@@ -121,31 +159,49 @@ NSString *const CreateStrandPath = @"strands/";
   DFPeanutStrand *reqStrand = [[DFPeanutStrand alloc] init];
   reqStrand.id = @(strandID);
   
-  DDLogInfo(@"Going to add photo %llu to strand %llu", photoObject.id, strandID);
+  NSMutableArray *photoIDs = [NSMutableArray new];
+  [photoIDs addObjectsFromArray:[photoObjects arrayByMappingObjectsWithBlock:^id(DFPeanutFeedObject *photoObject) {
+    return @(photoObject.id);
+  }]];
   
-  // first get the strand
-  [self
-   performRequest:RKRequestMethodGET
-   withPeanutStrand:reqStrand success:^(DFPeanutStrand *peanutStrand) {
-     //remove the photo from the strand's list of photos
-     NSMutableArray *newPhotosList = [peanutStrand.photos mutableCopy];
-     [newPhotosList addObject:@(photoObject.id)];
-     peanutStrand.photos = newPhotosList;
-     
-     // patch the strand with the new list
-     [self
-      performRequest:RKRequestMethodPATCH
-      withPeanutStrand:peanutStrand success:^(DFPeanutStrand *peanutStrand) {
-        DDLogInfo(@"%@ added photo %@ to %@", self.class, photoObject, peanutStrand);
-        if (success) success();
-      } failure:^(NSError *error) {
-        DDLogError(@"%@ couldn't patch strand: %@", self.class, error);
-        if (failure) failure(error);
-      }];
-   } failure:^(NSError *error) {
-     DDLogError(@"%@ couldn't get strand: %@", self.class, error);
-     failure(error);
+  DDLogInfo(@"Going to add photos %@ to strand %llu", photoIDs, strandID);
+
+  NSURLRequest *getRequest = [DFObjectManager
+                              requestWithObject:[[DFPeanutTrueFalseResponse alloc] init]
+                              method:RKRequestMethodGET
+                              path:AddPhotosPath
+                              parameters:@{
+                                           @"strand_id" : @(strandID),
+                                           @"photo_ids" : photoIDs
+                                           }];
+  RKObjectRequestOperation *requestOp =
+  [[DFObjectManager sharedManager]
+   objectRequestOperationWithRequest:getRequest
+   success:^(RKObjectRequestOperation *operation, RKMappingResult *mappingResult)
+   {
+     if ([[mappingResult.firstObject class] isSubclassOfClass:[DFPeanutTrueFalseResponse class]]){
+       DFPeanutTrueFalseResponse *response = mappingResult.firstObject;
+       if (response.result) {
+         if (success) success();
+       } else {
+         DDLogWarn(@"Adding photos returned a false response: %@",
+                   mappingResult.description);
+         if (failure) failure(nil);
+       }
+     } else {
+       DDLogWarn(@"Adding photos returned a non boolean response: %@",
+                 mappingResult.description);
+       if (failure) failure(nil);
+     }
+   }
+   failure:^(RKObjectRequestOperation *operation, NSError *error)
+   {
+     DDLogWarn(@"Adding photos failed failed.  Error: %@", error.description);
+     if (failure) failure(error);
    }];
+  
+  [[DFObjectManager sharedManager] enqueueObjectRequestOperation:requestOp];
 }
+
 
 @end

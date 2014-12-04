@@ -23,9 +23,9 @@ typedef void (^DFPeanutStrandFetchFailure)(NSError *error);
                failure:(DFPeanutStrandFetchFailure)failure;
 
 
-- (void)addPhoto:(DFPeanutFeedObject *)photoObject
-      toStrandID:(DFStrandIDType)strandID
-         success:(DFSuccessBlock)success
-         failure:(DFFailureBlock)failure;
+- (void)addPhotos:(NSArray *)photoObjects
+       toStrandID:(DFStrandIDType)strandID
+          success:(DFSuccessBlock)success
+          failure:(DFFailureBlock)failure;
 
 @end

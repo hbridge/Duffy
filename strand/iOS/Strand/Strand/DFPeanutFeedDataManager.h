@@ -65,8 +65,8 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
              success:(void(^)(void))success
              failure:(void(^)(NSError *error))failure;
 
-- (void)addFeedObjects:(NSArray *)photos
-         toStrandPosts:(DFPeanutFeedObject *)strandPosts
+- (void)addFeedObjects:(NSArray *)feedObjects
+            toStrandID:(DFStrandIDType)strandID
                success:(DFSuccessBlock)success
                failure:(DFFailureBlock)failure;
 
