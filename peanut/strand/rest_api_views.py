@@ -820,4 +820,3 @@ class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
         if len(strand.photos.all()) == 0:
             strand.delete()
 
-

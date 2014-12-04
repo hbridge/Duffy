@@ -30,6 +30,17 @@ class UserIdMixin():
 	
 		return self.cleaned_data['user_id']
 
+class StrandIdMixin():
+	def clean_strand_id(self):
+		strandId = self.cleaned_data['strand_id']
+		try:
+			strand = Strand.objects.get(id=strandId)
+			self.cleaned_data['strand'] = strand
+		except Strand.DoesNotExist:
+			raise forms.ValidationError("Strand not found")
+	
+		return self.cleaned_data['strand_id']
+
 """
 	Web Forms
 """
@@ -81,3 +92,7 @@ class AuthPhoneForm(StrandApiForm):
 
 class OnlyUserIdForm(StrandApiForm, UserIdMixin):
 	user_id = forms.IntegerField(min_value=1, max_value=10000)
+
+class UserIdAndStrandIdForm(StrandApiForm, UserIdMixin, StrandIdMixin):
+	user_id = forms.IntegerField(min_value=1, max_value=10000)
+	strand_id = forms.IntegerField(min_value=1, max_value=10000000)

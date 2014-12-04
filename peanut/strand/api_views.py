@@ -21,9 +21,10 @@ from common.serializers import UserSerializer
 from common import api_util, cluster_util, serializers
 
 from strand import geo_util, notifications_util, friends_util, strands_util
-from strand.forms import GetJoinableStrandsForm, GetNewPhotosForm, RegisterAPNSTokenForm, UpdateUserLocationForm, GetFriendsNearbyMessageForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm, StrandApiForm
+from strand.forms import UserIdAndStrandIdForm, RegisterAPNSTokenForm, UpdateUserLocationForm, SendSmsCodeForm, AuthPhoneForm, OnlyUserIdForm
 
 from ios_notifications.models import APNService, Device, Notification
+
 
 logger = logging.getLogger(__name__)
 
@@ -871,6 +872,36 @@ def swaps(request):
 		response['objects'] = responseObjects
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
+
+def add_photos_to_strand(request):
+	response = dict({'result': True})
+
+	form = UserIdAndStrandIdForm(api_util.getRequestData(request))
+
+	if (form.is_valid()):
+		user = form.cleaned_data['user']
+		strand = form.cleaned_data['strand']
+		
+		requestData = api_util.getRequestData(request)
+
+		photoIds = requestData["photo_ids[]"].split(',')
+		existingPhotoIds = Photo.getIds(strand.photos.all())
+
+		entriesToCreate = list()
+		newPhotoIds = list()
+		for photoId in photoIds:
+			if photoId not in existingPhotoIds:
+				photo = Photo.objects.get(id=photoId)
+				strands_util.addPhotoToStrand(strand, photo, {strand.id: list(strand.photos.all())}, {strand.id: list(strand.users.all())})
+				newPhotoIds.append(photoId)
+				
+		action = Action(user=user, strand=strand, photo_id=newPhotoIds[0], action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+		action.save()
+		action.photos = newPhotoIds
+	else:
+		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
+
 	return HttpResponse(json.dumps(response, cls=api_util.DuffyJsonEncoder), content_type="application/json")
 
 

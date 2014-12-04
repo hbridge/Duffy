@@ -22,6 +22,8 @@ urlpatterns = patterns('',
 	url(r'^send_sms_code', 'strand.api_views.send_sms_code'),
 	url(r'^auth_phone', 'strand.api_views.auth_phone'),
 
+	url(r'^add_photos_to_strand', 'strand.api_views.add_photos_to_strand'),
+
 	# REST
 	url(r'^photos/$', strand_rest_api_views.PhotoAPI.as_view()),
 	url(r'^photos/(?P<photoId>[0-9]+)/$', strand_rest_api_views.PhotoAPI.as_view()),
