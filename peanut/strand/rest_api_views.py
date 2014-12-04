@@ -608,41 +608,28 @@ class CreateActionAPI(CreateAPIView):
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 else:
                     return super(CreateActionAPI, self).post(request)
+            elif (obj.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED):
+                photoIds = Photo.getIds(obj.strand.photos.all())
+
+                actions = Action.objects.filter(strand_id=obj.strand_id).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+
+                notSeenPhotoIds = photoIds
+                for action in actions:
+                    if action.photo_id in notSeenPhotoIds:
+                        notSeenPhotoIds.remove(action.photo_id)
+
+                if len(notSeenPhotoIds) == 0:
+                    logger.debug("All photos have been seen for strand %s, marking as suggestible = False" % obj.strand_id)
+                    obj.strand.suggestible = False
+                    obj.strand.save()
+                else:
+                    logger.debug("Created action and had %s photos till not seen in the strand" % len(notSeenPhotoIds))
+                return super(CreateActionAPI, self).post(request)
+            else:
+                return super(CreateActionAPI, self).post(request)
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-"""
-class CreatePhotoSuggestionBulkAPI(BulkCreateAPIView):
-    model = PhotoSuggestion
-    lookup_field = 'id'
-    serializer_class = BulkPhotoSuggestionSerializer
-
-        After we create a photo suggestion then see if all the photos in the strand have a suggestion row.
-        If so, update the strand itself to say its not suggestible
-    def post_save(self, photoSuggestion, created, first=None):
-        if created and first and photoSuggestion.id == first.id:
-            photoRelations = Strand.photos.through.objects.filter(strand_id=photoSuggestion.strand_id)
-            photoIds = list()
-
-            for photoRelation in photoRelations:
-                photoIds.append(photoRelation.photo_id)
-
-            photos = PhotoSuggestion.objects.filter(photo_id__in=photoIds)
-
-            notSeenPhotoIds = photoIds
-            for photo in photos:
-                if photo.id in notSeenPhotoIds:
-                    notSeenPhotoIds.remove(photo.id)
-
-            if len(notSeenPhotoIds) == 0:
-                logger.debug("All photos have been seen for strand %s, marking as suggestible = False" % photoSuggestion.strand_id)
-                strand = Strand.objects.get(id=photoSuggestion.strand_id)
-                strand.suggestible = False
-                strand.save()
-            else:
-                logger.debug("Created photoSuggestion %s %s %s %s and had %s photos till not seen in the strand" % (photoSuggestion, photoSuggestion.photo_id, photoSuggestion.user_id, photoSuggestion.strand_id, len(notSeenPhotoIds)))
-"""
             
 class RetrieveUpdateUserAPI(RetrieveUpdateAPIView):
     def pre_save(self, user):

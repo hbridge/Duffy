@@ -28,6 +28,8 @@ from ios_notifications.models import APNService, Device, Notification
 
 logger = logging.getLogger(__name__)
 
+def getActionsCache(strandIds, photoIds):
+	return Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=strandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=strandIds)))
 
 def getActionsByPhotoIdCache(actionsCache):
 	actionsByPhotoId = dict()
@@ -277,6 +279,17 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 		if len(group['photos']) == 0:
 			continue
 
+		if actionsByPhotoIdCache:
+			# Look through all our photos and actions taken on the photos
+			# If we find that a photo already has an action of EVALUATED then we take it out
+			photosNotEvaluated = group['photos']
+			for photo in group['photos']:
+				if photo.id in actionsByPhotoIdCache:
+					for action in actionsByPhotoIdCache[photo.id]:
+						if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and photo in photosNotEvaluated:
+							photosNotEvaluated.remove(photo)
+			group['photos'] = photosNotEvaluated
+
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
 		if actionsByPhotoIdCache:
@@ -366,8 +379,10 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	
 	groups = sorted(groups, key=lambda x: x['photos'][0].time_taken, reverse=True)
 
+	actionsCache = getActionsCache(Strand.getIds(strands), Strand.getPhotoIds(strands))
+	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	# Pass in none for actions because there are no actions on private photos so don't use anything
-	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = None)
+	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache)
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
@@ -428,12 +443,11 @@ def getObjectsDataForStrands(strands, user):
 	# Grabbing all the post actions for a strand
 	# Getting the likes and comments for a photo
 	# See if the user has done a post, and if not...put in suggested photos
-	actionsCache = Action.objects.prefetch_related('strand', 'photos', 'photos__user', 'user').filter(Q(strand__in=strandIds) | (Q(photo_id__in=photoIds) & Q(strand__in=strandIds)))
-	actionsCache = list(actionsCache)
+	actionsCache = getActionsCache(strandIds, photoIds)
+	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 
 	simCaches = cluster_util.getSimCaches(photoIds)
 
-	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	for strand in strands:
 		entry = dict()
 

@@ -643,6 +643,13 @@ class Strand(models.Model):
 
 		return ids
 
+	@classmethod
+	def getPhotoIds(cls, objs):
+		ids = list()
+		for strand in objs:
+			ids.extend([x.id for x in strand.photos.all()])
+		return ids
+
 	class Meta:
 		db_table = 'strand_objects'
 
@@ -769,6 +776,7 @@ class Action(models.Model):
 
 	class Meta:
 		db_table = 'strand_action'
+		index_together = ('strand', 'action_type')
 
 	@classmethod
 	def bulkUpdate(cls, objs, attributesList):
