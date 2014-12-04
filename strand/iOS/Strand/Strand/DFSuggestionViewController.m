@@ -13,14 +13,9 @@
 
 @interface DFSuggestionViewController ()
 
-@property (nonatomic) NSInteger photoIndex;
-@property (retain, nonatomic) NSArray *photos;
-
 @end
 
 @implementation DFSuggestionViewController
-
-@synthesize suggestionFeedObject = _suggestionFeedObject;
 
 - (void)viewDidLoad {
   [super viewDidLoad];
@@ -38,8 +33,7 @@
                                      [UIColor whiteColor]
                                        ];
   
-  // Do any additional setup after loading the view from its nib.
-  [self configureWithSuggestion:self.suggestionFeedObject];
+  [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
 }
 
 - (void)setFrame:(CGRect)frame
@@ -54,52 +48,15 @@
   // Dispose of any resources that can be recreated.
 }
 
-- (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
+- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo
 {
-  _suggestionFeedObject = suggestionFeedObject;
-  if (self.view) {
-    [self configureWithSuggestion:suggestionFeedObject];
-  }
-}
-
-- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion
-{
+  self.suggestionFeedObject = suggestion;
   if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
   self.bottomLabel.text = [NSString stringWithFormat:@"Send %@ this photo?",
                                                  suggestion.actorsString];
   self.topLabel.text = suggestion.placeAndRelativeTimeString;
   
-  self.photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-  // Start at -1 since the goto method increments
-  self.photoIndex = -1;
-  [self gotoNextPhoto];
-
-  [self.view setNeedsLayout];
-}
-
-- (IBAction)requestButtonPressed:(id)sender {
-  [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:self.photos[self.photoIndex] users:self.suggestionFeedObject.actors];
-  if(![self gotoNextPhoto]) {
-    if (self.suggestionsOutHandler) self.suggestionsOutHandler();
-  }
-}
-
-- (IBAction)noButtonPressed:(id)sender {
-  if(![self gotoNextPhoto]) {
-    if (self.suggestionsOutHandler) self.suggestionsOutHandler();
-  }
-}
-
-- (BOOL)gotoNextPhoto
-{
-  self.photoIndex++;
-
-  if (self.photoIndex >= self.photos.count) {
-    return NO;
-  }
-  
-  DFPeanutFeedObject *nextPhoto = self.photos[self.photoIndex];
-  [[DFImageManager sharedManager] imageForID:nextPhoto.id
+  [[DFImageManager sharedManager] imageForID:photo.id
                                    pointSize:self.imageView.frame.size
                                  contentMode:DFImageRequestContentModeAspectFill
                                 deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic completion:^(UIImage *image) {
@@ -108,7 +65,16 @@
                                     [self.imageView setNeedsDisplay];
                                   });
                                 }];
-  return YES;
+  
+  [self.view setNeedsLayout];
+}
+
+- (IBAction)yesButtonPressed:(id)sender {
+  if (self.yesButtonHandler) self.yesButtonHandler();
+}
+
+- (IBAction)noButtonPressed:(id)sender {
+  if (self.noButtonHandler) self.noButtonHandler();
 }
 
 @end

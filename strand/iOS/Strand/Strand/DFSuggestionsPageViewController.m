@@ -24,6 +24,9 @@
 @property (nonatomic, retain) NSMutableArray *suggestionsToRemove;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
+@property (nonatomic) NSInteger photoIndex;
+@property (retain, nonatomic) NSMutableArray *indexPaths;
+
 @end
 
 @implementation DFSuggestionsPageViewController
@@ -38,7 +41,6 @@
     self.delegate = self;
     [self observeNotifications];
     [self configureNavAndTab];
-    self.suggestionsToRemove = [NSMutableArray new];
   }
   return self;
 }
@@ -91,16 +93,23 @@
 {
   self.allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
   self.filteredSuggestions = [self.allSuggestions mutableCopy];
-  if (self.userToFilter) {
-    NSMutableArray *filteredSuggestions = [NSMutableArray new];
-    for (DFPeanutFeedObject *suggestion in self.allSuggestions) {
-      if ([suggestion.actors containsObject:self.userToFilter]) {
-        [filteredSuggestions addObject:suggestion];
+  
+  NSInteger sectionCount = 0;
+  self.indexPaths = [NSMutableArray new];
+  
+  NSMutableArray *filteredSuggestions = [NSMutableArray new];
+  for (DFPeanutFeedObject *suggestion in self.allSuggestions) {
+    if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
+      NSInteger itemCount = 0;
+      [filteredSuggestions addObject:suggestion];
+      NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
+      for (int x=0; x < photos.count; x++) {
+        [self.indexPaths addObject:[NSIndexPath indexPathForItem:itemCount inSection:sectionCount]];
+        itemCount++;
       }
+      sectionCount++;
     }
   }
-  
-  [self.filteredSuggestions removeObjectsInArray:self.suggestionsToRemove];
   
   if ((self.viewControllers.count == 0
       || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
@@ -128,12 +137,27 @@
   }
 }
 
+/*
+ * We need to return the IndexPath which corrisponds to the given view controller
+ */
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController
 {
   if (![[viewController class] isSubclassOfClass:[DFSuggestionViewController class]]) return -1;
   DFSuggestionViewController *suggestionVC = (DFSuggestionViewController *)viewController;
-  NSUInteger currentIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
-  return currentIndex != NSNotFound ? currentIndex : -1;
+  NSUInteger sectionIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
+  
+  if (sectionIndex == NSNotFound) return -1;
+  NSArray *photos = [self.filteredSuggestions[sectionIndex] leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  NSUInteger itemIndex = [photos indexOfObject:suggestionVC.photoFeedObject];
+  if (itemIndex == NSNotFound) return -1;
+  
+  for (int x=0; x < self.indexPaths.count; x++) {
+    NSIndexPath *indexPath = self.indexPaths[x];
+    if (indexPath.section == sectionIndex && indexPath.item == itemIndex) {
+      return x;
+    }
+  }
+  return -1;
 }
 
 
@@ -154,23 +178,25 @@
       return nil;
     }
   }
-  DFPeanutFeedObject *suggestion = self.filteredSuggestions[index];
+  NSIndexPath *indexPath = self.indexPaths[index];
+  DFPeanutFeedObject *suggestion = self.filteredSuggestions[indexPath.section];
+  NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  DFPeanutFeedObject *photo = photos[indexPath.item];
+  
+  
   DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
   svc.suggestionFeedObject = suggestion;
+  svc.photoFeedObject = photo;
+
   svc.frame = self.view.bounds;
   DFSuggestionsPageViewController __weak *weakSelf = self;
-  /*
-  svc.requestButtonHandler = ^{
-    [weakSelf suggestionSelected:suggestion];
+  
+  svc.yesButtonHandler = ^{
+    [weakSelf suggestionSelected:suggestion photo:photo];
   };
   svc.noButtonHandler = ^{
-    [weakSelf suggestionHidden:suggestion];
-  };*/
-  
-  svc.suggestionsOutHandler = ^{
-    [weakSelf suggestionsOut:suggestion];
+    [weakSelf suggestionHidden:suggestion photo:photo];
   };
-  
   
   return svc;
 }
@@ -209,24 +235,15 @@
   return [self viewControllerForIndex:afterIndex];
 }
 
-- (void)suggestionSelected:(DFPeanutFeedObject *)suggestion
+- (void)suggestionSelected:(DFPeanutFeedObject *)suggestion photo:(DFPeanutFeedObject *)photo
 {
-  DFCreateStrandFlowViewController *createStrandFlow = [[DFCreateStrandFlowViewController alloc]
-                                                        initWithHighlightedPhotoCollection:suggestion];
-  createStrandFlow.delegate = self;
-  [self presentViewController:createStrandFlow animated:YES completion:nil];
-  createStrandFlow.extraAnalyticsInfo = suggestion.suggestionAnalyticsSummary;
-}
-
-- (void)suggestionHidden:(DFPeanutFeedObject *)suggestion
-{
-  [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
+  [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:photo users:suggestion.actors];
   [self gotoNextController];
 }
 
-- (void)suggestionsOut:(DFPeanutFeedObject *)suggestion
+- (void)suggestionHidden:(DFPeanutFeedObject *)suggestion  photo:(DFPeanutFeedObject *)photo
 {
-  [[DFPeanutFeedDataManager sharedManager] markSuggestion:suggestion visible:NO];
+  [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo.id strandID:suggestion.id];
   [self gotoNextController];
 }
 

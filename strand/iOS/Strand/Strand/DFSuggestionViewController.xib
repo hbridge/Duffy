@@ -11,9 +11,9 @@
                 <outlet property="bottomLabel" destination="A0L-27-xAM" id="fZB-OK-XOb"/>
                 <outlet property="footerView" destination="G8k-nx-0oB" id="Gvw-bf-uky"/>
                 <outlet property="imageView" destination="PcX-e4-LPg" id="AzR-4o-mNb"/>
-                <outlet property="requestButton" destination="Qws-Rm-gyS" id="Ad4-Bh-flG"/>
                 <outlet property="topLabel" destination="vY5-QO-GaR" id="rDw-i4-sFP"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+                <outlet property="yesButton" destination="Qws-Rm-gyS" id="HEW-he-dwp"/>
             </connections>
         </placeholder>
         <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
@@ -45,7 +45,7 @@
                                         <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                     </state>
                                     <connections>
-                                        <action selector="requestButtonPressed:" destination="-1" eventType="touchUpInside" id="An7-ey-QK8"/>
+                                        <action selector="yesButtonPressed:" destination="-1" eventType="touchUpInside" id="sl9-R9-BBL"/>
                                     </connections>
                                 </button>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qiY-tS-5gp" customClass="GBFlatButton">

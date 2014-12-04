@@ -16,15 +16,19 @@
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
-@property (weak, nonatomic) IBOutlet GBFlatButton *requestButton;
+@property (weak, nonatomic) IBOutlet GBFlatButton *yesButton;
 @property (weak, nonatomic) IBOutlet SAMGradientView *footerView;
 @property (nonatomic) CGRect frame;
-@property (nonatomic, copy) DFVoidBlock requestButtonHandler;
+@property (nonatomic, copy) DFVoidBlock yesButtonHandler;
 @property (nonatomic, copy) DFVoidBlock noButtonHandler;
 @property (nonatomic, copy) DFVoidBlock suggestionsOutHandler;
 
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
-- (IBAction)requestButtonPressed:(id)sender;
+@property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
+
+- (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo;
+
+- (IBAction)yesButtonPressed:(id)sender;
 - (IBAction)noButtonPressed:(id)sender;
 
 

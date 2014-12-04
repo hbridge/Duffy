@@ -18,8 +18,11 @@
 @implementation DFSwipableSuggestionViewController
 
 - (void)viewDidLoad {
-  [super viewDidLoad];
   self.imageView = self.cardinalImageView.imageView;
+  
+  // Need to set the imageView first since the parent needs it
+  [super viewDidLoad];
+  
   self.cardinalImageView.delegate = self;
 
   //self.profileStackView.backgroundColor = [UIColor clearColor];
@@ -42,7 +45,7 @@
 - (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
         buttonSelected:(UIButton *)button
 {
-  if (button == self.cardinalImageView.yesButton && self.requestButtonHandler) self.requestButtonHandler();
+  if (button == self.cardinalImageView.yesButton && self.yesButtonHandler) self.yesButtonHandler();
   else if (button == self.cardinalImageView.noButton && self.noButtonHandler) self.noButtonHandler();
 }
 
