@@ -95,12 +95,10 @@ def main(argv):
 					try:
 						if contactEntry.user.id == friend.id:
 							continue
-						elif contactEntry.user.id < friend.id:
-							FriendConnection.objects.create(user_1=contactEntry.user, user_2=friend)
 						else:
-							FriendConnection.objects.create(user_1=friend, user_2=contactEntry.user)
-
-						newConnectionCount += 1
+							if FriendConnection.addConnection(contactEntry.user, friend):
+								newConnectionCount += 1
+								
 					except IntegrityError:
 						logger.warning("Tried to create friend connection between %s and %s but there was one already" % (contactEntry.user.id, friend.id))
 

@@ -1,6 +1,6 @@
 from django.db.models import Q
 
-from common.models import FriendConnection
+from common.models import FriendConnection, SharedStrand
 
 """
 	Return friends and friends of friends ids for the given user
@@ -17,6 +17,30 @@ def getFriends(userId):
 
 	friends = sorted(friends, key=lambda x: x.display_name)
 	return friends
+
+
+"""
+	Return friends and friends of friends ids for the given user
+"""
+def getSharedStrands(userId, friends):
+	ids = [x.id for x in friends]
+	ids.append(userId)
+
+	sharedStrands = SharedStrand.objects.prefetch_related('users').filter(users__in=ids)
+
+	return sharedStrands
+
+def getSharedStrandForUserIds(sharedStrands, userIds):
+	for sharedStrand in sharedStrands:
+		if len(sharedStrand.users.all()) == len(userIds):
+			notFoundUsers = list(sharedStrand.users.all())
+			for user in sharedStrand.users.all():
+				if user.id in userIds:
+					notFoundUsers.remove(user)
+
+			if len(notFoundUsers) == 0:
+				return sharedStrand.strand
+	return None
 
 
 """

@@ -15,7 +15,7 @@ from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord, SharedStrand
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util, serializers
@@ -151,15 +151,8 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	invitedBy = ContactEntry.objects.filter(phone_number=phoneNumber).filter(contact_type="invited").exclude(skip=True)
 	
 	for invite in invitedBy:
-		try:
-			if user.id < invite.user.id:
-				FriendConnection.objects.create(user_1=user, user_2=invite.user)
-			else:
-				FriendConnection.objects.create(user_1=invite.user, user_2=user)
-			logger.debug("Created invite friend entry for user %s with user %s" % (user.id, invite.user.id))
-		except IntegrityError:
-			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (user.id, invite.user.id))
-
+		FriendConnection.addConnection(user, invite.user)
+		
 	# Now fill in strand invites for this phone number
 	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user__isnull=True).filter(accepted_user__isnull=True)
 	for strandInvite in strandInvites:
@@ -198,13 +191,18 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 # ------------------------
 
-def getActorsObjectData(users, includePhone = True, invitedUsers = None):
+def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None, sharedStrands = None):
 	if not isinstance(users, list):
 		users = [users]
 
 	userData = list()
 	for user in users:
 		entry = {'display_name': user.display_name, 'id': user.id}
+
+		if sharedStrands:
+			sharedStrand = friends_util.getSharedStrandForUserIds(sharedStrands, [userId, user.id])
+			if (sharedStrand):
+				entry["shared_strand"] = sharedStrand.id
 
 		if includePhone:
 			entry['phone_number'] = user.phone_number
@@ -360,7 +358,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 			interestedUsers = list()
 			suggestible = False
 
-		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(interestedUsers), 'suggestible': suggestible}
+		metadata = {'type': feedObjectType, 'id': strand.id, 'match_reasons': matchReasons, 'strand_id': strand.id, 'title': title, 'time_taken': strand.first_photo_time, 'actors': getActorsObjectData(user.id, interestedUsers), 'suggestible': suggestible}
 		entry = {'photos': photos, 'metadata': metadata}
 
 		groups.append(entry)
@@ -398,8 +396,8 @@ def getPrivateStrandSuggestionsForSharedStrand(user, strand):
 
 	return strandsThatMatch
 	
-def getObjectsDataForPost(postAction, simCaches, actionsByPhotoIdCache):
-	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(postAction.user)}
+def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
+	metadata = {'type': constants.FEED_OBJECT_TYPE_STRAND_POST, 'id': postAction.id, 'strand_id': postAction.strand.id, 'time_stamp': postAction.added, 'actors': getActorsObjectData(user.id, postAction.user)}
 	photos = postAction.photos.all()
 	photos = sorted(photos, key=lambda x: x.time_taken)
 	
@@ -463,12 +461,12 @@ def getObjectsDataForStrands(strands, user):
 				invitedUsers.append(invite.invited_user)
 			elif not invite.invited_user:
 				invitedUsers.append(User(id=0, display_name="", phone_number=invite.phone_number))
-		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
+		entry = {'type': constants.FEED_OBJECT_TYPE_STRAND_POSTS, 'title': strands_util.getTitleForStrand(strand), 'id': strand.id, 'actors': getActorsObjectData(user.id, list(strand.users.all()), invitedUsers=invitedUsers), 'time_taken': strand.first_photo_time, 'time_stamp': recentTimeStamp, 'location': strands_util.getLocationForStrand(strand)}
 
 		# Add the individual posts to the list
 		entry['objects'] = list()
 		for post in postActions:
-			entry['objects'].extend(getObjectsDataForPost(post, simCaches, actionsByPhotoIdCache))
+			entry['objects'].extend(getObjectsDataForPost(user, post, simCaches, actionsByPhotoIdCache))
 
 		# Add in the suggested private photos if the user hasn't done a post yet and has photos that match
 		if not userHasPostedPhotosToStrand(user, strand, actionsCache):
@@ -537,7 +535,7 @@ def getInviteObjectsDataForUser(user):
 			else:
 				title = "would like your photos"
 				
-			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(list(invite.strand.users.all())), 'time_stamp': invite.added}
+			entry = {'type': constants.FEED_OBJECT_TYPE_INVITE_STRAND, 'id': invite.id, 'title': title, 'actors': getActorsObjectData(user.id, list(invite.strand.users.all())), 'time_stamp': invite.added}
 			entry['ready'] = inviteIsReady
 			entry['objects'] = list()
 			entry['objects'].append(strandObjectDataById[invite.strand.id])
@@ -695,7 +693,8 @@ def strand_inbox(request):
 		responseObjects = sorted(responseObjects, key=lambda x: x['time_stamp'], reverse=True)
 
 		# Add in the list of all friends at the end
-		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(friends_util.getFriends(user.id), True)}
+		friends = friends_util.getFriends(user.id)
+		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(user.id, friends, True, sharedStrands = friends_util.getSharedStrands(user.id, friends))}
 		printStats("inbox-4")
 
 		responseObjects.append(friendsEntry)

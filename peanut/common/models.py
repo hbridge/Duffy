@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 from django.db.models.signals import pre_delete, post_save
 from django.dispatch import receiver
 from django.db.models.query import QuerySet
+from django.db import IntegrityError
 
 from phonenumber_field.modelfields import PhoneNumberField
 from uuidfield import UUIDField
@@ -520,43 +521,9 @@ class ContactEntry(models.Model):
 	def bulkUpdate(cls, objs, attributesList):
 		doBulkUpdate(cls, objs, attributesList)
 
-class FriendConnection(models.Model):
-	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
-	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
-	added = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
-
-	class Meta:
-		unique_together = ("user_1", "user_2")
-		db_table = 'strand_friends'
-
-	@classmethod
-	def friendConnectionExists(cls, user1, user2, existingFriendConnections):
-		for connection in existingFriendConnections:
-			if connection.user_1.id == user1.id and connection.user_2.id == user2.id:
-				return True
-
-	@classmethod
-	def addNewConnections(cls, userToAddTo, users):
-		allUsers = list()
-		allUsers.extend(users)
-		allUsers.append(userToAddTo)
-		
-		existingFriendConnections = FriendConnection.objects.filter(Q(user_1__in=allUsers) | Q(user_2__in=allUsers))
-		newFriendConnections = list()
-		for user in users:
-			if user.id == userToAddTo.id:
-				continue
-			if (user.id < userToAddTo.id and not cls.friendConnectionExists(user, userToAddTo, existingFriendConnections)):
-				newFriendConnections.append(FriendConnection(user_1 = user, user_2 = userToAddTo))
-			elif (userToAddTo.id < user.id and not cls.friendConnectionExists(userToAddTo, user, existingFriendConnections)):
-				newFriendConnections.append(FriendConnection(user_1 = userToAddTo, user_2 = user))
-
-		FriendConnection.objects.bulk_create(newFriendConnections)
-
 class Strand(models.Model):
-	first_photo_time = models.DateTimeField(db_index=True)
-	last_photo_time = models.DateTimeField(db_index=True)
+	first_photo_time = models.DateTimeField(db_index=True, null=True)
+	last_photo_time = models.DateTimeField(db_index=True, null=True)
 	
 	# These should come from the first photo
 	location_city =  models.CharField(max_length=1000, null=True)
@@ -729,6 +696,57 @@ class StrandNeighbor(models.Model):
 		doBulkUpdate(cls, objs, attributesList)
 
 
+class FriendConnection(models.Model):
+	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
+	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
+	shared_strand = models.ForeignKey(Strand, null=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		unique_together = ("user_1", "user_2")
+		db_table = 'strand_friends'
+
+	@classmethod
+	def friendConnectionExists(cls, user1, user2, existingFriendConnections):
+		for connection in existingFriendConnections:
+			if connection.user_1.id == user1.id and connection.user_2.id == user2.id:
+				return True
+
+	@classmethod
+	def addConnection(cls, user1, user2):
+		try:
+			if user1.id < user2.id:
+				u1 = user1
+				u2 = user2
+			else:
+				u1 = user2
+				u2 = user1
+
+			FriendConnection.objects.create(user_1=u1, user_2=u2, shared_strand=newStrand)
+			logger.debug("Created friend entry for user %s with user %s with new strand %s" % (u1.id, u2.id, newStrand))
+			return True
+		except IntegrityError:
+			logger.warning("Tried to create friend connection between %s and %s but there was one already" % (u1.id, u2.id))
+			return False
+
+	@classmethod
+	def addNewConnections(cls, userToAddTo, users):
+		allUsers = list()
+		allUsers.extend(users)
+		allUsers.append(userToAddTo)
+		
+		existingFriendConnections = FriendConnection.objects.filter(Q(user_1__in=allUsers) | Q(user_2__in=allUsers))
+		for user in users:
+			if user.id == userToAddTo.id:
+				continue
+			if not cls.friendConnectionExists(user, userToAddTo, existingFriendConnections):
+				cls.addConnection(user, userToAddTo)
+				
+		# TODO(Derek): If thie above loop gets bad, put back in the bulk calls
+		#FriendConnection.objects.bulk_create(newFriendConnections)
+
+
 class Action(models.Model):
 	user = models.ForeignKey(User, db_index=True)
 	action_type = models.IntegerField(db_index=True)
@@ -779,6 +797,17 @@ class LocationRecord(models.Model):
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
 
+class SharedStrand(models.Model):
+	users = models.ManyToManyField(User)
+	strand = models.ForeignKey(Strand)
+
+	# not used but here so we can use the bulk api
+	bulk_batch_key = models.IntegerField(null=True)
+	added = models.DateTimeField(auto_now_add=True)
+	updated = models.DateTimeField(auto_now=True)
+
+	class Meta:
+		db_table = 'strand_shared_strand'
 
 def doBulkUpdate(cls, objs, attributesList):
 	if not isinstance(objs, list) and not isinstance(objs, QuerySet):
