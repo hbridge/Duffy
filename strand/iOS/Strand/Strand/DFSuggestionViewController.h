@@ -10,8 +10,7 @@
 #import <GBFlatButton/GBFlatButton.h>
 #import <SAMGradientView.h>
 #import "DFProfileWithContextView.h"
-
-@class DFPeanutFeedObject;
+#import "DFPeanutFeedObject.h"
 
 @interface DFSuggestionViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;

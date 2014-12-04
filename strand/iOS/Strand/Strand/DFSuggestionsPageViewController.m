@@ -7,7 +7,7 @@
 //
 
 #import "DFSuggestionsPageViewController.h"
-#import "DFSuggestionViewController.h"
+#import "DFSwipableSuggestionViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNavigationController.h"
 #import "DFPeanutStrandInviteAdapter.h"
@@ -155,7 +155,7 @@
     }
   }
   DFPeanutFeedObject *suggestion = self.filteredSuggestions[index];
-  DFSuggestionViewController *svc = [[DFSuggestionViewController alloc] init];
+  DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
   svc.suggestionFeedObject = suggestion;
   svc.frame = self.view.bounds;
   DFSuggestionsPageViewController __weak *weakSelf = self;

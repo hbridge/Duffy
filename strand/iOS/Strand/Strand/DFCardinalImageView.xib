@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="DFCardinalImageView">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="700" translatesAutoresizingMaskIntoConstraints="NO" id="EFR-as-Tho">
+                    <rect key="frame" x="38" y="0.0" width="525" height="525"/>
+                    <gestureRecognizers/>
+                    <constraints>
+                        <constraint firstAttribute="width" secondItem="EFR-as-Tho" secondAttribute="height" multiplier="1:1" id="vAZ-ZP-g4a"/>
+                    </constraints>
+                    <connections>
+                        <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="FtM-Bq-0kY"/>
+                    </connections>
+                </imageView>
+                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
+                    <rect key="frame" x="38" y="0.0" width="525" height="525"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No" customClass="GBFlatButton">
+                    <rect key="frame" x="203" y="535" width="65" height="65"/>
+                    <color key="backgroundColor" red="0.88235294117647056" green="0.20000000000000001" blue="0.16078431372549021" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="65" id="1j8-gw-EvL"/>
+                        <constraint firstAttribute="height" constant="65" id="j7D-C1-UaJ"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <state key="normal" title="Skip">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes" customClass="GBFlatButton">
+                    <rect key="frame" x="333" y="535" width="65" height="65"/>
+                    <color key="backgroundColor" red="0.42352941176470588" green="0.81960784313725488" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="65" id="E3Z-n7-cfr"/>
+                        <constraint firstAttribute="height" constant="65" id="LMP-tg-RSm"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <inset key="titleEdgeInsets" minX="-2" minY="0.0" maxX="-2" maxY="0.0"/>
+                    <state key="normal" title="Send">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="yesButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Mex-ME-R45"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="EFR-as-Tho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="2sY-5G-Vas"/>
+                <constraint firstAttribute="bottom" secondItem="V0Q-qK-RXd" secondAttribute="bottom" id="7eH-o9-ivb"/>
+                <constraint firstItem="lr5-fU-tFy" firstAttribute="top" secondItem="xKd-Cz-PRo" secondAttribute="bottom" constant="10" id="Ffn-XC-I5q"/>
+                <constraint firstAttribute="centerX" secondItem="lr5-fU-tFy" secondAttribute="centerX" constant="65" id="G8y-8A-p70"/>
+                <constraint firstAttribute="bottom" secondItem="lr5-fU-tFy" secondAttribute="bottom" id="Qvo-LZ-BsU"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="EFR-as-Tho" secondAttribute="trailing" id="emd-i0-ycN"/>
+                <constraint firstAttribute="centerX" secondItem="V0Q-qK-RXd" secondAttribute="centerX" constant="-65" id="g5l-ib-RNb"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="EFR-as-Tho" secondAttribute="leading" id="k1f-Kx-CUI"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="top" secondItem="EFR-as-Tho" secondAttribute="top" id="lf6-5W-kKT"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="bottom" secondItem="EFR-as-Tho" secondAttribute="bottom" id="m9o-Eb-Drw"/>
+                <constraint firstAttribute="centerX" secondItem="EFR-as-Tho" secondAttribute="centerX" id="nBp-Kd-wvP"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <connections>
+                <outlet property="imageView" destination="EFR-as-Tho" id="rbB-zy-0Az"/>
+                <outlet property="noButton" destination="lr5-fU-tFy" id="ceJ-cP-s4b"/>
+                <outlet property="overlayImageView" destination="xKd-Cz-PRo" id="b1b-42-XCH"/>
+                <outlet property="panGestureRecognizer" destination="MM2-cw-TCR" id="cLj-Ui-G3M"/>
+                <outlet property="yesButton" destination="V0Q-qK-RXd" id="HRc-cq-96I"/>
+            </connections>
+        </view>
+        <panGestureRecognizer minimumNumberOfTouches="1" id="MM2-cw-TCR">
+            <connections>
+                <action selector="panGestureChanged:" destination="iN0-l3-epB" id="vbn-OE-d5T"/>
+            </connections>
+        </panGestureRecognizer>
+    </objects>
+</document>
