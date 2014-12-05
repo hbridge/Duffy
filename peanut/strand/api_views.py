@@ -158,6 +158,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		
 	# Now fill in strand invites for this phone number
 	strandInvites = StrandInvite.objects.filter(phone_number=user.phone_number).filter(invited_user__isnull=True).filter(accepted_user__isnull=True)
+	seenInvitesFromUsers = list()
 	for strandInvite in strandInvites:
 		strandInvite.invited_user = user
 		strandInvite.accepted_user = user
@@ -166,6 +167,12 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		if user not in strandInvite.strand.users.all():
 			action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
 			strandInvite.strand.users.add(user)
+
+		if strandInvite.user not in seenInvitesFromUsers:
+			sharedStrand = SharedStrand.objects.create(strand=strandInvite.strand)
+			sharedStrand.users = [user, strandInvite.user]
+			
+			seenInvitesFromUsers.append(strandInvite.user)
 
 	if len(strandInvites) > 0:
 		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
