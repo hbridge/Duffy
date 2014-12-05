@@ -8,9 +8,11 @@
 
 #import "DFSwipableSuggestionViewController.h"
 #import "DFNavigationController.h"
+#import <MMPopLabel/MMPopLabel.h>
 
 @interface DFSwipableSuggestionViewController ()
 
+@property (nonatomic, retain) MMPopLabel *selectPeoplePopLabel;
 
 @end
 
@@ -29,9 +31,11 @@
 
 - (void)viewDidLoad {
   self.imageView = self.cardinalImageView.imageView;
-  
+
   // Need to set the imageView first since the parent needs it
   [super viewDidLoad];
+  
+  [self configurePopLabel];
   
   self.cardinalImageView.delegate = self;
   
@@ -73,6 +77,12 @@
   self.profileStackView.backgroundColor = [UIColor clearColor];
 }
 
+- (void)configurePopLabel
+{
+  self.selectPeoplePopLabel = [MMPopLabel popLabelWithText:@"Select people first"];
+  [self.view addSubview:self.selectPeoplePopLabel];
+}
+
 - (void)configurePeopleLabel
 {
   if (self.nuxStep == 0) {
@@ -104,8 +114,17 @@
 - (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
         buttonSelected:(UIButton *)button
 {
-  if (button == self.cardinalImageView.yesButton && self.yesButtonHandler)
-    self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
+  if (button == self.cardinalImageView.yesButton && self.yesButtonHandler) {
+    if (self.selectedPeanutContacts.count > 0) {
+      self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
+    } else {
+      [self.selectPeoplePopLabel popAtView:self.addRecipientButton animatePopLabel:YES animateTargetView:YES];
+      [self.cardinalImageView resetView];
+      dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [self.selectPeoplePopLabel dismiss];
+      });
+    }
+  }
   else if (button == self.cardinalImageView.noButton && self.noButtonHandler)
     self.noButtonHandler(self.suggestionFeedObject);
 }

@@ -284,6 +284,7 @@
     [self gotoNextController];
     return;
   }
+  
   self.lastSentContacts = contacts;
   // figure out which selected contacts are users
   NSMutableArray *users = [NSMutableArray new];
