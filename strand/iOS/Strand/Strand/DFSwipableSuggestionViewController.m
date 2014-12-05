@@ -115,7 +115,7 @@
         buttonSelected:(UIButton *)button
 {
   if (button == self.cardinalImageView.yesButton && self.yesButtonHandler) {
-    if (self.selectedPeanutContacts.count > 0) {
+    if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
       self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
     } else {
       [self.selectPeoplePopLabel popAtView:self.addRecipientButton animatePopLabel:YES animateTargetView:YES];
