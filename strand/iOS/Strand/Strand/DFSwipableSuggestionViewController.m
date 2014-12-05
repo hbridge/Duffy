@@ -7,9 +7,11 @@
 //
 
 #import "DFSwipableSuggestionViewController.h"
+#import "DFNavigationController.h"
 
 @interface DFSwipableSuggestionViewController ()
 
+@property (nonatomic, retain) NSArray *selectedPeanutContacts;
 
 @end
 
@@ -30,6 +32,7 @@
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.shouldShowNameLabel = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
+  self.selectedPeanutContacts = [self suggestedPeanutContacts];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -48,5 +51,43 @@
   if (button == self.cardinalImageView.yesButton && self.yesButtonHandler) self.yesButtonHandler();
   else if (button == self.cardinalImageView.noButton && self.noButtonHandler) self.noButtonHandler();
 }
+
+- (IBAction)addPersonButtonPressed:(id)sender {
+  DFPeoplePickerViewController *peoplePickerController = [[DFPeoplePickerViewController alloc]
+                                                          initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
+  
+  peoplePickerController.allowsMultipleSelection = YES;
+  peoplePickerController.delegate = self;
+  [DFNavigationController presentWithRootController:peoplePickerController inParent:self];
+}
+
+- (void)pickerController:(DFPeoplePickerViewController *)pickerController
+didFinishWithPickedContacts:(NSArray *)peanutContacts
+{
+  self.selectedPeanutContacts = peanutContacts;
+  [self.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
+  [self.view setNeedsLayout];
+  [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+- (NSArray *)suggestedPeanutContacts
+{
+  return [self.suggestionFeedObject.actors arrayByMappingObjectsWithBlock:^id(id input) {
+    return [[DFPeanutContact alloc] initWithPeanutUser:input];
+  }];
+}
+
+- (NSArray *)selectedPeanutUsers
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutContact *contact in self.selectedPeanutContacts) {
+    DFPeanutUserObject *user = [[DFPeanutUserObject alloc] init];
+    user.phone_number = contact.phone_number;
+    user.display_name = contact.name;
+    [result addObject:user];
+  }
+  return result;
+}
+                                                          
 
 @end

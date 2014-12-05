@@ -8,8 +8,9 @@
 
 #import "DFSuggestionViewController.h"
 #import "DFCardinalImageView.h"
+#import "DFPeoplePickerViewController.h"
 
-@interface DFSwipableSuggestionViewController : DFSuggestionViewController <DFCardinalImageViewDelegate>
+@interface DFSwipableSuggestionViewController : DFSuggestionViewController <DFCardinalImageViewDelegate, DFPeoplePickerDelegate>
 
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;

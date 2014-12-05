@@ -76,6 +76,15 @@ NSString *const ContactsSectionTitle = @"Contacts";
   return self;
 }
 
+- (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts
+{
+  self = [self init];
+  if (self) {
+    _selectedContacts = [selectedPeanutContacts mutableCopy];
+  }
+  return self;
+}
+
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
                     notSelectablePeanutContacts:(NSArray *)notSelectableContacts
                             notSelectableReason:(NSString *)notSelectableReason

@@ -32,6 +32,4 @@
 - (IBAction)noButtonPressed:(id)sender;
 
 
-
-
 @end

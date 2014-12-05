@@ -51,6 +51,7 @@
 
 - (instancetype)initWithSuggestedPeanutUsers:(NSArray *)suggestedPeanutedUsers;
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts;
+- (instancetype)initWithSelectedPeanutContacts:(NSArray *)selectedPeanutContacts;
 - (instancetype)initWithSuggestedPeanutContacts:(NSArray *)suggestedPeanutContacts
                     notSelectablePeanutContacts:(NSArray *)notSelectableContacts
                             notSelectableReason:(NSString *)notSelectableReason;

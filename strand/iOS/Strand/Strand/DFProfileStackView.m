@@ -47,6 +47,12 @@
   }
 }
 
++ (id<NSCopying>)idForUser:(DFPeanutUserObject *)user
+{
+  if (user.id) return @(user.id);
+  else return user.phone_number;
+}
+
 - (void)setPeanutUsers:(NSArray *)users
 {
   _peanutUsers = users;
@@ -65,26 +71,28 @@
     NSInteger numberForUser = [self numberForUser:user];
     NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);
     UIColor *color = allColors[colorIndex];
-    fillColors[@(user.id)] = color;
+    fillColors[[self.class idForUser:user]] = color;
     
     //name
     NSString *abbreviation = @"";
     if ([user firstName].length > 0) {
       abbreviation = [[[user firstName] substringToIndex:1] uppercaseString];
     }
-    abbreviations[@(user.id)] = abbreviation;
+    abbreviations[[self.class idForUser:user]] = abbreviation;
     
     //image
     UIImage *image = [user roundedThumbnailOfPointSize:CGSizeMake(self.profilePhotoWidth,
                                                                   self.profilePhotoWidth)];
     if (image)
-      images[@(user.id)] = image;
+      images[[self.class idForUser:user]] = image;
     
   }
   _fillColorsById = fillColors;
   _abbreviationsById = abbreviations;
   _imagesById = images;
   
+  [self sizeToFit];
+  [self invalidateIntrinsicContentSize];
   [self setNeedsDisplay];
 }
 
@@ -95,7 +103,7 @@
     UIImage *image = [user roundedThumbnailOfPointSize:CGSizeMake(self.profilePhotoWidth,
                                                                   self.profilePhotoWidth)];
     if (image)
-      images[@(user.id)] = image;
+      images[[self.class idForUser:user]] = image;
   }
   self.imagesById = images;
 }
@@ -115,12 +123,21 @@
   }
 }
 
+- (CGSize)intrinsicContentSize
+{
+  return [self sizeThatFits:CGSizeZero];
+}
+
 - (NSInteger)numberForUser:(DFPeanutUserObject *)user {
-  return (NSInteger)user.id;
+  if (user.id)
+    return (NSInteger)user.id;
+  
+  return user.phone_number.hash;
 }
 
 - (CGSize)sizeThatFits:(CGSize)size
 {
+  if (self.peanutUsers.count == 0) return CGSizeZero;
   CGSize newSize = size;
   newSize.height = self.profilePhotoWidth;
   newSize.width = (CGFloat)MIN(self.maxProfilePhotos + 1, self.peanutUsers.count) * self.profilePhotoWidth
@@ -145,9 +162,9 @@
   
   for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
     DFPeanutUserObject *user = self.peanutUsers[i];
-    UIColor *fillColor = self.fillColorsById[@(user.id)];
-    NSString *abbreviation = self.abbreviationsById[@(user.id)];
-    UIImage *image = self.imagesById[@(user.id)];
+    UIColor *fillColor = self.fillColorsById[[self.class idForUser:user]];
+    NSString *abbreviation = self.abbreviationsById[[self.class idForUser:user]];
+    UIImage *image = self.imagesById[[self.class idForUser:user]];
     
     CGRect abbreviationRect = [self rectForIndex:i];
     if (!image) {
