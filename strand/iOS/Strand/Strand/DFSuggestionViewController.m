@@ -70,11 +70,12 @@
 }
 
 - (IBAction)yesButtonPressed:(id)sender {
-  if (self.yesButtonHandler) self.yesButtonHandler();
+  if (self.yesButtonHandler) self.yesButtonHandler(self.suggestionFeedObject,
+                                                   self.suggestionFeedObject.actors);
 }
 
 - (IBAction)noButtonPressed:(id)sender {
-  if (self.noButtonHandler) self.noButtonHandler();
+  if (self.noButtonHandler) self.noButtonHandler(self.suggestionFeedObject);
 }
 
 @end

@@ -28,7 +28,14 @@
   self.cardinalImageView.delegate = self;
 
   //self.profileStackView.backgroundColor = [UIColor clearColor];
-  self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+  if (self.suggestionFeedObject.actors.count > 0) {
+    self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+  } else {
+    DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
+    dummyUser.display_name = @"?";
+    dummyUser.phone_number = @"?";
+    self.profileStackView.peanutUsers = @[dummyUser];
+  }
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.shouldShowNameLabel = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
@@ -48,8 +55,10 @@
 - (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
         buttonSelected:(UIButton *)button
 {
-  if (button == self.cardinalImageView.yesButton && self.yesButtonHandler) self.yesButtonHandler();
-  else if (button == self.cardinalImageView.noButton && self.noButtonHandler) self.noButtonHandler();
+  if (button == self.cardinalImageView.yesButton && self.yesButtonHandler)
+    self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
+  else if (button == self.cardinalImageView.noButton && self.noButtonHandler)
+    self.noButtonHandler(self.suggestionFeedObject);
 }
 
 - (IBAction)addPersonButtonPressed:(id)sender {

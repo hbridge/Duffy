@@ -12,6 +12,10 @@
 #import "DFProfileWithContextView.h"
 #import "DFPeanutFeedObject.h"
 
+typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
+typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
+
+
 @interface DFSuggestionViewController : UIViewController
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
@@ -19,10 +23,9 @@
 @property (weak, nonatomic) IBOutlet GBFlatButton *yesButton;
 @property (weak, nonatomic) IBOutlet SAMGradientView *footerView;
 @property (nonatomic) CGRect frame;
-@property (nonatomic, copy) DFVoidBlock yesButtonHandler;
-@property (nonatomic, copy) DFVoidBlock noButtonHandler;
+@property (nonatomic, copy) DFSuggestionYesHandler yesButtonHandler;
+@property (nonatomic, copy) DFSuggestionNoHandler noButtonHandler;
 @property (nonatomic, copy) DFVoidBlock suggestionsOutHandler;
-
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
 

@@ -14,6 +14,7 @@
 #import <SVProgressHUD/SVProgressHUD.h>
 #import "DFNoTableItemsView.h"
 #import "DFUploadController.h"
+#import "DFPeanutStrandInviteAdapter.h"
 
 @interface DFSuggestionsPageViewController ()
 
@@ -23,6 +24,7 @@
 @property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
 @property (nonatomic, retain) NSMutableArray *suggestionsToRemove;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
+@property (nonatomic, readonly, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 
 @property (nonatomic) NSInteger photoIndex;
 @property (retain, nonatomic) NSMutableArray *indexPaths;
@@ -30,6 +32,7 @@
 @end
 
 @implementation DFSuggestionsPageViewController
+@synthesize inviteAdapter = _inviteAdapter;
 
 
 - (instancetype)init
@@ -191,10 +194,10 @@
   svc.frame = self.view.bounds;
   DFSuggestionsPageViewController __weak *weakSelf = self;
   
-  svc.yesButtonHandler = ^{
-    [weakSelf suggestionSelected:suggestion photo:photo];
+  svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+    [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
   };
-  svc.noButtonHandler = ^{
+  svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
     [weakSelf suggestionHidden:suggestion photo:photo];
   };
   
@@ -235,10 +238,88 @@
   return [self viewControllerForIndex:afterIndex];
 }
 
-- (void)suggestionSelected:(DFPeanutFeedObject *)suggestion photo:(DFPeanutFeedObject *)photo
+- (void)suggestionSelected:(DFPeanutFeedObject *)suggestion
+                  contacts:(NSArray *)contacts
+                     photo:(DFPeanutFeedObject *)photo
 {
-  [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:photo users:suggestion.actors];
+  // figure out which selected contacts are users
+  NSMutableArray *users = [NSMutableArray new];
+  for (DFPeanutContact *contact in contacts) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager]
+                                getUserWithPhoneNumber:contact.phone_number];
+    if (user) [users addObject:user];
+  }
+  
+  // if any are users share photos with them
+  if (users.count > 0) {
+    [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:photo users:suggestion.actors];
+  }
+  
+  // if there are more contacts, create a strand for each and send invites
+  if (contacts.count > users.count) {
+    [self createStrandsForPhoto:photo sendInvitesToContacts:contacts fromSuggestion:suggestion];
+  }
+  
   [self gotoNextController];
+}
+
+- (void)createStrandsForPhoto:(DFPeanutFeedObject *)photo
+        sendInvitesToContacts:(NSArray *)contacts
+               fromSuggestion:(DFPeanutFeedObject *)suggestion
+{
+  DFSuggestionsPageViewController __weak *weakSelf = self;
+  [SVProgressHUD show];
+  for (DFPeanutContact *contact in contacts) {
+    [[DFPeanutFeedDataManager sharedManager]
+     createNewStrandWithFeedObjects:@[photo]
+     additionalUserIds:nil
+     success:^(DFPeanutStrand *createdStrand){
+       [weakSelf sendInvitesForStrand:createdStrand
+                     toPeanutContacts:@[contact]
+                           suggestion:suggestion];
+     } failure:^(NSError *error) {
+       [SVProgressHUD showErrorWithStatus:error.localizedDescription];
+       DDLogError(@"%@ create failed: %@", weakSelf.class, error);
+     }];
+  }
+}
+
+- (void)sendInvitesForStrand:(DFPeanutStrand *)peanutStrand
+            toPeanutContacts:(NSArray *)peanutContacts
+                  suggestion:(DFPeanutFeedObject *)suggestion
+{
+  DFSuggestionsPageViewController __weak *weakSelf = self;
+  [self.inviteAdapter
+   sendInvitesForStrand:peanutStrand
+   toPeanutContacts:peanutContacts
+   inviteLocationString:suggestion.location
+   invitedPhotosDate:suggestion.time_taken
+   success:^(DFSMSInviteStrandComposeViewController *vc) {
+     dispatch_async(dispatch_get_main_queue(), ^{
+       DDLogInfo(@"Created strand successfully");
+       if (vc && [DFSMSInviteStrandComposeViewController canSendText]) {
+         // Some of the invitees aren't Strand users, send them a text
+         vc.messageComposeDelegate = weakSelf;
+         [weakSelf presentViewController:vc
+                                animated:YES
+                              completion:^{
+                                [SVProgressHUD dismiss];
+                              }];
+       } else {
+         [SVProgressHUD dismiss];
+       }
+     });
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ failed to invite to strand: %@, error: %@",
+                weakSelf.class, peanutStrand, error);
+   }];
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+                 didFinishWithResult:(MessageComposeResult)result
+{
+  
+  [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 - (void)suggestionHidden:(DFPeanutFeedObject *)suggestion  photo:(DFPeanutFeedObject *)photo
@@ -280,6 +361,12 @@
   if (result == DFCreateStrandResultSuccess) {
     [self gotoNextController];
   }
+}
+
+- (DFPeanutStrandInviteAdapter *)inviteAdapter
+{
+  if (!_inviteAdapter) _inviteAdapter = [[DFPeanutStrandInviteAdapter alloc] init];
+  return _inviteAdapter;
 }
 
 

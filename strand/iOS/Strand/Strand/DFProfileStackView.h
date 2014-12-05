@@ -17,6 +17,7 @@
 @property (nonatomic) CGFloat profilePhotoWidth;
 @property (nonatomic, retain) NSArray *peanutUsers;
 @property (nonatomic) BOOL shouldShowNameLabel;
+@property (nonatomic) BOOL showsQuestionMarkForNoUsers;
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user;
 

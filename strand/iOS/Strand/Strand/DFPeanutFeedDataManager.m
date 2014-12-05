@@ -17,6 +17,7 @@
 #import "DFPeanutSharedStrandAdapter.h"
 #import "DFPeanutActionAdapter.h"
 #import "DFPhotoStore.h"
+#import "DFPhoneNumberUtils.h"
 
 @interface DFPeanutFeedDataManager ()
 
@@ -619,6 +620,17 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
+- (DFPeanutUserObject *)getUserWithPhoneNumber:(NSString *)phoneNumber
+{
+  NSString *normalizedPhoneNumber = [DFPhoneNumberUtils normalizePhoneNumber:phoneNumber];
+  for (DFPeanutUserObject *user in self.cachedFriendsList) {
+    if ([user.phone_number isEqualToString:normalizedPhoneNumber]) {
+      return user;
+    }
+  }
+  return nil;
+}
+
 - (void)acceptInvite:(DFPeanutFeedObject *)inviteFeedObject
          addPhotoIDs:(NSArray *)photoIDs
              success:(void(^)(void))success
@@ -806,33 +818,35 @@ static DFPeanutFeedDataManager *defaultManager;
     if (cachedFriend.shared_strand == nil) {
       // So first create a strand
       // Then we'll create a record saying for this set of users, we're using this shared strand
-      [self createNewStrandWithFeedObjects:[NSArray arrayWithObject:photo]
-                         additionalUserIds:[NSArray arrayWithObject:@(cachedFriend.id)]
-                                   success:^(DFPeanutStrand *resultStrand) {
-                                     
-                                     // We successfully created the strand, not create the shared strand object and save that
-                                     cachedFriend.shared_strand = resultStrand.id;
-                                     
-                                     DFPeanutSharedStrand *sharedStrand = [DFPeanutSharedStrand new];
-                                     sharedStrand.users = resultStrand.users;
-                                     sharedStrand.strand = resultStrand.id;
-                                     [self.sharedStrandAdapter createSharedStrand:sharedStrand
-                                                                          success:^(NSArray *resultObjects){
-                                                                            // Lastly, we add the photo to the strand
-                                                                            [self addFeedObjects:[NSArray arrayWithObject:photo] toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
-                                                                          }
-                                                                          failure:^(NSError *error) {
-                                                                            DDLogError(@"Unable to create shared strand");
-                                                                          }];
-                                     
-                                   }
-                                   failure:nil
+      [self
+       createNewStrandWithFeedObjects:[NSArray arrayWithObject:photo]
+       additionalUserIds:[NSArray arrayWithObject:@(cachedFriend.id)]
+       success:^(DFPeanutStrand *resultStrand) {
+         // We successfully created the strand, not create the shared strand object and save that
+         cachedFriend.shared_strand = resultStrand.id;
+         
+         DFPeanutSharedStrand *sharedStrand = [DFPeanutSharedStrand new];
+         sharedStrand.users = resultStrand.users;
+         sharedStrand.strand = resultStrand.id;
+         [self.sharedStrandAdapter
+          createSharedStrand:sharedStrand
+          success:^(NSArray *resultObjects){
+            // Lastly, we add the photo to the strand
+            [self addFeedObjects:[NSArray arrayWithObject:photo] toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
+          }
+          failure:^(NSError *error) {
+            DDLogError(@"Unable to create shared strand");
+          }];
+       }
+       failure:nil
        ];
     } else {
       [self addFeedObjects:[NSArray arrayWithObject:photo] toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
     }
   }
 }
+
+
 
 - (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
 {

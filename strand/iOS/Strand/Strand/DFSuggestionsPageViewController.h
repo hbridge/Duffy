@@ -15,7 +15,7 @@
 
 
 @interface DFSuggestionsPageViewController : UIPageViewController
-<UIPageViewControllerDataSource, UIPageViewControllerDelegate, DFCreateStrandFlowViewControllerDelegate>
+<UIPageViewControllerDataSource, UIPageViewControllerDelegate, DFCreateStrandFlowViewControllerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutUserObject *userToFilter;
 

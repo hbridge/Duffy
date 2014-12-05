@@ -124,6 +124,7 @@
 		5A91C4781A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */; };
 		5A91C47B1A2FC11F00C4F9A6 /* DFCardinalImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47A1A2FC11F00C4F9A6 /* DFCardinalImageView.m */; };
 		5A91C47D1A2FC13100C4F9A6 /* DFCardinalImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C47C1A2FC13100C4F9A6 /* DFCardinalImageView.xib */; };
+		5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */; };
 		5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */; };
 		5A9636BE19E44F5700F3B606 /* DFCreateStrandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9636BD19E44F5700F3B606 /* DFCreateStrandViewController.m */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
@@ -500,6 +501,8 @@
 		5A91C4791A2FC11F00C4F9A6 /* DFCardinalImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCardinalImageView.h; sourceTree = "<group>"; };
 		5A91C47A1A2FC11F00C4F9A6 /* DFCardinalImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCardinalImageView.m; sourceTree = "<group>"; };
 		5A91C47C1A2FC13100C4F9A6 /* DFCardinalImageView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCardinalImageView.xib; sourceTree = "<group>"; };
+		5A91C47E1A321FC600C4F9A6 /* DFPhoneNumberUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoneNumberUtils.h; sourceTree = "<group>"; };
+		5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoneNumberUtils.m; sourceTree = "<group>"; };
 		5A93B59E19B6290F00A3DBA7 /* DFABResultTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFABResultTableViewCell.h; sourceTree = "<group>"; };
 		5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFABResultTableViewCell.m; sourceTree = "<group>"; };
 		5A9636BC19E44F5700F3B606 /* DFCreateStrandViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCreateStrandViewController.h; sourceTree = "<group>"; };
@@ -998,6 +1001,8 @@
 				5AED01DF19E348DF001F075D /* NSIndexPath+DFHelpers.m */,
 				5AA36F0019F6ED1B008B37AA /* UIColor+DFHelpers.h */,
 				5AA36F0119F6ED1B008B37AA /* UIColor+DFHelpers.m */,
+				5A91C47E1A321FC600C4F9A6 /* DFPhoneNumberUtils.h */,
+				5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -1994,6 +1999,7 @@
 				5A36816319FAD41F008EE2A7 /* DFCreateStrandFlowViewController.m in Sources */,
 				5AB7BEBD19FFF72C000BEB67 /* DFImageManagerRequest.m in Sources */,
 				5AAF03A619B509B400EF021C /* DFInviteStrandViewController.m in Sources */,
+				5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */,
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
 				5A91C47B1A2FC11F00C4F9A6 /* DFCardinalImageView.m in Sources */,

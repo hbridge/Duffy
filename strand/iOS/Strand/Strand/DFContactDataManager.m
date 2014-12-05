@@ -7,10 +7,9 @@
 //
 
 #import "DFContactDataManager.h"
-
 #import <RHAddressBook/AddressBook.h>
-
 #import "DFPeanutFeedDataManager.h"
+#import "DFPhoneNumberUtils.h"
 
 @interface DFContactDataManager ()
 
@@ -78,14 +77,7 @@ static DFContactDataManager *defaultManager;
       RHMultiStringValue *phoneMultiValue = [person phoneNumbers];
       for (int x = 0; x < phoneMultiValue.count; x++) {
         NSString *rawPhoneNumber = [[phoneMultiValue valueAtIndex:x] description];
-        
-        // Get phone number into the format of +15551234567
-        NSString *phoneNumber = [[rawPhoneNumber componentsSeparatedByCharactersInSet:[[NSCharacterSet decimalDigitCharacterSet] invertedSet]] componentsJoinedByString:@""];
-        if (![phoneNumber hasPrefix:@"1"]) {
-          phoneNumber = [NSString stringWithFormat:@"1%@", phoneNumber];
-        }
-        phoneNumber = [NSString stringWithFormat:@"+%@", phoneNumber];
-        
+        NSString *phoneNumber =[DFPhoneNumberUtils normalizePhoneNumber:rawPhoneNumber];
         if (![_phoneNumberToPersonCache objectForKey:phoneNumber]) {
           [_phoneNumberToPersonCache setObject:[NSMutableArray new] forKey:phoneNumber];
         }
