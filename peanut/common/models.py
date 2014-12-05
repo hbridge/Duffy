@@ -706,7 +706,6 @@ class StrandNeighbor(models.Model):
 class FriendConnection(models.Model):
 	user_1 = models.ForeignKey(User, related_name="friend_user_1", db_index=True)
 	user_2 = models.ForeignKey(User, related_name="friend_user_2", db_index=True)
-	shared_strand = models.ForeignKey(Strand, null=True)
 	added = models.DateTimeField(auto_now_add=True)
 	updated = models.DateTimeField(auto_now=True)
 
