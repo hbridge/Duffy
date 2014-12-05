@@ -289,13 +289,19 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 		if actionsByPhotoIdCache:
 			# Look through all our photos and actions taken on the photos
 			# If we find that a photo already has an action of EVALUATED then we take it out
-			photosNotEvaluated = group['photos']
+
+			# Have to make a list() of this since we need an independent copy to loop through
+			photosNotEvaluated = list(group['photos'])
 			for photo in group['photos']:
 				if photo.id in actionsByPhotoIdCache:
 					for action in actionsByPhotoIdCache[photo.id]:
 						if action.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED and photo in photosNotEvaluated:
 							photosNotEvaluated.remove(photo)
-			group['photos'] = photosNotEvaluated
+
+			if len(photosNotEvaluated) == 0:
+				continue
+			else:
+				group['photos'] = photosNotEvaluated
 
 		clusters = cluster_util.getClustersFromPhotos(group['photos'], constants.DEFAULT_CLUSTER_THRESHOLD, 0, simCaches)
 
@@ -906,7 +912,7 @@ def add_photos_to_strand(request):
 		
 		requestData = api_util.getRequestData(request)
 
-		photoIds = requestData["photo_ids[]"].split(',')
+		photoIds = [int(x) for x in requestData["photo_ids[]"].split(',')]
 		existingPhotoIds = Photo.getIds(strand.photos.all())
 
 		entriesToCreate = list()
@@ -916,10 +922,24 @@ def add_photos_to_strand(request):
 				photo = Photo.objects.get(id=photoId)
 				strands_util.addPhotoToStrand(strand, photo, {strand.id: list(strand.photos.all())}, {strand.id: list(strand.users.all())})
 				newPhotoIds.append(photoId)
-				
-		action = Action(user=user, strand=strand, photo_id=newPhotoIds[0], action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
-		action.save()
-		action.photos = newPhotoIds
+
+		if len(newPhotoIds) > 0:
+			action = Action(user=user, strand=strand, photo_id=newPhotoIds[0], action_type=constants.ACTION_TYPE_ADD_PHOTOS_TO_STRAND)
+			action.save()
+			action.photos = newPhotoIds
+
+			privateStrands = Strand.objects.prefetch_related('photos').filter(photos__id__in=newPhotoIds, private=True, user=user)
+
+			for photoId in newPhotoIds:
+				for privateStrand in privateStrands:
+					ids = Photo.getIds(privateStrand.photos.all())
+					if photoId in ids:
+						action = Action.objects.create(user=user, strand=privateStrand, photo_id=photoId, action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
+						
+			for privateStrand in privateStrands:
+				strands_util.checkStrandForAllPhotosEvaluated(privateStrand)
+
+		
 	else:
 		return HttpResponse(json.dumps(form.errors), content_type="application/json", status=400)
 

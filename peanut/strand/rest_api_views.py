@@ -610,21 +610,7 @@ class CreateActionAPI(CreateAPIView):
                 else:
                     return super(CreateActionAPI, self).post(request)
             elif (obj.action_type == constants.ACTION_TYPE_PHOTO_EVALUATED):
-                photoIds = Photo.getIds(obj.strand.photos.all())
-
-                actions = Action.objects.filter(strand_id=obj.strand_id).filter(action_type=constants.ACTION_TYPE_PHOTO_EVALUATED)
-
-                notSeenPhotoIds = photoIds
-                for action in actions:
-                    if action.photo_id in notSeenPhotoIds:
-                        notSeenPhotoIds.remove(action.photo_id)
-
-                if len(notSeenPhotoIds) == 0:
-                    logger.debug("All photos have been seen for strand %s, marking as suggestible = False" % obj.strand_id)
-                    obj.strand.suggestible = False
-                    obj.strand.save()
-                else:
-                    logger.debug("Created action and had %s photos till not seen in the strand" % len(notSeenPhotoIds))
+                strands_util.checkStrandForAllPhotosEvaluated(obj.strand)
                 return super(CreateActionAPI, self).post(request)
             else:
                 return super(CreateActionAPI, self).post(request)
@@ -743,7 +729,7 @@ class CreateStrandAPI(CreateAPIView):
                     privateStrand.save()
 
                     createNeighborRowsToNewStrand(strand, privateStrand)
-                    
+
             logger.info("Created new strand %s with users %s and photos %s" % (strand.id, strand.users.all(), strand.photos.all()))
             
 class RetrieveUpdateDestroyStrandAPI(RetrieveUpdateDestroyAPIView):
