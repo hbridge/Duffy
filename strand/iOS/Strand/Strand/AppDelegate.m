@@ -272,13 +272,13 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [DFPhotoStore sharedStore];
   
   //self.inboxViewController = [[DFInboxViewController alloc] init];
-  DFGalleryViewController *gallery = [[DFGalleryViewController alloc] init];
+  //DFGalleryViewController *gallery = [[DFGalleryViewController alloc] init];
   DFSuggestionsPageViewController *suggestionsController = [[DFSuggestionsPageViewController alloc] init];
   DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
   DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
   self.tabBarController = [[UITabBarController alloc] init];
   self.tabBarController.viewControllers =
-  @[[[DFNavigationController alloc] initWithRootViewController:gallery],
+  @[
     [[DFNavigationController alloc] initWithRootViewController:suggestionsController],
     [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
     [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
@@ -291,7 +291,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   //self.tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
   self.tabBarController.tabBar.translucent = NO;
   
-  self.tabBarController.selectedIndex = 1;
+  self.tabBarController.selectedIndex = 0;
   self.window.rootViewController = self.tabBarController;
 }
 
