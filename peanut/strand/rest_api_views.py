@@ -546,13 +546,14 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
             try:
                 user = User.objects.get(phone_number=strandInvite.phone_number, product_id=2)
                 strandInvite.invited_user = user
-                strandInvite.accepted_user = user
-
+                
                 # Temp solution to remove the need for invites.
                 # Just add the user into the strand
-                if user not in strandInvite.strand.users.all():
-                    action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-                    strandInvite.strand.users.add(user)
+                if int(self.request.DATA['build_number']) <= 4805:
+                    strandInvite.accepted_user = user
+                    if user not in strandInvite.strand.users.all():
+                        action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
+                        strandInvite.strand.users.add(user)
 
             except User.DoesNotExist:
                 logger.debug("Looked for %s but didn't find matching user" % (strandInvite.phone_number))
