@@ -54,8 +54,14 @@ NSString *const AddPhotosPath = @"add_photos_to_strand";
                                           pathPattern:CreateStrandPath
                                               keyPath:nil
                                           statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassClientError)];
+  RKResponseDescriptor *addPhotosSuccessResponse =
+  [RKResponseDescriptor responseDescriptorWithMapping:[DFPeanutTrueFalseResponse objectMapping]
+                                               method:RKRequestMethodAny
+                                          pathPattern:AddPhotosPath
+                                              keyPath:nil
+                                          statusCodes:RKStatusCodeIndexSetForClass(RKStatusCodeClassSuccessful)];
   
-  return @[restSuccessResponse, restErrorResponse, createSuccessResponse, createErrorResponse];
+  return @[restSuccessResponse, restErrorResponse, createSuccessResponse, createErrorResponse, addPhotosSuccessResponse];
 }
 
 + (NSArray *)requestDescriptors

@@ -732,7 +732,7 @@ static DFPeanutFeedDataManager *defaultManager;
      
      if (success) success();
    } failure:^(NSError *error) {
-     DDLogError(@"%@ failed to patch strand: %llu, error: %@",
+     DDLogError(@"%@ failed to add photos to strand: %llu, error: %@",
                 weakSelf.class, strandID, error);
      if (failure) failure(error);
    }];
