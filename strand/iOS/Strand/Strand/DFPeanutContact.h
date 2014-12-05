@@ -28,4 +28,6 @@ extern DFPeanutContactType DFPeanutContactInvited;
 @property (nonatomic, retain) NSString *contact_type;
 
 - (instancetype)initWithPeanutUser:(DFPeanutUserObject *)user;
+- (NSString *)firstName;
+
 @end

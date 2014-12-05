@@ -58,4 +58,9 @@ DFPeanutContactType DFPeanutContactInvited = @"invited";
   return [selfDict isEqualToDictionary:otherDict];
 }
 
+- (NSString *)firstName
+{
+  return [[[self name] componentsSeparatedByString:@" "] firstObject];
+}
+
 @end

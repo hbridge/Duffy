@@ -11,7 +11,6 @@
 
 @interface DFSwipableSuggestionViewController ()
 
-@property (nonatomic, retain) NSArray *selectedPeanutContacts;
 
 @end
 
@@ -48,6 +47,7 @@
     self.selectedPeanutContacts = [self suggestedPeanutContacts];
   } else {
     self.addRecipientButton.hidden = YES;
+    
     self.profileStackView.maxAbbreviationLength = 2;
     DFPeanutUserObject *teamSwapUser = [[DFPeanutUserObject alloc] init];
     teamSwapUser.display_name = @"TS";
@@ -67,9 +67,28 @@
     
   }
   
+  [self configurePeopleLabel];
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.shouldShowNameLabel = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
+}
+
+- (void)configurePeopleLabel
+{
+  if (self.nuxStep == 0) {
+    if (self.selectedPeanutContacts.count > 0) {
+      NSArray *contactNames = [self.selectedPeanutContacts arrayByMappingObjectsWithBlock:^id(DFPeanutContact *contact) {
+        return [contact firstName];
+      }];
+      NSString *commaList = [contactNames componentsJoinedByString:@", "];
+      self.peopleLabel.text = [NSString stringWithFormat:@"Send to %@",commaList];
+    } else {
+      self.peopleLabel.text = @"Pick Recipients";
+    }
+  } else {
+    self.peopleLabel.text = @"Send to Team Swap";
+  }
+  [self.peopleLabel invalidateIntrinsicContentSize];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -104,6 +123,7 @@
 didFinishWithPickedContacts:(NSArray *)peanutContacts
 {
   self.selectedPeanutContacts = peanutContacts;
+  [self configurePeopleLabel];
   [self.profileStackView setPeanutUsers:[self selectedPeanutUsers]];
   [self.view setNeedsLayout];
   [self dismissViewControllerAnimated:YES completion:nil];

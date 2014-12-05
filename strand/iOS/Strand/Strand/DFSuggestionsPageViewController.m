@@ -26,6 +26,7 @@
 @property (nonatomic, retain) NSMutableArray *suggestionsToRemove;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic, readonly, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
+@property (nonatomic, retain) NSArray *lastSentContacts;
 
 @property (nonatomic) NSInteger photoIndex;
 @property (retain, nonatomic) NSMutableArray *indexPaths;
@@ -204,6 +205,7 @@
   
   
   DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
+  if (suggestion.actors.count == 0) svc.selectedPeanutContacts = self.lastSentContacts;
   svc.suggestionFeedObject = suggestion;
   svc.photoFeedObject = photo;
 
@@ -282,6 +284,7 @@
     [self gotoNextController];
     return;
   }
+  self.lastSentContacts = contacts;
   // figure out which selected contacts are users
   NSMutableArray *users = [NSMutableArray new];
   for (DFPeanutContact *contact in contacts) {

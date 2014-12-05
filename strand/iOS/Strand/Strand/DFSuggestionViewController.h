@@ -29,6 +29,7 @@ typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
 @property (nonatomic) NSUInteger nuxStep;
+@property (nonatomic, retain) NSArray *selectedPeanutContacts;
 
 
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo;
