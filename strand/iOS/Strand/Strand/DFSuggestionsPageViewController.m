@@ -39,7 +39,7 @@
 - (instancetype)init
 {
   self = [super initWithTransitionStyle:UIPageViewControllerTransitionStyleScroll
-                  navigationOrientation:UIPageViewControllerNavigationOrientationHorizontal
+                  navigationOrientation:UIPageViewControllerNavigationOrientationVertical
                                 options:nil];
   if (self) {
     self.delegate = self;
