@@ -217,8 +217,8 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   [self showMainView];
   [self performForegroundOperations];
   
-  // Show the Inbox
-  self.tabBarController.selectedIndex = 1;
+  // Show suggestions
+  self.tabBarController.selectedIndex = 0;
 }
 
 /*
