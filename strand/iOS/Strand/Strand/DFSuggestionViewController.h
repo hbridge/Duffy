@@ -28,6 +28,8 @@ typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 @property (nonatomic, copy) DFVoidBlock suggestionsOutHandler;
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
+@property (nonatomic) NSUInteger nuxStep;
+
 
 - (void)configureWithSuggestion:(DFPeanutFeedObject *)suggestion withPhoto:(DFPeanutFeedObject *)photo;
 

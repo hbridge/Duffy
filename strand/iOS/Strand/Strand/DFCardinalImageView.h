@@ -42,6 +42,8 @@
 @property (nonatomic, weak) id<DFCardinalImageViewDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIPanGestureRecognizer *panGestureRecognizer;
 @property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
+@property (nonatomic) BOOL yesEnabled;
+@property (nonatomic) BOOL noEnabled;
 
 - (IBAction)panGestureChanged:(UIPanGestureRecognizer *)sender;
 - (void)resetView;

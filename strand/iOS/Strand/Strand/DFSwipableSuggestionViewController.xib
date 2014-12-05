@@ -7,6 +7,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFSwipableSuggestionViewController">
             <connections>
+                <outlet property="addRecipientButton" destination="UYI-Rc-QVa" id="BW8-Ah-Abn"/>
                 <outlet property="bottomLabel" destination="RRW-PK-CfC" id="gs9-7a-tJq"/>
                 <outlet property="cardinalImageView" destination="YTX-Vv-qtQ" id="8s2-Tk-5Wh"/>
                 <outlet property="profileStackView" destination="BkW-lL-hsr" id="KUf-zp-AfQ"/>

@@ -116,6 +116,7 @@ DFUserActionType DFUserActionViewNotifications = @"ViewNotifications";
 
 // whether setup steps have been passed
 DFSetupStepType DFSetupStepAskToAutoSaveToCameraRoll = @"DFSetupStepAskToAutoSaveToCameraRoll";
+DFSetupStepType DFSetupStepSuggestionsNux = @"DFSetupStepSwipeNux";
 
 + (void)setSetupStepPassed:(DFSetupStepType)step Passed:(BOOL)passed
 {

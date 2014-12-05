@@ -16,5 +16,8 @@
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
 @property (weak, nonatomic) IBOutlet DFCardinalImageView *cardinalImageView;
+@property (weak, nonatomic) IBOutlet UIButton *addRecipientButton;
+
+- (instancetype)initWithNuxStep:(NSUInteger)step;
 
 @end

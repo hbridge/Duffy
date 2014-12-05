@@ -15,6 +15,7 @@
 #import "DFNoTableItemsView.h"
 #import "DFUploadController.h"
 #import "DFPeanutStrandInviteAdapter.h"
+#import "DFDefaultsStore.h"
 
 @interface DFSuggestionsPageViewController ()
 
@@ -114,6 +115,12 @@
     }
   }
   
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+    // go in reverse order to make sure path 0 is at index 0
+    [self.indexPaths insertObject:[NSIndexPath indexPathForItem:1 inSection:NSIntegerMin] atIndex:0];
+    [self.indexPaths insertObject:[NSIndexPath indexPathForItem:0 inSection:NSIntegerMin] atIndex:0];
+  }
+  
   if ((self.viewControllers.count == 0
       || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
            isSubclassOfClass:[DFSuggestionViewController class]])
@@ -147,6 +154,9 @@
 {
   if (![[viewController class] isSubclassOfClass:[DFSuggestionViewController class]]) return -1;
   DFSuggestionViewController *suggestionVC = (DFSuggestionViewController *)viewController;
+  if (suggestionVC.nuxStep > 0) {
+    return suggestionVC.nuxStep - 1;
+  }
   NSUInteger sectionIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
   
   if (sectionIndex == NSNotFound) return -1;
@@ -182,6 +192,12 @@
     }
   }
   NSIndexPath *indexPath = self.indexPaths[index];
+  
+  if (indexPath.section == NSIntegerMin) {
+    // this is a nux request
+    return [self suggestionViewControllerForNuxStep:indexPath.row + 1];
+  }
+  
   DFPeanutFeedObject *suggestion = self.filteredSuggestions[indexPath.section];
   NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
   DFPeanutFeedObject *photo = photos[indexPath.item];
@@ -200,6 +216,26 @@
   svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
     [weakSelf suggestionHidden:suggestion photo:photo];
   };
+  
+  return svc;
+}
+        
+- (DFSuggestionViewController *)suggestionViewControllerForNuxStep:(NSUInteger)nuxStep
+{
+  DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
+                                             initWithNuxStep:nuxStep];
+  if (nuxStep == 1) {
+    svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+      [SVProgressHUD showSuccessWithStatus:@"Nice!"];
+      [self gotoNextController];
+    };
+  } else if (nuxStep == 2) {
+     svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
+       [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
+       [self gotoNextController];
+       [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
+     };
+  }
   
   return svc;
 }
@@ -242,6 +278,10 @@
                   contacts:(NSArray *)contacts
                      photo:(DFPeanutFeedObject *)photo
 {
+  if (!suggestion) {
+    [self gotoNextController];
+    return;
+  }
   // figure out which selected contacts are users
   NSMutableArray *users = [NSMutableArray new];
   for (DFPeanutContact *contact in contacts) {
@@ -324,7 +364,8 @@
 
 - (void)suggestionHidden:(DFPeanutFeedObject *)suggestion  photo:(DFPeanutFeedObject *)photo
 {
-  [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo.id strandID:suggestion.id];
+  if (photo)
+    [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo.id strandID:suggestion.id];
   [self gotoNextController];
 }
 

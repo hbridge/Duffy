@@ -31,6 +31,8 @@
     self.maxProfilePhotos = 4;
   if (self.profilePhotoWidth == 0.0)
     self.profilePhotoWidth = 35.0;
+  if (self.maxAbbreviationLength == 0)
+    self.maxAbbreviationLength = 1;
   
   UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                            initWithTarget:self
@@ -75,8 +77,11 @@
     
     //name
     NSString *abbreviation = @"";
-    if ([user firstName].length > 0) {
-      abbreviation = [[[user firstName] substringToIndex:1] uppercaseString];
+    NSString *firstName = [user firstName];
+    if (firstName.length > 0) {
+      abbreviation = [[firstName
+                       substringToIndex:MIN(self.maxAbbreviationLength, user.firstName.length)]
+                      uppercaseString];
     }
     abbreviations[[self.class idForUser:user]] = abbreviation;
     
@@ -93,6 +98,14 @@
   
   [self sizeToFit];
   [self invalidateIntrinsicContentSize];
+  [self setNeedsDisplay];
+}
+
+- (void)setColor:(UIColor *)color forUser:(DFPeanutUserObject *)user
+{
+  NSMutableDictionary *newFills = [[NSMutableDictionary alloc] initWithDictionary:self.fillColorsById];
+  newFills[[self.class idForUser:user]] = color;
+  _fillColorsById = newFills;
   [self setNeedsDisplay];
 }
 

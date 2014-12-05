@@ -19,6 +19,15 @@
 
 @implementation DFSwipableSuggestionViewController
 
+- (instancetype)initWithNuxStep:(NSUInteger)step
+{
+  self = [super init];
+  if (self) {
+    self.nuxStep = step;
+  }
+  return self;
+}
+
 - (void)viewDidLoad {
   self.imageView = self.cardinalImageView.imageView;
   
@@ -26,20 +35,41 @@
   [super viewDidLoad];
   
   self.cardinalImageView.delegate = self;
-
-  //self.profileStackView.backgroundColor = [UIColor clearColor];
-  if (self.suggestionFeedObject.actors.count > 0) {
-    self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+  
+  if (self.nuxStep == 0) {
+    if (self.suggestionFeedObject.actors.count > 0) {
+      self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+    } else {
+      DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
+      dummyUser.display_name = @"?";
+      dummyUser.phone_number = @"?";
+      self.profileStackView.peanutUsers = @[dummyUser];
+    }
+    self.selectedPeanutContacts = [self suggestedPeanutContacts];
   } else {
-    DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
-    dummyUser.display_name = @"?";
-    dummyUser.phone_number = @"?";
-    self.profileStackView.peanutUsers = @[dummyUser];
+    self.addRecipientButton.hidden = YES;
+    self.profileStackView.maxAbbreviationLength = 2;
+    DFPeanutUserObject *teamSwapUser = [[DFPeanutUserObject alloc] init];
+    teamSwapUser.display_name = @"TS";
+    teamSwapUser.phone_number = @"TS";
+    [self.profileStackView setPeanutUser:teamSwapUser];
+    [self.profileStackView setColor:[DFStrandConstants defaultBackgroundColor]
+                            forUser:teamSwapUser];
+    UIImage *nuxImage;
+    if (self.nuxStep == 1) {
+      nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
+      self.cardinalImageView.noEnabled = NO;
+    } else {
+      nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
+      self.cardinalImageView.yesEnabled = NO;
+    }
+    self.imageView.image = nuxImage;
+    
   }
+  
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.shouldShowNameLabel = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
-  self.selectedPeanutContacts = [self suggestedPeanutContacts];
 }
 
 - (void)didReceiveMemoryWarning {

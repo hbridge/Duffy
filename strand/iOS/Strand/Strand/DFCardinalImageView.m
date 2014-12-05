@@ -32,6 +32,8 @@ const CGFloat RightGestureThreshold = 75.0;
 - (void)awakeFromNib
 {
   [super awakeFromNib];
+  _yesEnabled = YES;
+  _noEnabled = YES;
   self.animator = [[UIDynamicAnimator alloc] initWithReferenceView:self];
   self.originalCenter = self.imageView.center;
   self.imageView.layer.cornerRadius = 3.0;
@@ -69,6 +71,22 @@ const CGFloat RightGestureThreshold = 75.0;
   self.imageView.alpha = 1.0;
   [self unhighlightAllButtons];
 }
+
+- (void)setYesEnabled:(BOOL)yesEnabled
+{
+  _yesEnabled = yesEnabled;
+  self.yesButton.enabled = yesEnabled;
+}
+
+- (void)setNoEnabled:(BOOL)noEnabled
+{
+  _noEnabled = noEnabled;
+  self.noButton.enabled = noEnabled;
+}
+
+
+
+
 
 #pragma mark - Drag Handling
 
@@ -122,11 +140,11 @@ const CGFloat RightGestureThreshold = 75.0;
 - (void)handleDragEnded:(CGPoint)translation
 {
   DDLogVerbose(@"finishing point y:%.02f", translation.y);
-  if (translation.x < LeftGestureThreshold) {
+  if (translation.x < LeftGestureThreshold && self.noEnabled) {
     //left
     [self handleButtonSelected:self.noButton];
     return;
-  } else if (translation.x > RightGestureThreshold){
+  } else if (translation.x > RightGestureThreshold && self.yesEnabled){
     [self handleButtonSelected:self.yesButton];
     return;
   }

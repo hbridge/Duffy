@@ -32,8 +32,8 @@
                                      [[UIColor whiteColor] colorWithAlphaComponent:0],
                                      [UIColor whiteColor]
                                        ];
-  
-  [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
+  if (self.suggestionFeedObject)
+    [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
 }
 
 - (void)setFrame:(CGRect)frame
