@@ -44,16 +44,24 @@
                         <action selector="addPersonButtonPressed:" destination="-1" eventType="touchUpInside" id="BiB-b7-vgq"/>
                     </connections>
                 </button>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Send to:" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="SGM-FR-1xZ">
+                    <rect key="frame" x="201" y="34" width="66" height="21"/>
+                    <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                    <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="UYI-Rc-QVa" firstAttribute="leading" secondItem="BkW-lL-hsr" secondAttribute="trailing" constant="8" id="4A7-uf-PvL"/>
                 <constraint firstItem="BkW-lL-hsr" firstAttribute="centerY" secondItem="UYI-Rc-QVa" secondAttribute="centerY" constant="0.5" id="5Dw-NI-fE5"/>
                 <constraint firstItem="BkW-lL-hsr" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="AUp-5O-Ctk" secondAttribute="leading" constant="10" id="A4Z-iX-hYr"/>
+                <constraint firstItem="BkW-lL-hsr" firstAttribute="leading" secondItem="SGM-FR-1xZ" secondAttribute="trailing" constant="8" id="OzT-IX-TCU"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="BkW-lL-hsr" secondAttribute="trailing" constant="10" id="SN2-il-GJ8"/>
                 <constraint firstAttribute="bottom" secondItem="YTX-Vv-qtQ" secondAttribute="bottom" constant="20" id="TmF-uI-wGb"/>
                 <constraint firstAttribute="centerX" secondItem="BkW-lL-hsr" secondAttribute="centerX" id="WbD-sw-OkY"/>
                 <constraint firstAttribute="trailing" secondItem="YTX-Vv-qtQ" secondAttribute="trailing" id="fAi-C9-zgU"/>
+                <constraint firstItem="BkW-lL-hsr" firstAttribute="centerY" secondItem="SGM-FR-1xZ" secondAttribute="centerY" constant="0.5" id="kyO-h6-wuD"/>
                 <constraint firstItem="YTX-Vv-qtQ" firstAttribute="top" secondItem="BkW-lL-hsr" secondAttribute="bottom" constant="20" id="nJ1-5L-7Zu"/>
                 <constraint firstItem="BkW-lL-hsr" firstAttribute="top" secondItem="AUp-5O-Ctk" secondAttribute="top" constant="20" id="uBx-He-ZVm"/>
                 <constraint firstItem="YTX-Vv-qtQ" firstAttribute="leading" secondItem="AUp-5O-Ctk" secondAttribute="leading" id="zXH-uS-afS"/>
