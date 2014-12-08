@@ -47,6 +47,20 @@
 - (void)configureSwipableButtonImageView
 {
   self.swipableButtonImageView.delegate = self;
+  [self.swipableButtonImageView.noButton
+   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
+   forState:UIControlStateNormal];
+  [self.swipableButtonImageView.otherButton
+   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingCommentButtonIcon"]
+   forState:UIControlStateNormal];
+  [self.swipableButtonImageView.yesButton
+   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingLikeButtonIcon"]
+   forState:UIControlStateNormal];
+  for (UIButton *button in @[self.swipableButtonImageView.noButton,
+                             self.swipableButtonImageView.otherButton,
+                             self.swipableButtonImageView.yesButton]) {
+    [button setTitle:nil forState:UIControlStateNormal];
+  }
   
   [[DFImageManager sharedManager]
    imageForID:self.photoID
