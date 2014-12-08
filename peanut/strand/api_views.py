@@ -161,12 +161,12 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 	seenInvitesFromUsers = list()
 	for strandInvite in strandInvites:
 		strandInvite.invited_user = user
-		strandInvite.accepted_user = user
+		#strandInvite.accepted_user = user
 
 		# Temp solution for not using invites
-		if user not in strandInvite.strand.users.all():
-			action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
-			strandInvite.strand.users.add(user)
+		#if user not in strandInvite.strand.users.all():
+		#	action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
+		#	strandInvite.strand.users.add(user)
 
 		if strandInvite.user not in seenInvitesFromUsers:
 			sharedStrand = SharedStrand.objects.create(strand=strandInvite.strand)
