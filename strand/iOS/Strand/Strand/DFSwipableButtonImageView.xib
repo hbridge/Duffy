@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
+        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
@@ -21,61 +22,91 @@
                         <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="FtM-Bq-0kY"/>
                     </connections>
                 </imageView>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
+                    <rect key="frame" x="138" y="535" width="325" height="65"/>
+                    <subviews>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes" customClass="GBFlatButton">
+                            <rect key="frame" x="260" y="0.0" width="65" height="65"/>
+                            <color key="backgroundColor" red="0.42352941176470588" green="0.81960784313725488" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="V0Q-qK-RXd" secondAttribute="height" multiplier="1:1" id="Sz8-Sj-yMw"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <inset key="titleEdgeInsets" minX="-2" minY="0.0" maxX="-2" maxY="0.0"/>
+                            <state key="normal" title="Send">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="yesButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Mex-ME-R45"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No" customClass="GBFlatButton">
+                            <rect key="frame" x="0.0" y="0.0" width="65" height="65"/>
+                            <color key="backgroundColor" red="0.88235294117647056" green="0.20000000000000001" blue="0.16078431372549021" alpha="1" colorSpace="calibratedRGB"/>
+                            <constraints>
+                                <constraint firstAttribute="width" secondItem="lr5-fU-tFy" secondAttribute="height" multiplier="1:1" id="jOG-eW-0bP"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <state key="normal" title="Skip">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
+                            </connections>
+                        </button>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other" customClass="GBFlatButton">
+                            <rect key="frame" x="130" y="0.0" width="65" height="65"/>
+                            <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
+                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                            <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            <state key="normal" title="Other">
+                                <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                            </state>
+                            <connections>
+                                <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="ZCP-10-dIz"/>
+                            </connections>
+                        </button>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="pue-vE-jXM" firstAttribute="width" secondItem="pue-vE-jXM" secondAttribute="height" multiplier="1:1" id="1Xz-pe-AGZ"/>
+                        <constraint firstItem="pue-vE-jXM" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" constant="65" id="5dv-r0-BBe"/>
+                        <constraint firstAttribute="height" constant="65" id="I7C-Lj-gsK"/>
+                        <constraint firstItem="lr5-fU-tFy" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="KKD-Zu-Unv"/>
+                        <constraint firstItem="pue-vE-jXM" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="Tqh-mC-REh"/>
+                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" priority="999" constant="65" id="UgG-Ew-fUf"/>
+                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="bix-X6-tAC"/>
+                        <constraint firstAttribute="bottom" secondItem="lr5-fU-tFy" secondAttribute="bottom" id="cfq-34-UgZ"/>
+                        <constraint firstAttribute="trailing" secondItem="V0Q-qK-RXd" secondAttribute="trailing" id="gra-eY-7dH"/>
+                        <constraint firstAttribute="bottom" secondItem="V0Q-qK-RXd" secondAttribute="bottom" id="heP-dy-gvy"/>
+                        <constraint firstAttribute="bottom" secondItem="pue-vE-jXM" secondAttribute="bottom" id="m70-bx-4uU"/>
+                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="pue-vE-jXM" secondAttribute="trailing" constant="65" id="pif-de-5IG"/>
+                        <constraint firstItem="lr5-fU-tFy" firstAttribute="leading" secondItem="l10-6U-oyL" secondAttribute="leading" id="sOw-sa-eog"/>
+                    </constraints>
+                </view>
                 <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
                     <rect key="frame" x="38" y="0.0" width="525" height="525"/>
                 </imageView>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No" customClass="GBFlatButton">
-                    <rect key="frame" x="203" y="535" width="65" height="65"/>
-                    <color key="backgroundColor" red="0.88235294117647056" green="0.20000000000000001" blue="0.16078431372549021" alpha="1" colorSpace="calibratedRGB"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="65" id="1j8-gw-EvL"/>
-                        <constraint firstAttribute="height" constant="65" id="j7D-C1-UaJ"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <state key="normal" title="Skip">
-                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                    </state>
-                    <connections>
-                        <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
-                    </connections>
-                </button>
-                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes" customClass="GBFlatButton">
-                    <rect key="frame" x="333" y="535" width="65" height="65"/>
-                    <color key="backgroundColor" red="0.42352941176470588" green="0.81960784313725488" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                    <constraints>
-                        <constraint firstAttribute="width" constant="65" id="E3Z-n7-cfr"/>
-                        <constraint firstAttribute="height" constant="65" id="LMP-tg-RSm"/>
-                    </constraints>
-                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                    <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
-                    <inset key="titleEdgeInsets" minX="-2" minY="0.0" maxX="-2" maxY="0.0"/>
-                    <state key="normal" title="Send">
-                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
-                    </state>
-                    <connections>
-                        <action selector="yesButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Mex-ME-R45"/>
-                    </connections>
-                </button>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="EFR-as-Tho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="2sY-5G-Vas"/>
-                <constraint firstAttribute="bottom" secondItem="V0Q-qK-RXd" secondAttribute="bottom" id="7eH-o9-ivb"/>
-                <constraint firstItem="lr5-fU-tFy" firstAttribute="top" secondItem="xKd-Cz-PRo" secondAttribute="bottom" constant="10" id="Ffn-XC-I5q"/>
-                <constraint firstAttribute="centerX" secondItem="lr5-fU-tFy" secondAttribute="centerX" constant="65" id="G8y-8A-p70"/>
-                <constraint firstAttribute="bottom" secondItem="lr5-fU-tFy" secondAttribute="bottom" id="Qvo-LZ-BsU"/>
+                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" id="H8h-um-EvH"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="EFR-as-Tho" secondAttribute="trailing" id="emd-i0-ycN"/>
-                <constraint firstAttribute="centerX" secondItem="V0Q-qK-RXd" secondAttribute="centerX" constant="-65" id="g5l-ib-RNb"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="EFR-as-Tho" secondAttribute="leading" id="k1f-Kx-CUI"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="top" secondItem="EFR-as-Tho" secondAttribute="top" id="lf6-5W-kKT"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="bottom" secondItem="EFR-as-Tho" secondAttribute="bottom" id="m9o-Eb-Drw"/>
                 <constraint firstAttribute="centerX" secondItem="EFR-as-Tho" secondAttribute="centerX" id="nBp-Kd-wvP"/>
+                <constraint firstAttribute="centerX" secondItem="l10-6U-oyL" secondAttribute="centerX" id="tje-Pw-gcZ"/>
+                <constraint firstItem="l10-6U-oyL" firstAttribute="top" secondItem="EFR-as-Tho" secondAttribute="bottom" constant="10" id="xSh-YO-3Vp"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
             <connections>
                 <outlet property="imageView" destination="EFR-as-Tho" id="rbB-zy-0Az"/>
                 <outlet property="noButton" destination="lr5-fU-tFy" id="ceJ-cP-s4b"/>
+                <outlet property="otherButton" destination="pue-vE-jXM" id="baw-SH-BRr"/>
                 <outlet property="overlayImageView" destination="xKd-Cz-PRo" id="b1b-42-XCH"/>
                 <outlet property="panGestureRecognizer" destination="MM2-cw-TCR" id="cLj-Ui-G3M"/>
                 <outlet property="yesButton" destination="V0Q-qK-RXd" id="HRc-cq-96I"/>

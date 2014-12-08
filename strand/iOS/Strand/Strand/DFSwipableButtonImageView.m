@@ -38,6 +38,16 @@ const CGFloat RightGestureThreshold = 75.0;
   self.originalCenter = self.imageView.center;
   self.imageView.layer.cornerRadius = 3.0;
   self.imageView.layer.masksToBounds = YES;
+  
+  for (UIButton *button in @[self.noButton, self.otherButton, self.yesButton]) {
+    button.layer.cornerRadius = button.frame.size.height / 2.0;
+    button.layer.masksToBounds = YES;
+  }
+}
+
+- (void)configureWithShowsOther:(BOOL)showsOther
+{
+  if (!showsOther) [self.otherButton removeFromSuperview];
 }
 
 - (id)awakeAfterUsingCoder:(NSCoder *)aDecoder

@@ -39,12 +39,14 @@
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIButton *yesButton;
 @property (weak, nonatomic) IBOutlet UIButton *noButton;
+@property (weak, nonatomic) IBOutlet UIButton *otherButton;
 @property (nonatomic, weak) id<DFSwipableButtonImageViewDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIPanGestureRecognizer *panGestureRecognizer;
 @property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
 @property (nonatomic) BOOL yesEnabled;
 @property (nonatomic) BOOL noEnabled;
 
+- (void)configureWithShowsOther:(BOOL)showsOther;
 - (IBAction)panGestureChanged:(UIPanGestureRecognizer *)sender;
 - (void)resetView;
 

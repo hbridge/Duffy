@@ -37,6 +37,7 @@
   
   [self configurePopLabel];
   
+  [self.swipableButtonImageView configureWithShowsOther:NO];
   self.swipableButtonImageView.delegate = self;
   
   if (self.nuxStep == 0) {
