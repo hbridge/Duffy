@@ -13,7 +13,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <imageView clipsSubviews="YES" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="200" verticalCompressionResistancePriority="700" translatesAutoresizingMaskIntoConstraints="NO" id="EFR-as-Tho">
-                    <rect key="frame" x="38" y="0.0" width="525" height="525"/>
+                    <rect key="frame" x="43" y="0.0" width="515" height="515"/>
                     <gestureRecognizers/>
                     <constraints>
                         <constraint firstAttribute="width" secondItem="EFR-as-Tho" secondAttribute="height" multiplier="1:1" id="vAZ-ZP-g4a"/>
@@ -23,9 +23,9 @@
                     </connections>
                 </imageView>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
-                    <rect key="frame" x="138" y="535" width="325" height="65"/>
+                    <rect key="frame" x="138" y="525" width="325" height="65"/>
                     <subviews>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes" customClass="GBFlatButton">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes">
                             <rect key="frame" x="260" y="0.0" width="65" height="65"/>
                             <color key="backgroundColor" red="0.42352941176470588" green="0.81960784313725488" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
@@ -41,7 +41,7 @@
                                 <action selector="yesButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="Mex-ME-R45"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No" customClass="GBFlatButton">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="lr5-fU-tFy" userLabel="No">
                             <rect key="frame" x="0.0" y="0.0" width="65" height="65"/>
                             <color key="backgroundColor" red="0.88235294117647056" green="0.20000000000000001" blue="0.16078431372549021" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
@@ -56,7 +56,7 @@
                                 <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other" customClass="GBFlatButton">
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other">
                             <rect key="frame" x="130" y="0.0" width="65" height="65"/>
                             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
@@ -69,7 +69,7 @@
                             </connections>
                         </button>
                     </subviews>
-                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="pue-vE-jXM" firstAttribute="width" secondItem="pue-vE-jXM" secondAttribute="height" multiplier="1:1" id="1Xz-pe-AGZ"/>
                         <constraint firstItem="pue-vE-jXM" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" constant="65" id="5dv-r0-BBe"/>
@@ -87,13 +87,13 @@
                     </constraints>
                 </view>
                 <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
-                    <rect key="frame" x="38" y="0.0" width="525" height="525"/>
+                    <rect key="frame" x="43" y="0.0" width="515" height="515"/>
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="EFR-as-Tho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="2sY-5G-Vas"/>
-                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" id="H8h-um-EvH"/>
+                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="10" id="H8h-um-EvH"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="EFR-as-Tho" secondAttribute="trailing" id="emd-i0-ycN"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="EFR-as-Tho" secondAttribute="leading" id="k1f-Kx-CUI"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="top" secondItem="EFR-as-Tho" secondAttribute="top" id="lf6-5W-kKT"/>

@@ -25,7 +25,7 @@
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="2mx-jU-aCa" customClass="DFSwipableButtonImageView">
-                    <rect key="frame" x="0.0" y="61" width="600" height="539"/>
+                    <rect key="frame" x="0.0" y="53" width="600" height="547"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                 </view>
             </subviews>
@@ -37,7 +37,7 @@
                 <constraint firstItem="zPr-Cm-BJD" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="IFQ-6k-nMp"/>
                 <constraint firstItem="2mx-jU-aCa" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="SnY-My-dtP"/>
                 <constraint firstAttribute="bottom" secondItem="2mx-jU-aCa" secondAttribute="bottom" id="YEq-GX-NQs"/>
-                <constraint firstItem="2mx-jU-aCa" firstAttribute="top" secondItem="zPr-Cm-BJD" secondAttribute="bottom" constant="8" id="vrB-mW-HXz"/>
+                <constraint firstItem="2mx-jU-aCa" firstAttribute="top" secondItem="zPr-Cm-BJD" secondAttribute="bottom" id="vrB-mW-HXz"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
         </view>

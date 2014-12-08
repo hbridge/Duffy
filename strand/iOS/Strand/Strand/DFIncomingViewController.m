@@ -40,8 +40,9 @@
 - (void)configureProfileWithContext
 {
   [self.profileWithContextView.profileStackView setPeanutUser:self.sender];
-  self.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ sent you a photo",
+  self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
                                                  self.sender.firstName];
+  [self.profileWithContextView.subtitleLabel removeFromSuperview];
 }
 
 - (void)configureSwipableButtonImageView
@@ -60,15 +61,21 @@
                              self.swipableButtonImageView.otherButton,
                              self.swipableButtonImageView.yesButton]) {
     [button setTitle:nil forState:UIControlStateNormal];
+    button.backgroundColor = [UIColor clearColor]; 
   }
-  
+}
+
+- (void)viewDidLayoutSubviews
+{
   [[DFImageManager sharedManager]
    imageForID:self.photoID
    pointSize:self.swipableButtonImageView.imageView.frame.size
    contentMode:DFImageRequestContentModeAspectFill
    deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
    completion:^(UIImage *image) {
-     self.swipableButtonImageView.imageView.image = image;
+     dispatch_async(dispatch_get_main_queue(), ^{
+       self.swipableButtonImageView.imageView.image = image;
+     });
    }];
 }
 
