@@ -242,6 +242,12 @@
     ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
       [weakSelf photoSkipped:photoID strand:strandID];
     };
+    ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      [weakSelf showCommentsForPhoto:photoID strand:strandID];
+    };
+    ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      [weakSelf likePhoto:photoID strand:strandID];
+    };
     
     return ivc;
   }
@@ -396,6 +402,28 @@
 {
   if (photoID)
     [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photoID strandID:strandID];
+  [self gotoNextController];
+}
+
+- (void)showCommentsForPhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand
+{
+  
+}
+
+- (void)likePhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand
+{
+  [[DFPeanutFeedDataManager sharedManager]
+   setLikedByUser:YES
+   photo:photo
+   inStrand:strand
+   oldActionID:0
+   success:^(DFActionID actionID) {
+    
+  } failure:^(NSError *error) {
+    
+  }];
+  [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo strandID:strand];
+  [SVProgressHUD showSuccessWithStatus:@"Liked!"];
   [self gotoNextController];
 }
 

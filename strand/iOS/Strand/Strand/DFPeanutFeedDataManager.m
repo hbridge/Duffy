@@ -18,6 +18,7 @@
 #import "DFPeanutActionAdapter.h"
 #import "DFPhotoStore.h"
 #import "DFPhoneNumberUtils.h"
+#import "DFAnalytics.h"
 
 @interface DFPeanutFeedDataManager ()
 
@@ -959,7 +960,43 @@ static DFPeanutFeedDataManager *defaultManager;
   dispatch_semaphore_signal(self.deferredCompletionSchedulerSemaphore);
 }
 
+- (void)setLikedByUser:(BOOL)liked
+                 photo:(DFPhotoIDType)photoID
+              inStrand:(DFStrandIDType)strand
+           oldActionID:(DFActionID)oldActionID
+              success:(void(^)(DFActionID actionID))success
+               failure:(DFFailureBlock)failure
+{
+  DDLogVerbose(@"Like button pressed");
+  if (!liked && !oldActionID) {
+    [NSException raise:@"must provide old action ID" format:@"oldActionID required when setting photo liked to false"];
+  } else if (liked && oldActionID) {
+    success(oldActionID);
+  }
+  
+  DFPeanutAction *action = [[DFPeanutAction alloc] init];
+  action.user = [[DFUser currentUser] userID];
+  action.action_type = DFPeanutActionFavorite;
+  action.photo = photoID;
+  action.strand = strand;
+  if (oldActionID) action.id = @(oldActionID);
 
+  RKRequestMethod method = liked ? RKRequestMethodPOST : RKRequestMethodDELETE;
+  
+  [self.actionAdapter
+   performRequest:method
+   withPath:ActionBasePath
+   objects:@[action]
+   parameters:nil
+   forceCollection:NO
+   success:^(NSArray *resultObjects) {
+     DFPeanutAction *action = resultObjects.firstObject;
+     success(action.id.longLongValue);
+   } failure:^(NSError *error) {
+     DDLogError(@"%@ setLiked failed: %@", self.class, error);
+     failure(error);
+   }];
+}
 
 
 #pragma mark - Network Adapter

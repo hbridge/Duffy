@@ -86,4 +86,11 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
             success:(DFSuccessBlock)success
             failure:(DFFailureBlock)failure;
 
+
+- (void)setLikedByUser:(BOOL)liked
+                 photo:(DFPhotoIDType)photoID
+              inStrand:(DFStrandIDType)strand
+           oldActionID:(DFActionID)oldActionID
+               success:(void(^)(DFActionID actionID))success
+               failure:(DFFailureBlock)failure;
 @end
