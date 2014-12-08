@@ -549,7 +549,7 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
                 
                 if int(self.request.DATA['build_number']) >= 4805:
                 # Temp solution for using invites to hold incoming pictures    
-                #    strandInvite.accepted_user = user
+                    strandInvite.accepted_user = user
                     if user not in strandInvite.strand.users.all():
                         action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
                         strandInvite.strand.users.add(user)

@@ -163,8 +163,7 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 		strandInvite.invited_user = user
 
 		# Temp solution for using invites to hold incoming pictures
-		#strandInvite.accepted_user = user
-
+		strandInvite.accepted_user = user
 		
 		if user not in strandInvite.strand.users.all():
 			action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
@@ -268,7 +267,7 @@ def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None,
 		},
 	]
 """
-def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
+def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None, filterOutEvaluated = True):
 	if len(groups) == 0:
 		return []
 
@@ -288,7 +287,7 @@ def getFormattedGroups(groups, simCaches = None, actionsByPhotoIdCache = None):
 		if len(group['photos']) == 0:
 			continue
 
-		if actionsByPhotoIdCache:
+		if actionsByPhotoIdCache and filterOutEvaluated:
 			# Look through all our photos and actions taken on the photos
 			# If we find that a photo already has an action of EVALUATED then we take it out
 
@@ -397,7 +396,7 @@ def getObjectsDataForPrivateStrands(user, strands, feedObjectType, friends = Non
 	actionsCache = getActionsCache(Strand.getIds(strands), Strand.getPhotoIds(strands))
 	actionsByPhotoIdCache = getActionsByPhotoIdCache(actionsCache)
 	# Pass in none for actions because there are no actions on private photos so don't use anything
-	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache)
+	formattedGroups = getFormattedGroups(groups, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = True)
 	
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 10000)
@@ -436,7 +435,7 @@ def getObjectsDataForPost(user, postAction, simCaches, actionsByPhotoIdCache):
 
 	groupEntry = {'photos': photos, 'metadata': metadata}
 
-	formattedGroups = getFormattedGroups([groupEntry], simCaches = simCaches, actionsByPhotoIdCache = actionsByPhotoIdCache)
+	formattedGroups = getFormattedGroups([groupEntry], simCaches = simCaches, actionsByPhotoIdCache = actionsByPhotoIdCache, filterOutEvaluated = False)
 	# Lastly, we turn our groups into sections which is the object we convert to json for the api
 	objects = api_util.turnFormattedGroupsIntoFeedObjects(formattedGroups, 200)
 	return objects
@@ -786,16 +785,17 @@ def swaps(request):
 		responseObjects = list()
 
 		# First throw in invite objects
-		inviteObjects = getInviteObjectsDataForUser(user)
-		responseObjects.extend(inviteObjects)
+		#inviteObjects = getInviteObjectsDataForUser(user)
+		#responseObjects.extend(inviteObjects)
 
 		inviteObjectIds = list()
-		for objects in inviteObjects:
+		inviteObjects = list()
+		#for objects in inviteObjects:
 			# This grabs the id of the suggestions post object, which is the private strand id
-			suggestedStrands = objects['objects'][1]['objects']
-			for suggestedStrand in suggestedStrands:
-				inviteObjectIds.append(suggestedStrand['id'])
-		printStats("swaps-invites")
+		#	suggestedStrands = objects['objects'][1]['objects']
+		#	for suggestedStrand in suggestedStrands:
+		#		inviteObjectIds.append(suggestedStrand['id'])
+		#printStats("swaps-invites")
 
 		# Now do neighbor suggestions
 		friendsIdList = friends_util.getFriendsIds(user.id)
