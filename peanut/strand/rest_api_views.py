@@ -547,10 +547,9 @@ class StrandInviteBulkAPI(BulkCreateAPIView):
                 user = User.objects.get(phone_number=strandInvite.phone_number, product_id=2)
                 strandInvite.invited_user = user
                 
-                # Temp solution to remove the need for invites.
-                # Just add the user into the strand
-                if int(self.request.DATA['build_number']) <= 4805:
-                    strandInvite.accepted_user = user
+                if int(self.request.DATA['build_number']) >= 4805:
+                # Temp solution for using invites to hold incoming pictures    
+                #    strandInvite.accepted_user = user
                     if user not in strandInvite.strand.users.all():
                         action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
                         strandInvite.strand.users.add(user)
