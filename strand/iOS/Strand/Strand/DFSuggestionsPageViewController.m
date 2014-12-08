@@ -347,6 +347,7 @@
     [self createStrandsForPhoto:photo sendInvitesToContacts:contacts fromSuggestion:suggestion];
   }
   
+  [SVProgressHUD showSuccessWithStatus:@"Sent!"];
   [self gotoNextController];
 }
 
