@@ -7,6 +7,8 @@
 //
 
 #import "DFIncomingViewController.h"
+#import <Slash/Slash.h>
+#import "DFImageManager.h"
 
 @interface DFIncomingViewController ()
 
@@ -14,24 +16,44 @@
 
 @implementation DFIncomingViewController
 
+
+- (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
+                       inStrand:(DFStrandIDType)strandID
+                     fromSender:(DFPeanutUserObject *)peanutUser
+{
+  self = [super init];
+  if (self) {
+    _photoID = photoID;
+    _strandID = strandID;
+    _sender = peanutUser;
+  }
+  return self;
+}
+
 - (void)viewDidLoad {
-    [super viewDidLoad];
-    // Do any additional setup after loading the view from its nib.
+  [super viewDidLoad];
+  
+  [self configureProfileWithContext];
+  [self configureSwipableButtonImageView];
 }
 
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+- (void)configureProfileWithContext
+{
+  [self.profileWithContextView.profileStackView setPeanutUser:self.sender];
+  self.profileWithContextView.titleLabel.text = [NSString stringWithFormat:@"%@ sent you a photo",
+                                                 self.sender.firstName];
 }
 
-/*
-#pragma mark - Navigation
-
-// In a storyboard-based application, you will often want to do a little preparation before navigation
-- (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
-    // Get the new view controller using [segue destinationViewController].
-    // Pass the selected object to the new view controller.
+- (void)configureSwipableButtonImageView
+{
+  [[DFImageManager sharedManager]
+   imageForID:self.photoID
+   pointSize:self.swipableButtonImageView.imageView.frame.size
+   contentMode:DFImageRequestContentModeAspectFill
+   deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
+   completion:^(UIImage *image) {
+     self.swipableButtonImageView.imageView.image = image;
+   }];
 }
-*/
 
 @end
