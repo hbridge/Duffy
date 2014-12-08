@@ -10,8 +10,9 @@
 #import "DFProfileWithContextView.h"
 #import "DFSwipableButtonImageView.h"
 #import "DFPeanutUserObject.h"
+#import "DFHomeSubViewController.h"
 
-@interface DFIncomingViewController : UIViewController <DFSwipableButtonImageViewDelegate>
+@interface DFIncomingViewController : DFHomeSubViewController <DFSwipableButtonImageViewDelegate>
 
 @property (weak, nonatomic) IBOutlet DFProfileWithContextView *profileWithContextView;
 @property (weak, nonatomic) IBOutlet DFSwipableButtonImageView *swipableButtonImageView;

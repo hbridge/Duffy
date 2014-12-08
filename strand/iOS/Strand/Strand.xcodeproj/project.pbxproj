@@ -285,6 +285,7 @@
 		65D1C2D01A2D095E007E7300 /* UIButton+Badge.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2CF1A2D095E007E7300 /* UIButton+Badge.m */; };
 		65D1C2D91A30C1AA007E7300 /* DFPeanutSharedStrand.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */; };
 		65D1C2DC1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */; };
+		65E2414E1A364EA90044F1CB /* DFHomeSubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */; };
 		65EF6C611A1563E300E0533F /* DFContactDataManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 65EF6C601A1563E300E0533F /* DFContactDataManager.m */; };
 /* End PBXBuildFile section */
 
@@ -798,6 +799,8 @@
 		65D1C2D81A30C1AA007E7300 /* DFPeanutSharedStrand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSharedStrand.m; sourceTree = "<group>"; };
 		65D1C2DA1A30C246007E7300 /* DFPeanutSharedStrandAdapter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPeanutSharedStrandAdapter.h; sourceTree = "<group>"; };
 		65D1C2DB1A30C246007E7300 /* DFPeanutSharedStrandAdapter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPeanutSharedStrandAdapter.m; sourceTree = "<group>"; };
+		65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFHomeSubViewController.h; sourceTree = "<group>"; };
+		65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFHomeSubViewController.m; sourceTree = "<group>"; };
 		65EF6C5F1A1563E300E0533F /* DFContactDataManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFContactDataManager.h; sourceTree = "<group>"; };
 		65EF6C601A1563E300E0533F /* DFContactDataManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFContactDataManager.m; sourceTree = "<group>"; };
 		9AD240727CD2B20B3DB61627 /* Pods.app store.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods.app store.xcconfig"; path = "Pods/Target Support Files/Pods/Pods.app store.xcconfig"; sourceTree = "<group>"; };
@@ -1264,6 +1267,8 @@
 				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */,
 				5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */,
 				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
+				65E2414C1A364EA90044F1CB /* DFHomeSubViewController.h */,
+				65E2414D1A364EA90044F1CB /* DFHomeSubViewController.m */,
 			);
 			name = "Suggestions Tab";
 			sourceTree = "<group>";
@@ -2187,6 +2192,7 @@
 				5A3172DD196C927000CA7693 /* DFDiagnosticInfoMailComposeController.m in Sources */,
 				5AD8589B1979A50200BFDC4E /* DFPeanutPushNotification.m in Sources */,
 				5AC4A9321947C30800862D9C /* DFUploadController.m in Sources */,
+				65E2414E1A364EA90044F1CB /* DFHomeSubViewController.m in Sources */,
 				5A0E12391976DCBF00B6FF04 /* DFNavigationController.m in Sources */,
 				5AC4A9541947C77300862D9C /* DFCreateAccountViewController.m in Sources */,
 				5A40344A1961F721003D7546 /* DFStrandPhotoAsset.m in Sources */,

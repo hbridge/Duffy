@@ -8,6 +8,7 @@
 
 #import "DFSuggestionsPageViewController.h"
 #import "DFSwipableSuggestionViewController.h"
+#import "DFIncomingViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "DFNavigationController.h"
 #import "DFPeanutStrandInviteAdapter.h"
@@ -19,8 +20,6 @@
 
 @interface DFSuggestionsPageViewController ()
 
-@property (nonatomic, retain) NSArray *allSuggestions;
-@property (nonatomic, retain) NSMutableArray *filteredSuggestions;
 @property (nonatomic, retain) DFPeanutFeedObject *pickedSuggestion;
 @property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
 @property (nonatomic, retain) NSMutableArray *suggestionsToRemove;
@@ -30,6 +29,10 @@
 
 @property (nonatomic) NSInteger photoIndex;
 @property (retain, nonatomic) NSMutableArray *indexPaths;
+
+@property (retain, nonatomic) NSMutableArray *photoList;
+@property (retain, nonatomic) NSMutableArray *strandList;
+@property (retain, nonatomic) NSMutableArray *subViewTypeList;
 
 @end
 
@@ -96,31 +99,48 @@
 
 - (void)reloadData
 {
-  self.allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-  self.filteredSuggestions = [self.allSuggestions mutableCopy];
   
-  NSInteger sectionCount = 0;
-  self.indexPaths = [NSMutableArray new];
+  self.photoList = [NSMutableArray new];
+  self.strandList = [NSMutableArray new];
+  self.subViewTypeList = [NSMutableArray new];
   
-  NSMutableArray *filteredSuggestions = [NSMutableArray new];
-  for (DFPeanutFeedObject *suggestion in self.allSuggestions) {
+  NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
+  
+  for (DFPeanutUserObject *user in friends) {
+    NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
+    for (DFPeanutFeedObject *strandPosts in strands) {
+      NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
+      for (DFPeanutFeedObject *photo in photos) {
+        if (photo.user != [[DFUser currentUser] userID]) {
+          [self.photoList addObject:photo];
+          [self.strandList addObject:strandPosts];
+          [self.subViewTypeList addObject:@(DFIncomingViewType)];
+        }
+      }
+    }
+  }
+ 
+  NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+  for (DFPeanutFeedObject *suggestion in allSuggestions) {
     if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
-      NSInteger itemCount = 0;
-      [filteredSuggestions addObject:suggestion];
+      
       NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
       for (int x=0; x < photos.count; x++) {
-        [self.indexPaths addObject:[NSIndexPath indexPathForItem:itemCount inSection:sectionCount]];
-        itemCount++;
+        [self.photoList addObject:photos[x]];
+        [self.strandList addObject:suggestion];
+        [self.subViewTypeList addObject:@(DFSuggestionViewType)];
       }
-      sectionCount++;
     }
   }
   
+  
+  /*
+   TODO(Derek): put NUX back in, here is what it was before
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
     // go in reverse order to make sure path 0 is at index 0
     [self.indexPaths insertObject:[NSIndexPath indexPathForItem:1 inSection:NSIntegerMin] atIndex:0];
     [self.indexPaths insertObject:[NSIndexPath indexPathForItem:0 inSection:NSIntegerMin] atIndex:0];
-  }
+  }*/
   
   if ((self.viewControllers.count == 0
       || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
@@ -132,7 +152,7 @@
 
 - (void)configureLoadingView
 {
-  if (self.filteredSuggestions.count == 0) {
+  if (self.photoList.count == 0) {
     if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
     [self.noResultsView setSuperView:self.view];
     if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
@@ -153,25 +173,18 @@
  */
 - (NSUInteger)indexOfViewController:(UIViewController *)viewController
 {
-  if (![[viewController class] isSubclassOfClass:[DFSuggestionViewController class]]) return -1;
-  DFSuggestionViewController *suggestionVC = (DFSuggestionViewController *)viewController;
+  if (![[viewController class] isSubclassOfClass:[DFHomeSubViewController class]]) return -1;
+  DFHomeSubViewController *subVC = (DFHomeSubViewController *)viewController;
+  
+  return subVC.index;
+  /*
   if (suggestionVC.nuxStep > 0) {
     return suggestionVC.nuxStep - 1;
   }
+   TODO(Derek): put NUX back in, here is what it was before
   NSUInteger sectionIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
-  
-  if (sectionIndex == NSNotFound) return -1;
-  NSArray *photos = [self.filteredSuggestions[sectionIndex] leafNodesFromObjectOfType:DFFeedObjectPhoto];
-  NSUInteger itemIndex = [photos indexOfObject:suggestionVC.photoFeedObject];
-  if (itemIndex == NSNotFound) return -1;
-  
-  for (int x=0; x < self.indexPaths.count; x++) {
-    NSIndexPath *indexPath = self.indexPaths[x];
-    if (indexPath.section == sectionIndex && indexPath.item == itemIndex) {
-      return x;
-    }
-  }
-  return -1;
+
+   */
 }
 
 
@@ -181,14 +194,14 @@
   return  [self indexOfViewController:currentController];
 }
 
-- (DFSuggestionViewController *)viewControllerForIndex:(NSInteger)index
+- (DFHomeSubViewController *)viewControllerForIndex:(NSInteger)index
 {
-  if (index < 0 || index >= self.filteredSuggestions.count) {
-    if (self.filteredSuggestions.count > 0) {
-      DDLogWarn(@"%@ viewControllerForIndex: %@ filteredSuggestions.count: %@",
+  if (index < 0 || index >= self.photoList.count) {
+    if (self.photoList.count > 0) {
+      DDLogWarn(@"%@ viewControllerForIndex: %@ photoList: %@",
                 self.class,
                 @(index),
-                @(self.filteredSuggestions.count));
+                @(self.photoList.count));
       return nil;
     }
   }
@@ -199,27 +212,40 @@
     return [self suggestionViewControllerForNuxStep:indexPath.row + 1];
   }
   
-  DFPeanutFeedObject *suggestion = self.filteredSuggestions[indexPath.section];
-  NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-  DFPeanutFeedObject *photo = photos[indexPath.item];
-  
-  
-  DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
-  if (suggestion.actors.count == 0) svc.selectedPeanutContacts = self.lastSentContacts;
-  svc.suggestionFeedObject = suggestion;
-  svc.photoFeedObject = photo;
-
-  svc.frame = self.view.bounds;
   DFSuggestionsPageViewController __weak *weakSelf = self;
   
-  svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
-    [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
-  };
-  svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
-    [weakSelf suggestionHidden:suggestion photo:photo];
-  };
+  DFPeanutFeedObject *strand = self.strandList[index];
+  DFPeanutFeedObject *photo = self.photoList[index];
   
-  return svc;
+  if ([self.subViewTypeList[index] isEqualToValue:@(DFSuggestionViewType)]) {
+    DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
+    if (strand.actors.count == 0) svc.selectedPeanutContacts = self.lastSentContacts;
+    svc.suggestionFeedObject = strand;
+    svc.photoFeedObject = photo;
+    svc.index = index;
+    
+    svc.frame = self.view.bounds;
+    
+    
+    svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+      [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
+    };
+    svc.noButtonHandler = ^(DFPeanutFeedObject *strand){
+      [weakSelf photoSkipped:photo.id strand:strand.id];
+    };
+    return svc;
+  } else if ([self.subViewTypeList[index] isEqualToValue:@(DFIncomingViewType)]) {
+    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:photo.user];
+    DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithPhotoID:photo.id inStrand:strand.id fromSender:user];
+    ivc.index = index;
+    
+    ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      [weakSelf photoSkipped:photoID strand:strandID];
+    };
+    
+    return ivc;
+  }
+  return nil;
 }
         
 - (DFSuggestionViewController *)suggestionViewControllerForNuxStep:(NSUInteger)nuxStep
@@ -258,7 +284,7 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
       viewControllerBeforeViewController:(UIViewController *)viewController
 {
-  if (self.filteredSuggestions.count < 2) return nil;
+  if (self.photoList.count < 2) return nil;
   
   NSUInteger currentIndex = [self indexOfViewController:viewController];
   NSInteger beforeIndex = currentIndex - 1;
@@ -269,10 +295,10 @@
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
-  if (self.filteredSuggestions.count < 2) return nil;
+  if (self.photoList.count < 2) return nil;
   NSInteger currentIndex = [self indexOfViewController:viewController];
   NSInteger afterIndex = currentIndex + 1;
-  if (afterIndex >= self.filteredSuggestions.count) return nil;
+  if (afterIndex >= self.photoList.count) return nil;
   return [self viewControllerForIndex:afterIndex];
 }
 
@@ -366,17 +392,17 @@
   [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)suggestionHidden:(DFPeanutFeedObject *)suggestion  photo:(DFPeanutFeedObject *)photo
+- (void)photoSkipped:(DFPhotoIDType)photoID strand:(DFStrandIDType)strandID
 {
-  if (photo)
-    [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo.id strandID:suggestion.id];
+  if (photoID)
+    [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photoID strandID:strandID];
   [self gotoNextController];
 }
 
 - (void)gotoNextController
 {
   UIViewController *nextController;
-  if (self.filteredSuggestions.count > 0) {
+  if (self.photoList.count > 0) {
     if (self.viewControllers.count == 0) {
       nextController = [self viewControllerForIndex:0];
     } else {

@@ -11,12 +11,13 @@
 #import <SAMGradientView.h>
 #import "DFProfileWithContextView.h"
 #import "DFPeanutFeedObject.h"
+#import "DFHomeSubViewController.h"
 
 typedef void(^DFSuggestionYesHandler)(DFPeanutFeedObject *suggestion, NSArray *contacts);
 typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 
 
-@interface DFSuggestionViewController : UIViewController
+@interface DFSuggestionViewController : DFHomeSubViewController
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
@@ -25,7 +26,7 @@ typedef void(^DFSuggestionNoHandler)(DFPeanutFeedObject *suggestion);
 @property (nonatomic) CGRect frame;
 @property (nonatomic, copy) DFSuggestionYesHandler yesButtonHandler;
 @property (nonatomic, copy) DFSuggestionNoHandler noButtonHandler;
-@property (nonatomic, copy) DFVoidBlock suggestionsOutHandler;
+
 @property (nonatomic, retain) DFPeanutFeedObject *suggestionFeedObject;
 @property (nonatomic, retain) DFPeanutFeedObject *photoFeedObject;
 @property (nonatomic) NSUInteger nuxStep;

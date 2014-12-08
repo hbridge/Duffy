@@ -566,6 +566,26 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
+- (NSArray *)nonEvaluatedPhotosInStrandPosts:(DFPeanutFeedObject *)strandPosts
+{
+  NSMutableArray *nonEvaluatedPhotos = [NSMutableArray new];
+  
+  NSArray *photos = [strandPosts leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  for (DFPeanutFeedObject *photo in photos) {
+    BOOL photoEvaluated = NO;
+    for (DFPeanutAction *action in photo.actions) {
+      if (action.action_type == DFPeanutActionEvalPhoto) {
+        photoEvaluated = YES;
+      }
+    }
+    if (!photoEvaluated) {
+      [nonEvaluatedPhotos addObject:photo];
+    }
+  }
+  
+  return nonEvaluatedPhotos;
+}
+
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
 {
   if (userID == [[DFUser currentUser] userID]) {
