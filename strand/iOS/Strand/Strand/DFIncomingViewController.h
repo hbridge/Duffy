@@ -11,7 +11,7 @@
 #import "DFSwipableButtonImageView.h"
 #import "DFPeanutUserObject.h"
 
-@interface DFIncomingViewController : UIViewController
+@interface DFIncomingViewController : UIViewController <DFSwipableButtonImageViewDelegate>
 
 @property (weak, nonatomic) IBOutlet DFProfileWithContextView *profileWithContextView;
 @property (weak, nonatomic) IBOutlet DFSwipableButtonImageView *swipableButtonImageView;
@@ -19,7 +19,6 @@
 typedef void (^DFIncomingPhotoNextBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
 typedef void (^DFIncomingPhotoCommentBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
 typedef void (^DFIncomingPhotoLikeBlock)(DFPhotoIDType photoID, DFStrandIDType strandID);
-
 
 @property (nonatomic) DFPhotoIDType photoID;
 @property (nonatomic) DFStrandIDType strandID;

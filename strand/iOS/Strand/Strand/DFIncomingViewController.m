@@ -46,6 +46,8 @@
 
 - (void)configureSwipableButtonImageView
 {
+  self.swipableButtonImageView.delegate = self;
+  
   [[DFImageManager sharedManager]
    imageForID:self.photoID
    pointSize:self.swipableButtonImageView.imageView.frame.size
@@ -54,6 +56,18 @@
    completion:^(UIImage *image) {
      self.swipableButtonImageView.imageView.image = image;
    }];
+}
+
+- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
+                 buttonSelected:(UIButton *)button
+{
+  if (button == self.swipableButtonImageView.noButton) {
+    if (self.nextHandler) self.nextHandler(self.photoID, self.strandID);
+  } else if (button == self.swipableButtonImageView.otherButton) {
+    if (self.commentHandler) self.commentHandler(self.photoID, self.strandID);
+  } else if (button == self.swipableButtonImageView.yesButton) {
+    if (self.likeHandler) self.likeHandler(self.photoID, self.strandID);
+  }
 }
 
 @end
