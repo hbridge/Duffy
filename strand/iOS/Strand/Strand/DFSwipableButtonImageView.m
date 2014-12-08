@@ -210,6 +210,7 @@ const CGFloat RightGestureThreshold = 75.0;
 - (void)highlightButton:(UIButton *)buttonToHighlight amount:(CGFloat)highlightAmount
 {
   NSArray *buttons = @[self.yesButton, self.noButton];
+  if (self.otherButton) buttons = [buttons arrayByAddingObject:self.otherButton];
   
   for (UIButton *button in buttons) {
     if (button == buttonToHighlight) {
