@@ -30,14 +30,14 @@
 }
 
 - (void)viewDidLoad {
-  self.imageView = self.cardinalImageView.imageView;
+  self.imageView = self.swipableButtonImageView.imageView;
 
   // Need to set the imageView first since the parent needs it
   [super viewDidLoad];
   
   [self configurePopLabel];
   
-  self.cardinalImageView.delegate = self;
+  self.swipableButtonImageView.delegate = self;
   
   if (self.nuxStep == 0) {
     if (self.suggestionFeedObject.actors.count > 0) {
@@ -62,10 +62,10 @@
     UIImage *nuxImage;
     if (self.nuxStep == 1) {
       nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
-      self.cardinalImageView.noEnabled = NO;
+      self.swipableButtonImageView.noEnabled = NO;
     } else {
       nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
-      self.cardinalImageView.yesEnabled = NO;
+      self.swipableButtonImageView.yesEnabled = NO;
     }
     self.imageView.image = nuxImage;
     
@@ -108,24 +108,24 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {
-  [self.cardinalImageView resetView];
+  [self.swipableButtonImageView resetView];
 }
 
-- (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
+- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
         buttonSelected:(UIButton *)button
 {
-  if (button == self.cardinalImageView.yesButton && self.yesButtonHandler) {
+  if (button == self.swipableButtonImageView.yesButton && self.yesButtonHandler) {
     if (self.selectedPeanutContacts.count > 0 || self.nuxStep > 0) {
       self.yesButtonHandler(self.suggestionFeedObject, self.selectedPeanutContacts);
     } else {
       [self.selectPeoplePopLabel popAtView:self.addRecipientButton animatePopLabel:YES animateTargetView:YES];
-      [self.cardinalImageView resetView];
+      [self.swipableButtonImageView resetView];
       dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self.selectPeoplePopLabel dismiss];
       });
     }
   }
-  else if (button == self.cardinalImageView.noButton && self.noButtonHandler)
+  else if (button == self.swipableButtonImageView.noButton && self.noButtonHandler)
     self.noButtonHandler(self.suggestionFeedObject);
 }
 

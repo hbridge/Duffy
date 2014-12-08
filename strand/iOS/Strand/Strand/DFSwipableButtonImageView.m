@@ -1,13 +1,13 @@
 
 //
-//  DFCardinalImageView.m
+//  DFswipableButtonImageView.m
 //  Strand
 //
 //  Created by Henry Bridge on 12/3/14.
 //  Copyright (c) 2014 Duffy Inc. All rights reserved.
 //
 
-#import "DFCardinalImageView.h"
+#import "DFSwipableButtonImageView.h"
 #import "DFSpringAttachmentBehavior.h"
 
 
@@ -16,7 +16,7 @@ const CGFloat DownGestureThreshold = 75.0;
 const CGFloat LeftGestureThreshold = -75.0;
 const CGFloat RightGestureThreshold = 75.0;
 
-@interface DFCardinalImageView()
+@interface DFSwipableButtonImageView()
 
 @property (nonatomic, retain) UIDynamicAnimator *animator;
 @property (nonatomic, retain) DFSpringAttachmentBehavior *springBehavior;
@@ -27,7 +27,7 @@ const CGFloat RightGestureThreshold = 75.0;
 
 @end
 
-@implementation DFCardinalImageView
+@implementation DFSwipableButtonImageView
 
 - (void)awakeFromNib
 {
@@ -110,8 +110,8 @@ const CGFloat RightGestureThreshold = 75.0;
   }
   self.lastPoint = translation;
   
-  if ([self.delegate respondsToSelector:@selector(cardinalImageView:didBeginPan:translation:)])
-    [self.delegate cardinalImageView:self didBeginPan:self.panGestureRecognizer translation:translation];
+  if ([self.delegate respondsToSelector:@selector(swipableButtonImageView:didBeginPan:translation:)])
+    [self.delegate swipableButtonImageView:self didBeginPan:self.panGestureRecognizer translation:translation];
 }
 
 - (void)handleDragMoved:(CGPoint)translation
@@ -133,8 +133,8 @@ const CGFloat RightGestureThreshold = 75.0;
     [self highlightButton:self.yesButton amount:percentRight];
   }
   
-  if ([self.delegate respondsToSelector:@selector(cardinalImageView:didMovePan:translation:)])
-    [self.delegate cardinalImageView:self didMovePan:self.panGestureRecognizer translation:translation];
+  if ([self.delegate respondsToSelector:@selector(swipableButtonImageView:didMovePan:translation:)])
+    [self.delegate swipableButtonImageView:self didMovePan:self.panGestureRecognizer translation:translation];
 }
 
 - (void)handleDragEnded:(CGPoint)translation
@@ -154,8 +154,8 @@ const CGFloat RightGestureThreshold = 75.0;
   [self.animator addBehavior:self.springBehavior];
   [self unhighlightAllButtons];
   
-  if ([self.delegate respondsToSelector:@selector(cardinalImageView:didEndPan:translation:)])
-    [self.delegate cardinalImageView:self didEndPan:self.panGestureRecognizer translation:translation];
+  if ([self.delegate respondsToSelector:@selector(swipableButtonImageView:didEndPan:translation:)])
+    [self.delegate swipableButtonImageView:self didEndPan:self.panGestureRecognizer translation:translation];
 }
 
 - (void)unhighlightAllButtons
@@ -209,7 +209,7 @@ const CGFloat RightGestureThreshold = 75.0;
 //                     self.imageView.frame = destFrame;
 //                     self.imageView.alpha = 0.0;
 //                   } completion:^(BOOL finished) {
-//                     [self.delegate cardinalImageView:self buttonSelected:button];
+//                     [self.delegate swipableButtonImageView:self buttonSelected:button];
 //                   }];
   
   [UIView animateWithDuration:0.5
@@ -221,7 +221,7 @@ const CGFloat RightGestureThreshold = 75.0;
                      self.imageView.frame = destFrame;
                      self.imageView.alpha = 0.0;
                    } completion:^(BOOL finished) {
-                     [self.delegate cardinalImageView:self buttonSelected:button];
+                     [self.delegate swipableButtonImageView:self buttonSelected:button];
                    }];
 }
 

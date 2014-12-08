@@ -9,9 +9,9 @@
             <connections>
                 <outlet property="addRecipientButton" destination="UYI-Rc-QVa" id="BW8-Ah-Abn"/>
                 <outlet property="bottomLabel" destination="RRW-PK-CfC" id="gs9-7a-tJq"/>
-                <outlet property="cardinalImageView" destination="YTX-Vv-qtQ" id="8s2-Tk-5Wh"/>
                 <outlet property="peopleLabel" destination="RRW-PK-CfC" id="hpd-id-cMy"/>
                 <outlet property="profileStackView" destination="BkW-lL-hsr" id="KUf-zp-AfQ"/>
+                <outlet property="swipableButtonImageView" destination="YTX-Vv-qtQ" id="K2r-lA-QFf"/>
                 <outlet property="view" destination="AUp-5O-Ctk" id="G5C-sf-kMR"/>
             </connections>
         </placeholder>
@@ -28,7 +28,7 @@
                         <constraint firstAttribute="width" priority="500" constant="50" id="uTu-Z4-BIa"/>
                     </constraints>
                 </view>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YTX-Vv-qtQ" customClass="DFCardinalImageView">
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YTX-Vv-qtQ" customClass="DFSwipableButtonImageView">
                     <rect key="frame" x="0.0" y="97" width="600" height="483"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                 </view>

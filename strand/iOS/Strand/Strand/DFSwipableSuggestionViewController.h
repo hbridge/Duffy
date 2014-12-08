@@ -7,15 +7,15 @@
 //
 
 #import "DFSuggestionViewController.h"
-#import "DFCardinalImageView.h"
+#import "DFSwipableButtonImageView.h"
 #import "DFPeoplePickerViewController.h"
 
-@interface DFSwipableSuggestionViewController : DFSuggestionViewController <DFCardinalImageViewDelegate, DFPeoplePickerDelegate>
+@interface DFSwipableSuggestionViewController : DFSuggestionViewController <DFSwipableButtonImageViewDelegate, DFPeoplePickerDelegate>
 
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UILabel *topLabel;
 @property (weak, nonatomic) IBOutlet UILabel *bottomLabel;
-@property (weak, nonatomic) IBOutlet DFCardinalImageView *cardinalImageView;
+@property (weak, nonatomic) IBOutlet DFSwipableButtonImageView *swipableButtonImageView;
 @property (weak, nonatomic) IBOutlet UIButton *addRecipientButton;
 @property (weak, nonatomic) IBOutlet UILabel *peopleLabel;
 

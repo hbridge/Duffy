@@ -1,5 +1,5 @@
 //
-//  DFCardinalImageView.h
+//  DFswipableButtonImageView.h
 //  Strand
 //
 //  Created by Henry Bridge on 12/3/14.
@@ -8,24 +8,24 @@
 
 #import <UIKit/UIKit.h>
 
-@class DFCardinalImageView;
+@class DFSwipableButtonImageView;
 
 
-@protocol DFCardinalImageViewDelegate <NSObject>
+@protocol DFSwipableButtonImageViewDelegate <NSObject>
 
 @required
-- (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
+- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
         buttonSelected:(UIButton *)button;
 
 
 @optional
-- (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
+- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
               didBeginPan:(UIPanGestureRecognizer *)panGesture
               translation:(CGPoint)translation;
-- (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
+- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
               didMovePan:(UIPanGestureRecognizer *)panGesture
               translation:(CGPoint)translation;
-- (void)cardinalImageView:(DFCardinalImageView *)cardinalImageView
+- (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView
               didEndPan:(UIPanGestureRecognizer *)panGesture
               translation:(CGPoint)translation;
 
@@ -34,12 +34,12 @@
 @end
 
 
-@interface DFCardinalImageView : UIView
+@interface DFSwipableButtonImageView : UIView
 
 @property (weak, nonatomic) IBOutlet UIImageView *imageView;
 @property (weak, nonatomic) IBOutlet UIButton *yesButton;
 @property (weak, nonatomic) IBOutlet UIButton *noButton;
-@property (nonatomic, weak) id<DFCardinalImageViewDelegate> delegate;
+@property (nonatomic, weak) id<DFSwipableButtonImageViewDelegate> delegate;
 @property (weak, nonatomic) IBOutlet UIPanGestureRecognizer *panGestureRecognizer;
 @property (weak, nonatomic) IBOutlet UIImageView *overlayImageView;
 @property (nonatomic) BOOL yesEnabled;

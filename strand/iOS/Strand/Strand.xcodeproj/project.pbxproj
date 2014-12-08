@@ -122,8 +122,8 @@
 		5A91C4711A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C46F1A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m */; };
 		5A91C4721A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */; };
 		5A91C4781A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */; };
-		5A91C47B1A2FC11F00C4F9A6 /* DFCardinalImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47A1A2FC11F00C4F9A6 /* DFCardinalImageView.m */; };
-		5A91C47D1A2FC13100C4F9A6 /* DFCardinalImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C47C1A2FC13100C4F9A6 /* DFCardinalImageView.xib */; };
+		5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */; };
+		5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */; };
 		5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */; };
 		5A91C4841A36116300C4F9A6 /* DFIncomingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */; };
 		5A91C4851A36116300C4F9A6 /* DFIncomingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */; };
@@ -500,9 +500,9 @@
 		5A91C4701A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwipableSuggestionViewController.xib; sourceTree = "<group>"; };
 		5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSpringAttachmentBehavior.h; sourceTree = "<group>"; };
 		5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSpringAttachmentBehavior.m; sourceTree = "<group>"; };
-		5A91C4791A2FC11F00C4F9A6 /* DFCardinalImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCardinalImageView.h; sourceTree = "<group>"; };
-		5A91C47A1A2FC11F00C4F9A6 /* DFCardinalImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFCardinalImageView.m; sourceTree = "<group>"; };
-		5A91C47C1A2FC13100C4F9A6 /* DFCardinalImageView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFCardinalImageView.xib; sourceTree = "<group>"; };
+		5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonImageView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFSwipableButtonImageView.h; sourceTree = "<group>"; };
+		5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFSwipableButtonImageView.m; sourceTree = "<group>"; };
+		5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFSwipableButtonImageView.xib; sourceTree = "<group>"; };
 		5A91C47E1A321FC600C4F9A6 /* DFPhoneNumberUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFPhoneNumberUtils.h; sourceTree = "<group>"; };
 		5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFPhoneNumberUtils.m; sourceTree = "<group>"; };
 		5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIncomingViewController.h; sourceTree = "<group>"; };
@@ -1259,9 +1259,9 @@
 				5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */,
 				5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */,
 				5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */,
-				5A91C4791A2FC11F00C4F9A6 /* DFCardinalImageView.h */,
-				5A91C47A1A2FC11F00C4F9A6 /* DFCardinalImageView.m */,
-				5A91C47C1A2FC13100C4F9A6 /* DFCardinalImageView.xib */,
+				5A91C4791A2FC11F00C4F9A6 /* DFSwipableButtonImageView.h */,
+				5A91C47A1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m */,
+				5A91C47C1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib */,
 				5A91C4761A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.h */,
 				5A91C4771A2FA4F900C4F9A6 /* DFSpringAttachmentBehavior.m */,
 			);
@@ -1908,7 +1908,7 @@
 				5ADD858619465C790037A6D5 /* Images.xcassets in Resources */,
 				5A02CEA3194F70FE00C4EBA6 /* DFPhotoViewController.xib in Resources */,
 				5A0BC49D19F99ECD00C1E3DD /* DFPhotoPickerHeaderReusableView.xib in Resources */,
-				5A91C47D1A2FC13100C4F9A6 /* DFCardinalImageView.xib in Resources */,
+				5A91C47D1A2FC13100C4F9A6 /* DFSwipableButtonImageView.xib in Resources */,
 				5AAF037D19AF86BF00EF021C /* DFSelectPhotosViewController.xib in Resources */,
 				5A83A3D619EED9ED0068F08B /* DFSmallCardTableViewCell.xib in Resources */,
 				5ACE17721A1D20E700DE998A /* DFPhotoFeedActionCell.xib in Resources */,
@@ -2011,7 +2011,7 @@
 				5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */,
 				5A0E122519747BD800B6FF04 /* DFPeanutInviteMessageResponse.m in Sources */,
 				5ADD857819465C790037A6D5 /* AppDelegate.m in Sources */,
-				5A91C47B1A2FC11F00C4F9A6 /* DFCardinalImageView.m in Sources */,
+				5A91C47B1A2FC11F00C4F9A6 /* DFSwipableButtonImageView.m in Sources */,
 				5AFDEBDB197748A7005DDA7D /* DFLocationPermissionViewController.m in Sources */,
 				5A02CEA2194F70FE00C4EBA6 /* DFPhotoViewController.m in Sources */,
 				5A91C4711A2F9ACE00C4F9A6 /* DFSwipableSuggestionViewController.m in Sources */,
