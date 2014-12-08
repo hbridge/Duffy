@@ -215,7 +215,7 @@ const CGFloat RightGestureThreshold = 75.0;
     if (button == buttonToHighlight) {
       button.alpha = 0.2 + 0.8 * highlightAmount;
       self.overlayImageView.alpha = 0.2 + 0.8 * highlightAmount;
-      self.overlayImageView.image  = button.imageView.image;
+      //self.overlayImageView.image  = button.imageView.image;
     } else {
       button.alpha = 0.2;
     }
