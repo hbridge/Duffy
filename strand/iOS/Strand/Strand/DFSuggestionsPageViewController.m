@@ -104,6 +104,18 @@
   self.strandList = [NSMutableArray new];
   self.subViewTypeList = [NSMutableArray new];
   
+  
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+    // Add two entries for NUX
+    [self.photoList addObject:@(0)];
+    [self.strandList addObject:@(0)];
+    [self.subViewTypeList addObject:@(DFNuxViewType)];
+    
+    [self.photoList addObject:@(0)];
+    [self.strandList addObject:@(0)];
+    [self.subViewTypeList addObject:@(DFNuxViewType)];
+  }
+  
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
   
   for (DFPeanutUserObject *user in friends) {
@@ -205,12 +217,6 @@
       return nil;
     }
   }
-  NSIndexPath *indexPath = self.indexPaths[index];
-  
-  if (indexPath.section == NSIntegerMin) {
-    // this is a nux request
-    return [self suggestionViewControllerForNuxStep:indexPath.row + 1];
-  }
   
   DFSuggestionsPageViewController __weak *weakSelf = self;
   
@@ -250,20 +256,25 @@
     };
     
     return ivc;
+  } else if ([self.subViewTypeList[index] isEqualToValue:@(DFNuxViewType)]) {
+    // this is a nux request
+    return [self suggestionViewControllerForNuxStep:index];
   }
   return nil;
 }
         
-- (DFSuggestionViewController *)suggestionViewControllerForNuxStep:(NSUInteger)nuxStep
+- (DFSuggestionViewController *)suggestionViewControllerForNuxStep:(NSUInteger)index
 {
   DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
-                                             initWithNuxStep:nuxStep];
-  if (nuxStep == 1) {
+                                             initWithNuxStep:index];
+  svc.index = index;
+  svc.nuxStep = index + 1;
+  if (index == 0) {
     svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
       [SVProgressHUD showSuccessWithStatus:@"Nice!"];
       [self gotoNextController];
     };
-  } else if (nuxStep == 2) {
+  } else if (index == 1) {
      svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
        [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
        [self gotoNextController];

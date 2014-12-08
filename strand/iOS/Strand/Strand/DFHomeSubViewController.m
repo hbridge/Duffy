@@ -12,5 +12,6 @@
 
 DFHomeSubViewType DFSuggestionViewType = 0;
 DFHomeSubViewType DFIncomingViewType = 1;
+DFHomeSubViewType DFNuxViewType = 2;
 
 @end

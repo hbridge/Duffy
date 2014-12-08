@@ -15,5 +15,6 @@
 typedef UInt64 DFHomeSubViewType;
 extern DFHomeSubViewType DFSuggestionViewType;
 extern DFHomeSubViewType DFIncomingViewType;
+extern DFHomeSubViewType DFNuxViewType;
 
 @end
