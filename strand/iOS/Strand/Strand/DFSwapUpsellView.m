@@ -66,8 +66,13 @@ CGFloat const DFUpsellMinHeight = 200.0;
                          buttonTarget:(id)target
                                     selector:(SEL)selector
 {
+  self.gradientColors = @[
+                          [[UIColor lightGrayColor] colorWithAlphaComponent:0],
+                          [[UIColor lightGrayColor] colorWithAlphaComponent:0.8]
+                          ];
+  self.layer.borderColor = [[UIColor darkGrayColor] CGColor];
   if (!error) {
-    self.upsellTitleLabel.text = @"Find More Friends to Swap with";
+    self.upsellTitleLabel.text = @"Find Friends to Swap with";
   } else {
     self.upsellTitleLabel.text = @"Contacts Permission Denied";
   }

@@ -22,6 +22,7 @@
 #import "DFStrandConstants.h"
 #import "DFPeanutFeedDataManager.h"
 #import "NSArray+DFHelpers.h"
+#import "DFNoTableItemsView.h"
 
 
 @interface DFPeoplePickerViewController ()
@@ -43,6 +44,7 @@
 @property (nonatomic, retain) NSMutableArray *selectedNonSuggestionsList;
 @property (nonatomic, retain) NSMutableArray *selectedContacts;
 @property (nonatomic) BOOL hideStatusBar;
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
 @end
 
@@ -116,6 +118,25 @@ NSString *const ContactsSectionTitle = @"Contacts";
   [self configureTableView];
   [self configureSearch];
   [self selectionUpdated];
+  [self configureNoResultsView];
+}
+
+- (void)configureNoResultsView
+{
+  if ([DFContactSyncManager contactsPermissionStatus] != kABAuthorizationStatusAuthorized
+      && self.unfilteredSections.count == 0) {
+    self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    self.noResultsView.titleLabel.text = @"Show Contacts";
+    self.noResultsView.subtitleLabel.text = @"Grant contacts permission to show results from your Contacts.";
+    [self.noResultsView.button setTitle:@"Grant Permission" forState:UIControlStateNormal];
+    DFPeoplePickerViewController __weak *weakSelf = self;
+    self.noResultsView.buttonHandler = ^{[weakSelf askForContactsPermission];};
+    self.noResultsView.button.hidden = NO;
+    [self.noResultsView setSuperView:self.tableView];
+  } else {
+    [self.noResultsView removeFromSuperview];
+    self.noResultsView = nil;
+  }
 }
 
 - (void)viewDidAppear:(BOOL)animated
@@ -649,6 +670,7 @@ NSString *const ContactsSectionTitle = @"Contacts";
   DFPeoplePickerViewController __weak *weakSelf = self;
   [DFContactSyncManager askForContactsPermissionWithSuccess:^{
     dispatch_async(dispatch_get_main_queue(), ^{
+      [weakSelf configureNoResultsView];
       [weakSelf loadUnfilteredArrays];
       [weakSelf updateSearchResults];
       [weakSelf.tableView reloadData];

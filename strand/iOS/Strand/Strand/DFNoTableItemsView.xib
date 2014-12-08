@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -26,12 +26,22 @@
                     <color key="textColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
+                <button hidden="YES" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0JM-va-gYd">
+                    <rect key="frame" x="277" y="93" width="46" height="30"/>
+                    <state key="normal" title="Button">
+                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                    </state>
+                    <connections>
+                        <action selector="buttonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="ZLx-Cm-yUU"/>
+                    </connections>
+                </button>
             </subviews>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstAttribute="trailing" secondItem="5o1-IU-s0a" secondAttribute="trailing" constant="20" id="2a0-FJ-odJ"/>
                 <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="5o1-IU-s0a" secondAttribute="bottom" constant="20" id="3a2-bq-Tvb"/>
                 <constraint firstItem="5o1-IU-s0a" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="20" id="3yn-Bu-uaa"/>
+                <constraint firstItem="0JM-va-gYd" firstAttribute="top" secondItem="5o1-IU-s0a" secondAttribute="bottom" constant="8" id="GVx-VL-BKt"/>
                 <constraint firstAttribute="centerX" secondItem="lU9-hh-vj8" secondAttribute="centerX" id="LDN-cS-Ar2"/>
                 <constraint firstItem="WH2-z2-97B" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="8" id="Ra3-Eh-JGq"/>
                 <constraint firstItem="WH2-z2-97B" firstAttribute="top" secondItem="lU9-hh-vj8" secondAttribute="bottom" constant="8" id="XFP-RL-Fa7"/>
@@ -40,10 +50,12 @@
                 <constraint firstAttribute="centerX" secondItem="5o1-IU-s0a" secondAttribute="centerX" id="bjg-7R-AL8"/>
                 <constraint firstAttribute="trailing" secondItem="WH2-z2-97B" secondAttribute="trailing" constant="8" id="eDW-3B-v9d"/>
                 <constraint firstItem="lU9-hh-vj8" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="h5U-Is-Vga"/>
+                <constraint firstItem="0JM-va-gYd" firstAttribute="centerX" secondItem="5o1-IU-s0a" secondAttribute="centerX" id="mwt-LC-Kv2"/>
                 <constraint firstItem="5o1-IU-s0a" firstAttribute="top" secondItem="WH2-z2-97B" secondAttribute="bottom" constant="8" id="tCb-RQ-f1r"/>
             </constraints>
             <connections>
                 <outlet property="activityIndicator" destination="lU9-hh-vj8" id="Nr7-MA-iAt"/>
+                <outlet property="button" destination="0JM-va-gYd" id="xDc-sk-uwY"/>
                 <outlet property="subtitleLabel" destination="5o1-IU-s0a" id="407-Ea-wEZ"/>
                 <outlet property="titleLabel" destination="WH2-z2-97B" id="oTR-PN-mDz"/>
             </connections>

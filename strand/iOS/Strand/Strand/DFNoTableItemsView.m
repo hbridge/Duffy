@@ -49,6 +49,10 @@
   self.frame = frame;
 }
 
+- (IBAction)buttonPressed:(id)sender {
+  if (self.buttonHandler) self.buttonHandler();
+}
+
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context
 {
   if ([[object class] isSubclassOfClass:[UILabel class]]) {
