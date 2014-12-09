@@ -18,6 +18,8 @@
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFDefaultsStore.h"
 #import "DFCommentViewController.h"
+#import "DFImageManagerRequest.h"
+#import "DFImageDiskCache.h"
 
 @interface DFSuggestionsPageViewController ()
 
@@ -34,6 +36,7 @@
 @property (retain, nonatomic) NSMutableArray *photoList;
 @property (retain, nonatomic) NSMutableArray *strandList;
 @property (retain, nonatomic) NSMutableArray *subViewTypeList;
+@property (retain, nonatomic) NSMutableSet *alreadyShownPhotoIds;
 
 @end
 
@@ -50,6 +53,10 @@
     self.delegate = self;
     [self observeNotifications];
     [self configureNavAndTab];
+    self.photoList = [NSMutableArray new];
+    self.strandList = [NSMutableArray new];
+    self.subViewTypeList = [NSMutableArray new];
+    self.alreadyShownPhotoIds = [NSMutableSet new];
   }
   return self;
 }
@@ -59,6 +66,11 @@
   [[NSNotificationCenter defaultCenter] addObserver:self
                                            selector:@selector(reloadData)
                                                name:DFStrandNewSwapsDataNotificationName
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewInboxDataNotificationName
                                              object:nil];
 }
 
@@ -100,11 +112,26 @@
 
 - (void)reloadData
 {
+  NSInteger currentIndex = [self currentViewControllerIndex];
+  DFPeanutFeedObject *currentPhoto;
   
-  self.photoList = [NSMutableArray new];
-  self.strandList = [NSMutableArray new];
-  self.subViewTypeList = [NSMutableArray new];
-  
+  if (currentIndex >= 0) {
+    currentPhoto = self.photoList[currentIndex];
+    DFPeanutFeedObject *currentStrand = self.strandList[currentIndex];
+    DFHomeSubViewType currentSubViewType = (DFHomeSubViewType)self.subViewTypeList[currentIndex];
+    UIViewController *currentController = self.viewControllers.firstObject;
+    
+    self.photoList = [NSMutableArray new];
+    self.strandList = [NSMutableArray new];
+    self.subViewTypeList = [NSMutableArray new];
+    
+    [self.photoList addObject:currentPhoto];
+    [self.strandList addObject:currentStrand];
+    [self.subViewTypeList addObject:@(currentSubViewType)];
+    
+    [self updateIndexOfViewController:currentController index:0];
+    currentIndex = 0;
+  }
   
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
     // Add two entries for NUX
@@ -119,45 +146,46 @@
   
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
   
+  // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
   for (DFPeanutUserObject *user in friends) {
     NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
     for (DFPeanutFeedObject *strandPosts in strands) {
       NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
       for (DFPeanutFeedObject *photo in photos) {
-        if (photo.user != [[DFUser currentUser] userID]) {
-          [self.photoList addObject:photo];
-          [self.strandList addObject:strandPosts];
-          [self.subViewTypeList addObject:@(DFIncomingViewType)];
+        if (photo.user != [[DFUser currentUser] userID] &&
+            ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+          
+          // Now lets see if the image is loaded yet
+          DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
+          if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
+            [self.photoList addObject:photo];
+            [self.strandList addObject:strandPosts];
+            [self.subViewTypeList addObject:@(DFIncomingViewType)];
+          }
         }
       }
     }
   }
- 
+  
   NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
   for (DFPeanutFeedObject *suggestion in allSuggestions) {
     if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
       
       NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
       for (int x=0; x < photos.count; x++) {
-        [self.photoList addObject:photos[x]];
-        [self.strandList addObject:suggestion];
-        [self.subViewTypeList addObject:@(DFSuggestionViewType)];
+        DFPeanutFeedObject *photo = photos[x];
+        if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+          [self.photoList addObject:photo];
+          [self.strandList addObject:suggestion];
+          [self.subViewTypeList addObject:@(DFSuggestionViewType)];
+        }
       }
     }
   }
   
-  
-  /*
-   TODO(Derek): put NUX back in, here is what it was before
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
-    // go in reverse order to make sure path 0 is at index 0
-    [self.indexPaths insertObject:[NSIndexPath indexPathForItem:1 inSection:NSIntegerMin] atIndex:0];
-    [self.indexPaths insertObject:[NSIndexPath indexPathForItem:0 inSection:NSIntegerMin] atIndex:0];
-  }*/
-  
   if ((self.viewControllers.count == 0
       || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
-           isSubclassOfClass:[DFSuggestionViewController class]])
+           isSubclassOfClass:[DFHomeSubViewController class]])
       && [[DFPeanutFeedDataManager sharedManager] areSuggestionsReady])
     [self gotoNextController];
   [self configureLoadingView];
@@ -190,15 +218,16 @@
   DFHomeSubViewController *subVC = (DFHomeSubViewController *)viewController;
   
   return subVC.index;
-  /*
-  if (suggestionVC.nuxStep > 0) {
-    return suggestionVC.nuxStep - 1;
-  }
-   TODO(Derek): put NUX back in, here is what it was before
-  NSUInteger sectionIndex = [self.filteredSuggestions indexOfObject:suggestionVC.suggestionFeedObject];
-
-   */
 }
+
+- (void)updateIndexOfViewController:(UIViewController *)viewController index:(NSUInteger)index
+{
+  if (![[viewController class] isSubclassOfClass:[DFHomeSubViewController class]]) return;
+  DFHomeSubViewController *subVC = (DFHomeSubViewController *)viewController;
+  
+  subVC.index = index;
+}
+
 
 
 - (NSUInteger)currentViewControllerIndex
@@ -467,9 +496,16 @@
     }
   }
   
-  if (!nextController)
+  if (!nextController) {
     nextController = [self noSuggestionsViewController];
-
+  } else {
+    NSInteger currentIndex = [self currentViewControllerIndex];
+    if (currentIndex >= 0) {
+      DFPeanutFeedObject *photo = self.photoList[currentIndex+1];
+      [self.alreadyShownPhotoIds addObject:@(photo.id)];
+    }
+  }
+  
   [self setViewControllers:@[nextController]
                  direction:UIPageViewControllerNavigationDirectionForward
                   animated:YES

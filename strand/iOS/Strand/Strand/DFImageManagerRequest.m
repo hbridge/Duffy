@@ -26,6 +26,23 @@
   return self;
 }
 
+- (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
+                      imageType:(DFImageType)imageType
+{
+  CGSize size;
+  
+  if (imageType == DFImageFull) {
+    size = CGSizeMake(DFPhotoAssetHighQualitySize, DFPhotoAssetHighQualitySize);
+  } else if (imageType == DFImageThumbnail) {
+    size = CGSizeMake(DFPhotoAssetDefaultThumbnailSize, DFPhotoAssetDefaultThumbnailSize);
+  }
+  return [self
+          initWithPhotoID:photoID
+          size:size
+          contentMode:DFImageRequestContentModeAspectFill
+          deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic];
+}
+
 - (NSUInteger)hash
 {
   return (NSUInteger)self.photoID + self.size.width + self.size.height + self.contentMode + self.deliveryMode;
