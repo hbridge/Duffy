@@ -10,6 +10,7 @@
 #import "DFSuggestionsPageViewController.h"
 #import "DFNavigationController.h"
 #import "DFDefaultsStore.h"
+#import "DFPushNotificationsManager.h"
 
 @interface DFHomeViewController ()
 
@@ -40,6 +41,8 @@
   [super viewDidAppear:animated];
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
     [self reviewButtonPressed:self.reviewButton];
+  } else {
+    [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
 }
 
