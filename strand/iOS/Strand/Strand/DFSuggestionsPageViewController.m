@@ -102,6 +102,7 @@
 {
   [super viewWillAppear:animated];
   [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
+  [self reloadData];
   [self configureLoadingView];
 }
 
@@ -113,34 +114,32 @@
 - (void)reloadData
 {
   NSInteger currentIndex = [self currentViewControllerIndex];
-  DFPeanutFeedObject *currentPhoto;
   
   if (currentIndex >= 0) {
-    currentPhoto = self.photoList[currentIndex];
-    DFPeanutFeedObject *currentStrand = self.strandList[currentIndex];
-    DFHomeSubViewType currentSubViewType = (DFHomeSubViewType)self.subViewTypeList[currentIndex];
-    UIViewController *currentController = self.viewControllers.firstObject;
+    NSRange rangeToDelete;
+    if ([self.subViewTypeList[currentIndex] isEqualToValue:@(DFNuxViewType)]) {
+      // Want to clear out everything after all the nux's
+      rangeToDelete = NSMakeRange(2, self.photoList.count-2);
+    } else if (self.photoList.count > currentIndex) {
+      // Want to clear out everything after the current photo
+      rangeToDelete = NSMakeRange(currentIndex+1, self.photoList.count-currentIndex-1);
+    }
     
-    self.photoList = [NSMutableArray new];
-    self.strandList = [NSMutableArray new];
-    self.subViewTypeList = [NSMutableArray new];
-    
-    [self.photoList addObject:currentPhoto];
-    [self.strandList addObject:currentStrand];
-    [self.subViewTypeList addObject:@(currentSubViewType)];
-    
-    [self updateIndexOfViewController:currentController index:0];
-    currentIndex = 0;
+    if (self.photoList.count > currentIndex) {
+      [self.photoList removeObjectsInRange:rangeToDelete];
+      [self.strandList removeObjectsInRange:rangeToDelete];
+      [self.subViewTypeList removeObjectsInRange:rangeToDelete];
+    }
   }
   
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux] && self.photoList.count == 0) {
     // Add two entries for NUX
-    [self.photoList addObject:@(0)];
-    [self.strandList addObject:@(0)];
+    [self.photoList addObject:[NSNull null]];
+    [self.strandList addObject:[NSNull null]];
     [self.subViewTypeList addObject:@(DFNuxViewType)];
     
-    [self.photoList addObject:@(0)];
-    [self.strandList addObject:@(0)];
+    [self.photoList addObject:[NSNull null]];
+    [self.strandList addObject:[NSNull null]];
     [self.subViewTypeList addObject:@(DFNuxViewType)];
   }
   
@@ -183,11 +182,11 @@
     }
   }
   
-  if ((self.viewControllers.count == 0
+  if (self.viewControllers.count == 0
       || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
            isSubclassOfClass:[DFHomeSubViewController class]])
-      && [[DFPeanutFeedDataManager sharedManager] areSuggestionsReady])
     [self gotoNextController];
+  
   [self configureLoadingView];
 }
 
@@ -220,6 +219,7 @@
   return subVC.index;
 }
 
+// TODO(Derek): This might not be needed anymore
 - (void)updateIndexOfViewController:(UIViewController *)viewController index:(NSUInteger)index
 {
   if (![[viewController class] isSubclassOfClass:[DFHomeSubViewController class]]) return;
@@ -502,7 +502,7 @@
     NSInteger currentIndex = [self currentViewControllerIndex];
     if (currentIndex >= 0) {
       DFPeanutFeedObject *photo = self.photoList[currentIndex+1];
-      [self.alreadyShownPhotoIds addObject:@(photo.id)];
+      if (![photo isEqual:[NSNull null]]) [self.alreadyShownPhotoIds addObject:@(photo.id)];
     }
   }
   
