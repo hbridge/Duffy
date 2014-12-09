@@ -7,7 +7,13 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "DFFriendsViewController.h"
 
-@interface DFHomeViewController : UIViewController
+@interface DFHomeViewController : DFFriendsViewController
+@property (weak, nonatomic) IBOutlet UIButton *reviewButton;
+@property (weak, nonatomic) IBOutlet UIButton *sendButton;
+- (IBAction)reviewButtonPressed:(id)sender;
+- (IBAction)sendButtonPressed:(id)sender;
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 @end

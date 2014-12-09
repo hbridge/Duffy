@@ -47,6 +47,7 @@
 #import "DFGalleryViewController.h"
 #import "DFContactDataManager.h"
 #import "DFSuggestionsPageViewController.h"
+#import "DFHomeViewController.h"
 
 @interface AppDelegate () <BITHockeyManagerDelegate> {}
 
@@ -270,29 +271,10 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   }
   
   [DFPhotoStore sharedStore];
+  DFHomeViewController *homeViewController = [[DFHomeViewController alloc] init];
+  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:homeViewController];
   
-  //self.inboxViewController = [[DFInboxViewController alloc] init];
-  //DFGalleryViewController *gallery = [[DFGalleryViewController alloc] init];
-  DFSuggestionsPageViewController *suggestionsController = [[DFSuggestionsPageViewController alloc] init];
-  DFFriendsViewController *friendsViewController = [[DFFriendsViewController alloc] init];
-  DFNotificationsViewController *notifsViewController = [[DFNotificationsViewController alloc] init];
-  self.tabBarController = [[UITabBarController alloc] init];
-  self.tabBarController.viewControllers =
-  @[
-    [[DFNavigationController alloc] initWithRootViewController:suggestionsController],
-    [[DFNavigationController alloc] initWithRootViewController:notifsViewController],
-    [[DFNavigationController alloc] initWithRootViewController:friendsViewController],
-    ];
-  
-//  for (UINavigationController *vc in self.tabBarController.viewControllers) {
-//    vc.tabBarItem.imageInsets = vc.tabBarItem.imageInsets = UIEdgeInsetsMake(5.5, 0, -5.5, 0);
-//  }
-  self.tabBarController.tabBar.selectedImageTintColor = [DFStrandConstants strandRed];
-  //self.tabBarController.tabBar.selectedImageTintColor = [UIColor whiteColor];
-  self.tabBarController.tabBar.translucent = NO;
-  
-  self.tabBarController.selectedIndex = 0;
-  self.window.rootViewController = self.tabBarController;
+  self.window.rootViewController = navController;
 }
 
 - (BOOL)isUserValid

@@ -7,15 +7,13 @@
 //
 
 #import "DFFriendProfileViewController.h"
-#import "DFGalleryViewController.h"
 #import "DFPeanutFeedDataManager.h"
 #import "UIDevice+DFHelpers.h"
-#import "DFSwapViewController.h"
+#import "DFFeedViewController.h"
 
 @interface DFFriendProfileViewController ()
 
-@property (nonatomic, retain) DFSwapViewController *unsharedViewController;
-@property (nonatomic, retain) DFGalleryViewController *sharedGalleryViewController;
+@property (nonatomic, retain) DFFeedViewController *feedViewController;
 
 @end
 
@@ -27,13 +25,10 @@
   self = [super init];
   if (self) {
     _peanutUser = peanutUser;
-    _unsharedViewController = [[DFSwapViewController alloc]
-                               initWithUserToFilter:peanutUser];
-    _sharedGalleryViewController = [[DFGalleryViewController alloc]
-                                    initWithFilterUser:peanutUser];
-    
+    DFStrandIDType strandID = self.peanutUser.shared_strand.longLongValue;
+    _feedViewController = [[DFFeedViewController alloc] initWithStrandPostsId:strandID];
     // set their parent view controller so they inherit the nav controller etc
-    [self displayContentController:_sharedGalleryViewController];
+    [self displayContentController:_feedViewController];
   }
   return self;
 }
@@ -50,29 +45,25 @@
 
 - (void)configureHeader
 {
-  NSArray *swappedStrands = [[DFPeanutFeedDataManager sharedManager]
-                             acceptedStrandsWithPostsCollapsedAndFilteredToUser:self.peanutUser.id];
+  
   self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
   self.nameLabel.text = [self.peanutUser fullName];
+  NSArray *photos = [self.feedViewController.postsObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
-                             (int)swappedStrands.count];
-  [self.tabSegmentedControl setTitle:[NSString stringWithFormat:@"Suggestions"]
-                   forSegmentAtIndex:1];
+                             (int)photos.count];
   
   // add a fancy background blur if iOS8 +
   if ([UIDevice majorVersionNumber] >= 8) {
     UIVisualEffectView *visualEffectView = [[UIVisualEffectView alloc] initWithEffect:
                                             
                                             [UIBlurEffect effectWithStyle:UIBlurEffectStyleLight]];
-    CGRect frame = CGRectMake(0, 0, self.view.frame.size.width, self.tabSegmentedControlWrapper.frame.origin.y + self.tabSegmentedControlWrapper.frame.size.height);
+    CGRect frame = CGRectMake(0, 0, self.view.frame.size.width, self.headerView.frame.size.height);
     visualEffectView.frame = frame;
     [self.view insertSubview:visualEffectView belowSubview:self.headerView];
     [visualEffectView.contentView addSubview:self.headerView];
-    [visualEffectView.contentView addSubview:self.tabSegmentedControlWrapper];
     
     self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
-    self.tabSegmentedControlWrapper.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
   }
 }
 
@@ -95,8 +86,7 @@
 {
   UIScrollView *mainView = [self mainScrollViewForViewController:viewController];
   mainView.frame = self.view.frame;
-  CGFloat contentTop = self.tabSegmentedControlWrapper.frame.origin.y
-  + self.tabSegmentedControlWrapper.frame.size.height;
+  CGFloat contentTop = self.headerView.frame.size.height;
   UIEdgeInsets insets = UIEdgeInsetsMake(contentTop, 0, 0, 0);
   mainView.contentInset = insets;
 }
@@ -158,15 +148,6 @@
     // Pass the selected object to the new view controller.
 }
 */
-- (IBAction)segmentViewValueChanged:(UISegmentedControl *)sender {
-  if (sender.selectedSegmentIndex == 0) {
-    [self hideContentController:self.unsharedViewController];
-    [self displayContentController:self.sharedGalleryViewController];
-  } else {
-    [self hideContentController:self.sharedGalleryViewController];
-    [self displayContentController:self.unsharedViewController];
-  }
-}
 
 
 - (IBAction)backButtonPressed:(id)sender {

@@ -117,6 +117,8 @@
 
 - (void)configureTableView:(UITableView *)tableView
 {
+  tableView.dataSource = self;
+  tableView.delegate = self;
   [tableView registerNib:[UINib nibWithNibName:@"DFPersonSelectionTableViewCell" bundle:nil]
   forCellReuseIdentifier:@"cell"];
   
@@ -219,7 +221,7 @@ static BOOL showContactsUpsell = NO;
   if (self.friendPeanutUsers.count == 0) {
     if (!self.noFriendsView) {
       self.noFriendsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-      [self.noFriendsView setSuperView:self.view];
+      [self.noFriendsView setSuperView:self.tableView];
     }
     
     self.noFriendsView.hidden = NO;

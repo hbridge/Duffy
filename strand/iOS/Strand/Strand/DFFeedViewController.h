@@ -21,6 +21,9 @@
 
 @property (nonatomic) DFPhotoIDType onViewScrollToPhotoId;
 @property (nonatomic) BOOL showPersonPerPhoto;
+@property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
+@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
+@property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 - (instancetype)initWithFeedObject:(DFPeanutFeedObject *)feedObject;

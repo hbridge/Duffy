@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6211" systemVersion="14A298i" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6204"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFHomeViewController">
             <connections>
+                <outlet property="reviewButton" destination="2fP-Ad-UAv" id="MMB-ke-WNW"/>
+                <outlet property="sendButton" destination="sao-uL-Ezk" id="sdY-qw-l1R"/>
+                <outlet property="tableView" destination="eqD-aJ-5L8" id="thT-cf-ogc"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -13,7 +18,102 @@
         <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
             <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYj-g7-RXb" userLabel="Button bar">
+                    <rect key="frame" x="0.0" y="64" width="600" height="79"/>
+                    <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QUv-33-Ffw" userLabel="ReviewWrapper">
+                            <rect key="frame" x="0.0" y="0.0" width="300" height="79"/>
+                            <subviews>
+                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/HomeInbox.png" translatesAutoresizingMaskIntoConstraints="NO" id="Aap-Qv-hUt">
+                                    <rect key="frame" x="142" y="22" width="16" height="16"/>
+                                </imageView>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2fP-Ad-UAv">
+                                    <rect key="frame" x="0.0" y="0.0" width="300" height="79"/>
+                                    <inset key="contentEdgeInsets" minX="0.0" minY="28" maxX="0.0" maxY="0.0"/>
+                                    <state key="normal" title="Review">
+                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="reviewButtonPressed:" destination="-1" eventType="touchUpInside" id="GuO-zE-IL3"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstItem="2fP-Ad-UAv" firstAttribute="leading" secondItem="QUv-33-Ffw" secondAttribute="leading" id="6c6-qM-jzn"/>
+                                <constraint firstAttribute="bottom" secondItem="2fP-Ad-UAv" secondAttribute="bottom" id="O4x-pK-bgf"/>
+                                <constraint firstAttribute="centerX" secondItem="Aap-Qv-hUt" secondAttribute="centerX" id="WHm-8c-JpC"/>
+                                <constraint firstAttribute="trailing" secondItem="2fP-Ad-UAv" secondAttribute="trailing" id="ceS-4K-0s2"/>
+                                <constraint firstAttribute="centerY" secondItem="Aap-Qv-hUt" secondAttribute="centerY" constant="10" id="w8J-f2-iUb"/>
+                                <constraint firstItem="2fP-Ad-UAv" firstAttribute="top" secondItem="QUv-33-Ffw" secondAttribute="top" id="yqa-dn-uPr"/>
+                            </constraints>
+                        </view>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AFb-Nj-ssH" userLabel="SendWrapper">
+                            <rect key="frame" x="301" y="0.0" width="299" height="79"/>
+                            <subviews>
+                                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Assets/Icons/HomeSend.png" translatesAutoresizingMaskIntoConstraints="NO" id="f5D-h6-OaN">
+                                    <rect key="frame" x="141" y="24" width="16" height="16"/>
+                                </imageView>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sao-uL-Ezk" userLabel="Send">
+                                    <rect key="frame" x="0.0" y="0.0" width="299" height="79"/>
+                                    <inset key="contentEdgeInsets" minX="0.0" minY="27" maxX="0.0" maxY="0.0"/>
+                                    <state key="normal" title="Send">
+                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                        <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="sendButtonPressed:" destination="-1" eventType="touchUpInside" id="c0g-aY-dgk"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="trailing" secondItem="sao-uL-Ezk" secondAttribute="trailing" id="2iQ-0e-4xq"/>
+                                <constraint firstItem="sao-uL-Ezk" firstAttribute="top" secondItem="AFb-Nj-ssH" secondAttribute="top" id="AXc-38-pdo"/>
+                                <constraint firstAttribute="centerX" secondItem="f5D-h6-OaN" secondAttribute="centerX" id="ER2-4T-TfJ"/>
+                                <constraint firstAttribute="centerY" secondItem="f5D-h6-OaN" secondAttribute="centerY" constant="8" id="WYG-c0-zcg"/>
+                                <constraint firstAttribute="bottom" secondItem="sao-uL-Ezk" secondAttribute="bottom" id="eqt-xw-RGx"/>
+                                <constraint firstItem="sao-uL-Ezk" firstAttribute="leading" secondItem="AFb-Nj-ssH" secondAttribute="leading" id="nKo-KU-en0"/>
+                            </constraints>
+                        </view>
+                    </subviews>
+                    <color key="backgroundColor" red="0.96078431369999995" green="0.31764705879999999" blue="0.18823529410000001" alpha="1" colorSpace="calibratedRGB"/>
+                    <constraints>
+                        <constraint firstAttribute="bottom" secondItem="QUv-33-Ffw" secondAttribute="bottom" id="3ue-uG-MlX"/>
+                        <constraint firstAttribute="width" secondItem="AFb-Nj-ssH" secondAttribute="width" multiplier="2" constant="1" id="6WC-ZB-Uzk"/>
+                        <constraint firstAttribute="trailing" secondItem="AFb-Nj-ssH" secondAttribute="trailing" id="9c3-H0-Z9c"/>
+                        <constraint firstAttribute="width" secondItem="QUv-33-Ffw" secondAttribute="width" multiplier="2" id="B8d-2a-LMA"/>
+                        <constraint firstItem="QUv-33-Ffw" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" id="Bks-xe-qgc"/>
+                        <constraint firstItem="QUv-33-Ffw" firstAttribute="leading" secondItem="MYj-g7-RXb" secondAttribute="leading" id="Swa-xn-lyo"/>
+                        <constraint firstAttribute="height" constant="79" id="fAN-cS-318"/>
+                        <constraint firstItem="AFb-Nj-ssH" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" id="ifv-cs-ewK"/>
+                        <constraint firstAttribute="bottom" secondItem="AFb-Nj-ssH" secondAttribute="bottom" id="rpL-Jb-Klz"/>
+                    </constraints>
+                </view>
+                <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="eqD-aJ-5L8">
+                    <rect key="frame" x="0.0" y="143" width="600" height="457"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                </tableView>
+            </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="eqD-aJ-5L8" secondAttribute="bottom" id="KhP-eJ-3dC"/>
+                <constraint firstItem="eqD-aJ-5L8" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="PCp-nw-Wc7"/>
+                <constraint firstItem="eqD-aJ-5L8" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="bottom" id="TqU-dN-E2N"/>
+                <constraint firstAttribute="trailing" secondItem="MYj-g7-RXb" secondAttribute="trailing" id="W1d-JV-aCL"/>
+                <constraint firstItem="MYj-g7-RXb" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="64" id="ac2-Sc-RAw"/>
+                <constraint firstAttribute="trailing" secondItem="eqD-aJ-5L8" secondAttribute="trailing" id="amV-q3-T8o"/>
+                <constraint firstItem="MYj-g7-RXb" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="m2l-2g-Hdl"/>
+            </constraints>
+            <simulatedStatusBarMetrics key="simulatedStatusBarMetrics"/>
+            <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" prompted="NO"/>
+            <point key="canvasLocation" x="200" y="315"/>
         </view>
     </objects>
+    <resources>
+        <image name="Assets/Icons/HomeInbox.png" width="16" height="16"/>
+        <image name="Assets/Icons/HomeSend.png" width="16" height="16"/>
+    </resources>
 </document>

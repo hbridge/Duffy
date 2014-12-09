@@ -26,15 +26,14 @@
 #import "SVProgressHUD.h"
 #import "DFTopBannerView.h"
 #import "UIBarButtonItem+Badge.h"
+#import "DFNoTableItemsView.h"
 
 @interface DFFeedViewController ()
 
 @property (readonly, nonatomic, retain) DFPhotoMetadataAdapter *photoAdapter;
 
 @property (nonatomic, retain) DFFeedDataSource *feedDataSource;
-@property (nonatomic, retain) DFPeanutFeedObject *inviteObject;
-@property (nonatomic, retain) DFPeanutFeedObject *postsObject;
-@property (nonatomic, retain) DFPeanutFeedObject *suggestionsObject;
+
 
 @property (nonatomic) DFPhotoIDType actionSheetPhotoID;
 @property (nonatomic) DFPhotoIDType requestedPhotoIDToJumpTo;
@@ -46,6 +45,7 @@
 @property (nonatomic, retain) DFTopBannerView *topBannerView;
 
 @property (nonatomic, retain) UIBarButtonItem *addPhotosButtomItem;
+@property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 
 @end
 
@@ -243,6 +243,20 @@
   [self configureTableView];
   [self configureUpsell];
   [self configureTopBanner];
+  [self configureNoResultsView];
+}
+
+- (void)configureNoResultsView
+{
+  if (!self.inviteObject && [self.feedDataSource numberOfSectionsInTableView:self.tableView] == 0) {
+    self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    self.noResultsView.titleLabel.text = @"No Photos Swapped Yet";
+    self.noResultsView.subtitleLabel.text = @"Send some photos to get started";
+    [self.noResultsView setSuperView:self.tableView];
+  } else {
+    [self.noResultsView removeFromSuperview];
+    self.noResultsView = nil;
+  }
 }
 
 - (void)configureTitleView

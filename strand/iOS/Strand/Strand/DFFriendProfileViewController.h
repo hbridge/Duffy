@@ -16,8 +16,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 @property (nonatomic, retain) DFPeanutUserObject *peanutUser;
-@property (weak, nonatomic) IBOutlet UIView *tabSegmentedControlWrapper;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *tabSegmentedControl;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
 
 - (instancetype)initWithPeanutUser:(DFPeanutUserObject *)peanutUser;

@@ -39,6 +39,7 @@ const CGFloat DFPersonSelectionTableViewCellHeight = 54;
 {
   [super layoutSubviews];
   [self configureChecked];
+  self.profilePhotoStackView.profilePhotoWidth = self.profilePhotoStackView.frame.size.width;
   
 }
 
