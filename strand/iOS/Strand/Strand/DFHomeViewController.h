@@ -17,5 +17,6 @@
 - (IBAction)sendButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet LKBadgeView *reviewBadgeView;
+@property (weak, nonatomic) IBOutlet LKBadgeView *sendBadgeView;
 
 @end

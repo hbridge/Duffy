@@ -57,9 +57,13 @@
 - (void)configureBadges
 {
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
+  NSUInteger numToSend = [[[DFPeanutFeedDataManager sharedManager] suggestedStrands] count];
+  for (LKBadgeView *badgeView in @[self.reviewBadgeView, self.sendBadgeView]) {
+    badgeView.badgeColor = [DFStrandConstants strandBlue];
+    badgeView.textColor = [UIColor whiteColor];
+  }
   self.reviewBadgeView.text = [@(numToReview) stringValue];
-  self.reviewBadgeView.badgeColor = [DFStrandConstants strandBlue];
-  self.reviewBadgeView.textColor = [UIColor whiteColor];
+  self.sendBadgeView.text = [@(numToSend) stringValue];
 }
 
 - (void)didReceiveMemoryWarning {

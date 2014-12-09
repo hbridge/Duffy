@@ -10,6 +10,7 @@
             <connections>
                 <outlet property="reviewBadgeView" destination="BWa-FG-aqQ" id="NdO-Qj-ZFx"/>
                 <outlet property="reviewButton" destination="2fP-Ad-UAv" id="MMB-ke-WNW"/>
+                <outlet property="sendBadgeView" destination="Pba-eB-LD4" id="gfR-4r-0xC"/>
                 <outlet property="sendButton" destination="sao-uL-Ezk" id="sdY-qw-l1R"/>
                 <outlet property="tableView" destination="eqD-aJ-5L8" id="thT-cf-ogc"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
@@ -85,13 +86,23 @@
                                         <action selector="sendButtonPressed:" destination="-1" eventType="touchUpInside" id="c0g-aY-dgk"/>
                                     </connections>
                                 </button>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pba-eB-LD4" customClass="LKBadgeView">
+                                    <rect key="frame" x="152" y="14" width="30" height="20"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <constraints>
+                                        <constraint firstAttribute="height" constant="20" id="ZHP-sQ-xmx"/>
+                                        <constraint firstAttribute="width" constant="30" id="uwp-HI-CpC"/>
+                                    </constraints>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstAttribute="trailing" secondItem="sao-uL-Ezk" secondAttribute="trailing" id="2iQ-0e-4xq"/>
                                 <constraint firstItem="sao-uL-Ezk" firstAttribute="top" secondItem="AFb-Nj-ssH" secondAttribute="top" id="AXc-38-pdo"/>
                                 <constraint firstAttribute="centerX" secondItem="f5D-h6-OaN" secondAttribute="centerX" id="ER2-4T-TfJ"/>
+                                <constraint firstItem="Pba-eB-LD4" firstAttribute="leading" secondItem="f5D-h6-OaN" secondAttribute="trailing" constant="-5" id="Tvk-0r-kjh"/>
                                 <constraint firstAttribute="centerY" secondItem="f5D-h6-OaN" secondAttribute="centerY" constant="8" id="WYG-c0-zcg"/>
+                                <constraint firstItem="f5D-h6-OaN" firstAttribute="top" secondItem="Pba-eB-LD4" secondAttribute="bottom" constant="-10" id="dNA-wW-Rxl"/>
                                 <constraint firstAttribute="bottom" secondItem="sao-uL-Ezk" secondAttribute="bottom" id="eqt-xw-RGx"/>
                                 <constraint firstItem="sao-uL-Ezk" firstAttribute="leading" secondItem="AFb-Nj-ssH" secondAttribute="leading" id="nKo-KU-en0"/>
                             </constraints>
