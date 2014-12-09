@@ -10,6 +10,10 @@
 
 @interface DFNavigationController : UINavigationController
 
+// Defaults back butotn title to "Cancel"
 + (void)presentWithRootController:(UIViewController *)rootController inParent:(UIViewController *)parent;
++ (void)presentWithRootController:(UIViewController *)rootController
+                         inParent:(UIViewController *)parent
+              withBackButtonTitle:(NSString *)backButtonTitle;
 
 @end

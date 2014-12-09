@@ -50,6 +50,7 @@
 
 @implementation DFPeoplePickerViewController
 @synthesize addressBook = _addressBook;
+@synthesize doneButtonActionText = _doneButtonActionText;
 
 
 NSString *const UserSectionTitle = @"Swap Friends";
@@ -249,6 +250,18 @@ NSString *const ContactsSectionTitle = @"Contacts";
   self.sdc.delegate = self;
 }
 
+- (void)setDoneButtonActionText:(NSString *)doneButtonActionText
+{
+  _doneButtonActionText = doneButtonActionText;
+  [self selectionUpdated];
+}
+
+- (NSString *)doneButtonActionText
+{
+  if (!_doneButtonActionText) return @"Send to";
+  return _doneButtonActionText;
+}
+
 - (void)selectionUpdated
 {
   int count = (int)self.selectedContacts.count;
@@ -256,13 +269,13 @@ NSString *const ContactsSectionTitle = @"Contacts";
   if (count > 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d People Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    buttonTitle = [NSString stringWithFormat:@"Send to %d People", count];
+    buttonTitle = [NSString stringWithFormat:@"%@ %d People", self.doneButtonActionText, count];
     self.doneButton.enabled = YES;
     self.doneButtonWrapper.hidden = NO;
   } else if (count == 1) {
     //self.navigationItem.title = [NSString stringWithFormat:@"%d Person Selected", count];
     self.navigationItem.rightBarButtonItem.enabled = YES;
-    buttonTitle = @"Send to 1 Person";
+    buttonTitle = [NSString stringWithFormat:@"%@ 1 Person", self.doneButtonActionText];
     self.doneButton.enabled = YES;
     self.doneButtonWrapper.hidden = NO;
   } else {

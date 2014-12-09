@@ -432,10 +432,9 @@
                                   initWithPhotoObject:photoObject
                                   inPostsObject:strandPosts];
   [DFNavigationController presentWithRootController:cvc
-                                           inParent:self];
-  dispatch_async(dispatch_get_main_queue(), ^{
-    cvc.navigationItem.leftBarButtonItem.title = @"Back";
-  });
+                                           inParent:self
+                                withBackButtonTitle:@"Close"];
+  
 }
 
 - (void)likePhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand

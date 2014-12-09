@@ -49,15 +49,25 @@
   return UIStatusBarStyleLightContent;
 }
 
-+ (void)presentWithRootController:(UIViewController *)rootController inParent:(UIViewController *)parent
++ (void)presentWithRootController:(UIViewController *)rootController
+                         inParent:(UIViewController *)parent
+{
+  [self presentWithRootController:rootController inParent:parent withBackButtonTitle:@"Cancel"];
+}
+
++ (void)presentWithRootController:(UIViewController *)rootController
+                         inParent:(UIViewController *)parent
+              withBackButtonTitle:(NSString *)backButtonTitle
 {
   DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:rootController];
   rootController.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]
-                                                     initWithBarButtonSystemItem:UIBarButtonSystemItemCancel
+                                                     initWithTitle:backButtonTitle
+                                                     style:UIBarButtonItemStylePlain
                                                      target:navController
                                                      action:@selector(dismissWhenPresented)];
   [parent presentViewController:navController animated:YES completion:nil];
 }
+
 
 - (void)dismissWhenPresented
 {

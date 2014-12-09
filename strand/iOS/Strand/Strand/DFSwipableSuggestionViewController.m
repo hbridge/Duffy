@@ -133,7 +133,7 @@
 - (IBAction)addPersonButtonPressed:(id)sender {
   DFPeoplePickerViewController *peoplePickerController = [[DFPeoplePickerViewController alloc]
                                                           initWithSelectedPeanutContacts:[self selectedPeanutContacts]];
-  
+  peoplePickerController.doneButtonActionText = @"Select";
   peoplePickerController.allowsMultipleSelection = YES;
   peoplePickerController.delegate = self;
   [DFNavigationController presentWithRootController:peoplePickerController inParent:self];
