@@ -9,6 +9,7 @@
 #import "DFHomeViewController.h"
 #import "DFSuggestionsPageViewController.h"
 #import "DFNavigationController.h"
+#import "DFDefaultsStore.h"
 
 @interface DFHomeViewController ()
 
@@ -32,6 +33,14 @@
 - (void)configureTableView
 {
   self.tableView.rowHeight = 65;
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+  [super viewDidAppear:animated];
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]) {
+    [self reviewButtonPressed:self.reviewButton];
+  }
 }
 
 - (void)didReceiveMemoryWarning {
