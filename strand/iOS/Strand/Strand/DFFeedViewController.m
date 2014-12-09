@@ -846,49 +846,49 @@ likeButtonPressedForPhoto:(DFPeanutFeedObject *)photoObject
 
 - (void)configureTopBanner
 {
-  if (!self.topBannerView) {
-    self.topBannerView = [UINib instantiateViewWithClass:[DFTopBannerView class]];
-    [self.view addSubview:self.topBannerView];
-    [self.view addConstraints:[NSLayoutConstraint
-                               constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
-                               options:0
-                               metrics:nil
-                               views:@{@"banner" : self.topBannerView}]];
-    [self.view addConstraints:[NSLayoutConstraint
-                               constraintsWithVisualFormat:@"V:|-(0)-[banner]"
-                               options:0
-                               metrics:nil
-                               views:@{@"banner" : self.topBannerView}]];
-    [self.topBannerView addConstraint:[NSLayoutConstraint constraintWithItem:self.topBannerView
-                                                                   attribute:NSLayoutAttributeHeight
-                                                                   relatedBy:NSLayoutRelationEqual
-                                                                      toItem:nil
-                                                                   attribute:NSLayoutAttributeHeight
-                                                                  multiplier:1.0
-                                                                    constant:43.0]];
-    
-    self.topBannerView.tintColor = [UIColor darkGrayColor];
-    self.topBannerView.leftImageView.image = [[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
-                                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
-    self.topBannerView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    __weak typeof(self) weakSelf = self;
-    self.topBannerView.actionButtonHandler = ^{
-      [weakSelf showAddPhotosView:YES];
-    };
-  }
-
-  if (self.suggestionsObject) {
-    self.topBannerView.hidden = NO;
-    self.tableView.contentInset = UIEdgeInsetsMake(43.0, 0, 0, 0);
-    NSArray *photoObjects = [self.suggestionsObject descendentdsOfType:DFFeedObjectPhoto];
-    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ %@ to contribute",
-                                         @(photoObjects.count),
-                                         photoObjects.count > 1 ? @"photos" : @"photo"];
-  } else {
-    self.topBannerView.hidden = YES;
-    self.tableView.contentInset = UIEdgeInsetsZero;
-  }
+//  if (!self.topBannerView) {
+//    self.topBannerView = [UINib instantiateViewWithClass:[DFTopBannerView class]];
+//    [self.view addSubview:self.topBannerView];
+//    [self.view addConstraints:[NSLayoutConstraint
+//                               constraintsWithVisualFormat:@"|-(0)-[banner]-(0)-|"
+//                               options:0
+//                               metrics:nil
+//                               views:@{@"banner" : self.topBannerView}]];
+//    [self.view addConstraints:[NSLayoutConstraint
+//                               constraintsWithVisualFormat:@"V:|-(0)-[banner]"
+//                               options:0
+//                               metrics:nil
+//                               views:@{@"banner" : self.topBannerView}]];
+//    [self.topBannerView addConstraint:[NSLayoutConstraint constraintWithItem:self.topBannerView
+//                                                                   attribute:NSLayoutAttributeHeight
+//                                                                   relatedBy:NSLayoutRelationEqual
+//                                                                      toItem:nil
+//                                                                   attribute:NSLayoutAttributeHeight
+//                                                                  multiplier:1.0
+//                                                                    constant:43.0]];
+//    
+//    self.topBannerView.tintColor = [UIColor darkGrayColor];
+//    self.topBannerView.leftImageView.image = [[UIImage imageNamed:@"Assets/Icons/PhotosBarButton"]
+//                                              imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate];
+//    self.topBannerView.translatesAutoresizingMaskIntoConstraints = NO;
+//    
+//    __weak typeof(self) weakSelf = self;
+//    self.topBannerView.actionButtonHandler = ^{
+//      [weakSelf showAddPhotosView:YES];
+//    };
+//  }
+//
+//  if (self.suggestionsObject) {
+//    self.topBannerView.hidden = NO;
+//    self.tableView.contentInset = UIEdgeInsetsMake(43.0, 0, 0, 0);
+//    NSArray *photoObjects = [self.suggestionsObject descendentdsOfType:DFFeedObjectPhoto];
+//    self.topBannerView.textLabel.text = [NSString stringWithFormat:@"You have %@ %@ to contribute",
+//                                         @(photoObjects.count),
+//                                         photoObjects.count > 1 ? @"photos" : @"photo"];
+//  } else {
+//    self.topBannerView.hidden = YES;
+//    self.tableView.contentInset = UIEdgeInsetsZero;
+//  }
 }
 
 @end
