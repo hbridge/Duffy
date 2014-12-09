@@ -68,7 +68,8 @@
                            imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
 
   self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
+                                            initWithImage:[UIImage imageNamed:@"Assets/Icons/InviteBarButton"]
+                                            style:UIBarButtonItemStylePlain
                                             target:self
                                             action:@selector(createButtonPressed:)];
   self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc]

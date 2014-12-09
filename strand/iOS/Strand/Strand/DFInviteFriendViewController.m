@@ -27,6 +27,7 @@
     _peoplePicker = [[DFPeoplePickerViewController alloc] init];
     _peoplePicker.hideFriendsSection = YES;
     _peoplePicker.allowsMultipleSelection = YES;
+    _peoplePicker.doneButtonActionText = @"Invite";
   }
   return self;
 }
