@@ -78,7 +78,7 @@ const NSUInteger NumNuxes = 3;
 
 - (void)configureNavAndTab
 {
-  self.navigationItem.title = @"Suggestions";
+  //self.navigationItem.title = @"Suggestions";
   self.tabBarItem.title = @"Suggestions";
   self.tabBarItem.image = [UIImage imageNamed:@"Assets/Icons/SwapBarButton"];
   self.tabBarItem.selectedImage = [UIImage imageNamed:@"Assets/Icons/SwapBarButtonSelected"];

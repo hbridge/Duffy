@@ -40,11 +40,16 @@
 }
 
 - (IBAction)reviewButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:self.suggestionsViewController inParent:self];
+  [DFNavigationController presentWithRootController:self.suggestionsViewController
+                                           inParent:self
+                                withBackButtonTitle:@"Close"];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:self.suggestionsViewController inParent:self];
+  [DFNavigationController
+   presentWithRootController:self.suggestionsViewController
+   inParent:self
+   withBackButtonTitle:@"Close"];
 }
 
 - (DFSuggestionsPageViewController *)suggestionsViewController
