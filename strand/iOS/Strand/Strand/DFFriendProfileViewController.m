@@ -63,7 +63,7 @@
     [self.view insertSubview:visualEffectView belowSubview:self.headerView];
     [visualEffectView.contentView addSubview:self.headerView];
     
-    self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
+    //self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
   }
 }
 

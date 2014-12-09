@@ -20,7 +20,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Nc7-0m-VWp" userLabel="Header Bar">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="97"/>
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="84"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vRE-Zm-eLd" customClass="DFProfileStackView">
                             <rect key="frame" x="48" y="26" width="45" height="45"/>
@@ -53,7 +53,7 @@
                             <nil key="highlightedColor"/>
                         </label>
                     </subviews>
-                    <color key="backgroundColor" white="1" alpha="0.90000000000000002" colorSpace="calibratedWhite"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="0.089999999999999997" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="8iR-ga-e4d" firstAttribute="leading" secondItem="vRE-Zm-eLd" secondAttribute="trailing" constant="8" id="1Wr-lf-yEM"/>
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="leading" secondItem="iNL-1h-xwh" secondAttribute="trailing" constant="4" id="3EU-g5-hVt"/>
@@ -61,7 +61,7 @@
                         <constraint firstItem="vRE-Zm-eLd" firstAttribute="centerY" secondItem="iNL-1h-xwh" secondAttribute="centerY" id="8BO-l4-ZqK"/>
                         <constraint firstItem="iNL-1h-xwh" firstAttribute="leading" secondItem="Nc7-0m-VWp" secondAttribute="leading" constant="8" id="OHx-hW-qvF"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="centerY" secondItem="vRE-Zm-eLd" secondAttribute="centerY" constant="-8" id="UGE-Vw-JF4"/>
-                        <constraint firstAttribute="bottom" secondItem="vRE-Zm-eLd" secondAttribute="bottom" constant="26" id="YIu-BY-bSO"/>
+                        <constraint firstAttribute="bottom" secondItem="vRE-Zm-eLd" secondAttribute="bottom" constant="13" id="YIu-BY-bSO"/>
                         <constraint firstItem="QmR-gx-IVb" firstAttribute="leading" secondItem="vRE-Zm-eLd" secondAttribute="trailing" constant="8" id="cz9-by-1W4"/>
                         <constraint firstItem="8iR-ga-e4d" firstAttribute="top" secondItem="QmR-gx-IVb" secondAttribute="bottom" constant="-3" id="i3w-vQ-Ubk"/>
                     </constraints>

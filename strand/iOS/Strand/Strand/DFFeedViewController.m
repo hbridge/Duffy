@@ -171,6 +171,7 @@
       [self configureTopBanner];
     }
   }
+  [self configureNoResultsView];
 }
 
 - (void)observeNotifications
@@ -358,6 +359,7 @@
       [photosAndClusters addObjectsFromArray:strandPost.objects];
     }
     self.feedDataSource.photosAndClusters = photosAndClusters;
+    [self configureNoResultsView];
   });
 }
 
