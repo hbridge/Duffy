@@ -17,6 +17,7 @@
 #import "DFUploadController.h"
 #import "DFPeanutStrandInviteAdapter.h"
 #import "DFDefaultsStore.h"
+#import "DFCommentViewController.h"
 
 @interface DFSuggestionsPageViewController ()
 
@@ -419,7 +420,16 @@
 
 - (void)showCommentsForPhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand
 {
-  
+  DFPeanutFeedObject *strandPosts = [[DFPeanutFeedDataManager sharedManager] strandPostsObjectWithId:strand];
+  DFPeanutFeedObject *photoObject = [[DFPeanutFeedDataManager sharedManager] photoWithID:photo inStrand:strand];
+  DFCommentViewController *cvc = [[DFCommentViewController alloc]
+                                  initWithPhotoObject:photoObject
+                                  inPostsObject:strandPosts];
+  [DFNavigationController presentWithRootController:cvc
+                                           inParent:self];
+  dispatch_async(dispatch_get_main_queue(), ^{
+    cvc.navigationItem.leftBarButtonItem.title = @"Back";
+  });
 }
 
 - (void)likePhoto:(DFPhotoIDType)photo strand:(DFStrandIDType)strand

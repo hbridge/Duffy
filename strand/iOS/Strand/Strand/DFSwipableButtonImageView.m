@@ -235,11 +235,14 @@ const CGFloat RightGestureThreshold = 75.0;
 
 - (void)handleButtonSelected:(UIButton *)button
 {
+  BOOL animate = NO;
   CGRect destFrame = self.imageView.frame;
   if (button == self.noButton) {
     destFrame.origin.x = self.superview.frame.origin.x - destFrame.size.width;
-  } else {
+    animate = YES;
+  } else if (button == self.yesButton){
     destFrame.origin.x = CGRectGetMaxX(self.superview.frame) + destFrame.size.width;
+    animate = YES;
   }
   
 //  [UIView animateWithDuration:0.5
@@ -251,8 +254,8 @@ const CGFloat RightGestureThreshold = 75.0;
 //                   } completion:^(BOOL finished) {
 //                     [self.delegate swipableButtonImageView:self buttonSelected:button];
 //                   }];
-  
-  [UIView animateWithDuration:0.5
+  if (animate) {
+    [UIView animateWithDuration:0.5
                         delay:0
        usingSpringWithDamping:2.0
         initialSpringVelocity:self.lastVelocity
@@ -263,11 +266,17 @@ const CGFloat RightGestureThreshold = 75.0;
                    } completion:^(BOOL finished) {
                      [self.delegate swipableButtonImageView:self buttonSelected:button];
                    }];
+  } else {
+    [self.delegate swipableButtonImageView:self buttonSelected:button];
+  }
 }
 
 - (void)animateImageViewToButton:(UIButton *)button
 {
 
+}
+- (IBAction)commentButtonPressed:(id)sender {
+  [self handleButtonSelected:sender];
 }
 
 - (IBAction)yesButtonPressed:(id)sender {

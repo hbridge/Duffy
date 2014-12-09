@@ -351,6 +351,19 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
+- (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID inStrand:(DFStrandIDType)strandID
+{
+  DFPeanutFeedObject *strandposts = [self strandPostsObjectWithId:strandID];
+  NSArray *photoObjects = [strandposts leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  for (DFPeanutFeedObject *photo in photoObjects) {
+    if (photo.id == photoID) {
+      return photo;
+    }
+  }
+  
+  return nil;
+}
+
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId
 {
   for (DFPeanutFeedObject *object in self.inboxFeedObjects) {

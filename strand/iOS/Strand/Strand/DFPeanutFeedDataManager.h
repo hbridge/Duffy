@@ -50,6 +50,8 @@ typedef void (^RefreshCompleteCompletionBlock)(void);
 - (NSArray *)nonEvaluatedPhotosInStrandPosts:(DFPeanutFeedObject *)strandPosts;
 
 - (DFPeanutFeedObject *)strandPostsObjectWithId:(DFStrandIDType)strandPostsId;
+- (DFPeanutFeedObject *)photoWithID:(DFPhotoIDType)photoID inStrand:(DFStrandIDType)strandID;
+
 - (DFPeanutFeedObject *)inviteObjectWithId:(DFInviteIDType)inviteId;
 - (NSString *)imagePathForPhotoWithID:(DFPhotoIDType)photoID ofType:(DFImageType)type;
 

@@ -22,11 +22,11 @@
                         <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="FtM-Bq-0kY"/>
                     </connections>
                 </imageView>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
-                    <rect key="frame" x="138" y="525" width="325" height="65"/>
+                <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
+                    <rect key="frame" x="146" y="525" width="310" height="65"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes">
-                            <rect key="frame" x="260" y="0.0" width="65" height="65"/>
+                            <rect key="frame" x="230" y="0.0" width="65" height="65"/>
                             <color key="backgroundColor" red="0.42352941176470588" green="0.81960784313725488" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                             <constraints>
                                 <constraint firstAttribute="width" secondItem="V0Q-qK-RXd" secondAttribute="height" multiplier="1:1" id="Sz8-Sj-yMw"/>
@@ -56,8 +56,8 @@
                                 <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other">
-                            <rect key="frame" x="130" y="0.0" width="65" height="65"/>
+                        <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other">
+                            <rect key="frame" x="115" y="1" width="65" height="65"/>
                             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -65,24 +65,24 @@
                                 <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                             </state>
                             <connections>
-                                <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="ZCP-10-dIz"/>
+                                <action selector="commentButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="AuC-2s-yvk"/>
                             </connections>
                         </button>
                     </subviews>
                     <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstItem="pue-vE-jXM" firstAttribute="width" secondItem="pue-vE-jXM" secondAttribute="height" multiplier="1:1" id="1Xz-pe-AGZ"/>
-                        <constraint firstItem="pue-vE-jXM" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" constant="65" id="5dv-r0-BBe"/>
+                        <constraint firstItem="pue-vE-jXM" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" constant="50" id="5dv-r0-BBe"/>
                         <constraint firstAttribute="height" constant="65" id="I7C-Lj-gsK"/>
                         <constraint firstItem="lr5-fU-tFy" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="KKD-Zu-Unv"/>
                         <constraint firstItem="pue-vE-jXM" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="Tqh-mC-REh"/>
-                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" priority="999" constant="65" id="UgG-Ew-fUf"/>
+                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="lr5-fU-tFy" secondAttribute="trailing" priority="999" constant="50" id="UgG-Ew-fUf"/>
                         <constraint firstItem="V0Q-qK-RXd" firstAttribute="top" secondItem="l10-6U-oyL" secondAttribute="top" id="bix-X6-tAC"/>
                         <constraint firstAttribute="bottom" secondItem="lr5-fU-tFy" secondAttribute="bottom" id="cfq-34-UgZ"/>
                         <constraint firstAttribute="trailing" secondItem="V0Q-qK-RXd" secondAttribute="trailing" id="gra-eY-7dH"/>
                         <constraint firstAttribute="bottom" secondItem="V0Q-qK-RXd" secondAttribute="bottom" id="heP-dy-gvy"/>
                         <constraint firstAttribute="bottom" secondItem="pue-vE-jXM" secondAttribute="bottom" id="m70-bx-4uU"/>
-                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="pue-vE-jXM" secondAttribute="trailing" constant="65" id="pif-de-5IG"/>
+                        <constraint firstItem="V0Q-qK-RXd" firstAttribute="leading" secondItem="pue-vE-jXM" secondAttribute="trailing" constant="50" id="pif-de-5IG"/>
                         <constraint firstItem="lr5-fU-tFy" firstAttribute="leading" secondItem="l10-6U-oyL" secondAttribute="leading" id="sOw-sa-eog"/>
                     </constraints>
                 </view>
