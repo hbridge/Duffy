@@ -39,7 +39,6 @@
   // Dispose of any resources that can be recreated.
 }
 
-
 - (IBAction)reviewButtonPressed:(id)sender {
   [DFNavigationController presentWithRootController:self.suggestionsViewController inParent:self];
 }

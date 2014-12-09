@@ -45,9 +45,13 @@
 
 - (void)configureHeader
 {
+  [self.backButton setImage:[self.backButton.imageView.image imageWithRenderingMode:UIImageRenderingModeAlwaysTemplate]
+                   forState:UIControlStateNormal];
   
   self.profilePhotoStackView.peanutUsers = @[self.peanutUser];
   self.profilePhotoStackView.backgroundColor = [UIColor clearColor];
+  self.profilePhotoStackView.profilePhotoWidth = 45.0;
+
   self.nameLabel.text = [self.peanutUser fullName];
   NSArray *photos = [self.feedViewController.postsObject leafNodesFromObjectOfType:DFFeedObjectPhoto];
   self.subtitleLabel.text = [NSString stringWithFormat:@"%d shared",
@@ -66,7 +70,6 @@
     //self.headerView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.8];
   }
 }
-
 - (void) displayContentController: (UIViewController*) contentController;
 {
   [self addChildViewController:contentController];

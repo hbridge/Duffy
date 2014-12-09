@@ -17,6 +17,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 @property (nonatomic, retain) DFPeanutUserObject *peanutUser;
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profilePhotoStackView;
+@property (weak, nonatomic) IBOutlet UIButton *backButton;
 
 - (instancetype)initWithPeanutUser:(DFPeanutUserObject *)peanutUser;
 
