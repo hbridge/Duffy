@@ -127,6 +127,8 @@
 		5A91C4801A321FC600C4F9A6 /* DFPhoneNumberUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C47F1A321FC600C4F9A6 /* DFPhoneNumberUtils.m */; };
 		5A91C4841A36116300C4F9A6 /* DFIncomingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */; };
 		5A91C4851A36116300C4F9A6 /* DFIncomingViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */; };
+		5A91C4891A378AFE00C4F9A6 /* DFHomeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A91C4871A378AFE00C4F9A6 /* DFHomeViewController.m */; };
+		5A91C48A1A378AFE00C4F9A6 /* DFHomeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 5A91C4881A378AFE00C4F9A6 /* DFHomeViewController.xib */; };
 		5A93B5A019B6290F00A3DBA7 /* DFABResultTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */; };
 		5A9636BE19E44F5700F3B606 /* DFCreateStrandViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A9636BD19E44F5700F3B606 /* DFCreateStrandViewController.m */; };
 		5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 5A98653C195879D10044F727 /* DFPeanutLocationAdapter.m */; };
@@ -509,6 +511,9 @@
 		5A91C4811A36116300C4F9A6 /* DFIncomingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFIncomingViewController.h; sourceTree = "<group>"; };
 		5A91C4821A36116300C4F9A6 /* DFIncomingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFIncomingViewController.m; sourceTree = "<group>"; };
 		5A91C4831A36116300C4F9A6 /* DFIncomingViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFIncomingViewController.xib; sourceTree = "<group>"; };
+		5A91C4861A378AFE00C4F9A6 /* DFHomeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFHomeViewController.h; sourceTree = "<group>"; };
+		5A91C4871A378AFE00C4F9A6 /* DFHomeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFHomeViewController.m; sourceTree = "<group>"; };
+		5A91C4881A378AFE00C4F9A6 /* DFHomeViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = DFHomeViewController.xib; sourceTree = "<group>"; };
 		5A93B59E19B6290F00A3DBA7 /* DFABResultTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFABResultTableViewCell.h; sourceTree = "<group>"; };
 		5A93B59F19B6290F00A3DBA7 /* DFABResultTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DFABResultTableViewCell.m; sourceTree = "<group>"; };
 		5A9636BC19E44F5700F3B606 /* DFCreateStrandViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DFCreateStrandViewController.h; sourceTree = "<group>"; };
@@ -1346,6 +1351,9 @@
 				5AA38DFE199EB2D000AD1805 /* Photo Feed */,
 				5A3172CF196C7C6F00CA7693 /* Settings */,
 				65232E9319EC8AF000F3832A /* Table View Cells */,
+				5A91C4861A378AFE00C4F9A6 /* DFHomeViewController.h */,
+				5A91C4871A378AFE00C4F9A6 /* DFHomeViewController.m */,
+				5A91C4881A378AFE00C4F9A6 /* DFHomeViewController.xib */,
 			);
 			name = "Main Views";
 			sourceTree = "<group>";
@@ -1920,6 +1928,7 @@
 				5AB0E6351A2E36D800B8C08E /* DFTopBannerView.xib in Resources */,
 				5AA9293419A66AB700032A3F /* DFNoResultsTableViewCell.xib in Resources */,
 				5AA45298196708D00099CBD2 /* DFPhotoStackCell.xib in Resources */,
+				5A91C48A1A378AFE00C4F9A6 /* DFHomeViewController.xib in Resources */,
 				5A188D6419803523009D3244 /* DFErrorScreen.xib in Resources */,
 				5A4C820619ED8E0900C22A12 /* DFPersonSelectionTableViewCell.xib in Resources */,
 				5AA9293819A67CC500032A3F /* DFABResultTableViewCell.xib in Resources */,
@@ -2111,6 +2120,7 @@
 				5AC4A9381947C30800862D9C /* DFUserPeanutAdapter.m in Sources */,
 				5A98653D195879D10044F727 /* DFPeanutLocationAdapter.m in Sources */,
 				5A4C820519ED8E0900C22A12 /* DFPersonSelectionTableViewCell.m in Sources */,
+				5A91C4891A378AFE00C4F9A6 /* DFHomeViewController.m in Sources */,
 				5ACE17691A1BF54800DE998A /* DFPhotoFeedImageCell.m in Sources */,
 				5A87DE151A267BC80058EB38 /* DFSuggestionViewController.m in Sources */,
 				5ACE17711A1D20E700DE998A /* DFPhotoFeedActionCell.m in Sources */,

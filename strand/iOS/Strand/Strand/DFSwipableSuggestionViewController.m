@@ -36,9 +36,7 @@
   [super viewDidLoad];
   
   [self configurePopLabel];
-  
-  [self.swipableButtonImageView configureWithShowsOther:NO];
-  self.swipableButtonImageView.delegate = self;
+  [self configureSwipableButtonImageView];
   
   if (self.nuxStep == 0) {
     if (self.suggestionFeedObject.actors.count > 0) {
@@ -77,6 +75,24 @@
   self.profileStackView.shouldShowNameLabel = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
 }
+
+- (void)configureSwipableButtonImageView
+{
+  [self.swipableButtonImageView configureWithShowsOther:NO];
+  self.swipableButtonImageView.delegate = self;
+  [self.swipableButtonImageView.yesButton
+   setImage:[UIImage imageNamed:@"Assets/Icons/SendButtonIcon"]
+   forState:UIControlStateNormal];
+  [self.swipableButtonImageView.noButton
+   setImage:[UIImage imageNamed:@"Assets/Icons/IncomingSkipButtonIcon"]
+   forState:UIControlStateNormal];
+  for (UIButton *button in @[self.swipableButtonImageView.yesButton, self.swipableButtonImageView.noButton]) {
+    [button setTitle:nil forState:UIControlStateNormal];
+    button.backgroundColor = [UIColor clearColor];
+  }
+
+}
+
 
 - (void)configurePopLabel
 {

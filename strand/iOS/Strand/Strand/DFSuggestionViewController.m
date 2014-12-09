@@ -36,6 +36,7 @@
     [self configureWithSuggestion:self.suggestionFeedObject withPhoto:self.photoFeedObject];
 }
 
+
 - (void)setFrame:(CGRect)frame
 {
   _frame = frame;

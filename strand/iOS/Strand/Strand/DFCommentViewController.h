@@ -16,6 +16,7 @@
 @property (nonatomic, retain) DFPeanutFeedObject *postsObject;
 @property (weak, nonatomic) IBOutlet UIToolbar *toolbar;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *sendButton;
+@property (nonatomic) BOOL closeOnSend;
 
 
 - (instancetype)initWithPhotoObject:(DFPeanutFeedObject *)photoObject inPostsObject:(DFPeanutFeedObject *)postsObject;
