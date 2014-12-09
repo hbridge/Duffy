@@ -78,7 +78,7 @@ const NSUInteger NumNuxes = 3;
 
 - (void)configureNavAndTab
 {
-  self.navigationItem.title = @"Suggestions";
+  //self.navigationItem.title = @"Suggestions";
   self.tabBarItem.title = @"Suggestions";
   self.tabBarItem.image = [UIImage imageNamed:@"Assets/Icons/SwapBarButton"];
   self.tabBarItem.selectedImage = [UIImage imageNamed:@"Assets/Icons/SwapBarButtonSelected"];
@@ -93,7 +93,6 @@ const NSUInteger NumNuxes = 3;
                                            action:nil];
 }
 
-
 - (void)viewDidLoad {
   [super viewDidLoad];
   // Do any additional setup after loading the view.
@@ -105,13 +104,27 @@ const NSUInteger NumNuxes = 3;
 {
   [super viewWillAppear:animated];
   [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
-  [self reloadData];
+  [self freshLoad];
+
   [self configureLoadingView];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+- (void)freshLoad
+{
+  [self.photoList removeAllObjects];
+  [self.strandList removeAllObjects];
+  [self.subViewTypeList removeAllObjects];
+  
+  UIViewController *currentController = self.viewControllers.firstObject;
+  [self updateIndexOfViewController:currentController index:-1];
+  
+  [self reloadData];
+  [self gotoNextController];
 }
 
 - (void)reloadData
@@ -134,7 +147,7 @@ const NSUInteger NumNuxes = 3;
       [self.subViewTypeList removeObjectsInRange:rangeToDelete];
     }
   }
-  
+
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux] && self.photoList.count == 0) {
     // Add two entries for NUX
     for (NSUInteger i = 0; i < NumNuxes; i++) {
@@ -146,38 +159,40 @@ const NSUInteger NumNuxes = 3;
   
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
   
-  // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
-  for (DFPeanutUserObject *user in friends) {
-    NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
-    for (DFPeanutFeedObject *strandPosts in strands) {
-      NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
-      for (DFPeanutFeedObject *photo in photos) {
-        if (photo.user != [[DFUser currentUser] userID] &&
-            ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-          
-          // Now lets see if the image is loaded yet
-          DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
-          if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-            [self.photoList addObject:photo];
-            [self.strandList addObject:strandPosts];
-            [self.subViewTypeList addObject:@(DFIncomingViewType)];
+  if (self.preferredType == DFIncomingViewType) {
+    // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
+    for (DFPeanutUserObject *user in friends) {
+      NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
+      for (DFPeanutFeedObject *strandPosts in strands) {
+        NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
+        for (DFPeanutFeedObject *photo in photos) {
+          if (photo.user != [[DFUser currentUser] userID] &&
+              ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+            
+            // Now lets see if the image is loaded yet
+            DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
+            if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
+              [self.photoList addObject:photo];
+              [self.strandList addObject:strandPosts];
+              [self.subViewTypeList addObject:@(DFIncomingViewType)];
+            }
           }
         }
       }
     }
-  }
-  
-  NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-  for (DFPeanutFeedObject *suggestion in allSuggestions) {
-    if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
-      
-      NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-      for (int x=0; x < photos.count; x++) {
-        DFPeanutFeedObject *photo = photos[x];
-        if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-          [self.photoList addObject:photo];
-          [self.strandList addObject:suggestion];
-          [self.subViewTypeList addObject:@(DFSuggestionViewType)];
+  } else {
+    NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+    for (DFPeanutFeedObject *suggestion in allSuggestions) {
+      if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
+        
+        NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
+        for (int x=0; x < photos.count; x++) {
+          DFPeanutFeedObject *photo = photos[x];
+          if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+            [self.photoList addObject:photo];
+            [self.strandList addObject:suggestion];
+            [self.subViewTypeList addObject:@(DFSuggestionViewType)];
+          }
         }
       }
     }
@@ -228,7 +243,6 @@ const NSUInteger NumNuxes = 3;
   
   subVC.index = index;
 }
-
 
 
 - (NSUInteger)currentViewControllerIndex
@@ -369,8 +383,9 @@ const NSUInteger NumNuxes = 3;
 - (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
        viewControllerAfterViewController:(UIViewController *)viewController
 {
-  if (self.photoList.count < 2) return nil;
   NSInteger currentIndex = [self indexOfViewController:viewController];
+  
+  if (self.photoList.count < NumNuxes && ![self.subViewTypeList[currentIndex] isEqualToValue:@(DFNuxViewType)]) return nil;
   NSInteger afterIndex = currentIndex + 1;
   if (afterIndex >= self.photoList.count) return nil;
   return [self viewControllerForIndex:afterIndex];

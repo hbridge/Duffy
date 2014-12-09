@@ -40,11 +40,18 @@
 }
 
 - (IBAction)reviewButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:self.suggestionsViewController inParent:self];
+  self.suggestionsViewController.preferredType = DFIncomingViewType;
+  [DFNavigationController presentWithRootController:self.suggestionsViewController
+                                           inParent:self
+                                withBackButtonTitle:@"Close"];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:self.suggestionsViewController inParent:self];
+  self.suggestionsViewController.preferredType = DFSuggestionViewType;
+  [DFNavigationController
+   presentWithRootController:self.suggestionsViewController
+   inParent:self
+   withBackButtonTitle:@"Close"];
 }
 
 - (DFSuggestionsPageViewController *)suggestionsViewController

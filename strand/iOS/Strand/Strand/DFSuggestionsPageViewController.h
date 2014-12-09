@@ -11,6 +11,7 @@
 #import "DFPeoplePickerViewController.h"
 #import <MessageUI/MessageUI.h>
 #import "DFCreateStrandFlowViewController.h"
+#import "DFHomeSubViewController.h"
 
 
 
@@ -18,6 +19,6 @@
 <UIPageViewControllerDataSource, UIPageViewControllerDelegate, DFCreateStrandFlowViewControllerDelegate, MFMessageComposeViewControllerDelegate>
 
 @property (nonatomic, retain) DFPeanutUserObject *userToFilter;
-
+@property (nonatomic) DFHomeSubViewType preferredType;
 
 @end
