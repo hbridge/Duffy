@@ -22,8 +22,8 @@
                         <outletCollection property="gestureRecognizers" destination="MM2-cw-TCR" appends="YES" id="FtM-Bq-0kY"/>
                     </connections>
                 </imageView>
-                <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
-                    <rect key="frame" x="146" y="525" width="310" height="65"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="l10-6U-oyL" userLabel="Button Wrapper">
+                    <rect key="frame" x="153" y="525" width="295" height="65"/>
                     <subviews>
                         <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="V0Q-qK-RXd" userLabel="Yes">
                             <rect key="frame" x="230" y="0.0" width="65" height="65"/>
@@ -56,8 +56,8 @@
                                 <action selector="noButtonPressed:" destination="iN0-l3-epB" eventType="touchUpInside" id="YoP-AT-mNu"/>
                             </connections>
                         </button>
-                        <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other">
-                            <rect key="frame" x="115" y="1" width="65" height="65"/>
+                        <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="clip" translatesAutoresizingMaskIntoConstraints="NO" id="pue-vE-jXM" userLabel="Other">
+                            <rect key="frame" x="115" y="0.0" width="65" height="65"/>
                             <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
