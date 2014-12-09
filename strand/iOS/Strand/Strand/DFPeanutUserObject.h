@@ -39,4 +39,6 @@
 - (UIImage *)thumbnail;
 - (UIImage *)roundedThumbnailOfPointSize:(CGSize)size;
 
++ (DFPeanutUserObject *)TeamSwapUser;
+
 @end

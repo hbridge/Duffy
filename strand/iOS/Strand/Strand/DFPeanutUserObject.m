@@ -115,4 +115,13 @@
   return [[[DFContactDataManager sharedManager] personFromPhoneNumber:phoneNumber] thumbnail];
 }
 
++ (DFPeanutUserObject *)TeamSwapUser
+{
+  DFPeanutUserObject *teamSwapUser = [[DFPeanutUserObject alloc] init];
+  teamSwapUser.id = NSUIntegerMax;
+  teamSwapUser.display_name = @"TS";
+  teamSwapUser.phone_number = @"TS";
+  return teamSwapUser;
+}
+
 @end

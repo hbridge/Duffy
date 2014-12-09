@@ -11,6 +11,7 @@
 @interface DFHomeSubViewController : UIViewController
 
 @property (nonatomic) NSUInteger index;
+@property (nonatomic) NSUInteger nuxStep;
 
 typedef UInt64 DFHomeSubViewType;
 extern DFHomeSubViewType DFSuggestionViewType;

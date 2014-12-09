@@ -52,12 +52,7 @@
     self.addRecipientButton.hidden = YES;
     
     self.profileStackView.maxAbbreviationLength = 2;
-    DFPeanutUserObject *teamSwapUser = [[DFPeanutUserObject alloc] init];
-    teamSwapUser.display_name = @"TS";
-    teamSwapUser.phone_number = @"TS";
-    [self.profileStackView setPeanutUser:teamSwapUser];
-    [self.profileStackView setColor:[DFStrandConstants defaultBackgroundColor]
-                            forUser:teamSwapUser];
+    [self.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
     UIImage *nuxImage;
     if (self.nuxStep == 1) {
       nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];

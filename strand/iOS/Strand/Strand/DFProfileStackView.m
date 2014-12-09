@@ -70,9 +70,14 @@
   for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
     //fill color
     DFPeanutUserObject *user = _peanutUsers[i];
-    NSInteger numberForUser = [self numberForUser:user];
-    NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);
-    UIColor *color = allColors[colorIndex];
+    UIColor *color;
+    if ([user isEqual:[DFPeanutUserObject TeamSwapUser]]) {
+      color = [DFStrandConstants defaultBackgroundColor];
+    } else {
+      NSInteger numberForUser = [self numberForUser:user];
+      NSUInteger colorIndex = abs((int)numberForUser % (int)[allColors count]);
+      color = allColors[colorIndex];
+    }
     fillColors[[self.class idForUser:user]] = color;
     
     //name

@@ -32,4 +32,6 @@ typedef void (^DFIncomingPhotoLikeBlock)(DFPhotoIDType photoID, DFStrandIDType s
                        inStrand:(DFStrandIDType)strandID
                      fromSender:(DFPeanutUserObject *)peanutUser;
 
+- (instancetype)initWithNuxStep:(NSUInteger)nuxStep;
+
 @end

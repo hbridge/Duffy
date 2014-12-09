@@ -30,6 +30,15 @@
   return self;
 }
 
+- (instancetype)initWithNuxStep:(NSUInteger)nuxStep
+{
+  self = [super init];
+  if (self) {
+    self.nuxStep = nuxStep;
+  }
+  return self;
+}
+
 - (void)viewDidLoad {
   [super viewDidLoad];
   
@@ -39,9 +48,16 @@
 
 - (void)configureProfileWithContext
 {
-  [self.profileWithContextView.profileStackView setPeanutUser:self.sender];
-  self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
+  if (self.nuxStep) {
+    self.profileWithContextView.profileStackView.maxAbbreviationLength = 2;
+    [self.profileWithContextView.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+    self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
+                                         self.sender.firstName];
+  } else {
+    [self.profileWithContextView.profileStackView setPeanutUser:self.sender];
+    self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
                                                  self.sender.firstName];
+  }
   [self.profileWithContextView.subtitleLabel removeFromSuperview];
 }
 
@@ -67,16 +83,20 @@
 
 - (void)viewDidLayoutSubviews
 {
-  [[DFImageManager sharedManager]
-   imageForID:self.photoID
-   pointSize:self.swipableButtonImageView.imageView.frame.size
-   contentMode:DFImageRequestContentModeAspectFill
-   deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
-   completion:^(UIImage *image) {
-     dispatch_async(dispatch_get_main_queue(), ^{
-       self.swipableButtonImageView.imageView.image = image;
-     });
-   }];
+  if (self.nuxStep) {
+    self.swipableButtonImageView.imageView.image = [UIImage imageNamed:@"Assets/Nux/NuxReceiveImage"];
+  } else {
+    [[DFImageManager sharedManager]
+     imageForID:self.photoID
+     pointSize:self.swipableButtonImageView.imageView.frame.size
+     contentMode:DFImageRequestContentModeAspectFill
+     deliveryMode:DFImageRequestOptionsDeliveryModeOpportunistic
+     completion:^(UIImage *image) {
+       dispatch_async(dispatch_get_main_queue(), ^{
+         self.swipableButtonImageView.imageView.image = image;
+       });
+     }];
+  }
 }
 
 - (void)swipableButtonImageView:(DFSwipableButtonImageView *)swipableButtonImageView

@@ -40,6 +40,8 @@
 
 @end
 
+const NSUInteger NumNuxes = 3;
+
 @implementation DFSuggestionsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
 
@@ -120,7 +122,7 @@
     NSRange rangeToDelete;
     if ([self.subViewTypeList[currentIndex] isEqualToValue:@(DFNuxViewType)]) {
       // Want to clear out everything after all the nux's
-      rangeToDelete = NSMakeRange(2, self.photoList.count-2);
+      rangeToDelete = NSMakeRange(NumNuxes, self.photoList.count-NumNuxes);
     } else if (self.photoList.count > currentIndex) {
       // Want to clear out everything after the current photo
       rangeToDelete = NSMakeRange(currentIndex+1, self.photoList.count-currentIndex-1);
@@ -135,13 +137,11 @@
   
   if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux] && self.photoList.count == 0) {
     // Add two entries for NUX
-    [self.photoList addObject:[NSNull null]];
-    [self.strandList addObject:[NSNull null]];
-    [self.subViewTypeList addObject:@(DFNuxViewType)];
-    
-    [self.photoList addObject:[NSNull null]];
-    [self.strandList addObject:[NSNull null]];
-    [self.subViewTypeList addObject:@(DFNuxViewType)];
+    for (NSUInteger i = 0; i < NumNuxes; i++) {
+      [self.photoList addObject:[NSNull null]];
+      [self.strandList addObject:[NSNull null]];
+      [self.subViewTypeList addObject:@(DFNuxViewType)];
+    }
   }
   
   NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
@@ -293,33 +293,53 @@
   }
   return nil;
 }
-        
-- (DFSuggestionViewController *)suggestionViewControllerForNuxStep:(NSUInteger)index
+
+- (DFHomeSubViewController *)suggestionViewControllerForNuxStep:(NSUInteger)index
 {
-  DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
-                                             initWithNuxStep:index];
-  svc.index = index;
-  svc.nuxStep = index + 1;
+  DFHomeSubViewController *nuxController;
   if (index == 0) {
-    svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
-      [SVProgressHUD showSuccessWithStatus:@"Nice!"];
+    DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithNuxStep:1];
+    nuxController = ivc;
+    ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      [SVProgressHUD showSuccessWithStatus:@"Aw, man!"];
       [self gotoNextController];
     };
-    svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion) {
-      [SVProgressHUD showErrorWithStatus:@"Tap Send to continue"];
+    ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      [SVProgressHUD showErrorWithStatus:@"Let's keep things simple..."];
     };
-  } else if (index == 1) {
-     svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
-       [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
-       [self gotoNextController];
-       [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
-     };
-    svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
-      [SVProgressHUD showErrorWithStatus:@"Tap Skip to continue"];
+    ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+      [SVProgressHUD showSuccessWithStatus:@"Sweet!"];
+      [self gotoNextController];
     };
+
+  } else {
+    DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc]
+                                               initWithNuxStep:index];
+    nuxController = svc;
+    svc.index = index;
+    svc.nuxStep = index;
+    
+    if (index == 1) {
+      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+        [SVProgressHUD showSuccessWithStatus:@"Nice!"];
+        [self gotoNextController];
+      };
+      svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion) {
+        [SVProgressHUD showErrorWithStatus:@"Tap Send to continue"];
+      };
+    } else if (index == 2) {
+      svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
+        [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
+        [self gotoNextController];
+        [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
+      };
+      svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+        [SVProgressHUD showErrorWithStatus:@"Tap Skip to continue"];
+      };
+    }
   }
   
-  return svc;
+  return nuxController;
 }
 
 - (UIViewController *)noSuggestionsViewController
