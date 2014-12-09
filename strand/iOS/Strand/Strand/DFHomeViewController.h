@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DFFriendsViewController.h"
+#import <LKBadgeView/LKBadgeView.h>
 
 @interface DFHomeViewController : DFFriendsViewController
 @property (weak, nonatomic) IBOutlet UIButton *reviewButton;
@@ -15,5 +16,6 @@
 - (IBAction)reviewButtonPressed:(id)sender;
 - (IBAction)sendButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet LKBadgeView *reviewBadgeView;
 
 @end

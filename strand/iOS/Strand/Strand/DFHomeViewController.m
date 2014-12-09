@@ -11,6 +11,7 @@
 #import "DFNavigationController.h"
 #import "DFDefaultsStore.h"
 #import "DFPushNotificationsManager.h"
+#import "DFPeanutFeedDataManager.h"
 
 @interface DFHomeViewController ()
 
@@ -44,6 +45,21 @@
   } else {
     [[DFPushNotificationsManager sharedManager] promptForPushNotifsIfNecessary];
   }
+  [self configureBadges];
+}
+
+- (void)reloadData
+{
+  [super reloadData];
+  [self configureBadges];
+}
+
+- (void)configureBadges
+{
+  NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];
+  self.reviewBadgeView.text = [@(numToReview) stringValue];
+  self.reviewBadgeView.badgeColor = [DFStrandConstants strandBlue];
+  self.reviewBadgeView.textColor = [UIColor whiteColor];
 }
 
 - (void)didReceiveMemoryWarning {

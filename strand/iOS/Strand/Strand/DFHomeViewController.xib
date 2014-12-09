@@ -8,6 +8,7 @@
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="DFHomeViewController">
             <connections>
+                <outlet property="reviewBadgeView" destination="BWa-FG-aqQ" id="NdO-Qj-ZFx"/>
                 <outlet property="reviewButton" destination="2fP-Ad-UAv" id="MMB-ke-WNW"/>
                 <outlet property="sendButton" destination="sao-uL-Ezk" id="sdY-qw-l1R"/>
                 <outlet property="tableView" destination="eqD-aJ-5L8" id="thT-cf-ogc"/>
@@ -46,13 +47,23 @@
                                         <action selector="reviewButtonPressed:" destination="-1" eventType="touchUpInside" id="GuO-zE-IL3"/>
                                     </connections>
                                 </button>
+                                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BWa-FG-aqQ" customClass="LKBadgeView">
+                                    <rect key="frame" x="153" y="12" width="30" height="20"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <constraints>
+                                        <constraint firstAttribute="width" constant="30" id="HdB-in-hUs"/>
+                                        <constraint firstAttribute="height" constant="20" id="J9I-XI-mz7"/>
+                                    </constraints>
+                                </view>
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstItem="2fP-Ad-UAv" firstAttribute="leading" secondItem="QUv-33-Ffw" secondAttribute="leading" id="6c6-qM-jzn"/>
+                                <constraint firstItem="Aap-Qv-hUt" firstAttribute="top" secondItem="BWa-FG-aqQ" secondAttribute="bottom" constant="-10" id="KNn-NM-7BP"/>
                                 <constraint firstAttribute="bottom" secondItem="2fP-Ad-UAv" secondAttribute="bottom" id="O4x-pK-bgf"/>
                                 <constraint firstAttribute="centerX" secondItem="Aap-Qv-hUt" secondAttribute="centerX" id="WHm-8c-JpC"/>
                                 <constraint firstAttribute="trailing" secondItem="2fP-Ad-UAv" secondAttribute="trailing" id="ceS-4K-0s2"/>
+                                <constraint firstItem="BWa-FG-aqQ" firstAttribute="leading" secondItem="Aap-Qv-hUt" secondAttribute="trailing" constant="-5" id="lbL-Pv-rif"/>
                                 <constraint firstAttribute="centerY" secondItem="Aap-Qv-hUt" secondAttribute="centerY" constant="10" id="w8J-f2-iUb"/>
                                 <constraint firstItem="2fP-Ad-UAv" firstAttribute="top" secondItem="QUv-33-Ffw" secondAttribute="top" id="yqa-dn-uPr"/>
                             </constraints>

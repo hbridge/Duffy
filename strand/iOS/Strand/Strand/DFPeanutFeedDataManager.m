@@ -374,6 +374,23 @@ static DFPeanutFeedDataManager *defaultManager;
   return nil;
 }
 
+- (NSArray *)unevaluatedPhotosFromOtherUsers
+{
+  NSMutableArray *result = [NSMutableArray new];
+  for (DFPeanutUserObject *user in self.friendsList) {
+    NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
+    for (DFPeanutFeedObject *strandPosts in strands) {
+      NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
+      for (DFPeanutFeedObject *photo in photos) {
+        if (photo.user != [[DFUser currentUser] userID]) {
+          [result addObject:photo];
+        }
+      }
+    }
+  }
+  return result;
+}
+
 
 /* BE CAREFUL WITH THIS FUNCITON
  It does not take into account strand ID so it can leak data across strands

@@ -11,5 +11,6 @@
 @interface DFFriendsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+- (void)reloadData;
 
 @end
