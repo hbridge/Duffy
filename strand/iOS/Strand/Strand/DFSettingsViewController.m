@@ -30,6 +30,8 @@
 #import "DFLogs.h"
 #import "DFCameraRollSyncManager.h"
 #import "DFColorPreviewController.h"
+#import "DFDefaultsStore.h"
+#import <SVProgressHUD/SVProgressHUD.h>
 
 @interface DFSettingsViewController ()
 
@@ -291,7 +293,14 @@
             [(AppDelegate *)[[UIApplication sharedApplication] delegate] resetApplication];
           }
      accesoryType:UITableViewCellAccessoryDisclosureIndicator];
-  
+  [mapping button:@"Reset Nux..."
+       identifier:@"resetNux"
+          handler:^(id object) {
+            [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:NO];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+            [SVProgressHUD showSuccessWithStatus:@"Reset"];
+          }
+     accesoryType:UITableViewCellAccessoryDisclosureIndicator];
   
   [mapping button:@"Test Something..."
        identifier:@"testSomething"

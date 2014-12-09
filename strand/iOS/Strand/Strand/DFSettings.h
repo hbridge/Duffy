@@ -38,6 +38,7 @@
 @property (readonly, nonatomic, retain) NSString *crash;
 @property (readonly, nonatomic, retain) NSString *userID;
 @property (readonly, nonatomic, retain) NSString *colorPreview;
+@property (readonly, nonatomic, retain) NSString *resetNux;
 
 
 

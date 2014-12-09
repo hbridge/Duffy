@@ -275,12 +275,18 @@
       [SVProgressHUD showSuccessWithStatus:@"Nice!"];
       [self gotoNextController];
     };
+    svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion) {
+      [SVProgressHUD showErrorWithStatus:@"Tap Send to continue"];
+    };
   } else if (index == 1) {
      svc.noButtonHandler = ^(DFPeanutFeedObject *suggestion){
        [SVProgressHUD showSuccessWithStatus:@"On to your photos!"];
        [self gotoNextController];
        [DFDefaultsStore setSetupStepPassed:DFSetupStepSuggestionsNux Passed:YES];
      };
+    svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+      [SVProgressHUD showErrorWithStatus:@"Tap Skip to continue"];
+    };
   }
   
   return svc;

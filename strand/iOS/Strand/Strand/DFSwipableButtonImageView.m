@@ -115,12 +115,14 @@ const CGFloat RightGestureThreshold = 75.0;
 {
   _yesEnabled = yesEnabled;
   self.yesButton.enabled = yesEnabled;
+  self.yesButton.alpha = yesEnabled ? 1.0 :0.2;
 }
 
 - (void)setNoEnabled:(BOOL)noEnabled
 {
   _noEnabled = noEnabled;
   self.noButton.enabled = noEnabled;
+  self.noButton.alpha = noEnabled ? 1.0 : 0.2;
 }
 
 
@@ -203,7 +205,7 @@ const CGFloat RightGestureThreshold = 75.0;
   
   self.overlayImageView.alpha = 0.0;
   for (UIButton *button in buttons) {
-    button.alpha = 1.0;
+    if (button.enabled) button.alpha = 1.0;
   }
 }
 
@@ -213,6 +215,7 @@ const CGFloat RightGestureThreshold = 75.0;
   if (self.otherButton) buttons = [buttons arrayByAddingObject:self.otherButton];
   
   for (UIButton *button in buttons) {
+    if (!button.enabled) continue;
     if (button == buttonToHighlight) {
       button.alpha = 0.2 + 0.8 * highlightAmount;
       self.overlayImageView.alpha = 0.2 + 0.8 * highlightAmount;
