@@ -22,6 +22,13 @@
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYj-g7-RXb" userLabel="Button bar">
                     <rect key="frame" x="0.0" y="64" width="600" height="79"/>
                     <subviews>
+                        <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Bck-RY-qWO" userLabel="Divider">
+                            <rect key="frame" x="300" y="25" width="0.5" height="29"/>
+                            <color key="backgroundColor" white="1" alpha="0.22" colorSpace="calibratedWhite"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="1" id="bkh-5N-qol"/>
+                            </constraints>
+                        </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QUv-33-Ffw" userLabel="ReviewWrapper">
                             <rect key="frame" x="0.0" y="0.0" width="300" height="79"/>
                             <subviews>
@@ -83,12 +90,15 @@
                     <constraints>
                         <constraint firstAttribute="bottom" secondItem="QUv-33-Ffw" secondAttribute="bottom" id="3ue-uG-MlX"/>
                         <constraint firstAttribute="width" secondItem="AFb-Nj-ssH" secondAttribute="width" multiplier="2" constant="1" id="6WC-ZB-Uzk"/>
+                        <constraint firstItem="Bck-RY-qWO" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" constant="25" id="8xW-Kw-gfp"/>
                         <constraint firstAttribute="trailing" secondItem="AFb-Nj-ssH" secondAttribute="trailing" id="9c3-H0-Z9c"/>
                         <constraint firstAttribute="width" secondItem="QUv-33-Ffw" secondAttribute="width" multiplier="2" id="B8d-2a-LMA"/>
                         <constraint firstItem="QUv-33-Ffw" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" id="Bks-xe-qgc"/>
+                        <constraint firstAttribute="bottom" secondItem="Bck-RY-qWO" secondAttribute="bottom" constant="25" id="CWz-IM-SLA"/>
                         <constraint firstItem="QUv-33-Ffw" firstAttribute="leading" secondItem="MYj-g7-RXb" secondAttribute="leading" id="Swa-xn-lyo"/>
                         <constraint firstAttribute="height" constant="79" id="fAN-cS-318"/>
                         <constraint firstItem="AFb-Nj-ssH" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" id="ifv-cs-ewK"/>
+                        <constraint firstAttribute="centerX" secondItem="Bck-RY-qWO" secondAttribute="centerX" id="k3q-SO-45Y"/>
                         <constraint firstAttribute="bottom" secondItem="AFb-Nj-ssH" secondAttribute="bottom" id="rpL-Jb-Klz"/>
                     </constraints>
                 </view>
