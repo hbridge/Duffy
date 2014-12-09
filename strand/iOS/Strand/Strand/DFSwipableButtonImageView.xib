@@ -86,14 +86,17 @@
                         <constraint firstItem="lr5-fU-tFy" firstAttribute="leading" secondItem="l10-6U-oyL" secondAttribute="leading" id="sOw-sa-eog"/>
                     </constraints>
                 </view>
-                <imageView userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
+                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xKd-Cz-PRo" userLabel="OverlayImageView">
                     <rect key="frame" x="43" y="0.0" width="515" height="515"/>
                 </imageView>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="EFR-as-Tho" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" id="2sY-5G-Vas"/>
-                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="10" id="H8h-um-EvH"/>
+                <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="xKd-Cz-PRo" secondAttribute="trailing" id="AId-so-J1d"/>
+                <constraint firstAttribute="bottom" secondItem="l10-6U-oyL" secondAttribute="bottom" priority="900" constant="10" id="H8h-um-EvH"/>
+                <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="iN0-l3-epB" secondAttribute="leading" id="U9o-fK-LxD"/>
+                <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="l10-6U-oyL" secondAttribute="bottom" constant="10" id="aBk-gS-atA"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="trailing" secondItem="EFR-as-Tho" secondAttribute="trailing" id="emd-i0-ycN"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="leading" secondItem="EFR-as-Tho" secondAttribute="leading" id="k1f-Kx-CUI"/>
                 <constraint firstItem="xKd-Cz-PRo" firstAttribute="top" secondItem="EFR-as-Tho" secondAttribute="top" id="lf6-5W-kKT"/>
@@ -111,6 +114,7 @@
                 <outlet property="panGestureRecognizer" destination="MM2-cw-TCR" id="cLj-Ui-G3M"/>
                 <outlet property="yesButton" destination="V0Q-qK-RXd" id="HRc-cq-96I"/>
             </connections>
+            <point key="canvasLocation" x="-224" y="273"/>
         </view>
         <panGestureRecognizer minimumNumberOfTouches="1" id="MM2-cw-TCR">
             <connections>
