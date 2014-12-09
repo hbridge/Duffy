@@ -114,6 +114,8 @@ const NSUInteger NumNuxes = 3;
     // Dispose of any resources that can be recreated.
 }
 
+// This is a hack method to get something working for a study
+// TODO(Derek): Find a cleaner way to reset the state
 - (void)freshLoad
 {
   [self.photoList removeAllObjects];
