@@ -76,8 +76,20 @@
     badgeView.badgeColor = [DFStrandConstants strandBlue];
     badgeView.textColor = [UIColor whiteColor];
   }
-  self.reviewBadgeView.text = [@(numToReview) stringValue];
-  self.sendBadgeView.text = [@(numToSend) stringValue];
+  if (numToReview > 0) {
+    self.reviewBadgeView.text = [@(numToReview) stringValue];
+    self.reviewBadgeView.hidden = NO;
+  } else {
+    self.reviewBadgeView.hidden = YES;
+  }
+  
+  if (numToSend > 0) {
+    self.sendBadgeView.text = @"★";
+    self.sendBadgeView.hidden = NO;
+  } else {
+    self.sendBadgeView.hidden = YES;
+  }
+  
 }
 
 - (void)didReceiveMemoryWarning {
