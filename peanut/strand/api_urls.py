@@ -7,7 +7,7 @@ from strand import api_views as strand_api_views
 from strand import rest_api_views as strand_rest_api_views
 from arbus import api_views as arbus_api_views
 
-from common.models import User, ContactEntry, Strand, StrandInvite, Action, SharedStrand
+from common.models import User, ContactEntry, Strand, StrandInvite, Action
 from common.serializers import UserSerializer
 
 urlpatterns = patterns('',
@@ -41,9 +41,6 @@ urlpatterns = patterns('',
 
 	url(r'^strand_invite/$', strand_rest_api_views.StrandInviteBulkAPI.as_view()),
 	url(r'^strand_invite/(?P<id>[0-9]+)/$', strand_rest_api_views.RetrieveUpdateDestroyStrandInviteAPI.as_view(model=StrandInvite, lookup_field='id')),
-
-	# Note: We have to create custom API views since we include build os in the json, so we have to use a specific key
-	url(r'^shared_strand/$', strand_rest_api_views.KeyedCreateAPIView.as_view(model=SharedStrand, key="shared_strand")),
 
 	# experimental
 	url(r'^send_notifications_test', 'strand.api_views.send_notifications_test'),

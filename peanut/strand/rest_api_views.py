@@ -23,7 +23,7 @@ from rest_framework.views import APIView
 
 from peanut.settings import constants
 
-from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor, SharedStrand
+from common.models import ContactEntry, StrandInvite, User, Photo, Action, Strand, FriendConnection, StrandNeighbor
 from common.serializers import PhotoSerializer, BulkContactEntrySerializer, BulkStrandInviteSerializer
 from common import location_util, api_util
 

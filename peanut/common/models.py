@@ -804,18 +804,6 @@ class LocationRecord(models.Model):
 	# You MUST use GeoManager to make Geo Queries
 	objects = models.GeoManager()
 
-class SharedStrand(models.Model):
-	users = models.ManyToManyField(User)
-	strand = models.ForeignKey(Strand)
-
-	# not used but here so we can use the bulk api
-	bulk_batch_key = models.IntegerField(null=True)
-	added = models.DateTimeField(auto_now_add=True)
-	updated = models.DateTimeField(auto_now=True)
-
-	class Meta:
-		db_table = 'strand_shared_strand'
-
 def doBulkUpdate(cls, objs, attributesList):
 	if not isinstance(objs, list) and not isinstance(objs, QuerySet):
 		objs = [objs]

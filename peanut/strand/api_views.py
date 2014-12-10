@@ -15,7 +15,7 @@ from django.db import IntegrityError, connection
 
 from peanut.settings import constants
 
-from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord, SharedStrand
+from common.models import Photo, User, SmsAuth, Strand, NotificationLog, ContactEntry, FriendConnection, StrandInvite, StrandNeighbor, Action, LocationRecord
 from common.serializers import UserSerializer
 
 from common import api_util, cluster_util, serializers
@@ -169,12 +169,6 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 			action = Action.objects.create(user=user, strand=strandInvite.strand, action_type=constants.ACTION_TYPE_JOIN_STRAND)
 			strandInvite.strand.users.add(user)
 
-		if strandInvite.user not in seenInvitesFromUsers:
-			sharedStrand = SharedStrand.objects.create(strand=strandInvite.strand)
-			sharedStrand.users = [user, strandInvite.user]
-			
-			seenInvitesFromUsers.append(strandInvite.user)
-
 	if len(strandInvites) > 0:
 		StrandInvite.bulkUpdate(strandInvites, "invited_user_id")
 
@@ -202,18 +196,13 @@ def createStrandUser(phoneNumber, displayName, phoneId, smsAuth, returnIfExist =
 
 # ------------------------
 
-def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None, sharedStrands = None):
+def getActorsObjectData(userId, users, includePhone = True, invitedUsers = None):
 	if not isinstance(users, list):
 		users = [users]
 
 	userData = list()
 	for user in users:
 		entry = {'display_name': user.display_name, 'id': user.id}
-
-		if sharedStrands:
-			sharedStrand = friends_util.getSharedStrandForUserIds(sharedStrands, [userId, user.id])
-			if (sharedStrand):
-				entry["shared_strand"] = sharedStrand.id
 
 		if includePhone:
 			entry['phone_number'] = user.phone_number
@@ -723,7 +712,7 @@ def strand_inbox(request):
 
 		# Add in the list of all friends at the end
 		friends = friends_util.getFriends(user.id)
-		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(user.id, friends, True, sharedStrands = friends_util.getSharedStrands(user.id, friends))}
+		friendsEntry = {'type': constants.FEED_OBJECT_TYPE_FRIENDS_LIST, 'actors': getActorsObjectData(user.id, friends, True)}
 		printStats("inbox-4")
 
 		responseObjects.append(friendsEntry)
