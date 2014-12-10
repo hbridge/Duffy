@@ -272,7 +272,7 @@ void (^_completionHandler)(UIBackgroundFetchResult);
   
   [DFPhotoStore sharedStore];
   DFHomeViewController *homeViewController = [[DFHomeViewController alloc] init];
-  UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:homeViewController];
+  DFNavigationController *navController = [[DFNavigationController alloc] initWithRootViewController:homeViewController];
   
   self.window.rootViewController = navController;
 }

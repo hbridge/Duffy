@@ -53,14 +53,7 @@ UIColor *DFStrandMainColor;
 
 +(UIColor *)defaultBackgroundColor
 {
-#ifdef DEBUG
-#ifndef TARGET_IPHONE_SIMULATOR
-  return [UIColor darkGrayColor];
-#endif
-  return [self strandRed];
-#else
-  return [self strandRed];
-#endif
+  return [UIColor colorWithRedByte:35 green:35 blue:35 alpha:1.0];
 }
 
 + (UIColor *)defaultBarForegroundColor

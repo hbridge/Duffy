@@ -10,13 +10,15 @@
 #import "DFFriendsViewController.h"
 #import <LKBadgeView/LKBadgeView.h>
 
-@interface DFHomeViewController : DFFriendsViewController
+@interface DFHomeViewController : UIViewController <UICollectionViewDelegate>
 @property (weak, nonatomic) IBOutlet UIButton *reviewButton;
 @property (weak, nonatomic) IBOutlet UIButton *sendButton;
 - (IBAction)reviewButtonPressed:(id)sender;
 - (IBAction)sendButtonPressed:(id)sender;
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (weak, nonatomic) IBOutlet LKBadgeView *reviewBadgeView;
 @property (weak, nonatomic) IBOutlet LKBadgeView *sendBadgeView;
+@property (weak, nonatomic) IBOutlet UICollectionView *collectionView;
+@property (weak, nonatomic) IBOutlet UICollectionViewFlowLayout *flowLayout;
+@property (nonatomic) NSUInteger numPhotosPerRow;
 
 @end
