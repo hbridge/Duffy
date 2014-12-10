@@ -348,7 +348,7 @@ const NSUInteger NumNuxes = 3;
   
   // if any are users share photos with them
   if (users.count > 0) {
-    [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:photo users:suggestion.actors];
+    [[DFPeanutFeedDataManager sharedManager] sharePhotoWithFriends:photo users:users];
   }
   
   // if there are more contacts, create a strand for each and send invites

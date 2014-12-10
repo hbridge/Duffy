@@ -62,6 +62,12 @@
   [self configureBadges];
 }
 
+- (void)refreshFromServer
+{
+  [super refreshFromServer];
+  [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
+}
+
 - (void)configureBadges
 {
   NSUInteger numToReview = [[[DFPeanutFeedDataManager sharedManager] unevaluatedPhotosFromOtherUsers] count];

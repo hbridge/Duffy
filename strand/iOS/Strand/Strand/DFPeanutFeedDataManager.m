@@ -892,7 +892,8 @@ static DFPeanutFeedDataManager *defaultManager;
        failure:nil
        ];
     } else {
-      [self addFeedObjects:[NSArray arrayWithObject:photo] toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
+      [self addFeedObjects:[NSArray arrayWithObject:photo]
+                toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
     }
   }
 }
