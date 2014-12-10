@@ -28,6 +28,7 @@
     _peoplePicker.hideFriendsSection = YES;
     _peoplePicker.allowsMultipleSelection = YES;
     _peoplePicker.doneButtonActionText = @"Invite";
+    _peoplePicker.navigationItem.title = @"Invite Friends";
   }
   return self;
 }
