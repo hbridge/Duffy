@@ -597,26 +597,6 @@ static DFPeanutFeedDataManager *defaultManager;
   }];
 }
 
-- (NSArray *)nonEvaluatedPhotosInStrandPosts:(DFPeanutFeedObject *)strandPosts
-{
-  NSMutableArray *nonEvaluatedPhotos = [NSMutableArray new];
-  
-  NSArray *photos = [strandPosts leafNodesFromObjectOfType:DFFeedObjectPhoto];
-  for (DFPeanutFeedObject *photo in photos) {
-    BOOL photoEvaluated = NO;
-    for (DFPeanutAction *action in photo.actions) {
-      if (action.action_type == DFPeanutActionEvalPhoto) {
-        photoEvaluated = YES;
-      }
-    }
-    if (!photoEvaluated) {
-      [nonEvaluatedPhotos addObject:photo];
-    }
-  }
-  
-  return nonEvaluatedPhotos;
-}
-
 - (DFPeanutUserObject *)userWithID:(DFUserIDType)userID
 {
   if (userID == [[DFUser currentUser] userID]) {
@@ -860,45 +840,95 @@ static DFPeanutFeedDataManager *defaultManager;
    }];
 }
 
-
+/*
+ * When we share a photo we create a new strand with just that photo and the set of users
+ */
 - (void)sharePhotoWithFriends:(DFPeanutFeedObject *)photo users:(NSArray *)users
 {
+  NSMutableArray *friendUserIds = [NSMutableArray new];
+  
   for (DFPeanutUserObject *user in users) {
-    DFPeanutUserObject *cachedFriend = [self getUserWithId:user.id];
-    // If we don't have a shared_strand for this set of users yet, we need to create it.
-    if (cachedFriend.shared_strand == nil) {
-      // So first create a strand
-      // Then we'll create a record saying for this set of users, we're using this shared strand
-      [self
-       createNewStrandWithFeedObjects:[NSArray arrayWithObject:photo]
-       additionalUserIds:[NSArray arrayWithObject:@(cachedFriend.id)]
-       success:^(DFPeanutStrand *resultStrand) {
-         // We successfully created the strand, not create the shared strand object and save that
-         cachedFriend.shared_strand = resultStrand.id;
-         
-         DFPeanutSharedStrand *sharedStrand = [DFPeanutSharedStrand new];
-         sharedStrand.users = resultStrand.users;
-         sharedStrand.strand = resultStrand.id;
-         [self.sharedStrandAdapter
-          createSharedStrand:sharedStrand
-          success:^(NSArray *resultObjects){
-            // Lastly, we add the photo to the strand
-            [self addFeedObjects:[NSArray arrayWithObject:photo] toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
-          }
-          failure:^(NSError *error) {
-            DDLogError(@"Unable to create shared strand");
-          }];
-       }
-       failure:nil
-       ];
-    } else {
-      [self addFeedObjects:[NSArray arrayWithObject:photo]
-                toStrandID:[cachedFriend.shared_strand longLongValue] success:nil failure:nil];
-    }
+    [friendUserIds addObject:@(user.id)];
   }
+  
+  [self
+   createNewStrandWithFeedObjects:[NSArray arrayWithObject:photo]
+   additionalUserIds:friendUserIds
+   success:^(DFPeanutStrand *resultStrand) {
+     DDLogInfo(@"Successfully created new strand %@", resultStrand.id);
+        }
+   failure:nil
+   ];
 }
 
+- (NSArray *)sortedStrandPostList
+{
+  NSMutableArray *strandPostList = [NSMutableArray new];
+  for (DFPeanutFeedObject *strandPosts in self.inboxFeedObjects) {
+    [strandPostList addObjectsFromArray:[strandPosts leafNodesFromObjectOfType:DFFeedObjectStrandPost]];
+  }
+  
+  NSSortDescriptor *sortDescriptor;
+  sortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"time_stamp"
+                                               ascending:YES];
+  NSArray *sortDescriptors = [NSArray arrayWithObject:sortDescriptor];
+  NSArray *sortedPosts;
+  sortedPosts = [strandPostList sortedArrayUsingDescriptors:sortDescriptors];
+  
+  return sortedPosts;
+}
 
+// This could be refactored with methods below if we keep using this method
+- (NSArray *)nonEvaluatedPhotosInStrandPosts:(DFPeanutFeedObject *)strandPosts
+{
+  NSMutableArray *nonEvaluatedPhotos = [NSMutableArray new];
+  
+  NSArray *photos = [strandPosts leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  for (DFPeanutFeedObject *photo in photos) {
+    BOOL photoEvaluated = NO;
+    for (DFPeanutAction *action in photo.actions) {
+      if (action.action_type == DFPeanutActionEvalPhoto) {
+        photoEvaluated = YES;
+      }
+    }
+    if (!photoEvaluated) {
+      [nonEvaluatedPhotos addObject:photo];
+    }
+  }
+  
+  return nonEvaluatedPhotos;
+}
+
+- (NSArray *)photosWithAction:(DFActionID)actionType
+{
+  NSMutableArray *photosWithAction = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *strandPost in [self sortedStrandPostList]) {
+    for (DFPeanutFeedObject *photo in [strandPost leafNodesFromObjectOfType:DFFeedObjectStrandPost]) {
+      BOOL photoHasAction = NO;
+      for (DFPeanutAction *action in photo.actions) {
+        if (action.action_type == actionType) {
+          photoHasAction = YES;
+        }
+      }
+      if (photoHasAction) {
+        [photosWithAction addObject:photo];
+      }
+    }
+  }
+  
+  return photosWithAction;
+}
+
+- (NSArray *)allEvaluatedPhotos
+{
+  return [self photosWithAction:DFPeanutActionEvalPhoto];
+}
+
+- (NSArray *)favoritedPhotos
+{
+  return [self photosWithAction:DFPeanutActionFavorite];
+}
 
 - (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
 {
