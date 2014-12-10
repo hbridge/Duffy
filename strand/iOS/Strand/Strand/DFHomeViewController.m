@@ -122,8 +122,8 @@
 
 - (void)reloadData
 {
-  self.datasource.collectionFeedObjects = [[DFPeanutFeedDataManager sharedManager]
-                                           acceptedStrandsWithPostsCollapsedAndFilteredToUser:0];
+  [self.datasource setFeedPhotos:[[DFPeanutFeedDataManager sharedManager]
+                                           allEvaluatedPhotos]];
   [self.collectionView reloadData];
   [self configureNoResultsView];
   [self configureBadges];
