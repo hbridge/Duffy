@@ -76,7 +76,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 - (NSAttributedString *)peopleSummaryString;
 
 - (NSArray *)subobjectsOfType:(DFFeedObjectType)type;
-- (NSArray *)descendentdsOfType:(DFFeedObjectType)type;
+- (NSArray *)descendentsOfType:(DFFeedObjectType)type;
 + (NSArray *)descendentsOfType:(DFFeedObjectType)type inFeedObjects:(NSArray *)feedObjects;
 - (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type;
 - (DFPeanutFeedObject *)firstPhotoWithID:(DFPhotoIDType)photoID;

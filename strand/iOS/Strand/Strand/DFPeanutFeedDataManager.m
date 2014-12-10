@@ -740,7 +740,7 @@ static DFPeanutFeedDataManager *defaultManager;
     if ([feedObject.type isEqual:DFFeedObjectPhoto]) {
       [photos addObject:feedObject];
     } else {
-      [photos addObjectsFromArray:[feedObject descendentdsOfType:DFFeedObjectPhoto]];
+      [photos addObjectsFromArray:[feedObject descendentsOfType:DFFeedObjectPhoto]];
     }
   }
   
@@ -865,7 +865,7 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   NSMutableArray *strandPostList = [NSMutableArray new];
   for (DFPeanutFeedObject *strandPosts in self.inboxFeedObjects) {
-    [strandPostList addObjectsFromArray:[strandPosts leafNodesFromObjectOfType:DFFeedObjectStrandPost]];
+    [strandPostList addObjectsFromArray:[strandPosts descendentsOfType:DFFeedObjectStrandPost]];
   }
   
   NSSortDescriptor *sortDescriptor;
@@ -883,7 +883,7 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   NSMutableArray *nonEvaluatedPhotos = [NSMutableArray new];
   
-  NSArray *photos = [strandPosts leafNodesFromObjectOfType:DFFeedObjectPhoto];
+  NSArray *photos = [strandPosts descendentsOfType:DFFeedObjectPhoto];
   for (DFPeanutFeedObject *photo in photos) {
     BOOL photoEvaluated = NO;
     for (DFPeanutAction *action in photo.actions) {
@@ -904,7 +904,7 @@ static DFPeanutFeedDataManager *defaultManager;
   NSMutableArray *photosWithAction = [NSMutableArray new];
   
   for (DFPeanutFeedObject *strandPost in [self sortedStrandPostList]) {
-    for (DFPeanutFeedObject *photo in [strandPost leafNodesFromObjectOfType:DFFeedObjectStrandPost]) {
+    for (DFPeanutFeedObject *photo in [strandPost descendentsOfType:DFFeedObjectPhoto]) {
       BOOL photoHasAction = NO;
       for (DFPeanutAction *action in photo.actions) {
         if (action.action_type == actionType) {

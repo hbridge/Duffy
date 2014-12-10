@@ -418,11 +418,11 @@ NSString *const SuggestedSectionTitle = @"Suggested Swaps";
   if (strandPosts) {
     // if this is a strandpost, get the first photo in the first post
     photoObject = [[[strandPosts.objects firstObject]
-                    descendentdsOfType:DFFeedObjectPhoto]
+                    descendentsOfType:DFFeedObjectPhoto]
                    firstObject];
   } else {
     // otherwise, it's a suggestion. get the first photo (by timestamp) of the photos
-    NSArray *photos = [feedObject descendentdsOfType:DFFeedObjectPhoto];
+    NSArray *photos = [feedObject descendentsOfType:DFFeedObjectPhoto];
     NSSortDescriptor *timeSort = [NSSortDescriptor sortDescriptorWithKey:@"time_taken" ascending:YES];
     photoObject = [[photos sortedArrayUsingDescriptors:@[timeSort]] firstObject];
   }

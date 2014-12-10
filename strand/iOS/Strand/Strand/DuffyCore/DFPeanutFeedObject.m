@@ -139,7 +139,7 @@ static NSArray *FeedObjectTypes;
   return [allDescendendents objectEnumerator];
 }
 
-- (NSArray *)descendentdsOfType:(DFFeedObjectType)type
+- (NSArray *)descendentsOfType:(DFFeedObjectType)type
 {
   NSPredicate *predicate = [NSPredicate predicateWithFormat:@"type == %@", type];
   NSArray *allDescendents = self.enumeratorOfDescendents.allObjects;
@@ -150,7 +150,7 @@ static NSArray *FeedObjectTypes;
 {
   NSMutableArray *result = [NSMutableArray new];
   for (DFPeanutFeedObject *feedObject in feedObjects) {
-    [result addObjectsFromArray:[feedObject descendentdsOfType:type]];
+    [result addObjectsFromArray:[feedObject descendentsOfType:type]];
   }
   return result;
 }
@@ -158,7 +158,7 @@ static NSArray *FeedObjectTypes;
 - (NSArray *)leafNodesFromObjectOfType:(DFFeedObjectType)type
 {
   if (self.objects.count == 0 && [self.type isEqualToString:type]) return @[self];
-  return [self descendentdsOfType:type];
+  return [self descendentsOfType:type];
 }
 
 - (DFPeanutFeedObject *)firstPhotoWithID:(DFPhotoIDType)photoID;
