@@ -25,7 +25,6 @@
 
 @property (nonatomic, retain) DFPeanutFeedObject *pickedSuggestion;
 @property (nonatomic, retain) DFPeanutStrand *lastCreatedStrand;
-@property (nonatomic, retain) NSMutableArray *suggestionsToRemove;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
 @property (nonatomic, readonly, retain) DFPeanutStrandInviteAdapter *inviteAdapter;
 @property (nonatomic, retain) NSArray *lastSentContacts;
@@ -33,10 +32,9 @@
 @property (nonatomic) NSInteger photoIndex;
 @property (retain, nonatomic) NSMutableArray *indexPaths;
 
-@property (retain, nonatomic) NSMutableArray *photoList;
-@property (retain, nonatomic) NSMutableArray *strandList;
-@property (retain, nonatomic) NSMutableArray *subViewTypeList;
 @property (retain, nonatomic) NSMutableSet *alreadyShownPhotoIds;
+@property (nonatomic, retain) UIViewController *noSuggestionsViewController;
+@property (nonatomic) NSUInteger highestSeenNuxStep;
 
 @end
 
@@ -44,7 +42,16 @@ const NSUInteger NumNuxes = 3;
 
 @implementation DFSuggestionsPageViewController
 @synthesize inviteAdapter = _inviteAdapter;
+@synthesize noSuggestionsViewController = _noSuggestionsViewController;
 
+- (instancetype)initWithPreferredType:(DFHomeSubViewType)preferredType
+{
+  self = [self init];
+  if (self) {
+    _preferredType = preferredType;
+  }
+  return self;
+}
 
 - (instancetype)init
 {
@@ -55,9 +62,7 @@ const NSUInteger NumNuxes = 3;
     self.delegate = self;
     [self observeNotifications];
     [self configureNavAndTab];
-    self.photoList = [NSMutableArray new];
-    self.strandList = [NSMutableArray new];
-    self.subViewTypeList = [NSMutableArray new];
+
     self.alreadyShownPhotoIds = [NSMutableSet new];
   }
   return self;
@@ -82,10 +87,7 @@ const NSUInteger NumNuxes = 3;
   self.tabBarItem.title = @"Suggestions";
   self.tabBarItem.image = [UIImage imageNamed:@"Assets/Icons/SwapBarButton"];
   self.tabBarItem.selectedImage = [UIImage imageNamed:@"Assets/Icons/SwapBarButtonSelected"];
-//  self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-//                                            initWithBarButtonSystemItem:UIBarButtonSystemItemAdd
-//                                            target:self
-//                                            action:@selector(createButtonPressed:)];
+
   self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc]
                                            initWithTitle:@""
                                            style:UIBarButtonItemStylePlain
@@ -104,113 +106,117 @@ const NSUInteger NumNuxes = 3;
 {
   [super viewWillAppear:animated];
   [[DFPeanutFeedDataManager sharedManager] refreshSwapsFromServer:nil];
-  [self freshLoad];
 
   [self configureLoadingView];
-}
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-// This is a hack method to get something working for a study
-// TODO(Derek): Find a cleaner way to reset the state
-- (void)freshLoad
-{
-  [self.photoList removeAllObjects];
-  [self.strandList removeAllObjects];
-  [self.subViewTypeList removeAllObjects];
-  
-  UIViewController *currentController = self.viewControllers.firstObject;
-  [self updateIndexOfViewController:currentController index:-1];
-  
-  [self reloadData];
-  [self gotoNextController];
 }
 
 - (void)reloadData
 {
-  NSInteger currentIndex = [self currentViewControllerIndex];
-  
-  if (currentIndex >= 0) {
-    NSRange rangeToDelete;
-    if ([self.subViewTypeList[currentIndex] isEqualToValue:@(DFNuxViewType)]) {
-      // Want to clear out everything after all the nux's
-      rangeToDelete = NSMakeRange(NumNuxes, self.photoList.count-NumNuxes);
-    } else if (self.photoList.count > currentIndex) {
-      // Want to clear out everything after the current photo
-      rangeToDelete = NSMakeRange(currentIndex+1, self.photoList.count-currentIndex-1);
-    }
-    
-    if (self.photoList.count > currentIndex) {
-      [self.photoList removeObjectsInRange:rangeToDelete];
-      [self.strandList removeObjectsInRange:rangeToDelete];
-      [self.subViewTypeList removeObjectsInRange:rangeToDelete];
-    }
-  }
-
-  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux] && self.photoList.count == 0) {
-    // Add two entries for NUX
-    for (NSUInteger i = 0; i < NumNuxes; i++) {
-      [self.photoList addObject:[NSNull null]];
-      [self.strandList addObject:[NSNull null]];
-      [self.subViewTypeList addObject:@(DFNuxViewType)];
-    }
-  }
-  
-  NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
-  
-  if (self.preferredType == DFIncomingViewType) {
-    // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
-    for (DFPeanutUserObject *user in friends) {
-      NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
-      for (DFPeanutFeedObject *strandPosts in strands) {
-        NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
-        for (DFPeanutFeedObject *photo in photos) {
-          if (photo.user != [[DFUser currentUser] userID] &&
-              ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-            
-            // Now lets see if the image is loaded yet
-            DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
-            if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
-              [self.photoList addObject:photo];
-              [self.strandList addObject:strandPosts];
-              [self.subViewTypeList addObject:@(DFIncomingViewType)];
-            }
-          }
-        }
-      }
-    }
-  } else {
-    NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
-    for (DFPeanutFeedObject *suggestion in allSuggestions) {
-      if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
-        
-        NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
-        for (int x=0; x < photos.count; x++) {
-          DFPeanutFeedObject *photo = photos[x];
-          if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
-            [self.photoList addObject:photo];
-            [self.strandList addObject:suggestion];
-            [self.subViewTypeList addObject:@(DFSuggestionViewType)];
-          }
-        }
-      }
-    }
-  }
-  
-  if (self.viewControllers.count == 0
-      || ![[self.viewControllers.firstObject class] // if the VC isn't a suggestion, reload in case there is one now
-           isSubclassOfClass:[DFHomeSubViewController class]])
+  UIViewController *currentViewController = self.viewControllers.firstObject;
+  if (!currentViewController || currentViewController == self.noSuggestionsViewController) {
     [self gotoNextController];
-  
+  }
   [self configureLoadingView];
 }
 
+- (void)gotoNextController
+{
+  UIViewController *nextController;
+  
+  if (![DFDefaultsStore isSetupStepPassed:DFSetupStepSuggestionsNux]
+      && self.highestSeenNuxStep < NumNuxes) {
+    nextController = [self viewControllerForNuxStep:self.highestSeenNuxStep];
+  } else {
+    if (self.preferredType == DFIncomingViewType) {
+      nextController = [self nextIncomingViewController];
+    } else {
+      nextController = [self nextSuggestionViewController];
+    }
+  }
+  
+  if (!nextController) {
+    nextController = [self noSuggestionsViewController];
+  } 
+  
+  [self setViewControllers:@[nextController]
+                 direction:UIPageViewControllerNavigationDirectionForward
+                  animated:YES
+                completion:nil];
+}
+
+- (UIViewController *)nextIncomingViewController
+{
+  NSArray *friends = [[DFPeanutFeedDataManager sharedManager] friendsList];
+  // First, lets go through your shared strands with friends and see if theres any photos you haven't looked at yet
+  for (DFPeanutUserObject *user in friends) {
+    NSArray *strands = [[DFPeanutFeedDataManager sharedManager] publicStrandsWithUser:user includeInvites:NO];
+    for (DFPeanutFeedObject *strandPosts in strands) {
+      NSArray *photos = [[DFPeanutFeedDataManager sharedManager] nonEvaluatedPhotosInStrandPosts:strandPosts];
+      for (DFPeanutFeedObject *photo in photos) {
+        if (photo.user != [[DFUser currentUser] userID] &&
+            ![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+          
+          // Now lets see if the image is loaded yet
+          DFImageManagerRequest *request = [[DFImageManagerRequest alloc] initWithPhotoID:photo.id imageType:DFImageFull];
+          if ([[DFImageDiskCache sharedStore] canServeRequest:request]) {
+            DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithPhotoID:photo.id inStrand:strandPosts.id fromSender:user];
+            [self.alreadyShownPhotoIds addObject:@(photo.id)];
+            
+            DFSuggestionsPageViewController __weak *weakSelf = self;
+            ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+              [weakSelf photoSkipped:photoID strand:strandID];
+            };
+            ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+              [weakSelf showCommentsForPhoto:photoID strand:strandID];
+            };
+            ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
+              [weakSelf likePhoto:photoID strand:strandID];
+            };
+
+            return ivc;
+          }
+        }
+      }
+    }
+  }
+  return nil;
+}
+
+- (UIViewController *)nextSuggestionViewController
+{
+  NSArray *allSuggestions = [[DFPeanutFeedDataManager sharedManager] suggestedStrands];
+  for (DFPeanutFeedObject *suggestion in allSuggestions) {
+    if (!self.userToFilter || (self.userToFilter && [suggestion.actors containsObject:self.userToFilter])) {
+      
+      NSArray *photos = [suggestion leafNodesFromObjectOfType:DFFeedObjectPhoto];
+      for (int x=0; x < photos.count; x++) {
+        DFPeanutFeedObject *photo = photos[x];
+        if (![self.alreadyShownPhotoIds containsObject:@(photo.id)]) {
+          [self.alreadyShownPhotoIds addObject:@(photo.id)];
+          DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
+          svc.frame = self.view.bounds;
+          [svc configureWithSuggestion:suggestion withPhoto:photo];
+          DFSuggestionsPageViewController __weak *weakSelf = self;
+
+          svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
+            [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
+          };
+          svc.noButtonHandler = ^(DFPeanutFeedObject *strand){
+            [weakSelf photoSkipped:photo.id strand:strand.id];
+          };
+          return svc;
+          
+        }
+      }
+    }
+  }
+  return nil;
+}
+
+
 - (void)configureLoadingView
 {
-  if (self.photoList.count == 0) {
+  if (self.viewControllers.count == 0) {
     if (!self.noResultsView) self.noResultsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
     [self.noResultsView setSuperView:self.view];
     if ([[DFPeanutFeedDataManager sharedManager] areSuggestionsReady]) {
@@ -253,64 +259,7 @@ const NSUInteger NumNuxes = 3;
   return  [self indexOfViewController:currentController];
 }
 
-- (DFHomeSubViewController *)viewControllerForIndex:(NSInteger)index
-{
-  if (index < 0 || index >= self.photoList.count) {
-    if (self.photoList.count > 0) {
-      DDLogWarn(@"%@ viewControllerForIndex: %@ photoList: %@",
-                self.class,
-                @(index),
-                @(self.photoList.count));
-      return nil;
-    }
-  }
-  
-  DFSuggestionsPageViewController __weak *weakSelf = self;
-  
-  DFPeanutFeedObject *strand = self.strandList[index];
-  DFPeanutFeedObject *photo = self.photoList[index];
-  
-  if ([self.subViewTypeList[index] isEqualToValue:@(DFSuggestionViewType)]) {
-    DFSwipableSuggestionViewController *svc = [[DFSwipableSuggestionViewController alloc] init];
-    if (strand.actors.count == 0) svc.selectedPeanutContacts = self.lastSentContacts;
-    svc.suggestionFeedObject = strand;
-    svc.photoFeedObject = photo;
-    svc.index = index;
-    
-    svc.frame = self.view.bounds;
-    
-    
-    svc.yesButtonHandler = ^(DFPeanutFeedObject *suggestion, NSArray *contacts){
-      [weakSelf suggestionSelected:suggestion contacts:contacts photo:photo];
-    };
-    svc.noButtonHandler = ^(DFPeanutFeedObject *strand){
-      [weakSelf photoSkipped:photo.id strand:strand.id];
-    };
-    return svc;
-  } else if ([self.subViewTypeList[index] isEqualToValue:@(DFIncomingViewType)]) {
-    DFPeanutUserObject *user = [[DFPeanutFeedDataManager sharedManager] userWithID:photo.user];
-    DFIncomingViewController *ivc = [[DFIncomingViewController alloc] initWithPhotoID:photo.id inStrand:strand.id fromSender:user];
-    ivc.index = index;
-    
-    ivc.nextHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      [weakSelf photoSkipped:photoID strand:strandID];
-    };
-    ivc.commentHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      [weakSelf showCommentsForPhoto:photoID strand:strandID];
-    };
-    ivc.likeHandler = ^(DFPhotoIDType photoID, DFStrandIDType strandID){
-      [weakSelf likePhoto:photoID strand:strandID];
-    };
-    
-    return ivc;
-  } else if ([self.subViewTypeList[index] isEqualToValue:@(DFNuxViewType)]) {
-    // this is a nux request
-    return [self suggestionViewControllerForNuxStep:index];
-  }
-  return nil;
-}
-
-- (DFHomeSubViewController *)suggestionViewControllerForNuxStep:(NSUInteger)index
+- (DFHomeSubViewController *)viewControllerForNuxStep:(NSUInteger)index
 {
   DFHomeSubViewController *nuxController;
   if (index == 0) {
@@ -355,43 +304,29 @@ const NSUInteger NumNuxes = 3;
     }
   }
   
+  self.highestSeenNuxStep++;
   return nuxController;
 }
 
 - (UIViewController *)noSuggestionsViewController
 {
-  UIViewController *noSuggestionVC = [[UIViewController alloc] init];
-  DFNoTableItemsView *noSuggestionsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
-  noSuggestionsView.titleLabel.text = @"No More Suggestions";
-  noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends.";
-  noSuggestionsView.superView = noSuggestionVC.view;
-  return noSuggestionVC;
+  if (!_noSuggestionsViewController) {
+  _noSuggestionsViewController = [[UIViewController alloc] init];
+    DFNoTableItemsView *noSuggestionsView = [UINib instantiateViewWithClass:[DFNoTableItemsView class]];
+    if (self.preferredType == DFSuggestionViewType) {
+      noSuggestionsView.titleLabel.text = @"No More Suggestions";
+      noSuggestionsView.subtitleLabel.text = @"Take more photos or invite more friends.";
+    } else {
+      noSuggestionsView.titleLabel.text = @"No More to Review";
+      noSuggestionsView.subtitleLabel.text = @"Send some photos to friends";
+    }
+    noSuggestionsView.superView = _noSuggestionsViewController.view;
+  }
+  return _noSuggestionsViewController;
 }
 
 
 #pragma mark - UIPageViewController Delegate/Datasource
-
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-      viewControllerBeforeViewController:(UIViewController *)viewController
-{
-  if (self.photoList.count < 2) return nil;
-  
-  NSUInteger currentIndex = [self indexOfViewController:viewController];
-  NSInteger beforeIndex = currentIndex - 1;
-  if (beforeIndex < 0) return nil;
-  return [self viewControllerForIndex:beforeIndex];
-}
-
-- (UIViewController *)pageViewController:(UIPageViewController *)pageViewController
-       viewControllerAfterViewController:(UIViewController *)viewController
-{
-  NSInteger currentIndex = [self indexOfViewController:viewController];
-  
-  if (self.photoList.count < NumNuxes && ![self.subViewTypeList[currentIndex] isEqualToValue:@(DFNuxViewType)]) return nil;
-  NSInteger afterIndex = currentIndex + 1;
-  if (afterIndex >= self.photoList.count) return nil;
-  return [self viewControllerForIndex:afterIndex];
-}
 
 - (void)suggestionSelected:(DFPeanutFeedObject *)suggestion
                   contacts:(NSArray *)contacts
@@ -519,36 +454,6 @@ const NSUInteger NumNuxes = 3;
   [[DFPeanutFeedDataManager sharedManager] hasEvaluatedPhoto:photo strandID:strand];
   [SVProgressHUD showSuccessWithStatus:@"Liked!"];
   [self gotoNextController];
-}
-
-- (void)gotoNextController
-{
-  UIViewController *nextController;
-  if (self.photoList.count > 0) {
-    if (self.viewControllers.count == 0) {
-      nextController = [self viewControllerForIndex:0];
-    } else {
-      UIViewController *currentController = self.viewControllers.firstObject;
-      nextController = [self pageViewController:self
-              viewControllerAfterViewController:currentController];
-    }
-  }
-  
-  if (!nextController) {
-    nextController = [self noSuggestionsViewController];
-  } else {
-    NSInteger currentIndex = [self currentViewControllerIndex];
-    if (currentIndex >= 0) {
-      DFPeanutFeedObject *photo = self.photoList[currentIndex+1];
-      if (![photo isEqual:[NSNull null]]) [self.alreadyShownPhotoIds addObject:@(photo.id)];
-    }
-  }
-  
-  [self setViewControllers:@[nextController]
-                 direction:UIPageViewControllerNavigationDirectionForward
-                  animated:YES
-                completion:nil];
-
 }
 
 #pragma mark - DFCreateStrandFlowController delegate

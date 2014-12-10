@@ -38,21 +38,7 @@
   [self configurePopLabel];
   [self configureSwipableButtonImageView];
   
-  if (self.nuxStep == 0) {
-    if (self.suggestionFeedObject.actors.count > 0) {
-      self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
-    } else {
-      DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
-      dummyUser.display_name = @"?";
-      dummyUser.phone_number = @"?";
-      self.profileStackView.peanutUsers = @[dummyUser];
-    }
-    self.selectedPeanutContacts = [self suggestedPeanutContacts];
-  } else {
-    self.addRecipientButton.hidden = YES;
-    
-    self.profileStackView.maxAbbreviationLength = 2;
-    [self.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+  if (self.nuxStep > 0) {
     UIImage *nuxImage;
     if (self.nuxStep == 1) {
       nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
@@ -69,6 +55,27 @@
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.shouldShowNameLabel = YES;
   self.profileStackView.backgroundColor = [UIColor clearColor];
+}
+
+- (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
+{
+  [super setSuggestionFeedObject:suggestionFeedObject];
+  if (self.nuxStep == 0) {
+    if (self.suggestionFeedObject.actors.count > 0) {
+      self.profileStackView.peanutUsers = self.suggestionFeedObject.actors;
+    } else {
+      DFPeanutUserObject *dummyUser = [[DFPeanutUserObject alloc] init];
+      dummyUser.display_name = @"?";
+      dummyUser.phone_number = @"?";
+      self.profileStackView.peanutUsers = @[dummyUser];
+    }
+    self.selectedPeanutContacts = [self suggestedPeanutContacts];
+  } else {
+    self.addRecipientButton.hidden = YES;
+    
+    self.profileStackView.maxAbbreviationLength = 2;
+    [self.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+  }
 }
 
 - (void)configureSwipableButtonImageView

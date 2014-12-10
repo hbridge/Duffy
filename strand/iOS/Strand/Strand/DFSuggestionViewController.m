@@ -53,7 +53,7 @@
 {
   self.suggestionFeedObject = suggestion;
   if (suggestion.actors.count == 0) self.bottomLabel.hidden = YES;
-  self.bottomLabel.text = [NSString stringWithFormat:@"Send %@ this photo?",
+  self.bottomLabel.text = [NSString stringWithFormat:@"Send to %@",
                                                  suggestion.actorsString];
   self.topLabel.text = suggestion.placeAndRelativeTimeString;
   

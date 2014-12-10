@@ -15,14 +15,22 @@
 
 @interface DFHomeViewController ()
 
-@property (nonatomic, retain) DFSuggestionsPageViewController *suggestionsViewController;
-
 @end
 
 @implementation DFHomeViewController
 
 - (void)viewDidLoad {
   [super viewDidLoad];
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewSwapsDataNotificationName
+                                             object:nil];
+  
+  [[NSNotificationCenter defaultCenter] addObserver:self
+                                           selector:@selector(reloadData)
+                                               name:DFStrandNewInboxDataNotificationName
+                                             object:nil];
+  
   [self configureNav];
   [self configureTableView];
 }
@@ -72,26 +80,17 @@
 }
 
 - (IBAction)reviewButtonPressed:(id)sender {
-  self.suggestionsViewController.preferredType = DFIncomingViewType;
-  [DFNavigationController presentWithRootController:self.suggestionsViewController
+  [DFNavigationController presentWithRootController:[[DFSuggestionsPageViewController alloc]
+                                                     initWithPreferredType:DFIncomingViewType]
                                            inParent:self
                                 withBackButtonTitle:@"Close"];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
-  self.suggestionsViewController.preferredType = DFSuggestionViewType;
-  [DFNavigationController
-   presentWithRootController:self.suggestionsViewController
-   inParent:self
-   withBackButtonTitle:@"Close"];
-}
-
-- (DFSuggestionsPageViewController *)suggestionsViewController
-{
-  if (!_suggestionsViewController) {
-    _suggestionsViewController = [[DFSuggestionsPageViewController alloc] init];
-  }
-  return _suggestionsViewController;
+  [DFNavigationController presentWithRootController:[[DFSuggestionsPageViewController alloc]
+                                                     initWithPreferredType:DFSuggestionViewType]
+                                           inParent:self
+                                withBackButtonTitle:@"Close"];
 }
 
 @end
