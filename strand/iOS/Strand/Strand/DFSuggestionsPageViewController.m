@@ -320,6 +320,8 @@ const NSUInteger NumNuxes = 3;
       noSuggestionsView.titleLabel.text = @"No More to Review";
       noSuggestionsView.subtitleLabel.text = @"Send some photos to friends";
     }
+    noSuggestionsView.titleLabel.textColor = [UIColor whiteColor];
+    noSuggestionsView.subtitleLabel.textColor = [UIColor whiteColor];
     noSuggestionsView.superView = _noSuggestionsViewController.view;
   }
   return _noSuggestionsViewController;

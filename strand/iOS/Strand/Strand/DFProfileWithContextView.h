@@ -9,13 +9,13 @@
 #import <UIKit/UIKit.h>
 #import "DFProfileStackView.h"
 
-IB_DESIGNABLE
 @interface DFProfileWithContextView : UIView
 @property (weak, nonatomic) IBOutlet DFProfileStackView *profileStackView;
 @property (weak, nonatomic) IBOutlet UILabel *titleLabel;
 @property (weak, nonatomic) IBOutlet UILabel *subtitleLabel;
 
-@property (nonatomic, retain) IBInspectable NSString *title;
-@property (nonatomic, retain) IBInspectable NSString *subTitle;
+@property (nonatomic, retain) UIColor *foregroundColor;
+@property (nonatomic, retain) NSString *title;
+@property (nonatomic, retain) NSString *subTitle;
 
 @end

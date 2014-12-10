@@ -30,6 +30,7 @@
 }
 
 - (void)viewDidLoad {
+  self.view.backgroundColor = [UIColor clearColor];
   self.imageView = self.swipableButtonImageView.imageView;
 
   // Need to set the imageView first since the parent needs it
@@ -127,6 +128,7 @@
 
 - (void)viewDidDisappear:(BOOL)animated
 {
+  [super viewDidDisappear:animated];
   [self.swipableButtonImageView resetView];
 }
 

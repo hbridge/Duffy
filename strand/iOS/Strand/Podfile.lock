@@ -21,6 +21,7 @@ PODS:
   - GBFlatButton (2.1.0)
   - HockeySDK (3.6.1)
   - JDStatusBarNotification (1.4.9)
+  - KLCPopup (1.0)
   - LKbadgeView (1.1.0)
   - Localytics-iOS-Client (2.23.0)
   - MCSwipeTableViewCell (2.1.2)
@@ -61,6 +62,7 @@ DEPENDENCIES:
   - GBFlatButton (~> 2.1.0)
   - HockeySDK (from `https://github.com/bitstadium/HockeySDK-iOS.git`)
   - JDStatusBarNotification (~> 1.4.7)
+  - KLCPopup (~> 1.0)
   - LKbadgeView (~> 1.1.0)
   - Localytics-iOS-Client (~> 2.23.0)
   - MCSwipeTableViewCell (~> 2.1.2)
@@ -93,6 +95,7 @@ SPEC CHECKSUMS:
   GBFlatButton: 30bf30c2594129ffeac1e6dce531022a4759c904
   HockeySDK: bf1964134fa6ef0c4c207c329e9aa6b866cee8f4
   JDStatusBarNotification: 9d833032d343e9a7abe0ec219c415dc115ba67a8
+  KLCPopup: 23548d0454ca156b0eb684f791f234b9c2134369
   LKbadgeView: 8e14044ee22c6d570c07e69e1ce73a3f91061730
   Localytics-iOS-Client: 3f878379d40c67945ea5972c1e1bf9762b5e5b9f
   MCSwipeTableViewCell: 8e78ff197ab06ba7bfd5c938a00149de8a33afa9

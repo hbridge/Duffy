@@ -12,8 +12,12 @@
 #import "DFDefaultsStore.h"
 #import "DFPushNotificationsManager.h"
 #import "DFPeanutFeedDataManager.h"
+#import "DFOverlayView.h"
+#import <KLCPopup/KLCPopup.h>
 
 @interface DFHomeViewController ()
+
+@property (nonatomic, retain) DFSuggestionsPageViewController *suggestionsPageViewController;
 
 @end
 
@@ -98,17 +102,34 @@
 }
 
 - (IBAction)reviewButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:[[DFSuggestionsPageViewController alloc]
-                                                     initWithPreferredType:DFIncomingViewType]
-                                           inParent:self
-                                withBackButtonTitle:@"Close"];
+  [self showPageViewControllerOverlay:[[DFSuggestionsPageViewController alloc]
+                                       initWithPreferredType:DFIncomingViewType]];
 }
 
 - (IBAction)sendButtonPressed:(id)sender {
-  [DFNavigationController presentWithRootController:[[DFSuggestionsPageViewController alloc]
-                                                     initWithPreferredType:DFSuggestionViewType]
-                                           inParent:self
-                                withBackButtonTitle:@"Close"];
+  [self showPageViewControllerOverlay:[[DFSuggestionsPageViewController alloc]
+                                       initWithPreferredType:DFSuggestionViewType]];
+}
+
+- (void)showPageViewControllerOverlay:(DFSuggestionsPageViewController *)svc
+{
+  // need to keep the page view controller retained as otherwise it will be GC'ed
+  // since we are stripping it's view away from it
+  self.suggestionsPageViewController = svc;
+  self.suggestionsPageViewController.view.backgroundColor = [UIColor clearColor];
+  DFOverlayView *overlayView = [[DFOverlayView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+  [overlayView setContentView:self.suggestionsPageViewController.view];
+  KLCPopup *popup = [KLCPopup popupWithContentView:overlayView
+                                          showType:KLCPopupShowTypeGrowIn
+                                       dismissType:KLCPopupDismissTypeShrinkOut
+                                          maskType:KLCPopupMaskTypeDimmed
+                          dismissOnBackgroundTouch:NO
+                             dismissOnContentTouch:NO];
+  [popup show];
+  overlayView.closeButtonHandler = ^{
+    [popup dismiss:YES];
+  };
+
 }
 
 @end

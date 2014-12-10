@@ -42,6 +42,7 @@
 - (void)viewDidLoad {
   [super viewDidLoad];
   
+  self.view.backgroundColor = [UIColor clearColor];
   [self configureProfileWithContext];
   [self configureSwipableButtonImageView];
 }
@@ -58,6 +59,7 @@
     self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
                                                  self.sender.firstName];
   }
+  self.profileWithContextView.foregroundColor = [UIColor whiteColor];
   [self.profileWithContextView.subtitleLabel removeFromSuperview];
 }
 
@@ -110,5 +112,6 @@
     if (self.likeHandler) self.likeHandler(self.photoID, self.strandID);
   }
 }
+
 
 @end

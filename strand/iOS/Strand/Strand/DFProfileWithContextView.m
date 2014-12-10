@@ -66,4 +66,11 @@
   return self.subtitleLabel.text;
 }
 
+- (void)setForegroundColor:(UIColor *)foregroundColor
+{
+  _foregroundColor = foregroundColor;
+  self.titleLabel.textColor = foregroundColor;
+  self.subtitleLabel.textColor = foregroundColor;
+}
+
 @end

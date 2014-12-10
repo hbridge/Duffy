@@ -27,6 +27,7 @@ typedef void (^DFIncomingPhotoLikeBlock)(DFPhotoIDType photoID, DFStrandIDType s
 @property (nonatomic, copy) DFIncomingPhotoNextBlock nextHandler;
 @property (nonatomic, copy) DFIncomingPhotoCommentBlock commentHandler;
 @property (nonatomic, copy) DFIncomingPhotoLikeBlock likeHandler;
+@property (nonatomic, retain) UIColor *foregroundColor;
 
 - (instancetype)initWithPhotoID:(DFPhotoIDType)photoID
                        inStrand:(DFStrandIDType)strandID

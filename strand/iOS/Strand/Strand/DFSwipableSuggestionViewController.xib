@@ -47,10 +47,11 @@
                         <constraint firstAttribute="height" constant="21" id="lDV-LD-XsM"/>
                     </constraints>
                     <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                    <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <nil key="highlightedColor"/>
                 </label>
             </subviews>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.33333333333333331" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
                 <constraint firstItem="RRW-PK-CfC" firstAttribute="leading" secondItem="AUp-5O-Ctk" secondAttribute="leading" constant="8" id="04e-Zm-05M"/>
                 <constraint firstItem="UYI-Rc-QVa" firstAttribute="leading" secondItem="BkW-lL-hsr" secondAttribute="trailing" constant="8" id="4A7-uf-PvL"/>
@@ -67,7 +68,7 @@
                 <constraint firstItem="YTX-Vv-qtQ" firstAttribute="leading" secondItem="AUp-5O-Ctk" secondAttribute="leading" id="zXH-uS-afS"/>
             </constraints>
             <nil key="simulatedStatusBarMetrics"/>
-            <point key="canvasLocation" x="628" y="487"/>
+            <point key="canvasLocation" x="616" y="482"/>
         </view>
     </objects>
     <resources>
