@@ -83,7 +83,7 @@
                      collectionView:self.collectionView];
   self.collectionView.delegate = self;
   self.datasource.showActionsBadge = YES;
-  self.collectionView.backgroundColor = [UIColor darkGrayColor];
+  self.collectionView.backgroundColor = [UIColor whiteColor];
 }
 
 - (void)viewWillAppear:(BOOL)animated

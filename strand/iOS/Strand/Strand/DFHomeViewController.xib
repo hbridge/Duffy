@@ -23,13 +23,13 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MYj-g7-RXb" userLabel="Button bar">
-                    <rect key="frame" x="0.0" y="0.0" width="600" height="100"/>
+                    <rect key="frame" x="0.0" y="0.0" width="600" height="89"/>
                     <subviews>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="QUv-33-Ffw" userLabel="ReviewWrapper">
-                            <rect key="frame" x="0.0" y="0.0" width="300" height="100"/>
+                            <rect key="frame" x="0.0" y="0.0" width="300" height="89"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2fP-Ad-UAv">
-                                    <rect key="frame" x="218" y="19" width="62" height="62"/>
+                                    <rect key="frame" x="218" y="8" width="62" height="62"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="62" id="Dv0-Ad-sfz"/>
                                         <constraint firstAttribute="width" constant="62" id="Nn4-oV-lmT"/>
@@ -44,7 +44,7 @@
                                     </connections>
                                 </button>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="BWa-FG-aqQ" customClass="LKBadgeView">
-                                    <rect key="frame" x="260" y="19" width="30" height="20"/>
+                                    <rect key="frame" x="260" y="3" width="30" height="20"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <constraints>
                                         <constraint firstAttribute="width" constant="30" id="HdB-in-hUs"/>
@@ -54,17 +54,17 @@
                             </subviews>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
-                                <constraint firstItem="2fP-Ad-UAv" firstAttribute="top" secondItem="BWa-FG-aqQ" secondAttribute="top" id="GTw-1L-rtO"/>
+                                <constraint firstItem="2fP-Ad-UAv" firstAttribute="top" secondItem="BWa-FG-aqQ" secondAttribute="top" constant="5" id="GTw-1L-rtO"/>
                                 <constraint firstItem="2fP-Ad-UAv" firstAttribute="trailing" secondItem="BWa-FG-aqQ" secondAttribute="trailing" constant="-10" id="IZZ-UA-Vvb"/>
-                                <constraint firstAttribute="centerY" secondItem="2fP-Ad-UAv" secondAttribute="centerY" id="Weq-ve-MLx"/>
+                                <constraint firstItem="2fP-Ad-UAv" firstAttribute="top" secondItem="QUv-33-Ffw" secondAttribute="top" constant="8" id="c0z-b9-K7s"/>
                                 <constraint firstAttribute="trailing" secondItem="2fP-Ad-UAv" secondAttribute="trailing" constant="20" id="ceS-4K-0s2"/>
                             </constraints>
                         </view>
                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AFb-Nj-ssH" userLabel="SendWrapper">
-                            <rect key="frame" x="301" y="0.0" width="299" height="100"/>
+                            <rect key="frame" x="301" y="0.0" width="299" height="89"/>
                             <subviews>
                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="bottom" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="sao-uL-Ezk" userLabel="Send">
-                                    <rect key="frame" x="20" y="19" width="62" height="62"/>
+                                    <rect key="frame" x="20" y="8" width="62" height="62"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="62" id="NpX-MF-4LG"/>
                                         <constraint firstAttribute="width" constant="62" id="m6O-h5-H5t"/>
@@ -79,7 +79,7 @@
                                     </connections>
                                 </button>
                                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="Pba-eB-LD4" customClass="LKBadgeView">
-                                    <rect key="frame" x="62" y="19" width="30" height="20"/>
+                                    <rect key="frame" x="62" y="3" width="30" height="20"/>
                                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                     <constraints>
                                         <constraint firstAttribute="height" constant="20" id="ZHP-sQ-xmx"/>
@@ -90,8 +90,8 @@
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <constraints>
                                 <constraint firstItem="Pba-eB-LD4" firstAttribute="trailing" secondItem="sao-uL-Ezk" secondAttribute="trailing" constant="10" id="0So-6N-Tb2"/>
-                                <constraint firstItem="Pba-eB-LD4" firstAttribute="top" secondItem="sao-uL-Ezk" secondAttribute="top" id="2ka-Bt-wop"/>
-                                <constraint firstAttribute="centerY" secondItem="sao-uL-Ezk" secondAttribute="centerY" id="fFT-8C-AXl"/>
+                                <constraint firstItem="sao-uL-Ezk" firstAttribute="top" secondItem="AFb-Nj-ssH" secondAttribute="top" constant="8" id="0Ud-4p-pyV"/>
+                                <constraint firstItem="Pba-eB-LD4" firstAttribute="top" secondItem="sao-uL-Ezk" secondAttribute="top" constant="-5" id="2ka-Bt-wop"/>
                                 <constraint firstItem="sao-uL-Ezk" firstAttribute="leading" secondItem="AFb-Nj-ssH" secondAttribute="leading" constant="20" id="nKo-KU-en0"/>
                             </constraints>
                         </view>
@@ -104,18 +104,18 @@
                         <constraint firstAttribute="width" secondItem="QUv-33-Ffw" secondAttribute="width" multiplier="2" id="B8d-2a-LMA"/>
                         <constraint firstItem="QUv-33-Ffw" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" id="Bks-xe-qgc"/>
                         <constraint firstItem="QUv-33-Ffw" firstAttribute="leading" secondItem="MYj-g7-RXb" secondAttribute="leading" id="Swa-xn-lyo"/>
-                        <constraint firstAttribute="height" constant="100" id="fAN-cS-318"/>
+                        <constraint firstAttribute="height" constant="89" id="fAN-cS-318"/>
                         <constraint firstItem="AFb-Nj-ssH" firstAttribute="top" secondItem="MYj-g7-RXb" secondAttribute="top" id="ifv-cs-ewK"/>
                         <constraint firstAttribute="bottom" secondItem="AFb-Nj-ssH" secondAttribute="bottom" id="rpL-Jb-Klz"/>
                     </constraints>
                 </view>
                 <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-uZ-vK1">
-                    <rect key="frame" x="0.0" y="100" width="600" height="436"/>
+                    <rect key="frame" x="0.0" y="89" width="600" height="447"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="0.0" minimumInteritemSpacing="0.0" id="kcj-Dt-vx5">
                         <size key="itemSize" width="50" height="50"/>
                         <size key="headerReferenceSize" width="0.0" height="0.0"/>
                         <size key="footerReferenceSize" width="0.0" height="0.0"/>
-                        <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                        <inset key="sectionInset" minX="0.0" minY="1" maxX="0.0" maxY="1"/>
                     </collectionViewFlowLayout>
                 </collectionView>
             </subviews>
