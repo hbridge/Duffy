@@ -17,6 +17,7 @@
 @property (nonatomic, retain) NSDictionary *abbreviationsById;
 @property (nonatomic, retain) NSDictionary *firstNamesById;
 @property (nonatomic, retain) NSDictionary *imagesById;
+@property (nonatomic, retain) NSMutableDictionary *badgeImagesById;
 @property (nonatomic, retain) UIView *popTargetView;
 @property (nonatomic, retain) MMPopLabel *popLabel;
 
@@ -121,6 +122,17 @@
   [self setNeedsDisplay];
 }
 
+- (void)setBadgeImage:(UIImage *)badgeImage forUser:(DFPeanutUserObject *)user
+{
+  if (!self.badgeImagesById) self.badgeImagesById = [NSMutableDictionary new];
+  if (badgeImage) {
+    self.badgeImagesById[[self.class idForUser:user]] = badgeImage;
+  } else {
+    [self.badgeImagesById removeObjectForKey:[self.class idForUser:user]];
+  }
+  [self setNeedsDisplay];
+}
+
 - (void)reloadImages
 {
   NSMutableDictionary *images = [NSMutableDictionary new];
@@ -195,21 +207,26 @@
   
   for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
     DFPeanutUserObject *user = self.peanutUsers[i];
-    UIColor *fillColor = self.fillColorsById[[self.class idForUser:user]];
-    NSString *abbreviation = self.abbreviationsById[[self.class idForUser:user]];
-    NSString *firstName = self.firstNamesById[[self.class idForUser:user]];
-    UIImage *image = self.imagesById[[self.class idForUser:user]];
+    id userID = [self.class idForUser:user];
+    UIColor *fillColor = self.fillColorsById[userID];
+    NSString *abbreviation = self.abbreviationsById[userID];
+    NSString *firstName = self.firstNamesById[userID];
+    UIImage *image = self.imagesById[userID];
     
-    CGRect abbreviationRect = [self rectForCircleAtIndex:i];
+    CGRect circleRect = [self rectForCircleAtIndex:i];
     if (!image) {
       CGContextSetFillColorWithColor(context, fillColor.CGColor);
-      CGContextFillEllipseInRect(context, abbreviationRect);
-      [self drawAbbreviationText:abbreviation inRect:abbreviationRect context:context];
+      CGContextFillEllipseInRect(context, circleRect);
+      [self drawAbbreviationText:abbreviation inRect:circleRect context:context];
     } else {
-      [image drawInRect:abbreviationRect];
+      [image drawInRect:circleRect];
     }
     if (self.nameMode == DFProfileStackViewNameShowAlways) {
-      [self drawNameText:firstName belowCircleRect:abbreviationRect context:context];
+      [self drawNameText:firstName belowCircleRect:circleRect context:context];
+    }
+    UIImage *badgeImage = self.badgeImagesById[userID];
+    if (badgeImage) {
+      [self drawBadgeImage:badgeImage onCircleRect:circleRect context:context];
     }
   }
 }
@@ -238,6 +255,15 @@ const CGFloat nameLabelMargin = 2.0;
   label.text = text;
   label.font = self.nameLabelFont;
   [label drawTextInRect:nameRect];
+}
+
+- (void)drawBadgeImage:(UIImage *)image onCircleRect:(CGRect)circleRect context:(CGContextRef)context
+{
+  CGRect badgeRect = CGRectMake(CGRectGetMaxX(circleRect) - image.size.width,
+                                CGRectGetMaxY(circleRect) - image.size.height,
+                                image.size.width,
+                                image.size.height);
+  [image drawInRect:badgeRect];
 }
 
 

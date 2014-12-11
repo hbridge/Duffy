@@ -54,10 +54,19 @@
   DFPeanutUserObject *sender = strandPost.actors.firstObject;
   self.senderProfileStackView.profilePhotoWidth = 50.0;
   [self.senderProfileStackView setPeanutUser:sender];
+  [self.senderProfileStackView
+   setBadgeImage:(_userLikeActionID > 0) ? [UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"] : nil
+   forUser:sender];
 
   self.recipientsProfileStackView.profilePhotoWidth = 35.0;
   NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
   [self.recipientsProfileStackView setPeanutUsers:recipients];
+  for (DFPeanutUserObject *recipient in recipients) {
+    if ([self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id]) {
+      [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
+                                           forUser:recipient];
+    }
+  }
 }
 
 - (void)configureToolbar
@@ -115,6 +124,7 @@
   BOOL newLikeValue = (self.userLikeActionID == 0);
   DFActionID oldID = self.userLikeActionID;
   self.userLikeActionID = newLikeValue;
+  [self configureProfileWithContext];
   [[DFPeanutFeedDataManager sharedManager]
    setLikedByUser:newLikeValue
    photo:self.photoObject.id

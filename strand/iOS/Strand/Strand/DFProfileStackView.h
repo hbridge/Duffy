@@ -28,5 +28,6 @@ typedef NS_ENUM(NSInteger, DFProfileStackViewNameMode) {
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user;
 - (void)setColor:(UIColor *)color forUser:(DFPeanutUserObject *)user;
+- (void)setBadgeImage:(UIImage *)badgeImage forUser:(DFPeanutUserObject *)user;
 
 @end
