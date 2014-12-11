@@ -39,22 +39,30 @@
   [self configureSwipableButtonImageView];
   
   if (self.nuxStep > 0) {
-    UIImage *nuxImage;
-    if (self.nuxStep == 1) {
-      nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
-      self.swipableButtonImageView.noEnabled = NO;
-    } else {
-      nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
-      self.swipableButtonImageView.yesEnabled = NO;
-    }
-    self.imageView.image = nuxImage;
-    
+    [self configureNuxStep:self.nuxStep];
   }
   
   [self configurePeopleLabel];
   self.profileStackView.profilePhotoWidth = 50.0;
   self.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
   self.profileStackView.backgroundColor = [UIColor clearColor];
+}
+
+- (void)configureNuxStep:(NSUInteger)nuxStep
+{
+  self.addRecipientButton.hidden = YES;
+  self.profileStackView.maxAbbreviationLength = 2;
+  [self.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
+  
+  UIImage *nuxImage;
+  if (self.nuxStep == 1) {
+    nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSendImage"];
+    self.swipableButtonImageView.noEnabled = NO;
+  } else {
+    nuxImage = [UIImage imageNamed:@"Assets/Nux/NuxSkipImage"];
+    self.swipableButtonImageView.yesEnabled = NO;
+  }
+  self.imageView.image = nuxImage;
 }
 
 - (void)setSuggestionFeedObject:(DFPeanutFeedObject *)suggestionFeedObject
@@ -70,11 +78,6 @@
       self.profileStackView.peanutUsers = @[dummyUser];
     }
     self.selectedPeanutContacts = [self suggestedPeanutContacts];
-  } else {
-    self.addRecipientButton.hidden = YES;
-    
-    self.profileStackView.maxAbbreviationLength = 2;
-    [self.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
   }
 }
 
