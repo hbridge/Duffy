@@ -24,7 +24,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" allowsMultipleSelectionDuringEditing="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="gGV-RF-dqd">
-                    <rect key="frame" x="0.0" y="66" width="600" height="534"/>
+                    <rect key="frame" x="0.0" y="81" width="600" height="519"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
                         <outlet property="dataSource" destination="-1" id="YtH-72-Of8"/>
@@ -58,26 +58,26 @@
                     </items>
                 </toolbar>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="VOD-io-kg3" customClass="DFProfileStackView">
-                    <rect key="frame" x="8" y="8" width="50" height="50"/>
+                    <rect key="frame" x="8" y="8" width="50" height="65"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
                         <constraint firstAttribute="width" constant="50" id="eNe-mr-nH6"/>
-                        <constraint firstAttribute="height" constant="50" id="gtS-kK-zo3"/>
+                        <constraint firstAttribute="height" constant="65" id="gtS-kK-zo3"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ibH-dU-jON" customClass="DFProfileStackView">
-                    <rect key="frame" x="59" y="16" width="541" height="35"/>
+                    <rect key="frame" x="59" y="23" width="541" height="50"/>
                     <color key="backgroundColor" red="0.90588241820000004" green="0.45490199329999997" blue="0.1215686351" alpha="1" colorSpace="deviceRGB"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="35" id="3Rn-MY-Zfc"/>
+                        <constraint firstAttribute="height" constant="50" id="3Rn-MY-Zfc"/>
                     </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstItem="VOD-io-kg3" firstAttribute="bottom" secondItem="ibH-dU-jON" secondAttribute="bottom" id="3fQ-Z4-E6U"/>
                 <constraint firstAttribute="bottom" secondItem="gGV-RF-dqd" secondAttribute="bottom" id="81M-RW-Hhu"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="leading" secondItem="mpa-i4-xv8" secondAttribute="leading" constant="8" id="9JY-vK-N88"/>
-                <constraint firstItem="ibH-dU-jON" firstAttribute="centerY" secondItem="VOD-io-kg3" secondAttribute="centerY" id="DhR-2b-FLT"/>
                 <constraint firstItem="VOD-io-kg3" firstAttribute="top" secondItem="mpa-i4-xv8" secondAttribute="top" constant="8" id="Ed5-1o-YVi"/>
                 <constraint firstAttribute="trailing" secondItem="ahP-4i-91Q" secondAttribute="trailing" id="SkN-zI-tV1"/>
                 <constraint firstItem="gGV-RF-dqd" firstAttribute="top" secondItem="VOD-io-kg3" secondAttribute="bottom" constant="8" id="WrZ-EP-rZx"/>

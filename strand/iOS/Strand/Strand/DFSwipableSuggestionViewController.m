@@ -53,7 +53,7 @@
   
   [self configurePeopleLabel];
   self.profileStackView.profilePhotoWidth = 50.0;
-  self.profileStackView.shouldShowNameLabel = YES;
+  self.profileStackView.nameMode = DFProfileStackViewNameShowOnTap;
   self.profileStackView.backgroundColor = [UIColor clearColor];
 }
 

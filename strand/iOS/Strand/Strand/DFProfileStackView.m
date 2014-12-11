@@ -15,6 +15,7 @@
 
 @property (nonatomic, retain) NSDictionary *fillColorsById;
 @property (nonatomic, retain) NSDictionary *abbreviationsById;
+@property (nonatomic, retain) NSDictionary *firstNamesById;
 @property (nonatomic, retain) NSDictionary *imagesById;
 @property (nonatomic, retain) UIView *popTargetView;
 @property (nonatomic, retain) MMPopLabel *popLabel;
@@ -33,6 +34,9 @@
     self.profilePhotoWidth = 35.0;
   if (self.maxAbbreviationLength == 0)
     self.maxAbbreviationLength = 1;
+  if (!self.nameLabelFont) {
+    self.nameLabelFont = [UIFont fontWithName:@"HelveticaNeue-Bold" size:11];
+  }
   
   UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                            initWithTarget:self
@@ -65,6 +69,7 @@
   });
   NSMutableDictionary *fillColors = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *abbreviations = [[NSMutableDictionary alloc] initWithCapacity:users.count];
+  NSMutableDictionary *firstNames = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSMutableDictionary *images = [[NSMutableDictionary alloc] initWithCapacity:users.count];
   NSArray *allColors = [DFStrandConstants profilePhotoStackColors];
   for (NSUInteger i = 0; i < self.peanutUsers.count; i++) {
@@ -89,6 +94,7 @@
                       uppercaseString];
     }
     abbreviations[[self.class idForUser:user]] = abbreviation;
+    firstNames[[self.class idForUser:user]] = firstName;
     
     //image
     UIImage *image = [user roundedThumbnailOfPointSize:CGSizeMake(self.profilePhotoWidth,
@@ -99,6 +105,7 @@
   }
   _fillColorsById = fillColors;
   _abbreviationsById = abbreviations;
+  _firstNamesById = firstNames;
   _imagesById = images;
   
   [self sizeToFit];
@@ -157,13 +164,13 @@
 {
   if (self.peanutUsers.count == 0) return CGSizeZero;
   CGSize newSize = size;
-  newSize.height = self.profilePhotoWidth;
+  newSize.height = self.profilePhotoWidth + [self nameLabelHeight];
   newSize.width = (CGFloat)MIN(self.maxProfilePhotos + 1, self.peanutUsers.count) * self.profilePhotoWidth
   + MAX(self.peanutUsers.count - 1, 0) * 2.0;
   return newSize;
 }
 
-- (CGRect)rectForIndex:(NSUInteger)index
+- (CGRect)rectForCircleAtIndex:(NSUInteger)index
 {
   CGRect rect = CGRectMake((CGFloat)index * self.profilePhotoWidth,
                            0,
@@ -175,6 +182,14 @@
   return rect;
 }
 
+- (CGFloat)nameLabelHeight
+{
+  if (self.nameMode != DFProfileStackViewNameShowAlways) return 0;
+  
+  return self.nameLabelFont.pointSize * [[UIScreen mainScreen] scale] + nameLabelMargin * 2.0;
+  
+}
+
 - (void)drawRect:(CGRect)rect {
   CGContextRef context = UIGraphicsGetCurrentContext();
   
@@ -182,22 +197,47 @@
     DFPeanutUserObject *user = self.peanutUsers[i];
     UIColor *fillColor = self.fillColorsById[[self.class idForUser:user]];
     NSString *abbreviation = self.abbreviationsById[[self.class idForUser:user]];
+    NSString *firstName = self.firstNamesById[[self.class idForUser:user]];
     UIImage *image = self.imagesById[[self.class idForUser:user]];
     
-    CGRect abbreviationRect = [self rectForIndex:i];
+    CGRect abbreviationRect = [self rectForCircleAtIndex:i];
     if (!image) {
       CGContextSetFillColorWithColor(context, fillColor.CGColor);
       CGContextFillEllipseInRect(context, abbreviationRect);
-      UILabel *label = [[UILabel alloc] initWithFrame:abbreviationRect];
-      label.textColor = [UIColor whiteColor];
-      label.textAlignment = NSTextAlignmentCenter;
-      label.text = abbreviation;
-      label.font = [UIFont fontWithName:@"HelveticaNeue" size:ceil(abbreviationRect.size.height)/2.0];
-      [label drawTextInRect:abbreviationRect];
+      [self drawAbbreviationText:abbreviation inRect:abbreviationRect context:context];
     } else {
       [image drawInRect:abbreviationRect];
     }
+    if (self.nameMode == DFProfileStackViewNameShowAlways) {
+      [self drawNameText:firstName belowCircleRect:abbreviationRect context:context];
+    }
   }
+}
+
+- (void)drawAbbreviationText:(NSString *)text inRect:(CGRect)rect context:(CGContextRef)context
+{
+  UILabel *label = [[UILabel alloc] initWithFrame:rect];
+  label.textColor = [UIColor whiteColor];
+  label.textAlignment = NSTextAlignmentCenter;
+  label.text = text;
+  label.font = [UIFont fontWithName:@"HelveticaNeue" size:ceil(rect.size.height)/2.0];
+  [label drawTextInRect:rect];
+}
+
+const CGFloat nameLabelMargin = 2.0;
+
+- (void)drawNameText:(NSString *)text belowCircleRect:(CGRect)circleRect context:(CGContextRef)context
+{
+  CGRect nameRect = circleRect;
+  nameRect.origin.y = CGRectGetMaxY(circleRect) + nameLabelMargin;
+  nameRect.size.height = self.nameLabelFont.pointSize;
+  
+  UILabel *label = [[UILabel alloc] initWithFrame:nameRect];
+  label.textColor = [UIColor blackColor];
+  label.textAlignment = NSTextAlignmentCenter;
+  label.text = text;
+  label.font = self.nameLabelFont;
+  [label drawTextInRect:nameRect];
 }
 
 
@@ -205,10 +245,10 @@
 
 - (void)tapped:(UITapGestureRecognizer *)sender
 {
-  if (!self.shouldShowNameLabel) return;
+  if (self.nameMode == DFProfileStackViewNameModeNone) return;
   
   for (NSUInteger i = 0; i < MIN(self.peanutUsers.count, _maxProfilePhotos); i++) {
-    CGRect rectForName = [self rectForIndex:i];
+    CGRect rectForName = [self rectForCircleAtIndex:i];
     CGPoint tapPoint = [sender locationInView:self];
     if (CGRectContainsPoint(rectForName, tapPoint)) {
       [self iconTappedForPeanutUser:self.peanutUsers[i] inRect:rectForName];

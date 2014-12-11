@@ -47,7 +47,7 @@
 {
   for (DFProfileStackView *psv in @[self.senderProfileStackView, self.recipientsProfileStackView]) {
     psv.backgroundColor = [UIColor clearColor];
-    psv.shouldShowNameLabel = YES;
+    psv.nameMode = DFProfileStackViewNameShowAlways;
   }
   
   DFPeanutFeedObject *strandPost = self.postsObject.objects.firstObject;

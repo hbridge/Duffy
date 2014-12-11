@@ -21,7 +21,7 @@
 
 - (void)awakeFromNib
 {
-  self.profilePhotoStackView.shouldShowNameLabel = YES;
+  self.profilePhotoStackView.nameMode = DFProfileStackViewNameShowOnTap;
 }
 
 @end

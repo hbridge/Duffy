@@ -13,11 +13,18 @@
 
 @interface DFProfileStackView : UIView <MMPopLabelDelegate>
 
+typedef NS_ENUM(NSInteger, DFProfileStackViewNameMode) {
+  DFProfileStackViewNameModeNone = 0,
+  DFProfileStackViewNameShowOnTap,
+  DFProfileStackViewNameShowAlways,
+};
+
 @property (nonatomic) NSUInteger maxProfilePhotos;
 @property (nonatomic) CGFloat profilePhotoWidth;
 @property (nonatomic, retain) NSArray *peanutUsers;
-@property (nonatomic) BOOL shouldShowNameLabel;
+@property (nonatomic) DFProfileStackViewNameMode nameMode;
 @property (nonatomic) NSUInteger maxAbbreviationLength;
+@property (nonatomic, retain) UIFont *nameLabelFont;
 
 - (void)setPeanutUser:(DFPeanutUserObject *)user;
 - (void)setColor:(UIColor *)color forUser:(DFPeanutUserObject *)user;
