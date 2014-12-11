@@ -57,6 +57,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 @property (nonatomic, retain) NSArray *actors;
 
 - (DFPeanutAction *)userFavoriteAction;
+- (DFPeanutAction *)userEvalPhotoAction;
 - (void)setUserFavoriteAction:(DFPeanutAction *)favoriteAction;
 
 - (NSArray *)commentActions;

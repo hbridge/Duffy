@@ -215,6 +215,12 @@ static NSArray *FeedObjectTypes;
                       forUser:0];
 }
 
+- (DFPeanutAction *)userEvalPhotoAction
+{
+  return [[self actionsOfType:DFPeanutActionEvalPhoto
+                      forUser:[[DFUser currentUser] userID]]
+          firstObject];
+}
 
 - (DFPeanutAction *)userFavoriteAction
 {

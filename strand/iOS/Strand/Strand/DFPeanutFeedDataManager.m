@@ -861,6 +861,7 @@ static DFPeanutFeedDataManager *defaultManager;
    ];
 }
 
+// Not used right now, take out if still not needed
 - (NSArray *)sortedStrandPostList
 {
   NSMutableArray *strandPostList = [NSMutableArray new];
@@ -903,7 +904,7 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   NSMutableArray *photosWithAction = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *strandPost in [self sortedStrandPostList]) {
+  for (DFPeanutFeedObject *strandPost in [self publicStrands]) {
     for (DFPeanutFeedObject *photo in [strandPost descendentsOfType:DFFeedObjectPhoto]) {
       BOOL photoHasAction = NO;
       for (DFPeanutAction *action in photo.actions) {
@@ -920,14 +921,31 @@ static DFPeanutFeedDataManager *defaultManager;
   return photosWithAction;
 }
 
+- (NSArray *)photosSortedByEvalTime:(NSArray *)photos
+{
+  NSArray *sortedArray;
+  sortedArray = [photos sortedArrayUsingComparator:^NSComparisonResult(id a, id b) {
+    DFPeanutAction *first = [(DFPeanutFeedObject*)a userEvalPhotoAction];
+    DFPeanutAction *second = [(DFPeanutFeedObject*)b userEvalPhotoAction];
+    
+    NSDate *firstDate = first.time_stamp;
+    NSDate *secondDate = second.time_stamp;
+    return [secondDate compare:firstDate];
+  }];
+  
+  return sortedArray;
+}
+
 - (NSArray *)allEvaluatedPhotos
 {
-  return [self photosWithAction:DFPeanutActionEvalPhoto];
+  NSArray *photos = [self photosWithAction:DFPeanutActionEvalPhoto];
+  return [self photosSortedByEvalTime:photos];
 }
 
 - (NSArray *)favoritedPhotos
 {
-  return [self photosWithAction:DFPeanutActionFavorite];
+  NSArray *photos = [self photosWithAction:DFPeanutActionFavorite];
+  return [self photosSortedByEvalTime:photos];
 }
 
 - (void)hasEvaluatedPhoto:(DFPhotoIDType)photoID strandID:(DFStrandIDType)privateStrandID
