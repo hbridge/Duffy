@@ -85,7 +85,7 @@ def sendSummaryFirestarterText(msgCount=10, testRun=True):
 		# If not testRun, send a real message to user and record it
 		if (not testRun):
 			if (invite.invited_user):
-				logEntry = notifications_util.sendNotification(invite.invited_user, msg, constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS, None)
+				logEntry = notifications_util.sendNotification(invite.invited_user, msg, constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS, {}, None)
 			else:
 				logEntry = NotificationLog.objects.create(phone_number=invite.phone_number, device_token="", msg=msg, custom_payload="", result=constants.IOS_NOTIFICATIONS_RESULT_ERROR, msg_type=constants.NOTIFICATIONS_UNACCEPTED_INVITE_FS)
 
