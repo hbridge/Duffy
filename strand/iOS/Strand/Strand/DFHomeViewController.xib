@@ -109,7 +109,7 @@
                         <constraint firstAttribute="bottom" secondItem="AFb-Nj-ssH" secondAttribute="bottom" id="rpL-Jb-Klz"/>
                     </constraints>
                 </view>
-                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-uZ-vK1">
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="kHh-uZ-vK1">
                     <rect key="frame" x="0.0" y="89" width="600" height="447"/>
                     <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="1" minimumInteritemSpacing="1" id="kcj-Dt-vx5">
                         <size key="itemSize" width="50" height="50"/>

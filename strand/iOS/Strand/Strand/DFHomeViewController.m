@@ -12,17 +12,18 @@
 #import "DFDefaultsStore.h"
 #import "DFPushNotificationsManager.h"
 #import "DFPeanutFeedDataManager.h"
-#import "DFImageDataSource.h"
 #import "DFNoTableItemsView.h"
 #import "DFIncomingViewController.h"
 #import "DFSettingsViewController.h"
 #import "DFInviteFriendViewController.h"
 #import "UIColor+DFHelpers.h"
+#import "DFSegmentedControlReusableView.h"
 
 @interface DFHomeViewController ()
 
 @property (nonatomic, retain) DFImageDataSource *datasource;
 @property (nonatomic, retain) DFNoTableItemsView *noResultsView;
+@property (nonatomic) NSUInteger selectedFilterIndex;
 
 @end
 
@@ -49,9 +50,6 @@
                                                name:DFStrandNewSwapsDataNotificationName
                                              object:nil];
 }
-
-
-
 
 - (void)configureNav
 {
@@ -81,9 +79,40 @@
   self.datasource = [[DFImageDataSource alloc]
                      initWithCollectionFeedObjects:nil
                      collectionView:self.collectionView];
+  self.datasource.imageDataSourceDelegate = self;
+  
+  [self.collectionView registerNib:[UINib nibForClass:[DFSegmentedControlReusableView class]]
+        forSupplementaryViewOfKind:UICollectionElementKindSectionHeader
+               withReuseIdentifier:@"header"];
   self.collectionView.delegate = self;
   self.datasource.showActionsBadge = YES;
   self.collectionView.backgroundColor = [UIColor whiteColor];
+  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, 70);
+
+}
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
+{
+  if (kind == UICollectionElementKindSectionHeader &&
+      indexPath.section == 0 &&
+      indexPath.row == 0) {
+    DFSegmentedControlReusableView *segmentedView = [self.collectionView
+                                      dequeueReusableSupplementaryViewOfKind:kind
+                                      withReuseIdentifier:@"header"
+                                      forIndexPath:indexPath];
+    [segmentedView.segmentedControl setTitle:@"Liked" forSegmentAtIndex:0];
+    [segmentedView.segmentedControl setTitle:@"All" forSegmentAtIndex:1];
+    [segmentedView.segmentedControl setWidth:100 forSegmentAtIndex:0];
+    [segmentedView.segmentedControl setWidth:100 forSegmentAtIndex:1];
+    segmentedView.segmentedControl.tintColor = [UIColor darkGrayColor];
+    [segmentedView.segmentedControl addTarget:self
+                                       action:@selector(filterChanged:)
+                             forControlEvents:UIControlEventValueChanged];
+    
+
+    return segmentedView;
+  }
+  return nil;
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -122,8 +151,14 @@
 
 - (void)reloadData
 {
-  [self.datasource setFeedPhotos:[[DFPeanutFeedDataManager sharedManager]
-                                           allEvaluatedPhotos]];
+  NSArray *feedPhotos;
+  if (self.selectedFilterIndex == 0) {
+    feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
+  } else {
+    feedPhotos = [[DFPeanutFeedDataManager sharedManager]
+                  allEvaluatedPhotos];
+  }
+  [self.datasource setFeedPhotos:feedPhotos];
   [self.collectionView reloadData];
   [self configureNoResultsView];
   [self configureBadges];
@@ -202,6 +237,18 @@ didSelectItemAtIndexPath:(NSIndexPath *)indexPath
   DFPeanutFeedObject *photo = [[[self.datasource feedObjectForIndexPath:indexPath]
                                 leafNodesFromObjectOfType:DFFeedObjectPhoto] firstObject];
   
+}
+
+- (void)filterChanged:(UISegmentedControl *)sender
+{
+  DDLogVerbose(@"new filter %@", [sender titleForSegmentAtIndex:sender.selectedSegmentIndex]);
+  self.selectedFilterIndex = sender.selectedSegmentIndex;
+}
+
+- (void)setSelectedFilterIndex:(NSUInteger)selectedFilterIndex
+{
+  _selectedFilterIndex = selectedFilterIndex;
+  [self reloadData];
 }
 
 - (void)createButtonPressed:(id)sender
