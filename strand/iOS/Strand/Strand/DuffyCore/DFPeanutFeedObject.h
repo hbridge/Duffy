@@ -49,6 +49,7 @@ extern DFFeedObjectType DFFeedObjectActionsList;
 @property (nonatomic, retain) NSString *suggestion_type;
 @property (nonatomic, retain) NSNumber *full_width;
 @property (nonatomic, retain) NSNumber *full_height;
+@property (nonatomic, retain) NSNumber *strand_id;
 
 
 // Relationships

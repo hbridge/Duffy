@@ -904,8 +904,8 @@ static DFPeanutFeedDataManager *defaultManager;
 {
   NSMutableArray *photosWithAction = [NSMutableArray new];
   
-  for (DFPeanutFeedObject *strandPost in [self publicStrands]) {
-    for (DFPeanutFeedObject *photo in [strandPost descendentsOfType:DFFeedObjectPhoto]) {
+  for (DFPeanutFeedObject *strandPosts in [self publicStrands]) {
+    for (DFPeanutFeedObject *photo in [strandPosts descendentsOfType:DFFeedObjectPhoto]) {
       BOOL photoHasAction = NO;
       for (DFPeanutAction *action in photo.actions) {
         if (action.action_type == actionType) {
@@ -915,6 +915,9 @@ static DFPeanutFeedDataManager *defaultManager;
       if (photoHasAction) {
         [photosWithAction addObject:photo];
       }
+      // TODO(Derek): This should be put into a lower level.
+      // Temp here to move things along
+      photo.strand_id = @(strandPosts.id);
     }
   }
   
