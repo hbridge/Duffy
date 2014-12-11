@@ -19,6 +19,8 @@
 #import "UIColor+DFHelpers.h"
 #import "DFSegmentedControlReusableView.h"
 
+const CGFloat headerHeight = 60.0;
+
 @interface DFHomeViewController ()
 
 @property (nonatomic, retain) DFImageDataSource *datasource;
@@ -87,8 +89,7 @@
   self.collectionView.delegate = self;
   self.datasource.showActionsBadge = YES;
   self.collectionView.backgroundColor = [UIColor whiteColor];
-  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, 70);
-
+  self.flowLayout.headerReferenceSize = CGSizeMake(self.collectionView.frame.size.width, headerHeight);
 }
 
 - (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath
@@ -113,6 +114,11 @@
     return segmentedView;
   }
   return nil;
+}
+
+- (void)didFinishFirstLoadForDatasource:(DFImageDataSource *)datasource
+{
+  self.collectionView.contentOffset = CGPointMake(0, headerHeight);
 }
 
 - (void)viewWillAppear:(BOOL)animated
