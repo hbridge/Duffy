@@ -924,6 +924,25 @@ static DFPeanutFeedDataManager *defaultManager;
   return photosWithAction;
 }
 
+- (NSArray *)photosSentByUser:(DFUserIDType)user
+{
+  NSMutableArray *photosSentByUser = [NSMutableArray new];
+  
+  for (DFPeanutFeedObject *strandPosts in [self publicStrands]) {
+    for (DFPeanutFeedObject *strandPost in strandPosts.objects) {
+      DFPeanutUserObject *sender = strandPost.actors.firstObject;
+      if (sender.id == user) {
+        for (DFPeanutFeedObject *photo in [strandPost leafNodesFromObjectOfType:DFFeedObjectPhoto]) {
+          [photosSentByUser addObject:photo];
+          photo.strand_id = @(strandPosts.id);
+        }
+      }
+    }
+  }
+  
+  return photosSentByUser;
+}
+
 - (NSArray *)photosSortedByEvalTime:(NSArray *)photos
 {
   NSArray *sortedArray;
@@ -939,11 +958,17 @@ static DFPeanutFeedDataManager *defaultManager;
   return sortedArray;
 }
 
-- (NSArray *)allEvaluatedPhotos
+- (NSArray *)allEvaluatedOrSentPhotos
 {
-  NSArray *photos = [self photosWithAction:DFPeanutActionEvalPhoto];
-  return [self photosSortedByEvalTime:photos];
+  NSArray *evaledPhotos = [self photosWithAction:DFPeanutActionEvalPhoto];
+  NSArray *myPhotos = [self photosSentByUser:[[DFUser currentUser] userID]];
+  NSMutableSet *merged = [[NSMutableSet alloc] initWithCapacity:evaledPhotos.count + myPhotos.count];
+  [merged addObjectsFromArray:evaledPhotos];
+  [merged addObjectsFromArray:myPhotos];
+  return [self photosSortedByEvalTime:merged.allObjects];
 }
+
+
 
 - (NSArray *)favoritedPhotos
 {

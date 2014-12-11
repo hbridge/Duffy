@@ -58,7 +58,7 @@ UIColor *DFStrandMainColor;
 
 + (UIColor *)defaultBarForegroundColor
 {
-  return [UIColor whiteColor];
+  return [UIColor colorWithWhite:0.7 alpha:1.0];
 }
 
 + (UIColor *)strongFeedForegroundTextColor

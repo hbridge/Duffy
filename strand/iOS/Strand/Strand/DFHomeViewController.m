@@ -167,7 +167,7 @@ const CGFloat headerHeight = 60.0;
     feedPhotos = [[DFPeanutFeedDataManager sharedManager] favoritedPhotos];
   } else {
     feedPhotos = [[DFPeanutFeedDataManager sharedManager]
-                  allEvaluatedPhotos];
+                  allEvaluatedOrSentPhotos];
   }
   [self.datasource setFeedPhotos:feedPhotos];
   [self.collectionView reloadData];
