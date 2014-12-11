@@ -62,9 +62,12 @@
   NSArray *recipients = [self.postsObject.actors arrayByRemovingObject:sender];
   [self.recipientsProfileStackView setPeanutUsers:recipients];
   for (DFPeanutUserObject *recipient in recipients) {
-    if ([self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id]) {
+    if ([[self.photoObject actionsOfType:DFPeanutActionFavorite forUser:recipient.id] count] > 0) {
       [self.recipientsProfileStackView setBadgeImage:[UIImage imageNamed:@"Assets/Icons/LikeOnButtonIcon"]
                                            forUser:recipient];
+    } else {
+      [self.recipientsProfileStackView setBadgeImage:nil
+                                             forUser:recipient];
     }
   }
 }
