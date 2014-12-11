@@ -7,6 +7,7 @@
 //
 
 #import "DFProfileWithContextView.h"
+#import <Slash/Slash.h>
 
 @implementation DFProfileWithContextView
 
@@ -64,6 +65,18 @@
 - (NSString *)subTitle
 {
   return self.subtitleLabel.text;
+}
+
+- (void)setTitleMarkup:(NSString *)titleMarkup
+{
+  NSError *error;
+  self.titleLabel.attributedText = [SLSMarkupParser
+                                    attributedStringWithMarkup:titleMarkup
+                                    style:[DFStrandConstants defaultTextStyle]
+                                    error:&error];
+  if (error) {
+    DDLogError(@"%@ setTitleMarkupError:%@", self.class,error);
+  }
 }
 
 @end

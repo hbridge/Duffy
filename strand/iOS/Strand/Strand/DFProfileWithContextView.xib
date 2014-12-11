@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6250" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="6254" systemVersion="14B25" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6244"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
@@ -12,15 +13,14 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="R2H-s3-OE1" customClass="DFProfileStackView">
-                    <rect key="frame" x="0.0" y="0.0" width="35" height="35"/>
+                    <rect key="frame" x="0.0" y="0.0" width="109" height="109"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="35" id="d2j-pO-Ddo"/>
-                        <constraint firstAttribute="width" constant="35" id="ieJ-yu-O9a"/>
+                        <constraint firstAttribute="width" secondItem="R2H-s3-OE1" secondAttribute="height" multiplier="1:1" id="wUk-KI-tc2"/>
                     </constraints>
                 </view>
                 <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u1l-uL-1qm" userLabel="Label wrapper">
-                    <rect key="frame" x="43" y="3" width="33" height="30"/>
+                    <rect key="frame" x="117" y="40" width="33" height="30"/>
                     <subviews>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="tch-aT-LmY">
                             <rect key="frame" x="0.0" y="0.0" width="33" height="16"/>
@@ -51,6 +51,7 @@
             </subviews>
             <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
             <constraints>
+                <constraint firstAttribute="bottom" secondItem="R2H-s3-OE1" secondAttribute="bottom" id="1Yk-t2-4hi"/>
                 <constraint firstItem="R2H-s3-OE1" firstAttribute="centerY" secondItem="u1l-uL-1qm" secondAttribute="centerY" id="LWi-VI-1Wg"/>
                 <constraint firstItem="R2H-s3-OE1" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="YYR-aR-58z"/>
                 <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="u1l-uL-1qm" secondAttribute="trailing" id="e6e-uF-9nl"/>

@@ -48,15 +48,17 @@
 
 - (void)configureProfileWithContext
 {
+  self.profileWithContextView.profileStackView.profilePhotoWidth = 45.0;
   if (self.nuxStep) {
     self.profileWithContextView.profileStackView.maxAbbreviationLength = 2;
     [self.profileWithContextView.profileStackView setPeanutUser:[DFPeanutUserObject TeamSwapUser]];
-    self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
-                                         @"Team Swap"];
+    [self.profileWithContextView setTitleMarkup:[NSString stringWithFormat:@"<name>%@</name> sent you a photo",
+                                         @"Team Swap"]];
   } else {
     [self.profileWithContextView.profileStackView setPeanutUser:self.sender];
-    self.profileWithContextView.title = [NSString stringWithFormat:@"%@ sent you a photo",
-                                                 self.sender.firstName];
+    [self.profileWithContextView setTitleMarkup:[NSString
+                                                 stringWithFormat:@"<name>%@</name> sent you a photo",
+                                                 self.sender.firstName]];
   }
   [self.profileWithContextView.subtitleLabel removeFromSuperview];
 }

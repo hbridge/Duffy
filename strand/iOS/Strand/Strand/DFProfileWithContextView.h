@@ -18,4 +18,6 @@ IB_DESIGNABLE
 @property (nonatomic, retain) IBInspectable NSString *title;
 @property (nonatomic, retain) IBInspectable NSString *subTitle;
 
+- (void)setTitleMarkup:(NSString *)titleMarkup;
+
 @end
